@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v0.6.0] 2026-08-22
+
+### Added
+
+- **`defineStyleTokensGate` — the tone is not a foreground colour.** The rule («a saturated tone must
+  not paint text — that is what `-text` is for») lived in a comment inside one component, so nothing
+  reported a breach: a consumer counted fifteen of them in their own package, against three correct
+  ones. `text-[var(--gr-<tone>)]` is now an error naming the paired role; `bg-`, `border-`, `fill-`
+  and `stroke-` are untouched — that is what a tone is for.
+
+  A tone mixed into a text colour (`color-mix` inside `text-*`) only warns: there the ratio decides,
+  and statics cannot weigh it. Icons are caught alongside text on purpose — next to a label an icon
+  owes the same legibility.
+
+  `toneRoles` overrides the list, `toneAsTextExceptions` allows a file explicitly — as a list, so the
+  exception is visible in review rather than inferred.
+
+- **`forbidImportantUtilities`** — an opt-in check against `!`-important utilities (`!text-…`,
+  `!bg-…`). Almost always it means the built-in knob — a token or a prop — was not found, and the
+  override then depends on the order of generated rules, so it drops silently.
+
 ## [v0.5.0] 2026-08-22
 
 ### Changed

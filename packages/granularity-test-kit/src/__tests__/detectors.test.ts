@@ -2,11 +2,15 @@ import { describe, expect, it } from 'vitest'
 
 import { offenders, stripComments, type SourceFile } from '../sources'
 import {
+  IMPORTANT_UTILITY,
   MS_LITERAL,
   PX_LITERAL_SCALE,
   UNO_DURATION_SCALE,
   UNO_EASE_SCALE,
   UNO_RADIUS_SCALE,
+  TONE_ROLES,
+  toneAsTextPattern,
+  toneMixedInTextPattern,
   UNO_TEXT_SCALE,
 } from '../gates/styleTokens'
 
@@ -81,5 +85,62 @@ describe('детекторы стилевых литералов', () => {
     ]
 
     expect(offenders(UNO_TEXT_SCALE, repeated)).toEqual(['text-sm (a.vue)', 'text-sm (b.vue)'])
+  })
+})
+
+/**
+ * Детектор роли тона отделён от гейта по той же причине: `text-[var(--gr-…)]`
+ * — обычная форма записи цвета, и ловить в ней надо ровно тона, не задевая ни
+ * парную `-text`-роль, ни фон, ни рамку, ни заливку иконки.
+ */
+const toneFixture: SourceFile[] = [{
+  path: 'tone.vue',
+  source: stripComments([
+    'class="text-[var(--gr-danger)]"',
+    'class="text-[var(--gr-success)] text-[var(--gr-warning)]"',
+    // Законное: роль текста, фон, рамка, заливка и обводка иконки.
+    'class="text-[var(--gr-danger-text)] bg-[var(--gr-danger)] border-[var(--gr-success)]"',
+    'class="fill-[var(--gr-warning)] stroke-[var(--gr-info)]"',
+    // Тон в имени переменной и в свойстве — не утилита.
+    'const danger = tokens["--gr-danger"]',
+    'style="color: var(--gr-slate)"',
+  ].join('\n')),
+}]
+
+describe('детектор тона в роли текста', () => {
+  it('ловит тон и не трогает парную роль, фон, рамку и заливку', () => {
+    expect(offenders(toneAsTextPattern(TONE_ROLES), toneFixture)).toEqual([
+      'text-[var(--gr-danger)] (tone.vue)',
+      'text-[var(--gr-success)] (tone.vue)',
+      'text-[var(--gr-warning)] (tone.vue)',
+    ])
+  })
+
+  it('подмешанный тон ловится отдельным правилом', () => {
+    const mixed: SourceFile[] = [{
+      path: 'mixed.vue',
+      source: 'class="text-[color-mix(in_srgb,var(--gr-danger)_40%,var(--gr-fg))]"',
+    }]
+
+    expect(offenders(toneMixedInTextPattern(TONE_ROLES), mixed)).toHaveLength(1)
+    // Прямое правило подмес не трогает: там доля решает всё.
+    expect(offenders(toneAsTextPattern(TONE_ROLES), mixed)).toEqual([])
+  })
+
+  it('важность ловится на любой утилите', () => {
+    const important: SourceFile[] = [{
+      path: 'important.vue',
+      source: stripComments([
+        'class="!text-[var(--gr-fg)] !bg-white"',
+        // Отрицание в шаблоне и логическое «не» — не утилиты.
+        'v-if="!disabled"',
+        'const next = !state.open',
+      ].join('\n')),
+    }]
+
+    expect(offenders(IMPORTANT_UTILITY, important)).toEqual([
+      '!bg-white (important.vue)',
+      '!text-[var(--gr-fg)] (important.vue)',
+    ])
   })
 })

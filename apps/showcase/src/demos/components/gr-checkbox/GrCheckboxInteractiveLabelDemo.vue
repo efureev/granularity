@@ -13,7 +13,7 @@ const previewOpens = ref(0)
       <span class="inline-flex flex-wrap items-center gap-2 text-sm">
         I accept the rollout policy and reviewed the
         <a
-          class="font-medium text-[var(--gr-primary)] underline underline-offset-2"
+          class="font-medium text-[var(--gr-primary-text)] underline underline-offset-2"
           href="https://example.com/policy"
           target="_blank"
           rel="noreferrer"
@@ -23,7 +23,7 @@ const previewOpens = ref(0)
         </a>
         <button
           type="button"
-          class="rounded-full border border-[var(--gr-brd)] px-2 py-1 text-xs font-medium text-[var(--gr-fg)] transition hover:border-[var(--gr-primary)] hover:text-[var(--gr-primary)]"
+          class="rounded-full border border-[var(--gr-brd)] px-2 py-1 text-xs font-medium text-[var(--gr-fg)] transition hover:border-[var(--gr-primary)] hover:text-[var(--gr-primary-text)]"
           @click.stop="previewOpens += 1"
         >
           Preview changes

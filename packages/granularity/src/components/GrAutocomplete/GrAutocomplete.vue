@@ -1076,7 +1076,7 @@ const themeAttrs = useGrThemeAttrs()
                 <slot name="option" :option="option" :selected="isSelected(option.value)">
                   <span class="flex items-center gap-2 min-w-0">
                     <span class="inline-block h-4 w-4 shrink-0" aria-hidden="true">
-                      <IconCheck v-if="isSelected(option.value)" class="block h-4 w-4 text-[var(--gr-primary)]" />
+                      <IconCheck v-if="isSelected(option.value)" class="block h-4 w-4 text-[var(--gr-primary-text)]" />
                     </span>
                     <span class="truncate">{{ option.label }}</span>
                   </span>

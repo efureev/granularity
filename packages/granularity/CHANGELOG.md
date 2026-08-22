@@ -7,6 +7,22 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.29.1] 2026-08-22
+
+### Fixed
+
+- **The saturated tone no longer paints foreground.** `GrIcon` with `tone="primary"`, the selection
+  check in `GrSelect` / `GrTreeSelect` / `GrAutocomplete`, the spinner of `GrLoading` and the grabbed
+  drag handle of `GrDashboardFrame` used `--gr-primary` as a text colour. On the light theme that
+  reads fine (5.74), on the dark one it is 3.70 — below AA, and nobody noticed because the rule
+  existed only as a comment. They all use `--gr-primary-text` now: 9.07 light, 6.94 dark, and the
+  colour stays in the same violet family.
+
+  The rule turned out to be unconditional: **every** tone fails AA in one theme or the other —
+  `success` 2.32 on light, `primary` 3.70 on dark — while every paired `-text` role holds everywhere
+  (5.46 at worst). Reported by a consumer of `@efureev/ft-extra-granularity`, who counted fifteen such
+  usages in their own package with nothing to warn them.
+
 ## [v0.29.0] 2026-08-22
 
 ### Added

@@ -16,6 +16,28 @@ export const UNO_TEXT_SCALE = /(?<![\w-])text-(?:xs|sm|base|lg|xl|[2-9]xl)(?![\w
 export const UNO_RADIUS_SCALE = /(?<![\w:.-])(?<!:\s)rounded(?:-(?:[tblrse]|tl|tr|bl|br|ss|se|es|ee))?(?:-(?:none|sm|md|lg|xl|[2-9]xl|full))?(?![\w:?=[-])/g
 
 export const PX_LITERAL_SCALE = /(?:text|rounded)-\[\d+(?:\.\d+)?px\]/g
+
+/** Тона по умолчанию: у каждого есть парная `-text`-роль. */
+export const TONE_ROLES = ['primary', 'success', 'warning', 'danger', 'info', 'slate', 'azure'] as const
+
+/**
+ * Насыщенный тон в роли цвета текста: `text-[var(--gr-danger)]`.
+ *
+ * Тон — цвет поверхности, и в роли текста он не держит контраст: у каждого
+ * найдётся тема, где он проваливает AA на обычной подложке. Для текста есть
+ * парная роль `-text`, выверенная на обеих темах.
+ */
+export function toneAsTextPattern(tones: readonly string[]): RegExp {
+  return new RegExp(`(?<![\\w-])text-\\[var\\(--gr-(?:${tones.join('|')})\\)\\]`, 'g')
+}
+
+/** Тот же тон, но подмешанный: доля решает всё, поэтому только предупреждение. */
+export function toneMixedInTextPattern(tones: readonly string[]): RegExp {
+  return new RegExp(`text-\\[color-mix\\([^\\]]*--gr-(?:${tones.join('|')})[^\\]]*\\]`, 'g')
+}
+
+/** `!`-важность поверх утилит: `!text-…`, `!bg-…`. */
+export const IMPORTANT_UTILITY = /(?<![\w-])![a-z][\w-]*-[^\s"'`]*/g
 export const UNO_DURATION_SCALE = /(?<![\w-])duration-\d+(?![\w-])/g
 export const UNO_EASE_SCALE = /(?<![\w-])ease-(?:in-out|in|out|linear)(?![\w-])/g
 export const MS_LITERAL = /(?<![\w.-])\d+ms(?![\w-])/g
@@ -48,6 +70,28 @@ export interface StyleTokensGateOptions {
    * быть видно в ревью, иначе им закроют случайный недосмотр.
    */
   pairedLeadingExceptions?: readonly string[]
+  /**
+   * Тона, которым запрещена роль цвета текста. По умолчанию — все, у кого есть
+   * парная `-text`-роль.
+   *
+   * Пустой список выключает правило: пакету со своей палитрой, где роли `-text`
+   * нет, запрещать нечего.
+   */
+  toneRoles?: readonly string[]
+  /**
+   * Файлы, где тон в роли текста оставлен осознанно.
+   *
+   * Списком, а не эвристикой: исключение обязано быть видно в ревью.
+   */
+  toneAsTextExceptions?: readonly string[]
+  /**
+   * Ловить `!`-важность поверх утилит (`!text-…`, `!bg-…`).
+   *
+   * Почти всегда это признак, что штатной ручки — токена или пропа — не нашли,
+   * и такой сигнал дешевле поймать в CI, чем на ревью. Флагом, потому что для
+   * пакета с накопленным долгом правило обязано включаться отдельной правкой.
+   */
+  forbidImportantUtilities?: boolean
 }
 
 /**
@@ -64,6 +108,9 @@ export interface StyleTokensGateOptions {
 export function defineStyleTokensGate(options: StyleTokensGateOptions = {}): void {
   const sources: SourceFile[] = readSources({ dir: options.srcDir, excludeTopDirs: options.excludeTopDirs })
     .map(({ path, source }) => ({ path, source: stripComments(source) }))
+
+  const toneRoles = options.toneRoles ?? TONE_ROLES
+  const toneExceptions = options.toneAsTextExceptions ?? []
 
   describe('стили берут значения из токенов', () => {
     it('кегли и радиусы — не пиксельные литералы', () => {
@@ -104,6 +151,56 @@ export function defineStyleTokensGate(options: StyleTokensGateOptions = {}): voi
       expect(
         offenders(UNO_TEXT_SCALE, sources),
         'используй `text-[length:var(--gr-text-*|--gr-control-text-*)]` + парный `leading-[var(--gr-leading-*)]`',
+      ).toEqual([])
+    })
+
+    /**
+     * Тон — цвет поверхности, а не текста.
+     *
+     * Роли разведены ровно под это: `--gr-danger` заливает, `--gr-danger-text`
+     * пишет. Ошибка при этом не выглядит ошибкой: `text-[var(--gr-success)]`
+     * читается как «зелёный текст» и на макете смотрится нарядно — а по
+     * контрасту проваливает AA на обычной карточке. Причём каждому тону
+     * найдётся тема, где он провален: у светлых — светлая, у ярких — тёмная.
+     *
+     * Иконка сюда попадает наравне с подписью, и это верно: рядом с текстом она
+     * обязана быть той же читаемости.
+     */
+    it.runIf(toneRoles.length > 0)('тон не красит текст — для этого есть `-text`', () => {
+      const scoped = sources.filter(({ path }) => !toneExceptions.some(allowed => path.endsWith(allowed)))
+
+      expect(
+        offenders(toneAsTextPattern(toneRoles), scoped),
+        'используй парную роль: `text-[var(--gr-<тон>-text)]` — тон в роли текста не держит контраст',
+      ).toEqual([])
+    })
+
+    /**
+     * Подмешанный тон — не то же самое: при малой доле это оттенок обычного
+     * текста, при большой — тот же провал. Долю статикой не оценить, поэтому
+     * здесь предупреждение в консоль, а не падение.
+     */
+    it.runIf(toneRoles.length > 0)('подмешанный тон в тексте — под присмотром', () => {
+      const mixed = offenders(toneMixedInTextPattern(toneRoles), sources)
+
+      if (mixed.length > 0) {
+        const list = mixed.map(line => `  ${line}`).join('\n')
+
+        console.warn(`[style-tokens] тон подмешан в цвет текста (${mixed.length}): проверь контраст на обеих темах\n${list}`)
+      }
+
+      expect(true).toBe(true)
+    })
+
+    /**
+     * `!`-важность поверх утилиты — признак, что штатной ручки не нашли: у
+     * компонента есть токен или проп ровно для этого, а важность перебивает их
+     * снаружи и ломается от любой смены порядка правил в сгенерированном CSS.
+     */
+    it.runIf(options.forbidImportantUtilities ?? false)('важность не подменяет штатную ручку', () => {
+      expect(
+        offenders(IMPORTANT_UTILITY, sources),
+        'убери `!`: настрой компонент токеном или пропом — важность зависит от порядка правил и молча отваливается',
       ).toEqual([])
     })
 

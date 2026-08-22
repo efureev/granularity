@@ -754,7 +754,7 @@ const themeAttrs = useGrThemeAttrs()
                       class="inline-block h-4 w-4 shrink-0"
                       aria-hidden="true"
                     >
-                      <IconCheck v-if="selectedKeySet.has(node.key)" class="block h-4 w-4 text-[var(--gr-primary)]" />
+                      <IconCheck v-if="selectedKeySet.has(node.key)" class="block h-4 w-4 text-[var(--gr-primary-text)]" />
                     </span>
                     <span class="truncate">{{ node.label }}</span>
                   </div>

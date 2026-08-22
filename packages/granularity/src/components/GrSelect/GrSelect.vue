@@ -1191,7 +1191,7 @@ const themeAttrs = useGrThemeAttrs()
                         <span class="inline-block h-4 w-4 shrink-0" aria-hidden="true">
                           <IconCheck
                             v-if="isSelected(child.option.value)"
-                            class="block h-4 w-4 text-[var(--gr-primary)]"
+                            class="block h-4 w-4 text-[var(--gr-primary-text)]"
                           />
                         </span>
                         <span class="truncate">{{ child.option.label }}</span>
@@ -1226,7 +1226,7 @@ const themeAttrs = useGrThemeAttrs()
                       <span class="inline-block h-4 w-4 shrink-0" aria-hidden="true">
                         <IconCheck
                           v-if="isSelected(row.option.value)"
-                          class="block h-4 w-4 text-[var(--gr-primary)]"
+                          class="block h-4 w-4 text-[var(--gr-primary-text)]"
                         />
                       </span>
                       <span class="truncate">{{ row.option.label }}</span>

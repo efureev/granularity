@@ -70,7 +70,7 @@ describe('granularity/GrLoading (unit)', () => {
     const spinner = scaled.get('[data-gr-loading-spinner]')
 
     expect(spinner.attributes('style')).toContain('--gr-icon-size: var(--gr-icon-size-sm)')
-    expect(spinner.attributes('class')).toContain('text-[var(--gr-primary)]')
+    expect(spinner.attributes('class')).toContain('text-[var(--gr-primary-text)]')
 
     const pixels = mount(GrLoading, { props: { spinnerSize: 40 } })
     expect(pixels.get('[data-gr-loading-spinner]').attributes('style')).toContain('--gr-icon-size: 40px')

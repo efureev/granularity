@@ -42,7 +42,7 @@ const handleBaseClass = [
 
 export const dragHandleClass = `${handleBaseClass} cursor-grab`
 
-export const dragHandleGrabbedClass = 'cursor-grabbing text-[var(--gr-primary)]'
+export const dragHandleGrabbedClass = 'cursor-grabbing text-[var(--gr-primary-text)]'
 
 /** Кнопка настроек виджета. Та же цель, что у ручки переноса, — но нажимается, а не тащится. */
 export const settingsButtonClass = `${handleBaseClass} cursor-pointer`

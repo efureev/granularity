@@ -15,7 +15,7 @@ const items = [
       :key="item"
       class="flex items-start gap-3 rounded-xl border border-[var(--gr-brd)] bg-[var(--gr-bg)] p-4"
     >
-      <GrIcon size="md" class="mt-0.5 text-[var(--gr-primary)]">
+      <GrIcon size="md" class="mt-0.5 text-[var(--gr-primary-text)]">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="h-full w-full">
           <path d="M4 12h16" />
           <path d="m12 5 7 7-7 7" />

@@ -7,6 +7,14 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [v0.5.1] 2026-08-22
+
+### Fixed
+
+- **The grabbed drag handle used a tone as a foreground colour.** `--gr-primary` gives 3.70 against
+  the dark theme's surfaces — below AA — so the handle dimmed exactly while being dragged. It uses
+  `--gr-primary-text` now.
+
 ## [v0.5.0] 2026-08-20
 
 ### Added

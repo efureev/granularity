@@ -20,13 +20,16 @@ export const iconSizeVarBySize: Record<GrIconSize, string> = {
 }
 
 /**
- * Тон → токен **текста**, а не насыщенный тон: правило пакета запрещает
- * насыщенный цвет как цвет текста (контраст на `-light`-подложках падает до
- * 2:1). Отображение повторяет `GrAlert/grAlertStyles.ts`: у `primary` и
- * `neutral` пары `-text` нет, поэтому берутся ближайшие семантические роли.
+ * Тон → токен **текста**, а не насыщенный тон: насыщенный не держит контраст в
+ * роли переднего плана. Причём каждому тону найдётся тема, где он провален:
+ * `--gr-primary` даёт 5.74 на светлой и 3.70 на тёмной, `--gr-success` — 2.32
+ * на светлой. Парные `-text` проходят AA везде, минимум 5.46.
+ *
+ * У `neutral` пары `-text` нет — для него роль приглушённого текста и есть
+ * ближайшая семантика.
  */
 export const iconToneClass: Record<GrTone, string> = {
-  primary: 'text-[var(--gr-primary)]',
+  primary: 'text-[var(--gr-primary-text)]',
   neutral: 'text-[var(--gr-muted-fg)]',
   success: 'text-[var(--gr-success-text)]',
   warning: 'text-[var(--gr-warning-text)]',

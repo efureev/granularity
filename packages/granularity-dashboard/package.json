@@ -1,7 +1,7 @@
 {
   "name": "@feugene/granularity-dashboard",
   "description": "Widget grid for the @feugene/granularity design system — drag, resize, breakpoints and layout persistence, zero dependencies.",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "license": "SEE LICENSE IN LICENSE",
   "author": {
     "name": "Evgeniy Fureev",
@@ -132,7 +132,7 @@
     "@antfu/eslint-config": "^9.1.0",
     "@feugene/fint-i18n": "^0.6.0",
     "@feugene/granularity": "^0.29.0",
-    "@feugene/granularity-test-kit": "^0.5.0",
+    "@feugene/granularity-test-kit": "^0.6.0",
     "@feugene/unocss-preset-granular": "^0.10.1",
     "@feugene/unplugin-granularity": "^0.6.0",
     "@types/node": "^26.1.1",

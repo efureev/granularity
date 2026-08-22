@@ -17,4 +17,9 @@ defineStyleTokensGate({
   // второй декларацией того же веса.
   pairedLeadingExceptions: ['GrKbd/grKbdStyles.ts'],
   excludeTopDirs: ['styles', 'tokens'],
+  // Насыщенный тон в роли переднего плана не держит контраст, и каждому тону
+  // найдётся тема, где он провален. Список запрещённых стережёт соседний гейт
+  // `toneContrast.test.ts`: он считает контраст по самим токенам, поэтому
+  // перекраска темы не оставит правило в прошлом.
+  forbidImportantUtilities: true,
 })
