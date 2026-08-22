@@ -1,7 +1,7 @@
 {
   "name": "@feugene/granularity-forms-schema",
   "description": "Schema-driven forms for the @feugene/granularity design system — zod and JSON Schema into real form fields, zero dependencies.",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "license": "SEE LICENSE IN LICENSE",
   "author": {
     "name": "Evgeniy Fureev",
@@ -52,7 +52,23 @@
       "import": "./dist/index.js",
       "default": "./dist/index.js"
     },
+    "./components/GrSchemaAdditionalFields": {
+      "types": "./dist/types/components/GrSchemaForm/index.d.ts",
+      "import": "./dist/components/GrSchemaForm/index.js"
+    },
+    "./components/GrSchemaArrayField": {
+      "types": "./dist/types/components/GrSchemaForm/index.d.ts",
+      "import": "./dist/components/GrSchemaForm/index.js"
+    },
+    "./components/GrSchemaField": {
+      "types": "./dist/types/components/GrSchemaForm/index.d.ts",
+      "import": "./dist/components/GrSchemaForm/index.js"
+    },
     "./components/GrSchemaForm": {
+      "types": "./dist/types/components/GrSchemaForm/index.d.ts",
+      "import": "./dist/components/GrSchemaForm/index.js"
+    },
+    "./components/GrSchemaUnionField": {
       "types": "./dist/types/components/GrSchemaForm/index.d.ts",
       "import": "./dist/components/GrSchemaForm/index.js"
     },
@@ -119,7 +135,7 @@
   },
   "peerDependencies": {
     "@feugene/granularity": ">=0.25.0 <1.0.0",
-    "@feugene/unocss-preset-granular": "^0.9.1",
+    "@feugene/unocss-preset-granular": "^0.10.1",
     "vue": "^3.5.0",
     "@feugene/granularity-chrono": ">=0.3.0 <1.0.0",
     "@feugene/unplugin-granularity": ">=0.4.0 <1.0.0",
@@ -149,8 +165,8 @@
     "@feugene/fint-i18n": "^0.6.0",
     "@feugene/granularity": "^0.28.0",
     "@feugene/granularity-chrono": "^0.9.0",
-    "@feugene/granularity-test-kit": "^0.4.0",
-    "@feugene/unocss-preset-granular": "^0.9.1",
+    "@feugene/granularity-test-kit": "^0.5.0",
+    "@feugene/unocss-preset-granular": "^0.10.1",
     "@feugene/unplugin-granularity": "^0.4.1",
     "@types/node": "^26.1.1",
     "@vitejs/plugin-vue": "^6.0.8",

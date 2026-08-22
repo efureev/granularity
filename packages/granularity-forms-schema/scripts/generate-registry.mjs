@@ -37,7 +37,11 @@ const targets = [
   // `dist/types/` без сегмента `src` — `rootDir` в `tsconfig.build.json`
   // указывает на `src`. Дефолт генератора описывает раскладку ядра, где
   // паразитный `src` в пути типов остался с самого начала.
+  // `subcomponents` добавляет алиасы на части составных компонентов
+  // (`GrSchemaField` → модуль `GrSchemaForm`): своей entry у них нет и не
+  // должно быть, а импортировать их гранулярно обязано быть можно.
   codegenTargets.packageExports({
+    subcomponents: true,
     entryFor: component => ({
       types: `./dist/types/components/${component}/index.d.ts`,
       import: `./dist/components/${component}/index.js`,
@@ -48,6 +52,16 @@ const targets = [
   codegenTargets.markedBlock({
     file: 'src/componentNames.ts',
     lines: components => components.map(component => `'${component}',`),
+  }),
+  // Части составных компонентов — отдельным списком, а не в общем: конфиг
+  // сборки раскладывает по первому CSS-ассеты, а своей директории в `dist` у
+  // части нет. Резолверу же нужны оба: имя пишется в шаблоне как обычное.
+  codegenTargets.markedBlock({
+    file: 'src/componentNames.ts',
+    blockId: 'subcomponents',
+    lines: (_components, context) => Object.keys(context.subcomponents)
+      .sort()
+      .map(name => `'${name}',`),
   }),
 ]
 

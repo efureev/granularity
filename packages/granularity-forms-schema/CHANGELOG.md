@@ -7,6 +7,21 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.3.3] 2026-08-22
+
+### Fixed
+
+- **Parts of the form can now be imported granularly, and auto-import routes them here.**
+  `GrSchemaField`, `GrSchemaArrayField`, `GrSchemaUnionField` and `GrSchemaAdditionalFields` live in
+  the `GrSchemaForm` directory and had no subpath of their own, so a granular import failed. Worse,
+  the resolver whitelist did not list them either — the core's greedy `Gr*` resolver picked them up
+  and pointed at `@feugene/granularity/components/GrSchemaField`, a path no package publishes, so a
+  consumer's build broke as soon as one of them appeared in a template.
+
+  Both lists are generated now: `exports` gets an alias per part (its own key, the form's module),
+  and the resolver whitelist gets the names. The build config keeps reading the components list
+  alone — CSS assets are laid out per component directory, and a part has none.
+
 ## [v0.3.2] 2026-08-22
 
 ### Fixed
