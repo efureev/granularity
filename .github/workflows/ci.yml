@@ -277,6 +277,14 @@ jobs:
       - name: Lint package
         run: yarn lint:granularity
 
+      # Минорный бамп пакета монорепо обязан приехать вместе с подъёмом
+      # диапазонов у всех, кто на него ссылается: `^0.4.1` в нулевом мажоре это
+      # `>=0.4.1 <0.5.0`, и yarn пойдёт за пакетом в реестр вместо воркспейса.
+      # Локально не всплывает — `node_modules` уже разложены.
+      - name: Workspace ranges
+        if: always()
+        run: yarn check:ranges
+
       # `vue-tsc` эмитит `.d.ts` на сборке — красный typecheck ломает публикацию типов.
       - name: Typecheck package
         if: always()

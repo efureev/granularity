@@ -117,7 +117,7 @@
     "@feugene/granularity": "^0.28.0",
     "@feugene/granularity-test-kit": "^0.5.0",
     "@feugene/unocss-preset-granular": "^0.10.1",
-    "@feugene/unplugin-granularity": "^0.5.0",
+    "@feugene/unplugin-granularity": "^0.6.0",
     "@tiptap/core": "^3.30.2",
     "@tiptap/extensions": "^3.30.2",
     "@tiptap/pm": "^3.30.2",

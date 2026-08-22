@@ -42,6 +42,7 @@
     "docs:audit": "node scripts/docs-audit.mjs --report",
     "docs:audit:check": "node scripts/docs-audit.mjs --check",
     "lint": "yarn lint:test-kit && yarn lint:granularity && yarn lint:chrono && yarn lint:charts && yarn lint:dashboard && yarn lint:forms-schema && yarn lint:datasource && yarn lint:editor && yarn lint:showcase",
+    "check:ranges": "node scripts/check-workspace-ranges.mjs",
     "lint:test-kit": "yarn workspace @feugene/granularity-test-kit lint",
     "lint:granularity": "yarn workspace @feugene/granularity lint",
     "lint:chrono": "yarn workspace @feugene/granularity-chrono lint",
