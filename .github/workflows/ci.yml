@@ -650,6 +650,14 @@ jobs:
         working-directory: packages/granularity
         run: npx --yes publint@latest --pack npm
 
+      # Вес гранулярного импорта — сумма по всему, что тянет entry: сам он
+      # почти пуст, общий код лежит в `dist/chunks/`. Не гейт, а видимость:
+      # порог с потолка краснел бы на честном росте и его подняли бы не глядя.
+      # Таблица уезжает в сводку прогона, чтобы скачок заметили в ревью.
+      - name: Entry sizes (gzip)
+        working-directory: packages/granularity
+        run: yarn sizes
+
       - name: Upload dist
         uses: actions/upload-artifact@v7
         with:
