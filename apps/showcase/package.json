@@ -60,6 +60,7 @@
     "test:a11y": "yarn build && playwright test e2e/a11y.spec.ts",
     "test:overlay": "yarn build && playwright test e2e/overlay.spec.ts",
     "test:interaction": "yarn build && playwright test e2e/interaction.spec.ts",
+    "test:geometry": "yarn build && playwright test e2e/geometry.spec.ts",
     "test:visual": "yarn build && playwright test e2e/visual.spec.ts",
     "test:visual:update": "yarn build && playwright test e2e/visual.spec.ts --update-snapshots"
   }

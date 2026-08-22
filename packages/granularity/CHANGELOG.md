@@ -9,6 +9,14 @@ to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- **`GrDropdownMenu` — `borderTop` / `borderBottom` no longer run into the panel's rounded corner.**
+  The rule was the list box's own border, and the list sits 5 px deep inside the panel (1 px border
+  + 4 px padding) while the corner is rounded by 16 px: at that depth the arc is still going, so the
+  end of the line landed on top of it and each corner showed a wedge instead of two separate lines.
+  The line is now drawn by a pseudo-element inset by 8 px — the same inset as
+  `GrDropdownMenuDivider :inset`. Items keep their full width: that width is what puts their
+  highlight inside the panel's padding. Reported by a consumer of `@efureev/ft-extra-granularity`.
+
 - **The `Intl` instance cache no longer resets in full.** On overflow it wiped every entry, so a
   working set larger than the limit — a table with a dozen columns in a few locales — rebuilt hot
   formatters on every insert, and building one costs about ten times the formatting itself. The

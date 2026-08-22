@@ -214,6 +214,7 @@ export const demoPathByPreviewKey = {
   'gr-dropdown-alignment-width':          'components/gr-dropdown/GrDropdownAlignmentDemo.vue',
   'gr-dropdown-basic-menu':               'components/gr-dropdown/GrDropdownBasicMenuDemo.vue',
   'gr-dropdown-hover':                    'components/gr-dropdown/GrDropdownHoverDemo.vue',
+  'gr-dropdown-menu-edge-lines':          'components/gr-dropdown-menu/GrDropdownMenuEdgeLinesDemo.vue',
   'gr-dropdown-menu-declarative':         'components/gr-dropdown-menu/GrDropdownMenuDeclarativeDemo.vue',
   'gr-dropdown-menu-grouped-actions':     'components/gr-dropdown-menu/GrDropdownMenuGroupedActionsDemo.vue',
   'gr-dropdown-menu-quick-actions':       'components/gr-dropdown-menu/GrDropdownMenuQuickActionsDemo.vue',

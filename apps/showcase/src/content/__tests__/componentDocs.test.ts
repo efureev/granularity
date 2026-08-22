@@ -335,7 +335,7 @@ describe('component docs metadata', () => {
     expect(buttonGroupDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(buttonGroupDoc.examples.every(example => example.previewKey?.startsWith('gr-button-group'))).toBe(true)
 
-    expect(dropdownMenuDoc.examples).toHaveLength(4)
+    expect(dropdownMenuDoc.examples).toHaveLength(5)
     expect(dropdownMenuDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(dropdownMenuDoc.examples.every(example => example.previewKey?.startsWith('gr-dropdown-menu'))).toBe(true)
 

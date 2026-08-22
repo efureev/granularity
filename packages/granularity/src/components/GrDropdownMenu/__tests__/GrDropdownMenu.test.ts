@@ -668,3 +668,46 @@ describe('GrDropdownMenu — клавиатура паттерна menu', () => 
     wrapper.unmount()
   })
 })
+
+/**
+ * Геометрию линии проверяет e2e (`apps/showcase/e2e/geometry.spec.ts`): в
+ * jsdom классов UnoCSS не существует, и увидеть, куда попал конец правила,
+ * нельзя. Здесь — страховка от возврата рамки бокса, с которой дефект и жил.
+ */
+describe('GrDropdownMenuList — линии у края', () => {
+  function listClassOf(props: Record<string, unknown>): string {
+    const wrapper = mount(GrDropdownMenuList, { props })
+    const className = wrapper.get('[data-gr-dropdown-menu-list]').attributes('class') ?? ''
+    wrapper.unmount()
+
+    return className
+  }
+
+  it('рисуются псевдоэлементом с инсетом, а не рамкой бокса', () => {
+    const className = listClassOf({ borderTop: true, borderBottom: true })
+
+    // Рамка бокса начинается у самого края поля панели — там ещё идёт дуга угла.
+    expect(className).not.toMatch(/(^|\s)border-[tb](\s|$)/)
+
+    expect(className).toContain('before:inset-x-2')
+    expect(className).toContain('after:inset-x-2')
+    // Без `content` псевдоэлемент не отрисуется вовсе.
+    expect(className).toContain('before:content-empty')
+    expect(className).toContain('after:content-empty')
+    expect(className).toContain('relative')
+  })
+
+  it('система координат появляется только вместе с линией', () => {
+    expect(listClassOf({})).not.toContain('relative')
+    expect(listClassOf({ borderTop: true })).toContain('relative')
+    // `relative` один на обе линии, а не по одному на каждую.
+    expect(listClassOf({ borderTop: true, borderBottom: true }).match(/relative/g)).toHaveLength(1)
+  })
+
+  it('разделители между пунктами линиями края не трогаются', () => {
+    const className = listClassOf({ dividers: true })
+
+    expect(className).toContain('divide-y')
+    expect(className).not.toContain('before:inset-x-2')
+  })
+})

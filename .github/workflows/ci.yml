@@ -901,6 +901,12 @@ jobs:
       - name: Interaction gate
         run: yarn workspace @feugene/granularity-showcase test:interaction
 
+      # Геометрия, которую видно только в браузере: где кончается линия, куда
+      # попал её конец относительно скругления панели. В jsdom классов UnoCSS
+      # не существует вовсе, а визуального слоя в CI нет.
+      - name: Geometry gate
+        run: yarn workspace @feugene/granularity-showcase test:geometry
+
       - name: Upload report
         if: failure()
         uses: actions/upload-artifact@v7

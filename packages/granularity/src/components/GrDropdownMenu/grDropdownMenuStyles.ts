@@ -52,8 +52,24 @@ export const headerClass = 'px-4 py-2 text-[length:var(--gr-text-xs)] leading-[v
 
 export const listBaseClass = 'w-full'
 export const dividersClass = 'divide-y divide-[var(--gr-brd)]'
-export const borderTopClass = 'border-t border-[var(--gr-brd)]'
-export const borderBottomClass = 'border-b border-[var(--gr-brd)]'
+/**
+ * Линия у края панели рисуется псевдоэлементом с инсетом, а не рамкой бокса.
+ *
+ * Список лежит в поле панели — 1 px рамки плюс 4 px `p-1`, — а угол скруглён на
+ * `--gr-radius-xl` (16 px). На глубине 5 px дуга ещё идёт: штрих рамки занимает
+ * там `x ∈ [4.4, 5.8]`, и правило во всю ширину, начинаясь на `x = 5`, упирается
+ * не в вертикальный край, а в дугу. Вместо двух самостоятельных линий у каждого
+ * угла виден клин, в который они сходятся.
+ *
+ * Инсет тот же, что у `GrDropdownMenuDivider :inset` (8 px), и уводит концы из
+ * полосы радиуса. Пункты при этом остаются во всю ширину: их ширина — часть
+ * попадания подсветки в поле панели, и сжимать список целиком нельзя.
+ *
+ * Та же арифметика уже учтена у `itemBaseClass`; здесь она доведена до линий.
+ */
+export const borderEdgeClass = 'relative'
+export const borderTopClass = 'before:absolute before:inset-x-2 before:top-0 before:h-px before:bg-[var(--gr-brd)] before:content-empty'
+export const borderBottomClass = 'after:absolute after:inset-x-2 after:bottom-0 after:h-px after:bg-[var(--gr-brd)] after:content-empty'
 
 export const columnsBaseClass = 'w-full grid divide-x divide-[var(--gr-brd)]'
 export const columnBaseClass = 'px-3 py-2 flex items-center'
@@ -82,6 +98,9 @@ export function grDropdownMenuListClass(options: {
   return [
     listBaseClass,
     options.dividers ? dividersClass : '',
+    // `relative` нужен обеим линиям и ставится один раз: это система координат
+    // для псевдоэлемента, а не признак самой линии.
+    options.borderTop || options.borderBottom ? borderEdgeClass : '',
     options.borderTop ? borderTopClass : '',
     options.borderBottom ? borderBottomClass : '',
   ].filter(Boolean).join(' ')

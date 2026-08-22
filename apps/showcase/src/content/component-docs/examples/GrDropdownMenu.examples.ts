@@ -23,6 +23,13 @@ export const grDropdownMenuExamples: ShowcaseComponentExampleDoc[] = [
     previewKey: 'gr-dropdown-menu-shortcut-grid',
   },
   {
+    id: 'dropdown-menu-edge-lines',
+    title: 'Lines that separate blocks',
+    description: '`borderTop` / `borderBottom` отбивают список от шапки и подвала. Правило рисуется псевдоэлементом с инсетом, а не рамкой бокса: у края панели линия во всю ширину упирается в дугу скругления, и вместо двух линий глаз видит клин.',
+    status: 'ready',
+    previewKey: 'gr-dropdown-menu-edge-lines',
+  },
+  {
     id: 'dropdown-menu-declarative',
     title: 'Menu from a model',
     description: 'Пункты, группы и разделители задаются массивом `items`, а `menuitemcheckbox`/`menuitemradio` дают состояние прямо в меню — композиция подкомпонентов остаётся для нестандартных случаев.',

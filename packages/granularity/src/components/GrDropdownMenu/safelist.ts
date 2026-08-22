@@ -3,6 +3,7 @@ import { splitClassTokens } from '../shared/classTokens'
 import {
     alignClass,
     borderBottomClass,
+  borderEdgeClass,
     borderTopClass,
     colsClass,
     columnBaseClass,
@@ -40,6 +41,7 @@ export const grDropdownMenuSafelist = [...new Set([
     ...splitClassTokens(headerClass),
     ...splitClassTokens(listBaseClass),
     ...splitClassTokens(dividersClass),
+    ...splitClassTokens(borderEdgeClass),
     ...splitClassTokens(borderTopClass),
     ...splitClassTokens(borderBottomClass),
     ...splitClassTokens(columnsBaseClass),
