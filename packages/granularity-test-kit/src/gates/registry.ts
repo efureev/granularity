@@ -1,14 +1,22 @@
 import { execFileSync } from 'node:child_process'
-import { existsSync, readdirSync, readFileSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import process from 'node:process'
 
 import { collectGranularSubcomponents } from '@feugene/unocss-preset-granular/codegen'
 import { beforeAll, describe, expect, it } from 'vitest'
 
+import { componentDirs } from '../sources'
+
 export interface RegistryGateOptions {
   /** Корень пакета; по умолчанию — cwd, из которого запущен vitest. */
   pkgDir?: string
+  /**
+   * Префикс имени компонента. По умолчанию `Gr` — обратная совместимость с
+   * ядром; companion-пакету со своей приставкой этого хватает, чтобы фабрика
+   * увидела его компоненты вместо нуля.
+   */
+  prefix?: string
   /** Реестр провайдера: имя компонента → его конфиг. */
   componentConfigs: Record<string, unknown>
   /**
@@ -55,15 +63,24 @@ export function defineRegistryGate(options: RegistryGateOptions): void {
 
   const read = (relativePath: string): string => readFileSync(resolve(pkgDir, relativePath), 'utf8')
 
-  /** Публичный компонент = директория `Gr*` c `index.ts` и `config.ts`. */
-  const publicComponents = readdirSync(resolve(pkgDir, 'src/components'), { withFileTypes: true })
-    .filter(entry => entry.isDirectory() && entry.name.startsWith('Gr'))
-    .map(entry => entry.name)
-    .filter(name => (
-      existsSync(resolve(pkgDir, 'src/components', name, 'index.ts'))
-      && existsSync(resolve(pkgDir, 'src/components', name, 'config.ts'))
+  /**
+   * Публичный компонент = директория `<prefix>*` c `index.ts` и `config.ts`,
+   * в том числе внутри группы. Обход тот же, что у генератора реестров: иначе
+   * гейт объявил бы лишними ровно те компоненты, которые генератор только что
+   * записал.
+   */
+  const componentPaths = componentDirs(resolve(pkgDir, 'src/components'), options.prefix)
+
+  const publicComponents = componentPaths
+    .filter(dir => (
+      existsSync(resolve(pkgDir, 'src/components', dir, 'index.ts'))
+      && existsSync(resolve(pkgDir, 'src/components', dir, 'config.ts'))
     ))
+    .map(dir => dir.slice(dir.lastIndexOf('/') + 1))
     .sort()
+
+  /** Путь компонента по его имени — для проверок, которым нужен адрес в дереве. */
+  const pathOf = new Map(componentPaths.map(dir => [dir.slice(dir.lastIndexOf('/') + 1), dir]))
 
   describe('реестры компонентов', () => {
     let subcomponents: Subcomponents = {}
@@ -95,7 +112,7 @@ export function defineRegistryGate(options: RegistryGateOptions): void {
       const barrel = read('src/index.ts')
 
       for (const component of publicComponents)
-        expect(barrel, component).toContain(`export * from './components/${component}'`)
+        expect(barrel, component).toContain(`export * from './components/${pathOf.get(component) ?? component}'`)
     })
 
     it('каждый публичный компонент имеет subpath-экспорт и vite-entry', () => {
@@ -104,7 +121,7 @@ export function defineRegistryGate(options: RegistryGateOptions): void {
 
       for (const component of publicComponents) {
         expect(pkg.exports[`./components/${component}`], `${component} в package.json#exports`).toBeDefined()
-        expect(viteConfig, `${component} в vite.config.ts`).toContain(`'components/${component}/index'`)
+        expect(viteConfig, `${component} в vite.config.ts`).toContain(`'components/${pathOf.get(component) ?? component}/index'`)
       }
     })
 

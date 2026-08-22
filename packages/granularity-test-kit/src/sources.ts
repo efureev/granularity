@@ -95,12 +95,39 @@ export function offenders(pattern: RegExp, input: readonly SourceFile[]): string
     [...source.matchAll(pattern)].map(match => `${match[0]} (${path})`)))].sort()
 }
 
-/** Директории компонентов пакета: `Gr*` в `src/components/`. */
-export function componentDirs(componentsDir: string): string[] {
+/**
+ * Директории компонентов пакета: `<prefix>*` в `src/components/`, включая
+ * лежащие в группах.
+ *
+ * Префикс параметром, а не литералом `Gr`: те же фабрики предназначены и
+ * companion-пакетам, а у них своя приставка. С зашитым `Gr` пять фабрик из
+ * девяти находили у такого пакета ноль компонентов — и четыре из них молча
+ * зеленели, потому что проверять становилось нечего.
+ *
+ * Возвращаются пути относительно `componentsDir`: `GrButton` у плоской
+ * раскладки, `transaction-details/FtExpenseModal` у групповой. Группа — это
+ * директория без префикса; вглубь обходится ровно один уровень, как и в
+ * генераторе реестров пресета.
+ */
+export function componentDirs(componentsDir: string, prefix = 'Gr'): string[] {
   if (!existsSync(componentsDir))
     return []
 
-  return readdirSync(componentsDir, { withFileTypes: true })
-    .filter(entry => entry.isDirectory() && entry.name.startsWith('Gr'))
-    .map(entry => entry.name)
+  const found: string[] = []
+
+  for (const entry of readdirSync(componentsDir, { withFileTypes: true })) {
+    if (!entry.isDirectory()) continue
+
+    if (entry.name.startsWith(prefix)) {
+      found.push(entry.name)
+      continue
+    }
+
+    for (const child of readdirSync(resolve(componentsDir, entry.name), { withFileTypes: true })) {
+      if (child.isDirectory() && child.name.startsWith(prefix))
+        found.push(`${entry.name}/${child.name}`)
+    }
+  }
+
+  return found
 }

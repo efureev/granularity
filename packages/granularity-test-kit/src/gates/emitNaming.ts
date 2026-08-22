@@ -11,6 +11,12 @@ const EMIT_DECLARATION = /\(\s*(e|event)\s*:\s*'([^']+)'/g
 export interface EmitNamingGateOptions {
   /** Директория компонентов; по умолчанию — `<cwd>/src/components`. */
   componentsDir?: string
+  /**
+   * Префикс имени компонента. По умолчанию `Gr` — обратная совместимость с
+   * ядром; companion-пакету со своей приставкой этого хватает, чтобы фабрика
+   * увидела его компоненты вместо нуля.
+   */
+  prefix?: string
 }
 
 export interface EmitDeclaration {
@@ -24,8 +30,8 @@ export interface EmitDeclaration {
  * Объявления эмитов пакета. Отдельно от гейта, чтобы разбор можно было
  * проверить прямо, не подбирая компонент, который случайно его покрывает.
  */
-export function collectEmitDeclarations(componentsDir: string): EmitDeclaration[] {
-  return componentDirs(componentsDir).flatMap(name => readdirSync(resolve(componentsDir, name))
+export function collectEmitDeclarations(componentsDir: string, prefix = 'Gr'): EmitDeclaration[] {
+  return componentDirs(componentsDir, prefix).flatMap(name => readdirSync(resolve(componentsDir, name))
     .filter(file => file.endsWith('.vue') && !file.includes('.test.'))
     .flatMap((file) => {
       const source = readFileSync(resolve(componentsDir, name, file), 'utf8')
@@ -62,7 +68,7 @@ export function collectEmitDeclarations(componentsDir: string): EmitDeclaration[
  */
 export function defineEmitNamingGate(options: EmitNamingGateOptions = {}): void {
   const componentsDir = options.componentsDir ?? resolve(process.cwd(), 'src/components')
-  const declarations = collectEmitDeclarations(componentsDir)
+  const declarations = collectEmitDeclarations(componentsDir, options.prefix)
 
   describe('нейминг эмитов', () => {
     it('ни один эмит не объявлен в kebab-case', () => {

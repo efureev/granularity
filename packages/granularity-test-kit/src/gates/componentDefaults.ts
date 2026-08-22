@@ -104,6 +104,12 @@ export interface ComponentDefaultsGateOptions {
   /** Корень пакета; по умолчанию — cwd, из которого запущен vitest. */
   pkgDir?: string
   /**
+   * Префикс имени компонента. По умолчанию `Gr` — обратная совместимость с
+   * ядром; companion-пакету со своей приставкой этого хватает, чтобы фабрика
+   * увидела его компоненты вместо нуля.
+   */
+  prefix?: string
+  /**
    * Единственный допустимый адрес аугментации — модуль, где реестр объявлен.
    * У ядра это относительный путь (`../../composables/useGrComponentConfig`),
    * у спутника — публичный подпуть
@@ -191,7 +197,7 @@ export function defineComponentDefaultsGate(options: ComponentDefaultsGateOption
   const pkgDir = options.pkgDir ?? process.cwd()
   const componentsDir = resolve(pkgDir, 'src/components')
 
-  const files = componentDirs(componentsDir)
+  const files = componentDirs(componentsDir, options.prefix)
     .map(component => ({ component, path: resolve(componentsDir, component, 'defaults.ts') }))
     .filter(({ path }) => existsSync(path))
     .map(({ component, path }) => ({ component, source: readFileSync(path, 'utf8') }))

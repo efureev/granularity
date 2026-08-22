@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v0.7.0] 2026-08-23
+
+### Added
+
+- **`prefix` on five gates.** `componentDirs` filtered `Gr` as a literal, so
+  `defineComponentDefaultsGate`, `defineComponentTokensGate`, `defineEmitNamingGate`,
+  `defineComponentDocsGate` and `defineRegistryGate` found **zero** components in a companion
+  package with its own prefix — and four of them went green on that, because there was nothing
+  left to check. The kit is meant for exactly those packages, and `/codegen` of the preset had
+  taken the prefix as an option long ago.
+
+  Default stays `'Gr'`, so nothing changes for the core. Reported by a consumer of
+  `@efureev/ft-extra-granularity`, who had to rewrite five ready-made factories by hand.
+
+### Changed
+
+- **`componentDirs` walks grouped layouts** and returns paths relative to the components
+  directory (`transaction-details/FtExpenseModal`), one level deep — the same rule the preset's
+  registry generator follows. Without it the gates would call «extra» exactly the components the
+  generator had just written.
+
 ## [v0.6.0] 2026-08-22
 
 ### Added

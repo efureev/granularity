@@ -31,6 +31,12 @@ export interface ComponentTokensGateOptions {
   /** Корень исходников; по умолчанию — `<cwd>/src`. */
   srcDir?: string
   /**
+   * Префикс имени компонента. По умолчанию `Gr` — обратная совместимость с
+   * ядром; companion-пакету со своей приставкой этого хватает, чтобы фабрика
+   * увидела его компоненты вместо нуля.
+   */
+  prefix?: string
+  /**
    * Токены, объявленные вне покомпонентных реестров: у ядра — его собственные
    * `tokens/*.json`, у спутника — всё, что объявило ядро, включая его
    * покомпонентные хуки. Употреблять их можно, объявлять заново — нет.
@@ -73,11 +79,11 @@ function readRegistry(path: string, owner: string, sourceDir: string, prefixed: 
 }
 
 /** Реестры пакета: по одному на компонент плюс объявленные отдельно. */
-export function readTokenRegistries(srcDir: string, extraRegistries: readonly string[] = []): TokenRegistry[] {
+export function readTokenRegistries(srcDir: string, extraRegistries: readonly string[] = [], prefix = 'Gr'): TokenRegistry[] {
   const componentsDir = resolve(srcDir, 'components')
 
   return [
-    ...componentDirs(componentsDir).map(owner => readRegistry(
+    ...componentDirs(componentsDir, prefix).map(owner => readRegistry(
       `src/components/${owner}/tokens.json`,
       owner,
       resolve(componentsDir, owner),
@@ -178,7 +184,7 @@ export function collectBrokenEntries(registries: readonly TokenRegistry[]): stri
  */
 export function defineComponentTokensGate(options: ComponentTokensGateOptions): void {
   const srcDir = options.srcDir ?? packageSrcDir()
-  const registries = readTokenRegistries(srcDir, options.extraRegistries)
+  const registries = readTokenRegistries(srcDir, options.extraRegistries, options.prefix)
   const registered = new Map(registries.flatMap(registry => registry.tokens.map(token => [token.name, registry] as const)))
   const globalTokens = new Set(options.globalTokens.map(token => token.name))
 

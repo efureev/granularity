@@ -63,6 +63,50 @@ describe('componentDirs', () => {
     expect(componentDirs(resolve(dir, 'src/components'))).toEqual(['GrThing'])
   })
 
+  /**
+   * Префикс параметром — условие применимости фабрик к companion-пакету: с
+   * зашитым `Gr` пять из девяти находили у пакета с приставкой `Ft` ноль
+   * компонентов, и четыре из них при этом молча зеленели.
+   */
+  it('чужой префикс находит свои компоненты, а чужие пропускает', () => {
+    const { dir: other, cleanup: drop } = createFixturePackage({
+      'src/components/FtPanel/index.ts': 'export {}',
+      'src/components/GrThing/index.ts': 'export {}',
+    })
+
+    try {
+      expect(componentDirs(resolve(other, 'src/components'), 'Ft')).toEqual(['FtPanel'])
+    }
+    finally {
+      drop()
+    }
+  })
+
+  /**
+   * Групповая раскладка — канон пресета: общий SFC группы обязан лежать рядом с
+   * её компонентами, чтобы попасть в область скана. Обход на уровень вглубь,
+   * ровно как у генератора реестров.
+   */
+  it('находит компоненты внутри групп и не заходит глубже уровня', () => {
+    const { dir: grouped, cleanup: drop } = createFixturePackage({
+      'src/components/FtPanel/index.ts': 'export {}',
+      'src/components/transaction-details/FtExpenseModal/index.ts': 'export {}',
+      'src/components/transaction-details/shared/Header.vue': '<template><div /></template>',
+      'src/components/transaction-details/FtIncomeModal/nested/FtDeep/index.ts': 'export {}',
+    })
+
+    try {
+      expect(componentDirs(resolve(grouped, 'src/components'), 'Ft').sort()).toEqual([
+        'FtPanel',
+        'transaction-details/FtExpenseModal',
+        'transaction-details/FtIncomeModal',
+      ])
+    }
+    finally {
+      drop()
+    }
+  })
+
   it('на несуществующей директории отдаёт пустой список', () => {
     expect(componentDirs(resolve(dir, 'src/nope'))).toEqual([])
   })
