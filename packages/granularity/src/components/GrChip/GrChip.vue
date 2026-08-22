@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, inject, onBeforeUnmount, ref } from 'vue'
+import { computed, inject, onBeforeUnmount, ref, useAttrs } from 'vue'
 
 import IconClose from '~icons/lucide/x'
 
@@ -7,6 +7,8 @@ import { useGranularityTranslations } from '../../internal/granularityI18n'
 import { useGrComponentProp, useGrComponentSize } from '../GrConfigProvider/context'
 
 import type { GrChipValue } from './grChipGroupContext'
+
+import { warnRenamedProp } from '../shared/renamedProp'
 import { GR_CHIP_GROUP_CONTEXT } from './grChipGroupContext'
 import type { GrChipRadius, GrChipSize, GrChipTone } from './grChipStyles'
 import {
@@ -83,6 +85,11 @@ const props = withDefaults(defineProps<GrChipProps>(), {
 })
 
 const emit = defineEmits<GrChipEmits>()
+
+// `variant` переименован в `tone`: незнакомый атрибут Vue сажает на корневой
+// узел, поэтому старое имя не роняет ни типы, ни рантайм — компонент молча
+// рисуется дефолтным тоном.
+warnRenamedProp('GrChip', useAttrs(), { variant: 'tone' })
 
 defineSlots<{
   /** Подпись чипа. Внутри выбираемого чипа — только фразовое содержимое. */

@@ -816,6 +816,34 @@ describe('GrSelect — теги', () => {
     expect(toned.get('[data-gr-select-tag]').classes()).toContain('bg-[var(--gr-info-light)]')
   })
 
+  /**
+   * Цвет у каждого тега свой — обычная модель для меток и статусов. Без неё
+   * потребитель уходил в слот `#value` рисовать выбранное сам и терял ровно то,
+   * что в `tags` сделано правильно: чипы снаружи `role="combobox"`, снятие
+   * крестиком и сворачивание в «+N».
+   */
+  it('опция красит свой тег, не трогая соседей', () => {
+    const wrapper = mount(GrSelect, {
+      props: {
+        ...tagProps,
+        tagTone: 'info',
+        options: [
+          { value: 'a', label: 'Alpha', tone: 'success' },
+          { value: 'b', label: 'Beta' },
+          { value: 'c', label: 'Gamma', tone: 'danger', dark: true },
+        ],
+      },
+    })
+
+    const tags = wrapper.findAll('[data-gr-select-tag]')
+
+    expect(tags[0].classes()).toContain('bg-[var(--gr-success-light)]')
+    // Без своего тона опция берёт общий `tagTone`.
+    expect(tags[1].classes()).toContain('bg-[var(--gr-info-light)]')
+    // `dark` у опции тоже перекрывает общий: заливка плотная.
+    expect(tags[2].classes()).toContain('bg-[var(--gr-badge-danger-bg,var(--gr-danger-solid))]')
+  })
+
   it('крестик снимает значение', async () => {
     const wrapper = mount(GrSelect, { props: tagProps })
 

@@ -36,6 +36,8 @@ function itemProps(item: GrDropdownMenuAction): Record<string, unknown> {
     checked: item.checked,
     icon: item.icon,
     shortcut: item.shortcut,
+    as: item.as,
+    align: item.align,
   }
 }
 
@@ -59,6 +61,9 @@ function onSelect(item: GrDropdownMenuAction): void {
       v-else-if="isMenuSection(entry)"
       :key="`group-${entry.title ?? index}`"
       :title="entry.title"
+      :title-align="entry.titleAlign"
+      :dividers="entry.dividers"
+      :uppercase="entry.uppercase"
     >
       <GrDropdownMenuItem
         v-for="item in entry.items"

@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import GrBadge from '../GrBadge.vue'
 
@@ -116,5 +116,44 @@ describe('GrBadge', () => {
 
     expect(wrapper.get('.gr-badge__text').text()).toBe('Черновик')
     expect(wrapper.get('.gr-badge__text').attributes('aria-hidden')).toBeUndefined()
+  })
+})
+
+/**
+ * Переименование пропа проходит у потребителя молча: незнакомый атрибут Vue
+ * сажает на корневой узел, поэтому не падают ни типы, ни рантайм — компонент
+ * рисуется дефолтом. Так тихо разъехались десять мест в стороннем пакете.
+ */
+describe('GrBadge — снятое имя пропа', () => {
+  it('предупреждает про `variant` и не меняет вид', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+
+    try {
+      const wrapper = mount(GrBadge, { attrs: { variant: 'danger' } })
+
+      expect(warn).toHaveBeenCalledTimes(1)
+      expect(warn.mock.calls[0][0]).toContain('`variant` переименован в `tone`')
+      // Предупреждение ничего не чинит за потребителя: алиас после 1.0 остался
+      // бы навсегда.
+      expect(wrapper.classes().join(' ')).not.toContain('danger')
+      wrapper.unmount()
+    }
+    finally {
+      warn.mockRestore()
+    }
+  })
+
+  it('на `tone` не жалуется', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+
+    try {
+      const wrapper = mount(GrBadge, { props: { tone: 'danger' } })
+
+      expect(warn).not.toHaveBeenCalled()
+      wrapper.unmount()
+    }
+    finally {
+      warn.mockRestore()
+    }
   })
 })

@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, useAttrs } from 'vue'
 
 import { useGrComponentProp } from '../GrConfigProvider/context'
 
 export type { GrBadgeRadius, GrBadgeSize, GrBadgeTone } from './grBadgeStyles'
+
+import { warnRenamedProp } from '../shared/renamedProp'
 
 import {
   grBadgeClass,
@@ -35,6 +37,11 @@ const props = withDefaults(
 const resolvedTone = useGrComponentProp('GrBadge', 'tone', () => props.tone, 'neutral')
 const resolvedSize = useGrComponentProp('GrBadge', 'size', () => props.size, 'sm')
 const resolvedRadius = useGrComponentProp('GrBadge', 'radius', () => props.radius, 'round')
+
+// `variant` переименован в `tone`: незнакомый атрибут Vue сажает на корневой
+// узел, поэтому старое имя не роняет ни типы, ни рантайм — компонент молча
+// рисуется дефолтным тоном.
+warnRenamedProp('GrBadge', useAttrs(), { variant: 'tone' })
 
 const className = computed(() => {
   return grBadgeClass({

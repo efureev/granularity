@@ -1,7 +1,7 @@
 import type { Component } from 'vue'
 
-import type { GrDropdownMenuItemRole } from './GrDropdownMenuItem.vue'
-import type { GrDropdownMenuItemVariant } from './grDropdownMenuStyles'
+import type { GrDropdownMenuItemAlign, GrDropdownMenuItemRole } from './GrDropdownMenuItem.vue'
+import type { GrDropdownMenuHeaderAlign, GrDropdownMenuItemVariant } from './grDropdownMenuStyles'
 
 /**
  * Декларативная модель меню.
@@ -28,6 +28,18 @@ export interface GrDropdownMenuAction {
   rel?: string
   /** Шорткат для `target="_blank"` + `rel="noopener noreferrer"`. */
   external?: boolean
+  /**
+   * Чем рендерить пункт: тег или компонент роутера.
+   *
+   * Без него пункт-ссылка из `items` остаётся обычным `<a>`, то есть в
+   * SPA переход идёт перезагрузкой страницы — а обойти это в модели нечем:
+   * `itemProps` внутренняя, слота на пункт нет. Проп есть у самого
+   * `GrDropdownMenuItem` и у соседей по кольцу (`GrLink`, `GrBreadcrumbs`,
+   * `GrSidebarItem`), из этого ряда выпадала только модель меню.
+   */
+  as?: string | Component
+  /** Выравнивание содержимого пункта. */
+  align?: GrDropdownMenuItemAlign
 }
 
 export interface GrDropdownMenuSeparator {
@@ -38,6 +50,12 @@ export interface GrDropdownMenuSeparator {
 export interface GrDropdownMenuSection {
   type: 'group'
   title?: string
+  /** Выравнивание заголовка группы. */
+  titleAlign?: GrDropdownMenuHeaderAlign
+  /** Разделители между пунктами группы. */
+  dividers?: boolean
+  /** Заголовок капсом. */
+  uppercase?: boolean
   items: GrDropdownMenuAction[]
 }
 

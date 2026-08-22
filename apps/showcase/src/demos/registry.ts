@@ -139,6 +139,7 @@ export const demoPathByPreviewKey = {
   'gr-button-state-matrix':               'components/gr-button/GrButtonMatrixDemo.vue',
   'gr-card-action-panel':                 'components/gr-card/GrCardActionPanelDemo.vue',
   'gr-card-basic-surface':                'components/gr-card/GrCardBasicSurfaceDemo.vue',
+  'gr-card-header-actions':               'components/gr-card/GrCardHeaderActionsDemo.vue',
   'gr-card-kpi-grid':                     'components/gr-card/GrCardKpiGridDemo.vue',
   'gr-card-section-heading':              'components/gr-card/GrCardSectionHeadingDemo.vue',
   'gr-card-variants':                     'components/gr-card/GrCardVariantsDemo.vue',

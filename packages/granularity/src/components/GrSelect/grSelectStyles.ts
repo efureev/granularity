@@ -4,6 +4,8 @@ export type GrSelectView = 'default' | 'link'
 export type GrSelectSize = GrComponentSize
 export type GrSelectVariant = 'primary' | 'default' | 'muted' | 'danger'
 export type GrSelectUnderline = 'auto' | 'always' | 'none'
+import type { GrChipTone } from '../GrChip/grChipStyles'
+
 export type GrSelectOptionsView = 'native' | 'panel'
 /**
  * Тип значения опции. Ограничен примитивами, которые переживают путь через DOM:
@@ -22,6 +24,17 @@ export type GrSelectOption<TValue extends GrSelectValue = string> = {
   value: TValue
   label: string
   disabled?: boolean
+  /**
+   * Тон чипа в режиме `tags` — перекрывает `tagTone` для этой опции.
+   *
+   * Цвет у каждого тега свой — обычная модель (метки, категории, статусы), и
+   * без неё потребитель уходил в слот `#value` рисовать выбранное сам, теряя
+   * ровно то, что в `tags` сделано правильно: чипы снаружи `role="combobox"`,
+   * снятие крестиком, сворачивание в «+N» и клавиатуру.
+   */
+  tone?: GrChipTone
+  /** Плотная заливка чипа этой опции — перекрывает `tagDark`. */
+  dark?: boolean
 }
 /** Группа опций: заголовок `label` + вложенные опции `options`. */
 export type GrSelectOptionGroup<TValue extends GrSelectValue = string> = {

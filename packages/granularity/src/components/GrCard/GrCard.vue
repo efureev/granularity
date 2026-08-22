@@ -4,6 +4,8 @@ import { computed, markRaw, useId, useSlots, type Component } from 'vue'
 import { useGrComponentProp } from '../GrConfigProvider/context'
 
 import {
+  headerActionsClass,
+  headerRowClass,
   cardDescriptionClass,
   cardTitleClass,
   grCardRootClass,
@@ -126,7 +128,15 @@ const descriptionId = useId()
 const hasOwnHeader = computed(() => Boolean(slots.header))
 const hasTitle = computed(() => !hasOwnHeader.value && Boolean(props.title))
 const hasDescription = computed(() => !hasOwnHeader.value && Boolean(props.description))
-const hasHeadingBlock = computed(() => hasTitle.value || hasDescription.value)
+/**
+ * Действия рисуются в **собственной** шапке карточки и включают её наравне с
+ * заголовком. Без этого слота карточке с кнопкой приходилось забирать `#header`
+ * целиком — а вместе с ним заново писать заголовок, его уровень и отступы. К
+ * этому обходу независимо пришли `GrDashboardItem` в этом же кольце и обёртки
+ * потребителей; оба теряли настоящий `h2…h6` и шкалу отступов.
+ */
+const hasActions = computed(() => !hasOwnHeader.value && Boolean(slots.actions))
+const hasHeadingBlock = computed(() => hasTitle.value || hasDescription.value || hasActions.value)
 
 /**
  * Обёртки появляются, только когда их попросили: карточка без секций остаётся
@@ -134,7 +144,7 @@ const hasHeadingBlock = computed(() => hasTitle.value || hasDescription.value)
  * `GrList` до появления пропов.
  */
 const hasSections = computed(() => Boolean(
-  slots.header || slots.footer || props.bodyClass || hasHeadingBlock.value,
+  slots.header || slots.footer || slots.actions || props.bodyClass || hasHeadingBlock.value,
 ))
 
 /**
@@ -176,6 +186,14 @@ defineSlots<{
   default?: () => any
   /** Шапка вместо пропов `title` и `description`. */
   header?: () => any
+  /**
+   * Действия справа в собственной шапке карточки: «⋯», «Обновить»,
+   * переключатель периода. Включают шапку так же, как `title`.
+   *
+   * Со слотом `#header` не сочетается: тот заменяет шапку целиком, и всё, что в
+   * ней есть, рисует потребитель.
+   */
+  actions?: () => any
   /** Подвал: действия, сводка, пагинация. */
   footer?: () => any
 }>()
@@ -196,24 +214,32 @@ defineSlots<{
     <template v-if="hasSections">
       <div v-if="hasOwnHeader || hasHeadingBlock" data-gr-card-header :class="headerClass">
         <slot name="header">
-          <component
-            :is="headingTag"
-            v-if="hasTitle"
-            :id="titleId"
-            data-gr-card-title
-            :class="cardTitleClass"
-          >
-            {{ title }}
-          </component>
+          <div :class="hasActions ? headerRowClass : undefined">
+            <div class="min-w-0">
+              <component
+                :is="headingTag"
+                v-if="hasTitle"
+                :id="titleId"
+                data-gr-card-title
+                :class="cardTitleClass"
+              >
+                {{ title }}
+              </component>
 
-          <p
-            v-if="hasDescription"
-            :id="descriptionId"
-            data-gr-card-description
-            :class="cardDescriptionClass"
-          >
-            {{ description }}
-          </p>
+              <p
+                v-if="hasDescription"
+                :id="descriptionId"
+                data-gr-card-description
+                :class="cardDescriptionClass"
+              >
+                {{ description }}
+              </p>
+            </div>
+
+            <div v-if="hasActions" data-gr-card-actions :class="headerActionsClass">
+              <slot name="actions" />
+            </div>
+          </div>
         </slot>
       </div>
 

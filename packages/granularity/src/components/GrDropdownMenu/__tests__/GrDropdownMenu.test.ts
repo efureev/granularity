@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils'
-import { nextTick } from 'vue'
+import { defineComponent, nextTick } from 'vue'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import GrDropdownMenu from '../GrDropdownMenu.vue'
@@ -709,5 +709,57 @@ describe('GrDropdownMenuList — линии у края', () => {
 
     expect(className).toContain('divide-y')
     expect(className).not.toContain('before:inset-x-2')
+  })
+})
+
+/**
+ * Декларативная модель обязана уметь то же, что композиция.
+ *
+ * Пока `itemProps` переносил десять полей из одиннадцати, пункт-ссылка из
+ * `items` рендерился обычным `<a>` — то есть в SPA переход шёл перезагрузкой
+ * страницы, и обойти это было нечем: функция внутренняя, слота на пункт нет.
+ */
+describe('GrDropdownMenu — модель и композиция совпадают', () => {
+  const RouterStub = defineComponent({
+    name: 'RouterLinkStub',
+    props: { to: { type: String, default: '' } },
+    template: '<a data-testid="router-link" :href="to"><slot /></a>',
+  })
+
+  function mountModel(items: unknown[]) {
+    return mount(GrDropdownMenu, {
+      props: { open: true, items } as never,
+      attachTo: document.body,
+      global: { stubs: { teleport: true } },
+    })
+  }
+
+  it('`as` доносит пункт до роутера', () => {
+    const wrapper = mountModel([
+      { key: 'profile', label: 'Профиль', as: RouterStub, href: '/profile' },
+    ])
+
+    expect(wrapper.find('[data-testid="router-link"]').exists()).toBe(true)
+    wrapper.unmount()
+  })
+
+  it('`align` доезжает до пункта', () => {
+    const wrapper = mountModel([{ key: 'a', label: 'A', align: 'right' }])
+
+    // Выравнивание — класс пункта: у композиции тот же проп даёт его же.
+    expect(wrapper.get('[data-gr-dropdown-menu-item]').classes().join(' ')).toContain('justify-end')
+    wrapper.unmount()
+  })
+
+  it('презентационные поля группы доезжают до неё', () => {
+    const wrapper = mountModel([
+      { type: 'group', title: 'Раздел', uppercase: true, dividers: true, items: [{ key: 'a', label: 'A' }] },
+    ])
+
+    // Разделители живут на контейнере пунктов внутри группы.
+    const group = wrapper.get('[data-gr-dropdown-menu-group]')
+    expect(group.get('[role="none"]').classes().join(' ')).toContain('divide-y')
+    expect(wrapper.html()).toContain('uppercase')
+    wrapper.unmount()
   })
 })

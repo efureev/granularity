@@ -1012,8 +1012,8 @@ const themeAttrs = useGrThemeAttrs()
         :key="keyOf(opt.value)"
         data-gr-select-tag
         class="pointer-events-auto"
-        :tone="tagTone"
-        :dark="tagDark"
+        :tone="opt.tone ?? tagTone"
+        :dark="opt.dark ?? tagDark"
         :size="chipSize"
         :radius="tagRadius"
         :closable="!isDisabled && !isReadonly"

@@ -7,6 +7,44 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.30.0] 2026-08-23
+
+### Added
+
+- **`GrCard` — an `#actions` slot in the card's own header.** Until now there were two cases: a title
+  from props, or `#header` replacing the header entirely. A single button in the header forced the
+  second one — and with it a hand-written title, its level and the padding scale. `GrDashboardItem`
+  in this very ring and consumers' wrappers arrived at that workaround independently, both losing a
+  real `h2…h6`. Actions turn the header on the same way `title` does; `#header` still wins over
+  everything.
+
+- **`GrBadge` / `GrChip` — a development warning for the removed `variant` prop.** The rename to
+  `tone` passed silently: Vue drops an unknown attribute into `$attrs` and puts it on the root node,
+  so neither types nor runtime complain and the component simply renders with the default tone. Ten
+  places across six files broke that quietly in a consumer package. The warning does not fix it —
+  an alias would outlive 1.0 — it only says which name to use.
+
+- **`GrSelect` — an option carries its own chip tone.** `tone` and `dark` on the option override
+  `tagTone`/`tagDark` for that tag. Tags with their own colour are an ordinary model — labels,
+  categories, statuses — and without this the consumer had to render the selection through the
+  `#value` slot, losing exactly what `tags` gets right: chips outside `role="combobox"`, removal by
+  the close button, the «+N» rollup and the keyboard path.
+
+- **`GrDropdownMenu` — the declarative model matches the composition.** An action now carries `as`
+  and `align`, a section carries `titleAlign`, `dividers` and `uppercase`. `as` is the one that
+  matters: without it a link built from `:items` stayed a plain `<a>`, so in an SPA the item
+  navigated with a full page reload — and there was no way around it, since the model is unfolded
+  into props inside the component and the entries have no per-item slot. A consumer who needed both
+  a data-driven menu and router links had to rewrite the traversal, which is exactly what a 213-line
+  wrapper in `@efureev/ft-extra-granularity` did.
+
+### Documentation
+
+- **«Quick start» no longer asks for `@headlessui/vue`.** It was dropped in 0.15.0 — the overlay
+  family runs on the package's own primitives — and it is not among the peer dependencies, yet the
+  README kept it in the install line and called it required. A new consumer installed a package they
+  did not need; an upgrading one could not tell whether removing it was safe.
+
 ## [v0.29.1] 2026-08-22
 
 ### Fixed

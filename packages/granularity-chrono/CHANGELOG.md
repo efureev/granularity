@@ -7,6 +7,16 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.9.1] 2026-08-23
+
+### Fixed
+
+- **The i18n docblock named the wrong block.** It said keys live under `gr`, «like the core», while
+  the package declares `grChrono` (`GR_CHRONO_I18N_BLOCK`) and everything else — README, loaders,
+  the integration gate — agrees with that. A consumer who trusted the comment registered `gr` and
+  got no chrono translations, with a failure quiet enough to miss: the calendar grid still reads
+  correctly because it comes from `Intl`, only panel labels and `aria-label`s stay English.
+
 ## [v0.9.0] 2026-08-20
 
 ### Added

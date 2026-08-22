@@ -2,6 +2,13 @@ import type { ShowcaseComponentExampleDoc } from '../types'
 
 export const grCardExamples: ShowcaseComponentExampleDoc[] = [
   {
+    id: 'card-header-actions',
+    title: 'Actions next to the card title',
+    description: 'Слот `#actions` рисует действия справа в собственной шапке карточки: заголовок остаётся настоящим `h2…h6` со своим уровнем и отступами. До него карточке с кнопкой приходилось забирать `#header` целиком и переписывать заголовок руками.',
+    status: 'ready',
+    previewKey: 'gr-card-header-actions',
+  },
+  {
     id: 'card-variants',
     title: 'Варианты поверхности и карточка-кнопка',
     description: '`elevated` / `outlined` / `ghost` и полиморфный корень: `clickable` делает интерактивной всю поверхность.',

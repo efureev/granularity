@@ -30,6 +30,16 @@ export const paddingClass: Record<GrCardPadding, string> = {
   lg: 'p-6',
 }
 
+/**
+ * Строка шапки: заголовок с описанием слева, действия справа.
+ *
+ * `items-start`, а не `center`: у карточки с описанием шапка выше одной строки,
+ * и кнопка, выровненная по центру блока, уезжала бы к описанию, а не к
+ * заголовку.
+ */
+export const headerRowClass = 'flex items-start justify-between gap-3'
+export const headerActionsClass = 'flex shrink-0 items-center gap-1'
+
 export const sectionDividerTopClass = 'border-t border-[var(--gr-brd)]'
 export const sectionDividerBottomClass = 'border-b border-[var(--gr-brd)]'
 

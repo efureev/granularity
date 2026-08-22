@@ -54,14 +54,17 @@ change and belongs in a major release, not a patch. See [`docs/styling.md`](./do
 ## Quick start
 
 ```bash
-yarn add @feugene/granularity vue @headlessui/vue @floating-ui/dom
+yarn add @feugene/granularity vue @floating-ui/dom
 ```
 
-`@headlessui/vue` and `@floating-ui/dom` are required peer dependencies, not bundled ones. The
-overlay components (`GrModal`, `GrDrawer`, `GrDialog`, `GrImageViewer`) are built on HeadlessUI, and
-positioning (`GrDropdown`, `GrSelect`, `GrAutocomplete`, `GrTreeSelect`, `GrTooltip`) on floating-ui. Keeping them
-external means an application that already uses either one ends up with a single copy — and a single
-focus trap, whose behaviour would otherwise differ between versions.
+`@floating-ui/dom` is a required peer dependency, not a bundled one: positioning (`GrDropdown`,
+`GrSelect`, `GrAutocomplete`, `GrTreeSelect`, `GrTooltip`) is built on it, and keeping it external
+means an application that already uses floating-ui ends up with a single copy.
+
+The overlay components (`GrModal`, `GrDrawer`, `GrDialog`, `GrImageViewer`) need nothing else —
+their focus trap, layer stack and scroll lock are the package's own primitives. `@headlessui/vue`
+was dropped in 0.15.0 and is not a peer dependency; if it is still installed for this package alone,
+it can be removed.
 
 If the application uses `UnoCSS`:
 

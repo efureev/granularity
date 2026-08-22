@@ -318,3 +318,56 @@ describe('GrCard — интерактивность', () => {
     expect(wrapper.classes()).toContain('focus-visible:ring-2')
   })
 })
+
+/**
+ * Действие в шапке — без потери самой шапки.
+ *
+ * Раньше третьего случая не было: либо заголовок из пропов, либо `#header`
+ * целиком. Как только появлялась кнопка, потребитель забирал слот и заново
+ * писал заголовок, его уровень и отступы. К этому обходу независимо пришли
+ * `GrDashboardItem` в кольце и обёртки снаружи — оба теряли настоящий `h2…h6`.
+ */
+describe('GrCard — действия в шапке', () => {
+  it('рисует действия рядом с заголовком, сохраняя его уровень', () => {
+    const wrapper = mount(GrCard, {
+      props: { title: 'Отчёт', headingLevel: 3 },
+      slots: { actions: '<button data-testid="more">⋯</button>', default: 'тело' },
+    })
+
+    const header = wrapper.get('[data-gr-card-header]')
+
+    expect(header.get('[data-gr-card-title]').element.tagName).toBe('H3')
+    expect(header.find('[data-testid="more"]').exists()).toBe(true)
+    wrapper.unmount()
+  })
+
+  it('включают шапку так же, как заголовок', () => {
+    const wrapper = mount(GrCard, {
+      slots: { actions: '<button>⋯</button>', default: 'тело' },
+    })
+
+    expect(wrapper.find('[data-gr-card-header]').exists()).toBe(true)
+    expect(wrapper.find('[data-gr-card-actions]').exists()).toBe(true)
+    wrapper.unmount()
+  })
+
+  // `#header` заменяет шапку целиком — приоритет прежний, иначе действия
+  // приехали бы вторым блоком поверх чужой разметки.
+  it('свой `#header` отменяет действия', () => {
+    const wrapper = mount(GrCard, {
+      slots: { header: '<div data-testid="own">своя шапка</div>', actions: '<button>⋯</button>' },
+    })
+
+    expect(wrapper.find('[data-testid="own"]').exists()).toBe(true)
+    expect(wrapper.find('[data-gr-card-actions]').exists()).toBe(false)
+    wrapper.unmount()
+  })
+
+  it('без действий разметка заголовка прежняя', () => {
+    const wrapper = mount(GrCard, { props: { title: 'Отчёт' } })
+
+    expect(wrapper.find('[data-gr-card-actions]').exists()).toBe(false)
+    expect(wrapper.get('[data-gr-card-title]').text()).toBe('Отчёт')
+    wrapper.unmount()
+  })
+})
