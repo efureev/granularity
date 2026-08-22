@@ -15,7 +15,8 @@
 
 - экспортироваться из `@feugene/granularity` или через отдельный subpath `@feugene/granularity/components/<ComponentName>`;
 - участвовать в `presetGranularity({ components: [...] })` и общих granular registry;
-- иметь собственный component CSS asset `@feugene/granularity/components/<ComponentName>/styles.css`;
+- если у компонента есть свой CSS, он уезжает в `dist/components/<Name>/styles.css` и
+  импортируется чанком компонента — отдельного subpath на него нет;
 - иметь зависимые granular-компоненты, safelist или локальные CSS-файлы, учитываемые preset/node-helper'ами.
 
 ## Минимальная структура компонента
@@ -76,7 +77,8 @@ src/components/<ComponentName>/
 
 Сейчас в пакете есть два разных механизма CSS:
 
-1. **Сгенерированный component style asset** `components/<ComponentName>/styles.css`.
+1. **Сгенерированный component style asset** `dist/components/<ComponentName>/styles.css` —
+   внутренний: его импортирует чанк компонента, наружу он не объявляется.
    - Он создаётся автоматически из registry через `granularityStyleAssets`.
    - По умолчанию он есть у каждого компонента, если в `config.ts` не отключать `emitStyleAsset`.
 
@@ -219,12 +221,10 @@ yarn workspace @feugene/granularity generate:registry
   `tokenDefinitionsRef` — это просто ссылка на CSS, файл читает node-слой
   пресета. Отдельный `config.node.ts` с `tokenDefinitionsFromCssSync` больше
   не нужен и в клиентский бандл `node:fs` не тянет.
-- **CSS-subpath.** `./components/<Name>/styles.css` в `package.json#exports`
-  добавляется вручную, если компоненту нужен отдельный CSS-импорт:
-
-  ```json
-  "./components/GrIcon/styles.css": "./dist/components/GrIcon/styles.css"
-  ```
+- **Ничего для CSS компонента.** И не нужно: `libInjectCss` вписывает
+  `import '../styles.css'` внутрь чанка, так что стиль приезжает вместе с
+  компонентом. Отдельного subpath на него пакет не публикует — файл без токенов
+  и тем подключать нечем.
 
 Из реестра провайдера дальше строятся `resolveGranularityComponentNames(...)`,
 зависимости между компонентами, `granularityComponents` и общий safelist,
@@ -250,7 +250,8 @@ yarn workspace @feugene/granularity generate:registry
 
 ### 4. `package` CSS-exports
 
-Foundation-only слой публикуется как `@feugene/granularity/foundation.css`, а полный пакетный bundle — как `@feugene/granularity/styles.css`.
+Foundation публикуется одним файлом — `@feugene/granularity/styles.css`; utility-классы компонентов
+собирает пресет на стороне приложения.
 
 Оба артефакта собираются из Uno preset, поэтому отдельно править общий source-entrypoint для CSS не нужно.
 

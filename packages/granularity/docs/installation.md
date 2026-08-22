@@ -6,9 +6,8 @@
 `UnoCSS` preset `presetGranularNode` из [`@feugene/unocss-preset-granular/node`][preset-granular]
 с `granularityProvider` из `@feugene/granularity/granular-provider/node`.
 
-Остальные варианты (прямые CSS-импорты, root import со «всем сразу»,
-подключение `foundation.css`/`styles.css` и т.п.) не поддерживаются и в этой
-инструкции не описываются.
+Остальные варианты (прямые CSS-импорты, root import со «всем сразу», подключение
+`styles.css` и т.п.) не поддерживаются и в этой инструкции не описываются.
 
 > Общие принципы установки (обоснование выбора `devDependencies`, требования
 > к окружению, рецепт сборки провайдеров) подробно описаны в документации

@@ -2,29 +2,30 @@
 
 ## Публичный CSS API пакета
 
-Пакет `@feugene/granularity` публикует несколько уровней CSS-артефактов. Они отличаются тем, **что именно собирают** и **для какого сценария предназначены**.
+Пакет `@feugene/granularity` публикует два уровня CSS-артефактов: общий бандл и
+слои, из которых он собран.
 
-- `@feugene/granularity/foundation.css`
-  - foundation-only bundle пакета;
-  - включает общие токены, обе встроенные темы (`light` и `dark`) и базовые правила;
-  - **не** включает component utility CSS.
 - `@feugene/granularity/styles.css`
-  - полный CSS bundle пакета;
-  - включает всё из `foundation.css` **плюс** utility/component CSS для всех зарегистрированных компонентов;
-  - собирается через `UnoCSS` и `presetGranularityNode` по исходникам компонентов.
-- `@feugene/granularity/components/<ComponentName>/styles.css`
-  - отдельный bundle для конкретного компонента;
-  - собирается тем же механизмом, что и общий `styles.css`, но только для выбранного компонента и его зарегистрированных зависимостей;
-  - обычно уже содержит foundation-слой, поэтому это самостоятельный CSS-артефакт.
-- `@feugene/granularity/styles/tokens.css`
-  - низкоуровневый файл только с design tokens.
-- `@feugene/granularity/styles/themes/light.css`
-  - встроенная светлая тема с semantic tokens.
-- `@feugene/granularity/styles/themes/dark.css`
-  - встроенная тёмная тема с semantic tokens.
-- `@feugene/granularity/styles/base.css`
-  - базовые правила поверх foundation tokens/themes: reset и кламп движения по
-    `prefers-reduced-motion`.
+  - токены, обе встроенные темы (`light` и `dark`), базовые правила и preflight —
+    одним файлом;
+  - для потребителя, который не подключает UnoCSS-пресет;
+  - **utility-классов компонентов в нём нет**: их генерирует пресет по тем
+    компонентам, которые выбраны. Без пресета компонент отрисуется со своим
+    собственным CSS, но без раскладочных утилит.
+- `@feugene/granularity/styles/tokens.css` — только design tokens.
+- `@feugene/granularity/styles/themes/light.css`, `.../dark.css` — встроенные темы
+  с семантическими токенами.
+- `@feugene/granularity/styles/base.css` — базовые правила поверх токенов и тем:
+  reset и кламп движения по `prefers-reduced-motion`.
+- `@feugene/granularity/styles/preflight.css` — preflight-слой.
+
+**Своего CSS-файла у компонента подключать не нужно.** У большинства компонентов
+собственного CSS нет вовсе, а у тех, у кого есть (`GrIcon`, `GrToaster`,
+`GrSplitter` и ещё пятнадцать), он вписан прямо в чанк компонента: гранулярный
+импорт уже тянет всё, что нужно. Subpath вида
+`@feugene/granularity/components/<Name>/styles.css` пакет не публикует —
+такой файл был бы кусочком без токенов и тем, и подключать его отдельно
+бессмысленно.
 
 ## Токены — генерируются, а не пишутся руками
 
@@ -56,12 +57,7 @@ yarn workspace @feugene/granularity generate:tokens --check  # проверит�
 
 ## Что объединяет эти файлы
 
-Есть два основных группирующих слоя:
-
-1. `packages/granularity/src/styles/index.css` — **source-группа** foundation-стилей.
-2. Публичные собранные bundle-артефакты — `foundation.css`, `styles.css` и `components/*/styles.css`.
-
-Исходный `src/styles/index.css` объединяет базовые CSS-файлы пакета:
+`packages/granularity/src/styles/index.css` — source-группа foundation-стилей:
 
 ```css
 @import './tokens.css';
@@ -70,81 +66,50 @@ yarn workspace @feugene/granularity generate:tokens --check  # проверит�
 @import './base.css';
 ```
 
-Из этого source-слоя получается публичный `foundation.css`.
-
-Дальше поверх foundation-содержимого `presetGranularityNode` достраивает:
-
-- `styles.css` — foundation + стили всех компонентов;
-- `components/<Name>/styles.css` — foundation + стили одного компонента и его зависимостей.
+Она и уезжает в `dist/styles/index.css`, то есть в публичный
+`@feugene/granularity/styles.css`. Ничего поверх неё пакет не досбирает:
+utility-классы компонентов — работа UnoCSS-пресета **на стороне приложения**, по
+списку выбранных компонентов.
 
 ## Границы ответственности
 
-### `foundation.css`
-
-Используйте `foundation.css`, когда нужны только базовые слои дизайн-системы:
-
-- tokens;
-- встроенные темы `light` и `dark`;
-- base rules.
-
-Это хороший выбор, если:
-
-- приложение само собирает component CSS через `presetGranularityNode`;
-- вы хотите отдельно контролировать, какие component bundles попадут в приложение;
-- нужно получить только foundation layer без всех компонентных utility-классов.
-
 ### `styles.css`
 
-Используйте `styles.css`, когда нужен **полный готовый CSS пакета**.
+Готовый foundation: токены, обе встроенные темы, base и preflight. Берите его,
+если приложение не подключает UnoCSS-пресет, — тогда компоненты получат токены,
+темы и собственный CSS, но не раскладочные утилиты.
 
-Он объединяет:
+Приложение с пресетом в этом файле обычно не нуждается: пресет соберёт и
+foundation, и утилиты выбранных компонентов.
 
-- весь foundation-слой из `foundation.css`;
-- обе встроенные темы: `light` и `dark`;
-- utility/component CSS всех зарегистрированных компонентов пакета.
+### CSS самого компонента
 
-Это самый простой вариант для приложений, которые хотят подключить стили пакета целиком без собственной preset-сборки.
+Подключать нечего и не нужно. Собственный CSS есть у восемнадцати компонентов
+(`GrIcon`, `GrToaster`, `GrSplitter`, …), и он вписан прямо в их чанк: импорт
+компонента тянет его сам. У остальных своего CSS нет вовсе — они целиком
+собираются из утилит пресета.
 
-### `components/<Name>/styles.css`
-
-Это не просто «сырой CSS-файл из папки компонента», а **собранный публичный bundle** для конкретного компонента.
-
-Важно понимать:
-
-- он генерируется через тот же preset-driven pipeline, что и `styles.css`;
-- он может включать зависимости компонента;
-- при импорте нескольких таких файлов foundation-часть будет дублироваться.
-
-Поэтому:
-
-- для одного-двух точечных компонентов `components/<Name>/styles.css` удобен;
-- для большого набора компонентов обычно лучше брать общий `styles.css` или собирать стили через `presetGranularityNode` на стороне приложения.
+Поэтому subpath `components/<Name>/styles.css` пакет не публикует: такой файл был
+бы куском без токенов и тем, и подключать его отдельно бессмысленно.
 
 ### Низкоуровневые `styles/*`
 
-Файлы в `styles/*` — это нижний уровень API для ручной композиции:
+Нижний уровень API для ручной композиции:
 
 - `styles/tokens.css`;
 - `styles/themes/light.css`;
 - `styles/themes/dark.css`;
-- `styles/base.css`.
+- `styles/base.css`;
+- `styles/preflight.css`.
 
-Они полезны, если приложение хочет самостоятельно собирать foundation-слой или заменить theme layer своей реализацией.
+Полезны, если приложение собирает foundation само или заменяет theme layer своей
+реализацией.
 
 ## Встроенные темы
 
-Пакет публикует две встроенные темы:
-
-- `light`
-- `dark`
-
-Обе темы уже входят в:
-
-- `foundation.css`;
-- `styles.css`;
-- component bundles `components/<Name>/styles.css`.
-
-Если приложение управляет темами самостоятельно, можно не использовать встроенные theme-файлы напрямую и собрать свой theme layer поверх `tokens.css` + `base.css`.
+Пакет публикует две встроенные темы — `light` и `dark`, — и обе входят в
+`styles.css`. Если приложение управляет темами само, встроенные файлы можно не
+подключать и собрать свой theme layer поверх `tokens.css` + `base.css`.
 
 ## Граница ответственности: `tokens` vs `theme`
 
@@ -169,22 +134,6 @@ import '@feugene/granularity/styles.css'
 
 Подходит, если приложение использует много компонентов и не хочет отдельно управлять CSS-сборкой.
 
-### Подключить только foundation-слой пакета
-
-```ts
-import '@feugene/granularity/foundation.css'
-```
-
-Подходит, если component CSS будет собираться отдельно, например через `presetGranularityNode` в приложении.
-
-### Подключить bundle конкретного компонента
-
-```ts
-import '@feugene/granularity/components/GrButton/styles.css'
-```
-
-Подходит, если нужен один конкретный компонент и не хочется подключать общий `styles.css`.
-
 ### Использовать свою тему приложения
 
 Если у приложения есть собственный theme layer, можно вручную собрать foundation без встроенных тем:
@@ -199,11 +148,11 @@ import '@feugene/granularity/styles/base.css'
 
 ## Что важно помнить
 
-- `foundation.css` — это foundation-only слой: tokens + `light` + `dark` + base.
-- `styles.css` — это `foundation.css` плюс стили всех компонентов пакета.
-- `src/styles/index.css` — source-группа foundation-стилей, из которой собирается публичный `foundation.css`.
-- `components/<Name>/styles.css` и `styles.css` собираются через preset, а не простым объединением ручных CSS-импортов.
-- если приложение уже собирает стили через `presetGranularityNode`, прямой импорт `styles.css` обычно не нужен.
+- `styles.css` — foundation целиком: tokens + `light` + `dark` + base + preflight. Utility-классов
+  компонентов в нём нет.
+- `src/styles/index.css` — source-группа, из которой он собирается.
+- CSS компонента приезжает вместе с его чанком; отдельного subpath на него нет.
+- если приложение уже собирает стили пресетом, прямой импорт `styles.css` обычно не нужен.
 
 ## RTL не поддерживается
 

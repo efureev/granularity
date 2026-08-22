@@ -7,6 +7,27 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.28.3] 2026-08-22
+
+### Fixed
+
+- **`@feugene/granularity/styles.css` works again.** The path the README, the docs and the showcase
+  all point at was not in `exports`: it disappeared during the `Ds*` → `Gr*` move, and the working
+  one was `styles/index.css`. Both resolve now.
+
+- **The README no longer promises entrypoints that do not exist.** `foundation.css`,
+  `components/<Name>/styles.css`, `uno` and `uno-node` were never exported. A component's own CSS
+  needs no import at all — its chunk carries it — and the UnoCSS integration goes through
+  `granular-provider`.
+
+  A new build step (`check-dist-exports`) walks every subpath in `exports` and fails the build if one
+  leads nowhere. It only checks the direction that hurts the consumer: a declared path with no file
+  behind it.
+
+- **`@feugene/granularity/directives/globalDirectives` is exported.** `docs/directives.md` tells IDE
+  users to `import type {}` from it; the subpath did not exist. It is types-only — the file carries
+  the `GlobalDirectives` augmentation and no runtime.
+
 ## [v0.28.2] 2026-08-22
 
 ### Fixed

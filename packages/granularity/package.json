@@ -1,7 +1,7 @@
 {
   "name": "@feugene/granularity",
   "description": "Granularity design system package with Vue 3 components, consumed via the `@feugene/unocss-preset-granular` preset.",
-  "version": "0.28.2",
+  "version": "0.28.3",
   "license": "SEE LICENSE IN LICENSE",
   "author": {
     "name": "Evgeniy Fureev",
@@ -53,6 +53,7 @@
       "default": "./dist/index.js"
     },
     "./styles/*": "./dist/styles/*",
+    "./styles.css": "./dist/styles/index.css",
     "./composables/useAnnouncer": {
       "types": "./dist/types/composables/useAnnouncer.d.ts",
       "import": "./dist/composables/useAnnouncer.js"
@@ -529,6 +530,9 @@
       "types": "./dist/types/directives/dropzone.d.ts",
       "import": "./dist/directives/dropzone.js"
     },
+    "./directives/globalDirectives": {
+      "types": "./dist/types/directives/globalDirectives.d.ts"
+    },
     "./directives/hotkey": {
       "types": "./dist/types/directives/hotkey.d.ts",
       "import": "./dist/directives/hotkey.js"
@@ -625,7 +629,7 @@
     "vue-tsc": "^3.3.7"
   },
   "scripts": {
-    "build": "vite build && gr-check-dist-dev-guard && node scripts/check-dist-no-tests.mjs && node scripts/generate-web-types.mjs && vue-tsc -p tsconfig.build.json",
+    "build": "vite build && gr-check-dist-dev-guard && node scripts/check-dist-no-tests.mjs && node scripts/generate-web-types.mjs && vue-tsc -p tsconfig.build.json && node scripts/check-dist-exports.mjs",
     "check:messages": "fint-i18n-check-messages src/i18n/locales",
     "dev": "vite build --watch",
     "doctor": "granular doctor ./granular.options.mjs --strict",

@@ -256,21 +256,15 @@ GrSelect>` для них не работает, такой компонент к
 
 ## Стили компонентов
 
-Для каждого опубликованного компонента можно подключать component-level CSS через путь вида:
+Подключать CSS компонента не нужно. У большинства собственного CSS нет вовсе —
+их оформление собирает UnoCSS-пресет по выбранным компонентам; у восемнадцати
+(`GrIcon`, `GrToaster`, `GrSplitter`, …) он есть и вписан прямо в их чанк, то
+есть приезжает вместе с импортом самого компонента.
 
-```ts
-import '@feugene/granularity/components/GrButton/styles.css'
-```
-
-Важно помнить, что `components/<Name>/styles.css` — это уже собранный публичный bundle компонента. Обычно он сам содержит foundation-слой пакета, поэтому его можно подключать самостоятельно:
-
-```ts
-import '@feugene/granularity/components/GrButton/styles.css'
-```
-
-Если приложение собирает несколько component bundle-ов и хочет централизованно управлять foundation-слоем, можно отдельно подключить `foundation.css` или уйти в `UnoCSS` preset.
-
-Ручные импорты `styles/tokens.css`, `styles/themes/*.css` и `styles/base.css` нужны только для низкоуровневых кастомных сценариев.
+Приложению остаётся foundation: либо пресет, либо
+`@feugene/granularity/styles.css` — токены, темы, base и preflight одним файлом.
+Ручные импорты `styles/tokens.css`, `styles/themes/*.css` и `styles/base.css`
+нужны только для низкоуровневых кастомных сценариев.
 
 ## Как работать с каталогом
 
