@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v0.5.0] 2026-08-22
+
+### Changed
+
+- **`defineRegistryGate` now knows about parts of composite components.** A part
+  (`GrTimelineItem`, `GrListItem`, a menu item) is not a public component — no `index.ts`, no
+  `config.ts`, no build entry of its own — but it must still have a subpath, otherwise a granular
+  import of that part fails with `ERR_PACKAGE_PATH_NOT_EXPORTED`. The gate now requires an alias per
+  part pointing at the parent's module, and requires that no part claims an entry.
+
+  The map is collected by the gate itself (`collectGranularSubcomponents` from
+  `@feugene/unocss-preset-granular/codegen`, an optional peer), not taken as an option: given the
+  map, the gate would confirm exactly what the generator had written.
+
+  A package whose parts have no aliases yet will go red — that is the point. Add
+  `packageExports({ subcomponents: true })` to its registry generator.
+
 ## [v0.4.0] 2026-08-20
 
 ### Added

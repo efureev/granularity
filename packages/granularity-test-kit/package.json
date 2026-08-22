@@ -1,7 +1,7 @@
 {
   "name": "@feugene/granularity-test-kit",
   "description": "Test gates for @feugene/granularity design-system packages — token, registry and defaults contracts as reusable factories.",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "license": "SEE LICENSE IN LICENSE",
   "author": {
     "name": "Evgeniy Fureev",
@@ -72,6 +72,7 @@
   },
   "peerDependencies": {
     "@axe-core/playwright": ">=4.10",
+    "@feugene/unocss-preset-granular": ">=0.10.1 <1.0.0",
     "@playwright/test": ">=1.50",
     "@vue/test-utils": ">=2.4",
     "axe-core": ">=4.10",
@@ -96,11 +97,15 @@
     },
     "vue": {
       "optional": true
+    },
+    "@feugene/unocss-preset-granular": {
+      "optional": true
     }
   },
   "devDependencies": {
     "@antfu/eslint-config": "^9.1.0",
     "@axe-core/playwright": "^4.12.1",
+    "@feugene/unocss-preset-granular": "^0.10.1",
     "@playwright/test": "^1.61.1",
     "@types/node": "^26.1.1",
     "@vue/test-utils": "^2.4.11",

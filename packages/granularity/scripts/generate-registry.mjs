@@ -14,7 +14,8 @@ import {
  * в `src/components/GrX/`. Из этого списка генерируются:
  *
  *   src/index.ts                     — root-barrel (`export * from './components/GrX'`);
- *   package.json#exports             — subpath `./components/GrX`;
+ *   package.json#exports             — subpath `./components/GrX` и алиасы на
+ *                                      подкомпоненты (`./components/GrTimelineItem`);
  *   vite.config.ts                   — entry `components/GrX/index`;
  *   src/granular-provider/shared.ts  — импорт `grXConfig` + запись в реестр.
  *
@@ -42,7 +43,12 @@ const targets = [
   // Своя форма subpath-экспорта: декларации лежат в `dist/types/` без сегмента
   // `src` — `rootDir` в `tsconfig.build.json` указывает на `src`. Дефолт
   // генератора описывает раскладку, которой в репозитории больше нет.
+  //
+  // `subcomponents` добавляет алиасы на части составных компонентов
+  // (`GrTimelineItem` → модуль `GrTimeline`): своей entry у них нет и не должно
+  // быть, а вот импортировать их гранулярно обязано быть можно.
   codegenTargets.packageExports({
+    subcomponents: true,
     entryFor: component => ({
       types: `./dist/types/components/${component}/index.d.ts`,
       import: `./dist/components/${component}/index.js`,

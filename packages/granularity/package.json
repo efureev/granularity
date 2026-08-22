@@ -1,7 +1,7 @@
 {
   "name": "@feugene/granularity",
   "description": "Granularity design system package with Vue 3 components, consumed via the `@feugene/unocss-preset-granular` preset.",
-  "version": "0.28.1",
+  "version": "0.28.2",
   "license": "SEE LICENSE IN LICENSE",
   "author": {
     "name": "Evgeniy Fureev",
@@ -69,6 +69,10 @@
       "types": "./dist/types/components/GrAvatar/index.d.ts",
       "import": "./dist/components/GrAvatar/index.js"
     },
+    "./components/GrAvatarGroup": {
+      "types": "./dist/types/components/GrAvatar/index.d.ts",
+      "import": "./dist/components/GrAvatar/index.js"
+    },
     "./components/GrBadge": {
       "types": "./dist/types/components/GrBadge/index.d.ts",
       "import": "./dist/components/GrBadge/index.js"
@@ -121,6 +125,10 @@
       "types": "./dist/types/components/GrCollapse/index.d.ts",
       "import": "./dist/components/GrCollapse/index.js"
     },
+    "./components/GrCollapseItem": {
+      "types": "./dist/types/components/GrCollapse/index.d.ts",
+      "import": "./dist/components/GrCollapse/index.js"
+    },
     "./components/GrColorPicker": {
       "types": "./dist/types/components/GrColorPicker/index.d.ts",
       "import": "./dist/components/GrColorPicker/index.js"
@@ -157,7 +165,23 @@
       "types": "./dist/types/components/GrDialog/index.d.ts",
       "import": "./dist/components/GrDialog/index.js"
     },
+    "./components/GrDialogCloseButton": {
+      "types": "./dist/types/components/GrDialog/index.d.ts",
+      "import": "./dist/components/GrDialog/index.js"
+    },
+    "./components/GrDialogFooter": {
+      "types": "./dist/types/components/GrDialog/index.d.ts",
+      "import": "./dist/components/GrDialog/index.js"
+    },
+    "./components/GrDialogHeader": {
+      "types": "./dist/types/components/GrDialog/index.d.ts",
+      "import": "./dist/components/GrDialog/index.js"
+    },
     "./components/GrDialogService": {
+      "types": "./dist/types/components/GrDialogService/index.d.ts",
+      "import": "./dist/components/GrDialogService/index.js"
+    },
+    "./components/GrDialogServiceHost": {
       "types": "./dist/types/components/GrDialogService/index.d.ts",
       "import": "./dist/components/GrDialogService/index.js"
     },
@@ -177,6 +201,34 @@
       "types": "./dist/types/components/GrDropdownMenu/index.d.ts",
       "import": "./dist/components/GrDropdownMenu/index.js"
     },
+    "./components/GrDropdownMenuColumn": {
+      "types": "./dist/types/components/GrDropdownMenu/index.d.ts",
+      "import": "./dist/components/GrDropdownMenu/index.js"
+    },
+    "./components/GrDropdownMenuColumns": {
+      "types": "./dist/types/components/GrDropdownMenu/index.d.ts",
+      "import": "./dist/components/GrDropdownMenu/index.js"
+    },
+    "./components/GrDropdownMenuDivider": {
+      "types": "./dist/types/components/GrDropdownMenu/index.d.ts",
+      "import": "./dist/components/GrDropdownMenu/index.js"
+    },
+    "./components/GrDropdownMenuGroup": {
+      "types": "./dist/types/components/GrDropdownMenu/index.d.ts",
+      "import": "./dist/components/GrDropdownMenu/index.js"
+    },
+    "./components/GrDropdownMenuHeader": {
+      "types": "./dist/types/components/GrDropdownMenu/index.d.ts",
+      "import": "./dist/components/GrDropdownMenu/index.js"
+    },
+    "./components/GrDropdownMenuItem": {
+      "types": "./dist/types/components/GrDropdownMenu/index.d.ts",
+      "import": "./dist/components/GrDropdownMenu/index.js"
+    },
+    "./components/GrDropdownMenuList": {
+      "types": "./dist/types/components/GrDropdownMenu/index.d.ts",
+      "import": "./dist/components/GrDropdownMenu/index.js"
+    },
     "./components/GrEmptyState": {
       "types": "./dist/types/components/GrEmptyState/index.d.ts",
       "import": "./dist/components/GrEmptyState/index.js"
@@ -192,6 +244,10 @@
     "./components/GrForm": {
       "types": "./dist/types/components/GrForm/index.d.ts",
       "import": "./dist/components/GrForm/index.js"
+    },
+    "./components/GrFormErrorBanner": {
+      "types": "./dist/types/components/GrResponseErrorBanner/index.d.ts",
+      "import": "./dist/components/GrResponseErrorBanner/index.js"
     },
     "./components/GrFormField": {
       "types": "./dist/types/components/GrFormField/index.d.ts",
@@ -234,6 +290,10 @@
       "import": "./dist/components/GrLink/index.js"
     },
     "./components/GrList": {
+      "types": "./dist/types/components/GrList/index.d.ts",
+      "import": "./dist/components/GrList/index.js"
+    },
+    "./components/GrListItem": {
       "types": "./dist/types/components/GrList/index.d.ts",
       "import": "./dist/components/GrList/index.js"
     },
@@ -301,6 +361,14 @@
       "types": "./dist/types/components/GrSidebar/index.d.ts",
       "import": "./dist/components/GrSidebar/index.js"
     },
+    "./components/GrSidebarGroup": {
+      "types": "./dist/types/components/GrSidebar/index.d.ts",
+      "import": "./dist/components/GrSidebar/index.js"
+    },
+    "./components/GrSidebarItem": {
+      "types": "./dist/types/components/GrSidebar/index.d.ts",
+      "import": "./dist/components/GrSidebar/index.js"
+    },
     "./components/GrSkeleton": {
       "types": "./dist/types/components/GrSkeleton/index.d.ts",
       "import": "./dist/components/GrSkeleton/index.js"
@@ -333,6 +401,10 @@
       "types": "./dist/types/components/GrTable/index.d.ts",
       "import": "./dist/components/GrTable/index.js"
     },
+    "./components/GrTabPanel": {
+      "types": "./dist/types/components/GrTabPanels/index.d.ts",
+      "import": "./dist/components/GrTabPanels/index.js"
+    },
     "./components/GrTabPanels": {
       "types": "./dist/types/components/GrTabPanels/index.d.ts",
       "import": "./dist/components/GrTabPanels/index.js"
@@ -346,6 +418,10 @@
       "import": "./dist/components/GrTextarea/index.js"
     },
     "./components/GrTimeline": {
+      "types": "./dist/types/components/GrTimeline/index.d.ts",
+      "import": "./dist/components/GrTimeline/index.js"
+    },
+    "./components/GrTimelineItem": {
       "types": "./dist/types/components/GrTimeline/index.d.ts",
       "import": "./dist/components/GrTimeline/index.js"
     },
@@ -364,6 +440,10 @@
     "./components/GrTreeSelect": {
       "types": "./dist/types/components/GrTreeSelect/index.d.ts",
       "import": "./dist/components/GrTreeSelect/index.js"
+    },
+    "./components/GrUploadErrorBanner": {
+      "types": "./dist/types/components/GrResponseErrorBanner/index.d.ts",
+      "import": "./dist/components/GrResponseErrorBanner/index.js"
     },
     "./components/GrValue": {
       "types": "./dist/types/components/GrValue/index.d.ts",
@@ -508,7 +588,7 @@
   },
   "peerDependencies": {
     "@feugene/fint-i18n": "^0.6.0",
-    "@feugene/unocss-preset-granular": "^0.9.1",
+    "@feugene/unocss-preset-granular": "^0.10.1",
     "@floating-ui/dom": "^1.8.0",
     "vue": "^3.5.0"
   },
@@ -523,8 +603,8 @@
   "devDependencies": {
     "@antfu/eslint-config": "^9.1.0",
     "@feugene/fint-i18n": "^0.6.0",
-    "@feugene/granularity-test-kit": "^0.4.0",
-    "@feugene/unocss-preset-granular": "^0.9.1",
+    "@feugene/granularity-test-kit": "^0.5.0",
+    "@feugene/unocss-preset-granular": "^0.10.1",
     "@floating-ui/dom": "^1.8.0",
     "@iconify-json/lucide": "^1.2.117",
     "@types/node": "^25.9.5",

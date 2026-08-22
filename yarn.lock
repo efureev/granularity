@@ -413,17 +413,10 @@
     "@unocss/preset-mini" "^66.7.5"
     "@unocss/rule-utils" "^66.7.5"
 
-"@feugene/unocss-preset-granular@^0.8.2":
-  version "0.8.2"
-  resolved "https://registry.yarnpkg.com/@feugene/unocss-preset-granular/-/unocss-preset-granular-0.8.2.tgz#488d0fa0e761037aa0f01b01a4dfc4413449fe15"
-  integrity sha512-ujLLXq+nBgMJp+fyuwaRt2mUOvjJxwiyycDLKYjp5UiuKhT/c7MjDjtAxM89d3HWEpTgTO4lYa31N8oeJCkMSA==
-  dependencies:
-    "@feugene/unocss-mini-extra-rules" "^0.8.1"
-
-"@feugene/unocss-preset-granular@^0.9.1":
-  version "0.9.1"
-  resolved "https://registry.yarnpkg.com/@feugene/unocss-preset-granular/-/unocss-preset-granular-0.9.1.tgz#484776dd8fc0fa5df753c0b5e93932ff58388d81"
-  integrity sha512-I2Xje2yaBPpqmAWSKM6z3xCS3iGfG05tcBuKAY51E0LXk+ylMLGiAJ572POKLusJO7MX6lm/l7l3miFWGXONUA==
+"@feugene/unocss-preset-granular@^0.10.1":
+  version "0.10.1"
+  resolved "https://registry.yarnpkg.com/@feugene/unocss-preset-granular/-/unocss-preset-granular-0.10.1.tgz#cb8737d9f6833972ad368485333a0e85348857bd"
+  integrity sha512-JuGrYepzlxLmlwd7oPEJnIYmda/0J6dSH19khwJv+Kl6f0bw9XjICsHFbg/iD0pFC60n9CLHZ1+CKOp4TzkVZg==
   dependencies:
     "@feugene/unocss-mini-extra-rules" "^0.8.1"
 

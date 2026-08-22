@@ -3,7 +3,8 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import process from 'node:process'
 
-import { describe, expect, it } from 'vitest'
+import { collectGranularSubcomponents } from '@feugene/unocss-preset-granular/codegen'
+import { beforeAll, describe, expect, it } from 'vitest'
 
 export interface RegistryGateOptions {
   /** Корень пакета; по умолчанию — cwd, из которого запущен vitest. */
@@ -23,6 +24,17 @@ export interface RegistryGateOptions {
   /** В `exports` нет компонентов, которых нет на диске. */
   requireExactExports?: boolean
 }
+
+/**
+ * Части составных компонентов (`GrTimelineItem`, `GrListItem`, пункты меню).
+ *
+ * Публичным компонентом такая часть не считается — своих `index.ts` и
+ * `config.ts` у неё нет, — но subpath ей нужен: без него гранулярный импорт
+ * упирается в `ERR_PACKAGE_PATH_NOT_EXPORTED`, то есть идея пакета на эти имена
+ * не распространяется. Карту гейт собирает сам, тем же кодом, что и генератор:
+ * приняв её параметром, он подтверждал бы ровно то, что записал генератор.
+ */
+type Subcomponents = Record<string, string>
 
 /**
  * Гейт на рассинхрон реестров.
@@ -54,6 +66,14 @@ export function defineRegistryGate(options: RegistryGateOptions): void {
     .sort()
 
   describe('реестры компонентов', () => {
+    let subcomponents: Subcomponents = {}
+
+    beforeAll(async () => {
+      subcomponents = await collectGranularSubcomponents({
+        componentsDir: resolve(pkgDir, 'src/components'),
+      })
+    })
+
     it.runIf(generatorScript !== null)('все списки совпадают с `src/components/`', () => {
       expect(() => {
         execFileSync('node', [generatorScript!, '--check'], { cwd: pkgDir, stdio: 'pipe' })
@@ -96,7 +116,30 @@ export function defineRegistryGate(options: RegistryGateOptions): void {
         .filter(key => key.startsWith('./components/'))
         .map(key => key.slice('./components/'.length))
 
-      expect(declared.sort()).toEqual(publicComponents)
+      expect(declared.sort()).toEqual([...publicComponents, ...Object.keys(subcomponents)].sort())
+    })
+
+    it('у каждой части составного компонента есть subpath на модуль родителя', () => {
+      const pkg = JSON.parse(read('package.json')) as {
+        exports: Record<string, { import?: string } | string>
+      }
+
+      for (const [name, owner] of Object.entries(subcomponents)) {
+        const entry = pkg.exports[`./components/${name}`]
+        const parent = pkg.exports[`./components/${owner}`]
+
+        expect(entry, `${name} в package.json#exports`).toBeDefined()
+        // Алиас, а не копия: модуль у части и родителя один и тот же.
+        expect(entry, `${name} ведёт не к ${owner}`).toEqual(parent)
+      }
+    })
+
+    it('часть составного компонента не заводит своей entry', () => {
+      // Код части и так лежит в чанке родителя — вторая entry дублировала бы его.
+      const viteConfig = read('vite.config.ts')
+
+      for (const name of Object.keys(subcomponents))
+        expect(viteConfig, name).not.toContain(`'components/${name}/index'`)
     })
   })
 }

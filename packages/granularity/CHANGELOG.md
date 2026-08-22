@@ -7,6 +7,21 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.28.2] 2026-08-22
+
+### Fixed
+
+- **Parts of composite components can now be imported granularly.** `GrTimelineItem`, `GrListItem`,
+  menu items and seventeen more live in the parent's directory and are not public components: no
+  `index.ts`, no `config.ts`, no entry of their own — their code ships in the parent's chunk. But
+  they had no subpath either, so `@feugene/granularity/components/GrTimelineItem` failed with
+  `ERR_PACKAGE_PATH_NOT_EXPORTED`: on those twenty names the whole point of the package did not
+  apply, even though a template spells them like any other component.
+
+  `package.json#exports` now carries an alias for each: the part's own key, the parent's module.
+  Generated, not hand-written — `generate:registry` builds them from the parent's barrel, and the
+  registry gate checks that each alias points at its owner and that no part claims an entry.
+
 ## [v0.28.1] 2026-08-22
 
 ### Fixed
