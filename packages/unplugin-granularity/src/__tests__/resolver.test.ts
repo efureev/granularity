@@ -93,3 +93,56 @@ describe('GranularityResolver (core preset)', () => {
     })
   })
 })
+
+describe('части составных компонентов', () => {
+  const resolver = GranularityResolver({ importStyle: true })[0] as ComponentResolverObject
+
+  /**
+   * Своей директории в `src` у части нет, но subpath есть: ядро публикует его
+   * алиасом на модуль родителя с `0.28.2`. Плагину поэтому нечего знать про
+   * состав составных компонентов — он строит путь по имени, как для всех.
+   */
+  it('резолвятся своим subpath, как обычные компоненты', () => {
+    expect(resolveWith(resolver, 'GrTimelineItem')).toEqual({
+      name: 'GrTimelineItem',
+      from: '@feugene/granularity/components/GrTimelineItem',
+      sideEffects: '@feugene/granularity/components/GrTimelineItem/styles.css',
+    })
+
+    expect(resolveWith(resolver, 'GrListItem')).toMatchObject({
+      from: '@feugene/granularity/components/GrListItem',
+    })
+  })
+
+  /**
+   * Провайдеру, который такие subpath ещё не публикует, карта по-прежнему
+   * нужна: без неё путь ведёт в никуда и сборка падает у его потребителя.
+   */
+  it('карта уводит имя в subpath родителя — для провайдера без алиасов', () => {
+    const legacy = createGranularResolver({
+      packageName: '@acme/kit',
+      prefix: 'Gr',
+      subcomponents: { GrTimelineItem: 'GrTimeline' },
+      importStyle: true,
+    })
+
+    expect(resolveWith(legacy, 'GrTimelineItem')).toEqual({
+      name: 'GrTimelineItem',
+      from: '@acme/kit/components/GrTimeline',
+      // CSS тоже родительский: своей директории в `dist` у части нет.
+      sideEffects: '@acme/kit/components/GrTimeline/styles.css',
+    })
+  })
+
+  it('обычные компоненты картой не задеты', () => {
+    const legacy = createGranularResolver({
+      packageName: '@acme/kit',
+      prefix: 'Gr',
+      subcomponents: { GrTimelineItem: 'GrTimeline' },
+    })
+
+    expect(resolveWith(legacy, 'GrTimeline')).toMatchObject({
+      from: '@acme/kit/components/GrTimeline',
+    })
+  })
+})

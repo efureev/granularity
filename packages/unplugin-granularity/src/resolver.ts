@@ -44,6 +44,16 @@ export interface GranularResolverOptions {
    */
   importStyle?: boolean | 'css'
 
+  /**
+   * Подкомпоненты: имя в шаблоне → компонент, из subpath которого они приезжают.
+   *
+   * Нужна провайдеру, который не публикует subpath на части составных
+   * компонентов: без неё жадный резолвер строит для них несуществующий путь, и
+   * сборка падает у потребителя. Ядро такие subpath публикует с `0.28.2`, и
+   * своей карты ему больше не нужно.
+   */
+  subcomponents?: Readonly<Record<string, string>>
+
   /** Исключить компоненты по RegExp. */
   exclude?: RegExp
 }
@@ -66,7 +76,7 @@ export interface GranularResolverOptions {
  * ```
  */
 export function createGranularResolver(options: GranularResolverOptions): ComponentResolverObject {
-  const { packageName, prefix, components, importStyle = false, exclude } = options
+  const { packageName, prefix, components, subcomponents, importStyle = false, exclude } = options
   const whitelist = components ? new Set(components) : undefined
 
   return {
@@ -88,9 +98,11 @@ export function createGranularResolver(options: GranularResolverOptions): Compon
         return
       }
 
-      const from = `${packageName}/components/${name}`
+      // Экспорт остаётся своим, модуль — родительский: subpath есть только у него.
+      const owner = subcomponents?.[name] ?? name
+      const from = `${packageName}/components/${owner}`
       const sideEffects = importStyle
-        ? `${packageName}/components/${name}/styles.css`
+        ? `${packageName}/components/${owner}/styles.css`
         : undefined
 
       return sideEffects ? { name, from, sideEffects } : { name, from }

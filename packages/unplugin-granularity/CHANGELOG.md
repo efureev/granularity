@@ -7,6 +7,31 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.5.0] 2026-08-22
+
+Breaking for old cores: the peer range now starts at `@feugene/granularity@0.28.2`.
+
+### Fixed
+
+- **Parts of composite components resolved to a path no package published.** The greedy `Gr*`
+  resolver built `@feugene/granularity/components/GrTimelineItem`, while the package published a
+  subpath only for components with their own `index.ts` and `config.ts`. Parts live in the parent's
+  directory, so a consumer's build failed with `"./components/GrTimelineItem" is not exported under
+  the conditions` — no type error, no warning, and only once the part actually appeared in a
+  template. All twenty were affected: menu items, `GrListItem`, `GrSidebarItem`, `GrTabPanel`, the
+  parts of `GrDialog`.
+
+  Fixed in the core rather than here: `@feugene/granularity@0.28.2` publishes a subpath alias for
+  every part, so the plugin builds the path by name, the same way it does for any component, and
+  carries no knowledge of what is composed of what. Hence the peer bump — on an older core those
+  subpaths do not exist.
+
+### Added
+
+- **`subcomponents` on `createGranularResolver`** — a map «part → owning component» for a provider
+  that does not publish such aliases yet: the import, and the `styles.css` side effect with it, are
+  taken from the owner's subpath. Companion packages of the core no longer need it.
+
 ## [v0.4.1] 2026-08-12
 
 ### Fixed
