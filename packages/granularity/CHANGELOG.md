@@ -7,6 +7,24 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.28.4] 2026-08-22
+
+### Fixed
+
+- **`GrTree` — the row highlight no longer covers the row.** The row surface is a separate
+  `::before` layer, and the label, the chevron and the checkmark sit in normal flow: within one
+  stacking context a positioned layer paints **over** flow content. With the package defaults — 5–16 %
+  `color-mix` — that only tinted the text, so nothing here caught it; give the public
+  `--gr-tree-row-hover-bg` (or `--gr-tree-row-current-bg`) an opaque value, as a consumer naturally
+  would, and the row went blank on hover and on selection. At depth zero the layer spans the whole
+  row, so the chevron disappeared too.
+
+  The layer now sits under the content (`z-index: -1`) and the row is isolated
+  (`isolation: isolate`). The second half is not optional: without its own stacking context a negative
+  layer slides behind the nearest ancestor with a background, and the highlight vanishes entirely.
+  Branch guides stay above the layer, as before. Reported by a consumer of
+  `@efureev/ft-extra-granularity`.
+
 ## [v0.28.3] 2026-08-22
 
 ### Fixed
