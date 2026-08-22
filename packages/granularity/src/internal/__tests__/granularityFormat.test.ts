@@ -57,3 +57,69 @@ describe('splitLeadingSign', () => {
     expect(splitLeadingSign([])).toEqual({ sign: '', rest: '' })
   })
 })
+
+describe('кэш инстансов Intl', () => {
+  /**
+   * Считаем построения, а не вызовы: кэш затем и нужен, что конструктор
+   * примерно на порядок дороже самого форматирования.
+   *
+   * Подмена руками, а не `vi.spyOn`: шпион перехватывает и `new`, отдавая
+   * мок-инстанс без `format`, — форматирование падало бы прямо в замере.
+   */
+  function countConstructions(run: () => void): number {
+    const Original = Intl.NumberFormat
+    let built = 0
+
+    const counting = function (...args: ConstructorParameters<typeof Intl.NumberFormat>) {
+      built += 1
+
+      return new Original(...args)
+    } as unknown as typeof Intl.NumberFormat
+    counting.supportedLocalesOf = (...args) => Original.supportedLocalesOf(...args)
+
+    Intl.NumberFormat = counting
+    try {
+      run()
+    }
+    finally {
+      Intl.NumberFormat = Original
+    }
+
+    return built
+  }
+
+  /** Заведомо уникальный набор опций: ключ кэша у каждого свой. */
+  const unique = (i: number): Intl.NumberFormatOptions => ({
+    minimumIntegerDigits: (i % 21) + 1,
+    maximumFractionDigits: Math.floor(i / 21),
+  })
+
+  const HOT: Intl.NumberFormatOptions = { style: 'percent', minimumFractionDigits: 2 }
+
+  it('горячая запись переживает вытеснение соседей', () => {
+    formatNumber('en', 1, HOT)
+
+    const built = countConstructions(() => {
+      for (let i = 0; i < 300; i += 1) {
+        formatNumber('en', i, HOT)
+        formatNumber('en', i, unique(i))
+      }
+    })
+
+    // Ровно по одному построению на новую запись: горячая читается на каждом
+    // витке и обязана остаться. Сброс кэша целиком пересоздавал бы её вместе
+    // со всеми — построений вышло бы заметно больше.
+    expect(built).toBe(300)
+  })
+
+  it('кэш ограничен: холодная запись вытесняется', () => {
+    // Опции генерируются на лету, и без предела кэш рос бы вместе с ними.
+    for (let i = 0; i < 300; i += 1) formatNumber('en', 1, unique(i))
+
+    const built = countConstructions(() => {
+      formatNumber('en', 1, unique(0))
+    })
+
+    expect(built).toBe(1)
+  })
+})

@@ -7,6 +7,13 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+
+- **The `Intl` instance cache no longer resets in full.** On overflow it wiped every entry, so a
+  working set larger than the limit — a table with a dozen columns in a few locales — rebuilt hot
+  formatters on every insert, and building one costs about ten times the formatting itself. The
+  cache now evicts by least recent read.
+
 ### Added
 
 - **`GrBreadcrumbs` — `iconOnly` on an item.** The classic home icon at the start of a trail: the
