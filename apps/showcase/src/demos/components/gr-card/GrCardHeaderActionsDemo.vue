@@ -13,7 +13,7 @@ const lastAction = ref('—')
     карточке с действием приходилось забирать `#header` целиком и переписывать
     заголовок вручную.
   -->
-  <GrCard title="Продажи за неделю" description="Обновлено 5 минут назад" :heading-level="3">
+  <GrCard title="Продажи за неделю" description="Обновлено 5 минут назад" :heading-level="3" padding="md">
     <template #actions>
       <GrButton size="xs" variant="ghost" @click="lastAction = 'Обновить'">
         Обновить
