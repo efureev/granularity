@@ -128,13 +128,20 @@ export interface GranularityResolverOptions {
   /**
    * Подтягивать ли CSS компонента как side-effect.
    *
-   * - `true` / `'css'` — в `sideEffects` попадёт `@feugene/granularity/components/<Name>/styles.css`.
-   *   Пакет сам помечает все `*.css` как side-effect, поэтому неиспользованный
-   *   стиль всё равно не попадёт в бандл.
-   * - `false` — ничего не подгружаем (если собираете стили отдельно, например
-   *   через общий `@feugene/granularity/styles.css`).
+   * - `true` / `'css'` — в `sideEffects` попадёт `<pkg>/components/<Name>/styles.css`;
+   * - `false` — ничего не подгружаем.
    *
-   * @default true
+   * **Ядру это не нужно, и по умолчанию выключено.** Свой CSS компонент тянет
+   * сам: `libInjectCss` вписывает `import '../styles.css'` внутрь его чанка, а
+   * у большинства компонентов собственного CSS нет вовсе — их оформление
+   * собирает UnoCSS-пресет. Subpath на такой файл ядро не публикует, поэтому
+   * включённая опция давала `ERR_PACKAGE_PATH_NOT_EXPORTED` на сборке
+   * потребителя — на каждом компоненте, а не только на редком.
+   *
+   * Опция остаётся для провайдера, который раздаёт CSS отдельными файлами и
+   * объявляет их в `exports`.
+   *
+   * @default false
    */
   importStyle?: boolean | 'css'
 
@@ -165,7 +172,7 @@ interface ResolvedOptions {
 function normalizeOptions(options: GranularityResolverOptions): ResolvedOptions {
   return {
     prefix: options.prefix ?? GRANULARITY_DEFAULT_PREFIX,
-    importStyle: options.importStyle !== false,
+    importStyle: options.importStyle === true || options.importStyle === 'css',
     directives: options.directives !== false,
     exclude: options.exclude,
   }

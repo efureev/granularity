@@ -7,6 +7,23 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.6.0] 2026-08-22
+
+Behaviour change: `importStyle` is now off by default.
+
+### Fixed
+
+- **`importStyle` pointed at a stylesheet no component publishes.** On by default, it added
+  `<pkg>/components/<Name>/styles.css` as a side effect — a subpath the core does not export at all,
+  so a consumer using the defaults hit `ERR_PACKAGE_PATH_NOT_EXPORTED` on every component, not on a
+  rare one. Nothing inside this repository caught it: the showcase, the only consumer here, passes
+  `importStyle: false`.
+
+  It is off by default now, and for the core it is not needed at all: a component that has CSS of its
+  own imports it from its own chunk (`libInjectCss`), and most components have none — their look is
+  assembled by the UnoCSS preset from the components you select. The option stays for providers that
+  ship CSS as separate files and declare them in `exports`.
+
 ## [v0.5.0] 2026-08-22
 
 Breaking for old cores: the peer range now starts at `@feugene/granularity@0.28.2`.

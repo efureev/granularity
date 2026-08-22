@@ -69,7 +69,7 @@ import '@feugene/granularity/components/GrInput/styles.css'
 ```ts
 GranularityResolver({
   prefix: 'Gr',       // префикс компонентов; default 'Gr'
-  importStyle: true,  // подтягивать styles.css как side-effect; default true
+  importStyle: false, // подтягивать <pkg>/components/<Name>/styles.css; default false
   directives: true,   // авто-импорт директив (v-hotkey и т.п.); default true
   exclude: /^GrIn/,   // игнорировать имена по RegExp
 })
@@ -78,7 +78,7 @@ GranularityResolver({
 | Опция         | Тип                          | По умолчанию | Назначение                                              |
 | ------------- | ---------------------------- | ------------ | -------------------------------------------------------- |
 | `prefix`      | `string`                     | `'Gr'`       | Какие компоненты из шаблонов считать «своими».          |
-| `importStyle` | `boolean \| 'css'`           | `true`       | Подгружать ли CSS компонента как side-effect.            |
+| `importStyle` | `boolean \| 'css'`           | `false`      | Подгружать ли CSS компонента как side-effect. Ядру не нужно — см. «Нюансы». |
 | `directives`  | `boolean`                    | `true`       | Включать ли второй резолвер — для директив.              |
 | `exclude`     | `RegExp \| undefined`        | —            | Исключение из обработки (применяется и к компонентам, и к директивам). |
 
@@ -100,8 +100,12 @@ Whitelist фиксированный — так резолвер остаётс�
 
 ## Нюансы
 
-- **Стили.** Если вы подключаете `@feugene/granularity/styles.css` общим
-  импортом — передайте `importStyle: false`, чтобы не дублировать CSS.
+- **Стили ядра подключать через резолвер не нужно.** Свой CSS компонент тянет
+  сам: он вписан в его чанк, а у большинства компонентов собственного CSS нет
+  вовсе — оформление собирает UnoCSS-пресет по выбранным компонентам. Отсюда и
+  `importStyle: false` по умолчанию: включённая опция ссылалась бы на
+  `@feugene/granularity/components/<Name>/styles.css`, которого ядро не
+  публикует, и ломала бы сборку. Общий файл — `@feugene/granularity/styles.css`.
 - **Коллизии имён.** Если в приложении есть свой `Gr…`, который не относится
   к granularity, используйте `exclude` (например `/^GrLegacy/`) или поменяйте `prefix`.
 - **`GlobalComponents` для Volar.** Резолвер работает вместе с

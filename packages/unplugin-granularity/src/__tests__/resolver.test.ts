@@ -70,10 +70,12 @@ describe('GranularityResolver (core preset)', () => {
     const [component, directive] = GranularityResolver() as ComponentResolverObject[]
 
     expect(component?.type).toBe('component')
+    // Без `sideEffects`: свой CSS компонент тянет из собственного чанка, а
+    // subpath на `styles.css` ядро не публикует — ссылка на него ломала бы
+    // сборку потребителя.
     expect(resolveWith(component!, 'GrInput')).toEqual({
       name: 'GrInput',
       from: '@feugene/granularity/components/GrInput',
-      sideEffects: '@feugene/granularity/components/GrInput/styles.css',
     })
 
     expect(directive?.type).toBe('directive')
@@ -82,6 +84,16 @@ describe('GranularityResolver (core preset)', () => {
       from: '@feugene/granularity/directives/hotkey',
     })
     expect(resolveWith(directive!, 'Unknown')).toBeUndefined()
+  })
+
+  it('подключает CSS только по явной просьбе', () => {
+    const [component] = GranularityResolver({ importStyle: true }) as ComponentResolverObject[]
+
+    expect(resolveWith(component!, 'GrInput')).toEqual({
+      name: 'GrInput',
+      from: '@feugene/granularity/components/GrInput',
+      sideEffects: '@feugene/granularity/components/GrInput/styles.css',
+    })
   })
 
   it('omits the directive resolver when directives=false and drops styles when importStyle=false', () => {
