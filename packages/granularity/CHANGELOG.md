@@ -7,6 +7,8 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.28.1] 2026-08-22
+
 ### Fixed
 
 - **`GrDropdownMenu` — `borderTop` / `borderBottom` no longer run into the panel's rounded corner.**
