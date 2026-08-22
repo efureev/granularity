@@ -169,3 +169,101 @@ describe('vClickOutside', () => {
     wrapper.unmount()
   })
 })
+
+/**
+ * Слушатель у директивы один на документ и тип события, а не на элемент:
+ * страница с десятком оверлеев вешала десяток слушателей `click` на документ,
+ * и каждый ререндер компонента их снимал и вешал заново.
+ */
+describe('подписка на документ', () => {
+  function countClickListeners(run: () => void): { added: number, removed: number } {
+    const add = vi.spyOn(document, 'addEventListener')
+    const remove = vi.spyOn(document, 'removeEventListener')
+    try {
+      run()
+
+      return {
+        added: add.mock.calls.filter(([type]) => type === 'click').length,
+        removed: remove.mock.calls.filter(([type]) => type === 'click').length,
+      }
+    }
+    finally {
+      add.mockRestore()
+      remove.mockRestore()
+    }
+  }
+
+  const Many = defineComponent({
+    directives: { clickOutside: vClickOutside },
+    props: { handler: { type: Function, required: true }, count: { type: Number, default: 3 } },
+    template: `
+      <div>
+        <div v-for="i in count" :key="i" v-click-outside="handler" :data-testid="'panel-' + i">panel</div>
+      </div>
+    `,
+  })
+
+  it('десять элементов дают один слушатель, а не десять', () => {
+    const handler = vi.fn()
+    let wrapper: ReturnType<typeof mount> | undefined
+
+    const { added } = countClickListeners(() => {
+      wrapper = mount(Many, { attachTo: document.body, props: { handler, count: 10 } })
+    })
+
+    expect(added).toBe(1)
+
+    // Общий слушатель обязан обслуживать все элементы разом.
+    clickOn(document.body)
+    expect(handler).toHaveBeenCalledTimes(10)
+
+    wrapper?.unmount()
+  })
+
+  it('ререндер не переподписывает документ', async () => {
+    const handler = vi.fn()
+    const wrapper = mount(Many, { attachTo: document.body, props: { handler, count: 3 } })
+
+    const add = vi.spyOn(document, 'addEventListener')
+    const remove = vi.spyOn(document, 'removeEventListener')
+
+    // Хук `updated` срабатывает на каждом обновлении хозяина, а набор событий
+    // при этом не меняется — снимать и вешать слушатель заново незачем.
+    wrapper.vm.$forceUpdate()
+    await nextTick()
+
+    const added = add.mock.calls.filter(([type]) => type === 'click').length
+    const removed = remove.mock.calls.filter(([type]) => type === 'click').length
+    add.mockRestore()
+    remove.mockRestore()
+
+    expect({ added, removed }).toEqual({ added: 0, removed: 0 })
+
+    wrapper.unmount()
+  })
+
+  it('размонтирование одного не глушит остальных', async () => {
+    const handler = vi.fn()
+    const count = ref(3)
+    const Host = defineComponent({
+      directives: { clickOutside: vClickOutside },
+      setup: () => ({ count, handler }),
+      template: `<div><div v-for="i in count" :key="i" v-click-outside="handler">panel</div></div>`,
+    })
+
+    const wrapper = mount(Host, { attachTo: document.body })
+    count.value = 1
+    await nextTick()
+
+    clickOn(document.body)
+    expect(handler).toHaveBeenCalledTimes(1)
+
+    count.value = 0
+    await nextTick()
+    handler.mockClear()
+    clickOn(document.body)
+    expect(handler).not.toHaveBeenCalled()
+
+    wrapper.unmount()
+  })
+})

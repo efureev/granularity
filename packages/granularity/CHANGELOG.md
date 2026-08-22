@@ -14,6 +14,12 @@ to [Semantic Versioning](https://semver.org/).
   formatters on every insert, and building one costs about ten times the formatting itself. The
   cache now evicts by least recent read.
 
+- **`v-click-outside` keeps one listener per document and event.** Every element used to add its
+  own — a page with ten overlays put ten `click` listeners on the document — and the `updated` hook
+  removed and re-added them on **every** re-render of the host, while the set of events almost never
+  changes. Subscriptions are now shared and counted, and a re-render with an unchanged set touches
+  nothing.
+
 ### Added
 
 - **`GrBreadcrumbs` — `iconOnly` on an item.** The classic home icon at the start of a trail: the
