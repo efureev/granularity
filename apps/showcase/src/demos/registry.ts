@@ -51,6 +51,7 @@ export const demoPathByPreviewKey = {
   'extra-editor-toolbar': 'extra/granularity-editor/GrRichTextToolbarDemo.vue',
   'extra-editor-frame': 'extra/granularity-editor/GrRichTextFrameDemo.vue',
   'extra-editor-extensions': 'extra/granularity-editor/GrRichTextExtensionsDemo.vue',
+  'extra-media-image-crop-basic': 'extra/granularity-media/GrImageCropBasicDemo.vue',
   'extra-datasource-basic': 'extra/granularity-datasource/UseDataSourceBasicDemo.vue',
   'extra-datasource-url': 'extra/granularity-datasource/UseDataSourceUrlDemo.vue',
   'extra-chrono-calendar-basic': 'extra/granularity-chrono/GrCalendarBasicDemo.vue',

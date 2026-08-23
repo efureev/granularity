@@ -37,6 +37,7 @@ declare module 'vue' {
     GrDialog: typeof import('@feugene/granularity/components/GrDialog')['GrDialog']
     GrDuration: typeof import('@feugene/granularity-chrono/components/GrDuration')['GrDuration']
     GrFormField: typeof import('@feugene/granularity/components/GrFormField')['GrFormField']
+    GrImageCrop: typeof import('@feugene/granularity-media/components/GrImageCrop')['GrImageCrop']
     GrInput: typeof import('@feugene/granularity/components/GrInput')['GrInput']
     GrLink: typeof import('@feugene/granularity/components/GrLink')['GrLink']
     GrPagination: typeof import('@feugene/granularity/components/GrPagination')['GrPagination']

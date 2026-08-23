@@ -9,6 +9,8 @@ import { GR_CHRONO_I18N_BLOCK } from '@feugene/granularity-chrono/i18n'
 import grChronoLocales from '@feugene/granularity-chrono/i18n/all'
 import { GR_EDITOR_I18N_BLOCK } from '@feugene/granularity-editor/i18n'
 import grEditorLocales from '@feugene/granularity-editor/i18n/all'
+import { GR_MEDIA_I18N_BLOCK } from '@feugene/granularity-media/i18n'
+import grMediaLocales from '@feugene/granularity-media/i18n/all'
 import { GR_CHARTS_I18N_BLOCK } from '@feugene/granularity-charts/i18n'
 import grChartsLocales from '@feugene/granularity-charts/i18n/all'
 import { GR_DASHBOARD_I18N_BLOCK } from '@feugene/granularity-dashboard/i18n'
@@ -32,7 +34,7 @@ export async function setupShowcaseI18n() {
     // ключи у него `gr.calendar.*`, а реестр лоадеров `fint-i18n` источники
     // одного блока склеивает. Без этой строки календарь и пикеры показывают
     // английский fallback из компонента — на любом языке витрины.
-    loaders: [showcaseLocaleLoaders, ...grLocales, ...grChronoLocales, ...grChartsLocales, ...grDashboardLocales, ...grFormsSchemaLocales, ...grEditorLocales],
+    loaders: [showcaseLocaleLoaders, ...grLocales, ...grChronoLocales, ...grChartsLocales, ...grDashboardLocales, ...grFormsSchemaLocales, ...grEditorLocales, ...grMediaLocales],
     plugins: [
       new PersistencePlugin({
         key: 'showcase-locale', // Key in localStorage
@@ -41,7 +43,7 @@ export async function setupShowcaseI18n() {
     ],
   })
 
-  i18n.registerBlocks([SHOWCASE_I18N_BLOCK, GRANULARITY_I18N_BLOCK, GR_CHRONO_I18N_BLOCK, GR_CHARTS_I18N_BLOCK, GR_DASHBOARD_I18N_BLOCK, GR_FORMS_SCHEMA_I18N_BLOCK, GR_EDITOR_I18N_BLOCK])
+  i18n.registerBlocks([SHOWCASE_I18N_BLOCK, GRANULARITY_I18N_BLOCK, GR_CHRONO_I18N_BLOCK, GR_CHARTS_I18N_BLOCK, GR_DASHBOARD_I18N_BLOCK, GR_FORMS_SCHEMA_I18N_BLOCK, GR_EDITOR_I18N_BLOCK, GR_MEDIA_I18N_BLOCK])
   // `PersistencePlugin` уже мог восстановить сохранённый в localStorage (`showcase-locale`)
   // язык в `i18n.locale.value` во время `createFintI18n`. Грузим блоки именно для активного
   // языка, а не для `defaultLocale`, иначе после перезагрузки страница остаётся на английском

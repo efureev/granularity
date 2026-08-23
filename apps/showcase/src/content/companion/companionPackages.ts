@@ -3,6 +3,7 @@ import dashboardPkg from '@feugene/granularity-dashboard/package.json'
 import datasourcePkg from '@feugene/granularity-datasource/package.json'
 import editorPkg from '@feugene/granularity-editor/package.json'
 import formsSchemaPkg from '@feugene/granularity-forms-schema/package.json'
+import mediaPkg from '@feugene/granularity-media/package.json'
 import chronoPkg from '@feugene/granularity-chrono/package.json'
 
 import type { ShowcaseApiSectionMeta } from '../model.ts'
@@ -2340,6 +2341,101 @@ import type { DataSourceUrlAdapter } from '@feugene/granularity-datasource/url'`
               { name: 'setFilter / setFilters', type: '(name, value) · (filters) => void', description: 'Один фильтр или весь набор разом.' },
               { name: 'reset / reload', type: '() => void · () => Promise<void>', description: '`reset` возвращает умолчания; `reload` повторяет запрос текущего состояния — например после правки строки.' },
             ],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'granularity-media',
+    npmName: '@feugene/granularity-media',
+    label: 'Media',
+    version: mediaPkg.version,
+    description: 'Кадрирование картинки перед отправкой: рамка неподвижна, двигается изображение, а наружу уходит готовый файл.',
+    dependencies: [],
+    components: [
+      {
+        name: 'GrImageCrop',
+        slug: 'gr-image-crop',
+        title: 'GrImageCrop',
+        summary: 'Аватар из принесённой пользователем фотографии: он выбирает кадр, вы получаете файл нужного размера.',
+        importPath: '@feugene/granularity-media/components/GrImageCrop',
+        overview: {
+          paragraphs: [
+            'Пользователь приносит фотографию произвольных пропорций, а профилю нужен квадрат. Компонент показывает картинку под неподвижной рамкой: её тянут и приближают, а наружу уходит готовый `Blob` — можно сразу отправлять.',
+            'В отличие от просмотрщика, который ничего не меняет, здесь результат — новый файл. Соотношение сторон задаёте вы: место, куда картинка встанет, известно заранее.',
+          ],
+          features: [
+            'Один жест вместо двух: рамка стоит, двигается изображение — на телефоне не нужно попадать в угловые ручки.',
+            'Клавиатура целиком: стрелки двигают кадр, плюс и минус меняют увеличение, `Home` сбрасывает.',
+            'Круглая маска для аватара — при этом файл остаётся прямоугольным и не растёт в весе.',
+            'Размер результата по умолчанию — в пикселях исходника, а не окна: разрешение не теряется.',
+            'Экспорт в `image/webp` с выбранным качеством: на сервер уезжает килобайт вместо мегабайта.',
+            'Своих зависимостей нет — только Canvas и браузерные API.',
+          ],
+        },
+        typeDeclarations: `import type {
+  GrCropRect,
+  GrImageCropOutput,
+  GrImageCropProps,
+  GrImageCropShape,
+  GrImageCropSize,
+} from '@feugene/granularity-media'`,
+        apiSections: [
+          {
+            key: 'props',
+            title: 'Props',
+            origin: 'manual',
+            items: [
+              { name: 'src', type: 'string | File | Blob | null', default: 'null', description: 'Источник: файл из загрузчика, blob с камеры или готовый адрес.' },
+              { name: 'aspectRatio', type: 'number', default: '1', description: 'Отношение ширины кадра к высоте. Число, а не строка `16:9`: строку пришлось бы разбирать в рантайме.' },
+              { name: 'shape', type: `'rect' | 'circle'`, default: `'rect'`, description: 'Форма маски показа. На форму файла не влияет — он остаётся прямоугольным.' },
+              { name: 'zoom', type: 'number', default: '1', description: 'Увеличение относительно вписанного кадра, `v-model:zoom`. Меньше единицы не опускается: картинка перестала бы покрывать окно.' },
+              { name: 'maxZoom', type: 'number', default: '4', description: 'Верхняя граница увеличения.' },
+              { name: 'output', type: '{ width?, height?, type?, quality? }', description: 'Размер и кодек результата. Без него кадр выходит в пикселях исходника.' },
+              { name: 'size', type: `'xs' | 'sm' | 'md' | 'lg'`, description: 'Шкала вложенных контролов; читается из `GrConfigProvider`.' },
+              { name: 'disabled', type: 'boolean', default: 'false', description: 'Кадр не двигается ни жестом, ни клавиатурой.' },
+              { name: 'ariaLabel', type: 'string', description: 'Имя группы, если рядом нет подписи.' },
+            ],
+          },
+          {
+            key: 'emits',
+            title: 'Emits',
+            origin: 'manual',
+            items: [
+              { name: 'update:zoom', type: '(value: number)', description: 'Увеличение изменилось — жестом, слайдером или клавишей.' },
+              { name: 'change', type: '(rect: GrCropRect)', description: 'Область исходника под рамкой после сдвига, увеличения или новой картинки.' },
+              { name: 'load', type: '({ width, height })', description: 'Картинка загрузилась; размеры — натуральные.' },
+              { name: 'error', type: '(error: unknown)', description: 'Загрузка не удалась либо холст оказался непригоден для чтения (кросс-доменный источник без CORS).' },
+            ],
+          },
+          {
+            key: 'expose',
+            title: 'Методы',
+            origin: 'manual',
+            items: [
+              { name: 'crop()', type: '() => Promise<Blob | null>', description: 'Вырезает текущий кадр. `null` — картинки нет или экспорт запрещён политикой источника.' },
+              { name: 'reset()', type: '() => void', description: 'Возвращает центр и увеличение `1`.' },
+              { name: 'rect()', type: '() => GrCropRect', description: 'Текущая область исходника без экспорта.' },
+            ],
+          },
+          {
+            key: 'slots',
+            title: 'Слоты',
+            origin: 'manual',
+            items: [
+              { name: 'controls', type: '{ zoom, setZoom }', description: 'Замена встроенного слайдера увеличения.' },
+              { name: 'empty', type: '—', description: 'Что показать, пока картинки нет.' },
+            ],
+          },
+        ],
+        examples: [
+          {
+            id: 'media-image-crop-basic',
+            title: 'Avatar from a landscape photo',
+            description: 'Квадратный кадр из картинки 1600 × 900: тяните изображение, меняйте увеличение и вырезайте результат.',
+            previewKey: 'extra-media-image-crop-basic',
+            note: 'Рамка неподвижна намеренно: обратная модель требует двух жестов вместо одного, а её угловые ручки на телефоне меньше пальца. Круг — маска показа, а не форма файла: круглым изображение делает то место, где оно показывается, а PNG с прозрачными углами весит больше и не годится на цветной подложке. Размер результата задан явно (256 × 256); без `output` кадр вышел бы в пикселях исходника — по окну на экране разрешение молча ополовинилось бы.',
           },
         ],
       },

@@ -1,0 +1,8 @@
+{
+  "imageCrop": {
+    "label": "Recorte de imagen",
+    "frame": "Marco: las flechas mueven la imagen, más y menos ajustan el zoom",
+    "empty": "Ninguna imagen seleccionada",
+    "zoom": "Zoom"
+  }
+}

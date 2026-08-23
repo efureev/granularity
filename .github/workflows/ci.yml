@@ -13,6 +13,7 @@ on:
       - 'granularity-forms-schema-v*'
       - 'granularity-datasource-v*'
       - 'granularity-editor-v*'
+      - 'granularity-media-v*'
   pull_request:
     branches: [ main ]
   # Ручной перезапуск: push тега тем же значением события не создаёт, и упавший
@@ -466,6 +467,155 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+  build-granularity-media:
+    needs:
+      - quality-granularity
+      - build-granularity
+      - build-unplugin-granularity
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Download granularity dist
+        uses: actions/download-artifact@v8
+        with:
+          name: granularity-dist
+          path: packages/granularity/dist
+
+      - name: Download unplugin-granularity dist
+        uses: actions/download-artifact@v8
+        with:
+          name: unplugin-granularity-dist
+          path: packages/unplugin-granularity/dist
+
+      # Пакет линтуется с проверкой типов, а гейты импортируют тест-кит: без его
+      # `dist` типы приезжают как `any`, и `ts/no-unsafe-call` роняет шаг Lint.
+      - name: Build test kit
+        run: yarn build:test-kit
+
+      - name: Lint package
+        run: yarn lint:media
+
+      - name: Typecheck package
+        if: always()
+        run: yarn typecheck:media
+
+      # Реестры сверяются с файловой системой до сборки: рассинхрон ломает не
+      # сборку, а tree-shaking, subpath-импорт и скан классов — молча.
+      - name: Registry drift
+        working-directory: packages/granularity-media
+        run: yarn generate:registry --check
+
+      - name: Locale completeness
+        working-directory: packages/granularity-media
+        run: yarn check:messages
+
+      - name: Test package
+        run: yarn test:media
+
+      - name: Build package
+        run: yarn build:media
+
+      - name: Granular doctor
+        working-directory: packages/granularity-media
+        run: yarn doctor
+
+      - name: Validate package metadata (publint)
+        working-directory: packages/granularity-media
+        run: npx --yes publint@latest --pack npm
+
+      - name: Upload dist
+        uses: actions/upload-artifact@v7
+        with:
+          name: granularity-media-dist
+          path: packages/granularity-media/dist/
+
+  # Публикация @feugene/granularity-media в npm по тегу
+  # `granularity-media-v<semver>`.
+  publish-npm-granularity-media:
+    needs:
+      - build-granularity-media
+    if: startsWith(github.ref, 'refs/tags/granularity-media-v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Verify tag matches package version
+        working-directory: packages/granularity-media
+        run: |
+          PKG_VERSION=$(node -p "require('./package.json').version")
+          TAG_VERSION="${GITHUB_REF_NAME#granularity-media-v}"
+          echo "package.json version: $PKG_VERSION"
+          echo "git tag version:      $TAG_VERSION"
+          if [ "$PKG_VERSION" != "$TAG_VERSION" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match package.json version $PKG_VERSION"
+            exit 1
+          fi
+
+      - name: Download dist
+        uses: actions/download-artifact@v8
+        with:
+          name: granularity-media-dist
+          path: packages/granularity-media/dist
+
+      - name: Publish to npm
+        run: npm publish --access public --provenance
+        working-directory: packages/granularity-media
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  # Зеркало в GitHub Packages под scope владельца репозитория.
+  publish-gpr-granularity-media:
+    needs:
+      - build-granularity-media
+    if: startsWith(github.ref, 'refs/tags/granularity-media-v')
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@efureev'
+
+      - name: Download dist
+        uses: actions/download-artifact@v8
+        with:
+          name: granularity-media-dist
+          path: packages/granularity-media/dist
+
+      - name: Prepare package for GitHub Packages
+        working-directory: packages/granularity-media
+        run: |
+          npm pkg set name='@efureev/granularity-media'
+          npm pkg delete publishConfig.provenance
+          npm pkg set publishConfig.registry='https://npm.pkg.github.com'
+          node -e "const p=require('./package.json');console.log('publishing as:',p.name,'@',p.version)"
+
+      - name: Publish to GitHub Packages
+        working-directory: packages/granularity-media
+        run: npm publish --ignore-scripts --no-provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   quality-showcase:
     needs:
       - build-granularity
@@ -476,6 +626,7 @@ jobs:
       - build-granularity-forms-schema
       - build-granularity-datasource
       - build-granularity-editor
+      - build-granularity-media
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -540,6 +691,12 @@ jobs:
         with:
           name: granularity-editor-dist
           path: packages/granularity-editor/dist
+
+      - name: Download granularity-media dist
+        uses: actions/download-artifact@v8
+        with:
+          name: granularity-media-dist
+          path: packages/granularity-media/dist
 
       - name: Lint showcase
         run: yarn lint:showcase
@@ -751,6 +908,7 @@ jobs:
       - build-granularity-forms-schema
       - build-granularity-datasource
       - build-granularity-editor
+      - build-granularity-media
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -810,6 +968,12 @@ jobs:
           name: granularity-editor-dist
           path: packages/granularity-editor/dist
 
+      - name: Download granularity-media dist
+        uses: actions/download-artifact@v8
+        with:
+          name: granularity-media-dist
+          path: packages/granularity-media/dist
+
       - name: Test showcase
         run: yarn test:showcase
 
@@ -826,6 +990,7 @@ jobs:
       - build-granularity-forms-schema
       - build-granularity-datasource
       - build-granularity-editor
+      - build-granularity-media
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -891,6 +1056,12 @@ jobs:
           name: granularity-editor-dist
           path: packages/granularity-editor/dist
 
+      - name: Download granularity-media dist
+        uses: actions/download-artifact@v8
+        with:
+          name: granularity-media-dist
+          path: packages/granularity-media/dist
+
       - name: Install Playwright browsers
         working-directory: apps/showcase
         run: npx playwright install --with-deps chromium
@@ -932,6 +1103,7 @@ jobs:
       - build-granularity-forms-schema
       - build-granularity-datasource
       - build-granularity-editor
+      - build-granularity-media
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -990,6 +1162,12 @@ jobs:
         with:
           name: granularity-editor-dist
           path: packages/granularity-editor/dist
+
+      - name: Download granularity-media dist
+        uses: actions/download-artifact@v8
+        with:
+          name: granularity-media-dist
+          path: packages/granularity-media/dist
 
       - name: Build showcase
         run: yarn build:showcase

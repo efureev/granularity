@@ -1,0 +1,8 @@
+{
+  "imageCrop": {
+    "label": "Image crop",
+    "frame": "Frame: arrow keys move the image, plus and minus zoom",
+    "empty": "No image selected",
+    "zoom": "Zoom"
+  }
+}

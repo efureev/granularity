@@ -41,7 +41,12 @@
 | --- | --- |
 | плитка вложения в ленте: картинка либо иконка по типу | [`GrFilePreview`](../packages/granularity/docs/components/GrFilePreview.md) |
 | картинку рассматривают во весь экран | [`GrImageViewer`](../packages/granularity/docs/components/GrImageViewer.md) |
+| из картинки вырезают кадр перед отправкой | [`GrImageCrop`](../packages/granularity-media/docs/components/GrImageCrop.md) |
 | показать содержимое файла текстом | [`GrCodeBlock`](../packages/granularity/docs/components/GrCodeBlock.md) |
+
+Различитель `GrImageViewer` / `GrImageCrop` — **что остаётся после**. Первый
+ничего не меняет: пользователь посмотрел и закрыл. Второй производит новый
+файл, и его результат уезжает на сервер.
 
 `GrFilePreview` просмотрщик не открывает — он эмитит `click`, а окно показывает
 потребитель. Пары «плитка + просмотрщик» одним компонентом в пакете нет
@@ -360,6 +365,7 @@
 | [`GrFormFile`](../packages/granularity/docs/components/GrFormFile.md) | ядро | файл — значение поля |
 | [`GrFormSection`](../packages/granularity/docs/components/GrFormSection.md) | ядро | форма длинная |
 | [`GrIcon`](../packages/granularity/docs/components/GrIcon.md) | ядро | иконке нужен единый размер |
+| [`GrImageCrop`](../packages/granularity-media/docs/components/GrImageCrop.md) | media | аватар из загруженного файла |
 | [`GrImageViewer`](../packages/granularity/docs/components/GrImageViewer.md) | ядро | картинку нужно рассмотреть |
 | [`GrInput`](../packages/granularity/docs/components/GrInput.md) | ядро | вводится строка |
 | [`GrInputTag`](../packages/granularity/docs/components/GrInputTag.md) | ядро | значения придумывает пользователь |
@@ -381,6 +387,7 @@
 | [`GrRating`](../packages/granularity/docs/components/GrRating.md) | ядро | оценка ставится в один клик |
 | [`GrRelativeTime`](../packages/granularity-chrono/docs/components/GrRelativeTime.md) | chrono | свежесть важнее точности |
 | [`GrResponseErrorBanner`](../packages/granularity/docs/components/GrResponseErrorBanner.md) | ядро | запрос упал |
+| [`GrRichText`](../packages/granularity-editor/docs/components/GrRichText.md) | editor | текст, который читатель увидит оформленным |
 | [`GrSchemaForm`](../packages/granularity-forms-schema/docs/components/GrSchemaForm.md) | forms-schema | бэкенд уже описывает контракт |
 | [`GrSegmented`](../packages/granularity/docs/components/GrSegmented.md) | ядро | переключение вида одного и того же |
 | [`GrSelect`](../packages/granularity/docs/components/GrSelect.md) | ядро | поле формы со списком значений |
