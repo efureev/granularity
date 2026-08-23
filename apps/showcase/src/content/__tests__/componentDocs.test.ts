@@ -160,7 +160,7 @@ describe('component docs metadata', () => {
     const textareaDoc = getShowcaseComponentDoc(textareaEntity!)
     const switchDoc = getShowcaseComponentDoc(switchEntity!)
 
-    expect(inputDoc.examples).toHaveLength(6)
+    expect(inputDoc.examples).toHaveLength(7)
     expect(inputDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(inputDoc.examples.every(example => example.previewKey?.startsWith('gr-input'))).toBe(true)
 

@@ -9,7 +9,7 @@ import { useGrFormControl } from '../../composables/useGrFormControl'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 import type { InputHTMLAttributes } from 'vue'
 
-import { grInputFieldClass, grInputShellClass, paddingX } from './grInputStyles'
+import { addonInlinePrefixClass, addonInlineSuffixClass, addonSegmentPrefixClass, addonSegmentSuffixClass, grInputFieldClass, grInputShellClass, paddingX } from './grInputStyles'
 
 import IconLoader from '~icons/lucide/loader-2'
 import IconX from '~icons/lucide/x'
@@ -74,6 +74,19 @@ export interface GrInputProps {
      */
     prefixFixed?: boolean
     suffixFixed?: boolean
+    /**
+     * Как выглядят аддоны `#prefix`/`#suffix`.
+     *
+     * `segment` (по умолчанию) — отдельный отсек, отрезанный рамкой и выровненный
+     * по ступени размера: так поле с «₽» и поле с «USD» стоят в колонку.
+     * `inline` — украшение внутри рамки: ни разделителя, ни своей ширины.
+     *
+     * Разница не косметическая. Поисковая строка с лупой в сегменте читается
+     * составным элементом — полем с приклеенной кнопкой, — а не одним полем;
+     * именно поэтому иконку внутри рамки нельзя было выразить аддоном, и
+     * потребители отказывались от неё вовсе.
+     */
+    addon?: 'segment' | 'inline'
 }
 
 export interface GrInputEmits {
@@ -132,6 +145,7 @@ const props = withDefaults(
       suffixMaxWidth: undefined,
       prefixFixed: false,
       suffixFixed: false,
+      addon: 'segment',
     },
 )
 
@@ -207,6 +221,11 @@ const showClear = computed(() => resolvedClearable.value && props.modelValue.len
 const trailingCount = computed(() => (showClear.value ? 1 : 0) + (showPasswordToggle.value ? 1 : 0) + (props.loading ? 1 : 0))
 const trailingReserve = computed(() => (trailingCount.value > 0 ? `${trailingCount.value * 28}px` : '0px'))
 
+const isInlineAddon = computed(() => props.addon === 'inline')
+
+const prefixAddonClass = computed(() => (isInlineAddon.value ? addonInlinePrefixClass : addonSegmentPrefixClass))
+const suffixAddonClass = computed(() => (isInlineAddon.value ? addonInlineSuffixClass : addonSegmentSuffixClass))
+
 const {
   prefixEl,
   suffixEl,
@@ -214,7 +233,9 @@ const {
   suffixStyle,
   fieldPadding: inputStyle,
 } = useControlAddons(() => props, {
-  defaultMinWidth: () => ADDON_MIN_WIDTH_BY_SIZE[resolvedSize.value],
+  // У украшения своей ширины нет — иначе иконка висела бы в пустом отсеке
+  // шириной со ступень размера.
+  defaultMinWidth: () => (isInlineAddon.value ? '0px' : ADDON_MIN_WIDTH_BY_SIZE[resolvedSize.value]),
   paddingX: () => paddingX[resolvedSize.value],
   trailingReserve: () => trailingReserve.value,
 })
@@ -291,7 +312,8 @@ function togglePassword(): void {
           v-if="$slots.prefix"
           ref="prefixEl"
           data-testid="gr-input-prefix"
-          class="absolute inset-y-0 left-0 flex items-center justify-center border-r border-[var(--gr-brd)] px-2 text-[var(--gr-muted-fg)] pointer-events-none select-none truncate"
+          class="absolute inset-y-0 left-0 flex items-center justify-center text-[var(--gr-muted-fg)] pointer-events-none select-none truncate"
+          :class="prefixAddonClass"
           :style="prefixStyle"
           aria-hidden="true"
       >
@@ -369,8 +391,8 @@ function togglePassword(): void {
           v-if="$slots.suffix"
           ref="suffixEl"
           data-testid="gr-input-suffix"
-          class="absolute inset-y-0 right-0 flex items-center justify-center border-l border-[var(--gr-brd)] px-2 text-[var(--gr-muted-fg)] pointer-events-none select-none truncate"
-          :class="suffixFixed ? '[direction:rtl]' : ''"
+          class="absolute inset-y-0 right-0 flex items-center justify-center text-[var(--gr-muted-fg)] pointer-events-none select-none truncate"
+          :class="[suffixAddonClass, suffixFixed ? '[direction:rtl]' : '']"
           :style="suffixStyle"
           aria-hidden="true"
       >

@@ -25,6 +25,8 @@ import type { GrRichTextSize } from './grRichTextStyles'
 import {
   bubbleClass,
   contentClass,
+  fieldFooterClass,
+  fieldHeaderClass,
   iconClass,
   rootClass,
   rootDisabledClass,
@@ -394,6 +396,20 @@ function updateBubble(): void {
   }
 }
 
+defineSlots<{
+  /**
+   * Полоса над областью ввода: подпись, счётчик, переключатель режима.
+   *
+   * Отдельная зона, а не место в тулбаре: тулбар строится по схеме и водит
+   * фокус ровером, а тут содержимое потребителя со своей клавиатурой.
+   */
+  header?: () => any
+  /** Полоса под областью ввода: счётчик символов, подсказка, кнопки отправки. */
+  footer?: () => any
+  /** Подмена кнопки тулбара по ключу действия. */
+  [key: `action-${string}`]: ((props: { action: unknown, active: boolean }) => any) | undefined
+}>()
+
 defineExpose({
   /** Инстанс TipTap: своя команда, своё расширение, свой плагин. */
   editor: computed(() => editor.value),
@@ -459,9 +475,17 @@ const rootClasses = computed(() => [
       </template>
     </div>
 
+    <div v-if="$slots.header" data-gr-rich-text-header :class="fieldHeaderClass">
+      <slot name="header" />
+    </div>
+
     <!-- Содержимое приезжает после монтирования: ProseMirror требует DOM, и на
          сервере области ввода не существует. -->
     <div ref="hostEl" data-gr-rich-text-content data-allow-mismatch="children" />
+
+    <div v-if="$slots.footer" data-gr-rich-text-footer :class="fieldFooterClass">
+      <slot name="footer" />
+    </div>
 
     <GrPopover
       v-if="showBubble"

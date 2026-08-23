@@ -7,6 +7,17 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.31.0] 2026-08-23
+
+### Added
+
+- **`GrInput` — `addon="inline"`: a decoration inside the border.** `#prefix` and `#suffix` were
+  segments only — an compartment cut off by a border and sized to the step of the control, which is
+  right for «₽» and «USD» but wrong for a search field: a magnifier in a compartment reads as a field
+  with a button glued to it, not as one field. There was no way to express an icon inside the border,
+  so consumers dropped the icon altogether. The new mode removes the divider and the reserved width;
+  the field still indents by the measured width, so the text starts right after the decoration.
+
 ## [v0.30.0] 2026-08-23
 
 ### Added

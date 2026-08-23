@@ -2,6 +2,13 @@ import type { ShowcaseComponentExampleDoc } from '../types'
 
 export const grInputExamples: ShowcaseComponentExampleDoc[] = [
   {
+    id: 'input-inline-addon',
+    title: 'Icon inside the field',
+    description: '`addon="inline"` рисует `#prefix`/`#suffix` внутри рамки: без разделителя и без собственной ширины. Режим по умолчанию — `segment`: отдельный отсек, выровненный по ступени размера, каким его знают денежные поля.',
+    status: 'ready',
+    previewKey: 'gr-input-inline-addon',
+  },
+  {
     id: 'input-events-and-loading',
     title: 'События поля и фоновая проверка',
     description: '`@change` по blur/Enter, отдельный `@clear` для очистки кнопкой, `loading` под асинхронную проверку и `focus()`/`select()` через ref.',

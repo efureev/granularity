@@ -350,3 +350,53 @@ describe('GrInput — loading', () => {
     expect(mount(GrInput, { props: { modelValue: 'x' } }).find('[data-gr-input-spinner]').exists()).toBe(false)
   })
 })
+
+/**
+ * Аддон-сегмент и украшение внутри рамки — разные сущности.
+ *
+ * Сегмент отрезан рамкой и держит ширину ступени размера: так поля с «₽» и
+ * «USD» стоят в колонку. Поисковая строка с лупой в таком отсеке читается
+ * составным элементом, а не одним полем, — из-за этого иконку внутри рамки
+ * нельзя было выразить вовсе, и от неё отказывались.
+ */
+describe('GrInput — режим аддонов', () => {
+  it('по умолчанию сегмент: рамка-разделитель и своя ширина', () => {
+    const wrapper = mount(GrInput, {
+      props: { modelValue: '' },
+      slots: { prefix: '₽', suffix: 'кг' },
+    })
+
+    const prefix = wrapper.get('[data-testid="gr-input-prefix"]')
+    const suffix = wrapper.get('[data-testid="gr-input-suffix"]')
+
+    expect(prefix.classes()).toContain('border-r')
+    expect(suffix.classes()).toContain('border-l')
+    // Ширина ступени размера — иначе соседние поля разъезжаются.
+    expect(prefix.attributes('style')).toContain('min-width')
+  })
+
+  it('`inline` снимает разделитель и собственную ширину', () => {
+    const wrapper = mount(GrInput, {
+      props: { modelValue: '', addon: 'inline' },
+      slots: { prefix: '🔍', suffix: 'кг' },
+    })
+
+    const prefix = wrapper.get('[data-testid="gr-input-prefix"]')
+    const suffix = wrapper.get('[data-testid="gr-input-suffix"]')
+
+    expect(prefix.classes()).not.toContain('border-r')
+    expect(suffix.classes()).not.toContain('border-l')
+    expect(prefix.attributes('style') ?? '').toContain('min-width: 0px')
+  })
+
+  it('поле всё равно отступает под украшение', () => {
+    const wrapper = mount(GrInput, {
+      props: { modelValue: '', addon: 'inline' },
+      slots: { prefix: '🔍' },
+    })
+
+    // Отступ считается по измеренной ширине, а не по ступени: текст начинается
+    // сразу за иконкой, а не в пустом отсеке.
+    expect(wrapper.get('input').attributes('style') ?? '').toContain('padding-left')
+  })
+})

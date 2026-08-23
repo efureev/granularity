@@ -1,5 +1,17 @@
 import { splitClassTokens } from '../shared/classTokens'
-import { invalidClass, shellBaseClass, shellDisabledClass, shellEnabledClass, sizes, states, textAlign } from './grInputStyles'
+import {
+  addonInlinePrefixClass,
+  addonInlineSuffixClass,
+  addonSegmentPrefixClass,
+  addonSegmentSuffixClass,
+  invalidClass,
+  shellBaseClass,
+  shellDisabledClass,
+  shellEnabledClass,
+  sizes,
+  states,
+  textAlign,
+} from './grInputStyles'
 
 export const grInputSafelist = [...new Set([
   ...Object.values(sizes).flatMap(splitClassTokens),
@@ -9,4 +21,8 @@ export const grInputSafelist = [...new Set([
   ...splitClassTokens(shellBaseClass),
   ...splitClassTokens(shellEnabledClass),
   ...splitClassTokens(shellDisabledClass),
+  ...splitClassTokens(addonSegmentPrefixClass),
+  ...splitClassTokens(addonSegmentSuffixClass),
+  ...splitClassTokens(addonInlinePrefixClass),
+  ...splitClassTokens(addonInlineSuffixClass),
 ])]

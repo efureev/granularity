@@ -12,7 +12,9 @@ function mountEditor(props: Record<string, unknown> = {}) {
 type Editor = ReturnType<typeof mountEditor>
 
 /** Редактор поднимается в `onMounted` — до него в поле пусто. */
-async function ready(_wrapper: Editor) {
+// Тип аргумента не важен: функция ждёт монтирования, а не читает обёртку —
+// иначе тест со слотами не проходил бы по типам мимо `mountEditor`.
+async function ready(_wrapper?: unknown) {
   for (let i = 0; i < 3; i += 1) await nextTick()
 }
 
@@ -481,6 +483,66 @@ describe('GrRichText — пузырьковый тулбар', () => {
     await ready(wrapper)
 
     expect(bubblePanel()).toBeNull()
+    wrapper.unmount()
+  })
+})
+
+/**
+ * Шапка и подвал поля.
+ *
+ * Раньше зон было ровно две — тулбар и текст, — и подпись со счётчиком
+ * приходилось ставить снаружи рамки, теряя связь с полем: визуально они
+ * оказывались отдельным блоком, а не частью контрола.
+ */
+describe('GrRichText — шапка и подвал', () => {
+  it('рисуются вокруг области ввода, внутри рамки поля', async () => {
+    const wrapper = mountEditor({ modelValue: '<p>текст</p>' })
+    await ready(wrapper)
+
+    expect(wrapper.find('[data-gr-rich-text-header]').exists()).toBe(false)
+    expect(wrapper.find('[data-gr-rich-text-footer]').exists()).toBe(false)
+
+    wrapper.unmount()
+
+    const withSlots = mount(GrRichText, {
+      props: { modelValue: '<p>текст</p>' },
+      slots: { header: '<span data-testid="head">Черновик</span>', footer: '<span data-testid="foot">120 знаков</span>' },
+      attachTo: document.body,
+    })
+    await ready(withSlots)
+
+    const root = withSlots.get('[data-gr-rich-text]')
+    const header = root.get('[data-gr-rich-text-header]')
+    const footer = root.get('[data-gr-rich-text-footer]')
+
+    expect(header.find('[data-testid="head"]').exists()).toBe(true)
+    expect(footer.find('[data-testid="foot"]').exists()).toBe(true)
+
+    // Порядок в DOM: шапка → текст → подвал.
+    const order = [...root.element.children].map(node => node.getAttribute('data-gr-rich-text-header') !== null
+      ? 'header'
+      : node.getAttribute('data-gr-rich-text-content') !== null
+        ? 'content'
+        : node.getAttribute('data-gr-rich-text-footer') !== null ? 'footer' : 'other')
+
+    expect(order.filter(name => name !== 'other')).toEqual(['header', 'content', 'footer'])
+
+    withSlots.unmount()
+  })
+
+  // Линия принадлежит границе между зонами: у края поля она сошлась бы со
+  // скруглением рамки — та же геометрия, что у панели `GrDropdownMenu`.
+  it('отбиваются рамкой изнутри, а не полем', async () => {
+    const wrapper = mount(GrRichText, {
+      props: { modelValue: '<p>текст</p>' },
+      slots: { header: 'шапка', footer: 'подвал' },
+      attachTo: document.body,
+    })
+    await ready(wrapper)
+
+    expect(wrapper.get('[data-gr-rich-text-header]').classes()).toContain('border-b')
+    expect(wrapper.get('[data-gr-rich-text-footer]').classes()).toContain('border-t')
+
     wrapper.unmount()
   })
 })

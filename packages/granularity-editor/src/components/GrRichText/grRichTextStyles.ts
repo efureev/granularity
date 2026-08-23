@@ -41,6 +41,18 @@ export const bubbleClass = 'flex items-center gap-1'
 
 export const contentClass = 'px-3 py-2 outline-none'
 
+/**
+ * Шапка и подвал поля: своя полоса над текстом и под ним.
+ *
+ * Отбиваются рамкой изнутри, как тулбар, — и по той же причине: у края поля
+ * линия сходится со скруглением рамки, поэтому она принадлежит границе между
+ * зонами, а не самой зоне. Фона у них нет: тулбар — панель управления и потому
+ * подложен `--gr-muted`, а шапка с подвалом несут содержимое потребителя, и
+ * вторая подложка спорила бы с ним.
+ */
+export const fieldHeaderClass = 'border-b border-[var(--gr-brd)] px-3 py-2'
+export const fieldFooterClass = 'border-t border-[var(--gr-brd)] px-3 py-2'
+
 /** Иконка кнопки: размер ведёт кегль, поэтому в `em`, а не в пикселях. */
 export const iconClass = 'h-[1.15em] w-[1.15em]'
 
@@ -60,5 +72,7 @@ export const grRichTextSafelist: string[] = [
   ...splitClassTokens(toolbarSeparatorClass),
   ...splitClassTokens(bubbleClass),
   ...splitClassTokens(contentClass),
+  ...splitClassTokens(fieldHeaderClass),
+  ...splitClassTokens(fieldFooterClass),
   ...splitClassTokens(iconClass),
 ]

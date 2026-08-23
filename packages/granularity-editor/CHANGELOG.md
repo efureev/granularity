@@ -7,6 +7,19 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.2.0] 2026-08-23
+
+### Added
+
+- **`#header` and `#footer` slots — bands inside the field.** The component had exactly two zones,
+  the toolbar and the text, so a caption or a character counter had to sit outside the border: it
+  read as a separate element, since the border framed only the text and the link to the field rested
+  on proximity alone. Both zones are optional and turn on by the mere presence of the slot; they are
+  separated by a border from the inside, like the toolbar, because the line belongs to the boundary
+  between zones — at the edge of the field it would meet the rounded corner. Neither carries a
+  background: `--gr-muted` is the toolbar's because it is a control panel, while these hold the
+  consumer's own content.
+
 ## [v0.1.3] 2026-08-21
 
 ### Added

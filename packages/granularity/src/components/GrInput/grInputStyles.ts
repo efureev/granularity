@@ -80,3 +80,21 @@ export function grInputFieldClass(options: {
 }): string {
   return [sizes[options.size], textAlign[options.align]].join(' ')
 }
+
+/**
+ * Аддон-сегмент: отрезан рамкой и держит ширину не меньше ступени размера — так
+ * поле с «₽» и поле с «USD» выстраиваются в колонку, а не пляшут по ширине.
+ */
+export const addonSegmentPrefixClass = 'border-r border-[var(--gr-brd)] px-2'
+export const addonSegmentSuffixClass = 'border-l border-[var(--gr-brd)] px-2'
+
+/**
+ * Украшение внутри рамки: ни разделителя, ни своей ширины — лупа в поисковой
+ * строке, единица измерения, счётчик.
+ *
+ * Отдельный режим, а не «сегмент без рамки»: у сегмента ширина выровнена по
+ * ступени размера, и иконка в нём висела бы в пустом отсеке. Здесь поле берёт
+ * ровно ту ширину, что заняло содержимое, а текст начинается сразу за ним.
+ */
+export const addonInlinePrefixClass = 'pl-3 pr-2'
+export const addonInlineSuffixClass = 'pl-2 pr-3'
