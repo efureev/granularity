@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 
-import { createA11yBaseline, expectNoA11yRegressions } from '@feugene/granularity-test-kit/e2e'
+import { a11yRegressions, createA11yBaseline, expectNoA11yRegressions } from '@feugene/granularity-test-kit/e2e'
 
 import { a11yKnownIssues } from './a11y-baseline'
 import { companionComponentNames, registryComponentNames, scanTargets } from './components'
@@ -69,4 +69,40 @@ test('каждый компонент реестра покрыт e2e', () => {
     uncovered,
     `Нет ни страницы витрины, ни записи в SERVICE_ENTITIES: ${uncovered.join(', ')}`,
   ).toEqual([])
+})
+
+/**
+ * Сторож самого измерения: axe обязан читать цвета в покое.
+ *
+ * Кадр посреди движения даёт смешанный цвет, и `color-contrast` находит дефект,
+ * которого у страницы в покое нет. На витрине это выглядело случайным падением
+ * `GrSidebar`: dev-сервер отдаёт правила UnoCSS по требованию, класс активного
+ * пункта доезжает кадром позже вставки узла, и `transition-colors` играет ровно
+ * в окне скана.
+ *
+ * Стенд свой, а не страница витрины: демо переписывают, а инвариант принадлежит
+ * гейту. Проверяются оба вида движения — у перехода и у анимации разные способы
+ * попасть в кадр, и заморозка обязана снимать оба.
+ */
+test('a11y: скан меряет покой, а не кадр движения', async ({ page }) => {
+  await page.setContent(`
+    <main id="probe-area">
+      <style>
+        /* В покое обе кнопки — белым по #4f46e5, это 8.59:1. */
+        #by-animation, #by-transition { background: #4f46e5; color: #ffffff }
+        /* Анимация держит середину пути постоянно: #7d818b на #afabf3 — 1.84:1. */
+        #by-animation { animation: drift 10s linear infinite }
+        @keyframes drift { 0%, 100% { background: #afabf3; color: #7d818b } }
+        /* Переход едет из той же середины секунду, и скан приходится на путь. */
+        #by-transition { background: #afabf3; color: #7d818b; transition: background-color 1s linear, color 1s linear }
+        #by-transition.is-settling { background: #4f46e5; color: #ffffff }
+      </style>
+      <button id="by-animation" type="button">Пункт с анимацией</button>
+      <button id="by-transition" type="button">Пункт с переходом</button>
+    </main>
+  `)
+  await page.evaluate(() => document.getElementById('by-transition')?.classList.add('is-settling'))
+  await page.waitForTimeout(400)
+
+  expect(await a11yRegressions(page, { include: '#probe-area' })).toEqual([])
 })

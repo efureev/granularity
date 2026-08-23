@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v0.7.2] 2026-08-23
+
+### Fixed
+
+- **The axe scan now measures the page at rest.** `a11yRegressions` read whatever frame the page
+  happened to be on, and a frame in the middle of a transition carries a blended colour: the active
+  `GrSidebar` item halfway through `transition-colors` is `#7d818b` on `#afabf3` — 1.84:1 where the
+  settled state is 8.59:1. `color-contrast` reported a defect the page does not have, and the
+  failure looked random because it depended on whether the scan landed inside the 150 ms window.
+  The showcase starts that motion by itself: its dev server generates UnoCSS rules on demand, so a
+  class first seen when a demo mounts arrives one frame after the node. Transitions and animations
+  are now frozen for the duration of the scan and released immediately after, since the scan is also
+  called mid-scenario where the next step waits on an animation.
+
 ## [v0.7.1] 2026-08-23
 
 ### Fixed
