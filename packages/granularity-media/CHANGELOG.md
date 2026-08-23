@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v0.2.0] 2026-08-23
+
+### Added
+
+- **`GrCameraCapture` — a photo taken now instead of a file picked from disk.** The camera only
+  starts on a button press: a permission prompt that appears on its own gets dismissed without
+  reading, and the browser will not ask twice — the answer is remembered for the whole site.
+- **Four distinct refusals instead of one "no access".** `denied`, `missing`, `busy` and `insecure`
+  each call for a different action from the user, and telling someone to "allow camera access" when
+  the device has no camera sends them looking for a setting that does not exist. On plain `http://`
+  `navigator.mediaDevices` is absent altogether, which is not a refusal at all. The exception is
+  read by name, not by message: messages are localised by the browser and change between versions,
+  and browsers disagree on names — Safari calls a busy device `NotReadableError`, Firefox
+  `AbortError`.
+- **The preview is mirrored, the photo is not.** People expect to see themselves as in a mirror, but
+  carrying that flip into the capture would send text on a card or document into looking-glass land
+   — and that is exactly what the rear camera is used for.
+- **The stream dies with the component.** A live track keeps the camera indicator lit even after the
+  component is gone: the browser only turns it off when every track is stopped.
+
 ## [v0.1.0] 2026-08-23
 
 ### Added

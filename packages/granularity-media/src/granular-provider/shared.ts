@@ -8,6 +8,7 @@ import {
   type GranularProvider,
 } from '@feugene/unocss-preset-granular/contract'
 // <granularity:components:imports> — блок генерируется `yarn generate:registry`
+import { grCameraCaptureConfig } from '../components/GrCameraCapture/config'
 import { grImageCropConfig } from '../components/GrImageCrop/config'
 // </granularity:components:imports>
 
@@ -22,6 +23,7 @@ export const GRANULARITY_MEDIA_PROVIDER_ID = '@feugene/granularity-media'
  */
 export const granularityMediaComponentConfigs = {
   // <granularity:components:registry> — блок генерируется `yarn generate:registry`
+  GrCameraCapture: grCameraCaptureConfig,
   GrImageCrop: grImageCropConfig,
   // </granularity:components:registry>
 } satisfies Record<string, GranularComponentDescriptor>

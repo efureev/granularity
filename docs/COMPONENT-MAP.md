@@ -42,7 +42,12 @@
 | плитка вложения в ленте: картинка либо иконка по типу | [`GrFilePreview`](../packages/granularity/docs/components/GrFilePreview.md) |
 | картинку рассматривают во весь экран | [`GrImageViewer`](../packages/granularity/docs/components/GrImageViewer.md) |
 | из картинки вырезают кадр перед отправкой | [`GrImageCrop`](../packages/granularity-media/docs/components/GrImageCrop.md) |
+| картинку снимают камерой прямо сейчас | [`GrCameraCapture`](../packages/granularity-media/docs/components/GrCameraCapture.md) |
 | показать содержимое файла текстом | [`GrCodeBlock`](../packages/granularity/docs/components/GrCodeBlock.md) |
+
+Различитель `GrCameraCapture` / `GrImageCrop` — **откуда берётся картинка**: первый
+её создаёт, второй обрабатывает уже существующую. Рядом они и работают: снял —
+кадрировал.
 
 Различитель `GrImageViewer` / `GrImageCrop` — **что остаётся после**. Первый
 ничего не меняет: пользователь посмотрел и закрыл. Второй производит новый
@@ -318,6 +323,7 @@
 | [`GrButton`](../packages/granularity/docs/components/GrButton.md) | ядро | действие меняет состояние |
 | [`GrButtonGroup`](../packages/granularity/docs/components/GrButtonGroup.md) | ядро | действия одного класса стоят рядом |
 | [`GrCalendar`](../packages/granularity-chrono/docs/components/GrCalendar.md) | chrono | календарь и есть экран |
+| [`GrCameraCapture`](../packages/granularity-media/docs/components/GrCameraCapture.md) | media | аватар без файлового менеджера |
 | [`GrCard`](../packages/granularity/docs/components/GrCard.md) | ядро | контенту нужна поверхность |
 | [`GrChartArea`](../packages/granularity-charts/docs/components/GrChartArea.md) | charts | целое и вклад частей в него во времени |
 | [`GrChartBar`](../packages/granularity-charts/docs/components/GrChartBar.md) | charts | сколько у каждой категории |

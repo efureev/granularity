@@ -4,5 +4,21 @@
     "frame": "Frame: arrow keys move the image, plus and minus zoom",
     "empty": "No image selected",
     "zoom": "Zoom"
+  },
+  "camera": {
+    "label": "Camera",
+    "idle": "The camera is off.",
+    "starting": "Requesting camera access…",
+    "denied": "Camera access is blocked. Allow it in the browser settings for this site.",
+    "missing": "No camera found on this device.",
+    "busy": "The camera is busy in another application.",
+    "insecure": "The camera works only over HTTPS.",
+    "error": "The camera could not be started.",
+    "start": "Turn on camera",
+    "retry": "Try again",
+    "capture": "Take photo",
+    "stop": "Turn off",
+    "live": "Camera is on",
+    "captured": "Photo taken"
   }
 }

@@ -4,5 +4,21 @@
     "frame": "Marco: las flechas mueven la imagen, más y menos ajustan el zoom",
     "empty": "Ninguna imagen seleccionada",
     "zoom": "Zoom"
+  },
+  "camera": {
+    "label": "Cámara",
+    "idle": "La cámara está apagada.",
+    "starting": "Solicitando acceso a la cámara…",
+    "denied": "El acceso a la cámara está bloqueado. Permítelo en la configuración del navegador para este sitio.",
+    "missing": "No se encontró ninguna cámara en este dispositivo.",
+    "busy": "La cámara está ocupada por otra aplicación.",
+    "insecure": "La cámara solo funciona por HTTPS.",
+    "error": "No se pudo iniciar la cámara.",
+    "start": "Encender cámara",
+    "retry": "Reintentar",
+    "capture": "Tomar foto",
+    "stop": "Apagar",
+    "live": "Cámara encendida",
+    "captured": "Foto tomada"
   }
 }

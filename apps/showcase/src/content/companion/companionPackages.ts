@@ -2355,6 +2355,90 @@ import type { DataSourceUrlAdapter } from '@feugene/granularity-datasource/url'`
     dependencies: [],
     components: [
       {
+        name: 'GrCameraCapture',
+        slug: 'gr-camera-capture',
+        title: 'GrCameraCapture',
+        summary: 'Снимок с камеры устройства: превью в рамке, кнопка съёмки и готовый файл на выходе.',
+        importPath: '@feugene/granularity-media/components/GrCameraCapture',
+        overview: {
+          paragraphs: [
+            'Файл появляется в момент нажатия, а не выбирается в файловом менеджере. На телефоне «сфотографировать» быстрее, чем искать снимок в галерее, а для документа или визитки это единственный удобный путь.',
+            'Камера включается только по кнопке: запрос разрешения, всплывший сам по себе, отклоняют не глядя — и второй раз браузер уже не спросит, потому что решение запоминается для сайта целиком.',
+          ],
+          features: [
+            'Четыре разных отказа вместо одного «нет доступа»: запрещено, камеры нет, занята другим приложением, страница не по HTTPS.',
+            'Превью фронтальной камеры зеркальное, снимок — нет: иначе текст в кадре уехал бы в зазеркалье.',
+            'Поток гаснет вместе с компонентом — индикатор камеры не остаётся гореть.',
+            'Кадр под нужное соотношение сторон срезается по центру, ровно как показывало превью.',
+            'Экспорт в JPEG с выбранным качеством; размер по умолчанию — в пикселях кадра камеры.',
+            'Состояние и управление доступны наружу: `start`, `stop`, `capture` и слот `#controls`.',
+          ],
+        },
+        typeDeclarations: `import type {
+  GrCameraCaptureOutput,
+  GrCameraCaptureProps,
+  GrCameraCaptureSize,
+  GrCameraFacing,
+  GrCameraStatus,
+} from '@feugene/granularity-media'`,
+        apiSections: [
+          {
+            key: 'props',
+            title: 'Props',
+            origin: 'manual',
+            items: [
+              { name: 'facing', type: `'user' | 'environment'`, default: `'user'`, description: 'Фронтальная камера или тыловая.' },
+              { name: 'deviceId', type: 'string', description: 'Конкретное устройство. Требуется точно (`exact`): иначе браузер вправе отдать другую камеру.' },
+              { name: 'autoStart', type: 'boolean', default: 'false', description: 'Включать камеру сразу. По умолчанию нет — запрос без действия пользователя отклоняют не глядя.' },
+              { name: 'aspectRatio', type: 'number', default: '4 / 3', description: 'Соотношение сторон рамки и снимка. Лишнее срезается по центру.' },
+              { name: 'mirror', type: 'boolean', description: 'Зеркалить превью. Без него зеркалится только фронтальная камера.' },
+              { name: 'output', type: '{ width?, height?, type?, quality? }', description: 'Размер и кодек снимка. По умолчанию JPEG с качеством 0.92.' },
+              { name: 'size', type: `'xs' | 'sm' | 'md' | 'lg'`, description: 'Шкала вложенных кнопок; читается из `GrConfigProvider`.' },
+              { name: 'disabled', type: 'boolean', default: 'false', description: 'Камера не включается, снимок не делается.' },
+              { name: 'ariaLabel', type: 'string', description: 'Имя группы, если рядом нет подписи.' },
+            ],
+          },
+          {
+            key: 'emits',
+            title: 'Emits',
+            origin: 'manual',
+            items: [
+              { name: 'capture', type: '(blob: Blob)', description: 'Снимок сделан.' },
+              { name: 'start', type: '()', description: 'Поток пошёл.' },
+              { name: 'stop', type: '()', description: 'Поток остановлен.' },
+              { name: 'statusChange', type: '(status: GrCameraStatus)', description: 'Состояние камеры сменилось: `idle`, `starting`, `live`, `denied`, `missing`, `busy`, `insecure`, `error`.' },
+            ],
+          },
+          {
+            key: 'expose',
+            title: 'Методы',
+            origin: 'manual',
+            items: [
+              { name: 'start()', type: '() => Promise<void>', description: 'Запрашивает разрешение и включает камеру.' },
+              { name: 'stop()', type: '() => void', description: 'Гасит дорожки потока.' },
+              { name: 'capture()', type: '() => Promise<Blob | null>', description: 'Снимает кадр. `null` — камера не запущена.' },
+            ],
+          },
+          {
+            key: 'slots',
+            title: 'Слоты',
+            origin: 'manual',
+            items: [
+              { name: 'controls', type: '{ status, start, stop, capture }', description: 'Своя панель управления вместо встроенной.' },
+            ],
+          },
+        ],
+        examples: [
+          {
+            id: 'media-camera-basic',
+            title: 'Photo without a file manager',
+            description: 'Камера включается по кнопке, снимок появляется рядом. Состояние показано как есть — на этой странице камера обычно выключена.',
+            previewKey: 'extra-media-camera-basic',
+            note: 'Демо не включает камеру само: на странице документации это означало бы запрос разрешения у каждого, кто зашёл почитать. Отказы разведены на четыре состояния, потому что действия пользователя в них разные: «разрешите доступ» при отсутствующей камере отправило бы искать настройку, которой нет, а на `http://` объекта `navigator.mediaDevices` не существует вовсе.',
+          },
+        ],
+      },
+      {
         name: 'GrImageCrop',
         slug: 'gr-image-crop',
         title: 'GrImageCrop',

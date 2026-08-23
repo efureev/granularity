@@ -10,6 +10,7 @@
  */
 export const GRANULARITY_MEDIA_COMPONENTS = [
   // <granularity:components> — блок генерируется `yarn generate:registry`
+  'GrCameraCapture',
   'GrImageCrop',
   // </granularity:components>
 ] as const

@@ -39,6 +39,9 @@ export default defineConfig({
           new URL('./src/i18n/all.ts', import.meta.url),
         ),
         // <granularity:components> — блок генерируется `yarn generate:registry`
+        'components/GrCameraCapture/index': fileURLToPath(
+          new URL('./src/components/GrCameraCapture/index.ts', import.meta.url),
+        ),
         'components/GrImageCrop/index': fileURLToPath(
           new URL('./src/components/GrImageCrop/index.ts', import.meta.url),
         ),

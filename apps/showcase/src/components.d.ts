@@ -14,6 +14,7 @@ declare module 'vue' {
     GrBadge: typeof import('@feugene/granularity/components/GrBadge')['GrBadge']
     GrButton: typeof import('@feugene/granularity/components/GrButton')['GrButton']
     GrCalendar: typeof import('@feugene/granularity-chrono/components/GrCalendar')['GrCalendar']
+    GrCameraCapture: typeof import('@feugene/granularity-media/components/GrCameraCapture')['GrCameraCapture']
     GrChartArea: typeof import('@feugene/granularity-charts/components/GrChartArea')['GrChartArea']
     GrChartBar: typeof import('@feugene/granularity-charts/components/GrChartBar')['GrChartBar']
     GrChartBullet: typeof import('@feugene/granularity-charts/components/GrChartBullet')['GrChartBullet']

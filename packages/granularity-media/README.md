@@ -1,7 +1,9 @@
 # `@feugene/granularity-media`
 
-Работа с изображением и камерой для `@feugene/granularity`. Первый компонент —
-`GrImageCrop`: пользователь выбирает кадр, приложение получает готовый `Blob`.
+Работа с изображением и камерой для `@feugene/granularity`. Два компонента, и они
+стоят рядом по сценарию: `GrCameraCapture` снимает кадр камерой,
+`GrImageCrop` выбирает кадр из уже существующей картинки. Оба отдают готовый
+`Blob` — можно сразу отправлять.
 
 ```bash
 yarn add @feugene/granularity-media
@@ -29,7 +31,9 @@ async function save() {
 
 <template>
   <GrImageCrop ref="cropper" :src="file" shape="circle" :output="{ width: 256, height: 256 }" />
-  <button @click="save">Сохранить</button>
+  <button @click="save">
+Сохранить
+</button>
 </template>
 ```
 
@@ -73,8 +77,27 @@ presetGranularNode({
 Локали подключаются тем же `createFintI18n`, что и словари ядра — блок
 `GR_MEDIA_I18N_BLOCK`.
 
+## Снимок камерой
+
+```vue
+<GrCameraCapture :aspect-ratio="1" @capture="blob => upload(blob)" />
+```
+
+Камера включается только по кнопке: запрос разрешения, всплывший сам по себе,
+отклоняют не глядя — а второй раз браузер уже не спросит, потому что решение
+запоминается для сайта целиком.
+
+Отказ разведён на четыре состояния (`denied`, `missing`, `busy`, `insecure`),
+потому что действия пользователя в них разные: «разрешите доступ» при
+отсутствующей камере отправляет искать настройку, которой нет, а на `http://`
+объекта `navigator.mediaDevices` не существует вовсе.
+
+Превью фронтальной камеры зеркальное, снимок — нет: иначе текст на визитке или в
+документе уехал бы в зазеркалье.
+
 ## Документация
 
 - [`docs/components.md`](./docs/components.md) — состав пакета;
-- [`docs/components/GrImageCrop.md`](./docs/components/GrImageCrop.md) — страница компонента;
+- [`docs/components/GrImageCrop.md`](./docs/components/GrImageCrop.md) и
+  [`docs/components/GrCameraCapture.md`](./docs/components/GrCameraCapture.md) — страницы компонентов;
 - [`docs/keyboard.md`](./docs/keyboard.md), [`docs/ssr.md`](./docs/ssr.md) — сквозные правила пакета.
