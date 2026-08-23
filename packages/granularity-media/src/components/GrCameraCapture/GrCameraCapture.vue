@@ -33,13 +33,19 @@ export interface GrCameraCaptureProps {
   /** Конкретное устройство, если приложение его уже выбрало. */
   deviceId?: string
   /**
+   * Соотношение сторон рамки и снимка.
+   *
+   * Без него рамка принимает соотношение самого потока: камеры отдают то 4:3,
+   * то 16:9, и любое зашитое число показало бы обрезанный кадр как настоящий.
+   */
+  aspectRatio?: number
+  /**
    * Включать камеру сразу.
    *
    * По умолчанию `false`: запрос разрешения без действия пользователя
    * отклоняют не глядя, а второй раз браузер уже не спросит.
    */
   autoStart?: boolean
-  aspectRatio?: number
   /** Зеркалить превью. По умолчанию — только фронтальную камеру. */
   mirror?: boolean
   output?: GrCameraCaptureOutput
@@ -59,7 +65,7 @@ const props = withDefaults(defineProps<GrCameraCaptureProps>(), {
   facing: 'user',
   deviceId: undefined,
   autoStart: false,
-  aspectRatio: 4 / 3,
+  aspectRatio: undefined,
   mirror: undefined,
   output: undefined,
   // `undefined`, а не `md`: настоящий дефолт живёт в `useGrComponentSize`.
@@ -82,6 +88,11 @@ const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrCamera
 const videoEl = ref<HTMLVideoElement | null>(null)
 const stream = shallowRef<MediaStream | null>(null)
 const status = ref<GrCameraStatus>('idle')
+/** Соотношение сторон потока: известно только после первого кадра. */
+const streamRatio = ref<number | null>(null)
+
+/** Пока камера молчит, рамка держит 4:3 — на нём её место в раскладке видно. */
+const frameRatio = computed(() => props.aspectRatio ?? streamRatio.value ?? 4 / 3)
 
 const mirrored = computed(() => shouldMirrorPreview(props.facing, props.mirror))
 const isLive = computed(() => status.value === 'live')
@@ -114,11 +125,20 @@ function setStatus(next: GrCameraStatus): void {
   emit('statusChange', next)
 }
 
+function readStreamRatio(): void {
+  const video = videoEl.value
+  if (!video || video.videoWidth <= 0 || video.videoHeight <= 0)
+    return
+
+  streamRatio.value = video.videoWidth / video.videoHeight
+}
+
 function stopTracks(): void {
   // Живой трек держит индикатор камеры включённым, даже когда компонента уже
   // нет на экране: браузер гасит его только по `stop()` каждой дорожки.
   stream.value?.getTracks().forEach(track => track.stop())
   stream.value = null
+  streamRatio.value = null
 
   if (videoEl.value)
     videoEl.value.srcObject = null
@@ -147,7 +167,11 @@ async function start(): Promise<void> {
     stream.value = media
     if (videoEl.value) {
       videoEl.value.srcObject = media
+      // Размеры кадра приходят не сразу: до `loadedmetadata` они нули, и
+      // соотношение, снятое раньше, было бы выдумкой.
+      videoEl.value.addEventListener('loadedmetadata', readStreamRatio, { once: true })
       await videoEl.value.play().catch(() => undefined)
+      readStreamRatio()
     }
 
     setStatus('live')
@@ -183,7 +207,7 @@ async function capture(): Promise<Blob | null> {
     return null
 
   const frame = { width: video.videoWidth, height: video.videoHeight }
-  const rect = cameraFrameRect(frame, props.aspectRatio)
+  const rect = cameraFrameRect(frame, frameRatio.value)
   if (rect.sw <= 0)
     return null
 
@@ -223,7 +247,7 @@ defineExpose({ start, stop, capture, status })
 
 <template>
   <div :class="rootClass" role="group" :aria-label="ariaLabel ?? t('grMedia.camera.label', 'Camera')">
-    <div :class="frameClass" :style="{ aspectRatio: String(aspectRatio) }">
+    <div :class="frameClass" :style="{ aspectRatio: String(frameRatio) }">
       <video
         ref="videoEl"
         :class="[videoClass, mirrored ? mirroredClass : '']"

@@ -109,6 +109,37 @@ describe('GrCameraCapture', () => {
     expect(call[1]).toBeCloseTo((1280 - 720) / 2)
   })
 
+  it('рамка принимает соотношение потока, а не зашитое число', async () => {
+    const { stream } = makeStream()
+    stubMediaDevices(vi.fn().mockResolvedValue(stream) as never)
+
+    const wrapper = mount(GrCameraCapture, { props: { autoStart: true } })
+    await vi.waitFor(() => expect(wrapper.emitted('start')).toBeTruthy())
+    await nextTick()
+
+    // Камера отдаёт 1280×720: показывать её кадр как 4:3 значит обрезать бока и
+    // выдать обрезок за то, что видит камера.
+    const frame = wrapper.find('[role="group"] > div')
+    expect(frame.attributes('style')).toContain(String(FRAME.width / FRAME.height))
+  })
+
+  it('заданное соотношение сильнее потока — и снимок совпадает с рамкой', async () => {
+    const drawImage = vi.fn()
+    vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue({ drawImage } as unknown as CanvasRenderingContext2D)
+    HTMLCanvasElement.prototype.toBlob = (callback: (blob: Blob | null) => void) => callback(new Blob())
+
+    const { stream } = makeStream()
+    stubMediaDevices(vi.fn().mockResolvedValue(stream) as never)
+
+    const wrapper = mount(GrCameraCapture, { props: { autoStart: true, aspectRatio: 1 } })
+    await vi.waitFor(() => expect(wrapper.emitted('start')).toBeTruthy())
+    await nextTick()
+
+    expect(wrapper.find('[role="group"] > div').attributes('style')).toContain('1')
+    await (wrapper.vm as unknown as { capture: () => Promise<Blob | null> }).capture()
+    expect(drawImage.mock.calls[0]![3]).toBeCloseTo(720)
+  })
+
   it('выключение гасит дорожки потока', async () => {
     const { stream, stop } = makeStream()
     stubMediaDevices(vi.fn().mockResolvedValue(stream) as never)

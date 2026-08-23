@@ -22,9 +22,13 @@ function onCapture(blob: Blob) {
 
 <template>
   <div class="grid gap-4 lg:grid-cols-2">
+    <!--
+      Соотношение сторон не задано намеренно: рамка примет его от камеры.
+      Зашитое число показало бы обрезанный кадр как настоящий — а камеры отдают
+      то 4:3, то 16:9.
+    -->
     <GrCameraCapture
       ref="camera"
-      :aspect-ratio="4 / 3"
       :output="{ width: 800, type: 'image/jpeg', quality: 0.9 }"
       @capture="onCapture"
       @status-change="(value: GrCameraStatus) => (status = value)"

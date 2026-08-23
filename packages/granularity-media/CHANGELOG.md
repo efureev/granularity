@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v0.2.1] 2026-08-23
+
+### Fixed
+
+- **`GrCameraCapture`: the frame now takes the stream's own aspect ratio.** It was hard-wired to
+  4:3, so a 16:9 camera was shown cropped — and the crop was presented as what the camera sees.
+  Without `aspectRatio` the frame follows the stream (4:3 until the first frame arrives, since
+  dimensions are zero before `loadedmetadata`); passing the prop still wins, because the application
+  knows where the photo will go.
+
 ## [v0.2.0] 2026-08-23
 
 ### Added
