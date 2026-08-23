@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v0.7.1] 2026-08-23
+
+### Fixed
+
+- **The preset is loaded lazily, so `optional: true` is no longer a lie.** `gates/registry.ts`
+  imported `@feugene/unocss-preset-granular/codegen` statically, which made the preset mandatory for
+  **every** gate in the kit: importing `@feugene/granularity-test-kit/gates` failed at resolution
+  before the consumer even chose a factory — while `peerDependenciesMeta` promised the opposite and
+  the other eight factories need nothing from it. The import now happens inside `beforeAll`, with a
+  message naming the package and the version instead of a bare module-not-found.
+
+- **The registry gate narrows the subcomponent scan by the component list.** Without `components`
+  the map picked up `.vue` files from directories that are not components at all.
+
 ## [v0.7.0] 2026-08-23
 
 ### Added

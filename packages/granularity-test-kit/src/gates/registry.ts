@@ -3,7 +3,6 @@ import { existsSync, readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import process from 'node:process'
 
-import { collectGranularSubcomponents } from '@feugene/unocss-preset-granular/codegen'
 import { beforeAll, describe, expect, it } from 'vitest'
 
 import { componentDirs } from '../sources'
@@ -85,9 +84,32 @@ export function defineRegistryGate(options: RegistryGateOptions): void {
   describe('реестры компонентов', () => {
     let subcomponents: Subcomponents = {}
 
+    /**
+     * Пресет подгружается лениво и только здесь.
+     *
+     * Статический импорт делал бы его обязательным для **любого** гейта кита:
+     * `@feugene/granularity-test-kit/gates` падал бы на резолюции ещё до того,
+     * как потребитель решит, какую фабрику звать, — при том что остальные
+     * восьмеро пресета не требуют, а `peerDependenciesMeta` объявляет его
+     * необязательным.
+     */
     beforeAll(async () => {
-      subcomponents = await collectGranularSubcomponents({
+      const codegen = await import('@feugene/unocss-preset-granular/codegen').catch(() => null)
+
+      if (!codegen) {
+        throw new Error(
+          'Гейту реестров нужен `@feugene/unocss-preset-granular` (>=0.10.1): по нему он '
+          + 'узнаёт части составных компонентов. Установите пакет или уберите вызов '
+          + '`defineRegistryGate`.',
+        )
+      }
+
+      // Список компонентов сужает обход: без него карта зацепила бы `.vue`
+      // из директорий, компонентами не являющихся.
+      subcomponents = await codegen.collectGranularSubcomponents({
         componentsDir: resolve(pkgDir, 'src/components'),
+        prefix: options.prefix,
+        components: publicComponents,
       })
     })
 

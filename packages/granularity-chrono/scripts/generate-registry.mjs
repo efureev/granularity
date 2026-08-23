@@ -38,6 +38,7 @@ const targets = [
   // указывает на `src`. Дефолт генератора описывает раскладку ядра, где
   // паразитный `src` в пути типов остался с самого начала.
   codegenTargets.packageExports({
+    subcomponents: true,
     entryFor: component => ({
       types: `./dist/types/components/${component}/index.d.ts`,
       import: `./dist/components/${component}/index.js`,

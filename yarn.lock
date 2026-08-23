@@ -413,10 +413,10 @@
     "@unocss/preset-mini" "^66.7.5"
     "@unocss/rule-utils" "^66.7.5"
 
-"@feugene/unocss-preset-granular@^0.10.1":
-  version "0.10.1"
-  resolved "https://registry.yarnpkg.com/@feugene/unocss-preset-granular/-/unocss-preset-granular-0.10.1.tgz#cb8737d9f6833972ad368485333a0e85348857bd"
-  integrity sha512-JuGrYepzlxLmlwd7oPEJnIYmda/0J6dSH19khwJv+Kl6f0bw9XjICsHFbg/iD0pFC60n9CLHZ1+CKOp4TzkVZg==
+"@feugene/unocss-preset-granular@^0.11.0":
+  version "0.11.0"
+  resolved "https://registry.yarnpkg.com/@feugene/unocss-preset-granular/-/unocss-preset-granular-0.11.0.tgz#27ec22557d3dc7c57d9cd81d955c88b7f8b8dee4"
+  integrity sha512-TCttiEKH7jYUsLUqAaQQZS/3aMwc/za2wHW2EB0yOC7BNcLzb0ID+AtbqerkVPm3mTy575BykrBh4Q2EK52esg==
   dependencies:
     "@feugene/unocss-mini-extra-rules" "^0.8.1"
 
