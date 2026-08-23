@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v0.7.3] 2026-08-23
+
+### Fixed
+
+- **Two liveness guards no longer fail a package for being young.** Both watch the *parser*, not
+  the package, and both were tied to the shape of a mature one. The locale gate demanded more than
+  five keys under a message reading "no key found at all" — a package with one component was red
+  while its parsing worked perfectly; the threshold is now zero, which is what the message says.
+  The style gate required `--gr-leading-*` specifically, so a package built out of controls — which
+  legitimately uses only `--gr-control-leading-*` — could never satisfy it, even though the paired
+  check right above it accepts both scales. Both scales now count.
+
 ## [v0.7.2] 2026-08-23
 
 ### Fixed

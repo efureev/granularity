@@ -182,7 +182,10 @@ export function defineLocaleCompletenessGate(options: LocaleCompletenessGateOpti
       const own = [...asked].sort()
       const declared = [...baseKeys.keys()].sort()
 
-      expect(own.length, 'ни один ключ не найден — сломан разбор, а не словарь').toBeGreaterThan(5)
+      // Порог — ноль, а не «достаточно много»: проверка сторожит разбор, а не
+      // размер словаря. С порогом в пять ключей пакет с одним компонентом
+      // краснел бы за то, что он молодой, — при исправном разборе.
+      expect(own.length, 'ни один ключ не найден — сломан разбор, а не словарь').toBeGreaterThan(0)
       expect(own.filter(key => !declared.includes(key)), 'ключ спрашивают, но его нет в словаре').toEqual([])
       expect(declared.filter(key => !own.includes(key)), 'ключ в словаре, но его никто не спрашивает').toEqual([])
     })

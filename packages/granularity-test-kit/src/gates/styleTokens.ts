@@ -256,7 +256,12 @@ export function defineStyleTokensGate(options: StyleTokensGateOptions = {}): voi
 
       expect(uses(/var\(--gr-duration-/), '--gr-duration-* не используется ни одним компонентом').toBeGreaterThan(0)
       expect(uses(/var\(--gr-ease-/), '--gr-ease-* не используется ни одним компонентом').toBeGreaterThan(0)
-      expect(uses(/var\(--gr-leading-/), '--gr-leading-* не используется ни одним компонентом').toBeGreaterThan(0)
+      // Обе шкалы межстрочного законны — ровно как в парной проверке выше:
+      // пакет, собранный из контролов, употребляет только `--gr-control-leading-*`.
+      expect(
+        uses(/var\(--gr-(?:control-)?leading-/),
+        '--gr-leading-* / --gr-control-leading-* не используется ни одним компонентом',
+      ).toBeGreaterThan(0)
     })
   })
 }
