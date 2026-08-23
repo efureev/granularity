@@ -9,6 +9,7 @@ import type { GrCameraStatus } from '@feugene/granularity-media'
  * означало бы запрос разрешения у каждого, кто зашёл почитать.
  */
 const shot = ref<string | null>(null)
+const shotSize = ref<{ width: number, height: number } | null>(null)
 const status = ref<GrCameraStatus>('idle')
 const camera = useTemplateRef('camera')
 
@@ -17,6 +18,11 @@ function onCapture(blob: Blob) {
     URL.revokeObjectURL(shot.value)
 
   shot.value = URL.createObjectURL(blob)
+}
+
+function onShotLoad(event: Event) {
+  const img = event.target as HTMLImageElement
+  shotSize.value = { width: img.naturalWidth, height: img.naturalHeight }
 }
 </script>
 
@@ -45,7 +51,17 @@ function onCapture(blob: Blob) {
       </p>
 
       <template v-if="shot">
-        <img :src="shot" alt="Снимок с камеры" class="w-full rounded-[var(--gr-radius-md)]">
+        <img
+          :src="shot"
+          alt="Снимок с камеры"
+          class="w-full rounded-[var(--gr-radius-md)]"
+          @load="onShotLoad"
+        >
+        <p v-if="shotSize" class="showcase-demo-text text-sm">
+          Снимок: <strong>{{ shotSize.width }} × {{ shotSize.height }}</strong> — те же пропорции,
+          что и у превью. Камеры отдают то 4:3, то 16:9, и кадр не подгоняется под окно: нужен
+          ровно квадрат — это <code>GrImageCrop</code> следующим шагом.
+        </p>
         <p class="showcase-demo-text text-sm">
           Превью фронтальной камеры зеркальное, а снимок — нет: иначе текст в кадре уехал бы
           в зазеркалье.

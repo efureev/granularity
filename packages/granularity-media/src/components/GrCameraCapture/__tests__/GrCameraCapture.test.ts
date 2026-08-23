@@ -87,7 +87,7 @@ describe('GrCameraCapture', () => {
     expect(wrapper.text()).toContain('HTTPS')
   })
 
-  it('снимок берёт центральный кадр под заданное соотношение', async () => {
+  it('снимок берёт весь кадр, что бы ни просили у камеры', async () => {
     const drawImage = vi.fn()
     vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue({ drawImage } as unknown as CanvasRenderingContext2D)
     HTMLCanvasElement.prototype.toBlob = (callback: (blob: Blob | null) => void) => callback(new Blob())
@@ -95,6 +95,7 @@ describe('GrCameraCapture', () => {
     const { stream } = makeStream()
     stubMediaDevices(vi.fn().mockResolvedValue(stream) as never)
 
+    // Просим квадрат, камера отдаёт 1280×720 — снимается её кадр целиком.
     const wrapper = mount(GrCameraCapture, { props: { autoStart: true, aspectRatio: 1 } })
     await vi.waitFor(() => expect(wrapper.emitted('start')).toBeTruthy())
 
@@ -102,32 +103,30 @@ describe('GrCameraCapture', () => {
 
     expect(blob).toBeInstanceOf(Blob)
     expect(wrapper.emitted('capture')).toHaveLength(1)
-    // Кадр камеры 1280×720, соотношение 1: центральный квадрат 720×720.
     const call = drawImage.mock.calls[0]!
-    expect(call[3]).toBeCloseTo(720)
-    expect(call[4]).toBeCloseTo(720)
-    expect(call[1]).toBeCloseTo((1280 - 720) / 2)
+    expect(call[1]).toBe(0)
+    expect(call[2]).toBe(0)
+    expect(call[3]).toBe(FRAME.width)
+    expect(call[4]).toBe(FRAME.height)
   })
 
-  it('рамка принимает соотношение потока, а не зашитое число', async () => {
+  it('соотношение уходит в запрос пожеланием, а не требованием', async () => {
     const { stream } = makeStream()
-    stubMediaDevices(vi.fn().mockResolvedValue(stream) as never)
+    const getUserMedia = vi.fn().mockResolvedValue(stream)
+    stubMediaDevices(getUserMedia as never)
 
-    const wrapper = mount(GrCameraCapture, { props: { autoStart: true } })
+    const wrapper = mount(GrCameraCapture, { props: { autoStart: true, aspectRatio: 1 } })
     await vi.waitFor(() => expect(wrapper.emitted('start')).toBeTruthy())
-    await nextTick()
 
-    // Камера отдаёт 1280×720: показывать её кадр как 4:3 значит обрезать бока и
-    // выдать обрезок за то, что видит камера.
-    const frame = wrapper.find('[role="group"] > div')
-    expect(frame.attributes('style')).toContain(String(FRAME.width / FRAME.height))
+    // Голое число — `ideal`. `{ exact: 1 }` дал бы `OverconstrainedError`, то
+    // есть «камеры нет» на исправной камере с другим соотношением.
+    expect(getUserMedia).toHaveBeenCalledWith({
+      video: { facingMode: 'user', aspectRatio: 1 },
+      audio: false,
+    })
   })
 
-  it('заданное соотношение сильнее потока — и снимок совпадает с рамкой', async () => {
-    const drawImage = vi.fn()
-    vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue({ drawImage } as unknown as CanvasRenderingContext2D)
-    HTMLCanvasElement.prototype.toBlob = (callback: (blob: Blob | null) => void) => callback(new Blob())
-
+  it('рамка показывает полученное соотношение, а не запрошенное', async () => {
     const { stream } = makeStream()
     stubMediaDevices(vi.fn().mockResolvedValue(stream) as never)
 
@@ -135,9 +134,28 @@ describe('GrCameraCapture', () => {
     await vi.waitFor(() => expect(wrapper.emitted('start')).toBeTruthy())
     await nextTick()
 
-    expect(wrapper.find('[role="group"] > div').attributes('style')).toContain('1')
+    const frame = wrapper.find('[role="group"] > div')
+    expect(frame.attributes('style')).toContain(String(FRAME.width / FRAME.height))
+  })
+
+  it('одна сторона в `output` не растягивает снимок', async () => {
+    const drawImage = vi.fn()
+    vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue({ drawImage } as unknown as CanvasRenderingContext2D)
+    HTMLCanvasElement.prototype.toBlob = (callback: (blob: Blob | null) => void) => callback(new Blob())
+
+    const { stream } = makeStream()
+    stubMediaDevices(vi.fn().mockResolvedValue(stream) as never)
+
+    const wrapper = mount(GrCameraCapture, { props: { autoStart: true, output: { width: 800 } } })
+    await vi.waitFor(() => expect(wrapper.emitted('start')).toBeTruthy())
+    await nextTick()
+
     await (wrapper.vm as unknown as { capture: () => Promise<Blob | null> }).capture()
-    expect(drawImage.mock.calls[0]![3]).toBeCloseTo(720)
+
+    // Кадр 1280×720: при ширине 800 высота обязана стать 450, а не 720.
+    const call = drawImage.mock.calls[0]!
+    expect(call[7]).toBe(800)
+    expect(call[8]).toBe(450)
   })
 
   it('выключение гасит дорожки потока', async () => {

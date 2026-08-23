@@ -80,36 +80,3 @@ export function cameraSupported(navigatorLike: Pick<Navigator, 'mediaDevices'> |
 export function shouldMirrorPreview(facing: 'user' | 'environment', mirror: boolean | undefined): boolean {
   return mirror ?? facing === 'user'
 }
-
-export interface GrCameraFrameRect {
-  sx: number
-  sy: number
-  sw: number
-  sh: number
-}
-
-/**
- * Какая часть кадра камеры попадёт в снимок при заданном соотношении сторон.
- *
- * Камера отдаёт своё соотношение (обычно 4:3 или 16:9), а приложению нужно
- * своё. Лишнее срезается по центру — так же, как это делает `object-fit: cover`
- * в превью: снимок обязан совпасть с тем, что пользователь видел.
- */
-export function cameraFrameRect(frame: { width: number, height: number }, aspectRatio: number): GrCameraFrameRect {
-  const ratio = aspectRatio > 0 ? aspectRatio : 1
-
-  if (frame.width <= 0 || frame.height <= 0)
-    return { sx: 0, sy: 0, sw: 0, sh: 0 }
-
-  const frameRatio = frame.width / frame.height
-
-  if (frameRatio > ratio) {
-    const width = frame.height * ratio
-
-    return { sx: (frame.width - width) / 2, sy: 0, sw: width, sh: frame.height }
-  }
-
-  const height = frame.width / ratio
-
-  return { sx: 0, sy: (frame.height - height) / 2, sw: frame.width, sh: height }
-}

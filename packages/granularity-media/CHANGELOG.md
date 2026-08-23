@@ -7,6 +7,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v0.3.0] 2026-08-23
+
+### Changed
+
+- **`GrCameraCapture` no longer crops.** Cameras on different devices hand back different sizes and
+  ratios, so fitting the frame to a fixed window is meaningless — one phone would lose the sides,
+  another the top. The photo is now taken whole, in the camera's own proportions, and the preview
+  frame follows the stream. Cropping to a required shape is the next step, not this component:
+  `GrImageCrop` does it on the captured file.
+- **`aspectRatio` became a request to the camera** rather than a crop. It goes into `getUserMedia`
+  as `ideal`, so a device that can produce it will; one that cannot returns its own, and that is
+  what gets shown and captured. `exact` is deliberately not used: it raises `OverconstrainedError`,
+  i.e. reports "no camera" for a perfectly good camera with a different ratio.
+- **`output` is a bounding box, not an exact size.** With both sides given, the frame is fitted
+  inside them and keeps its proportions; taking the numbers literally stretched the picture whenever
+  the ratios disagreed. `GrImageCrop` follows the same rule.
+
+### Removed
+
+- `cameraFrameRect` and `GrCameraFrameRect` — the centre-crop helper has no callers left, and a dead
+  utility in the public surface is worse than none: it invites use.
+
+
+## [v0.2.2] 2026-08-23
+
+### Fixed
+
+- **A single side in `output` no longer stretches the result.** Asking for one dimension is the
+  common case — "an avatar 800 wide" — and the other was taken from the source area instead of being
+  derived from its ratio: a 640×480 camera frame at `width: 800` produced an 800×480 canvas, an
+  image stretched a quarter wider than reality. Both `GrCameraCapture` and `GrImageCrop` were
+  affected; the calculation now lives in one place and is covered on its own.
+
 ## [v0.2.1] 2026-08-23
 
 ### Fixed

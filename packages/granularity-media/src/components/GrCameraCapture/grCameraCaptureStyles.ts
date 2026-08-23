@@ -7,8 +7,12 @@ export const rootClass = 'grid gap-2'
 
 export const frameClass = 'relative w-full overflow-hidden rounded-[var(--gr-radius-md)] border border-[var(--gr-brd)] bg-[var(--gr-muted)]'
 
-/** Превью покрывает рамку целиком: снимок берётся тем же `cover`, что и показ. */
-export const videoClass = 'h-full w-full object-cover'
+/**
+ * Превью **вписывается**, а не покрывает: кадр показывается целиком, в своих
+ * пропорциях. При совпадающей рамке разницы нет, но между стартом и первым
+ * кадром рамка ещё держит запасные 4:3 — и `cover` срезал бы картинку.
+ */
+export const videoClass = 'h-full w-full object-contain'
 
 export const mirroredClass = 'scale-x-[-1]'
 

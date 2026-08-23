@@ -173,6 +173,20 @@ describe('GrImageCrop', () => {
     expect(call[8]).toBe(900)
   })
 
+  it('одна сторона в `output` не растягивает кадр', async () => {
+    const drawImage = vi.fn()
+    vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue({ drawImage } as unknown as CanvasRenderingContext2D)
+    HTMLCanvasElement.prototype.toBlob = (callback: (blob: Blob | null) => void) => callback(new Blob())
+
+    const wrapper = await mountLoaded({ output: { width: 512 } })
+    await (wrapper.vm as unknown as { crop: () => Promise<Blob | null> }).crop()
+
+    // Квадратная область 900×900 при ширине 512 обязана дать 512×512.
+    const call = drawImage.mock.calls[0]!
+    expect(call[7]).toBe(512)
+    expect(call[8]).toBe(512)
+  })
+
   it('непригодный для чтения холст не роняет вызов, а сообщает об ошибке', async () => {
     vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue({ drawImage: vi.fn() } as unknown as CanvasRenderingContext2D)
     HTMLCanvasElement.prototype.toBlob = () => {

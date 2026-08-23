@@ -7,7 +7,8 @@ import { useGrComponentSize } from '@feugene/granularity/composables/useGrCompon
 import { useGranularityTranslations } from '@feugene/granularity/composables/useGranularityTranslations'
 
 import type { GrCameraStatus } from './cameraState'
-import { cameraFrameRect, cameraStatusFromError, cameraSupported, shouldMirrorPreview } from './cameraState'
+import { outputSize } from '../../internal/outputSize'
+import { cameraStatusFromError, cameraSupported, shouldMirrorPreview } from './cameraState'
 import type { GrCameraCaptureSize, GrCameraFacing } from './grCameraCaptureStyles'
 import {
   controlsClass,
@@ -33,10 +34,11 @@ export interface GrCameraCaptureProps {
   /** Конкретное устройство, если приложение его уже выбрало. */
   deviceId?: string
   /**
-   * Соотношение сторон рамки и снимка.
+   * Пожелание камере: какое соотношение сторон запросить у устройства.
    *
-   * Без него рамка принимает соотношение самого потока: камеры отдают то 4:3,
-   * то 16:9, и любое зашитое число показало бы обрезанный кадр как настоящий.
+   * Это **не обрезка**. Камера, которая умеет запрошенное, отдаст его сама;
+   * та, что не умеет, отдаст своё — и показан, и снят будет её настоящий кадр.
+   * Нужен ровно квадрат — это `GrImageCrop` после съёмки.
    */
   aspectRatio?: number
   /**
@@ -91,8 +93,12 @@ const status = ref<GrCameraStatus>('idle')
 /** Соотношение сторон потока: известно только после первого кадра. */
 const streamRatio = ref<number | null>(null)
 
-/** Пока камера молчит, рамка держит 4:3 — на нём её место в раскладке видно. */
-const frameRatio = computed(() => props.aspectRatio ?? streamRatio.value ?? 4 / 3)
+/**
+ * Рамка следует **полученному** потоку, а не запрошенному соотношению:
+ * камера вправе отдать своё, и показывать надо то, что она отдала.
+ * Пока она молчит, рамка держит 4:3 — на нём её место в раскладке видно.
+ */
+const frameRatio = computed(() => streamRatio.value ?? 4 / 3)
 
 const mirrored = computed(() => shouldMirrorPreview(props.facing, props.mirror))
 const isLive = computed(() => status.value === 'live')
@@ -158,9 +164,15 @@ async function start(): Promise<void> {
 
   try {
     const media = await navigator.mediaDevices.getUserMedia({
-      video: props.deviceId
-        ? { deviceId: { exact: props.deviceId } }
-        : { facingMode: props.facing },
+      video: {
+        ...(props.deviceId
+          ? { deviceId: { exact: props.deviceId } }
+          : { facingMode: props.facing }),
+        // Голое число — это `ideal`, то есть пожелание. `exact` здесь дал бы
+        // `OverconstrainedError`, то есть состояние «камеры нет» на исправной
+        // камере, которая просто умеет другое соотношение.
+        ...(props.aspectRatio ? { aspectRatio: props.aspectRatio } : {}),
+      },
       audio: false,
     })
 
@@ -195,7 +207,12 @@ function stop(): void {
 }
 
 /**
- * Снимок текущего кадра.
+ * Снимок текущего кадра — целиком, без среза.
+ *
+ * Камеры на разных устройствах отдают разные размеры и соотношения, поэтому
+ * подгонять кадр под окно бессмысленно: на одном телефоне срезалось бы одно, на
+ * другом другое. Снимок повторяет то, что показывало превью, а обрезка под
+ * нужное место — работа `GrImageCrop`.
  *
  * Зеркало превью сюда **не переносится**: на снимке оказывается то, что было
  * перед камерой. Иначе текст на визитке или в документе уехал бы в зазеркалье —
@@ -206,14 +223,14 @@ async function capture(): Promise<Blob | null> {
   if (!video || !isLive.value)
     return null
 
-  const frame = { width: video.videoWidth, height: video.videoHeight }
-  const rect = cameraFrameRect(frame, frameRatio.value)
+  const rect = { sx: 0, sy: 0, sw: video.videoWidth, sh: video.videoHeight }
   if (rect.sw <= 0)
     return null
 
   const canvas = document.createElement('canvas')
-  canvas.width = Math.max(1, Math.round(props.output?.width ?? rect.sw))
-  canvas.height = Math.max(1, Math.round(props.output?.height ?? rect.sh))
+  const size = outputSize(rect, props.output)
+  canvas.width = size.width
+  canvas.height = size.height
 
   const context = canvas.getContext('2d')
   if (!context)

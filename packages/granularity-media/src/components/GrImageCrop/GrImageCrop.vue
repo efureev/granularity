@@ -7,6 +7,7 @@ import { useGrComponentSize } from '@feugene/granularity/composables/useGrCompon
 import { useGranularityTranslations } from '@feugene/granularity/composables/useGranularityTranslations'
 
 import type { GrCropOffset, GrCropRect } from './cropGeometry'
+import { outputSize } from '../../internal/outputSize'
 import { clampOffset, cropRect, viewportFor } from './cropGeometry'
 import type { GrImageCropShape, GrImageCropSize } from './grImageCropStyles'
 import {
@@ -293,8 +294,9 @@ async function toBlob(): Promise<Blob | null> {
 
   const rect = currentRect()
   const canvas = document.createElement('canvas')
-  canvas.width = Math.max(1, Math.round(props.output?.width ?? rect.sw))
-  canvas.height = Math.max(1, Math.round(props.output?.height ?? rect.sh))
+  const size = outputSize(rect, props.output)
+  canvas.width = size.width
+  canvas.height = size.height
 
   const context = canvas.getContext('2d')
   if (!context)

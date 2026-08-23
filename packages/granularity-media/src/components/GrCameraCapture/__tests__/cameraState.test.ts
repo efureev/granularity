@@ -1,11 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import {
-  cameraFrameRect,
-  cameraStatusFromError,
-  cameraSupported,
-  shouldMirrorPreview,
-} from '../cameraState'
+import { cameraStatusFromError, cameraSupported, shouldMirrorPreview } from '../cameraState'
 
 function domError(name: string): Error {
   const error = new Error('camera')
@@ -62,36 +57,5 @@ describe('shouldMirrorPreview', () => {
   it('явный проп сильнее умолчания по камере', () => {
     expect(shouldMirrorPreview('user', false)).toBe(false)
     expect(shouldMirrorPreview('environment', true)).toBe(true)
-  })
-})
-
-describe('cameraFrameRect', () => {
-  it('из широкого кадра берёт центральный квадрат', () => {
-    const rect = cameraFrameRect({ width: 1280, height: 720 }, 1)
-
-    expect(rect.sw).toBeCloseTo(720)
-    expect(rect.sh).toBeCloseTo(720)
-    expect(rect.sx).toBeCloseTo((1280 - 720) / 2)
-    expect(rect.sy).toBeCloseTo(0)
-  })
-
-  it('из высокого кадра срезает по вертикали', () => {
-    const rect = cameraFrameRect({ width: 720, height: 1280 }, 1)
-
-    expect(rect.sh).toBeCloseTo(720)
-    expect(rect.sy).toBeCloseTo((1280 - 720) / 2)
-  })
-
-  it('совпадающее соотношение ничего не срезает', () => {
-    expect(cameraFrameRect({ width: 1600, height: 900 }, 16 / 9)).toEqual({
-      sx: 0,
-      sy: 0,
-      sw: 1600,
-      sh: 900,
-    })
-  })
-
-  it('до первого кадра отдаёт пустой прямоугольник, а не деление на ноль', () => {
-    expect(cameraFrameRect({ width: 0, height: 0 }, 1)).toEqual({ sx: 0, sy: 0, sw: 0, sh: 0 })
   })
 })
