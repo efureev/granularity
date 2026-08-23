@@ -58,7 +58,15 @@ export const sliderPaddingBySize: Record<GrSliderSize, string> = {
   lg: 'py-2.5',
 }
 
-export const sliderRailClass = 'absolute inset-0 rounded-[var(--gr-radius-full)] bg-[var(--gr-slider-rail,color-mix(in_srgb,var(--gr-muted)_45%,transparent))]'
+/**
+ * Дорожка — `--gr-brd`, а не полупрозрачный `--gr-muted`.
+ *
+ * Прежний дефолт (`color-mix(--gr-muted 45%, transparent)`) на светлой теме
+ * давал #f1f5f9 при 45 % поверх почти такой же поверхности: непройденная часть
+ * шкалы не читалась вовсе, и слайдер выглядел точкой на пустом месте — по нему
+ * нельзя было понять ни диапазон, ни положение внутри него.
+ */
+export const sliderRailClass = 'absolute inset-0 rounded-[var(--gr-radius-full)] bg-[var(--gr-slider-rail,var(--gr-brd))]'
 
 export const sliderFillBaseClass = 'absolute rounded-[var(--gr-radius-full)]'
 

@@ -2997,7 +2997,7 @@ export const grComponentTokens: GrComponentToken[] = [
     "owner": "GrSlider",
     "name": "--gr-slider-rail",
     "kind": "hook",
-    "default": "color-mix(in srgb, var(--gr-muted) 45%, transparent)",
+    "default": "var(--gr-brd)",
     "description": "Цвет непройденной части трека."
   },
   {

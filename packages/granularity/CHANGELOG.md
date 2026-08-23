@@ -7,6 +7,18 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.31.1] 2026-08-23
+
+### Fixed
+
+- **`GrSlider`: the rail is visible again.** Its default was
+  `color-mix(in srgb, var(--gr-muted) 45%, transparent)` — on a light theme that is `#f1f5f9` at
+  45 % over a surface of nearly the same colour, so the unfilled part of the scale did not read at
+  all: the control looked like a dot on empty space, with no way to tell its range or the position
+  inside it. The default is now `--gr-brd`, the token that exists for exactly this — a quiet but
+  visible line — and it holds in both themes. Consumers overriding `--gr-slider-rail` are
+  unaffected.
+
 ## [v0.31.0] 2026-08-23
 
 ### Added
