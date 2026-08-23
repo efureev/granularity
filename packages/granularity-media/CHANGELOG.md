@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v0.5.0] 2026-08-24
+
+### Fixed
+
+- **`GrImageCrop` cropped a frame other than the one on screen.** The window's height was computed
+  as `width / aspectRatio` while the real height comes from CSS — `aspect-ratio` plus the border,
+  and under `box-sizing: border-box` the gap is systematic. The window is now measured, both sides,
+  and measured **again** after the image loads: the frame only takes its ratio together with the
+  image, so the first measurement lands on a transitional height.
+- **A resize now reports a changed frame.** Responsive layouts resize the window without the user
+  touching anything, and the first measurement arrives after `load`; a consumer building a file from
+  the previous frame would get something other than what is on screen.
+
+### Changed
+
+- **Zoom works without `v-model:zoom`.** `zoom` was a controlled prop with no internal state, so the
+  built-in slider was dead for everyone who had not wired the model — which is the common case. The
+  component now keeps its own zoom and lets the prop override it, the same contract the core's
+  overlays use for `v-model:open`.
+
 ## [v0.4.0] 2026-08-24
 
 ### Added

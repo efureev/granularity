@@ -9,7 +9,7 @@ import { GrButton, GrRadioGroup } from '@feugene/granularity'
  * что именно выбирает пользователь.
  */
 const source = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900">
+  <svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">
     <rect width="1600" height="900" fill="#0f172a" />
     <circle cx="1180" cy="300" r="220" fill="#38bdf8" fill-opacity="0.5" />
     <circle cx="480" cy="620" r="160" fill="#f472b6" fill-opacity="0.55" />

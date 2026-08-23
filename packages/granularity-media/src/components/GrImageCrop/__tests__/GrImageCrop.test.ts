@@ -43,19 +43,32 @@ class StubImage {
   }
 }
 
+/** Колбэки наблюдателя: тест дёргает их сам — в jsdom раскладки нет. */
+let resizeCallbacks: ResizeObserverCallback[] = []
+
 const originalImage = globalThis.Image
 const originalObserver = globalThis.ResizeObserver
 
 beforeEach(() => {
+  resizeCallbacks = []
   globalThis.Image = StubImage as unknown as typeof Image
   // `ResizeObserver` в jsdom нет: без заглушки монтирование падает.
   globalThis.ResizeObserver = class {
+    constructor(public callback: ResizeObserverCallback) {
+      resizeCallbacks.push(callback)
+    }
+
     observe(): void {}
     disconnect(): void {}
   } as unknown as typeof ResizeObserver
 
   // Ширина окна кадра: в jsdom раскладки нет, а без ширины геометрия вырождена.
   Object.defineProperty(HTMLElement.prototype, 'clientWidth', {
+    configurable: true,
+    get: () => VIEWPORT_WIDTH,
+  })
+  // Высота теперь тоже измеряется, а не выводится из ширины.
+  Object.defineProperty(HTMLElement.prototype, 'clientHeight', {
     configurable: true,
     get: () => VIEWPORT_WIDTH,
   })
@@ -141,6 +154,62 @@ describe('GrImageCrop', () => {
 
     const emitted = wrapper.emitted('update:zoom') as [number][]
     expect(emitted[emitted.length - 1]![0]).toBe(1)
+  })
+
+  it('увеличение работает и без `v-model:zoom`', async () => {
+    const wrapper = await mountLoaded()
+    const frame = wrapper.find('[role="application"]')
+    const before = lastRect(wrapper)
+
+    await frame.trigger('keydown', { key: '+' })
+
+    // Без собственного состояния проп остался бы единицей, и встроенный
+    // слайдер был бы мёртвым у всех, кто модель не подключил.
+    expect(lastRect(wrapper).sw).toBeLessThan(before.sw)
+  })
+
+  it('переданный `zoom` перекрывает собственное состояние', async () => {
+    const wrapper = await mountLoaded({ zoom: 2 })
+    const frame = wrapper.find('[role="application"]')
+    const before = lastRect(wrapper)
+
+    await frame.trigger('keydown', { key: '+' })
+
+    // Управляет потребитель: пока он не обновил проп, кадр не меняется.
+    expect(lastRect(wrapper).sw).toBeCloseTo(before.sw)
+    expect(wrapper.emitted('update:zoom')?.at(-1)?.[0]).toBeCloseTo(2.15)
+  })
+
+  it('кадр считается от измеренного окна, а не от расчётного', async () => {
+    // Рамка ниже расчётной высоты: `aspect-ratio` вместе с рамкой даёт
+    // содержимое меньше, чем `ширина / соотношение`.
+    Object.defineProperty(HTMLElement.prototype, 'clientHeight', {
+      configurable: true,
+      get: () => VIEWPORT_WIDTH / 2,
+    })
+
+    const wrapper = await mountLoaded()
+    const rect = lastRect(wrapper)
+
+    // Окно 300×150 на картинке 1600×900: в кадр идёт полоса 2:1, а не квадрат.
+    expect(rect.sw / rect.sh).toBeCloseTo(2)
+  })
+
+  it('изменение размера окна сообщается как изменение кадра', async () => {
+    const wrapper = await mountLoaded()
+    const before = lastRect(wrapper)
+
+    // Окно стало вдвое ниже: у адаптивной раскладки это происходит и без
+    // участия пользователя, а первое измерение приходит уже после `load`.
+    resizeCallbacks.forEach(callback => callback(
+      [{ contentRect: { width: VIEWPORT_WIDTH, height: VIEWPORT_WIDTH / 2 } } as ResizeObserverEntry],
+      {} as ResizeObserver,
+    ))
+    await nextTick()
+
+    const after = lastRect(wrapper)
+    expect(after.sh).not.toBeCloseTo(before.sh)
+    expect(after.sw / after.sh).toBeCloseTo(2)
   })
 
   it('отключённый компонент не двигает кадр', async () => {

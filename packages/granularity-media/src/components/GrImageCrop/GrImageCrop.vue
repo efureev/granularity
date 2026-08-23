@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vue'
 
 import GrSlider from '@feugene/granularity/components/GrSlider'
 import { useDragGesture } from '@feugene/granularity/composables/useDragGesture'
@@ -38,7 +38,13 @@ export interface GrImageCropProps {
   /** Отношение ширины кадра к высоте: `1` — аватар, `16 / 9` — обложка. */
   aspectRatio?: number
   shape?: GrImageCropShape
-  /** Увеличение относительно вписанного кадра. Не меньше единицы. */
+  /**
+   * Увеличение относительно вписанного кадра, не меньше единицы.
+   *
+   * Проп необязателен: без `v-model:zoom` компонент ведёт увеличение сам —
+   * иначе встроенный слайдер оказывался бы мёртвым у всех, кто модель не
+   * подключил, а это самый частый случай.
+   */
   zoom?: number
   maxZoom?: number
   output?: GrImageCropOutput
@@ -59,7 +65,7 @@ const props = withDefaults(defineProps<GrImageCropProps>(), {
   src: null,
   aspectRatio: 1,
   shape: 'rect',
-  zoom: 1,
+  zoom: undefined,
   maxZoom: 4,
   output: undefined,
   // `undefined`, а не `md`: настоящий дефолт живёт в `useGrComponentSize`,
@@ -89,13 +95,35 @@ const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrImageC
 const viewportEl = ref<HTMLElement | null>(null)
 const image = shallowRef<HTMLImageElement | null>(null)
 const naturalSize = ref({ width: 0, height: 0 })
-const viewportWidth = ref(0)
+const viewportSize = ref({ width: 0, height: 0 })
 const offset = ref<GrCropOffset>({ x: 0, y: 0 })
 const objectUrl = ref<string | null>(null)
 
-const viewport = computed(() => viewportFor(viewportWidth.value, props.aspectRatio))
+/**
+ * Окно измеряется, а не вычисляется.
+ *
+ * Высота, посчитанная как `ширина / aspectRatio`, расходится с настоящей: её
+ * задаёт CSS (`aspect-ratio` плюс рамка), и при `box-sizing: border-box`
+ * расхождение систематическое. Кадр от такой высоты вырезался **не тот**, что
+ * пользователь видел в рамке. До первого измерения остаётся расчёт — иначе
+ * геометрия вырождена.
+ */
+const viewport = computed(() => (
+  viewportSize.value.height > 0
+    ? viewportSize.value
+    : viewportFor(viewportSize.value.width, props.aspectRatio)
+))
 const hasImage = computed(() => image.value !== null && naturalSize.value.width > 0)
-const currentZoom = computed(() => Math.min(props.maxZoom, Math.max(1, props.zoom)))
+/**
+ * Своё увеличение — как `useControlledOpen` у оверлеев ядра: проп перекрывает
+ * его, когда потребитель подключил модель, и не мешает, когда не подключил.
+ */
+const internalZoom = ref(1)
+const isZoomControlled = computed(() => props.zoom !== undefined)
+const currentZoom = computed(() => Math.min(
+  props.maxZoom,
+  Math.max(1, props.zoom ?? internalZoom.value),
+))
 
 const imageStyle = computed(() => {
   const scale = viewport.value.width > 0 && naturalSize.value.width > 0
@@ -139,6 +167,10 @@ function setZoom(value: number): void {
     return
 
   const next = Math.min(props.maxZoom, Math.max(1, value))
+
+  if (!isZoomControlled.value)
+    internalZoom.value = next
+
   emit('update:zoom', next)
   // Уменьшение сокращает пределы сдвига, и прежнее смещение вывело бы кадр за
   // край картинки — подрезаем сразу, не дожидаясь следующего жеста.
@@ -148,6 +180,10 @@ function setZoom(value: number): void {
 
 function reset(): void {
   offset.value = { x: 0, y: 0 }
+
+  if (!isZoomControlled.value)
+    internalZoom.value = 1
+
   emit('update:zoom', 1)
   announceChange()
 }
@@ -251,7 +287,13 @@ function load(source: GrImageCropProps['src']): void {
     naturalSize.value = { width: element.naturalWidth, height: element.naturalHeight }
     offset.value = { x: 0, y: 0 }
     emit('load', { ...naturalSize.value })
-    announceChange()
+
+    // Рамка получает своё соотношение вместе с картинкой — меряем уже после
+    // того, как раскладка это учла.
+    void nextTick(() => {
+      measureViewport()
+      announceChange()
+    })
   })
   element.addEventListener('error', event => emit('error', event))
   element.src = url
@@ -259,12 +301,35 @@ function load(source: GrImageCropProps['src']): void {
 
 let observer: ResizeObserver | null = null
 
+/**
+ * Замер окна.
+ *
+ * Зовётся ещё раз после загрузки картинки: до неё рамка не имеет своего
+ * соотношения (`aspect-ratio` ставится вместе с картинкой), и первое измерение
+ * приходит на переходной высоте. Кадр от неё считался бы не тем, что видно.
+ */
+function measureViewport(): void {
+  const element = viewportEl.value
+  if (!element)
+    return
+
+  viewportSize.value = { width: element.clientWidth, height: element.clientHeight }
+}
+
 onMounted(() => {
   if (viewportEl.value) {
-    viewportWidth.value = viewportEl.value.clientWidth
+    measureViewport()
     observer = new ResizeObserver(([entry]) => {
-      viewportWidth.value = entry?.contentRect.width ?? 0
+      viewportSize.value = {
+        width: entry?.contentRect.width ?? 0,
+        height: entry?.contentRect.height ?? 0,
+      }
       offset.value = clampOffset(offset.value, naturalSize.value, viewport.value, currentZoom.value)
+      // Размер окна изменился — изменилась и вырезаемая область: у адаптивной
+      // раскладки это происходит и без участия пользователя, а первое
+      // измерение приходит уже после `load`. Потребитель, собравший файл по
+      // прежнему кадру, получил бы не то, что видит на экране.
+      announceChange()
     })
     observer.observe(viewportEl.value)
   }

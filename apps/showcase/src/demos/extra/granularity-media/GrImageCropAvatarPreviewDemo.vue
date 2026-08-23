@@ -1,17 +1,21 @@
 <script setup lang="ts">
-import { onBeforeUnmount, ref, useTemplateRef, watch } from 'vue'
+import { nextTick, onBeforeUnmount, ref, useTemplateRef } from 'vue'
 
 import { GrAvatar, GrCard } from '@feugene/granularity'
 
 /**
- * Живой предпросмотр в тех местах, где аватар потом и появится.
+ * Один кадр — три файла, и каждый показан там, где он потом и появится.
  *
- * Главное сомнение при кадрировании — «а как это будет смотреться маленьким»:
- * лицо, занимающее весь круг на превью 300 px, в строке списка превращается в
- * пятно. Ответ даёт только показ рядом, в настоящих размерах.
+ * Приложения хранят аватар не одной картинкой: в шапку идёт крупный, в строку
+ * списка — мелкий, и отдавать 256 px туда, где рисуется 24, значит возить лишние
+ * килобайты на каждой строке. Размер задаёт `output`, а кадр остаётся тем же.
+ *
+ * Второе, что видно только так: главное сомнение при кадрировании — «а как это
+ * будет смотреться маленьким». В кружке 24 px сразу заметно, что в кадр попало
+ * лишнее.
  */
 const source = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900">
+  <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900" viewBox="0 0 1200 900">
     <rect width="1200" height="900" fill="#1e293b" />
     <circle cx="640" cy="380" r="180" fill="#fbbf24" />
     <rect x="470" y="560" width="340" height="340" rx="170" fill="#38bdf8" />
@@ -20,43 +24,69 @@ const source = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
   </svg>
 `)}`
 
-const preview = ref<string | null>(null)
+interface Variant {
+  key: 'large' | 'medium' | 'small'
+  label: string
+  px: number
+  url: string | null
+  weight: number
+}
+
+const variants = ref<Variant[]>([
+  { key: 'large', label: 'Крупный', px: 256, url: null, weight: 0 },
+  { key: 'medium', label: 'Средний', px: 96, url: null, weight: 0 },
+  { key: 'small', label: 'Мелкий', px: 32, url: null, weight: 0 },
+])
+
+const outputWidth = ref(256)
 const cropper = useTemplateRef('cropper')
-const zoom = ref(1.4)
 
 let pending: ReturnType<typeof setTimeout> | null = null
-/** Номер запроса: поздний ответ не должен перетирать свежий предпросмотр. */
+/** Номер запроса: поздний ответ не должен перетирать свежие варианты. */
 let request = 0
 
+function urlFor(key: Variant['key']): string | undefined {
+  return variants.value.find(item => item.key === key)?.url ?? undefined
+}
+
 /**
- * Предпросмотр обновляется с задержкой: `crop()` рисует холст и кодирует файл,
- * и делать это на каждый пиксель перетаскивания значит греть процессор ради
- * кадров, которых никто не увидит.
+ * Варианты пересобираются с задержкой: три `crop()` подряд рисуют холст и
+ * кодируют файл, и делать это на каждый пиксель перетаскивания значит греть
+ * процессор ради кадров, которых никто не увидит.
  */
-function schedulePreview() {
+function scheduleVariants() {
   if (pending)
     clearTimeout(pending)
 
   pending = setTimeout(async () => {
     const current = ++request
-    const blob = await cropper.value?.crop()
-    if (!blob || current !== request)
-      return
 
-    if (preview.value)
-      URL.revokeObjectURL(preview.value)
+    for (const variant of variants.value) {
+      // Размер задаётся пропом — тем же способом, что и в приложении.
+      outputWidth.value = variant.px
+      await nextTick()
 
-    preview.value = URL.createObjectURL(blob)
-  }, 250)
+      const blob = await cropper.value?.crop()
+      if (!blob || current !== request)
+        return
+
+      if (variant.url)
+        URL.revokeObjectURL(variant.url)
+
+      variant.url = URL.createObjectURL(blob)
+      variant.weight = blob.size
+    }
+  }, 300)
 }
-
-watch(zoom, schedulePreview)
 
 onBeforeUnmount(() => {
   if (pending)
     clearTimeout(pending)
-  if (preview.value)
-    URL.revokeObjectURL(preview.value)
+
+  for (const variant of variants.value) {
+    if (variant.url)
+      URL.revokeObjectURL(variant.url)
+  }
 })
 </script>
 
@@ -65,26 +95,45 @@ onBeforeUnmount(() => {
     <div class="grid gap-3">
       <GrImageCrop
         ref="cropper"
-        v-model:zoom="zoom"
         :src="source"
         shape="circle"
         :aspect-ratio="1"
-        :output="{ width: 256 }"
-        @change="schedulePreview"
-        @load="schedulePreview"
+        :output="{ width: outputWidth }"
+        @change="scheduleVariants"
+        @load="scheduleVariants"
       />
       <p class="showcase-demo-text text-sm">
-        Тяните картинку — предпросмотр справа меняется следом.
+        Тяните картинку и меняйте увеличение — три файла справа пересобираются следом.
       </p>
     </div>
 
     <div class="grid content-start gap-4">
       <GrCard padding="md">
+        <div class="flex flex-wrap items-end gap-4">
+          <div v-for="variant in variants" :key="variant.key" class="grid justify-items-center gap-1">
+            <img
+              v-if="variant.url"
+              :src="variant.url"
+              :alt="`${variant.label} вариант`"
+              class="rounded-[var(--gr-radius-full)] object-cover"
+              :style="{ width: `${Math.min(variant.px, 96)}px`, height: `${Math.min(variant.px, 96)}px` }"
+            >
+            <span class="showcase-demo-text text-xs">
+              {{ variant.label }} · {{ variant.px }} px
+            </span>
+            <span class="showcase-demo-text text-xs">
+              {{ (variant.weight / 1024).toFixed(1) }} КБ
+            </span>
+          </div>
+        </div>
+      </GrCard>
+
+      <GrCard padding="md">
         <div class="flex items-center gap-3">
-          <GrAvatar :src="preview ?? undefined" size="lg" />
+          <GrAvatar :src="urlFor('medium')" size="lg" />
           <div class="grid">
             <span class="text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)] font-600">Иван Петров</span>
-            <span class="showcase-demo-text text-xs">Шапка профиля — 40 px</span>
+            <span class="showcase-demo-text text-xs">Шапка профиля — сюда идёт средний</span>
           </div>
         </div>
       </GrCard>
@@ -92,22 +141,12 @@ onBeforeUnmount(() => {
       <GrCard padding="md">
         <div class="grid gap-2">
           <div v-for="row in ['Отчёт за август', 'Договор №14', 'Заявка на отпуск']" :key="row" class="flex items-center gap-2">
-            <GrAvatar :src="preview ?? undefined" size="xs" />
+            <GrAvatar :src="urlFor('small')" size="xs" />
             <span class="showcase-demo-text text-sm">{{ row }}</span>
           </div>
-          <span class="showcase-demo-text text-xs">Строка списка — 24 px: здесь видно, много ли лица осталось в кадре</span>
-        </div>
-      </GrCard>
-
-      <GrCard padding="md">
-        <div class="flex gap-3">
-          <GrAvatar :src="preview ?? undefined" size="sm" />
-          <div class="grid gap-1">
-            <span class="showcase-demo-text text-sm">
-              Согласовано. Приложил протокол — посмотрите пункт 4.
-            </span>
-            <span class="showcase-demo-text text-xs">Комментарий — 32 px</span>
-          </div>
+          <span class="showcase-demo-text text-xs">
+            Строка списка — мелкий: 256 px здесь означал бы лишние килобайты на каждой строке
+          </span>
         </div>
       </GrCard>
     </div>

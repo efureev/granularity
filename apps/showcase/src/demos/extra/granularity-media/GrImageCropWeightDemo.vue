@@ -11,7 +11,7 @@ import { GrSegmented, GrSlider } from '@feugene/granularity'
  * рядом. Заодно видно, что у png качество не спрашивают вовсе.
  */
 const source = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 1000">
+  <svg xmlns="http://www.w3.org/2000/svg" width="1400" height="1000" viewBox="0 0 1400 1000">
     <defs>
       <radialGradient id="g" cx="35%" cy="30%">
         <stop offset="0%" stop-color="#fde68a" />

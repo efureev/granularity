@@ -1,7 +1,7 @@
 {
   "name": "@feugene/granularity-media",
   "description": "Media components for @feugene/granularity: image cropping, camera capture, code scanning and video playback.",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "license": "SEE LICENSE IN LICENSE",
   "author": {
     "name": "Evgeniy Fureev",
