@@ -27,5 +27,15 @@
     "stop": "Stop",
     "unsupported": "This browser cannot read codes. Pass a `detector` to enable it.",
     "detected": "Code recognised"
+  },
+  "player": {
+    "label": "Video player",
+    "play": "Play",
+    "pause": "Pause",
+    "mute": "Mute",
+    "unmute": "Unmute",
+    "fullscreen": "Full screen",
+    "seek": "Position",
+    "error": "The video could not be played."
   }
 }

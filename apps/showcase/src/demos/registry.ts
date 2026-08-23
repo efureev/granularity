@@ -55,6 +55,7 @@ export const demoPathByPreviewKey = {
   'extra-media-camera-to-crop': 'extra/granularity-media/GrCameraToCropDemo.vue',
   'extra-media-code-scanner-basic': 'extra/granularity-media/GrCodeScannerBasicDemo.vue',
   'extra-media-code-scanner-receiving': 'extra/granularity-media/GrCodeScannerReceivingDemo.vue',
+  'extra-media-video-player-basic': 'extra/granularity-media/GrVideoPlayerBasicDemo.vue',
   'extra-media-image-crop-avatar': 'extra/granularity-media/GrImageCropAvatarPreviewDemo.vue',
   'extra-media-image-crop-weight': 'extra/granularity-media/GrImageCropWeightDemo.vue',
   'extra-media-image-crop-basic': 'extra/granularity-media/GrImageCropBasicDemo.vue',

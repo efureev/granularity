@@ -44,6 +44,7 @@
 | из картинки вырезают кадр перед отправкой | [`GrImageCrop`](../packages/granularity-media/docs/components/GrImageCrop.md) |
 | картинку снимают камерой прямо сейчас | [`GrCameraCapture`](../packages/granularity-media/docs/components/GrCameraCapture.md) |
 | камерой читают QR или штрихкод | [`GrCodeScanner`](../packages/granularity-media/docs/components/GrCodeScanner.md) |
+| видео проигрывают на странице | [`GrVideoPlayer`](../packages/granularity-media/docs/components/GrVideoPlayer.md) |
 | показать содержимое файла текстом | [`GrCodeBlock`](../packages/granularity/docs/components/GrCodeBlock.md) |
 
 Различитель `GrCodeScanner` / `GrCameraCapture` — **что уходит наружу**: у
@@ -422,6 +423,7 @@
 | [`GrTree`](../packages/granularity/docs/components/GrTree.md) | ядро | данные вложены |
 | [`GrTreeSelect`](../packages/granularity/docs/components/GrTreeSelect.md) | ядро | варианты вложены |
 | [`GrValue`](../packages/granularity/docs/components/GrValue.md) | ядро | пишете свой компонент с величиной |
+| [`GrVideoPlayer`](../packages/granularity-media/docs/components/GrVideoPlayer.md) | media | ролик внутри страницы продукта |
 | [`XgQuickForm`](../packages/extra-granularity/docs/components/XgQuickForm.md) | extra | форма из одного поля |
 <!-- component-map:generated:end -->
 

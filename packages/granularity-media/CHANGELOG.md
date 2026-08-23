@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v0.6.0] 2026-08-24
+
+### Added
+
+- **`GrVideoPlayer` — video with controls of its own.** Native `controls` look different in every
+  browser and know nothing about the design system's themes or sizes; these are drawn from tokens.
+- **Full screen is requested on the frame, not on `<video>`.** Asking the video element hands the
+  browser its own interface — our buttons, labels and keyboard would disappear exactly when they are
+  needed most.
+- **The buffered bar takes the range around the current position.** Browsers keep several loaded
+  ranges, and after seeking backwards the last one belongs to a different part of the clip: a bar
+  drawn from it would jump ahead and promise data that is not there.
+- **Duration is not always known.** A stream recorded by `MediaRecorder`, or a live one, carries no
+  duration in its header and the browser reports `NaN`. The progress bar is then not drawn at all
+  and the label shows just the current time — "1:05 / 0:00" would promise an end the recording does
+  not have.
+- **Time is announced in words.** `aria-valuetext` reads "1:05 / 2:00"; a bare `aria-valuenow` would
+  say "65 of 120" — correct and useless.
+
+This completes the package: cropping, camera capture, code scanning and playback.
+
+
 ## [v0.5.0] 2026-08-24
 
 ### Fixed

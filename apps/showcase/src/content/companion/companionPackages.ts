@@ -2355,6 +2355,90 @@ import type { DataSourceUrlAdapter } from '@feugene/granularity-datasource/url'`
     dependencies: [],
     components: [
       {
+        name: 'GrVideoPlayer',
+        slug: 'gr-video-player',
+        title: 'GrVideoPlayer',
+        summary: 'Видео со своими элементами управления: тема и размеры дизайн-системы вместо браузерных.',
+        importPath: '@feugene/granularity-media/components/GrVideoPlayer',
+        overview: {
+          paragraphs: [
+            'Нативные `controls` в каждом браузере выглядят по-своему и не знают ни про темы, ни про размеры дизайн-системы. Здесь элементы управления нарисованы токенами и живут по её правилам.',
+            'Плеер держит один ролик и делает это целиком: перемотка мышью и с клавиатуры, звук, полный экран, полоса загруженного, время в подписи для диктора.',
+          ],
+          features: [
+            'Полный экран запрашивается у рамки, а не у `<video>`: иначе браузер подменил бы наши элементы управления своими.',
+            'Полоса буфера берётся вокруг текущей позиции — по последнему диапазону она прыгала бы вперёд после перемотки назад.',
+            'Время объявляется словами: «1:05 / 2:00» вместо «65 из 120».',
+            'Клавиатура целиком: пробел, стрелки, `Home`/`End`, `M`, `F`.',
+            'Ошибка источника показывается подписью, а не остаётся чёрным кадром.',
+            'Воспроизведение прекращается вместе с компонентом — звук не идёт со страницы, которой нет.',
+          ],
+        },
+        typeDeclarations: `import type {
+  GrVideoPlayerEmits,
+  GrVideoPlayerProps,
+  GrVideoPlayerSize,
+} from '@feugene/granularity-media'`,
+        apiSections: [
+          {
+            key: 'props',
+            title: 'Props',
+            origin: 'manual',
+            items: [
+              { name: 'src', type: 'string | null', default: 'null', description: 'Адрес ролика.' },
+              { name: 'poster', type: 'string', description: 'Кадр до запуска: без него первые секунды видна чёрная рамка.' },
+              { name: 'aspectRatio', type: 'number', default: '16 / 9', description: 'Соотношение сторон рамки.' },
+              { name: 'autoplay', type: 'boolean', default: 'false', description: 'Запускать сразу. Без `muted` браузеры это блокируют.' },
+              { name: 'loop', type: 'boolean', default: 'false', description: 'Повторять по кругу.' },
+              { name: 'muted', type: 'boolean', default: 'false', description: 'Начинать без звука.' },
+              { name: 'seekStep', type: 'number', default: '5', description: 'Шаг перемотки стрелками, секунды.' },
+              { name: 'size', type: `'xs' | 'sm' | 'md' | 'lg'`, description: 'Кегль подписей; читается из `GrConfigProvider`.' },
+              { name: 'disabled', type: 'boolean', default: 'false', description: 'Управление не работает ни мышью, ни клавиатурой.' },
+              { name: 'ariaLabel', type: 'string', description: 'Имя группы, если рядом нет подписи.' },
+            ],
+          },
+          {
+            key: 'emits',
+            title: 'Emits',
+            origin: 'manual',
+            items: [
+              { name: 'play', type: '()', description: 'Воспроизведение началось.' },
+              { name: 'pause', type: '()', description: 'Пауза.' },
+              { name: 'ended', type: '()', description: 'Ролик закончился.' },
+              { name: 'timeupdate', type: '(current: number)', description: 'Текущая позиция, секунды.' },
+              { name: 'error', type: '(error: unknown)', description: 'Источник не воспроизводится.' },
+            ],
+          },
+          {
+            key: 'expose',
+            title: 'Методы',
+            origin: 'manual',
+            items: [
+              { name: 'play()', type: '() => void', description: 'Переключает пуск и паузу.' },
+              { name: 'seekTo()', type: '(seconds: number) => void', description: 'Ставит позицию, подрезая её по длительности.' },
+              { name: 'toggleMuted()', type: '() => void', description: 'Переключает звук.' },
+            ],
+          },
+          {
+            key: 'slots',
+            title: 'Слоты',
+            origin: 'manual',
+            items: [
+              { name: 'controls', type: '{ playing, current, duration, toggle }', description: 'Своя панель управления вместо встроенной.' },
+            ],
+          },
+        ],
+        examples: [
+          {
+            id: 'media-video-player-basic',
+            title: 'Controls that match the interface',
+            description: 'Ролик со своими элементами управления: перемотка, звук, полный экран и клавиатура.',
+            previewKey: 'extra-media-video-player-basic',
+            note: 'Ролик собирается скриптом `scripts/generate-demo-video.mjs` и лежит в `public/demo`: витрина обязана работать без сети, а тащить бинарь из внешнего источника значит зависеть от чужого хостинга. Полный экран запрашивается у рамки, а не у `<video>`, иначе браузер подменил бы эти элементы управления своими — вместе с клавиатурой и подписями.',
+          },
+        ],
+      },
+      {
         name: 'GrCodeScanner',
         slug: 'gr-code-scanner',
         title: 'GrCodeScanner',

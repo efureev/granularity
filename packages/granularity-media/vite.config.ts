@@ -48,6 +48,9 @@ export default defineConfig({
         'components/GrImageCrop/index': fileURLToPath(
           new URL('./src/components/GrImageCrop/index.ts', import.meta.url),
         ),
+        'components/GrVideoPlayer/index': fileURLToPath(
+          new URL('./src/components/GrVideoPlayer/index.ts', import.meta.url),
+        ),
         // </granularity:components>
       },
       formats: ['es'],

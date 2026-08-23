@@ -13,6 +13,7 @@ export const GRANULARITY_MEDIA_COMPONENTS = [
   'GrCameraCapture',
   'GrCodeScanner',
   'GrImageCrop',
+  'GrVideoPlayer',
   // </granularity:components>
 ] as const
 

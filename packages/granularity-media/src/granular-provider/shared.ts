@@ -11,6 +11,7 @@ import {
 import { grCameraCaptureConfig } from '../components/GrCameraCapture/config'
 import { grCodeScannerConfig } from '../components/GrCodeScanner/config'
 import { grImageCropConfig } from '../components/GrImageCrop/config'
+import { grVideoPlayerConfig } from '../components/GrVideoPlayer/config'
 // </granularity:components:imports>
 
 /** Идентификатор провайдера — совпадает с именем пакета. */
@@ -27,6 +28,7 @@ export const granularityMediaComponentConfigs = {
   GrCameraCapture: grCameraCaptureConfig,
   GrCodeScanner: grCodeScannerConfig,
   GrImageCrop: grImageCropConfig,
+  GrVideoPlayer: grVideoPlayerConfig,
   // </granularity:components:registry>
 } satisfies Record<string, GranularComponentDescriptor>
 

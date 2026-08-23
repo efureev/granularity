@@ -27,5 +27,15 @@
     "stop": "Detener",
     "unsupported": "Este navegador no puede leer códigos. Pasa un `detector` para habilitarlos.",
     "detected": "Código reconocido"
+  },
+  "player": {
+    "label": "Reproductor de vídeo",
+    "play": "Reproducir",
+    "pause": "Pausa",
+    "mute": "Silenciar",
+    "unmute": "Activar sonido",
+    "fullscreen": "Pantalla completa",
+    "seek": "Posición",
+    "error": "No se pudo reproducir el vídeo."
   }
 }

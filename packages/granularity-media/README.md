@@ -1,9 +1,10 @@
 # `@feugene/granularity-media`
 
-Работа с изображением и камерой для `@feugene/granularity`. Три компонента, и они
-стоят рядом по сценарию: `GrCameraCapture` снимает кадр камерой, `GrImageCrop`
-выбирает кадр из уже существующей картинки, `GrCodeScanner` читает камерой QR и
-штрихкоды. Первые два отдают готовый `Blob`, третий — содержимое кода.
+Работа с изображением, камерой и видео для `@feugene/granularity`. Четыре
+компонента, и они стоят рядом по сценарию: `GrCameraCapture` снимает кадр
+камерой, `GrImageCrop` выбирает кадр из уже существующей картинки,
+`GrCodeScanner` читает камерой QR и штрихкоды, `GrVideoPlayer` проигрывает
+готовое видео своими элементами управления.
 
 ```bash
 yarn add @feugene/granularity-media
@@ -111,10 +112,22 @@ Safari и Firefox закрываются детектором, который п
 без фильтра приложение оформило бы двадцать заказов вместо одного. Режим
 приёмки, где сканируют одинаковые упаковки подряд, включается `continuous`.
 
+## Видео со своими элементами управления
+
+```vue
+<GrVideoPlayer :src="clip" poster="/preview.jpg" muted />
+```
+
+Нативные `controls` в каждом браузере выглядят по-своему и не знают ни про темы,
+ни про размеры дизайн-системы. Полный экран запрашивается у рамки, а не у
+`<video>`: иначе браузер подменил бы эти элементы управления своими — вместе с
+клавиатурой и подписями.
+
 ## Документация
 
 - [`docs/components.md`](./docs/components.md) — состав пакета;
 - [`docs/components/GrImageCrop.md`](./docs/components/GrImageCrop.md),
   [`docs/components/GrCameraCapture.md`](./docs/components/GrCameraCapture.md) и
-  [`docs/components/GrCodeScanner.md`](./docs/components/GrCodeScanner.md) — страницы компонентов;
+  [`docs/components/GrCodeScanner.md`](./docs/components/GrCodeScanner.md) и
+  [`docs/components/GrVideoPlayer.md`](./docs/components/GrVideoPlayer.md) — страницы компонентов;
 - [`docs/keyboard.md`](./docs/keyboard.md), [`docs/ssr.md`](./docs/ssr.md) — сквозные правила пакета.
