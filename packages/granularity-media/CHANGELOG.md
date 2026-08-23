@@ -7,6 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v0.4.0] 2026-08-24
+
+### Added
+
+- **`GrCodeScanner` — reading QR and barcodes with the camera.** What leaves the component is a
+  string, not a file; the frame is never stored.
+- **No decoder ships with the package.** `BarcodeDetector` exists in Chrome and Edge but in neither
+  Safari nor Firefox — i.e. not on iPhone at all, which is where scanning mostly happens. Bundling a
+  decoder would force the heaviest dependency in the package on everyone, including those who only
+  took the cropper, so the native path is built in and everything else is covered by a `detector`
+  the application passes; the component page carries a ready recipe. "Nothing can read codes here"
+  is its own state: telling the user to "allow the camera" would send them to solve the wrong
+  problem.
+- **One code in frame is one event.** The camera yields dozens of frames per second and the same
+  code is recognised in each; unfiltered, an application would place twenty orders instead of one.
+  `continuous` lifts the filter for goods-in, where identical packages are scanned in a row. The
+  symbology is part of a code's identity: the same digits as `qr_code` and as `ean_13` are two
+  different codes.
+
+### Changed
+
+- Camera plumbing — permission, refusal states, frame ratio, stopping tracks — moved into a shared
+  composable used by both `GrCameraCapture` and `GrCodeScanner`. Written twice, it would have
+  drifted apart on the first fix.
+
+
 ## [v0.3.0] 2026-08-23
 
 ### Changed

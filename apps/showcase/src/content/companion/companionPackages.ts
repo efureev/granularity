@@ -2355,6 +2355,89 @@ import type { DataSourceUrlAdapter } from '@feugene/granularity-datasource/url'`
     dependencies: [],
     components: [
       {
+        name: 'GrCodeScanner',
+        slug: 'gr-code-scanner',
+        title: 'GrCodeScanner',
+        summary: 'Чтение QR и штрихкодов камерой: наружу уходит содержимое кода, а не файл.',
+        importPath: '@feugene/granularity-media/components/GrCodeScanner',
+        overview: {
+          paragraphs: [
+            'Наводят камеру на код — приложение получает строку: адрес, номер товара, ключ привязки. Кадр при этом никуда не сохраняется, и в этом отличие от съёмки.',
+            'Декодера пакет не несёт: нативный `BarcodeDetector` есть в Chrome и Edge, а Safari и Firefox закрываются детектором, который передаёт приложение. Тащить чужую библиотеку внутрь значило бы навязать её и тем, кто взял только кроп.',
+          ],
+          features: [
+            'Один код в кадре — одно событие: без фильтра приложение оформило бы двадцать заказов вместо одного.',
+            'Режим приёмки: `continuous` возвращает повторы, когда сканируют одинаковые упаковки подряд.',
+            'Символика — часть тождества: одно значение в QR и в EAN-13 это разные коды.',
+            'Разбор идёт по таймеру, а не на каждом кадре: телефон в руке греется заметно.',
+            'Кадр, который не разобрался, пропускается молча — в объектив попала рука, а не случился сбой.',
+            '«Читать нечем» — отдельное состояние: браузер без детектора говорит об этом прямо.',
+          ],
+        },
+        typeDeclarations: `import type {
+  GrCodeDetector,
+  GrCodeResult,
+  GrCodeScannerProps,
+  GrCodeScannerSize,
+} from '@feugene/granularity-media'`,
+        apiSections: [
+          {
+            key: 'props',
+            title: 'Props',
+            origin: 'manual',
+            items: [
+              { name: 'facing', type: `'user' | 'environment'`, default: `'environment'`, description: 'Тыловая камера по умолчанию: ей наводят на код.' },
+              { name: 'deviceId', type: 'string', description: 'Конкретное устройство; требуется точно (`exact`).' },
+              { name: 'autoStart', type: 'boolean', default: 'false', description: 'Включать камеру сразу. По умолчанию нет — запрос без действия пользователя отклоняют не глядя.' },
+              { name: 'formats', type: 'string[]', description: 'Символики: `qr_code`, `ean_13`, `code_128`, … Без списка — всё, что умеет браузер.' },
+              { name: 'detector', type: '(source) => Promise<GrCodeResult[]>', description: 'Детектор для браузеров без `BarcodeDetector` — Safari и Firefox. Рецепт на странице компонента.' },
+              { name: 'interval', type: 'number', default: '250', description: 'Как часто разбирать кадр, мс. Чаще — горячее устройство, реже — вялый отклик.' },
+              { name: 'continuous', type: 'boolean', default: 'false', description: 'Сообщать один и тот же код повторно: режим приёмки.' },
+              { name: 'size', type: `'xs' | 'sm' | 'md' | 'lg'`, description: 'Шкала вложенных кнопок; читается из `GrConfigProvider`.' },
+              { name: 'disabled', type: 'boolean', default: 'false', description: 'Камера не включается, кадры не разбираются.' },
+              { name: 'ariaLabel', type: 'string', description: 'Имя группы, если рядом нет подписи.' },
+            ],
+          },
+          {
+            key: 'emits',
+            title: 'Emits',
+            origin: 'manual',
+            items: [
+              { name: 'detect', type: '(codes: GrCodeResult[])', description: 'Коды, которых не было в предыдущем кадре.' },
+              { name: 'start', type: '()', description: 'Поток пошёл, разбор начался.' },
+              { name: 'stop', type: '()', description: 'Поток и разбор остановлены.' },
+              { name: 'statusChange', type: '(status: GrCameraStatus)', description: 'Состояние камеры: те же восемь, что у съёмки.' },
+            ],
+          },
+          {
+            key: 'expose',
+            title: 'Методы',
+            origin: 'manual',
+            items: [
+              { name: 'start()', type: '() => Promise<void>', description: 'Запрашивает разрешение и включает сканирование.' },
+              { name: 'stop()', type: '() => void', description: 'Гасит и поток, и разбор кадров.' },
+            ],
+          },
+          {
+            key: 'slots',
+            title: 'Слоты',
+            origin: 'manual',
+            items: [
+              { name: 'controls', type: '{ status, start, stop }', description: 'Своя панель управления вместо встроенной.' },
+            ],
+          },
+        ],
+        examples: [
+          {
+            id: 'media-code-scanner-basic',
+            title: 'Reading a code instead of typing it',
+            description: 'Наведите камеру на QR или штрихкод — содержимое появится в списке. Переключатель показывает разницу режимов.',
+            previewKey: 'extra-media-code-scanner-basic',
+            note: 'В Safari и Firefox нативного `BarcodeDetector` нет, и сканер честно говорит, что читать нечем: предлагать «включите камеру» значило бы отправить пользователя решать не ту задачу. Рецепт подключения `@zxing/browser` — на странице компонента. Разбор идёт по таймеру (250 мс), а не на каждом кадре: непрерывный разбор держит процессор занятым, и телефон в руке греется заметно.',
+          },
+        ],
+      },
+      {
         name: 'GrCameraCapture',
         slug: 'gr-camera-capture',
         title: 'GrCameraCapture',

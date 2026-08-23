@@ -42,6 +42,9 @@ export default defineConfig({
         'components/GrCameraCapture/index': fileURLToPath(
           new URL('./src/components/GrCameraCapture/index.ts', import.meta.url),
         ),
+        'components/GrCodeScanner/index': fileURLToPath(
+          new URL('./src/components/GrCodeScanner/index.ts', import.meta.url),
+        ),
         'components/GrImageCrop/index': fileURLToPath(
           new URL('./src/components/GrImageCrop/index.ts', import.meta.url),
         ),

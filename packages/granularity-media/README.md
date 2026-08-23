@@ -1,9 +1,9 @@
 # `@feugene/granularity-media`
 
-Работа с изображением и камерой для `@feugene/granularity`. Два компонента, и они
-стоят рядом по сценарию: `GrCameraCapture` снимает кадр камерой,
-`GrImageCrop` выбирает кадр из уже существующей картинки. Оба отдают готовый
-`Blob` — можно сразу отправлять.
+Работа с изображением и камерой для `@feugene/granularity`. Три компонента, и они
+стоят рядом по сценарию: `GrCameraCapture` снимает кадр камерой, `GrImageCrop`
+выбирает кадр из уже существующей картинки, `GrCodeScanner` читает камерой QR и
+штрихкоды. Первые два отдают готовый `Blob`, третий — содержимое кода.
 
 ```bash
 yarn add @feugene/granularity-media
@@ -95,9 +95,26 @@ presetGranularNode({
 Превью фронтальной камеры зеркальное, снимок — нет: иначе текст на визитке или в
 документе уехал бы в зазеркалье.
 
+## Чтение кодов
+
+```vue
+<GrCodeScanner :formats="['qr_code']" @detect="codes => open(codes[0].value)" />
+```
+
+Декодера пакет не несёт. Нативный `BarcodeDetector` есть в Chrome и Edge, а
+Safari и Firefox закрываются детектором, который передаёт приложение
+(`:detector`): встроить библиотеку значило бы навязать самую тяжёлую
+зависимость и тем, кто взял один кроп. Готовый рецепт на `@zxing/browser` — на
+странице компонента.
+
+Один код в кадре даёт одно событие: камера отдаёт десятки кадров в секунду, и
+без фильтра приложение оформило бы двадцать заказов вместо одного. Режим
+приёмки, где сканируют одинаковые упаковки подряд, включается `continuous`.
+
 ## Документация
 
 - [`docs/components.md`](./docs/components.md) — состав пакета;
-- [`docs/components/GrImageCrop.md`](./docs/components/GrImageCrop.md) и
-  [`docs/components/GrCameraCapture.md`](./docs/components/GrCameraCapture.md) — страницы компонентов;
+- [`docs/components/GrImageCrop.md`](./docs/components/GrImageCrop.md),
+  [`docs/components/GrCameraCapture.md`](./docs/components/GrCameraCapture.md) и
+  [`docs/components/GrCodeScanner.md`](./docs/components/GrCodeScanner.md) — страницы компонентов;
 - [`docs/keyboard.md`](./docs/keyboard.md), [`docs/ssr.md`](./docs/ssr.md) — сквозные правила пакета.

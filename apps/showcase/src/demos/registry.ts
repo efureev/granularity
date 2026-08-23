@@ -52,6 +52,7 @@ export const demoPathByPreviewKey = {
   'extra-editor-frame': 'extra/granularity-editor/GrRichTextFrameDemo.vue',
   'extra-editor-extensions': 'extra/granularity-editor/GrRichTextExtensionsDemo.vue',
   'extra-media-camera-basic': 'extra/granularity-media/GrCameraCaptureBasicDemo.vue',
+  'extra-media-code-scanner-basic': 'extra/granularity-media/GrCodeScannerBasicDemo.vue',
   'extra-media-image-crop-basic': 'extra/granularity-media/GrImageCropBasicDemo.vue',
   'extra-datasource-basic': 'extra/granularity-datasource/UseDataSourceBasicDemo.vue',
   'extra-datasource-url': 'extra/granularity-datasource/UseDataSourceUrlDemo.vue',

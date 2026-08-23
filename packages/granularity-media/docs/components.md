@@ -4,6 +4,7 @@
 | --- | --- |
 | [`GrImageCrop`](./components/GrImageCrop.md) | выбор кадра из картинки перед отправкой: рамка неподвижна, двигается изображение |
 | [`GrCameraCapture`](./components/GrCameraCapture.md) | снимок с камеры устройства: превью, кнопка съёмки и готовый файл на выходе |
+| [`GrCodeScanner`](./components/GrCodeScanner.md) | чтение QR и штрихкодов камерой: наружу уходит содержимое кода, а не файл |
 
 Жанр страницы компонента, обязательные секции и запрет на рукописные перечни
 API описаны один раз — в `packages/granularity/docs/components.md`,

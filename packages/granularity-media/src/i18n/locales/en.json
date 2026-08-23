@@ -20,5 +20,12 @@
     "stop": "Turn off",
     "live": "Camera is on",
     "captured": "Photo taken"
+  },
+  "scanner": {
+    "label": "Code scanner",
+    "start": "Start scanning",
+    "stop": "Stop",
+    "unsupported": "This browser cannot read codes. Pass a `detector` to enable it.",
+    "detected": "Code recognised"
   }
 }

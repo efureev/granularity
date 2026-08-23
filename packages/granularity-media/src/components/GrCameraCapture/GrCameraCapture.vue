@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref, shallowRef } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 
 import GrButton from '@feugene/granularity/components/GrButton'
 import { useAnnouncer } from '@feugene/granularity/composables/useAnnouncer'
@@ -8,7 +8,8 @@ import { useGranularityTranslations } from '@feugene/granularity/composables/use
 
 import type { GrCameraStatus } from './cameraState'
 import { outputSize } from '../../internal/outputSize'
-import { cameraStatusFromError, cameraSupported, shouldMirrorPreview } from './cameraState'
+import { useCameraStream } from '../../internal/useCameraStream'
+import { shouldMirrorPreview } from './cameraState'
 import type { GrCameraCaptureSize, GrCameraFacing } from './grCameraCaptureStyles'
 import {
   controlsClass,
@@ -84,127 +85,26 @@ defineSlots<{
 }>()
 
 const { t } = useGranularityTranslations()
+// Живой регион про сам снимок: поток о себе сообщает изнутри композабла.
 const { announce } = useAnnouncer()
 const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrCameraCapture' })
 
 const videoEl = ref<HTMLVideoElement | null>(null)
-const stream = shallowRef<MediaStream | null>(null)
-const status = ref<GrCameraStatus>('idle')
-/** Соотношение сторон потока: известно только после первого кадра. */
-const streamRatio = ref<number | null>(null)
 
-/**
- * Рамка следует **полученному** потоку, а не запрошенному соотношению:
- * камера вправе отдать своё, и показывать надо то, что она отдала.
- * Пока она молчит, рамка держит 4:3 — на нём её место в раскладке видно.
- */
-const frameRatio = computed(() => streamRatio.value ?? 4 / 3)
-
-const mirrored = computed(() => shouldMirrorPreview(props.facing, props.mirror))
-const isLive = computed(() => status.value === 'live')
-
-/** Подпись состояния: у каждого отказа своя причина и свой следующий шаг. */
-const stateMessage = computed(() => {
-  switch (status.value) {
-    case 'starting':
-      return t('grMedia.camera.starting', 'Requesting camera access…')
-    case 'denied':
-      return t('grMedia.camera.denied', 'Camera access is blocked. Allow it in the browser settings for this site.')
-    case 'missing':
-      return t('grMedia.camera.missing', 'No camera found on this device.')
-    case 'busy':
-      return t('grMedia.camera.busy', 'The camera is busy in another application.')
-    case 'insecure':
-      return t('grMedia.camera.insecure', 'The camera works only over HTTPS.')
-    case 'error':
-      return t('grMedia.camera.error', 'The camera could not be started.')
-    default:
-      return t('grMedia.camera.idle', 'The camera is off.')
-  }
+const camera = useCameraStream({
+  video: videoEl,
+  disabled: () => props.disabled,
+  facing: () => props.facing,
+  deviceId: () => props.deviceId,
+  aspectRatio: () => props.aspectRatio,
+  onStatus: next => emit('statusChange', next),
+  onStart: () => emit('start'),
+  onStop: () => emit('stop'),
 })
 
-function setStatus(next: GrCameraStatus): void {
-  if (status.value === next)
-    return
+const { frameRatio, isLive, message: stateMessage, start, status, stop } = camera
 
-  status.value = next
-  emit('statusChange', next)
-}
-
-function readStreamRatio(): void {
-  const video = videoEl.value
-  if (!video || video.videoWidth <= 0 || video.videoHeight <= 0)
-    return
-
-  streamRatio.value = video.videoWidth / video.videoHeight
-}
-
-function stopTracks(): void {
-  // Живой трек держит индикатор камеры включённым, даже когда компонента уже
-  // нет на экране: браузер гасит его только по `stop()` каждой дорожки.
-  stream.value?.getTracks().forEach(track => track.stop())
-  stream.value = null
-  streamRatio.value = null
-
-  if (videoEl.value)
-    videoEl.value.srcObject = null
-}
-
-async function start(): Promise<void> {
-  if (props.disabled || status.value === 'starting' || status.value === 'live')
-    return
-
-  if (!cameraSupported(navigator)) {
-    setStatus('insecure')
-
-    return
-  }
-
-  setStatus('starting')
-
-  try {
-    const media = await navigator.mediaDevices.getUserMedia({
-      video: {
-        ...(props.deviceId
-          ? { deviceId: { exact: props.deviceId } }
-          : { facingMode: props.facing }),
-        // Голое число — это `ideal`, то есть пожелание. `exact` здесь дал бы
-        // `OverconstrainedError`, то есть состояние «камеры нет» на исправной
-        // камере, которая просто умеет другое соотношение.
-        ...(props.aspectRatio ? { aspectRatio: props.aspectRatio } : {}),
-      },
-      audio: false,
-    })
-
-    stream.value = media
-    if (videoEl.value) {
-      videoEl.value.srcObject = media
-      // Размеры кадра приходят не сразу: до `loadedmetadata` они нули, и
-      // соотношение, снятое раньше, было бы выдумкой.
-      videoEl.value.addEventListener('loadedmetadata', readStreamRatio, { once: true })
-      await videoEl.value.play().catch(() => undefined)
-      readStreamRatio()
-    }
-
-    setStatus('live')
-    emit('start')
-    announce(t('grMedia.camera.live', 'Camera is on'))
-  }
-  catch (error) {
-    stopTracks()
-    setStatus(cameraStatusFromError(error))
-    announce(stateMessage.value, { politeness: 'assertive' })
-  }
-}
-
-function stop(): void {
-  if (!stream.value)
-    return
-
-  stopTracks()
-  setStatus('idle')
-  emit('stop')
-}
+const mirrored = computed(() => shouldMirrorPreview(props.facing, props.mirror))
 
 /**
  * Снимок текущего кадра — целиком, без среза.
@@ -254,10 +154,6 @@ onMounted(() => {
   if (props.autoStart)
     void start()
 })
-
-// Поток обязан гаснуть вместе с компонентом: иначе индикатор камеры горит на
-// странице, где её уже нет.
-onBeforeUnmount(stopTracks)
 
 defineExpose({ start, stop, capture, status })
 </script>

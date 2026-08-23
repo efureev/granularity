@@ -20,5 +20,12 @@
     "stop": "Apagar",
     "live": "Cámara encendida",
     "captured": "Foto tomada"
+  },
+  "scanner": {
+    "label": "Escáner de códigos",
+    "start": "Iniciar escaneo",
+    "stop": "Detener",
+    "unsupported": "Este navegador no puede leer códigos. Pasa un `detector` para habilitarlos.",
+    "detected": "Código reconocido"
   }
 }

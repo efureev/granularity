@@ -43,7 +43,11 @@
 | картинку рассматривают во весь экран | [`GrImageViewer`](../packages/granularity/docs/components/GrImageViewer.md) |
 | из картинки вырезают кадр перед отправкой | [`GrImageCrop`](../packages/granularity-media/docs/components/GrImageCrop.md) |
 | картинку снимают камерой прямо сейчас | [`GrCameraCapture`](../packages/granularity-media/docs/components/GrCameraCapture.md) |
+| камерой читают QR или штрихкод | [`GrCodeScanner`](../packages/granularity-media/docs/components/GrCodeScanner.md) |
 | показать содержимое файла текстом | [`GrCodeBlock`](../packages/granularity/docs/components/GrCodeBlock.md) |
+
+Различитель `GrCodeScanner` / `GrCameraCapture` — **что уходит наружу**: у
+первого строка из кода, у второго файл. Сканер кадр не сохраняет вовсе.
 
 Различитель `GrCameraCapture` / `GrImageCrop` — **откуда берётся картинка**: первый
 её создаёт, второй обрабатывает уже существующую. Рядом они и работают: снял —
@@ -339,6 +343,7 @@
 | [`GrChip`](../packages/granularity/docs/components/GrChip.md) | ядро | снимаемая метка у сущности |
 | [`GrChipGroup`](../packages/granularity/docs/components/GrChipGroup.md) | ядро | фильтры списка строкой |
 | [`GrCodeBlock`](../packages/granularity/docs/components/GrCodeBlock.md) | ядро | показать ответ сервиса как есть |
+| [`GrCodeScanner`](../packages/granularity-media/docs/components/GrCodeScanner.md) | media | вход по QR |
 | [`GrCollapse`](../packages/granularity/docs/components/GrCollapse.md) | ядро | содержимого много, а нужно не всё сразу |
 | [`GrColorPicker`](../packages/granularity/docs/components/GrColorPicker.md) | ядро | цвет задаёт пользователь |
 | [`GrCommandPalette`](../packages/granularity/docs/components/GrCommandPalette.md) | ядро | команд много и они разбросаны по интерфейсу |
