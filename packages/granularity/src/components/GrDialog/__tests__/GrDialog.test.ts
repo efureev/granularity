@@ -295,7 +295,6 @@ describe('GrDialog — скролл, фокус и жизненный цикл',
   })
 })
 
-
 describe('GrDialog — императивный API', () => {
   it('open/close/toggle просят родителя, а не подменяют модель', () => {
     const wrapper = mount(GrDialog, { props: { modelValue: false, ariaLabel: 'X' } })

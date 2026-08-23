@@ -56,8 +56,10 @@ function isFile(value: unknown): value is File {
  * набор: правило молчит, а пустоту разбирает `required` движка.
  */
 export function fileRuleFiles(value: unknown): File[] {
-  if (isFile(value)) return [value]
-  if (Array.isArray(value)) return value.filter(isFile)
+  if (isFile(value))
+    return [value]
+  if (Array.isArray(value))
+    return value.filter(isFile)
   return []
 }
 
@@ -84,7 +86,8 @@ export async function runFileRule(
   rule: GrFormFileRule,
 ): Promise<FileValidationIssue | undefined> {
   const files = fileRuleFiles(value)
-  if (!files.length) return undefined
+  if (!files.length)
+    return undefined
 
   const { issues } = await runFileValidators(files, fileRuleValidators(rule), {
     source: 'form',

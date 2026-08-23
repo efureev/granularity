@@ -15,8 +15,10 @@ export interface ToFieldErrorMapOptions {
 }
 
 function toMessages(value: unknown): string[] {
-  if (typeof value === 'string') return [value]
-  if (Array.isArray(value)) return value.filter((item): item is string => typeof item === 'string')
+  if (typeof value === 'string')
+    return [value]
+  if (Array.isArray(value))
+    return value.filter((item): item is string => typeof item === 'string')
 
   return []
 }
@@ -41,12 +43,14 @@ export function toFieldErrorMap(source: unknown, options: ToFieldErrorMapOptions
   const result: GrFieldErrorMap = { fields: {}, form: [] }
   const root = record(source)
   if (!root) {
-    if (typeof source === 'string') result.form.push(source)
+    if (typeof source === 'string')
+      result.form.push(source)
     return result
   }
 
   const put = (rawPath: string, messages: string[]): void => {
-    if (messages.length === 0) return
+    if (messages.length === 0)
+      return
 
     const normalized = normalizeFieldPath(rawPath, { stripPrefixes: options.stripPrefixes })
     const path = options.aliases?.[normalized] ?? options.aliases?.[rawPath] ?? normalized
@@ -73,7 +77,8 @@ export function toFieldErrorMap(source: unknown, options: ToFieldErrorMapOptions
   if (Array.isArray(errors)) {
     for (const entry of errors) {
       const item = record(entry)
-      if (!item) continue
+      if (!item)
+        continue
 
       const pointer = record(item.source)?.pointer
       const message = toMessages(item.detail ?? item.title ?? item.message)
@@ -86,7 +91,8 @@ export function toFieldErrorMap(source: unknown, options: ToFieldErrorMapOptions
   if (Array.isArray(violations)) {
     for (const entry of violations) {
       const item = record(entry)
-      if (!item) continue
+      if (!item)
+        continue
 
       const path = item.propertyPath ?? item.property ?? item.field
       put(typeof path === 'string' ? path : '', toMessages(item.message ?? item.title))

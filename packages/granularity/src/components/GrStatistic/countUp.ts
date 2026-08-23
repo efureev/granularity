@@ -26,7 +26,8 @@ export function countUpFrame(
   duration: number,
   precision?: number,
 ): number {
-  if (!(duration > 0) || elapsed >= duration) return to
+  if (!(duration > 0) || elapsed >= duration)
+    return to
 
   const digits = Math.min(Math.max(precision ?? 0, 0), 20)
   const value = from + (to - from) * easeOutCubic(elapsed / duration)

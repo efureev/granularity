@@ -11,11 +11,13 @@ import {
 /** Узел по адресу — тесты читаются адресами, а не индексами в массиве. */
 function at(nodes: GrJsonNode[], path: string): GrJsonNode {
   for (const node of nodes) {
-    if (node.path === path) return node
+    if (node.path === path)
+      return node
 
     if (node.children) {
       const found = tryAt(node.children, path)
-      if (found) return found
+      if (found)
+        return found
     }
   }
 
@@ -24,10 +26,12 @@ function at(nodes: GrJsonNode[], path: string): GrJsonNode {
 
 function tryAt(nodes: GrJsonNode[], path: string): GrJsonNode | undefined {
   for (const node of nodes) {
-    if (node.path === path) return node
+    if (node.path === path)
+      return node
 
     const found = node.children && tryAt(node.children, path)
-    if (found) return found
+    if (found)
+      return found
   }
 
   return undefined

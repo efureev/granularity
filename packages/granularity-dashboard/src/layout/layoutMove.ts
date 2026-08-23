@@ -35,7 +35,8 @@ function apply(
 ): GrDashboardLayout {
   const placed = layout.map(item => (item.id === id ? next : item))
   const resolved = resolveCollisions(placed, id, { preventCollision: options.preventCollision })
-  if (!resolved) return sortLayout(layout)
+  if (!resolved)
+    return sortLayout(layout)
 
   return compact(resolved, options.compact ?? 'vertical')
 }
@@ -52,10 +53,12 @@ export function moveItem(
   options: GrDashboardMoveOptions,
 ): GrDashboardLayout {
   const item = layout.find(entry => entry.id === id)
-  if (!item || item.static) return sortLayout(layout)
+  if (!item || item.static)
+    return sortLayout(layout)
 
   const next = clampItem({ ...item, x: cell.x, y: cell.y }, options.cols)
-  if (next.x === item.x && next.y === item.y) return sortLayout(layout)
+  if (next.x === item.x && next.y === item.y)
+    return sortLayout(layout)
 
   return apply(layout, id, next, options)
 }
@@ -71,11 +74,13 @@ export function resizeItem(
   options: GrDashboardMoveOptions,
 ): GrDashboardLayout {
   const item = layout.find(entry => entry.id === id)
-  if (!item || item.static) return sortLayout(layout)
+  if (!item || item.static)
+    return sortLayout(layout)
 
   const w = Math.min(clampWidth(item, span.w, options.cols), options.cols - item.x)
   const h = clampHeight(item, span.h)
-  if (w === item.w && h === item.h) return sortLayout(layout)
+  if (w === item.w && h === item.h)
+    return sortLayout(layout)
 
   return apply(layout, id, { ...item, w, h }, options)
 }

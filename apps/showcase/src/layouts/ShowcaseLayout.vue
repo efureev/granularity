@@ -108,7 +108,7 @@ const currentSections = computed(() => {
 })
 const currentTitle = computed(() => currentEntity.value?.title ?? localizedCurrentPage.value.title)
 const topNavigationItems = computed(() => showcaseTopNavigationItems
-  .map(item => {
+  .map((item) => {
     const localizedPage = localizePageByName(item.name)
 
     return {

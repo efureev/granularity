@@ -84,12 +84,14 @@ export function useControlAddons(
   const { prefixEl, suffixEl, measuredPrefixWidth, measuredSuffixWidth } = useAddonMeasurement(hasPrefix, hasSuffix)
 
   const prefixLen = computed(() => {
-    if (!hasPrefix.value) return '0px'
+    if (!hasPrefix.value)
+      return '0px'
     return props().prefixFixed ? prefixFixedWidth.value : measuredPrefixWidth.value ?? prefixMinWidth.value
   })
 
   const suffixLen = computed(() => {
-    if (!hasSuffix.value) return '0px'
+    if (!hasSuffix.value)
+      return '0px'
     return props().suffixFixed ? suffixFixedWidth.value : measuredSuffixWidth.value ?? suffixMinWidth.value
   })
 

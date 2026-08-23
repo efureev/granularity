@@ -44,7 +44,8 @@ export function markInert(elements: HTMLElement[]): () => void {
     })
     marked.push(element)
 
-    if (foreign) continue
+    if (foreign)
+      continue
 
     element.setAttribute('inert', '')
     // `inert` убирает поддерево из дерева доступности не во всех движках,
@@ -55,16 +56,20 @@ export function markInert(elements: HTMLElement[]): () => void {
   return () => {
     for (const element of marked) {
       const record = records.get(element)
-      if (!record) continue
+      if (!record)
+        continue
 
       record.count -= 1
-      if (record.count > 0) continue
+      if (record.count > 0)
+        continue
 
       records.delete(element)
-      if (record.foreign) continue
+      if (record.foreign)
+        continue
 
       element.removeAttribute('inert')
-      if (record.ariaHidden === null) element.removeAttribute('aria-hidden')
+      if (record.ariaHidden === null)
+        element.removeAttribute('aria-hidden')
       else element.setAttribute('aria-hidden', record.ariaHidden)
     }
   }
@@ -90,7 +95,8 @@ export function markInert(elements: HTMLElement[]): () => void {
  * сети» и нужны.
  */
 export function inertableOutside(root: HTMLElement | null | undefined): HTMLElement[] {
-  if (!root?.isConnected) return []
+  if (!root?.isConnected)
+    return []
 
   const result: HTMLElement[] = []
   const body = root.ownerDocument.body
@@ -99,14 +105,20 @@ export function inertableOutside(root: HTMLElement | null | undefined): HTMLElem
 
   while (node && node !== body) {
     const parent: HTMLElement | null = node.parentElement
-    if (!parent) break
+    if (!parent)
+      break
 
     for (const sibling of Array.from(parent.children)) {
-      if (!(sibling instanceof HTMLElement)) continue
-      if (sibling === node) continue
-      if (sibling.hasAttribute('data-gr-overlay-root')) continue
-      if (sibling.hasAttribute('data-gr-portal')) continue
-      if (sibling.hasAttribute('data-gr-live-region')) continue
+      if (!(sibling instanceof HTMLElement))
+        continue
+      if (sibling === node)
+        continue
+      if (sibling.hasAttribute('data-gr-overlay-root'))
+        continue
+      if (sibling.hasAttribute('data-gr-portal'))
+        continue
+      if (sibling.hasAttribute('data-gr-live-region'))
+        continue
       result.push(sibling)
     }
 

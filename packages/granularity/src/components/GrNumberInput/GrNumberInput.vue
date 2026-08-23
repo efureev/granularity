@@ -193,7 +193,6 @@ defineSlots<{
   suffix?: () => any
 }>()
 
-
 const inputEl = ref<HTMLInputElement | null>(null)
 
 // В фокусе поле показывает «сырое» значение: группировка мешала бы правке.
@@ -325,22 +324,27 @@ function sanitize(raw: string): string {
 }
 
 function toNumber(value: string): number | null {
-  if (value.trim() === '') return null
+  if (value.trim() === '')
+    return null
   const sep = props.decimalSeparator || '.'
   const normalized = sep === '.' ? value : value.replace(sep, '.')
   const n = Number(normalized)
-  if (!Number.isFinite(n)) return null
+  if (!Number.isFinite(n))
+    return null
   return n
 }
 
 function clamp(v: number): number {
-  if (props.min !== undefined) v = Math.max(props.min, v)
-  if (props.max !== undefined) v = Math.min(props.max, v)
+  if (props.min !== undefined)
+    v = Math.max(props.min, v)
+  if (props.max !== undefined)
+    v = Math.min(props.max, v)
   return v
 }
 
 function normalize(v: number): number {
-  if (props.precision === undefined) return v
+  if (props.precision === undefined)
+    return v
   const p = Math.max(0, props.precision)
   return Number(v.toFixed(p))
 }
@@ -354,7 +358,8 @@ function format(n: number): string {
   let s = p === undefined
     ? n.toLocaleString('en-US', { useGrouping: false, maximumFractionDigits: 20 })
     : n.toFixed(Math.max(0, p))
-  if (sep !== '.') s = s.replace('.', sep)
+  if (sep !== '.')
+    s = s.replace('.', sep)
   return s
 }
 
@@ -376,7 +381,8 @@ function onInput(e: Event): void {
   draft.value = next
 
   const num = toNumber(next)
-  if (num !== props.modelValue) emit('update:modelValue', num)
+  if (num !== props.modelValue)
+    emit('update:modelValue', num)
 }
 
 /**
@@ -391,7 +397,8 @@ function commit(): void {
 
   draft.value = null
 
-  if (next !== props.modelValue) emit('update:modelValue', next)
+  if (next !== props.modelValue)
+    emit('update:modelValue', next)
   emit('change', next)
 }
 
@@ -415,7 +422,8 @@ function setValue(n: number): void {
  * нажать не может. Поле фокусирует тот, кто шагает от него самого.
  */
 function stepBy(dir: 1 | -1, step: number = props.step ?? 1): void {
-  if (isDisabled.value || isReadonly.value) return
+  if (isDisabled.value || isReadonly.value)
+    return
 
   const current = props.modelValue ?? 0
   setValue(addStep(current, step * dir))
@@ -445,10 +453,12 @@ function onStepClick(dir: 1 | -1, event: MouseEvent): void {
 }
 
 function onKeydown(e: KeyboardEvent): void {
-  if (isDisabled.value) return
+  if (isDisabled.value)
+    return
   // Readonly-поле ведёт себя как текст: стрелки и Home/End отдаются нативной
   // каретке, значение не меняется.
-  if (isReadonly.value) return
+  if (isReadonly.value)
+    return
 
   switch (e.key) {
     case 'ArrowUp':
@@ -490,13 +500,15 @@ const ariaValueNow = computed(() => props.modelValue ?? undefined)
 const numericValue = computed(() => props.modelValue)
 
 const canIncrease = computed(() => {
-  if (props.max === undefined) return true
+  if (props.max === undefined)
+    return true
   const current = numericValue.value
   return current === null || normalize(current) < props.max
 })
 
 const canDecrease = computed(() => {
-  if (props.min === undefined) return true
+  if (props.min === undefined)
+    return true
   const current = numericValue.value
   return current === null || normalize(current) > props.min
 })
@@ -523,7 +535,8 @@ function formatGrouped(num: number): string {
  * несёт то же самое число, и дублировать его текстом незачем.
  */
 const ariaValueText = computed(() => {
-  if (!props.useGrouping) return undefined
+  if (!props.useGrouping)
+    return undefined
   return props.modelValue === null ? undefined : formatGrouped(props.modelValue)
 })
 
@@ -532,9 +545,12 @@ const ariaValueText = computed(() => {
  * Группировка только вне фокуса: при правке разделители разрядов мешают.
  */
 const displayValue = computed(() => {
-  if (draft.value !== null) return draft.value
-  if (props.modelValue === null) return ''
-  if (props.useGrouping && !isFocused.value) return formatGrouped(props.modelValue)
+  if (draft.value !== null)
+    return draft.value
+  if (props.modelValue === null)
+    return ''
+  if (props.useGrouping && !isFocused.value)
+    return formatGrouped(props.modelValue)
   return format(props.modelValue)
 })
 
@@ -579,7 +595,8 @@ function canStep(dir: 1 | -1): boolean {
  * Повтор останавливается на границе — иначе таймер крутился бы вхолостую.
  */
 function startRepeat(dir: 1 | -1): void {
-  if (isDisabled.value || isReadonly.value) return
+  if (isDisabled.value || isReadonly.value)
+    return
 
   stopRepeat()
   repeatFired = false

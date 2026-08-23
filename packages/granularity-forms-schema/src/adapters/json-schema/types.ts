@@ -62,5 +62,5 @@ export interface JsonSchemaDocument {
   [key: string]: unknown
 }
 
-export type JsonSchemaType =
-  | 'string' | 'number' | 'integer' | 'boolean' | 'object' | 'array' | 'null'
+export type JsonSchemaType
+  = | 'string' | 'number' | 'integer' | 'boolean' | 'object' | 'array' | 'null'

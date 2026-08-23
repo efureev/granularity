@@ -17,7 +17,7 @@ defineProps<{
   title: string
   description: string
   status: string
-  sections: { id: string; title: string; description: string; bullets: string[] }[]
+  sections: { id: string, title: string, description: string, bullets: string[] }[]
   examples?: ShowcaseExampleMeta[]
   usageCode?: string
   accessibilityItems?: string[]

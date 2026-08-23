@@ -72,8 +72,10 @@ function stringLiterals(source: string): string[] {
 function looksLikeClassList(literal: string): boolean {
   const tokens = literal.split(/\s+/).filter(Boolean)
 
-  if (tokens.length === 0) return false
-  if (tokens.length > 1) return true
+  if (tokens.length === 0)
+    return false
+  if (tokens.length > 1)
+    return true
 
   return /[-:[\]/]/.test(tokens[0])
 }
@@ -90,7 +92,8 @@ export function parseSharedImports(fileContent: string): string[] {
   const found = new Set<string>()
 
   for (const [, typeOnly, clause, module] of code.matchAll(SHARED_IMPORT)) {
-    if (typeOnly || !hasValueImport(clause)) continue
+    if (typeOnly || !hasValueImport(clause))
+      continue
     found.add(module)
   }
 
@@ -100,7 +103,8 @@ export function parseSharedImports(fileContent: string): string[] {
 /** `import { type A }` — тоже пустышка для бандла, как и `import type`. */
 function hasValueImport(clause: string): boolean {
   const named = clause.match(/\{([^}]*)\}/)
-  if (!named) return true
+  if (!named)
+    return true
 
   return named[1].split(',').some(name => name.trim() && !name.trim().startsWith('type '))
 }
@@ -115,7 +119,8 @@ function expandSharedModules(entry: string[]): string[] {
 
   while (queue.length > 0) {
     const module = queue.pop()!
-    if (seen.has(module)) continue
+    if (seen.has(module))
+      continue
     seen.add(module)
 
     const path = resolve(sharedDir, `${module}.ts`)
@@ -128,7 +133,8 @@ function expandSharedModules(entry: string[]): string[] {
     }
 
     for (const [, typeOnly, clause, sibling] of stripComments(source).matchAll(SIBLING_IMPORT)) {
-      if (typeOnly || !hasValueImport(clause)) continue
+      if (typeOnly || !hasValueImport(clause))
+        continue
       queue.push(sibling)
     }
   }
@@ -187,7 +193,8 @@ describe('safelist-контракт', () => {
 
     for (const component of componentNames()) {
       const files = helperFiles(component)
-      if (files.length === 0) continue
+      if (files.length === 0)
+        continue
 
       const safelist = await declaredSafelist(component)
       const candidates = new Set<string>()
@@ -196,10 +203,12 @@ describe('safelist-контракт', () => {
         const source = stripComments(readFileSync(file, 'utf8'))
 
         for (const literal of stringLiterals(source)) {
-          if (!looksLikeClassList(literal)) continue
+          if (!looksLikeClassList(literal))
+            continue
 
           for (const token of literal.split(/\s+/).filter(Boolean)) {
-            if (!safelist.has(token)) candidates.add(token)
+            if (!safelist.has(token))
+              candidates.add(token)
           }
         }
       }
@@ -212,7 +221,8 @@ describe('safelist-контракт', () => {
           isUtility.set(token, matched.size > 0)
         }
 
-        if (isUtility.get(token)) missing.push(token)
+        if (isUtility.get(token))
+          missing.push(token)
       }
 
       if (missing.length > 0) {

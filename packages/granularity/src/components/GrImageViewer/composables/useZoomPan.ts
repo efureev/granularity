@@ -85,7 +85,8 @@ export function useZoomPan(options: UseZoomPanOptions) {
    */
   function panBounds(): { x: number, y: number } {
     const viewport = options.viewportEl.value
-    if (!viewport) return { x: 0, y: 0 }
+    if (!viewport)
+      return { x: 0, y: 0 }
 
     const quarterTurns = Math.abs(Math.round(rotation.value / 90) % 2)
     const width = quarterTurns === 1 ? renderedHeight.value : renderedWidth.value
@@ -123,7 +124,8 @@ export function useZoomPan(options: UseZoomPanOptions) {
     const previous = scale.value
     const next = clampScale(value)
 
-    if (next === previous) return
+    if (next === previous)
+      return
 
     if (anchor && viewport) {
       const rect = viewport.getBoundingClientRect()
@@ -268,7 +270,8 @@ export function useZoomPan(options: UseZoomPanOptions) {
     onStart: (event) => {
       // Тач ведёт `usePointerGestures`: у него свои pinch и свайп, и второй
       // владелец жеста тянул бы кадр дважды.
-      if (event.pointerType === 'touch') return false
+      if (event.pointerType === 'touch')
+        return false
 
       event.preventDefault()
       startPan(event.clientX, event.clientY)

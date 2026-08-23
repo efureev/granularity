@@ -631,7 +631,7 @@ function resolveYDomain(
   }
 
   // Стек всегда отсчитывается от нуля: полоса, висящая над осью, врёт о своей высоте.
-  const padded = padDomain(merged, { includeZero: options.includeZero || options.stacked !== undefined && options.stacked !== false })
+  const padded = padDomain(merged, { includeZero: options.includeZero || (options.stacked !== undefined && options.stacked !== false) })
 
   return [minOverride ?? padded[0], maxOverride ?? padded[1]]
 }

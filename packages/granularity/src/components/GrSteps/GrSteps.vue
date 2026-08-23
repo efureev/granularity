@@ -118,7 +118,8 @@ function statusAt(index: number): GrStepStatus {
 }
 
 function isEnterable(index: number): boolean {
-  if (!resolvedClickable.value) return false
+  if (!resolvedClickable.value)
+    return false
   return canEnterStep({
     steps: props.steps,
     index,
@@ -136,8 +137,10 @@ function markerText(index: number): string {
 }
 
 function stateText(status: GrStepStatus): string {
-  if (status === 'complete') return t('gr.steps.completed', 'completed')
-  if (status === 'error') return t('gr.steps.error', 'has errors')
+  if (status === 'complete')
+    return t('gr.steps.completed', 'completed')
+  if (status === 'error')
+    return t('gr.steps.error', 'has errors')
   return ''
 }
 
@@ -148,7 +151,8 @@ const statusText = computed(() => t('gr.steps.status', 'Step {step} of {count}',
 
 /** Полоса компактного вида: доля пройденного, а не номер шага. */
 const progressValue = computed(() => {
-  if (props.steps.length <= 1) return 100
+  if (props.steps.length <= 1)
+    return 100
   return Math.round((currentIndex.value / (props.steps.length - 1)) * 100)
 })
 
@@ -164,7 +168,8 @@ function triggerClass(index: number): string {
 /** Место под соединитель нужно только тем пунктам, за которыми ещё есть шаг. */
 function itemClass(index: number): string {
   const base = stepsItemClass[resolvedOrientation.value]
-  if (index >= props.steps.length - 1) return base
+  if (index >= props.steps.length - 1)
+    return base
   return `${base} ${stepsItemConnectedClass[resolvedOrientation.value]}`.trim()
 }
 
@@ -179,11 +184,13 @@ function iconOf(step: GrStep): string | Component | undefined {
 
 async function goToIndex(index: number): Promise<boolean> {
   const target = props.steps[index]
-  if (!target || target.value === props.modelValue) return false
+  if (!target || target.value === props.modelValue)
+    return false
 
   if (props.beforeLeave) {
     const allowed = await props.beforeLeave(props.modelValue, target.value)
-    if (!allowed) return false
+    if (!allowed)
+      return false
   }
 
   emit('update:modelValue', target.value)
@@ -193,7 +200,8 @@ async function goToIndex(index: number): Promise<boolean> {
 }
 
 async function onStepClick(index: number): Promise<void> {
-  if (!isEnterable(index)) return
+  if (!isEnterable(index))
+    return
   await goToIndex(index)
 }
 

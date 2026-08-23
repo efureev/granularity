@@ -6,9 +6,9 @@ export type ShowcaseEntityKind = 'component' | 'directive' | 'composable' | 'uti
  * автодополнения, но закрытый список пришлось бы править ради каждой доменной
  * секции, а `ExtraComponentDetailPage` и так рисует всё объявленное.
  */
-export type ShowcaseApiSectionKey =
-  | 'props' | 'slots' | 'events' | 'emits' | 'methods' | 'parameters' | 'returns'
-  | (string & {})
+export type ShowcaseApiSectionKey
+  = | 'props' | 'slots' | 'events' | 'emits' | 'methods' | 'parameters' | 'returns'
+    | (string & {})
 export type ShowcaseApiSectionOrigin = 'generated' | 'manual' | 'pending'
 export type ShowcaseExampleStatus = 'ready' | 'planned'
 

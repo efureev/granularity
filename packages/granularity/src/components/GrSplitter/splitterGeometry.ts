@@ -50,7 +50,8 @@ export function sizeFromPointer(
 ): number {
   const total = orientation === 'horizontal' ? rect.width : rect.height
   // Схлопнутый контейнер (ещё не в раскладке, `display: none`) — делить не на что.
-  if (!(total > 0)) return 0
+  if (!(total > 0))
+    return 0
 
   const offset = orientation === 'horizontal' ? clientX - rect.left : clientY - rect.top
 
@@ -64,7 +65,8 @@ export function sizeFromPointer(
  */
 export function shouldCollapse(value: number, bounds: GrSplitterBounds): boolean {
   const min = Math.min(100, Math.max(0, toFinite(bounds.min, 0)))
-  if (min <= 0) return false
+  if (min <= 0)
+    return false
 
   return toFinite(value, min) < min / 2
 }

@@ -28,7 +28,8 @@ function onSelect(item: GrCommandItem): void {
   const href = hrefOf(item.id)
   close()
 
-  if (href) void router.push(href)
+  if (href)
+    void router.push(href)
 }
 </script>
 

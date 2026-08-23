@@ -19,7 +19,8 @@ function mountPicker(props: Record<string, unknown> = {}) {
  */
 function panel(): HTMLElement | null {
   const node = document.querySelector<HTMLElement>('[data-gr-color-picker-panel]')
-  if (!node) return null
+  if (!node)
+    return null
 
   const layer = node.closest<HTMLElement>('[data-gr-popover-panel]')
   return layer?.style.display === 'none' ? null : node

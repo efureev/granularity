@@ -87,9 +87,9 @@ const emit = defineEmits<GrTreeSelectEmits<T>>()
 
 defineSlots<{
   /** Рендер значения внутри триггера (вместо дефолтного текста). */
-  value?: (props: { value: GrTreeSelectModelValue; labels: string[]; displayValue: string; pathLabels?: string[] }) => any
+  value?: (props: { value: GrTreeSelectModelValue, labels: string[], displayValue: string, pathLabels?: string[] }) => any
   /** Рендер строки дерева. */
-  node?: (props: { node: GrTreeNode<T>; data: T; selected: boolean }) => any
+  node?: (props: { node: GrTreeNode<T>, data: T, selected: boolean }) => any
   /** Содержимое пустого состояния (когда нет данных). */
   empty?: () => any
   /** Содержимое панели, пока данные едут. */
@@ -110,7 +110,10 @@ const fieldId = computed(() => field?.id.value)
 const describedBy = computed(() => field?.describedById.value)
 const {
   disabled: isDisabled,
-  invalid: isInvalid, required: isRequired, readonly: isReadonly } = useGrFormControl(() => props)
+  invalid: isInvalid,
+  required: isRequired,
+  readonly: isReadonly,
+} = useGrFormControl(() => props)
 
 function focus(): void {
   triggerEl.value?.focus()
@@ -232,7 +235,7 @@ const selectedKeySet = computed(() => new Set(selectedKeys.value))
 
 const selectedLabels = computed(() => {
   const map = labelByKey.value
-  return selectedKeys.value.map((k) => map.get(k) ?? String(k))
+  return selectedKeys.value.map(k => map.get(k) ?? String(k))
 })
 
 const selectedPathLabels = computed<string[] | undefined>(() => {

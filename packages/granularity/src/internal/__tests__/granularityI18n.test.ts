@@ -7,8 +7,10 @@ function makeAdapter(dict: Record<string, string>): GranularityI18nAdapter {
   return {
     t: (key, params) => {
       const template = dict[key]
-      if (template === undefined) return key
-      if (!params) return template
+      if (template === undefined)
+        return key
+      if (!params)
+        return template
       return template.replace(/\{([a-zA-Z0-9_.-]+)\}/g, (match, name: string) => {
         const value = params[name]
         return value == null ? match : String(value)

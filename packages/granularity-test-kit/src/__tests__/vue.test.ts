@@ -30,7 +30,9 @@ describe('queryWrapper', () => {
   it('отдаёт рабочую обёртку', async () => {
     document.body.innerHTML = '<button data-go type="button">жми</button>'
     let clicked = false
-    queryOne('[data-go]').addEventListener('click', () => { clicked = true })
+    queryOne('[data-go]').addEventListener('click', () => {
+      clicked = true
+    })
 
     const wrapper = queryWrapper('[data-go]')
     expect(wrapper.text()).toBe('жми')
@@ -77,7 +79,9 @@ describe('stubElementRects', () => {
 describe('nextFrame', () => {
   it('дожидается кадра', async () => {
     let painted = false
-    requestAnimationFrame(() => { painted = true })
+    requestAnimationFrame(() => {
+      painted = true
+    })
 
     expect(painted).toBe(false)
     await nextFrame()

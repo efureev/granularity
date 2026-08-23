@@ -25,7 +25,8 @@ const lastChange = ref('')
 // сервер). Здесь имитируем это локально, но `rows` приходят уже отсортированными.
 const sortedRows = computed(() => {
   const key = sortKey.value
-  if (!key) return rows
+  if (!key)
+    return rows
   const dir = sortDir.value
   return [...rows].sort((a, b) => {
     const av = (a as Record<string, unknown>)[key]

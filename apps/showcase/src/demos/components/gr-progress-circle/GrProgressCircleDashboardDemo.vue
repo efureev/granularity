@@ -28,7 +28,8 @@ function nextValue(current: number): number {
 
 onMounted(() => {
   // Дрожащая цифра — ровно то, чего не хочет «уменьшить движение».
-  if (window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches) return
+  if (window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches)
+    return
 
   timer = setInterval(() => tweenTo(nextValue(live.value), TICK), TICK)
 })

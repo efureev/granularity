@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {computed, ref} from 'vue'
+import { computed, ref } from 'vue'
 
 import {
   GrButton,
@@ -30,35 +30,35 @@ const disabled = ref(false)
 const square = ref(false)
 
 const variantOptions = [
-  {value: 'primary', label: 'Primary'},
-  {value: 'secondary', label: 'Secondary'},
-  {value: 'outline', label: 'Outline'},
-  {value: 'ghost', label: 'Ghost'},
-  {value: 'ghost-border', label: 'Ghost border'},
+  { value: 'primary', label: 'Primary' },
+  { value: 'secondary', label: 'Secondary' },
+  { value: 'outline', label: 'Outline' },
+  { value: 'ghost', label: 'Ghost' },
+  { value: 'ghost-border', label: 'Ghost border' },
 ] satisfies Array<{ value: GrButtonVariant, label: string }>
 
 const toneOptions = [
-  {value: 'primary', label: 'Primary'},
-  {value: 'neutral', label: 'Neutral'},
-  {value: 'success', label: 'Success'},
-  {value: 'warning', label: 'Warning'},
-  {value: 'danger', label: 'Danger'},
-  {value: 'info', label: 'Info'},
-  {value: 'slate', label: 'Slate'},
-  {value: 'azure', label: 'Azure'},
+  { value: 'primary', label: 'Primary' },
+  { value: 'neutral', label: 'Neutral' },
+  { value: 'success', label: 'Success' },
+  { value: 'warning', label: 'Warning' },
+  { value: 'danger', label: 'Danger' },
+  { value: 'info', label: 'Info' },
+  { value: 'slate', label: 'Slate' },
+  { value: 'azure', label: 'Azure' },
 ] satisfies Array<{ value: GrButtonTone, label: string }>
 
 const sizeOptions = [
-  {value: 'xs', label: 'XS'},
-  {value: 'sm', label: 'SM'},
-  {value: 'md', label: 'MD'},
-  {value: 'lg', label: 'LG'},
+  { value: 'xs', label: 'XS' },
+  { value: 'sm', label: 'SM' },
+  { value: 'md', label: 'MD' },
+  { value: 'lg', label: 'LG' },
 ] satisfies Array<{ value: GrButtonSize, label: string }>
 
 const typeOptions = [
-  {value: 'button', label: 'button'},
-  {value: 'submit', label: 'submit'},
-  {value: 'reset', label: 'reset'},
+  { value: 'button', label: 'button' },
+  { value: 'submit', label: 'submit' },
+  { value: 'reset', label: 'reset' },
 ] satisfies Array<{ value: GrButtonType, label: string }>
 
 const buttonText = computed(() => {
@@ -113,8 +113,8 @@ const previewCode = computed(() => {
     attributes.push(`aria-label="${escapeAttribute(effectiveAriaLabel.value)}"`)
 
   const content = square.value && !loading.value
-      ? '  <IconSparkles class="h-4 w-4" aria-hidden="true" />'
-      : `  ${buttonText.value}`
+    ? '  <IconSparkles class="h-4 w-4" aria-hidden="true" />'
+    : `  ${buttonText.value}`
 
   return ['<GrButton', ...attributes.map(attribute => `  ${attribute}`), '>', content, '</GrButton>'].join('\n')
 })

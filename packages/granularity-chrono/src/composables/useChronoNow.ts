@@ -41,14 +41,16 @@ function documentHidden(): boolean {
 }
 
 function stop(ticker: Ticker): void {
-  if (ticker.handle === null) return
+  if (ticker.handle === null)
+    return
 
   clearInterval(ticker.handle)
   ticker.handle = null
 }
 
 function start(interval: number, ticker: Ticker): void {
-  if (ticker.handle !== null || documentHidden()) return
+  if (ticker.handle !== null || documentHidden())
+    return
 
   ticker.handle = setInterval(() => {
     ticker.now.value = new Date()
@@ -89,10 +91,12 @@ function subscribe(interval: number): Ticker {
 
 function unsubscribe(interval: number): void {
   const ticker = tickers.get(interval)
-  if (!ticker) return
+  if (!ticker)
+    return
 
   ticker.subscribers -= 1
-  if (ticker.subscribers > 0) return
+  if (ticker.subscribers > 0)
+    return
 
   stop(ticker)
   tickers.delete(interval)
@@ -115,13 +119,15 @@ function unsubscribe(interval: number): void {
 export function useChronoNow(interval: MaybeRefOrGetter<number> = GR_CHRONO_TICK_MS): ComputedRef<Date> {
   const snapshot = new Date()
 
-  if (typeof document === 'undefined') return computed(() => snapshot)
+  if (typeof document === 'undefined')
+    return computed(() => snapshot)
 
   const active = shallowRef<Ticker | null>(null)
   let current: number | null = null
 
   function release(): void {
-    if (current === null) return
+    if (current === null)
+      return
 
     unsubscribe(current)
     current = null
@@ -129,16 +135,19 @@ export function useChronoNow(interval: MaybeRefOrGetter<number> = GR_CHRONO_TICK
   }
 
   watch(() => toValue(interval), (next) => {
-    if (current === next) return
+    if (current === next)
+      return
 
     release()
-    if (!(next > 0)) return
+    if (!(next > 0))
+      return
 
     active.value = subscribe(next)
     current = next
   }, { immediate: true })
 
-  if (getCurrentScope()) onScopeDispose(release)
+  if (getCurrentScope())
+    onScopeDispose(release)
 
   return computed(() => active.value?.now.value ?? snapshot)
 }

@@ -38,7 +38,8 @@ export function usePortalTarget(local?: () => string | HTMLElement | undefined):
 
   const target = computed<string | HTMLElement>(() => {
     const explicit = local?.() ?? config.portalTarget?.value
-    if (explicit) return explicit
+    if (explicit)
+      return explicit
 
     // Корень создаётся лениво и только на клиенте; до монтирования телепорт
     // выключен, поэтому `body` здесь — недостижимый запасной вариант, а не

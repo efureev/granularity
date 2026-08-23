@@ -111,16 +111,16 @@
 #### 4. Подключение в `grButtonStyles.ts`
 
 ```ts
-export type GrButtonTone =
-  | 'primary'
-  | 'neutral'
-  | 'success'
-  | 'warning'
-  | 'danger'
-  | 'info'
-  | 'slate'
-  | 'azure'
-  | 'brand-alt'
+export type GrButtonTone
+  = | 'primary'
+    | 'neutral'
+    | 'success'
+    | 'warning'
+    | 'danger'
+    | 'info'
+    | 'slate'
+    | 'azure'
+    | 'brand-alt'
 ```
 
 ```ts

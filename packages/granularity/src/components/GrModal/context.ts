@@ -44,7 +44,8 @@ export function useGrModalContext(): GrModalContext | null {
  */
 export function useGrModalTitle(active: () => boolean): { titleId: string | undefined } {
   const context = useGrModalContext()
-  if (!context) return { titleId: undefined }
+  if (!context)
+    return { titleId: undefined }
 
   let release: (() => void) | undefined
 

@@ -110,7 +110,7 @@ export default defineConfig({
     Components({
       resolvers: [
         GranularityChronoResolver(), // whitelist — must come first…
-        GranularityResolver(),       // …before the greedy Gr* core resolver
+        GranularityResolver(), // …before the greedy Gr* core resolver
       ],
     }),
   ],

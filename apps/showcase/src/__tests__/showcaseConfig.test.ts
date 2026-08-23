@@ -20,7 +20,15 @@ const showcaseMainEntry = readFileSync(
   'utf8',
 )
 
-const normalizedShowcaseMainEntry = showcaseMainEntry.replace(/\s+/g, ' ')
+/**
+ * Пробелы внутри `{ … }` схлопываются вместе с переносами: гейт сторожит состав
+ * входа, а не его форматирование, и переставший подходить отступ обязан
+ * оставлять его зелёным.
+ */
+const normalizedShowcaseMainEntry = showcaseMainEntry
+  .replace(/\s+/g, ' ')
+  .replace(/\{ /g, '{')
+  .replace(/ \}/g, '}')
 
 const showcaseI18nEntryPath = fileURLToPath(new URL('../i18n/index.ts', import.meta.url))
 const showcaseI18nMessagesPath = fileURLToPath(new URL('../i18n/messages.ts', import.meta.url))
@@ -68,49 +76,49 @@ describe('showcase bootstrap config', () => {
   })
 
   it('подключает reset, uno runtime и раннюю инициализацию темы без legacy-зависимостей', () => {
-    expect(showcaseMainEntry).toContain("import '@unocss/reset/tailwind-compat.css'")
-    expect(showcaseMainEntry).toContain("import 'virtual:uno.css'")
-    expect(normalizedShowcaseMainEntry).toContain("import {initThemeEarly} from '@feugene/granularity'")
-    expect(normalizedShowcaseMainEntry).toContain("import {setupShowcaseI18n} from './i18n'")
-    expect(normalizedShowcaseMainEntry).toContain("import {router} from './app/router'")
+    expect(showcaseMainEntry).toContain('import \'@unocss/reset/tailwind-compat.css\'')
+    expect(showcaseMainEntry).toContain('import \'virtual:uno.css\'')
+    expect(normalizedShowcaseMainEntry).toContain('import {initThemeEarly} from \'@feugene/granularity\'')
+    expect(normalizedShowcaseMainEntry).toContain('import {setupShowcaseI18n} from \'./i18n\'')
+    expect(normalizedShowcaseMainEntry).toContain('import {router} from \'./app/router\'')
     expect(normalizedShowcaseMainEntry).toContain('initThemeEarly()')
     expect(normalizedShowcaseMainEntry).toContain('const i18n = await setupShowcaseI18n()')
     expect(normalizedShowcaseMainEntry).toContain('.use(i18n)')
     expect(normalizedShowcaseMainEntry).toContain('.use(router)')
-    expect(showcaseMainEntry).not.toContain("@feugene/granularity/styles.css")
+    expect(showcaseMainEntry).not.toContain('@feugene/granularity/styles.css')
     expect(showcaseMainEntry).not.toContain('legacy')
   })
 
   it('подключает fint-i18n и отдельные app-level locale loaders для showcase', () => {
     expect(existsSync(showcaseI18nEntryPath)).toBe(true)
     expect(existsSync(showcaseI18nMessagesPath)).toBe(true)
-    expect(showcaseI18nEntry).toContain("import { createFintI18n } from '@feugene/fint-i18n/core'")
-    expect(showcaseI18nEntry).toContain("import { installI18n } from '@feugene/fint-i18n/vue'")
-    expect(showcaseI18nEntry).toContain("import { GRANULARITY_I18N_BLOCK } from '@feugene/granularity/i18n'")
+    expect(showcaseI18nEntry).toContain('import { createFintI18n } from \'@feugene/fint-i18n/core\'')
+    expect(showcaseI18nEntry).toContain('import { installI18n } from \'@feugene/fint-i18n/vue\'')
+    expect(showcaseI18nEntry).toContain('import { GRANULARITY_I18N_BLOCK } from \'@feugene/granularity/i18n\'')
     expect(showcaseI18nEntry).toContain('SHOWCASE_I18N_BLOCK')
     expect(showcaseI18nEntry).toContain('showcaseLocaleLoaders')
     // Словарь companion-пакета — отдельной строкой: без него календарь и
     // пикеры показывают английский fallback на любом языке витрины, и заметить
     // это можно было только глазами.
-    expect(showcaseI18nEntry).toContain("from '@feugene/granularity-chrono/i18n/all'")
+    expect(showcaseI18nEntry).toContain('from \'@feugene/granularity-chrono/i18n/all\'')
     expect(showcaseI18nEntry).toContain('...grChronoLocales')
-    expect(showcaseI18nEntry).toContain("from '@feugene/granularity-charts/i18n/all'")
+    expect(showcaseI18nEntry).toContain('from \'@feugene/granularity-charts/i18n/all\'')
     expect(showcaseI18nEntry).toContain('...grChartsLocales')
-    expect(showcaseI18nEntry).toContain("from '@feugene/granularity-dashboard/i18n/all'")
-    expect(showcaseI18nEntry).toContain("from '@feugene/granularity-forms-schema/i18n/all'")
+    expect(showcaseI18nEntry).toContain('from \'@feugene/granularity-dashboard/i18n/all\'')
+    expect(showcaseI18nEntry).toContain('from \'@feugene/granularity-forms-schema/i18n/all\'')
     expect(showcaseI18nEntry).toContain('...grFormsSchemaLocales')
-    expect(showcaseI18nEntry).toContain("from '@feugene/granularity-editor/i18n/all'")
+    expect(showcaseI18nEntry).toContain('from \'@feugene/granularity-editor/i18n/all\'')
     expect(showcaseI18nEntry).toContain('...grEditorLocales]')
     expect(showcaseI18nEntry).toContain('...grDashboardLocales')
     expect(showcaseI18nEntry).toContain('registerBlocks([SHOWCASE_I18N_BLOCK, GRANULARITY_I18N_BLOCK, GR_CHRONO_I18N_BLOCK, GR_CHARTS_I18N_BLOCK, GR_DASHBOARD_I18N_BLOCK, GR_FORMS_SCHEMA_I18N_BLOCK, GR_EDITOR_I18N_BLOCK])')
-    expect(showcaseI18nMessagesEntry).toContain("export const SHOWCASE_I18N_BLOCK = 'showcase'")
-    expect(showcaseI18nMessagesEntry).toContain("'./locales/en/showcase.json'")
-    expect(showcaseI18nMessagesEntry).toContain("'./locales/ru/showcase.json'")
+    expect(showcaseI18nMessagesEntry).toContain('export const SHOWCASE_I18N_BLOCK = \'showcase\'')
+    expect(showcaseI18nMessagesEntry).toContain('\'./locales/en/showcase.json\'')
+    expect(showcaseI18nMessagesEntry).toContain('\'./locales/ru/showcase.json\'')
   })
 
   it('использует router shell и root public API пакета в layout-компоненте', () => {
     expect(showcaseAppEntry).toContain('<RouterView />')
-    expect(showcaseLayoutEntry).toContain("from '@feugene/granularity'")
+    expect(showcaseLayoutEntry).toContain('from \'@feugene/granularity\'')
     expect(showcaseLayoutEntry).not.toContain('@feugene/granularity/components/')
   })
 
@@ -127,13 +135,13 @@ describe('showcase bootstrap config', () => {
     ])
     expect(showcaseGranularOptions.components).toBe('all')
     expect(showcaseGranularOptions.themes).toEqual({ names: ['light', 'dark'] })
-    expect(showcaseUnoConfig).toContain("from '@feugene/unocss-preset-granular/node'")
-    expect(showcaseUnoConfig).toContain("presetGranularNode")
-    expect(showcaseUnoConfig).toContain("import granularityProvider from '@feugene/granularity/granular-provider/node'")
-    expect(showcaseUnoConfig).toContain("import chronoProvider from '@feugene/granularity-chrono/granular-provider/node'")
-    expect(showcaseUnoConfig).toContain("import chartsProvider from '@feugene/granularity-charts/granular-provider/node'")
-    expect(showcaseUnoConfig).toContain("import dashboardProvider from '@feugene/granularity-dashboard/granular-provider/node'")
-    expect(showcaseUnoConfig).toContain("import formsSchemaProvider from '@feugene/granularity-forms-schema/granular-provider/node'")
-    expect(showcaseUnoConfig).toContain("names: ['light', 'dark']")
+    expect(showcaseUnoConfig).toContain('from \'@feugene/unocss-preset-granular/node\'')
+    expect(showcaseUnoConfig).toContain('presetGranularNode')
+    expect(showcaseUnoConfig).toContain('import granularityProvider from \'@feugene/granularity/granular-provider/node\'')
+    expect(showcaseUnoConfig).toContain('import chronoProvider from \'@feugene/granularity-chrono/granular-provider/node\'')
+    expect(showcaseUnoConfig).toContain('import chartsProvider from \'@feugene/granularity-charts/granular-provider/node\'')
+    expect(showcaseUnoConfig).toContain('import dashboardProvider from \'@feugene/granularity-dashboard/granular-provider/node\'')
+    expect(showcaseUnoConfig).toContain('import formsSchemaProvider from \'@feugene/granularity-forms-schema/granular-provider/node\'')
+    expect(showcaseUnoConfig).toContain('names: [\'light\', \'dark\']')
   })
 })

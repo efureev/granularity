@@ -45,8 +45,10 @@ export function extractCssBlock(content: string, selector: string): string {
   let depth = 0
 
   for (let index = openBrace; index < content.length; index += 1) {
-    if (content[index] === '{') depth += 1
-    if (content[index] === '}') depth -= 1
+    if (content[index] === '{')
+      depth += 1
+    if (content[index] === '}')
+      depth -= 1
 
     if (depth === 0) {
       return content.slice(openBrace + 1, index)
@@ -69,12 +71,15 @@ function splitTopLevel(input: string): string[] {
       continue
     }
 
-    if (char === '(') depth += 1
-    if (char === ')') depth -= 1
+    if (char === '(')
+      depth += 1
+    if (char === ')')
+      depth -= 1
     buffer += char
   }
 
-  if (buffer.trim()) parts.push(buffer.trim())
+  if (buffer.trim())
+    parts.push(buffer.trim())
 
   return parts
 }
@@ -178,7 +183,8 @@ export function resolveColorExpression(
 export function getColorClassExpression(className: string, prefix: string): string | undefined {
   const transparentToken = `${prefix}transparent`
 
-  if (className.includes(transparentToken)) return 'transparent'
+  if (className.includes(transparentToken))
+    return 'transparent'
 
   // `text-[` — префикс не только цвета: кегль из токена приезжает как
   // `text-[length:var(--gr-text-sm)]` и в шкале классов стоит раньше цвета.
@@ -186,11 +192,13 @@ export function getColorClassExpression(className: string, prefix: string): stri
     const valueStart = start + prefix.length
     const valueEnd = className.indexOf(']', valueStart)
 
-    if (valueEnd === -1) return undefined
+    if (valueEnd === -1)
+      return undefined
 
     const value = className.slice(valueStart, valueEnd).replace(/_/g, ' ')
 
-    if (!value.startsWith('length:')) return value
+    if (!value.startsWith('length:'))
+      return value
   }
 
   return undefined

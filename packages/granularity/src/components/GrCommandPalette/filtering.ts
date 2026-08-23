@@ -49,7 +49,8 @@ export function filterCommandItems(
   query: string,
   filter: GrCommandFilter = matchCommandItem,
 ): GrCommandItem[] {
-  if (!query.trim()) return items
+  if (!query.trim())
+    return items
   return items.filter(item => filter(item, query))
 }
 
@@ -91,7 +92,8 @@ export type GrCommandMatchSegment = {
  */
 export function splitCommandMatch(text: string, query: string): GrCommandMatchSegment[] {
   const needle = query.trim().toLowerCase()
-  if (!needle || !text) return [{ text, match: false }]
+  if (!needle || !text)
+    return [{ text, match: false }]
 
   const segments: GrCommandMatchSegment[] = []
   const haystack = text.toLowerCase()
@@ -99,15 +101,19 @@ export function splitCommandMatch(text: string, query: string): GrCommandMatchSe
 
   while (from < text.length) {
     const at = haystack.indexOf(needle, from)
-    if (at < 0) break
+    if (at < 0)
+      break
 
-    if (at > from) segments.push({ text: text.slice(from, at), match: false })
+    if (at > from)
+      segments.push({ text: text.slice(from, at), match: false })
     segments.push({ text: text.slice(at, at + needle.length), match: true })
     from = at + needle.length
   }
 
-  if (!segments.length) return [{ text, match: false }]
-  if (from < text.length) segments.push({ text: text.slice(from), match: false })
+  if (!segments.length)
+    return [{ text, match: false }]
+  if (from < text.length)
+    segments.push({ text: text.slice(from), match: false })
 
   return segments
 }
@@ -123,7 +129,8 @@ export function withRecentCommands(
   recentIds: string[],
   title: string,
 ): GrCommandGroup[] {
-  if (!recentIds.length) return groups
+  if (!recentIds.length)
+    return groups
 
   const byId = new Map(items.map(item => [item.id, item]))
   const recent: GrCommandItem[] = []
@@ -131,12 +138,14 @@ export function withRecentCommands(
 
   for (const id of recentIds) {
     const item = byId.get(id)
-    if (!item || taken.has(id)) continue
+    if (!item || taken.has(id))
+      continue
     recent.push(item)
     taken.add(id)
   }
 
-  if (!recent.length) return groups
+  if (!recent.length)
+    return groups
 
   const rest = groups
     .map(group => ({ ...group, items: group.items.filter(item => !taken.has(item.id)) }))
@@ -151,7 +160,8 @@ export function findDuplicateCommandIds(items: GrCommandItem[]): string[] {
   const duplicates = new Set<string>()
 
   for (const item of items) {
-    if (seen.has(item.id)) duplicates.add(item.id)
+    if (seen.has(item.id))
+      duplicates.add(item.id)
     else seen.add(item.id)
   }
 

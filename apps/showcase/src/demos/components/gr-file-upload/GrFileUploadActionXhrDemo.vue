@@ -17,7 +17,8 @@ const lastError = ref<string | null>(null)
 
 function onStateChange(state: GrUploadState) {
   phase.value = state.phase
-  if (state.phase !== 'error') lastError.value = null
+  if (state.phase !== 'error')
+    lastError.value = null
 }
 
 function onError(error: unknown) {

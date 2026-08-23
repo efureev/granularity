@@ -12,9 +12,12 @@ const port = ref('5432')
 // Несколько претензий к одному полю: массив вместо склеенной строки.
 const hostErrors = computed<string[]>(() => {
   const issues: string[] = []
-  if (!host.value) issues.push('Хост обязателен')
-  else if (host.value.includes(' ')) issues.push('Пробелы в хосте недопустимы')
-  if (host.value.endsWith('.')) issues.push('Точка в конце — опечатка')
+  if (!host.value)
+    issues.push('Хост обязателен')
+  else if (host.value.includes(' '))
+    issues.push('Пробелы в хосте недопустимы')
+  if (host.value.endsWith('.'))
+    issues.push('Точка в конце — опечатка')
   return issues
 })
 

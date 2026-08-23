@@ -72,7 +72,8 @@ describe('elevation по темам', () => {
           continue
         }
 
-        if (!/\.(?:vue|ts)$/.test(entry) || entry.endsWith('.test.ts')) continue
+        if (!/\.(?:vue|ts)$/.test(entry) || entry.endsWith('.test.ts'))
+          continue
 
         const source = readFileSync(full, 'utf-8')
         if (/(?<![\w-])shadow-(?:sm|md|lg|xl|2xl)(?![\w-])/.test(source))

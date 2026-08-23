@@ -43,7 +43,9 @@ describe('GrTree — ленивая подгрузка', () => {
 
   it('раскрытие грузит ветку один раз и показывает загрузку', async () => {
     let resolveChildren: ((children: Item[]) => void) | undefined
-    const load = vi.fn((_node, resolve) => { resolveChildren = resolve })
+    const load = vi.fn((_node, resolve) => {
+      resolveChildren = resolve
+    })
 
     const wrapper = mountLazy(load)
     await wrapper.get('[data-gr-tree-toggle]').trigger('click')
@@ -82,7 +84,9 @@ describe('GrTree — ленивая подгрузка', () => {
 
   it('повторный `resolve` не задваивает детей', async () => {
     let resolveChildren: ((children: Item[]) => void) | undefined
-    const wrapper = mountLazy((_node, resolve) => { resolveChildren = resolve })
+    const wrapper = mountLazy((_node, resolve) => {
+      resolveChildren = resolve
+    })
 
     await wrapper.get('[data-gr-tree-toggle]').trigger('click')
     resolveChildren?.([{ id: 11, label: 'Loaded', isLeaf: true }])

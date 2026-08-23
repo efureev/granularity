@@ -109,7 +109,6 @@ defineSlots<{
   default?: () => any
 }>()
 
-
 const slots = useSlots()
 
 const labelId = useId()
@@ -160,8 +159,10 @@ const isInvalid = computed(() => fieldInvalid.value)
 const showsInvalid = computed(() => isInvalid.value || Boolean(group?.invalid.value))
 
 const labelledBy = computed(() => {
-  if (props.ariaLabel) return undefined
-  if (hasLabel.value) return labelId
+  if (props.ariaLabel)
+    return undefined
+  if (hasLabel.value)
+    return labelId
   return fieldLabelId.value
 })
 
@@ -276,6 +277,7 @@ function onClick(e: MouseEvent): void {
   toggle()
 }
 </script>
+
 <template>
   <div
     data-gr-checkbox

@@ -52,7 +52,8 @@ function rolesOf(name: string): ToneRole[] {
   const known = new Set(grThemeTokens.map(token => token.name))
   const prefix = `--gr-${name}`
 
-  if (!known.has(prefix)) return ['fill', 'solid', 'light', 'text']
+  if (!known.has(prefix))
+    return ['fill', 'solid', 'light', 'text']
 
   return ([
     ['fill', prefix],
@@ -73,7 +74,8 @@ function baseTokensOf(base: ToneOptions['base']): GrThemeTokens {
 
 function requireColor(tokens: GrThemeTokens, role: string): string {
   const value = resolveRole(tokens, role)
-  if (!value) throw new Error(`тон выводится от темы, а роль ${role} в ней не цвет`)
+  if (!value)
+    throw new Error(`тон выводится от темы, а роль ${role} в ней не цвет`)
 
   return value
 }
@@ -89,8 +91,10 @@ function shiftUntil(from: string, towards: string, against: string, expected: nu
     const candidate = mixSrgb(from, towards, amount)
     const ratio = contrast(candidate, against)
 
-    if (ratio >= expected) return candidate
-    if (ratio > best.ratio) best = { value: candidate, ratio }
+    if (ratio >= expected)
+      return candidate
+    if (ratio > best.ratio)
+      best = { value: candidate, ratio }
   }
 
   throw new GrToneError(role, best.ratio, expected)
@@ -143,7 +147,8 @@ export function tone(name: string, seed: string, options: ToneOptions): GrThemeT
     )
 
     const [best] = [...candidates].sort((left, right) => scoreOf(right) - scoreOf(left))
-    if (scoreOf(best) < AA_TEXT) throw new GrToneError(`${prefix}-fg`, scoreOf(best), AA_TEXT)
+    if (scoreOf(best) < AA_TEXT)
+      throw new GrToneError(`${prefix}-fg`, scoreOf(best), AA_TEXT)
 
     result[`${prefix}-fg`] = best
   }
@@ -167,7 +172,8 @@ export function tone(name: string, seed: string, options: ToneOptions): GrThemeT
       const state = mixSrgb(solid, '#000000', amount)
       const ratio = contrast(solidFg, state)
 
-      if (ratio < AA_TEXT) throw new GrToneError(`${prefix}${suffix}`, ratio, AA_TEXT)
+      if (ratio < AA_TEXT)
+        throw new GrToneError(`${prefix}${suffix}`, ratio, AA_TEXT)
 
       result[`${prefix}${suffix}`] = state
     }

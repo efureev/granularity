@@ -28,7 +28,8 @@ async function lineStart(page: import('@playwright/test').Page, panelId: string)
       ? layer
       : layer?.querySelector('[data-gr-dropdown-content]')
     const list = panel?.querySelector('[data-gr-dropdown-menu-list]')
-    if (!panel || !list) throw new Error('панель или список не найдены')
+    if (!panel || !list)
+      throw new Error('панель или список не найдены')
 
     const panelStyle = getComputedStyle(panel)
     const radius = Number.parseFloat(panelStyle.borderTopLeftRadius)
@@ -67,7 +68,8 @@ test.describe('линии у края скруглённой панели', () =
     await trigger.click()
 
     const panelId = await trigger.getAttribute('aria-controls')
-    if (!panelId) throw new Error('у триггера нет `aria-controls`')
+    if (!panelId)
+      throw new Error('у триггера нет `aria-controls`')
 
     await expect(page.locator(`#${panelId}`)).toBeVisible()
 
@@ -113,7 +115,8 @@ async function inkRatio(page: import('@playwright/test').Page, clip: { x: number
     for (let i = 0; i < data.length; i += 4) {
       // Подпись тёмная, подсветка светлая: считаем всё заметно темнее середины.
       const luma = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2]
-      if (luma < 128) ink += 1
+      if (luma < 128)
+        ink += 1
     }
 
     return ink / (bitmap.width * bitmap.height)
@@ -154,7 +157,8 @@ test.describe('подсветка строки дерева', () => {
     await label.scrollIntoViewIfNeeded()
 
     const box = await label.boundingBox()
-    if (!box) throw new Error('подпись строки не найдена')
+    if (!box)
+      throw new Error('подпись строки не найдена')
 
     const before = await inkRatio(page, box)
     expect(before, 'подпись не видна ещё до наведения').toBeGreaterThan(0.02)
@@ -186,7 +190,8 @@ test.describe('подсветка строки дерева', () => {
     await row.scrollIntoViewIfNeeded()
 
     const box = await row.boundingBox()
-    if (!box) throw new Error('строка не найдена')
+    if (!box)
+      throw new Error('строка не найдена')
 
     // Правый край строки: подписи там нет, значит меняется ровно фон.
     const strip = { x: box.x + box.width - 40, y: box.y + 2, width: 30, height: Math.max(box.height - 4, 1) }

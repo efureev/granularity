@@ -46,7 +46,8 @@ function resolve(expression: string, theme: ThemeName) {
 function expressionOf(className: string): string {
   const expression = getColorClassExpression(className, 'text-[')
 
-  if (!expression) throw new Error(`не удалось извлечь цвет из ${className}`)
+  if (!expression)
+    throw new Error(`не удалось извлечь цвет из ${className}`)
 
   return expression
 }
@@ -79,7 +80,8 @@ describe('GrJsonViewer — палитра значений', () => {
             resolve(expressionOf(rightClass), theme),
           )
 
-          if (distance < MIN_DELTA_E) tooClose.push(`${leftName} ↔ ${rightName}: ΔE ${distance.toFixed(1)}`)
+          if (distance < MIN_DELTA_E)
+            tooClose.push(`${leftName} ↔ ${rightName}: ΔE ${distance.toFixed(1)}`)
         }
       }
 

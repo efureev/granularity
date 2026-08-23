@@ -132,7 +132,7 @@ export default defineConfig({
     emptyOutDir: true,
     lib: {
       entry: {
-        index: fileURLToPath(new URL('./src/index.ts', import.meta.url)),
+        'index': fileURLToPath(new URL('./src/index.ts', import.meta.url)),
         'components/GrMyThing/index': fileURLToPath(new URL('./src/components/GrMyThing/index.ts', import.meta.url)),
         'granular-provider': fileURLToPath(new URL('./src/granular-provider/index.ts', import.meta.url)),
         'granular-provider-node': fileURLToPath(new URL('./src/granular-provider/node.ts', import.meta.url)),
@@ -282,7 +282,8 @@ export function useTranslations() {
 
   // t(ключ, fallback, params): при отсутствии перевода возвращается fallback.
   const t = (key: string, fallback: string, params?: Record<string, any>): string => {
-    if (!i18n) return fallback
+    if (!i18n)
+      return fallback
     const result = i18n.t(key, params)
     return result === key ? fallback : result
   }
@@ -295,6 +296,7 @@ export function useTranslations() {
 <!-- src/components/GrMyThing/GrMyThing.vue -->
 <script setup lang="ts">
 import { useTranslations } from '../../internal/i18n'
+
 const { t } = useTranslations()
 </script>
 
@@ -375,7 +377,8 @@ export const MY_PROVIDER_ID = '@feugene/my-package'
 // rolldown заменяет `new URL('..', import.meta.url)` на data:-URL, поэтому корень
 // пакета собираем из `import.meta.url` вручную (два последних сегмента — файл и каталог).
 const packageBaseUrl = `${import.meta.url.slice(
-  0, import.meta.url.lastIndexOf('/', import.meta.url.lastIndexOf('/') - 1) + 1,
+  0,
+  import.meta.url.lastIndexOf('/', import.meta.url.lastIndexOf('/') - 1) + 1,
 )}`
 
 export function createMyProvider(granularityProvider: GranularProvider): GranularProvider {
@@ -393,6 +396,7 @@ export function createMyProvider(granularityProvider: GranularProvider): Granula
 // src/granular-provider/index.ts  (browser-entry)
 import { granularityProvider } from '@feugene/granularity/granular-provider'
 import { createMyProvider } from './shared'
+
 export const myProvider = createMyProvider(granularityProvider)
 export default myProvider
 ```
@@ -401,6 +405,7 @@ export default myProvider
 // src/granular-provider/node.ts  (node-entry, FS-aware)
 import { granularityProvider } from '@feugene/granularity/granular-provider/node'
 import { createMyProvider } from './shared'
+
 export const myProvider = createMyProvider(granularityProvider)
 export default myProvider
 ```
@@ -441,7 +446,7 @@ export function MyPackageResolver(): ComponentResolver {
   return createGranularResolver({
     packageName: '@feugene/my-package',
     components: ['GrMyThing'], // whitelist
-    importStyle: false,        // CSS инлайнится в JS-чанк
+    importStyle: false, // CSS инлайнится в JS-чанк
   })
 }
 ```
@@ -474,7 +479,7 @@ export function MyPackageResolver(): ComponentResolver {
 ```ts
 Components({
   resolvers: [
-    MyPackageResolver(),   // whitelist — раньше…
+    MyPackageResolver(), // whitelist — раньше…
     GranularityResolver(), // …жадного Gr*-резолвера ядра
   ],
 })

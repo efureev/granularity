@@ -101,7 +101,6 @@ defineSlots<{
     triggerProps: Record<string, unknown>
   }) => any
 }>()
-
 </script>
 
 <template>

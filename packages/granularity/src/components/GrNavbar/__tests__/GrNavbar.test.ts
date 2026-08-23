@@ -2,7 +2,6 @@ import { mount } from '@vue/test-utils'
 import { defineComponent } from 'vue'
 import { describe, expect, it, vi } from 'vitest'
 
-
 vi.mock('~icons/lucide/menu', () => ({
   default: defineComponent({
     name: 'IconMenu',

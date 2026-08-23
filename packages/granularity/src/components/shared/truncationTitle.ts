@@ -16,7 +16,8 @@
 export function titleWhenTruncated(event: Event): void {
   const element = event.currentTarget
 
-  if (!(element instanceof HTMLElement)) return
+  if (!(element instanceof HTMLElement))
+    return
 
   // У поля ввода видимая строка живёт в `value`, а не в содержимом узла.
   const source = element instanceof HTMLInputElement ? element.value : element.textContent

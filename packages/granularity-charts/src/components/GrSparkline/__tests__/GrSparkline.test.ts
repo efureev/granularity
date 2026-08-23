@@ -85,7 +85,6 @@ describe('GrSparkline', () => {
     expect(() => factory({ data: [null, null] })).not.toThrow()
     expect(factory({ data: [] }).attributes('aria-label')).toBe('Sparkline')
   })
-
 })
 
 describe('GrSparkline — прореживание', () => {

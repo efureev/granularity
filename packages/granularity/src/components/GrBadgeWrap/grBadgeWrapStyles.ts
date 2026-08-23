@@ -60,7 +60,8 @@ export const toneClass: Record<GrBadgeWrapTone, string> = {
  * значение — «99 плюс» пользователю ничего не говорит.
  */
 export function formatBadgeValue(value: string | number, max?: number): string {
-  if (max === undefined || typeof value !== 'number') return String(value)
+  if (max === undefined || typeof value !== 'number')
+    return String(value)
   return value > max ? `${max}+` : String(value)
 }
 
@@ -79,8 +80,11 @@ export function isBadgeWrapPulse(
   prev: string | number | undefined,
   next: string | number | undefined,
 ): boolean {
-  if (next === undefined) return false
-  if (prev === undefined) return true
-  if (typeof prev === 'number' && typeof next === 'number') return next > prev
+  if (next === undefined)
+    return false
+  if (prev === undefined)
+    return true
+  if (typeof prev === 'number' && typeof next === 'number')
+    return next > prev
   return prev !== next
 }

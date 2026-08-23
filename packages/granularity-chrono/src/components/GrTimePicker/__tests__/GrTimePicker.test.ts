@@ -69,7 +69,8 @@ async function press(unit: string, key: string) {
 /** Ключ опции, на которую указывает `aria-activedescendant` колонки. */
 function activeKey(unit: string): string | undefined {
   const id = column(unit).attributes('aria-activedescendant')
-  if (!id) return undefined
+  if (!id)
+    return undefined
 
   return document.querySelector(`[id="${id}"]`)?.getAttribute('data-key') ?? undefined
 }

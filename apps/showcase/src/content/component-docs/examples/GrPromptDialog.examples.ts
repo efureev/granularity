@@ -27,7 +27,8 @@ export const grPromptDialogExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Imperative service (useDialogService)',
     description: 'Нужен `prompt` без декларативного компонента в шаблоне? Императивный `useDialogService().prompt()` возвращает `Promise<string | null>` и собран с живыми примерами на отдельной странице composable.',
     status: 'ready',
-    previewKey: 'gr-prompt-dialog-service-link',    note: 'Императивный prompt и остальные методы (confirm/alert) описаны на странице composable useDialogService.',
+    previewKey: 'gr-prompt-dialog-service-link',
+    note: 'Императивный prompt и остальные методы (confirm/alert) описаны на странице composable useDialogService.',
   },
   {
     id: 'prompt-dialog-multiline-rules',

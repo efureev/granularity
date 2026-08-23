@@ -47,7 +47,8 @@ export class GrUploadHttpError extends Error {
 }
 
 function appendExtraFormData(body: FormData, extraData: GrUploadExtraData | undefined) {
-  if (!extraData) return
+  if (!extraData)
+    return
 
   for (const [key, value] of Object.entries(extraData)) {
     if (Array.isArray(value)) {
@@ -66,7 +67,8 @@ function parseResponse(xhr: XMLHttpRequest): unknown {
   if (contentType.includes('application/json')) {
     try {
       return JSON.parse(raw)
-    } catch {
+    }
+    catch {
       return raw
     }
   }
@@ -99,7 +101,8 @@ export function uploadViaXhr(options: UploadViaXhrOptions): Promise<unknown> {
     const onAbort = () => {
       try {
         xhr.abort()
-      } catch {
+      }
+      catch {
         /* ignore */
       }
     }
@@ -126,7 +129,8 @@ export function uploadViaXhr(options: UploadViaXhrOptions): Promise<unknown> {
       const status = xhr.status
 
       if (status >= 200 && status < 300) {
-        if (onProgress) onProgress({ percent: 100, loaded: 1, total: 1, indeterminate: false })
+        if (onProgress)
+          onProgress({ percent: 100, loaded: 1, total: 1, indeterminate: false })
         resolve(payload)
         return
       }

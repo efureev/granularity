@@ -38,11 +38,11 @@ type GrChronoRangeValue = readonly [Date, Date] | null
 ### Свой адаптер
 
 ```ts
-import type {GrChronoAdapter} from '@feugene/granularity-chrono'
+import type { GrChronoAdapter } from '@feugene/granularity-chrono'
 
 const secondsAdapter: GrChronoAdapter<number | null> = {
-    parse: raw => (typeof raw === 'number' ? new Date(raw * 1000) : null),
-    serialize: date => Math.floor(date.getTime() / 1000),
+  parse: raw => (typeof raw === 'number' ? new Date(raw * 1000) : null),
+  serialize: date => Math.floor(date.getTime() / 1000),
 }
 ```
 
@@ -62,10 +62,10 @@ const secondsAdapter: GrChronoAdapter<number | null> = {
 ставить date-библиотеку рядом с пакетом, где это уже есть.
 
 ```ts
-import {addMonths, isoWeekNumber, plainDate} from '@feugene/granularity-chrono'
+import { addMonths, isoWeekNumber, plainDate } from '@feugene/granularity-chrono'
 
 addMonths(plainDate(2026, 0, 31), 1) // { y: 2026, m: 1, d: 28 } — день зажат длиной месяца
-isoWeekNumber({y: 2026, m: 11, d: 31}) // неделя принадлежит году своего четверга
+isoWeekNumber({ y: 2026, m: 11, d: 31 }) // неделя принадлежит году своего четверга
 ```
 
 Там же — сетка месяца (`buildCalendarGrid`), колонки времени (`buildTimeColumns`), обёртки `Intl` с кэшем
@@ -95,7 +95,7 @@ isoWeekNumber({y: 2026, m: 11, d: 31}) // неделя принадлежит г
 `setInterval`.
 
 ```ts
-import {selectRelativeAmount, useChronoNow} from '@feugene/granularity-chrono'
+import { selectRelativeAmount, useChronoNow } from '@feugene/granularity-chrono'
 
 const now = useChronoNow(30_000)
 selectRelativeAmount(now.value, posted) // { value: -3, unit: 'minute' }
@@ -125,10 +125,10 @@ selectRelativeAmount(now.value, posted) // { value: -3, unit: 'minute' }
 молча, ни разу не исполнившись на машине разработчика.
 
 ```ts
-import {durationToIso, formatDuration} from '@feugene/granularity-chrono'
+import { durationToIso, formatDuration } from '@feugene/granularity-chrono'
 
-formatDuration('ru', 9000)  // «2 ч 30 мин»
-durationToIso(9000)         // «PT2H30M» — для `<time datetime>`
+formatDuration('ru', 9000) // «2 ч 30 мин»
+durationToIso(9000) // «PT2H30M» — для `<time datetime>`
 ```
 
 Машинная форма считается по **полному** значению, а не по показанным единицам:

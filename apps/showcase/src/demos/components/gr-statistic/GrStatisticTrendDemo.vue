@@ -7,7 +7,9 @@ const loading = ref(false)
 
 function refresh(): void {
   loading.value = true
-  setTimeout(() => { loading.value = false }, 1200)
+  setTimeout(() => {
+    loading.value = false
+  }, 1200)
 }
 </script>
 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {computed, ref, shallowRef} from 'vue'
+import { computed, ref, shallowRef } from 'vue'
 
 import {
   GrButton,
@@ -19,7 +19,7 @@ class FakeHttpError extends Error {
   constructor(status: number, data: unknown, headers?: Record<string, string>) {
     super(`Request failed with status ${status}`)
     this.name = 'AxiosError'
-    this.response = {status, data, headers}
+    this.response = { status, data, headers }
   }
 }
 
@@ -49,8 +49,8 @@ class FakeFileValidationError extends Error {
   }
 }
 
-type PresetId =
-    | 'network'
+type PresetId
+  = | 'network'
     | 'aborted'
     | 'laravel-422'
     | 'jsonapi-422'
@@ -61,8 +61,8 @@ type PresetId =
     | 'plain-string'
 
 const presets = computed<{ id: PresetId, label: string, build: () => unknown }[]>(() => [
-  {id: 'network', label: 'Network (no connection)', build: () => new FakeNetworkError()},
-  {id: 'aborted', label: 'Aborted (cancelled by user)', build: () => new FakeAbortError()},
+  { id: 'network', label: 'Network (no connection)', build: () => new FakeNetworkError() },
+  { id: 'aborted', label: 'Aborted (cancelled by user)', build: () => new FakeAbortError() },
   {
     id: 'laravel-422',
     label: 'Laravel validation (422 + errors)',
@@ -83,13 +83,13 @@ const presets = computed<{ id: PresetId, label: string, build: () => unknown }[]
           status: '422',
           title: 'Invalid Attribute',
           detail: 'Email is required.',
-          source: {pointer: '/data/attributes/email'}
+          source: { pointer: '/data/attributes/email' },
         },
         {
           status: '422',
           title: 'Invalid Attribute',
           detail: 'Phone is invalid.',
-          source: {pointer: '/data/attributes/phone'}
+          source: { pointer: '/data/attributes/phone' },
         },
       ],
     }),
@@ -97,41 +97,38 @@ const presets = computed<{ id: PresetId, label: string, build: () => unknown }[]
   {
     id: 'rfc7807-403',
     label: 'RFC 7807 problem+json (403)',
-    build: () => new FakeHttpError(403,
-        {
-          type: 'https://example.com/probs/out-of-credit',
-          title: 'You do not have enough credit.',
-          status: 403,
-          detail: 'Your current balance is 30, but that costs 50.',
-        },
-        {'content-type': 'application/problem+json'},
-    ),
+    build: () => new FakeHttpError(403, {
+      type: 'https://example.com/probs/out-of-credit',
+      title: 'You do not have enough credit.',
+      status: 403,
+      detail: 'Your current balance is 30, but that costs 50.',
+    }, { 'content-type': 'application/problem+json' }),
   },
   {
     id: 'client-404',
     label: 'Client error (404)',
-    build: () => new FakeHttpError(404, {message: 'Resource not found'})
+    build: () => new FakeHttpError(404, { message: 'Resource not found' }),
   },
   {
     id: 'server-500',
     label: 'Server error (500)',
-    build: () => new FakeHttpError(500, {message: 'Internal Server Error'})
+    build: () => new FakeHttpError(500, { message: 'Internal Server Error' }),
   },
   {
     id: 'file-validation',
     label: 'FileValidationError (local)',
     build: () => new FakeFileValidationError([
-      {file: {name: 'photo.heic'}, message: 'Format heic is not supported.'},
-      {file: {name: 'huge.zip'}, message: 'File is larger than 10 MB.'},
+      { file: { name: 'photo.heic' }, message: 'Format heic is not supported.' },
+      { file: { name: 'huge.zip' }, message: 'File is larger than 10 MB.' },
     ]),
   },
-  {id: 'plain-string', label: 'Plain string', build: () => 'Something went wrong on the backend'},
+  { id: 'plain-string', label: 'Plain string', build: () => 'Something went wrong on the backend' },
 ])
 
-const presetOptions = computed(() => presets.value.map(p => ({label: p.label, value: p.id})))
+const presetOptions = computed(() => presets.value.map(p => ({ label: p.label, value: p.id })))
 const selectedPreset = ref<PresetId>('laravel-422')
 
-const {currentError, setRaw, dismiss, retry} = useResponseError()
+const { currentError, setRaw, dismiss, retry } = useResponseError()
 const eventLog = shallowRef<string[]>([])
 
 function log(msg: string) {
@@ -143,7 +140,7 @@ async function trigger() {
   if (!preset)
     return
   const raw = preset.build()
-  const info = await setRaw(raw, {presetId: preset.id})
+  const info = await setRaw(raw, { presetId: preset.id })
   if (info)
     log(`classified kind=${info.kind}${info.status ? `, status=${info.status}` : ''}`)
   else

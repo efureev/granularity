@@ -198,7 +198,8 @@ describe('GrChartArea: сто процентов', () => {
 
   it('ось показывает доли, а не величины', () => {
     const labels = factory({ stacked: '100%' })
-      .findAll('[data-gr-chart-axis="y"] text').map(node => node.text())
+      .findAll('[data-gr-chart-axis="y"] text')
+      .map(node => node.text())
 
     expect(labels.some(label => label.includes('%'))).toBe(true)
   })
@@ -216,7 +217,8 @@ describe('GrChartArea: сто процентов', () => {
     // Доля — свойство рисунка, значение — свойство данных. Таблица про данные.
     const cells = factory({ stacked: '100%' })
       .findAll('[data-gr-chart-table] tbody tr')[0]!
-      .findAll('td').map(node => node.text())
+      .findAll('td')
+      .map(node => node.text())
 
     expect(cells).toEqual(['10', '5'])
   })

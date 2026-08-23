@@ -22,11 +22,14 @@ export function themeRoleNames(): string[] {
  */
 export function resolveRole(tokens: GrThemeTokens, name: string, seen: string[] = []): string | null {
   const value = tokens[name]
-  if (value === undefined) return null
-  if (isHex(value)) return value
+  if (value === undefined)
+    return null
+  if (isHex(value))
+    return value
 
   const reference = value.trim().match(/^var\(\s*(--[\w-]+)\s*\)$/)
-  if (!reference) return null
+  if (!reference)
+    return null
 
   if (seen.includes(name))
     throw new Error(`роль ${name} ссылается сама на себя: ${[...seen, name].join(' → ')}`)

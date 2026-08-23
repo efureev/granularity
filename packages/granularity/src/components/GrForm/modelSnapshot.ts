@@ -15,12 +15,15 @@ function isBinary(value: unknown): value is Blob {
 }
 
 function cloneValue(value: unknown): unknown {
-  if (typeof value === 'function' || typeof value === 'symbol') return undefined
-  if (value === null || typeof value !== 'object') return value
+  if (typeof value === 'function' || typeof value === 'symbol')
+    return undefined
+  if (value === null || typeof value !== 'object')
+    return value
 
   // По ссылке: содержимое файла клонировать нечем, а идентичность как раз и
   // нужна — `resetFields` обязан вернуть тот самый файл, а не его подобие.
-  if (isBinary(value)) return value
+  if (isBinary(value))
+    return value
 
   if (Array.isArray(value)) {
     // Как у `JSON.stringify`: не-сериализуемый элемент массива становится `null`,
@@ -33,12 +36,14 @@ function cloneValue(value: unknown): unknown {
 
   // `Date` и прочие носители `toJSON` ведут себя ровно как раньше.
   const toJSON = (value as { toJSON?: unknown }).toJSON
-  if (typeof toJSON === 'function') return cloneValue((value as { toJSON: () => unknown }).toJSON())
+  if (typeof toJSON === 'function')
+    return cloneValue((value as { toJSON: () => unknown }).toJSON())
 
   const out: Record<string, unknown> = {}
   for (const [key, item] of Object.entries(value)) {
     const cloned = cloneValue(item)
-    if (cloned !== undefined) out[key] = cloned
+    if (cloned !== undefined)
+      out[key] = cloned
   }
   return out
 }

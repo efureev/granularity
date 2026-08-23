@@ -90,7 +90,8 @@ export function useDashboardLayout(options: UseDashboardLayoutOptions): UseDashb
   let pending: GrDashboardResponsiveLayout | null = null
 
   function write(value: GrDashboardResponsiveLayout): void {
-    if (!options.storage || !options.key) return
+    if (!options.storage || !options.key)
+      return
 
     options.storage.save(options.key, serializeLayout(value, version))
   }
@@ -101,7 +102,8 @@ export function useDashboardLayout(options: UseDashboardLayoutOptions): UseDashb
       timer = null
     }
 
-    if (!pending) return
+    if (!pending)
+      return
 
     write(pending)
     pending = null
@@ -111,20 +113,23 @@ export function useDashboardLayout(options: UseDashboardLayoutOptions): UseDashb
     // Запись с паузой: жест меняет раскладку на каждой смене ячейки, и без неё
     // один перенос давал бы десяток обращений к хранилищу.
     pending = value
-    if (timer !== null) clearTimeout(timer)
+    if (timer !== null)
+      clearTimeout(timer)
 
     timer = setTimeout(() => {
       timer = null
       const value = pending
       pending = null
-      if (value) write(value)
+      if (value)
+        write(value)
     }, delay)
   }
 
   onMounted(() => {
     if (options.storage && options.key) {
       const restored = parseLayout(options.storage.load(options.key), { version, migrate: options.migrate })
-      if (restored) layout.value = restored
+      if (restored)
+        layout.value = restored
     }
 
     isRestored.value = true
@@ -133,7 +138,8 @@ export function useDashboardLayout(options: UseDashboardLayoutOptions): UseDashb
   watch(layout, (value) => {
     // До восстановления не пишем: иначе первая же реакция затёрла бы
     // сохранённое значение раскладкой по умолчанию.
-    if (!isRestored.value) return
+    if (!isRestored.value)
+      return
 
     schedule(value)
   }, { deep: false })
@@ -142,7 +148,8 @@ export function useDashboardLayout(options: UseDashboardLayoutOptions): UseDashb
 
   function reset(): void {
     layout.value = options.initial
-    if (options.storage && options.key) options.storage.remove(options.key)
+    if (options.storage && options.key)
+      options.storage.remove(options.key)
 
     pending = null
     if (timer !== null) {

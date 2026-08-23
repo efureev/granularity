@@ -26,7 +26,8 @@ export function flattenSlotNodes(nodes: VNode[]): VNode[] {
 }
 
 export function isWhitespaceTextNode(node: VNode): boolean {
-  if (node.type !== Text) return false
+  if (node.type !== Text)
+    return false
   return typeof node.children === 'string' && node.children.trim().length === 0
 }
 

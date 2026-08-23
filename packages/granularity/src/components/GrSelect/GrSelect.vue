@@ -308,14 +308,16 @@ defineSlots<{
   empty?: () => any
 }>()
 
-
 // Fallback из контекста `GrFormField` (id/aria-describedby/invalid/required)
 // для связки с лейблом и сообщением об ошибке.
 const field = useGrFormFieldContext()
 const resolvedId = computed(() => field?.id.value)
 const {
   disabled: isDisabled,
-  invalid: isInvalid, required: isRequired, readonly: isReadonly } = useGrFormControl(() => props)
+  invalid: isInvalid,
+  required: isRequired,
+  readonly: isReadonly,
+} = useGrFormControl(() => props)
 
 const nativeSelectEl = ref<HTMLSelectElement | null>(null)
 const triggerButtonEl = ref<HTMLElement | null>(null)
@@ -400,11 +402,16 @@ const showSearchInput = computed(() =>
 const showTags = computed(() => props.multiple && props.tags && effectiveOptionsView.value === 'panel')
 
 const nativeCustomOptionVisible = computed(() => {
-  if (!props.allowCustomValue) return false
-  if (effectiveOptionsView.value !== 'native') return false
-  if (props.multiple) return false
-  if (!props.options) return false
-  if (modelSingle.value === '') return false
+  if (!props.allowCustomValue)
+    return false
+  if (effectiveOptionsView.value !== 'native')
+    return false
+  if (props.multiple)
+    return false
+  if (!props.options)
+    return false
+  if (modelSingle.value === '')
+    return false
   return !hasModelInOptions.value
 })
 
@@ -460,7 +467,8 @@ function closeDropdown(): void {
 const locked = computed(() => isDisabled.value || isReadonly.value)
 
 function toggleDropdown(): void {
-  if (locked.value) return
+  if (locked.value)
+    return
   setOpen(!open.value)
 }
 
@@ -471,7 +479,8 @@ useDismissible(open, closeDropdown)
 watch(
   () => props.view,
   () => {
-    if (open.value) updateFloatingPosition()
+    if (open.value)
+      updateFloatingPosition()
   },
 )
 
@@ -495,7 +504,8 @@ const { panelItems, panelRows, canAddCustom } = useSelectPanelItems<TValue>({
 })
 
 function emitValue(value: GrSelectModelValue<TValue>): void {
-  if (isReadonly.value) return
+  if (isReadonly.value)
+    return
 
   emit('update:modelValue', value)
   emit('change', value)
@@ -517,7 +527,8 @@ function selectValue(value: TValue): void {
 }
 
 function toggleValue(value: TValue): void {
-  if (isOptionDisabled(value)) return
+  if (isOptionDisabled(value))
+    return
 
   if (!props.multiple) {
     selectValue(value)
@@ -543,14 +554,17 @@ function addCustom(): void {
   // Кастомное значение набирается текстом, поэтому оно строковое —
   // при числовом `TValue` эта ветка неприменима (см. docs/components.md).
   const v = customValue.value.trim() as TValue
-  if (!v) return
+  if (!v)
+    return
   toggleValue(v)
 }
 
 // Удаление одного значения из multiple-выбора (клик по «×» на chip).
 function removeValue(value: TValue): void {
-  if (locked.value) return
-  if (!props.multiple) return
+  if (locked.value)
+    return
+  if (!props.multiple)
+    return
   // Кнопка чипа держит объект из `options`, модель — свою копию: сравнение
   // только через ключ, `!==` не удалил бы ничего.
   emitValue(selectedValues.value.filter(v => !sameValue(v, value)))
@@ -558,7 +572,8 @@ function removeValue(value: TValue): void {
 
 const visibleTagOptions = computed(() => {
   const limit = props.maxTagCount
-  if (limit === undefined || limit < 0) return selectedOptions.value
+  if (limit === undefined || limit < 0)
+    return selectedOptions.value
   return selectedOptions.value.slice(0, limit)
 })
 
@@ -628,7 +643,8 @@ if (__GR_DEV__) {
   watch(
     () => [props.virtual, effectiveOptionsView.value, props.view] as const,
     ([virtual, view, appearance]) => {
-      if (!virtual) return
+      if (!virtual)
+        return
 
       if (view !== 'panel') {
         console.warn(
@@ -651,7 +667,8 @@ if (__GR_DEV__) {
 const listboxIdIfRendered = computed(() => (open.value && !props.loading ? listboxId : undefined))
 
 function openDropdown(): void {
-  if (locked.value || open.value) return
+  if (locked.value || open.value)
+    return
   setOpen(true)
 }
 
@@ -724,17 +741,24 @@ const showNativeChevron = computed(() => {
 })
 
 const nativeClearOptionVisible = computed(() => {
-  if (!resolvedClearable.value) return false
-  if (effectiveOptionsView.value !== 'native') return false
-  if (props.multiple) return false
-  if (!props.options) return true
+  if (!resolvedClearable.value)
+    return false
+  if (effectiveOptionsView.value !== 'native')
+    return false
+  if (props.multiple)
+    return false
+  if (!props.options)
+    return true
   return !flatOptions.value.some(o => isEmptySelectValue(o.value))
 })
 
 const panelClearVisible = computed(() => {
-  if (!resolvedClearable.value) return false
-  if (effectiveOptionsView.value !== 'panel') return false
-  if (props.view === 'link') return false
+  if (!resolvedClearable.value)
+    return false
+  if (effectiveOptionsView.value !== 'panel')
+    return false
+  if (props.view === 'link')
+    return false
   return hasSelection.value
 })
 
@@ -808,7 +832,8 @@ function onChange(e: Event): void {
 }
 
 function clearSelection(): void {
-  if (locked.value) return
+  if (locked.value)
+    return
   emitValue((props.multiple ? [] : '') as GrSelectModelValue<TValue>)
   emit('clear')
 }

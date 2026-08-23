@@ -12,7 +12,8 @@ async function request(files: File[], ctx: GrFileUploadRequestCtx) {
   const step = Math.max(1, Math.floor(total / 25))
 
   while (loaded < total) {
-    if (ctx.signal.aborted) throw new Error('aborted')
+    if (ctx.signal.aborted)
+      throw new Error('aborted')
     await new Promise(resolve => setTimeout(resolve, 60))
     loaded = Math.min(total, loaded + step)
     ctx.onProgress?.({
@@ -27,9 +28,12 @@ async function request(files: File[], ctx: GrFileUploadRequestCtx) {
 }
 
 function phaseLabel(state: GrUploadState): string {
-  if (state.phase === 'uploading') return state.indeterminate ? 'Sending…' : 'Uploading'
-  if (state.phase === 'success') return 'Done'
-  if (state.phase === 'error') return 'Failed'
+  if (state.phase === 'uploading')
+    return state.indeterminate ? 'Sending…' : 'Uploading'
+  if (state.phase === 'success')
+    return 'Done'
+  if (state.phase === 'error')
+    return 'Failed'
   return 'Idle'
 }
 </script>

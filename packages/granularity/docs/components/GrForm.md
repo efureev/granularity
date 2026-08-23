@@ -178,7 +178,7 @@ const form = useForm({ email: '', password: '' })
 
 ```ts
 await wrapper.find('form').trigger('submit')
-await flushPromises()          // не nextTick: правила могли уйти на сервер
+await flushPromises() // не nextTick: правила могли уйти на сервер
 expect(onSubmit).toHaveBeenCalled()
 ```
 

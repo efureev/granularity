@@ -108,8 +108,10 @@ export function useDragSort<TKey, TTarget>(
   const gesture = useDragGesture({
     disabled: () => options.disabled?.() ?? false,
     onStart: (event) => {
-      if (pendingKey === null) return false
-      if (options.canDrag?.(pendingKey) === false) return false
+      if (pendingKey === null)
+        return false
+      if (options.canDrag?.(pendingKey) === false)
+        return false
 
       originX = event.clientX
       originY = event.clientY
@@ -119,7 +121,8 @@ export function useDragSort<TKey, TTarget>(
     onMove: (event) => {
       if (mode.value === null) {
         const moved = Math.hypot(event.clientX - originX, event.clientY - originY)
-        if (moved < (options.threshold?.() ?? 4)) return
+        if (moved < (options.threshold?.() ?? 4))
+          return
 
         source.value = pendingKey
         mode.value = 'pointer'
@@ -137,7 +140,8 @@ export function useDragSort<TKey, TTarget>(
       updateTarget(lastPoint)
     },
     onEnd: () => {
-      if (mode.value === 'pointer') commit()
+      if (mode.value === 'pointer')
+        commit()
       else reset()
     },
     onCancel: reset,
@@ -157,7 +161,8 @@ export function useDragSort<TKey, TTarget>(
 
   function updateTarget(point: { x: number, y: number }): void {
     const current = source.value
-    if (current === null) return
+    if (current === null)
+      return
 
     // Отрисованы не все: список может быть под окном отсечения, ветка дерева —
     // свёрнута. Попадание считается по тому, что на экране есть.
@@ -165,7 +170,8 @@ export function useDragSort<TKey, TTarget>(
 
     options.items().forEach((key, index) => {
       const el = options.elementFor(key)
-      if (el) rendered.push({ key, index, span: spanOf(el.getBoundingClientRect()) })
+      if (el)
+        rendered.push({ key, index, span: spanOf(el.getBoundingClientRect()) })
     })
 
     const hit = hitTest(rendered.map(entry => entry.span), isVertical() ? point.y : point.x)
@@ -174,7 +180,8 @@ export function useDragSort<TKey, TTarget>(
       ? null
       : options.resolveTarget({ key: entry.key, index: entry.index, fraction: hit.fraction }, current, target.value)
 
-    if (next === target.value) return
+    if (next === target.value)
+      return
 
     target.value = next
     notify()
@@ -190,12 +197,14 @@ export function useDragSort<TKey, TTarget>(
 
     const scroller = options.scroller?.()
     const point = lastPoint
-    if (!scroller || !point || mode.value !== 'pointer') return
+    if (!scroller || !point || mode.value !== 'pointer')
+      return
 
     const delta = autoScrollDelta(spanOf(scroller.getBoundingClientRect()), isVertical() ? point.y : point.x)
 
     if (delta !== 0) {
-      if (isVertical()) scroller.scrollTop += delta
+      if (isVertical())
+        scroller.scrollTop += delta
       else scroller.scrollLeft += delta
 
       updateTarget(point)
@@ -205,20 +214,23 @@ export function useDragSort<TKey, TTarget>(
   }
 
   function startScrolling(): void {
-    if (scrollFrame !== null || !options.scroller?.()) return
+    if (scrollFrame !== null || !options.scroller?.())
+      return
 
     scrollFrame = requestAnimationFrame(tickScroll)
   }
 
   function stopScrolling(): void {
-    if (scrollFrame === null) return
+    if (scrollFrame === null)
+      return
 
     cancelAnimationFrame(scrollFrame)
     scrollFrame = null
   }
 
   function onWindowKeydown(event: KeyboardEvent): void {
-    if (event.key !== 'Escape') return
+    if (event.key !== 'Escape')
+      return
 
     event.preventDefault()
     gesture.stop(false)
@@ -240,7 +252,8 @@ export function useDragSort<TKey, TTarget>(
     const from = source.value
     const to = target.value
 
-    if (from !== null && to !== null) options.onDrop(from, to)
+    if (from !== null && to !== null)
+      options.onDrop(from, to)
 
     reset()
   }
@@ -248,7 +261,8 @@ export function useDragSort<TKey, TTarget>(
   function startFrom(key: TKey) {
     return (event: PointerEvent): void => {
       // Клавиатурный перенос идёт своим чередом: указатель его не перебивает.
-      if (mode.value === 'keyboard') return
+      if (mode.value === 'keyboard')
+        return
 
       pendingKey = key
       gesture.start(event)
@@ -256,8 +270,10 @@ export function useDragSort<TKey, TTarget>(
   }
 
   function grab(key: TKey): void {
-    if (options.disabled?.() || options.canDrag?.(key) === false) return
-    if (mode.value !== null) return
+    if (options.disabled?.() || options.canDrag?.(key) === false)
+      return
+    if (mode.value !== null)
+      return
 
     source.value = key
     target.value = null
@@ -266,14 +282,16 @@ export function useDragSort<TKey, TTarget>(
   }
 
   function setTarget(next: TTarget | null): void {
-    if (mode.value !== 'keyboard') return
+    if (mode.value !== 'keyboard')
+      return
 
     target.value = next
     notify()
   }
 
   function drop(): void {
-    if (mode.value !== 'keyboard') return
+    if (mode.value !== 'keyboard')
+      return
 
     commit()
   }
@@ -284,7 +302,8 @@ export function useDragSort<TKey, TTarget>(
       return
     }
 
-    if (mode.value === 'keyboard') reset()
+    if (mode.value === 'keyboard')
+      reset()
   }
 
   onScopeDispose(() => {

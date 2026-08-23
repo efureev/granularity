@@ -41,9 +41,9 @@
   токена шкалы выше тот, кто открыт позже.
 
 ```ts
-import {usePortalTarget} from '@feugene/granularity'
+import { usePortalTarget } from '@feugene/granularity'
 
-const {target, enabled} = usePortalTarget()
+const { target, enabled } = usePortalTarget()
 // <teleport :to="target" :disabled="!enabled">…</teleport>
 ```
 
@@ -101,14 +101,14 @@ Esc обрабатывается единым capture-обработчиком �
 Публичный вход — композабл `useOverlayLayer()`:
 
 ```ts
-import {useOverlayLayer} from '@feugene/granularity'
+import { useOverlayLayer } from '@feugene/granularity'
 
 const open = ref(false)
 const panel = ref<HTMLElement | null>(null)
 
 useOverlayLayer(open, () => {
-    open.value = false
-}, {root: panel})
+  open.value = false
+}, { root: panel })
 ```
 
 | Опция             | Смысл                                                                               |
@@ -129,13 +129,13 @@ useOverlayLayer(open, () => {
 ### Ловушка фокуса
 
 ```ts
-import {useFocusTrap, useOverlayLayer} from '@feugene/granularity'
+import { useFocusTrap, useOverlayLayer } from '@feugene/granularity'
 
-const layer = useOverlayLayer(open, close, {modal: true, root: panel})
+const layer = useOverlayLayer(open, close, { modal: true, root: panel })
 
 useFocusTrap(panel, {
-    active: () => open.value && isTopmost.value,
-    containers: layer.rootsAbove,
+  active: () => open.value && isTopmost.value,
+  containers: layer.rootsAbove,
 })
 ```
 
@@ -189,11 +189,11 @@ useFocusTrap(panel, {
 const open = ref(false)
 const panel = ref<HTMLElement | null>(null)
 
-const {target, enabled} = usePortalTarget()
-const {floatingStyle} = useFloating(trigger, panel, open)   // слой — из шкалы
+const { target, enabled } = usePortalTarget()
+const { floatingStyle } = useFloating(trigger, panel, open) // слой — из шкалы
 useDismissible(open, () => {
-    open.value = false
-})          // очередь Esc
+  open.value = false
+}) // очередь Esc
 // клик вне — директивой `v-click-outside`, ловушки фокуса быть не должно
 ```
 

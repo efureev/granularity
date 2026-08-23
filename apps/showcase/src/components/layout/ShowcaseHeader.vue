@@ -26,7 +26,7 @@ const { localizePageByName } = useShowcasePageI18n()
 const packageVersion = __GRANULARITY_VERSION__
 
 const topNavigationItems = computed(() => showcaseTopNavigationItems
-  .map(item => {
+  .map((item) => {
     const localizedPage = localizePageByName(item.name)
 
     return {

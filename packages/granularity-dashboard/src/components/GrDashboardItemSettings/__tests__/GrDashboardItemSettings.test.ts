@@ -76,15 +76,18 @@ function stand(options: StandOptions = {}) {
   return { wrapper, layout, open, applied, cancelled }
 }
 
-const width = (wrapper: ReturnType<typeof stand>['wrapper']) =>
-  wrapper.find('input[data-gr-dashboard-settings-width]')
+function width(wrapper: ReturnType<typeof stand>['wrapper']) {
+  return wrapper.find('input[data-gr-dashboard-settings-width]')
+}
 
-const height = (wrapper: ReturnType<typeof stand>['wrapper']) =>
-  wrapper.find('input[data-gr-dashboard-settings-height]')
+function height(wrapper: ReturnType<typeof stand>['wrapper']) {
+  return wrapper.find('input[data-gr-dashboard-settings-height]')
+}
 
 function buttonByText(wrapper: ReturnType<typeof stand>['wrapper'], text: string): HTMLElement {
   const found = wrapper.findAll('button').find(button => button.text().trim() === text)
-  if (!found) throw new Error(`кнопка не найдена: ${text}`)
+  if (!found)
+    throw new Error(`кнопка не найдена: ${text}`)
 
   return found.element
 }

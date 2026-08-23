@@ -14,7 +14,8 @@ export function useTweenedValue(initial: number) {
   let frame: number | undefined
 
   function stop(): void {
-    if (frame !== undefined) cancelAnimationFrame(frame)
+    if (frame !== undefined)
+      cancelAnimationFrame(frame)
     frame = undefined
   }
 
@@ -38,7 +39,8 @@ export function useTweenedValue(initial: number) {
       const progress = Math.min(1, (now - start) / duration)
       value.value = from + (target - from) * progress
 
-      if (progress < 1) frame = requestAnimationFrame(step)
+      if (progress < 1)
+        frame = requestAnimationFrame(step)
       else frame = undefined
     }
 

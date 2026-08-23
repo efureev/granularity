@@ -102,7 +102,7 @@ const props = withDefaults(defineProps<GrTreeProps<T>>(), {
 const emit = defineEmits<GrTreeEmits<T>>()
 
 defineSlots<{
-  default?: (props: { node: GrTreeNode<T>; data: T }) => any
+  default?: (props: { node: GrTreeNode<T>, data: T }) => any
 }>()
 
 const dataAdapter = createGrTreeDataAdapter(props)
@@ -148,15 +148,18 @@ const dropTarget = interactionContext.dropTarget
 const currentKeyControlled = computed(() => treeProps.currentKey !== undefined)
 
 watch(() => treeProps.currentKey, (key) => {
-  if (!currentKeyControlled.value) return
-  if (treeStore.currentKey.value === (key ?? undefined)) return
+  if (!currentKeyControlled.value)
+    return
+  if (treeStore.currentKey.value === (key ?? undefined))
+    return
 
   treeStore.setCurrentKey(key ?? undefined)
 }, { immediate: true })
 
 /** Значение фильтра приходит пропом; метод `filter()` остаётся для императивных сценариев. */
 watch(() => treeProps.filterValue, (value) => {
-  if (value === undefined) return
+  if (value === undefined)
+    return
 
   applyFilter(value)
 }, { immediate: true })
@@ -274,7 +277,8 @@ const rowEstimate = computed(() => Number.parseFloat(sizeStyle.value['--gr-tree-
 
 const virtualMaxHeight = computed(() => {
   const value = treeProps.maxHeight
-  if (value == null) return undefined
+  if (value == null)
+    return undefined
   return typeof value === 'number' ? `${value}px` : value
 })
 
@@ -292,7 +296,8 @@ const virtualizer = useVirtualList({
 
 /** Строки к отрисовке: при выключенной виртуализации — все. */
 const renderedRows = computed(() => {
-  if (!treeProps.virtual) return visibleRows.value
+  if (!treeProps.virtual)
+    return visibleRows.value
 
   const { start, end } = virtualizer.range.value
   return visibleRows.value.slice(start, end)
@@ -317,7 +322,8 @@ const renderedRows = computed(() => {
  * строки, — схлопнуться между кадрами нечему.
  */
 const rootStyle = computed(() => {
-  if (!treeProps.virtual) return sizeStyle.value
+  if (!treeProps.virtual)
+    return sizeStyle.value
 
   return {
     ...sizeStyle.value,
@@ -363,7 +369,8 @@ function releaseNodeEl(key: GrTreeKey): void {
 function scrollRowIntoView(key: GrTreeNode<T>['key']): Promise<void> {
   if (treeProps.virtual) {
     const index = visibleRows.value.findIndex(row => row.node.key === key)
-    if (index >= 0) virtualizer.scrollToIndex(index)
+    if (index >= 0)
+      virtualizer.scrollToIndex(index)
   }
 
   return nextTick()
@@ -442,7 +449,8 @@ function onTreeKeydown(event: KeyboardEvent): void {
   // `Shift` со стрелкой двигает сам узел — раскладка аутлайнера. Проверяется
   // раньше навигации: иначе примитив увёл бы фокус вместо переноса.
   if (event.shiftKey && MOVE_KEYS.has(event.key)) {
-    if (!treeProps.draggable) return
+    if (!treeProps.draggable)
+      return
 
     event.preventDefault()
     void onNodeMoveKey(cur.node, event.key)
@@ -595,7 +603,8 @@ function canDrag(node: GrTreeNode<T>): boolean {
  * никакого `matchMedia` спрашивать нельзя.
  */
 function shouldShowDragHandle(node: GrTreeNode<T>): boolean {
-  if (!canDrag(node)) return false
+  if (!canDrag(node))
+    return false
 
   return treeProps.dragHandleVisibility === 'always' || hoveredKey.value === node.key
 }
@@ -605,8 +614,10 @@ function shouldShowDragHandle(node: GrTreeNode<T>): boolean {
  * Зоны нарезает компонент: примитив отдаёт только долю вдоль строки.
  */
 function dropTypeFromFraction(fraction: number): GrTreeNodeDropType {
-  if (fraction < 1 / 3) return 'prev'
-  if (fraction > 2 / 3) return 'next'
+  if (fraction < 1 / 3)
+    return 'prev'
+  if (fraction > 2 / 3)
+    return 'next'
 
   return 'inner'
 }
@@ -618,10 +629,12 @@ function canDrop(drag: GrTreeNode<T>, target: GrTreeNode<T>, type: GrTreeAllowDr
 /** Перенос состоялся: одна дорога и для указателя, и для клавиатуры. */
 function applyMove(source: GrTreeNode<T>, targetKey: GrTreeKey, type: GrTreeNodeDropType): boolean {
   const reference = treeStore.getNode(targetKey)
-  if (!reference) return false
+  if (!reference)
+    return false
 
   const movedNode = treeStore.moveNode(source, reference, type)
-  if (!movedNode) return false
+  if (!movedNode)
+    return false
 
   const dropNode = treeStore.getNode(reference.key) ?? reference
   interactionContext.emitNodeDrop(movedNode, dropNode, type)
@@ -642,7 +655,8 @@ const dragSort = useDragSort<GrTreeKey, GrTreeDropTarget>({
   resolveTarget: (hit, sourceKey, previous) => {
     const source = treeStore.getNode(sourceKey)
     const node = treeStore.getNode(hit.key)
-    if (!source || !node) return null
+    if (!source || !node)
+      return null
 
     const type = dropTypeFromFraction(hit.fraction)
     const allowed = treeStore.canMoveNode(source, node, type) && canDrop(source, node, type)
@@ -656,7 +670,8 @@ const dragSort = useDragSort<GrTreeKey, GrTreeDropTarget>({
   },
   onDrop: (sourceKey, target) => {
     const source = treeStore.getNode(sourceKey)
-    if (!source || !target.allowed) return
+    if (!source || !target.allowed)
+      return
 
     applyMove(source, target.key, target.type)
   },
@@ -667,7 +682,8 @@ const dragSort = useDragSort<GrTreeKey, GrTreeDropTarget>({
 })
 
 function onHandlePointerDown(event: PointerEvent, node: GrTreeNode<T>): void {
-  if (!treeProps.draggable) return
+  if (!treeProps.draggable)
+    return
 
   dragSort.startFrom(node.key)(event)
 }
@@ -698,8 +714,10 @@ function moveByKeyboard(node: GrTreeNode<T>, key: string): boolean {
 }
 
 async function onNodeMoveKey(node: GrTreeNode<T>, key: string): Promise<void> {
-  if (!treeProps.draggable || !canDrag(node)) return
-  if (!moveByKeyboard(node, key)) return
+  if (!treeProps.draggable || !canDrag(node))
+    return
+  if (!moveByKeyboard(node, key))
+    return
 
   announce(t('gr.tree.moved', 'Moved {label}', { label: node.label }))
 
@@ -790,7 +808,9 @@ function focus(key?: GrTreeKey): boolean {
 
 // Дерево уничтожают целиком — строки размонтируются вместе с ним, и возвращать
 // фокус на умирающий корень нельзя: он уедет из документа вместе с деревом.
-onBeforeUnmount(() => { isUnmounting = true })
+onBeforeUnmount(() => {
+  isUnmounting = true
+})
 
 defineExpose<GrTreeInstance<T>>({
   appendNode: treeStore.appendNode,
@@ -1120,7 +1140,6 @@ defineExpose<GrTreeInstance<T>>({
     width: calc(var(--gr-tree-checkbox-size) - 4px);
     height: calc(var(--gr-tree-checkbox-size) - 4px);
 }
-
 
 [data-gr-tree-node] {
     outline: none;

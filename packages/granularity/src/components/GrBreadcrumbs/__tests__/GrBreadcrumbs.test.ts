@@ -370,9 +370,12 @@ describe('GrBreadcrumbs — схлопывание по ширине', () => {
     Object.defineProperty(HTMLElement.prototype, 'scrollWidth', {
       configurable: true,
       get(this: HTMLElement) {
-        if (this.matches('[data-gr-breadcrumbs-item-wrap]')) return ITEM_WIDTH
-        if (this.matches('[data-gr-breadcrumbs-separator]')) return SEPARATOR_WIDTH
-        if (this.matches('[data-gr-breadcrumbs-ellipsis-item]')) return ELLIPSIS_WIDTH
+        if (this.matches('[data-gr-breadcrumbs-item-wrap]'))
+          return ITEM_WIDTH
+        if (this.matches('[data-gr-breadcrumbs-separator]'))
+          return SEPARATOR_WIDTH
+        if (this.matches('[data-gr-breadcrumbs-ellipsis-item]'))
+          return ELLIPSIS_WIDTH
         return 0
       },
     })
@@ -387,7 +390,8 @@ describe('GrBreadcrumbs — схлопывание по ширине', () => {
 
   afterEach(() => {
     for (const [name, descriptor] of Object.entries(original)) {
-      if (descriptor) Object.defineProperty(HTMLElement.prototype, name, descriptor)
+      if (descriptor)
+        Object.defineProperty(HTMLElement.prototype, name, descriptor)
       else delete (HTMLElement.prototype as unknown as Record<string, unknown>)[name]
     }
   })
@@ -503,7 +507,7 @@ describe('GrBreadcrumbs — схлопывание по ширине', () => {
 })
 
 describe('GrBreadcrumbs — иконка пункта', () => {
-const CustomIcon = defineComponent({ name: 'CustomIcon', render: () => h('svg', { 'data-custom-icon': '' }) })
+  const CustomIcon = defineComponent({ name: 'CustomIcon', render: () => h('svg', { 'data-custom-icon': '' }) })
 
   it('принимает компонент наравне с классом', () => {
     const wrapper = mountPath({ items: [{ label: 'Главная', href: '/', icon: CustomIcon }, { label: 'Тут' }] })

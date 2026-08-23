@@ -54,7 +54,8 @@ function formatSort(sort: DataSourceSort): string {
 
 function parseSort(raw: string): DataSourceSort | null {
   const key = raw.startsWith('-') ? raw.slice(1) : raw
-  if (!key) return null
+  if (!key)
+    return null
 
   const dir: SortDir = raw.startsWith('-') ? 'desc' : 'asc'
 
@@ -74,13 +75,18 @@ export function writeStateToQuery(search: string, state: DataSourceState, option
   const { defaults } = options
 
   for (const name of [...params.keys()]) {
-    if (name === keys.page || name === keys.perPage || name === keys.sort || name === keys.search) params.delete(name)
-    else if (name.startsWith(keys.filter)) params.delete(name)
+    if (name === keys.page || name === keys.perPage || name === keys.sort || name === keys.search)
+      params.delete(name)
+    else if (name.startsWith(keys.filter))
+      params.delete(name)
   }
 
-  if (state.page !== defaults.page) params.set(keys.page, String(state.page))
-  if (state.perPage !== defaults.perPage) params.set(keys.perPage, String(state.perPage))
-  if (state.search !== defaults.search) params.set(keys.search, state.search)
+  if (state.page !== defaults.page)
+    params.set(keys.page, String(state.page))
+  if (state.perPage !== defaults.perPage)
+    params.set(keys.perPage, String(state.perPage))
+  if (state.search !== defaults.search)
+    params.set(keys.search, state.search)
 
   if (!sameSort(state.sort, defaults.sort)) {
     // Снятая сортировка при непустом умолчании — тоже состояние, и пустая
@@ -88,7 +94,8 @@ export function writeStateToQuery(search: string, state: DataSourceState, option
     params.set(keys.sort, state.sort ? formatSort(state.sort) : '')
   }
 
-  if (!sameFilters(state.filters, defaults.filters)) writeFilters(params, keys, state.filters, defaults.filters)
+  if (!sameFilters(state.filters, defaults.filters))
+    writeFilters(params, keys, state.filters, defaults.filters)
 
   const query = params.toString()
 
@@ -105,7 +112,8 @@ function writeFilters(
     if (isEmptyFilter(value)) {
       // Снятый фильтр при непустом умолчании обязан остаться в адресе пустым
       // значением — иначе перезагрузка вернёт умолчание, которое сняли.
-      if (!isEmptyFilter(defaults[name])) params.set(`${keys.filter}${name}`, '')
+      if (!isEmptyFilter(defaults[name]))
+        params.set(`${keys.filter}${name}`, '')
       continue
     }
 
@@ -149,7 +157,8 @@ export function readStateFromQuery(search: string, options: QueryCodecOptions): 
 }
 
 function readInt(raw: string | null, fallback: number, min: number): number {
-  if (raw === null) return fallback
+  if (raw === null)
+    return fallback
 
   const value = Number(raw)
 
@@ -165,7 +174,8 @@ function readFilters(
 
   for (const name of new Set([...params.keys()].filter(key => key.startsWith(keys.filter)))) {
     const field = name.slice(keys.filter.length)
-    if (!field) continue
+    if (!field)
+      continue
 
     const raw = params.getAll(name)
     filters[field] = coerce(raw, defaults[field])
@@ -182,7 +192,8 @@ function coerce(raw: string[], sample: FilterValue | undefined): FilterValue {
   const value = raw[0] ?? ''
   // Пустое значение — это снятый фильтр, а не ноль и не `false`: у числового
   // поля ноль пришлось бы отличать от «не задано», и отличить не вышло бы.
-  if (value === '') return null
+  if (value === '')
+    return null
 
   if (typeof sample === 'number') {
     const parsed = Number(value)
@@ -190,7 +201,8 @@ function coerce(raw: string[], sample: FilterValue | undefined): FilterValue {
     return Number.isFinite(parsed) ? parsed : sample
   }
 
-  if (typeof sample === 'boolean') return value === 'true' || value === '1'
+  if (typeof sample === 'boolean')
+    return value === 'true' || value === '1'
 
   return value
 }

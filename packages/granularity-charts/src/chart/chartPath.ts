@@ -35,11 +35,11 @@ interface SolidPoint {
  * Округления здесь нет намеренно — оно нужно только строке `d`, чтобы та была
  * короче и читаемее в diff. Холсту полная точность достаётся даром.
  */
-export type DrawCommand =
-  | { op: 'move', x: number, y: number }
-  | { op: 'line', x: number, y: number }
-  | { op: 'cubic', x1: number, y1: number, x2: number, y2: number, x: number, y: number }
-  | { op: 'close' }
+export type DrawCommand
+  = | { op: 'move', x: number, y: number }
+    | { op: 'line', x: number, y: number }
+    | { op: 'cubic', x1: number, y1: number, x2: number, y2: number, x: number, y: number }
+    | { op: 'close' }
 
 /** Координаты в `d` округляются: строка короче, а diff снимка читаем. */
 function n(value: number): number {
@@ -94,7 +94,8 @@ export function areaCommands(
 ): DrawCommand[] {
   return segmentsOf(points).flatMap((segment) => {
     const top = segmentCommands(segment, curve)
-    if (top.length === 0) return []
+    if (top.length === 0)
+      return []
 
     const first = segment[0]!
     const last = segment[segment.length - 1]!
@@ -181,11 +182,13 @@ export function bandCommands(
     runs.push(current)
 
   return runs.flatMap((run) => {
-    if (run.length < 2) return []
+    if (run.length < 2)
+      return []
 
     const upper = segmentCommands(run.map(i => ({ x: top[i]!.x, y: top[i]!.y as number })), curve)
     const lower = segmentCommands(run.map(i => ({ x: base[i]!.x, y: base[i]!.y as number })).reverse(), curve)
-    if (upper.length === 0 || lower.length === 0) return []
+    if (upper.length === 0 || lower.length === 0)
+      return []
 
     // Низ пришивается к верху линией, а не переносом: `move` разорвал бы контур,
     // и заливка потекла бы по своим правилам заполнения.
@@ -247,10 +250,13 @@ export function curveCommands(points: readonly PathPoint[], curve: GrChartCurve 
 export function commandsToPath(commands: readonly DrawCommand[]): string {
   return commands
     .map((command) => {
-      if (command.op === 'move') return `M ${n(command.x)} ${n(command.y)}`
-      if (command.op === 'line') return `L ${n(command.x)} ${n(command.y)}`
+      if (command.op === 'move')
+        return `M ${n(command.x)} ${n(command.y)}`
+      if (command.op === 'line')
+        return `L ${n(command.x)} ${n(command.y)}`
 
-      if (command.op === 'close') return 'Z'
+      if (command.op === 'close')
+        return 'Z'
 
       return `C ${n(command.x1)} ${n(command.y1)} ${n(command.x2)} ${n(command.y2)} ${n(command.x)} ${n(command.y)}`
     })

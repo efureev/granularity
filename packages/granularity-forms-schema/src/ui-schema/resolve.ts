@@ -14,8 +14,10 @@ function resolveFlag(
   model: Record<string, unknown>,
   instance: GrSchemaFieldInstance,
 ): boolean {
-  if (value === undefined) return fallback
-  if (typeof value === 'boolean') return value
+  if (value === undefined)
+    return fallback
+  if (typeof value === 'boolean')
+    return value
 
   return evaluateCondition(value, createConditionContext(model, instance.name, instance.indices))
 }
@@ -64,7 +66,8 @@ export function resolveFieldUi(
 
 /** `firstName` / `first_name` / `first-name` → «First name». */
 export function humanize(key: string): string {
-  if (key === '' || key === '*') return ''
+  if (key === '' || key === '*')
+    return ''
 
   const words = key
     .replace(/[_-]+/g, ' ')
@@ -86,7 +89,8 @@ export function applyOrder<T extends { templatePath: string }>(
   items: T[],
   order: string[] | undefined,
 ): T[] {
-  if (!order || order.length === 0) return items
+  if (!order || order.length === 0)
+    return items
 
   const rest = items.filter(item => !order.includes(item.templatePath))
   const result: T[] = []
@@ -102,15 +106,18 @@ export function applyOrder<T extends { templatePath: string }>(
   }
 
   // Список без `'*'` — не повод терять поля: дописываем хвост.
-  if (!order.includes('*')) result.push(...rest)
+  if (!order.includes('*'))
+    result.push(...rest)
 
   return result
 }
 
 /** Слияние двух `uiSchema`: правая сильнее по каждому листу. */
 export function mergeUiSchema(base?: GrUiSchema, over?: GrUiSchema): GrUiSchema {
-  if (!base) return over ?? {}
-  if (!over) return base
+  if (!base)
+    return over ?? {}
+  if (!over)
+    return base
 
   const fields: Record<string, GrUiFieldOptions> = { ...base.fields }
   for (const [key, value] of Object.entries(over.fields ?? {}))

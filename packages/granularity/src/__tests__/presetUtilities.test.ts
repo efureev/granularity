@@ -57,7 +57,8 @@ describe('утилиты сверх presetMini', () => {
 
     for (const utility of UTILITIES_BEYOND_MINI) {
       const { matched } = await uno.generate(utility, { preflights: false })
-      if (matched.size === 0) missing.push(utility)
+      if (matched.size === 0)
+        missing.push(utility)
     }
 
     expect(missing, `не генерируются: ${missing.join(', ')}`).toEqual([])
@@ -70,7 +71,8 @@ describe('утилиты сверх presetMini', () => {
 
     for (const utility of UTILITIES_BEYOND_MINI) {
       const { matched } = await mini.generate(utility, { preflights: false })
-      if (matched.size > 0) covered.push(utility)
+      if (matched.size > 0)
+        covered.push(utility)
     }
 
     expect(covered, `уже есть в presetMini, из списка можно убрать: ${covered.join(', ')}`).toEqual([])

@@ -43,7 +43,8 @@ describe('collectEntryFiles', () => {
 
   const readFile = (path: string): string => {
     const source = tree[path]
-    if (source === undefined) throw new Error(`нет файла ${path}`)
+    if (source === undefined)
+      throw new Error(`нет файла ${path}`)
 
     return source
   }
@@ -68,7 +69,8 @@ describe('collectEntryFiles', () => {
 
   it('специфер в никуда обход не роняет', () => {
     expect(collectEntryFiles('/pkg/dist/chunks/shared.js', (path: string) => {
-      if (path === '/pkg/dist/chunks/shared.js') return 'import "./missing.js"'
+      if (path === '/pkg/dist/chunks/shared.js')
+        return 'import "./missing.js"'
       throw new Error('нет файла')
     })).toEqual(['/pkg/dist/chunks/shared.js'])
   })

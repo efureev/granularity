@@ -26,7 +26,8 @@ export function useInertOthers(root: Ref<HTMLElement | null>, active: () => bool
   watch(
     () => Boolean(active()) && Boolean(root.value),
     (isActive) => {
-      if (isActive) apply()
+      if (isActive)
+        apply()
       else clear()
     },
     { immediate: true, flush: 'post' },

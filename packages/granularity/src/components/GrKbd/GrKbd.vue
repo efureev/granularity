@@ -76,13 +76,16 @@ onMounted(() => {
 })
 
 const isApple = computed(() => {
-  if (props.platform === 'apple') return true
-  if (props.platform === 'other') return false
+  if (props.platform === 'apple')
+    return true
+  if (props.platform === 'other')
+    return false
   return detectedApple.value
 })
 
 const tokens = computed(() => {
-  if (props.keys === undefined) return []
+  if (props.keys === undefined)
+    return []
   return Array.isArray(props.keys) ? props.keys : splitHotkeyCombo(props.keys)
 })
 
@@ -103,10 +106,14 @@ const comboClass = computed(() => grKbdComboClass(resolvedSize.value, props.vari
  * поэтому «слева символ» и означает «пишем как система».
  */
 function separatorAt(index: number): string {
-  if (index === 0) return ''
-  if (props.separator !== undefined) return props.separator
-  if (props.variant === 'sequence') return t('gr.kbd.then', 'then')
-  if (props.variant === 'split') return '+'
+  if (index === 0)
+    return ''
+  if (props.separator !== undefined)
+    return props.separator
+  if (props.variant === 'sequence')
+    return t('gr.kbd.then', 'then')
+  if (props.variant === 'split')
+    return '+'
 
   return keyViews.value[index - 1]?.symbol ? '' : '+'
 }
@@ -138,7 +145,6 @@ defineSlots<{
   /** Клавиша или сочетание вместо пропа `keys`. */
   default?: () => any
 }>()
-
 </script>
 
 <template>

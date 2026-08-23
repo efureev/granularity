@@ -18,7 +18,8 @@ interface I18nLike {
 
 /** Подстановка `{name}` во fallback: без i18n параметры иначе остались бы в тексте. */
 export function interpolateFallback(text: string, params?: Record<string, unknown>): string {
-  if (!params) return text
+  if (!params)
+    return text
 
   return text.replace(/\{(\w+)\}/g, (match, key: string) =>
     (key in params ? String(params[key]) : match))
@@ -30,7 +31,8 @@ export function useTranslations(): {
   const i18n = getCurrentInstance() ? inject<I18nLike | null>(FINT_I18N_KEY, null) : null
 
   const t = (key: string, fallback: string, params?: Record<string, unknown>): string => {
-    if (!i18n) return interpolateFallback(fallback, params)
+    if (!i18n)
+      return interpolateFallback(fallback, params)
 
     const result = i18n.t(key, params)
     return result === key ? interpolateFallback(fallback, params) : result

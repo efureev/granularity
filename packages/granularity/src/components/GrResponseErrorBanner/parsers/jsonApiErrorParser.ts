@@ -17,27 +17,34 @@ import type { ResponseErrorFieldError, ResponseErrorParser } from '../responseEr
  */
 export const jsonApiErrorParser: ResponseErrorParser = (ctx) => {
   const body = ctx.body
-  if (!body || typeof body !== 'object') return null
+  if (!body || typeof body !== 'object')
+    return null
 
   const errors = (body as { errors?: unknown }).errors
-  if (!Array.isArray(errors) || errors.length === 0) return null
+  if (!Array.isArray(errors) || errors.length === 0)
+    return null
 
   // Эвристика: первый элемент должен иметь title/detail/source — иначе это не JSON:API
   const first = errors[0]
-  if (!first || typeof first !== 'object') return null
+  if (!first || typeof first !== 'object')
+    return null
   const has = (key: string) => key in (first as object)
-  if (!has('title') && !has('detail') && !has('source')) return null
+  if (!has('title') && !has('detail') && !has('source'))
+    return null
 
   const fieldErrorsMap = new Map<string, string[]>()
   const details: string[] = []
   let message: string | undefined
 
   for (const e of errors) {
-    if (!e || typeof e !== 'object') continue
+    if (!e || typeof e !== 'object')
+      continue
     const eo = e as { title?: unknown, detail?: unknown, source?: { pointer?: unknown } }
     const text = (typeof eo.detail === 'string' && eo.detail) || (typeof eo.title === 'string' && eo.title) || ''
-    if (!text) continue
-    if (!message && typeof eo.title === 'string') message = eo.title
+    if (!text)
+      continue
+    if (!message && typeof eo.title === 'string')
+      message = eo.title
 
     const pointer = typeof eo.source?.pointer === 'string' ? eo.source.pointer : ''
     const field = pointer ? pointer.split('/').filter(Boolean).pop() : undefined
@@ -50,7 +57,8 @@ export const jsonApiErrorParser: ResponseErrorParser = (ctx) => {
     details.push(text)
   }
 
-  if (!details.length) return null
+  if (!details.length)
+    return null
 
   const fieldErrors: ResponseErrorFieldError[] = Array.from(fieldErrorsMap, ([field, messages]) => ({ field, messages }))
 

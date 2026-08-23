@@ -73,7 +73,6 @@ defineSlots<{
   default?: () => any
 }>()
 
-
 // Эффективный размер группы: локальный проп → `GrConfigProvider` → `md`.
 // Дочерние чекбоксы получают уже разрешённое значение через контекст.
 const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrCheckboxGroup' })

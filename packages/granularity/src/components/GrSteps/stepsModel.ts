@@ -45,10 +45,13 @@ export function stepIndexOf(steps: readonly GrStep[], value: string): number {
  */
 export function stepStatusAt(steps: readonly GrStep[], index: number, currentIndex: number): GrStepStatus {
   const explicit = steps[index]?.status
-  if (explicit) return explicit
+  if (explicit)
+    return explicit
 
-  if (index < currentIndex) return 'complete'
-  if (index === currentIndex) return 'current'
+  if (index < currentIndex)
+    return 'complete'
+  if (index === currentIndex)
+    return 'current'
   return 'upcoming'
 }
 
@@ -69,9 +72,12 @@ export function canEnterStep(options: {
   const { steps, index, currentIndex, linear } = options
   const step = steps[index]
 
-  if (!step || step.disabled) return false
-  if (index === currentIndex) return false
-  if (!linear || index < currentIndex) return true
+  if (!step || step.disabled)
+    return false
+  if (index === currentIndex)
+    return false
+  if (!linear || index < currentIndex)
+    return true
 
   return index <= furthestReachableIndex(steps, currentIndex)
 }
@@ -85,7 +91,8 @@ function furthestReachableIndex(steps: readonly GrStep[], currentIndex: number):
   let furthest = currentIndex + 1
 
   for (let index = currentIndex + 1; index < steps.length; index += 1) {
-    if (steps[index]?.status !== 'complete') break
+    if (steps[index]?.status !== 'complete')
+      break
     furthest = index + 1
   }
 
@@ -95,7 +102,8 @@ function furthestReachableIndex(steps: readonly GrStep[], currentIndex: number):
 /** Индекс следующего доступного шага, или `-1`, если дальше идти некуда. */
 export function nextEnterableIndex(steps: readonly GrStep[], currentIndex: number): number {
   for (let index = currentIndex + 1; index < steps.length; index += 1) {
-    if (!steps[index]?.disabled) return index
+    if (!steps[index]?.disabled)
+      return index
   }
 
   return -1
@@ -104,7 +112,8 @@ export function nextEnterableIndex(steps: readonly GrStep[], currentIndex: numbe
 /** Индекс предыдущего доступного шага, или `-1`. */
 export function previousEnterableIndex(steps: readonly GrStep[], currentIndex: number): number {
   for (let index = currentIndex - 1; index >= 0; index -= 1) {
-    if (!steps[index]?.disabled) return index
+    if (!steps[index]?.disabled)
+      return index
   }
 
   return -1

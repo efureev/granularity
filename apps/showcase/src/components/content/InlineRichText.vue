@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import {computed} from 'vue'
+import { computed } from 'vue'
 
-import {GrBadge, GrLink} from '@feugene/granularity'
+import { GrBadge, GrLink } from '@feugene/granularity'
 
 type InlineRichTextPart = {
   type: 'text' | 'badge' | 'link'
@@ -68,7 +68,7 @@ function createParts(text: string) {
     })
   }
 
-  return parts.length ? parts : [{type: 'text', content: text} as InlineRichTextPart]
+  return parts.length ? parts : [{ type: 'text', content: text } as InlineRichTextPart]
 }
 
 const parts = computed(() => createParts(props.text))

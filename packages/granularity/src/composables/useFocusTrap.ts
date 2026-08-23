@@ -68,7 +68,8 @@ export function useFocusTrap(
   }
 
   function contains(target: Node | null): boolean {
-    if (!target) return false
+    if (!target)
+      return false
     return roots().some(root => root === target || root.contains(target))
   }
 
@@ -81,7 +82,8 @@ export function useFocusTrap(
     // кнопку, окно ввода — на поле, и делают это в тот же такт, когда панель
     // появилась. `initialFocus` — дефолт слоя, а не приказ, поэтому такую
     // установку он не перебивает.
-    if (contains(document.activeElement)) return
+    if (contains(document.activeElement))
+      return
 
     const requested = options.initialFocus?.()
     if (requested && isFocusable(requested)) {
@@ -102,8 +104,10 @@ export function useFocusTrap(
   }
 
   function onKeydown(event: KeyboardEvent): void {
-    if (event.key !== 'Tab') return
-    if (!contains(document.activeElement)) return
+    if (event.key !== 'Tab')
+      return
+    if (!contains(document.activeElement))
+      return
 
     const items = focusables()
     if (items.length === 0) {
@@ -157,8 +161,10 @@ export function useFocusTrap(
   }
 
   function activate(): void {
-    if (listening) return
-    if (typeof document === 'undefined') return
+    if (listening)
+      return
+    if (typeof document === 'undefined')
+      return
     listening = true
 
     previouslyFocused = (document.activeElement as HTMLElement) ?? null
@@ -169,13 +175,15 @@ export function useFocusTrap(
 
     // Ждём, пока Vue домонтирует содержимое слоя: до этого фокусировать нечего.
     void nextTick(() => {
-      if (!listening) return
+      if (!listening)
+        return
       focusInitial()
     })
   }
 
   function deactivate(): void {
-    if (!listening) return
+    if (!listening)
+      return
     listening = false
 
     document.removeEventListener('keydown', onKeydown, true)
@@ -185,15 +193,18 @@ export function useFocusTrap(
     previouslyFocused = null
     lastFocusedInside = null
 
-    if (options.restoreFocus === false || !target) return
-    if (!target.isConnected) return
+    if (options.restoreFocus === false || !target)
+      return
+    if (!target.isConnected)
+      return
     target.focus?.()
   }
 
   watch(
     () => Boolean(options.active?.() ?? true) && Boolean(container.value),
     (isActive) => {
-      if (isActive) activate()
+      if (isActive)
+        activate()
       else deactivate()
     },
     { immediate: true },

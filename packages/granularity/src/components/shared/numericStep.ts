@@ -13,7 +13,8 @@
  */
 export function bigStep(step: number, min?: number, max?: number): number {
   const base = step * 10
-  if (min === undefined || max === undefined) return base
+  if (min === undefined || max === undefined)
+    return base
 
   const span = max - min
   const tenth = Math.round((span / 10) / step) * step

@@ -96,7 +96,8 @@ const {
 const isMultiple = computed(() => props.selection === 'multiple')
 
 const selectedValues = computed<GrChipValue[]>(() => {
-  if (props.modelValue === undefined || props.modelValue === null) return []
+  if (props.modelValue === undefined || props.modelValue === null)
+    return []
   return Array.isArray(props.modelValue) ? [...props.modelValue] : [props.modelValue]
 })
 
@@ -117,7 +118,8 @@ function commit(next: GrChipValue | GrChipValue[] | null): void {
  * пустое значение обычно запрещено.
  */
 function toggle(value: GrChipValue): void {
-  if (isDisabled.value || isReadonly.value) return
+  if (isDisabled.value || isReadonly.value)
+    return
 
   if (!isMultiple.value) {
     commit(isSelected(value) ? null : value)
@@ -125,12 +127,14 @@ function toggle(value: GrChipValue): void {
   }
 
   const next = selectedValues.value.filter(item => item !== value)
-  if (next.length === selectedValues.value.length) next.push(value)
+  if (next.length === selectedValues.value.length)
+    next.push(value)
   commit(next)
 }
 
 function requestRemove(value: GrChipValue): void {
-  if (isDisabled.value || isReadonly.value) return
+  if (isDisabled.value || isReadonly.value)
+    return
   emit('remove', value)
 }
 
@@ -140,7 +144,8 @@ function register(entry: GrChipEntry): () => void {
   entries.value.push(entry)
   return () => {
     const index = entries.value.indexOf(entry)
-    if (index >= 0) entries.value.splice(index, 1)
+    if (index >= 0)
+      entries.value.splice(index, 1)
   }
 }
 

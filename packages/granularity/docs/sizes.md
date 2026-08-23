@@ -122,7 +122,6 @@ export const sizes = {
 нельзя было бы использовать как исключение из глобального правила.
 
 ```vue
-
 <GrConfigProvider size="sm" :component-defaults="{ GrButton: { size: 'lg' } }">
   <GrInput v-model="q"/>          <!-- sm: от глобального -->
   <GrButton>Найти</GrButton>       <!-- lg: componentDefaults важнее -->

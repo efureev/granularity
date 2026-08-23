@@ -12,10 +12,10 @@ import type { GrSchemaOption } from '../model'
 export type GrUiColumnCount = 1 | 2 | 3 | 4 | 6 | 12
 export type GrUiBreakpoint = 'base' | 'sm' | 'md' | 'lg'
 export type GrUiColumns = GrUiColumnCount | Partial<Record<GrUiBreakpoint, GrUiColumnCount>>
-export type GrUiSpan =
-  | GrUiColumnCount
-  | 'full'
-  | Partial<Record<GrUiBreakpoint, GrUiColumnCount | 'full'>>
+export type GrUiSpan
+  = | GrUiColumnCount
+    | 'full'
+    | Partial<Record<GrUiBreakpoint, GrUiColumnCount | 'full'>>
 
 export interface GrUiConditionRule {
   /**
@@ -48,13 +48,13 @@ export interface GrUiConditionContext {
   indices: number[]
 }
 
-export type GrUiCondition =
-  | GrUiConditionRule
-  | readonly GrUiConditionRule[]
-  | { all: readonly GrUiCondition[] }
-  | { any: readonly GrUiCondition[] }
-  | { not: GrUiCondition }
-  | ((ctx: GrUiConditionContext) => boolean)
+export type GrUiCondition
+  = | GrUiConditionRule
+    | readonly GrUiConditionRule[]
+    | { all: readonly GrUiCondition[] }
+    | { any: readonly GrUiCondition[] }
+    | { not: GrUiCondition }
+    | ((ctx: GrUiConditionContext) => boolean)
 
 export interface GrUiArrayOptions {
   itemLabel?: string | ((item: unknown, index: number) => string)

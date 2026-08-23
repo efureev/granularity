@@ -36,9 +36,9 @@ export async function setupShowcaseI18n() {
     plugins: [
       new PersistencePlugin({
         key: 'showcase-locale', // Key in localStorage
-        syncTabs: true        // Synchronize between tabs
-      })
-    ]
+        syncTabs: true, // Synchronize between tabs
+      }),
+    ],
   })
 
   i18n.registerBlocks([SHOWCASE_I18N_BLOCK, GRANULARITY_I18N_BLOCK, GR_CHRONO_I18N_BLOCK, GR_CHARTS_I18N_BLOCK, GR_DASHBOARD_I18N_BLOCK, GR_FORMS_SCHEMA_I18N_BLOCK, GR_EDITOR_I18N_BLOCK])

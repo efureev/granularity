@@ -46,7 +46,8 @@ export function stubElementRects(
   })
 
   return () => {
-    if (original) Object.defineProperty(Element.prototype, 'getBoundingClientRect', original)
+    if (original)
+      Object.defineProperty(Element.prototype, 'getBoundingClientRect', original)
     else delete (Element.prototype as { getBoundingClientRect?: unknown }).getBoundingClientRect
   }
 }

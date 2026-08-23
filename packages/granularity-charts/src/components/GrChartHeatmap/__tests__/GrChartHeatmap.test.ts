@@ -92,7 +92,8 @@ describe('GrChartHeatmap', () => {
 
   it('`steps: 0` даёт непрерывную легенду, `steps: 5` — ступенчатую', () => {
     const swatches = (steps: number) => factory({ steps })
-      .findAll('[data-gr-chart-heatmap-legend] rect').length
+      .findAll('[data-gr-chart-heatmap-legend] rect')
+      .length
 
     expect(swatches(5)).toBe(5)
     expect(swatches(0)).toBeGreaterThan(5)

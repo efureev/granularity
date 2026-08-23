@@ -126,7 +126,8 @@ const SIZE_EPSILON = 0.5
 
 function readSize(el: Element): number {
   const box = el.getBoundingClientRect().height
-  if (box > 0) return box
+  if (box > 0)
+    return box
 
   // jsdom не считает layout: `getBoundingClientRect` там всегда нулевой, а
   // `offsetHeight` тест может задать сам.
@@ -153,7 +154,8 @@ export function useVirtualList(options: UseVirtualListOptions): UseVirtualListRe
     ? new ResizeObserver((entries) => {
         for (const entry of entries) {
           const index = observedIndex.get(entry.target)
-          if (index !== undefined) applySize(index, readSize(entry.target))
+          if (index !== undefined)
+            applySize(index, readSize(entry.target))
         }
       })
     : null
@@ -188,13 +190,15 @@ export function useVirtualList(options: UseVirtualListOptions): UseVirtualListRe
   }
 
   function invalidateFrom(index: number): void {
-    if (index < builtTo) builtTo = Math.max(0, index)
+    if (index < builtTo)
+      builtTo = Math.max(0, index)
   }
 
   /** Последний индекс, чьё начало не ниже `px`. */
   function indexAt(px: number): number {
     const count = options.count()
-    if (count === 0) return 0
+    if (count === 0)
+      return 0
 
     buildTo(count)
 
@@ -202,7 +206,8 @@ export function useVirtualList(options: UseVirtualListOptions): UseVirtualListRe
     let high = builtTo
     while (low < high) {
       const mid = (low + high + 1) >> 1
-      if ((offsets[mid] ?? 0) <= px) low = mid
+      if ((offsets[mid] ?? 0) <= px)
+        low = mid
       else high = mid - 1
     }
 
@@ -271,7 +276,8 @@ export function useVirtualList(options: UseVirtualListOptions): UseVirtualListRe
 
   function syncScrollTop(): void {
     const el = options.container.value
-    if (!el) return
+    if (!el)
+      return
 
     scrollTop.value = el.scrollTop
     recompute()
@@ -279,14 +285,16 @@ export function useVirtualList(options: UseVirtualListOptions): UseVirtualListRe
 
   function syncViewport(): void {
     const el = options.container.value
-    if (!el) return
+    if (!el)
+      return
 
     measuredViewport.value = el.clientHeight
     recompute()
   }
 
   function measure(index: number, el: Element | null): void {
-    if (!el) return
+    if (!el)
+      return
 
     observedIndex.set(el, index)
     sizeObserver?.observe(el)
@@ -295,10 +303,12 @@ export function useVirtualList(options: UseVirtualListOptions): UseVirtualListRe
   }
 
   function applySize(index: number, size: number): void {
-    if (size <= 0) return
+    if (size <= 0)
+      return
 
     const previous = measured.get(index)
-    if (previous !== undefined && Math.abs(previous - size) < SIZE_EPSILON) return
+    if (previous !== undefined && Math.abs(previous - size) < SIZE_EPSILON)
+      return
 
     // Считаем смещение ДО правки: строка ниже вьюпорта позицию не двигает, а
     // строка выше — двигает всё содержимое под курсором.
@@ -322,7 +332,8 @@ export function useVirtualList(options: UseVirtualListOptions): UseVirtualListRe
   function scrollToIndex(index: number, align: GrVirtualAlign = 'auto'): void {
     const el = options.container.value
     const count = options.count()
-    if (!el || count === 0) return
+    if (!el || count === 0)
+      return
 
     const clamped = Math.min(Math.max(index, 0), count - 1)
     const start = offsetAt(clamped)
@@ -342,8 +353,10 @@ export function useVirtualList(options: UseVirtualListOptions): UseVirtualListRe
         next = start + size / 2 - height / 2
         break
       case 'auto':
-        if (start < el.scrollTop) next = start
-        else if (end > el.scrollTop + height) next = end - height
+        if (start < el.scrollTop)
+          next = start
+        else if (end > el.scrollTop + height)
+          next = end - height
         else return
         break
     }
@@ -354,7 +367,8 @@ export function useVirtualList(options: UseVirtualListOptions): UseVirtualListRe
   }
 
   function detach(): void {
-    if (!attachedTo) return
+    if (!attachedTo)
+      return
     attachedTo.removeEventListener('scroll', syncScrollTop)
     viewportObserver?.unobserve(attachedTo)
     attachedTo = null
@@ -366,7 +380,8 @@ export function useVirtualList(options: UseVirtualListOptions): UseVirtualListRe
 
   watch(options.container, (el) => {
     detach()
-    if (!el) return
+    if (!el)
+      return
 
     attachedTo = el
     el.addEventListener('scroll', syncScrollTop, { passive: true })
@@ -378,13 +393,15 @@ export function useVirtualList(options: UseVirtualListOptions): UseVirtualListRe
   // Длина списка изменилась. Сокращение дополнительно чистит хвост смещений и
   // замеров: он относится к строкам, которых больше нет.
   watch(() => options.count(), (count) => {
-    if (count < builtTo) truncate(count)
+    if (count < builtTo)
+      truncate(count)
     recompute()
   })
 
   function invalidate(from = 0): void {
     for (const index of [...measured.keys()]) {
-      if (index >= from) measured.delete(index)
+      if (index >= from)
+        measured.delete(index)
     }
     invalidateFrom(from)
     recompute()
@@ -399,7 +416,8 @@ export function useVirtualList(options: UseVirtualListOptions): UseVirtualListRe
     builtTo = count
     offsets = offsets.slice(0, count + 1)
     for (const index of [...measured.keys()]) {
-      if (index >= count) measured.delete(index)
+      if (index >= count)
+        measured.delete(index)
     }
   }
 

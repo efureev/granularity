@@ -120,21 +120,30 @@ export function createResponseErrorClassifier(options: CreateResponseErrorClassi
 
     for (const parser of parsers) {
       const result = parser(ctx)
-      if (!result) continue
-      if (result.kind) kind = result.kind
-      if (typeof result.status === 'number') status = result.status
-      if (result.message) message = result.message
-      if (result.details?.length) details = result.details
-      if (result.fieldErrors?.length) fieldErrors = result.fieldErrors
-      if (result.stop) break
+      if (!result)
+        continue
+      if (result.kind)
+        kind = result.kind
+      if (typeof result.status === 'number')
+        status = result.status
+      if (result.message)
+        message = result.message
+      if (result.details?.length)
+        details = result.details
+      if (result.fieldErrors?.length)
+        fieldErrors = result.fieldErrors
+      if (result.stop)
+        break
     }
 
-    if (!kind) kind = 'unknown'
+    if (!kind)
+      kind = 'unknown'
 
     // Ни один парсер не дал сообщения — подставляем своё и помечаем это флагом:
     // по нему (и только по нему) баннер вправе заменить текст переводом.
     const isFallbackMessage = !message
-    if (!message) message = resolveDefaultMessage(kind, texts)
+    if (!message)
+      message = resolveDefaultMessage(kind, texts)
 
     return {
       kind,

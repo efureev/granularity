@@ -64,7 +64,7 @@ describe('развилка по виду узла', () => {
     expect(own).toEqual([])
   })
 
-  it.each(STRUCTURAL_KINDS)('«%s» в развилке разобран', kind => {
+  it.each(STRUCTURAL_KINDS)('«%s» в развилке разобран', (kind) => {
     const source = readFileSync(join(COMPONENTS_DIR, SWITCH_FILE), 'utf8')
 
     expect(source).toContain(`kind === '${kind}'`)

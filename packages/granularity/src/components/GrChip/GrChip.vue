@@ -117,12 +117,14 @@ const isReadonly = computed(() => group?.readonly.value ?? false)
 const isInteractive = computed(() => inGroup.value || props.selectable)
 
 const isSelected = computed(() => {
-  if (inGroup.value && props.value !== undefined) return group!.isSelected(props.value)
+  if (inGroup.value && props.value !== undefined)
+    return group!.isSelected(props.value)
   return props.selected
 })
 
 const isClosable = computed(() => {
-  if (isReadonly.value || isDisabled.value) return false
+  if (isReadonly.value || isDisabled.value)
+    return false
   return props.closable || (inGroup.value ? group!.closable.value : false)
 })
 
@@ -164,8 +166,10 @@ const rootClass = computed(() => grChipClass({
 const iconSizeClass = computed(() => chipIconSizeClassBySize[resolvedSize.value])
 
 const removeTitle = computed(() => {
-  if (props.removeLabel) return props.removeLabel
-  if (props.label) return t('gr.chip.removeNamed', 'Remove {label}', { label: props.label })
+  if (props.removeLabel)
+    return props.removeLabel
+  if (props.label)
+    return t('gr.chip.removeNamed', 'Remove {label}', { label: props.label })
   return t('gr.chip.remove', 'Remove')
 })
 
@@ -178,33 +182,41 @@ const removeTitle = computed(() => {
  * `aria-multiselectable`.
  */
 const chipRole = computed(() => {
-  if (!inGroup.value) return undefined
+  if (!inGroup.value)
+    return undefined
   return group!.selection.value === 'single' ? 'radio' : 'option'
 })
 
 const tabindex = computed(() => {
-  if (!isInteractive.value) return undefined
-  if (isDisabled.value) return -1
-  if (!inGroup.value || props.value === undefined) return 0
+  if (!isInteractive.value)
+    return undefined
+  if (isDisabled.value)
+    return -1
+  if (!inGroup.value || props.value === undefined)
+    return 0
   return group!.rovingValue.value === props.value ? 0 : -1
 })
 
 function toggle(): void {
-  if (isDisabled.value || isReadonly.value) return
+  if (isDisabled.value || isReadonly.value)
+    return
 
   if (inGroup.value && props.value !== undefined) {
     group!.toggle(props.value)
     return
   }
 
-  if (props.selectable) emit('update:selected', !props.selected)
+  if (props.selectable)
+    emit('update:selected', !props.selected)
 }
 
 function requestRemove(): void {
-  if (!isClosable.value) return
+  if (!isClosable.value)
+    return
 
   emit('remove')
-  if (inGroup.value && props.value !== undefined) group!.requestRemove(props.value)
+  if (inGroup.value && props.value !== undefined)
+    group!.requestRemove(props.value)
 }
 
 /**
@@ -214,7 +226,8 @@ function requestRemove(): void {
  * невалиден и по контент-модели HTML.
  */
 function onRootClick(event: MouseEvent): void {
-  if (isDisabled.value) return
+  if (isDisabled.value)
+    return
 
   if (event.target instanceof Element && event.target.closest('[data-gr-chip-close]')) {
     requestRemove()
@@ -225,13 +238,16 @@ function onRootClick(event: MouseEvent): void {
 }
 
 function onRootKeydown(event: KeyboardEvent): void {
-  if (isDisabled.value) return
+  if (isDisabled.value)
+    return
 
   // Навигация принадлежит группе: состав знает только она.
-  if (inGroup.value && group!.handleNavigationKeys(event)) return
+  if (inGroup.value && group!.handleNavigationKeys(event))
+    return
 
   if (event.key === 'Delete' || event.key === 'Backspace') {
-    if (!isClosable.value) return
+    if (!isClosable.value)
+      return
     event.preventDefault()
     requestRemove()
   }

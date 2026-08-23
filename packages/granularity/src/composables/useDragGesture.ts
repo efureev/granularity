@@ -72,7 +72,8 @@ export function useDragGesture(options: UseDragGestureOptions): UseDragGestureRe
   let attached = false
 
   function onPointerMove(event: PointerEvent): void {
-    if (!isDragging.value) return
+    if (!isDragging.value)
+      return
 
     options.onMove(event)
   }
@@ -86,7 +87,8 @@ export function useDragGesture(options: UseDragGestureOptions): UseDragGestureRe
   }
 
   function detach(): void {
-    if (!attached) return
+    if (!attached)
+      return
 
     attached = false
     window.removeEventListener('pointermove', onPointerMove)
@@ -95,21 +97,27 @@ export function useDragGesture(options: UseDragGestureOptions): UseDragGestureRe
   }
 
   function finish(commit: boolean, event?: PointerEvent): void {
-    if (!isDragging.value) return
+    if (!isDragging.value)
+      return
 
     isDragging.value = false
     detach()
 
-    if (commit) options.onEnd?.(event)
+    if (commit)
+      options.onEnd?.(event)
     else options.onCancel?.()
   }
 
   function start(event: PointerEvent): void {
-    if (isDragging.value) return
-    if (options.disabled?.()) return
+    if (isDragging.value)
+      return
+    if (options.disabled?.())
+      return
     // Только основная кнопка: правый и средний клик перетаскиванием не считаются.
-    if (event.button !== 0) return
-    if (options.onStart?.(event) === false) return
+    if (event.button !== 0)
+      return
+    if (options.onStart?.(event) === false)
+      return
 
     isDragging.value = true
     attached = true

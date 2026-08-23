@@ -12,7 +12,8 @@ const stored: GrDashboardResponsiveLayout = { lg: [{ id: 'a', x: 6, y: 0, w: 2, 
 
 function memoryStorage(seed?: string): GrDashboardLayoutStorage & { data: Map<string, string> } {
   const data = new Map<string, string>()
-  if (seed !== undefined) data.set('dash', seed)
+  if (seed !== undefined)
+    data.set('dash', seed)
 
   return {
     data,

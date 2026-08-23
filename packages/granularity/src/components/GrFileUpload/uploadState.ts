@@ -40,11 +40,11 @@ export interface GrUploadStateError {
   error: unknown
 }
 
-export type GrUploadState =
-  | GrUploadStateIdle
-  | GrUploadStateUploading
-  | GrUploadStateSuccess
-  | GrUploadStateError
+export type GrUploadState
+  = | GrUploadStateIdle
+    | GrUploadStateUploading
+    | GrUploadStateSuccess
+    | GrUploadStateError
 
 export const GR_UPLOAD_STATE_IDLE: GrUploadStateIdle = Object.freeze({
   phase: 'idle',

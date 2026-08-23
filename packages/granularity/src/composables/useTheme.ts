@@ -32,16 +32,19 @@ const DEFAULT_STORAGE_KEY = 'gr-theme'
 const IS_SERVER = typeof window === 'undefined'
 
 function readStoredTheme(storageKey: string, persist: boolean): ThemeName | null {
-  if (typeof window === 'undefined' || !persist) return null
+  if (typeof window === 'undefined' || !persist)
+    return null
 
   // Доступ к `localStorage` может бросать `SecurityError` в Safari private mode
   // и при отключённых cookies/storage — поэтому оборачиваем в try/catch.
   try {
     const storage = window.localStorage
-    if (typeof storage?.getItem !== 'function') return null
+    if (typeof storage?.getItem !== 'function')
+      return null
 
     const stored = storage.getItem(storageKey)
-    if (stored === 'light' || stored === 'dark') return stored
+    if (stored === 'light' || stored === 'dark')
+      return stored
   }
   catch {
     // ignore
@@ -51,7 +54,8 @@ function readStoredTheme(storageKey: string, persist: boolean): ThemeName | null
 }
 
 function getSystemTheme(): ThemeName {
-  if (typeof window === 'undefined') return 'light'
+  if (typeof window === 'undefined')
+    return 'light'
   return window.matchMedia?.('(prefers-color-scheme: dark)')?.matches ? 'dark' : 'light'
 }
 
@@ -60,7 +64,8 @@ function getPreferredTheme(storageKey = DEFAULT_STORAGE_KEY, persist = true): Th
 }
 
 function applyTheme(theme: ThemeName, target?: () => HTMLElement | null) {
-  if (typeof document === 'undefined') return
+  if (typeof document === 'undefined')
+    return
 
   // Канон GR — атрибут `[data-theme]`: на `<html>` (см. docs/styling.md →
   // «Темизация») либо на корне приложения, когда состояние задало `target`.
@@ -159,14 +164,16 @@ function resolveThemeState(options: UseThemeOptions): ThemeState {
   // `app.runWithContext(() => useTheme())` — `hasInjectionContext` покрывает оба.
   if (hasInjectionContext()) {
     const provided = inject(GRANULARITY_THEME_STATE, null)
-    if (provided) return provided
+    if (provided)
+      return provided
   }
 
   // На сервере без плагина модульное состояние текло бы между запросами. Но
   // читать тему на сервере — нормальный сценарий (шаблон смотрит `isDark`), и
   // ронять на нём весь рендер нельзя: отдаём состояние на один вызов и запрещаем
   // мутацию — течёт именно она.
-  if (IS_SERVER) return createThemeState(options, false)
+  if (IS_SERVER)
+    return createThemeState(options, false)
 
   // Дедуп и текст — прямо под гардом: `__GR_DEV__` разворачивается в условие
   // на сборке, и у потребителя вся ветка выкидывается вместе с сообщением.
@@ -193,12 +200,14 @@ function resolveThemeState(options: UseThemeOptions): ThemeState {
 // состояние, а не на потребителя, — `onScopeDispose` здесь был бы вреден, он
 // порвал бы общую подписку при размонтировании одного из них.
 function bindListeners(state: ThemeState) {
-  if (state.listenersBound || typeof window === 'undefined') return
+  if (state.listenersBound || typeof window === 'undefined')
+    return
   state.listenersBound = true
 
   // Cross-tab: другая вкладка записала тему в localStorage.
   const onStorage = (event: StorageEvent): void => {
-    if (!state.persist || event.key !== state.storageKey) return
+    if (!state.persist || event.key !== state.storageKey)
+      return
     if (event.newValue === 'light' || event.newValue === 'dark') {
       state.theme.value = event.newValue
       applyTheme(event.newValue, state.target)
@@ -210,7 +219,8 @@ function bindListeners(state: ThemeState) {
   // НЕ выбрал тему явно (в storage ничего не сохранено).
   const mql = window.matchMedia?.('(prefers-color-scheme: dark)')
   const onSchemeChange = (event: MediaQueryListEvent): void => {
-    if (readStoredTheme(state.storageKey, state.persist) !== null) return
+    if (readStoredTheme(state.storageKey, state.persist) !== null)
+      return
     const next: ThemeName = event.matches ? 'dark' : 'light'
     state.theme.value = next
     applyTheme(next, state.target)
@@ -252,9 +262,12 @@ export function useTheme(options: UseThemeOptions = {}) {
 
   // Опции вызова уточняют состояние — тот же приём, что был у модульного
   // синглтона: слушателям нужно знать, какой ключ отслеживать.
-  if (options.storageKey !== undefined) state.storageKey = options.storageKey
-  if (options.persist !== undefined) state.persist = options.persist
-  if (options.target !== undefined) state.target = options.target
+  if (options.storageKey !== undefined)
+    state.storageKey = options.storageKey
+  if (options.persist !== undefined)
+    state.persist = options.persist
+  if (options.target !== undefined)
+    state.target = options.target
 
   bindListeners(state)
 

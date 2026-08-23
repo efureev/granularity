@@ -933,7 +933,6 @@ function dateRangePickerApiSections(): ShowcaseApiSectionMeta[] {
   ]
 }
 
-
 /** Публичная поверхность сетки виджетов. */
 function dashboardApiSections(): ShowcaseApiSectionMeta[] {
   return [

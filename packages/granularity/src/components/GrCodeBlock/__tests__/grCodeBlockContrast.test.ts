@@ -48,7 +48,8 @@ const COLORED_KINDS: GrCodeTokenKind[] = ['key', 'string', 'number', 'literal', 
 function expressionOf(kind: GrCodeTokenKind): string {
   const expression = getColorClassExpression(codeTokenClass[kind], 'text-[')
 
-  if (!expression) throw new Error(`GrCodeBlock: не удалось извлечь цвет роли ${kind}`)
+  if (!expression)
+    throw new Error(`GrCodeBlock: не удалось извлечь цвет роли ${kind}`)
 
   return expression
 }
@@ -90,7 +91,8 @@ describe('GrCodeBlock — палитра подсветки', () => {
           const second = COLORED_KINDS[j]
           const distance = getColorDistance(resolve(expressionOf(first), theme), resolve(expressionOf(second), theme))
 
-          if (distance < MIN_DELTA_E) tooClose.push(`${first} ↔ ${second}: ΔE ${distance.toFixed(2)}`)
+          if (distance < MIN_DELTA_E)
+            tooClose.push(`${first} ↔ ${second}: ΔE ${distance.toFixed(2)}`)
         }
       }
 

@@ -39,7 +39,8 @@ function exportedSfcs(): Sfc[] {
   const result: Sfc[] = []
 
   for (const dir of readdirSync(componentsDir)) {
-    if (!dir.startsWith('Gr')) continue
+    if (!dir.startsWith('Gr'))
+      continue
 
     const indexPath = resolve(componentsDir, dir, 'index.ts')
     let index: string
@@ -51,12 +52,14 @@ function exportedSfcs(): Sfc[] {
     }
 
     for (const file of readdirSync(resolve(componentsDir, dir))) {
-      if (!file.endsWith('.vue')) continue
+      if (!file.endsWith('.vue'))
+        continue
 
       const name = file.replace('.vue', '')
       const exported = index.includes(`as ${name} } from './${name}.vue'`)
         || index.includes(`export { default } from './${name}.vue'`)
-      if (!exported) continue
+      if (!exported)
+        continue
 
       result.push({
         dir,
@@ -90,7 +93,8 @@ describe('публичные типы компонентов', () => {
       `%s отдаёт тип ${suffix} из своей бочки`,
       (_id, sfc) => {
         const typeName = `${sfc.name}${suffix}`
-        if (EXCEPTIONS[`${sfc.dir}/${typeName}`]) return
+        if (EXCEPTIONS[`${sfc.dir}/${typeName}`])
+          return
 
         expect(sfc.index).toContain(typeName)
       },

@@ -130,7 +130,8 @@ provide<GranularityI18nAdapter>(GRANULARITY_I18N_KEY, {
 watch(
   () => [props.locale, activeI18n.value] as const,
   ([locale, adapter]) => {
-    if (!locale || adapter?.locale?.value === locale) return
+    if (!locale || adapter?.locale?.value === locale)
+      return
     void adapter?.syncLocale?.(locale)
   },
   { immediate: true },
@@ -161,7 +162,6 @@ defineSlots<{
   /** Поддерево, которому адресованы настройки. */
   default?: () => any
 }>()
-
 </script>
 
 <template>

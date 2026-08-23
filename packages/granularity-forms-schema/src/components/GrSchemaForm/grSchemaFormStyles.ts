@@ -35,8 +35,10 @@ export const gridSpanClass: Record<GrUiBreakpoint, Record<GrUiColumnCount | 'ful
 export const schemaGridClass = 'grid gap-x-[var(--gr-schema-form-gap-x,1rem)] gap-y-[var(--gr-schema-form-gap-y,0.25rem)] items-start'
 
 export function columnsToClass(columns: GrUiColumns | undefined): string {
-  if (columns === undefined) return gridColumnsClass.base[1]
-  if (typeof columns === 'number') return gridColumnsClass.base[columns]
+  if (columns === undefined)
+    return gridColumnsClass.base[1]
+  if (typeof columns === 'number')
+    return gridColumnsClass.base[columns]
 
   return Object.entries(columns)
     .map(([breakpoint, count]) => gridColumnsClass[breakpoint as GrUiBreakpoint]?.[count])
@@ -45,8 +47,10 @@ export function columnsToClass(columns: GrUiColumns | undefined): string {
 }
 
 export function spanToClass(span: GrUiSpan | undefined): string {
-  if (span === undefined) return ''
-  if (typeof span === 'number' || span === 'full') return gridSpanClass.base[span]
+  if (span === undefined)
+    return ''
+  if (typeof span === 'number' || span === 'full')
+    return gridSpanClass.base[span]
 
   return Object.entries(span)
     .map(([breakpoint, value]) => gridSpanClass[breakpoint as GrUiBreakpoint]?.[value])

@@ -23,7 +23,8 @@ function runExport() {
 
   exportTimer = window.setInterval(() => {
     percent.value = Math.min(100, percent.value + 8)
-    if (percent.value === 100) abortExport()
+    if (percent.value === 100)
+      abortExport()
   }, 220)
 }
 

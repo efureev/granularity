@@ -19,7 +19,8 @@ import { chromium } from '@playwright/test'
  */
 export default async function globalSetup(config: FullConfig): Promise<void> {
   const baseURL = config.projects[0]?.use?.baseURL
-  if (!baseURL) return
+  if (!baseURL)
+    return
 
   const browser = await chromium.launch()
   const page = await browser.newPage()

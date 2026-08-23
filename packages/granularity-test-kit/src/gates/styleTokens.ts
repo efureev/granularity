@@ -225,13 +225,16 @@ export function defineStyleTokensGate(options: StyleTokensGateOptions = {}): voi
       const exceptions = options.pairedLeadingExceptions ?? []
 
       for (const { path, source } of sources) {
-        if (exceptions.some(allowed => path.endsWith(allowed))) continue
+        if (exceptions.some(allowed => path.endsWith(allowed)))
+          continue
 
         source.split('\n').forEach((line, index) => {
-          if (!TOKEN_TEXT_SCALE.test(line)) return
+          if (!TOKEN_TEXT_SCALE.test(line))
+            return
           // `leading-none` — осознанный выбор (клавиша, счётчик шага): две
           // одинаковые по весу декларации подрались бы за порядок в стилях.
-          if (/leading-/.test(line)) return
+          if (/leading-/.test(line))
+            return
 
           unpaired.push(`${path}:${index + 1}: ${line.trim().slice(0, 80)}`)
         })

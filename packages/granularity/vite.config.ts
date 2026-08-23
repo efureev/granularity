@@ -57,7 +57,7 @@ export default defineConfig({
    * `!typeof process !== 'undefined' && …`.
    */
   define: {
-    __GR_DEV__: "(typeof process !== 'undefined' && process.env.NODE_ENV !== 'production')",
+    __GR_DEV__: '(typeof process !== \'undefined\' && process.env.NODE_ENV !== \'production\')',
   },
   plugins: [
     vue(),
@@ -88,7 +88,7 @@ export default defineConfig({
     emptyOutDir: true,
     lib: {
       entry: {
-        index: fileURLToPath(new URL('./src/index.ts', import.meta.url)),
+        'index': fileURLToPath(new URL('./src/index.ts', import.meta.url)),
         // <granularity:components> — блок генерируется `yarn generate:registry`
         'components/GrAlert/index': fileURLToPath(
           new URL('./src/components/GrAlert/index.ts', import.meta.url),

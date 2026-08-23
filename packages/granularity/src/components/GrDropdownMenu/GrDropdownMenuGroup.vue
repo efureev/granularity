@@ -31,7 +31,6 @@ defineSlots<{
   /** Пункты группы. */
   default?: () => any
 }>()
-
 </script>
 
 <template>

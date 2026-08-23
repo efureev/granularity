@@ -118,7 +118,6 @@ defineSlots<{
   /** Сочетание клавиш справа — обычно `GrKbd`. */
   shortcut?: () => any
 }>()
-
 </script>
 
 <template>

@@ -1,6 +1,5 @@
 import type { GrComponentSize, GrControlState } from '../shared/sizes'
 
-
 export type GrNumberInputState = GrControlState
 export type GrNumberInputSize = GrComponentSize
 export type GrNumberInputControlsDirection = 'vertical' | 'horizontal'

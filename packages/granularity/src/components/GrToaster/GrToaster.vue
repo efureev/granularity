@@ -233,11 +233,13 @@ const swipe = useDragGesture({
     const target = event.target as HTMLElement | null
     // Нажатие на кнопке — это нажатие на кнопке: закрытие и действия тоста не
     // должны превращаться в протяжку.
-    if (target?.closest('button, a[href]')) return false
+    if (target?.closest('button, a[href]'))
+      return false
 
     const host = target?.closest<HTMLElement>('[data-gr-toast]')
     const id = host?.dataset.toastId
-    if (!host || !id) return false
+    if (!host || !id)
+      return false
 
     swipingId.value = id
     swipeOffset.value = 0
@@ -255,7 +257,8 @@ const swipe = useDragGesture({
       && Math.sign(swipeOffset.value) === SWIPE_DIRECTION[props.placement]
       && Math.abs(swipeOffset.value) >= swipeThreshold
 
-    if (passed) void releaseSwiped(id)
+    if (passed)
+      void releaseSwiped(id)
     else resetSwipe()
   },
   // Обрыв возвращает тост на место, а не дожимает смахивание: указатель забрал
@@ -264,7 +267,8 @@ const swipe = useDragGesture({
 })
 
 function swipeStyle(toast: Toast): Record<string, string> | undefined {
-  if (swipingId.value !== toast.id) return undefined
+  if (swipingId.value !== toast.id)
+    return undefined
 
   return {
     transform: `translateX(${swipeOffset.value}px)`,
@@ -281,7 +285,8 @@ function swipeStyle(toast: Toast): Record<string, string> | undefined {
  * модальный слой, и перехват закрывал бы уведомление вместо диалога под ним.
  */
 function onToastKeydown(event: KeyboardEvent, toast: Toast): void {
-  if (event.key !== 'Delete' && event.key !== 'Backspace') return
+  if (event.key !== 'Delete' && event.key !== 'Backspace')
+    return
 
   event.preventDefault()
 
@@ -291,7 +296,8 @@ function onToastKeydown(event: KeyboardEvent, toast: Toast): void {
   dismiss(toast.id)
 
   // Фокус не должен упасть на `body`: дальше по стеку есть что читать.
-  if (next) void nextTick(() => toastElement(next.id)?.focus())
+  if (next)
+    void nextTick(() => toastElement(next.id)?.focus())
 }
 
 // Единый источник правды по таймерам: тост тикает, только если он видим И стек не на
@@ -320,11 +326,11 @@ function metaFor(tone: GrToastTone): ToneMeta {
 const containerClass = computed(() => PLACEMENT_CLASS[props.placement])
 
 const containerStyle = computed(() => {
-  if (props.width === undefined) return undefined
+  if (props.width === undefined)
+    return undefined
 
   return { '--gr-toaster-width': typeof props.width === 'number' ? `${props.width}px` : props.width }
 })
-
 
 /**
  * Переводит фокус на верхний тост. Тост фокусируем только программно
@@ -333,7 +339,8 @@ const containerStyle = computed(() => {
  */
 function focus(): boolean {
   const target = containerEl.value?.querySelector<HTMLElement>('[data-gr-toast]')
-  if (!target) return false
+  if (!target)
+    return false
 
   target.focus()
   return true
@@ -345,7 +352,8 @@ const hotkeyBinding = computed(() => ({
 }))
 
 function onFocusHotkey(event: KeyboardEvent): void {
-  if (focus()) event.preventDefault()
+  if (focus())
+    event.preventDefault()
 }
 
 defineExpose({ focus })

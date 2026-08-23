@@ -76,7 +76,8 @@ const linkToneColors: Record<GrLinkTone, GrLinkToneColors> = {
 
 /** Инлайновые CSS-переменные цвета для текущей комбинации `tone` × `variant`. */
 export function grLinkColorStyle(options: { tone: GrLinkTone, variant: GrLinkVariant, disabled: boolean }): Record<string, string> {
-  if (options.disabled) return {}
+  if (options.disabled)
+    return {}
 
   const colors = linkToneColors[options.tone] ?? linkToneColors.primary
 
@@ -104,9 +105,12 @@ export const disabledStateClass = 'cursor-not-allowed text-[var(--gr-muted-fg)]'
 const UNDERLINE_VALUES: readonly GrLinkUnderline[] = ['auto', 'always', 'none']
 
 function underlineClass(underline: GrLinkUnderline, disabled: boolean): string {
-  if (disabled) return 'no-underline'
-  if (underline === 'always') return 'underline underline-offset-4'
-  if (underline === 'none') return 'no-underline'
+  if (disabled)
+    return 'no-underline'
+  if (underline === 'always')
+    return 'underline underline-offset-4'
+  if (underline === 'none')
+    return 'no-underline'
   return 'no-underline hover:underline hover:underline-offset-4'
 }
 

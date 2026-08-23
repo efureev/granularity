@@ -78,7 +78,7 @@ interface DraftRow { id: number, key: string }
 const rows = ref<DraftRow[]>([])
 let seq = 0
 
-watch(freeKeys, keys => {
+watch(freeKeys, (keys) => {
   rows.value = rows.value.filter(row => keys.includes(row.key))
 
   for (const key of keys) {
@@ -115,7 +115,8 @@ function writeObject(next: Record<string, unknown>): void {
 /** Свободный ключ по умолчанию: `key`, `key2`, `key3` — лишь бы не занят. */
 function freeName(): string {
   const base = t('grForms.additional.newKey', 'key')
-  if (!(base in object.value)) return base
+  if (!(base in object.value))
+    return base
 
   let index = 2
   while (`${base}${index}` in object.value) index += 1
@@ -124,7 +125,8 @@ function freeName(): string {
 }
 
 function add(): void {
-  if (!canEdit.value || !valueNode.value) return
+  if (!canEdit.value || !valueNode.value)
+    return
 
   const key = freeName()
   writeObject({ ...object.value, [key]: createInitialItem(valueNode.value) })
@@ -137,7 +139,8 @@ function add(): void {
 }
 
 function remove(row: DraftRow): void {
-  if (!canEdit.value) return
+  if (!canEdit.value)
+    return
 
   // Порядок обязателен: ядро не чистит сообщения при дерегистрации поля.
   form?.clearValidate([nameOf(row.key)])
@@ -158,7 +161,8 @@ function remove(row: DraftRow): void {
  */
 function rename(row: DraftRow, raw: unknown): void {
   const next = String(raw ?? '').trim()
-  if (!canEdit.value || next === row.key) return
+  if (!canEdit.value || next === row.key)
+    return
 
   // Занятое имя откатываем: две строки с одним ключом писали бы поверх друг друга.
   if (next === '' || next in object.value) {

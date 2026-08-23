@@ -14,7 +14,8 @@ import type { ResponseErrorParser } from '../responseError.types'
  * добавьте `'aborted'` в `autoHideKinds`.
  */
 export const abortErrorParser: ResponseErrorParser = (ctx) => {
-  if (!ctx.isAbort) return null
+  if (!ctx.isAbort)
+    return null
   // Текст по `kind` подставит классификатор — и пометит его фолбэком.
   return {
     kind: 'aborted',

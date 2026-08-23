@@ -9,17 +9,17 @@
  * всех токенов равна исходной строке. Любая потеря символа — сдвиг разметки.
  */
 
-export type GrCodeTokenKind =
+export type GrCodeTokenKind
   /** Имя поля объекта: строка, за которой идёт двоеточие. */
-  | 'key'
-  | 'string'
-  | 'number'
+  = | 'key'
+    | 'string'
+    | 'number'
   /** `true`, `false`, `null`. */
-  | 'literal'
+    | 'literal'
   /** Скобки, запятые, двоеточия. */
-  | 'punctuation'
+    | 'punctuation'
   /** Пробелы, переносы и всё, что не опознано. */
-  | 'plain'
+    | 'plain'
 
 export interface GrCodeToken {
   text: string
@@ -44,7 +44,8 @@ function readString(source: string, start: number): number {
     }
 
     index += 1
-    if (char === '"') break
+    if (char === '"')
+      break
   }
 
   return index
@@ -54,7 +55,8 @@ function readString(source: string, start: number): number {
 function readNumber(source: string, start: number): number {
   let index = start
 
-  if (source[index] === '-') index += 1
+  if (source[index] === '-')
+    index += 1
   while (index < source.length && /[\d.eE+-]/.test(source[index])) index += 1
 
   return index
@@ -63,7 +65,8 @@ function readNumber(source: string, start: number): number {
 /** Первый непробельный символ после позиции — по нему строка отличается от ключа. */
 function nextMeaningful(source: string, from: number): string | undefined {
   for (let index = from; index < source.length; index += 1) {
-    if (!/\s/.test(source[index])) return source[index]
+    if (!/\s/.test(source[index]))
+      return source[index]
   }
 
   return undefined
@@ -75,7 +78,8 @@ export function tokenizeJson(source: string): GrCodeToken[] {
   let plainStart = 0
 
   const flushPlain = (until: number): void => {
-    if (until > plainStart) tokens.push({ text: source.slice(plainStart, until), kind: 'plain' })
+    if (until > plainStart)
+      tokens.push({ text: source.slice(plainStart, until), kind: 'plain' })
   }
 
   while (index < source.length) {

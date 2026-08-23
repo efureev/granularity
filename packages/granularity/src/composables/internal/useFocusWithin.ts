@@ -38,19 +38,23 @@ export function useFocusWithin(
 ): UseFocusWithinHandlers {
   function crossedBoundary(event: FocusEvent): boolean {
     const other = event.relatedTarget as Node | null
-    if (!other) return true
+    if (!other)
+      return true
 
-    if (root.value?.contains(other)) return false
+    if (root.value?.contains(other))
+      return false
 
     return !options.containers?.().some(node => node?.contains(other))
   }
 
   return {
     onFocusIn(event) {
-      if (crossedBoundary(event)) options.enter?.(event)
+      if (crossedBoundary(event))
+        options.enter?.(event)
     },
     onFocusOut(event) {
-      if (crossedBoundary(event)) options.leave?.(event)
+      if (crossedBoundary(event))
+        options.leave?.(event)
     },
   }
 }

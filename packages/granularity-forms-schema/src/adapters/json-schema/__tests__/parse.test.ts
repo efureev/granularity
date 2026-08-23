@@ -79,7 +79,7 @@ describe('структура', () => {
   it('подписи вариантов берутся из расширения OpenAPI, если оно есть', () => {
     const { fields } = fieldsOf({
       type: 'object',
-      properties: { role: { type: 'string', enum: ['admin', 'user'], 'x-enumNames': ['Админ', 'Пользователь'] } },
+      properties: { role: { 'type': 'string', 'enum': ['admin', 'user'], 'x-enumNames': ['Админ', 'Пользователь'] } },
     })
 
     expect(fields[0]!.node.options?.map(o => o.label)).toEqual(['Админ', 'Пользователь'])

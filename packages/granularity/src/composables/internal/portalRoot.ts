@@ -23,10 +23,12 @@ export const GR_PORTAL_ID = 'gr-portal'
  * монтирования (см. `useTeleportEnabled`).
  */
 export function ensurePortalRoot(): HTMLElement | null {
-  if (typeof document === 'undefined') return null
+  if (typeof document === 'undefined')
+    return null
 
   const existing = document.getElementById(GR_PORTAL_ID)
-  if (existing) return existing
+  if (existing)
+    return existing
 
   const root = document.createElement('div')
   root.id = GR_PORTAL_ID
@@ -38,7 +40,8 @@ export function ensurePortalRoot(): HTMLElement | null {
 
 /** Текущий корень портала, если он уже создан. */
 export function getPortalRoot(): HTMLElement | null {
-  if (typeof document === 'undefined') return null
+  if (typeof document === 'undefined')
+    return null
   return document.getElementById(GR_PORTAL_ID)
 }
 

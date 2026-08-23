@@ -258,12 +258,26 @@ describe('useFloating — виртуальный якорь', () => {
     // Точка курсора — прямоугольник 0×0: `flip` и `shift` меряют её как обычный
     // якорь нулевого размера, поэтому стороны обязаны сойтись в одну точку.
     expect(point.getBoundingClientRect()).toMatchObject({
-      x: 10, y: 20, width: 0, height: 0, top: 20, left: 10, right: 10, bottom: 20,
+      x: 10,
+      y: 20,
+      width: 0,
+      height: 0,
+      top: 20,
+      left: 10,
+      right: 10,
+      bottom: 20,
     })
 
     const row = createFloatingAnchor(() => ({ x: 4, y: 8, width: 200, height: 32 }))
     expect(row.getBoundingClientRect()).toMatchObject({
-      x: 4, y: 8, width: 200, height: 32, top: 8, left: 4, right: 204, bottom: 40,
+      x: 4,
+      y: 8,
+      width: 200,
+      height: 32,
+      top: 8,
+      left: 4,
+      right: 204,
+      bottom: 40,
     })
   })
 

@@ -61,19 +61,19 @@ export interface UseDataSourceOptions<TRow> {
  * потребителя с проверкой типов страница краснеет на ровном месте.
  */
 export interface DataSourceTableBinding<TRow> {
-  rows: TRow[]
-  loading: boolean
-  externalSort: true
-  sortKey: string
-  sortDir: SortDir
+  'rows': TRow[]
+  'loading': boolean
+  'externalSort': true
+  'sortKey': string
+  'sortDir': SortDir
   'onUpdate:sortKey': (key: string) => void
   'onUpdate:sortDir': (dir: SortDir) => void
 }
 
 export interface DataSourcePaginationBinding {
-  page: number
-  pageSize: number
-  total: number
+  'page': number
+  'pageSize': number
+  'total': number
   'onUpdate:page': (page: number) => void
   'onUpdate:pageSize': (pageSize: number) => void
 }
@@ -131,7 +131,8 @@ function isAbortError(value: unknown): boolean {
 
 /** Текстовое представление значения строки — для поиска по умолчанию. */
 function searchable(row: unknown): string {
-  if (row === null || typeof row !== 'object') return String(row ?? '')
+  if (row === null || typeof row !== 'object')
+    return String(row ?? '')
 
   return Object.values(row as Record<string, unknown>)
     .filter(value => typeof value === 'string' || typeof value === 'number')
@@ -146,8 +147,10 @@ function defaultFilter(row: unknown, filters: Readonly<Record<string, FilterValu
   const record = (row ?? {}) as Record<string, unknown>
 
   return Object.entries(filters).every(([name, value]) => {
-    if (isEmptyFilter(value)) return true
-    if (Array.isArray(value)) return value.some(item => String(item) === String(record[name]))
+    if (isEmptyFilter(value))
+      return true
+    if (Array.isArray(value))
+      return value.some(item => String(item) === String(record[name]))
 
     return String(value) === String(record[name])
   })
@@ -158,7 +161,8 @@ function defaultCompare(a: unknown, b: unknown, sort: DataSourceSort): number {
   const right = (b as Record<string, unknown>)?.[sort.key]
   const sign = sort.dir === 'desc' ? -1 : 1
 
-  if (typeof left === 'number' && typeof right === 'number') return (left - right) * sign
+  if (typeof left === 'number' && typeof right === 'number')
+    return (left - right) * sign
 
   return String(left ?? '').localeCompare(String(right ?? '')) * sign
 }
@@ -210,7 +214,8 @@ export function useDataSource<TRow>(options: UseDataSourceOptions<TRow> = {}): U
 
   const clientSorted = computed<TRow[]>(() => {
     const { sort } = state.value
-    if (!sort) return clientMatched.value
+    if (!sort)
+      return clientMatched.value
 
     const compare = options.compare ?? defaultCompare
 
@@ -246,7 +251,8 @@ export function useDataSource<TRow>(options: UseDataSourceOptions<TRow> = {}): U
 
   async function run(): Promise<void> {
     const { fetcher } = options
-    if (!fetcher) return
+    if (!fetcher)
+      return
 
     inflight?.abort()
     const controller = new AbortController()
@@ -267,7 +273,8 @@ export function useDataSource<TRow>(options: UseDataSourceOptions<TRow> = {}): U
 
     try {
       const result = await fetcher(toRequest(state.value), { signal: controller.signal })
-      if (current !== seq) return
+      if (current !== seq)
+        return
 
       // Копия, а не ссылка: наружу уходит изменяемый массив, какой ждёт таблица.
       serverRows.value = [...result.rows]
@@ -275,18 +282,22 @@ export function useDataSource<TRow>(options: UseDataSourceOptions<TRow> = {}): U
     }
     catch (raised) {
       // Прерванный запрос — не ошибка: его прервали мы сами.
-      if (current !== seq || isAbortError(raised)) return
+      if (current !== seq || isAbortError(raised))
+        return
 
       error.value = raised
     }
     finally {
-      if (current === seq) loading.value = false
+      if (current === seq)
+        loading.value = false
     }
   }
 
   function schedule(delay: number): void {
-    if (!isServer) return
-    if (timer !== null) clearTimeout(timer)
+    if (!isServer)
+      return
+    if (timer !== null)
+      clearTimeout(timer)
 
     if (delay <= 0) {
       void run()
@@ -301,7 +312,8 @@ export function useDataSource<TRow>(options: UseDataSourceOptions<TRow> = {}): U
 
   function patch(next: Partial<DataSourceState>): void {
     const applied = applyPatch(state.value, next)
-    if (sameState(applied, state.value)) return
+    if (sameState(applied, state.value))
+      return
 
     const delay = isTyped(state.value, applied) ? (options.debounce ?? 300) : 0
 
@@ -315,17 +327,20 @@ export function useDataSource<TRow>(options: UseDataSourceOptions<TRow> = {}): U
   const adapter = url ? url.adapter ?? historyUrlAdapter() : null
 
   function readFromUrl(): void {
-    if (!adapter) return
+    if (!adapter)
+      return
 
     const next = readStateFromQuery(adapter.read(), { prefix: url?.prefix, defaults })
-    if (sameState(next, state.value)) return
+    if (sameState(next, state.value))
+      return
 
     state.value = next
     schedule(0)
   }
 
   function writeToUrl(): void {
-    if (!adapter) return
+    if (!adapter)
+      return
 
     // `replace`, а не запись в историю: перелистывание и правка фильтра — не
     // навигация. Иначе «назад» перестанет уводить со страницы и начнёт
@@ -349,14 +364,17 @@ export function useDataSource<TRow>(options: UseDataSourceOptions<TRow> = {}): U
     // разметка (умолчания) разошлась бы с первым клиентским рендером (страница
     // из ссылки) — гидрация об этом сообщит предупреждением.
     readFromUrl()
-    if (immediate) schedule(0)
+    if (immediate)
+      schedule(0)
   }
 
-  if (getCurrentInstance()) onMounted(start)
+  if (getCurrentInstance())
+    onMounted(start)
   else start()
 
   onScopeDispose(() => {
-    if (timer !== null) clearTimeout(timer)
+    if (timer !== null)
+      clearTimeout(timer)
     inflight?.abort()
   })
 
@@ -407,11 +425,11 @@ export function useDataSource<TRow>(options: UseDataSourceOptions<TRow> = {}): U
     },
 
     table: computed<DataSourceTableBinding<TRow>>(() => ({
-      rows: rows.value,
-      loading: loading.value,
-      externalSort: true,
-      sortKey: state.value.sort?.key ?? '',
-      sortDir: state.value.sort?.dir ?? 'asc',
+      'rows': rows.value,
+      'loading': loading.value,
+      'externalSort': true,
+      'sortKey': state.value.sort?.key ?? '',
+      'sortDir': state.value.sort?.dir ?? 'asc',
       'onUpdate:sortKey': (key: string) => {
         patch({ sort: key ? { key, dir: state.value.sort?.dir ?? 'asc' } : null })
       },
@@ -421,9 +439,9 @@ export function useDataSource<TRow>(options: UseDataSourceOptions<TRow> = {}): U
     })),
 
     pagination: computed<DataSourcePaginationBinding>(() => ({
-      page: state.value.page,
-      pageSize: state.value.perPage,
-      total: total.value,
+      'page': state.value.page,
+      'pageSize': state.value.perPage,
+      'total': total.value,
       'onUpdate:page': (page: number) => patch({ page }),
       'onUpdate:pageSize': (pageSize: number) => patch({ perPage: pageSize }),
     })),

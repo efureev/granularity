@@ -235,7 +235,6 @@ defineSlots<{
   }) => any
 }>()
 
-
 const slots = useSlots()
 
 const { t } = useGranularityTranslations()
@@ -260,10 +259,12 @@ const resolvedProgressLabel = computed(() => props.progressLabel ?? t('gr.fileUp
 function slotIsTextOnly(nodes: VNode[]): boolean {
   const meaningful = meaningfulSlotNodes(nodes)
 
-  if (meaningful.length === 0) return true
+  if (meaningful.length === 0)
+    return true
 
   for (const node of meaningful) {
-    if (node.type !== Text) return false
+    if (node.type !== Text)
+      return false
   }
 
   return true
@@ -300,8 +301,10 @@ function setFiles(next: File[]): void {
 
 // Контролируемый режим: проп задан — он и есть источник истины.
 watch(() => props.modelValue, (next) => {
-  if (next === undefined) return
-  if (next === lastFiles.value) return
+  if (next === undefined)
+    return
+  if (next === lastFiles.value)
+    return
 
   lastFiles.value = [...next]
 }, { deep: false })
@@ -384,7 +387,6 @@ const defaultSlotProps = computed(() => ({
   abortFile,
 }))
 
-
 const zoneClass = computed(() => grFileUploadZoneClass({
   size: resolvedSize.value,
   disabled: isDisabled.value,
@@ -404,7 +406,8 @@ const hiddenInputStyle = {
 } as const satisfies Record<string, string>
 
 function openDialog() {
-  if (isLocked.value) return
+  if (isLocked.value)
+    return
   inputRef.value?.click()
 }
 
@@ -418,15 +421,18 @@ function totalSizeOf(files: File[]): number {
 }
 
 function normalizeLimit(limit: number | undefined): number | undefined {
-  if (typeof limit !== 'number') return undefined
-  if (!Number.isFinite(limit)) return undefined
-  if (limit <= 0) return undefined
+  if (typeof limit !== 'number')
+    return undefined
+  if (!Number.isFinite(limit))
+    return undefined
+  if (limit <= 0)
+    return undefined
   return Math.floor(limit)
 }
 
-
 async function uploadViaAction(files: File[], signal: AbortSignal, extraData: GrFileUploadExtraData | undefined) {
-  if (!props.action) throw new Error('GrFileUpload: either `action` or `request` must be provided')
+  if (!props.action)
+    throw new Error('GrFileUpload: either `action` or `request` must be provided')
 
   return uploadViaXhr({
     url: props.action,
@@ -440,8 +446,9 @@ async function uploadViaAction(files: File[], signal: AbortSignal, extraData: Gr
   })
 }
 
-async function runBeforeUpload(files: File[]): Promise<'ok' | { aborted: true; reason: unknown }> {
-  if (!props.beforeUpload) return 'ok'
+async function runBeforeUpload(files: File[]): Promise<'ok' | { aborted: true, reason: unknown }> {
+  if (!props.beforeUpload)
+    return 'ok'
 
   for (const file of files) {
     try {
@@ -453,7 +460,8 @@ async function runBeforeUpload(files: File[]): Promise<'ok' | { aborted: true; r
 
       if (result && typeof (result as any).then === 'function')
         await result
-    } catch (error) {
+    }
+    catch (error) {
       return { aborted: true, reason: error }
     }
   }
@@ -478,8 +486,10 @@ function effectiveValidators(): FileValidator[] {
 let runCounter = 0
 
 async function handleFiles(files: File[], source: FileValidatorSource = 'input') {
-  if (isLocked.value) return
-  if (!files.length) return
+  if (isLocked.value)
+    return
+  if (!files.length)
+    return
 
   runCounter += 1
   const runId = runCounter
@@ -497,21 +507,24 @@ async function handleFiles(files: File[], source: FileValidatorSource = 'input')
     multiple: props.multiple,
   })
 
-  if (isStale()) return
+  if (isStale())
+    return
 
   if (issues.length > 0) {
     emit('error', new FileValidationError(issues, valid))
     return
   }
 
-  if (!valid.length) return
+  if (!valid.length)
+    return
 
   // Набор сменился — миниатюры прежнего больше не нужны.
   revokeAllPreviews()
   setFiles(valid)
 
   const before = await runBeforeUpload(valid)
-  if (isStale()) return
+  if (isStale())
+    return
 
   if (before !== 'ok') {
     emit('error', before.reason)
@@ -521,7 +534,8 @@ async function handleFiles(files: File[], source: FileValidatorSource = 'input')
   let extraData: GrFileUploadExtraData | undefined
   try {
     extraData = props.uploadExtraData?.(valid)
-  } catch (error) {
+  }
+  catch (error) {
     emit('error', error)
     return
   }
@@ -563,15 +577,19 @@ async function handleFiles(files: File[], source: FileValidatorSource = 'input')
 
     if (props.hideProgressOnSuccess && props.hideProgressOnSuccess > 0)
       scheduleIdle(props.hideProgressOnSuccess)
-  } catch (error) {
+  }
+  catch (error) {
     if (error instanceof GrUploadAbortError) {
       setStateIdle()
-    } else {
+    }
+    else {
       setStateError(error)
     }
     emit('error', error)
-  } finally {
-    if (activeController === controller) activeController = null
+  }
+  finally {
+    if (activeController === controller)
+      activeController = null
   }
 }
 
@@ -581,16 +599,19 @@ async function handleFiles(files: File[], source: FileValidatorSource = 'input')
  * в порядке `Tab` и объявляется как «только чтение», но нового файла не примет.
  */
 function onInputClick(event: MouseEvent) {
-  if (isReadonly.value && !isDisabled.value) event.preventDefault()
+  if (isReadonly.value && !isDisabled.value)
+    event.preventDefault()
 }
 
 async function onInputChange(event: Event) {
-  if (isLocked.value) return
+  if (isLocked.value)
+    return
 
   const target = event.target as HTMLInputElement | null
   const files = target?.files ? Array.prototype.slice.call(target.files) as File[] : []
 
-  if (target) target.value = ''
+  if (target)
+    target.value = ''
 
   await nextTick()
   await handleFiles(files, 'input')
@@ -600,17 +621,21 @@ async function onInputChange(event: Event) {
 // стоит фокус. Собственный обработчик здесь только дублировал бы нативный и
 // открывал диалог дважды.
 function onRootClick(event: MouseEvent) {
-  if (hasCustomUi.value) return
+  if (hasCustomUi.value)
+    return
   // `openDialog` кликает по input программно, и этот клик всплывает обратно сюда.
   // Без отсечки зона открывала бы диалог по кругу.
-  if (event.target === inputRef.value) return
+  if (event.target === inputRef.value)
+    return
 
   openDialog()
 }
 
 const effectiveProgressTone = computed<GrProgressBarTone>(() => {
-  if (state.phase === 'error') return 'danger'
-  if (state.phase === 'success') return 'success'
+  if (state.phase === 'error')
+    return 'danger'
+  if (state.phase === 'success')
+    return 'success'
   return props.progressTone
 })
 
@@ -620,9 +645,12 @@ const effectiveProgressTone = computed<GrProgressBarTone>(() => {
  * в процентах сюда не идёт — диктор захлебнётся; объявляются только фазы.
  */
 const liveMessage = computed(() => {
-  if (state.phase === 'uploading') return t('gr.fileUpload.uploading', 'Uploading…')
-  if (state.phase === 'success') return t('gr.fileUpload.success', 'Upload complete')
-  if (state.phase === 'error') return t('gr.fileUpload.error', 'Upload failed')
+  if (state.phase === 'uploading')
+    return t('gr.fileUpload.uploading', 'Uploading…')
+  if (state.phase === 'success')
+    return t('gr.fileUpload.success', 'Upload complete')
+  if (state.phase === 'error')
+    return t('gr.fileUpload.error', 'Upload failed')
   return ''
 })
 
@@ -630,7 +658,8 @@ const progressVisible = computed(() => state.phase !== 'idle')
 const progressIndeterminate = computed(() => state.phase === 'uploading' && state.indeterminate)
 const progressPercent = computed(() => (progressIndeterminate.value ? 0 : state.percent))
 const progressText = computed(() => {
-  if (progressIndeterminate.value) return ''
+  if (progressIndeterminate.value)
+    return ''
   return `${Math.round(progressPercent.value)}%`
 })
 
@@ -650,7 +679,8 @@ function entryFor(file: File): GrFileUploadEntry | undefined {
 
 /** Повторить загрузку текущего набора — после ошибки выбирать файлы заново незачем. */
 async function retry(): Promise<void> {
-  if (!lastFiles.value.length) return
+  if (!lastFiles.value.length)
+    return
 
   await handleFiles([...lastFiles.value], 'input')
 }
@@ -661,7 +691,8 @@ async function retry(): Promise<void> {
  */
 function removeFile(file: File): void {
   const next = lastFiles.value.filter(item => item !== file)
-  if (next.length === lastFiles.value.length) return
+  if (next.length === lastFiles.value.length)
+    return
 
   abortFile(file)
   abort()
@@ -672,8 +703,10 @@ function removeFile(file: File): void {
 
   // В пофайловом режиме остальные файлы своих статусов не теряют: удалили один
   // — сводное состояние просто пересчитывается по оставшимся.
-  if (props.uploadMode === 'per-file' && fileEntries.value.length) assignState(summarizeFileEntries(fileEntries.value))
-  else if (state.phase !== 'idle') setStateIdle()
+  if (props.uploadMode === 'per-file' && fileEntries.value.length)
+    assignState(summarizeFileEntries(fileEntries.value))
+  else if (state.phase !== 'idle')
+    setStateIdle()
 }
 
 function focus(): void {
@@ -688,8 +721,10 @@ function blur(): void {
 // выборе файла поздно. Выразить требование типом нельзя: `defineProps` в SFC
 // принимает объектный тип или интерфейс, но не discriminated union.
 onMounted(() => {
-  if (!__GR_DEV__) return
-  if (props.action || props.request) return
+  if (!__GR_DEV__)
+    return
+  if (props.action || props.request)
+    return
 
   console.warn('[GrFileUpload] не задан ни `action`, ни `request`: отправлять файлы некуда.')
 })

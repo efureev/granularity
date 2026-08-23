@@ -112,7 +112,8 @@ export function barToward(from: number, to: number, orientation: ChartOrientatio
  * сомкнулись бы в сплошную заливку.
  */
 export function barBandwidth(scale: GrChartScale, area: Rect, count: number, orientation: ChartOrientation = 'vertical'): number {
-  if (scale.bandwidth > 0) return scale.bandwidth
+  if (scale.bandwidth > 0)
+    return scale.bandwidth
 
   return (alongExtent(area, orientation) / Math.max(1, count)) * 0.8
 }
@@ -144,12 +145,14 @@ export function barHitIndex(input: BarHitInput): number {
   const [low, high] = acrossBounds(input.area, orientation)
   const across = orientation === 'horizontal' ? input.point.x : input.point.y
 
-  if (across < low || across > high) return -1
+  if (across < low || across > high)
+    return -1
 
   const along = orientation === 'horizontal' ? input.point.y : input.point.x
   const index = nearestIndex(input.positions, input.scale, along)
 
-  if (index === -1) return -1
+  if (index === -1)
+    return -1
 
   return Math.abs(along - input.scale.scale(input.positions[index]!)) <= input.bandwidth / 2 ? index : -1
 }

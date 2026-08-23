@@ -26,7 +26,10 @@ describe('anchorFromElement', () => {
   it('берёт прямоугольник целиком, а не его угол', () => {
     const element = document.createElement('div')
     element.getBoundingClientRect = () => ({
-      left: 10, top: 20, width: 300, height: 32,
+      left: 10,
+      top: 20,
+      width: 300,
+      height: 32,
     } as DOMRect)
 
     expect(anchorFromElement(element)).toEqual({ x: 10, y: 20, width: 300, height: 32 })

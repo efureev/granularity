@@ -100,7 +100,8 @@ const instanceName = computed(() => props.name ?? props.path ?? '')
 const node = computed(() => props.node ?? form?.nodeAt(templatePath.value))
 
 const ui = computed(() => {
-  if (!node.value) return undefined
+  if (!node.value)
+    return undefined
 
   const own = props.ui ? { [templatePath.value]: props.ui } : {}
   const merged = form
@@ -126,10 +127,12 @@ const value = computed(() =>
   props.modelValue !== undefined ? props.modelValue : form?.valueAt(instanceName.value))
 
 const renderer = computed(() => {
-  if (!node.value) return undefined
+  if (!node.value)
+    return undefined
 
   const found = registry.value.resolve(node.value, ui.value?.widget)
-  if (!found) emit('unresolved', node.value, instanceName.value)
+  if (!found)
+    emit('unresolved', node.value, instanceName.value)
 
   return found
 })
@@ -137,7 +140,8 @@ const renderer = computed(() => {
 const component = computed(() => ui.value?.component ?? renderer.value?.component)
 
 const control = computed(() => {
-  if (!node.value || !renderer.value) return {}
+  if (!node.value || !renderer.value)
+    return {}
 
   const fromRenderer = renderer.value.props?.({
     node: node.value,
@@ -160,7 +164,8 @@ const isReadonly = computed(() => props.readonly ?? ui.value?.readonly ?? form?.
 
 /** Серверная ошибка сильнее клиентской: она о том, что бэкенд уже отклонил. */
 const errors = computed<string | string[] | undefined>(() => {
-  if (props.error !== undefined) return props.error
+  if (props.error !== undefined)
+    return props.error
 
   const fromServer = form?.serverErrorAt(instanceName.value)
   return fromServer && fromServer.length > 0 ? fromServer : undefined

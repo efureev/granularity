@@ -29,14 +29,16 @@ export function useOverlayPresence(open: Ref<boolean>): OverlayPresence {
   const visible = ref(open.value)
 
   watch(open, (isOpen) => {
-    if (isOpen) mounted.value = true
+    if (isOpen)
+      mounted.value = true
     visible.value = isOpen
   })
 
   function onPanelAfterLeave(): void {
     // Пока панель уезжала, слой могли открыть заново — тогда размонтировать
     // нечего и незачем.
-    if (!open.value) mounted.value = false
+    if (!open.value)
+      mounted.value = false
   }
 
   return { mounted, visible, onPanelAfterLeave }

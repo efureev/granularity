@@ -26,7 +26,8 @@ function advance(
 ): void {
   const next = current + STEP
 
-  if (next > 100) jumpTo(0)
+  if (next > 100)
+    jumpTo(0)
   else tweenTo(next, duration)
 }
 
@@ -36,7 +37,8 @@ function advance(
  * `matchMedia` читается в `onMounted`, а не в теле `setup`.
  */
 onMounted(() => {
-  if (window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches) return
+  if (window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches)
+    return
 
   fastTimer = setInterval(advance, 1000, fast.value, tweenFast, jumpFast, 1000)
   slowTimer = setInterval(advance, 5000, slow.value, tweenSlow, jumpSlow, 5000)

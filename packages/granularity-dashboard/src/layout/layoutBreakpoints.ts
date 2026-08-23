@@ -36,7 +36,8 @@ export function resolveBreakpoint(width: number, breakpoints: GrDashboardBreakpo
 }
 
 export function colsFor(breakpoint: GrDashboardBreakpoint, cols: GrDashboardCols | number): number {
-  if (typeof cols === 'number') return Math.max(1, Math.round(cols))
+  if (typeof cols === 'number')
+    return Math.max(1, Math.round(cols))
 
   return Math.max(1, Math.round(cols[breakpoint] ?? 12))
 }
@@ -59,7 +60,8 @@ export function deriveLayout(
    */
   compaction: GrDashboardCompaction = 'vertical',
 ): GrDashboardLayout {
-  if (fromCols === toCols) return sortLayout(source)
+  if (fromCols === toCols)
+    return sortLayout(source)
 
   const ratio = toCols / fromCols
 
@@ -93,16 +95,19 @@ export function layoutFor(
   options: LayoutForOptions,
 ): GrDashboardLayout {
   const own = responsive[breakpoint]
-  if (own) return sortLayout(own)
+  if (own)
+    return sortLayout(own)
 
   const ordered = orderedBreakpoints(options.breakpoints)
   const index = ordered.indexOf(breakpoint)
-  if (index === -1) return []
+  if (index === -1)
+    return []
 
   const wider = ordered.slice(0, index).reverse().find(key => responsive[key])
   const narrower = ordered.slice(index + 1).find(key => responsive[key])
   const donor = wider ?? narrower
-  if (!donor) return []
+  if (!donor)
+    return []
 
   return deriveLayout(
     responsive[donor] ?? [],

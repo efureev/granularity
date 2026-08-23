@@ -132,7 +132,8 @@ const clock = useChronoNow(() => (props.base || !resolvedLive.value ? 0 : tick.v
 const staticNow = new Date()
 
 const now = computed(() => {
-  if (props.base) return props.base
+  if (props.base)
+    return props.base
 
   return resolvedLive.value ? clock.value : staticNow
 })
@@ -146,7 +147,8 @@ watch(() => amount.value?.unit, (unit) => {
 /** Значение старше порога — относительная строка перестаёт помогать. */
 const beyondCutoff = computed(() => {
   const date = parsed.value
-  if (!date || resolvedCutoff.value <= 0) return false
+  if (!date || resolvedCutoff.value <= 0)
+    return false
 
   return Math.abs(differenceInDays(toPlainDate(date), toPlainDate(now.value))) >= resolvedCutoff.value
 })
@@ -156,8 +158,10 @@ const absolute = computed(() => (
 ))
 
 const text = computed(() => {
-  if (!amount.value) return ''
-  if (beyondCutoff.value) return absolute.value
+  if (!amount.value)
+    return ''
+  if (beyondCutoff.value)
+    return absolute.value
 
   return formatRelativeTime(resolvedLocale.value, amount.value, {
     numeric: resolvedNumeric.value,

@@ -1,6 +1,7 @@
 import type { GrComponentSize } from '../shared/sizes'
 
 import type { Component } from 'vue'
+
 export type GrSegmentedVariant = 'pills' | 'button'
 export type GrSegmentedSize = GrComponentSize
 
@@ -25,8 +26,8 @@ export type GrSegmentedOption = {
    */
   ariaLabel?: string
 }
-export const rootBaseClass =
-  'relative inline-grid min-w-0 items-stretch rounded-[var(--gr-segmented-radius)] p-[var(--gr-segmented-padding)] transition-colors duration-[var(--gr-duration-fast)]'
+export const rootBaseClass
+  = 'relative inline-grid min-w-0 items-stretch rounded-[var(--gr-segmented-radius)] p-[var(--gr-segmented-padding)] transition-colors duration-[var(--gr-duration-fast)]'
 
 /** Направление потока: остальную раскладку задают `gridTemplate*` в стиле корня. */
 export const rootOrientationClassMap: Record<GrSegmentedOrientation, string> = {
@@ -39,14 +40,14 @@ export const rootVariantClassMap: Record<GrSegmentedVariant, string> = {
 }
 export const rootBlockClass = 'w-full'
 export const rootDisabledClass = 'text-[var(--gr-disabled-fg)]'
-export const indicatorBaseClass =
-  'pointer-events-none absolute left-0 top-0 rounded-[calc(var(--gr-segmented-radius)-var(--gr-segmented-padding))] transition-[transform,width,height,opacity] ease-[var(--gr-ease-out)]'
+export const indicatorBaseClass
+  = 'pointer-events-none absolute left-0 top-0 rounded-[calc(var(--gr-segmented-radius)-var(--gr-segmented-padding))] transition-[transform,width,height,opacity] ease-[var(--gr-ease-out)]'
 export const indicatorVariantClassMap: Record<GrSegmentedVariant, string> = {
-  pills:  'border border-[var(--gr-segmented-indicator-brd)] bg-[var(--gr-segmented-indicator-bg)] shadow-[var(--gr-segmented-indicator-shadow)]',
+  pills: 'border border-[var(--gr-segmented-indicator-brd)] bg-[var(--gr-segmented-indicator-bg)] shadow-[var(--gr-segmented-indicator-shadow)]',
   button: 'border border-[var(--gr-segmented-indicator-brd)] bg-[var(--gr-segmented-indicator-bg)] shadow-[var(--gr-segmented-indicator-shadow)]',
 }
-export const itemBaseClass =
-  'group/segmented-item relative z-[1] inline-flex min-h-[var(--gr-segmented-min-height)] min-w-0 items-center justify-center gap-2 rounded-[calc(var(--gr-segmented-radius)-var(--gr-segmented-padding))] px-[var(--gr-segmented-item-px)] py-[var(--gr-segmented-item-py)] text-[length:var(--gr-segmented-font-size)] leading-[var(--gr-segmented-line-height)] font-[var(--gr-segmented-font-weight)] text-[var(--gr-segmented-item-color)] transition-colors duration-[var(--gr-duration-fast)] select-none focus:outline-none focus-visible:shadow-[0_0_0_2px_var(--gr-ring),0_0_0_4px_var(--gr-bg)]'
+export const itemBaseClass
+  = 'group/segmented-item relative z-[1] inline-flex min-h-[var(--gr-segmented-min-height)] min-w-0 items-center justify-center gap-2 rounded-[calc(var(--gr-segmented-radius)-var(--gr-segmented-padding))] px-[var(--gr-segmented-item-px)] py-[var(--gr-segmented-item-py)] text-[length:var(--gr-segmented-font-size)] leading-[var(--gr-segmented-line-height)] font-[var(--gr-segmented-font-weight)] text-[var(--gr-segmented-item-color)] transition-colors duration-[var(--gr-duration-fast)] select-none focus:outline-none focus-visible:shadow-[0_0_0_2px_var(--gr-ring),0_0_0_4px_var(--gr-bg)]'
 export const itemVariantClassMap: Record<GrSegmentedVariant, string> = {
   pills: '',
   button: '',

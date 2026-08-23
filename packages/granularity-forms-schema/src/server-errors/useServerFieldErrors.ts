@@ -34,11 +34,13 @@ export interface GrServerFieldErrors {
 }
 
 function indexAfter(path: string, arrayPath: string): number | undefined {
-  if (!path.startsWith(`${arrayPath}.`)) return undefined
+  if (!path.startsWith(`${arrayPath}.`))
+    return undefined
 
   const rest = splitPath(path.slice(arrayPath.length + 1))
   const first = rest[0]
-  if (first === undefined || !/^\d+$/.test(first)) return undefined
+  if (first === undefined || !/^\d+$/.test(first))
+    return undefined
 
   return Number(first)
 }
@@ -66,7 +68,8 @@ export function useServerFieldErrors(options: UseServerFieldErrorsOptions = {}):
 
   const orphans = computed<GrServerErrorOrphan[]>(() => {
     const paths = known()
-    if (paths.size === 0) return []
+    if (paths.size === 0)
+      return []
 
     return Object.entries(errors.value)
       .filter(([path]) => !paths.has(path))
@@ -115,7 +118,8 @@ export function useServerFieldErrors(options: UseServerFieldErrorsOptions = {}):
     },
 
     dismiss(path) {
-      if (!(path in errors.value)) return
+      if (!(path in errors.value))
+        return
 
       const next = { ...errors.value }
       delete next[path]
@@ -134,7 +138,8 @@ export function useServerFieldErrors(options: UseServerFieldErrorsOptions = {}):
         }
 
         // Удалённая строка забирает свои ошибки с собой.
-        if (delta < 0 && current === index) continue
+        if (delta < 0 && current === index)
+          continue
 
         next[withIndex(path, arrayPath, current + delta)] = messages
       }
@@ -154,9 +159,12 @@ export function useServerFieldErrors(options: UseServerFieldErrorsOptions = {}):
         }
 
         let moved = current
-        if (current === from) moved = to
-        else if (from < to && current > from && current <= to) moved = current - 1
-        else if (from > to && current >= to && current < from) moved = current + 1
+        if (current === from)
+          moved = to
+        else if (from < to && current > from && current <= to)
+          moved = current - 1
+        else if (from > to && current >= to && current < from)
+          moved = current + 1
 
         next[withIndex(path, arrayPath, moved)] = messages
       }

@@ -30,7 +30,8 @@ export function createFileEntry(file: File): GrFileUploadEntry {
  * стартует после маленького.
  */
 export function summarizeFileEntries(entries: GrFileUploadEntry[]): GrUploadState {
-  if (!entries.length) return { phase: 'idle', percent: 0, indeterminate: false, loaded: 0, total: 0 }
+  if (!entries.length)
+    return { phase: 'idle', percent: 0, indeterminate: false, loaded: 0, total: 0 }
 
   const total = entries.length
   const percent = Math.round(entries.reduce((sum, entry) => sum + entry.percent, 0) / total)

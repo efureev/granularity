@@ -27,10 +27,12 @@ const ISO_TIME = '^\\d{2}:\\d{2}(:\\d{2}(\\.\\d+)?)?$'
 
 /** Календарно существующая дата: `2026-02-31` формат проходит, а даты такой нет. */
 function isRealDate(value: unknown): boolean {
-  if (typeof value !== 'string') return true
+  if (typeof value !== 'string')
+    return true
 
   const match = /^(\d{4})-(\d{2})-(\d{2})/.exec(value)
-  if (!match) return true
+  if (!match)
+    return true
 
   const [, year, month, day] = match
   const date = new Date(Date.UTC(Number(year), Number(month) - 1, Number(day)))
@@ -94,7 +96,8 @@ export const KNOWN_FORMATS: Partial<Record<GrSchemaFormat, GrSchemaFormatSpec>> 
   },
   'json': {
     validate: (value) => {
-      if (typeof value !== 'string' || value.trim() === '') return true
+      if (typeof value !== 'string' || value.trim() === '')
+        return true
       try {
         JSON.parse(value)
         return true

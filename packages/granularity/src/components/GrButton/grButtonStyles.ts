@@ -31,8 +31,8 @@ export type GrButtonToneTokens = {
   borderActive: string
 }
 
-export const base =
-  'inline-flex items-center justify-center gap-2 select-none whitespace-nowrap rounded-[var(--gr-button-radius,0.375rem)] transition-colors duration-[var(--gr-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] disabled:cursor-not-allowed'
+export const base
+  = 'inline-flex items-center justify-center gap-2 select-none whitespace-nowrap rounded-[var(--gr-button-radius,0.375rem)] transition-colors duration-[var(--gr-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] disabled:cursor-not-allowed'
 
 /** Кнопка на всю ширину контейнера. */
 export const blockClass = 'w-full'
@@ -49,10 +49,10 @@ export const blockClass = 'w-full'
  * иначе стрелка пагинации превращалась бы в залитую плашку.
  */
 export const disabledClassByVariant: Record<GrButtonVariant, string> = {
-  primary: 'bg-[var(--gr-button-disabled-bg)] text-[var(--gr-button-disabled-fg)] border border-[var(--gr-button-disabled-brd)] cursor-not-allowed',
-  secondary: 'bg-[var(--gr-button-disabled-bg)] text-[var(--gr-button-disabled-fg)] border border-[var(--gr-button-disabled-brd)] cursor-not-allowed',
-  outline: 'bg-transparent text-[var(--gr-button-disabled-fg)] border border-[var(--gr-button-disabled-brd)] cursor-not-allowed',
-  ghost: 'bg-transparent text-[var(--gr-button-disabled-fg)] cursor-not-allowed',
+  'primary': 'bg-[var(--gr-button-disabled-bg)] text-[var(--gr-button-disabled-fg)] border border-[var(--gr-button-disabled-brd)] cursor-not-allowed',
+  'secondary': 'bg-[var(--gr-button-disabled-bg)] text-[var(--gr-button-disabled-fg)] border border-[var(--gr-button-disabled-brd)] cursor-not-allowed',
+  'outline': 'bg-transparent text-[var(--gr-button-disabled-fg)] border border-[var(--gr-button-disabled-brd)] cursor-not-allowed',
+  'ghost': 'bg-transparent text-[var(--gr-button-disabled-fg)] cursor-not-allowed',
   'ghost-border': 'bg-transparent text-[var(--gr-button-disabled-fg)] border border-transparent cursor-not-allowed',
 }
 

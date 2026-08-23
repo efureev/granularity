@@ -53,12 +53,22 @@ fallthrough — компонент их не перечисляет.
 только `external`.
 
 ```vue
-<GrLink href="https://example.com" external>Документация</GrLink>
-<GrLink href="https://example.com" target="_blank">То же самое</GrLink>
+<GrLink href="https://example.com" external>
+Документация
+</GrLink>
+
+<GrLink href="https://example.com" target="_blank">
+То же самое
+</GrLink>
 
 <!-- Иконку можно выключить или, наоборот, включить внутренней ссылке. -->
-<GrLink href="https://example.com" external :external-icon="false">Без иконки</GrLink>
-<GrLink href="/inner" external-icon>С иконкой</GrLink>
+<GrLink href="https://example.com" external :external-icon="false">
+Без иконки
+</GrLink>
+
+<GrLink href="/inner" external-icon>
+С иконкой
+</GrLink>
 ```
 
 `newTabLabel` перекрывает текст подсказки, ключ локали — `gr.link.opensInNewTab`.

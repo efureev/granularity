@@ -24,15 +24,15 @@ export default defineConfig({
     emptyOutDir: true,
     lib: {
       entry: {
-        index: fileURLToPath(new URL('./src/index.ts', import.meta.url)),
-        editor: fileURLToPath(new URL('./src/editor/index.ts', import.meta.url)),
+        'index': fileURLToPath(new URL('./src/index.ts', import.meta.url)),
+        'editor': fileURLToPath(new URL('./src/editor/index.ts', import.meta.url)),
         'granular-provider': fileURLToPath(
           new URL('./src/granular-provider/index.ts', import.meta.url),
         ),
         'granular-provider-node': fileURLToPath(
           new URL('./src/granular-provider/node.ts', import.meta.url),
         ),
-        resolver: fileURLToPath(
+        'resolver': fileURLToPath(
           new URL('./src/resolver.ts', import.meta.url),
         ),
         'i18n/index': fileURLToPath(
@@ -73,6 +73,6 @@ export default defineConfig({
   define: {
     // Скобки обязательны: `!__GR_DEV__` без них развернулось бы в
     // `!typeof process !== 'undefined' && …`.
-    __GR_DEV__: "(typeof process !== 'undefined' && process.env.NODE_ENV !== 'production')",
+    __GR_DEV__: '(typeof process !== \'undefined\' && process.env.NODE_ENV !== \'production\')',
   },
 })

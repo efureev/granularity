@@ -143,7 +143,8 @@ function claim(add: () => void, remove: () => void): () => void {
   add()
   let released = false
   return () => {
-    if (released) return
+    if (released)
+      return
     released = true
     remove()
   }
@@ -151,15 +152,27 @@ function claim(add: () => void, remove: () => void): () => void {
 
 function claimTitle(): () => void {
   return claim(
-    () => { titleClaims += 1; hasTitle.value = true },
-    () => { titleClaims -= 1; hasTitle.value = titleClaims > 0 },
+    () => {
+      titleClaims += 1
+      hasTitle.value = true
+    },
+    () => {
+      titleClaims -= 1
+      hasTitle.value = titleClaims > 0
+    },
   )
 }
 
 function claimDescription(): () => void {
   return claim(
-    () => { descriptionClaims += 1; hasDescription.value = true },
-    () => { descriptionClaims -= 1; hasDescription.value = descriptionClaims > 0 },
+    () => {
+      descriptionClaims += 1
+      hasDescription.value = true
+    },
+    () => {
+      descriptionClaims -= 1
+      hasDescription.value = descriptionClaims > 0
+    },
   )
 }
 
@@ -193,7 +206,8 @@ const describedBy = computed(() => (hasDescription.value ? descriptionId : undef
 // Собственный `aria-label` ставим только в отсутствие заголовка: при обоих
 // атрибутах `aria-labelledby` всё равно сильнее, и второе имя было бы шумом.
 const ariaLabelAttr = computed(() => {
-  if (labelledBy.value) return undefined
+  if (labelledBy.value)
+    return undefined
   return props.ariaLabel || t('gr.modal.title', 'Dialog')
 })
 
@@ -203,9 +217,12 @@ const ariaLabelAttr = computed(() => {
 let missingNameWarned = false
 
 function warnMissingAccessibleName(): void {
-  if (missingNameWarned) return
-  if (!__GR_DEV__) return
-  if (slots.title || props.ariaLabel) return
+  if (missingNameWarned)
+    return
+  if (!__GR_DEV__)
+    return
+  if (slots.title || props.ariaLabel)
+    return
 
   missingNameWarned = true
   console.warn(
@@ -217,8 +234,10 @@ function warnMissingAccessibleName(): void {
 // Два заголовка на окно — это разъехавшийся `aria-labelledby`: диктор прочитает
 // первый, а автор будет уверен во втором.
 function warnDuplicateTitle(): void {
-  if (!__GR_DEV__) return
-  if (titleClaims <= 1) return
+  if (!__GR_DEV__)
+    return
+  if (titleClaims <= 1)
+    return
 
   console.warn(
     '[GrModal] На окно заявлено несколько заголовков — имя берётся от первого. '
@@ -267,7 +286,8 @@ function onPanelAfterLeave(): void {
 watch(
   () => props.modelValue,
   (value) => {
-    if (!value) return
+    if (!value)
+      return
     warnMissingAccessibleName()
     warnDuplicateTitle()
   },

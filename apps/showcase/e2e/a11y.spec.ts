@@ -42,7 +42,8 @@ for (const target of scanTargets) {
     // секции: он появляется раньше них. Без ожидания axe успевал просканировать
     // пустые рамки превью и объявить страницу чистой, ничего не проверив.
     await expect.poll(async () => page.evaluate(() => [...document.querySelectorAll('[data-example-preview]')]
-      .filter(preview => preview.childElementCount === 0).length)).toBe(0)
+      .filter(preview => preview.childElementCount === 0)
+      .length)).toBe(0)
 
     await expectNoA11yRegressions(page, {
       include: '[data-example-preview]',

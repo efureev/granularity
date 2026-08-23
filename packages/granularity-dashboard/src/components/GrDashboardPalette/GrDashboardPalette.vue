@@ -99,8 +99,10 @@ function canDrag(item: GrDashboardPaletteItem): boolean {
  * тут контракт.
  */
 function startTransfer(item: GrDashboardPaletteItem, event: PointerEvent): void {
-  if (!canDrag(item)) return
-  if ((event.target as HTMLElement | null)?.closest('button')) return
+  if (!canDrag(item))
+    return
+  if ((event.target as HTMLElement | null)?.closest('button'))
+    return
 
   transfer.start({
     id: item.id,
@@ -129,7 +131,8 @@ const label = computed(() => props.ariaLabel ?? t('grDashboard.palette.label', '
  * клавиатуры, а это ровно тот случай, когда «доступность потом» не наступает.
  */
 function add(item: GrDashboardPaletteItem): void {
-  if (props.disabled || item.disabled) return
+  if (props.disabled || item.disabled)
+    return
 
   emit('add', item)
   announce(t('grDashboard.item.added', '{title} added', { title: item.title }))

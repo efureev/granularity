@@ -17,17 +17,20 @@ import type { ResponseErrorParser } from '../responseError.types'
  */
 export const problemDetailsParser: ResponseErrorParser = (ctx) => {
   const body = ctx.body
-  if (!body || typeof body !== 'object' || Array.isArray(body)) return null
+  if (!body || typeof body !== 'object' || Array.isArray(body))
+    return null
 
   const data = body as { type?: unknown, title?: unknown, detail?: unknown, status?: unknown }
   const isProblemContentType = ctx.headers?.['content-type']?.includes('application/problem+json')
   const hasShape = typeof data.title === 'string' && (typeof data.type === 'string' || typeof data.status === 'number')
 
-  if (!isProblemContentType && !hasShape) return null
+  if (!isProblemContentType && !hasShape)
+    return null
 
   const message = typeof data.title === 'string' ? data.title : undefined
   const details: string[] = []
-  if (typeof data.detail === 'string' && data.detail) details.push(data.detail)
+  if (typeof data.detail === 'string' && data.detail)
+    details.push(data.detail)
 
   const status = typeof data.status === 'number' ? data.status : ctx.status
 

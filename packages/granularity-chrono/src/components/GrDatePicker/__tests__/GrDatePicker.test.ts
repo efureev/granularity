@@ -41,7 +41,8 @@ function day(wrapper: Picker, key: string) {
  * уходит фокус. Тик один на каждый шаг плюс запас на отрисовку сетки.
  */
 async function openPicker(wrapper: Picker, how: 'click' | 'Enter' | ' ' | 'ArrowDown' = 'click') {
-  if (how === 'click') await field(wrapper).trigger('click')
+  if (how === 'click')
+    await field(wrapper).trigger('click')
   else await field(wrapper).trigger('keydown', { key: how })
 
   for (let i = 0; i < 4; i += 1) await nextTick()
@@ -820,9 +821,7 @@ describe('GrDatePicker — множественный выбор', () => {
     const wrapper = mountMultiple({ modelValue: [at('2026-08-12'), at('2026-08-14')] })
     await openPicker(wrapper)
 
-    const selected = calendar(wrapper).findAll('[data-gr-calendar-cell]')
-      .filter(cell => cell.attributes('aria-selected') === 'true')
-      .map(cell => cell.text())
+    const selected = calendar(wrapper).findAll('[data-gr-calendar-cell]').filter(cell => cell.attributes('aria-selected') === 'true').map(cell => cell.text())
 
     expect(selected).toEqual(['12', '14'])
   })

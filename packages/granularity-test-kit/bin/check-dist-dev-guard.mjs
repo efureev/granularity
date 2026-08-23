@@ -30,7 +30,8 @@ const GUARD_DOUBLE = 'process.env.NODE_ENV !== "production"'
 function jsFiles(dir) {
   return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
     const full = resolve(dir, entry.name)
-    if (entry.isDirectory()) return jsFiles(full)
+    if (entry.isDirectory())
+      return jsFiles(full)
     return entry.name.endsWith('.js') ? [full] : []
   })
 }
@@ -49,8 +50,10 @@ for (const file of files) {
   const source = readFileSync(file, 'utf8')
   const rel = file.slice(distDir.length + 1)
 
-  if (source.includes('__GR_DEV__')) leaked.push(rel)
-  if (source.includes(GUARD) || source.includes(GUARD_DOUBLE)) expanded += 1
+  if (source.includes('__GR_DEV__'))
+    leaked.push(rel)
+  if (source.includes(GUARD) || source.includes(GUARD_DOUBLE))
+    expanded += 1
 }
 
 if (leaked.length > 0) {

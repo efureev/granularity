@@ -26,8 +26,10 @@ export const plainMessageParser: ResponseErrorParser = (ctx) => {
   if (ctx.body && typeof ctx.body === 'object') {
     const data = ctx.body as Record<string, unknown>
     const fromKey = data[messageKey]
-    if (typeof fromKey === 'string' && fromKey) return { message: fromKey }
-    if (typeof data.error === 'string' && data.error) return { message: data.error }
+    if (typeof fromKey === 'string' && fromKey)
+      return { message: fromKey }
+    if (typeof data.error === 'string' && data.error)
+      return { message: data.error }
   }
 
   const hadResponse = typeof ctx.status === 'number' || ctx.body != null

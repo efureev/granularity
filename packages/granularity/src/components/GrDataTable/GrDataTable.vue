@@ -1,4 +1,3 @@
-
 <script setup lang="ts" generic="TRow extends Record<string, unknown> = Record<string, unknown>">
 import { computed, nextTick, onMounted, onUnmounted, ref, useId, watch } from 'vue'
 
@@ -51,9 +50,9 @@ import IconArrowDown from '~icons/lucide/arrow-down'
  * произвольная строка тоже допустима: колонка может быть вычисляемой и жить
  * только в слоте `#cell-<key>`.
  */
-export type GrDataColumnKey<TRow extends Record<string, unknown> = Record<string, unknown>> =
-  | Extract<keyof TRow, string>
-  | (string & {})
+export type GrDataColumnKey<TRow extends Record<string, unknown> = Record<string, unknown>>
+  = | Extract<keyof TRow, string>
+    | (string & {})
 
 export type GrDataColumn<TRow extends Record<string, unknown> = Record<string, unknown>> = {
   key: GrDataColumnKey<TRow>
@@ -92,12 +91,12 @@ export type GrDataColumn<TRow extends Record<string, unknown> = Record<string, u
  * Колонка, для которой значения нет, остаётся пустой ячейкой — заполнять все
  * колонки итог не обязан.
  */
-export type GrDataTableSummary<TRow extends Record<string, unknown> = Record<string, unknown>> =
-  Partial<Record<GrDataColumnKey<TRow>, unknown>>
+export type GrDataTableSummary<TRow extends Record<string, unknown> = Record<string, unknown>>
+  = Partial<Record<GrDataColumnKey<TRow>, unknown>>
 
-export type GrDataTableRowKey<TRow extends Record<string, unknown> = Record<string, unknown>> =
-  | string
-  | ((row: TRow) => string | number)
+export type GrDataTableRowKey<TRow extends Record<string, unknown> = Record<string, unknown>>
+  = | string
+    | ((row: TRow) => string | number)
 
 /** Порядок обхода состояний сортировки по клику на заголовок. */
 export type GrDataTableSortCycle = 'asc-desc' | 'asc-desc-none'
@@ -485,14 +484,16 @@ const orderedColumns = computed<GrDataColumn<TRow>[]>(() => {
 
   for (const key of order) {
     const col = remaining.get(key)
-    if (!col) continue
+    if (!col)
+      continue
 
     remaining.delete(key)
     ordered.push(col)
   }
 
   for (const col of props.columns) {
-    if (remaining.has(String(col.key))) ordered.push(col)
+    if (remaining.has(String(col.key)))
+      ordered.push(col)
   }
 
   // Закреплённые колонки стоят своими группами у своих краёв — иначе
@@ -503,8 +504,10 @@ const orderedColumns = computed<GrDataColumn<TRow>[]>(() => {
 
 /** Группа закрепления: 0 — слева, 1 — обычная колонка, 2 — справа. */
 function pinGroupOf(col: GrDataColumn<TRow>): number {
-  if (col.pinned === 'left') return 0
-  if (col.pinned === 'right') return 2
+  if (col.pinned === 'left')
+    return 0
+  if (col.pinned === 'right')
+    return 2
 
   return 1
 }
@@ -520,12 +523,14 @@ function pinGroupOf(col: GrDataColumn<TRow>): number {
  */
 const tableMinWidth = computed<number | undefined>(() => {
   const cols = orderedColumns.value
-  if (cols.length === 0) return undefined
+  if (cols.length === 0)
+    return undefined
 
   let total = 0
   for (const col of cols) {
     const width = widthOf(col)
-    if (typeof width !== 'number') return undefined
+    if (typeof width !== 'number')
+      return undefined
 
     total += width
   }
@@ -565,13 +570,16 @@ function registerEl(store: Map<string, HTMLElement>, key: string, el: unknown): 
   // Перестановка размонтирует старую ячейку уже после того, как встала новая:
   // снимаем запись, только если она протухла.
   const previous = store.get(key)
-  if (previous && !previous.isConnected) store.delete(key)
+  if (previous && !previous.isConnected)
+    store.delete(key)
 }
 
 function applyColumnMove(from: number, to: number): void {
   const keys = columnKeys.value
-  if (from < 0 || to < 0 || to >= keys.length || from === to) return
-  if (!sameGroup(from, to)) return
+  if (from < 0 || to < 0 || to >= keys.length || from === to)
+    return
+  if (!sameGroup(from, to))
+    return
 
   const key = keys[from]
   // Подпись берётся до перестановки: `orderedColumns` — computed, и после
@@ -606,7 +614,8 @@ const columnSort = useDragSort<string, number>({
 
 function sameGroup(from: number, to: number): boolean {
   const cols = orderedColumns.value
-  if (!cols[from] || !cols[to]) return false
+  if (!cols[from] || !cols[to])
+    return false
 
   return pinGroupOf(cols[from]) === pinGroupOf(cols[to])
 }
@@ -623,7 +632,8 @@ const columnRoving = useRovingFocus<string>({
 })
 
 async function onColumnHandleKeydown(event: KeyboardEvent, key: string): Promise<void> {
-  if (!props.reorderableColumns) return
+  if (!props.reorderableColumns)
+    return
 
   // `Shift` со стрелкой двигает колонку, голая стрелка — фокус между ручками.
   // Раскладка та же, что у переноса узла в `GrTree`.
@@ -648,16 +658,19 @@ const draggingColumnKey = computed(() => (columnSort.mode.value === null ? null 
 /** Полоса места вставки — на колонке-соседе, со стороны движения. */
 function columnDropClass(index: number): string {
   const target = columnSort.target.value
-  if (!columnSort.isActive.value || target === null || target !== index) return ''
+  if (!columnSort.isActive.value || target === null || target !== index)
+    return ''
 
   const active = columnSort.source.value === null ? -1 : indexOfColumn(columnSort.source.value)
-  if (index === active) return ''
+  if (index === active)
+    return ''
 
   return target < active ? columnDropBeforeClass : columnDropAfterClass
 }
 
-const columnHandleLabel = (col: GrDataColumn<TRow>): string =>
-  t('gr.dataTable.moveColumn', 'Move column {label}', { label: col.label })
+function columnHandleLabel(col: GrDataColumn<TRow>): string {
+  return t('gr.dataTable.moveColumn', 'Move column {label}', { label: col.label })
+}
 
 // ————— Ширина колонок.
 
@@ -693,7 +706,8 @@ function setColumnWidth(key: string, width: number): void {
 
 function announceWidth(key: string): void {
   const col = orderedColumns.value.find(item => String(item.key) === key)
-  if (!col) return
+  if (!col)
+    return
 
   announce(t('gr.dataTable.columnResized', 'Column {label} is {width} pixels wide', {
     label: col.label,
@@ -706,7 +720,8 @@ const resizeGesture = useDragGesture({
   onStart: (event) => {
     const key = pendingResizeKey
     const el = key === null ? null : headerCellEls.get(key)
-    if (key === null || !el) return false
+    if (key === null || !el)
+      return false
 
     resizeStartX = event.clientX
     // Стартовая ширина — измеренная, а не объявленная: колонка могла жить на
@@ -716,7 +731,8 @@ const resizeGesture = useDragGesture({
     resizingKey.value = key
   },
   onMove: (event) => {
-    if (resizingKey.value === null) return
+    if (resizingKey.value === null)
+      return
 
     // Против выделения текста заголовка во время протяжки.
     event.preventDefault()
@@ -725,7 +741,8 @@ const resizeGesture = useDragGesture({
   onEnd: () => {
     const key = resizingKey.value
     resizingKey.value = null
-    if (key === null) return
+    if (key === null)
+      return
 
     emit('columnResize', { key, width: columnWidths.value[key] ?? Math.round(resizeStartWidth) })
     announceWidth(key)
@@ -733,11 +750,13 @@ const resizeGesture = useDragGesture({
   onCancel: () => {
     const key = resizingKey.value
     resizingKey.value = null
-    if (key === null) return
+    if (key === null)
+      return
 
     // Оборванный жест возвращает ширину, которая была до нажатия.
     const next = { ...columnWidths.value }
-    if (widthBeforeResize === undefined) delete next[key]
+    if (widthBeforeResize === undefined)
+      delete next[key]
     else next[key] = widthBeforeResize
 
     internalColumnWidths.value = next
@@ -752,7 +771,8 @@ function onResizerPointerDown(event: PointerEvent, key: string): void {
 
 /** Сброс к авторазметке: колонка снова считается по содержимому. */
 function resetColumnWidth(key: string): void {
-  if (columnWidths.value[key] === undefined) return
+  if (columnWidths.value[key] === undefined)
+    return
 
   const next = { ...columnWidths.value }
   delete next[key]
@@ -772,7 +792,8 @@ function resizeByKeyboard(key: string, delta: number): void {
 }
 
 function onResizerKeydown(event: KeyboardEvent, key: string): void {
-  if (!props.resizableColumns || props.loading) return
+  if (!props.resizableColumns || props.loading)
+    return
 
   const step = event.shiftKey ? RESIZE_BIG_STEP : RESIZE_STEP
 
@@ -830,7 +851,8 @@ function measurePinnedOffsets(): void {
     : 0
 
   for (const col of cols) {
-    if (col.pinned !== 'left') continue
+    if (col.pinned !== 'left')
+      continue
 
     next[String(col.key)] = left
     left += headerCellEls.get(String(col.key))?.getBoundingClientRect().width ?? 0
@@ -839,7 +861,8 @@ function measurePinnedOffsets(): void {
   let right = 0
   for (let index = cols.length - 1; index >= 0; index -= 1) {
     const col = cols[index]
-    if (col.pinned !== 'right') continue
+    if (col.pinned !== 'right')
+      continue
 
     next[String(col.key)] = right
     right += headerCellEls.get(String(col.key))?.getBoundingClientRect().width ?? 0
@@ -849,7 +872,8 @@ function measurePinnedOffsets(): void {
 }
 
 function measureColumnWidths(): void {
-  if (!props.resizableColumns) return
+  if (!props.resizableColumns)
+    return
 
   const next: Record<string, number> = {}
 
@@ -857,7 +881,8 @@ function measureColumnWidths(): void {
     const key = String(col.key)
     const width = headerCellEls.get(key)?.getBoundingClientRect().width
 
-    if (width) next[key] = Math.round(width)
+    if (width)
+      next[key] = Math.round(width)
   }
 
   measuredColumnWidths.value = next
@@ -869,7 +894,8 @@ function measureLayout(): void {
 }
 
 function pinnedStyleOf(col: GrDataColumn<TRow>): Record<string, string> | undefined {
-  if (!col.pinned) return undefined
+  if (!col.pinned)
+    return undefined
 
   const offset = pinnedOffsets.value[String(col.key)] ?? 0
 
@@ -878,14 +904,17 @@ function pinnedStyleOf(col: GrDataColumn<TRow>): Record<string, string> | undefi
 
 /** Тень рисует только крайняя колонка группы — иначе полос было бы столько же, сколько колонок. */
 function pinnedEdgeClass(col: GrDataColumn<TRow>, index: number): string {
-  if (col.pinned === 'left') return orderedColumns.value[index + 1]?.pinned === 'left' ? '' : columnPinnedLeftEdgeClass
-  if (col.pinned === 'right') return orderedColumns.value[index - 1]?.pinned === 'right' ? '' : columnPinnedRightEdgeClass
+  if (col.pinned === 'left')
+    return orderedColumns.value[index + 1]?.pinned === 'left' ? '' : columnPinnedLeftEdgeClass
+  if (col.pinned === 'right')
+    return orderedColumns.value[index - 1]?.pinned === 'right' ? '' : columnPinnedRightEdgeClass
 
   return ''
 }
 
 function pinnedCellClass(col: GrDataColumn<TRow>, index: number): string[] {
-  if (!col.pinned) return []
+  if (!col.pinned)
+    return []
 
   return [columnPinnedClass, pinnedEdgeClass(col, index)]
 }
@@ -900,11 +929,13 @@ let layoutObserver: ResizeObserver | null = null
 onMounted(() => {
   measureLayout()
 
-  if (typeof ResizeObserver === 'undefined') return
+  if (typeof ResizeObserver === 'undefined')
+    return
 
   layoutObserver = new ResizeObserver(() => measureLayout())
   const el = headerCellEls.get(SELECT_COLUMN_KEY) ?? headerCellEls.get(columnKeys.value[0])
-  if (el?.parentElement) layoutObserver.observe(el.parentElement)
+  if (el?.parentElement)
+    layoutObserver.observe(el.parentElement)
 })
 
 onUnmounted(() => {
@@ -1048,7 +1079,8 @@ const virtualizer = useVirtualList({
 /** Строки к отрисовке вместе с их абсолютной позицией в наборе. */
 const renderedRows = computed(() => {
   const rows = sortedRows.value
-  if (!props.virtual) return rows.map((row, index) => ({ row, index }))
+  if (!props.virtual)
+    return rows.map((row, index) => ({ row, index }))
 
   const { start, end } = virtualizer.range.value
   return rows.slice(start, end).map((row, offset) => ({ row, index: start + offset }))
@@ -1059,7 +1091,8 @@ const spacerAfter = computed(() => (props.virtual ? virtualizer.offsetEnd.value 
 
 /** Ширина колонки: число трактуем как пиксели. */
 function columnWidthStyle(width: string | number | undefined): Record<string, string> | undefined {
-  if (width === undefined) return undefined
+  if (width === undefined)
+    return undefined
   return { width: typeof width === 'number' ? `${width}px` : width }
 }
 
@@ -1072,7 +1105,8 @@ function scrollToRow(key: string | number, options?: ScrollIntoViewOptions): boo
   // `dataset` вернул бы `undefined`, и метод молча отвечал бы «не нашёл».
   if (props.virtual) {
     const index = sortedRows.value.findIndex(row => String(rowKeyValue(row)) === target)
-    if (index < 0) return false
+    if (index < 0)
+      return false
 
     virtualizer.scrollToIndex(index)
     void nextTick(() => {
@@ -1098,7 +1132,7 @@ function findRowEl(rowKey: string): HTMLElement | undefined {
   return Array.prototype.find.call(rows, (el: HTMLElement) => el.dataset.rowKey === rowKey) as HTMLElement | undefined
 }
 
-const scrollTo = (options: ScrollToOptions): void => {
+function scrollTo(options: ScrollToOptions): void {
   scrollEl()?.scrollTo(options)
 }
 
@@ -1138,7 +1172,6 @@ defineSlots<{
   footer?: (props: { columns: GrDataColumn<TRow>[], totalColumns: number }) => any
   [byColumn: string]: ((props?: any) => any) | undefined
 }>()
-
 </script>
 
 <template>

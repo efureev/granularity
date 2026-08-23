@@ -35,7 +35,8 @@ export const grTabsExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Tabs as page-level panel switcher',
     description: 'Документируем ключевую идею: `GrTabs` — это navigation primitive, а не готовая система вкладочных панелей с собственной разметкой.',
     status: 'ready',
-    previewKey: 'gr-tabs-panel-layout',    note: 'Этот сценарий помогает не ожидать от компонента скрытой магии с panels/portals: orchestration остаётся снаружи.',
+    previewKey: 'gr-tabs-panel-layout',
+    note: 'Этот сценарий помогает не ожидать от компонента скрытой магии с panels/portals: orchestration остаётся снаружи.',
   },
   {
     id: 'tabs-sizes',

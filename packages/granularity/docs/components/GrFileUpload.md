@@ -51,7 +51,7 @@ input объявлены пропами явно.
 const uploader = ref<GrFileUploadInstance>()
 
 uploader.value?.retry()
-uploader.value?.removeFile(file)   // удаление обрывает идущую загрузку: она была про прежний набор
+uploader.value?.removeFile(file) // удаление обрывает идущую загрузку: она была про прежний набор
 uploader.value?.abort()
 ```
 

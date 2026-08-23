@@ -12,7 +12,7 @@ const percentage = ref<number | null>(42.5)
     <GrFormField label="Comma decimal separator">
       <GrNumberInput
         v-model="amountComma"
-        decimal-separator="," 
+        decimal-separator=","
         :precision="2"
         :step="0.25"
         placeholder="0,00"
@@ -24,7 +24,7 @@ const percentage = ref<number | null>(42.5)
     <GrFormField label="Range guards">
       <GrNumberInput
         v-model="percentage"
-        decimal-separator="," 
+        decimal-separator=","
         :min="0"
         :max="100"
         :step="0.5"

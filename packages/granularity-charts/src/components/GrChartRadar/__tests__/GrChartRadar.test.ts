@@ -57,8 +57,7 @@ function outerRadius(wrapper: ReturnType<typeof factory>): number {
 }
 
 async function hover(wrapper: ReturnType<typeof factory>, x: number, y: number): Promise<void> {
-  wrapper.find('[data-gr-chart-surface]').element
-    .dispatchEvent(pointer('pointermove', { clientX: x, clientY: y }))
+  wrapper.find('[data-gr-chart-surface]').element.dispatchEvent(pointer('pointermove', { clientX: x, clientY: y }))
 
   await nextTick()
 }
@@ -129,9 +128,7 @@ describe('GrChartRadar', () => {
   })
 
   it('общая шкала подписывает кольца значениями', () => {
-    const labels = factory().findAll('[data-gr-chart-radar-body] text')
-      .map(node => node.text())
-      .filter(Boolean)
+    const labels = factory().findAll('[data-gr-chart-radar-body] text').map(node => node.text()).filter(Boolean)
 
     expect(labels.some(label => /^\d/.test(label))).toBe(true)
   })

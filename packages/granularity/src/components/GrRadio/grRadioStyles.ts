@@ -123,7 +123,8 @@ export function grRadioButtonClass(options: {
 }
 
 export function grRadioRootClass(options: { disabled: boolean, readonly: boolean }): string {
-  if (options.disabled) return grRadioRootDisabledClass
+  if (options.disabled)
+    return grRadioRootDisabledClass
   return options.readonly ? grRadioRootReadonlyClass : grRadioRootEnabledClass
 }
 

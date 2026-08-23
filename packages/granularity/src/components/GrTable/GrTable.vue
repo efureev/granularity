@@ -169,7 +169,8 @@ const theadClass = computed(() => [
 ].filter(Boolean).join(' '))
 
 const tableStyle = computed(() => {
-  if (props.tableMinWidth === undefined) return undefined
+  if (props.tableMinWidth === undefined)
+    return undefined
 
   const value = typeof props.tableMinWidth === 'number' ? `${props.tableMinWidth}px` : props.tableMinWidth
 
@@ -185,15 +186,18 @@ function scrollTo(options: ScrollToOptions): void {
 // Только верхний уровень собственного tbody: вложенная таблица в ячейке не
 // должна сдвигать индексацию строк.
 function contentRows(): HTMLElement[] {
-  if (!showRows.value) return []
+  if (!showRows.value)
+    return []
   const el = scrollEl.value
-  if (!el) return []
+  if (!el)
+    return []
   return Array.from(el.querySelectorAll<HTMLElement>(':scope > table > tbody > tr'))
 }
 
 function scrollToRow(index: number, options?: ScrollIntoViewOptions): boolean {
   const row = contentRows()[index]
-  if (!row) return false
+  if (!row)
+    return false
   row.scrollIntoView(options ?? { block: 'nearest' })
   return true
 }
@@ -219,7 +223,6 @@ defineSlots<{
   /** Итоговая строка под таблицей. */
   footer?: () => any
 }>()
-
 </script>
 
 <template>

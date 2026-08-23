@@ -645,7 +645,6 @@ describe('GrModal — жизненный цикл и раскладка', () => 
   })
 })
 
-
 describe('GrModal — императивный API', () => {
   it('open/close/toggle просят родителя, а не подменяют модель', async () => {
     const wrapper = mount(GrModal, { props: { modelValue: false, ariaLabel: 'X' } })

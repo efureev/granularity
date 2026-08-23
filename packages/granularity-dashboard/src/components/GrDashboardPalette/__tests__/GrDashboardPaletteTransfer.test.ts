@@ -37,7 +37,8 @@ function stand(props: Record<string, unknown> = {}, slots: PaletteSlots = {}) {
 function row(root: HTMLElement, id: string): HTMLElement {
   const items = [...root.querySelectorAll<HTMLElement>('[data-gr-dashboard-palette-item]')]
   const found = items.find(item => item.textContent?.includes(id === 'sales' ? 'Продажи' : 'Трафик'))
-  if (!found) throw new Error(`нет плитки ${id}`)
+  if (!found)
+    throw new Error(`нет плитки ${id}`)
 
   return found.firstElementChild as HTMLElement
 }

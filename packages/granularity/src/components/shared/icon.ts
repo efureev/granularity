@@ -14,7 +14,8 @@ export function iconTag(
   icon: string | Component | undefined,
   fallback: string | Component = 'span',
 ): string | Component {
-  if (!icon) return fallback
+  if (!icon)
+    return fallback
 
   return typeof icon === 'string' ? 'span' : markRaw(icon)
 }

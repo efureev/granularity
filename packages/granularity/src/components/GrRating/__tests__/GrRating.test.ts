@@ -249,7 +249,7 @@ describe('GrRating — name (нативная форма)', () => {
 })
 
 describe('GrRating — символ иконкой', () => {
-const CustomIcon = defineComponent({ name: 'CustomIcon', render: () => h('svg', { 'data-custom-icon': '' }) })
+  const CustomIcon = defineComponent({ name: 'CustomIcon', render: () => h('svg', { 'data-custom-icon': '' }) })
 
   it('класс от потребителя уезжает на `span`, компонент рисуется как есть', () => {
     const byClass = mount(GrRating, { props: { modelValue: 3, icon: 'i-lucide-heart' } })

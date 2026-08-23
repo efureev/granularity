@@ -49,9 +49,9 @@ function getButtonColors(variant: GrButtonVariant, tone: GrButtonTone, state: (t
   return {
     text,
     background:
-      getColorClassExpression(className, `${state}:bg-[`) ??
-      getColorClassExpression(className, `${state}:bg-`) ??
-      restBackground,
+      getColorClassExpression(className, `${state}:bg-[`)
+      ?? getColorClassExpression(className, `${state}:bg-`)
+      ?? restBackground,
   }
 }
 
@@ -366,7 +366,6 @@ describe('GrButton — отключённое состояние', () => {
 
     expect(wrapper.get('[data-gr-button]').classes()).not.toContain('bg-[var(--gr-button-disabled-bg)]')
   })
-
 })
 
 describe('GrButton — квадратный режим', () => {

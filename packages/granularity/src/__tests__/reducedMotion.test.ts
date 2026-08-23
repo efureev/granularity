@@ -51,14 +51,18 @@ function readStyle(name: string): string {
 /** Тело `@media (prefers-reduced-motion: reduce)` — со сжатыми пробелами. */
 function reducedMotionBlock(source: string): string | null {
   const start = source.indexOf('@media (prefers-reduced-motion: reduce)')
-  if (start < 0) return null
+  if (start < 0)
+    return null
 
   let depth = 0
   for (let i = source.indexOf('{', start); i < source.length; i++) {
-    if (source[i] === '{') depth++
+    if (source[i] === '{') {
+      depth++
+    }
     else if (source[i] === '}') {
       depth--
-      if (depth === 0) return source.slice(start, i + 1).replace(/\s+/g, ' ')
+      if (depth === 0)
+        return source.slice(start, i + 1).replace(/\s+/g, ' ')
     }
   }
 

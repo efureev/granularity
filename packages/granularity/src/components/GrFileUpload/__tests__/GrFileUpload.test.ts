@@ -162,7 +162,7 @@ describe('GrFileUpload', () => {
     const wrapper = mount(GrFileUpload, {
       props: { request },
       slots: {
-        default: ({ openDialog }: any) => h('button', { type: 'button', 'data-testid': 'btn', onClick: openDialog }, 'Upload'),
+        default: ({ openDialog }: any) => h('button', { 'type': 'button', 'data-testid': 'btn', 'onClick': openDialog }, 'Upload'),
       },
     })
 
@@ -281,9 +281,11 @@ describe('GrFileUpload', () => {
       getResponseHeader(name: string) {
         return name.toLowerCase() === 'content-type' ? 'application/json' : null
       }
+
       addEventListener(name: string, cb: (event?: any) => void) {
         ;(this.listeners[name] ??= []).push(cb)
       }
+
       removeEventListener() {}
       send = vi.fn(function (this: XhrMock, body: any) {
         lastInstance.body = body
@@ -314,7 +316,8 @@ describe('GrFileUpload', () => {
       const body = lastInstance.body as FormData
       expect(body.get('file')).toBeInstanceOf(File)
       expect(body.get('folder')).toBe('inbox')
-    } finally {
+    }
+    finally {
       ;(globalThis as any).XMLHttpRequest = originalXhr
     }
   })
@@ -757,7 +760,10 @@ describe('GrFileUpload — пофайловая загрузка', () => {
       inFlight += 1
       peak = Math.max(peak, inFlight)
       return new Promise<void>((resolve) => {
-        release.push(() => { inFlight -= 1; resolve() })
+        release.push(() => {
+          inFlight -= 1
+          resolve()
+        })
       })
     })
 
@@ -802,7 +808,8 @@ describe('GrFileUpload — пофайловая загрузка', () => {
   it('retryFile повторяет только свой файл', async () => {
     let attempt = 0
     const request = vi.fn((files: File[]) => {
-      if (files[0].name !== 'bad.png') return Promise.resolve({ ok: true })
+      if (files[0].name !== 'bad.png')
+        return Promise.resolve({ ok: true })
       attempt += 1
       return attempt === 1 ? Promise.reject(new Error('boom')) : Promise.resolve({ ok: true })
     })
@@ -831,7 +838,8 @@ describe('GrFileUpload — пофайловая загрузка', () => {
       controllers.push(ctx.signal)
       return new Promise((resolve, reject) => {
         ctx.signal.addEventListener('abort', () => reject(Object.assign(new Error('aborted'), { name: 'AbortError' })))
-        if (files[0].name === 'fast.png') resolve({ ok: true })
+        if (files[0].name === 'fast.png')
+          resolve({ ok: true })
       })
     })
 
@@ -1114,7 +1122,9 @@ describe('GrFileUpload — modelValue', () => {
 
   it('update:modelValue и change — разные моменты', async () => {
     let resolveUpload: (value: unknown) => void = () => {}
-    const request = vi.fn(() => new Promise((resolve) => { resolveUpload = resolve }))
+    const request = vi.fn(() => new Promise((resolve) => {
+      resolveUpload = resolve
+    }))
 
     const wrapper = mount(GrFileUpload, {
       props: { request, showFileList: true },

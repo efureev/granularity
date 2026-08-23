@@ -100,7 +100,8 @@ if (__GR_DEV__) {
     ([interactive, as]) => {
       // Компонент из `as` (`RouterLink`, Inertia `Link`) рендерит `<a>`, но узнать
       // это до рендера нельзя — предупреждаем только по явно названному тегу.
-      if (!interactive || typeof as !== 'string' || isFocusableTag(as)) return
+      if (!interactive || typeof as !== 'string' || isFocusableTag(as))
+        return
 
       console.warn(
         `[granularity] GrListItem: as="${as}" не попадает в таб-порядок — строка кликается `
@@ -122,7 +123,6 @@ defineSlots<{
   /** Описание под заголовком вместо пропа `description`. */
   description?: () => any
 }>()
-
 </script>
 
 <template>

@@ -3,13 +3,15 @@ import type { FileValidationIssue, FileValidator } from './types'
 import { matchAccept } from './matchAccept'
 
 export function acceptValidator(accept: string | undefined): FileValidator {
-  if (!accept) return () => []
+  if (!accept)
+    return () => []
 
   return ({ files }): FileValidationIssue[] => {
     const issues: FileValidationIssue[] = []
 
     for (const file of files) {
-      if (matchAccept(file, accept)) continue
+      if (matchAccept(file, accept))
+        continue
 
       issues.push({
         fileName: file.name,

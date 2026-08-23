@@ -34,7 +34,9 @@
 ## Отступы
 
 ```vue
-<GrCard padding="md">…</GrCard>
+<GrCard padding="md">
+…
+</GrCard>
 ```
 
 `none` (по умолчанию), `sm` (12px), `md` (16px), `lg` (24px). Пока секций нет,
@@ -143,9 +145,17 @@
 ## Карточка-ссылка и карточка-кнопка
 
 ```vue
-<GrCard href="/reports/42" padding="md">…</GrCard>
-<GrCard clickable padding="md" @click="open">…</GrCard>
-<GrCard :as="RouterLink" :to="{ name: 'report' }" padding="md">…</GrCard>
+<GrCard href="/reports/42" padding="md">
+…
+</GrCard>
+
+<GrCard clickable padding="md" @click="open">
+…
+</GrCard>
+
+<GrCard :as="RouterLink" :to="{ name: 'report' }" padding="md">
+…
+</GrCard>
 ```
 
 Порядок выбора тега — `as` → `<a href>` → `<button clickable>` → `<div>`, как у

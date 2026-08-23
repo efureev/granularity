@@ -79,14 +79,16 @@ export function useOverlayLayer(
   let previouslyFocused: HTMLElement | null = null
 
   function register(): void {
-    if (layerId !== null) return
+    if (layerId !== null)
+      return
 
     // Стек — браузерное понятие: Esc, `inert` и возврат фокуса на сервере
     // бессмысленны. Регистрируйся слой и там — он остался бы в модульном массиве
     // навсегда, потому что `onUnmounted` при `renderToString` не вызывается, и
     // каждый серверный рендер открытого оверлея копил бы замыкание со ссылками
     // на свои компоненты.
-    if (typeof window === 'undefined') return
+    if (typeof window === 'undefined')
+      return
 
     if (options.restoreFocus !== false && typeof document !== 'undefined')
       previouslyFocused = (document.activeElement as HTMLElement) ?? null
@@ -101,7 +103,8 @@ export function useOverlayLayer(
   }
 
   function unregister(): void {
-    if (layerId === null) return
+    if (layerId === null)
+      return
     removeOverlayLayer(layerId)
     layerId = null
 
@@ -112,27 +115,32 @@ export function useOverlayLayer(
     const target = previouslyFocused
     previouslyFocused = null
 
-    if (options.restoreFocus === false || !target) return
-    if (typeof document === 'undefined') return
+    if (options.restoreFocus === false || !target)
+      return
+    if (typeof document === 'undefined')
+      return
 
     // Фокус уже вне слоя — пользователь ушёл сам, отбирать нельзя. Решение
     // принимаем сейчас, пока слой ещё в DOM, а применяем следующим тиком.
     const active = document.activeElement
     const root = options.root?.value
-    if (root && active && active !== document.body && !root.contains(active)) return
+    if (root && active && active !== document.body && !root.contains(active))
+      return
 
     // Возврат откладывается намеренно: ловушка фокуса того же слоя снимает свои
     // слушатели в этом же флаше, и сфокусируй мы триггер сразу — она затащила бы
     // фокус обратно в закрывающийся слой.
     void nextTick(() => {
-      if (target.isConnected) target.focus?.()
+      if (target.isConnected)
+        target.focus?.()
     })
   }
 
   watch(
     open,
     (isOpen) => {
-      if (isOpen) register()
+      if (isOpen)
+        register()
       else unregister()
     },
     { immediate: true },

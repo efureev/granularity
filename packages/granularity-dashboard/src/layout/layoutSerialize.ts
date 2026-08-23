@@ -33,11 +33,14 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 function parseItem(value: unknown): GrDashboardItemLayout | null {
-  if (!isRecord(value)) return null
+  if (!isRecord(value))
+    return null
 
   const { id, x, y, w, h } = value
-  if (typeof id !== 'string' || id === '') return null
-  if (![x, y, w, h].every(n => typeof n === 'number' && Number.isFinite(n))) return null
+  if (typeof id !== 'string' || id === '')
+    return null
+  if (![x, y, w, h].every(n => typeof n === 'number' && Number.isFinite(n)))
+    return null
 
   const item: GrDashboardItemLayout = {
     id,
@@ -49,26 +52,31 @@ function parseItem(value: unknown): GrDashboardItemLayout | null {
 
   for (const key of ['minW', 'minH', 'maxW', 'maxH'] as const) {
     const bound = value[key]
-    if (typeof bound === 'number' && Number.isFinite(bound)) item[key] = Math.round(bound)
+    if (typeof bound === 'number' && Number.isFinite(bound))
+      item[key] = Math.round(bound)
   }
 
-  if (value.static === true) item.static = true
+  if (value.static === true)
+    item.static = true
 
   return item
 }
 
 function parseResponsive(value: unknown): GrDashboardResponsiveLayout | null {
-  if (!isRecord(value)) return null
+  if (!isRecord(value))
+    return null
 
   const result: GrDashboardResponsiveLayout = {}
 
   for (const [breakpoint, layout] of Object.entries(value)) {
-    if (!Array.isArray(layout)) return null
+    if (!Array.isArray(layout))
+      return null
 
     const items = layout.map(parseItem).filter((item): item is GrDashboardItemLayout => item !== null)
     // Виджет с испорченной записью пропускается, но раскладка, в которой
     // испорчено всё, — это не «пустой дашборд», а нечитаемые данные.
-    if (items.length !== layout.length && items.length === 0) return null
+    if (items.length !== layout.length && items.length === 0)
+      return null
 
     result[breakpoint] = items
   }
@@ -87,7 +95,8 @@ export function parseLayout(
   raw: string | null | undefined,
   options: ParseLayoutOptions = {},
 ): GrDashboardResponsiveLayout | null {
-  if (!raw) return null
+  if (!raw)
+    return null
 
   let parsed: unknown
   try {
@@ -109,7 +118,8 @@ export function parseLayout(
 
 /** Раскладки равны, если равны по составу и координатам. */
 export function layoutsEqual(a: GrDashboardLayout, b: GrDashboardLayout): boolean {
-  if (a.length !== b.length) return false
+  if (a.length !== b.length)
+    return false
 
   return a.every((item, index) => {
     const other = b[index]

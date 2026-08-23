@@ -68,13 +68,15 @@ export function toggleCheckedKeys<T>(
   const next = new Set(checkedKeys)
 
   if (strict) {
-    if (checked) next.add(node.key)
+    if (checked)
+      next.add(node.key)
     else next.delete(node.key)
     return next
   }
 
   const applyDown = (target: GrTreeNode<T>): void => {
-    if (checked) next.add(target.key)
+    if (checked)
+      next.add(target.key)
     else next.delete(target.key)
     target.childNodes.forEach(applyDown)
   }
@@ -82,7 +84,8 @@ export function toggleCheckedKeys<T>(
 
   for (let parent = node.parent; parent; parent = parent.parent) {
     const allChecked = parent.childNodes.every(child => next.has(child.key))
-    if (allChecked) next.add(parent.key)
+    if (allChecked)
+      next.add(parent.key)
     else next.delete(parent.key)
   }
 
@@ -101,7 +104,8 @@ export function pruneToTree<T>(roots: GrTreeNode<T>[], keys: Set<GrTreeKey>): Se
 
   const next = new Set<GrTreeKey>()
   for (const key of keys) {
-    if (known.has(key)) next.add(key)
+    if (known.has(key))
+      next.add(key)
   }
   return next
 }
@@ -129,7 +133,8 @@ export function collectCheckedKeys<T>(
 export function collectHalfCheckedKeys(states: GrTreeCheckStates): GrTreeKey[] {
   const out: GrTreeKey[] = []
   for (const [key, state] of states) {
-    if (state === 'half') out.push(key)
+    if (state === 'half')
+      out.push(key)
   }
   return out
 }

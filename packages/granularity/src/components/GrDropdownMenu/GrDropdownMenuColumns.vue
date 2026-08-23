@@ -13,7 +13,6 @@ defineSlots<{
   /** Колонки меню (`GrDropdownMenuColumn`). */
   default?: () => any
 }>()
-
 </script>
 
 <template>

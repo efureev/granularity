@@ -123,7 +123,8 @@ export function useRovingFocus<TKey>(
   const disabled = (key: TKey): boolean => options.isDisabled?.(key) ?? false
 
   function firstFocusable(items: readonly TKey[]): TKey | undefined {
-    if (!skips()) return items[0]
+    if (!skips())
+      return items[0]
     return items.find(key => !disabled(key)) ?? items[0]
   }
 
@@ -134,13 +135,16 @@ export function useRovingFocus<TKey>(
    */
   const rovingKey = computed<TKey | undefined>(() => {
     const items = options.items()
-    if (items.length === 0) return undefined
+    if (items.length === 0)
+      return undefined
 
     const active = activeKey.value
-    if (active !== undefined && items.includes(active)) return active
+    if (active !== undefined && items.includes(active))
+      return active
 
     const initial = options.initialKey?.()
-    if (initial !== undefined && items.includes(initial)) return initial
+    if (initial !== undefined && items.includes(initial))
+      return initial
 
     return firstFocusable(items)
   })
@@ -164,7 +168,8 @@ export function useRovingFocus<TKey>(
     // Состояние — до фокуса: `onMove` часто меняет модель (в `radiogroup`
     // стрелка переносит выбор), и компонент вправе рассчитывать, что к моменту
     // фокуса оно уже применено.
-    if (key !== previous) options.onMove?.(key, previous)
+    if (key !== previous)
+      options.onMove?.(key, previous)
 
     const focusNow = (): void => {
       options.elementFor(key)?.focus()
@@ -186,7 +191,8 @@ export function useRovingFocus<TKey>(
   function targetIndex(from: number, delta: number): number | undefined {
     const items = options.items()
     const len = items.length
-    if (len === 0 || delta === 0) return undefined
+    if (len === 0 || delta === 0)
+      return undefined
 
     let index = from
 
@@ -198,7 +204,8 @@ export function useRovingFocus<TKey>(
       const next = index + delta
 
       if (next < 0 || next >= len) {
-        if (!wraps()) return undefined
+        if (!wraps())
+          return undefined
         // Зацикливание по модулю набора. Колонку это сохраняет, когда длина
         // кратна ширине строки — у календарной сетки 42 = 6 × 7 так и есть.
         index = ((next % len) + len) % len
@@ -207,7 +214,8 @@ export function useRovingFocus<TKey>(
         index = next
       }
 
-      if (!skips() || !disabled(items[index])) return index
+      if (!skips() || !disabled(items[index]))
+        return index
     }
 
     return undefined
@@ -223,7 +231,8 @@ export function useRovingFocus<TKey>(
     const items = options.items()
     // `rovingKey` пуст только при пустом наборе — двигаться нечем.
     const from = currentIndex()
-    if (from < 0) return false
+    if (from < 0)
+      return false
 
     const target = targetIndex(from, delta)
     if (target === undefined) {
@@ -244,7 +253,8 @@ export function useRovingFocus<TKey>(
 
   function moveToEdge(edge: GrRovingEdge): boolean {
     const items = options.items()
-    if (items.length === 0) return false
+    if (items.length === 0)
+      return false
 
     const from = currentIndex()
     // В сетке `Home`/`End` — края строки (в календаре это начало и конец
@@ -281,10 +291,12 @@ export function useRovingFocus<TKey>(
       case 'ArrowLeft':
         return mode === 'vertical' ? 0 : -1
       case 'ArrowDown':
-        if (mode === 'horizontal') return 0
+        if (mode === 'horizontal')
+          return 0
         return mode === 'grid' ? columns : 1
       case 'ArrowUp':
-        if (mode === 'horizontal') return 0
+        if (mode === 'horizontal')
+          return 0
         return mode === 'grid' ? -columns : -1
       default:
         return 0
@@ -292,19 +304,23 @@ export function useRovingFocus<TKey>(
   }
 
   function handleNavigationKeys(event: KeyboardEvent): boolean {
-    if (event.altKey || event.ctrlKey || event.metaKey) return false
+    if (event.altKey || event.ctrlKey || event.metaKey)
+      return false
 
     if (event.key === 'Home' || event.key === 'End') {
       const moved = moveToEdge(event.key === 'Home' ? 'start' : 'end')
-      if (moved) event.preventDefault()
+      if (moved)
+        event.preventDefault()
       return moved
     }
 
     const delta = deltaForKey(event.key)
-    if (delta === 0) return false
+    if (delta === 0)
+      return false
 
     const moved = moveBy(delta)
-    if (moved) event.preventDefault()
+    if (moved)
+      event.preventDefault()
     return moved
   }
 

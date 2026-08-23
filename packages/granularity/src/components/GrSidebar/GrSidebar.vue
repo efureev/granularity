@@ -119,7 +119,6 @@ defineSlots<{
   /** Подзаголовок под заголовком. */
   subtitle?: () => any
 }>()
-
 </script>
 
 <template>

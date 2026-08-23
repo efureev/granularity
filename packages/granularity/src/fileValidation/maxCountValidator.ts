@@ -8,12 +8,14 @@ import type { FileValidationIssue, FileValidator } from './types'
  * проходит тем же путём локализации, что и остальные.
  */
 export function maxCountValidator(maxCount: number | undefined): FileValidator {
-  if (typeof maxCount !== 'number' || !Number.isFinite(maxCount) || maxCount <= 0) return () => []
+  if (typeof maxCount !== 'number' || !Number.isFinite(maxCount) || maxCount <= 0)
+    return () => []
 
   const limit = Math.floor(maxCount)
 
   return ({ files }): FileValidationIssue[] => {
-    if (files.length <= limit) return []
+    if (files.length <= limit)
+      return []
 
     const issue: FileValidationIssue = {
       code: 'maxCount',

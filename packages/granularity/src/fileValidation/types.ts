@@ -1,11 +1,11 @@
-export type FileValidationIssueCode =
-  | 'accept'
-  | 'mimeType'
-  | 'extension'
-  | 'maxCount'
-  | 'maxFileSize'
-  | 'maxTotalSize'
-  | (string & {})
+export type FileValidationIssueCode
+  = | 'accept'
+    | 'mimeType'
+    | 'extension'
+    | 'maxCount'
+    | 'maxFileSize'
+    | 'maxTotalSize'
+    | (string & {})
 
 export type FileValidationIssue = {
   fileName?: string

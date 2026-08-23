@@ -415,7 +415,7 @@ describe('GrStatistic — перебор чисел', () => {
 })
 
 describe('GrStatistic — иконка блока', () => {
-const CustomIcon = defineComponent({ name: 'CustomIcon', render: () => h('svg', { 'data-custom-icon': '' }) })
+  const CustomIcon = defineComponent({ name: 'CustomIcon', render: () => h('svg', { 'data-custom-icon': '' }) })
 
   it('принимает и класс, и компонент', () => {
     const byClass = mount(GrStatistic, { props: { value: 10, icon: 'i-lucide-users' } })

@@ -59,7 +59,8 @@ export function useSelectValues<TValue extends GrSelectValue>(
   const flatOptions = computed<GrSelectOption<TValue>[]>(() => {
     const result: GrSelectOption<TValue>[] = []
     for (const item of optionsResolved.value) {
-      if (isOptionGroup(item)) result.push(...item.options)
+      if (isOptionGroup(item))
+        result.push(...item.options)
       else result.push(item)
     }
     return result
@@ -82,7 +83,8 @@ export function useSelectValues<TValue extends GrSelectValue>(
   const modelMultiple = computed(() => toSelectArray<TValue>(options.modelValue()))
 
   const selectedValues = computed(() => {
-    if (options.multiple()) return modelMultiple.value
+    if (options.multiple())
+      return modelMultiple.value
     return isEmptySelectValue(modelSingle.value) ? [] : [modelSingle.value as TValue]
   })
 
@@ -101,7 +103,8 @@ export function useSelectValues<TValue extends GrSelectValue>(
 
   function fromDomValue(raw: string): TValue {
     const known = valueByDomKey.value.get(raw)
-    if (known !== undefined) return known
+    if (known !== undefined)
+      return known
     // Значения нет среди опций — это `allowCustomValue`, а он по природе строковый.
     return raw as TValue
   }
@@ -111,13 +114,15 @@ export function useSelectValues<TValue extends GrSelectValue>(
   )
 
   const hasModelInOptions = computed(() => {
-    if (options.multiple()) return false
+    if (options.multiple())
+      return false
     return flatOptions.value.some(o => sameValue(o.value, modelSingle.value))
   })
 
   const displayLabel = computed<string>(() => {
     if (options.multiple()) {
-      if (!selectedValues.value.length) return ''
+      if (!selectedValues.value.length)
+        return ''
       return selectedValues.value
         .map(v => flatOptions.value.find(o => sameValue(o.value, v))?.label ?? keyOf(v))
         .join(', ')
@@ -127,7 +132,8 @@ export function useSelectValues<TValue extends GrSelectValue>(
   })
 
   const displayText = computed(() => {
-    if (hasSelection.value) return displayLabel.value
+    if (hasSelection.value)
+      return displayLabel.value
     return options.placeholder() ?? ''
   })
 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {computed, ref} from 'vue'
+import { computed, ref } from 'vue'
 
 import {
   GrFormField,
@@ -34,45 +34,45 @@ const relMode = ref<GrLinkRelMode>('auto')
 const customRel = ref('')
 
 const toneOptions = [
-  {value: 'primary', label: 'Primary'},
-  {value: 'neutral', label: 'Neutral'},
-  {value: 'success', label: 'Success'},
-  {value: 'warning', label: 'Warning'},
-  {value: 'danger', label: 'Danger'},
-  {value: 'info', label: 'Info'},
-  {value: 'slate', label: 'Slate'},
-  {value: 'azure', label: 'Azure'},
+  { value: 'primary', label: 'Primary' },
+  { value: 'neutral', label: 'Neutral' },
+  { value: 'success', label: 'Success' },
+  { value: 'warning', label: 'Warning' },
+  { value: 'danger', label: 'Danger' },
+  { value: 'info', label: 'Info' },
+  { value: 'slate', label: 'Slate' },
+  { value: 'azure', label: 'Azure' },
 ] satisfies Array<{ value: GrLinkTone, label: string }>
 
 const variantOptions = [
-  {value: 'default', label: 'Default'},
-  {value: 'muted', label: 'Muted'},
+  { value: 'default', label: 'Default' },
+  { value: 'muted', label: 'Muted' },
 ] satisfies Array<{ value: GrLinkVariant, label: string }>
 
 const sizeOptions = [
-  {value: 'sm', label: 'SM'},
-  {value: 'md', label: 'MD'},
-  {value: 'lg', label: 'LG'},
+  { value: 'sm', label: 'SM' },
+  { value: 'md', label: 'MD' },
+  { value: 'lg', label: 'LG' },
 ] satisfies Array<{ value: GrLinkSize, label: string }>
 
 const underlineOptions = [
-  {value: 'auto', label: 'Auto'},
-  {value: 'always', label: 'Always'},
-  {value: 'none', label: 'None'},
+  { value: 'auto', label: 'Auto' },
+  { value: 'always', label: 'Always' },
+  { value: 'none', label: 'None' },
 ] satisfies Array<{ value: GrLinkUnderline, label: string }>
 
 const targetOptions = [
-  {value: 'auto', label: 'Auto'},
-  {value: '_self', label: '_self'},
-  {value: '_blank', label: '_blank'},
-  {value: 'custom', label: 'Custom'},
+  { value: 'auto', label: 'Auto' },
+  { value: '_self', label: '_self' },
+  { value: '_blank', label: '_blank' },
+  { value: 'custom', label: 'Custom' },
 ] satisfies Array<{ value: GrLinkTargetMode, label: string }>
 
 const relOptions = [
-  {value: 'auto', label: 'Auto'},
-  {value: 'noopener noreferrer', label: 'noopener noreferrer'},
-  {value: 'nofollow', label: 'nofollow'},
-  {value: 'custom', label: 'Custom'},
+  { value: 'auto', label: 'Auto' },
+  { value: 'noopener noreferrer', label: 'noopener noreferrer' },
+  { value: 'nofollow', label: 'nofollow' },
+  { value: 'custom', label: 'Custom' },
 ] satisfies Array<{ value: GrLinkRelMode, label: string }>
 
 const linkText = computed(() => {

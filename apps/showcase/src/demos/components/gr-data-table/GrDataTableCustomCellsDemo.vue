@@ -42,7 +42,7 @@ function statusVariant(status: unknown): 'success' | 'warning' | 'danger' {
 
       <template #cell-actions="{ row }">
         <div class="flex justify-end gap-2">
-          <GrButton size="sm" variant="ghost" @click="lastAction = `Viewed ${ row.service}`">
+          <GrButton size="sm" variant="ghost" @click="lastAction = `Viewed ${row.service}`">
             View
           </GrButton>
           <!-- Icon-only: иконка декоративна, имя кнопки задаётся явно. -->
@@ -51,8 +51,8 @@ function statusVariant(status: unknown): 'success' | 'warning' | 'danger' {
             square
             variant="outline"
             tone="danger"
-            :aria-label="`Escalate ${ row.service}`"
-            @click="lastAction = `Escalated ${ row.service}`"
+            :aria-label="`Escalate ${row.service}`"
+            @click="lastAction = `Escalated ${row.service}`"
           >
             <IconTrash />
           </GrButton>

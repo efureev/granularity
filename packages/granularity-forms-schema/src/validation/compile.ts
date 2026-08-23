@@ -48,7 +48,8 @@ function translate(options: GrSchemaRuleCompilerOptions, key: string, fallback: 
 }
 
 function interpolate(text: string, params?: Record<string, unknown>): string {
-  if (!params) return text
+  if (!params)
+    return text
   return text.replace(/\{(\w+)\}/g, (match, key: string) => (key in params ? String(params[key]) : match))
 }
 
@@ -68,10 +69,12 @@ function numericBound(
   return {
     message,
     validator: (value) => {
-      if (value === null || value === undefined || value === '') return true
+      if (value === null || value === undefined || value === '')
+        return true
 
       const numeric = typeof value === 'number' ? value : Number(value)
-      if (Number.isNaN(numeric)) return true
+      if (Number.isNaN(numeric))
+        return true
 
       switch (kind) {
         case 'min': return numeric >= bound
@@ -87,8 +90,10 @@ function declarativeRule(node: GrSchemaNode, options: GrSchemaRuleCompilerOption
   const rule: GrFormRule = {}
   const { constraints: c } = node
 
-  if (node.format === 'email') rule.type = 'email'
-  else if (node.format === 'url' || node.format === 'uri') rule.type = 'url'
+  if (node.format === 'email')
+    rule.type = 'email'
+  else if (node.format === 'url' || node.format === 'uri')
+    rule.type = 'url'
 
   const formatSpec = node.format
     ? { ...KNOWN_FORMATS[node.format], ...options.formats?.[node.format] }
@@ -106,9 +111,12 @@ function declarativeRule(node: GrSchemaNode, options: GrSchemaRuleCompilerOption
   // Числовые границы уходят сюда только когда модель точно числовая.
   const measurable = node.kind === 'string' || node.kind === 'array' || (node.kind === 'number' && numericModel)
   if (measurable) {
-    if (c.len !== undefined) rule.len = c.len
-    if (c.min !== undefined) rule.min = c.min
-    if (c.max !== undefined) rule.max = c.max
+    if (c.len !== undefined)
+      rule.len = c.len
+    if (c.min !== undefined)
+      rule.min = c.min
+    if (c.max !== undefined)
+      rule.max = c.max
   }
 
   if (node.kind === 'file' && (c.accept || c.maxSize || c.maxFiles)) {
@@ -147,7 +155,8 @@ function localRules(node: GrSchemaNode, options: GrSchemaRuleCompilerOptions, nu
       rules.push({
         message: translate(options, 'grForms.rule.integer', 'Enter a whole number'),
         validator: (value) => {
-          if (value === null || value === undefined || value === '') return true
+          if (value === null || value === undefined || value === '')
+            return true
           return Number.isInteger(typeof value === 'number' ? value : Number(value))
         },
       })
@@ -157,9 +166,11 @@ function localRules(node: GrSchemaNode, options: GrSchemaRuleCompilerOptions, nu
       rules.push({
         message: translate(options, 'grForms.rule.step', 'Value must be a multiple of {step}', { step: c.step }),
         validator: (value) => {
-          if (value === null || value === undefined || value === '') return true
+          if (value === null || value === undefined || value === '')
+            return true
           const numeric = typeof value === 'number' ? value : Number(value)
-          if (Number.isNaN(numeric)) return true
+          if (Number.isNaN(numeric))
+            return true
           // Через целые: 0.3 % 0.1 в двоичной арифметике даёт не ноль.
           const factor = 10 ** decimalPlaces(c.step!)
           return Math.round(numeric * factor) % Math.round(c.step! * factor) === 0
@@ -184,7 +195,8 @@ function localRules(node: GrSchemaNode, options: GrSchemaRuleCompilerOptions, nu
     rules.push({
       message: translate(options, 'grForms.rule.unique', 'Values must not repeat'),
       validator: (value) => {
-        if (!Array.isArray(value)) return true
+        if (!Array.isArray(value))
+          return true
         // Объекты сравниваются сериализацией: ссылочное равенство для строк
         // повторителя бессмысленно — две одинаково заполненные строки разные.
         const seen = (value as unknown[]).map(item =>
@@ -195,8 +207,10 @@ function localRules(node: GrSchemaNode, options: GrSchemaRuleCompilerOptions, nu
   }
 
   if (node.kind === 'date' || node.format === 'date' || node.format === 'date-time') {
-    if (c.minDate) rules.push(dateBound('min', c.minDate, translate(options, 'grForms.rule.minDate', 'Not earlier than {date}', { date: c.minDate })))
-    if (c.maxDate) rules.push(dateBound('max', c.maxDate, translate(options, 'grForms.rule.maxDate', 'Not later than {date}', { date: c.maxDate })))
+    if (c.minDate)
+      rules.push(dateBound('min', c.minDate, translate(options, 'grForms.rule.minDate', 'Not earlier than {date}', { date: c.minDate })))
+    if (c.maxDate)
+      rules.push(dateBound('max', c.maxDate, translate(options, 'grForms.rule.maxDate', 'Not later than {date}', { date: c.maxDate })))
   }
 
   const formatSpec = node.format
@@ -226,11 +240,14 @@ function dateBound(kind: 'min' | 'max', bound: string, message: string): GrFormR
   return {
     message,
     validator: (value) => {
-      if (value === null || value === undefined || value === '') return true
-      if (Number.isNaN(limit)) return true
+      if (value === null || value === undefined || value === '')
+        return true
+      if (Number.isNaN(limit))
+        return true
 
       const time = value instanceof Date ? value.getTime() : Date.parse(String(value))
-      if (Number.isNaN(time)) return true
+      if (Number.isNaN(time))
+        return true
 
       return kind === 'min' ? time >= limit : time <= limit
     },
@@ -262,7 +279,8 @@ export function compileFieldRules(
 
   if (tiers.includes('declarative')) {
     const rule = declarativeRule(node, options, numericModel)
-    if (rule) rules.push(rule)
+    if (rule)
+      rules.push(rule)
   }
 
   if (tiers.includes('local'))
@@ -276,7 +294,8 @@ export function compileFieldRules(
     })
   }
 
-  if (rules.length === 0) rules.push(SENTINEL_RULE)
+  if (rules.length === 0)
+    rules.push(SENTINEL_RULE)
 
   return options.decorate ? options.decorate(rules, instance) : rules
 }
@@ -295,8 +314,10 @@ export function compileRules(
   for (const instance of instances) {
     // Контейнеры правил не несут — кроме массива, у которого границы длины
     // проверяются на нём самом.
-    if (!instance.leaf && instance.node.kind !== 'array') continue
-    if (instance.node.kind === 'array' && !hasArrayRules(instance)) continue
+    if (!instance.leaf && instance.node.kind !== 'array')
+      continue
+    if (instance.node.kind === 'array' && !hasArrayRules(instance))
+      continue
 
     rules[instance.name] = compileFieldRules(instance, options)
   }

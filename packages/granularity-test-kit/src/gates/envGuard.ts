@@ -94,7 +94,7 @@ export function handWrittenChecks(files: readonly GuardedFile[]): string[] {
  */
 export function unguardedWarnings(
   files: readonly GuardedFile[],
-  options: { guard: string, allowed?: Record<string, string> } ,
+  options: { guard: string, allowed?: Record<string, string> },
 ): string[] {
   const allowed = options.allowed ?? {}
 

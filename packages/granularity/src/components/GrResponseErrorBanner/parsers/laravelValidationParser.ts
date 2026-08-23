@@ -15,21 +15,25 @@ import type { ResponseErrorFieldError, ResponseErrorParser } from '../responseEr
  */
 export const laravelValidationParser: ResponseErrorParser = (ctx) => {
   const body = ctx.body
-  if (!body || typeof body !== 'object' || Array.isArray(body)) return null
+  if (!body || typeof body !== 'object' || Array.isArray(body))
+    return null
 
   const data = body as Record<string, unknown>
   const errors = data.errors
-  if (!errors || typeof errors !== 'object' || Array.isArray(errors)) return null
+  if (!errors || typeof errors !== 'object' || Array.isArray(errors))
+    return null
 
   const fieldErrors: ResponseErrorFieldError[] = []
   for (const [field, raw] of Object.entries(errors as Record<string, unknown>)) {
     const messages = Array.isArray(raw)
       ? raw.filter((m): m is string => typeof m === 'string')
       : typeof raw === 'string' ? [raw] : []
-    if (messages.length) fieldErrors.push({ field, messages })
+    if (messages.length)
+      fieldErrors.push({ field, messages })
   }
 
-  if (!fieldErrors.length) return null
+  if (!fieldErrors.length)
+    return null
 
   // Только то, что действительно прислал сервер: не нашли — пусть общий текст
   // подставит классификатор, пометив его фолбэком (иначе баннер не переведёт).

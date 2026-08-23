@@ -56,7 +56,7 @@
 ```ts
 const table = ref<InstanceType<typeof GrTable>>()
 
-table.value?.scrollToRow(42)      // индекс строки содержимого; false — строки нет
+table.value?.scrollToRow(42) // индекс строки содержимого; false — строки нет
 table.value?.scrollTo({ top: 0 })
 ```
 

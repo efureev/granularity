@@ -12,7 +12,7 @@ import {
   showcaseInstallationNarrative,
   showcaseQuickStartCards,
 } from '../content/foundations'
-import InlineRichText from "../components/content/InlineRichText.vue";
+import InlineRichText from '../components/content/InlineRichText.vue'
 
 const { t } = useFintI18n()
 

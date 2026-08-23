@@ -39,8 +39,8 @@ const ui: GrUiSchema = { layout: { columns: { base: 1 } } }
 
 const model = ref<Record<string, unknown>>({
   sku: 'TS-100',
-  attributes: { 'Материал': 'хлопок', 'Состав': '100% хлопок' },
-  limits: { 'ozon': 10 },
+  attributes: { Материал: 'хлопок', Состав: '100% хлопок' },
+  limits: { ozon: 10 },
 })
 
 const json = computed(() => JSON.stringify(model.value, null, 2))

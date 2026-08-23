@@ -27,7 +27,6 @@ defineSlots<{
   /** Действия диалога. */
   default?: () => any
 }>()
-
 </script>
 
 <template>

@@ -1,9 +1,9 @@
 import type { Directive } from 'vue'
 import { nextTick } from 'vue'
 
-export type AutosizeBindingValue =
-  | boolean
-  | {
+export type AutosizeBindingValue
+  = | boolean
+    | {
       enabled?: boolean
     }
 
@@ -16,13 +16,16 @@ type InternalState = {
 const states = new WeakMap<HTMLElement, InternalState>()
 
 function normalize(value: AutosizeBindingValue | undefined) {
-  if (value === false) return { enabled: false }
-  if (value && typeof value === 'object') return { enabled: value.enabled ?? true }
+  if (value === false)
+    return { enabled: false }
+  if (value && typeof value === 'object')
+    return { enabled: value.enabled ?? true }
   return { enabled: true }
 }
 
 function resolveTextarea(el: HTMLElement): HTMLTextAreaElement | null {
-  if (el instanceof HTMLTextAreaElement) return el
+  if (el instanceof HTMLTextAreaElement)
+    return el
   return el.querySelector('textarea')
 }
 
@@ -68,7 +71,8 @@ export const vAutosize: Directive<HTMLElement, AutosizeBindingValue> = {
     }
     states.set(el, state)
 
-    if (!enabled || !textarea) return
+    if (!enabled || !textarea)
+      return
 
     textarea.style.overflowY = 'hidden'
     autosize(textarea)
@@ -76,7 +80,8 @@ export const vAutosize: Directive<HTMLElement, AutosizeBindingValue> = {
 
     const onInput = () => {
       const current = states.get(el)
-      if (!current?.textarea) return
+      if (!current?.textarea)
+        return
       autosize(current.textarea)
     }
 
@@ -86,7 +91,8 @@ export const vAutosize: Directive<HTMLElement, AutosizeBindingValue> = {
   updated(el, binding) {
     const { enabled } = normalize(binding.value)
     const state = states.get(el)
-    if (!state) return
+    if (!state)
+      return
 
     const nextTextarea = resolveTextarea(el)
     if (state.textarea !== nextTextarea) {
@@ -105,7 +111,8 @@ export const vAutosize: Directive<HTMLElement, AutosizeBindingValue> = {
 
         const onInput = () => {
           const current = states.get(el)
-          if (!current?.textarea) return
+          if (!current?.textarea)
+            return
           autosize(current.textarea)
         }
         state.onInput = onInput
@@ -115,7 +122,8 @@ export const vAutosize: Directive<HTMLElement, AutosizeBindingValue> = {
       return
     }
 
-    if (!state.textarea) return
+    if (!state.textarea)
+      return
 
     if (!enabled) {
       // Disabled in-flight: detach listener and restore previous overflow.
@@ -136,7 +144,8 @@ export const vAutosize: Directive<HTMLElement, AutosizeBindingValue> = {
 
       const onInput = () => {
         const current = states.get(el)
-        if (!current?.textarea) return
+        if (!current?.textarea)
+          return
         autosize(current.textarea)
       }
       state.onInput = onInput
@@ -148,11 +157,13 @@ export const vAutosize: Directive<HTMLElement, AutosizeBindingValue> = {
   },
   unmounted(el) {
     const state = states.get(el)
-    if (!state) return
+    if (!state)
+      return
 
     if (state.textarea && state.onInput) {
       state.textarea.removeEventListener('input', state.onInput)
-      if (state.prevOverflowY !== null) state.textarea.style.overflowY = state.prevOverflowY
+      if (state.prevOverflowY !== null)
+        state.textarea.style.overflowY = state.prevOverflowY
     }
 
     states.delete(el)

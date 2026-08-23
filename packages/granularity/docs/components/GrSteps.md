@@ -64,8 +64,13 @@
 ```vue
 <GrSteps v-model="step" :steps="steps" />
 
-<GrForm v-if="step === 'delivery'" :model="form" :rules="rules">…</GrForm>
-<GrForm v-else-if="step === 'payment'" :model="form" :rules="rules">…</GrForm>
+<GrForm v-if="step === 'delivery'" :model="form" :rules="rules">
+…
+</GrForm>
+
+<GrForm v-else-if="step === 'payment'" :model="form" :rules="rules">
+…
+</GrForm>
 ```
 
 ## Валидация шага — через `beforeLeave`, а не через знание о форме
@@ -77,7 +82,8 @@
 ```ts
 async function validateStep(from: string, to: string): Promise<boolean> {
   // Назад пускаем всегда: правка заполненного не должна упираться в валидацию.
-  if (stepIndex(to) < stepIndex(from)) return true
+  if (stepIndex(to) < stepIndex(from))
+    return true
   return formRef.value!.validate()
 }
 ```

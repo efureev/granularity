@@ -8,11 +8,16 @@
 
 ```ts
 interface GrDashboardItemLayout {
-  id: string          // совпадает с `itemId` у GrDashboardItem
-  x: number, y: number // колонка и строка левого верхнего угла, от нуля
-  w: number, h: number // размер в ячейках
-  minW?, minH?, maxW?, maxH?: number
-  static?: boolean    // не двигается сам и не двигается соседями
+  id: string // совпадает с `itemId` у GrDashboardItem
+  x: number
+  y: number // колонка и строка левого верхнего угла, от нуля
+  w: number
+  h: number // размер в ячейках
+  minW?
+  minH?
+  maxW?
+  maxH?: number
+  static?: boolean // не двигается сам и не двигается соседями
 }
 ```
 

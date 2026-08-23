@@ -16,7 +16,6 @@ import IconArrowLeft from '~icons/lucide/arrow-left'
 const route = useRoute()
 const { t } = useFintI18n()
 
-
 const component = computed(() => getCompanionComponentBySlug(String(route.params.componentSlug ?? '')))
 
 const importCode = computed(() =>
@@ -29,7 +28,6 @@ const importCode = computed(() =>
  * живущий на чужой странице. Раньше такие секции молча не отображались.
  */
 const apiSections = computed(() => component.value?.apiSections ?? [])
-
 </script>
 
 <template>

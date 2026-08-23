@@ -12,9 +12,9 @@ import type { GrSelectPanelItem } from './useSelectPanelItems'
  * иначе при непустом списке Enter не мог бы выбрать подсвеченную опцию, а при
  * активной опции — закоммитить произвольное значение.
  */
-export type GrSelectNavigableItem<TValue extends GrSelectValue> =
-  | { kind: 'add' }
-  | { kind: 'option', value: TValue, index: number }
+export type GrSelectNavigableItem<TValue extends GrSelectValue>
+  = | { kind: 'add' }
+    | { kind: 'option', value: TValue, index: number }
 
 export interface UseSelectNavigationOptions<TValue extends GrSelectValue> {
   panelItems: ComputedRef<GrSelectPanelItem<TValue>[]>
@@ -107,14 +107,16 @@ export function useSelectNavigation<TValue extends GrSelectValue>(
   const navigableIndexByPanelIndex = computed(() => {
     const map = new Map<number, number>()
     navigableItems.value.forEach((item, navIndex) => {
-      if (item.kind === 'option') map.set(item.index, navIndex)
+      if (item.kind === 'option')
+        map.set(item.index, navIndex)
     })
     return map
   })
 
   function onOptionHover(panelIndex: number): void {
     const next = navigableIndexByPanelIndex.value.get(panelIndex)
-    if (next !== undefined && next !== activeIndex.value) activeIndex.value = next
+    if (next !== undefined && next !== activeIndex.value)
+      activeIndex.value = next
   }
 
   /**
@@ -145,15 +147,18 @@ export function useSelectNavigation<TValue extends GrSelectValue>(
   })
 
   function labelOf(item: GrSelectNavigableItem<TValue>): string {
-    if (item.kind !== 'option') return ''
+    if (item.kind !== 'option')
+      return ''
 
     const direct = labelByItem.value.get(item.value)
-    if (direct !== undefined) return direct
+    if (direct !== undefined)
+      return direct
 
     // `sameValue` умеет сравнивать объекты по ключу — на такой список Map по
     // ссылке не ложится, и остаётся честный перебор.
     return options.flatOptions.value
-      .find(option => options.sameValue(option.value, item.value))?.label ?? ''
+      .find(option => options.sameValue(option.value, item.value))
+      ?.label ?? ''
   }
 
   const typeahead = useTypeahead<GrSelectNavigableItem<TValue>>({
@@ -168,8 +173,10 @@ export function useSelectNavigation<TValue extends GrSelectValue>(
   function onComboKeydown(event: KeyboardEvent): void {
     // Клавиша во время IME-композиции принадлежит композиции: Enter коммитит её,
     // Esc отменяет, стрелки ходят по кандидатам.
-    if (isComposingEvent(event)) return
-    if (options.locked.value) return
+    if (isComposingEvent(event))
+      return
+    if (options.locked.value)
+      return
 
     if (!options.open.value) {
       if (['ArrowDown', 'ArrowUp', 'Enter', ' '].includes(event.key)) {
@@ -179,7 +186,8 @@ export function useSelectNavigation<TValue extends GrSelectValue>(
       return
     }
 
-    if (handleNavigationKeys(event)) return
+    if (handleNavigationKeys(event))
+      return
 
     switch (event.key) {
       case 'Enter': {
@@ -187,9 +195,12 @@ export function useSelectNavigation<TValue extends GrSelectValue>(
         // Активный элемент сильнее `canAddCustom`: пользователь подсветил опцию
         // стрелками — Enter обязан выбрать её, а не добавить набранный запрос.
         const item = activeItem.value
-        if (item?.kind === 'add') options.addCustom()
-        else if (item?.kind === 'option') options.toggleValue(item.value)
-        else if (options.canAddCustom.value) options.addCustom()
+        if (item?.kind === 'add')
+          options.addCustom()
+        else if (item?.kind === 'option')
+          options.toggleValue(item.value)
+        else if (options.canAddCustom.value)
+          options.addCustom()
         break
       }
       case 'Tab':
@@ -198,8 +209,9 @@ export function useSelectNavigation<TValue extends GrSelectValue>(
       default:
         // typeahead — только когда нет поля ввода (иначе мешает вводу в search/custom-инпут).
         if (!options.showSearchInput.value && event.key.length === 1
-          && !event.metaKey && !event.ctrlKey && !event.altKey)
+          && !event.metaKey && !event.ctrlKey && !event.altKey) {
           typeahead.type(event.key)
+        }
     }
   }
 

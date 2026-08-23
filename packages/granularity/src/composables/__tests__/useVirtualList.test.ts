@@ -276,7 +276,8 @@ describe('useVirtualList', () => {
       expect(list.totalSize.value).toBe(2010)
     }
     finally {
-      if (original) globalThis.ResizeObserver = original
+      if (original)
+        globalThis.ResizeObserver = original
     }
   })
 })

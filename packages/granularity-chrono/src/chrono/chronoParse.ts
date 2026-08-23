@@ -34,7 +34,8 @@ const DEFAULT_ORDER: LocaleDateOrder = { order: ['day', 'month', 'year'], separa
 /** Порядок частей даты в локали: `08/12/2026` против `12.08.2026`. */
 export function localeDateOrder(locale: string): LocaleDateOrder {
   const cached = orders.get(locale)
-  if (cached) return cached
+  if (cached)
+    return cached
 
   let result = DEFAULT_ORDER
 
@@ -53,7 +54,8 @@ export function localeDateOrder(locale: string): LocaleDateOrder {
 
     const separator = parts.find(part => part.type === 'literal')?.value.trim() || ' '
 
-    if (order.length === 3) result = { order: order as [DateUnit, DateUnit, DateUnit], separator }
+    if (order.length === 3)
+      result = { order: order as [DateUnit, DateUnit, DateUnit], separator }
   }
   catch {
     // Некорректный тег локали — остаётся значение по умолчанию.
@@ -76,7 +78,8 @@ function digitGroups(text: string): string[] {
  * «правильное» значение, а общепринятое, и своё придумывать здесь нечего.
  */
 function expandYear(value: number, digits: number): number {
-  if (digits > 2) return value
+  if (digits > 2)
+    return value
 
   return value < 70 ? 2000 + value : 1900 + value
 }
@@ -87,7 +90,8 @@ function expandYear(value: number, digits: number): number {
  */
 export function parseLocaleDate(locale: string, text: string): PlainDate | null {
   const groups = digitGroups(text)
-  if (groups.length !== 3) return null
+  if (groups.length !== 3)
+    return null
 
   const { order } = localeDateOrder(locale)
   const values: Partial<Record<DateUnit, number>> = {}
@@ -103,8 +107,10 @@ export function parseLocaleDate(locale: string, text: string): PlainDate | null 
   const month = (values.month as number) - 1
   const day = values.day as number
 
-  if (!Number.isFinite(year) || year < 1 || month < 0 || month > 11) return null
-  if (day < 1 || day > daysInMonth(year, month)) return null
+  if (!Number.isFinite(year) || year < 1 || month < 0 || month > 11)
+    return null
+  if (day < 1 || day > daysInMonth(year, month))
+    return null
 
   return { y: year, m: month, d: day }
 }
@@ -119,14 +125,16 @@ export function parseLocaleDate(locale: string, text: string): PlainDate | null 
 export function maskLocaleDate(locale: string, text: string): string {
   const { order, separator } = localeDateOrder(locale)
   const digits = text.replace(/\D/g, '')
-  if (!digits) return ''
+  if (!digits)
+    return ''
 
   const sizes = order.map(unit => (unit === 'year' ? 4 : 2))
   const chunks: string[] = []
   let offset = 0
 
   for (const size of sizes) {
-    if (offset >= digits.length) break
+    if (offset >= digits.length)
+      break
 
     chunks.push(digits.slice(offset, offset + size))
     offset += size
@@ -157,14 +165,16 @@ export function localeDatePattern(locale: string, letters: Record<DateUnit, stri
  */
 export function parseLocaleTime(locale: string, text: string): PlainTime | null {
   const groups = digitGroups(text)
-  if (groups.length < 2 || groups.length > 3) return null
+  if (groups.length < 2 || groups.length > 3)
+    return null
 
   const [hourText, minuteText, secondText] = groups as [string, string, string?]
   const hour = Number(hourText)
   const minute = Number(minuteText)
   const second = secondText === undefined ? 0 : Number(secondText)
 
-  if (minute > 59 || second > 59) return null
+  if (minute > 59 || second > 59)
+    return null
 
   const [am, pm] = dayPeriodNames(locale)
   const lower = text.toLowerCase()
@@ -172,12 +182,14 @@ export function parseLocaleTime(locale: string, text: string): PlainTime | null 
   const hasAm = lower.includes(am.toLowerCase()) || /\bam\b/.test(lower)
 
   if (hasAm || hasPm) {
-    if (hour < 1 || hour > 12) return null
+    if (hour < 1 || hour > 12)
+      return null
 
     return { h: fromTwelveHour(hour, hasPm ? 'pm' : 'am'), min: minute, s: second }
   }
 
-  if (hour > 23) return null
+  if (hour > 23)
+    return null
 
   return { h: hour, min: minute, s: second }
 }
@@ -204,7 +216,8 @@ const DEFAULT_DATE_TIME_ORDER: LocaleDateTimeOrder = {
 /** Взаимное расположение частей в локали — то, чего не выведешь из строки. */
 export function localeDateTimeOrder(locale: string): LocaleDateTimeOrder {
   const cached = dateTimeOrders.get(locale)
-  if (cached) return cached
+  if (cached)
+    return cached
 
   let result = DEFAULT_DATE_TIME_ORDER
 
@@ -264,7 +277,8 @@ function cutBetweenGroups(
   const gap = text.slice(gapStart, after.index)
   const letters = /\p{L}+/u.exec(gap)
 
-  if (!letters) return [text.slice(0, gapStart), text.slice(gapStart)]
+  if (!letters)
+    return [text.slice(0, gapStart), text.slice(gapStart)]
 
   const cut = gapStart + letters.index + (localeDateTimeOrder(locale).dayPeriodFirst ? 0 : letters[0].length)
 
@@ -292,7 +306,8 @@ export function parseLocaleDateTime(locale: string, text: string): PlainDateTime
     return date ? { date, time: null } : null
   }
 
-  if (groups.length < 5 || groups.length > 6) return null
+  if (groups.length < 5 || groups.length > 6)
+    return null
 
   const { timeFirst } = localeDateTimeOrder(locale)
   const [head, tail] = cutBetweenGroups(locale, text, groups, timeFirst ? groups.length - 3 : 3)
@@ -308,7 +323,8 @@ export function parseLocaleDateTime(locale: string, text: string): PlainDateTime
  */
 export function splitLocaleRange(locale: string, text: string): [string, string] | null {
   const groups = digitMatches(text)
-  if (groups.length < 2 || groups.length % 2 !== 0) return null
+  if (groups.length < 2 || groups.length % 2 !== 0)
+    return null
 
   return cutBetweenGroups(locale, text, groups, groups.length / 2)
 }
@@ -329,7 +345,8 @@ export interface PartialPlainTime {
  */
 export function parsePartialLocaleTime(locale: string, text: string): PartialPlainTime | null {
   const groups = digitGroups(text)
-  if (groups.length === 0 || groups.length > 3) return null
+  if (groups.length === 0 || groups.length > 3)
+    return null
 
   const [am, pm] = dayPeriodNames(locale)
   const lower = text.toLowerCase()
@@ -341,23 +358,27 @@ export function parsePartialLocaleTime(locale: string, text: string): PartialPla
   const result: PartialPlainTime = {}
 
   if (hasAm || hasPm) {
-    if (hour < 1 || hour > 12) return null
+    if (hour < 1 || hour > 12)
+      return null
     result.h = fromTwelveHour(hour, hasPm ? 'pm' : 'am')
   }
   else {
-    if (hour > 23) return null
+    if (hour > 23)
+      return null
     result.h = hour
   }
 
   if (minuteText !== undefined) {
     const minute = Number(minuteText)
-    if (minute > 59) return null
+    if (minute > 59)
+      return null
     result.min = minute
   }
 
   if (secondText !== undefined) {
     const second = Number(secondText)
-    if (second > 59) return null
+    if (second > 59)
+      return null
     result.s = second
   }
 
@@ -384,7 +405,8 @@ export function parsePartialLocaleDateTime(
 ): PartialDateTimeParts {
   const empty: PartialDateTimeParts = { date: null, time: null }
   const groups = digitMatches(text)
-  if (groups.length === 0) return empty
+  if (groups.length === 0)
+    return empty
 
   const { timeFirst } = localeDateTimeOrder(locale)
   const timeCount = options.seconds ? 3 : 2
@@ -440,7 +462,8 @@ export function localeTimePattern(
   const units: TimeUnit[] = options.seconds ? ['hour', 'minute', 'second'] : ['hour', 'minute']
   const clock = units.map(unit => letters[unit].repeat(2)).join(timeSeparator)
 
-  if (!options.twelveHour) return clock
+  if (!options.twelveHour)
+    return clock
 
   const [am] = dayPeriodNames(locale)
 

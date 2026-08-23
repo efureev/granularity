@@ -80,14 +80,16 @@ const DEFAULT_MESSAGES: Record<GrFormRuleFailure, string> = {
  */
 export function createGrFormMessageResolver(t: GrFormMessageTranslate): GrFormMessageResolver {
   return (kind, rule, params) => {
-    if (rule.message) return rule.message
+    if (rule.message)
+      return rule.message
 
     // Текст файловой ошибки приходит от самого валидатора и локализуется его же
     // ключом (`gr.fileValidation.*`): иначе одно и то же «файл не того типа»
     // звучало бы по-разному в поле и в форме. `gr.form.file` — фолбэк на случай
     // вида `file` без issue: сюда движок не приходит, но резолвер публичный.
     const issue = params.issue as FileValidationIssue | undefined
-    if (kind === 'file' && issue) return resolveFileValidationMessage(issue, t)
+    if (kind === 'file' && issue)
+      return resolveFileValidationMessage(issue, t)
 
     return t(`gr.form.${kind}`, DEFAULT_MESSAGES[kind], params)
   }
@@ -101,25 +103,33 @@ function isUrl(value: string): boolean {
 
 /** Пустое значение: `null`/`undefined`/пустая (или пробельная) строка/пустой массив. */
 export function isEmpty(value: unknown): boolean {
-  if (value == null) return true
-  if (typeof value === 'string') return value.trim() === ''
-  if (Array.isArray(value)) return value.length === 0
+  if (value == null)
+    return true
+  if (typeof value === 'string')
+    return value.trim() === ''
+  if (Array.isArray(value))
+    return value.length === 0
   return false
 }
 
 /** Мера значения для min/max/len: число → само значение, строка/массив → длина. */
 function measure(value: unknown): number {
-  if (typeof value === 'number') return value
-  if (typeof value === 'string') return value.length
-  if (Array.isArray(value)) return value.length
+  if (typeof value === 'number')
+    return value
+  if (typeof value === 'string')
+    return value.length
+  if (Array.isArray(value))
+    return value.length
   return Number(value)
 }
 
 /** Достаёт значение из объекта по dot-path (`address.city`). */
 export function getByPath(obj: Record<string, unknown>, path: string): unknown {
-  if (!path.includes('.')) return obj[path]
+  if (!path.includes('.'))
+    return obj[path]
   return path.split('.').reduce<unknown>((acc, key) => {
-    if (acc && typeof acc === 'object') return (acc as Record<string, unknown>)[key]
+    if (acc && typeof acc === 'object')
+      return (acc as Record<string, unknown>)[key]
     return undefined
   }, obj)
 }
@@ -130,7 +140,8 @@ export function setByPath(obj: Record<string, unknown>, path: string, value: unk
   const last = keys.pop() as string
   let target = obj
   for (const key of keys) {
-    if (!target[key] || typeof target[key] !== 'object') target[key] = {}
+    if (!target[key] || typeof target[key] !== 'object')
+      target[key] = {}
     target = target[key] as Record<string, unknown>
   }
   target[last] = value
@@ -138,13 +149,16 @@ export function setByPath(obj: Record<string, unknown>, path: string, value: unk
 
 /** Нормализует правило(а) поля в массив. */
 export function toRuleArray(rules: GrFormRule | GrFormRule[] | undefined): GrFormRule[] {
-  if (!rules) return []
+  if (!rules)
+    return []
   return Array.isArray(rules) ? rules : [rules]
 }
 
 function ruleMatchesTrigger(rule: GrFormRule, trigger?: GrFormTrigger): boolean {
-  if (!trigger) return true // полная валидация (validate()) — все правила
-  if (!rule.trigger) return true // правило без триггера срабатывает на любом
+  if (!trigger)
+    return true // полная валидация (validate()) — все правила
+  if (!rule.trigger)
+    return true // правило без триггера срабатывает на любом
   const triggers = Array.isArray(rule.trigger) ? rule.trigger : [rule.trigger]
   return triggers.includes(trigger)
 }
@@ -172,28 +186,39 @@ export async function runFieldRules(
   for (const rule of rules) {
     const empty = isEmpty(value)
 
-    if (rule.required && empty) return resolveMessage('required', rule, {})
+    if (rule.required && empty)
+      return resolveMessage('required', rule, {})
     // Необязательное пустое значение — остальные проверки этого правила пропускаем.
-    if (empty) continue
+    if (empty)
+      continue
 
-    if (rule.type === 'email' && !EMAIL_RE.test(String(value))) return resolveMessage('email', rule, {})
-    if (rule.type === 'url' && !isUrl(String(value))) return resolveMessage('url', rule, {})
+    if (rule.type === 'email' && !EMAIL_RE.test(String(value)))
+      return resolveMessage('email', rule, {})
+    if (rule.type === 'url' && !isUrl(String(value)))
+      return resolveMessage('url', rule, {})
 
-    if (rule.len != null && measure(value) !== rule.len) return resolveMessage('len', rule, { len: rule.len })
-    if (rule.min != null && measure(value) < rule.min) return resolveMessage('min', rule, { min: rule.min })
-    if (rule.max != null && measure(value) > rule.max) return resolveMessage('max', rule, { max: rule.max })
+    if (rule.len != null && measure(value) !== rule.len)
+      return resolveMessage('len', rule, { len: rule.len })
+    if (rule.min != null && measure(value) < rule.min)
+      return resolveMessage('min', rule, { min: rule.min })
+    if (rule.max != null && measure(value) > rule.max)
+      return resolveMessage('max', rule, { max: rule.max })
 
-    if (rule.pattern && !rule.pattern.test(String(value))) return resolveMessage('pattern', rule, {})
+    if (rule.pattern && !rule.pattern.test(String(value)))
+      return resolveMessage('pattern', rule, {})
 
     if (rule.file) {
       const issue = await runFileRule(value, rule.file)
-      if (issue) return resolveMessage('file', rule, { issue })
+      if (issue)
+        return resolveMessage('file', rule, { issue })
     }
 
     if (rule.validator) {
       const result = await rule.validator(value, model)
-      if (result === false) return rule.message ?? resolveMessage('invalid', rule, {})
-      if (typeof result === 'string') return result
+      if (result === false)
+        return rule.message ?? resolveMessage('invalid', rule, {})
+      if (typeof result === 'string')
+        return result
     }
   }
 

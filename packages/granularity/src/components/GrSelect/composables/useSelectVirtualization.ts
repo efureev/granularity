@@ -77,26 +77,31 @@ export function useSelectVirtualization<TValue extends GrSelectValue>(
     let rootCount = options.canAddCustom.value ? 1 : 0
 
     options.panelItems.value.forEach((item, index) => {
-      if (item.kind === 'group') return
+      if (item.kind === 'group')
+        return
 
       const setKey = item.groupKey ?? ROOT
       const next = (sizes.get(setKey) ?? (setKey === ROOT ? rootCount : 0)) + 1
       sizes.set(setKey, next)
       positions.set(index, { setKey, posInSet: next })
-      if (setKey === ROOT) rootCount = next
+      if (setKey === ROOT)
+        rootCount = next
     })
 
-    if (options.canAddCustom.value && !sizes.has(ROOT)) sizes.set(ROOT, rootCount)
+    if (options.canAddCustom.value && !sizes.has(ROOT))
+      sizes.set(ROOT, rootCount)
 
     return { sizes, positions, ROOT }
   })
 
   /** ARIA набора: объявляем только при виртуализации — иначе набор виден по DOM. */
   function optionSetProps(index: number): Record<string, number> | undefined {
-    if (!virtualEnabled.value) return undefined
+    if (!virtualEnabled.value)
+      return undefined
 
     const position = optionSets.value.positions.get(index)
-    if (!position) return undefined
+    if (!position)
+      return undefined
 
     return {
       'aria-setsize': optionSets.value.sizes.get(position.setKey) ?? 1,
@@ -106,7 +111,8 @@ export function useSelectVirtualization<TValue extends GrSelectValue>(
 
   /** ARIA для кнопки «Add …»: она первая в наборе уровня listbox'а. */
   const addOptionSetProps = computed<Record<string, number> | undefined>(() => {
-    if (!virtualEnabled.value) return undefined
+    if (!virtualEnabled.value)
+      return undefined
     return {
       'aria-setsize': optionSets.value.sizes.get(optionSets.value.ROOT) ?? 1,
       'aria-posinset': 1,
@@ -117,14 +123,16 @@ export function useSelectVirtualization<TValue extends GrSelectValue>(
   const groupLabels = computed(() => {
     const labels = new Map<string, string>()
     for (const item of options.panelItems.value) {
-      if (item.kind === 'group') labels.set(item.key, item.label)
+      if (item.kind === 'group')
+        labels.set(item.key, item.label)
     }
     return labels
   })
 
   /** Виден ли «Add …»: вне окна его рисовать нельзя — он элемент набора. */
   const showAddOption = computed(() => {
-    if (!options.canAddCustom.value) return false
+    if (!options.canAddCustom.value)
+      return false
     return !virtualEnabled.value || virtualizer.range.value.start === 0
   })
 
@@ -134,7 +142,8 @@ export function useSelectVirtualization<TValue extends GrSelectValue>(
    * опции оказались бы прямыми детьми listbox'а и потеряли имя набора.
    */
   const renderedPanelRows = computed<GrSelectPanelRow<TValue>[]>(() => {
-    if (!virtualEnabled.value) return options.panelRows.value
+    if (!virtualEnabled.value)
+      return options.panelRows.value
 
     const items = options.panelItems.value
     const { start, end } = virtualizer.range.value
@@ -186,7 +195,8 @@ export function useSelectVirtualization<TValue extends GrSelectValue>(
 
   const listboxStyle = computed(() => {
     const base: Record<string, string> = { maxHeight: `${options.maxHeight()}px` }
-    if (!virtualEnabled.value) return base
+    if (!virtualEnabled.value)
+      return base
 
     return {
       ...base,

@@ -1,10 +1,10 @@
 import type { Directive } from 'vue'
 import { nextTick } from 'vue'
 
-export type AutofocusBindingValue =
-  | boolean
-  | string
-  | {
+export type AutofocusBindingValue
+  = | boolean
+    | string
+    | {
       selector?: string
       preventScroll?: boolean
       disabled?: boolean
@@ -31,14 +31,17 @@ function resolveOptions(value: AutofocusBindingValue | undefined) {
 }
 
 function tryFocus(target: Element | null | undefined, preventScroll: boolean) {
-  if (!target) return
+  if (!target)
+    return
 
   const focusable = target as unknown as { focus?: (options?: any) => void }
-  if (typeof focusable.focus !== 'function') return
+  if (typeof focusable.focus !== 'function')
+    return
 
   try {
     focusable.focus({ preventScroll })
-  } catch {
+  }
+  catch {
     // Fallback for browsers that don't support FocusOptions.
     focusable.focus()
   }
@@ -51,7 +54,8 @@ function tryFocus(target: Element | null | undefined, preventScroll: boolean) {
 export const vAutofocus: Directive<HTMLElement, AutofocusBindingValue> = {
   mounted(el, binding) {
     const { enabled, selector, preventScroll } = resolveOptions(binding.value)
-    if (!enabled) return
+    if (!enabled)
+      return
 
     void nextTick().then(() => {
       // Небольшая задержка помогает, когда внутренний input появляется после обновления/анимаций.

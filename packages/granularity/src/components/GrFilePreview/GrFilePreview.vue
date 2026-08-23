@@ -104,7 +104,9 @@ type ImageState = 'loading' | 'loaded' | 'error'
 const imageState = ref<ImageState>('loading')
 
 // Новая ссылка не должна наследовать ни ошибку прошлой, ни её готовность.
-watch(() => props.src, () => { imageState.value = 'loading' })
+watch(() => props.src, () => {
+  imageState.value = 'loading'
+})
 
 const showImage = computed(() => (
   isPreviewableKind(kind.value) && Boolean(props.src) && imageState.value !== 'error'
@@ -130,8 +132,10 @@ const fallbackIcon = computed(() => iconByKind[kind.value])
 const isInteractive = computed(() => Boolean(props.as) || Boolean(props.href) || props.clickable)
 
 const rootTag = computed<string | Component>(() => {
-  if (props.as) return typeof props.as === 'string' ? props.as : markRaw(props.as)
-  if (props.href) return 'a'
+  if (props.as)
+    return typeof props.as === 'string' ? props.as : markRaw(props.as)
+  if (props.href)
+    return 'a'
   return props.clickable ? 'button' : 'div'
 })
 

@@ -261,7 +261,8 @@ const {
 /** Выбранное одним видом: набор — списком, одиночное — списком из одного. */
 const selectedList = computed<PlainDate[]>(() => {
   const raw = selectedDate.value
-  if (!raw) return []
+  if (!raw)
+    return []
 
   return Array.isArray(raw) ? raw.map(toPlainDate) : [toPlainDate(raw)]
 })
@@ -269,7 +270,6 @@ const selectedList = computed<PlainDate[]>(() => {
 const selected = computed<PlainDate | null>(() => (
   props.multiple ? null : selectedList.value[0] ?? null
 ))
-
 
 const minPlain = computed(() => (props.min ? toPlainDate(props.min) : undefined))
 const maxPlain = computed(() => (props.max ? toPlainDate(props.max) : undefined))
@@ -282,8 +282,10 @@ const todayPlain = computed(() => (props.today ? toPlainDate(props.today) : unde
  */
 const disabledDates = computed<DisabledDatesInput>(() => {
   const source = props.disabledDates
-  if (!source) return undefined
-  if (typeof source === 'function') return (date: PlainDate) => source(fromPlainParts(date))
+  if (!source)
+    return undefined
+  if (typeof source === 'function')
+    return (date: PlainDate) => source(fromPlainParts(date))
 
   return source.map(toPlainDate)
 })
@@ -293,9 +295,12 @@ const disabledDates = computed<DisabledDatesInput>(() => {
 const isEditable = computed(() => props.editable && props.mode === 'day' && !props.multiple)
 
 const displayFormat = computed<Intl.DateTimeFormatOptions | undefined>(() => {
-  if (props.format) return props.format
-  if (props.mode === 'month') return { month: 'long', year: 'numeric' }
-  if (props.mode === 'year') return { year: 'numeric' }
+  if (props.format)
+    return props.format
+  if (props.mode === 'month')
+    return { month: 'long', year: 'numeric' }
+  if (props.mode === 'year')
+    return { year: 'numeric' }
 
   return isEditable.value ? EDITABLE_DATE_FORMAT : undefined
 })
@@ -305,9 +310,11 @@ const DISPLAY_LIMIT = 3
 
 const displayValue = computed(() => {
   const list = selectedList.value
-  if (list.length === 0) return ''
+  if (list.length === 0)
+    return ''
 
-  if (!props.multiple) return formatPlainDate(resolvedLocale.value, list[0]!, displayFormat.value)
+  if (!props.multiple)
+    return formatPlainDate(resolvedLocale.value, list[0]!, displayFormat.value)
 
   // Потолок обязателен: без него поле переполняется на пятой дате, а набор из
   // тридцати превращает подпись в нечитаемую строку.
@@ -331,7 +338,8 @@ const field = useEditableField({
   mask: raw => maskLocaleDate(resolvedLocale.value, raw),
   parse: (text) => {
     const parsed = parseLocaleDate(resolvedLocale.value, text)
-    if (!parsed) return null
+    if (!parsed)
+      return null
 
     // Запрещённая дата не выбирается ни кликом, ни `Enter`: сетка такую ячейку
     // просто не даёт нажать, а текст обязан спросить сам.
@@ -347,7 +355,8 @@ const field = useEditableField({
  * пользователь не знает, что от него ждут, а порядок частей у локалей разный.
  */
 const fieldPlaceholder = computed(() => {
-  if (props.placeholder || !isEditable.value) return props.placeholder
+  if (props.placeholder || !isEditable.value)
+    return props.placeholder
 
   return localeDatePattern(resolvedLocale.value, {
     day: t('grChrono.datePicker.patternDay', 'D'),
@@ -357,7 +366,8 @@ const fieldPlaceholder = computed(() => {
 })
 
 function onFieldKeydown(event: KeyboardEvent): void {
-  if (field.handleKeydown(event)) return
+  if (field.handleKeydown(event))
+    return
 
   shell.onFieldKeydown(event)
 }
@@ -388,7 +398,8 @@ function toggled(date: PlainDate): Date[] {
 function onSelect(date: PlainDate): void {
   // Гард здесь, а не только в `commit`: закрытая по клику панель выглядела бы
   // так, будто выбор состоялся.
-  if (shell.isLocked.value) return
+  if (shell.isLocked.value)
+    return
 
   // Набор набирают, а не выбирают однажды: панель остаётся открытой.
   if (props.multiple) {
@@ -411,7 +422,8 @@ const isDisabledDate = computed(() => createDisabledPredicate(disabledDates.valu
  * приходит выключенной, а не молча ничего не делает.
  */
 function canSelectDate(date: Date): boolean {
-  if (shell.isLocked.value) return false
+  if (shell.isLocked.value)
+    return false
 
   const plain = toPlainDate(date)
 
@@ -420,7 +432,8 @@ function canSelectDate(date: Date): boolean {
 
 /** Выбор из подвала. Возвращает `false`, если дата запрещена. */
 function selectDate(date: Date): boolean {
-  if (!canSelectDate(date)) return false
+  if (!canSelectDate(date))
+    return false
 
   if (props.multiple) {
     shell.commit(toggled(toPlainDate(date)))

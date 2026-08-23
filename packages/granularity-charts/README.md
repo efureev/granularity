@@ -47,7 +47,7 @@ import { GranularityChartsResolver } from '@feugene/granularity-charts/resolver'
 Components({
   resolvers: [
     GranularityChartsResolver(), // whitelist — раньше…
-    GranularityResolver(),       // …жадного Gr*-резолвера ядра
+    GranularityResolver(), // …жадного Gr*-резолвера ядра
   ],
 })
 ```

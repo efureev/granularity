@@ -8,7 +8,7 @@ import { toFieldErrorMap } from '../normalize'
  */
 describe('toFieldErrorMap', () => {
   it('Laravel: карта «поле → сообщения»', () => {
-    const map = toFieldErrorMap({ errors: { email: ['Занято'], 'items.0.name': ['Пусто'] } })
+    const map = toFieldErrorMap({ errors: { 'email': ['Занято'], 'items.0.name': ['Пусто'] } })
 
     expect(map.fields).toEqual({ 'email': ['Занято'], 'items.0.name': ['Пусто'] })
   })

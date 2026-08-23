@@ -25,7 +25,9 @@ const drag = useDragGesture({
 ```
 
 ```vue
-<div class="[touch-action:none]" @pointerdown="drag.start">…</div>
+<div class="[touch-action:none]" @pointerdown="drag.start">
+…
+</div>
 ```
 
 ## Два исхода, а не один

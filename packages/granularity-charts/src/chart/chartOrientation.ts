@@ -32,7 +32,7 @@ export function acrossOf(point: { x: number, y: number }, orientation: ChartOrie
 
 /** Обратная сборка: из «вдоль» и «поперёк» в экранную точку. */
 export function orientedPoint(along: number, across: number, orientation: ChartOrientation): { x: number, y: number } {
-  return orientation === 'horizontal' ? { x: across, y: along } : { x: along, y: across };
+  return orientation === 'horizontal' ? { x: across, y: along } : { x: along, y: across }
 }
 
 /** Границы области поперёк — по ним проверяется, попал ли указатель в поле значений. */
@@ -55,9 +55,12 @@ export function alongExtent(area: Rect, orientation: ChartOrientation): number {
  * поэтому раме, которая знает только про экран, значение подаётся перевёрнутым.
  */
 export function orientedGrid<T extends 'x' | 'y' | 'both' | 'none'>(show: T, orientation: ChartOrientation): T {
-  if (orientation !== 'horizontal') return show
-  if (show === 'x') return 'y' as T
-  if (show === 'y') return 'x' as T
+  if (orientation !== 'horizontal')
+    return show
+  if (show === 'x')
+    return 'y' as T
+  if (show === 'y')
+    return 'x' as T
 
   return show
 }

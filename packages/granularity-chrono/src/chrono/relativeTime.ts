@@ -47,9 +47,12 @@ export function selectRelativeAmount(from: Date, to: Date): RelativeAmount {
   const elapsed = to.getTime() - from.getTime()
   const magnitude = Math.abs(elapsed)
 
-  if (magnitude < MS_IN_MINUTE) return { value: toward(elapsed / MS_IN_SECOND), unit: 'second' }
-  if (magnitude < MS_IN_HOUR) return { value: toward(elapsed / MS_IN_MINUTE), unit: 'minute' }
-  if (magnitude < MS_IN_DAY) return { value: toward(elapsed / MS_IN_HOUR), unit: 'hour' }
+  if (magnitude < MS_IN_MINUTE)
+    return { value: toward(elapsed / MS_IN_SECOND), unit: 'second' }
+  if (magnitude < MS_IN_HOUR)
+    return { value: toward(elapsed / MS_IN_MINUTE), unit: 'minute' }
+  if (magnitude < MS_IN_DAY)
+    return { value: toward(elapsed / MS_IN_HOUR), unit: 'hour' }
 
   return calendarAmount(toPlainDate(from), toPlainDate(to))
 }
@@ -58,8 +61,10 @@ export function selectRelativeAmount(from: Date, to: Date): RelativeAmount {
 function calendarAmount(from: PlainDate, to: PlainDate): RelativeAmount {
   const months = differenceInMonths(from, to)
 
-  if (Math.abs(months) >= 12) return { value: toward(months / 12), unit: 'year' }
-  if (Math.abs(months) >= 1) return { value: months, unit: 'month' }
+  if (Math.abs(months) >= 12)
+    return { value: toward(months / 12), unit: 'year' }
+  if (Math.abs(months) >= 1)
+    return { value: months, unit: 'month' }
 
   const days = differenceInDays(from, to)
 

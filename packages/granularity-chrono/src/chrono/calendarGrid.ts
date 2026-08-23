@@ -66,8 +66,10 @@ export type DisabledDatesInput
  * с числом запрещённых дат, которых у производственного календаря бывают сотни.
  */
 export function createDisabledPredicate(input: DisabledDatesInput): (date: PlainDate) => boolean {
-  if (!input) return () => false
-  if (typeof input === 'function') return input
+  if (!input)
+    return () => false
+  if (typeof input === 'function')
+    return input
 
   const keys = new Set(input.map(plainDateKey))
   return date => keys.has(plainDateKey(date))

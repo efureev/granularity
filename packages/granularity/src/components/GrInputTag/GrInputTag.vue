@@ -145,7 +145,6 @@ defineSlots<{
   tag?: (props: { tag: string, index: number, remove: () => void }) => any
 }>()
 
-
 // Fallback из контекста `GrFormField` (id/aria-describedby/invalid/required) —
 // как у GrInput и GrSelect: контрол не знает про форму, знает только про поле.
 const field = useGrFormFieldContext()
@@ -250,7 +249,8 @@ const roving = useRovingFocus<number>({
   onOverflow: (edge) => {
     // За последним чипом — поле ввода: продолжение того же ряда. Слева от
     // первого — начало строки, фокус остаётся на месте.
-    if (edge === 'end') focus()
+    if (edge === 'end')
+      focus()
     return true
   },
   // Удаление чипа перерисовывает ряд: без ожидания фокус уехал бы на узел,

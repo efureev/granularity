@@ -62,7 +62,8 @@ function stand() {
 
 function handle(root: HTMLElement, id: string, kind: 'drag' | 'resize' = 'drag'): HTMLElement {
   const el = root.querySelector<HTMLElement>(`[data-item-id="${id}"] [data-gr-dashboard-${kind}-handle]`)
-  if (!el) throw new Error(`нет ручки ${kind} у ${id}`)
+  if (!el)
+    throw new Error(`нет ручки ${kind} у ${id}`)
 
   return el
 }

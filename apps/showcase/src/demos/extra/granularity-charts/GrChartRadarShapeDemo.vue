@@ -9,8 +9,18 @@ import { computed, ref } from 'vue'
  * форма марки и своя штриховка.
  */
 const axes = [
-  'Vue', 'React', 'Svelte', 'Angular', 'Solid', 'Qwik',
-  'Astro', 'Nuxt', 'Next', 'Remix', 'Vite', 'Webpack',
+  'Vue',
+  'React',
+  'Svelte',
+  'Angular',
+  'Solid',
+  'Qwik',
+  'Astro',
+  'Nuxt',
+  'Next',
+  'Remix',
+  'Vite',
+  'Webpack',
 ]
 
 const series = [

@@ -17,12 +17,12 @@ const schema: JsonSchemaDocument = {
   type: 'object',
   properties: {
     kind: {
-      type: 'string',
-      enum: ['person', 'company'],
+      'type': 'string',
+      'enum': ['person', 'company'],
       // `x-enumNames` — расширение, которым OpenAPI-генераторы отдают подписи:
       // в самом `enum` лежат значения контракта, а не текст для человека.
       'x-enumNames': ['Физлицо', 'Компания'],
-      title: 'Контрагент',
+      'title': 'Контрагент',
     },
     fullName: { type: 'string', minLength: 2, title: 'ФИО' },
     passport: { type: 'string', pattern: '^\\d{4} \\d{6}$', title: 'Паспорт' },

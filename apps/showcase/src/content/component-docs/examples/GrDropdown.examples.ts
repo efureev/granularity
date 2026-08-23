@@ -20,7 +20,8 @@ export const grDropdownExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Persistent content with manual close',
     description: 'Показываем `closeOnContentClick=false`, когда внутри dropdown есть mini-form/filter pane и компонент не должен закрываться после каждого клика.',
     status: 'ready',
-    previewKey: 'gr-dropdown-persistent-content',    note: 'Это типичный composition-case: dropdown используется не как простое menu, а как контейнер для mini-control surface.',
+    previewKey: 'gr-dropdown-persistent-content',
+    note: 'Это типичный composition-case: dropdown используется не как простое menu, а как контейнер для mini-control surface.',
   },
   {
     id: 'dropdown-hover',

@@ -25,8 +25,10 @@ export function isComposingEvent(event: KeyboardEvent): boolean {
  * typeahead меню обязаны молчать, пока пользователь печатает в поле внутри них.
  */
 export function isEditableTarget(target: EventTarget | null): boolean {
-  if (!(target instanceof HTMLElement)) return false
-  if (target.isContentEditable) return true
+  if (!(target instanceof HTMLElement))
+    return false
+  if (target.isContentEditable)
+    return true
 
   const tag = target.tagName
   return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT'
@@ -38,14 +40,17 @@ export function isEditableTarget(target: EventTarget | null): boolean {
  * `GrKbd` (что показать), палитре (что слушать) и директиве `v-hotkey`.
  */
 export function isAppleDevice(): boolean {
-  if (typeof navigator === 'undefined') return false
+  if (typeof navigator === 'undefined')
+    return false
   return /Mac|iPhone|iPad|iPod/.test(navigator.platform || navigator.userAgent)
 }
 
 /** Физический код клавиши для латинской буквы или цифры; иначе `null`. */
 export function codeForChar(ch: string): string | null {
-  if (/^[a-z]$/i.test(ch)) return `Key${ch.toUpperCase()}`
-  if (/^\d$/.test(ch)) return `Digit${ch}`
+  if (/^[a-z]$/i.test(ch))
+    return `Key${ch.toUpperCase()}`
+  if (/^\d$/.test(ch))
+    return `Digit${ch}`
   return null
 }
 
@@ -66,10 +71,12 @@ export function eventMatchesKey(
   expected: string,
   options: EventMatchesKeyOptions = {},
 ): boolean {
-  if (expected === ' ') return event.key === ' ' || event.key === 'Spacebar'
+  if (expected === ' ')
+    return event.key === ' ' || event.key === 'Spacebar'
 
   if (expected.length === 1) {
-    if (event.key.toLowerCase() === expected.toLowerCase()) return true
+    if (event.key.toLowerCase() === expected.toLowerCase())
+      return true
     return Boolean(options.codeFallback) && codeForChar(expected) === event.code
   }
 
@@ -85,8 +92,10 @@ export function eventMatchesKey(
  * Буквы под исключение не попадают: `'a'` и Shift+A — разные намерения.
  */
 export function shiftSatisfied(event: KeyboardEvent, expectedKey: string, expectShift: boolean): boolean {
-  if (expectShift) return event.shiftKey
-  if (!event.shiftKey) return true
+  if (expectShift)
+    return event.shiftKey
+  if (!event.shiftKey)
+    return true
 
   return expectedKey.length === 1 && !/\p{L}/u.test(expectedKey) && event.key === expectedKey
 }

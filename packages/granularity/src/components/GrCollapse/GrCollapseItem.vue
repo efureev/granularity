@@ -123,10 +123,12 @@ function focusRelative(direction: 1 | -1): void {
 
 function focusEdge(edge: 'start' | 'end'): void {
   const triggers = getAllTriggers()
-  if (triggers.length === 0)
+  if (triggers.length === 0) {
     return
+  }
 
-  ;(edge === 'start' ? triggers[0] : triggers.at(-1))?.focus()
+  const target = edge === 'start' ? triggers[0] : triggers.at(-1)
+  target?.focus()
 }
 
 function onKeydown(event: KeyboardEvent): void {
@@ -170,7 +172,6 @@ defineSlots<{
   /** Управление справа в заголовке: счётчик, переключатель, кнопка. */
   extra?: () => any
 }>()
-
 </script>
 
 <template>
@@ -198,7 +199,7 @@ defineSlots<{
           <GrIcon
             v-if="iconAtStart"
             :size="chevronSize"
-           
+
             data-gr-collapse-chevron
             :class="chevronClassName"
           >
@@ -218,7 +219,7 @@ defineSlots<{
           <GrIcon
             v-if="!iconAtStart"
             :size="chevronSize"
-           
+
             data-gr-collapse-chevron
             :class="chevronClassName"
           >

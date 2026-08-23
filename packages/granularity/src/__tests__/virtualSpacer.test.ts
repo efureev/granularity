@@ -77,7 +77,8 @@ function readComponentSources(dir: string): { markup: string, sources: string } 
     const current = stack.pop()!
 
     for (const entry of readdirSync(current, { withFileTypes: true })) {
-      if (entry.name === '__tests__') continue
+      if (entry.name === '__tests__')
+        continue
 
       const path = resolve(current, entry.name)
       if (entry.isDirectory()) {
@@ -85,11 +86,13 @@ function readComponentSources(dir: string): { markup: string, sources: string } 
         continue
       }
 
-      if (!/\.(?:vue|ts)$/.test(entry.name)) continue
+      if (!/\.(?:vue|ts)$/.test(entry.name))
+        continue
 
       const source = readFileSync(path, 'utf-8')
       sources += source
-      if (entry.name.endsWith('.vue')) markup += source
+      if (entry.name.endsWith('.vue'))
+        markup += source
     }
   }
 
@@ -114,7 +117,8 @@ function spacerRows(source: string): string[] {
   while (at >= 0) {
     const start = source.lastIndexOf('<tr', at)
     const end = source.indexOf('</tr>', at)
-    if (start >= 0 && end >= 0) rows.push(source.slice(start, end))
+    if (start >= 0 && end >= 0)
+      rows.push(source.slice(start, end))
 
     at = source.indexOf('data-gr-datatable-spacer', at + 1)
   }
@@ -124,8 +128,10 @@ function spacerRows(source: string): string[] {
 
 /** Каким контрактом распорок пользуется компонент. */
 function spacerContract(source: string): 'pseudo' | 'rows' | 'none' {
-  if (source.includes('data-gr-virtual')) return 'pseudo'
-  if (source.includes('data-gr-datatable-spacer')) return 'rows'
+  if (source.includes('data-gr-virtual'))
+    return 'pseudo'
+  if (source.includes('data-gr-datatable-spacer'))
+    return 'rows'
   return 'none'
 }
 

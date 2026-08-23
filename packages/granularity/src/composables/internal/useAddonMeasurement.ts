@@ -21,11 +21,13 @@ export function useAddonMeasurement(hasPrefix: Ref<boolean>, hasSuffix: Ref<bool
   let scheduled = false
 
   function readWidthPx(el: HTMLElement | null): string | undefined {
-    if (!el) return undefined
+    if (!el)
+      return undefined
 
     const width = Math.ceil(el.getBoundingClientRect().width || 0)
     // jsdom часто отдаёт 0; не перезатираем fallback minWidth в этом случае.
-    if (width <= 0) return undefined
+    if (width <= 0)
+      return undefined
 
     return `${width}px`
   }
@@ -36,16 +38,21 @@ export function useAddonMeasurement(hasPrefix: Ref<boolean>, hasSuffix: Ref<bool
   }
 
   function refreshObserver(): void {
-    if (typeof ResizeObserver === 'undefined') return
-    if (!ro) ro = new ResizeObserver(() => measure())
+    if (typeof ResizeObserver === 'undefined')
+      return
+    if (!ro)
+      ro = new ResizeObserver(() => measure())
 
     ro.disconnect()
-    if (prefixEl.value) ro.observe(prefixEl.value)
-    if (suffixEl.value) ro.observe(suffixEl.value)
+    if (prefixEl.value)
+      ro.observe(prefixEl.value)
+    if (suffixEl.value)
+      ro.observe(suffixEl.value)
   }
 
   function scheduleMeasure(): void {
-    if (scheduled) return
+    if (scheduled)
+      return
     scheduled = true
 
     void nextTick(() => {
@@ -69,8 +76,10 @@ export function useAddonMeasurement(hasPrefix: Ref<boolean>, hasSuffix: Ref<bool
 
 /** Складывает две CSS-длины: числовые `px` — арифметически, иначе через `calc()`. */
 export function addLen(a: string, b: string): string {
-  if (a === '0px') return b
-  if (b === '0px') return a
+  if (a === '0px')
+    return b
+  if (b === '0px')
+    return a
 
   const apx = a.endsWith('px') ? Number(a.slice(0, -2)) : null
   const bpx = b.endsWith('px') ? Number(b.slice(0, -2)) : null

@@ -7,17 +7,17 @@
  */
 
 /** Что за значение в узле. Решает и цвет, и то, раскрывается ли узел. */
-export type GrJsonNodeKind =
-  | 'object'
-  | 'array'
-  | 'string'
-  | 'number'
-  | 'boolean'
-  | 'null'
+export type GrJsonNodeKind
+  = | 'object'
+    | 'array'
+    | 'string'
+    | 'number'
+    | 'boolean'
+    | 'null'
   /** Значения, которых в JSON не бывает: функция, символ, `undefined`. */
-  | 'unsupported'
+    | 'unsupported'
   /** Хвост обрезанного массива — «ещё N элементов». Своего значения не имеет. */
-  | 'truncation'
+    | 'truncation'
 
 export type GrJsonNode = {
   /** Читаемый адрес узла (`$.items[3].name`). Он же ключ для `GrTree`. */
@@ -69,7 +69,8 @@ function branchPreview(kind: 'object' | 'array', count: number): string {
 
 function scalarPreview(value: unknown, maxStringLength: number): { preview: string, truncated: boolean } {
   if (typeof value === 'string') {
-    if (value.length <= maxStringLength) return { preview: JSON.stringify(value), truncated: false }
+    if (value.length <= maxStringLength)
+      return { preview: JSON.stringify(value), truncated: false }
 
     // Кавычка открывается и не закрывается намеренно: закрытая читалась бы как
     // конец строки, а строка продолжается — её просто не показывают целиком.
@@ -77,7 +78,8 @@ function scalarPreview(value: unknown, maxStringLength: number): { preview: stri
   }
 
   // `BigInt` представления в JSON не имеет, и `JSON.stringify` на нём бросает.
-  if (typeof value === 'bigint') return { preview: `${value}n`, truncated: false }
+  if (typeof value === 'bigint')
+    return { preview: `${value}n`, truncated: false }
 
   if (typeof value === 'function' || typeof value === 'symbol' || value === undefined)
     return { preview: String(value), truncated: false }
@@ -86,8 +88,10 @@ function scalarPreview(value: unknown, maxStringLength: number): { preview: stri
 }
 
 function kindOf(value: unknown): GrJsonNodeKind {
-  if (value === null) return 'null'
-  if (Array.isArray(value)) return 'array'
+  if (value === null)
+    return 'null'
+  if (Array.isArray(value))
+    return 'array'
 
   switch (typeof value) {
     case 'string': return 'string'
@@ -211,7 +215,8 @@ export function jsonToNodes(value: unknown, options: GrJsonToNodesOptions = {}):
 
 /** Пути всех узлов до заданной глубины — ими задаётся начальная свёртка. */
 export function pathsToDepth(nodes: GrJsonNode[], depth: number, level = 0): string[] {
-  if (level >= depth) return []
+  if (level >= depth)
+    return []
 
   return nodes.flatMap(node => (
     node.children ? [node.path, ...pathsToDepth(node.children, depth, level + 1)] : []

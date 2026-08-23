@@ -22,9 +22,11 @@ export function useControlledOpen(
     // Сравнение — ДО мутации: в uncontrolled-режиме запись в `internalOpen`
     // немедленно меняет `open`, и проверка после неё всегда была бы ложной,
     // то есть `onChange` не вызывался бы никогда.
-    if (next === open.value) return
+    if (next === open.value)
+      return
 
-    if (!isControlled.value) internalOpen.value = next
+    if (!isControlled.value)
+      internalOpen.value = next
 
     onChange(next)
   }

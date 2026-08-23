@@ -6,7 +6,8 @@ export const grDataTableExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Controlled / external sort',
     description: 'Управляемая сортировка через `v-model:sortKey` / `v-model:sortDir` + событие `@sortChange`. С `external-sort` таблица не сортирует `rows` сама — данные приходят уже отсортированными (серверная сортировка, синхронизация с URL).',
     status: 'ready',
-    previewKey: 'gr-data-table-controlled-sort',    note: 'Контролируемый режим нужен для серверной сортировки и синхронизации состояния с URL; без пропов `sortKey`/`sortDir` таблица работает в uncontrolled-режиме как прежде.',
+    previewKey: 'gr-data-table-controlled-sort',
+    note: 'Контролируемый режим нужен для серверной сортировки и синхронизации состояния с URL; без пропов `sortKey`/`sortDir` таблица работает в uncontrolled-режиме как прежде.',
   },
   {
     id: 'data-table-sortable-columns',
@@ -36,7 +37,8 @@ export const grDataTableExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Custom status and actions cells',
     description: 'Ключевой composition-scenario: стандартный data pipeline остаётся у `GrDataTable`, а конкретные ячейки переопределяются слотами.',
     status: 'ready',
-    previewKey: 'gr-data-table-custom-cells',    note: 'Именно slots превращают компонент из «таблицы по данным» в реальный admin/reporting building block.',
+    previewKey: 'gr-data-table-custom-cells',
+    note: 'Именно slots превращают компонент из «таблицы по данным» в реальный admin/reporting building block.',
   },
   {
     id: 'data-table-filtered-view',
@@ -50,7 +52,8 @@ export const grDataTableExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Row selection, sticky header and loading',
     description: '`selectable` добавляет ведущую колонку с чекбоксами и «выбрать все» в шапке (модель — `v-model:selected` по ключам строк). `sticky-header` + `max-height` держат заголовок видимым при вертикальном скролле. `loading` заменяет тело строкой-индикатором.',
     status: 'ready',
-    previewKey: 'gr-data-table-selection-sticky',    note: '«Выбрать все» оперирует только видимыми строками и сохраняет внешние ключи; при клиентской сортировке выбор остаётся по ключам, а не по позициям.',
+    previewKey: 'gr-data-table-selection-sticky',
+    note: '«Выбрать все» оперирует только видимыми строками и сохраняет внешние ключи; при клиентской сортировке выбор остаётся по ключам, а не по позициям.',
   },
   {
     id: 'data-table-sizes',
@@ -71,7 +74,8 @@ export const grDataTableExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Справочник на 10 000 строк',
     description: 'С `virtual` в DOM живёт только окно вокруг вьюпорта. Распорки здесь — служебные строки, а не псевдоэлементы: `<tbody>` игнорирует отступы, и произвольную коробку в него не положить.',
     status: 'ready',
-    previewKey: 'gr-data-table-virtual',    note: 'Виртуализация включает фиксированную раскладку: ширина колонки считается по содержимому всех строк, а в DOM их только окно — без фиксации колонки прыгали бы на каждой прокрутке. Полное число строк уходит в `aria-rowcount`, номер строки — в `aria-rowindex`.',
+    previewKey: 'gr-data-table-virtual',
+    note: 'Виртуализация включает фиксированную раскладку: ширина колонки считается по содержимому всех строк, а в DOM их только окно — без фиксации колонки прыгали бы на каждой прокрутке. Полное число строк уходит в `aria-rowcount`, номер строки — в `aria-rowindex`.',
   },
   {
     id: 'data-table-column-order',

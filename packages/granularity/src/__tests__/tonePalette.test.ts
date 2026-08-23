@@ -78,13 +78,15 @@ describe('различимость тонов', () => {
 
         for (const tone of tones) {
           const expression = themeVars[`--gr-${tone}${suffix}`]
-          if (!expression) continue
+          if (!expression)
+            continue
 
           const color = resolveColorExpression(expression, themeVars, derivedThemeVars)
           const key = `${color.r},${color.g},${color.b}`
           const twin = seen.get(key)
 
-          if (twin) offenders.push(`${themeName} \`${suffix || 'base'}\`: ${twin} = ${tone}`)
+          if (twin)
+            offenders.push(`${themeName} \`${suffix || 'base'}\`: ${twin} = ${tone}`)
           else seen.set(key, tone)
         }
       }

@@ -22,13 +22,15 @@ const hourCycles = new Map<string, 'h11' | 'h12' | 'h23' | 'h24'>()
 
 function take<T>(cache: Map<string, T>, key: string, create: () => T): T {
   const cached = cache.get(key)
-  if (cached !== undefined) return cached
+  if (cached !== undefined)
+    return cached
 
   const created = create()
   // Сброс целиком, а не вытеснение по одному: ключи здесь порождаются не
   // пользовательским вводом, а конечным набором опций показа, и переполнение
   // означает скорее ошибку вызывающего, чем нормальную работу.
-  if (cache.size >= CACHE_LIMIT) cache.clear()
+  if (cache.size >= CACHE_LIMIT)
+    cache.clear()
   cache.set(key, created)
 
   return created
@@ -74,7 +76,8 @@ export function localeFirstDayOfWeek(locale: string): IsoWeekday {
       }
 
       const firstDay = info.getWeekInfo?.().firstDay ?? info.weekInfo?.firstDay
-      if (firstDay && firstDay >= 1 && firstDay <= 7) return firstDay as IsoWeekday
+      if (firstDay && firstDay >= 1 && firstDay <= 7)
+        return firstDay as IsoWeekday
     }
     catch {
       // Некорректный тег локали — ниже вернётся понедельник.
@@ -167,7 +170,8 @@ export function dayPeriodNames(locale: string): [string, string] {
 
   const partAt = (hour: number, fallback: string): string =>
     format.formatToParts(new Date(Date.UTC(2021, 0, 1, hour)))
-      .find(part => part.type === 'dayPeriod')?.value ?? fallback
+      .find(part => part.type === 'dayPeriod')
+      ?.value ?? fallback
 
   return [partAt(9, 'AM'), partAt(21, 'PM')]
 }

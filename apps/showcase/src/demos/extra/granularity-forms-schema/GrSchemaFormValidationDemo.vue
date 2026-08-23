@@ -45,7 +45,6 @@ const model = ref<Record<string, unknown>>({
 })
 
 const submitted = ref(false)
-
 </script>
 
 <template>

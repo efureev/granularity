@@ -37,7 +37,8 @@ const isLast = computed(() => step.value === 'done')
  */
 async function beforeLeave(from: string, to: string): Promise<boolean> {
   const order = steps.value.map(item => item.value)
-  if (order.indexOf(to) < order.indexOf(from)) return true
+  if (order.indexOf(to) < order.indexOf(from))
+    return true
 
   const names = fieldsByStep[from] ?? []
   const results = await Promise.all(names.map(name => formRef.value!.validateField(name)))

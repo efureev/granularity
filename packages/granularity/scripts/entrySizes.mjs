@@ -22,7 +22,8 @@ export function parseImports(source) {
 
   for (const match of source.matchAll(IMPORT_RE)) {
     const specifier = match[1]
-    if (specifier.startsWith('.')) found.push(specifier)
+    if (specifier.startsWith('.'))
+      found.push(specifier)
   }
 
   return found
@@ -39,7 +40,8 @@ export function collectEntryFiles(entryFile, readFile = path => readFileSync(pat
 
   while (pending.length > 0) {
     const current = pending.pop()
-    if (seen.has(current)) continue
+    if (seen.has(current))
+      continue
 
     let source
     try {
@@ -96,7 +98,7 @@ export function formatReport(rows, { limit = rows.length } = {}) {
 }
 
 export function measureEntries(packageDir, entries) {
-  return entries.map(entry => {
+  return entries.map((entry) => {
     const files = collectEntryFiles(resolve(packageDir, entry.file))
 
     return {
@@ -114,7 +116,8 @@ export function entriesFromExports(exportsMap) {
 
   for (const [name, value] of Object.entries(exportsMap)) {
     const file = typeof value === 'string' ? value : value?.import
-    if (typeof file !== 'string' || !file.endsWith('.js')) continue
+    if (typeof file !== 'string' || !file.endsWith('.js'))
+      continue
 
     entries.push({ name, file })
   }

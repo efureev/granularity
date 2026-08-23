@@ -54,7 +54,8 @@ const props = withDefaults(defineProps<GrBadgeWrapProps>(), {
 const { t } = useGranularityTranslations()
 
 const showCount = computed(() => {
-  if (props.dot || props.value === undefined) return false
+  if (props.dot || props.value === undefined)
+    return false
   return props.value !== 0 || props.showZero
 })
 
@@ -84,21 +85,23 @@ const visibleValue = computed(() => showCount.value ? props.value : undefined)
  * анимацию до `0.01ms`, а не выключает её (`docs/motion.md`).
  */
 watch(visibleValue, (next, prev) => {
-  if (!props.animate || pulsing.value) return
-  if (isBadgeWrapPulse(prev, next)) pulsing.value = true
+  if (!props.animate || pulsing.value)
+    return
+  if (isBadgeWrapPulse(prev, next))
+    pulsing.value = true
 })
 
 // Ушедший с экрана счётчик `animationend` уже не пришлёт, и без сброса
 // следующее его появление осталось бы без анимации навсегда.
 watch(showCount, (visible) => {
-  if (!visible) pulsing.value = false
+  if (!visible)
+    pulsing.value = false
 })
 
 defineSlots<{
   /** Элемент, к которому крепится метка. */
   default?: () => any
 }>()
-
 </script>
 
 <template>

@@ -210,8 +210,10 @@ describe('barHitIndex — бинарный поиск против обхода'
     const [low, high] = [input.area.y, input.area.y + input.area.height]
     const across = orientation === 'horizontal' ? input.point.x : input.point.y
 
-    if (orientation === 'vertical' && (across < low || across > high)) return -1
-    if (input.positions.length === 0) return -1
+    if (orientation === 'vertical' && (across < low || across > high))
+      return -1
+    if (input.positions.length === 0)
+      return -1
 
     const along = orientation === 'horizontal' ? input.point.y : input.point.x
     let index = 0

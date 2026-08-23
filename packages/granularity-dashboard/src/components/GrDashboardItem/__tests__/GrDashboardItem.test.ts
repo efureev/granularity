@@ -260,8 +260,10 @@ describe('grDashboardItem: отступы и прокрутка', () => {
 
     const body = bodyOf(stand({ props: { overflow: 'hidden' } }).root)
 
-    if (scroll) Object.defineProperty(HTMLElement.prototype, 'scrollHeight', scroll)
-    if (client) Object.defineProperty(HTMLElement.prototype, 'clientHeight', client)
+    if (scroll)
+      Object.defineProperty(HTMLElement.prototype, 'scrollHeight', scroll)
+    if (client)
+      Object.defineProperty(HTMLElement.prototype, 'clientHeight', client)
 
     expect(body.getAttribute('tabindex')).toBeNull()
   })

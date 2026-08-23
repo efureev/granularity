@@ -78,7 +78,8 @@ describe('GrChartFunnel', () => {
 
   it('форма ступени всё же меняется', () => {
     expect(steps(factory({ shape: 'bar' }))[0]!.attributes('d'))
-      .not.toBe(steps(factory({ shape: 'trapezoid' }))[0]!.attributes('d'))
+      .not
+      .toBe(steps(factory({ shape: 'trapezoid' }))[0]!.attributes('d'))
   })
 
   it('подпись ступени переключается между значением и долями', () => {
@@ -128,7 +129,8 @@ describe('GrChartFunnel', () => {
 
   it('горизонталь меняет направление ступеней', () => {
     expect(steps(factory({ orientation: 'horizontal' }))[0]!.attributes('d'))
-      .not.toBe(steps(factory())[0]!.attributes('d'))
+      .not
+      .toBe(steps(factory())[0]!.attributes('d'))
   })
 
   it('пустой список ступеней даёт пустое состояние', () => {

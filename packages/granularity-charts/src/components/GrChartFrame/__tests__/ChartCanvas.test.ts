@@ -16,7 +16,9 @@ import ChartCanvas from '../shared/ChartCanvas.vue'
 interface Call { op: string, args: unknown[] }
 
 function fakeContext(calls: Call[]): CanvasRenderingContext2D {
-  const record = (op: string) => (...args: unknown[]) => { calls.push({ op, args }) }
+  const record = (op: string) => (...args: unknown[]) => {
+    calls.push({ op, args })
+  }
 
   return {
     setTransform: record('setTransform'),
@@ -47,7 +49,8 @@ function stubRatio(value: number): () => void {
   Object.defineProperty(globalThis, 'devicePixelRatio', { configurable: true, value })
 
   return () => {
-    if (original) Object.defineProperty(globalThis, 'devicePixelRatio', original)
+    if (original)
+      Object.defineProperty(globalThis, 'devicePixelRatio', original)
   }
 }
 

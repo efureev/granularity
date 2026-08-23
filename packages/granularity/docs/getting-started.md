@@ -77,9 +77,9 @@ export default defineConfig({
 Поэтому импортов три, а не один, и порядок между ними значим:
 
 ```ts
-import '@unocss/reset/tailwind-compat.css'  // сброс браузерных стилей
-import 'virtual:uno:granular.css'           // слой `granular`
-import 'virtual:uno.css'                    // всё остальное
+import '@unocss/reset/tailwind-compat.css' // сброс браузерных стилей
+import 'virtual:uno:granular.css' // слой `granular`
+import 'virtual:uno.css' // всё остальное
 ```
 
 **Оба виртуальных модуля обязательны.** Слой `granular` — это фундамент:
@@ -695,7 +695,7 @@ export async function setupI18n() {
   i18n.registerBlocks([APP_I18N_BLOCK, GRANULARITY_I18N_BLOCK, GR_CHRONO_I18N_BLOCK])
   await i18n.loadUsedBlocks(i18n.locale.value)
 
-  return { install: (app) => installI18n(app, i18n) }
+  return { install: app => installI18n(app, i18n) }
 }
 ```
 

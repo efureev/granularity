@@ -52,22 +52,28 @@ function periodBounds(mode: PeriodMode, year: number, value: number): [PlainDate
 }
 
 function isAllowed(from: PlainDate, to: PlainDate, min?: PlainDate, max?: PlainDate): boolean {
-  if (min && comparePlainDates(to, min) < 0) return false
-  if (max && comparePlainDates(from, max) > 0) return false
+  if (min && comparePlainDates(to, min) < 0)
+    return false
+  if (max && comparePlainDates(from, max) > 0)
+    return false
 
   return true
 }
 
 function keyOf(mode: PeriodMode, year: number, value: number): string {
-  if (mode === 'month') return `${year}-${String(value + 1).padStart(2, '0')}`
-  if (mode === 'quarter') return `${year}-Q${value + 1}`
+  if (mode === 'month')
+    return `${year}-${String(value + 1).padStart(2, '0')}`
+  if (mode === 'quarter')
+    return `${year}-Q${value + 1}`
 
   return String(value)
 }
 
 function isCurrent(mode: PeriodMode, year: number, value: number, today: PlainDate): boolean {
-  if (mode === 'month') return today.y === year && today.m === value
-  if (mode === 'quarter') return today.y === year && Math.floor(today.m / 3) === value
+  if (mode === 'month')
+    return today.y === year && today.m === value
+  if (mode === 'quarter')
+    return today.y === year && Math.floor(today.m / 3) === value
 
   return today.y === value
 }

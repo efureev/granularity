@@ -32,7 +32,8 @@ export function useFilePreviews(options: UseFilePreviewsOptions): UseFilePreview
 
   function fileKey(file: File): string {
     const existing = keys.get(file)
-    if (existing !== undefined) return existing
+    if (existing !== undefined)
+      return existing
 
     counter += 1
     const key = `gr-file-${counter}`
@@ -41,12 +42,15 @@ export function useFilePreviews(options: UseFilePreviewsOptions): UseFilePreview
   }
 
   function previewUrl(file: File): string | undefined {
-    if (!options.enabled() || !file.type.startsWith('image/')) return undefined
+    if (!options.enabled() || !file.type.startsWith('image/'))
+      return undefined
 
     const existing = urls.get(file)
-    if (existing) return existing
+    if (existing)
+      return existing
 
-    if (typeof URL === 'undefined' || typeof URL.createObjectURL !== 'function') return undefined
+    if (typeof URL === 'undefined' || typeof URL.createObjectURL !== 'function')
+      return undefined
 
     const url = URL.createObjectURL(file)
     urls.set(file, url)
@@ -55,7 +59,8 @@ export function useFilePreviews(options: UseFilePreviewsOptions): UseFilePreview
 
   function revokePreview(file: File): void {
     const url = urls.get(file)
-    if (!url) return
+    if (!url)
+      return
 
     URL.revokeObjectURL(url)
     urls.delete(file)

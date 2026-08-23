@@ -618,9 +618,11 @@ test.describe('GrTimeline: ось сквозь заголовок группы',
       const ink: { dot: boolean, top: number, bottom: number }[] = []
       rails.forEach((rail) => {
         rail.querySelectorAll('[data-gr-timeline-marker], [data-gr-timeline-line]').forEach((node) => {
-          if (getComputedStyle(node).visibility === 'hidden') return
+          if (getComputedStyle(node).visibility === 'hidden')
+            return
           const box = node.getBoundingClientRect()
-          if (!box.height) return
+          if (!box.height)
+            return
           ink.push({ dot: node.hasAttribute('data-gr-timeline-marker'), top: box.top, bottom: box.bottom })
         })
       })
@@ -630,7 +632,8 @@ test.describe('GrTimeline: ось сквозь заголовок группы',
       // означает дыру в оси.
       let unwantedGap = 0
       for (let i = 1; i < ink.length; i++) {
-        if (ink[i - 1].dot) continue
+        if (ink[i - 1].dot)
+          continue
         unwantedGap = Math.max(unwantedGap, ink[i].top - ink[i - 1].bottom)
       }
 

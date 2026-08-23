@@ -77,14 +77,18 @@ export function isSamePlainTime(left: PlainTime, right: PlainTime): boolean {
  * на границе, а не перепрыгнуть на другой конец суток.
  */
 export function clampPlainTime(time: PlainTime, min?: PlainTime, max?: PlainTime): PlainTime {
-  if (min && comparePlainTimes(time, min) < 0) return min
-  if (max && comparePlainTimes(time, max) > 0) return max
+  if (min && comparePlainTimes(time, min) < 0)
+    return min
+  if (max && comparePlainTimes(time, max) > 0)
+    return max
   return time
 }
 
 export function isPlainTimeWithin(time: PlainTime, min?: PlainTime, max?: PlainTime): boolean {
-  if (min && comparePlainTimes(time, min) < 0) return false
-  if (max && comparePlainTimes(time, max) > 0) return false
+  if (min && comparePlainTimes(time, min) < 0)
+    return false
+  if (max && comparePlainTimes(time, max) > 0)
+    return false
   return true
 }
 
@@ -93,7 +97,8 @@ export function isPlainTimeWithin(time: PlainTime, min?: PlainTime, max?: PlainT
  * показывать 07, пришедшее из модели.
  */
 export function floorToStep(time: PlainTime, stepSeconds: number): PlainTime {
-  if (stepSeconds <= 1) return time
+  if (stepSeconds <= 1)
+    return time
 
   const total = toSecondsOfDay(time)
   return fromSecondsOfDay(total - (total % stepSeconds))
@@ -111,11 +116,13 @@ export function floorToStep(time: PlainTime, stepSeconds: number): PlainTime {
  * пикер времени не знает и сместить их не может.
  */
 export function ceilToStep(time: PlainTime, stepSeconds: number): PlainTime {
-  if (stepSeconds <= 1) return time
+  if (stepSeconds <= 1)
+    return time
 
   const total = toSecondsOfDay(time)
   const rest = total % stepSeconds
-  if (rest === 0) return time
+  if (rest === 0)
+    return time
 
   const ceiled = total - rest + stepSeconds
 

@@ -50,7 +50,8 @@ describe('modelFingerprint', () => {
     // До отпечатка любой `File` сериализовался в `{}`, и подмена документа была
     // неотличима от бездействия.
     expect(modelFingerprint({ doc: file }))
-      .not.toBe(modelFingerprint({ doc: new File(['yy'], 'draft.pdf', { lastModified: 1 }) }))
+      .not
+      .toBe(modelFingerprint({ doc: new File(['yy'], 'draft.pdf', { lastModified: 1 }) }))
   })
 
   it('копия файла с теми же именем, размером и временем считается тем же значением', () => {

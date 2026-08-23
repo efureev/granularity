@@ -1,12 +1,11 @@
 <script setup lang="ts">
-import {GrBadge, GrCard, GrIcon} from '@feugene/granularity'
+import { GrBadge, GrCard, GrIcon } from '@feugene/granularity'
 import IconCircleCheck from '~icons/lucide/circle-check-big'
 
-
 const stats = [
-  {label: 'Healthy integrations', value: '18', tone: 'text-emerald-500'},
-  {label: 'Needs review', value: '4', tone: 'text-amber-500'},
-  {label: 'Failed checks', value: '1', tone: 'text-rose-500'},
+  { label: 'Healthy integrations', value: '18', tone: 'text-emerald-500' },
+  { label: 'Needs review', value: '4', tone: 'text-amber-500' },
+  { label: 'Failed checks', value: '1', tone: 'text-rose-500' },
 ]
 </script>
 

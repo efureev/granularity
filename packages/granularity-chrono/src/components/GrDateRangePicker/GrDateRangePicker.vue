@@ -286,8 +286,10 @@ const todayPlain = computed(() => (props.today ? toPlainDate(props.today) : unde
 
 const disabledDates = computed<DisabledDatesInput>(() => {
   const source = props.disabledDates
-  if (!source) return undefined
-  if (typeof source === 'function') return (date: PlainDate) => source(fromPlainParts(date))
+  if (!source)
+    return undefined
+  if (typeof source === 'function')
+    return (date: PlainDate) => source(fromPlainParts(date))
 
   return source.map(toPlainDate)
 })
@@ -316,7 +318,8 @@ const endOfDay = computed<PlainTime>(() => {
  */
 const boundTimes = computed<[PlainTime, PlainTime] | null>(() => {
   const value = selected.value
-  if (!value) return null
+  if (!value)
+    return null
 
   return [toPlainTime(value[0]), toPlainTime(value[1])]
 })
@@ -329,7 +332,8 @@ const boundTimes = computed<[PlainTime, PlainTime] | null>(() => {
  * теряет сутки данных.
  */
 function withDefaultTimes(from: PlainDate, to: PlainDate): [Date, Date] {
-  if (!props.enableTime) return [fromPlainParts(from), fromPlainParts(to)]
+  if (!props.enableTime)
+    return [fromPlainParts(from), fromPlainParts(to)]
 
   return [fromPlainParts(from, { h: 0, min: 0, s: 0 }), fromPlainParts(to, endOfDay.value)]
 }
@@ -338,7 +342,8 @@ function withDefaultTimes(from: PlainDate, to: PlainDate): [Date, Date] {
 function setBoundTime(edge: 0 | 1, time: PlainTime): void {
   const value = selected.value
   const times = boundTimes.value
-  if (isLocked.value || !value || !times) return
+  if (isLocked.value || !value || !times)
+    return
 
   const next: [Date, Date] = [...value] as [Date, Date]
   next[edge] = fromPlainParts(toPlainDate(value[edge]), time)
@@ -365,7 +370,8 @@ function boundLabel(date: PlainDate, edge: 0 | 1): string {
   const format = props.format ?? (props.editable ? EDITABLE_DATE_FORMAT : undefined)
   const text = formatPlainDate(resolvedLocale.value, date, format)
   const times = boundTimes.value
-  if (!props.enableTime || props.format || !times) return text
+  if (!props.enableTime || props.format || !times)
+    return text
 
   const time = formatPlainTime(resolvedLocale.value, times[edge], props.editable
     ? editableTimeFormat({ seconds: props.enableSeconds, twelveHour: twelveHour.value })
@@ -381,7 +387,8 @@ function boundLabel(date: PlainDate, edge: 0 | 1): string {
 
 const displayValue = computed(() => {
   const range = selectedRange.value
-  if (!range) return ''
+  if (!range)
+    return ''
 
   const [from, to] = range
 
@@ -397,7 +404,8 @@ const displayValue = computed(() => {
  */
 function parseBound(text: string): Date | null {
   const parts = parseLocaleDateTime(resolvedLocale.value, text)
-  if (!parts || props.enableTime !== (parts.time !== null)) return null
+  if (!parts || props.enableTime !== (parts.time !== null))
+    return null
 
   return fromPlainParts(parts.date, parts.time ?? undefined)
 }
@@ -409,10 +417,12 @@ const field = useEditableField<[Date, Date]>({
   display: () => displayValue.value,
   parse: (text) => {
     const halves = splitLocaleRange(resolvedLocale.value, text)
-    if (!halves) return null
+    if (!halves)
+      return null
 
     const bounds = halves.map(parseBound)
-    if (bounds.some(bound => bound === null)) return null
+    if (bounds.some(bound => bound === null))
+      return null
 
     // Порядок нормализуется, как и у кликов: период можно вести назад.
     const [from, to] = (bounds as Date[]).sort((a, b) => a.getTime() - b.getTime()) as [Date, Date]
@@ -440,7 +450,8 @@ const field = useEditableField<[Date, Date]>({
 
 /** Плейсхолдер-подсказка: обе границы, чтобы было видно, что их ждут две. */
 const fieldPlaceholder = computed(() => {
-  if (props.placeholder || !props.editable) return props.placeholder
+  if (props.placeholder || !props.editable)
+    return props.placeholder
 
   const date = localeDatePattern(resolvedLocale.value, {
     day: t('grChrono.datePicker.patternDay', 'D'),
@@ -448,7 +459,8 @@ const fieldPlaceholder = computed(() => {
     year: t('grChrono.datePicker.patternYear', 'Y'),
   })
 
-  if (!props.enableTime) return `${date}${props.separator}${date}`
+  if (!props.enableTime)
+    return `${date}${props.separator}${date}`
 
   const time = localeTimePattern(resolvedLocale.value, {
     hour: t('grChrono.timePicker.patternHour', 'H'),
@@ -460,7 +472,8 @@ const fieldPlaceholder = computed(() => {
 })
 
 function onFieldKeydown(event: KeyboardEvent): void {
-  if (field.handleKeydown(event)) return
+  if (field.handleKeydown(event))
+    return
 
   shell.onFieldKeydown(event)
 }
@@ -475,7 +488,8 @@ function onFieldKeydown(event: KeyboardEvent): void {
  */
 const previewRange = computed<[PlainDate | null, PlainDate | null]>(() => {
   const draft = field.draft.value
-  if (draft === null) return [null, null]
+  if (draft === null)
+    return [null, null]
 
   const bound = (text: string): PlainDate | null => parsePartialLocaleDateTime(
     resolvedLocale.value,
@@ -494,7 +508,8 @@ const rangeStart = computed(() => (
 ))
 
 const rangeEnd = computed(() => {
-  if (previewRange.value[0]) return previewRange.value[1]
+  if (previewRange.value[0])
+    return previewRange.value[1]
 
   return anchor.value ? null : selectedRange.value?.[1] ?? null
 })
@@ -507,8 +522,10 @@ function lengthOf(from: PlainDate, to: PlainDate): number {
 function isLengthAllowed(from: PlainDate, to: PlainDate): boolean {
   const length = lengthOf(from, to)
 
-  if (props.minRange !== undefined && length < props.minRange) return false
-  if (props.maxRange !== undefined && length > props.maxRange) return false
+  if (props.minRange !== undefined && length < props.minRange)
+    return false
+  if (props.maxRange !== undefined && length > props.maxRange)
+    return false
 
   return true
 }
@@ -526,7 +543,8 @@ function announceRange(from: PlainDate, to: PlainDate): void {
 }
 
 function onDaySelect(date: PlainDate): void {
-  if (isLocked.value) return
+  if (isLocked.value)
+    return
 
   // Первый клик открывает период, второй закрывает. Клик по началу открытого
   // периода — тоже второй: период в один день допустим, если длина позволяет.
@@ -558,7 +576,8 @@ function onDaySelect(date: PlainDate): void {
 
   // Со временем выбор на второй дате не заканчивается: закрыв панель, мы отняли
   // бы у пользователя колонки, ради которых он и включил `enableTime`.
-  if (props.enableTime) return
+  if (props.enableTime)
+    return
 
   // Фокус на поле вернёт стек слоёв: на момент закрытия он ещё внутри панели.
   shell.closePanel()
@@ -577,7 +596,8 @@ function isDayAllowed(date: PlainDate): boolean {
  * выключенным.
  */
 function canSetRange(from: Date, to: Date): boolean {
-  if (isLocked.value) return false
+  if (isLocked.value)
+    return false
 
   const [start, end] = orderPlain(toPlainDate(from), toPlainDate(to))
 
@@ -591,7 +611,8 @@ function canSetRange(from: Date, to: Date): boolean {
  * ничего не произошло.
  */
 function setRange(from: Date, to: Date): boolean {
-  if (!canSetRange(from, to)) return false
+  if (!canSetRange(from, to))
+    return false
 
   const [start, end] = orderPlain(toPlainDate(from), toPlainDate(to))
 
@@ -629,7 +650,8 @@ function applyPreset(preset: GrDateRangePreset): void {
 }
 
 function onDayHover(date: PlainDate | null): void {
-  if (!anchor.value) return
+  if (!anchor.value)
+    return
 
   hovered.value = date
 }

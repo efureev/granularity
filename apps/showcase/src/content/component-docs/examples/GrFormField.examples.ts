@@ -6,7 +6,8 @@ export const grFormFieldExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Auto id, hint, required and error linking',
     description: 'Поле само генерирует `id` (связка с `label for`) и через provide/inject отдаёт контролу `aria-describedby` (hint + error), `aria-invalid` и `aria-required` — без ручного `forId`. Ошибка анонсируется через `role="alert"`.',
     status: 'ready',
-    previewKey: 'gr-form-field-context',    note: 'GrInput / GrSelect / GrTextarea внутри `GrFormField` подхватывают контекст автоматически — id/aria прокидывать не нужно.',
+    previewKey: 'gr-form-field-context',
+    note: 'GrInput / GrSelect / GrTextarea внутри `GrFormField` подхватывают контекст автоматически — id/aria прокидывать не нужно.',
   },
   {
     id: 'form-field-basic-label',
@@ -34,7 +35,8 @@ export const grFormFieldExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Custom control + custom rule (no GrForm)',
     description: 'Даже без `GrForm` поле связывает свой контрол и ошибку: кастомный контрол (звёздный рейтинг) читает контекст через `useGrFormFieldContext()`, а валидация делается вручную — своя функция-правило вычисляет `:error`, который `GrFormField` показывает через `role="alert"`.',
     status: 'ready',
-    previewKey: 'gr-form-field-custom-control',    note: 'Тот же приём (чтение `useGrFormFieldContext()`) делает любой контрол совместимым и с `GrForm` — тогда правило описывается декларативно в `rules`, а не вручную.',
+    previewKey: 'gr-form-field-custom-control',
+    note: 'Тот же приём (чтение `useGrFormFieldContext()`) делает любой контрол совместимым и с `GrForm` — тогда правило описывается декларативно в `rules`, а не вручную.',
   },
   {
     id: 'form-field-inline-label',

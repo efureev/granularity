@@ -38,7 +38,7 @@ const frameDir = resolve(process.cwd(), 'src/components/GrChartFrame')
 const frameConsumers = Object.entries(granularityChartsComponentConfigs)
   .filter(([name]) => existsSync(resolve(process.cwd(), `src/components/${name}/config.ts`)))
   .filter(([name]) => readFileSync(resolve(process.cwd(), `src/components/${name}/config.ts`), 'utf8')
-    .includes("group: 'GrChartFrame'"))
+    .includes('group: \'GrChartFrame\''))
   .map(([name]) => name)
 
 describe('GrChartFrame — рама, а не компонент', () => {

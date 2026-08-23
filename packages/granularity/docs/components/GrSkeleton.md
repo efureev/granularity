@@ -4,7 +4,9 @@
 
 ```vue
 <GrSkeleton />
+
 <GrSkeleton variant="rect" width="38%" height="20px" />
+
 <GrSkeleton variant="circle" width="44px" />
 ```
 

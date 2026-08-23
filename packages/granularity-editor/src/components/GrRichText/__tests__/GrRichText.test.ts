@@ -21,7 +21,8 @@ async function ready(_wrapper?: unknown) {
 function area(wrapper: Editor): HTMLElement {
   const root = wrapper.element as HTMLElement
   const element = root.querySelector('[contenteditable]')
-  if (!element) throw new Error('нет области ввода')
+  if (!element)
+    throw new Error('нет области ввода')
 
   return element as HTMLElement
 }
@@ -32,7 +33,8 @@ function actions(wrapper: Editor) {
 
 function action(wrapper: Editor, key: string) {
   const element = wrapper.find(`[data-gr-rich-text-action][data-key="${key}"]`)
-  if (!element.exists()) throw new Error(`нет кнопки ${key}`)
+  if (!element.exists())
+    throw new Error(`нет кнопки ${key}`)
 
   return element
 }
@@ -447,7 +449,8 @@ describe('GrRichText — пузырьковый тулбар', () => {
     await selectAllWithBubble(wrapper)
 
     const button = bubbleButtons().find(node => node.dataset.key === 'bold')
-    if (!button) throw new Error('нет кнопки bold')
+    if (!button)
+      throw new Error('нет кнопки bold')
 
     const mousedown = new MouseEvent('mousedown', { bubbles: true, cancelable: true })
     button.dispatchEvent(mousedown)

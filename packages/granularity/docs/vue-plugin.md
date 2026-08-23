@@ -85,7 +85,7 @@ createApp(App)
 
    ```ts
    components: [
-     { install: (app) => app.component('GrFancy', GrFancy) },
+     { install: app => app.component('GrFancy', GrFancy) },
    ]
    ```
 

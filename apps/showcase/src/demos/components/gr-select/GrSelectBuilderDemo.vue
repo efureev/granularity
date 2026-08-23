@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {computed, ref, watch} from 'vue'
+import { computed, ref, watch } from 'vue'
 
 import {
   GrCard,
@@ -42,40 +42,40 @@ const singleValue = ref<string>('')
 const multipleValue = ref<string[]>([])
 
 const demoOptions = [
-  {value: 'alpha', label: 'Alpha workspace'},
-  {value: 'beta', label: 'Beta workspace'},
-  {value: 'gamma', label: 'Gamma workspace'},
-  {value: 'delta', label: 'Delta workspace: very long label that should wrap'},
+  { value: 'alpha', label: 'Alpha workspace' },
+  { value: 'beta', label: 'Beta workspace' },
+  { value: 'gamma', label: 'Gamma workspace' },
+  { value: 'delta', label: 'Delta workspace: very long label that should wrap' },
 ]
 
 const viewOptions = [
-  {value: 'default', label: 'Default'},
-  {value: 'link', label: 'Link'},
+  { value: 'default', label: 'Default' },
+  { value: 'link', label: 'Link' },
 ] satisfies Array<{ value: GrSelectView, label: string }>
 
 const sizeOptions = [
-  {value: 'xs', label: 'XS'},
-  {value: 'sm', label: 'SM'},
-  {value: 'md', label: 'MD'},
-  {value: 'lg', label: 'LG'},
+  { value: 'xs', label: 'XS' },
+  { value: 'sm', label: 'SM' },
+  { value: 'md', label: 'MD' },
+  { value: 'lg', label: 'LG' },
 ] satisfies Array<{ value: GrSelectSize, label: string }>
 
 const variantOptions = [
-  {value: 'primary', label: 'Primary'},
-  {value: 'default', label: 'Default'},
-  {value: 'muted', label: 'Muted'},
-  {value: 'danger', label: 'Danger'},
+  { value: 'primary', label: 'Primary' },
+  { value: 'default', label: 'Default' },
+  { value: 'muted', label: 'Muted' },
+  { value: 'danger', label: 'Danger' },
 ] satisfies Array<{ value: GrSelectVariant, label: string }>
 
 const underlineOptions = [
-  {value: 'auto', label: 'Auto'},
-  {value: 'always', label: 'Always'},
-  {value: 'none', label: 'None'},
+  { value: 'auto', label: 'Auto' },
+  { value: 'always', label: 'Always' },
+  { value: 'none', label: 'None' },
 ] satisfies Array<{ value: GrSelectUnderline, label: string }>
 
 const optionsViewOptions = [
-  {value: 'native', label: 'Native'},
-  {value: 'panel', label: 'Panel'},
+  { value: 'native', label: 'Native' },
+  { value: 'panel', label: 'Panel' },
 ] satisfies Array<{ value: GrSelectOptionsView, label: string }>
 
 watch(multiple, (next) => {

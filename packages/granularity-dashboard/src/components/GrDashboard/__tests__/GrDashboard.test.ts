@@ -239,8 +239,10 @@ describe('gRDashboard: прокручиваемое тело виджета', ()
     Object.defineProperty(HTMLElement.prototype, 'clientHeight', { configurable: true, value: clientHeight })
 
     return () => {
-      if (scroll) Object.defineProperty(HTMLElement.prototype, 'scrollHeight', scroll)
-      if (client) Object.defineProperty(HTMLElement.prototype, 'clientHeight', client)
+      if (scroll)
+        Object.defineProperty(HTMLElement.prototype, 'scrollHeight', scroll)
+      if (client)
+        Object.defineProperty(HTMLElement.prototype, 'clientHeight', client)
     }
   }
 

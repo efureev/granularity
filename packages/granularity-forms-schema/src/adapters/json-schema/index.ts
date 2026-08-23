@@ -11,10 +11,12 @@ import type { JsonSchemaDocument } from './types'
  * ни с zod-объектом (у того есть `_def`), ни с обычными данными.
  */
 function isJsonSchema(schema: unknown): schema is JsonSchemaDocument {
-  if (!schema || typeof schema !== 'object' || Array.isArray(schema)) return false
+  if (!schema || typeof schema !== 'object' || Array.isArray(schema))
+    return false
 
   const document = schema as Record<string, unknown>
-  if ('_def' in document || '~standard' in document) return false
+  if ('_def' in document || '~standard' in document)
+    return false
 
   return '$schema' in document
     || 'properties' in document

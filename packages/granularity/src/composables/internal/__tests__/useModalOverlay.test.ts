@@ -27,7 +27,9 @@ function mountOverlay(options: Partial<UseModalOverlayOptions> & { open?: boolea
     setup() {
       const panel = ref<HTMLElement | null>(null)
 
-      captured = useModalOverlay(open, () => { dismissCount += 1 }, {
+      captured = useModalOverlay(open, () => {
+        dismissCount += 1
+      }, {
         panel,
         modal: options.modal,
         closeOnEscape: options.closeOnEscape,

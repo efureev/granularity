@@ -62,15 +62,18 @@ export function useComboboxNavigation<TItem>(
   )
 
   const activeDescendantId = computed(() => {
-    if (!options.open()) return undefined
+    if (!options.open())
+      return undefined
     const item = activeItem.value
-    if (item === undefined) return undefined
+    if (item === undefined)
+      return undefined
     return options.idOf(item, activeIndex.value)
   })
 
   function clamp(index: number): number {
     const len = options.items().length
-    if (len === 0) return -1
+    if (len === 0)
+      return -1
     return ((index % len) + len) % len
   }
 
@@ -78,7 +81,8 @@ export function useComboboxNavigation<TItem>(
     activeIndex.value = clamp(index)
 
     const item = activeItem.value
-    if (item !== undefined) void options.scrollTo?.(item, activeIndex.value)
+    if (item !== undefined)
+      void options.scrollTo?.(item, activeIndex.value)
   }
 
   function init(): void {
@@ -100,9 +104,12 @@ export function useComboboxNavigation<TItem>(
   // мимо. За верхнюю границу — на последний; пустого активного при непустом
   // списке не бывает.
   watch(options.items, (items) => {
-    if (!options.open()) return
-    if (activeIndex.value >= items.length) activeIndex.value = items.length - 1
-    if (activeIndex.value < 0 && items.length) activeIndex.value = 0
+    if (!options.open())
+      return
+    if (activeIndex.value >= items.length)
+      activeIndex.value = items.length - 1
+    if (activeIndex.value < 0 && items.length)
+      activeIndex.value = 0
   })
 
   function handleNavigationKeys(event: KeyboardEvent): boolean {

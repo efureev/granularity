@@ -33,7 +33,8 @@ export interface LocaleCompletenessGateOptions {
 }
 
 function isPluralForms(value: unknown): value is Json {
-  if (typeof value !== 'object' || value === null || Array.isArray(value)) return false
+  if (typeof value !== 'object' || value === null || Array.isArray(value))
+    return false
 
   const keys = Object.keys(value)
 
@@ -85,7 +86,8 @@ function sourceFiles(dir: string, acc: string[] = []): string[] {
     const path = resolve(dir, entry.name)
 
     if (entry.isDirectory()) {
-      if (entry.name !== '__tests__') sourceFiles(path, acc)
+      if (entry.name !== '__tests__')
+        sourceFiles(path, acc)
     }
     else if (/\.(?:vue|ts)$/.test(entry.name) && !entry.name.includes('.test.')) {
       acc.push(path)
@@ -145,7 +147,8 @@ export function defineLocaleCompletenessGate(options: LocaleCompletenessGateOpti
       const mismatched = [...baseKeys.entries()]
         .filter(([key, value]) => {
           const translated = flat[locale]!.get(key)
-          if (translated === undefined) return false
+          if (translated === undefined)
+            return false
 
           const expected = placeholders(value)
           const actual = placeholders(translated)

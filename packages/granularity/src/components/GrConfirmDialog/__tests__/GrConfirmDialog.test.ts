@@ -155,7 +155,6 @@ async function mountConfirm(attrs = '', slots = '') {
 
 const byTestId = (id: string) => document.querySelector<HTMLElement>(`[data-testid="${id}"]`)
 
-
 describe('GrConfirmDialog — фокус при открытии', () => {
   it('по умолчанию фокус на «Отмена»: Enter сразу после открытия ничего не разрушает', async () => {
     const wrapper = await mountConfirm()

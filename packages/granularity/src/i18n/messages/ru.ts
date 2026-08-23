@@ -1,5 +1,5 @@
 import type { LocaleLoaderCollection } from '@feugene/fint-i18n/core'
-import { GRANULARITY_I18N_BLOCK } from "./const";
+import { GRANULARITY_I18N_BLOCK } from './const'
 
 export const ru = {
   ru: {

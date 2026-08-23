@@ -123,7 +123,6 @@ defineSlots<{
   error?: (props: { errors: GrFormFileError[] }) => any
 }>()
 
-
 const { t } = useGranularityTranslations()
 
 // Контекст `GrFormField`. Виджет здесь — кнопка выбора файла, а не нативный
@@ -224,7 +223,8 @@ const { fileKey, previewUrl, revokePreview, revokeAllPreviews } = useFilePreview
  */
 watch(files, (next, prev) => {
   for (const file of prev ?? []) {
-    if (!next.includes(file)) revokePreview(file)
+    if (!next.includes(file))
+      revokePreview(file)
   }
 })
 
@@ -249,7 +249,8 @@ const effectiveValidators = computed<FileValidator[]>(() => {
 })
 
 function clearInputValue() {
-  if (!inputRef.value) return
+  if (!inputRef.value)
+    return
   inputRef.value.value = ''
 }
 
@@ -259,12 +260,14 @@ function setErrors(next: GrFormFileError[]) {
 }
 
 function clearErrors() {
-  if (displayedErrors.value.length === 0) return
+  if (displayedErrors.value.length === 0)
+    return
   setErrors([])
 }
 
 function openDialog() {
-  if (isLocked.value) return
+  if (isLocked.value)
+    return
   inputRef.value?.click()
 }
 
@@ -303,20 +306,23 @@ async function applyFiles(nextFiles: File[]) {
 }
 
 async function onInputChange(event: Event) {
-  if (isLocked.value) return
+  if (isLocked.value)
+    return
 
   const target = event.target as HTMLInputElement | null
   const nextFiles = target?.files ? Array.prototype.slice.call(target.files) as File[] : []
 
   // Reset value so selecting the same file twice triggers change.
-  if (target) target.value = ''
+  if (target)
+    target.value = ''
   await nextTick()
 
   await applyFiles(nextFiles)
 }
 
 function clearAll() {
-  if (isLocked.value) return
+  if (isLocked.value)
+    return
   clearErrors()
   clearInputValue()
   emit('clear')
@@ -326,7 +332,8 @@ function clearAll() {
 }
 
 function removeAt(index: number) {
-  if (isLocked.value) return
+  if (isLocked.value)
+    return
   if (!props.multiple) {
     clearAll()
     return
@@ -388,7 +395,8 @@ const dropzone = computed(() => {
 watch(
   () => props.modelValue,
   (value) => {
-    if (!inputRef.value) return
+    if (!inputRef.value)
+      return
 
     if (!value || (Array.isArray(value) && value.length === 0)) {
       // Позволяет выбрать тот же файл снова после внешнего сброса.

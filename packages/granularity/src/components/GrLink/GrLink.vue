@@ -89,7 +89,8 @@ const attrs = useAttrs()
 const isInteractive = computed(() => !props.disabled && (!!props.as || !!props.href))
 
 const renderAs = computed<string | Component>(() => {
-  if (!isInteractive.value) return 'span'
+  if (!isInteractive.value)
+    return 'span'
   if (props.as) {
     // Если `as` — объект-компонент, помечаем его как нереактивный, чтобы избежать
     // оверхеда от Vue-прокси и предупреждений в консоли. Строки (нативные теги)
@@ -173,7 +174,6 @@ defineSlots<{
   /** Текст ссылки. */
   default?: () => any
 }>()
-
 </script>
 
 <template>

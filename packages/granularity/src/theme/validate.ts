@@ -54,10 +54,12 @@ export function validateTheme(theme: GrTheme | { name: string, tokens: GrThemeTo
     const [foreground, background] = [value(token), value(against)]
     // Роль не разворачивается в цвет (например `rgb(… / .45)` у подложки) —
     // считать нечего: молчаливая «проверка» хуже её отсутствия.
-    if (!foreground || !background) return
+    if (!foreground || !background)
+      return
 
     const actual = contrast(foreground, background)
-    if (actual >= expected) return
+    if (actual >= expected)
+      return
 
     issues.push({
       kind: 'contrast',
@@ -75,14 +77,17 @@ export function validateTheme(theme: GrTheme | { name: string, tokens: GrThemeTo
 
     const fill = value(fillRole)
     const foreground = value(fgRole)
-    if (!fill || !foreground) return
+    if (!fill || !foreground)
+      return
 
     for (const { amount, mixWith } of derivedOf(fillRole)) {
       const mixed = value(mixWith)
-      if (!mixed) continue
+      if (!mixed)
+        continue
 
       const state = contrast(foreground, mixSrgb(fill, mixed, amount))
-      if (state >= AA_TEXT) continue
+      if (state >= AA_TEXT)
+        continue
 
       issues.push({
         kind: 'contrast',
@@ -102,7 +107,8 @@ export function validateTheme(theme: GrTheme | { name: string, tokens: GrThemeTo
   const withOwnFg = new Set(toneNames().map(tone => `--gr-${tone}`))
 
   for (const surface of ['--gr-bg', '--gr-card', '--gr-popover', '--gr-sidebar']) {
-    if (withOwnFg.has(surface)) continue
+    if (withOwnFg.has(surface))
+      continue
 
     requireContrast('--gr-fg', surface, AA_TEXT, 'основной текст')
   }
@@ -118,7 +124,8 @@ export function validateTheme(theme: GrTheme | { name: string, tokens: GrThemeTo
     // Состояния solid — свои роли темы, а не производные формулой, поэтому
     // текст на них проверяется отдельно: у темы с нуля это единственная защита.
     for (const state of ['-hover', '-active']) {
-      if (tokens[`${fill}${state}`] === undefined) continue
+      if (tokens[`${fill}${state}`] === undefined)
+        continue
 
       requireContrast(`${fill}-fg`, `${fill}${state}`, AA_TEXT, `текст на состоянии ${tone}${state}`)
     }
@@ -138,10 +145,12 @@ export function validateTheme(theme: GrTheme | { name: string, tokens: GrThemeTo
     for (let j = i + 1; j < distinct.length; j += 1) {
       const [first, second] = [`--gr-${distinct[i]}`, `--gr-${distinct[j]}`]
       const [firstValue, secondValue] = [value(first), value(second)]
-      if (!firstValue || !secondValue) continue
+      if (!firstValue || !secondValue)
+        continue
 
       const distance = deltaE(firstValue, secondValue)
-      if (distance >= NOTICEABLE) continue
+      if (distance >= NOTICEABLE)
+        continue
 
       issues.push({
         kind: 'distance',

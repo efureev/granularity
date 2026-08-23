@@ -59,7 +59,8 @@
 
 ```ts
 async function beforeChange(name: GrCollapseValue, expanding: boolean): Promise<boolean> {
-  if (expanding) return true
+  if (expanding)
+    return true
   return confirmDiscardChanges(name)
 }
 ```

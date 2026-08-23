@@ -233,7 +233,8 @@ const shown = computed(() => (props.autoApply ? selectedDate.value : draft.value
 // `panelVisible`, а не `panelOpen`: в `inline` панель на экране с монтирования,
 // и черновику неоткуда взяться, если ждать открытия.
 watch(panelVisible, (next) => {
-  if (next && !props.autoApply) draft.value = selectedDate.value
+  if (next && !props.autoApply)
+    draft.value = selectedDate.value
 }, { immediate: true })
 
 const minPlain = computed(() => (props.min ? toPlainDate(props.min) : undefined))
@@ -247,14 +248,17 @@ const todayPlain = computed(() => (props.today ? toPlainDate(props.today) : unde
  */
 const disabledDates = computed<DisabledDatesInput>(() => {
   const source = props.disabledDates
-  if (!source) return undefined
-  if (typeof source === 'function') return (date: PlainDate) => source(fromPlainParts(date))
+  if (!source)
+    return undefined
+  if (typeof source === 'function')
+    return (date: PlainDate) => source(fromPlainParts(date))
 
   return source.map(toPlainDate)
 })
 
 const displayValue = computed(() => {
-  if (!selectedDate.value) return ''
+  if (!selectedDate.value)
+    return ''
   if (props.format) {
     return formatPlainDate(resolvedLocale.value, toPlainDate(selectedDate.value), props.format)
   }
@@ -285,7 +289,8 @@ const isDisabledDate = computed(() => createDisabledPredicate(disabledDates.valu
 
 function isAllowed(date: Date): boolean {
   const plain = toPlainDate(date)
-  if (isDisabledDate.value(plain) || !isPlainDateWithin(plain, minPlain.value, maxPlain.value)) return false
+  if (isDisabledDate.value(plain) || !isPlainDateWithin(plain, minPlain.value, maxPlain.value))
+    return false
 
   return (!props.min || date.getTime() >= props.min.getTime())
     && (!props.max || date.getTime() <= props.max.getTime())
@@ -298,7 +303,8 @@ const field = useEditableField<Date>({
   display: () => displayValue.value,
   parse: (text) => {
     const parts = parseLocaleDateTime(resolvedLocale.value, text)
-    if (!parts) return null
+    if (!parts)
+      return null
 
     // Набрана одна дата — время остаётся прежним: не набранное не меняется.
     // Пустая модель времени не хранит, и тогда это полночь.
@@ -319,7 +325,8 @@ const field = useEditableField<Date>({
  * частей у локалей разный, и без неё непонятно, чего от тебя ждут.
  */
 const fieldPlaceholder = computed(() => {
-  if (props.placeholder || !props.editable) return props.placeholder
+  if (props.placeholder || !props.editable)
+    return props.placeholder
 
   const date = localeDatePattern(resolvedLocale.value, {
     day: t('grChrono.datePicker.patternDay', 'D'),
@@ -336,7 +343,8 @@ const fieldPlaceholder = computed(() => {
 })
 
 function onFieldKeydown(event: KeyboardEvent): void {
-  if (field.handleKeydown(event)) return
+  if (field.handleKeydown(event))
+    return
 
   shell.onFieldKeydown(event)
 }
@@ -363,7 +371,8 @@ const shownDate = computed<PlainDate | null>(() => (
 const shownTime = computed<PlainTime | null>(() => {
   const base = shown.value ? toPlainTime(shown.value) : null
   const typed = preview.value?.time
-  if (!typed) return base
+  if (!typed)
+    return base
 
   return { h: typed.h ?? base?.h ?? 0, min: typed.min ?? base?.min ?? 0, s: typed.s ?? base?.s ?? 0 }
 })
@@ -377,7 +386,8 @@ const timeBounds = computed(() => {
   const date = shownDate.value
 
   const at = (bound: Date | undefined): PlainTime | undefined => {
-    if (!bound || !date) return undefined
+    if (!bound || !date)
+      return undefined
     const boundDate = toPlainDate(bound)
 
     return boundDate.y === date.y && boundDate.m === date.m && boundDate.d === date.d
@@ -390,9 +400,11 @@ const timeBounds = computed(() => {
 
 /** Новое значение: либо наружу, либо в черновик — по `autoApply`. */
 function put(date: Date): void {
-  if (isLocked.value) return
+  if (isLocked.value)
+    return
 
-  if (props.autoApply) shell.commit(date)
+  if (props.autoApply)
+    shell.commit(date)
   else draft.value = date
 }
 
@@ -406,7 +418,8 @@ function onTimeChange(time: PlainTime): void {
 }
 
 function apply(): void {
-  if (draft.value) shell.commit(draft.value)
+  if (draft.value)
+    shell.commit(draft.value)
   shell.closePanel()
 }
 

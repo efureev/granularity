@@ -35,7 +35,8 @@ const titles = new Map(catalogue.map(item => [item.id, item.title]))
 
 function drop(event: GrDashboardDropEvent): void {
   const { transfer, cell, breakpoint, options } = event
-  if (placedIds.value.has(transfer.id)) return
+  if (placedIds.value.has(transfer.id))
+    return
 
   const next = addItem(
     layout.value[breakpoint] ?? [],

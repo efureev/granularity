@@ -98,18 +98,22 @@ const mergedToneByKind = computed<Record<ResponseErrorKind, ResponseErrorTone>>(
 }))
 
 const isHidden = computed(() => {
-  if (!props.error) return true
+  if (!props.error)
+    return true
   return props.autoHideKinds.includes(props.error.kind)
 })
 
 const tone = computed<ResponseErrorTone>(() => {
-  if (props.tone) return props.tone
-  if (!props.error) return 'danger'
+  if (props.tone)
+    return props.tone
+  if (!props.error)
+    return 'danger'
   return mergedToneByKind.value[props.error.kind] ?? 'danger'
 })
 
 const title = computed(() => {
-  if (!props.error) return ''
+  if (!props.error)
+    return ''
   return resolveResponseErrorTitle(props.error.kind, mergedTexts.value)
 })
 
@@ -135,7 +139,8 @@ const statusLabel = computed(() =>
 
 const message = computed(() => {
   const raw = props.error?.message ?? ''
-  if (!props.error) return raw
+  if (!props.error)
+    return raw
 
   // Заменяем переводом только то сообщение, которое сам классификатор и
   // подставил (`isFallbackMessage`). Прежнее опознание сравнением строк
@@ -152,12 +157,14 @@ const message = computed(() => {
  * Дедуплицируем и убираем повтор с `message`.
  */
 const detailEntries = computed<{ field?: string, text: string }[]>(() => {
-  if (!props.error || !props.showDetails) return []
+  if (!props.error || !props.showDetails)
+    return []
 
   const seen = new Set<string>()
   if (props.dedupeDetails) {
     const main = message.value.trim()
-    if (main) seen.add(main)
+    if (main)
+      seen.add(main)
   }
 
   const result: { field?: string, text: string }[] = []
@@ -166,19 +173,22 @@ const detailEntries = computed<{ field?: string, text: string }[]>(() => {
     for (const fe of fieldErrors) {
       for (const m of fe.messages) {
         const text = m.trim()
-        if (!text || seen.has(text)) continue
+        if (!text || seen.has(text))
+          continue
         seen.add(text)
         result.push({ field: fe.field, text })
       }
     }
-    if (result.length) return result
+    if (result.length)
+      return result
   }
 
   const details = props.error.details
   if (details?.length) {
     for (const d of details) {
       const text = (d ?? '').trim()
-      if (!text || seen.has(text)) continue
+      if (!text || seen.has(text))
+        continue
       seen.add(text)
       result.push({ text })
     }
@@ -187,12 +197,14 @@ const detailEntries = computed<{ field?: string, text: string }[]>(() => {
 })
 
 function fieldLabel(field?: string): string | undefined {
-  if (!field) return undefined
+  if (!field)
+    return undefined
   return props.fieldLabels[field] ?? field
 }
 
 function onRetry(): void {
-  if (props.error) emit('retry', props.error)
+  if (props.error)
+    emit('retry', props.error)
 }
 
 function onDismiss(): void {

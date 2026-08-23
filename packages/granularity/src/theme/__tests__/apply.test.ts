@@ -11,7 +11,7 @@ afterEach(() => {
 
 describe('подключение темы в рантайме', () => {
   it('вставляет стиль и снимает его возвращённой функцией', () => {
-    const remove = applyTheme("[data-theme='ocean'] { --gr-bg: #041e2b; }", { name: 'ocean' })
+    const remove = applyTheme('[data-theme=\'ocean\'] { --gr-bg: #041e2b; }', { name: 'ocean' })
 
     expect(document.head.querySelector('style[data-gr-theme="ocean"]')?.textContent).toContain('--gr-bg')
 

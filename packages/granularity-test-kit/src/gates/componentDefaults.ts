@@ -130,11 +130,11 @@ export interface ComponentDefaultsGateOptions {
   }
 }
 
-
 /** Ключи `ConfigurableProps` — то, что объявлено настраиваемым. */
 function configurableKeys(source: string): string[] {
   const start = source.search(/interface\s+\w*ConfigurableProps\s*\{/)
-  if (start === -1) return []
+  if (start === -1)
+    return []
 
   const body = balanced(source, source.indexOf('{', start), '{', '}')
 
@@ -154,15 +154,19 @@ function configurableKeys(source: string): string[] {
  * спотыкается на `GrIcon.vue`, где `withDefaults` отформатирован в три строки.
  */
 function balanced(source: string, openIndex: number, open: string, close: string): string {
-  if (openIndex === -1) return ''
+  if (openIndex === -1)
+    return ''
 
   let depth = 0
 
   for (let i = openIndex; i < source.length; i += 1) {
-    if (source[i] === open) depth += 1
+    if (source[i] === open) {
+      depth += 1
+    }
     else if (source[i] === close) {
       depth -= 1
-      if (depth === 0) return source.slice(openIndex + 1, i)
+      if (depth === 0)
+        return source.slice(openIndex + 1, i)
     }
   }
 
@@ -172,7 +176,8 @@ function balanced(source: string, openIndex: number, open: string, close: string
 /** Объект дефолтов из `withDefaults(defineProps<…>(), { … })`. */
 function withDefaultsBody(source: string): { found: boolean, body: string } {
   const call = source.indexOf('withDefaults(')
-  if (call === -1) return { found: false, body: '' }
+  if (call === -1)
+    return { found: false, body: '' }
 
   const args = balanced(source, source.indexOf('(', call), '(', ')')
   const objectStart = args.indexOf('{', args.indexOf('defineProps'))
@@ -247,11 +252,13 @@ export function defineComponentDefaultsGate(options: ComponentDefaultsGateOption
           const sfc = readFileSync(resolve(dir, file), 'utf8')
           const { found, body } = withDefaultsBody(sfc)
           // Без `withDefaults` Vue и так отдаёт `undefined` — правило не о чем.
-          if (!found) continue
+          if (!found)
+            continue
 
           for (const key of keys) {
             const match = body.match(new RegExp(`(?:^|[,{])\\s*${key}\\s*:\\s*([^,\n]+)`))
-            if (!match) continue
+            if (!match)
+              continue
 
             const value = match[1]!.trim()
             if (value !== 'undefined')

@@ -377,8 +377,8 @@ describe('component docs metadata', () => {
 
     // Оба глоба обязаны остаться ленивыми: `eager` затащил бы все демо и все их
     // исходники в общий бандл витрины вместо чанка открытой страницы.
-    expect(registrySource).toContain("import.meta.glob('./**/*.vue')")
-    expect(registrySource).toContain("import.meta.glob('./**/*.{vue,ts}', { query: '?raw', import: 'default' })")
+    expect(registrySource).toContain('import.meta.glob(\'./**/*.vue\')')
+    expect(registrySource).toContain('import.meta.glob(\'./**/*.{vue,ts}\', { query: \'?raw\', import: \'default\' })')
     expect(registrySource).not.toContain('eager: true')
 
     expect(componentDetailPageSource).not.toMatch(/import\s+\w+Demo\s+from\s+'\.\.\/demos\//)

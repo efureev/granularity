@@ -29,7 +29,6 @@ defineSlots<{
   /** Заголовок раздела меню вместо пропа `label`. */
   default?: () => any
 }>()
-
 </script>
 
 <template>

@@ -150,7 +150,8 @@ export function useModalOverlay(
   watch(
     () => options.lockScroll?.() ?? (open.value && isModal()),
     (locked) => {
-      if (locked) lock()
+      if (locked)
+        lock()
       else unlock()
     },
     { immediate: true },
@@ -178,8 +179,10 @@ export function useModalOverlay(
         const startedHere = pointerDownOnBackdrop
         pointerDownOnBackdrop = false
 
-        if (!startedHere || event.target !== event.currentTarget) return
-        if (options.closeOnBackdrop?.() === false) return
+        if (!startedHere || event.target !== event.currentTarget)
+          return
+        if (options.closeOnBackdrop?.() === false)
+          return
 
         onDismiss()
       },

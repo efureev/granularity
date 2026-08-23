@@ -28,7 +28,7 @@ function dispatchCombo(target: Window | HTMLElement, key: string, init: Keyboard
 describe('vHotkey', () => {
   it('global scope (по умолчанию): срабатывает на события window', () => {
     const handler = vi.fn()
-    const wrapper = mountWithHotkey({ 'Escape': handler })
+    const wrapper = mountWithHotkey({ Escape: handler })
 
     dispatchKey(window, 'Escape')
     expect(handler).toHaveBeenCalledTimes(1)
@@ -38,7 +38,7 @@ describe('vHotkey', () => {
 
   it('element scope: НЕ срабатывает на window, срабатывает на событиях элемента', () => {
     const handler = vi.fn()
-    const wrapper = mountWithHotkey({ handlers: { 'Escape': handler }, scope: 'element' })
+    const wrapper = mountWithHotkey({ handlers: { Escape: handler }, scope: 'element' })
 
     dispatchKey(window, 'Escape')
     expect(handler).not.toHaveBeenCalled()
@@ -52,7 +52,7 @@ describe('vHotkey', () => {
 
   it('element scope: слушатель снимается при unmount', () => {
     const handler = vi.fn()
-    const wrapper = mountWithHotkey({ handlers: { 'Escape': handler }, scope: 'element' })
+    const wrapper = mountWithHotkey({ handlers: { Escape: handler }, scope: 'element' })
     const el = wrapper.get('[data-el]').element as HTMLElement
 
     wrapper.unmount()
@@ -92,7 +92,7 @@ describe('vHotkey', () => {
 
   it('событие во время IME-композиции игнорируется', () => {
     const handler = vi.fn()
-    const wrapper = mountWithHotkey({ 'Escape': handler })
+    const wrapper = mountWithHotkey({ Escape: handler })
 
     window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', isComposing: true, bubbles: true }))
     expect(handler).not.toHaveBeenCalled()
@@ -102,12 +102,12 @@ describe('vHotkey', () => {
 
   it('смена scope на лету переносит слушатель', async () => {
     const handler = vi.fn()
-    const wrapper = mountWithHotkey({ handlers: { 'Escape': handler }, scope: 'global' })
+    const wrapper = mountWithHotkey({ handlers: { Escape: handler }, scope: 'global' })
 
     dispatchKey(window, 'Escape')
     expect(handler).toHaveBeenCalledTimes(1)
 
-    await wrapper.setProps({ binding: { handlers: { 'Escape': handler }, scope: 'element' } })
+    await wrapper.setProps({ binding: { handlers: { Escape: handler }, scope: 'element' } })
 
     dispatchKey(window, 'Escape')
     expect(handler).toHaveBeenCalledTimes(1) // window больше не слушается

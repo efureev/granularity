@@ -60,16 +60,23 @@ function unwrap(schema: ZodLike): Unwrapped {
     guard += 1
     const name = typeNameOf(current)
 
-    if (RESIDUAL_WRAPPERS.has(name)) result.residual = true
+    if (RESIDUAL_WRAPPERS.has(name))
+      result.residual = true
 
-    if (name === 'optional') result.optional = true
-    else if (name === 'nullable') result.nullable = true
-    else if (name === 'default' || name === 'prefault') result.default = defaultOf(current)
-    else if (name === 'readonly') result.readOnly = true
-    else if (!WRAPPERS.has(name) && name !== 'effects') break
+    if (name === 'optional')
+      result.optional = true
+    else if (name === 'nullable')
+      result.nullable = true
+    else if (name === 'default' || name === 'prefault')
+      result.default = defaultOf(current)
+    else if (name === 'readonly')
+      result.readOnly = true
+    else if (!WRAPPERS.has(name) && name !== 'effects')
+      break
 
     const inner = innerOf(current)
-    if (!inner) break
+    if (!inner)
+      break
 
     current = inner
     result.schema = current
@@ -132,14 +139,16 @@ function applyChecks(
       case 'min_length':
       case 'min_size':
       case 'min':
-        if (check.inclusive === false) constraints.exclusiveMin = value
+        if (check.inclusive === false)
+          constraints.exclusiveMin = value
         else constraints.min = value
         break
 
       case 'max_length':
       case 'max_size':
       case 'max':
-        if (check.inclusive === false) constraints.exclusiveMax = value
+        if (check.inclusive === false)
+          constraints.exclusiveMax = value
         else constraints.max = value
         break
 
@@ -150,12 +159,14 @@ function applyChecks(
         break
 
       case 'greater_than':
-        if (check.inclusive === false) constraints.exclusiveMin = value
+        if (check.inclusive === false)
+          constraints.exclusiveMin = value
         else constraints.min = value
         break
 
       case 'less_than':
-        if (check.inclusive === false) constraints.exclusiveMax = value
+        if (check.inclusive === false)
+          constraints.exclusiveMax = value
         else constraints.max = value
         break
 
@@ -200,14 +211,17 @@ function applyChecks(
         break
 
       default:
-        if (check.kind in STRING_FORMATS) format = STRING_FORMATS[check.kind]
+        if (check.kind in STRING_FORMATS)
+          format = STRING_FORMATS[check.kind]
         else residual = true
     }
 
-    if (check.message && !message) message = check.message
+    if (check.message && !message)
+      message = check.message
   }
 
-  if (kind === 'array' && constraints.integer) delete constraints.integer
+  if (kind === 'array' && constraints.integer)
+    delete constraints.integer
 
   return { format, message, residual }
 }
@@ -331,7 +345,8 @@ function parseNode(
 
     // Разобранное объединение выражено моделью целиком: форма сама рисует
     // переключатель ветки, и гонять ради него полную проверку схемой незачем.
-    if (unionIsResolved(union)) return union
+    if (unionIsResolved(union))
+      return union
 
     ctx.warnings.push({
       path,
@@ -397,7 +412,8 @@ export function parseZodSchema(schema: ZodLike, options: GrSchemaParseOptions = 
 
 /** Полная проверка схемой: пути ошибок zod приводятся к точечной форме. */
 export function createZodValidate(schema: ZodLike): GrSchemaModel['validate'] {
-  if (typeof schema.safeParse !== 'function') return undefined
+  if (typeof schema.safeParse !== 'function')
+    return undefined
 
   return (value: unknown) => {
     const result = schema.safeParse!(value) as {
@@ -405,7 +421,8 @@ export function createZodValidate(schema: ZodLike): GrSchemaModel['validate'] {
       error?: { issues?: { path?: (string | number)[], message?: string, code?: string }[] }
     }
 
-    if (result.success) return []
+    if (result.success)
+      return []
 
     return (result.error?.issues ?? []).map(issue => ({
       path: (issue.path ?? []).join('.'),

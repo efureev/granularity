@@ -142,8 +142,10 @@ const resolvedErrors = computed<string[]>(() => {
 
 // Обязательность: проп `required` ИЛИ наличие `required`-правила в форме.
 const isRequired = computed(() => {
-  if (props.required) return true
-  if (boundToForm.value && props.name) return form!.requiredFields.value.has(props.name)
+  if (props.required)
+    return true
+  if (boundToForm.value && props.name)
+    return form!.requiredFields.value.has(props.name)
   return false
 })
 
@@ -215,16 +217,20 @@ onMounted(async () => {
  * об этом можно только вручную. Дешёвая страховка — предупреждение в dev.
  */
 function warnIfControlMissed(): void {
-  if (!__GR_DEV__) return
-  if (!hasLabel.value) return
+  if (!__GR_DEV__)
+    return
+  if (!hasLabel.value)
+    return
 
   const root = fieldRootEl.value
-  if (!root) return
+  if (!root)
+    return
 
   const target = Array.from(root.querySelectorAll<HTMLElement>('[id]'))
     .some(element => element.id === fieldId.value)
 
-  if (target) return
+  if (target)
+    return
 
   console.warn(
     `[GrFormField] Подпись «${props.label ?? ''}» ссылается на id "${fieldId.value}", `
@@ -243,10 +249,12 @@ onBeforeUnmount(() => unregister?.())
 // если фокус ушёл за пределы корня. `relatedTarget: null` (фокус в никуда:
 // клик по body, уход из окна) — тоже уход.
 function onFocusOut(event: FocusEvent): void {
-  if (!form || !props.name) return
+  if (!form || !props.name)
+    return
 
   const next = event.relatedTarget as Node | null
-  if (next && fieldRootEl.value?.contains(next)) return
+  if (next && fieldRootEl.value?.contains(next))
+    return
 
   void form.validateField(props.name, 'blur')
 }
@@ -261,7 +269,6 @@ defineSlots<{
   /** Текст ошибки вместо стандартного. Получает уже разрешённый список. */
   error?: (props: { errors: string[] }) => any
 }>()
-
 </script>
 
 <template>

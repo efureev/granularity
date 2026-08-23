@@ -50,8 +50,8 @@ describe('CSS темы', () => {
   const theme = extendTheme({ name: 'ocean', base: 'dark', tokens: OCEAN, validate: false })
 
   it('селектор по умолчанию — атрибут темы, но его можно задать', () => {
-    expect(theme.selector).toBe("[data-theme='ocean']")
-    expect(theme.css).toContain("[data-theme='ocean'] {")
+    expect(theme.selector).toBe('[data-theme=\'ocean\']')
+    expect(theme.css).toContain('[data-theme=\'ocean\'] {')
 
     const scoped = extendTheme({ name: 'ocean', base: 'dark', selector: '.ocean', validate: false })
     expect(scoped.css).toContain('.ocean {')
@@ -97,7 +97,7 @@ describe('согласие с генератором', () => {
     const theme = extendTheme({
       name,
       base: name,
-      selector: name === 'light' ? ':root' : "[data-theme='dark']",
+      selector: name === 'light' ? ':root' : '[data-theme=\'dark\']',
       validate: false,
     })
 

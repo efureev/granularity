@@ -174,8 +174,8 @@ const surfaces = {
 }
 
 export const ocean = extendTheme({
-  name: 'ocean',                     // селектор по умолчанию — [data-theme='ocean']
-  base: 'dark',                      // 'light' | 'dark' | другая тема
+  name: 'ocean', // селектор по умолчанию — [data-theme='ocean']
+  base: 'dark', // 'light' | 'dark' | другая тема
   tokens: {
     ...surfaces,
     '--gr-primary': '#4fd1e0',
@@ -187,7 +187,7 @@ export const ocean = extendTheme({
 })
 
 ocean.tokens // полный набор ролей: своё поверх базы
-ocean.css    // CSS, включая фолбэк производных для браузеров без color-mix
+ocean.css // CSS, включая фолбэк производных для браузеров без color-mix
 ```
 
 Что это даёт кроме объёма:
@@ -321,7 +321,7 @@ const remove = applyTheme(ocean.css, { name: 'ocean' })
 ```ts
 // src/main.ts
 await import('./reset')
-await import('./granularity')          // foundation пакета (tokens + light/dark)
+await import('./granularity') // foundation пакета (tokens + light/dark)
 await import('./styles/theme-ocean.css') // тема приложения
 await import('./app-styles')
 ```

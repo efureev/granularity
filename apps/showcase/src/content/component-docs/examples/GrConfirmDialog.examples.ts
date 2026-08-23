@@ -20,7 +20,8 @@ export const grConfirmDialogExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Imperative service (useDialogService)',
     description: 'Императивный вызов диалогов (`confirm`/`prompt`/`alert`) из `<script>`/`.ts` без вставки компонента в шаблон вынесен на отдельную страницу composable `useDialogService` — там собраны живые примеры и обработка ошибок сервера.',
     status: 'ready',
-    previewKey: 'gr-confirm-dialog-service-link',    note: 'Полный набор императивных сценариев (confirm/prompt/alert, async-onConfirm, ошибки сети и валидации) — на странице composable useDialogService.',
+    previewKey: 'gr-confirm-dialog-service-link',
+    note: 'Полный набор императивных сценариев (confirm/prompt/alert, async-onConfirm, ошибки сети и валидации) — на странице composable useDialogService.',
   },
   {
     id: 'confirm-dialog-custom-body',

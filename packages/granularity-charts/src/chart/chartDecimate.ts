@@ -58,19 +58,24 @@ export interface DecimationBudgetInput {
  * забыли бы на третьем вызове.
  */
 export function decimationBudget(input: DecimationBudgetInput): number | null {
-  if (input.mode === 'never') return null
-  if (input.kind === 'band') return null
+  if (input.mode === 'never')
+    return null
+  if (input.kind === 'band')
+    return null
 
   const budget = input.maxPoints ?? budgetForWidth(input.plotWidth)
 
-  if (budget === null || budget < 3) return null
-  if (input.mode === 'auto' && input.total <= budget) return null
+  if (budget === null || budget < 3)
+    return null
+  if (input.mode === 'auto' && input.total <= budget)
+    return null
 
   return budget
 }
 
 function budgetForWidth(plotWidth: number): number | null {
-  if (!(plotWidth > 0)) return null
+  if (!(plotWidth > 0))
+    return null
 
   const quantized = Math.max(WIDTH_QUANTUM, Math.round(plotWidth / WIDTH_QUANTUM) * WIDTH_QUANTUM)
 
@@ -82,8 +87,10 @@ function spanOf(values: readonly number[]): number {
   let max = Number.NEGATIVE_INFINITY
 
   for (const value of values) {
-    if (value < min) min = value
-    if (value > max) max = value
+    if (value < min)
+      min = value
+    if (value > max)
+      max = value
   }
 
   const span = max - min
@@ -198,7 +205,8 @@ export function decimatePoints(
       return
     }
 
-    if (current.length === 0) start = index
+    if (current.length === 0)
+      start = index
     current.push(point)
   })
 

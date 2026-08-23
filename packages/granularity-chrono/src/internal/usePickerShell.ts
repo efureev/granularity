@@ -70,7 +70,8 @@ export function multipleCodec<TItem>(
 ): PickerCodec<readonly TItem[] | null, Date[]> {
   return {
     parse: (raw) => {
-      if (!Array.isArray(raw)) return null
+      if (!Array.isArray(raw))
+        return null
 
       // `Array.isArray` сужает до `any[]` и теряет тип элемента: возвращаем его
       // явной аннотацией, иначе адаптер получает `any`.
@@ -90,7 +91,8 @@ export function rangeCodec<TItem>(
 ): PickerCodec<readonly [TItem, TItem] | null, [Date, Date]> {
   return {
     parse: (raw) => {
-      if (!Array.isArray(raw) || raw.length !== 2) return null
+      if (!Array.isArray(raw) || raw.length !== 2)
+        return null
 
       const from = adapter.parse(raw[0])
       const to = adapter.parse(raw[1])
@@ -213,7 +215,8 @@ export function usePickerShell<TValue, TParsed = Date>(
 
   const selected = computed<TParsed | null>(() => {
     const value = props().modelValue
-    if (value === undefined || value === null) return null
+    if (value === undefined || value === null)
+      return null
 
     return codec.value.parse(value)
   })
@@ -253,19 +256,22 @@ export function usePickerShell<TValue, TParsed = Date>(
    * обязан привести к тому же, что и клик по полю.
    */
   watch(panelOpen, async (next) => {
-    if (!next) return
+    if (!next)
+      return
 
     hasBeenOpen.value = true
 
     // В `inline` панель и так на экране: уводить в неё фокус без действия
     // пользователя значит забирать его у страницы на монтировании.
-    if (props().inline) return
+    if (props().inline)
+      return
 
     // Однократное «не забирай фокус»: следующее открытие снова обычное, каким
     // бы способом оно ни пришло.
     const moveFocus = focusPanelOnOpen.value
     focusPanelOnOpen.value = true
-    if (!moveFocus) return
+    if (!moveFocus)
+      return
 
     // Два тика: первый монтирует панель, второй отдаёт ей отрисованное содержимое.
     await nextTick()
@@ -280,7 +286,8 @@ export function usePickerShell<TValue, TParsed = Date>(
    * наоборот: оно ровно и значит «уведи меня в сетку».
    */
   function openPanel(moveFocus = true): void {
-    if (isDisabled.value || panelOpen.value || props().inline) return
+    if (isDisabled.value || panelOpen.value || props().inline)
+      return
 
     focusPanelOnOpen.value = moveFocus
     panelOpen.value = true
@@ -307,13 +314,15 @@ export function usePickerShell<TValue, TParsed = Date>(
   }
 
   function commit(value: TParsed): void {
-    if (isLocked.value) return
+    if (isLocked.value)
+      return
 
     options.emit.model(codec.value.serialize(value))
   }
 
   function clear(): void {
-    if (isLocked.value) return
+    if (isLocked.value)
+      return
 
     options.emit.model(null)
     options.emit.clear()

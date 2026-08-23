@@ -52,7 +52,8 @@ export function usePerFileUpload(options: UsePerFileUploadOptions): UsePerFileUp
 
   function patch(file: File, next: Partial<GrFileUploadEntry>): void {
     const entry = entryOf(file)
-    if (!entry) return
+    if (!entry)
+      return
 
     Object.assign(entry, next)
     syncSummary()
@@ -101,7 +102,8 @@ export function usePerFileUpload(options: UsePerFileUploadOptions): UsePerFileUp
     const workers = Array.from({ length: Math.min(limit, queue.length) }, async () => {
       while (queue.length) {
         const next = queue.shift()
-        if (!next) return
+        if (!next)
+          return
         await uploadOne(next)
       }
     })
@@ -118,7 +120,8 @@ export function usePerFileUpload(options: UsePerFileUploadOptions): UsePerFileUp
   }
 
   async function retryFile(file: File): Promise<void> {
-    if (!entryOf(file)) return
+    if (!entryOf(file))
+      return
 
     await uploadOne(file)
   }

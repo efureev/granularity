@@ -30,7 +30,7 @@ export default antfu(
     jsonc: false,
     yaml: false,
     unocss: false,
-    stylistic: false,
+    stylistic: true,
   },
   {
     rules: {
@@ -52,6 +52,10 @@ export default antfu(
       'ts/strict-boolean-expressions': 'off',
 
       'no-console': 'off',
+
+      // `break` — часть синтаксиса `case`, а не второй оператор строки:
+      // таблица `case 'x': doIt(); break` читается строкой на вариант.
+      'style/max-statements-per-line': ['error', { max: 1, ignoredNodes: ['BreakStatement'] }],
 
       'unused-imports/no-unused-imports': 'warn',
     },

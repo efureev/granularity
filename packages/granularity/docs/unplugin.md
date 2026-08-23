@@ -63,10 +63,10 @@ Go
 
 ```ts
 GranularityResolver({
-  prefix: 'Gr',             // префикс компонентов, по умолчанию 'Gr'
-  importStyle: false,       // подключать component-level CSS, по умолчанию false
-  directives: true,         // резолвить директивы из whitelist, по умолчанию true
-  exclude: /^GrIcon$/,      // компоненты/директивы, которые резолвер игнорирует
+  prefix: 'Gr', // префикс компонентов, по умолчанию 'Gr'
+  importStyle: false, // подключать component-level CSS, по умолчанию false
+  directives: true, // резолвить директивы из whitelist, по умолчанию true
+  exclude: /^GrIcon$/, // компоненты/директивы, которые резолвер игнорирует
 })
 ```
 
@@ -95,7 +95,7 @@ import { GranularityChronoResolver } from '@feugene/granularity-chrono/resolver'
 Components({
   resolvers: [
     GranularityChronoResolver(), // whitelist — раньше…
-    GranularityResolver(),           // …жадного Gr*-резолвера ядра
+    GranularityResolver(), // …жадного Gr*-резолвера ядра
   ],
 })
 ```

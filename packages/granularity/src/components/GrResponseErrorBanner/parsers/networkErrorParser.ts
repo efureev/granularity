@@ -13,7 +13,8 @@ import type { ResponseErrorParser } from '../responseError.types'
  * Возвращает `kind: 'network'` и `stop: true`.
  */
 export const networkErrorParser: ResponseErrorParser = (ctx) => {
-  if (ctx.isAbort) return null
+  if (ctx.isAbort)
+    return null
 
   if (ctx.isNetwork) {
     // Текст по `kind` подставит классификатор — и пометит его фолбэком.

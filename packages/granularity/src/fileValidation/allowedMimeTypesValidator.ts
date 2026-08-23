@@ -19,7 +19,8 @@ export function allowedMimeTypesValidator(
   options: AllowedMimeTypesValidatorOptions = {},
 ): FileValidator {
   const allowedMime = (allowed ?? []).map(s => s.trim().toLowerCase()).filter(Boolean)
-  if (allowedMime.length === 0) return () => []
+  if (allowedMime.length === 0)
+    return () => []
 
   return ({ files }): FileValidationIssue[] => {
     const issues: FileValidationIssue[] = []

@@ -14,19 +14,19 @@
 export const GR_SCHEMA_MODEL_VERSION = 1 as const
 
 /** Вид значения. `enum` — не вид, а признак: у узла заполнен `options`. */
-export type GrSchemaKind =
-  | 'string'
-  | 'number'
-  | 'boolean'
+export type GrSchemaKind
+  = | 'string'
+    | 'number'
+    | 'boolean'
   /** Значение-`Date` в рантайме. Строковые даты — `string` + `format`. */
-  | 'date'
-  | 'file'
-  | 'object'
-  | 'array'
+    | 'date'
+    | 'file'
+    | 'object'
+    | 'array'
   /** Не сводится к `enum`: объединение объектов по дискриминатору. */
-  | 'union'
+    | 'union'
   /** Адаптер не разобрал узел. Рисуется только на чтение и с предупреждением. */
-  | 'unknown'
+    | 'unknown'
 
 /**
  * Семантика значения.
@@ -34,11 +34,11 @@ export type GrSchemaKind =
  * Union открытый: `format: 'iban'` от чужого бэкенда обязан быть легальным, —
  * закрытый список потребовал бы правки пакета ради каждого нового формата.
  */
-export type GrSchemaFormat =
-  | 'email' | 'url' | 'uri' | 'uuid' | 'tel' | 'password' | 'multiline' | 'slug'
-  | 'date' | 'date-time' | 'time' | 'duration'
-  | 'color' | 'color-alpha' | 'binary' | 'ipv4' | 'ipv6' | 'hostname' | 'json'
-  | (string & {})
+export type GrSchemaFormat
+  = | 'email' | 'url' | 'uri' | 'uuid' | 'tel' | 'password' | 'multiline' | 'slug'
+    | 'date' | 'date-time' | 'time' | 'duration'
+    | 'color' | 'color-alpha' | 'binary' | 'ipv4' | 'ipv6' | 'hostname' | 'json'
+    | (string & {})
 
 export interface GrSchemaOption {
   value: string | number | boolean
@@ -142,11 +142,11 @@ export interface GrSchemaUnionNode extends GrSchemaNodeBase {
   variants: GrSchemaObjectNode[]
 }
 
-export type GrSchemaNode =
-  | GrSchemaScalarNode
-  | GrSchemaObjectNode
-  | GrSchemaArrayNode
-  | GrSchemaUnionNode
+export type GrSchemaNode
+  = | GrSchemaScalarNode
+    | GrSchemaObjectNode
+    | GrSchemaArrayNode
+    | GrSchemaUnionNode
 
 /** Проблема, найденная полной проверкой по схеме. */
 export interface GrSchemaIssue {

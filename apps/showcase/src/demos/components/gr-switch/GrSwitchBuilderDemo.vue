@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {computed, ref} from 'vue'
+import { computed, ref } from 'vue'
 
 import {
   GrFormField,
@@ -20,10 +20,10 @@ const activeBackgroundColor = ref('')
 const inactiveBackgroundColor = ref('')
 
 const sizeOptions = [
-  {value: 'xs', label: 'XS'},
-  {value: 'sm', label: 'SM'},
-  {value: 'md', label: 'MD'},
-  {value: 'lg', label: 'LG'},
+  { value: 'xs', label: 'XS' },
+  { value: 'sm', label: 'SM' },
+  { value: 'md', label: 'MD' },
+  { value: 'lg', label: 'LG' },
 ] satisfies Array<{ value: GrSwitchSize, label: string }>
 
 const switchText = computed(() => {

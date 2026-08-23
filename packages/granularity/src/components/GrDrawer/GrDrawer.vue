@@ -163,7 +163,8 @@ const panelClass = computed(() => grDrawerPanelClass({
 
 const panelStyle = computed(() => {
   const length = customLength.value
-  if (length === undefined) return undefined
+  if (length === undefined)
+    return undefined
 
   const value = typeof length === 'number' ? `${length}px` : length
   return axis.value === 'horizontal' ? { width: value } : { height: value }
@@ -176,7 +177,8 @@ if (__GR_DEV__) {
     ([currentAxis, width, height]) => {
       const ignored = currentAxis === 'horizontal' ? 'height' : 'width'
       const value = currentAxis === 'horizontal' ? height : width
-      if (value === undefined) return
+      if (value === undefined)
+        return
 
       console.warn(
         `[GrDrawer] Проп \`${ignored}\` не применяется к стороне "${side.value}": `

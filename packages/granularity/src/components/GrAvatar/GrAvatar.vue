@@ -106,12 +106,18 @@ const primaryState = ref<ImageState>('loading')
 const fallbackState = ref<ImageState>('loading')
 
 // Новая ссылка не должна наследовать ошибку прошлой.
-watch(() => props.src, () => { primaryState.value = 'loading' })
-watch(() => props.fallbackSrc, () => { fallbackState.value = 'loading' })
+watch(() => props.src, () => {
+  primaryState.value = 'loading'
+})
+watch(() => props.fallbackSrc, () => {
+  fallbackState.value = 'loading'
+})
 
 const activeSrc = computed(() => {
-  if (props.src && primaryState.value !== 'error') return props.src
-  if (props.fallbackSrc && fallbackState.value !== 'error') return props.fallbackSrc
+  if (props.src && primaryState.value !== 'error')
+    return props.src
+  if (props.fallbackSrc && fallbackState.value !== 'error')
+    return props.fallbackSrc
   return undefined
 })
 
@@ -119,7 +125,8 @@ const isFallbackActive = computed(() => Boolean(activeSrc.value) && activeSrc.va
 
 // Скелет держит место, пока картинка едет: иначе ряд аватаров мигает пустотой.
 const showSkeleton = computed(() => {
-  if (!activeSrc.value) return false
+  if (!activeSrc.value)
+    return false
   return (isFallbackActive.value ? fallbackState.value : primaryState.value) === 'loading'
 })
 
@@ -150,12 +157,14 @@ const rootClass = computed(() => [
 ])
 
 function onError(kind: 'primary' | 'fallback'): void {
-  if (kind === 'primary') primaryState.value = 'error'
+  if (kind === 'primary')
+    primaryState.value = 'error'
   else fallbackState.value = 'error'
 }
 
 function onLoad(kind: 'primary' | 'fallback'): void {
-  if (kind === 'primary') primaryState.value = 'loaded'
+  if (kind === 'primary')
+    primaryState.value = 'loaded'
   else fallbackState.value = 'loaded'
 }
 </script>

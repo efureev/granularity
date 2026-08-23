@@ -119,7 +119,6 @@ describe('showcase layout integration', () => {
     vi.unstubAllGlobals()
   })
 
-
   it('рендерит breadcrumbs и doc sections для component detail route', async () => {
     const { wrapper } = await mountShowcaseAt('/components/gr-button')
 

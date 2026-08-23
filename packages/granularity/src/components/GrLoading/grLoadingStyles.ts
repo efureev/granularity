@@ -8,29 +8,29 @@ import { splitClassTokens } from '../shared/classTokens'
  * собственного контейнера.
  */
 export const rootModeClass = {
-    fullscreen: 'fixed inset-0 z-[var(--gr-z-loading)]',
-    inline: 'absolute inset-0 z-10',
+  fullscreen: 'fixed inset-0 z-[var(--gr-z-loading)]',
+  inline: 'absolute inset-0 z-10',
 } as const
 export const rootBackgroundClass = 'bg-[var(--gr-overlay-bg)]'
 export const rootBackdropBlurClass = 'backdrop-blur-sm'
 
 export function grLoadingRootClass(options: {
-    fullscreen: boolean,
-    hasBackground: boolean,
-    customClass?: string
+  fullscreen: boolean
+  hasBackground: boolean
+  customClass?: string
 }): string {
-    return [
-        options.fullscreen ? rootModeClass.fullscreen : rootModeClass.inline,
-        !options.hasBackground ? rootBackgroundClass : '',
-        rootBackdropBlurClass,
-        options.customClass,
-    ]
-        .filter(Boolean)
-        .join(' ')
+  return [
+    options.fullscreen ? rootModeClass.fullscreen : rootModeClass.inline,
+    !options.hasBackground ? rootBackgroundClass : '',
+    rootBackdropBlurClass,
+    options.customClass,
+  ]
+    .filter(Boolean)
+    .join(' ')
 }
 
 export const grLoadingClassTokens = [
-    ...Object.values(rootModeClass).flatMap(splitClassTokens),
-    ...splitClassTokens(rootBackgroundClass),
-    ...splitClassTokens(rootBackdropBlurClass),
+  ...Object.values(rootModeClass).flatMap(splitClassTokens),
+  ...splitClassTokens(rootBackgroundClass),
+  ...splitClassTokens(rootBackdropBlurClass),
 ]

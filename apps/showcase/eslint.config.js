@@ -36,7 +36,7 @@ export default antfu(
     jsonc: false,
     yaml: false,
     unocss: false,
-    stylistic: false,
+    stylistic: true,
   },
   {
     // Набор совпадает с пакетом библиотеки: витрина и пакет пишутся одними
@@ -75,6 +75,10 @@ export default antfu(
       'regexp/use-ignore-case': 'off',
 
       'no-console': 'off',
+
+      // `break` — часть синтаксиса `case`, а не второй оператор строки:
+      // таблица `case 'x': doIt(); break` читается строкой на вариант.
+      'style/max-statements-per-line': ['error', { max: 1, ignoredNodes: ['BreakStatement'] }],
 
       'unused-imports/no-unused-imports': 'warn',
 

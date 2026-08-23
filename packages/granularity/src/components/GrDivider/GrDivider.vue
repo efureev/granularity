@@ -82,7 +82,8 @@ const hasLabel = computed(() =>
 const accessibleName = computed(() => props.ariaLabel ?? props.label)
 
 function toCssLength(value: number | string | undefined): string | undefined {
-  if (value == null) return undefined
+  if (value == null)
+    return undefined
   return typeof value === 'number' ? `${value}px` : value
 }
 
@@ -90,10 +91,12 @@ const rootStyle = computed(() => {
   const style: Record<string, string> = {}
 
   const thickness = toCssLength(props.thickness)
-  if (thickness) style['--gr-divider-thickness'] = thickness
+  if (thickness)
+    style['--gr-divider-thickness'] = thickness
 
   const length = toCssLength(props.length)
-  if (length) style[props.orientation === 'vertical' ? 'height' : 'width'] = length
+  if (length)
+    style[props.orientation === 'vertical' ? 'height' : 'width'] = length
 
   return style
 })
@@ -110,7 +113,6 @@ defineSlots<{
   /** Подпись внутри линии: «или», название раздела. */
   default?: () => any
 }>()
-
 </script>
 
 <template>

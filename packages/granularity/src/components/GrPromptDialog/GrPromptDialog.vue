@@ -197,7 +197,8 @@ let validationRun = 0
 watch(
   () => props.modelValue,
   (isOpen) => {
-    if (!isOpen) return
+    if (!isOpen)
+      return
 
     touched.value = false
     ruleError.value = undefined
@@ -208,19 +209,22 @@ watch(
 const resolveMessage = createGrFormMessageResolver(t)
 
 const normalizedRules = computed<GrFormRule[]>(() => {
-  if (!props.rules) return []
+  if (!props.rules)
+    return []
   return Array.isArray(props.rules) ? props.rules : [props.rules]
 })
 
 const requiredError = computed(() => {
-  if (!props.required) return undefined
+  if (!props.required)
+    return undefined
   return valueModel.value.trim().length > 0 ? undefined : resolvedRequiredErrorText.value
 })
 
 const canConfirm = computed(() => !requiredError.value)
 
 const validationError = computed(() => {
-  if (!touched.value) return undefined
+  if (!touched.value)
+    return undefined
   return requiredError.value ?? ruleError.value
 })
 
@@ -234,20 +238,23 @@ const fieldErrorMessage = computed(() => props.fieldError ?? validationError.val
  */
 async function runRules(trigger: GrFormTrigger): Promise<string | undefined> {
   const rules = rulesForTrigger(normalizedRules.value, trigger)
-  if (!rules.length) return undefined
+  if (!rules.length)
+    return undefined
 
   const run = ++validationRun
   validating.value = true
   try {
     const message = await runFieldRules(valueModel.value, rules, { value: valueModel.value }, resolveMessage)
     // Ответ устарел — значение или сам диалог успели смениться.
-    if (run !== validationRun) return undefined
+    if (run !== validationRun)
+      return undefined
 
     ruleError.value = message
     return message
   }
   finally {
-    if (run === validationRun) validating.value = false
+    if (run === validationRun)
+      validating.value = false
   }
 }
 
@@ -268,7 +275,8 @@ function onCancel(): void {
 }
 
 function focusField(): void {
-  if (props.multiline) textareaRef.value?.focus()
+  if (props.multiline)
+    textareaRef.value?.focus()
   else inputRef.value?.focus()
 }
 
@@ -312,7 +320,8 @@ function onEnter(): void {
 watch(
   [() => props.modelValue, inputRef, textareaRef],
   () => {
-    if (!props.modelValue) return
+    if (!props.modelValue)
+      return
     focusField()
   },
   // `immediate`: окно могут смонтировать уже открытым — тогда смены пропа не
@@ -328,7 +337,6 @@ defineSlots<{
   /** Кнопки диалога вместо пары «отмена и подтверждение». */
   footer?: () => any
 }>()
-
 </script>
 
 <template>

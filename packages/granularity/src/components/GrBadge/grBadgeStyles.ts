@@ -59,8 +59,10 @@ export const darkToneClassByTone: Record<GrBadgeTone, string> = {
  * только размеры — он интерактивен, и цель нажатия у него не метки, а контрола.
  */
 export function radiusClass(radius: GrBadgeRadius, size: GrBadgeSize): string {
-  if (radius === 'square') return 'rounded-[var(--gr-radius-none)]'
-  if (radius === 'semi') return semiRadiusClassBySize[size]
+  if (radius === 'square')
+    return 'rounded-[var(--gr-radius-none)]'
+  if (radius === 'semi')
+    return semiRadiusClassBySize[size]
   return 'rounded-[var(--gr-radius-full)]'
 }
 export function toneClass(tone: GrBadgeTone, dark: boolean): string {

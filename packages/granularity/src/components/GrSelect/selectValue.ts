@@ -38,7 +38,9 @@ export function isEmptySelectValue(value: unknown): boolean {
 
 /** Модель к массиву: скаляр становится набором из одного, пустое — пустым. */
 export function toSelectArray<TValue>(value: TValue | TValue[] | ''): TValue[] {
-  if (Array.isArray(value)) return value
-  if (isEmptySelectValue(value)) return []
+  if (Array.isArray(value))
+    return value
+  if (isEmptySelectValue(value))
+    return []
   return [value as TValue]
 }

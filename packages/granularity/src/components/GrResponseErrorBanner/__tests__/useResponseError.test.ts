@@ -110,7 +110,9 @@ describe('useResponseError', () => {
     const { currentError, retry, setRaw } = useResponseError()
     await setRaw({ status: 500, raw: null })
 
-    await expect(retry(async () => { throw new Error('again down') })).rejects.toThrow('again down')
+    await expect(retry(async () => {
+      throw new Error('again down')
+    })).rejects.toThrow('again down')
     expect(currentError.value?.kind).toBe('server')
 
     await retry(() => {})

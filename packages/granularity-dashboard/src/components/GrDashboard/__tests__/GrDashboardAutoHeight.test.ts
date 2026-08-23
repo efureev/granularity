@@ -55,7 +55,8 @@ class FakeResizeObserver {
 function fireResize(...targets: Element[]): void {
   for (const observer of observers) {
     const seen = targets.filter(target => observer.els.has(target))
-    if (seen.length === 0) continue
+    if (seen.length === 0)
+      continue
 
     observer.cb(seen.map(target => ({ target })) as unknown as ResizeObserverEntry[], null as never)
   }
@@ -77,17 +78,19 @@ beforeEach(() => {
   globalThis.ResizeObserver = FakeResizeObserver
 
   const originalStyle = window.getComputedStyle.bind(window)
-  window.getComputedStyle = ((el: Element, pseudo?: string | null) => {
+  window.getComputedStyle = (el: Element, pseudo?: string | null) => {
     const own = paddings.get(el)
-    if (own === undefined) return originalStyle(el, pseudo)
+    if (own === undefined)
+      return originalStyle(el, pseudo)
 
     return { paddingTop: `${own / 2}px`, paddingBottom: `${own / 2}px` } as CSSStyleDeclaration
-  })
+  }
 
   restore = () => {
     window.getComputedStyle = originalStyle
     paddings.clear()
-    if (original) Object.defineProperty(Element.prototype, 'getBoundingClientRect', original)
+    if (original)
+      Object.defineProperty(Element.prototype, 'getBoundingClientRect', original)
     globalThis.ResizeObserver = previousObserver
     heights.clear()
     observers.clear()

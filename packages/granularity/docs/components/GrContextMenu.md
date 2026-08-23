@@ -7,7 +7,6 @@
 Клавиатура — [`../keyboard.md`](../keyboard.md), слои — [`../overlays.md`](../overlays.md).
 
 ```vue
-
 <GrContextMenu :items="items" @select="onSelect">
   <ul>…</ul>
 </GrContextMenu>
@@ -40,7 +39,6 @@
 папки одни действия, у файла другие. Отдельного способа отменить открытие не нужно — пустая модель просто не откроется.
 
 ```vue
-
 <GrContextMenu :items="items" @before-open="onBeforeOpen" @select="onSelect">
   <GrTree :data="data" node-key="id"/>
 </GrContextMenu>
@@ -48,10 +46,10 @@
 
 ```ts
 function onBeforeOpen(context: GrContextMenuOpenContext): void {
-    // Цель берём из DOM, а не из события мыши: тот же код обслуживает Shift+F10,
-    // у которого события мыши нет вовсе.
-    const row = context.target?.closest('[data-gr-tree-node-key]')
-    items.value = row ? itemsFor(row.dataset.grTreeNodeKey!) : []
+  // Цель берём из DOM, а не из события мыши: тот же код обслуживает Shift+F10,
+  // у которого события мыши нет вовсе.
+  const row = context.target?.closest('[data-gr-tree-node-key]')
+  items.value = row ? itemsFor(row.dataset.grTreeNodeKey!) : []
 }
 ```
 
@@ -67,7 +65,6 @@ function onBeforeOpen(context: GrContextMenuOpenContext): void {
 страница (холст, карта), или меню принадлежит объекту, которого в разметке нет.
 
 ```vue
-
 <GrContextMenu ref="menu" trigger="manual" :items="items" @select="onSelect">
   <canvas @contextmenu.prevent="onCanvasMenu"/>
 </GrContextMenu>

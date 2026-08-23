@@ -70,7 +70,8 @@ function barrelExports(dir: string): Export[] {
     const blockIsType = Boolean(match[1])
     for (const raw of match[2].split(',')) {
       const entry = raw.trim()
-      if (!entry) continue
+      if (!entry)
+        continue
       const isType = blockIsType || /^type\s/.test(entry)
       const cleaned = entry.replace(/^type\s+/, '')
       const alias = cleaned.match(/\bas\s+([\w$]+)/)
@@ -83,7 +84,8 @@ function barrelExports(dir: string): Export[] {
 
 function componentDirs(): string[] {
   return readdirSync(componentsDir).filter((dir) => {
-    if (!dir.startsWith('Gr')) return false
+    if (!dir.startsWith('Gr'))
+      return false
     try {
       readFileSync(resolve(componentsDir, dir, 'index.ts'))
       return true
@@ -117,14 +119,18 @@ describe('публичная поверхность компонентных б�
 
     for (const dir of dirs) {
       for (const item of barrelExports(dir)) {
-        if (item.kind === 'type') continue
+        if (item.kind === 'type')
+          continue
         // SFC, `grXConfig` и `grXSafelist` — предписанный контракт барели
         // (.claude/rules/library-conventions.md, «Анатомия компонента»).
-        if (/\.vue$/.test(item.from) || /\/config$/.test(item.from) || /\/safelist$/.test(item.from)) continue
+        if (/\.vue$/.test(item.from) || /\/config$/.test(item.from) || /\/safelist$/.test(item.from))
+          continue
         // Композаблы — поверхность интеграции: через них потребитель встраивает
         // свой контрол в провайдер, поле и форму.
-        if (/^use[A-Z]/.test(item.name)) continue
-        if (`${dir}/${item.name}` in ALLOWED_VALUES) continue
+        if (/^use[A-Z]/.test(item.name))
+          continue
+        if (`${dir}/${item.name}` in ALLOWED_VALUES)
+          continue
 
         offenders.push(`${dir}/${item.name} (из ${item.from})`)
       }

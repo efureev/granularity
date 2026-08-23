@@ -22,8 +22,8 @@ import type { GrTone } from '../shared/tones'
  * - `server`      — 5xx, проблема на сервере; retry разумен.
  * - `unknown`     — ничего не сматчилось, fallback.
  */
-export type ResponseErrorKind =
-    | 'network'
+export type ResponseErrorKind
+  = | 'network'
     | 'aborted'
     | 'validation'
     | 'client'
@@ -116,7 +116,7 @@ export type ResponseErrorParserResult = {
 
 /** Сигнатура парсера. */
 export type ResponseErrorParser = (
-    ctx: ResponseErrorContext,
+  ctx: ResponseErrorContext,
 ) => ResponseErrorParserResult | null | undefined
 
 /**

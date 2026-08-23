@@ -246,7 +246,6 @@ defineSlots<{
   empty?: () => any
 }>()
 
-
 const { t } = useGranularityTranslations()
 
 const resolvedLoadingText = computed(() => props.loadingText ?? t('gr.autocomplete.loading', 'Loading…'))
@@ -267,7 +266,10 @@ const field = useGrFormFieldContext()
 const resolvedId = computed(() => field?.id.value)
 const {
   disabled: isDisabled,
-  invalid: isInvalid, required: isRequired, readonly: isReadonly } = useGrFormControl(() => props)
+  invalid: isInvalid,
+  required: isRequired,
+  readonly: isReadonly,
+} = useGrFormControl(() => props)
 const describedBy = computed(() => field?.describedById.value)
 
 // Read-only запирает контрол так же, как disabled: значение видно, но панель не
@@ -298,7 +300,8 @@ function optionsSignature(options: GrAutocompleteOption<TValue>[] | undefined): 
 // Родитель сменил стартовый список — он снова источник до следующего ответа
 // сервера, а летящий запрос относится к прежнему набору данных и отменяется.
 watch(() => optionsSignature(props.options), () => {
-  if (!props.fetchOptions) return
+  if (!props.fetchOptions)
+    return
   cancelSearch()
   remoteAnswered.value = false
   remoteOptions.value = []
@@ -312,8 +315,10 @@ function isEmptyValue(value: unknown): boolean {
 }
 
 function toArray(value: GrAutocompleteModelValue<TValue>): TValue[] {
-  if (Array.isArray(value)) return value
-  if (isEmptyValue(value)) return []
+  if (Array.isArray(value))
+    return value
+  if (isEmptyValue(value))
+    return []
   return [value]
 }
 
@@ -388,9 +393,11 @@ useDismissible(open, closeDropdown)
 const searchQuery = computed(() => {
   // При `fetchOptions` фильтрует сервер: локальный матчер отсеял бы то, что он
   // уже прислал в ответ на этот же запрос.
-  if (!props.filterable || props.fetchOptions) return ''
+  if (!props.filterable || props.fetchOptions)
+    return ''
   // single: пока пользователь не начал вводить — показываем весь список.
-  if (!props.multiple && !dirty.value) return ''
+  if (!props.multiple && !dirty.value)
+    return ''
   return query.value.trim()
 })
 
@@ -410,13 +417,17 @@ const effectiveOptions = computed<GrAutocompleteOption<TValue>[]>(() =>
 )
 
 const canAddCustom = computed(() => {
-  if (!props.allowCustomValue) return false
+  if (!props.allowCustomValue)
+    return false
   // Кастомное значение набирается текстом — оно строковое по природе;
   // при числовом `TValue` эта ветка неприменима (см. docs/components.md).
   const v = query.value.trim() as TValue
-  if (!v) return false
-  if (props.multiple && selectedValues.value.includes(v)) return false
-  if (!props.multiple && v === modelSingle.value) return false
+  if (!v)
+    return false
+  if (props.multiple && selectedValues.value.includes(v))
+    return false
+  if (!props.multiple && v === modelSingle.value)
+    return false
   // Не предлагаем «Add», если такое значение/метка уже есть среди опций.
   return !optionsResolved.value.some(o => o.value === v || o.label === v)
 })
@@ -465,14 +476,16 @@ const virtualizer = useVirtualList({
 
 /** Виден ли «Add …»: вне виртуального окна его рисовать нельзя — он элемент набора. */
 const showAddOption = computed(() => {
-  if (!canAddCustom.value) return false
+  if (!canAddCustom.value)
+    return false
   return !props.virtual || virtualizer.range.value.start === 0
 })
 
 /** Опции к отрисовке вместе с их абсолютным индексом в `filteredOptions`. */
 const renderedOptions = computed(() => {
   const all = effectiveOptions.value
-  if (!props.virtual) return all.map((option, index) => ({ option, index }))
+  if (!props.virtual)
+    return all.map((option, index) => ({ option, index }))
 
   const { start, end } = virtualizer.range.value
   const from = Math.max(0, start - addOffset.value)
@@ -487,13 +500,15 @@ const renderedOptions = computed(() => {
  * на списке в десять тысяч.
  */
 function optionSetProps(virtualIndex: number): Record<string, number> | undefined {
-  if (!props.virtual) return undefined
+  if (!props.virtual)
+    return undefined
   return { 'aria-setsize': virtualCount.value, 'aria-posinset': virtualIndex + 1 }
 }
 
 const listboxStyle = computed(() => {
   const base: Record<string, string> = { maxHeight: `${props.dropdownMaxHeight}px` }
-  if (!props.virtual) return base
+  if (!props.virtual)
+    return base
 
   return {
     ...base,
@@ -506,14 +521,15 @@ const listboxStyle = computed(() => {
  * иначе при непустом списке Enter всегда уходил бы в активную опцию, и
  * закоммитить произвольное значение с клавиатуры было бы нечем.
  */
-type NavigableItem =
-  | { kind: 'add' }
-  | { kind: 'option', option: GrAutocompleteOption<TValue>, index: number }
+type NavigableItem
+  = | { kind: 'add' }
+    | { kind: 'option', option: GrAutocompleteOption<TValue>, index: number }
 
 const navigableItems = computed<NavigableItem[]>(() => {
   const items: NavigableItem[] = canAddCustom.value ? [{ kind: 'add' }] : []
   effectiveOptions.value.forEach((option, index) => {
-    if (!option.disabled) items.push({ kind: 'option', option, index })
+    if (!option.disabled)
+      items.push({ kind: 'option', option, index })
   })
   return items
 })
@@ -557,7 +573,8 @@ const activeValue = computed(() => (activeItem.value?.kind === 'option' ? active
 
 // ————— Открытие/закрытие.
 function openDropdown(): void {
-  if (locked.value || open.value) return
+  if (locked.value || open.value)
+    return
   setOpen(true)
 }
 
@@ -582,7 +599,8 @@ function isAbortError(error: unknown): boolean {
 
 async function runFetch(query: string): Promise<void> {
   const fetchOptions = props.fetchOptions
-  if (!fetchOptions) return
+  if (!fetchOptions)
+    return
 
   inflight?.abort()
   const controller = new AbortController()
@@ -592,25 +610,30 @@ async function runFetch(query: string): Promise<void> {
 
   try {
     const result = await fetchOptions(query, controller.signal)
-    if (seq !== searchSeq) return
+    if (seq !== searchSeq)
+      return
     remoteOptions.value = result
     remoteAnswered.value = true
   }
   catch (error) {
-    if (seq !== searchSeq || isAbortError(error)) return
+    if (seq !== searchSeq || isAbortError(error))
+      return
     remoteOptions.value = []
     remoteAnswered.value = true
     emit('searchError', error)
   }
   finally {
-    if (seq === searchSeq) remoteLoading.value = false
+    if (seq === searchSeq)
+      remoteLoading.value = false
   }
 }
 
 function scheduleSearch(value: string): void {
-  if (searchTimer) clearTimeout(searchTimer)
+  if (searchTimer)
+    clearTimeout(searchTimer)
   searchTimer = setTimeout(() => {
-    if (props.minQueryLength > 0 && value.trim().length < props.minQueryLength) return
+    if (props.minQueryLength > 0 && value.trim().length < props.minQueryLength)
+      return
     emit('search', value.trim())
     void runFetch(value.trim())
   }, props.debounce)
@@ -622,7 +645,8 @@ function scheduleSearch(value: string): void {
  * себя устаревшим и флаг не тронет — спиннер остался бы навсегда.
  */
 function cancelSearch(): void {
-  if (searchTimer) clearTimeout(searchTimer)
+  if (searchTimer)
+    clearTimeout(searchTimer)
   searchTimer = null
   inflight?.abort()
   inflight = null
@@ -642,7 +666,8 @@ function onInput(event: Event): void {
 }
 
 function onFocus(): void {
-  if (locked.value) return
+  if (locked.value)
+    return
   openDropdown()
 }
 
@@ -662,32 +687,40 @@ function selectSingle(value: TValue, label: string): void {
 function toggleMultiple(value: TValue): void {
   const next = selectedValues.value.slice()
   const idx = next.indexOf(value)
-  if (idx >= 0) next.splice(idx, 1)
+  if (idx >= 0)
+    next.splice(idx, 1)
   else next.push(value)
   emit('update:modelValue', next)
   emit('change', next as GrAutocompleteModelValue<TValue>)
   setQuery('')
-  if (props.closeOnSelect) closeDropdown()
+  if (props.closeOnSelect)
+    closeDropdown()
   else void nextTick(focusInput)
 }
 
 function chooseOption(option: GrAutocompleteOption<TValue>): void {
-  if (locked.value || option.disabled) return
-  if (props.multiple) toggleMultiple(option.value)
+  if (locked.value || option.disabled)
+    return
+  if (props.multiple)
+    toggleMultiple(option.value)
   else selectSingle(option.value, option.label)
 }
 
 function commitCustom(): void {
-  if (locked.value) return
+  if (locked.value)
+    return
   // Кастомное значение строковое по природе — см. `canAddCustom`.
   const v = query.value.trim() as TValue
-  if (!v) return
-  if (props.multiple) toggleMultiple(v)
+  if (!v)
+    return
+  if (props.multiple)
+    toggleMultiple(v)
   else selectSingle(v, String(v))
 }
 
 function removeValue(value: TValue, focusAfter: () => void = focusInput): void {
-  if (locked.value) return
+  if (locked.value)
+    return
   const next = selectedValues.value.filter(v => v !== value)
   emit('update:modelValue', next)
   emit('change', next as GrAutocompleteModelValue<TValue>)
@@ -695,7 +728,8 @@ function removeValue(value: TValue, focusAfter: () => void = focusInput): void {
 }
 
 function clearSelection(): void {
-  if (locked.value) return
+  if (locked.value)
+    return
   const next = (props.multiple ? [] : '') as GrAutocompleteModelValue<TValue>
   emit('update:modelValue', next)
   emit('change', next)
@@ -742,7 +776,8 @@ const chipRoving = useRovingFocus<number>({
   // Ряд чипов — не кольцо: за правым краем стоит поле ввода, за левым ничего.
   wrap: () => false,
   onOverflow: (edge) => {
-    if (edge === 'end') focusInput()
+    if (edge === 'end')
+      focusInput()
     return true
   },
   // Удаление чипа перерисовывает ряд: без ожидания фокус уехал бы на узел,
@@ -761,7 +796,8 @@ function focusChip(index: number): void {
 }
 
 function onChipKeydown(event: KeyboardEvent, index: number, value: TValue): void {
-  if (chipRoving.handleNavigationKeys(event)) return
+  if (chipRoving.handleNavigationKeys(event))
+    return
 
   switch (event.key) {
     case 'Delete':
@@ -776,7 +812,8 @@ function onChipKeydown(event: KeyboardEvent, index: number, value: TValue): void
     default:
       // Печатный символ возвращает в поле: фокус переезжает синхронно, до
       // вставки текста, поэтому символ попадает в запрос, а не пропадает.
-      if (event.key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey) focusInput()
+      if (event.key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey)
+        focusInput()
   }
 }
 
@@ -784,8 +821,10 @@ function onChipKeydown(event: KeyboardEvent, index: number, value: TValue): void
 function onKeydown(event: KeyboardEvent): void {
   // Клавиша во время IME-композиции принадлежит композиции: Enter коммитит её,
   // Esc отменяет, стрелки ходят по кандидатам.
-  if (isComposingEvent(event)) return
-  if (locked.value) return
+  if (isComposingEvent(event))
+    return
+  if (locked.value)
+    return
 
   // Курсор в начале пустого запроса — стрелка влево уходит к чипам, а не
   // двигает каретку, которой всё равно некуда двигаться.
@@ -803,15 +842,19 @@ function onKeydown(event: KeyboardEvent): void {
   }
 
   // Только при открытой панели: в закрытом инпуте Home/End двигают каретку.
-  if (open.value && handleNavigationKeys(event)) return
+  if (open.value && handleNavigationKeys(event))
+    return
 
   switch (event.key) {
     case 'Enter': {
-      if (!open.value) break
+      if (!open.value)
+        break
       event.preventDefault()
       const item = activeItem.value
-      if (item?.kind === 'option') chooseOption(item.option)
-      else if (item?.kind === 'add' || canAddCustom.value) commitCustom()
+      if (item?.kind === 'option')
+        chooseOption(item.option)
+      else if (item?.kind === 'add' || canAddCustom.value)
+        commitCustom()
       break
     }
     case 'Backspace':
@@ -831,9 +874,11 @@ function onKeydown(event: KeyboardEvent): void {
 watch(
   [singleSelectedLabel, () => props.multiple],
   ([label, multiple]) => {
-    if (multiple) return
+    if (multiple)
+      return
     // Не перетираем то, что пользователь сейчас набирает.
-    if (open.value || dirty.value) return
+    if (open.value || dirty.value)
+      return
     setQuery(label)
   },
   { immediate: true },

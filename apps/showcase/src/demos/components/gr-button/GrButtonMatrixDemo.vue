@@ -6,10 +6,10 @@ import { GR_TONES, GrButton, type GrButtonVariant } from '@feugene/granularity'
 const buttonVariants = ['primary', 'secondary', 'outline', 'ghost', 'ghost-border'] as const satisfies readonly GrButtonVariant[]
 const buttonTones = GR_TONES
 const buttonStates = [
-  {key: 'rest', label: 'Rest'},
-  {key: 'hover', label: 'Hover'},
-  {key: 'focus', label: 'Focus'},
-  {key: 'active', label: 'Active'},
+  { key: 'rest', label: 'Rest' },
+  { key: 'hover', label: 'Hover' },
+  { key: 'focus', label: 'Focus' },
+  { key: 'active', label: 'Active' },
 ] as const
 
 type ButtonVariant = (typeof buttonVariants)[number]

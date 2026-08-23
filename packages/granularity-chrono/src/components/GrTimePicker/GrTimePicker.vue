@@ -160,7 +160,6 @@ defineSlots<{
 
 const columnsRef = ref<InstanceType<typeof TimeColumns> | null>(null)
 
-
 const shell = usePickerShell<TValue>({
   props: () => props,
   codec: () => dateCodec(resolveChronoAdapter<TValue>(props.valueAdapter)),
@@ -202,12 +201,12 @@ const selectedTime = computed<PlainTime | null>(() => (
   selectedDate.value ? toPlainTime(selectedDate.value) : null
 ))
 
-
 const minTime = computed(() => (props.min ? toPlainTime(props.min) : undefined))
 const maxTime = computed(() => (props.max ? toPlainTime(props.max) : undefined))
 
 const displayValue = computed(() => {
-  if (!selectedTime.value) return ''
+  if (!selectedTime.value)
+    return ''
 
   // `timeStyle` тут не годится: он берёт 12/24 из локали и проп `use12Hours`
   // молча игнорирует — поле показывало бы одно, а колонки другое.
@@ -238,7 +237,8 @@ const field = useEditableField({
 })
 
 function onFieldKeydown(event: KeyboardEvent): void {
-  if (field.handleKeydown(event)) return
+  if (field.handleKeydown(event))
+    return
 
   shell.onFieldKeydown(event)
 }
@@ -250,7 +250,8 @@ function onFieldKeydown(event: KeyboardEvent): void {
 const shownTime = computed<PlainTime | null>(() => {
   const draft = field.draft.value
   const typed = draft === null ? null : parsePartialLocaleTime(resolvedLocale.value, draft)
-  if (!typed) return selectedTime.value
+  if (!typed)
+    return selectedTime.value
 
   const base = selectedTime.value
 
@@ -269,8 +270,10 @@ function onTimeChange(time: PlainTime): void {
  * не было.
  */
 const nowStepSeconds = computed(() => {
-  if (props.minuteStep > 1) return props.minuteStep * 60
-  if (!props.enableSeconds) return 60
+  if (props.minuteStep > 1)
+    return props.minuteStep * 60
+  if (!props.enableSeconds)
+    return 60
 
   return Math.max(1, props.secondStep)
 })
@@ -289,14 +292,16 @@ function snapTime(date: Date): PlainTime {
  * обязана погаснуть. Проверка до округления пропустила бы её.
  */
 function canSelectTime(date: Date): boolean {
-  if (shell.isLocked.value) return false
+  if (shell.isLocked.value)
+    return false
 
   return isPlainTimeWithin(snapTime(date), minTime.value, maxTime.value)
 }
 
 /** Выбор из подвала. Возвращает `false`, если время запрещено. */
 function selectTime(date: Date): boolean {
-  if (!canSelectTime(date)) return false
+  if (!canSelectTime(date))
+    return false
 
   shell.commit(fromPlainParts(anchorDate(), snapTime(date)))
   shell.closePanel()

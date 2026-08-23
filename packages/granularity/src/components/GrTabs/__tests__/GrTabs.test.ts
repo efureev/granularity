@@ -563,7 +563,7 @@ describe('GrTabs — остановка Tab', () => {
 })
 
 describe('GrTabs — иконка вкладки', () => {
-const CustomIcon = defineComponent({ name: 'CustomIcon', render: () => h('svg', { 'data-custom-icon': '' }) })
+  const CustomIcon = defineComponent({ name: 'CustomIcon', render: () => h('svg', { 'data-custom-icon': '' }) })
 
   it('принимает и класс, и компонент', () => {
     const byClass = mount(GrTabs, {

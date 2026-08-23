@@ -1,12 +1,12 @@
-export type ShowcasePageName =
-  | 'overview'
-  | 'foundations'
-  | 'components'
-  | 'architecture'
-  | 'extras'
-  | 'directives'
-  | 'composables'
-  | 'utilities'
+export type ShowcasePageName
+  = | 'overview'
+    | 'foundations'
+    | 'components'
+    | 'architecture'
+    | 'extras'
+    | 'directives'
+    | 'composables'
+    | 'utilities'
 
 export type ShowcaseSection = {
   id: string

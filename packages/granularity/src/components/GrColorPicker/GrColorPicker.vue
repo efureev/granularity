@@ -148,17 +148,20 @@ const state = ref<GrHsla>(parseHexColor(props.modelValue) ?? FALLBACK)
 let lastEmitted = ''
 
 watch(() => props.modelValue, (next) => {
-  if (next === lastEmitted) return
+  if (next === lastEmitted)
+    return
 
   const parsed = parseHexColor(next)
-  if (parsed) state.value = parsed
+  if (parsed)
+    state.value = parsed
 })
 
 const cssColor = computed(() => hslaToCss(state.value))
 const hexValue = computed(() => formatHexColor(state.value, props.alpha))
 
 function commit(next: GrHsla): void {
-  if (isLocked.value) return
+  if (isLocked.value)
+    return
 
   state.value = normalizeHsla(next)
 
@@ -202,7 +205,9 @@ function commitHex(): void {
   // бы Vue то же самое, что он уже отрисовал, — патча не случилось бы, и в поле
   // остался бы набранный мусор.
   if (!parsed) {
-    void nextTick(() => { hexDraft.value = hexValue.value })
+    void nextTick(() => {
+      hexDraft.value = hexValue.value
+    })
     return
   }
 
@@ -227,7 +232,8 @@ function isPresetSelected(preset: string): boolean {
 
 function selectPreset(preset: string): void {
   const parsed = parseHexColor(preset)
-  if (parsed) commit(parsed)
+  if (parsed)
+    commit(parsed)
 }
 
 const triggerClass = computed(() => grColorPickerTriggerClass({

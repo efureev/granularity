@@ -16,7 +16,8 @@ export function unionTagOf(variant: GrSchemaObjectNode, discriminator: string): 
 
 /** Вариант по значению дискриминатора. */
 export function unionVariantFor(node: GrSchemaUnionNode, tag: unknown): GrSchemaObjectNode | undefined {
-  if (!node.discriminator) return undefined
+  if (!node.discriminator)
+    return undefined
 
   return node.variants.find(variant => unionTagOf(variant, node.discriminator!) === tag)
 }
@@ -41,7 +42,8 @@ export interface GrSchemaUnionOption {
  * `courier_delivery_v2` незачем.
  */
 export function unionOptions(node: GrSchemaUnionNode): GrSchemaUnionOption[] {
-  if (!node.discriminator) return []
+  if (!node.discriminator)
+    return []
 
   return node.variants.flatMap((variant) => {
     const tag = unionTagOf(variant, node.discriminator!)

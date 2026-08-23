@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type {GrBadgeTone} from '@feugene/granularity'
-import {GrBadge, GrTable} from '@feugene/granularity'
+import type { GrBadgeTone } from '@feugene/granularity'
+import { GrBadge, GrTable } from '@feugene/granularity'
 
 interface TableRow {
   campaign: string
@@ -10,9 +10,9 @@ interface TableRow {
   reach: string
 }
 const rows: TableRow[] = [
-  {campaign: 'Spring onboarding', owner: 'Olivia', status: 'Ready', tag: 'success', reach: '18.2k'},
-  {campaign: 'Card migration', owner: 'Maksim', status: 'Review', tag: 'info', reach: '9.7k'},
-  {campaign: 'Payout reminder', owner: 'Anna', status: 'Paused', tag: 'warning', reach: '6.3k'},
+  { campaign: 'Spring onboarding', owner: 'Olivia', status: 'Ready', tag: 'success', reach: '18.2k' },
+  { campaign: 'Card migration', owner: 'Maksim', status: 'Review', tag: 'info', reach: '9.7k' },
+  { campaign: 'Payout reminder', owner: 'Anna', status: 'Paused', tag: 'warning', reach: '6.3k' },
 ]
 </script>
 

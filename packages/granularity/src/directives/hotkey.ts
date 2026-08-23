@@ -4,9 +4,9 @@ import { eventMatchesKey, isAppleDevice, isComposingEvent, isEditableTarget, shi
 
 export type HotkeyHandler = (event: KeyboardEvent) => void
 
-export type HotkeyEntry =
-  | HotkeyHandler
-  | {
+export type HotkeyEntry
+  = | HotkeyHandler
+    | {
       handler: HotkeyHandler
       /** По умолчанию: `true` для комбинаций с Ctrl/Meta/Alt, иначе `false`. */
       preventDefault?: boolean
@@ -26,9 +26,9 @@ export type HotkeyMap = Record<string, HotkeyEntry>
  */
 export type HotkeyScope = 'global' | 'element'
 
-export type HotkeyBindingValue =
-  | HotkeyMap
-  | {
+export type HotkeyBindingValue
+  = | HotkeyMap
+    | {
       handlers: HotkeyMap
       enabled?: boolean
       scope?: HotkeyScope
@@ -57,9 +57,10 @@ type InternalState = {
 const states = new WeakMap<HTMLElement, InternalState>()
 
 function normalizeBinding(value: HotkeyBindingValue | undefined) {
-  if (!value) return { enabled: false, handlers: {} as HotkeyMap, scope: 'global' as HotkeyScope }
+  if (!value)
+    return { enabled: false, handlers: {} as HotkeyMap, scope: 'global' as HotkeyScope }
   if ('handlers' in (value as any)) {
-    const v = value as { handlers: HotkeyMap; enabled?: boolean; scope?: HotkeyScope }
+    const v = value as { handlers: HotkeyMap, enabled?: boolean, scope?: HotkeyScope }
     return { enabled: v.enabled ?? true, handlers: v.handlers ?? {}, scope: v.scope ?? 'global' }
   }
   return { enabled: true, handlers: value as HotkeyMap, scope: 'global' as HotkeyScope }
@@ -67,10 +68,14 @@ function normalizeBinding(value: HotkeyBindingValue | undefined) {
 
 function normalizeKeyToken(token: string): string {
   const t = token.trim().toLowerCase()
-  if (t === 'esc') return 'Escape'
-  if (t === 'escape') return 'Escape'
-  if (t === 'space') return ' '
-  if (t.length === 1) return t
+  if (t === 'esc')
+    return 'Escape'
+  if (t === 'escape')
+    return 'Escape'
+  if (t === 'space')
+    return ' '
+  if (t.length === 1)
+    return t
   return token.trim()
 }
 
@@ -83,7 +88,8 @@ function parseHotkeys(map: HotkeyMap): ParsedHotkey[] {
       .map(p => p.trim())
       .filter(Boolean)
 
-    if (!parts.length) continue
+    if (!parts.length)
+      continue
 
     let ctrl = false
     let meta = false
@@ -92,14 +98,20 @@ function parseHotkeys(map: HotkeyMap): ParsedHotkey[] {
     let shift = false
 
     const keyToken = parts.at(-1)
-    if (!keyToken) continue
+    if (!keyToken)
+      continue
     for (const p of parts.slice(0, -1)) {
       const t = p.toLowerCase()
-      if (t === 'mod') mod = true
-      else if (t === 'ctrl' || t === 'control') ctrl = true
-      else if (t === 'meta' || t === 'cmd' || t === 'command' || t === '⌘') meta = true
-      else if (t === 'alt' || t === 'option') alt = true
-      else if (t === 'shift') shift = true
+      if (t === 'mod')
+        mod = true
+      else if (t === 'ctrl' || t === 'control')
+        ctrl = true
+      else if (t === 'meta' || t === 'cmd' || t === 'command' || t === '⌘')
+        meta = true
+      else if (t === 'alt' || t === 'option')
+        alt = true
+      else if (t === 'shift')
+        shift = true
     }
 
     const key = normalizeKeyToken(keyToken)
@@ -116,10 +128,14 @@ function matchesHotkey(event: KeyboardEvent, hk: ParsedHotkey): boolean {
   const expectMeta = hk.meta || (hk.mod && apple)
   const expectCtrl = hk.ctrl || (hk.mod && !apple)
 
-  if (expectCtrl !== event.ctrlKey) return false
-  if (expectMeta !== event.metaKey) return false
-  if (hk.alt !== event.altKey) return false
-  if (!shiftSatisfied(event, hk.key, hk.shift)) return false
+  if (expectCtrl !== event.ctrlKey)
+    return false
+  if (expectMeta !== event.metaKey)
+    return false
+  if (hk.alt !== event.altKey)
+    return false
+  if (!shiftSatisfied(event, hk.key, hk.shift))
+    return false
 
   // По физическому коду матчатся только комбинации с модификаторами: там
   // клавиша — позиция на клавиатуре, и `Ctrl+K` обязан работать на любой
@@ -161,7 +177,8 @@ function resolveEntry(entry: HotkeyEntry) {
  */
 export const vHotkey: Directive<HTMLElement, HotkeyBindingValue> = {
   mounted(el, binding) {
-    if (typeof window === 'undefined') return
+    if (typeof window === 'undefined')
+      return
 
     const { enabled, handlers, scope } = normalizeBinding(binding.value)
     const target: Window | HTMLElement = scope === 'element' ? el : window
@@ -171,15 +188,19 @@ export const vHotkey: Directive<HTMLElement, HotkeyBindingValue> = {
       hotkeys: parseHotkeys(handlers),
       listener: (event: KeyboardEvent) => {
         const current = states.get(el)
-        if (!current?.enabled) return
-        if (!el.isConnected) return
+        if (!current?.enabled)
+          return
+        if (!el.isConnected)
+          return
         // Клавиша во время IME-композиции принадлежит композиции, а не хоткею.
-        if (isComposingEvent(event)) return
+        if (isComposingEvent(event))
+          return
 
         const editable = isEditableTarget(event.target)
 
         for (const hk of current.hotkeys) {
-          if (!matchesHotkey(event, hk)) continue
+          if (!matchesHotkey(event, hk))
+            continue
 
           const entry = resolveEntry(hk.entry)
 
@@ -190,8 +211,10 @@ export const vHotkey: Directive<HTMLElement, HotkeyBindingValue> = {
           }
 
           const preventDefault = entry.preventDefault ?? (hk.ctrl || hk.meta || hk.mod || hk.alt)
-          if (preventDefault) event.preventDefault()
-          if (entry.stopPropagation) event.stopPropagation()
+          if (preventDefault)
+            event.preventDefault()
+          if (entry.stopPropagation)
+            event.stopPropagation()
 
           entry.handler(event)
           return
@@ -205,7 +228,8 @@ export const vHotkey: Directive<HTMLElement, HotkeyBindingValue> = {
   },
   updated(el, binding) {
     const state = states.get(el)
-    if (!state) return
+    if (!state)
+      return
 
     const next = normalizeBinding(binding.value)
     state.enabled = next.enabled
@@ -221,7 +245,8 @@ export const vHotkey: Directive<HTMLElement, HotkeyBindingValue> = {
   },
   unmounted(el) {
     const state = states.get(el)
-    if (!state) return
+    if (!state)
+      return
     state.target.removeEventListener('keydown', state.listener as EventListener)
     states.delete(el)
   },

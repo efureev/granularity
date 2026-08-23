@@ -12,8 +12,8 @@ const generatedSearchScript = readFileSync(
 
 describe('showcase generated search index', () => {
   it('генерируется build-time скриптом через vite ssr loader и содержит page/entity/section entries', () => {
-    expect(generatedSearchScript).toContain("server.ssrLoadModule('/src/app/showcase.ts')")
-    expect(generatedSearchScript).toContain("server.ssrLoadModule('/src/app/showcaseSearch.ts')")
+    expect(generatedSearchScript).toContain('server.ssrLoadModule(\'/src/app/showcase.ts\')')
+    expect(generatedSearchScript).toContain('server.ssrLoadModule(\'/src/app/showcaseSearch.ts\')')
 
     const pageEntries = generatedSearchIndex.filter(entry => entry.kind === 'page')
     const entityEntries = generatedSearchIndex.filter(entry => entry.kind === 'entity')

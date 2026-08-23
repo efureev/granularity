@@ -13,7 +13,8 @@ export const grModalExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Backdrop guard for critical flows',
     description: 'Показываем `closeOnBackdrop=false` для кейсов, где нельзя случайно потерять прогресс черновика или подтверждения.',
     status: 'ready',
-    previewKey: 'gr-modal-backdrop-guard',    note: 'Этот сценарий полезен для проверки focus-trap и поведения backdrop в критичных формах/confirm flows.',
+    previewKey: 'gr-modal-backdrop-guard',
+    note: 'Этот сценарий полезен для проверки focus-trap и поведения backdrop в критичных формах/confirm flows.',
   },
   {
     id: 'modal-size-switcher',
@@ -27,7 +28,8 @@ export const grModalExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Imperative dialogs from an open modal',
     description: 'Запускаем `useDialogService` (`confirm` / `alert` / `prompt`) прямо из открытой `GrModal`. Сервис монтирует собственный host в `document.body` поверх окна, поэтому закрытие диалога не закрывает исходную модалку — решение возвращается через `Promise`.',
     status: 'ready',
-    previewKey: 'gr-modal-dialog-service',    note: 'Закрытие confirm/alert/prompt не закрывает исходную модалку — это удобно для подтверждений и быстрых вводов внутри сложных форм.',
+    previewKey: 'gr-modal-dialog-service',
+    note: 'Закрытие confirm/alert/prompt не закрывает исходную модалку — это удобно для подтверждений и быстрых вводов внутри сложных форм.',
   },
   {
     id: 'modal-nested-poppers',

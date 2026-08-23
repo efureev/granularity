@@ -49,7 +49,6 @@ import { useViewerKeyboard } from './composables/useViewerKeyboard'
 export type GrImageViewerItem = { src: string, alt?: string }
 export type GrImageViewerSource = string | GrImageViewerItem
 
-
 export interface GrImageViewerProps {
   modelValue: boolean
   /**
@@ -273,7 +272,8 @@ const displayIndex = computed(() => (hasImages.value ? currentIndex.value + 1 : 
 const { announce } = useAnnouncer()
 
 watch(displayIndex, (index) => {
-  if (!hasImages.value) return
+  if (!hasImages.value)
+    return
 
   announce(t('gr.imageViewer.position', 'Image {index} of {total}', { index, total: total.value }))
 })
@@ -450,11 +450,13 @@ const toolbarSlotProps = computed<GrImageViewerSlotProps>(() => ({
  */
 function download(): void {
   const item = currentItem.value
-  if (!item?.src) return
+  if (!item?.src)
+    return
 
   emit('download', { src: item.src, alt: item.alt ?? '', index: currentIndex.value })
 
-  if (typeof document === 'undefined') return
+  if (typeof document === 'undefined')
+    return
 
   const link = document.createElement('a')
   link.href = item.src
@@ -585,11 +587,10 @@ onBeforeUnmount(() => {
 
 defineSlots<{
   /** Панель инструментов целиком вместо встроенной. */
-  toolbar?: (props: GrImageViewerSlotProps) => any
+  'toolbar'?: (props: GrImageViewerSlotProps) => any
   /** Свои кнопки рядом со встроенными — поворот, скачивание, печать. */
   'toolbar-actions'?: (props: GrImageViewerSlotProps) => any
 }>()
-
 </script>
 
 <template>

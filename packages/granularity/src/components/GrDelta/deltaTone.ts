@@ -25,7 +25,8 @@ export type GrDeltaTone = 'success' | 'danger' | 'neutral'
  * нет, это решает вызывающий.
  */
 export function deltaTone(value: number, polarity: GrDeltaPolarity = 'positive-good'): GrDeltaTone {
-  if (polarity === 'none' || value === 0 || Number.isNaN(value)) return 'neutral'
+  if (polarity === 'none' || value === 0 || Number.isNaN(value))
+    return 'neutral'
 
   const good = polarity === 'positive-good' ? value > 0 : value < 0
 
@@ -34,6 +35,7 @@ export function deltaTone(value: number, polarity: GrDeltaPolarity = 'positive-g
 
 /** Направление стрелки. Ноль стрелки не получает: двигаться было некуда. */
 export function deltaDirection(value: number): 'up' | 'down' | 'flat' {
-  if (Number.isNaN(value) || value === 0) return 'flat'
+  if (Number.isNaN(value) || value === 0)
+    return 'flat'
   return value > 0 ? 'up' : 'down'
 }

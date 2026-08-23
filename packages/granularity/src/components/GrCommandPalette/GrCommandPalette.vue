@@ -157,7 +157,8 @@ const groups = computed(() => {
 
   // С непустым запросом секции «недавние» нет: там правит релевантность, а не
   // история — иначе первая же буква уводила бы взгляд не туда.
-  if (query.value.trim()) return grouped
+  if (query.value.trim())
+    return grouped
 
   return withRecentCommands(grouped, filteredItems.value, props.recentIds ?? [], recentTitle.value)
 })
@@ -187,9 +188,9 @@ function itemDomId(id: string): string {
 const ITEM_SIZE_ESTIMATE = 44
 const GROUP_LABEL_SIZE_ESTIMATE = 28
 
-type PaletteRow =
-  | { kind: 'label', groupIndex: number }
-  | { kind: 'item', groupIndex: number, item: GrCommandItem, posInSet: number, setSize: number }
+type PaletteRow
+  = | { kind: 'label', groupIndex: number }
+    | { kind: 'item', groupIndex: number, item: GrCommandItem, posInSet: number, setSize: number }
 
 const listEl = ref<HTMLElement | null>(null)
 
@@ -197,7 +198,8 @@ const paletteRows = computed<PaletteRow[]>(() => {
   const rows: PaletteRow[] = []
 
   groups.value.forEach((group, groupIndex) => {
-    if (group.name) rows.push({ kind: 'label', groupIndex })
+    if (group.name)
+      rows.push({ kind: 'label', groupIndex })
 
     group.items.forEach((item, index) => {
       rows.push({
@@ -279,10 +281,10 @@ const renderedGroups = computed<RenderedGroup[]>(() => {
 
 /** ARIA набора: объявляем только при виртуализации — иначе набор виден по DOM. */
 function itemSetProps(entry: { posInSet: number, setSize: number }): Record<string, number> | undefined {
-  if (!props.virtual) return undefined
+  if (!props.virtual)
+    return undefined
   return { 'aria-setsize': entry.setSize, 'aria-posinset': entry.posInSet }
 }
-
 
 /** Сегменты подсветки: совпавшее с запросом рисуется `<mark>`. */
 function matchSegments(text: string): ReturnType<typeof splitCommandMatch> {
@@ -294,7 +296,8 @@ async function scrollActiveIntoView(item: GrCommandItem): Promise<void> {
   // прокрутка не случилась бы, а `aria-activedescendant` указал бы в пустоту.
   if (props.virtual) {
     const rowIndex = paletteRows.value.findIndex(row => row.kind === 'item' && row.item.id === item.id)
-    if (rowIndex >= 0) virtualizer.scrollToIndex(rowIndex)
+    if (rowIndex >= 0)
+      virtualizer.scrollToIndex(rowIndex)
   }
 
   await nextTick()
@@ -337,9 +340,11 @@ watch(
 watch(
   itemsResolved,
   (items) => {
-    if (!__GR_DEV__) return
+    if (!__GR_DEV__)
+      return
     const duplicates = findDuplicateCommandIds(items)
-    if (!duplicates.length) return
+    if (!duplicates.length)
+      return
 
     console.warn(
       `[GrCommandPalette] повторяющиеся id команд: ${duplicates.join(', ')}. `
@@ -362,14 +367,17 @@ function toggle(): void {
 }
 
 function selectItem(item: GrCommandItem): void {
-  if (item.disabled) return
+  if (item.disabled)
+    return
   emit('select', item)
-  if (props.closeOnSelect) close()
+  if (props.closeOnSelect)
+    close()
 }
 
 function onItemHover(item: GrCommandItem): void {
   const index = navigableItems.value.indexOf(item)
-  if (index >= 0) setActive(index)
+  if (index >= 0)
+    setActive(index)
 }
 
 function onInput(event: Event): void {
@@ -380,13 +388,16 @@ function onInput(event: Event): void {
 function onKeydown(event: KeyboardEvent): void {
   // Клавиша во время IME-композиции принадлежит композиции: Enter коммитит её,
   // стрелки ходят по кандидатам.
-  if (isComposingEvent(event)) return
+  if (isComposingEvent(event))
+    return
 
-  if (handleNavigationKeys(event)) return
+  if (handleNavigationKeys(event))
+    return
 
   switch (event.key) {
     case 'Enter':
-      if (!activeItem.value) break
+      if (!activeItem.value)
+        break
       event.preventDefault()
       selectItem(activeItem.value)
       break
@@ -397,7 +408,8 @@ function onKeydown(event: KeyboardEvent): void {
 watch(
   () => props.modelValue,
   (open) => {
-    if (!open) return
+    if (!open)
+      return
 
     query.value = ''
     resetActive(0)
@@ -411,7 +423,8 @@ watch(
 watch(
   [() => props.modelValue, inputEl],
   ([open]) => {
-    if (open) inputEl.value?.focus()
+    if (open)
+      inputEl.value?.focus()
   },
   { flush: 'post' },
 )
@@ -430,19 +443,22 @@ const hotkeyHint = computed(() =>
 
 function onWindowKeydown(event: KeyboardEvent): void {
   const hotkey = parsedHotkey.value
-  if (!hotkey || !matchesCommandHotkey(event, hotkey, isApple.value)) return
+  if (!hotkey || !matchesCommandHotkey(event, hotkey, isApple.value))
+    return
   event.preventDefault()
   toggle()
 }
 
 onMounted(() => {
-  if (typeof window === 'undefined') return
+  if (typeof window === 'undefined')
+    return
   isApple.value = isAppleDevice()
   window.addEventListener('keydown', onWindowKeydown)
 })
 
 onBeforeUnmount(() => {
-  if (typeof window !== 'undefined') window.removeEventListener('keydown', onWindowKeydown)
+  if (typeof window !== 'undefined')
+    window.removeEventListener('keydown', onWindowKeydown)
 })
 
 // Эффективный размер: локальный проп → `GrConfigProvider` → дефолт компонента.
@@ -453,7 +469,8 @@ const listStyle = computed(() => ({ maxHeight: `var(--gr-command-list-max-height
 
 const listStyleWithSpacers = computed(() => {
   const base = listStyle.value
-  if (!props.virtual) return base
+  if (!props.virtual)
+    return base
 
   return {
     ...base,
@@ -471,7 +488,6 @@ defineSlots<{
   /** Подвал палитры: подсказки по клавишам, счётчик. */
   footer?: () => any
 }>()
-
 </script>
 
 <template>

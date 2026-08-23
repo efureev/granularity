@@ -35,7 +35,9 @@ function valueOf(person: Person, key: string): string | number {
 /** Сервер-заглушка: фильтрует, сортирует и режет — как это делал бы бэкенд. */
 async function fetchPeople(request: DataSourceRequest) {
   const nth = requests.value++
-  await new Promise((resolve) => { setTimeout(resolve, DELAYS[nth % DELAYS.length]) })
+  await new Promise((resolve) => {
+    setTimeout(resolve, DELAYS[nth % DELAYS.length])
+  })
 
   const search = request.search.trim().toLowerCase()
   const wanted = String(request.filters.role ?? '')

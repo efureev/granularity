@@ -33,14 +33,14 @@ export default defineConfig({
     emptyOutDir: true,
     lib: {
       entry: {
-        index: fileURLToPath(new URL('./src/index.ts', import.meta.url)),
+        'index': fileURLToPath(new URL('./src/index.ts', import.meta.url)),
         'granular-provider': fileURLToPath(
           new URL('./src/granular-provider/index.ts', import.meta.url),
         ),
         'granular-provider-node': fileURLToPath(
           new URL('./src/granular-provider/node.ts', import.meta.url),
         ),
-        resolver: fileURLToPath(
+        'resolver': fileURLToPath(
           new URL('./src/resolver.ts', import.meta.url),
         ),
         'composables/useChronoNow': fileURLToPath(

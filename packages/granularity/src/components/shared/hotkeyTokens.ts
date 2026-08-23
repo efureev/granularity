@@ -8,10 +8,10 @@
  */
 
 /** Ключи читаемых имён — `gr.kbd.<name>`. */
-export type GrKbdKeyName =
-  | 'command' | 'option' | 'shift' | 'control' | 'enter' | 'escape' | 'tab'
-  | 'backspace' | 'delete' | 'pageUp' | 'pageDown'
-  | 'arrowUp' | 'arrowDown' | 'arrowLeft' | 'arrowRight'
+export type GrKbdKeyName
+  = | 'command' | 'option' | 'shift' | 'control' | 'enter' | 'escape' | 'tab'
+    | 'backspace' | 'delete' | 'pageUp' | 'pageDown'
+    | 'arrowUp' | 'arrowDown' | 'arrowLeft' | 'arrowRight'
 
 /** Одна клавиша в человекочитаемом виде. */
 export interface HotkeyKeyView {

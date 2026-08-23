@@ -20,14 +20,16 @@ export const grTreeSelectExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Multiple selection with filtering',
     description: 'Показываем наиболее ценный complex-flow: multi-select режим, встроенный filter и `closeOnSelect=false` для пакетного выбора узлов.',
     status: 'ready',
-    previewKey: 'gr-tree-select-multiple-filter',    note: 'Это хороший reference для permission matrices, taxonomy pickers и bulk-assignment flows.',
+    previewKey: 'gr-tree-select-multiple-filter',
+    note: 'Это хороший reference для permission matrices, taxonomy pickers и bulk-assignment flows.',
   },
   {
     id: 'tree-select-custom-slots',
     title: 'Custom trigger value and node slots',
     description: 'Документируем slot API компонента: кастомный value-preview в trigger и enriched node rendering внутри dropdown-tree.',
     status: 'ready',
-    previewKey: 'gr-tree-select-custom-slots',    note: 'Этот пример помогает увидеть, как `GrTreeSelect` превращается из generic picker в domain-specific selector без форка компонента.',
+    previewKey: 'gr-tree-select-custom-slots',
+    note: 'Этот пример помогает увидеть, как `GrTreeSelect` превращается из generic picker в domain-specific selector без форка компонента.',
   },
   {
     id: 'tree-select-keyboard',

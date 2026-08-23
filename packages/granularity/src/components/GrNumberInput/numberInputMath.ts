@@ -6,7 +6,8 @@ export { bigStep } from '../shared/numericStep'
  * значение.
  */
 export function decimalsOf(value: number): number {
-  if (!Number.isFinite(value)) return 0
+  if (!Number.isFinite(value))
+    return 0
 
   const text = String(Math.abs(value))
 

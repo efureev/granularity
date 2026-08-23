@@ -24,9 +24,12 @@
 ## Одна клавиша и сочетание
 
 ```vue
-<GrKbd>Esc</GrKbd>
+<GrKbd>
+Esc
+</GrKbd>
 
 <GrKbd keys="mod+K" />
+
 <GrKbd :keys="['mod', 'shift', 'P']" />
 ```
 
@@ -48,7 +51,9 @@
 
 ```vue
 <GrKbd keys="mod+K" />                      <!-- ⌘K -->
+
 <GrKbd keys="mod+K" variant="split" />      <!-- ⌘ K -->
+
 <GrKbd :keys="['G', 'I']" variant="sequence" />
 ```
 
@@ -93,7 +98,7 @@
 import { GR_KBD_TOKENS, findKbdToken } from '@feugene/granularity'
 
 const navigation = GR_KBD_TOKENS.filter(spec => spec.group === 'navigation')
-const command = findKbdToken('⌘')   // тот же токен, что и `meta`
+const command = findKbdToken('⌘') // тот же токен, что и `meta`
 ```
 
 ## Платформа
@@ -104,7 +109,9 @@ const command = findKbdToken('⌘')   // тот же токен, что и `meta
 
 ```vue
 <GrKbd keys="mod+K" />                    <!-- определяется автоматически -->
+
 <GrKbd keys="mod+K" platform="apple" />   <!-- всегда ⌘ -->
+
 <GrKbd keys="mod+K" platform="other" />   <!-- всегда Ctrl -->
 ```
 

@@ -114,9 +114,11 @@ const entries = computed(() => groups.value[0]?.entries ?? [])
 const resolvedEmptyText = computed(() => props.emptyText ?? t('gr.timeline.empty', 'Nothing here yet'))
 
 const isEmpty = computed(() => {
-  if (props.empty !== undefined) return props.empty
+  if (props.empty !== undefined)
+    return props.empty
 
-  if (dataMode.value) return props.items!.length === 0
+  if (dataMode.value)
+    return props.items!.length === 0
 
   // `v-for` по пустому массиву оставляет фрагмент без узлов, `v-if` — комментарий,
   // и ни то ни другое пунктом ленты не является.
@@ -127,8 +129,10 @@ const loadingRowCount = computed(() => Math.max(1, Math.trunc(props.loadingRows)
 
 function keyOf(item: T, index: number): string | number {
   const key = props.itemKey
-  if (typeof key === 'function') return key(item, index)
-  if (typeof key === 'string') return (item as Record<string, unknown>)[key] as string | number
+  if (typeof key === 'function')
+    return key(item, index)
+  if (typeof key === 'string')
+    return (item as Record<string, unknown>)[key] as string | number
 
   return index
 }

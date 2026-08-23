@@ -122,7 +122,7 @@ describe('GrSelect', () => {
       },
     })
 
-    const optionValues = wrapper.findAll('option').map((o) => o.attributes('value'))
+    const optionValues = wrapper.findAll('option').map(o => o.attributes('value'))
     expect(optionValues).toContain('CUSTOM')
   })
 
@@ -139,7 +139,7 @@ describe('GrSelect', () => {
       },
     })
 
-    const optionValues = wrapper.findAll('option').map((o) => o.attributes('value'))
+    const optionValues = wrapper.findAll('option').map(o => o.attributes('value'))
     expect(optionValues[0]).toBe('')
   })
 
@@ -157,7 +157,7 @@ describe('GrSelect', () => {
       },
     })
 
-    const optionValues = wrapper.findAll('option').map((o) => o.attributes('value'))
+    const optionValues = wrapper.findAll('option').map(o => o.attributes('value'))
     expect(optionValues).not.toContain('')
   })
 
@@ -217,7 +217,7 @@ describe('GrSelect', () => {
     await wrapper.get('[data-testid="gr-select-trigger"]').trigger('click')
     await nextTick()
 
-    const eur = getTeleportedOptions().find((button) => button.textContent?.includes('EUR'))
+    const eur = getTeleportedOptions().find(button => button.textContent?.includes('EUR'))
     expect(eur).toBeTruthy()
 
     await new DOMWrapper(eur).trigger('click')
@@ -315,10 +315,10 @@ describe('GrSelect', () => {
     await nextTick()
 
     const options = getTeleportedOptions()
-    expect(options.map((option) => option.textContent?.trim() ?? '')).toEqual(expect.arrayContaining(['Food', 'Cafe']))
+    expect(options.map(option => option.textContent?.trim() ?? '')).toEqual(expect.arrayContaining(['Food', 'Cafe']))
 
-    const food = options.find((option) => option.textContent?.includes('Food'))!
-    const cafe = options.find((option) => option.textContent?.includes('Cafe'))!
+    const food = options.find(option => option.textContent?.includes('Food'))!
+    const cafe = options.find(option => option.textContent?.includes('Cafe'))!
 
     await new DOMWrapper(food).trigger('click')
     await nextTick()
@@ -332,7 +332,7 @@ describe('GrSelect', () => {
 
     await wrapper.setProps({ modelValue: ['1', '2'] })
 
-    await new DOMWrapper(getTeleportedOptions().find((option) => option.textContent?.includes('Food'))).trigger('click')
+    await new DOMWrapper(getTeleportedOptions().find(option => option.textContent?.includes('Food'))).trigger('click')
     await nextTick()
     expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([['2']])
   })
@@ -380,12 +380,12 @@ describe('GrSelect', () => {
     })
 
     const groups = wrapper.findAll('optgroup')
-    expect(groups.map((g) => g.attributes('label'))).toEqual(['Popular cities', 'City name'])
+    expect(groups.map(g => g.attributes('label'))).toEqual(['Popular cities', 'City name'])
 
-    const firstGroupOptions = groups[0].findAll('option').map((o) => o.attributes('value'))
+    const firstGroupOptions = groups[0].findAll('option').map(o => o.attributes('value'))
     expect(firstGroupOptions).toEqual(['Shanghai', 'Beijing'])
 
-    expect(wrapper.findAll('option').map((o) => o.attributes('value'))).toContain('Chengdu')
+    expect(wrapper.findAll('option').map(o => o.attributes('value'))).toContain('Chengdu')
   })
 
   it('в native-режиме с группами показывает label выбранного значения', () => {
@@ -434,15 +434,15 @@ describe('GrSelect', () => {
     await nextTick()
 
     const groupLabels = [...document.body.querySelectorAll('[data-gr-select-group-label]')]
-      .map((el) => el.textContent?.trim())
+      .map(el => el.textContent?.trim())
     expect(groupLabels).toEqual(['Popular cities', 'City name'])
 
     const options = getTeleportedOptions()
-    expect(options.map((o) => o.textContent?.trim())).toEqual(
+    expect(options.map(o => o.textContent?.trim())).toEqual(
       expect.arrayContaining(['Shanghai', 'Beijing', 'Chengdu']),
     )
 
-    const chengdu = options.find((o) => o.textContent?.includes('Chengdu'))!
+    const chengdu = options.find(o => o.textContent?.includes('Chengdu'))!
     await new DOMWrapper(chengdu).trigger('click')
     await nextTick()
 
@@ -481,10 +481,10 @@ describe('GrSelect', () => {
     await nextTick()
 
     const groupLabels = [...document.body.querySelectorAll('[data-gr-select-group-label]')]
-      .map((el) => el.textContent?.trim())
+      .map(el => el.textContent?.trim())
     expect(groupLabels).toEqual(['City name'])
 
-    expect(getTeleportedOptions().map((o) => o.textContent?.trim())).toEqual(['Chengdu'])
+    expect(getTeleportedOptions().map(o => o.textContent?.trim())).toEqual(['Chengdu'])
   })
 
   it('показывает placeholder, когда значение не выбрано', async () => {

@@ -144,7 +144,6 @@ const rootImportSnippet = `import {
 
 import '@feugene/granularity/styles.css'`
 
-
 const useThemeSnippet = `import { initThemeEarly, useTheme } from '@feugene/granularity'
 
 initThemeEarly()
@@ -310,7 +309,6 @@ export const showcaseFoundationTokens = foundationTokensFromData
 
 export const showcaseThemeTokens = themeTokensFromData
 
-
 const foundationTokenCount = showcaseFoundationTokens.length
 
 const foundationBaseCssExcerpt = `html,
@@ -359,7 +357,7 @@ const themeExcerptTokenNames = [
 
 const lightThemeCssExcerpt = renderThemeExcerpt('light', ':root', themeExcerptTokenNames)
 
-const darkThemeCssExcerpt = renderThemeExcerpt('dark', "[data-theme='dark']", themeExcerptTokenNames)
+const darkThemeCssExcerpt = renderThemeExcerpt('dark', '[data-theme=\'dark\']', themeExcerptTokenNames)
 
 // Срез обязан дотягиваться дальше палитры — до типографики, интервалов и
 // радиусов: иначе страница Foundations показывает один список цветов. Граница

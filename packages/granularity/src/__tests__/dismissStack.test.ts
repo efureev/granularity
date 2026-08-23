@@ -48,10 +48,10 @@ const Harness = defineComponent({
 /** Содержимое окна и панель телепортированы в `body` — ищем в документе. */
 function inDocument(selector: string): HTMLElement {
   const el = document.querySelector<HTMLElement>(selector)
-  if (!el) throw new Error(`не найдено в документе: ${selector}`)
+  if (!el)
+    throw new Error(`не найдено в документе: ${selector}`)
   return el
 }
-
 
 function dropdownVisible(): boolean {
   const panel = document.querySelector<HTMLElement>('[data-gr-dropdown-panel]')

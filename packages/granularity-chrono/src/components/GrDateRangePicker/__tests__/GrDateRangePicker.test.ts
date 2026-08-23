@@ -38,7 +38,8 @@ function day(key: string) {
 /** Ячейка таблицы под днём: полосу диапазона рисует она, а не сам день. */
 function cell(key: string) {
   const element = document.querySelector(`[data-gr-calendar-day][data-key="${key}"]`)?.closest('td')
-  if (!element) throw new Error(`нет ячейки ${key}`)
+  if (!element)
+    throw new Error(`нет ячейки ${key}`)
 
   return new DOMWrapper(element)
 }
@@ -585,7 +586,8 @@ describe('GrDateRangePicker — время границ', () => {
     await nextTick()
 
     const emitted = lastModel(wrapper)
-    if (emitted) await wrapper.setProps({ modelValue: emitted as readonly [Date, Date] })
+    if (emitted)
+      await wrapper.setProps({ modelValue: emitted as readonly [Date, Date] })
     await nextTick()
   }
 
@@ -664,7 +666,8 @@ describe('GrDateRangePicker — порядок краёв со временем'
     const option = [...(block?.querySelectorAll(`[data-unit="${unit}"] [role="option"]`) ?? [])]
       .find(el => el.textContent?.trim() === value)
 
-    if (!option) throw new Error(`нет варианта ${unit}=${value} у края ${edge}`)
+    if (!option)
+      throw new Error(`нет варианта ${unit}=${value} у края ${edge}`)
 
     return new DOMWrapper(option as HTMLElement)
   }

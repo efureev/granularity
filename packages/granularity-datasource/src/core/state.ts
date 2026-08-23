@@ -82,7 +82,8 @@ export function sameFilters(
   const keys = new Set([...Object.keys(a), ...Object.keys(b)])
 
   for (const key of keys) {
-    if (!sameValue(a[key], b[key])) return false
+    if (!sameValue(a[key], b[key]))
+      return false
   }
 
   return true
@@ -92,7 +93,8 @@ function sameValue(a: FilterValue | undefined, b: FilterValue | undefined): bool
   // Снятый фильтр приходит четырьмя видами — `undefined`, `null`, `''` и `[]`,
   // — и все они значат одно. Сравнивай их по значению, и очистка поля дважды
   // подряд слала бы второй запрос за тем же самым ответом.
-  if (isEmptyFilter(a) && isEmptyFilter(b)) return true
+  if (isEmptyFilter(a) && isEmptyFilter(b))
+    return true
 
   if (Array.isArray(a) && Array.isArray(b)) {
     return a.length === b.length && a.every((item, index) => Object.is(item, b[index]))
@@ -114,14 +116,16 @@ export function sameState(a: DataSourceState, b: DataSourceState): boolean {
 }
 
 export function sameSort(a: DataSourceSort | null, b: DataSourceSort | null): boolean {
-  if (a === null || b === null) return a === b
+  if (a === null || b === null)
+    return a === b
 
   return a.key === b.key && a.dir === b.dir
 }
 
 /** Пустой фильтр — это отсутствие фильтра: `''`, `null` и пустой список. */
 export function isEmptyFilter(value: FilterValue | undefined): boolean {
-  if (value === undefined || value === null || value === '') return true
+  if (value === undefined || value === null || value === '')
+    return true
 
   return Array.isArray(value) && value.length === 0
 }

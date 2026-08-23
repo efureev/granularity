@@ -24,7 +24,9 @@ const statusOptions = computed<GrSegmentedOption[]>(() => [
 
 function syncReview() {
   syncing.value = true
-  window.setTimeout(() => { syncing.value = false }, 2000)
+  window.setTimeout(() => {
+    syncing.value = false
+  }, 2000)
 }
 
 const statusLabel = computed(() => statusOptions.value.find(option => option.value === status.value)?.label ?? status.value)

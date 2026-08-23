@@ -27,11 +27,14 @@ function createSafeReplacer(): (key: string, value: unknown) => unknown {
 
   return function safeReplacer(_key: string, value: unknown): unknown {
     // `BigInt` не имеет представления в JSON, и `stringify` на нём бросает.
-    if (typeof value === 'bigint') return `${value}n`
+    if (typeof value === 'bigint')
+      return `${value}n`
 
-    if (typeof value !== 'object' || value === null) return value
+    if (typeof value !== 'object' || value === null)
+      return value
 
-    if (seen.has(value)) return CIRCULAR_MARKER
+    if (seen.has(value))
+      return CIRCULAR_MARKER
 
     seen.add(value)
     return value
@@ -46,8 +49,10 @@ function createSafeReplacer(): (key: string, value: unknown) => unknown {
  * показывать нечего. Всё остальное сериализуется с отступом.
  */
 export function serializeCode(value: unknown, indent = 2): string {
-  if (typeof value === 'string') return value
-  if (value === undefined) return ''
+  if (typeof value === 'string')
+    return value
+  if (value === undefined)
+    return ''
 
   try {
     const serialized = JSON.stringify(value, createSafeReplacer(), indent)

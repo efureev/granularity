@@ -35,7 +35,8 @@ export function isLeapYear(year: number): boolean {
 
 /** Длина месяца с учётом високосного года. */
 export function daysInMonth(year: number, month: number): number {
-  if (month === 1) return isLeapYear(year) ? 29 : 28
+  if (month === 1)
+    return isLeapYear(year) ? 29 : 28
   return DAYS_IN_MONTH[month] ?? 30
 }
 
@@ -128,7 +129,8 @@ export function differenceInDays(from: PlainDate, to: PlainDate): number {
  * кнопкой «вперёд» перескакивало бы месяц.
  */
 export function addMonths(date: PlainDate, months: number): PlainDate {
-  if (months === 0) return date
+  if (months === 0)
+    return date
 
   const index = date.y * 12 + date.m + months
   const y = Math.floor(index / 12)
@@ -153,8 +155,10 @@ export function differenceInMonths(from: PlainDate, to: PlainDate): number {
   const months = (to.y - from.y) * 12 + (to.m - from.m)
 
   // День месяца не дотянул до исходного — последний месяц не закрылся.
-  if (months > 0 && to.d < from.d) return months - 1
-  if (months < 0 && to.d > from.d) return months + 1
+  if (months > 0 && to.d < from.d)
+    return months - 1
+  if (months < 0 && to.d > from.d)
+    return months + 1
 
   return months
 }
@@ -169,9 +173,12 @@ export function endOfMonth(date: PlainDate): PlainDate {
 
 /** `-1`, `0`, `1` — лексикографически по году, месяцу, дню. */
 export function comparePlainDates(left: PlainDate, right: PlainDate): -1 | 0 | 1 {
-  if (left.y !== right.y) return left.y < right.y ? -1 : 1
-  if (left.m !== right.m) return left.m < right.m ? -1 : 1
-  if (left.d !== right.d) return left.d < right.d ? -1 : 1
+  if (left.y !== right.y)
+    return left.y < right.y ? -1 : 1
+  if (left.m !== right.m)
+    return left.m < right.m ? -1 : 1
+  if (left.d !== right.d)
+    return left.d < right.d ? -1 : 1
   return 0
 }
 
@@ -189,13 +196,17 @@ export function isPlainDateWithin(
   min?: PlainDate,
   max?: PlainDate,
 ): boolean {
-  if (min && comparePlainDates(date, min) < 0) return false
-  if (max && comparePlainDates(date, max) > 0) return false
+  if (min && comparePlainDates(date, min) < 0)
+    return false
+  if (max && comparePlainDates(date, max) > 0)
+    return false
   return true
 }
 
 export function clampPlainDate(date: PlainDate, min?: PlainDate, max?: PlainDate): PlainDate {
-  if (min && comparePlainDates(date, min) < 0) return min
-  if (max && comparePlainDates(date, max) > 0) return max
+  if (min && comparePlainDates(date, min) < 0)
+    return min
+  if (max && comparePlainDates(date, max) > 0)
+    return max
   return date
 }

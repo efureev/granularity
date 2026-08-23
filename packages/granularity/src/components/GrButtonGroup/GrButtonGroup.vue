@@ -40,7 +40,6 @@ defineSlots<{
   /** Кнопки группы. */
   default?: () => any
 }>()
-
 </script>
 
 <template>

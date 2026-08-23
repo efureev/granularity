@@ -39,7 +39,7 @@ export function stubMatchMedia(options: StubMatchMediaOptions = {}): () => void 
   const { reducedMotion = false, matches = false } = options
   const original = window.matchMedia
 
-  window.matchMedia = ((query: string) => ({
+  window.matchMedia = (query: string) => ({
     media: query,
     matches: query.includes('prefers-reduced-motion') ? reducedMotion : matches,
     onchange: null,
@@ -48,7 +48,7 @@ export function stubMatchMedia(options: StubMatchMediaOptions = {}): () => void 
     addListener: () => {},
     removeListener: () => {},
     dispatchEvent: () => false,
-  }))
+  })
 
   return () => {
     window.matchMedia = original

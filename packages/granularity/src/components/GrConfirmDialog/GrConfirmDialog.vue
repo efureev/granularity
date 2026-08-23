@@ -145,8 +145,10 @@ const resolvedCloseOnEsc = computed(() => (softCloseBlocked.value ? false : prop
  * повод падать.
  */
 function focusAction(): void {
-  if (props.focusAction === 'confirm') confirmButtonRef.value?.focus()
-  else if (props.focusAction === 'cancel') cancelButtonRef.value?.focus()
+  if (props.focusAction === 'confirm')
+    confirmButtonRef.value?.focus()
+  else if (props.focusAction === 'cancel')
+    cancelButtonRef.value?.focus()
 }
 
 // Источник — не только `modelValue`, но и сами кнопки: содержимое панели
@@ -155,7 +157,8 @@ function focusAction(): void {
 watch(
   [() => props.modelValue, cancelButtonRef, confirmButtonRef],
   () => {
-    if (!props.modelValue || props.focusAction === 'none') return
+    if (!props.modelValue || props.focusAction === 'none')
+      return
     focusAction()
   },
   // `immediate`: окно могут смонтировать уже открытым — смены пропа тогда нет.
@@ -181,7 +184,6 @@ defineSlots<{
   /** Кнопки диалога вместо пары «отмена и подтверждение». */
   footer?: () => any
 }>()
-
 </script>
 
 <template>

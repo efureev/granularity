@@ -1113,7 +1113,7 @@ describe('GrTree — остановка Tab', () => {
  * потребителя, а его собственная приходит классом или компонентом.
  */
 describe('GrTree — иконки', () => {
-const CustomIcon = defineComponent({ name: 'CustomIcon', render: () => h('svg', { 'data-custom-icon': '' }) })
+  const CustomIcon = defineComponent({ name: 'CustomIcon', render: () => h('svg', { 'data-custom-icon': '' }) })
 
   it('без пропа рисует встроенную стрелку и встроенную ручку переноса', () => {
     const wrapper = mount(GrTree, { props: { data: tree(), nodeKey: 'id', draggable: true } })

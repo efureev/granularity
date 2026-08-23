@@ -225,7 +225,8 @@ function onAreaContextMenu(event: MouseEvent): void {
 
   if (isKeyboardContextMenu(event)) {
     const target = (document.activeElement as HTMLElement | null) ?? areaEl.value
-    if (target) openAtElement(target)
+    if (target)
+      openAtElement(target)
     return
   }
 
@@ -341,7 +342,6 @@ defineSlots<{
   /** Содержимое меню. */
   content?: (props: { close: () => void }) => any
 }>()
-
 </script>
 
 <template>

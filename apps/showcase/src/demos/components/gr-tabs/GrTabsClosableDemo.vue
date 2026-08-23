@@ -19,7 +19,8 @@ const currentTab = ref('index')
  */
 function close(value: string) {
   const index = tabs.value.findIndex(tab => tab.value === value)
-  if (index < 0) return
+  if (index < 0)
+    return
 
   tabs.value.splice(index, 1)
 

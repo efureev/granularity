@@ -88,7 +88,8 @@ describe('состав эмитов форм-контрола', () => {
   it.each(controls.map(control => [control.name, control.component] as const))(
     '%s объявляет clear, если у него есть clearable',
     (_name, component) => {
-      if (!declaredProps(component).includes('clearable')) return
+      if (!declaredProps(component).includes('clearable'))
+        return
 
       expect(declaredEmits(component)).toContain('clear')
     },

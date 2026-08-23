@@ -59,24 +59,28 @@ export function useEditableField<TCommit>(
   })
 
   function apply(): void {
-    if (draft.value === null) return
+    if (draft.value === null)
+      return
 
     const parsed = options.parse(draft.value)
-    if (parsed !== null) options.commit(parsed)
+    if (parsed !== null)
+      options.commit(parsed)
 
     // И при удаче, и при промахе черновик снимается: показывать надо модель.
     draft.value = null
   }
 
   function onInput(event: Event): void {
-    if (!options.editable() || options.locked()) return
+    if (!options.editable() || options.locked())
+      return
 
     const raw = (event.target as HTMLInputElement).value
     draft.value = options.mask ? options.mask(raw) : raw
   }
 
   function onBlur(): void {
-    if (!options.editable()) return
+    if (!options.editable())
+      return
     if (!options.applyOnBlur()) {
       draft.value = null
       return
@@ -86,7 +90,8 @@ export function useEditableField<TCommit>(
   }
 
   function handleKeydown(event: KeyboardEvent): boolean {
-    if (!options.editable()) return false
+    if (!options.editable())
+      return false
 
     if (event.key === 'Enter') {
       // Иначе форма отправится с текстом, который ещё не стал значением.

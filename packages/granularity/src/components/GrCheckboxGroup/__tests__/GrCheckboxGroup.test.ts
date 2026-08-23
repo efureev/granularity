@@ -130,9 +130,9 @@ describe('GrCheckboxGroup', () => {
     const Harness = defineComponent({
       render: () => h('form', { 'data-testid': 'form' }, [
         h(GrCheckboxGroup, {
-          'modelValue': ['sms', 'push'],
-          'name': 'channels',
-          'options': OPTIONS,
+          modelValue: ['sms', 'push'],
+          name: 'channels',
+          options: OPTIONS,
         }),
       ]),
     })

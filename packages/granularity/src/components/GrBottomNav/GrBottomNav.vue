@@ -107,8 +107,10 @@ const rootClass = computed(() => grBottomNavRootClass({
 const linkComponent = computed(() => (props.as && typeof props.as !== 'string' ? markRaw(props.as) : props.as))
 
 function itemTag(item: GrBottomNavItem): string | Component {
-  if (item.disabled) return 'span'
-  if (item.to !== undefined && linkComponent.value) return linkComponent.value
+  if (item.disabled)
+    return 'span'
+  if (item.to !== undefined && linkComponent.value)
+    return linkComponent.value
   return item.href ? 'a' : 'button'
 }
 
@@ -117,8 +119,10 @@ function itemTag(item: GrBottomNavItem): string | Component {
  * единицы измерения диктору ничего не сообщает.
  */
 function badgeLabel(item: GrBottomNavItem): string | undefined {
-  if (item.badge == null || item.badge === '') return undefined
-  if (item.badgeLabel) return item.badgeLabel
+  if (item.badge == null || item.badge === '')
+    return undefined
+  if (item.badgeLabel)
+    return item.badgeLabel
   if (typeof item.badge === 'number') {
     return t('gr.bottomNav.badge', '{count} new', { count: item.badge, n: item.badge })
   }
@@ -126,7 +130,8 @@ function badgeLabel(item: GrBottomNavItem): string | undefined {
 }
 
 function select(item: GrBottomNavItem): void {
-  if (item.disabled) return
+  if (item.disabled)
+    return
   emit('update:modelValue', item.value)
 }
 </script>

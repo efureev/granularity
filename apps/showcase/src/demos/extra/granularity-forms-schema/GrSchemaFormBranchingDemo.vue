@@ -30,10 +30,10 @@ const schema: JsonSchemaDocument = {
           properties: {
             kind: { const: 'pickup' },
             point: {
-              type: 'string',
-              enum: ['msk-sever', 'msk-yug', 'spb-centr'],
+              'type': 'string',
+              'enum': ['msk-sever', 'msk-yug', 'spb-centr'],
               'x-enumNames': ['Москва, Северный', 'Москва, Южный', 'Петербург, Центральный'],
-              title: 'Пункт выдачи',
+              'title': 'Пункт выдачи',
             },
           },
           required: ['point'],
@@ -46,10 +46,10 @@ const schema: JsonSchemaDocument = {
             kind: { const: 'courier' },
             address: { type: 'string', minLength: 5, title: 'Адрес' },
             slot: {
-              type: 'string',
-              enum: ['10-14', '14-18', '18-22'],
+              'type': 'string',
+              'enum': ['10-14', '14-18', '18-22'],
               'x-enumNames': ['10:00 — 14:00', '14:00 — 18:00', '18:00 — 22:00'],
-              title: 'Интервал',
+              'title': 'Интервал',
             },
           },
           required: ['address', 'slot'],

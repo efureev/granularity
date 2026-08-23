@@ -25,7 +25,8 @@ export function maxFileSize(options: MaxFileSizeOptions): FileValidator {
   const limits = [fromBytes, fromMb === undefined ? undefined : fromMb * 1024 * 1024]
     .filter((value): value is number => value !== undefined)
 
-  if (!limits.length) return () => []
+  if (!limits.length)
+    return () => []
 
   const maxBytes = Math.min(...limits)
 
@@ -33,7 +34,8 @@ export function maxFileSize(options: MaxFileSizeOptions): FileValidator {
     const issues: FileValidationIssue[] = []
 
     for (const file of files) {
-      if (file.size <= maxBytes) continue
+      if (file.size <= maxBytes)
+        continue
 
       issues.push({
         fileName: file.name,

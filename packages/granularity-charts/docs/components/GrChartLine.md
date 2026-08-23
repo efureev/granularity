@@ -112,7 +112,10 @@
 
 ```vue
 <GrChartLine v-model:x-window="window" :series="series" zoom="both" />
-<GrButton :disabled="window === null" @click="window = null">Весь ряд</GrButton>
+
+<GrButton :disabled="window === null" @click="window = null">
+Весь ряд
+</GrButton>
 ```
 
 Окно **выбирает данные**, а не обрезает рисунок: по нему считаются позиции,
@@ -144,8 +147,11 @@
 
 ```vue
 <GrChartLine :series="series" />                              <!-- auto: как нарисовано -->
+
 <GrChartLine :series="series" :data-table-max-rows="200" />   <!-- свой потолок -->
+
 <GrChartLine :series="series" :data-table-max-rows="Infinity" /> <!-- всегда полная -->
+
 <GrChartLine :series="series" data-table="off" />             <!-- таблицы нет вовсе -->
 ```
 

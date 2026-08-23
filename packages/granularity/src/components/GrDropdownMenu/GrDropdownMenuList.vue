@@ -31,7 +31,6 @@ defineSlots<{
   /** Пункты списка меню. */
   default?: () => any
 }>()
-
 </script>
 
 <template>

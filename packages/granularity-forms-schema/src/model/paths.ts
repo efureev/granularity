@@ -74,10 +74,12 @@ export function normalizeFieldPath(raw: string, options: NormalizeFieldPathOptio
 }
 
 export function getAtPath(value: unknown, path: string): unknown {
-  if (path === '') return value
+  if (path === '')
+    return value
 
   return splitPath(path).reduce<unknown>((acc, key) => {
-    if (acc && typeof acc === 'object') return (acc as Record<string, unknown>)[key]
+    if (acc && typeof acc === 'object')
+      return (acc as Record<string, unknown>)[key]
     return undefined
   }, value)
 }
@@ -92,7 +94,8 @@ export function getAtPath(value: unknown, path: string): unknown {
  */
 export function setAtPath(target: Record<string, unknown>, path: string, value: unknown): void {
   const segments = splitPath(path)
-  if (segments.length === 0) return
+  if (segments.length === 0)
+    return
 
   const last = segments.pop()!
   let cursor: Record<string, unknown> = target
@@ -113,12 +116,15 @@ export function setAtPath(target: Record<string, unknown>, path: string, value: 
 
 export function deleteAtPath(target: Record<string, unknown>, path: string): void {
   const segments = splitPath(path)
-  if (segments.length === 0) return
+  if (segments.length === 0)
+    return
 
   const last = segments.pop()!
   const parent = getAtPath(target, segments.join('.'))
-  if (!parent || typeof parent !== 'object') return
+  if (!parent || typeof parent !== 'object')
+    return
 
-  if (Array.isArray(parent) && isIndexSegment(last)) parent.splice(Number(last), 1)
+  if (Array.isArray(parent) && isIndexSegment(last))
+    parent.splice(Number(last), 1)
   else delete (parent as Record<string, unknown>)[last]
 }

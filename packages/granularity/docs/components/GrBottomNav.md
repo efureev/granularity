@@ -104,7 +104,10 @@
 
 ```vue
 <GrBottomNav v-model="section" :items="items" size="lg" />
-<GrConfigProvider size="sm">…</GrConfigProvider>
+
+<GrConfigProvider size="sm">
+…
+</GrConfigProvider>
 ```
 
 Ступень тянет три вещи сразу:

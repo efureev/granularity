@@ -135,7 +135,8 @@ const rowIds = new WeakMap<object, string>()
 let rowSeq = 0
 
 function rowKey(item: unknown, index: number): string {
-  if (item === null || typeof item !== 'object') return `index-${index}`
+  if (item === null || typeof item !== 'object')
+    return `index-${index}`
 
   let key = rowIds.get(item)
   if (!key) {
@@ -148,7 +149,8 @@ function rowKey(item: unknown, index: number): string {
 }
 
 function rowFields(index: number): GrSchemaFieldInstance[] {
-  if (!node.value) return []
+  if (!node.value)
+    return []
 
   return form?.fieldsOf(
     joinPath(arrayName.value, index),
@@ -159,8 +161,10 @@ function rowFields(index: number): GrSchemaFieldInstance[] {
 
 function labelOf(item: unknown, index: number): string {
   const template = props.itemLabel ?? props.ui?.itemLabel
-  if (typeof template === 'function') return template(item, index)
-  if (typeof template === 'string') return template.replace('{index}', String(index + 1))
+  if (typeof template === 'function')
+    return template(item, index)
+  if (typeof template === 'string')
+    return template.replace('{index}', String(index + 1))
 
   return t('grForms.array.itemLabel', 'Item {index}', { index: index + 1 })
 }
@@ -182,7 +186,8 @@ function writeRows(next: unknown[]): void {
 }
 
 function add(item?: unknown, at?: number): void {
-  if (!canAdd.value || !node.value) return
+  if (!canAdd.value || !node.value)
+    return
 
   const value = item
     ?? (typeof props.ui?.itemDefault === 'function' ? (props.ui.itemDefault as () => unknown)() : props.ui?.itemDefault)
@@ -207,7 +212,8 @@ function add(item?: unknown, at?: number): void {
 }
 
 function remove(index: number): void {
-  if (!canRemove.value) return
+  if (!canRemove.value)
+    return
 
   const item = rows.value[index]
 
@@ -232,8 +238,10 @@ function remove(index: number): void {
 }
 
 function move(from: number, to: number): void {
-  if (props.readonly || props.disabled) return
-  if (to < 0 || to >= rows.value.length || from === to) return
+  if (props.readonly || props.disabled)
+    return
+  if (to < 0 || to >= rows.value.length || from === to)
+    return
 
   form?.clearValidate(pathsFrom(Math.min(from, to)))
 

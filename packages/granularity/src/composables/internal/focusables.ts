@@ -31,13 +31,15 @@ const FOCUSABLE_SELECTOR = [
  * достаточно, чтобы тесты видели ту же логику, а не пустой список.
  */
 function isVisible(element: HTMLElement): boolean {
-  if (element.hidden) return false
+  if (element.hidden)
+    return false
 
   if (typeof element.checkVisibility === 'function')
     return element.checkVisibility({ contentVisibilityAuto: true, visibilityProperty: true })
 
   const style = element.ownerDocument.defaultView?.getComputedStyle(element)
-  if (!style) return true
+  if (!style)
+    return true
   return style.display !== 'none' && style.visibility !== 'hidden'
 }
 
@@ -47,15 +49,19 @@ function isInert(element: HTMLElement): boolean {
 }
 
 export function isFocusable(element: HTMLElement): boolean {
-  if (!element.matches(FOCUSABLE_SELECTOR)) return false
-  if (element.hasAttribute('disabled')) return false
-  if (element.getAttribute('aria-hidden') === 'true') return false
+  if (!element.matches(FOCUSABLE_SELECTOR))
+    return false
+  if (element.hasAttribute('disabled'))
+    return false
+  if (element.getAttribute('aria-hidden') === 'true')
+    return false
   return !isInert(element) && isVisible(element)
 }
 
 /** Участвует ли элемент в таб-порядке (`tabindex="-1"` — нет). */
 export function isTabbable(element: HTMLElement): boolean {
-  if (!isFocusable(element)) return false
+  if (!isFocusable(element))
+    return false
   return Number.parseInt(element.getAttribute('tabindex') ?? '0', 10) >= 0
 }
 
@@ -70,7 +76,8 @@ export function getFocusableElements(
   root: HTMLElement | null | undefined,
   options: { tabbableOnly?: boolean } = {},
 ): HTMLElement[] {
-  if (!root) return []
+  if (!root)
+    return []
 
   const tabbableOnly = options.tabbableOnly ?? true
   const matches = Array.from(root.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR))
@@ -94,8 +101,10 @@ export function getFocusableElementsIn(roots: (HTMLElement | null | undefined)[]
 
   return Array.from(unique).sort((left, right) => {
     const position = left.compareDocumentPosition(right)
-    if (position & Node.DOCUMENT_POSITION_FOLLOWING) return -1
-    if (position & Node.DOCUMENT_POSITION_PRECEDING) return 1
+    if (position & Node.DOCUMENT_POSITION_FOLLOWING)
+      return -1
+    if (position & Node.DOCUMENT_POSITION_PRECEDING)
+      return 1
     return 0
   })
 }

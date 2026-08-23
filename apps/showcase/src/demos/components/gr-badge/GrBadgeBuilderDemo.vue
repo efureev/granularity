@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {computed, ref} from 'vue'
+import { computed, ref } from 'vue'
 
 import {
   GrBadge,
@@ -23,27 +23,27 @@ const dark = ref(false)
 const uppercase = ref(false)
 
 const toneOptions = [
-  {value: 'neutral', label: 'Neutral'},
-  {value: 'primary', label: 'Primary'},
-  {value: 'info', label: 'Info'},
-  {value: 'success', label: 'Success'},
-  {value: 'warning', label: 'Warning'},
-  {value: 'danger', label: 'Danger'},
-  {value: 'slate', label: 'Slate'},
-  {value: 'azure', label: 'Azure'},
+  { value: 'neutral', label: 'Neutral' },
+  { value: 'primary', label: 'Primary' },
+  { value: 'info', label: 'Info' },
+  { value: 'success', label: 'Success' },
+  { value: 'warning', label: 'Warning' },
+  { value: 'danger', label: 'Danger' },
+  { value: 'slate', label: 'Slate' },
+  { value: 'azure', label: 'Azure' },
 ] satisfies Array<{ value: GrBadgeTone, label: string }>
 
 const sizeOptions = [
-  {value: 'xs', label: 'XS'},
-  {value: 'sm', label: 'SM'},
-  {value: 'md', label: 'MD'},
-  {value: 'lg', label: 'LG'},
+  { value: 'xs', label: 'XS' },
+  { value: 'sm', label: 'SM' },
+  { value: 'md', label: 'MD' },
+  { value: 'lg', label: 'LG' },
 ] satisfies Array<{ value: GrBadgeSize, label: string }>
 
 const radiusOptions = [
-  {value: 'square', label: 'Square'},
-  {value: 'semi', label: 'Semi'},
-  {value: 'round', label: 'Round'},
+  { value: 'square', label: 'Square' },
+  { value: 'semi', label: 'Semi' },
+  { value: 'round', label: 'Round' },
 ] satisfies Array<{ value: GrBadgeRadius, label: string }>
 
 const badgeText = computed(() => {

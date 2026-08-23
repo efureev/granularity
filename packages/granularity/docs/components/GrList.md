@@ -82,7 +82,9 @@
 
 ```vue
 <GrListItem title="Профиль" href="/settings/profile" />
+
 <GrListItem title="Выйти" clickable @click="signOut" />
+
 <GrListItem title="Раздел" :as="RouterLink" :to="{ name: 'section' }" />
 ```
 

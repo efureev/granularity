@@ -7,38 +7,38 @@ import type { App, Component, Directive, Plugin } from 'vue'
  * - объект с собственным `install`,
  * - либо объект `{ name, component }`, если имя нужно задать явно.
  */
-export type GranularityInstallableComponent =
-    | (Component & { name?: string; __name?: string; install?: (app: App) => void })
+export type GranularityInstallableComponent
+  = | (Component & { name?: string, __name?: string, install?: (app: App) => void })
     | { install: (app: App) => void }
-    | { name: string; component: Component }
+    | { name: string, component: Component }
 
 /**
  * Директива — либо пара `{ name, directive }`, либо объект с `install`.
  */
-export type GranularityInstallableDirective =
-    | { name: string; directive: Directive }
+export type GranularityInstallableDirective
+  = | { name: string, directive: Directive }
     | { install: (app: App) => void }
 
 export interface CreateGranularityOptions {
-    /**
-     * Список компонентов для глобальной регистрации.
-     * Пакет сам по себе ничего не импортирует — пользователь передаёт сюда только те компоненты,
-     * которые ему действительно нужны. За счёт этого tree-shaking остаётся полным.
-     */
-    components?: GranularityInstallableComponent[]
-    /**
-     * Список директив. Передавайте ровно те, что нужны, по аналогии с компонентами.
-     */
-    directives?: GranularityInstallableDirective[]
-    /**
-     * Произвольные `provide`-значения. Ключи могут быть `symbol` или строкой.
-     * Пакет не навязывает конкретные ключи (например, i18n) — выбор за пользователем.
-     */
-    provides?: Array<{ key: string | symbol; value: unknown }>
-    /**
-     * Произвольные `app.config.globalProperties` — по умолчанию ничего не ставим.
-     */
-    globalProperties?: Record<string, unknown>
+  /**
+   * Список компонентов для глобальной регистрации.
+   * Пакет сам по себе ничего не импортирует — пользователь передаёт сюда только те компоненты,
+   * которые ему действительно нужны. За счёт этого tree-shaking остаётся полным.
+   */
+  components?: GranularityInstallableComponent[]
+  /**
+   * Список директив. Передавайте ровно те, что нужны, по аналогии с компонентами.
+   */
+  directives?: GranularityInstallableDirective[]
+  /**
+   * Произвольные `provide`-значения. Ключи могут быть `symbol` или строкой.
+   * Пакет не навязывает конкретные ключи (например, i18n) — выбор за пользователем.
+   */
+  provides?: Array<{ key: string | symbol, value: unknown }>
+  /**
+   * Произвольные `app.config.globalProperties` — по умолчанию ничего не ставим.
+   */
+  globalProperties?: Record<string, unknown>
 }
 
 /**
@@ -53,62 +53,64 @@ export interface CreateGranularityOptions {
  * ```
  */
 export function defineInstallable<T extends Component>(component: T, name: string): GranularityInstallableComponent {
-    return {
-        install(app: App) {
-            app.component(name, component)
-        },
-    }
+  return {
+    install(app: App) {
+      app.component(name, component)
+    },
+  }
 }
 
 function installComponent(app: App, c: GranularityInstallableComponent): void {
-    if (typeof (c as any).install === 'function') {
-        ;(c as any).install(app)
-        return
-    }
+  if (typeof (c as any).install === 'function') {
+    ;(c as any).install(app)
+    return
+  }
 
-    // Форма `{ name, component }` — явное указание имени для произвольного компонента.
-    // Допускаем как object-компоненты (SFC / options), так и functional-компоненты.
-    if (
-        typeof (c as any).name === 'string'
-        && (c as any).component
-        && (typeof (c as any).component === 'object' || typeof (c as any).component === 'function')
-    ) {
-        const {name, component} = c as { name: string; component: Component }
-        app.component(name, component)
-        return
-    }
+  // Форма `{ name, component }` — явное указание имени для произвольного компонента.
+  // Допускаем как object-компоненты (SFC / options), так и functional-компоненты.
+  if (
+    typeof (c as any).name === 'string'
+    && (c as any).component
+    && (typeof (c as any).component === 'object' || typeof (c as any).component === 'function')
+  ) {
+    const { name, component } = c as { name: string, component: Component }
+    app.component(name, component)
+    return
+  }
 
-    // SFC: Vue 3 компилирует имя компонента из имени файла в поле `__name`
-    // (например, `GrButton.vue` → `__name: 'GrButton'`). Также поддерживаем явное `name`.
-    const resolvedName
-        = (c as Component & { name?: string }).name
-            ?? (c as { __name?: string }).__name
-    if (resolvedName) {
-        app.component(resolvedName, c as Component)
-        return
-    }
+  // SFC: Vue 3 компилирует имя компонента из имени файла в поле `__name`
+  // (например, `GrButton.vue` → `__name: 'GrButton'`). Также поддерживаем явное `name`.
+  const resolvedName
+    = (c as Component & { name?: string }).name
+      ?? (c as { __name?: string }).__name
+  if (resolvedName) {
+    app.component(resolvedName, c as Component)
+    return
+  }
 
-    // Сознательно без throw — просто сообщаем в dev-режиме.
-    if (!__GR_DEV__) return
+  // Сознательно без throw — просто сообщаем в dev-режиме.
+  if (!__GR_DEV__)
+    return
 
-    console.warn('[granularity] component passed to createGranularity has no `install`, `name`, or `__name` — skipped.')
+  console.warn('[granularity] component passed to createGranularity has no `install`, `name`, or `__name` — skipped.')
 }
 
 function installDirective(app: App, d: GranularityInstallableDirective): void {
-    if ('install' in d && typeof d.install === 'function') {
-        d.install(app)
-        return
-    }
+  if ('install' in d && typeof d.install === 'function') {
+    d.install(app)
+    return
+  }
 
-    if ('name' in d && 'directive' in d) {
-        app.directive(d.name, d.directive)
-        return
-    }
+  if ('name' in d && 'directive' in d) {
+    app.directive(d.name, d.directive)
+    return
+  }
 
-    // Сознательно без throw — согласовано с `installComponent`.
-    if (!__GR_DEV__) return
+  // Сознательно без throw — согласовано с `installComponent`.
+  if (!__GR_DEV__)
+    return
 
-    console.warn('[granularity] directive passed to createGranularity has no `install` or `{ name, directive }` — skipped.')
+  console.warn('[granularity] directive passed to createGranularity has no `install` or `{ name, directive }` — skipped.')
 }
 
 /**
@@ -116,19 +118,19 @@ function installDirective(app: App, d: GranularityInstallableDirective): void {
  * удобно, когда плагин не нужен (например, в тестах).
  */
 export function installGranularity(app: App, options: CreateGranularityOptions = {}): void {
-    for (const c of options.components ?? [])
-        installComponent(app, c)
+  for (const c of options.components ?? [])
+    installComponent(app, c)
 
-    for (const d of options.directives ?? [])
-        installDirective(app, d)
+  for (const d of options.directives ?? [])
+    installDirective(app, d)
 
-    for (const {key, value} of options.provides ?? [])
-        app.provide(key as any, value)
+  for (const { key, value } of options.provides ?? [])
+    app.provide(key as any, value)
 
-    if (options.globalProperties) {
-        for (const [key, value] of Object.entries(options.globalProperties))
-            app.config.globalProperties[key] = value
-    }
+  if (options.globalProperties) {
+    for (const [key, value] of Object.entries(options.globalProperties))
+      app.config.globalProperties[key] = value
+  }
 }
 
 /**
@@ -155,9 +157,9 @@ export function installGranularity(app: App, options: CreateGranularityOptions =
  * ```
  */
 export function createGranularity(options: CreateGranularityOptions = {}): Plugin {
-    return {
-        install(app: App) {
-            installGranularity(app, options)
-        },
-    }
+  return {
+    install(app: App) {
+      installGranularity(app, options)
+    },
+  }
 }

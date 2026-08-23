@@ -124,7 +124,9 @@ describe('useOverlayLayer: возврат фокуса', () => {
       setup() {
         const open = ref(false)
         const panel = ref<HTMLElement | null>(null)
-        useOverlayLayer(open, () => { open.value = false }, { root: panel })
+        useOverlayLayer(open, () => {
+          open.value = false
+        }, { root: panel })
         return { open, panel }
       },
       template: `

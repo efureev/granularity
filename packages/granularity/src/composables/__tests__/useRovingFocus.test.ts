@@ -373,7 +373,9 @@ describe('перенос фокуса', () => {
 
   it('асинхронный beforeFocus откладывает фокус до готовности — случай виртуализации', async () => {
     let resolve: (() => void) | undefined
-    const beforeFocus = vi.fn(() => new Promise<void>((r) => { resolve = r }))
+    const beforeFocus = vi.fn(() => new Promise<void>((r) => {
+      resolve = r
+    }))
     const { roving, focused, dispose } = setup(['a', 'b'], { beforeFocus })
 
     const pending = roving.focusKey('b')

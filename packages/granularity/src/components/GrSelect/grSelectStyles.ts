@@ -42,9 +42,9 @@ export type GrSelectOptionGroup<TValue extends GrSelectValue = string> = {
   options: GrSelectOption<TValue>[]
 }
 /** Элемент списка опций: либо одиночная опция, либо группа опций. */
-export type GrSelectOptionOrGroup<TValue extends GrSelectValue = string> =
-  | GrSelectOption<TValue>
-  | GrSelectOptionGroup<TValue>
+export type GrSelectOptionOrGroup<TValue extends GrSelectValue = string>
+  = | GrSelectOption<TValue>
+    | GrSelectOptionGroup<TValue>
 export type GrSelectModelValue<TValue extends GrSelectValue = string> = TValue | TValue[]
 
 export const defaultBaseClass = 'w-full rounded-[var(--gr-radius-control)] border bg-[var(--gr-bg)] text-[var(--gr-fg)] transition-colors duration-[var(--gr-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]'
@@ -67,7 +67,6 @@ export const borderClassByState: Record<GrSelectState, string> = {
  */
 export const invalidBorderClass = 'border-[var(--gr-invalid-brd)] focus-visible:ring-[var(--gr-invalid-ring)]'
 export const linkBaseClass = 'cursor-pointer inline-block w-auto align-baseline appearance-none bg-transparent border border-transparent px-0 py-0 rounded-[var(--gr-radius-control)] transition-colors duration-[var(--gr-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]'
-
 
 export const selectSizeClassBySize: Record<GrSelectSize, string> = {
   xs: 'h-7 px-2.5 text-[length:var(--gr-control-text-xs)] leading-[var(--gr-control-leading-xs)]',
@@ -113,9 +112,12 @@ export const selectLinkNativeLabelVariantClassByVariant: Record<GrSelectVariant,
 }
 
 function selectLinkUnderlineClass(options: { underline: GrSelectUnderline, disabled: boolean }): string {
-  if (options.disabled) return 'no-underline'
-  if (options.underline === 'always') return 'underline underline-offset-4'
-  if (options.underline === 'none') return 'no-underline'
+  if (options.disabled)
+    return 'no-underline'
+  if (options.underline === 'always')
+    return 'underline underline-offset-4'
+  if (options.underline === 'none')
+    return 'no-underline'
   return 'no-underline hover:underline hover:underline-offset-4'
 }
 
@@ -126,9 +128,12 @@ function selectLinkUnderlineClass(options: { underline: GrSelectUnderline, disab
  * `peer-hover:underline` вместо `hover:underline`.
  */
 function selectLinkNativeLabelUnderlineClass(options: { underline: GrSelectUnderline, disabled: boolean }): string {
-  if (options.disabled) return 'no-underline'
-  if (options.underline === 'always') return 'underline underline-offset-4'
-  if (options.underline === 'none') return 'no-underline'
+  if (options.disabled)
+    return 'no-underline'
+  if (options.underline === 'always')
+    return 'underline underline-offset-4'
+  if (options.underline === 'none')
+    return 'no-underline'
   return 'no-underline peer-hover:underline peer-hover:underline-offset-4'
 }
 

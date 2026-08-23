@@ -250,7 +250,7 @@ function renderTs({ foundation, derived, themes, components }) {
   return [
     GENERATED_BANNER_TS,
     '',
-    "import type { GrComponentToken, GrDerivedToken, GrFoundationToken, GrThemeToken } from './types'",
+    'import type { GrComponentToken, GrDerivedToken, GrFoundationToken, GrThemeToken } from \'./types\'',
     '',
     `export const grThemeNames = ${literal(themes.map(theme => theme.name))} as const`,
     '',

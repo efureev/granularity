@@ -56,8 +56,13 @@ describe('первый день недели', () => {
     const grid = august2026({ firstDayOfWeek: 1 })
 
     expect(grid.weeks[0]!.days.map(cell => cell.key)).toEqual([
-      '2026-07-27', '2026-07-28', '2026-07-29', '2026-07-30',
-      '2026-07-31', '2026-08-01', '2026-08-02',
+      '2026-07-27',
+      '2026-07-28',
+      '2026-07-29',
+      '2026-07-30',
+      '2026-07-31',
+      '2026-08-01',
+      '2026-08-02',
     ])
   })
 
@@ -141,7 +146,8 @@ describe('номера недель', () => {
     // Декабрь 2026: последние дни года по ISO принадлежат 53-й неделе, а
     // 28 декабря начинается уже первая неделя 2027-го.
     const numbers = buildCalendarGrid({ year: 2026, month: 11, firstDayOfWeek: 1 })
-      .weeks.map(week => week.weekNumber)
+      .weeks
+      .map(week => week.weekNumber)
 
     expect(numbers).toEqual([49, 50, 51, 52, 53, 1])
   })

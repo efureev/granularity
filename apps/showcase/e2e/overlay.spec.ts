@@ -154,7 +154,8 @@ test.describe('панель автокомплита', () => {
 
     const input = inputs.first()
     await expect.poll(async () => {
-      if (await input.getAttribute('aria-expanded') !== 'true') await input.click()
+      if (await input.getAttribute('aria-expanded') !== 'true')
+        await input.click()
       return input.getAttribute('aria-expanded')
     }).toBe('true')
 
@@ -215,7 +216,8 @@ test.describe('панель селекта', () => {
 
     const trigger = triggers.first()
     await expect.poll(async () => {
-      if (await trigger.getAttribute('aria-expanded') !== 'true') await trigger.click()
+      if (await trigger.getAttribute('aria-expanded') !== 'true')
+        await trigger.click()
       return trigger.getAttribute('aria-expanded')
     }).toBe('true')
 
@@ -424,7 +426,8 @@ test.describe('панель поверх окна', () => {
 
     return locator.page().evaluate(({ x, y }) => {
       const element = document.elementFromPoint(x, y)
-      if (!element) return 'ничего'
+      if (!element)
+        return 'ничего'
 
       const panel = element.closest('[data-gr-select-panel], [data-gr-popover-panel], [data-gr-date-picker-panel]')
       return panel ? 'панель' : (element.closest('[data-gr-modal-panel]') ? 'окно' : 'страница')

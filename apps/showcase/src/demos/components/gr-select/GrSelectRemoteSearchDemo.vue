@@ -26,7 +26,8 @@ async function fetchOptions(search: string): Promise<void> {
   loading.value = true
 
   await new Promise(resolve => setTimeout(resolve, 400))
-  if (id !== requestId) return
+  if (id !== requestId)
+    return
 
   options.value = CATALOG.filter(option => option.label.toLowerCase().includes(search.trim().toLowerCase()))
   loading.value = false

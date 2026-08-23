@@ -13,7 +13,8 @@ beforeEach(() => {
 /** Прогон идёт в `America/New_York` — зоне с переводом часов (см. `setup.ts`). */
 function at(iso: string): Date {
   const match = /^(\d{4})-(\d{2})-(\d{2})(?:[T ](\d{2}):(\d{2})(?::(\d{2}))?)?$/.exec(iso)
-  if (!match) throw new Error(`не разобрал ${iso}`)
+  if (!match)
+    throw new Error(`не разобрал ${iso}`)
 
   const [, y, m, d, h, min, s] = match as unknown as [string, string, string, string?, string?, string?, string?]
 

@@ -41,7 +41,8 @@ const flat = computed(() => {
   const result: TreeItem[] = []
   const walk = (items: TreeItem[]) => items.forEach((item) => {
     result.push(item)
-    if (item.children) walk(item.children)
+    if (item.children)
+      walk(item.children)
   })
   walk(treeData)
 

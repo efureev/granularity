@@ -191,22 +191,22 @@ const className = computed(() => [
 // Обе ветки шаблона (со счётчиком и без) рендерят одно и то же поле, поэтому
 // атрибуты живут одним объектом: двадцать строк копипасты расходятся молча.
 const textareaAttrs = computed(() => ({
-  id: resolvedId.value,
+  'id': resolvedId.value,
   'data-gr-textarea': '',
-  name: props.name,
-  rows: props.rows,
-  maxlength: props.maxlength,
-  autocomplete: props.autocomplete,
-  placeholder: props.placeholder,
-  disabled: isDisabled.value,
-  value: props.modelValue,
+  'name': props.name,
+  'rows': props.rows,
+  'maxlength': props.maxlength,
+  'autocomplete': props.autocomplete,
+  'placeholder': props.placeholder,
+  'disabled': isDisabled.value,
+  'value': props.modelValue,
   'aria-invalid': isInvalid.value ? ('true' as const) : undefined,
   'aria-describedby': describedBy.value,
   'aria-required': isRequired.value ? ('true' as const) : undefined,
   'aria-readonly': isReadonly.value ? ('true' as const) : undefined,
   'aria-label': props.ariaLabel,
-  readonly: isReadonly.value,
-  class: [baseClass, className.value],
+  'readonly': isReadonly.value,
+  'class': [baseClass, className.value],
 }))
 
 function onInput(e: Event): void {

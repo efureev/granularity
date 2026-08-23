@@ -32,7 +32,8 @@ export type ParsedCommandHotkey = {
 export function parseCommandHotkey(combo: string): ParsedCommandHotkey | null {
   const parts = combo.split('+').map(p => p.trim()).filter(Boolean)
   const keyToken = parts.at(-1)
-  if (!keyToken) return null
+  if (!keyToken)
+    return null
 
   const parsed: ParsedCommandHotkey = {
     key: keyToken.length === 1 ? keyToken.toLowerCase() : keyToken,
@@ -45,11 +46,16 @@ export function parseCommandHotkey(combo: string): ParsedCommandHotkey | null {
 
   for (const part of parts.slice(0, -1)) {
     const token = part.toLowerCase()
-    if (token === 'mod') parsed.mod = true
-    else if (token === 'ctrl' || token === 'control') parsed.ctrl = true
-    else if (token === 'meta' || token === 'cmd' || token === 'command' || token === '⌘') parsed.meta = true
-    else if (token === 'alt' || token === 'option') parsed.alt = true
-    else if (token === 'shift') parsed.shift = true
+    if (token === 'mod')
+      parsed.mod = true
+    else if (token === 'ctrl' || token === 'control')
+      parsed.ctrl = true
+    else if (token === 'meta' || token === 'cmd' || token === 'command' || token === '⌘')
+      parsed.meta = true
+    else if (token === 'alt' || token === 'option')
+      parsed.alt = true
+    else if (token === 'shift')
+      parsed.shift = true
   }
 
   return parsed
@@ -61,15 +67,20 @@ export function matchesCommandHotkey(
   apple = isAppleDevice(),
 ): boolean {
   // Клавиша во время IME-композиции принадлежит композиции, а не сочетанию.
-  if (isComposingEvent(event)) return false
+  if (isComposingEvent(event))
+    return false
 
   const expectMeta = hotkey.meta || (hotkey.mod && apple)
   const expectCtrl = hotkey.ctrl || (hotkey.mod && !apple)
 
-  if (event.metaKey !== expectMeta) return false
-  if (event.ctrlKey !== expectCtrl) return false
-  if (event.altKey !== hotkey.alt) return false
-  if (!shiftSatisfied(event, hotkey.key, hotkey.shift)) return false
+  if (event.metaKey !== expectMeta)
+    return false
+  if (event.ctrlKey !== expectCtrl)
+    return false
+  if (event.altKey !== hotkey.alt)
+    return false
+  if (!shiftSatisfied(event, hotkey.key, hotkey.shift))
+    return false
 
   // Комбинация с модификаторами матчится и по физическому коду: на нелатинской
   // раскладке `mod+K` приходит как `key: 'л'`, и без кода сочетание мертво.
@@ -81,10 +92,14 @@ export function matchesCommandHotkey(
 /** Человекочитаемые клавиши для подсказки в поле ввода (`⌘` / `Ctrl`). */
 export function formatCommandHotkey(hotkey: ParsedCommandHotkey, apple = isAppleDevice()): string[] {
   const keys: string[] = []
-  if (hotkey.meta || (hotkey.mod && apple)) keys.push('⌘')
-  if (hotkey.ctrl || (hotkey.mod && !apple)) keys.push('Ctrl')
-  if (hotkey.alt) keys.push(apple ? '⌥' : 'Alt')
-  if (hotkey.shift) keys.push(apple ? '⇧' : 'Shift')
+  if (hotkey.meta || (hotkey.mod && apple))
+    keys.push('⌘')
+  if (hotkey.ctrl || (hotkey.mod && !apple))
+    keys.push('Ctrl')
+  if (hotkey.alt)
+    keys.push(apple ? '⌥' : 'Alt')
+  if (hotkey.shift)
+    keys.push(apple ? '⇧' : 'Shift')
   keys.push(hotkey.key.length === 1 ? hotkey.key.toUpperCase() : hotkey.key)
   return keys
 }
@@ -96,7 +111,8 @@ export function formatCommandHotkey(hotkey: ParsedCommandHotkey, apple = isApple
  */
 export function formatHotkeyToken(token: string, apple: boolean): HotkeyKeyView {
   const spec = findKbdToken(token)
-  if (spec) return apple ? spec.apple : spec.other
+  if (spec)
+    return apple ? spec.apple : spec.other
 
   // Не из каталога — печатная клавиша: одиночный символ заглавным, потому что
   // `k` и `K` на клавише выглядят одинаково.

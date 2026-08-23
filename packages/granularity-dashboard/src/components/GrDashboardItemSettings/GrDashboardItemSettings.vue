@@ -112,7 +112,8 @@ const maxHeight = computed(() => {
 watch(
   () => [props.modelValue, props.itemId, item.value?.w, item.value?.h] as const,
   () => {
-    if (!props.modelValue) return
+    if (!props.modelValue)
+      return
 
     width.value = item.value?.w ?? null
     height.value = item.value?.h ?? null
@@ -121,7 +122,8 @@ watch(
 )
 
 watch(() => props.modelValue, (open) => {
-  if (!open) refused.value = false
+  if (!open)
+    refused.value = false
 })
 
 const dialogTitle = computed(() => props.title ?? t('grDashboard.settings.title', 'Widget settings'))
@@ -131,7 +133,8 @@ function close(): void {
 }
 
 function cancel(): void {
-  if (props.itemId !== null) emit('cancel', props.itemId)
+  if (props.itemId !== null)
+    emit('cancel', props.itemId)
 
   close()
 }

@@ -15,7 +15,9 @@ function dropClipboard(): void {
   Object.defineProperty(navigator, 'clipboard', { value: undefined, configurable: true })
 }
 
-afterEach(() => { dropClipboard() })
+afterEach(() => {
+  dropClipboard()
+})
 
 const SAMPLE = {
   id: 'run_01',
@@ -79,7 +81,9 @@ describe('GrJsonViewer — поиск', () => {
 })
 
 describe('GrJsonViewer — копирование', () => {
-  beforeEach(() => { dropClipboard() })
+  beforeEach(() => {
+    dropClipboard()
+  })
 
   // Молча не работающая кнопка хуже её отсутствия.
   it('без буфера кнопок копирования нет', async () => {

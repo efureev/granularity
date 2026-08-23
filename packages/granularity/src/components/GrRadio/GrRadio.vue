@@ -178,8 +178,10 @@ function onButtonClick(): void {
 // Паттерн radiogroup: группа — одна остановка Tab, внутрь попадают стрелками.
 // Вне группы (одиночный `GrRadio`) переключатель остаётся обычной остановкой.
 const rovingTabindex = computed(() => {
-  if (resolvedDisabled.value) return -1
-  if (!group) return 0
+  if (resolvedDisabled.value)
+    return -1
+  if (!group)
+    return 0
   return group.rovingValue.value === props.value ? 0 : -1
 })
 
@@ -187,7 +189,8 @@ const rootEl = ref<HTMLElement | null>(null)
 
 /** Кольцо ведёт группа: только она знает состав и порядок. */
 function onKeydown(event: KeyboardEvent): void {
-  if (!group || resolvedDisabled.value) return
+  if (!group || resolvedDisabled.value)
+    return
 
   group.handleNavigationKeys(event)
 }
@@ -206,7 +209,6 @@ defineSlots<{
   /** Пояснение под подписью. */
   description?: () => any
 }>()
-
 </script>
 
 <template>

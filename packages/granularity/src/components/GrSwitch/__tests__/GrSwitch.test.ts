@@ -111,7 +111,7 @@ describe('GrSwitch — нативная форма', () => {
   it('атрибуты потребителя садятся на кнопку, а не теряются во фрагменте', () => {
     const wrapper = mount(GrSwitch, {
       props: { modelValue: true, name: 'x' },
-      attrs: { class: 'my-switch', 'data-test': 'toggle' },
+      attrs: { 'class': 'my-switch', 'data-test': 'toggle' },
     })
     const button = wrapper.get('[role="switch"]')
 
@@ -220,11 +220,13 @@ describe('GrSwitch — геометрия бегунка', () => {
   /** `h-6` → 24, `w-11` → 44, `translate-x-[21px]` → 21. */
   function pixels(className: string, prefix: 'h-' | 'w-' | 'translate-x-'): number {
     const token = className.split(' ').find(part => part.startsWith(prefix))
-    if (!token) throw new Error(`нет класса ${prefix}* в «${className}»`)
+    if (!token)
+      throw new Error(`нет класса ${prefix}* в «${className}»`)
 
     const value = token.slice(prefix.length)
     const arbitrary = value.match(/^\[(\d+(?:\.\d+)?)px\]$/)
-    if (arbitrary) return Number.parseFloat(arbitrary[1])
+    if (arbitrary)
+      return Number.parseFloat(arbitrary[1])
 
     // Шкала Uno: 1 = 0.25rem = 4px.
     return Number.parseFloat(value) * 4

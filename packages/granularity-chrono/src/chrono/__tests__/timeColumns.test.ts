@@ -5,7 +5,8 @@ import { plainTime } from '../plainTime'
 
 function column(columns: ReturnType<typeof buildTimeColumns>, unit: string) {
   const found = columns.find(item => item.unit === unit)
-  if (!found) throw new Error(`нет колонки ${unit}`)
+  if (!found)
+    throw new Error(`нет колонки ${unit}`)
 
   return found
 }

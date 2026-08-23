@@ -63,7 +63,8 @@ export function usePointerGestures(options: UsePointerGesturesOptions) {
   }
 
   function activePair(): [TrackedPointer, TrackedPointer] | null {
-    if (pointers.size < 2) return null
+    if (pointers.size < 2)
+      return null
     const [first, second] = [...pointers.values()]
     return [first, second]
   }
@@ -104,7 +105,8 @@ export function usePointerGestures(options: UsePointerGesturesOptions) {
     const pair = activePair()
     if (pair && isPinching.value) {
       const current = distance(pair[0], pair[1])
-      if (!current) return
+      if (!current)
+        return
 
       options.setScaleAt(pinchStartScale * (current / pinchStartDistance), midpoint(pair[0], pair[1]))
       return
@@ -122,10 +124,13 @@ export function usePointerGestures(options: UsePointerGesturesOptions) {
 
     // Вертикальное движение — это скролл или случайное дрожание, листать по
     // нему нельзя: пользователь целился не туда.
-    if (Math.abs(deltaX) < SWIPE_THRESHOLD_PX) return
-    if (Math.abs(deltaX) < Math.abs(deltaY) * SWIPE_AXIS_RATIO) return
+    if (Math.abs(deltaX) < SWIPE_THRESHOLD_PX)
+      return
+    if (Math.abs(deltaX) < Math.abs(deltaY) * SWIPE_AXIS_RATIO)
+      return
 
-    if (deltaX < 0) options.onSwipeLeft()
+    if (deltaX < 0)
+      options.onSwipeLeft()
     else options.onSwipeRight()
   }
 
@@ -140,7 +145,8 @@ export function usePointerGestures(options: UsePointerGesturesOptions) {
       isPinching.value = false
       // Оставшийся палец продолжает жест уже как перетаскивание.
       const [remaining] = [...pointers.values()]
-      if (remaining && options.scale() > 1) options.pan.start(remaining.x, remaining.y)
+      if (remaining && options.scale() > 1)
+        options.pan.start(remaining.x, remaining.y)
       return
     }
 

@@ -17,7 +17,8 @@ export function useEntityI18nBlock(blockName: Ref<string | null>): void {
   let active: string | null = null
 
   function setActive(next: string | null): void {
-    if (next === active) return
+    if (next === active)
+      return
 
     const previous = active
     active = next

@@ -24,8 +24,10 @@ const manifest = JSON.parse(readFileSync(join(packageDir, 'package.json'), 'utf8
 
 /** Все пути значения записи: строка, либо объект с условиями. */
 function targetsOf(value) {
-  if (typeof value === 'string') return [value]
-  if (!value || typeof value !== 'object') return []
+  if (typeof value === 'string')
+    return [value]
+  if (!value || typeof value !== 'object')
+    return []
 
   return Object.values(value).flatMap(targetsOf)
 }
@@ -38,7 +40,8 @@ function targetsOf(value) {
 function patternMatches(target) {
   const [head, tail] = target.split('*')
   const dir = join(packageDir, head.endsWith('/') ? head : dirname(head))
-  if (!existsSync(dir)) return false
+  if (!existsSync(dir))
+    return false
 
   const prefix = head.endsWith('/') ? '' : head.slice(head.lastIndexOf('/') + 1)
 
@@ -53,7 +56,8 @@ for (const [key, value] of Object.entries(manifest.exports ?? {})) {
       ? patternMatches(target)
       : existsSync(join(packageDir, target))
 
-    if (!ok) missing.push(`${key} → ${target}`)
+    if (!ok)
+      missing.push(`${key} → ${target}`)
   }
 }
 

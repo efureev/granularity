@@ -20,7 +20,8 @@ let searchTimer: ReturnType<typeof setTimeout> | null = null
 // Имитация похода на сервер: палитра не фильтрует сама (`:filterable="false"`),
 // список приходит снаружи.
 function onSearch(query: string): void {
-  if (searchTimer) clearTimeout(searchTimer)
+  if (searchTimer)
+    clearTimeout(searchTimer)
 
   if (!query) {
     loading.value = false

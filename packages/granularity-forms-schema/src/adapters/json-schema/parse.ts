@@ -64,7 +64,8 @@ function resolveRef(ref: string, ctx: ParseContext, path: string): JsonSchemaDoc
 
 /** Сливает `allOf` в один документ: ограничения складываются, `required` объединяется. */
 function mergeAllOf(document: JsonSchemaDocument, ctx: ParseContext, path: string): JsonSchemaDocument {
-  if (!document.allOf || document.allOf.length === 0) return document
+  if (!document.allOf || document.allOf.length === 0)
+    return document
 
   const merged: JsonSchemaDocument = { ...document }
   delete merged.allOf
@@ -77,8 +78,10 @@ function mergeAllOf(document: JsonSchemaDocument, ctx: ParseContext, path: strin
     merged.required = [...new Set([...(merged.required ?? []), ...(flattened.required ?? [])])]
 
     for (const [key, value] of Object.entries(flattened)) {
-      if (key === 'properties' || key === 'required') continue
-      if (merged[key] === undefined) merged[key] = value
+      if (key === 'properties' || key === 'required')
+        continue
+      if (merged[key] === undefined)
+        merged[key] = value
     }
   }
 
@@ -114,26 +117,37 @@ function readConstraints(document: JsonSchemaDocument, kind: GrSchemaKind): GrSc
   const constraints: GrSchemaConstraints = {}
 
   if (kind === 'string') {
-    if (document.minLength !== undefined) constraints.min = document.minLength
-    if (document.maxLength !== undefined) constraints.max = document.maxLength
-    if (document.pattern) constraints.pattern = document.pattern
+    if (document.minLength !== undefined)
+      constraints.min = document.minLength
+    if (document.maxLength !== undefined)
+      constraints.max = document.maxLength
+    if (document.pattern)
+      constraints.pattern = document.pattern
   }
 
   if (kind === 'number') {
-    if (document.minimum !== undefined) constraints.min = document.minimum
-    if (document.maximum !== undefined) constraints.max = document.maximum
-    if (document.multipleOf !== undefined) constraints.step = document.multipleOf
-    if (document.type === 'integer') constraints.integer = true
+    if (document.minimum !== undefined)
+      constraints.min = document.minimum
+    if (document.maximum !== undefined)
+      constraints.max = document.maximum
+    if (document.multipleOf !== undefined)
+      constraints.step = document.multipleOf
+    if (document.type === 'integer')
+      constraints.integer = true
 
     // Draft 4 писал `exclusiveMinimum: true` рядом с `minimum`; свежие драфты —
     // числом. Обе формы живы в реальных схемах, обе поддерживаем.
-    if (typeof document.exclusiveMinimum === 'number') constraints.exclusiveMin = document.exclusiveMinimum
+    if (typeof document.exclusiveMinimum === 'number') {
+      constraints.exclusiveMin = document.exclusiveMinimum
+    }
     else if (document.exclusiveMinimum === true && document.minimum !== undefined) {
       constraints.exclusiveMin = document.minimum
       delete constraints.min
     }
 
-    if (typeof document.exclusiveMaximum === 'number') constraints.exclusiveMax = document.exclusiveMaximum
+    if (typeof document.exclusiveMaximum === 'number') {
+      constraints.exclusiveMax = document.exclusiveMaximum
+    }
     else if (document.exclusiveMaximum === true && document.maximum !== undefined) {
       constraints.exclusiveMax = document.maximum
       delete constraints.max
@@ -141,16 +155,20 @@ function readConstraints(document: JsonSchemaDocument, kind: GrSchemaKind): GrSc
   }
 
   if (kind === 'array') {
-    if (document.minItems !== undefined) constraints.min = document.minItems
-    if (document.maxItems !== undefined) constraints.max = document.maxItems
-    if (document.uniqueItems) constraints.uniqueItems = true
+    if (document.minItems !== undefined)
+      constraints.min = document.minItems
+    if (document.maxItems !== undefined)
+      constraints.max = document.maxItems
+    if (document.uniqueItems)
+      constraints.uniqueItems = true
   }
 
   return constraints
 }
 
 function readAnnotations(document: JsonSchemaDocument, prefix: string | false): Record<string, unknown> | undefined {
-  if (prefix === false) return undefined
+  if (prefix === false)
+    return undefined
 
   const entries = Object.entries(document).filter(([key]) => key.startsWith(prefix))
   return entries.length > 0 ? Object.fromEntries(entries) : undefined
@@ -170,7 +188,8 @@ function hasResidual(document: JsonSchemaDocument): boolean {
  */
 function inferDiscriminator(variants: GrSchemaObjectNode[]): string | undefined {
   const first = variants[0]
-  if (!first) return undefined
+  if (!first)
+    return undefined
 
   return first.fields.find(field => field.const !== undefined
     && variants.every(variant => variant.fields.some(other => other.key === field.key && other.const !== undefined)),
@@ -199,7 +218,8 @@ function parseNode(
     }
 
     const resolved = resolveRef(document.$ref, ctx, path)
-    if (!resolved) return unknownNode(key, path, required)
+    if (!resolved)
+      return unknownNode(key, path, required)
 
     ctx.refStack.push(document.$ref)
     try {
@@ -285,7 +305,8 @@ function parseNode(
       variants,
     }
 
-    if (unionIsResolved(union)) return union
+    if (unionIsResolved(union))
+      return union
 
     ctx.warnings.push({
       path,
@@ -349,9 +370,12 @@ function stripRef(document: JsonSchemaDocument): JsonSchemaDocument {
 
 /** Тип не объявлен — выводим из присутствующих ключей. */
 function inferKind(document: JsonSchemaDocument): GrSchemaKind {
-  if (document.properties) return 'object'
-  if (document.items || document.prefixItems) return 'array'
-  if (document.enum || document.const !== undefined) return 'string'
+  if (document.properties)
+    return 'object'
+  if (document.items || document.prefixItems)
+    return 'array'
+  if (document.enum || document.const !== undefined)
+    return 'string'
   return 'unknown'
 }
 

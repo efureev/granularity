@@ -12,7 +12,8 @@ function hasOverlap(layout: GrDashboardLayout): boolean {
 /** Есть ли виджет, который может сдвинуться на ячейку к началу оси. */
 function canFloat(layout: GrDashboardLayout, axis: 'x' | 'y'): boolean {
   return layout.some((item) => {
-    if (item.static || item[axis] === 0) return false
+    if (item.static || item[axis] === 0)
+      return false
 
     const moved = axis === 'x' ? { ...item, x: item.x - 1 } : { ...item, y: item.y - 1 }
 

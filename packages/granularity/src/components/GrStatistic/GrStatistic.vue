@@ -192,7 +192,6 @@ const rootHref = computed(() => (
 
 const rootClass = computed(() => statisticRootClass({ interactive: isInteractive.value }))
 
-
 function toNumber(value: number | string): number | null {
   const numeric = typeof value === 'number' ? value : Number(value)
   return Number.isFinite(numeric) ? numeric : null
@@ -201,7 +200,8 @@ function toNumber(value: number | string): number | null {
 let frameHandle: number | null = null
 
 function stopCounting(): void {
-  if (frameHandle !== null) cancelAnimationFrame(frameHandle)
+  if (frameHandle !== null)
+    cancelAnimationFrame(frameHandle)
   frameHandle = null
 }
 
@@ -291,7 +291,8 @@ const affixStyle = computed(() => ({ '--gr-value-suffix-size': statisticAffixSiz
  * нуля, и цвет плитки мигал бы нейтральным на каждой анимации.
  */
 const resolvedTone = computed<GrStatisticTone>(() => {
-  if (props.tone !== undefined) return props.tone
+  if (props.tone !== undefined)
+    return props.tone
 
   const numeric = toNumber(props.value)
 
@@ -308,7 +309,8 @@ const trendIconByTrend: Record<GrStatisticTrend, Component> = {
 // Иконка направления `aria-hidden`, а «+12,5 %» само по себе рост от падения не
 // отличает: направление доносит скрытая подпись.
 const trendLabel = computed(() => {
-  if (!props.trend) return undefined
+  if (!props.trend)
+    return undefined
 
   const labels = {
     up: () => t('gr.statistic.trendUp', 'Increase'),
@@ -333,7 +335,6 @@ defineSlots<{
   /** Динамика под значением вместо встроенного `GrDelta`. */
   trend?: () => any
 }>()
-
 </script>
 
 <template>

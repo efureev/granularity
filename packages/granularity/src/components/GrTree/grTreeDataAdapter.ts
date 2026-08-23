@@ -66,17 +66,18 @@ export function createGrTreeDataAdapter<T extends Record<string, any> = any>(
 
   function ensureChildren(data: T): T[] {
     const key = getChildrenKey()
-    const value = (data as Record<string, unknown>)[key]
-    if (Array.isArray(value))
-      return value as T[]
+    const record = data as Record<string, unknown>
+    if (Array.isArray(record[key])) {
+      return record[key] as T[]
+    }
 
-    ;(data as Record<string, unknown>)[key] = []
+    record[key] = []
 
     // Читаем обратно, а не возвращаем только что созданный массив: у
     // реактивных данных чтение отдаёт прокси, и только запись через него
     // видна дереву. Иначе `push` уходит мимо реактивности, и добавленные
     // дети не появляются на экране.
-    return (data as Record<string, unknown>)[key] as T[]
+    return record[key] as T[]
   }
 
   function getExplicitNodeKey(data: T): GrTreeKey | undefined {

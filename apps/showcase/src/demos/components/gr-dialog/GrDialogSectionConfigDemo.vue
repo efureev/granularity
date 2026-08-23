@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import {ref} from 'vue'
+import { ref } from 'vue'
 
-import {GrButton, GrDialog, GrCheckbox} from '@feugene/granularity'
+import { GrButton, GrDialog, GrCheckbox } from '@feugene/granularity'
 
 const open = ref(false)
 const confirmed = ref(false)

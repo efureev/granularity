@@ -43,8 +43,10 @@ const iconComponent = computed(() => (props.icon && typeof props.icon !== 'strin
 const firstLetter = computed(() => props.label.trim().charAt(0).toUpperCase() || '•')
 
 const rootTag = computed<string | Component>(() => {
-  if (props.disabled) return 'span'
-  if (props.as) return typeof props.as === 'string' ? props.as : markRaw(props.as)
+  if (props.disabled)
+    return 'span'
+  if (props.as)
+    return typeof props.as === 'string' ? props.as : markRaw(props.as)
   return props.href ? 'a' : 'button'
 })
 

@@ -128,7 +128,6 @@ defineSlots<{
   text?: (props: { value: number }) => any
 }>()
 
-
 const { t } = useGranularityTranslations()
 
 // Контекст `GrFormField`: id/aria-describedby/invalid/required как fallback.
@@ -136,7 +135,10 @@ const field = useGrFormFieldContext()
 const resolvedId = computed(() => field?.id.value)
 const {
   disabled: isDisabled,
-  invalid: isInvalid, required: isRequired, readonly: isReadonly } = useGrFormControl(() => props)
+  invalid: isInvalid,
+  required: isRequired,
+  readonly: isReadonly,
+} = useGrFormControl(() => props)
 const describedBy = computed(() => field?.describedById.value)
 
 const rootEl = ref<HTMLElement | null>(null)
@@ -171,7 +173,8 @@ const hoverValue = ref<number | null>(null)
 const displayValue = computed(() => hoverValue.value ?? clamp(props.modelValue))
 
 function clamp(value: number): number {
-  if (!Number.isFinite(value)) return 0
+  if (!Number.isFinite(value))
+    return 0
   return Math.min(props.max, Math.max(0, value))
 }
 
@@ -189,7 +192,8 @@ const symbols = computed(() => {
 
 /** Подпись деления под текущим значением: половинки округляются вверх. */
 const currentLabel = computed(() => {
-  if (!props.texts?.length || displayValue.value <= 0) return undefined
+  if (!props.texts?.length || displayValue.value <= 0)
+    return undefined
   return props.texts[Math.ceil(displayValue.value) - 1]
 })
 
@@ -205,13 +209,15 @@ const valueText = computed(() => {
 const resolvedAriaLabel = computed(() => props.ariaLabel ?? t('gr.rating.label', 'Rating'))
 
 const text = computed(() => {
-  if (props.formatText) return props.formatText(displayValue.value)
+  if (props.formatText)
+    return props.formatText(displayValue.value)
   return currentLabel.value ?? String(displayValue.value)
 })
 
 /** Значение, соответствующее позиции курсора внутри символа `index`. */
 function valueAt(index: number, event: MouseEvent): number {
-  if (!props.allowHalf) return index + 1
+  if (!props.allowHalf)
+    return index + 1
   const rect = (event.currentTarget as HTMLElement).getBoundingClientRect()
   return rect.width > 0 && event.clientX - rect.left < rect.width / 2 ? index + 0.5 : index + 1
 }
@@ -223,17 +229,20 @@ function onScaleBlur(event: FocusEvent): void {
 
 function commit(value: number): void {
   const next = clamp(value)
-  if (next !== props.modelValue) emit('update:modelValue', next)
+  if (next !== props.modelValue)
+    emit('update:modelValue', next)
   emit('change', next)
 }
 
 function onSymbolClick(index: number, event: MouseEvent): void {
-  if (!interactive.value) return
+  if (!interactive.value)
+    return
   const next = valueAt(index, event)
   const cleared = props.clearable && next === props.modelValue
 
   commit(cleared ? 0 : next)
-  if (cleared) emit('clear')
+  if (cleared)
+    emit('clear')
 }
 
 function onSymbolMouseMove(index: number, event: MouseEvent): void {
@@ -243,19 +252,22 @@ function onSymbolMouseMove(index: number, event: MouseEvent): void {
     return
   }
   const next = valueAt(index, event)
-  if (next === hoverValue.value) return
+  if (next === hoverValue.value)
+    return
   hoverValue.value = next
   emit('hoverChange', next)
 }
 
 function resetHover(): void {
-  if (hoverValue.value === null) return
+  if (hoverValue.value === null)
+    return
   hoverValue.value = null
   emit('hoverChange', null)
 }
 
 function onKeydown(event: KeyboardEvent): void {
-  if (!interactive.value) return
+  if (!interactive.value)
+    return
   const current = clamp(props.modelValue)
   let next: number | null = null
 

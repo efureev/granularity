@@ -5,7 +5,9 @@ import { usePointerGestures } from '../composables/usePointerGestures'
 
 function setup(overrides: { scale?: number, canSwipe?: boolean } = {}) {
   const scale = ref(overrides.scale ?? 1)
-  const setScaleAt = vi.fn((value: number) => { scale.value = value })
+  const setScaleAt = vi.fn((value: number) => {
+    scale.value = value
+  })
   const pan = { start: vi.fn(), move: vi.fn(), end: vi.fn() }
   const onSwipeLeft = vi.fn()
   const onSwipeRight = vi.fn()

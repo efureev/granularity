@@ -72,7 +72,6 @@ defineSlots<{
   /** Своя разметка иконки вместо имени из набора. */
   default?: () => any
 }>()
-
 </script>
 
 <template>

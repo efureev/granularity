@@ -27,7 +27,11 @@ function makeHarness(rules: GrFormRules, initial: Record<string, string> = { ema
       const model = reactive({ ...initial })
       const formRef = ref<GrFormInstance>()
       const submitted = ref(0)
-      return { model, rules, formRef, submitted, onSubmit: () => { submitted.value++ } }
+      const onSubmit = () => {
+        submitted.value++
+      }
+
+      return { model, rules, formRef, submitted, onSubmit }
     },
     template: `
       <GrForm ref="formRef" :model="model" :rules="rules" @submit="onSubmit">
@@ -365,7 +369,11 @@ describe('GrForm — файлы правилом формы', () => {
         const model = reactive<Record<string, unknown>>({ doc: null })
         const formRef = ref<GrFormInstance>()
         const submitted = ref(0)
-        return { model, rules, formRef, submitted, onSubmit: () => { submitted.value++ } }
+        const onSubmit = () => {
+          submitted.value++
+        }
+
+        return { model, rules, formRef, submitted, onSubmit }
       },
       template: `
         <GrForm ref="formRef" :model="model" :rules="rules" @submit="onSubmit">
@@ -437,7 +445,11 @@ describe('GrForm — файлы правилом формы', () => {
           doc: new File(['x'], 'photo.png', { type: 'image/png' }),
         })
         const payloads = ref<Record<string, string>[]>([])
-        return { model, rules, payloads, onInvalid: (e: Record<string, string>) => { payloads.value.push(e) } }
+        const onInvalid = (e: Record<string, string>) => {
+          payloads.value.push(e)
+        }
+
+        return { model, rules, payloads, onInvalid }
       },
       template: `
         <GrForm :model="model" :rules="rules" @invalid="onInvalid">
@@ -546,7 +558,8 @@ describe('GrForm — гонка асинхронной валидации пол
           email: [{
             validator: () => new Promise<boolean | string>((resolve) => {
               call += 1
-              if (call === 1) firstResolve = resolve
+              if (call === 1)
+                firstResolve = resolve
               else secondResolve = resolve
             }),
           }],

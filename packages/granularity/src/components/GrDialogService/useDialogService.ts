@@ -85,8 +85,10 @@ function getModuleState(): DialogServiceState {
 let ambiguousStateWarned = false
 
 function warnAmbiguousState(): void {
-  if (ambiguousStateWarned) return
-  if (!__GR_DEV__) return
+  if (ambiguousStateWarned)
+    return
+  if (!__GR_DEV__)
+    return
 
   ambiguousStateWarned = true
   console.warn(
@@ -104,7 +106,8 @@ function resolveDialogServiceState(): DialogServiceState {
   // `inject` работает только в `setup` — там ответ точный.
   if (getCurrentInstance()) {
     const provided = inject(GRANULARITY_DIALOG_SERVICE_STATE, null)
-    if (provided) return provided
+    if (provided)
+      return provided
   }
 
   if (registeredStates.size === 1)
@@ -117,10 +120,13 @@ function resolveDialogServiceState(): DialogServiceState {
 }
 
 function ensureMounted(state: DialogServiceState, appContext?: AppContext | null): void {
-  if (typeof window === 'undefined' || typeof document === 'undefined') return
+  if (typeof window === 'undefined' || typeof document === 'undefined')
+    return
 
-  if (appContext) state.appContext = appContext
-  if (state.mounted) return
+  if (appContext)
+    state.appContext = appContext
+  if (state.mounted)
+    return
 
   const container = document.createElement('div')
   container.setAttribute('data-gr-dialog-service-host', '')
@@ -140,8 +146,10 @@ function ensureMounted(state: DialogServiceState, appContext?: AppContext | null
 }
 
 function warnIfContextless(state: DialogServiceState, context: CapturedDialogContext | null): void {
-  if (state.contextlessWarned || context?.config || context?.i18n) return
-  if (!__GR_DEV__) return
+  if (state.contextlessWarned || context?.config || context?.i18n)
+    return
+  if (!__GR_DEV__)
+    return
 
   state.contextlessWarned = true
   console.warn(

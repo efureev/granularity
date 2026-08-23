@@ -84,7 +84,8 @@ function stand(options: StandOptions = {}) {
 
 function tile(root: HTMLElement): HTMLElement {
   const el = root.querySelector<HTMLElement>('[data-gr-dashboard-palette-item] > *')
-  if (!el) throw new Error('нет плитки каталога')
+  if (!el)
+    throw new Error('нет плитки каталога')
 
   return el
 }

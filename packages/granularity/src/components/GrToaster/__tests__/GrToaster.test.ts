@@ -2,7 +2,6 @@ import { mount } from '@vue/test-utils'
 import { defineComponent, nextTick, ref } from 'vue'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-
 vi.mock('~icons/lucide/check-circle', () => ({
   default: defineComponent({
     name: 'IconCheckCircle',

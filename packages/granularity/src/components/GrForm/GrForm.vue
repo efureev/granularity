@@ -122,7 +122,8 @@ function getValue(name: string): unknown {
 const requiredFields = computed(() => {
   const set = new Set<string>(selfRequiredFields.value)
   for (const name of Object.keys(props.rules ?? {})) {
-    if (rulesRequired(getRules(name))) set.add(name)
+    if (rulesRequired(getRules(name)))
+      set.add(name)
   }
   return set
 })
@@ -141,7 +142,8 @@ const IMPLICIT_REQUIRED_RULE: GrFormRule = { required: true }
 
 function effectiveRules(name: string): GrFormRule[] {
   const rules = getRules(name)
-  if (rules.length) return rules
+  if (rules.length)
+    return rules
   return selfRequiredFields.value.has(name) ? [IMPLICIT_REQUIRED_RULE] : []
 }
 
@@ -160,10 +162,12 @@ const validationSeq = new Map<string, number>()
 const validationRuns = new Map<string, { seq: number, promise: Promise<boolean> }>()
 
 async function validateField(name: string, trigger?: GrFormTrigger): Promise<boolean> {
-  if (trigger === 'blur' && !props.validateOnBlur) return !errors.value[name]
+  if (trigger === 'blur' && !props.validateOnBlur)
+    return !errors.value[name]
 
   const rules = rulesForTrigger(effectiveRules(name), trigger)
-  if (!rules.length) return !errors.value[name]
+  if (!rules.length)
+    return !errors.value[name]
 
   const seq = (validationSeq.get(name) ?? 0) + 1
   validationSeq.set(name, seq)
@@ -205,7 +209,8 @@ async function runValidation(name: string, seq: number, rules: GrFormRule[]): Pr
 async function validate(): Promise<boolean> {
   const results = await Promise.all(validatedNames.value.map(name => validateField(name)))
   const valid = results.every(Boolean)
-  if (!valid && props.scrollToError) scrollToFirstError()
+  if (!valid && props.scrollToError)
+    scrollToFirstError()
   return valid
 }
 
@@ -217,7 +222,8 @@ async function validate(): Promise<boolean> {
  */
 function invalidateValidation(names?: string[]): void {
   const list = names ?? [...validationSeq.keys()]
-  if (!list.length) return
+  if (!list.length)
+    return
 
   const nextValidating = new Set(validatingSet.value)
   for (const name of list) {
@@ -275,8 +281,10 @@ function resetFields(names?: string | string[]): void {
   // отбрасывает функции — то есть для внешней модели (`useForm` Inertia, стор)
   // «нет в снимке» означает «это её метод», и сброс снёс бы саму модель.
   for (const key of keys) {
-    if (key in snapshot) setByPath(model, key, cloneModelValue(snapshot[key]))
-    else if (typeof model[key] !== 'function') removeKey(model, key)
+    if (key in snapshot)
+      setByPath(model, key, cloneModelValue(snapshot[key]))
+    else if (typeof model[key] !== 'function')
+      removeKey(model, key)
   }
 
   clearValidate(list)
@@ -300,7 +308,8 @@ const isValid = computed(() => Object.values(errors.value).every(message => !mes
  */
 function scrollToField(name: string): void {
   const el = fieldRegistry.get(name)?.()
-  if (!el) return
+  if (!el)
+    return
   el.scrollIntoView?.({ behavior: props.scrollBehavior, block: 'center' })
   const focusable = el.querySelector<HTMLElement>('input, select, textarea, button, [tabindex]:not([tabindex="-1"])')
   focusable?.focus?.()
@@ -318,7 +327,8 @@ function scrollToFirstError(): void {
   )
 
   const first = elements[0]
-  if (!first) return
+  if (!first)
+    return
   first.scrollIntoView?.({ behavior: props.scrollBehavior, block: 'center' })
   first.querySelector<HTMLElement>('input, select, textarea, button, [tabindex]:not([tabindex="-1"])')?.focus?.()
 }
@@ -335,8 +345,10 @@ watch(
       watch(
         () => getValue(name),
         () => {
-          if (props.validateOnChange) void validateField(name, 'change')
-          else if (errors.value[name]) void validateField(name) // ре-валидация, чтобы снять ошибку
+          if (props.validateOnChange)
+            void validateField(name, 'change')
+          else if (errors.value[name])
+            void validateField(name) // ре-валидация, чтобы снять ошибку
         },
         { deep: true },
       ),
@@ -362,7 +374,8 @@ provide(GR_FORM_KEY, {
           registration.required,
           (required) => {
             const next = new Set(selfRequiredFields.value)
-            if (required) next.add(name)
+            if (required)
+              next.add(name)
             else next.delete(name)
             selfRequiredFields.value = next
           },
@@ -394,7 +407,8 @@ function onSubmit(): void {
 
     const failed: Record<string, string> = {}
     for (const [name, message] of Object.entries(errors.value)) {
-      if (message) failed[name] = message
+      if (message)
+        failed[name] = message
     }
     emit('invalid', failed)
   })
@@ -427,7 +441,6 @@ defineSlots<{
     setSnapshot: (model?: Record<string, unknown>) => void
   }) => any
 }>()
-
 </script>
 
 <template>

@@ -83,10 +83,12 @@ export const dateAdapter: GrChronoAdapter<Date | null> = {
 /** `2026-08-12` — календарная дата без времени и без зоны. */
 export const isoDateAdapter: GrChronoAdapter<string | null> = {
   parse: (raw) => {
-    if (typeof raw !== 'string') return null
+    if (typeof raw !== 'string')
+      return null
 
     const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(raw)
-    if (!match) return null
+    if (!match)
+      return null
 
     const [, y, m, d] = match as unknown as [string, string, string, string]
     const date = fromPlainParts({ y: Number(y), m: Number(m) - 1, d: Number(d) })
@@ -106,10 +108,12 @@ export const isoDateAdapter: GrChronoAdapter<string | null> = {
  */
 export const isoDateTimeAdapter: GrChronoAdapter<string | null> = {
   parse: (raw) => {
-    if (typeof raw !== 'string') return null
+    if (typeof raw !== 'string')
+      return null
 
     const match = /^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2})(?::(\d{2}))?$/.exec(raw)
-    if (!match) return null
+    if (!match)
+      return null
 
     const [, y, m, d, h, min, s] = match as unknown as [string, string, string, string, string, string, string?]
     const date = fromPlainParts(
@@ -130,7 +134,8 @@ export const isoDateTimeAdapter: GrChronoAdapter<string | null> = {
 /** Миллисекунды эпохи. */
 export const timestampAdapter: GrChronoAdapter<number | null> = {
   parse: (raw) => {
-    if (typeof raw !== 'number' || !Number.isFinite(raw)) return null
+    if (typeof raw !== 'number' || !Number.isFinite(raw))
+      return null
 
     const date = new Date(raw)
     return isValidDate(date) ? date : null
@@ -157,8 +162,10 @@ export type GrChronoAdapterName = keyof typeof ADAPTERS
 export function resolveChronoAdapter<T>(
   adapter: GrChronoAdapterName | GrChronoAdapter<T> | undefined,
 ): GrChronoAdapter<T> {
-  if (!adapter) return ADAPTERS.date as unknown as GrChronoAdapter<T>
-  if (typeof adapter === 'string') return ADAPTERS[adapter] as unknown as GrChronoAdapter<T>
+  if (!adapter)
+    return ADAPTERS.date as unknown as GrChronoAdapter<T>
+  if (typeof adapter === 'string')
+    return ADAPTERS[adapter] as unknown as GrChronoAdapter<T>
 
   return adapter
 }

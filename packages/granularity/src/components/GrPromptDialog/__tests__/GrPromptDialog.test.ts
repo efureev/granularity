@@ -8,7 +8,6 @@ afterEach(() => {
   document.body.innerHTML = ''
 })
 
-
 describe('GrPromptDialog', () => {
   it('показывает ошибку при пустом значении и подтверждает при заполнении', async () => {
     const Harness = defineComponent({
@@ -170,7 +169,8 @@ async function mountPrompt(attrs = '', extra: Record<string, unknown> = {}) {
 
 function byTestId(testId: string): DOMWrapper<HTMLElement> {
   const el = document.querySelector<HTMLElement>(`[data-testid="${testId}"]`)
-  if (!el) throw new Error(`[test] элемент ${testId} не найден`)
+  if (!el)
+    throw new Error(`[test] элемент ${testId} не найден`)
   return new DOMWrapper(el)
 }
 
@@ -289,7 +289,8 @@ describe('GrPromptDialog — rules', () => {
     const rules = {
       validator: () => {
         call += 1
-        if (call === 1) return new Promise<string | boolean>((resolve) => { resolveFirst = resolve })
+        if (call === 1)
+          return new Promise<string | boolean>((resolve) => { resolveFirst = resolve })
         return true
       },
     }

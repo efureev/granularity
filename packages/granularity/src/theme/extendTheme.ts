@@ -70,7 +70,8 @@ function renderDeclarations(tokens: GrThemeTokens, indent: string): string[] {
 
 function renderComponentDeclarations(tokens: GrThemeTokens, indent: string): string[] {
   const names = Object.keys(tokens)
-  if (names.length === 0) return []
+  if (names.length === 0)
+    return []
 
   return ['', `${indent}/* Покомпонентные токены темы. */`, ...names.map(name => `${indent}${name}: ${tokens[name]};`)]
 }
@@ -96,7 +97,8 @@ function renderFallback(tokens: GrThemeTokens, selector: string): string[] {
 
     // Роль ссылается не на цвет (например на `var()` вне темы) — фолбэк для неё
     // посчитать нечем, и выдумывать значение хуже, чем его не давать.
-    if (!base || !mixWith) continue
+    if (!base || !mixWith)
+      continue
 
     lines.push(`    ${token.name}: ${mixSrgb(base, mixWith, token.amount)};`)
   }
@@ -149,7 +151,8 @@ function buildTheme(options: BuildOptions): GrTheme {
     throw new Error(`тема "${name}" объявляет покомпонентные токены, которых у пакета нет: ${unknownComponent.join(', ')}`)
 
   const missing = themeRoleNames().filter(role => tokens[role] === undefined)
-  if (missing.length > 0) throw new Error(explainMissing(missing))
+  if (missing.length > 0)
+    throw new Error(explainMissing(missing))
 
   const theme: GrTheme = {
     name,
@@ -161,7 +164,8 @@ function buildTheme(options: BuildOptions): GrTheme {
 
   if (validate) {
     const issues = validateTheme(theme)
-    if (issues.length > 0) throw new GrThemeError(name, issues)
+    if (issues.length > 0)
+      throw new GrThemeError(name, issues)
   }
 
   return theme

@@ -108,12 +108,18 @@ describe('useDataSource — клиентская стратегия', () => {
 })
 
 describe('useDataSource — серверная стратегия', () => {
-  beforeEach(() => { vi.useFakeTimers() })
-  afterEach(() => { vi.useRealTimers() })
+  beforeEach(() => {
+    vi.useFakeTimers()
+  })
+  afterEach(() => {
+    vi.useRealTimers()
+  })
 
   function deferred<T>() {
     let resolve!: (value: T) => void
-    const promise = new Promise<T>((r) => { resolve = r })
+    const promise = new Promise<T>((r) => {
+      resolve = r
+    })
 
     return { promise, resolve }
   }
@@ -211,7 +217,9 @@ describe('useDataSource — серверная стратегия', () => {
 
   it('ошибка попадает в `error`, а прерывание — нет', async () => {
     const failure = new Error('500')
-    const fetcher = vi.fn(async (_request: DataSourceRequest): Promise<DataSourceResult<Row>> => { throw failure })
+    const fetcher = vi.fn(async (_request: DataSourceRequest): Promise<DataSourceResult<Row>> => {
+      throw failure
+    })
     const { wrapper, source } = mountSource<Row>({ fetcher })
     await settle()
 

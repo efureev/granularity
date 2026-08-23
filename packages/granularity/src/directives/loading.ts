@@ -49,9 +49,9 @@ export type LoadingController = {
   readonly target: HTMLElement
 }
 
-export type LoadingBindingValue =
-  | boolean
-  | (Omit<LoadingOptions, 'appContext'> & {
+export type LoadingBindingValue
+  = | boolean
+    | (Omit<LoadingOptions, 'appContext'> & {
       loading?: boolean
     })
 
@@ -60,18 +60,21 @@ function isHTMLElement(value: unknown): value is HTMLElement {
 }
 
 function resolveTarget(input: LoadingTarget | undefined, fallback: HTMLElement): HTMLElement {
-  if (!input) return fallback
+  if (!input)
+    return fallback
 
   if (typeof input === 'string') {
     // Prefer searching within the same root (document / document fragment / shadow root)
     // to support components that are not attached to `document` yet (e.g. in unit tests).
     const root = fallback.getRootNode?.() ?? document
-    const foundInRoot =
-      typeof (root as any).querySelector === 'function' ? ((root as any).querySelector(input) as Element | null) : null
-    if (isHTMLElement(foundInRoot)) return foundInRoot
+    const foundInRoot
+      = typeof (root as any).querySelector === 'function' ? ((root as any).querySelector(input) as Element | null) : null
+    if (isHTMLElement(foundInRoot))
+      return foundInRoot
 
     const foundInDocument = document.querySelector(input)
-    if (isHTMLElement(foundInDocument)) return foundInDocument
+    if (isHTMLElement(foundInDocument))
+      return foundInDocument
 
     return fallback
   }
@@ -84,12 +87,14 @@ function resolveTarget(input: LoadingTarget | undefined, fallback: HTMLElement):
 }
 
 function resolveFullscreen(options: LoadingOptions, target: HTMLElement): boolean {
-  if (options.fullscreen != null) return options.fullscreen
+  if (options.fullscreen != null)
+    return options.fullscreen
   return target === document.body
 }
 
 function ensurePositionedContainer(target: HTMLElement, fullscreen: boolean): () => void {
-  if (fullscreen) return () => {}
+  if (fullscreen)
+    return () => {}
 
   const prevInline = target.style.position
   const computed = window.getComputedStyle(target)
@@ -106,16 +111,19 @@ function ensurePositionedContainer(target: HTMLElement, fullscreen: boolean): ()
 }
 
 function ensureClippedContainer(target: HTMLElement, fullscreen: boolean): () => void {
-  if (fullscreen) return () => {}
+  if (fullscreen)
+    return () => {}
 
   const computed = window.getComputedStyle(target)
   // If the target has rounded corners, we must clip its content so the overlay
   // (and its blurred backdrop) never bleeds outside the visible rounded shape.
   const hasRadius = !!computed.borderRadius && computed.borderRadius !== '0px'
-  if (!hasRadius) return () => {}
+  if (!hasRadius)
+    return () => {}
 
   const overflow = computed.overflow
-  if (overflow && overflow !== 'visible') return () => {}
+  if (overflow && overflow !== 'visible')
+    return () => {}
 
   const prevInline = target.style.overflow
   target.style.overflow = 'hidden'
@@ -172,7 +180,7 @@ function blockContent(target: HTMLElement, overlayHost: HTMLElement, fullscreen:
   }
 }
 
-function parseBinding(value: LoadingBindingValue | undefined): { loading: boolean; options: LoadingOptions } {
+function parseBinding(value: LoadingBindingValue | undefined): { loading: boolean, options: LoadingOptions } {
   if (value === true || value === false) {
     return { loading: value, options: {} }
   }
@@ -224,7 +232,8 @@ export function createLoading(options: LoadingOptions = {}, fallbackTarget?: HTM
   let unblockContent: (() => void) | undefined
 
   function doRender(): void {
-    if (disposed) return
+    if (disposed)
+      return
 
     const vnode = createVNode(GrLoading as any, {
       text: current.text,
@@ -253,7 +262,8 @@ export function createLoading(options: LoadingOptions = {}, fallbackTarget?: HTM
   }
 
   function close(): void {
-    if (disposed) return
+    if (disposed)
+      return
     disposed = true
 
     render(null, mountEl)
@@ -304,10 +314,10 @@ function sync(el: HTMLElement, value: LoadingBindingValue | undefined, appContex
   const fullscreen = resolveFullscreen(options, target)
   const normalizedTarget = fullscreen ? (ensurePortalRoot() ?? document.body) : target
 
-  const shouldRecreate =
-    !state.controller
-    || state.target !== normalizedTarget
-    || state.fullscreen !== fullscreen
+  const shouldRecreate
+    = !state.controller
+      || state.target !== normalizedTarget
+      || state.fullscreen !== fullscreen
 
   if (shouldRecreate) {
     state.controller?.close()
@@ -318,7 +328,8 @@ function sync(el: HTMLElement, value: LoadingBindingValue | undefined, appContex
   }
 
   const controller = state.controller
-  if (!controller) return
+  if (!controller)
+    return
   controller.setOptions({ ...options, fullscreen, target: normalizedTarget })
 }
 

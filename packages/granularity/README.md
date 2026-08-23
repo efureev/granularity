@@ -73,7 +73,6 @@ yarn add -D unocss
 ```
 
 ```ts
-
 import '@feugene/granularity/styles.css'
 ```
 

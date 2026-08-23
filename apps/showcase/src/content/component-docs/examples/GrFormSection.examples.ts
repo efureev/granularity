@@ -34,6 +34,7 @@ export const grFormSectionExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Bordered & rounded-border sections',
     description: 'У `GrFormSection` один корневой `<section>`, поэтому `class` проходит на него насквозь (fallthrough) и мержится с внутренним `grid gap-4`. Так секцию легко превратить в карточку — прямоугольная рамка (`border`) или скруглённая (`rounded-2xl border`) задаётся обычными utility-классами, без пропсов.',
     status: 'ready',
-    previewKey: 'gr-form-section-bordered',    note: 'Внутренний вертикальный ритм секции (`grid gap-4`) сохраняется — добавляемые классы только расширяют оформление (рамка, паддинги, фон, скругление).',
+    previewKey: 'gr-form-section-bordered',
+    note: 'Внутренний вертикальный ритм секции (`grid gap-4`) сохраняется — добавляемые классы только расширяют оформление (рамка, паддинги, фон, скругление).',
   },
 ]

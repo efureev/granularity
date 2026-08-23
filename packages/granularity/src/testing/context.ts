@@ -67,10 +67,11 @@ export function granularityGlobal(options: GranularityGlobalOptions = {}): { pro
 
   const provide: Record<symbol, unknown> = { [GR_CONFIG_KEY]: config }
 
-  if (options.i18n)
+  if (options.i18n) {
     provide[GRANULARITY_I18N_KEY] = 't' in options.i18n && typeof options.i18n.t === 'function'
       ? options.i18n
       : i18nAdapter(options.i18n)
+  }
 
   return { provide }
 }

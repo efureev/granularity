@@ -103,7 +103,8 @@ const resolvedEmptyText = computed(() => props.emptyText ?? t('gr.collapse.empty
  * содержимое.
  */
 const isEmpty = computed(() => {
-  if (props.empty !== undefined) return props.empty
+  if (props.empty !== undefined)
+    return props.empty
 
   return !hasMeaningfulSlotContent(slots.default?.() ?? [])
 })

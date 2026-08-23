@@ -274,16 +274,20 @@ const periodLabels = computed(() => (props.mode === 'month' ? monthNames(resolve
  * а не локале-зависимые данные.
  */
 function periodLabel(cell: PeriodCell): string {
-  if (props.mode === 'month') return periodLabels.value[cell.value] ?? String(cell.value)
-  if (props.mode === 'quarter') return t('grChrono.calendar.quarter', 'Q{n}', { n: cell.value + 1 })
+  if (props.mode === 'month')
+    return periodLabels.value[cell.value] ?? String(cell.value)
+  if (props.mode === 'quarter')
+    return t('grChrono.calendar.quarter', 'Q{n}', { n: cell.value + 1 })
 
   return String(cell.value)
 }
 
 /** Заголовок: месяц с годом, год или десятилетие — смотря что показываем. */
 const periodTitle = computed(() => {
-  if (props.mode === 'month' || props.mode === 'quarter') return formatYearTitle(resolvedLocale.value, viewDate.value.y)
-  if (props.mode === 'year') return decadeLabel(viewDate.value.y)
+  if (props.mode === 'month' || props.mode === 'quarter')
+    return formatYearTitle(resolvedLocale.value, viewDate.value.y)
+  if (props.mode === 'year')
+    return decadeLabel(viewDate.value.y)
 
   return formatMonthTitle(resolvedLocale.value, viewDate.value.y, viewDate.value.m)
 })
@@ -316,10 +320,12 @@ const weekdayColumns = computed(() => weekdayOrder(resolvedWeekStart.value).map(
 const selectedKeys = computed(() => new Set((props.selectedDates ?? []).map(plainDateKey)))
 
 function isSelected(cell: CalendarCell): boolean {
-  if (selectedKeys.value.size > 0) return selectedKeys.value.has(cell.key)
+  if (selectedKeys.value.size > 0)
+    return selectedKeys.value.has(cell.key)
 
   const selected = props.modelValue
-  if (!selected) return false
+  if (!selected)
+    return false
 
   return isWeekMode.value
     ? isSamePlainDate(startOfWeek(cell.date, resolvedWeekStart.value), startOfWeek(selected, resolvedWeekStart.value))
@@ -333,10 +339,12 @@ function isSelected(cell: CalendarCell): boolean {
  */
 const shownRange = computed<[PlainDate, PlainDate] | null>(() => {
   const start = props.rangeStart
-  if (!start) return null
+  if (!start)
+    return null
 
   const end = props.rangeEnd ?? props.rangePreview
-  if (!end) return [start, start]
+  if (!end)
+    return [start, start]
 
   return comparePlainDates(start, end) <= 0 ? [start, end] : [end, start]
 })
@@ -348,7 +356,8 @@ const shownRange = computed<[PlainDate, PlainDate] | null>(() => {
  */
 function rangeStateOf(cell: CalendarCell): { inRange: boolean, start: boolean, end: boolean } {
   const range = shownRange.value
-  if (!range) return { inRange: false, start: false, end: false }
+  if (!range)
+    return { inRange: false, start: false, end: false }
 
   const [from, to] = range
   const inside = comparePlainDates(cell.date, from) >= 0 && comparePlainDates(cell.date, to) <= 0
@@ -369,7 +378,8 @@ function isEdge(cell: CalendarCell): boolean {
 const dayEls = ref(new Map<string, HTMLElement>())
 
 function setDayEl(key: string, element: unknown): void {
-  if (element instanceof HTMLElement) dayEls.value.set(key, element)
+  if (element instanceof HTMLElement)
+    dayEls.value.set(key, element)
   else dayEls.value.delete(key)
 }
 
@@ -384,11 +394,14 @@ const cellKeys = computed(() => (
 /** Ячейка периода, попавшая в выбор: месяц выбранной даты, её квартал либо год. */
 const selectedPeriodKey = computed(() => {
   const selected = props.modelValue
-  if (!selected || isDayMode.value) return undefined
+  if (!selected || isDayMode.value)
+    return undefined
 
   return periodCells.value.find((cell) => {
-    if (props.mode === 'month') return cell.date.y === selected.y && cell.value === selected.m
-    if (props.mode === 'quarter') return cell.date.y === selected.y && cell.value === Math.floor(selected.m / 3)
+    if (props.mode === 'month')
+      return cell.date.y === selected.y && cell.value === selected.m
+    if (props.mode === 'quarter')
+      return cell.date.y === selected.y && cell.value === Math.floor(selected.m / 3)
 
     return cell.value === selected.y
   })?.key
@@ -411,7 +424,8 @@ const roving = useRovingFocus<string>({
   // Края сетки — не кольцо: за ними следующий и предыдущий месяцы.
   wrap: () => false,
   onOverflow: (edge) => {
-    if (isLocked.value) return true
+    if (isLocked.value)
+      return true
     // Стрелка вниз из последней недели листает месяц вперёд, вверх из
     // первой — назад. Клавишу гасим в любом случае: иначе прокрутится
     // страница под календарём.
@@ -421,10 +435,12 @@ const roving = useRovingFocus<string>({
   // Пока фокус не трогали, остановку держит выбранный день; если его в этом
   // месяце нет — первый день месяца, а не добор соседнего.
   initialKey: () => {
-    if (!isDayMode.value) return selectedPeriodKey.value ?? cellKeys.value[0]
+    if (!isDayMode.value)
+      return selectedPeriodKey.value ?? cellKeys.value[0]
 
     const selected = props.modelValue
-    if (selected && cellByKey.value.has(plainDateKey(selected))) return plainDateKey(selected)
+    if (selected && cellByKey.value.has(plainDateKey(selected)))
+      return plainDateKey(selected)
 
     return grid.value.cells.find(cell => cell.inMonth)?.key
   },
@@ -432,17 +448,21 @@ const roving = useRovingFocus<string>({
 
 /** Шаг листания: месяц, год или десятилетие — смотря что показываем. */
 function shiftView(from: PlainDate, delta: number): PlainDate {
-  if (props.mode === 'month') return addYears(from, delta)
-  if (props.mode === 'year') return addYears(from, delta * 10)
+  if (props.mode === 'month')
+    return addYears(from, delta)
+  if (props.mode === 'year')
+    return addYears(from, delta * 10)
 
   return addMonths(from, delta)
 }
 
 function goToPeriod(delta: number): void {
-  if (isLocked.value) return
+  if (isLocked.value)
+    return
 
   const next = shiftView(viewDate.value, delta)
-  if (!isPeriodReachable(next)) return
+  if (!isPeriodReachable(next))
+    return
 
   internalView.value = next
   emit('update:viewDate', next)
@@ -467,15 +487,16 @@ function isPeriodReachable(view: PlainDate): boolean {
       ? [{ y: view.y, m: 0, d: 1 }, { y: view.y, m: 11, d: 31 }]
       : [{ y: decadeStart(view.y), m: 0, d: 1 }, { y: decadeStart(view.y) + 9, m: 11, d: 31 }]
 
-  if (props.max && comparePlainDates(first, props.max) > 0) return false
-  if (props.min && comparePlainDates(last, props.min) < 0) return false
+  if (props.max && comparePlainDates(first, props.max) > 0)
+    return false
+  if (props.min && comparePlainDates(last, props.min) < 0)
+    return false
 
   return true
 }
 
 const canGoBack = computed(() => !isLocked.value && isPeriodReachable(shiftView(viewDate.value, -1)))
 const canGoForward = computed(() => !isLocked.value && isPeriodReachable(shiftView(viewDate.value, 1)))
-
 
 /**
  * Выбор — событие, а не состояние: `aria-selected` меняется на ячейке, где
@@ -486,17 +507,19 @@ const canGoForward = computed(() => !isLocked.value && isPeriodReachable(shiftVi
  * сама, и объявленное раньше она бы затёрла.
  */
 function announceSelected(date: PlainDate): void {
-  if (!props.announceSelection) return
+  if (!props.announceSelection)
+    return
 
   announce(props.mode === 'year'
     ? formatYearTitle(resolvedLocale.value, date.y)
     : formatPlainDate(resolvedLocale.value, date, props.mode === 'month'
-      ? { month: 'long', year: 'numeric' }
-      : { dateStyle: 'long' }))
+        ? { month: 'long', year: 'numeric' }
+        : { dateStyle: 'long' }))
 }
 
 function selectPeriod(cell: PeriodCell): void {
-  if (isLocked.value || cell.disabled) return
+  if (isLocked.value || cell.disabled)
+    return
 
   emit('update:modelValue', cell.date)
   emit('change', cell.date)
@@ -511,7 +534,8 @@ function selectPeriod(cell: PeriodCell): void {
 }
 
 function selectCell(cell: CalendarCell): void {
-  if (isLocked.value || cell.disabled) return
+  if (isLocked.value || cell.disabled)
+    return
 
   // В режиме недели значение — её начало: форма модели остаётся общей для всех
   // режимов, и `valueAdapter` работает как работал.
@@ -522,7 +546,8 @@ function selectCell(cell: CalendarCell): void {
 
   // Клик по добору соседнего месяца переводит показ туда: иначе выбранный
   // день исчез бы из сетки сразу после выбора.
-  if (!cell.inMonth) goToPeriod(comparePlainDates(cell.date, viewDate.value) > 0 ? 1 : -1)
+  if (!cell.inMonth)
+    goToPeriod(comparePlainDates(cell.date, viewDate.value) > 0 ? 1 : -1)
 
   announceSelected(value)
 }
@@ -539,7 +564,8 @@ function canSelectDate(date: PlainDate): boolean {
 
 /** Выбор из подвала. Возвращает `false`, если дата запрещена. */
 function selectDate(date: PlainDate): boolean {
-  if (!canSelectDate(date)) return false
+  if (!canSelectDate(date))
+    return false
 
   emit('update:modelValue', date)
   emit('change', date)
@@ -559,7 +585,8 @@ function onPeriodClick(cell: PeriodCell): void {
 }
 
 function onGridKeydown(event: KeyboardEvent): void {
-  if (isLocked.value) return
+  if (isLocked.value)
+    return
 
   // Листание месяцами и годами — до примитива: `PageUp`/`PageDown` он не знает,
   // а `Shift` для него модификатор, который он пропускает.
@@ -572,27 +599,32 @@ function onGridKeydown(event: KeyboardEvent): void {
     return
   }
 
-  if (roving.handleNavigationKeys(event)) return
+  if (roving.handleNavigationKeys(event))
+    return
 
   if (event.key === 'Enter' || event.key === ' ') {
     event.preventDefault()
     const key = roving.rovingKey.value
-    if (!key) return
+    if (!key)
+      return
 
     if (isDayMode.value) {
       const cell = cellByKey.value.get(key)
-      if (cell) selectCell(cell)
+      if (cell)
+        selectCell(cell)
       return
     }
 
     const period = periodByKey.value.get(key)
-    if (period) selectPeriod(period)
+    if (period)
+      selectPeriod(period)
   }
 }
 
 function focus(): void {
   const key = roving.rovingKey.value
-  if (key) dayEls.value.get(key)?.focus()
+  if (key)
+    dayEls.value.get(key)?.focus()
 }
 
 defineExpose({
@@ -600,7 +632,8 @@ defineExpose({
   goToPeriod,
   /** Перевести показ на месяц с этой датой и поставить на неё фокус. */
   focusDate: (date: PlainDate) => {
-    if (!isPlainDateWithin(date, props.min, props.max)) return
+    if (!isPlainDateWithin(date, props.min, props.max))
+      return
     internalView.value = date
     void roving.focusKey(plainDateKey(date))
   },

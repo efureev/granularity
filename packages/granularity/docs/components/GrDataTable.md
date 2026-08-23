@@ -218,7 +218,7 @@
 ```ts
 const table = ref<GrDataTableInstance>()
 
-table.value?.scrollToRow(42)      // с `virtual` доводит и до строки вне окна
+table.value?.scrollToRow(42) // с `virtual` доводит и до строки вне окна
 table.value?.scrollTo({ top: 0 })
 table.value?.clearSort()
 table.value?.toggleAll()

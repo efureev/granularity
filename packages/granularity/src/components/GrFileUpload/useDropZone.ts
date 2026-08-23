@@ -29,7 +29,8 @@ export function useDropZone(options: UseDropZoneOptions): UseDropZoneReturn {
   let overCounter = 0
 
   function setOver(next: boolean): void {
-    if (isOver.value === next) return
+    if (isOver.value === next)
+      return
     isOver.value = next
   }
 
@@ -38,7 +39,8 @@ export function useDropZone(options: UseDropZoneOptions): UseDropZoneReturn {
   }
 
   function onDragEnter(event: DragEvent): void {
-    if (ignored()) return
+    if (ignored())
+      return
 
     event.preventDefault()
     overCounter += 1
@@ -46,22 +48,27 @@ export function useDropZone(options: UseDropZoneOptions): UseDropZoneReturn {
   }
 
   function onDragOver(event: DragEvent): void {
-    if (ignored()) return
+    if (ignored())
+      return
 
     event.preventDefault()
-    if (event.dataTransfer) event.dataTransfer.dropEffect = 'copy'
+    if (event.dataTransfer)
+      event.dataTransfer.dropEffect = 'copy'
   }
 
   function onDragLeave(event: DragEvent): void {
-    if (ignored()) return
+    if (ignored())
+      return
 
     event.preventDefault()
     overCounter = Math.max(0, overCounter - 1)
-    if (overCounter === 0) setOver(false)
+    if (overCounter === 0)
+      setOver(false)
   }
 
   function onDropFiles(event: DragEvent): void {
-    if (ignored()) return
+    if (ignored())
+      return
 
     event.preventDefault()
     overCounter = 0

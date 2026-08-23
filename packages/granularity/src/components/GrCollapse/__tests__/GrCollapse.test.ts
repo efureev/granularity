@@ -241,7 +241,8 @@ describe('GrCollapse', () => {
     const outerFirst = triggers[0].element as HTMLElement
     const outerSecond = wrapper.findAll('[data-gr-collapse-item]')
       .at(-1)!
-      .find('[data-gr-collapse-trigger]').element as HTMLElement
+      .find('[data-gr-collapse-trigger]')
+      .element as HTMLElement
 
     outerFirst.focus()
     await triggers[0].trigger('keydown', { key: 'ArrowDown' })

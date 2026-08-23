@@ -83,7 +83,10 @@ const fieldId = computed(() => field?.id.value)
 const describedBy = computed(() => field?.describedById.value)
 const {
   disabled: isDisabled,
-  invalid: isInvalid, required: isRequired, readonly: isReadonly } = useGrFormControl(() => props)
+  invalid: isInvalid,
+  required: isRequired,
+  readonly: isReadonly,
+} = useGrFormControl(() => props)
 const labelledBy = computed(() => (props.ariaLabel ? undefined : field?.labelId.value))
 
 const emit = defineEmits<GrRadioGroupEmits>()
@@ -91,7 +94,6 @@ defineSlots<{
   /** Собственная разметка переключателей вместо генерации из `options`. */
   default?: () => any
 }>()
-
 
 function setValue(next: GrRadioValue): void {
   if (isDisabled.value || isReadonly.value)
@@ -121,7 +123,8 @@ function register(entry: GrRadioEntry): () => void {
   entries.value.push(entry)
   return () => {
     const index = entries.value.indexOf(entry)
-    if (index >= 0) entries.value.splice(index, 1)
+    if (index >= 0)
+      entries.value.splice(index, 1)
   }
 }
 

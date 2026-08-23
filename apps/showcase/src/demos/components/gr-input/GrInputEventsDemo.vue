@@ -30,14 +30,16 @@ function clearLog(): void {
 async function onChange(value: string): Promise<void> {
   note(`change: ${value || '—'}`)
 
-  if (!value) return
+  if (!value)
+    return
 
   const run = ++checkRun
   checking.value = true
   await new Promise(resolve => setTimeout(resolve, 900))
 
   // Журнал успели очистить (или начали новую проверку) — результат устарел.
-  if (run !== checkRun) return
+  if (run !== checkRun)
+    return
 
   checking.value = false
   note(`проверен: ${value}`)

@@ -1,5 +1,5 @@
 import type { LocaleLoaderCollection } from '@feugene/fint-i18n/core'
-import { GRANULARITY_I18N_BLOCK } from "./const";
+import { GRANULARITY_I18N_BLOCK } from './const'
 
 /**
  * English locale loaders for the playground app.
@@ -9,9 +9,9 @@ import { GRANULARITY_I18N_BLOCK } from "./const";
  * "Authoring localization packages" guide in the docs.
  */
 export const en = {
-    en: {
-        [GRANULARITY_I18N_BLOCK]: () => import('../locales/en.json'),
-    },
+  en: {
+    [GRANULARITY_I18N_BLOCK]: () => import('../locales/en.json'),
+  },
 } satisfies LocaleLoaderCollection
 
 export default en

@@ -130,17 +130,21 @@ const formRef = ref<GrFormInstance | null>(null)
 
 /** Разбор схемы: `schemaModel` сильнее — её могли разобрать заранее или на сервере. */
 const parsed = computed<GrSchemaModel | undefined>(() => {
-  if (props.schemaModel) return props.schemaModel
-  if (!props.schema) return undefined
+  if (props.schemaModel)
+    return props.schemaModel
+  if (!props.schema)
+    return undefined
 
   const adapter = props.adapters?.find(item => item.supports(props.schema))
-  if (!adapter) return undefined
+  if (!adapter)
+    return undefined
 
   return adapter.parse(props.schema, props.parseOptions)
 })
 
 watch(parsed, (model) => {
-  if (model) emit('parsed', model, model.warnings)
+  if (model)
+    emit('parsed', model, model.warnings)
 }, { immediate: true })
 
 const root = computed(() => parsed.value?.root)
@@ -152,17 +156,21 @@ const model = computed<Record<string, unknown>>(() =>
   (props.modelValue as Record<string, unknown> | undefined) ?? internalModel.value)
 
 function syncModel(next: Record<string, unknown>): void {
-  if (props.modelValue === undefined) internalModel.value = next
+  if (props.modelValue === undefined)
+    internalModel.value = next
   emit('update:modelValue', next as TModel)
 }
 
 function initialiseModel(): void {
-  if (!root.value) return
+  if (!root.value)
+    return
 
   const base = createInitialModel(root.value, model.value)
   ensureShape(base, root.value)
 
-  if (props.modelValue === undefined) internalModel.value = base
+  if (props.modelValue === undefined) {
+    internalModel.value = base
+  }
   else {
     // Чужую модель не подменяем — дополняем на месте: она может быть стором.
     for (const [key, value] of Object.entries(base)) {
@@ -181,7 +189,8 @@ onMounted(() => {
 })
 
 const registry = computed<GrSchemaRendererRegistry>(() => {
-  if (!props.renderers) return createSchemaRendererRegistry(coreRenderers)
+  if (!props.renderers)
+    return createSchemaRendererRegistry(coreRenderers)
   if (Array.isArray(props.renderers))
     return createSchemaRendererRegistry(coreRenderers).register(...props.renderers)
 
@@ -217,14 +226,17 @@ const resolvedHeadingLevel = useGrComponentProp('GrSchemaForm', 'headingLevel', 
 
 /** Все поля по текущим данным; скрытые условиями отсеиваются здесь же. */
 const allFields = computed<GrSchemaFieldInstance[]>(() => {
-  if (!root.value) return []
+  if (!root.value)
+    return []
 
   return expandFields(root.value, model.value, {
     include: (node, name) => {
       const templatePath = node.path
       const options = ui.value.fields?.[templatePath]
-      if (ui.value.hidden?.includes(templatePath) || options?.hidden) return false
-      if (!options?.when) return true
+      if (ui.value.hidden?.includes(templatePath) || options?.hidden)
+        return false
+      if (!options?.when)
+        return true
 
       return evaluateCondition(options.when, createConditionContext(model.value, name, []))
     },
@@ -238,7 +250,8 @@ const serverErrors = useServerFieldErrors({
 })
 
 watch(() => props.serverErrors, (source) => {
-  if (source === undefined) serverErrors.clear()
+  if (source === undefined)
+    serverErrors.clear()
   else serverErrors.set(source)
 }, { immediate: true, deep: true })
 
@@ -287,7 +300,8 @@ function sectionFields(section: GrUiSection): GrSchemaFieldInstance[] {
 }
 
 function isSectionVisible(section: GrUiSection): boolean {
-  if (!section.when) return true
+  if (!section.when)
+    return true
   return evaluateCondition(section.when, createConditionContext(model.value, '', []))
 }
 
@@ -330,7 +344,8 @@ provideSchemaForm({
   },
 
   nodeAt: (templatePath) => {
-    if (!root.value) return undefined
+    if (!root.value)
+      return undefined
     return allFields.value.find(field => field.templatePath === templatePath)?.node
   },
 
@@ -341,7 +356,7 @@ provideSchemaForm({
     syncModel(model.value)
   },
 
-  deleteValueAt: name => {
+  deleteValueAt: (name) => {
     deleteAtPath(model.value, name)
     syncModel(model.value)
   },
@@ -358,14 +373,16 @@ provideSchemaForm({
   },
 
   clearValidate: (names) => {
-    if (names.length > 0) formRef.value?.clearValidate(names)
+    if (names.length > 0)
+      formRef.value?.clearValidate(names)
   },
 })
 
 async function validate(): Promise<boolean> {
   const valid = (await formRef.value?.validate()) ?? true
 
-  if (!valid) return false
+  if (!valid)
+    return false
 
   if (needsSchemaCheck() && applySchemaIssues(await parsed.value!.validate!(model.value)))
     return false
@@ -394,7 +411,8 @@ function needsSchemaCheck(): boolean {
  * Работа та же самая, и делать её вторым способом было бы странно.
  */
 function applySchemaIssues(issues: readonly GrSchemaIssue[]): boolean {
-  if (issues.length === 0) return false
+  if (issues.length === 0)
+    return false
 
   const byPath = new Map<string, string[]>()
 

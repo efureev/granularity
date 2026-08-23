@@ -41,7 +41,8 @@ const focusOptions = graph.nodes.map(node => ({ value: node.name, label: node.na
 // Стартует на самом дорогом компоненте: он же самый глубокий, поэтому первый
 // показ сразу отвечает и «что тянет за собой», и «как выглядит глубина 3».
 const defaultFocus = [...graph.nodes]
-  .sort((left, right) => right.transitiveCount - left.transitiveCount)[0]?.name ?? ''
+  .sort((left, right) => right.transitiveCount - left.transitiveCount)[0]
+  ?.name ?? ''
 
 // Карточка компонента ссылается сюда с `?focus=GrX`, поэтому выбор живёт в
 // адресе: иначе ссылка «открыть граф» приводила бы на чужой компонент.

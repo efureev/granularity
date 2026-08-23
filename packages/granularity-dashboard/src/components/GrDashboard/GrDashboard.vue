@@ -219,7 +219,8 @@ const declaredLayout = computed<GrDashboardLayout>(() => layoutFor(props.layout,
  */
 const baseLayout = computed<GrDashboardLayout>(() => declaredLayout.value.map((item) => {
   const declared = bounds.get(item.id)
-  if (!declared) return clampItem(item, cols.value)
+  if (!declared)
+    return clampItem(item, cols.value)
 
   return clampItem({
     minW: declared.minW,
@@ -313,7 +314,8 @@ const bodyCallbacks = new Map<HTMLElement, () => void>()
 let bodyObserver: ResizeObserver | null = null
 
 function ensureBodyObserver(): ResizeObserver | null {
-  if (bodyObserver || typeof ResizeObserver === 'undefined') return bodyObserver
+  if (bodyObserver || typeof ResizeObserver === 'undefined')
+    return bodyObserver
 
   bodyObserver = new ResizeObserver((entries) => {
     for (const entry of entries) bodyCallbacks.get(entry.target as HTMLElement)?.()
@@ -330,7 +332,8 @@ function ensureBodyObserver(): ResizeObserver | null {
  */
 function measure(): void {
   const width = rootEl.value?.getBoundingClientRect().width ?? 0
-  if (width > 0) containerWidth.value = width
+  if (width > 0)
+    containerWidth.value = width
 }
 
 onMounted(() => {
@@ -338,10 +341,12 @@ onMounted(() => {
 
   // Наблюдатель один и на контейнере: он выбирает брейкпоинт, а не считает
   // пиксели виджетов — их раскладывает CSS Grid.
-  if (typeof ResizeObserver === 'undefined') return
+  if (typeof ResizeObserver === 'undefined')
+    return
 
   observer = new ResizeObserver(measure)
-  if (rootEl.value) observer.observe(rootEl.value)
+  if (rootEl.value)
+    observer.observe(rootEl.value)
 })
 
 onBeforeUnmount(() => {
@@ -353,7 +358,8 @@ onBeforeUnmount(() => {
 })
 
 watch([breakpoint, cols], ([nextBreakpoint, nextCols], previous) => {
-  if (previous && previous[0] === nextBreakpoint) return
+  if (previous && previous[0] === nextBreakpoint)
+    return
 
   emit('breakpointChange', nextBreakpoint, nextCols)
 })
@@ -380,7 +386,8 @@ let frame: number | null = null
 
 function writeVars(state: DragState): void {
   const el = itemEls.get(state.id)
-  if (!el) return
+  if (!el)
+    return
 
   if (state.kind === 'move') {
     el.style.setProperty('--gr-dashboard-drag-x', `${pendingDx}px`)
@@ -395,7 +402,8 @@ function writeVars(state: DragState): void {
 
 function clearVars(id: string): void {
   const el = itemEls.get(id)
-  if (!el) return
+  if (!el)
+    return
 
   for (const name of ['--gr-dashboard-drag-x', '--gr-dashboard-drag-y', '--gr-dashboard-resize-w', '--gr-dashboard-resize-h'])
     el.style.removeProperty(name)
@@ -434,7 +442,8 @@ function transferOf(item: GrDashboardItemLayout): GrDashboardTransfer {
 
 function isInsideOwnGrid(x: number, y: number): boolean {
   const rect = rootEl.value?.getBoundingClientRect()
-  if (!rect) return true
+  if (!rect)
+    return true
 
   return x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom
 }
@@ -458,7 +467,8 @@ function beginTransferOut(state: NonNullable<typeof dragState.value>, at: GrDash
 
 /** Указатель вернулся домой: сессия сворачивается, обычный перенос продолжается. */
 function endTransferOut(): void {
-  if (!carriedAway.value) return
+  if (!carriedAway.value)
+    return
 
   carriedAway.value = null
   transfer.release(false)
@@ -471,7 +481,8 @@ function endTransferOut(): void {
 function flush(): void {
   frame = null
   const state = dragState.value
-  if (!state) return
+  if (!state)
+    return
 
   writeVars(state)
 
@@ -479,7 +490,9 @@ function flush(): void {
     const at = { x: state.pointerX + pendingDx, y: state.pointerY + pendingDy }
 
     if (carriedAway.value) {
-      if (isInsideOwnGrid(at.x, at.y)) endTransferOut()
+      if (isInsideOwnGrid(at.x, at.y)) {
+        endTransferOut()
+      }
       else {
         transfer.moveTo(at)
         return
@@ -491,7 +504,8 @@ function flush(): void {
     }
 
     const cell = cellFromDelta(state.origin, state.metrics, pendingDx, pendingDy)
-    if (cell.x === state.cell.x && cell.y === state.cell.y) return
+    if (cell.x === state.cell.x && cell.y === state.cell.y)
+      return
 
     state.cell = cell
     preview.value = moveItem(baseLayout.value, state.id, cell, moveOptions.value)
@@ -499,7 +513,8 @@ function flush(): void {
   }
 
   const span = spanFromDelta(state.origin, state.metrics, pendingDx, pendingDy)
-  if (span.w === state.span.w && span.h === state.span.h) return
+  if (span.w === state.span.w && span.h === state.span.h)
+    return
 
   state.span = span
   preview.value = resizeItem(baseLayout.value, state.id, pinAutoHeight(state.id, span), moveOptions.value)
@@ -507,7 +522,8 @@ function flush(): void {
 
 function scheduleFlush(event: PointerEvent): void {
   const state = dragState.value
-  if (!state) return
+  if (!state)
+    return
 
   pendingDx = event.clientX - state.pointerX
   pendingDy = event.clientY - state.pointerY
@@ -517,7 +533,8 @@ function scheduleFlush(event: PointerEvent): void {
 
 function finishGesture(commitResult: boolean): void {
   const state = dragState.value
-  if (!state) return
+  if (!state)
+    return
 
   // Виджет на весу над чужой сеткой: исход решает она, а не наша арифметика.
   // Приёмник эмитит свой `itemDrop`, мы убираем виджет у себя — но только если
@@ -536,7 +553,8 @@ function finishGesture(commitResult: boolean): void {
     pendingDx = 0
     pendingDy = 0
 
-    if (!landed) return
+    if (!landed)
+      return
 
     emit('itemTransferOut', state.id, payload)
     commit(removeItem(baseLayout.value, state.id, moveOptions.value))
@@ -561,13 +579,17 @@ function finishGesture(commitResult: boolean): void {
   pendingDx = 0
   pendingDy = 0
 
-  if (!commitResult || !next) return
+  if (!commitResult || !next)
+    return
 
   const to = next.find(item => item.id === state.id)
-  if (!to) return
-  if (to.x === state.origin.x && to.y === state.origin.y && to.w === state.origin.w && to.h === state.origin.h) return
+  if (!to)
+    return
+  if (to.x === state.origin.x && to.y === state.origin.y && to.w === state.origin.w && to.h === state.origin.h)
+    return
 
-  if (state.kind === 'move') emit('itemMove', state.id, state.origin, to)
+  if (state.kind === 'move')
+    emit('itemMove', state.id, state.origin, to)
   else emit('itemResize', state.id, state.origin, to)
 
   commit(next)
@@ -598,19 +620,22 @@ function phantomOf(payload: GrDashboardTransfer): GrDashboardItemLayout {
  */
 function transferOver(payload: GrDashboardTransfer, at: GrDashboardTransferPoint): void {
   const rect = rootEl.value?.getBoundingClientRect()
-  if (!rect) return
+  if (!rect)
+    return
 
   const snapshot = metricsOf(rect.width, cols.value, rowHeight.value, gap.value)
   const cell = cellFromPoint(snapshot, at.x - rect.left, at.y - rect.top, payload.size)
   const previous = transferCell.value
-  if (previous && previous.x === cell.x && previous.y === cell.y) return
+  if (previous && previous.x === cell.x && previous.y === cell.y)
+    return
 
   transferCell.value = cell
   preview.value = addItem(baseLayout.value, phantomOf(payload), moveOptions.value, cell)
 }
 
 function transferLeave(): void {
-  if (transferCell.value === null) return
+  if (transferCell.value === null)
+    return
 
   transferCell.value = null
   preview.value = null
@@ -618,7 +643,8 @@ function transferLeave(): void {
 
 function transferDrop(payload: GrDashboardTransfer): void {
   const cell = transferCell.value
-  if (!cell) return
+  if (!cell)
+    return
 
   emit('itemDrop', {
     transfer: payload,
@@ -662,12 +688,16 @@ const gesture = useDragGesture({
 function beginGesture(id: string, kind: 'move' | 'resize', event: PointerEvent): void {
   // Два жеста разом делили бы один `preview`, и раскладка досталась бы тому,
   // кто отпустил позже.
-  if (transfer.isTransferring.value) return
+  if (transfer.isTransferring.value)
+    return
 
   const origin = itemFor(id)
-  if (!origin || origin.static) return
-  if (kind === 'move' && !canMove(id)) return
-  if (kind === 'resize' && !canResizeItem(id)) return
+  if (!origin || origin.static)
+    return
+  if (kind === 'move' && !canMove(id))
+    return
+  if (kind === 'resize' && !canResizeItem(id))
+    return
 
   // Метрика снимается один раз: замер на каждое движение — это принудительный
   // reflow сорок раз в секунду.
@@ -699,21 +729,25 @@ function beginGesture(id: string, kind: 'move' | 'resize', event: PointerEvent):
  * него не шлёт, а бросить начатое пользователь вправе.
  */
 function onWindowKeydown(event: KeyboardEvent): void {
-  if (event.key !== 'Escape' || !dragState.value) return
+  if (event.key !== 'Escape' || !dragState.value)
+    return
 
   event.preventDefault()
   gesture.stop(false)
 }
 
 watch(() => gesture.isDragging.value, (dragging) => {
-  if (typeof window === 'undefined') return
+  if (typeof window === 'undefined')
+    return
 
-  if (dragging) window.addEventListener('keydown', onWindowKeydown, true)
+  if (dragging)
+    window.addEventListener('keydown', onWindowKeydown, true)
   else window.removeEventListener('keydown', onWindowKeydown, true)
 })
 
 onBeforeUnmount(() => {
-  if (typeof window !== 'undefined') window.removeEventListener('keydown', onWindowKeydown, true)
+  if (typeof window !== 'undefined')
+    window.removeEventListener('keydown', onWindowKeydown, true)
 })
 
 // ————— Клавиатура.
@@ -744,7 +778,8 @@ function announcePosition(key: string, fallback: string, item: GrDashboardItemLa
 
 function grab(id: string): void {
   const item = itemFor(id)
-  if (!item || item.static || !canMove(id)) return
+  if (!item || item.static || !canMove(id))
+    return
 
   grabbedId.value = id
   keyboardOrigin.value = item
@@ -755,10 +790,12 @@ function drop(): void {
   const id = grabbedId.value
   grabbedId.value = null
   keyboardOrigin.value = null
-  if (!id) return
+  if (!id)
+    return
 
   const item = itemFor(id)
-  if (item) announcePosition('grDashboard.item.dropped', '{title} moved. Column {col}, row {row}', item)
+  if (item)
+    announcePosition('grDashboard.item.dropped', '{title} moved. Column {col}, row {row}', item)
 }
 
 function cancelKeyboard(): void {
@@ -766,7 +803,8 @@ function cancelKeyboard(): void {
   const origin = keyboardOrigin.value
   grabbedId.value = null
   keyboardOrigin.value = null
-  if (!id || !origin) return
+  if (!id || !origin)
+    return
 
   const from = itemFor(id)
   const next = moveItem(baseLayout.value, id, { x: origin.x, y: origin.y }, moveOptions.value)
@@ -784,20 +822,24 @@ function cancelKeyboard(): void {
 
 function moveGrabbedBy(dx: number, dy: number): void {
   const id = grabbedId.value
-  if (!id) return
+  if (!id)
+    return
 
   const item = itemFor(id)
-  if (!item) return
+  if (!item)
+    return
 
   const next = moveItem(baseLayout.value, id, { x: item.x + dx, y: item.y + dy }, moveOptions.value)
   commit(next)
 
   const moved = next.find(entry => entry.id === id)
-  if (!moved) return
+  if (!moved)
+    return
 
   // Клавиатура эмитит `itemMove` наравне с указателем: приложение, слушающее
   // событие, иначе видело бы только половину переносов.
-  if (moved.x !== item.x || moved.y !== item.y) emit('itemMove', id, item, moved)
+  if (moved.x !== item.x || moved.y !== item.y)
+    emit('itemMove', id, item, moved)
 
   announcePosition('grDashboard.item.moved', 'Column {col}, row {row}', moved)
 }
@@ -810,12 +852,14 @@ const ARROW_DELTA: Record<string, [number, number]> = {
 }
 
 function onHandleKeydown(id: string, event: KeyboardEvent): void {
-  if (mode.value !== 'edit') return
+  if (mode.value !== 'edit')
+    return
 
   const grabbed = grabbedId.value === id
 
   if (event.key === 'Escape') {
-    if (!grabbed) return
+    if (!grabbed)
+      return
 
     event.preventDefault()
     cancelKeyboard()
@@ -824,7 +868,8 @@ function onHandleKeydown(id: string, event: KeyboardEvent): void {
 
   if (event.key === ' ' || event.key === 'Enter') {
     event.preventDefault()
-    if (grabbed) drop()
+    if (grabbed)
+      drop()
     else grab(id)
     return
   }
@@ -832,7 +877,8 @@ function onHandleKeydown(id: string, event: KeyboardEvent): void {
   if (grabbed) {
     // Взятый виджет забирает стрелки себе: двигается он, а не фокус.
     const delta = ARROW_DELTA[event.key]
-    if (!delta) return
+    if (!delta)
+      return
 
     event.preventDefault()
     moveGrabbedBy(delta[0], delta[1])
@@ -843,10 +889,12 @@ function onHandleKeydown(id: string, event: KeyboardEvent): void {
 }
 
 function onResizeKeydown(id: string, event: KeyboardEvent): void {
-  if (mode.value !== 'edit' || !canResizeItem(id)) return
+  if (mode.value !== 'edit' || !canResizeItem(id))
+    return
 
   const item = itemFor(id)
-  if (!item) return
+  if (!item)
+    return
 
   const step = event.shiftKey ? 3 : 1
   let w = item.w
@@ -857,8 +905,14 @@ function onResizeKeydown(id: string, event: KeyboardEvent): void {
     case 'ArrowRight': w += step; break
     case 'ArrowUp': h -= step; break
     case 'ArrowDown': h += step; break
-    case 'Home': w = item.minW ?? 1; h = item.minH ?? 1; break
-    case 'End': w = item.maxW ?? cols.value; h = item.maxH ?? h; break
+    case 'Home':
+      w = item.minW ?? 1
+      h = item.minH ?? 1
+      break
+    case 'End':
+      w = item.maxW ?? cols.value
+      h = item.maxH ?? h
+      break
     default: return
   }
 
@@ -874,14 +928,17 @@ function onResizeKeydown(id: string, event: KeyboardEvent): void {
  * показавший форму, принял бы отказ за успех.
  */
 function applyResize(id: string, span: GrDashboardSpan): boolean {
-  if (mode.value !== 'edit' || !canResizeItem(id)) return false
+  if (mode.value !== 'edit' || !canResizeItem(id))
+    return false
 
   const from = itemFor(id)
-  if (!from) return false
+  if (!from)
+    return false
 
   const next = resizeItem(baseLayout.value, id, pinAutoHeight(id, span), moveOptions.value)
   const to = next.find(entry => entry.id === id)
-  if (!to || (to.w === from.w && to.h === from.h)) return false
+  if (!to || (to.w === from.w && to.h === from.h))
+    return false
 
   emit('itemResize', id, from, to)
   commit(next)
@@ -905,34 +962,40 @@ let autoFrame: number | null = null
  */
 function flushAutoHeights(): void {
   autoFrame = null
-  if (contentHeights.size === 0) return
+  if (contentHeights.size === 0)
+    return
 
   let next = baseLayout.value
   const changed: [string, GrDashboardItemLayout, GrDashboardItemLayout][] = []
 
   for (const [id, px] of contentHeights) {
     const from = next.find(entry => entry.id === id)
-    if (!from) continue
+    if (!from)
+      continue
 
     const rows = rowsForHeight(px, metrics.value)
-    if (rows === from.h) continue
+    if (rows === from.h)
+      continue
 
     const applied = resizeItem(next, id, { w: from.w, h: rows }, moveOptions.value)
     const to = applied.find(entry => entry.id === id)
-    if (!to || to.h === from.h) continue
+    if (!to || to.h === from.h)
+      continue
 
     next = applied
     changed.push([id, from, to])
   }
 
-  if (changed.length === 0) return
+  if (changed.length === 0)
+    return
 
   for (const [id, from, to] of changed) emit('itemAutoResize', id, from, to)
   commit(next)
 }
 
 function scheduleAutoHeights(): void {
-  if (autoFrame !== null) return
+  if (autoFrame !== null)
+    return
 
   autoFrame = typeof requestAnimationFrame === 'undefined'
     ? (queueMicrotask(flushAutoHeights), -1)
@@ -945,7 +1008,8 @@ function scheduleAutoHeights(): void {
  * виджету только ширину.
  */
 function pinAutoHeight(id: string, span: GrDashboardSpan): GrDashboardSpan {
-  if (!contentHeights.has(id)) return span
+  if (!contentHeights.has(id))
+    return span
 
   return { w: span.w, h: itemFor(id)?.h ?? span.h }
 }
@@ -956,7 +1020,8 @@ function reportContentHeight(id: string, px: number | null): void {
     return
   }
 
-  if (contentHeights.get(id) === px) return
+  if (contentHeights.get(id) === px)
+    return
 
   contentHeights.set(id, px)
   scheduleAutoHeights()
@@ -964,10 +1029,12 @@ function reportContentHeight(id: string, px: number | null): void {
 
 /** Взятое не может остаться взятым навсегда: фокус ушёл — перенос отменён. */
 function onFocusout(event: FocusEvent): void {
-  if (!grabbedId.value) return
+  if (!grabbedId.value)
+    return
 
   const next = event.relatedTarget as Node | null
-  if (next && rootEl.value?.contains(next)) return
+  if (next && rootEl.value?.contains(next))
+    return
 
   cancelKeyboard()
 }
@@ -994,11 +1061,13 @@ const context: GrDashboardContext = {
     handleEls.delete(id)
   },
   setHandleElement: (id, el) => {
-    if (el) handleEls.set(id, el)
+    if (el)
+      handleEls.set(id, el)
     else handleEls.delete(id)
   },
   setItemElement: (id, el) => {
-    if (el) itemEls.set(id, el)
+    if (el)
+      itemEls.set(id, el)
     else itemEls.delete(id)
   },
   observeBody: (el, onResize) => {
@@ -1038,7 +1107,8 @@ defineExpose({ breakpoint, cols })
 
 const placeholderCell = computed(() => {
   const state = dragState.value
-  if (state) return preview.value?.find(item => item.id === state.id) ?? null
+  if (state)
+    return preview.value?.find(item => item.id === state.id) ?? null
 
   return transferCell.value === null ? null : (preview.value?.find(item => item.id === GR_TRANSFER_ID) ?? null)
 })

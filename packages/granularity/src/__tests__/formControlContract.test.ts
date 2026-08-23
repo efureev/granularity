@@ -46,7 +46,8 @@ describe('состав эмитов форм-контрола', () => {
   it.each(controls.map(({ component, meta }) => [meta.name, component] as const))(
     '%s объявляет clear, если у него есть clearable',
     (_name, component) => {
-      if (!declaredProps(component).includes('clearable')) return
+      if (!declaredProps(component).includes('clearable'))
+        return
 
       expect(declaredEmits(component)).toContain('clear')
     },
@@ -114,7 +115,8 @@ describe('контракт форм-контрола', () => {
       })
 
       it('наследует readonly от GrFormField', async () => {
-        if (meta.noReadonly) return
+        if (meta.noReadonly)
+          return
 
         const wrapper = mount(defineComponent({
           render: () => h(GrFormField, { label: 'Поле', readonly: true }, {

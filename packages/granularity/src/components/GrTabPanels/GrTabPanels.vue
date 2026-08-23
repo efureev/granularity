@@ -40,7 +40,6 @@ defineSlots<{
   /** Панели (`GrTabPanel`). */
   default?: () => any
 }>()
-
 </script>
 
 <template>

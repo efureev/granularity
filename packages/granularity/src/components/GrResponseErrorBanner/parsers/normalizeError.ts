@@ -110,7 +110,8 @@ type AxiosLikeError = Error & {
 }
 
 function isPlainNormalized(v: unknown): v is NormalizedRawError {
-  if (!v || typeof v !== 'object') return false
+  if (!v || typeof v !== 'object')
+    return false
   const o = v as Record<string, unknown>
   return 'raw' in o && (
     'status' in o || 'body' in o || 'isAbort' in o || 'isNetwork' in o || 'headers' in o
@@ -119,8 +120,8 @@ function isPlainNormalized(v: unknown): v is NormalizedRawError {
 
 function isResponseEnvelope(v: unknown): v is { response: Response, body: unknown } {
   return !!v && typeof v === 'object'
-      && 'response' in (v)
-      && isFetchResponse((v).response)
+    && 'response' in (v)
+    && isFetchResponse((v).response)
 }
 
 function isFetchResponse(v: unknown): v is Response {
@@ -132,21 +133,24 @@ function isXhr(v: unknown): v is XMLHttpRequest {
 }
 
 function isAxiosLike(v: unknown): v is AxiosLikeError {
-  if (!v || typeof v !== 'object') return false
+  if (!v || typeof v !== 'object')
+    return false
   const o = v as Record<string, unknown>
   return o.isAxiosError === true
-      || ('response' in o && typeof o.response === 'object' && o.response !== null)
-      || ('code' in o && typeof o.code === 'string')
+    || ('response' in o && typeof o.response === 'object' && o.response !== null)
+    || ('code' in o && typeof o.code === 'string')
 }
 
 function isAbortError(v: unknown): boolean {
-  if (!v || typeof v !== 'object') return false
+  if (!v || typeof v !== 'object')
+    return false
   const o = v as { name?: string, code?: string }
   return o.name === 'AbortError' || o.name === 'CanceledError' || o.code === 'ERR_CANCELED'
 }
 
 async function readFetchBody(res: Response): Promise<unknown> {
-  if (res.bodyUsed) return undefined
+  if (res.bodyUsed)
+    return undefined
   try {
     const clone = res.clone()
     const text = await clone.text()
@@ -166,16 +170,19 @@ function readHeaders(res: Response): Record<string, string> {
 }
 
 function normalizeHeaderRecord(h: unknown): Record<string, string> | undefined {
-  if (!h || typeof h !== 'object') return undefined
+  if (!h || typeof h !== 'object')
+    return undefined
   const out: Record<string, string> = {}
   for (const [k, v] of Object.entries(h as Record<string, unknown>)) {
-    if (typeof v === 'string') out[k.toLowerCase()] = v
+    if (typeof v === 'string')
+      out[k.toLowerCase()] = v
   }
   return out
 }
 
 function parseMaybeJson(text: string | undefined): unknown {
-  if (typeof text !== 'string' || !text) return undefined
+  if (typeof text !== 'string' || !text)
+    return undefined
   try {
     return JSON.parse(text)
   }

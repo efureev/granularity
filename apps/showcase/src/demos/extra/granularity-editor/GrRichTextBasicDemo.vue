@@ -39,8 +39,10 @@ const outputOptions = [
 
 /** `toolbar` принимает и булево, и строку — радиогруппа отдаёт только строки. */
 const toolbarProp = computed(() => {
-  if (toolbar.value === 'true') return true
-  if (toolbar.value === 'false') return false
+  if (toolbar.value === 'true')
+    return true
+  if (toolbar.value === 'false')
+    return false
 
   return toolbar.value
 })

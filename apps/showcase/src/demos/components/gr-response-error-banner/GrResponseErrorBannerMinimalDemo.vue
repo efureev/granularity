@@ -12,7 +12,8 @@ async function loadReport() {
       headers: { 'content-type': 'application/json' },
     })
 
-    if (!response.ok) throw response
+    if (!response.ok)
+      throw response
   }
   catch (error) {
     await setRaw(error)

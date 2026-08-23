@@ -17,8 +17,8 @@ describe('entity page helpers', () => {
     const componentEntity = resolveFeaturedEntity('components', showcaseEntityRegistry)
     const directiveEntity = resolveFeaturedEntity('directives', showcaseEntityRegistry)
 
-    expect(createUsageSnippet(componentEntity)).toContain("import { GrButton } from '@feugene/granularity'")
-    expect(createUsageSnippet(directiveEntity)).toContain("import { vLoading } from '@feugene/granularity/directives'")
+    expect(createUsageSnippet(componentEntity)).toContain('import { GrButton } from \'@feugene/granularity\'')
+    expect(createUsageSnippet(directiveEntity)).toContain('import { vLoading } from \'@feugene/granularity/directives\'')
   })
 
   it('создаёт связанные ссылки на source, export entry и narrative docs', () => {

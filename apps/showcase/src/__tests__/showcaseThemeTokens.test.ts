@@ -47,7 +47,7 @@ describe('showcase theme tokens', () => {
       'utf8',
     )
 
-    expect(showcaseMainEntry).toContain("import './styles/showcase-theme.css'")
+    expect(showcaseMainEntry).toContain('import \'./styles/showcase-theme.css\'')
   })
 
   it('не использует hardcoded palette в token-driven showcase исходниках', () => {

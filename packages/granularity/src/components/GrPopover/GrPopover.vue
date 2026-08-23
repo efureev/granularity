@@ -142,7 +142,8 @@ const panelId = useId()
 const clickOutsideExclude = [() => panelEl.value]
 
 function open(): void {
-  if (props.disabled) return
+  if (props.disabled)
+    return
   setOpen(true)
 }
 
@@ -179,13 +180,15 @@ const { floatingStyle, resolvedPlacement, update: updateFloatingPosition } = use
 )
 
 watch(() => props.placement, () => {
-  if (isOpen.value) updateFloatingPosition()
+  if (isOpen.value)
+    updateFloatingPosition()
 })
 
 // Объект якоря стабилен, поэтому смену координат `useFloating` сам не заметит:
 // повторный вызов у другой точки — это пересчёт позиции, а не переоткрытие.
 watch(() => props.anchor, () => {
-  if (isOpen.value) updateFloatingPosition()
+  if (isOpen.value)
+    updateFloatingPosition()
 }, { deep: true })
 
 /**
@@ -213,7 +216,8 @@ const { inertAttr, portalTarget, teleportEnabled, themeAttrs } = useModalOverlay
 // В модальном режиме перенос обязателен: фон в `inert`, и фокус, оставленный
 // снаружи, попал бы в недоступное поддерево.
 watch(isOpen, async (next) => {
-  if (!next || !(props.autoFocus || props.modal)) return
+  if (!next || !(props.autoFocus || props.modal))
+    return
 
   await nextTick()
   panelEl.value?.focus()
@@ -240,11 +244,13 @@ const triggerProps = computed(() => ({
 }))
 
 function onTriggerClick(): void {
-  if (props.trigger === 'click') toggle()
+  if (props.trigger === 'click')
+    toggle()
 }
 
 function onContentClick(): void {
-  if (props.closeOnContentClick) close()
+  if (props.closeOnContentClick)
+    close()
 }
 
 const panelClasses = computed(() =>
@@ -268,7 +274,6 @@ defineSlots<{
   /** Содержимое панели. */
   content?: (props: { close: () => void }) => any
 }>()
-
 </script>
 
 <template>

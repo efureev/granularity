@@ -99,8 +99,10 @@ function createRegion(politeness: GrAnnouncerPoliteness): HTMLElement {
  * ставится в момент `useAnnouncer()`, а текст пишется отложенно.
  */
 function ensureHost(): AnnouncerHost | null {
-  if (typeof document === 'undefined') return null
-  if (host?.polite.isConnected) return host
+  if (typeof document === 'undefined')
+    return null
+  if (host?.polite.isConnected)
+    return host
 
   const existing = document.getElementById(HOST_ID)
   existing?.remove()
@@ -123,7 +125,8 @@ function ensureHost(): AnnouncerHost | null {
 
 function cancel(map: Map<HTMLElement, ReturnType<typeof setTimeout>>, region: HTMLElement): void {
   const handle = map.get(region)
-  if (handle === undefined) return
+  if (handle === undefined)
+    return
   clearTimeout(handle)
   map.delete(region)
 }
@@ -139,7 +142,8 @@ export function useAnnouncer(): GrAnnouncer {
     const targets = politeness ? [regionFor(politeness)] : [regionFor('polite'), regionFor('assertive')]
 
     for (const region of targets) {
-      if (!region) continue
+      if (!region)
+        continue
       cancel(writeTimers, region)
       cancel(clearTimers, region)
       region.textContent = ''
@@ -148,7 +152,8 @@ export function useAnnouncer(): GrAnnouncer {
 
   function announce(message: string, options: GrAnnounceOptions = {}): void {
     const region = regionFor(options.politeness ?? 'polite')
-    if (!region || !message) return
+    if (!region || !message)
+      return
 
     cancel(writeTimers, region)
     cancel(clearTimers, region)
@@ -162,7 +167,8 @@ export function useAnnouncer(): GrAnnouncer {
       region.textContent = message
 
       const clearAfterMs = options.clearAfterMs ?? DEFAULT_CLEAR_AFTER_MS
-      if (clearAfterMs <= 0) return
+      if (clearAfterMs <= 0)
+        return
 
       clearTimers.set(region, setTimeout(() => {
         clearTimers.delete(region)

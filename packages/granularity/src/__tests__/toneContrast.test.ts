@@ -43,7 +43,8 @@ function parse(hex: string): { r: number, g: number, b: number } {
 /** Худший контраст токена по всем подложкам темы. */
 function worstRatio(theme: ThemeName, token: string): number | undefined {
   const foreground = hexOf(theme, token)
-  if (!foreground) return undefined
+  if (!foreground)
+    return undefined
 
   const ratios = SURFACES
     .map(surface => hexOf(theme, surface))

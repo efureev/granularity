@@ -31,6 +31,6 @@ export default defineConfig({
     // Тот же гард, что в ядре: подстановка текстом, чтобы бандлер потребителя
     // свернул предупреждения вместе с веткой. Скобки обязательны — без них
     // `!__GR_DEV__` развернулось бы в `!typeof process !== 'undefined' && …`.
-    __GR_DEV__: "(typeof process !== 'undefined' && process.env.NODE_ENV !== 'production')",
+    __GR_DEV__: '(typeof process !== \'undefined\' && process.env.NODE_ENV !== \'production\')',
   },
 })

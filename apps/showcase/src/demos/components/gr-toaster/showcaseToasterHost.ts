@@ -15,7 +15,8 @@ export function useShowcaseToasterHost(hostId: string) {
    * таймером.
    */
   function activateHost() {
-    if (activeHostId.value === hostId) return
+    if (activeHostId.value === hostId)
+      return
 
     useToast().clear()
     activeHostId.value = hostId

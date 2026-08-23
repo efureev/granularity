@@ -3,9 +3,12 @@ import { isResolvedUnion } from './union'
 import type { GrSchemaNode, GrSchemaObjectNode } from './types'
 
 function cloneDefault(value: unknown): unknown {
-  if (value === null || typeof value !== 'object') return value
-  if (Array.isArray(value)) return value.map(cloneDefault)
-  if (value instanceof Date) return new Date(value.getTime())
+  if (value === null || typeof value !== 'object')
+    return value
+  if (Array.isArray(value))
+    return value.map(cloneDefault)
+  if (value instanceof Date)
+    return new Date(value.getTime())
 
   return Object.fromEntries(
     Object.entries(value as Record<string, unknown>).map(([key, item]) => [key, cloneDefault(item)]),
@@ -28,8 +31,10 @@ function cloneDefault(value: unknown): unknown {
  *   выбрасывает `undefined`-ключи, и сброс формы затем удалил бы ключ вовсе.
  */
 export function defaultValueFor(node: GrSchemaNode): unknown {
-  if (node.default !== undefined) return cloneDefault(node.default)
-  if (node.const !== undefined) return cloneDefault(node.const)
+  if (node.default !== undefined)
+    return cloneDefault(node.default)
+  if (node.const !== undefined)
+    return cloneDefault(node.const)
 
   switch (node.kind) {
     case 'string':
@@ -123,11 +128,13 @@ export function ensureShape(target: Record<string, unknown>, root: GrSchemaObjec
         const existing = getAtPath(target, path)
 
         if (field.kind === 'array') {
-          if (!Array.isArray(existing)) setAtPath(target, path, [])
+          if (!Array.isArray(existing))
+            setAtPath(target, path, [])
         }
         else if (field.kind === 'object') {
           const isPlainObject = existing !== null && typeof existing === 'object' && !Array.isArray(existing)
-          if (!isPlainObject) setAtPath(target, path, {})
+          if (!isPlainObject)
+            setAtPath(target, path, {})
         }
         else if (existing === undefined) {
           setAtPath(target, path, defaultValueFor(field))
@@ -140,7 +147,8 @@ export function ensureShape(target: Record<string, unknown>, root: GrSchemaObjec
 
     if (node.kind === 'array') {
       const list = getAtPath(target, base)
-      if (!Array.isArray(list)) return
+      if (!Array.isArray(list))
+        return
 
       // Строки, уже лежащие в модели, тоже обязаны иметь форму схемы.
       for (let index = 0; index < list.length; index += 1) visit(node.item, joinPath(base, index))

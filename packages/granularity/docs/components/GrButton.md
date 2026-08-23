@@ -45,7 +45,9 @@
 говорит спиннер.
 
 ```vue
-<GrButton :loading="saving" loading-text="Сохраняем отчёт">Сохранить</GrButton>
+<GrButton :loading="saving" loading-text="Сохраняем отчёт">
+Сохранить
+</GrButton>
 ```
 
 `aria-busy` сам по себе объявляет не всякая AT, поэтому во время загрузки к

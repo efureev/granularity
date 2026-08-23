@@ -2,7 +2,7 @@
 import { computed, useSlots } from 'vue'
 
 import { GrCard } from '@feugene/granularity'
-import InlineRichText from "../content/InlineRichText.vue";
+import InlineRichText from '../content/InlineRichText.vue'
 
 defineProps<{
   /** Small kicker/eyebrow above the title. */

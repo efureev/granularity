@@ -210,14 +210,16 @@ useOverlayLayer(isOpen, close, { root: panelEl })
 watch(
   () => [props.placement, props.offset],
   () => {
-    if (isOpen.value) updateFloatingPosition()
+    if (isOpen.value)
+      updateFloatingPosition()
   },
 )
 
 watch(
   () => props.disabled,
   (value) => {
-    if (value) close()
+    if (value)
+      close()
   },
 )
 
@@ -308,7 +310,6 @@ defineSlots<{
   /** Содержимое меню. */
   content?: (props: { close: () => void }) => any
 }>()
-
 </script>
 
 <template>

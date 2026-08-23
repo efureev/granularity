@@ -37,7 +37,8 @@ function clamp(value: number, min: number, max: number): number {
  * появляются там, где они и нужны, — на шкале слайдера (`normalizeHsla`).
  */
 function normalizeHue(hue: number): number {
-  if (!Number.isFinite(hue)) return 0
+  if (!Number.isFinite(hue))
+    return 0
   return ((hue % 360) + 360) % 360
 }
 
@@ -46,7 +47,8 @@ function expandShorthand(hex: string): string | null {
   if (hex.length === 3 || hex.length === 4)
     return [...hex].map(char => char + char).join('')
 
-  if (hex.length === 6 || hex.length === 8) return hex
+  if (hex.length === 6 || hex.length === 8)
+    return hex
 
   return null
 }
@@ -61,13 +63,16 @@ function rgbToHsl({ r, g, b }: Rgb): { h: number, s: number, l: number } {
   const delta = max - min
   const lightness = (max + min) / 2
 
-  if (delta === 0) return { h: 0, s: 0, l: lightness * 100 }
+  if (delta === 0)
+    return { h: 0, s: 0, l: lightness * 100 }
 
   const saturation = delta / (1 - Math.abs(2 * lightness - 1))
 
   let hue: number
-  if (max === red) hue = ((green - blue) / delta) % 6
-  else if (max === green) hue = (blue - red) / delta + 2
+  if (max === red)
+    hue = ((green - blue) / delta) % 6
+  else if (max === green)
+    hue = (blue - red) / delta + 2
   else hue = (red - green) / delta + 4
 
   return { h: normalizeHue(hue * 60), s: saturation * 100, l: lightness * 100 }
@@ -83,11 +88,16 @@ function hslToRgb({ h, s, l }: Omit<GrHsla, 'a'>): Rgb {
   const match = lightness - chroma / 2
 
   const [red, green, blue] = ((): [number, number, number] => {
-    if (hue < 60) return [chroma, second, 0]
-    if (hue < 120) return [second, chroma, 0]
-    if (hue < 180) return [0, chroma, second]
-    if (hue < 240) return [0, second, chroma]
-    if (hue < 300) return [second, 0, chroma]
+    if (hue < 60)
+      return [chroma, second, 0]
+    if (hue < 120)
+      return [second, chroma, 0]
+    if (hue < 180)
+      return [0, chroma, second]
+    if (hue < 240)
+      return [0, second, chroma]
+    if (hue < 300)
+      return [second, 0, chroma]
     return [chroma, 0, second]
   })()
 
@@ -110,13 +120,16 @@ function toHexPair(value: number): string {
  * из поля ввода, и упавший компонент — худший ответ на опечатку.
  */
 export function parseHexColor(value: unknown): GrHsla | null {
-  if (typeof value !== 'string') return null
+  if (typeof value !== 'string')
+    return null
 
   const match = HEX_PATTERN.exec(value.trim())
-  if (!match) return null
+  if (!match)
+    return null
 
   const hex = expandShorthand(match[1])
-  if (!hex) return null
+  if (!hex)
+    return null
 
   const rgb: Rgb = {
     r: Number.parseInt(hex.slice(0, 2), 16),
@@ -138,7 +151,8 @@ export function formatHexColor(color: GrHsla, withAlpha = false): string {
   const { r, g, b } = hslToRgb(color)
   const base = `#${toHexPair(r)}${toHexPair(g)}${toHexPair(b)}`
 
-  if (!withAlpha) return base
+  if (!withAlpha)
+    return base
 
   return `${base}${toHexPair(clamp(color.a, 0, 1) * 255)}`
 }

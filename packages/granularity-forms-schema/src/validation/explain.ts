@@ -24,13 +24,20 @@ export function explainRules(
   const result: GrSchemaRuleExplanation[] = []
 
   for (const rule of rules) {
-    if (rule.required) result.push({ tier: 'declarative', check: 'required', message: rule.message })
-    if (rule.type) result.push({ tier: 'declarative', check: rule.type, message: rule.message })
-    if (rule.len !== undefined) result.push({ tier: 'declarative', check: 'len', message: rule.message })
-    if (rule.min !== undefined) result.push({ tier: 'declarative', check: 'min', message: rule.message })
-    if (rule.max !== undefined) result.push({ tier: 'declarative', check: 'max', message: rule.message })
-    if (rule.pattern) result.push({ tier: 'declarative', check: 'pattern', message: rule.message })
-    if (rule.file) result.push({ tier: 'declarative', check: 'file', message: rule.message })
+    if (rule.required)
+      result.push({ tier: 'declarative', check: 'required', message: rule.message })
+    if (rule.type)
+      result.push({ tier: 'declarative', check: rule.type, message: rule.message })
+    if (rule.len !== undefined)
+      result.push({ tier: 'declarative', check: 'len', message: rule.message })
+    if (rule.min !== undefined)
+      result.push({ tier: 'declarative', check: 'min', message: rule.message })
+    if (rule.max !== undefined)
+      result.push({ tier: 'declarative', check: 'max', message: rule.message })
+    if (rule.pattern)
+      result.push({ tier: 'declarative', check: 'pattern', message: rule.message })
+    if (rule.file)
+      result.push({ tier: 'declarative', check: 'file', message: rule.message })
 
     if (rule.validator) {
       const isResidual = rule.trigger === 'submit' && rule.message === undefined

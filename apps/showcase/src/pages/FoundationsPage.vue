@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import {computed, ref} from 'vue'
+import { computed, ref } from 'vue'
 
 import { useFintI18n } from '@feugene/fint-i18n/vue'
-import {GrBadge, GrCard, GrLink, GrSwitch} from '@feugene/granularity'
+import { GrBadge, GrCard, GrLink, GrSwitch } from '@feugene/granularity'
 
 import InlineRichText from '../components/content/InlineRichText.vue'
 import CodeBlock from '../components/doc/CodeBlock.vue'
@@ -50,7 +50,7 @@ const themePreviewContainerStyle = computed(() => {
   if (activeThemeName.value === 'dark')
     return undefined
 
-  const lightThemeTokenEntries = showcaseThemeTokens.map(token => {
+  const lightThemeTokenEntries = showcaseThemeTokens.map((token) => {
     const currentValue = token.values.light.value
 
     return `${token.name}: ${currentValue}`
@@ -60,7 +60,7 @@ const themePreviewContainerStyle = computed(() => {
 })
 
 function getVisibleCodeSamples(guide: (typeof showcaseFoundationGuides)[number]) {
-  return guide.codeSamples.filter(codeSample => {
+  return guide.codeSamples.filter((codeSample) => {
     if (codeSample.language === 'md')
       return false
 

@@ -14,7 +14,8 @@ import { sortLayout } from './layoutModel'
 import { layoutsEqual } from './layoutSerialize'
 
 export function collides(a: GrDashboardItemLayout, b: GrDashboardItemLayout): boolean {
-  if (a.id === b.id) return false
+  if (a.id === b.id)
+    return false
 
   return a.x < b.x + b.w
     && a.x + a.w > b.x
@@ -85,8 +86,12 @@ function pack(layout: GrDashboardLayout, options: PackOptions): GrDashboardLayou
     const origin = coordOf(item, axis)
     let value = origin
 
-    if (settle) while (firstCollision(placed, withCoord(item, axis, value))) value += 1
-    if (float) while (value > 0 && !firstCollision(placed, withCoord(item, axis, value - 1))) value -= 1
+    if (settle) {
+      while (firstCollision(placed, withCoord(item, axis, value))) value += 1
+    }
+    if (float) {
+      while (value > 0 && !firstCollision(placed, withCoord(item, axis, value - 1))) value -= 1
+    }
 
     placed.push(value === origin ? item : withCoord(item, axis, value))
   }
@@ -141,7 +146,8 @@ function compactBoth(layout: GrDashboardLayout): GrDashboardLayout {
 
   while (guard > 0) {
     const next = compactVertical(slideLeft(current))
-    if (layoutsEqual(next, current)) return next
+    if (layoutsEqual(next, current))
+      return next
 
     current = next
     guard -= 1
@@ -186,11 +192,14 @@ export function resolveCollisions(
 ): GrDashboardLayout | null {
   const items = layout.map(item => ({ ...item }))
   const moved = items.find(item => item.id === movedId)
-  if (!moved) return sortLayout(items)
+  if (!moved)
+    return sortLayout(items)
 
   const blocked = collisionsWith(items, moved)
-  if (blocked.length === 0) return sortLayout(items)
-  if (options.preventCollision || blocked.some(item => item.static)) return null
+  if (blocked.length === 0)
+    return sortLayout(items)
+  if (options.preventCollision || blocked.some(item => item.static))
+    return null
 
   const statics = items.filter(item => item.static)
 
@@ -202,16 +211,19 @@ export function resolveCollisions(
   while (queue.length > 0 && guard > 0) {
     guard -= 1
     const current = queue.shift()
-    if (!current) break
+    if (!current)
+      break
 
     for (const other of items) {
-      if (other.static || !collides(other, current)) continue
+      if (other.static || !collides(other, current))
+        continue
 
       other.y = current.y + current.h
 
       // Толчок, упёршийся в статику, отменяет всё перемещение: положить виджет
       // поверх неподвижного — это молча испорченная раскладка.
-      if (firstCollision(statics, other)) return null
+      if (firstCollision(statics, other))
+        return null
 
       queue.push(other)
     }

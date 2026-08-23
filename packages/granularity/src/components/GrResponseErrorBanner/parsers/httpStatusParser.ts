@@ -17,7 +17,8 @@ import type { ResponseErrorParser } from '../responseError.types'
  */
 export const httpStatusParser: ResponseErrorParser = (ctx) => {
   const status = ctx.status
-  if (typeof status !== 'number') return null
+  if (typeof status !== 'number')
+    return null
 
   if (status >= 500) {
     return { kind: 'server', status }

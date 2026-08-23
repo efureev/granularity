@@ -117,7 +117,8 @@ describe('vAutofocus', () => {
     const el = wrapper.get('[data-self]').element as HTMLInputElement
 
     const focus = vi.spyOn(el, 'focus').mockImplementation((options?: FocusOptions) => {
-      if (options !== undefined) throw new TypeError('FocusOptions не поддержан')
+      if (options !== undefined)
+        throw new TypeError('FocusOptions не поддержан')
     })
 
     await flush()

@@ -176,10 +176,12 @@ const style = computed(() => {
 
   // Виджет несут в другую сетку: из раскладки он уже убран, и без этого
   // элемент потерял бы `grid-area` и всплыл бы в свободной ячейке.
-  if (dashboard?.carriedAwayId.value === props.itemId) return { display: 'none' }
+  if (dashboard?.carriedAwayId.value === props.itemId)
+    return { display: 'none' }
 
   const placed = item.value
-  if (!placed) return undefined
+  if (!placed)
+    return undefined
 
   return {
     gridColumn: `${placed.x + 1} / span ${placed.w}`,
@@ -200,7 +202,8 @@ const scrollable = ref(false)
 
 function syncScrollable(): void {
   const el = bodyEl.value
-  if (!el || overflow.value === 'hidden') return
+  if (!el || overflow.value === 'hidden')
+    return
 
   scrollable.value = el.scrollHeight - el.clientHeight > 1
 }
@@ -220,12 +223,14 @@ const measureEl = ref<HTMLElement | null>(null)
  * слагаемых от числа строк не зависят — тело забирает весь излишек высоты.
  */
 function syncContentHeight(): void {
-  if (!autoHeight.value) return
+  if (!autoHeight.value)
+    return
 
   const content = measureEl.value
   const root = rootEl.value
   const body = bodyEl.value
-  if (!content || !root || !body) return
+  if (!content || !root || !body)
+    return
 
   // Отступы тела не входят ни в обёртку, ни в разность: `getBoundingClientRect`
   // у тела — это его border-box, то есть padding внутри него, а обёртка стоит
@@ -239,22 +244,26 @@ function syncContentHeight(): void {
 }
 
 function attachMeasure(): void {
-  if (!measureEl.value) return
+  if (!measureEl.value)
+    return
 
   syncContentHeight()
   dashboard?.observeBody(measureEl.value, syncContentHeight)
 }
 
 function detachMeasure(el: HTMLElement | null): void {
-  if (el) dashboard?.unobserveBody(el)
+  if (el)
+    dashboard?.unobserveBody(el)
   dashboard?.reportContentHeight(props.itemId, null)
 }
 
 // Обёртки нет до включения пропа и не остаётся после выключения: подписка
 // переезжает вместе с ней, а снятый запрос возвращает высоту раскладке.
 watch(measureEl, (el, previous) => {
-  if (previous) detachMeasure(previous)
-  if (el) attachMeasure()
+  if (previous)
+    detachMeasure(previous)
+  if (el)
+    attachMeasure()
 })
 
 // ————— Панель режима редактирования у виджета без шапки.
@@ -309,14 +318,16 @@ onMounted(() => {
   observer = new IntersectionObserver((entries) => {
     // Смонтировалось — остаётся смонтированным: размонтировать уехавший за
     // край виджет значит терять его состояние на каждой прокрутке.
-    if (!entries.some(entry => entry.isIntersecting)) return
+    if (!entries.some(entry => entry.isIntersecting))
+      return
 
     visible.value = true
     observer?.disconnect()
     observer = null
   }, { rootMargin: '200px' })
 
-  if (rootEl.value) observer.observe(rootEl.value)
+  if (rootEl.value)
+    observer.observe(rootEl.value)
 })
 
 onBeforeUnmount(() => {
@@ -324,7 +335,8 @@ onBeforeUnmount(() => {
   observer = null
   hoverQuery?.removeEventListener('change', syncCoarsePointer)
   hoverQuery = null
-  if (bodyEl.value) dashboard?.unobserveBody(bodyEl.value)
+  if (bodyEl.value)
+    dashboard?.unobserveBody(bodyEl.value)
   detachMeasure(measureEl.value)
 
   dashboard?.unregisterItem(props.itemId)

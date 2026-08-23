@@ -45,6 +45,7 @@
 
 ```vue
 <GrProgressBar :value="percent" show-value aria-label="Загрузка" />
+
 <GrProgressBar :value="percent" :format-value="v => `${gb(v)} из 32 ГБ`" show-value />
 ```
 

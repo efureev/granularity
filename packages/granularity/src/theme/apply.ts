@@ -39,14 +39,16 @@ export function applyTheme(css: string, options: ApplyThemeOptions = {}): () => 
   style.setAttribute(ATTRIBUTE, name)
   style.textContent = css
 
-  if (!existing) host.append(style)
+  if (!existing)
+    host.append(style)
 
   return () => style.remove()
 }
 
 /** Снимает тему, подключённую `applyTheme`. */
 export function removeTheme(name = 'custom', target?: HTMLElement | null): void {
-  if (typeof document === 'undefined') return
+  if (typeof document === 'undefined')
+    return
 
   const host = target ?? document.head
   host.querySelector(`style[${ATTRIBUTE}="${name}"]`)?.remove()

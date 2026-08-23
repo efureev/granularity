@@ -43,8 +43,7 @@ function slices(wrapper: ReturnType<typeof factory>) {
  * `MouseEvent` с координатами через присваивание, а они там только на чтение.
  */
 async function hover(wrapper: ReturnType<typeof factory>, x: number, y: number): Promise<void> {
-  wrapper.find('[data-gr-chart-surface]').element
-    .dispatchEvent(pointer('pointermove', { clientX: x, clientY: y }))
+  wrapper.find('[data-gr-chart-surface]').element.dispatchEvent(pointer('pointermove', { clientX: x, clientY: y }))
 
   await nextTick()
 }

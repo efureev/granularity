@@ -16,7 +16,8 @@ const srcDir = resolve(process.cwd(), 'src')
 function sourceFiles(dir: string): string[] {
   return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
     const full = resolve(dir, entry.name)
-    if (entry.isDirectory()) return sourceFiles(full)
+    if (entry.isDirectory())
+      return sourceFiles(full)
     return /\.(?:ts|vue|css)$/.test(entry.name) && !entry.name.includes('.test.') ? [full] : []
   })
 }

@@ -139,7 +139,9 @@ function collapseAll(): void {
 const query = ref('')
 const treeRef = ref<{ filter: (value: string) => void } | null>(null)
 
-watch(query, (value) => { treeRef.value?.filter(value) })
+watch(query, (value) => {
+  treeRef.value?.filter(value)
+})
 
 function filter(value: string): void {
   query.value = value
@@ -147,7 +149,8 @@ function filter(value: string): void {
 
 /** Поиск идёт и по ключу, и по значению: в чужом ответе ищут то одно, то другое. */
 function matchKeyOrValue(value: string, data: GrJsonNode): boolean {
-  if (!value) return true
+  if (!value)
+    return true
 
   const needle = value.toLowerCase()
 

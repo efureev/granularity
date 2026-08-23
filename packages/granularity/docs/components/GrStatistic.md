@@ -129,7 +129,9 @@ i18n-адаптера пакета. Ничего настраивать не н�
 
 ```vue
 <GrStatistic title="Заказы" :value="1284" href="/orders" />
+
 <GrStatistic title="Заказы" :value="1284" clickable @click="drill" />
+
 <GrStatistic title="Заказы" :value="1284" :as="RouterLink" :to="{ name: 'orders' }" />
 ```
 

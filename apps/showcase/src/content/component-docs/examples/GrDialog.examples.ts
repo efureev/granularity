@@ -20,7 +20,8 @@ export const grDialogExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Guarded backdrop for critical flows',
     description: 'Отдельный сценарий для `closeOnBackdrop=false`, когда закрытие должно происходить только по явным действиям.',
     status: 'ready',
-    previewKey: 'gr-dialog-guarded-backdrop',    note: 'Сценарий полезен для финальных шагов publish/delete/release flows.',
+    previewKey: 'gr-dialog-guarded-backdrop',
+    note: 'Сценарий полезен для финальных шагов publish/delete/release flows.',
   },
   {
     id: 'dialog-scrollable-body',

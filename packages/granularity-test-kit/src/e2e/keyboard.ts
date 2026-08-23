@@ -19,7 +19,8 @@ import type { Page } from '@playwright/test'
 export async function focusedDescription(page: Page, extraAttrs: string[] = []): Promise<string> {
   return page.evaluate((extra) => {
     const active = document.activeElement
-    if (!active) return 'null'
+    if (!active)
+      return 'null'
 
     const attrs = ['data-testid', ...extra]
       .filter(name => active.hasAttribute(name))
@@ -46,7 +47,8 @@ async function focusedHasAttribute(page: Page, attribute: string): Promise<boole
 export async function tabUntil(page: Page, attribute: string, limit = 25): Promise<number> {
   for (let presses = 1; presses <= limit; presses++) {
     await page.keyboard.press('Tab')
-    if (await focusedHasAttribute(page, attribute)) return presses
+    if (await focusedHasAttribute(page, attribute))
+      return presses
   }
 
   throw new Error(

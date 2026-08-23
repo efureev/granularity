@@ -79,7 +79,8 @@ const resolvedLoadingText = computed(() => props.loadingText ?? t('gr.button.loa
 // Полиморфный корень: `as` → `<a href>` → `<button>`.
 const isLink = computed(() => Boolean(props.as || props.href))
 const renderAs = computed<string | Component>(() => {
-  if (props.as) return typeof props.as === 'string' ? props.as : markRaw(props.as)
+  if (props.as)
+    return typeof props.as === 'string' ? props.as : markRaw(props.as)
   return props.href ? 'a' : 'button'
 })
 
@@ -146,7 +147,6 @@ defineSlots<{
   /** Аддон справа: шеврон, счётчик. */
   suffix?: () => any
 }>()
-
 </script>
 
 <template>

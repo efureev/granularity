@@ -25,7 +25,8 @@ async function collectComponentNames() {
   const names = []
 
   for (const entry of entries) {
-    if (!entry.isDirectory() || !entry.name.startsWith('Gr')) continue
+    if (!entry.isDirectory() || !entry.name.startsWith('Gr'))
+      continue
     try {
       await access(resolve(componentsDir, entry.name, `${entry.name}.vue`))
       names.push(entry.name)
@@ -81,13 +82,13 @@ async function main() {
   })
 
   const webTypes = {
-    $schema: 'https://raw.githubusercontent.com/JetBrains/web-types/master/schema/web-types.json',
-    name: pkg.name,
-    version: pkg.version,
-    framework: 'vue',
+    '$schema': 'https://raw.githubusercontent.com/JetBrains/web-types/master/schema/web-types.json',
+    'name': pkg.name,
+    'version': pkg.version,
+    'framework': 'vue',
     'js-types-syntax': 'typescript',
     'description-markup': 'markdown',
-    contributions: {
+    'contributions': {
       html: {
         'vue-components': vueComponents,
       },

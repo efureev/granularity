@@ -40,12 +40,12 @@ class FakeAbortError extends DOMException {
   }
 }
 
-type PresetId =
-  | 'network'
-  | 'aborted'
-  | 'laravel-422'
-  | 'client-404'
-  | 'server-500'
+type PresetId
+  = | 'network'
+    | 'aborted'
+    | 'laravel-422'
+    | 'client-404'
+    | 'server-500'
 
 const presets = computed<{ id: PresetId, label: string, build: () => unknown }[]>(() => [
   { id: 'network', label: 'Network (no connection)', build: () => new FakeNetworkError() },

@@ -59,10 +59,13 @@ function syncTopmost(): void {
 }
 
 function handleKeydown(event: KeyboardEvent): void {
-  if (event.key !== 'Escape') return
+  if (event.key !== 'Escape')
+    return
   // Esc во время IME-композиции отменяет её, а не закрывает слой.
-  if (isComposingEvent(event)) return
-  if (stack.length === 0) return
+  if (isComposingEvent(event))
+    return
+  if (stack.length === 0)
+    return
 
   const top = stack[stack.length - 1]
 
@@ -73,12 +76,15 @@ function handleKeydown(event: KeyboardEvent): void {
   if (typeof event.stopImmediatePropagation === 'function')
     event.stopImmediatePropagation()
 
-  if (top.shouldClose()) top.close()
+  if (top.shouldClose())
+    top.close()
 }
 
 function startListening(): void {
-  if (listening) return
-  if (typeof window === 'undefined') return
+  if (listening)
+    return
+  if (typeof window === 'undefined')
+    return
   // Capture-фаза опережает любые локальные обработчики: Esc обязан достаться
   // верхнему слою, а не тому, кто первым подписался.
   window.addEventListener('keydown', handleKeydown, true)
@@ -86,8 +92,10 @@ function startListening(): void {
 }
 
 function stopListening(): void {
-  if (!listening) return
-  if (typeof window === 'undefined') return
+  if (!listening)
+    return
+  if (typeof window === 'undefined')
+    return
   window.removeEventListener('keydown', handleKeydown, true)
   listening = false
 }
@@ -104,8 +112,10 @@ export function pushOverlayLayer(layer: Omit<OverlayLayer, 'id'>): number {
 /** Снимает слой со стека (при закрытии или размонтировании). */
 export function removeOverlayLayer(id: number): void {
   const index = stack.findIndex(item => item.id === id)
-  if (index >= 0) stack.splice(index, 1)
-  if (stack.length === 0) stopListening()
+  if (index >= 0)
+    stack.splice(index, 1)
+  if (stack.length === 0)
+    stopListening()
   syncTopmost()
 }
 
@@ -118,7 +128,8 @@ export function removeOverlayLayer(id: number): void {
  */
 export function layerRootsAbove(id: number): HTMLElement[] {
   const index = stack.findIndex(layer => layer.id === id)
-  if (index < 0) return []
+  if (index < 0)
+    return []
 
   return stack
     .slice(index + 1)

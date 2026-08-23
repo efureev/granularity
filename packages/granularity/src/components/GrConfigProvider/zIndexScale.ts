@@ -31,7 +31,8 @@ let owner: symbol | null = null
  */
 export function applyGrZIndexBase(token: symbol, base: number | undefined): (() => void) | null {
   if (typeof document === 'undefined' || base == null) {
-    if (owner === token) owner = null
+    if (owner === token)
+      owner = null
     return null
   }
 
@@ -52,10 +53,12 @@ export function applyGrZIndexBase(token: symbol, base: number | undefined): (() 
 
   return () => {
     for (const [name, value] of previous) {
-      if (value) root.style.setProperty(name, value)
+      if (value)
+        root.style.setProperty(name, value)
       else root.style.removeProperty(name)
     }
-    if (owner === token) owner = null
+    if (owner === token)
+      owner = null
   }
 }
 

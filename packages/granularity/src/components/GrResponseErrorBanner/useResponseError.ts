@@ -123,7 +123,8 @@ export function useResponseError(options: UseResponseErrorOptions = {}): UseResp
 
   async function retry(handler: (info: ResponseErrorInfo) => void | Promise<void>): Promise<void> {
     const info = currentError.value
-    if (!info) return
+    if (!info)
+      return
     await handler(info)
     currentError.value = null
   }

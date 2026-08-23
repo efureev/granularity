@@ -359,7 +359,7 @@ describe('GrCommandPalette — IME-композиция', () => {
 })
 
 describe('GrCommandPalette — иконка команды', () => {
-const CustomIcon = defineComponent({ name: 'CustomIcon', render: () => h('svg', { 'data-custom-icon': '' }) })
+  const CustomIcon = defineComponent({ name: 'CustomIcon', render: () => h('svg', { 'data-custom-icon': '' }) })
 
   it('принимает компонент наравне с классом', async () => {
     const wrapper = await mountPalette({

@@ -103,7 +103,8 @@ const bounds = computed<GrSplitterBounds>(() => ({
  */
 const sizeState = ref(clampSize(props.modelValue ?? props.defaultSize, bounds.value))
 watch(() => props.modelValue, (value) => {
-  if (value !== undefined) sizeState.value = clampSize(value, bounds.value)
+  if (value !== undefined)
+    sizeState.value = clampSize(value, bounds.value)
 })
 
 const collapsedState = ref(props.collapsed)
@@ -142,12 +143,15 @@ function setSize(next: number, commit: boolean): void {
   const changed = value !== sizeState.value
 
   sizeState.value = value
-  if (changed) emit('update:modelValue', value)
-  if (commit) emit('change', value)
+  if (changed)
+    emit('update:modelValue', value)
+  if (commit)
+    emit('change', value)
 }
 
 function setCollapsed(value: boolean): void {
-  if (collapsedState.value === value) return
+  if (collapsedState.value === value)
+    return
 
   collapsedState.value = value
   emit('update:collapsed', value)
@@ -169,7 +173,8 @@ function moveBy(delta: number): void {
 }
 
 function toggleCollapsed(): void {
-  if (!collapsible.value) return
+  if (!collapsible.value)
+    return
 
   if (isCollapsed.value) {
     setCollapsed(false)
@@ -191,7 +196,8 @@ function reset(): void {
 // ————— Указатель.
 function onPointerMove(event: PointerEvent): void {
   const rect = rootEl.value?.getBoundingClientRect()
-  if (!rect) return
+  if (!rect)
+    return
 
   // Против выделения текста под курсором во время жеста.
   event.preventDefault()
@@ -199,7 +205,8 @@ function onPointerMove(event: PointerEvent): void {
   const raw = sizeFromPointer(rect, event.clientX, event.clientY, orientation.value)
 
   if (collapsible.value && shouldCollapse(raw, bounds.value)) {
-    if (!collapsedState.value) restoreSize.value = sizeState.value
+    if (!collapsedState.value)
+      restoreSize.value = sizeState.value
     setCollapsed(true)
     return
   }
@@ -230,15 +237,21 @@ const decreaseKey = computed(() => (orientation.value === 'horizontal' ? 'ArrowL
 const increaseKey = computed(() => (orientation.value === 'horizontal' ? 'ArrowRight' : 'ArrowDown'))
 
 function onKeydown(event: KeyboardEvent): void {
-  if (props.disabled) return
+  if (props.disabled)
+    return
 
   const step = event.shiftKey ? props.bigStep : props.step
 
-  if (event.key === decreaseKey.value) moveBy(-step)
-  else if (event.key === increaseKey.value) moveBy(step)
-  else if (event.key === 'Home') moveBy(-100)
-  else if (event.key === 'End') moveBy(100)
-  else if (event.key === 'Enter') toggleCollapsed()
+  if (event.key === decreaseKey.value)
+    moveBy(-step)
+  else if (event.key === increaseKey.value)
+    moveBy(step)
+  else if (event.key === 'Home')
+    moveBy(-100)
+  else if (event.key === 'End')
+    moveBy(100)
+  else if (event.key === 'Enter')
+    toggleCollapsed()
   else return
 
   // Дошли сюда — клавиша наша: страница не должна ещё и прокрутиться.
@@ -246,7 +259,8 @@ function onKeydown(event: KeyboardEvent): void {
 }
 
 function onDoubleClick(): void {
-  if (props.disabled) return
+  if (props.disabled)
+    return
 
   reset()
 }

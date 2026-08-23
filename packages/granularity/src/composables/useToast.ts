@@ -151,7 +151,8 @@ function resolveToastState(): ToastState {
   // поэтому вызов из router guard / интерцептора достаёт состояние приложения.
   if (hasInjectionContext()) {
     const provided = inject(GRANULARITY_TOAST_STATE, null)
-    if (provided) return provided
+    if (provided)
+      return provided
   }
 
   // В SSR модульный фолбэк запрещён: одно mutable-состояние на модуль утекало бы
@@ -196,7 +197,8 @@ export function useToast() {
   const list = computed(() => state.toasts)
 
   function armTimer(id: string, timer: ToastTimer): void {
-    if (timer.remaining <= 0 || typeof window === 'undefined') return
+    if (timer.remaining <= 0 || typeof window === 'undefined')
+      return
     timer.startedAt = now()
     timer.handle = window.setTimeout(() => {
       state.timers.delete(id)
@@ -278,13 +280,19 @@ export function useToast() {
    */
   function update(id: string, patch: Partial<ToastInput>): boolean {
     const toast = state.toasts.find(item => item.id === id)
-    if (!toast) return false
+    if (!toast)
+      return false
 
-    if (patch.title !== undefined) toast.title = patch.title
-    if (patch.message !== undefined) toast.message = patch.message
-    if (patch.tone !== undefined) toast.tone = patch.tone
-    if (patch.action !== undefined) toast.action = patch.action
-    if (patch.actions !== undefined) toast.actions = patch.actions
+    if (patch.title !== undefined)
+      toast.title = patch.title
+    if (patch.message !== undefined)
+      toast.message = patch.message
+    if (patch.tone !== undefined)
+      toast.tone = patch.tone
+    if (patch.action !== undefined)
+      toast.action = patch.action
+    if (patch.actions !== undefined)
+      toast.actions = patch.actions
 
     if (patch.timeoutMs !== undefined)
       toast.timeoutMs = rearmTimer(id, patch.timeoutMs)
@@ -313,7 +321,8 @@ export function useToast() {
    */
   function applyStage(id: string, stage: ToastInput & { tone: GrToastTone, timeoutMs: number }): void {
     const toast = state.toasts.find(item => item.id === id)
-    if (!toast) return
+    if (!toast)
+      return
 
     toast.title = stage.title
     toast.message = stage.message
@@ -353,7 +362,8 @@ export function useToast() {
   /** Останавливает отсчёт автозакрытия, сохраняя остаток (идемпотентно). */
   function pause(id: string): void {
     const timer = state.timers.get(id)
-    if (!timer || timer.handle == null) return
+    if (!timer || timer.handle == null)
+      return
 
     clearTimeout(timer.handle)
     timer.handle = null
@@ -363,7 +373,8 @@ export function useToast() {
   /** Возобновляет отсчёт с сохранённого остатка (идемпотентно). */
   function resume(id: string): void {
     const timer = state.timers.get(id)
-    if (!timer || timer.handle != null) return
+    if (!timer || timer.handle != null)
+      return
 
     armTimer(id, timer)
   }

@@ -13,10 +13,10 @@ import type {
  * Элемент рендера панели: либо заголовок группы, либо опция.
  * Группировка сохраняется, фильтрация по запросу скрывает пустые группы.
  */
-export type GrSelectPanelItem<TValue extends GrSelectValue> =
-  | { kind: 'group', label: string, key: string }
+export type GrSelectPanelItem<TValue extends GrSelectValue>
+  = | { kind: 'group', label: string, key: string }
   /** `groupKey` связывает опцию с заголовком её группы для скринридера. */
-  | { kind: 'option', option: GrSelectOption<TValue>, key: string, groupKey?: string }
+    | { kind: 'option', option: GrSelectOption<TValue>, key: string, groupKey?: string }
 
 export type GrSelectPanelOptionRow<TValue extends GrSelectValue> = {
   option: GrSelectOption<TValue>
@@ -24,8 +24,8 @@ export type GrSelectPanelOptionRow<TValue extends GrSelectValue> = {
   index: number
 }
 
-export type GrSelectPanelRow<TValue extends GrSelectValue> =
-  | {
+export type GrSelectPanelRow<TValue extends GrSelectValue>
+  = | {
     kind: 'group'
     label: string
     key: string
@@ -90,7 +90,8 @@ export function useSelectPanelItems<TValue extends GrSelectValue>(
     options.optionsResolved.value.forEach((item, index) => {
       if (options.isOptionGroup(item)) {
         const matched = item.options.filter(o => matchesOptionQuery(o, q))
-        if (!matched.length) return
+        if (!matched.length)
+          return
         const groupKey = `__group__${index}`
         items.push({ kind: 'group', label: item.label, key: groupKey })
         for (const option of matched) {
@@ -142,19 +143,24 @@ export function useSelectPanelItems<TValue extends GrSelectValue>(
   })
 
   const canAddCustom = computed(() => {
-    if (!options.allowCustomValue()) return false
-    if (!options.isPanelView()) return false
+    if (!options.allowCustomValue())
+      return false
+    if (!options.isPanelView())
+      return false
     // Кастомное значение набирается текстом, поэтому оно строковое —
     // при числовом `TValue` эта ветка неприменима (см. docs/components.md).
     const v = options.query().trim() as TValue
-    if (!v) return false
+    if (!v)
+      return false
 
     if (options.multiple()) {
-      if (options.selectedValues.value.some(selected => options.sameValue(selected, v))) return false
+      if (options.selectedValues.value.some(selected => options.sameValue(selected, v)))
+        return false
       return !options.flatOptions.value.some(o => options.sameValue(o.value, v))
     }
 
-    if (options.sameValue(v, options.modelSingle.value)) return false
+    if (options.sameValue(v, options.modelSingle.value))
+      return false
     return !options.flatOptions.value.some(o => options.sameValue(o.value, v))
   })
 

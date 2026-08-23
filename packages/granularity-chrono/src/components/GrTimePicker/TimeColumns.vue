@@ -82,12 +82,14 @@ const columnEls = ref(new Map<TimeUnit, HTMLElement>())
 const optionEls = ref(new Map<string, HTMLElement>())
 
 function setColumnEl(unit: TimeUnit, element: unknown): void {
-  if (element instanceof HTMLElement) columnEls.value.set(unit, element)
+  if (element instanceof HTMLElement)
+    columnEls.value.set(unit, element)
   else columnEls.value.delete(unit)
 }
 
 function setOptionEl(key: string, element: unknown): void {
-  if (element instanceof HTMLElement) optionEls.value.set(key, element)
+  if (element instanceof HTMLElement)
+    optionEls.value.set(key, element)
   else optionEls.value.delete(key)
 }
 
@@ -137,7 +139,8 @@ const shown: Record<TimeUnit, number> = { hour: -1, minute: -1, second: -1, peri
  * для скринридера молчит.
  */
 watch(() => props.open, (open) => {
-  if (open) initNavigation()
+  if (open)
+    initNavigation()
 }, { immediate: true })
 
 /**
@@ -151,7 +154,8 @@ watch(() => props.open, (open) => {
 function revealSelected(unit: TimeUnit): void {
   const column = columnOf(unit)
   const option = column?.options[column.selectedIndex]
-  if (!option) return
+  if (!option)
+    return
 
   // В jsdom метода нет, и это не повод падать: прокрутка — оформление.
   optionEls.value.get(option.key)?.scrollIntoView?.({ block: 'center' })
@@ -181,11 +185,13 @@ function initNavigation(): void {
  * стрелками, но ещё не подтвердили.
  */
 watch(() => props.modelValue, () => {
-  if (!props.open) return
+  if (!props.open)
+    return
 
   for (const unit of UNITS) {
     const index = columnOf(unit)?.selectedIndex ?? -1
-    if (index < 0 || index === shown[unit]) continue
+    if (index < 0 || index === shown[unit])
+      continue
 
     shown[unit] = index
     navigation[unit].setActive(index)
@@ -194,7 +200,8 @@ watch(() => props.modelValue, () => {
 })
 
 function select(unit: TimeUnit, option: TimeOption): void {
-  if (props.locked || option.disabled) return
+  if (props.locked || option.disabled)
+    return
 
   const base = props.modelValue ?? plainTime(0, 0, 0)
   const next = applyTimeUnit(base, unit, option.value, props.twelveHour)
@@ -217,13 +224,16 @@ function onOptionClick(unit: TimeUnit, option: TimeOption, index: number): void 
 }
 
 function onColumnKeydown(unit: TimeUnit, event: KeyboardEvent): void {
-  if (props.locked) return
-  if (navigation[unit].handleNavigationKeys(event)) return
+  if (props.locked)
+    return
+  if (navigation[unit].handleNavigationKeys(event))
+    return
 
   if (event.key === 'Enter' || event.key === ' ') {
     event.preventDefault()
     const option = navigation[unit].activeItem.value
-    if (option) select(unit, option)
+    if (option)
+      select(unit, option)
   }
 }
 

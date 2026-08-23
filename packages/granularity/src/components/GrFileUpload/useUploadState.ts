@@ -35,7 +35,8 @@ export function useUploadState(options: UseUploadStateOptions): UseUploadStateRe
   let idleTimer: ReturnType<typeof setTimeout> | null = null
 
   function clearScheduledIdle(): void {
-    if (idleTimer === null) return
+    if (idleTimer === null)
+      return
 
     clearTimeout(idleTimer)
     idleTimer = null
@@ -89,7 +90,8 @@ export function useUploadState(options: UseUploadStateOptions): UseUploadStateRe
   }
 
   function applyProgress(info: GrUploadProgressInfo): void {
-    if (state.phase !== 'uploading') return
+    if (state.phase !== 'uploading')
+      return
 
     assign({
       phase: 'uploading',
@@ -103,7 +105,8 @@ export function useUploadState(options: UseUploadStateOptions): UseUploadStateRe
   function scheduleIdle(delayMs: number): void {
     clearScheduledIdle()
     idleTimer = setTimeout(() => {
-      if (state.phase === 'success') setIdle()
+      if (state.phase === 'success')
+        setIdle()
       idleTimer = null
     }, delayMs)
   }

@@ -7,14 +7,14 @@
  * иконку.
  */
 
-export type GrFileKind =
-  | 'image'
-  | 'pdf'
-  | 'document'
-  | 'spreadsheet'
-  | 'archive'
+export type GrFileKind
+  = | 'image'
+    | 'pdf'
+    | 'document'
+    | 'spreadsheet'
+    | 'archive'
   /** Тип не опознан, пуст или это `application/octet-stream`. */
-  | 'unknown'
+    | 'unknown'
 
 /** Точные типы. Порядок не важен — совпадение полное. */
 const EXACT: Record<string, GrFileKind> = {
@@ -51,19 +51,24 @@ function normalize(mime: string): string {
 }
 
 export function fileKindOf(mime: string | null | undefined): GrFileKind {
-  if (!mime) return 'unknown'
+  if (!mime)
+    return 'unknown'
 
   const type = normalize(mime)
-  if (!type) return 'unknown'
+  if (!type)
+    return 'unknown'
 
   // Картинка — единственный вид, который компонент рисует, а не подписывает.
-  if (type.startsWith('image/')) return 'image'
+  if (type.startsWith('image/'))
+    return 'image'
 
   const exact = EXACT[type]
-  if (exact) return exact
+  if (exact)
+    return exact
 
   // `text/csv` уже разобран выше: таблица важнее общего правила для текста.
-  if (type.startsWith('text/')) return 'document'
+  if (type.startsWith('text/'))
+    return 'document'
 
   return 'unknown'
 }

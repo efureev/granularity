@@ -2,12 +2,14 @@ import { describe, expect, it } from 'vitest'
 
 import { createA11yBaseline, selectRegressions } from '../e2e'
 
-const violation = (id: string, impact: string, nodes = 1) => ({
-  id,
-  impact,
-  help: `правило ${id}`,
-  nodes: Array.from({ length: nodes }, () => ({})),
-})
+function violation(id: string, impact: string, nodes = 1) {
+  return {
+    id,
+    impact,
+    help: `правило ${id}`,
+    nodes: Array.from({ length: nodes }, () => ({})),
+  }
+}
 
 describe('selectRegressions', () => {
   it('пропускает только блокирующие impact', () => {

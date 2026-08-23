@@ -17,64 +17,64 @@ import IconEye from '~icons/lucide/eye'
 import IconEyeOff from '~icons/lucide/eye-off'
 
 export interface GrInputProps {
-    /**
+  /**
      * Значение поля. Необязательное: без `v-model` поле рисуется пустым.
      * Дефолт — пустая строка, а не `undefined`: длина значения читается
      * напрямую (`showClear`), и `undefined` уронил бы рендер.
      */
-    modelValue?: string
-    type?: 'text' | 'email' | 'password' | 'number' | 'search' | 'tel' | 'url'
-    placeholder?: string
-    autocomplete?: string
-    inputmode?: InputHTMLAttributes['inputmode']
-    disabled?: boolean
-    /** Только для чтения: значение видно и выделяемо, но не редактируется. */
-    readonly?: boolean
-    invalid?: boolean
-    /** Обязательное поле (`aria-required`). Складывается с `required` у `GrFormField`. */
-    required?: boolean
-    /** Доступное имя вне `GrFormField`. */
-    ariaLabel?: string
-    state?: 'default' | 'success' | 'warning' | 'danger'
-    name?: string
-    id?: string
-    size?: GrInputSize
+  modelValue?: string
+  type?: 'text' | 'email' | 'password' | 'number' | 'search' | 'tel' | 'url'
+  placeholder?: string
+  autocomplete?: string
+  inputmode?: InputHTMLAttributes['inputmode']
+  disabled?: boolean
+  /** Только для чтения: значение видно и выделяемо, но не редактируется. */
+  readonly?: boolean
+  invalid?: boolean
+  /** Обязательное поле (`aria-required`). Складывается с `required` у `GrFormField`. */
+  required?: boolean
+  /** Доступное имя вне `GrFormField`. */
+  ariaLabel?: string
+  state?: 'default' | 'success' | 'warning' | 'danger'
+  name?: string
+  id?: string
+  size?: GrInputSize
 
-    /** Показывать кнопку очистки, когда есть значение (и не disabled/readonly). */
-    clearable?: boolean
-    /** i18n aria-label кнопки очистки. */
-    clearLabel?: string
-    /** Ограничение длины + основа для счётчика символов. */
-    maxlength?: number
-    /** Показывать счётчик символов (`len` или `len/maxlength`). */
-    showCount?: boolean
-    /**
+  /** Показывать кнопку очистки, когда есть значение (и не disabled/readonly). */
+  clearable?: boolean
+  /** i18n aria-label кнопки очистки. */
+  clearLabel?: string
+  /** Ограничение длины + основа для счётчика символов. */
+  maxlength?: number
+  /** Показывать счётчик символов (`len` или `len/maxlength`). */
+  showCount?: boolean
+  /**
      * Фоновая работа по полю (проверка занятости логина, автосохранение):
      * спиннер в trailing-области + `aria-busy`. Ввод не блокируется —
      * для этого есть `disabled`/`readonly`.
      */
-    loading?: boolean
-    /** Кнопка показать/скрыть пароль (только при `type="password"`). */
-    passwordToggle?: boolean
-    /** i18n aria-label кнопки показать/скрыть пароль. */
-    passwordShowLabel?: string
-    passwordHideLabel?: string
+  loading?: boolean
+  /** Кнопка показать/скрыть пароль (только при `type="password"`). */
+  passwordToggle?: boolean
+  /** i18n aria-label кнопки показать/скрыть пароль. */
+  passwordShowLabel?: string
+  passwordHideLabel?: string
 
-    textAlign?: GrInputTextAlign
+  textAlign?: GrInputTextAlign
 
-    prefixMinWidth?: string
-    prefixMaxWidth?: string
-    suffixMinWidth?: string
-    suffixMaxWidth?: string
-    /**
+  prefixMinWidth?: string
+  prefixMaxWidth?: string
+  suffixMinWidth?: string
+  suffixMaxWidth?: string
+  /**
      * Фиксированная ширина у prefix/suffix: аддон получает жёсткую ширину
      * (из `*MaxWidth` → `*MinWidth` → дефолт), а контент обрезается по краю
      * (prefix — справа, suffix — слева). По умолчанию аддоны «растягиваются»
      * под контент (в пределах min/max), а излишек клипается оболочкой.
      */
-    prefixFixed?: boolean
-    suffixFixed?: boolean
-    /**
+  prefixFixed?: boolean
+  suffixFixed?: boolean
+  /**
      * Как выглядят аддоны `#prefix`/`#suffix`.
      *
      * `segment` (по умолчанию) — отдельный отсек, отрезанный рамкой и выровненный
@@ -86,7 +86,7 @@ export interface GrInputProps {
      * именно поэтому иконку внутри рамки нельзя было выразить аддоном, и
      * потребители отказывались от неё вовсе.
      */
-    addon?: 'segment' | 'inline'
+  addon?: 'segment' | 'inline'
 }
 
 export interface GrInputEmits {
@@ -110,43 +110,43 @@ export type GrInputSize = GrComponentSize
 export type GrInputTextAlign = 'left' | 'center' | 'right'
 
 const props = withDefaults(
-    defineProps<GrInputProps>(),
-    {
-      modelValue: '',
-      type: 'text',
-      placeholder: undefined,
-      autocomplete: undefined,
-      inputmode: undefined,
-      disabled: false,
-      readonly: false,
-      invalid: false,
-      required: false,
-      ariaLabel: undefined,
-      state: 'default',
-      name: undefined,
-      id: undefined,
-      size: undefined,
+  defineProps<GrInputProps>(),
+  {
+    modelValue: '',
+    type: 'text',
+    placeholder: undefined,
+    autocomplete: undefined,
+    inputmode: undefined,
+    disabled: false,
+    readonly: false,
+    invalid: false,
+    required: false,
+    ariaLabel: undefined,
+    state: 'default',
+    name: undefined,
+    id: undefined,
+    size: undefined,
 
-      // Настраивается через `GrConfigProvider`; дефолт — в резолвере ниже.
-      clearable: undefined,
-      clearLabel: undefined,
-      maxlength: undefined,
-      showCount: false,
-      loading: false,
-      passwordToggle: false,
-      passwordShowLabel: undefined,
-      passwordHideLabel: undefined,
+    // Настраивается через `GrConfigProvider`; дефолт — в резолвере ниже.
+    clearable: undefined,
+    clearLabel: undefined,
+    maxlength: undefined,
+    showCount: false,
+    loading: false,
+    passwordToggle: false,
+    passwordShowLabel: undefined,
+    passwordHideLabel: undefined,
 
-      textAlign: 'left',
+    textAlign: 'left',
 
-      prefixMinWidth: undefined,
-      prefixMaxWidth: undefined,
-      suffixMinWidth: undefined,
-      suffixMaxWidth: undefined,
-      prefixFixed: false,
-      suffixFixed: false,
-      addon: 'segment',
-    },
+    prefixMinWidth: undefined,
+    prefixMaxWidth: undefined,
+    suffixMinWidth: undefined,
+    suffixMaxWidth: undefined,
+    prefixFixed: false,
+    suffixFixed: false,
+    addon: 'segment',
+  },
 )
 
 const emit = defineEmits<GrInputEmits>()
@@ -156,7 +156,6 @@ defineSlots<{
   /** Аддон справа от поля: единица измерения, подсказка. */
   suffix?: () => any
 }>()
-
 
 // Контекст `GrFormField` (если инпут внутри него): даёт id/aria-describedby/
 // invalid/required как fallback, чтобы не прокидывать `forId` вручную.

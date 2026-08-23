@@ -4,13 +4,13 @@ import { computed, inject, onMounted, ref, watch } from 'vue'
 import { GR_TAB_PANELS_KEY } from './context'
 
 export interface GrTabPanelProps {
-    value: string
-    keepAlive?: boolean
-    /**
+  value: string
+  keepAlive?: boolean
+  /**
      * Не монтировать содержимое, пока панель не показали впервые. Имеет смысл
      * вместе с `keepAlive`: без него неактивная панель и так не в DOM.
      */
-    lazy?: boolean
+  lazy?: boolean
 }
 
 /**
@@ -35,12 +35,15 @@ const tabId = computed(() => (ctx ? `${ctx.idBase.value}-tab-${props.value}` : u
 
 const wasActive = ref(isActive.value)
 watch(isActive, (active) => {
-  if (active) wasActive.value = true
+  if (active)
+    wasActive.value = true
 })
 
 const shouldRender = computed(() => {
-  if (isActive.value) return true
-  if (!props.keepAlive) return false
+  if (isActive.value)
+    return true
+  if (!props.keepAlive)
+    return false
   return props.lazy ? wasActive.value : true
 })
 
@@ -52,8 +55,10 @@ const shouldRender = computed(() => {
  */
 if (__GR_DEV__) {
   onMounted(() => {
-    if (!tabId.value || !isActive.value) return
-    if (document.getElementById(tabId.value)) return
+    if (!tabId.value || !isActive.value)
+      return
+    if (document.getElementById(tabId.value))
+      return
 
     console.warn(
       `[GrTabPanel] Вкладки с id "${tabId.value}" нет в документе: `
@@ -66,7 +71,6 @@ defineSlots<{
   /** Содержимое панели. */
   default?: () => any
 }>()
-
 </script>
 
 <template>

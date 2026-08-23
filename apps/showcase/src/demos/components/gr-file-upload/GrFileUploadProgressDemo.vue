@@ -17,7 +17,8 @@ async function request(files: File[], ctx: GrFileUploadRequestCtx) {
   const step = Math.max(1, Math.floor(total / 20))
 
   while (loaded < total) {
-    if (ctx.signal.aborted) throw new Error('aborted')
+    if (ctx.signal.aborted)
+      throw new Error('aborted')
     await new Promise(resolve => setTimeout(resolve, 80))
     loaded = Math.min(total, loaded + step)
     ctx.onProgress?.({

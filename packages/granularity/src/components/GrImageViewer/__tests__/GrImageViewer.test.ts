@@ -395,7 +395,11 @@ describe('GrImageViewer — предзагрузка соседей', () => {
     }
 
     globalThis.Image = TrackedImage as unknown as typeof Image
-    return { created, restore: () => { globalThis.Image = OriginalImage } }
+    const restore = () => {
+      globalThis.Image = OriginalImage
+    }
+
+    return { created, restore }
   }
 
   it('закрытый просмотрщик не греет соседние кадры', async () => {
@@ -455,11 +459,12 @@ describe('GrImageViewer — скачивание', () => {
     const clicks: string[] = []
     const originalCreate = document.createElement.bind(document)
 
-    const createSpy = vi.spyOn(document, 'createElement').mockImplementation(((tag: string) => {
+    const createSpy = vi.spyOn(document, 'createElement').mockImplementation((tag: string) => {
       const el = originalCreate(tag)
-      if (tag === 'a') el.click = () => { clicks.push((el as HTMLAnchorElement).href) }
+      if (tag === 'a')
+        el.click = () => { clicks.push((el as HTMLAnchorElement).href) }
       return el
-    }))
+    })
 
     const wrapper = await mountViewer({ showDownload: true })
     await wrapper.get('[data-gr-image-viewer-download]').trigger('click')

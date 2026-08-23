@@ -11,7 +11,8 @@ const errors = ref<GrFormFileError[]>([])
 const sending = ref(false)
 
 async function submit(): Promise<void> {
-  if (!files.value.length) return
+  if (!files.value.length)
+    return
 
   sending.value = true
   await new Promise(resolve => setTimeout(resolve, 700))

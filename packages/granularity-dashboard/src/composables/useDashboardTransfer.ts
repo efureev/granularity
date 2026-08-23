@@ -131,7 +131,8 @@ let stopActive: ((commit: boolean) => void) | null = null
 let escapeAttached = false
 
 function onWindowKeydown(event: KeyboardEvent): void {
-  if (event.key !== 'Escape' || !transfer.value) return
+  if (event.key !== 'Escape' || !transfer.value)
+    return
 
   event.preventDefault()
   stopActive?.(false)
@@ -139,14 +140,16 @@ function onWindowKeydown(event: KeyboardEvent): void {
 
 /** `Esc` слушаем сами: браузер `pointercancel` на него не шлёт, а бросить начатое пользователь вправе. */
 function attachEscape(): void {
-  if (escapeAttached || typeof window === 'undefined') return
+  if (escapeAttached || typeof window === 'undefined')
+    return
 
   escapeAttached = true
   window.addEventListener('keydown', onWindowKeydown, true)
 }
 
 function detachEscape(): void {
-  if (!escapeAttached) return
+  if (!escapeAttached)
+    return
 
   escapeAttached = false
   window.removeEventListener('keydown', onWindowKeydown, true)
@@ -161,11 +164,14 @@ function targetAt(x: number, y: number): GrDashboardTransferTarget | null {
   let found: GrDashboardTransferTarget | null = null
 
   for (const target of targets) {
-    if (!target.enabled()) continue
+    if (!target.enabled())
+      continue
 
     const rect = target.rect()
-    if (!rect || rect.width <= 0 || rect.height <= 0) continue
-    if (x < rect.left || x > rect.right || y < rect.top || y > rect.bottom) continue
+    if (!rect || rect.width <= 0 || rect.height <= 0)
+      continue
+    if (x < rect.left || x > rect.right || y < rect.top || y > rect.bottom)
+      continue
 
     found = target
   }
@@ -176,7 +182,8 @@ function targetAt(x: number, y: number): GrDashboardTransferTarget | null {
 function flush(): void {
   frame = null
   const current = transfer.value
-  if (!current) return
+  if (!current)
+    return
 
   const next = targetAt(point.value.x, point.value.y)
 
@@ -214,7 +221,8 @@ function finish(commit: boolean): void {
   const current = transfer.value
   const target = activeTarget
 
-  if (commit && current && target) target.drop(current)
+  if (commit && current && target)
+    target.drop(current)
 
   reset()
 }
@@ -223,7 +231,8 @@ function onMove(event: PointerEvent): void {
   point.value = { x: event.clientX, y: event.clientY }
 
   if (pending) {
-    if (Math.hypot(event.clientX - originX, event.clientY - originY) < GR_DASHBOARD_TRANSFER_THRESHOLD) return
+    if (Math.hypot(event.clientX - originX, event.clientY - originY) < GR_DASHBOARD_TRANSFER_THRESHOLD)
+      return
 
     transfer.value = pending
     pending = null
@@ -244,7 +253,8 @@ function onMove(event: PointerEvent): void {
  * жест — его прервёт сам источник.
  */
 function adoptExternal(value: GrDashboardTransfer): void {
-  if (transfer.value || pending) return
+  if (transfer.value || pending)
+    return
 
   transfer.value = value
   stopActive = releaseExternal
@@ -252,14 +262,16 @@ function adoptExternal(value: GrDashboardTransfer): void {
 }
 
 function moveExternal(at: GrDashboardTransferPoint): void {
-  if (!transfer.value) return
+  if (!transfer.value)
+    return
 
   point.value = at
   frame ??= requestAnimationFrame(flush)
 }
 
 function releaseExternal(commit: boolean): void {
-  if (!transfer.value) return
+  if (!transfer.value)
+    return
 
   finish(commit)
 }
@@ -274,11 +286,13 @@ export function useDashboardTransfer(): UseDashboardTransferReturn {
   const stop = (commit: boolean): void => gesture.stop(commit)
 
   function start(value: GrDashboardTransfer, event: PointerEvent): void {
-    if (transfer.value || pending) return
+    if (transfer.value || pending)
+      return
     // Пальцем каталог прокручивают, а не таскают: отобрать вертикальную ось у
     // скроллера ради жеста, у которого есть работающий эквивалент (кнопка), —
     // плохой обмен.
-    if (event.pointerType === 'touch') return
+    if (event.pointerType === 'touch')
+      return
 
     pending = value
     originX = event.clientX
@@ -301,14 +315,16 @@ export function useDashboardTransfer(): UseDashboardTransferReturn {
 
     return () => {
       targets.delete(target)
-      if (activeTarget === target) activeTarget = null
+      if (activeTarget === target)
+        activeTarget = null
     }
   }
 
   // Примитив при смерти области снимает слушатели, но `onCancel` не зовёт:
   // сессия повисла бы, спрячь приложение каталог на старте переноса.
   onScopeDispose(() => {
-    if (stopActive === stop) reset()
+    if (stopActive === stop)
+      reset()
   })
 
   return {

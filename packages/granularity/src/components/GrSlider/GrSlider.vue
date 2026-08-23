@@ -125,7 +125,10 @@ const field = useGrFormFieldContext()
 const resolvedId = computed(() => field?.id.value)
 const {
   disabled: isDisabled,
-  invalid: isInvalid, required: isRequired, readonly: isReadonly } = useGrFormControl(() => props)
+  invalid: isInvalid,
+  required: isRequired,
+  readonly: isReadonly,
+} = useGrFormControl(() => props)
 const describedBy = computed(() => field?.describedById.value)
 
 const trackEl = ref<HTMLElement | null>(null)
@@ -217,8 +220,10 @@ const fillStyle = computed(() => {
 // ————— Метки делений.
 type SliderMark = { value: number, label: string }
 const normalizedMarks = computed<SliderMark[]>(() => {
-  if (!props.marks) return []
-  if (Array.isArray(props.marks)) return props.marks.map(v => ({ value: v, label: String(v) }))
+  if (!props.marks)
+    return []
+  if (Array.isArray(props.marks))
+    return props.marks.map(v => ({ value: v, label: String(v) }))
   return Object.entries(props.marks).map(([value, label]) => ({ value: Number(value), label }))
 })
 
@@ -230,7 +235,8 @@ function tooltipText(value: number): string {
 function emitValue(next: number[], commit: boolean): void {
   const payload: GrSliderModelValue = props.range ? [next[0], next[1]] : next[0]
   emit('update:modelValue', payload)
-  if (commit) emit('change', payload)
+  if (commit)
+    emit('change', payload)
 }
 
 function setThumb(index: number, value: number, commit: boolean): void {
@@ -239,7 +245,8 @@ function setThumb(index: number, value: number, commit: boolean): void {
 
   // range: не даём бегункам «перепрыгнуть» друг друга.
   if (props.range) {
-    if (index === 0) next[0] = Math.min(next[0], next[1])
+    if (index === 0)
+      next[0] = Math.min(next[0], next[1])
     else next[1] = Math.max(next[1], next[0])
   }
 
@@ -260,7 +267,8 @@ const hoveredThumb = ref<number | null>(null)
 
 function valueFromPointer(event: { clientX: number, clientY: number }): number {
   const rect = trackEl.value?.getBoundingClientRect()
-  if (!rect) return props.min
+  if (!rect)
+    return props.min
 
   // В вертикали минимум внизу, поэтому доля отсчитывается от нижнего края.
   const ratio = isVertical.value
@@ -276,11 +284,14 @@ function valueFromPointer(event: { clientX: number, clientY: number }): number {
  * в верхний и оба стоят на месте.
  */
 function nearestThumb(value: number): number {
-  if (!props.range) return 0
+  if (!props.range)
+    return 0
 
   const [lo, hi] = values.value
-  if (value < lo) return 0
-  if (value > hi) return 1
+  if (value < lo)
+    return 0
+  if (value > hi)
+    return 1
 
   return Math.abs(value - lo) < Math.abs(value - hi) ? 0 : 1
 }
@@ -310,7 +321,8 @@ const drag = useDragGesture({
     setThumb(index, value, false)
   },
   onMove: (event) => {
-    if (activeThumb.value === null) return
+    if (activeThumb.value === null)
+      return
     event.preventDefault()
     setThumb(activeThumb.value, valueFromPointer(event), false)
   },
@@ -326,7 +338,8 @@ function keyboardBigStep(): number {
 }
 
 function onThumbKeydown(event: KeyboardEvent, index: number): void {
-  if (isDisabled.value || isReadonly.value) return
+  if (isDisabled.value || isReadonly.value)
+    return
   const current = values.value[index]
   let next: number | null = null
 
@@ -359,15 +372,19 @@ function onThumbKeydown(event: KeyboardEvent, index: number): void {
   setThumb(index, next, true)
 }
 
-const showTooltipFor = (index: number): boolean => {
-  if (props.showTooltip === 'always') return true
-  if (!props.showTooltip) return false
+function showTooltipFor(index: number): boolean {
+  if (props.showTooltip === 'always')
+    return true
+  if (!props.showTooltip)
+    return false
   return activeThumb.value === index || hoveredThumb.value === index
 }
 
 function thumbAriaLabel(index: number): string | undefined {
-  if (!props.ariaLabel) return undefined
-  if (!props.range) return props.ariaLabel
+  if (!props.ariaLabel)
+    return undefined
+  if (!props.range)
+    return props.ariaLabel
 
   const bound = index === 0 ? t('gr.slider.min', 'min') : t('gr.slider.max', 'max')
   return `${props.ariaLabel} (${bound})`

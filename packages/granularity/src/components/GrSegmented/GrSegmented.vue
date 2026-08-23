@@ -101,7 +101,6 @@ defineSlots<{
   }) => any
 }>()
 
-
 // `useId()` стабилен между сервером и клиентом, в отличие от `instance.uid`.
 const fallbackName = `gr-segmented-${useId()}`
 
@@ -112,7 +111,10 @@ const describedBy = computed(() => field?.describedById.value)
 const labelledBy = computed(() => (props.ariaLabel ? undefined : field?.labelId.value))
 const {
   disabled: isDisabled,
-  invalid: isInvalid, required: isRequired, readonly: isReadonly } = useGrFormControl(() => props)
+  invalid: isInvalid,
+  required: isRequired,
+  readonly: isReadonly,
+} = useGrFormControl(() => props)
 
 const rootRef = ref<HTMLElement | null>(null)
 
@@ -376,7 +378,8 @@ const roving = useRovingFocus<GrSegmentedValue>({
   // Стрелка в `radiogroup` переносит и выбор, а не только фокус.
   onMove: (value) => {
     const option = optionOf(value)
-    if (option) emitValue(option)
+    if (option)
+      emitValue(option)
   },
 })
 
@@ -384,7 +387,8 @@ function onItemClick(option: GrSegmentedOption): void {
   emitValue(option)
   // Клик тоже переносит остановку `Tab`: иначе она осталась бы там, куда её
   // увела последняя стрелка.
-  if (!isOptionBlocked(option)) roving.setActive(option.value)
+  if (!isOptionBlocked(option))
+    roving.setActive(option.value)
 }
 
 /** Императивный фокус ведёт на текущую остановку `Tab`, а не на первый сегмент. */

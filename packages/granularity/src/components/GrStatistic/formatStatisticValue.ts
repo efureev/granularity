@@ -31,7 +31,8 @@ export function formatStatisticValue(
   if (typeof value === 'string' && (value.trim() === '' || !Number.isFinite(numeric))) {
     return value
   }
-  if (!Number.isFinite(numeric)) return String(value)
+  if (!Number.isFinite(numeric))
+    return String(value)
 
   if (locale) {
     return formatByLocale(numeric, locale, { precision, groupSeparator, decimalSeparator })
@@ -40,7 +41,8 @@ export function formatStatisticValue(
   const fixed = precision === undefined ? String(numeric) : numeric.toFixed(precision)
   // `toFixed` не даёт экспоненциальной записи, а `String(число)` — может (1e21+).
   // В таком случае группировать нечего: возвращаем как есть.
-  if (fixed.includes('e') || fixed.includes('E')) return fixed
+  if (fixed.includes('e') || fixed.includes('E'))
+    return fixed
 
   const negative = fixed.startsWith('-')
   const [intPart, fracPart] = (negative ? fixed.slice(1) : fixed).split('.')
@@ -78,8 +80,10 @@ function formatByLocale(
   })
     .formatToParts(value)
     .map((part) => {
-      if (part.type === 'group' && groupSeparator !== undefined) return groupSeparator
-      if (part.type === 'decimal' && decimalSeparator !== undefined) return decimalSeparator
+      if (part.type === 'group' && groupSeparator !== undefined)
+        return groupSeparator
+      if (part.type === 'decimal' && decimalSeparator !== undefined)
+        return decimalSeparator
       return part.value
     })
     .join('')

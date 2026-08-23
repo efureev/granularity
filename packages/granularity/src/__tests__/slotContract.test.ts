@@ -40,47 +40,47 @@ const COMMON_SLOTS = new Set([
  * явно, чтобы `option` или `value` не расползлись туда, где значат другое.
  */
 const DOMAIN_SLOTS: Record<string, string[]> = {
-  caption: ['GrTable', 'GrDataTable'],
-  center: ['GrNavbar'],
-  ellipsis: ['GrBreadcrumbs'],
-  end: ['GrSplitter'],
-  extra: ['GrCollapse'],
-  hint: ['GrFormField'],
+  'caption': ['GrTable', 'GrDataTable'],
+  'center': ['GrNavbar'],
+  'ellipsis': ['GrBreadcrumbs'],
+  'end': ['GrSplitter'],
+  'extra': ['GrCollapse'],
+  'hint': ['GrFormField'],
   // Пункт ленты шагов. Не `item`: у соседей это строка списка, а здесь —
   // этап процесса со своим статусом, и общее имя стёрло бы разницу.
-  step: ['GrSteps'],
-  item: ['GrBottomNav', 'GrBreadcrumbs', 'GrCommandPalette', 'GrList', 'GrSortableList', 'GrTimeline'],
+  'step': ['GrSteps'],
+  'item': ['GrBottomNav', 'GrBreadcrumbs', 'GrCommandPalette', 'GrList', 'GrSortableList', 'GrTimeline'],
   // Не `value`: у `GrSelect` это выбранное значение в контроле, здесь — лист
   // дерева. Одно имя на два смысла и есть то, что этот словарь ловит.
-  leaf: ['GrJsonViewer'],
-  group: ['GrTimeline'],
-  handle: ['GrSortableList'],
+  'leaf': ['GrJsonViewer'],
+  'group': ['GrTimeline'],
+  'handle': ['GrSortableList'],
   // Места до и после величины, куда потребитель кладёт своё: знак и стрелку
   // (`GrDelta`), скрытое конечное значение для диктора (`GrStatistic`). Не
   // `before`/`after`: те читаются как «до/после всего компонента», а эти два
   // стоят **внутри** записи величины, между её частями.
-  lead: ['GrValue'],
-  trail: ['GrValue'],
-  left: ['GrNavbar'],
-  marker: ['GrTimeline'],
-  node: ['GrTreeSelect'],
-  option: ['GrSelect', 'GrAutocomplete'],
-  progress: ['GrFileUpload'],
-  separator: ['GrBreadcrumbs'],
-  shortcut: ['GrDropdownMenu'],
-  start: ['GrSplitter'],
-  subtitle: ['GrSidebar'],
-  symbol: ['GrRating'],
-  tab: ['GrTabs'],
-  tag: ['GrInputTag'],
-  text: ['GrRating'],
-  time: ['GrTimeline'],
-  tip: ['GrFileUpload'],
-  toolbar: ['GrImageViewer'],
+  'lead': ['GrValue'],
+  'trail': ['GrValue'],
+  'left': ['GrNavbar'],
+  'marker': ['GrTimeline'],
+  'node': ['GrTreeSelect'],
+  'option': ['GrSelect', 'GrAutocomplete'],
+  'progress': ['GrFileUpload'],
+  'separator': ['GrBreadcrumbs'],
+  'shortcut': ['GrDropdownMenu'],
+  'start': ['GrSplitter'],
+  'subtitle': ['GrSidebar'],
+  'symbol': ['GrRating'],
+  'tab': ['GrTabs'],
+  'tag': ['GrInputTag'],
+  'text': ['GrRating'],
+  'time': ['GrTimeline'],
+  'tip': ['GrFileUpload'],
+  'toolbar': ['GrImageViewer'],
   'toolbar-actions': ['GrImageViewer'],
-  total: ['GrPagination'],
-  trend: ['GrStatistic'],
-  value: ['GrSelect', 'GrTreeSelect'],
+  'total': ['GrPagination'],
+  'trend': ['GrStatistic'],
+  'value': ['GrSelect', 'GrTreeSelect'],
 }
 
 /**
@@ -135,7 +135,8 @@ function slotNamesOf(source: string): string[] {
     const named = /\bname="([^"]+)"/.exec(tag)
     // Слоты с вычисляемым именем (`#cell-<key>` у `GrDataTable`) — семейство, а
     // не роль: имя задаёт колонка, словарь про них ничего сказать не может.
-    if (named && named[1].includes('${')) continue
+    if (named && named[1].includes('${'))
+      continue
 
     names.add(named ? named[1] : 'default')
   }
@@ -148,10 +149,12 @@ function sfcFiles(): Array<[string, string]> {
   const files: Array<[string, string]> = []
 
   for (const entry of readdirSync(componentsDir, { withFileTypes: true })) {
-    if (!entry.isDirectory() || !entry.name.startsWith('Gr')) continue
+    if (!entry.isDirectory() || !entry.name.startsWith('Gr'))
+      continue
 
     for (const file of readdirSync(resolve(componentsDir, entry.name))) {
-      if (!file.endsWith('.vue')) continue
+      if (!file.endsWith('.vue'))
+        continue
       files.push([`${entry.name}/${file}`, readFileSync(resolve(componentsDir, entry.name, file), 'utf8')])
     }
   }
@@ -171,10 +174,12 @@ describe('словарь слотов', () => {
 
     for (const { name, slots } of components) {
       for (const slot of slots) {
-        if (COMMON_SLOTS.has(slot)) continue
+        if (COMMON_SLOTS.has(slot))
+          continue
 
         const owners = DOMAIN_SLOTS[slot]
-        if (owners?.includes(name)) continue
+        if (owners?.includes(name))
+          continue
 
         offenders.push(owners
           ? `${name}: доменный слот \`${slot}\` принадлежит ${owners.join(', ')}`
@@ -190,7 +195,8 @@ describe('словарь слотов', () => {
 
     for (const { name, slots } of components) {
       for (const slot of slots) {
-        if (!rendered.has(slot)) rendered.set(slot, new Set())
+        if (!rendered.has(slot))
+          rendered.set(slot, new Set())
         rendered.get(slot)!.add(name)
       }
     }
@@ -215,7 +221,8 @@ describe('типизация слотов', () => {
    * `defineSlots` есть хоть в одном — восемь дырок так и проскочили бы.
    */
   it.each(sfcFiles())('%s объявляет defineSlots, если у него есть слоты', (_label, source) => {
-    if (slotNamesOf(source).length === 0) return
+    if (slotNamesOf(source).length === 0)
+      return
 
     // Без `defineSlots` слоты не попадают ни в `.d.ts`, ни в API-таблицы
     // витрины: описание слота там берётся ровно из JSDoc над его членом.

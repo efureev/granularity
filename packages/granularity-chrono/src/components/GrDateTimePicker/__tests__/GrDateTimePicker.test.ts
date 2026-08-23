@@ -201,7 +201,8 @@ describe('GrDateTimePicker — autoApply=false', () => {
     expect(query('[data-gr-calendar-day][data-key="2026-08-12"]').attributes('class'))
       .toContain('--gr-calendar-selected-bg')
     expect(query('[data-gr-calendar-day][data-key="2026-08-20"]').attributes('class'))
-      .not.toContain('--gr-calendar-selected-bg')
+      .not
+      .toContain('--gr-calendar-selected-bg')
     wrapper.unmount()
   })
 

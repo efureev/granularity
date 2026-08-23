@@ -56,10 +56,12 @@ const outsideLog = ref('—')
 // Директива ждёт элемент: ref на компонент отдаёт инстанс, поэтому берём его корень.
 function resolveOutsideExclude(): HTMLElement | null {
   const target = outsideExcludeEl.value
-  if (!target) return null
+  if (!target)
+    return null
   // `instanceof`, а не `'$el' in target`: проверка через `in` не сужает union,
   // и `$el` остаётся неизвестного типа.
-  if (target instanceof HTMLElement) return target
+  if (target instanceof HTMLElement)
+    return target
 
   return target.$el ?? null
 }
@@ -134,7 +136,7 @@ function handleHotkey(label: string) {
   hotkeyLog.value = `Shortcut triggered: ${label}`
 }
 
-function formatIssues(issues: Array<{ code: string; fileName?: string }>) {
+function formatIssues(issues: Array<{ code: string, fileName?: string }>) {
   return issues.map(issue => `${issue.code}:${issue.fileName ?? 'n/a'}`).join(', ') || 'none'
 }
 
@@ -242,7 +244,6 @@ async function runAlertDemo() {
 const nestedStatus = ref(t('composables.useDialogService.nested.idle'))
 
 async function runNestedDemo() {
-
   // Второй диалог спрашивается из `onConfirm` первого — сервис показывает его
   // поверх, потому что первый ждёт именно его ответа.
   const deleted = await dialog.confirm(t('composables.useDialogService.nested.message'), {

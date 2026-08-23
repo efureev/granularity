@@ -64,10 +64,12 @@ watch(() => config.theme?.value, () => {
 
 function resolveColor(value: string): string {
   const cached = colors.get(value)
-  if (cached !== undefined) return cached
+  if (cached !== undefined)
+    return cached
 
   const element = canvasEl.value
-  if (!element) return value
+  if (!element)
+    return value
 
   // Резолв через сам холст: `var()` вычисляется в контексте его темы.
   const previous = element.style.color
@@ -82,7 +84,8 @@ function resolveColor(value: string): string {
 
 /** `stroke-dasharray` — строка SVG; холсту нужен массив чисел. */
 function dashOf(dash: string | undefined): number[] {
-  if (!dash) return []
+  if (!dash)
+    return []
 
   return dash.split(/[\s,]+/).map(Number).filter(Number.isFinite)
 }
@@ -91,16 +94,20 @@ function apply(ctx: CanvasRenderingContext2D, commands: readonly DrawCommand[]):
   ctx.beginPath()
 
   for (const command of commands) {
-    if (command.op === 'move') ctx.moveTo(command.x, command.y)
-    else if (command.op === 'line') ctx.lineTo(command.x, command.y)
-    else if (command.op === 'close') ctx.closePath()
+    if (command.op === 'move')
+      ctx.moveTo(command.x, command.y)
+    else if (command.op === 'line')
+      ctx.lineTo(command.x, command.y)
+    else if (command.op === 'close')
+      ctx.closePath()
     else ctx.bezierCurveTo(command.x1, command.y1, command.x2, command.y2, command.x, command.y)
   }
 }
 
 function drawGrid(ctx: CanvasRenderingContext2D): void {
   const show = props.showGrid
-  if (show === 'none') return
+  if (show === 'none')
+    return
 
   ctx.save()
   ctx.strokeStyle = resolveColor(gridStroke)
@@ -129,7 +136,8 @@ function draw(): void {
   // В jsdom `getContext` нет вовсе: компонент обязан пережить это молча — тем
   // же правилом, каким пакет переживает отсутствие `ResizeObserver`.
   const ctx = element?.getContext?.('2d')
-  if (!element || !ctx) return
+  if (!element || !ctx)
+    return
 
   const ratio = Math.max(1, globalThis.devicePixelRatio || 1)
   const pixelWidth = Math.round(props.width * ratio)
@@ -160,7 +168,8 @@ function draw(): void {
       ctx.globalAlpha = 1
     }
 
-    if (item.commands.length === 0) continue
+    if (item.commands.length === 0)
+      continue
 
     apply(ctx, item.commands)
     ctx.strokeStyle = resolveColor(item.color)

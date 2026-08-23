@@ -48,8 +48,10 @@ const mounted: { unmount: () => void }[] = []
 beforeEach(() => {
   restoreRect = stubElementRects((element) => {
     const board = element.closest?.('[data-gr-dashboard]')
-    if (board?.getAttribute('aria-label') === 'правая') return RIGHT
-    if (board?.getAttribute('aria-label') === 'левая') return LEFT
+    if (board?.getAttribute('aria-label') === 'правая')
+      return RIGHT
+    if (board?.getAttribute('aria-label') === 'левая')
+      return LEFT
 
     return LEFT
   })
@@ -139,7 +141,8 @@ function stand(options: StandOptions = {}) {
 /** Ручка переноса виджета в левой сетке. */
 function handle(root: HTMLElement, id: string): HTMLElement {
   const el = root.querySelector<HTMLElement>(`[data-item-id="${id}"] [data-gr-dashboard-handle], [data-item-id="${id}"] button`)
-  if (!el) throw new Error(`нет ручки у «${id}»`)
+  if (!el)
+    throw new Error(`нет ручки у «${id}»`)
 
   return el
 }

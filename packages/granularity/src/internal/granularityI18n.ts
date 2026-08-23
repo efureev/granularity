@@ -71,9 +71,12 @@ function interpolateFallback(template: string, params?: Record<string, any>): st
   // (совпадает с fint-i18n: `t('literal')` без параметров тоже разэкранирует `{{name}}`).
   // Ранний выход по `!params` здесь недопустим.
   return template.replace(FALLBACK_PLACEHOLDER_RE, (match, name: string | undefined) => {
-    if (match === '{{') return '{'
-    if (match === '}}') return '}'
-    if (name === undefined) return match
+    if (match === '{{')
+      return '{'
+    if (match === '}}')
+      return '}'
+    if (name === undefined)
+      return match
 
     const value = params?.[name]
     return value == null ? match : String(value)

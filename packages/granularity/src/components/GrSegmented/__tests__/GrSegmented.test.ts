@@ -157,7 +157,7 @@ describe('GrSegmented', () => {
     await wrapper.findAll('[role="radio"]')[1].trigger('click')
 
     expect(wrapper.emitted('update:modelValue')).toEqual([['board']])
-    expect(wrapper.emitted('change')).toEqual([[ 'board', { value: 'board', label: 'Board' } ]])
+    expect(wrapper.emitted('change')).toEqual([['board', { value: 'board', label: 'Board' }]])
   })
 
   it('игнорирует disabled group и disabled option', async () => {

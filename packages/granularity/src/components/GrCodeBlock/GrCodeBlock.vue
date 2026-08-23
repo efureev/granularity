@@ -94,7 +94,8 @@ const source = computed(() => serializeCode(props.code))
 const lines = computed<GrCodeToken[][]>(() => {
   const rows = source.value.split('\n')
 
-  if (props.language !== 'json') return rows.map(row => [{ text: row, kind: 'plain' as const }])
+  if (props.language !== 'json')
+    return rows.map(row => [{ text: row, kind: 'plain' as const }])
 
   return rows.map(row => tokenizeJson(row))
 })
@@ -107,7 +108,8 @@ const lines = computed<GrCodeToken[][]>(() => {
 const isScroller = computed(() => props.maxHeight !== undefined || !resolvedWrap.value)
 
 const scrollStyle = computed(() => {
-  if (props.maxHeight === undefined) return undefined
+  if (props.maxHeight === undefined)
+    return undefined
 
   return { maxHeight: typeof props.maxHeight === 'number' ? `${props.maxHeight}px` : props.maxHeight }
 })

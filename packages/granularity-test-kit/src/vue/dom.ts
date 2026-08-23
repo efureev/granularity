@@ -16,7 +16,8 @@ export function queryOne<T extends HTMLElement = HTMLElement>(
   root: ParentNode = document,
 ): T {
   const element = root.querySelector<T>(selector)
-  if (!element) throw new Error(`нет элемента ${selector}`)
+  if (!element)
+    throw new Error(`нет элемента ${selector}`)
 
   return element
 }

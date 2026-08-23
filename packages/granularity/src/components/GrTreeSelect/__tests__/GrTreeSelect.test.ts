@@ -7,7 +7,7 @@ import type { GrTreeSelectProps } from '../grTreeSelectTypes'
 import type { GranularityI18nAdapter } from '../../../i18n/adapter'
 import { granularityGlobal } from '../../../testing'
 
-type Row = { id: number; label: string; children?: Row[] }
+type Row = { id: number, label: string, children?: Row[] }
 
 function createGranularityTestI18n(locale: 'en' | 'ru'): GranularityI18nAdapter {
   const messages = {
@@ -32,7 +32,7 @@ function createGranularityTestI18n(locale: 'en' | 'ru'): GranularityI18nAdapter 
 
 async function mountHarness(
   props?: Partial<GrTreeSelectProps>,
-  options?: { locale?: 'en' | 'ru'; data?: Row[] },
+  options?: { locale?: 'en' | 'ru', data?: Row[] },
 ) {
   const i18n = options?.locale
     ? createGranularityTestI18n(options.locale)
@@ -101,7 +101,7 @@ function bodyExists(selector: string): boolean {
 }
 
 function bodyFindAllRows(): DOMWrapper<Element>[] {
-  return [...document.body.querySelectorAll('.gr-tree__row')].map((el) => new DOMWrapper(el))
+  return [...document.body.querySelectorAll('.gr-tree__row')].map(el => new DOMWrapper(el))
 }
 
 describe('GrTreeSelect (unit)', () => {
@@ -122,7 +122,7 @@ describe('GrTreeSelect (unit)', () => {
     expect(chevronIcon.exists()).toBe(true)
     expect(chevronIcon.classes()).toContain('rotate-180')
 
-    const travelRow = bodyFindAllRows().find((w) => w.text().includes('Travel'))
+    const travelRow = bodyFindAllRows().find(w => w.text().includes('Travel'))
     expect(travelRow).toBeTruthy()
 
     await travelRow!.trigger('click')
@@ -162,7 +162,7 @@ describe('GrTreeSelect (unit)', () => {
     await wrapperClear.find('[data-testid="gr-tree-select-trigger"]').trigger('click')
     await nextTick()
 
-    const travelRow = bodyFindAllRows().find((w) => w.text().includes('Travel'))
+    const travelRow = bodyFindAllRows().find(w => w.text().includes('Travel'))
     expect(travelRow).toBeTruthy()
 
     await travelRow!.trigger('click')
@@ -222,7 +222,7 @@ describe('GrTreeSelect (unit)', () => {
     await wrapper.find('[data-testid="gr-tree-select-trigger"]').trigger('click')
     await nextTick()
 
-    const travelRow = bodyFindAllRows().find((w) => w.text().includes('Travel'))
+    const travelRow = bodyFindAllRows().find(w => w.text().includes('Travel'))
     expect(travelRow).toBeTruthy()
 
     await travelRow!.trigger('click')
@@ -258,7 +258,7 @@ describe('GrTreeSelect (unit)', () => {
     await trigger.trigger('click')
     await nextTick()
 
-    const rentRow = bodyFindAllRows().find((w) => w.text().includes('Rent'))
+    const rentRow = bodyFindAllRows().find(w => w.text().includes('Rent'))
     expect(rentRow).toBeTruthy()
 
     await rentRow!.trigger('click')
@@ -281,10 +281,10 @@ describe('GrTreeSelect (unit)', () => {
     await filter.setValue('Ren')
     await nextTick()
 
-    const rowsText = bodyFindAllRows().map((w) => w.text())
-    expect(rowsText.some((t) => t.includes('Rent'))).toBe(true)
-    expect(rowsText.some((t) => t.includes('Food'))).toBe(false)
-    expect(rowsText.some((t) => t.includes('Travel'))).toBe(false)
+    const rowsText = bodyFindAllRows().map(w => w.text())
+    expect(rowsText.some(t => t.includes('Rent'))).toBe(true)
+    expect(rowsText.some(t => t.includes('Food'))).toBe(false)
+    expect(rowsText.some(t => t.includes('Travel'))).toBe(false)
 
     wrapper.unmount()
   })
@@ -322,7 +322,7 @@ describe('GrTreeSelect (unit)', () => {
     await trigger.trigger('click')
     await nextTick()
 
-    const travelRow = bodyFindAllRows().find((w) => w.text().includes('Travel'))
+    const travelRow = bodyFindAllRows().find(w => w.text().includes('Travel'))
     expect(travelRow).toBeTruthy()
 
     await travelRow!.trigger('click')

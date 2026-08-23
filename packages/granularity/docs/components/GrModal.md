@@ -121,7 +121,9 @@
 состав, что у `GrDropdown`, `GrDialog`, `GrCommandPalette` и `GrPopover`.
 
 ```vue
-<GrModal ref="modal" v-model="open" aria-label="Настройки">…</GrModal>
+<GrModal ref="modal" v-model="open" aria-label="Настройки">
+…
+</GrModal>
 
 <script setup>
 const modal = ref()

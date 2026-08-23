@@ -116,7 +116,8 @@ export function componentDirs(componentsDir: string, prefix = 'Gr'): string[] {
   const found: string[] = []
 
   for (const entry of readdirSync(componentsDir, { withFileTypes: true })) {
-    if (!entry.isDirectory()) continue
+    if (!entry.isDirectory())
+      continue
 
     if (entry.name.startsWith(prefix)) {
       found.push(entry.name)

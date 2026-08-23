@@ -90,9 +90,9 @@ export type GrBreadcrumbsLinkComponent = string | Component
  * Чистая функция, потому что вся её сложность — арифметика границ, и проверять
  * её монтированием компонента дороже, чем таблицей входов.
  */
-export type GrBreadcrumbsLayoutEntry =
-  | { kind: 'item', item: GrBreadcrumbItem, index: number }
-  | { kind: 'ellipsis', hiddenCount: number }
+export type GrBreadcrumbsLayoutEntry
+  = | { kind: 'item', item: GrBreadcrumbItem, index: number }
+    | { kind: 'ellipsis', hiddenCount: number }
 
 /**
  * Сколько пунктов хвоста влезает в доступную ширину.
@@ -120,7 +120,8 @@ export function resolveBreadcrumbsFit(options: {
   const { itemWidths, separatorWidth, ellipsisWidth, available, itemsBeforeCollapse, gapWidth = 0 } = options
   const total = itemWidths.length
 
-  if (total === 0) return 0
+  if (total === 0)
+    return 0
 
   const sum = (from: number, to: number): number =>
     itemWidths.slice(from, to).reduce((acc, width) => acc + width, 0)
@@ -136,14 +137,16 @@ export function resolveBreadcrumbsFit(options: {
     + Math.max(0, parts - 1) * separatorWidth
     + Math.max(0, 2 * parts - 2) * gapWidth
 
-  if (rowWidth(sum(0, total), total) <= available) return total
+  if (rowWidth(sum(0, total), total) <= available)
+    return total
 
   const before = Math.max(0, Math.min(itemsBeforeCollapse, total))
 
   for (let after = total - before - 1; after > 1; after--) {
     const content = sum(0, before) + ellipsisWidth + sum(total - after, total)
 
-    if (rowWidth(content, before + 1 + after) <= available) return after
+    if (rowWidth(content, before + 1 + after) <= available)
+      return after
   }
 
   return 1

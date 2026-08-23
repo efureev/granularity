@@ -80,38 +80,51 @@ export interface GrSchemaRendererRegistry {
 }
 
 function toArray<T>(value: T | T[] | undefined): T[] | undefined {
-  if (value === undefined) return undefined
+  if (value === undefined)
+    return undefined
   return Array.isArray(value) ? value : [value]
 }
 
 function matchesDeclarative(node: GrSchemaNode, when: GrSchemaRendererMatch): boolean {
   const kinds = toArray(when.kind)
-  if (kinds && !kinds.includes(node.kind)) return false
+  if (kinds && !kinds.includes(node.kind))
+    return false
 
   const formats = toArray(when.format)
-  if (formats && (!node.format || !formats.includes(node.format))) return false
+  if (formats && (!node.format || !formats.includes(node.format)))
+    return false
 
   const optionCount = node.options?.length ?? 0
-  if (when.enum !== undefined && (optionCount > 0) !== when.enum) return false
-  if (when.optionsAtMost !== undefined && (optionCount === 0 || optionCount > when.optionsAtMost)) return false
-  if (when.optionsAbove !== undefined && optionCount <= when.optionsAbove) return false
+  if (when.enum !== undefined && (optionCount > 0) !== when.enum)
+    return false
+  if (when.optionsAtMost !== undefined && (optionCount === 0 || optionCount > when.optionsAtMost))
+    return false
+  if (when.optionsAbove !== undefined && optionCount <= when.optionsAbove)
+    return false
 
   if (when.itemKind !== undefined || when.itemEnum !== undefined) {
-    if (!isSchemaArrayNode(node)) return false
+    if (!isSchemaArrayNode(node))
+      return false
 
     const itemKinds = toArray(when.itemKind)
-    if (itemKinds && !itemKinds.includes(node.item.kind)) return false
+    if (itemKinds && !itemKinds.includes(node.item.kind))
+      return false
 
     const itemOptions = node.item.options?.length ?? 0
-    if (when.itemEnum !== undefined && (itemOptions > 0) !== when.itemEnum) return false
+    if (when.itemEnum !== undefined && (itemOptions > 0) !== when.itemEnum)
+      return false
   }
 
   const { max, min } = node.constraints
-  if (when.maxAbove !== undefined && (max === undefined || max <= when.maxAbove)) return false
-  if (when.maxAtMost !== undefined && (max === undefined || max > when.maxAtMost)) return false
-  if (when.bounded === true && (min === undefined || max === undefined)) return false
+  if (when.maxAbove !== undefined && (max === undefined || max <= when.maxAbove))
+    return false
+  if (when.maxAtMost !== undefined && (max === undefined || max > when.maxAtMost))
+    return false
+  if (when.bounded === true && (min === undefined || max === undefined))
+    return false
 
-  if (when.annotation !== undefined && !(node.annotations && when.annotation in node.annotations)) return false
+  if (when.annotation !== undefined && !(node.annotations && when.annotation in node.annotations))
+    return false
 
   return true
 }
@@ -131,7 +144,8 @@ export function createSchemaRendererRegistry(
         // Своя запись по умолчанию сильнее дефолтной: потребитель регистрирует
         // её после, и ждёт, что она победит, а не встанет в хвост.
         const withPriority = { priority: 1000, ...renderer }
-        if (index === -1) entries.push(withPriority)
+        if (index === -1)
+          entries.push(withPriority)
         else entries[index] = withPriority
       }
       return registry
@@ -139,19 +153,22 @@ export function createSchemaRendererRegistry(
 
     override(name, patch) {
       const index = entries.findIndex(entry => entry.name === name)
-      if (index !== -1) entries[index] = { ...entries[index]!, ...patch }
+      if (index !== -1)
+        entries[index] = { ...entries[index]!, ...patch }
       return registry
     },
 
     remove(name) {
       const index = entries.findIndex(entry => entry.name === name)
-      if (index !== -1) entries.splice(index, 1)
+      if (index !== -1)
+        entries.splice(index, 1)
       return registry
     },
 
     resolve(node, widget) {
       // Явно названный виджет игнорирует условия: потребитель уже решил.
-      if (widget) return entries.find(entry => entry.name === widget)
+      if (widget)
+        return entries.find(entry => entry.name === widget)
 
       return sorted().find(entry =>
         (!entry.when || matchesDeclarative(node, entry.when))

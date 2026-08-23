@@ -1,16 +1,16 @@
 <script setup lang="ts">
-import {computed} from 'vue'
-import {RouterLink, useRoute} from 'vue-router'
+import { computed } from 'vue'
+import { RouterLink, useRoute } from 'vue-router'
 
-import {useFintI18n} from '@feugene/fint-i18n/vue'
+import { useFintI18n } from '@feugene/fint-i18n/vue'
 
-import {GrCard} from '@feugene/granularity'
+import { GrCard } from '@feugene/granularity'
 
 import {
   getShowcaseComponentBySlug,
 } from '../app/showcase'
-import {useShowcasePageI18n} from '../app/useShowcasePageI18n'
-import {useEntityI18nBlock} from '../app/useEntityI18nBlock'
+import { useShowcasePageI18n } from '../app/useShowcasePageI18n'
+import { useEntityI18nBlock } from '../app/useEntityI18nBlock'
 import ComponentDependencyCard from '../components/doc/ComponentDependencyCard.vue'
 import EventsTable from '../components/doc/EventsTable.vue'
 import ExampleCard from '../components/doc/ExampleCard.vue'
@@ -23,14 +23,12 @@ import {
   createAccessibilityItems,
   createRelatedLinks,
 } from '../components/doc/entityPageHelpers'
-import {getShowcaseComponentDoc} from '../content/componentDocs'
-import {resolveDemoComponent} from '../demos/registry'
+import { getShowcaseComponentDoc } from '../content/componentDocs'
+import { resolveDemoComponent } from '../demos/registry'
 
 const route = useRoute()
-const {t} = useFintI18n()
-const {localizePageByName, localizeEntitySummary} = useShowcasePageI18n()
-
-
+const { t } = useFintI18n()
+const { localizePageByName, localizeEntitySummary } = useShowcasePageI18n()
 
 const componentEntity = computed(() => {
   return getShowcaseComponentBySlug(String(route.params.componentSlug ?? ''))
@@ -98,7 +96,6 @@ const componentsPage = computed(() => localizePageByName('components'))
 const componentSummary = computed(() =>
   componentEntity.value ? localizeEntitySummary(componentEntity.value) : '',
 )
-
 
 // Блок переводов компонента (`components.<Name>`) грузится лениво при открытии
 // страницы и выгружается при уходе — см. `useEntityI18nBlock`.

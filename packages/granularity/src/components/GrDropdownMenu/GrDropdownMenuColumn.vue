@@ -15,7 +15,6 @@ defineSlots<{
   /** Содержимое колонки меню. */
   default?: () => any
 }>()
-
 </script>
 
 <template>

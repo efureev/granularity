@@ -58,7 +58,8 @@ export function useShowcaseSearch() {
   }
 
   function toggle(): void {
-    if (isOpen.value) close()
+    if (isOpen.value)
+      close()
     else open()
   }
 

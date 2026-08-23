@@ -109,7 +109,8 @@ const clock = useChronoNow(() => (
 const staticNow = new Date()
 
 const now = computed(() => {
-  if (props.base) return props.base
+  if (props.base)
+    return props.base
 
   return resolvedLive.value ? clock.value : staticNow
 })
@@ -117,9 +118,12 @@ const now = computed(() => {
 const seconds = computed(() => {
   const value = props.value
 
-  if (value === undefined || value === null) return null
-  if (typeof value === 'number') return Number.isFinite(value) ? value : null
-  if (value instanceof Date) return (now.value.getTime() - value.getTime()) / 1000
+  if (value === undefined || value === null)
+    return null
+  if (typeof value === 'number')
+    return Number.isFinite(value) ? value : null
+  if (value instanceof Date)
+    return (now.value.getTime() - value.getTime()) / 1000
 
   return (value[1].getTime() - value[0].getTime()) / 1000
 })

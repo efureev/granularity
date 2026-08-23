@@ -90,7 +90,8 @@ const switcherLabel = computed(() => ui.value?.label ?? props.node.title)
 function switchTo(next: unknown): void {
   const target = unionVariantFor(props.node, next)
 
-  if (!target) return
+  if (!target)
+    return
 
   const previous = current.value ?? {}
   const value: Record<string, unknown> = {}

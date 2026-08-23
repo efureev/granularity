@@ -29,14 +29,16 @@ export const grToasterExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Action buttons: size, variant, multiple',
     description: 'Payload `useToast.push` принимает `action: { label, onClick }` для одной кнопки или `actions: [...]` для нескольких. У каждой кнопки настраиваются `size` и `variant`; `dismissOnClick: false` оставляет тост открытым (например, «Retry» для sticky-ошибки).',
     status: 'ready',
-    previewKey: 'gr-toaster-action',    note: '`action.onClick` вызывается синхронно перед закрытием — удобно для undo/retry-паттернов, где важно успеть отменить операцию.',
+    previewKey: 'gr-toaster-action',
+    note: '`action.onClick` вызывается синхронно перед закрытием — удобно для undo/retry-паттернов, где важно успеть отменить операцию.',
   },
   {
     id: 'toaster-action-slot',
     title: 'Custom action buttons via slot',
     description: 'Слот `#actions` полностью заменяет дефолтные кнопки: он получает сам `toast` и функцию `dismiss`, которая закрывает именно этот тост. Так можно рендерить любые контролы и самому решать, когда закрывать уведомление.',
     status: 'ready',
-    previewKey: 'gr-toaster-action-slot',    note: 'Слот задаётся один раз на `GrToaster` и применяется ко всем тостам; внутри доступен `toast` (title/message/tone/…) и `dismiss()`.',
+    previewKey: 'gr-toaster-action-slot',
+    note: 'Слот задаётся один раз на `GrToaster` и применяется ко всем тостам; внутри доступен `toast` (title/message/tone/…) и `dismiss()`.',
   },
   {
     id: 'toaster-focus-hotkey',

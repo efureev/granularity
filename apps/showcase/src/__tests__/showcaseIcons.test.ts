@@ -6,22 +6,22 @@ import { describe, expect, it } from 'vitest'
 const iconFiles = [
   {
     relativePath: '../components/package/PackageEntitiesCatalogPage.vue',
-    expectedImport: "import IconArrowRight from '~icons/lucide/arrow-right'",
+    expectedImport: 'import IconArrowRight from \'~icons/lucide/arrow-right\'',
     forbiddenSymbol: '→',
   },
   {
     relativePath: '../pages/PackageEntityDetailPage.vue',
-    expectedImport: "import IconArrowLeft from '~icons/lucide/arrow-left'",
+    expectedImport: 'import IconArrowLeft from \'~icons/lucide/arrow-left\'',
     forbiddenSymbol: '←',
   },
   {
     relativePath: '../components/layout/ShowcaseHeader.vue',
-    expectedImport: "import IconMenu from '~icons/lucide/menu'",
+    expectedImport: 'import IconMenu from \'~icons/lucide/menu\'',
     forbiddenSymbol: '☰',
   },
   {
     relativePath: '../layouts/ShowcaseLayout.vue',
-    expectedImport: "import IconX from '~icons/lucide/x'",
+    expectedImport: 'import IconX from \'~icons/lucide/x\'',
     forbiddenSymbol: '✕',
   },
 ] as const

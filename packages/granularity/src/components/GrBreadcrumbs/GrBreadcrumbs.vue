@@ -149,8 +149,10 @@ const lastIndex = computed(() => props.items.length - 1)
  * одна функция, а режимы отличаются только тем, откуда взялось число.
  */
 const autoMaxItems = computed(() => {
-  if (!props.autoCollapse || fitAfter.value === undefined) return undefined
-  if (fitAfter.value >= props.items.length) return undefined
+  if (!props.autoCollapse || fitAfter.value === undefined)
+    return undefined
+  if (fitAfter.value >= props.items.length)
+    return undefined
 
   return props.items.length - 1
 })
@@ -188,7 +190,8 @@ function isCurrent(index: number): boolean {
  * пропажу видно только глазами.
  */
 function labelClassFor(item: GrBreadcrumbItem): string {
-  if (!item.iconOnly) return breadcrumbsLabelClass
+  if (!item.iconOnly)
+    return breadcrumbsLabelClass
 
   if (!item.icon) {
     if (__GR_DEV__) {
@@ -208,8 +211,10 @@ function labelClassFor(item: GrBreadcrumbItem): string {
  * Ссылкой пункт становится, только если ведёт куда-то и не выключен.
  */
 function isLink(item: GrBreadcrumbItem, index: number): boolean {
-  if (item.disabled) return false
-  if (isCurrent(index) && !props.linkCurrent) return false
+  if (item.disabled)
+    return false
+  if (isCurrent(index) && !props.linkCurrent)
+    return false
   return item.href !== undefined || item.to !== undefined
 }
 
@@ -226,20 +231,25 @@ function widthOf(el: Element | null | undefined): number {
  * поэтому `resize` пересчитывает только арифметику.
  */
 function measure(): void {
-  if (!props.autoCollapse) return
+  if (!props.autoCollapse)
+    return
 
   const list = listEl.value
-  if (!list) return
+  if (!list)
+    return
 
   const ellipsis = list.querySelector('[data-gr-breadcrumbs-ellipsis-item]')
-  if (ellipsis) ellipsisWidth = widthOf(ellipsis)
+  if (ellipsis)
+    ellipsisWidth = widthOf(ellipsis)
 
   if (!measured) {
     // Ширины снимаем только с полного пути: спрятанных пунктов в DOM нет.
-    if (fitAfter.value !== undefined) return
+    if (fitAfter.value !== undefined)
+      return
 
     const wraps = [...list.querySelectorAll('[data-gr-breadcrumbs-item-wrap]')]
-    if (wraps.length !== props.items.length) return
+    if (wraps.length !== props.items.length)
+      return
 
     measured = {
       items: wraps.map(widthOf),
@@ -249,7 +259,8 @@ function measure(): void {
 
   const available = list.clientWidth
   // jsdom и скрытый контейнер отдают 0 — решать по такой ширине нечего.
-  if (available <= 0) return
+  if (available <= 0)
+    return
 
   lastAvailable = available
 
@@ -265,7 +276,8 @@ function measure(): void {
 
 /** Зазор списка в пикселях: он задан классом, а не пропом, поэтому спрашиваем стиль. */
 function listGap(list: HTMLElement): number {
-  if (typeof getComputedStyle !== 'function') return 0
+  if (typeof getComputedStyle !== 'function')
+    return 0
 
   return Number.parseFloat(getComputedStyle(list).columnGap) || 0
 }
@@ -295,7 +307,8 @@ onMounted(() => {
   void nextTick(measure)
 
   // На сервере и в jsdom `ResizeObserver` отсутствует — измерять там нечего.
-  if (typeof ResizeObserver === 'undefined') return
+  if (typeof ResizeObserver === 'undefined')
+    return
 
   observer = new ResizeObserver(() => {
     // Смена ширины — новая раскладка, и раскрытая руками середина относилась к
@@ -307,7 +320,8 @@ onMounted(() => {
 
     measure()
   })
-  if (listEl.value) observer.observe(listEl.value)
+  if (listEl.value)
+    observer.observe(listEl.value)
 })
 
 onBeforeUnmount(() => observer?.disconnect())

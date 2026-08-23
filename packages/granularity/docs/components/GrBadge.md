@@ -4,8 +4,13 @@
 он ничего не принимает и никуда не ведёт.
 
 ```vue
-<GrBadge tone="success">Оплачено</GrBadge>
-<GrBadge tone="danger" dark>Просрочено</GrBadge>
+<GrBadge tone="success">
+Оплачено
+</GrBadge>
+
+<GrBadge tone="danger" dark>
+Просрочено
+</GrBadge>
 ```
 
 Чем бейдж **не** является:
@@ -72,7 +77,9 @@
 раньше, чем этого хочет макет.
 
 ```vue
-<GrBadge radius="semi" size="lg">SKU-14920</GrBadge>
+<GrBadge radius="semi" size="lg">
+SKU-14920
+</GrBadge>
 ```
 
 ## Текст центрируется оптически

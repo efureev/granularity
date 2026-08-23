@@ -11,7 +11,8 @@ const value = ref(0)
 let timer: ReturnType<typeof setInterval> | undefined
 
 function stop() {
-  if (timer) clearInterval(timer)
+  if (timer)
+    clearInterval(timer)
   timer = undefined
 }
 

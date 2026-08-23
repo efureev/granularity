@@ -31,7 +31,8 @@ export interface DragSortHitResult {
  * остаётся детерминированной, а не зависящей от направления подхода.
  */
 export function hitTest(spans: readonly DragSortSpan[], position: number): DragSortHitResult | null {
-  if (spans.length === 0) return null
+  if (spans.length === 0)
+    return null
 
   let nearestIndex = 0
   let nearestDistance = Number.POSITIVE_INFINITY
@@ -56,7 +57,8 @@ export function hitTest(spans: readonly DragSortSpan[], position: number): DragS
 
 function fractionIn(span: DragSortSpan, position: number): number {
   const size = span.end - span.start
-  if (size <= 0) return 0
+  if (size <= 0)
+    return 0
 
   return clamp((position - span.start) / size, 0, 1)
 }
@@ -70,7 +72,8 @@ function fractionIn(span: DragSortSpan, position: number): number {
  * на одну позицию не двигал бы ничего.
  */
 export function insertionIndex(hit: DragSortHitResult, from: number, count: number): number {
-  if (count <= 0) return 0
+  if (count <= 0)
+    return 0
 
   const base = hit.fraction < 0.5 ? hit.index : hit.index + 1
   const adjusted = from < base ? base - 1 : base
@@ -96,11 +99,14 @@ export function autoScrollDelta(viewport: DragSortSpan, position: number, option
   const zone = options.zone ?? 32
   const speed = options.speed ?? 12
 
-  if (zone <= 0 || speed <= 0) return 0
+  if (zone <= 0 || speed <= 0)
+    return 0
   // Вьюпорт короче двух зон: полосы наложились бы и тянули список в обе стороны.
-  if (viewport.end - viewport.start <= zone * 2) return 0
+  if (viewport.end - viewport.start <= zone * 2)
+    return 0
 
-  if (position < viewport.start || position > viewport.end) return 0
+  if (position < viewport.start || position > viewport.end)
+    return 0
 
   const fromStart = position - viewport.start
   if (fromStart < zone)
@@ -120,7 +126,8 @@ export function autoScrollDelta(viewport: DragSortSpan, position: number, option
  */
 export function moveItem<T>(items: readonly T[], from: number, to: number): T[] {
   const next = items.slice()
-  if (from === to || from < 0 || from >= items.length) return next
+  if (from === to || from < 0 || from >= items.length)
+    return next
 
   const [moved] = next.splice(from, 1)
   next.splice(clamp(to, 0, next.length), 0, moved)

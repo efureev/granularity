@@ -700,8 +700,7 @@ describe('приближение по абсциссе', () => {
   // применённого окна, а оно приезжает обратно пропом. В браузере каждое
   // `wheel` — своя задача, и перерисовка между ними успевает всегда.
   async function wheel(wrapper: ReturnType<typeof factory>, deltaY: number): Promise<void> {
-    wrapper.find('[data-gr-chart-surface]').element
-      .dispatchEvent(new WheelEvent('wheel', { bubbles: true, cancelable: true, clientX: 300, deltaY }))
+    wrapper.find('[data-gr-chart-surface]').element.dispatchEvent(new WheelEvent('wheel', { bubbles: true, cancelable: true, clientX: 300, deltaY }))
     await nextTick()
   }
 

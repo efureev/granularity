@@ -98,7 +98,8 @@ const PROMPT_FIELD = 'value'
 // Одна запись — её и показываем: адрес не важен, когда адресат один.
 const promptFieldError = computed<string | null>(() => {
   const own = fieldErrors.value[PROMPT_FIELD]
-  if (own != null) return own
+  if (own != null)
+    return own
 
   const entries = Object.values(fieldErrors.value)
   return entries.length === 1 ? entries[0] : null
@@ -241,16 +242,21 @@ async function handleConfirm(): Promise<void> {
     const result = await req.onConfirm(ctx)
     // Сначала проверка «диалог ещё жив», потом запись состояния: за время
     // `await` заявку мог завершить `ctx.close()` или `closeAll()`.
-    if (req.settled) return
+    if (req.settled)
+      return
     loading.value = false
-    if (result === false) return // оставить открытым без ошибки
-    if (currentError.value || hasFieldError.value || ctx._errorSet()) return // есть ошибка — не закрывать
+    if (result === false)
+      return // оставить открытым без ошибки
+    if (currentError.value || hasFieldError.value || ctx._errorSet())
+      return // есть ошибка — не закрывать
     finish('confirm', value)
   }
   catch (error) {
-    if (req.settled) return
+    if (req.settled)
+      return
     loading.value = false
-    if (!ctx._errorSet()) await ctx.setRawError(error)
+    if (!ctx._errorSet())
+      await ctx.setRawError(error)
     // оставить диалог открытым с показанной ошибкой
   }
   finally {
@@ -263,7 +269,8 @@ function handleCancel(): void {
 }
 
 function handleModelUpdate(value: boolean): void {
-  if (!value) finish('close')
+  if (!value)
+    finish('close')
 }
 
 // Опции веток читаются типизированно, без `as any` в шаблоне.

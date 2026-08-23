@@ -19,15 +19,19 @@ export const fileValidationParser: ResponseErrorParser = (ctx) => {
       issues?: Array<{ file?: { name?: string }, message?: unknown, code?: string }>
       errors?: Array<{ file?: { name?: string }, message?: unknown, code?: string }>
     }
-  if (!raw || typeof raw !== 'object') return null
-  if (raw.name !== 'FileValidationError') return null
+  if (!raw || typeof raw !== 'object')
+    return null
+  if (raw.name !== 'FileValidationError')
+    return null
 
   const list = raw.issues ?? raw.errors ?? []
   const details: string[] = []
   for (const it of list) {
-    if (!it || typeof it !== 'object') continue
+    if (!it || typeof it !== 'object')
+      continue
     const msg = typeof it.message === 'string' ? it.message : ''
-    if (!msg) continue
+    if (!msg)
+      continue
     const fileName = it.file?.name
     details.push(fileName ? `${fileName}: ${msg}` : msg)
   }

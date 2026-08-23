@@ -4,12 +4,12 @@
 показать это негде: «Ссылка скопирована», «Строка удалена», «Найдено 12 записей».
 
 ```ts
-import {useAnnouncer} from '@feugene/granularity'
+import { useAnnouncer } from '@feugene/granularity'
 
-const {announce} = useAnnouncer()
+const { announce } = useAnnouncer()
 
 announce('Ссылка скопирована')
-announce('Не удалось сохранить', {politeness: 'assertive'})
+announce('Не удалось сохранить', { politeness: 'assertive' })
 ```
 
 Композабл не требует setup-контекста — его можно звать из стора, обработчика, перехватчика запросов. `useAnnouncer()` в
@@ -34,13 +34,13 @@ announce('Не удалось сохранить', {politeness: 'assertive'})
 function useAnnouncer(): GrAnnouncer
 
 interface GrAnnouncer {
-    announce: (message: string, options?: GrAnnounceOptions) => void
-    clear: (politeness?: GrAnnouncerPoliteness) => void
+  announce: (message: string, options?: GrAnnounceOptions) => void
+  clear: (politeness?: GrAnnouncerPoliteness) => void
 }
 
 interface GrAnnounceOptions {
-    politeness?: 'polite' | 'assertive'  // по умолчанию 'polite'
-    clearAfterMs?: number                // по умолчанию 7000; 0 — не стирать
+  politeness?: 'polite' | 'assertive' // по умолчанию 'polite'
+  clearAfterMs?: number // по умолчанию 7000; 0 — не стирать
 }
 ```
 

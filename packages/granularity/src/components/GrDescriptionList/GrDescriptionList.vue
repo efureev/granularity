@@ -108,12 +108,14 @@ const narrow = ref(false)
 let observer: ResizeObserver | null = null
 
 onMounted(() => {
-  if (props.stackBelow === undefined || typeof ResizeObserver === 'undefined') return
+  if (props.stackBelow === undefined || typeof ResizeObserver === 'undefined')
+    return
 
   observer = new ResizeObserver(([entry]) => {
     narrow.value = entry.contentRect.width < (props.stackBelow as number)
   })
-  if (rootEl.value) observer.observe(rootEl.value)
+  if (rootEl.value)
+    observer.observe(rootEl.value)
 })
 
 onBeforeUnmount(() => {
@@ -153,7 +155,8 @@ const rootStyle = computed(() => (
 ))
 
 const pairClass = computed(() => {
-  if (isFlow.value) return descriptionPairFlowClass
+  if (isFlow.value)
+    return descriptionPairFlowClass
 
   return [
     isInline.value ? descriptionPairInlineClass : descriptionPairStackedClass,
@@ -202,7 +205,6 @@ defineSlots<{
   /** Значение пункта: `#value-email`. */
   [value: `value-${string}`]: (props: { item: GrDescriptionItem }) => any
 }>()
-
 </script>
 
 <template>

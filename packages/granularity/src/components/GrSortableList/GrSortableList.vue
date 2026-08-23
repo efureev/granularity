@@ -87,8 +87,10 @@ const isEmpty = computed(() => count.value === 0)
 const isVertical = computed(() => props.orientation === 'vertical')
 
 function keyOf(item: T, index: number): string {
-  if (typeof props.itemKey === 'function') return String(props.itemKey(item, index))
-  if (typeof props.itemKey === 'string') return String((item as Record<string, unknown>)[props.itemKey])
+  if (typeof props.itemKey === 'function')
+    return String(props.itemKey(item, index))
+  if (typeof props.itemKey === 'string')
+    return String((item as Record<string, unknown>)[props.itemKey])
 
   return String(index)
 }
@@ -108,7 +110,8 @@ function registerRow(key: string, el: unknown): void {
   // Перестановка размонтирует старый узел уже после того, как встал новый:
   // снимаем запись, только если она протухла (приём из `GrTree`).
   const previous = rowEls.get(key)
-  if (previous && !previous.isConnected) rowEls.delete(key)
+  if (previous && !previous.isConnected)
+    rowEls.delete(key)
 }
 
 const roving = useRovingFocus<string>({
@@ -119,7 +122,8 @@ const roving = useRovingFocus<string>({
 })
 
 function applyMove(from: number, to: number): void {
-  if (from < 0 || to < 0 || from === to) return
+  if (from < 0 || to < 0 || from === to)
+    return
 
   const next = moveItem(props.modelValue, from, to)
   emit('update:modelValue', next)
@@ -138,7 +142,8 @@ const sort = useDragSort<string, number>({
   onUpdate: (source, target, mode) => {
     // Объявляется только клавиатурный перенос: у мыши всё видно на экране, а
     // поток объявлений на каждом движении указателя делает диктор бесполезным.
-    if (mode !== 'keyboard' || source === null) return
+    if (mode !== 'keyboard' || source === null)
+      return
 
     const position = (target ?? indexOfKey(source)) + 1
     announce(t('gr.sortable.moved', 'Position {position} of {count}', { position, count: count.value }))
@@ -150,9 +155,11 @@ const activeIndex = computed(() => (sort.source.value === null ? -1 : indexOfKey
 /** Куда встанет строка: индикатор рисуется на строке-соседе, а не отдельным узлом. */
 function indicatorFor(index: number): 'before' | 'after' | null {
   const target = sort.target.value
-  if (target === null || !sort.isActive.value || index === activeIndex.value) return null
+  if (target === null || !sort.isActive.value || index === activeIndex.value)
+    return null
 
-  if (target === index) return target < activeIndex.value || activeIndex.value === -1 ? 'before' : 'after'
+  if (target === index)
+    return target < activeIndex.value || activeIndex.value === -1 ? 'before' : 'after'
 
   return null
 }
@@ -174,14 +181,16 @@ function rowClass(index: number, key: string): string[] {
 }
 
 function startPointer(key: string, event: PointerEvent): void {
-  if (props.disabled) return
+  if (props.disabled)
+    return
 
   sort.startFrom(key)(event)
 }
 
 function grab(key: string): void {
   sort.grab(key)
-  if (sort.mode.value !== 'keyboard') return
+  if (sort.mode.value !== 'keyboard')
+    return
 
   // Цель ставится до объявления: `setTarget` сам объявляет позицию, и обратный
   // порядок стёр бы более полное сообщение о захвате.
@@ -208,7 +217,8 @@ async function drop(key: string): Promise<void> {
 }
 
 function cancel(): void {
-  if (!sort.isActive.value) return
+  if (!sort.isActive.value)
+    return
 
   sort.cancel()
   announce(t('gr.sortable.cancelled', 'Move cancelled'))
@@ -218,18 +228,21 @@ function moveTargetBy(delta: number): void {
   const current = sort.target.value ?? activeIndex.value
   const next = Math.min(count.value - 1, Math.max(0, current + delta))
 
-  if (next !== current) sort.setTarget(next)
+  if (next !== current)
+    sort.setTarget(next)
 }
 
 function onRowKeydown(event: KeyboardEvent, key: string): void {
-  if (props.disabled) return
+  if (props.disabled)
+    return
 
   const forward = isVertical.value ? 'ArrowDown' : 'ArrowRight'
   const backward = isVertical.value ? 'ArrowUp' : 'ArrowLeft'
   const grabbed = sort.mode.value === 'keyboard'
 
   if (event.key === 'Escape') {
-    if (!grabbed) return
+    if (!grabbed)
+      return
 
     event.preventDefault()
     cancel()
@@ -238,7 +251,8 @@ function onRowKeydown(event: KeyboardEvent, key: string): void {
 
   if (event.key === ' ' || event.key === 'Enter') {
     event.preventDefault()
-    if (grabbed) void drop(key)
+    if (grabbed)
+      void drop(key)
     else grab(key)
     return
   }
@@ -257,10 +271,12 @@ function onRowKeydown(event: KeyboardEvent, key: string): void {
 
 /** Фокус ушёл из списка — взятая строка не может остаться взятой навсегда. */
 function onFocusout(event: FocusEvent): void {
-  if (sort.mode.value !== 'keyboard') return
+  if (sort.mode.value !== 'keyboard')
+    return
 
   const next = event.relatedTarget as Node | null
-  if (next && listEl.value?.contains(next)) return
+  if (next && listEl.value?.contains(next))
+    return
 
   cancel()
 }

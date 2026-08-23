@@ -30,7 +30,8 @@ const commands = computed<GrCommandItem[]>(() => [
 
 function onSelect(item: GrCommandItem): void {
   lastCommand.value = item.label
-  if (item.id === 'theme') toggleTheme()
+  if (item.id === 'theme')
+    toggleTheme()
 }
 
 // Сочетание, которое палитра только показывает, здесь работает по-настоящему:

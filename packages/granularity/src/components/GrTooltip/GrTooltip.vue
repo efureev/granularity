@@ -108,7 +108,8 @@ const hasContent = computed(() => Boolean(slots.content) || Boolean(props.text))
 
 const open = computed<boolean>({
   get: () => {
-    if (props.disabled || !hasContent.value) return false
+    if (props.disabled || !hasContent.value)
+      return false
     return props.open ?? uncontrolledOpen.value
   },
   set: (next) => {
@@ -135,11 +136,14 @@ function schedule(next: boolean, delayMs: number): void {
     return
   }
 
-  delayTimer = setTimeout(() => { open.value = next }, delayMs)
+  delayTimer = setTimeout(() => {
+    open.value = next
+  }, delayMs)
 }
 
 function show(): void {
-  if (props.disabled) return
+  if (props.disabled)
+    return
   schedule(true, props.openDelay)
 }
 
@@ -150,7 +154,8 @@ function hide(): void {
 /** Escape и клик вне закрывают мгновенно: задержка тут читалась бы как залипание. */
 function dismiss(): void {
   clearTimeout(delayTimer)
-  if (open.value) open.value = false
+  if (open.value)
+    open.value = false
 }
 
 // Нужен только тач-режиму: курсор и фокус закрывают подсказку сами.
@@ -162,7 +167,8 @@ const dismissOnOutside = computed(() => ({ handler: dismiss, enabled: open.value
  * панель, тап вне — закрывает (`vClickOutside`).
  */
 function onTouch(): void {
-  if (open.value) dismiss()
+  if (open.value)
+    dismiss()
   else show()
 }
 
@@ -193,7 +199,8 @@ onUpdated(syncSlotFocusable)
 
 watchEffect((onCleanup) => {
   const el = slotFocusableEl.value
-  if (!el) return
+  if (!el)
+    return
 
   el.setAttribute('aria-describedby', tooltipId)
   onCleanup(() => el.removeAttribute('aria-describedby'))

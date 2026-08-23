@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import {GrAlert} from "@feugene/granularity";
+import { GrAlert } from '@feugene/granularity'
 </script>
+
 <template>
   <div class="grid gap-3 lg:grid-cols-2">
     <GrAlert

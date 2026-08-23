@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import {computed, ref} from 'vue'
-import {RouterLink} from 'vue-router'
+import { computed, ref } from 'vue'
+import { RouterLink } from 'vue-router'
 
-import {GrCard,GrBadge} from '@feugene/granularity'
+import { GrCard, GrBadge } from '@feugene/granularity'
 
 import ShowcasePageHero from '../components/showcase/ShowcasePageHero.vue'
-import {showcaseComponentEntities} from '../app/showcase'
-import {compareEntityGroups} from '../app/showcaseEntityGroups'
-import {useShowcasePageI18n} from '../app/useShowcasePageI18n'
+import { showcaseComponentEntities } from '../app/showcase'
+import { compareEntityGroups } from '../app/showcaseEntityGroups'
+import { useShowcasePageI18n } from '../app/useShowcasePageI18n'
 
 const {
   getEntityGroupLabel,
@@ -31,9 +31,9 @@ const filteredComponents = computed(() => {
 
   return localizedComponentEntities.value.filter((entity) => {
     return [entity.name, entity.summary, entity.group]
-        .join(' ')
-        .toLowerCase()
-        .includes(query)
+      .join(' ')
+      .toLowerCase()
+      .includes(query)
   })
 })
 
@@ -50,14 +50,13 @@ const groupedComponents = computed(() => {
   }
 
   return [...buckets.entries()]
-      .sort(([left], [right]) => compareEntityGroups('components', left, right))
-      .map(([group, entities]) => ({
-        group,
-        label: getEntityGroupLabel('components', group),
-        entities,
-      }))
+    .sort(([left], [right]) => compareEntityGroups('components', left, right))
+    .map(([group, entities]) => ({
+      group,
+      label: getEntityGroupLabel('components', group),
+      entities,
+    }))
 })
-
 </script>
 
 <template>

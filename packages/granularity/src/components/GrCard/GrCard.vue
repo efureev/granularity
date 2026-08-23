@@ -106,7 +106,8 @@ const headingLevel = useGrComponentProp('GrCard', 'headingLevel', () => props.he
 let headingInButtonWarned = false
 
 const headingTag = computed(() => {
-  if (rootTag.value !== 'button') return `h${headingLevel.value}`
+  if (rootTag.value !== 'button')
+    return `h${headingLevel.value}`
 
   if (!headingInButtonWarned && __GR_DEV__) {
     headingInButtonWarned = true
@@ -197,7 +198,6 @@ defineSlots<{
   /** Подвал: действия, сводка, пагинация. */
   footer?: () => any
 }>()
-
 </script>
 
 <template>

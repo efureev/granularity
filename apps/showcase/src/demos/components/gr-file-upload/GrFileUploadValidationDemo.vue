@@ -17,7 +17,7 @@ async function request(files: File[], ctx: GrFileUploadRequestCtx) {
   }
 }
 
-function onSuccess(payload: { count: number; names: string[]; extraData?: GrFileUploadExtraData }) {
+function onSuccess(payload: { count: number, names: string[], extraData?: GrFileUploadExtraData }) {
   const bucketValue = payload.extraData?.bucket
   const bucketLabel = typeof bucketValue === 'string' ? bucketValue : 'n/a'
   lastResult.value = `uploaded ${payload.count} file(s): ${payload.names.join(', ') || '—'} · bucket=${bucketLabel}`

@@ -110,7 +110,8 @@ const virtualizer = useVirtualList({
 /** Окно к отрисовке: при выключенной виртуализации — весь набор. */
 const renderedItems = computed(() => {
   const items = props.items ?? []
-  if (!virtualEnabled.value) return items.map((item, index) => ({ item, index }))
+  if (!virtualEnabled.value)
+    return items.map((item, index) => ({ item, index }))
 
   const { start, end } = virtualizer.range.value
   return items.slice(start, end).map((item, offset) => ({ item, index: start + offset }))
@@ -118,8 +119,10 @@ const renderedItems = computed(() => {
 
 function keyOf(item: T, index: number): string | number {
   const key = props.itemKey
-  if (typeof key === 'function') return key(item, index)
-  if (typeof key === 'string') return (item as Record<string, unknown>)[key] as string | number
+  if (typeof key === 'function')
+    return key(item, index)
+  if (typeof key === 'string')
+    return (item as Record<string, unknown>)[key] as string | number
 
   return index
 }
@@ -133,22 +136,26 @@ function keyOf(item: T, index: number): string | number {
  * начинают расходиться с разметкой при любой фильтрации.
  */
 function ariaOf(index: number): Record<string, number> {
-  if (!virtualEnabled.value) return {}
+  if (!virtualEnabled.value)
+    return {}
 
   return { 'aria-setsize': props.items!.length, 'aria-posinset': index + 1 }
 }
 
 const maxHeightStyle = computed(() => {
   const value = props.maxHeight
-  if (value == null) return undefined
+  if (value == null)
+    return undefined
   return typeof value === 'number' ? `${value}px` : value
 })
 
 const listStyle = computed(() => {
-  if (props.maxHeight === undefined) return undefined
+  if (props.maxHeight === undefined)
+    return undefined
 
   const scroller = { overflowY: 'auto' as const, maxHeight: maxHeightStyle.value }
-  if (!virtualEnabled.value) return scroller
+  if (!virtualEnabled.value)
+    return scroller
 
   return { ...scroller, ...virtualizer.spacerStyle.value }
 })
@@ -162,13 +169,16 @@ const listStyle = computed(() => {
  * считаются), поэтому сопоставление по позиции однозначно.
  */
 function measureRendered(): void {
-  if (!virtualEnabled.value) return
+  if (!virtualEnabled.value)
+    return
   // В состояниях loading/empty дети контейнера — скелетоны и заглушки: их
   // высоты записались бы в замеры под индексами будущих строк данных.
-  if (!showItems.value) return
+  if (!showItems.value)
+    return
 
   const container = listEl.value
-  if (!container) return
+  if (!container)
+    return
 
   const { start } = virtualizer.range.value
   const children = container.children
@@ -190,7 +200,8 @@ if (__GR_DEV__) {
   watch(
     () => [props.virtual, dataMode.value, props.maxHeight] as const,
     ([virtual, hasItems, maxHeight]) => {
-      if (!virtual) return
+      if (!virtual)
+        return
 
       if (!hasItems) {
         console.warn(
@@ -221,7 +232,8 @@ if (__GR_DEV__) {
   )
 
   onMounted(() => {
-    if (!virtualEnabled.value) return
+    if (!virtualEnabled.value)
+      return
 
     const first = listEl.value?.firstElementChild
     if (first && !first.hasAttribute('aria-posinset')) {
@@ -249,7 +261,6 @@ defineSlots<{
   /** Пустое состояние вместо текста по умолчанию. */
   empty?: () => any
 }>()
-
 </script>
 
 <template>

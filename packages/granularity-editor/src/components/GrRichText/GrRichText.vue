@@ -167,10 +167,12 @@ function emitValue(instance: Editor): void {
 let shapeWarned = false
 
 function checkShape(value: unknown): void {
-  if (!__GR_DEV__ || shapeWarned || value === undefined || value === null) return
+  if (!__GR_DEV__ || shapeWarned || value === undefined || value === null)
+    return
 
   const isObject = typeof value === 'object'
-  if (isObject === (props.output === 'json')) return
+  if (isObject === (props.output === 'json'))
+    return
 
   shapeWarned = true
   console.warn(
@@ -188,11 +190,16 @@ function editorAttributes(): Record<string, string> {
     'class': contentClass,
   }
 
-  if (props.ariaLabel) attributes['aria-label'] = props.ariaLabel
-  if (field.describedBy.value) attributes['aria-describedby'] = field.describedBy.value
-  if (field.invalid.value) attributes['aria-invalid'] = 'true'
-  if (field.required.value) attributes['aria-required'] = 'true'
-  if (field.labelId.value && !props.ariaLabel) attributes['aria-labelledby'] = field.labelId.value
+  if (props.ariaLabel)
+    attributes['aria-label'] = props.ariaLabel
+  if (field.describedBy.value)
+    attributes['aria-describedby'] = field.describedBy.value
+  if (field.invalid.value)
+    attributes['aria-invalid'] = 'true'
+  if (field.required.value)
+    attributes['aria-required'] = 'true'
+  if (field.labelId.value && !props.ariaLabel)
+    attributes['aria-labelledby'] = field.labelId.value
 
   return attributes
 }
@@ -205,7 +212,8 @@ function editorAttributes(): Record<string, string> {
  * сообщит о расхождении, которого мы и добиваемся сознательно.
  */
 function create(content: unknown): void {
-  if (!hostEl.value) return
+  if (!hostEl.value)
+    return
 
   editor.value = new Editor({
     element: hostEl.value,
@@ -256,7 +264,8 @@ onBeforeUnmount(() => {
  */
 watch([() => props.schema, () => props.extensions], () => {
   const previous = editor.value
-  if (!previous) return
+  if (!previous)
+    return
 
   // Разметкой, а не документом: JSON разбирается строго, и первый же узел,
   // которого нет в новой схеме, уносит с собой весь текст. HTML разбирается
@@ -273,12 +282,14 @@ watch([() => props.schema, () => props.extensions], () => {
 // курсор в начало на каждом нажатии клавиши.
 watch(() => props.modelValue, (next) => {
   const instance = editor.value
-  if (!instance) return
+  if (!instance)
+    return
 
   checkShape(next)
 
   const current = readValue(instance)
-  if (JSON.stringify(current) === JSON.stringify(next ?? '')) return
+  if (JSON.stringify(current) === JSON.stringify(next ?? ''))
+    return
 
   instance.commands.setContent((next ?? '') as string, { emitUpdate: false })
 })
@@ -292,7 +303,8 @@ watch(field.locked, (locked) => {
 function isActive(action: GrRichTextAction): boolean {
   void revision.value
   const instance = editor.value
-  if (!instance || !action.active) return false
+  if (!instance || !action.active)
+    return false
 
   return action.activeAttrs
     ? instance.isActive(action.active, action.activeAttrs)
@@ -309,11 +321,13 @@ function isActive(action: GrRichTextAction): boolean {
  */
 function run(action: GrRichTextAction): void {
   const instance = editor.value
-  if (!instance || field.locked.value) return
+  if (!instance || field.locked.value)
+    return
 
   const chain = instance.chain().focus() as unknown as Record<string, (args?: unknown) => { run: () => void }>
   const command = chain[action.command]
-  if (typeof command !== 'function') return
+  if (typeof command !== 'function')
+    return
 
   command.call(chain, action.commandArgs).run()
 }
@@ -323,7 +337,8 @@ const toolbarKeys = computed(() => actions.value.map(action => action.key))
 const toolbarButtons = ref(new Map<string, HTMLElement>())
 
 function setButtonEl(key: string, element: unknown): void {
-  if (element instanceof HTMLElement) toolbarButtons.value.set(key, element)
+  if (element instanceof HTMLElement)
+    toolbarButtons.value.set(key, element)
   else toolbarButtons.value.delete(key)
 }
 
@@ -363,7 +378,8 @@ function closeBubble(): void {
  * когда должен появиться. Источник истины один: выделение и фокус в поле.
  */
 function onBubbleOpen(next: boolean): void {
-  if (!next) closeBubble()
+  if (!next)
+    closeBubble()
 }
 
 /**
@@ -372,10 +388,12 @@ function onBubbleOpen(next: boolean): void {
  */
 function updateBubble(): void {
   const instance = editor.value
-  if (!showBubble.value || !instance || field.locked.value) return closeBubble()
+  if (!showBubble.value || !instance || field.locked.value)
+    return closeBubble()
 
   const { from, to, empty } = instance.state.selection
-  if (empty) return closeBubble()
+  if (empty)
+    return closeBubble()
 
   try {
     const start = instance.view.coordsAtPos(from)

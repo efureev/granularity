@@ -6,7 +6,8 @@ export const grCommandPaletteExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Commands with groups and shortcuts',
     description: 'Палитра открывается по ⌘K (Ctrl+K вне macOS) или программно через `v-model`. Команды группируются полем `group`, ищутся по метке, описанию и `keywords`. Команда «Toggle theme» здесь настоящая: переключает тему через `useTheme()`, а её сочетание ⌘J повешено директивой `v-hotkey` — работает и без открытия палитры.',
     status: 'ready',
-    previewKey: 'gr-command-palette-basic',    note: 'Поле ввода — `role="combobox"`, список — `role="listbox"`, активная команда указывается через `aria-activedescendant`: фокус не покидает поиск.',
+    previewKey: 'gr-command-palette-basic',
+    note: 'Поле ввода — `role="combobox"`, список — `role="listbox"`, активная команда указывается через `aria-activedescendant`: фокус не покидает поиск.',
   },
   {
     id: 'command-palette-async',
@@ -27,6 +28,7 @@ export const grCommandPaletteExamples: ShowcaseComponentExampleDoc[] = [
     title: 'Палитра на 5 000 команд',
     description: 'С `virtual` в DOM живёт только окно вокруг вьюпорта; высоту окна задаёт `maxHeight`. Группы при этом сохраняются: если список прокручен внутрь группы, её обёртка всё равно создаётся и берёт имя через `aria-label` — заголовка в разметке в этот момент нет.',
     status: 'ready',
-    previewKey: 'gr-command-palette-virtual',    note: '`aria-setsize`/`aria-posinset` считаются по своей группе, а не по всему списку. Стрелки прокручивают список до активной команды прежде, чем перевести на неё `aria-activedescendant`: вне окна элемента в DOM нет.',
+    previewKey: 'gr-command-palette-virtual',
+    note: '`aria-setsize`/`aria-posinset` считаются по своей группе, а не по всему списку. Стрелки прокручивают список до активной команды прежде, чем перевести на неё `aria-activedescendant`: вне окна элемента в DOM нет.',
   },
 ]

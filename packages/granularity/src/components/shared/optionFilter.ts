@@ -26,7 +26,8 @@ export function normalizeOptionQuery(raw: string): string {
  * списка значило бы делать одну и ту же работу n раз.
  */
 export function matchesQueryParts(parts: readonly (string | undefined)[], needle: string): boolean {
-  if (!needle) return true
+  if (!needle)
+    return true
 
   return parts.some(part => part !== undefined && part.toLowerCase().includes(needle))
 }
@@ -59,9 +60,11 @@ export function filterOptions<TOption extends OptionLike>(
   filter?: (option: TOption, query: string) => boolean,
 ): TOption[] {
   const query = rawQuery.trim()
-  if (!query) return options
+  if (!query)
+    return options
 
-  if (filter) return options.filter(option => filter(option, query))
+  if (filter)
+    return options.filter(option => filter(option, query))
 
   const needle = query.toLowerCase()
   return options.filter(option => matchesOptionQuery(option, needle))
@@ -89,7 +92,8 @@ export function resolveSelectedOptions<TValue, TOption extends { label: string, 
   // и подпись чипа не должна зависеть от порядка обхода.
   for (const option of options) {
     const key = keyOf(option.value)
-    if (!byKey.has(key)) byKey.set(key, option)
+    if (!byKey.has(key))
+      byKey.set(key, option)
   }
 
   return values.map((value) => {

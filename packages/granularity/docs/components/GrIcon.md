@@ -42,10 +42,14 @@
 
 ```vue
 <!-- рядом есть текст «Сохранено» — иконка декоративна -->
-<GrIcon><IconCheck /></GrIcon>
+<GrIcon>
+<IconCheck />
+</GrIcon>
 
 <!-- иконка сама несёт смысл -->
-<GrIcon label="Проверено"><IconCheck /></GrIcon>
+<GrIcon label="Проверено">
+<IconCheck />
+</GrIcon>
 ```
 
 Редкий случай «иконка значима, но имя даёт соседний элемент» выражается

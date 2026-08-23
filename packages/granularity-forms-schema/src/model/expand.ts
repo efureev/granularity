@@ -33,8 +33,10 @@ export function expandFields(
     parent: string,
     depth: number,
   ): void => {
-    if (depth > maxDepth) return
-    if (options.include && !options.include(node, name)) return
+    if (depth > maxDepth)
+      return
+    if (options.include && !options.include(node, name))
+      return
 
     const instance: GrSchemaFieldInstance = {
       node,
@@ -64,7 +66,8 @@ export function expandFields(
 
     if (isSchemaArrayNode(node)) {
       const list = getAtPath(value, name)
-      if (!Array.isArray(list)) return
+      if (!Array.isArray(list))
+        return
 
       for (let index = 0; index < list.length; index += 1) {
         visit(
@@ -84,11 +87,13 @@ export function expandFields(
       // значило бы объявить формой поля, которых на экране нет.
       const current = getAtPath(value, name)
       const discriminator = node.discriminator
-      if (!discriminator || current === null || typeof current !== 'object') return
+      if (!discriminator || current === null || typeof current !== 'object')
+        return
 
       const variant = unionVariantFor(node, (current as Record<string, unknown>)[discriminator])
 
-      if (!variant) return
+      if (!variant)
+        return
 
       // Раскрываются **поля** варианта, а не он сам: инстанс варианта нёс бы то
       // же имя, что и объединение, и список полей контейнера содержал бы два

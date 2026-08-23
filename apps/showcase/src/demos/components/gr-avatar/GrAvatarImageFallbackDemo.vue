@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {GrAvatar, GrCard} from "@feugene/granularity";
+import { GrAvatar, GrCard } from '@feugene/granularity'
 
 const avatarSvg = encodeURIComponent(`
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" fill="none">

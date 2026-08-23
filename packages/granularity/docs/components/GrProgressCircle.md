@@ -5,6 +5,7 @@
 
 ```vue
 <GrProgressCircle :value="72" show-value aria-label="Заполнение диска" />
+
 <GrProgressCircle :value="91" shape="dashboard" size="lg" show-value aria-label="Память" />
 ```
 

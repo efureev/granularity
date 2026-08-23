@@ -54,8 +54,10 @@ function pad(value: number): string {
 
 /** Хотя бы одно время в отрезке попадает в границы. */
 function rangeAllowed(from: PlainTime, to: PlainTime, min?: PlainTime, max?: PlainTime): boolean {
-  if (min && comparePlainTimes(to, min) < 0) return false
-  if (max && comparePlainTimes(from, max) > 0) return false
+  if (min && comparePlainTimes(to, min) < 0)
+    return false
+  if (max && comparePlainTimes(from, max) > 0)
+    return false
 
   return true
 }
@@ -170,8 +172,10 @@ function periodColumn(options: BuildTimeColumnsOptions): TimeColumn {
 export function buildTimeColumns(options: BuildTimeColumnsOptions): TimeColumn[] {
   const columns = [hourColumn(options), minuteColumn(options)]
 
-  if (options.enableSeconds) columns.push(secondColumn(options))
-  if (options.twelveHour) columns.push(periodColumn(options))
+  if (options.enableSeconds)
+    columns.push(secondColumn(options))
+  if (options.twelveHour)
+    columns.push(periodColumn(options))
 
   return columns
 }

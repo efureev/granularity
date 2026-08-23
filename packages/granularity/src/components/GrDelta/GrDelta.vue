@@ -105,11 +105,13 @@ const formatOptions = computed<Intl.NumberFormatOptions>(() => ({
  * внутри величины, и разметка не меняется ни на байт.
  */
 const valueNodes = computed<{ sign: string, value: string }>(() => {
-  if (isEmpty.value) return { sign: '', value: resolvedEmptyText.value }
+  if (isEmpty.value)
+    return { sign: '', value: resolvedEmptyText.value }
 
   const parts = formatNumberToParts(resolvedLocale.value, props.value as number, formatOptions.value)
 
-  if (!props.prefix) return { sign: '', value: parts.map(part => part.value).join('') }
+  if (!props.prefix)
+    return { sign: '', value: parts.map(part => part.value).join('') }
 
   const { sign, rest } = splitLeadingSign(parts)
 
@@ -120,8 +122,10 @@ const sign = computed(() => valueNodes.value.sign)
 const formatted = computed(() => valueNodes.value.value)
 
 const arrowIcon = computed(() => {
-  if (direction.value === 'up') return IconTrendingUp
-  if (direction.value === 'down') return IconTrendingDown
+  if (direction.value === 'up')
+    return IconTrendingUp
+  if (direction.value === 'down')
+    return IconTrendingDown
   return IconMinus
 })
 

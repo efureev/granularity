@@ -28,16 +28,19 @@ export function historyUrlAdapter(): DataSourceUrlAdapter {
     read: () => (typeof window === 'undefined' ? '' : window.location.search),
 
     write: (search, { replace }) => {
-      if (typeof window === 'undefined') return
+      if (typeof window === 'undefined')
+        return
 
       const next = `${window.location.pathname}${search}${window.location.hash}`
 
-      if (replace) window.history.replaceState(window.history.state, '', next)
+      if (replace)
+        window.history.replaceState(window.history.state, '', next)
       else window.history.pushState(null, '', next)
     },
 
     subscribe: (listener) => {
-      if (typeof window === 'undefined') return () => {}
+      if (typeof window === 'undefined')
+        return () => {}
 
       window.addEventListener('popstate', listener)
 

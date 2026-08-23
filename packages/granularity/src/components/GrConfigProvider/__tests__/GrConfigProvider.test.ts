@@ -239,7 +239,6 @@ describe('componentDefaults: дефолтные пропсы по компоне
     // tone унаследован от родителя, хотя дочерний блок GrButton его не упоминает.
     expect(button.attributes('data-gr-tone')).toBe('danger')
   })
-
 })
 
 // Контролы, подключённые к провайдеру. Проверяем не конкретные utility-классы
@@ -425,7 +424,8 @@ describe('i18n: адаптер отдаётся реактивно', () => {
     const adapter: Record<string, unknown> = {
       t: (key: string) => dict[key] ?? key,
     }
-    if (options.withTe) adapter.te = (key: string) => key in dict
+    if (options.withTe)
+      adapter.te = (key: string) => key in dict
     return adapter as TestAdapter
   }
 

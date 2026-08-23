@@ -6,9 +6,9 @@ import { FileValidationError, runFileValidators } from '../fileValidation'
 
 export type DropzoneOnFiles = (files: File[], event: DragEvent) => void | Promise<void>
 
-export type DropzoneBindingValue =
-  | DropzoneOnFiles
-  | {
+export type DropzoneBindingValue
+  = | DropzoneOnFiles
+    | {
       onFiles: DropzoneOnFiles
       /** По умолчанию `true`. */
       enabled?: boolean
@@ -106,7 +106,8 @@ function tokenizeClass(value: string): string[] {
 
 function setOver(el: HTMLElement, next: boolean) {
   const state = states.get(el)
-  if (!state) return
+  if (!state)
+    return
 
   // `state.isOver` может рассинхронизироваться с DOM (например, при обновлениях
   // компонента/директивы во время drag-over). Поэтому DOM-состояние всегда
@@ -118,10 +119,13 @@ function setOver(el: HTMLElement, next: boolean) {
 
   const tokens = tokenizeClass(state.options.overClass)
   if (next) {
-    if (tokens.length) el.classList.add(...tokens)
+    if (tokens.length)
+      el.classList.add(...tokens)
     el.dataset.grDropzoneOver = 'true'
-  } else {
-    if (tokens.length) el.classList.remove(...tokens)
+  }
+  else {
+    if (tokens.length)
+      el.classList.remove(...tokens)
     delete el.dataset.grDropzoneOver
   }
 
@@ -132,7 +136,8 @@ function setOver(el: HTMLElement, next: boolean) {
 
 function unbind(el: HTMLElement) {
   const state = states.get(el)
-  if (!state) return
+  if (!state)
+    return
 
   // Гарантированно очищаем визуальное состояние и счётчики.
   // Это важно, если директива обновлялась/перебиндилась во время DnD.
@@ -158,46 +163,61 @@ function bind(el: HTMLElement, value: DropzoneBindingValue | undefined) {
     isOver: false,
     onDragEnter(event) {
       const current = states.get(el)
-      if (!current?.options.enabled) return
+      if (!current?.options.enabled)
+        return
 
-      if (current.options.preventDefault) event.preventDefault()
-      if (current.options.stopPropagation) event.stopPropagation()
+      if (current.options.preventDefault)
+        event.preventDefault()
+      if (current.options.stopPropagation)
+        event.stopPropagation()
 
       current.overCounter += 1
       setOver(el, true)
     },
     onDragOver(event) {
       const current = states.get(el)
-      if (!current?.options.enabled) return
+      if (!current?.options.enabled)
+        return
 
-      if (current.options.preventDefault) event.preventDefault()
-      if (current.options.stopPropagation) event.stopPropagation()
+      if (current.options.preventDefault)
+        event.preventDefault()
+      if (current.options.stopPropagation)
+        event.stopPropagation()
 
-      if (event.dataTransfer) event.dataTransfer.dropEffect = 'copy'
+      if (event.dataTransfer)
+        event.dataTransfer.dropEffect = 'copy'
     },
     onDragLeave(event) {
       const current = states.get(el)
-      if (!current?.options.enabled) return
+      if (!current?.options.enabled)
+        return
 
-      if (current.options.preventDefault) event.preventDefault()
-      if (current.options.stopPropagation) event.stopPropagation()
+      if (current.options.preventDefault)
+        event.preventDefault()
+      if (current.options.stopPropagation)
+        event.stopPropagation()
 
       current.overCounter = Math.max(0, current.overCounter - 1)
-      if (current.overCounter === 0) setOver(el, false)
+      if (current.overCounter === 0)
+        setOver(el, false)
     },
     onDrop(event) {
       const current = states.get(el)
-      if (!current?.options.enabled) return
+      if (!current?.options.enabled)
+        return
 
-      if (current.options.preventDefault) event.preventDefault()
-      if (current.options.stopPropagation) event.stopPropagation()
+      if (current.options.preventDefault)
+        event.preventDefault()
+      if (current.options.stopPropagation)
+        event.stopPropagation()
 
       current.overCounter = 0
       setOver(el, false)
 
       const dt = event.dataTransfer
       const files = dt?.files ? Array.prototype.slice.call(dt.files) as File[] : []
-      if (!files.length) return
+      if (!files.length)
+        return
 
       void (async () => {
         try {
@@ -213,9 +233,11 @@ function bind(el: HTMLElement, value: DropzoneBindingValue | undefined) {
             return
           }
 
-          if (!picked.length) return
+          if (!picked.length)
+            return
           await current.options.onFiles?.(picked, event)
-        } catch (error) {
+        }
+        catch (error) {
           current.options.onError?.(error)
         }
       })()
@@ -248,10 +270,12 @@ function update(el: HTMLElement, value: DropzoneBindingValue | undefined) {
   // Если поменялся `overClass`, синхронизируем DOM (учитывая multi-token значения).
   if (prevOverClass !== nextOptions.overClass) {
     const prevTokens = tokenizeClass(prevOverClass)
-    if (prevTokens.length) el.classList.remove(...prevTokens)
+    if (prevTokens.length)
+      el.classList.remove(...prevTokens)
     if (state.isOver) {
       const nextTokens = tokenizeClass(nextOptions.overClass)
-      if (nextTokens.length) el.classList.add(...nextTokens)
+      if (nextTokens.length)
+        el.classList.add(...nextTokens)
     }
   }
 

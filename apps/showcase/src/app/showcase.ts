@@ -18,6 +18,7 @@ import {
   showcaseComponentEntities,
   showcaseEntityRegistry,
 } from './showcaseEntities.ts'
+
 export {
   showcaseComponentDetailSections,
   showcaseExtraComponentDetailSections,
@@ -31,6 +32,7 @@ import {
   showcasePages,
 } from './showcasePages.ts'
 import { getCompanionComponentByPath } from '../content/companion/companionPackages.ts'
+
 export type {
   ShowcaseBreadcrumb,
   ShowcaseNavigationItem,

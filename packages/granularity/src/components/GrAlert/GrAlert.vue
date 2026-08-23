@@ -147,7 +147,8 @@ const role = computed(() => {
     ? (tone.value === 'danger' || tone.value === 'warning' ? 'assertive' : 'polite')
     : live.value
 
-  if (mode === 'off') return undefined
+  if (mode === 'off')
+    return undefined
   return mode === 'assertive' ? 'alert' : 'status'
 })
 </script>

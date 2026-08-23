@@ -104,7 +104,8 @@ describe('readonly: ни одна клавиша не меняет значен�
         { ...meta.filled, ariaLabel: meta.name },
         meta.keyboardTarget ?? meta.widget,
       )
-      if (emits > 0) measured.push(meta.name)
+      if (emits > 0)
+        measured.push(meta.name)
     }
 
     expect(

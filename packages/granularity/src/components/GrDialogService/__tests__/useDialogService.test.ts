@@ -27,7 +27,8 @@ async function flush(times = 4): Promise<void> {
  */
 async function flushUntil(predicate: () => boolean, times = 40): Promise<void> {
   for (let i = 0; i < times; i += 1) {
-    if (predicate()) return
+    if (predicate())
+      return
     await nextTick()
     // Классификатор ошибок асинхронный и может уйти в макротаску — одними
     // микротасками его до конца не прогонишь.
@@ -197,7 +198,9 @@ describe('useDialogService — завершение заявки', () => {
   it('close() активного диалога прерывает in-flight onConfirm', async () => {
     let seenAborted: boolean | null = null
     let release!: () => void
-    const gate = new Promise<void>((resolve) => { release = resolve })
+    const gate = new Promise<void>((resolve) => {
+      release = resolve
+    })
 
     const p = dialogService.confirm('Long task', {
       onConfirm: async (ctx) => {
@@ -234,9 +237,15 @@ describe('useDialogService — завершение заявки', () => {
 
   it('closeAll резолвит очередь в порядке FIFO', async () => {
     const order: string[] = []
-    const p1 = dialogService.confirm('One').then(() => { order.push('one') })
-    const p2 = dialogService.confirm('Two').then(() => { order.push('two') })
-    const p3 = dialogService.confirm('Three').then(() => { order.push('three') })
+    const p1 = dialogService.confirm('One').then(() => {
+      order.push('one')
+    })
+    const p2 = dialogService.confirm('Two').then(() => {
+      order.push('two')
+    })
+    const p3 = dialogService.confirm('Three').then(() => {
+      order.push('three')
+    })
     await flush()
 
     dialogService.closeAll()
@@ -289,7 +298,9 @@ describe('useDialogService — завершение заявки', () => {
 
   it('пока onConfirm в полёте, Esc и бэкдроп не закрывают окно', async () => {
     let release!: () => void
-    const gate = new Promise<void>((resolve) => { release = resolve })
+    const gate = new Promise<void>((resolve) => {
+      release = resolve
+    })
 
     const p = dialogService.confirm('Long task', {
       onConfirm: async () => { await gate },
@@ -418,8 +429,12 @@ describe('useDialogService — app-scoped состояние', () => {
       return { app, root }
     }
 
-    const first = makeApp((s) => { firstService = s })
-    const second = makeApp((s) => { secondService = s })
+    const first = makeApp((s) => {
+      firstService = s
+    })
+    const second = makeApp((s) => {
+      secondService = s
+    })
 
     const a = firstService!.confirm('Из первого')
     const b = secondService!.confirm('Из второго')

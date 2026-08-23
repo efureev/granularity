@@ -12,7 +12,8 @@ const props = defineProps<{ cell: GrDashboardItemLayout | null }>()
  */
 const style = computed(() => {
   const cell = props.cell
-  if (!cell) return undefined
+  if (!cell)
+    return undefined
 
   return {
     gridColumn: `${cell.x + 1} / span ${cell.w}`,

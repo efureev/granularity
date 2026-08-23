@@ -25,7 +25,7 @@ export const grSwitchClassTokens = {
     ...splitClassTokens(thumbSpinnerBase),
     ...Object.values(thumbSpinnerSizes).flatMap(splitClassTokens),
   ],
-  thumbTranslations: Object.values(thumbTranslations).flatMap(({checked, unchecked}) => {
+  thumbTranslations: Object.values(thumbTranslations).flatMap(({ checked, unchecked }) => {
     return [...splitClassTokens(checked), ...splitClassTokens(unchecked)]
   }),
   labelBase: [...splitClassTokens(labelBase), ...splitClassTokens(labelDisabledClass)],

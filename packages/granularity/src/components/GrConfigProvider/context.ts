@@ -115,7 +115,8 @@ function isGrConfigContext(source: unknown): source is GrConfigContext {
  * недостаточно; см. `SPEC-GrConfig-resolver.md`.
  */
 export function resolveGrConfig(source?: GrConfigSource | null): GrConfigContext {
-  if (isGrConfigContext(source)) return source
+  if (isGrConfigContext(source))
+    return source
 
   const provides = source?.provides
   if (provides) {
@@ -123,7 +124,8 @@ export function resolveGrConfig(source?: GrConfigSource | null): GrConfigContext
     return isGrConfigContext(fromProvides) ? fromProvides : EMPTY_CONFIG
   }
 
-  if (getCurrentInstance()) return inject(GR_CONFIG_KEY, EMPTY_CONFIG)
+  if (getCurrentInstance())
+    return inject(GR_CONFIG_KEY, EMPTY_CONFIG)
 
   return EMPTY_CONFIG
 }
@@ -159,7 +161,8 @@ export function resetUnsupportedSizeWarnings(): void {
 
 function warnUnsupportedSize(size: string, supported: readonly string[]): void {
   const key = `${size}|${supported.join(',')}`
-  if (warnedUnsupportedSizes.has(key)) return
+  if (warnedUnsupportedSizes.has(key))
+    return
   warnedUnsupportedSizes.add(key)
 
   console.warn(
@@ -191,14 +194,16 @@ export function useGrComponentSize<TSize extends string = GrComponentSize>(
 
   return computed(() => {
     const local = localSize()
-    if (local !== undefined) return local
+    if (local !== undefined)
+      return local
 
     const fromComponentDefaults = component
       ? (config.componentDefaults.value[component] as { size?: TSize } | undefined)?.size
       : undefined
 
     const fromConfig = fromComponentDefaults ?? config.size.value
-    if (fromConfig === undefined) return fallback
+    if (fromConfig === undefined)
+      return fallback
 
     if (supported && !supported.includes(fromConfig as TSize)) {
       // Текст предупреждения и его дедуп живут прямо под гардом, а не в общей
@@ -245,7 +250,8 @@ export function useGrComponentProp<
 
   return computed(() => {
     const local = localValue()
-    if (local !== undefined) return local as NonNullable<GrDefaultsOf<TComponent>[TProp]>
+    if (local !== undefined)
+      return local as NonNullable<GrDefaultsOf<TComponent>[TProp]>
 
     // Промежуточная аннотация (а не `as`) нужна, чтобы TS не разворачивал
     // `GrComponentDefaults[TComponent]` в объединение всех блоков — по нему

@@ -36,7 +36,8 @@ export interface ZodCheck {
 }
 
 export function isZodSchema(value: unknown): value is ZodLike {
-  if (!value || typeof value !== 'object') return false
+  if (!value || typeof value !== 'object')
+    return false
 
   const candidate = value as ZodLike
   const def = candidate._def ?? candidate.def
@@ -71,7 +72,8 @@ export function innerOf(schema: ZodLike): ZodLike | undefined {
   const def = defOf(schema)
 
   for (const candidate of [def.innerType, def.schema, def.in, def.out]) {
-    if (isZodSchema(candidate)) return candidate
+    if (isZodSchema(candidate))
+      return candidate
   }
 
   return undefined
@@ -96,7 +98,8 @@ export function checksOf(schema: ZodLike): ZodCheck[] {
   const def = defOf(schema)
   const checks = def.checks
 
-  if (!Array.isArray(checks)) return []
+  if (!Array.isArray(checks))
+    return []
 
   return checks.map((check) => {
     const item = check as Record<string, unknown>
@@ -124,8 +127,10 @@ export function checksOf(schema: ZodLike): ZodCheck[] {
  * сообщение из контекста, которого у нас нет, и тогда текста просто не будет.
  */
 function readMessage(error: unknown): string | undefined {
-  if (typeof error === 'string') return error
-  if (typeof error !== 'function') return undefined
+  if (typeof error === 'string')
+    return error
+  if (typeof error !== 'function')
+    return undefined
 
   try {
     const produced = (error as (ctx: unknown) => unknown)({})
@@ -166,7 +171,8 @@ export function elementOf(schema: ZodLike): ZodLike | undefined {
   const def = defOf(schema)
 
   for (const candidate of [def.element, def.valueType, def.items]) {
-    if (isZodSchema(candidate)) return candidate
+    if (isZodSchema(candidate))
+      return candidate
   }
 
   return undefined
@@ -176,9 +182,11 @@ export function optionsOf(schema: ZodLike): unknown[] | undefined {
   const def = defOf(schema)
   const values = def.values ?? def.entries ?? def.options
 
-  if (Array.isArray(values)) return values as unknown[]
+  if (Array.isArray(values))
+    return values as unknown[]
   // v4 держит варианты объектом `{ admin: 'admin' }`, v3 — массивом.
-  if (values && typeof values === 'object') return Object.values(values as Record<string, unknown>)
+  if (values && typeof values === 'object')
+    return Object.values(values as Record<string, unknown>)
 
   return undefined
 }
@@ -192,7 +200,8 @@ export function defaultOf(schema: ZodLike): unknown {
 
 export function descriptionOf(schema: ZodLike): string | undefined {
   const direct = schema.description
-  if (typeof direct === 'string') return direct
+  if (typeof direct === 'string')
+    return direct
 
   const def = defOf(schema)
   return typeof def.description === 'string' ? def.description : undefined
@@ -201,7 +210,8 @@ export function descriptionOf(schema: ZodLike): string | undefined {
 /** Метаданные `.meta({...})` из v4 и `.describe()`-совместимые аннотации. */
 export function metaOf(schema: ZodLike): Record<string, unknown> | undefined {
   const meta = (schema as { meta?: () => unknown }).meta
-  if (typeof meta !== 'function') return undefined
+  if (typeof meta !== 'function')
+    return undefined
 
   const value = meta.call(schema)
   return value && typeof value === 'object' ? value as Record<string, unknown> : undefined

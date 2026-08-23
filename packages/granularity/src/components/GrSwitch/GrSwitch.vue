@@ -71,24 +71,24 @@ const getCustomColor = (value?: string) => value?.trim() || undefined
 defineOptions({ inheritAttrs: false })
 
 const props = withDefaults(
-    defineProps<GrSwitchProps>(),
-    {
-      modelValue: false,
-      disabled: false,
-      readonly: false,
-      invalid: false,
-      required: false,
-      ariaLabel: undefined,
-      size: undefined,
-      labelPosition: 'end',
-      loading: false,
-      loadingText: undefined,
-      name: undefined,
-      value: 'on',
-      form: undefined,
-      activeBackgroundColor: undefined,
-      inactiveBackgroundColor: undefined,
-    },
+  defineProps<GrSwitchProps>(),
+  {
+    modelValue: false,
+    disabled: false,
+    readonly: false,
+    invalid: false,
+    required: false,
+    ariaLabel: undefined,
+    size: undefined,
+    labelPosition: 'end',
+    loading: false,
+    loadingText: undefined,
+    name: undefined,
+    value: 'on',
+    form: undefined,
+    activeBackgroundColor: undefined,
+    inactiveBackgroundColor: undefined,
+  },
 )
 
 // Контекст `GrFormField`: id для `<label for>`, описание ошибкой, невалидность.
@@ -129,7 +129,6 @@ defineSlots<{
   default?: () => any
 }>()
 
-
 const rootClass = computed(() => grSwitchRootClass(props.labelPosition))
 
 const trackClass = computed(() => grSwitchTrackClass(resolvedSize.value))
@@ -138,28 +137,28 @@ const trackStyle = computed(() => {
   const isChecked = props.modelValue
   const defaultBackgroundColor = isChecked ? 'var(--gr-primary)' : 'var(--gr-muted)'
   const customBackgroundColor = getCustomColor(
-      isChecked ? props.activeBackgroundColor : props.inactiveBackgroundColor,
+    isChecked ? props.activeBackgroundColor : props.inactiveBackgroundColor,
   )
   // Недоступность гасится токеном и перебивает кастомный цвет: иначе выключенный
   // переключатель остался бы таким же ярким, как рабочий.
   const backgroundColor = isDisabled.value
-      ? 'var(--gr-disabled-bg)'
-      : customBackgroundColor ?? defaultBackgroundColor
+    ? 'var(--gr-disabled-bg)'
+    : customBackgroundColor ?? defaultBackgroundColor
 
   return {
     '--gr-switch-track-bg': backgroundColor,
     '--gr-switch-track-brd': isDisabled.value
-        ? 'var(--gr-disabled-brd)'
-        : customBackgroundColor
-            ? backgroundColor
-            : isChecked
-                ? 'var(--gr-primary)'
-                : 'var(--gr-brd)',
-    backgroundColor: 'var(--gr-switch-track-bg)',
+      ? 'var(--gr-disabled-brd)'
+      : customBackgroundColor
+        ? backgroundColor
+        : isChecked
+          ? 'var(--gr-primary)'
+          : 'var(--gr-brd)',
+    'backgroundColor': 'var(--gr-switch-track-bg)',
   }
 })
 
-const thumbClass = computed(() => grSwitchThumbClass({size: resolvedSize.value, checked: props.modelValue}))
+const thumbClass = computed(() => grSwitchThumbClass({ size: resolvedSize.value, checked: props.modelValue }))
 
 const spinnerClass = computed(() => grSwitchSpinnerClass(resolvedSize.value))
 
@@ -170,7 +169,7 @@ const resolvedLoadingText = computed(() => props.loadingText ?? t('gr.switch.loa
 // Выключенный переключатель не отправляется вовсе — так устроен чекбокс в HTML,
 // и сервер отличает «выкл» по отсутствию ключа.
 const submitsValue = computed(
-    () => props.modelValue && !isDisabled.value && Boolean(props.name),
+  () => props.modelValue && !isDisabled.value && Boolean(props.name),
 )
 
 function toggle(): void {

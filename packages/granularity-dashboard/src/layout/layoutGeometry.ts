@@ -93,7 +93,8 @@ export function cellFromPoint(
 ): { x: number, y: number } {
   const col = colStep(metrics)
   const row = rowStep(metrics)
-  if (metrics.width <= 0 || col <= 0 || row <= 0) return { x: 0, y: 0 }
+  if (metrics.width <= 0 || col <= 0 || row <= 0)
+    return { x: 0, y: 0 }
 
   const w = Math.max(1, Math.round(span?.w ?? 1))
   const h = Math.max(1, Math.round(span?.h ?? 1))
@@ -136,7 +137,8 @@ export function spanFromDelta(
  */
 export function rowsForHeight(height: number, metrics: GrDashboardMetrics): number {
   const step = rowStep(metrics)
-  if (!(step > 0) || !Number.isFinite(height)) return 1
+  if (!(step > 0) || !Number.isFinite(height))
+    return 1
 
   return Math.max(1, Math.ceil((height + metrics.gap) / step))
 }

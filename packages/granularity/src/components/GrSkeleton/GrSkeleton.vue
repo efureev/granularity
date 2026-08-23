@@ -42,7 +42,8 @@ const resolvedWidth = computed(() => props.width ?? (props.variant === 'circle' 
 // У круга высота повторяет ширину, пока её не задали явно: иначе одна заданная
 // сторона превращала бы его в овал.
 const resolvedHeight = computed(() => {
-  if (props.height !== undefined) return props.height
+  if (props.height !== undefined)
+    return props.height
   return props.variant === 'circle' ? resolvedWidth.value : '12px'
 })
 

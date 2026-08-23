@@ -23,13 +23,15 @@ export function warnRenamedProp(
   attrs: Record<string, unknown>,
   renames: Readonly<Record<string, string>>,
 ): void {
-  if (!__GR_DEV__) return
+  if (!__GR_DEV__)
+    return
 
   const reported = new Set<string>()
 
   watchEffect(() => {
     for (const [from, to] of Object.entries(renames)) {
-      if (attrs[from] === undefined || reported.has(from)) continue
+      if (attrs[from] === undefined || reported.has(from))
+        continue
 
       reported.add(from)
       console.warn(
