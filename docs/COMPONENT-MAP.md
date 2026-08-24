@@ -2,12 +2,15 @@
 
 Ответ на вопрос «какой компонент взять под эту задачу» — по всем пакетам сразу:
 ядро `@feugene/granularity` и спутники `granularity-charts`, `granularity-chrono`,
-`granularity-dashboard`, `granularity-datasource`, `granularity-editor`, `extra-granularity`.
+`granularity-dashboard`, `granularity-datasource`, `granularity-editor`,
+`granularity-forms-schema`, `granularity-media`, `extra-granularity`.
 
 Читается сверху вниз: **Развилки** ставят различающий вопрос и приводят к одному
-компоненту, **Быстрый выбор** — алфавитный список на случай, когда имя уже
-известно. Подробности всегда на странице компонента: она объясняет, почему
-устроено так, и где проходит граница с соседом.
+компоненту, **Решение — не компонент** ловит задачи, которые компонентом не
+решаются, **Составные семейства** показывают, из чего собран выбранный компонент,
+**Быстрый выбор** — алфавитный список на случай, когда имя уже известно.
+Подробности всегда на странице компонента: она объясняет, почему устроено так, и
+где проходит граница с соседом.
 
 Карта живёт в корне репозитория, а не в пакете: она ссылается на все пакеты
 сразу, поэтому в опубликованный тарбол любого из них попасть не может.
@@ -100,7 +103,7 @@
 | обвязка одного поля: подпись, подсказка, ошибка, `id` | [`GrFormField`](../packages/granularity/docs/components/GrFormField.md) |
 | правила валидации, блокировка отправки, скролл к ошибке | [`GrForm`](../packages/granularity/docs/components/GrForm.md) |
 | смысловой блок полей с заголовком | [`GrFormSection`](../packages/granularity/docs/components/GrFormSection.md) |
-| общие дефолты контролов на всё поддерево | [`GrConfigProvider`](../packages/granularity/docs/components/GrConfigProvider.md) |
+| дефолты, размер, локаль и тема на всё поддерево | [`GrConfigProvider`](../packages/granularity/docs/components/GrConfigProvider.md) |
 | готовая мини-форма из трёх примитивов | [`XgQuickForm`](../packages/extra-granularity/docs/components/XgQuickForm.md) |
 | поля описаны схемой бэкенда — zod, JSON Schema, OpenAPI | [`GrSchemaForm`](../packages/granularity-forms-schema/docs/components/GrSchemaForm.md) |
 
@@ -139,13 +142,17 @@
 | строки однородные, разметку даёт компонент | [`GrList`](../packages/granularity/docs/components/GrList.md) |
 | строки — пары «характеристика → значение» | [`GrDescriptionList`](../packages/granularity/docs/components/GrDescriptionList.md) |
 | пары — метаданные строкой, а не столбцом | [`GrDescriptionList`](../packages/granularity/docs/components/GrDescriptionList.md) с `layout="flow"` |
-| таблица, ячейки оформляет потребитель | [`GrTable`](../packages/granularity/docs/components/GrTable.md) |
-| таблица с сортировкой, выбором строк, слотами ячеек | [`GrDataTable`](../packages/granularity/docs/components/GrDataTable.md) |
+| таблица данных: сортировка, выбор строк, колонки, итог | [`GrDataTable`](../packages/granularity/docs/components/GrDataTable.md) |
+| разметку `<tr>`/`<td>` пишет потребитель | [`GrTable`](../packages/granularity/docs/components/GrTable.md) |
 | строки вложены друг в друга | [`GrTree`](../packages/granularity/docs/components/GrTree.md) |
 | порядок строк меняет пользователь | [`GrSortableList`](../packages/granularity/docs/components/GrSortableList.md) |
 | строки — события во времени | [`GrTimeline`](../packages/granularity/docs/components/GrTimeline.md) |
 | строк больше, чем помещается на экран | [`GrPagination`](../packages/granularity/docs/components/GrPagination.md) |
-| секции, из которых открыта одна-две | [`GrCollapse`](../packages/granularity/docs/components/GrCollapse.md) |
+| строк тысячи, и страницы не нужны | [`GrList`](../packages/granularity/docs/components/GrList.md) / [`GrDataTable`](../packages/granularity/docs/components/GrDataTable.md) с `virtual` |
+
+По умолчанию берут `GrDataTable`: сортировка, выбор, порядок и ширина колонок,
+итог и виртуализация уже внутри. `GrTable` — обёртка над чужой разметкой: она
+добавляет `caption`, состояния и скролл-регион, не трогая `<tr>` и `<td>`.
 
 Компонента, связывающего таблицу с фильтрами и пагинацией, в карте нет намеренно:
 это не компонент, а **состояние**. Сортировка, фильтры, страница, поиск, адресная
@@ -260,8 +267,7 @@
 | поверхность с рамкой, фоном и тенью | [`GrCard`](../packages/granularity/docs/components/GrCard.md) |
 | разделить контент линией | [`GrDivider`](../packages/granularity/docs/components/GrDivider.md) |
 | две панели, границу двигает пользователь | [`GrSplitter`](../packages/granularity/docs/components/GrSplitter.md) |
-| секции, раскрывающиеся по клику | [`GrCollapse`](../packages/granularity/docs/components/GrCollapse.md) |
-| блок полей с заголовком | [`GrFormSection`](../packages/granularity/docs/components/GrFormSection.md) |
+| содержимого много, показывают не всё сразу | [`GrCollapse`](../packages/granularity/docs/components/GrCollapse.md) |
 | сетка виджетов, которую двигает пользователь | [`GrDashboard`](../packages/granularity-dashboard/docs/components/GrDashboard.md) |
 | виджет на такой сетке | [`GrDashboardItem`](../packages/granularity-dashboard/docs/components/GrDashboardItem.md) |
 | переключатель режима и сброс раскладки | [`GrDashboardToolbar`](../packages/granularity-dashboard/docs/components/GrDashboardToolbar.md) |
@@ -309,6 +315,47 @@
 
 Календарь событий, агенду и Гант этот пакет не закрывает — см. «Чего в
 экосистеме нет».
+
+## Решение — не компонент
+
+Задачи, с которыми приходят в карту, но закрывает их директива или composable.
+Компонента под них нет и не будет: разметку в этих случаях пишет потребитель.
+
+| Задача | Чем закрывается |
+| --- | --- |
+| индикатор поверх готового блока, императивно | `v-loading` — [директивы](../packages/granularity/docs/directives.md) |
+| строк тысячи, а разметку строки пишете свою | `useVirtualList` — [виртуализация](../packages/granularity/docs/virtual-list.md) |
+| светлая и тёмная тема приложения | `useTheme` — [темы](../packages/granularity/docs/theming.md) |
+| уведомление из кода | `useToast` — очередь единственного [`GrToaster`](../packages/granularity/docs/components/GrToaster.md) |
+| таблица ↔ фильтры ↔ страница ↔ URL ↔ сервер | `useDataSource` — [`granularity-datasource`](../packages/granularity-datasource/README.md) |
+| горячие клавиши на элементе | `v-hotkey` — [директивы](../packages/granularity/docs/directives.md) |
+| файлы бросают на свою область | `v-dropzone` — [директивы](../packages/granularity/docs/directives.md) |
+| высота поля растёт по содержимому | `v-autosize` — [директивы](../packages/granularity/docs/directives.md) |
+| перетаскивание в своём списке | `useDragSort` — [перенос строк](../packages/granularity/docs/drag-sort.md) |
+| изменение надо объявить скринридеру | `useAnnouncer` — [живой регион](../packages/granularity/docs/announcer.md) |
+| свой оверлей: слой, фокус, закрытие, позиция | `useOverlayLayer`, `useFocusTrap`, `useDismissible`, `useFloating` — [оверлеи](../packages/granularity/docs/overlays.md) |
+
+Дефолты контролов, локаль и тему поддерева задаёт `GrConfigProvider` — он в
+развилке «Форма как целое», хотя действует на всё приложение.
+
+## Составные семейства
+
+Части приезжают из того же subpath, что и родитель, — отдельно их не подключают.
+Подробности всегда на странице родителя.
+
+| Родитель | Части |
+| --- | --- |
+| [`GrAvatar`](../packages/granularity/docs/components/GrAvatar.md) | `GrAvatarGroup` |
+| [`GrCollapse`](../packages/granularity/docs/components/GrCollapse.md) | `GrCollapseItem` |
+| [`GrDialog`](../packages/granularity/docs/components/GrDialog.md) | `GrDialogHeader`, `GrDialogFooter`, `GrDialogCloseButton` |
+| [`GrDialogService`](../packages/granularity/docs/components/GrDialogService.md) | `GrDialogServiceHost` |
+| [`GrDropdownMenu`](../packages/granularity/docs/components/GrDropdownMenu.md) | `GrDropdownMenuList`, `GrDropdownMenuGroup`, `GrDropdownMenuHeader`, `GrDropdownMenuItem`, `GrDropdownMenuDivider`, `GrDropdownMenuColumns`, `GrDropdownMenuColumn` |
+| [`GrList`](../packages/granularity/docs/components/GrList.md) | `GrListItem` |
+| [`GrResponseErrorBanner`](../packages/granularity/docs/components/GrResponseErrorBanner.md) | `GrFormErrorBanner`, `GrUploadErrorBanner` |
+| [`GrSchemaForm`](../packages/granularity-forms-schema/docs/components/GrSchemaForm.md) | `GrSchemaField`, `GrSchemaArrayField`, `GrSchemaUnionField`, `GrSchemaAdditionalFields` |
+| [`GrSidebar`](../packages/granularity/docs/components/GrSidebar.md) | `GrSidebarGroup`, `GrSidebarItem` |
+| [`GrTabPanels`](../packages/granularity/docs/components/GrTabPanels.md) | `GrTabPanel` |
+| [`GrTimeline`](../packages/granularity/docs/components/GrTimeline.md) | `GrTimelineItem` |
 
 ## Быстрый выбор
 
@@ -437,10 +484,9 @@
 при скролле; `GrMenu` — вертикальное меню навигации (меню действий по правому
 клику закрывает `GrContextMenu`, вложенных подменю нет ни у кого).
 
-**Планируется отдельными пакетами.** Форма из схемы
-бэкенда, rich-text и markdown, кроп аватара и камера, связка «таблица ↔ фильтры
-↔ URL», календарь событий и Гант, редактор кода и diff, выгрузка в XLSX и PDF,
-карта, схема связей, продуктовые туры.
+**Планируется отдельными пакетами.** Просмотр markdown, календарь событий и
+Гант, редактор кода и diff, выгрузка в XLSX и PDF, карта, схема связей,
+продуктовые туры.
 
 **Не будет.** 3D и география у графиков — это карта, отдельный пакет.
 Отдельного пакета иконок не будет: связка `unplugin-icons` с UnoCSS уже решает
