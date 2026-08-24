@@ -529,6 +529,10 @@ import { defineComponentDefaultsGate } from '@feugene/granularity-test-kit/gates
 defineComponentDefaultsGate({ registryModule: '@feugene/granularity/composables/useGrComponentConfig' })
 ```
 
+Путь к реестру указывается **на место объявления**, а не на реэкспорт из корня пакета: через
+реэкспорт слияние `componentDefaults` отваливается молча — дефолты просто перестают доезжать,
+ничего при этом не падая.
+
 ```ts
 // src/__tests__/gateCoverage.test.ts
 import { defineGateCoverage } from '@feugene/granularity-test-kit/gates'
