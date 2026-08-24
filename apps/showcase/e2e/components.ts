@@ -91,6 +91,11 @@ export const companionComponentNames: string[] = [
  * требовала бы пересъёмки.
  */
 const VISUAL_EXCLUDED_PACKAGES = [
+  // `GrVideoPlayer` — в кадре живое видео: какой именно кадр успел
+  // декодироваться к моменту снимка, решает удача, и эталон меряет её, а не
+  // раскладку. Доступность страницы при этом проверяет axe, который сюда
+  // заходит.
+  'GrVideoPlayer',
   ...Object.keys(granularityChartsComponentConfigs),
   ...Object.keys(granularityDashboardComponentConfigs),
   // `GrRichText` — курсор в редакторе мигает, и снимок ловил бы его фазу.

@@ -44,9 +44,9 @@ function onTime(current: number) {
       </p>
 
       <p class="showcase-demo-text text-sm">
-        Клавиатура работает, когда плеер в фокусе: пробел — пуск и пауза,
-        <code>←</code> <code>→</code> — перемотка на пять секунд, <code>Home</code> и
-        <code>End</code> — к началу и концу, <code>M</code> — звук, <code>F</code> — во весь экран.
+        Клавиатура работает, когда плеер в фокусе: пробел — пуск и пауза, стрелки влево и
+        вправо — перемотка на пять секунд, <code>Home</code> и <code>End</code> — к началу и
+        концу, <code>M</code> — звук, <code>F</code> — во весь экран.
       </p>
 
       <p class="showcase-demo-text text-sm">

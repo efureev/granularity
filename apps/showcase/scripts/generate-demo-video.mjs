@@ -1,5 +1,4 @@
-import { Buffer } from 'node:buffer'
-import { mkdirSync, writeFileSync } from 'node:fs'
+import { mkdirSync, renameSync, rmSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -9,82 +8,70 @@ import { chromium } from '@playwright/test'
  * Демо-ролик для страницы `GrVideoPlayer`.
  *
  * Витрина обязана работать без сети, а видеофайла в репозитории не было. Ролик
- * рисуется на canvas и записывается `MediaRecorder` прямо в браузере — так он
- * воспроизводим: файл можно пересоздать этой же командой, не таская бинарь из
- * внешнего источника.
+ * рисуется анимацией на странице и записывается **встроенной записью
+ * Playwright** — у неё внутри свой ffmpeg, поэтому в файле есть длительность и
+ * индекс, то есть полосу перемотки можно тащить.
+ *
+ * Запись `MediaRecorder` для этого не годится: она не пишет длительность в
+ * заголовок WebM (баг Chromium 642012), браузер отдаёт такому файлу
+ * `duration: NaN`, и плеер честно показывает одно текущее время без полосы.
  *
  * Запуск: `node scripts/generate-demo-video.mjs`
  */
-const OUTPUT = resolve(dirname(fileURLToPath(import.meta.url)), '../public/demo/sample.webm')
+const HERE = dirname(fileURLToPath(import.meta.url))
+const OUTPUT = resolve(HERE, '../public/demo/sample.webm')
+const TEMP_DIR = resolve(HERE, '../.video-tmp')
 const SECONDS = 6
 
-const browser = await chromium.launch()
-const page = await browser.newPage()
-
-const base64 = await page.evaluate(async (seconds) => {
-  const canvas = Object.assign(document.createElement('canvas'), { width: 640, height: 360 })
-  const ctx = canvas.getContext('2d')
-  const stream = canvas.captureStream(25)
-  // MP4, а не WebM: у записи `MediaRecorder` в WebM нет длительности в
-  // заголовке — браузер отдаёт `duration: NaN`, и полоса прогресса с подписью
-  // времени остаются пустыми до конца ролика.
-  const recorder = new MediaRecorder(stream, { mimeType: 'video/webm' })
-  const chunks = []
-
-  recorder.ondataavailable = event => chunks.push(event.data)
-  recorder.start()
-
+const PAGE = `
+<!doctype html>
+<meta charset="utf-8">
+<style>
+  html, body { margin: 0; height: 100%; background: #0f172a; overflow: hidden }
+  .stage { position: relative; width: 100%; height: 100%; font: 700 40px system-ui, sans-serif; color: #f8fafc }
+  .ball { position: absolute; width: 96px; height: 96px; border-radius: 50%; background: #38bdf8;
+          animation: ride ${SECONDS}s linear forwards }
+  .clock { position: absolute; top: 24px; left: 32px }
+  .bar { position: absolute; left: 32px; right: 32px; bottom: 40px; height: 10px; border-radius: 5px; background: rgba(255,255,255,.2) }
+  .bar > i { display: block; height: 100%; border-radius: 5px; background: #f472b6; animation: fill ${SECONDS}s linear forwards }
+  @keyframes ride { from { left: 40px; top: 40% } 50% { top: 12% } to { left: calc(100% - 136px); top: 40% } }
+  @keyframes fill { from { width: 0 } to { width: 100% } }
+</style>
+<div class="stage">
+  <div class="clock" id="clock">0.0 с</div>
+  <div class="ball"></div>
+  <div class="bar"><i></i></div>
+</div>
+<script>
   const started = performance.now()
-  await new Promise((done) => {
-    const draw = () => {
-      const elapsed = (performance.now() - started) / 1000
-      const progress = elapsed / seconds
+  const clock = document.getElementById('clock')
+  const tick = () => {
+    clock.textContent = ((performance.now() - started) / 1000).toFixed(1) + ' с'
+    requestAnimationFrame(tick)
+  }
+  requestAnimationFrame(tick)
+</script>
+`
 
-      ctx.fillStyle = '#0f172a'
-      ctx.fillRect(0, 0, 640, 360)
+rmSync(TEMP_DIR, { recursive: true, force: true })
 
-      // Движущийся круг: по нему видно, что ролик идёт, а не завис на кадре.
-      ctx.fillStyle = '#38bdf8'
-      ctx.beginPath()
-      ctx.arc(80 + progress * 480, 180 + Math.sin(progress * Math.PI * 4) * 60, 44, 0, Math.PI * 2)
-      ctx.fill()
+const browser = await chromium.launch()
+const context = await browser.newContext({
+  viewport: { width: 640, height: 360 },
+  recordVideo: { dir: TEMP_DIR, size: { width: 640, height: 360 } },
+})
+const page = await context.newPage()
+await page.setContent(PAGE)
+await page.waitForTimeout(SECONDS * 1000)
 
-      ctx.fillStyle = 'rgba(255,255,255,0.85)'
-      ctx.font = 'bold 40px sans-serif'
-      ctx.fillText(`${elapsed.toFixed(1)} с`, 40, 60)
-
-      ctx.fillStyle = 'rgba(255,255,255,0.25)'
-      ctx.fillRect(40, 300, 560, 8)
-      ctx.fillStyle = '#f472b6'
-      ctx.fillRect(40, 300, 560 * Math.min(1, progress), 8)
-
-      if (elapsed >= seconds) {
-        done()
-
-        return
-      }
-
-      requestAnimationFrame(draw)
-    }
-
-    requestAnimationFrame(draw)
-  })
-
-  const blob = await new Promise((resolveBlob) => {
-    recorder.onstop = () => resolveBlob(new Blob(chunks, { type: 'video/webm' }))
-    recorder.stop()
-  })
-
-  const buffer = await blob.arrayBuffer()
-  let binary = ''
-  for (const byte of new Uint8Array(buffer))
-    binary += String.fromCharCode(byte)
-
-  return btoa(binary)
-}, SECONDS)
-
+const video = page.video()
+await context.close()
 await browser.close()
 
+const recorded = await video.path()
 mkdirSync(dirname(OUTPUT), { recursive: true })
-writeFileSync(OUTPUT, Buffer.from(base64, 'base64'))
-console.log(`[demo-video] записан ${OUTPUT} (${(Buffer.from(base64, 'base64').length / 1024).toFixed(0)} КБ)`)
+rmSync(OUTPUT, { force: true })
+renameSync(recorded, OUTPUT)
+rmSync(TEMP_DIR, { recursive: true, force: true })
+
+console.log(`[demo-video] записан ${OUTPUT}`)
