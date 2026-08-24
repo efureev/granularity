@@ -41,7 +41,7 @@ function toggleTool(tool: string) {
           v-for="tool in activeTools"
           :key="tool"
           size="sm"
-          variant="secondary"
+          tone="neutral"
         >
           {{ tool }}
         </GrBadge>

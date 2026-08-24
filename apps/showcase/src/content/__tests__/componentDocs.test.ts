@@ -368,6 +368,18 @@ describe('component docs metadata', () => {
     expect(imageViewerDoc.examples.every(example => example.previewKey?.startsWith('gr-image-viewer'))).toBe(true)
   })
 
+  /**
+   * `InlineRichText` знает единственную разметку — бэктики: они превращаются в
+   * `GrBadge` или в ссылку на продукт. Всё остальное выводится как есть,
+   * поэтому `**жирный**` из привычки писать markdown приезжает читателю
+   * звёздочками. Так на странице `GrDialogService` жили два таких абзаца.
+   */
+  it('в описаниях нет разметки, которую витрина не рендерит', () => {
+    const overridesSource = readFileSync(new URL('../component-docs/overrides.ts', import.meta.url), 'utf8')
+
+    expect(overridesSource).not.toContain('**')
+  })
+
   it('держит live previews ленивыми и не импортирует demo-слой статически', () => {
     const registrySource = readFileSync(new URL('../../demos/registry.ts', import.meta.url), 'utf8')
     const componentDetailPageSource = readFileSync(

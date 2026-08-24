@@ -74,7 +74,7 @@ const departure = ref<string | null>('2026-08-12')
             </template>
           </GrDropdown>
 
-          <GrTooltip content="Подсказка тоже поверх окна: её слой ниже модального">
+          <GrTooltip text="Подсказка тоже поверх окна: её слой ниже модального">
             <GrButton variant="ghost" size="sm">
               Why so many pickers?
             </GrButton>

@@ -16,7 +16,7 @@ import { GrButton, GrButtonGroup, GrTooltip } from '@feugene/granularity'
     <!-- Обёртка вокруг кнопки не разрывает ряд: склейка считает звенья, а не прямых потомков. -->
     <GrButtonGroup aria-label="Действия над документом" variant="outline">
       <GrButton>Открыть</GrButton>
-      <GrTooltip content="Копия появится рядом с оригиналом">
+      <GrTooltip text="Копия появится рядом с оригиналом">
         <GrButton>Дублировать</GrButton>
       </GrTooltip>
       <GrButton>Архивировать</GrButton>
