@@ -7,6 +7,20 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+
+- **Peer range for `@feugene/fint-i18n` widened to `>=0.6.0 <1.0.0`.** On `0.x`
+  versions a caret does not admit the next minor, so `^0.6.0` excluded `0.7.0` —
+  the release consumers had already moved to. The peer is optional, so nothing
+  ever failed to install; the mismatch surfaced as a warning in every consumer's
+  install log.
+
+  Nothing was removed in `0.7.0`: it adds locale negotiation and changes how a
+  regional tag falls back to its base language, and this package touches
+  neither. Compatibility is verified rather than assumed — the dev dependency
+  now points at `^0.7.0`, so the suite runs against the version the peer range
+  claims to support.
+
 ## [v0.5.1] 2026-08-22
 
 ### Fixed
