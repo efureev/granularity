@@ -400,11 +400,6 @@
   resolved "https://registry.yarnpkg.com/@exodus/bytes/-/bytes-1.15.1.tgz#b13bc464ca162c17abf0837fb3a11aeab79e45d1"
   integrity sha512-S6mL0yNB/Abt9Ei4tq8gDhcczc4S3+vQ4ra7vxnAf+YHC02srtqxKKZghx2Dq6p0e66THKwR6r8N6P95wEty7Q==
 
-"@feugene/fint-i18n@^0.6.0":
-  version "0.6.0"
-  resolved "https://registry.yarnpkg.com/@feugene/fint-i18n/-/fint-i18n-0.6.0.tgz#beb5e5d89befec8f2b6e006ce4959255cbb00c04"
-  integrity sha512-vvPqoiM6kzJtYRW/EYc1xDS/lnG3/PtbwNftBRkn8hoK0hvoHiiTGBACBSllwhcfaBY9OdbZX1Ew8SbKTMPmpQ==
-
 "@feugene/fint-i18n@^0.7.0":
   version "0.7.0"
   resolved "https://registry.yarnpkg.com/@feugene/fint-i18n/-/fint-i18n-0.7.0.tgz#f2a84266f372936d113dd99012135d538a897742"
