@@ -7,6 +7,7 @@ export const grModalExamples: ShowcaseComponentExampleDoc[] = [
     description: 'Базовый сценарий для `GrModal`: минимальный контейнер, открытие по кнопке и явное закрытие из пользовательского контента.',
     status: 'ready',
     previewKey: 'gr-modal-basic-flow',
+    note: 'Панель без внутренних отступов — так и задумано: `GrModal` даёт только рамку и механику окна, а содержимое кладёт как есть. Поля, шапку и подвал добавляет `GrDialog` поверх него.',
   },
   {
     id: 'modal-backdrop-guard',

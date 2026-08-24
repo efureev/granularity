@@ -255,6 +255,19 @@ const grRatingOverview: ShowcaseComponentOverviewDoc = {
   ],
 }
 
+const grModalOverview: ShowcaseComponentOverviewDoc = {
+  paragraphs: [
+    'Окно как механика, а не как оформление: слой поверх страницы, Esc и возврат фокуса на триггер, ловушка Tab внутри окна, блокировка прокрутки под ним и порядок, когда окон несколько. Всё, ради чего модалку обычно пишут руками и потом год чинят.',
+    'Внутри панели — ваша разметка, ровно как написана: своих отступов `GrModal` не добавляет ни пикселя, поэтому примеры ниже выглядят «в край». Это не недоделка, а условие: паддинг внутри панели пришлось бы отменять отрицательными марджинами каждый раз, когда в окне картинка во всю ширину, таблица, карта или тулбар. Нужны привычные поля, шапка и подвал с выверенным ритмом — берите `GrDialog`: он построен на этом же окне и добавляет к нему раскладку.',
+  ],
+  features: [
+    'Esc, `inert` и возврат фокуса — из общего стека слоёв',
+    'Скролл всей страницы или только тела окна',
+    'Пять размеров, включая полноэкранный',
+    'Поля и раскладка — в `GrDialog` поверх него',
+  ],
+}
+
 const grContextMenuOverview = {
   paragraphs: [
     'Действия там, где пользователь уже смотрит: правый клик по строке, узлу дерева или свободной области вместо поездки мышью к кнопке «⋯».',
@@ -448,7 +461,7 @@ export const componentDocOverrides: Partial<Record<string, ShowcaseComponentDocM
   GrSelect: createComponentDocMeta(grSelectExamples),
   GrFilePreview: createComponentDocMeta(grFilePreviewExamples, grFilePreviewOverview),
   GrFileUpload: createComponentDocMeta(grFileUploadExamples),
-  GrModal: createComponentDocMeta(grModalExamples),
+  GrModal: createComponentDocMeta(grModalExamples, grModalOverview),
   GrDialog: createComponentDocMeta(grDialogExamples),
   GrDrawer: createComponentDocMeta(grDrawerExamples),
   GrConfirmDialog: createComponentDocMeta(grConfirmDialogExamples),
