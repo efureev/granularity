@@ -16,6 +16,10 @@ import { chromium } from '@playwright/test'
  * заголовок WebM (баг Chromium 642012), браузер отдаёт такому файлу
  * `duration: NaN`, и плеер честно показывает одно текущее время без полосы.
  *
+ * В самом кадре нет ничего похожего на полосу прогресса: рядом, под кадром,
+ * стоит настоящая — и две полосы читались бы как одна. Ход времени показывают
+ * счётчик и движение шара.
+ *
  * Запуск: `node scripts/generate-demo-video.mjs`
  */
 const HERE = dirname(fileURLToPath(import.meta.url))
@@ -32,15 +36,11 @@ const PAGE = `
   .ball { position: absolute; width: 96px; height: 96px; border-radius: 50%; background: #38bdf8;
           animation: ride ${SECONDS}s linear forwards }
   .clock { position: absolute; top: 24px; left: 32px }
-  .bar { position: absolute; left: 32px; right: 32px; bottom: 40px; height: 10px; border-radius: 5px; background: rgba(255,255,255,.2) }
-  .bar > i { display: block; height: 100%; border-radius: 5px; background: #f472b6; animation: fill ${SECONDS}s linear forwards }
   @keyframes ride { from { left: 40px; top: 40% } 50% { top: 12% } to { left: calc(100% - 136px); top: 40% } }
-  @keyframes fill { from { width: 0 } to { width: 100% } }
 </style>
 <div class="stage">
   <div class="clock" id="clock">0.0 с</div>
   <div class="ball"></div>
-  <div class="bar"><i></i></div>
 </div>
 <script>
   const started = performance.now()
