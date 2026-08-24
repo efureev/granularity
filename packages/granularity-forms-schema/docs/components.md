@@ -3,8 +3,9 @@
 Пакет публикует одно семейство: форма из схемы и её части.
 
 - [`GrSchemaForm`](./components/GrSchemaForm.md) — форма по схеме целиком;
-  вместе с ней из того же subpath приходят `GrSchemaField` (одно поле по узлу) и
-  `GrSchemaArrayField` (повторяемая секция).
+  вместе с ней из того же subpath приходят `GrSchemaField` (одно поле по узлу),
+  `GrSchemaArrayField` (повторяемая секция), `GrSchemaUnionField` (ветвление по
+  дискриминатору) и `GrSchemaAdditionalFields` (хвост свободных ключей).
 
 ## Сквозное — не на странице компонента
 

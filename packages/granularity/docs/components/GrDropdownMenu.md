@@ -81,8 +81,13 @@
 
 ## Меню из модели
 
-Композиция подкомпонентов остаётся для нестандартных пунктов, но девять меню из
-десяти однотипны — их проще описать массивом:
+Композиция остаётся для нестандартных пунктов: `GrDropdownMenuList` — обёртка
+списка, `GrDropdownMenuGroup` и `GrDropdownMenuHeader` — раздел с заголовком,
+`GrDropdownMenuItem` и `GrDropdownMenuDivider` — пункт и разделитель,
+`GrDropdownMenuColumns` с `GrDropdownMenuColumn` — раскладка в колонки. Все они
+приезжают из того же subpath, что и меню.
+
+Но девять меню из десяти однотипны — их проще описать массивом:
 
 ```vue
 <GrDropdownMenu :items="items" @select="onSelect" />
