@@ -4,6 +4,8 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { useOverlayLayer } from '../composables/useOverlayLayer'
 import {
+  floatingLayerZIndex,
+  modalLayerZIndex,
   overlayStackSize,
   pushOverlayLayer,
   removeOverlayLayer,
@@ -179,5 +181,93 @@ describe('useOverlayLayer: возврат фокуса', () => {
 
     expect(document.activeElement).toBe(outside)
     wrapper.unmount()
+  })
+})
+
+/**
+ * Высота модального слоя.
+ *
+ * У всех модалок один токен (`--gr-z-modal`), поэтому без прибавки порядок
+ * отрисовки решал бы порядок узлов в портале — а он задаётся **созданием**
+ * телепорта, не открытием слоя. Статически объявленный диалог оказывался под
+ * окном, открытым позже, и получал от стека `inert`: пользователь видел окно,
+ * которое не отвечает, и не видел диалога, который отвечает.
+ */
+describe('глубина модального слоя', () => {
+  afterEach(() => resetOverlayStack())
+
+  function pushModal(depths: number[], modal = true): number {
+    return pushOverlayLayer({
+      modal,
+      shouldClose: () => true,
+      close: () => {},
+      setDepth: (value) => { depths.push(value) },
+    })
+  }
+
+  it('каждый следующий модальный слой глубже предыдущего', () => {
+    const first: number[] = []
+    const second: number[] = []
+    const third: number[] = []
+
+    pushModal(first)
+    pushModal(second)
+    pushModal(third)
+
+    expect(first.at(-1)).toBe(0)
+    expect(second.at(-1)).toBe(1)
+    expect(third.at(-1)).toBe(2)
+  })
+
+  it('закрытие среднего слоя пересчитывает тех, кто выше', () => {
+    const first: number[] = []
+    const second: number[] = []
+    const third: number[] = []
+
+    pushModal(first)
+    const middle = pushModal(second)
+    pushModal(third)
+
+    removeOverlayLayer(middle)
+
+    // Верхний спускается на освободившийся уровень, иначе между слоями
+    // остаётся дыра, в которую попадает floating-панель.
+    expect(third.at(-1)).toBe(1)
+    expect(first.at(-1)).toBe(0)
+  })
+
+  it('немодальный слой глубину модальных не сдвигает', () => {
+    const modal: number[] = []
+    const popover: number[] = []
+
+    pushModal(modal)
+    pushModal(popover, false)
+    const above: number[] = []
+    pushModal(above)
+
+    // Поповер живёт в том же стеке ради Esc, но высоту ему считает
+    // `useFloating` — от числа модалок, а не от позиции в списке.
+    expect(popover).toHaveLength(0)
+    expect(above.at(-1)).toBe(1)
+  })
+
+  it('формула высоты не плодит арифметику на единственном окне', () => {
+    expect(modalLayerZIndex(0)).toBe('var(--gr-z-modal)')
+    expect(modalLayerZIndex(2)).toBe('calc(var(--gr-z-modal) + 2)')
+    // Escape-hatch: глубина прибавляется к подменённой переменной.
+    expect(modalLayerZIndex(1, '--app-z-viewer')).toBe('calc(var(--app-z-viewer) + 1)')
+  })
+
+  it('панель внутри окна остаётся выше самого верхнего окна', () => {
+    const depths: number[] = []
+    pushModal(depths)
+    pushModal([])
+
+    // Два окна: верхнее на `+1`, панель из него — на `+2`.
+    expect(floatingLayerZIndex('--gr-z-dropdown')).toBe('calc(var(--gr-z-modal) + 2)')
+  })
+
+  it('снаружи окон панель остаётся на своей шкале', () => {
+    expect(floatingLayerZIndex('--gr-z-dropdown')).toBe('var(--gr-z-dropdown)')
   })
 })

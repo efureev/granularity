@@ -660,3 +660,74 @@ describe('GrModal — императивный API', () => {
     wrapper.unmount()
   })
 })
+
+/**
+ * Порядок отрисовки против порядка открытия.
+ *
+ * Позицию в контейнере телепорта резервирует **создание** компонента: сам
+ * `<teleport>` рендерится всегда, а по условию создаётся только корень внутри
+ * него. Значит статически объявленный диалог встаёт в портал раньше окна,
+ * созданного позже, и при равном `z-index` оказывается под ним — при том что
+ * стек слоёв считает верхним именно его и гасит окно `inert`. Пользователь
+ * видит окно, которое не отвечает, и не видит диалога, который отвечает.
+ */
+describe('GrModal — высота слоя', () => {
+  afterEach(() => {
+    resetOverlayStack()
+    resetScrollLock()
+  })
+
+  const Host = defineComponent({
+    components: { GrModal },
+    setup() {
+      const first = ref(false)
+      const second = ref(false)
+
+      return { first, second }
+    },
+    template: `
+      <div>
+        <GrModal v-model="first" aria-label="Первое"><p>первое</p></GrModal>
+        <GrModal v-model="second" aria-label="Второе"><p>второе</p></GrModal>
+      </div>
+    `,
+  })
+
+  it('окно, открытое позже, лежит выше — независимо от порядка создания', async () => {
+    const wrapper = mount(Host, { attachTo: document.body })
+
+    wrapper.vm.first = true
+    await nextTick()
+    wrapper.vm.second = true
+    await nextTick()
+    await nextTick()
+
+    const [first, second] = [...document.querySelectorAll<HTMLElement>('[data-gr-overlay-root]')]
+
+    expect(first?.style.zIndex).toBe('var(--gr-z-modal)')
+    expect(second?.style.zIndex).toBe('calc(var(--gr-z-modal) + 1)')
+
+    wrapper.unmount()
+  })
+
+  it('уходящее окно держит свою высоту, пока живёт в DOM', async () => {
+    const wrapper = mount(Host, { attachTo: document.body })
+
+    wrapper.vm.first = true
+    await nextTick()
+    wrapper.vm.second = true
+    await nextTick()
+    await nextTick()
+
+    wrapper.vm.second = false
+    await nextTick()
+    await nextTick()
+
+    // Слой уходит из стека сразу, а поддерево живёт до конца leave-анимации:
+    // обнули высоту здесь — окно нырнёт под соседнее прямо во время ухода.
+    const roots = [...document.querySelectorAll<HTMLElement>('[data-gr-overlay-root]')]
+    expect(roots[1]?.style.zIndex).toBe('calc(var(--gr-z-modal) + 1)')
+
+    wrapper.unmount()
+  })
+})

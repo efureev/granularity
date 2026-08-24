@@ -314,6 +314,7 @@ export const demoPathByPreviewKey = {
   'gr-modal-basic-flow': 'components/gr-modal/GrModalBasicFlowDemo.vue',
   'gr-modal-dialog-service': 'components/gr-modal/GrModalDialogServiceDemo.vue',
   'gr-modal-nested-poppers': 'components/gr-modal/GrModalNestedPoppersDemo.vue',
+  'gr-modal-stack': 'components/gr-modal/GrModalStackDemo.vue',
   'gr-modal-scroll-lifecycle': 'components/gr-modal/GrModalScrollLifecycleDemo.vue',
   'gr-modal-size-switcher': 'components/gr-modal/GrModalSizeSwitcherDemo.vue',
   'gr-navbar-actions-slot': 'components/gr-navbar/GrNavbarActionsDemo.vue',

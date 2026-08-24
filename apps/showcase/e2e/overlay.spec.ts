@@ -448,6 +448,61 @@ test.describe('панель поверх окна', () => {
     expect(await topmostAt(panel)).toBe('панель')
   })
 
+  /**
+   * Порядок отрисовки против порядка создания.
+   *
+   * Диалог объявлен в шаблоне демо **раньше** окон, то есть его якорь встал в
+   * контейнер портала первым. Пока высота у всех модальных слоёв была одна,
+   * он оказывался под окном, открытым позже, — и оставался невидимым, хотя
+   * стек считал верхним именно его и гасил окно `inert`. Экран выглядел
+   * зависшим: видно окно, которое не отвечает, и не видно того, что отвечает.
+   */
+  test('диалог, открытый поверх окна, нарисован поверх него', async ({ page }) => {
+    await page.goto(componentPath('GrModal'))
+    await page.locator('#live-examples').waitFor()
+
+    await page.getByRole('button', { name: 'Открыть лесенку', exact: true }).click()
+    await waitForOpaque(page, '[data-gr-modal-panel]')
+
+    await page.getByRole('button', { name: 'Диалог поверх окна', exact: true }).click()
+
+    const dialog = page.getByRole('dialog').filter({ hasText: 'Выбор стратегии' })
+    await expect(dialog).toBeVisible()
+
+    const box = await dialog.boundingBox()
+    expect(box, 'диалог не отрисован').not.toBeNull()
+
+    // Проверяем нарисованное, а не числа: расхождение было именно в отрисовке.
+    const painted = await page.evaluate(({ x, y }) => {
+      const element = document.elementFromPoint(x, y)
+      const root = element?.closest('[role="dialog"]')
+
+      return root?.textContent?.includes('Выбор стратегии') ? 'диалог' : 'что-то другое'
+    }, { x: box!.x + box!.width / 2, y: box!.y + 30 })
+
+    expect(painted).toBe('диалог')
+  })
+
+  test('окно, открытое позже, лежит выше открытого раньше', async ({ page }) => {
+    await page.goto(componentPath('GrModal'))
+    await page.locator('#live-examples').waitFor()
+
+    await page.getByRole('button', { name: 'Открыть лесенку', exact: true }).click()
+    await waitForOpaque(page, '[data-gr-modal-panel]')
+    await page.getByRole('button', { name: 'Открыть окно 2', exact: true }).click()
+
+    const heights = await page.evaluate(() =>
+      [...document.querySelectorAll('[data-gr-overlay-root]')].map(root => ({
+        z: (root as HTMLElement).style.zIndex,
+        inert: root.hasAttribute('inert'),
+      })))
+
+    // «Верхний» для отрисовки и «верхний» для `inert` — один и тот же слой.
+    expect(heights.at(-1)?.z).toContain('+ 1')
+    expect(heights.at(-1)?.inert).toBe(false)
+    expect(heights.at(-2)?.inert).toBe(true)
+  })
+
   test('панель пикера внутри GrDialog рисуется поверх окна', async ({ page }) => {
     await page.goto('extras/gr-date-picker')
     await page.locator('#live-examples').waitFor()

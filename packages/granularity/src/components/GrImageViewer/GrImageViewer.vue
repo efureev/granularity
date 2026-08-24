@@ -278,13 +278,6 @@ watch(displayIndex, (index) => {
   announce(t('gr.imageViewer.position', 'Image {index} of {total}', { index, total: total.value }))
 })
 
-// Просмотрщик — оверлей модального класса, значит и слой у него модальный.
-// `zIndexVar` подменяет переменную слоя своей — тот же escape-hatch, что у
-// `useFloating` и `GrLoading`.
-const viewerStyle = computed(() => ({
-  zIndex: `var(${props.zIndexVar ?? '--gr-z-modal'})`,
-}))
-
 // Сенсорные жесты: pinch двумя пальцами и свайп для листания. Мышь идёт мимо —
 // у неё своя ветка перетаскивания в `useZoomPan`.
 const {
@@ -480,16 +473,27 @@ const {
   isMounted,
   isVisible,
   inertAttr,
+  layerZIndex,
   portalTarget,
   teleportEnabled,
   themeAttrs,
   onPanelAfterLeave: releasePresence,
   backdrop,
 } = useModalOverlay(open, closeViewer, {
+  // Escape-hatch доходит до расчёта высоты: глубина слоя прибавляется к той
+  // переменной, которую задал потребитель, а не к `--gr-z-modal` мимо неё.
+  zIndexVar: () => props.zIndexVar,
   panel: panelEl,
   closeOnEscape: () => props.closeOnPressEscape,
   closeOnBackdrop: () => props.hideOnClickModal,
 })
+
+// Просмотрщик — оверлей модального класса, значит и слой у него модальный.
+// `zIndexVar` подменяет переменную слоя своей — тот же escape-hatch, что у
+// `useFloating` и `GrLoading`.
+const viewerStyle = computed(() => ({
+  zIndex: layerZIndex.value,
+}))
 
 watch(
   () => props.modelValue,

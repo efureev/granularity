@@ -2,6 +2,7 @@ import type { ComputedRef, Ref } from 'vue'
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 
 import { useGrThemeAttrs } from '../../components/GrConfigProvider/context'
+import { modalLayerZIndex } from './overlayStack'
 import { useFocusTrap } from '../useFocusTrap'
 import { useOverlayLayer } from '../useOverlayLayer'
 import { usePortalTarget } from '../usePortalTarget'
@@ -58,6 +59,11 @@ export interface UseModalOverlayOptions {
    */
   root?: Ref<HTMLElement | null>
   /**
+   * Имя CSS-переменной слоя. Escape-hatch мимо `--gr-z-modal` — им пользуется
+   * просмотрщик. Глубина слоя прибавляется и к подменённой переменной.
+   */
+  zIndexVar?: () => string | undefined
+  /**
    * Точечное переопределение точки монтирования (проп `teleportTo`). По
    * умолчанию — общий портал оверлеев.
    */
@@ -86,6 +92,15 @@ export interface ModalOverlay {
   isTopmost: Ref<boolean>
   /** Значение атрибута `inert` для корня: слой перестал быть верхним. */
   inertAttr: ComputedRef<true | undefined>
+  /**
+   * Высота слоя: базовый токен плюс позиция в стеке.
+   *
+   * Один токен на все модальные слои означал бы, что порядок отрисовки решает
+   * порядок узлов в портале, а он задан **созданием** телепорта, а не
+   * открытием: статически объявленный диалог вставал бы под окном, открытым
+   * позже, и оказывался невидимым — при том что стек считает верхним его.
+   */
+  layerZIndex: ComputedRef<string>
   portalTarget: ComputedRef<string | HTMLElement>
   teleportEnabled: ComputedRef<boolean>
   /** `data-theme` на телепортированный корень: в DOM он вне обёртки провайдера. */
@@ -133,6 +148,11 @@ export function useModalOverlay(
     root: rootEl,
   })
 
+  const layerZIndex = computed(() => modalLayerZIndex(
+    layer.depth.value,
+    options.zIndexVar?.() ?? '--gr-z-modal',
+  ))
+
   useFocusTrap(options.panel, {
     active: () => open.value && isModal() && isTopmost.value,
     initialFocus: options.initialFocus,
@@ -167,6 +187,7 @@ export function useModalOverlay(
     isVisible,
     isTopmost,
     inertAttr,
+    layerZIndex,
     portalTarget,
     teleportEnabled,
     themeAttrs,

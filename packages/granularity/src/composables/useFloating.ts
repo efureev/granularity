@@ -3,7 +3,7 @@ import type { Middleware, Placement, VirtualElement } from '@floating-ui/dom'
 import { autoUpdate, computePosition, flip, offset as offsetMiddleware, shift, size as sizeMiddleware } from '@floating-ui/dom'
 import { nextTick, onBeforeUnmount, ref, watch } from 'vue'
 
-import { openModalCount } from './internal/overlayStack'
+import { floatingLayerZIndex } from './internal/overlayStack'
 
 export type UseFloatingPlacement = Placement
 
@@ -14,28 +14,6 @@ export type UseFloatingPlacement = Placement
  * официального `@floating-ui/vue` (`useFloating` → `roundByDPR`), чтобы не тянуть весь
  * пакет ради одной утилиты.
  */
-/**
- * Высота панели: своя шкала снаружи и подъём над окном внутри него.
- *
- * Панель телепортируется в общий портал, то есть становится **соседом** корня
- * модального окна, а не его потомком: собственный stacking-контекст окна её не
- * накрывает, и статический `--gr-z-dropdown` (1000) оставлял её под окном
- * (`--gr-z-modal`, 1100). Поэтому высоту берём из стека слоёв — единственного
- * места, которое знает, что сейчас открыто.
- *
- * Слагаемое — **число** модальных слоёв, а не шаг шкалы: вложенные окна дают
- * +2, а полноэкранная загрузка (1150) и тосты (1200) остаются сверху.
- *
- * Обратный случай — «поповер снаружи не должен перекрывать окно» — не страдает:
- * пока окно открыто, страница под ним в `inert`, и открыть там поповер нечем.
- * Ненулевой счётчик означает ровно «панель открыта изнутри окна».
- */
-function floatingZIndex(zIndexVar: string): string {
-  const modals = openModalCount()
-
-  return modals > 0 ? `calc(var(--gr-z-modal) + ${modals})` : `var(${zIndexVar})`
-}
-
 function getDpr(element: HTMLElement): number {
   if (typeof window === 'undefined')
     return 1
@@ -235,7 +213,7 @@ export function useFloating(
       position: 'fixed',
       left: `${roundByDpr(floating, x)}px`,
       top: `${roundByDpr(floating, y)}px`,
-      zIndex: floatingZIndex(options.zIndexVar ?? '--gr-z-dropdown'),
+      zIndex: floatingLayerZIndex(options.zIndexVar ?? '--gr-z-dropdown'),
     }
   }
 

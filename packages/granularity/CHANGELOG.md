@@ -7,6 +7,23 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.32.0] 2026-08-24
+
+### Fixed
+
+- **A modal opened later is now painted above one opened earlier.** Every modal layer — `GrModal`
+  and everything built on it, `GrDrawer`, `GrImageViewer` — used the same `z-index`
+  (`--gr-z-modal`), so what ended up on top was decided by node order inside the portal container.
+  That order is fixed when a component is *created*, not when it opens: `<teleport>` reserves its
+  slot immediately. A dialog declared statically in the template therefore sat below a modal
+  mounted later, while the overlay stack — which tracks the last *opened* layer — marked that modal
+  `inert`. The result was the worst of both: the window on top does not respond, and the one that
+  does respond is invisible. The stack now hands each modal layer its own depth and the layer
+  renders at `calc(var(--gr-z-modal) + depth)`, so «topmost for painting» and «topmost for `inert`»
+  come from one list. A closed window keeps its depth while its subtree is still in the DOM,
+  otherwise it would dive under its neighbour during the leave animation. `zIndexVar` on
+  `GrImageViewer` still works — the depth is added on top of the substituted variable.
+
 ## [v0.31.1] 2026-08-23
 
 ### Fixed

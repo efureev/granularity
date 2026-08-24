@@ -56,7 +56,7 @@ describe('component docs metadata', () => {
     const dropdownDoc = getShowcaseComponentDoc(dropdownEntity!)
     const dataTableDoc = getShowcaseComponentDoc(dataTableEntity!)
 
-    expect(modalDoc.examples).toHaveLength(6)
+    expect(modalDoc.examples).toHaveLength(7)
     expect(modalDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(modalDoc.examples.every(example => example.previewKey?.startsWith('gr-modal'))).toBe(true)
 

@@ -264,6 +264,7 @@ const {
   isMounted,
   isVisible,
   inertAttr,
+  layerZIndex,
   portalTarget,
   teleportEnabled,
   themeAttrs,
@@ -307,6 +308,7 @@ defineExpose({ open, close, toggle })
       role="dialog"
       aria-modal="true"
       :class="rootClass"
+      :style="{ zIndex: layerZIndex }"
       :inert="inertAttr"
       :aria-labelledby="labelledBy"
       :aria-describedby="describedBy"

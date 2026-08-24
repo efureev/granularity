@@ -1,5 +1,5 @@
 import type { Ref } from 'vue'
-import { nextTick, onUnmounted, watch } from 'vue'
+import { nextTick, onUnmounted, ref, watch } from 'vue'
 
 import { layerRootsAbove, pushOverlayLayer, removeOverlayLayer } from './internal/overlayStack'
 
@@ -48,6 +48,14 @@ export interface OverlayLayerHandle {
    * законен.
    */
   rootsAbove: () => HTMLElement[]
+  /**
+   * Позиция среди модальных слоёв, от нуля. По ней компонент считает высоту.
+   *
+   * Значение **не сбрасывается** при закрытии: слой уходит из стека сразу, а
+   * его поддерево живёт до конца leave-анимации. Обнули глубину там — уходящее
+   * окно нырнуло бы под соседнее прямо во время ухода.
+   */
+  depth: Ref<number>
 }
 
 /**
@@ -77,6 +85,7 @@ export function useOverlayLayer(
 ): OverlayLayerHandle {
   let layerId: number | null = null
   let previouslyFocused: HTMLElement | null = null
+  const depth = ref(0)
 
   function register(): void {
     if (layerId !== null)
@@ -98,6 +107,7 @@ export function useOverlayLayer(
       shouldClose: () => options.closeOnEscape?.() ?? true,
       close: onDismiss,
       setTopmost: options.onTopmostChange,
+      setDepth: (value) => { depth.value = value },
       root: () => options.root?.value ?? null,
     })
   }
@@ -150,5 +160,6 @@ export function useOverlayLayer(
 
   return {
     rootsAbove: () => (layerId === null ? [] : layerRootsAbove(layerId)),
+    depth,
   }
 }

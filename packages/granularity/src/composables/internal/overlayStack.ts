@@ -40,6 +40,16 @@ export interface OverlayLayer {
   /** Уведомление «этот модальный слой сейчас верхний». Только для `modal`. */
   setTopmost?: (isTopmost: boolean) => void
   /**
+   * Позиция слоя среди модальных, от нуля. Только для `modal`.
+   *
+   * От неё считается высота: у всех модальных слоёв один токен
+   * (`--gr-z-modal`), и без этой прибавки порядок отрисовки решал бы порядок
+   * узлов в портале, а он задаётся **созданием** телепорта, а не открытием
+   * слоя. Диалог, объявленный в шаблоне статически, вставал бы под окном,
+   * открытым позже, — и получал бы `inert` от стека, оставаясь видимым.
+   */
+  setDepth?: (depth: number) => void
+  /**
    * Корень слоя. Ловушка фокуса нижнего слоя обязана считать его своим:
    * панель селекта, открытого внутри модалки, телепортирована в `body` и лежит
    * вне DOM-поддерева окна, но для пользователя это тот же слой.
@@ -51,11 +61,21 @@ const stack: OverlayLayer[] = []
 let listening = false
 let nextId = 1
 
-/** Пересчитывает верхний **модальный** слой и уведомляет все модальные. */
-function syncTopmost(): void {
+/**
+ * Пересчитывает состояние модальных слоёв: кто верхний и на какой высоте.
+ *
+ * Обе величины выводятся из одного порядка, поэтому и считаются в одном месте:
+ * разъедься они — «верхний» для `inert` и «верхний» для отрисовки перестали бы
+ * совпадать, а это ровно тот дефект, из-за которого высота и заведена.
+ */
+function syncModalLayers(): void {
   const modals = stack.filter(layer => layer.modal)
   const top = modals[modals.length - 1]
-  for (const layer of modals) layer.setTopmost?.(layer === top)
+
+  modals.forEach((layer, index) => {
+    layer.setTopmost?.(layer === top)
+    layer.setDepth?.(index)
+  })
 }
 
 function handleKeydown(event: KeyboardEvent): void {
@@ -105,7 +125,7 @@ export function pushOverlayLayer(layer: Omit<OverlayLayer, 'id'>): number {
   const id = nextId++
   stack.push({ ...layer, id })
   startListening()
-  syncTopmost()
+  syncModalLayers()
   return id
 }
 
@@ -116,7 +136,7 @@ export function removeOverlayLayer(id: number): void {
     stack.splice(index, 1)
   if (stack.length === 0)
     stopListening()
-  syncTopmost()
+  syncModalLayers()
 }
 
 /**
@@ -158,6 +178,34 @@ export function overlayStackSize(): number {
  */
 export function openModalCount(): number {
   return stack.reduce((count, layer) => count + (layer.modal ? 1 : 0), 0)
+}
+
+/**
+ * Высота слоя, лежащего внутри открытого окна.
+ *
+ * Панель телепортирована в общий портал и становится **соседом** корня окна, а
+ * не его потомком: собственный stacking-контекст окна её не накрывает, и
+ * статический `--gr-z-dropdown` (1000) оставлял её под окном (1100). Слагаемое —
+ * число модальных слоёв, поэтому панель встаёт над самым верхним из них, а
+ * полноэкранная загрузка (1150) и тосты (1200) остаются сверху.
+ *
+ * Обратный случай — «поповер снаружи не должен перекрывать окно» — не страдает:
+ * пока окно открыто, страница под ним в `inert`, и открыть там поповер нечем.
+ */
+export function floatingLayerZIndex(zIndexVar: string): string {
+  const modals = openModalCount()
+
+  return modals > 0 ? `calc(var(--gr-z-modal) + ${modals})` : `var(${zIndexVar})`
+}
+
+/**
+ * Высота самого модального слоя: базовый токен плюс его позиция в стеке.
+ *
+ * Нулевая глубина оставляет чистый `var(...)` — у единственного окна на экране
+ * в стилях не появляется лишней арифметики.
+ */
+export function modalLayerZIndex(depth: number, zIndexVar = '--gr-z-modal'): string {
+  return depth > 0 ? `calc(var(${zIndexVar}) + ${depth})` : `var(${zIndexVar})`
 }
 
 /** Тестовая/служебная очистка стека. */
