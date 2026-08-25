@@ -75,87 +75,8 @@ describe('GrDropdown', () => {
     expect(document.body.querySelector('#dropdown-content')).toBe(content)
     expect(wrapper.element.contains(content)).toBe(false)
   })
-
-  it('привязывает правый край панели к trigger без измерения ширины панели', async () => {
-    vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function getBoundingClientRect(this: HTMLElement) {
-      const text = this.textContent ?? ''
-
-      if (text.includes('Открыть') && !text.includes('Элемент меню')) {
-        return {
-          x: 100,
-          y: 20,
-          top: 20,
-          right: 300,
-          bottom: 52,
-          left: 100,
-          width: 200,
-          height: 32,
-          toJSON: () => ({}),
-        }
-      }
-
-      return {
-        x: 0,
-        y: 0,
-        top: 0,
-        right: 0,
-        bottom: 0,
-        left: 0,
-        width: 0,
-        height: 0,
-        toJSON: () => ({}),
-      }
-    })
-
-    const wrapper = mount(GrDropdown, {
-      attachTo: document.body,
-      slots: {
-        trigger: '<button type="button" data-testid="trigger" v-bind="params.triggerProps">Открыть</button>',
-        content: '<div id="dropdown-content">Элемент меню</div>',
-      },
-    })
-
-    await wrapper.get('[data-testid="trigger"]').trigger('click')
-    await nextTick()
-    await flushFloatingUpdate()
-
-    const panel = document.body.querySelector<HTMLElement>('#dropdown-content')?.parentElement?.parentElement
-
-    expect(panel).toBeTruthy()
-    // `align='right'` (дефолт) → `placement='bottom-end'`: правый край панели совпадает
-    // с правым краем триггера (300px), панель без измеренной ширины (0) не сдвигается влево.
-    expect(panel?.style.left).toBe('300px')
-    expect(panel?.style.top).toBe('60px')
-    expect(panel?.className).toContain('origin-top-right')
-  })
-
-  it('привязывает панель к trigger, а не к растянутому layout-контейнеру', async () => {
-    const wrapper = mount(GrDropdown, {
-      attachTo: document.body,
-      slots: {
-        trigger: '<button type="button" data-testid="trigger" v-bind="params.triggerProps">Открыть</button>',
-        content: '<div id="dropdown-content">Элемент меню</div>',
-      },
-    })
-
-    const layoutContainer = wrapper.element as HTMLElement
-    const triggerWrapper = wrapper.get('[data-testid="trigger"]').element.parentElement as HTMLElement
-
-    vi.spyOn(layoutContainer, 'getBoundingClientRect').mockImplementation(() => rect(0, 20, 900, 48))
-    vi.spyOn(triggerWrapper, 'getBoundingClientRect').mockImplementation(() => rect(24, 20, 240, 40))
-
-    await wrapper.get('[data-testid="trigger"]').trigger('click')
-    await nextTick()
-    await flushFloatingUpdate()
-
-    const panel = document.body.querySelector<HTMLElement>('#dropdown-content')?.parentElement?.parentElement
-
-    expect(panel).toBeTruthy()
-    expect(panel?.style.left).toBe('264px')
-    expect(panel?.style.top).toBe('68px')
-    expect(panel?.className).toContain('origin-top-right')
-  })
 })
+
 describe('GrDropdown a11y (item 18)', () => {
   it('exposes triggerProps (aria-haspopup/expanded) and opens via keyboard', async () => {
     const { defineComponent } = await import('vue')
@@ -182,7 +103,7 @@ describe('GrDropdown a11y (item 18)', () => {
     await nextTick()
 
     expect(trigger.attributes('aria-expanded')).toBe('true')
-    expect(document.body.querySelector('[data-gr-dropdown-panel]')?.getAttribute('role')).toBe('menu')
+    expect(document.body.querySelector('[data-gr-popover-panel]')?.getAttribute('role')).toBe('menu')
 
     wrapper.unmount()
   })
@@ -222,8 +143,11 @@ describe('GrDropdown — триггер, размещение и ширина', 
     return mount(Harness, { attachTo: document.body, props: { dropdownProps: props } })
   }
 
+  // Открыто/закрыто держит панель `GrPopover`, на которой стоит меню:
+  // `v-show` принадлежит ей. `[data-gr-dropdown-panel]` — контейнер пунктов
+  // внутри неё, он несёт ширину и клавиатуру.
   function panelOpen(): boolean {
-    const panel = document.body.querySelector<HTMLElement>('[data-gr-dropdown-panel]')
+    const panel = document.body.querySelector<HTMLElement>('[data-gr-popover-panel]')
     return Boolean(panel) && panel!.style.display !== 'none'
   }
 
@@ -318,7 +242,7 @@ describe('GrDropdown — триггер, размещение и ширина', 
     await nextTick()
     expect(panelOpen()).toBe(false)
 
-    await wrapper.get('[data-gr-dropdown-trigger]').trigger('mouseenter')
+    await wrapper.get('[data-gr-popover-trigger]').trigger('mouseenter')
     await nextTick()
     expect(panelOpen()).toBe(false)
 
@@ -328,7 +252,7 @@ describe('GrDropdown — триггер, размещение и ширина', 
   it('trigger=hover открывает с задержкой и не закрывается при переходе курсора на панель', async () => {
     vi.useFakeTimers()
     const wrapper = await mountMenu({ trigger: 'hover', openDelay: 100, closeDelay: 150 })
-    const triggerArea = wrapper.get('[data-gr-dropdown-trigger]')
+    const triggerArea = wrapper.get('[data-gr-popover-trigger]')
 
     await triggerArea.trigger('mouseenter')
     expect(panelOpen()).toBe(false)
@@ -339,7 +263,7 @@ describe('GrDropdown — триггер, размещение и ширина', 
 
     // Курсор ушёл с триггера, но пришёл на панель — закрытие отменяется.
     await triggerArea.trigger('mouseleave')
-    const panel = document.body.querySelector<HTMLElement>('[data-gr-dropdown-panel]')!
+    const panel = document.body.querySelector<HTMLElement>('[data-gr-popover-panel]')!
     panel.dispatchEvent(new MouseEvent('mouseenter', { bubbles: false }))
     vi.advanceTimersByTime(200)
     await nextTick()
@@ -403,7 +327,9 @@ describe('GrDropdown — триггер, размещение и ширина', 
     await nextTick()
     await flushFloatingUpdate()
 
-    const panel = document.body.querySelector<HTMLElement>('[data-gr-dropdown-panel]')
+    // Проп доехал до позиционирования: `transform-origin` считает `GrPopover`,
+    // на панели которого меню и стоит. Здесь проверяется именно проброс.
+    const panel = document.body.querySelector<HTMLElement>('[data-gr-popover-panel]')
     expect(panel?.className).toContain('origin-bottom-left')
     expect(panel?.style.left).toBe('40px')
 
@@ -493,7 +419,9 @@ describe('GrDropdown — кольцо фокуса внутри панели', (
     press(panelOf(), 'Tab')
     await nextTick()
 
-    expect(panelOf().style.display).toBe('none')
+    // Клавиша адресована контейнеру пунктов, а `v-show` — панели поповера, на
+    // которой меню стоит.
+    expect(document.body.querySelector<HTMLElement>('[data-gr-popover-panel]')!.style.display).toBe('none')
 
     wrapper.unmount()
   })

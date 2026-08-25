@@ -54,7 +54,12 @@ function inDocument(selector: string): HTMLElement {
 }
 
 function dropdownVisible(): boolean {
-  const panel = document.querySelector<HTMLElement>('[data-gr-dropdown-panel]')
+  // Меню стоит на `GrPopover`, и `v-show` принадлежит его панели.
+  // `[data-gr-dropdown-panel]` — контейнер пунктов внутри неё; ищем панель
+  // через него, чтобы не поймать чужой поповер, если он появится в наборе.
+  const menu = document.querySelector<HTMLElement>('[data-gr-dropdown-panel]')
+  const panel = menu?.closest<HTMLElement>('[data-gr-popover-panel]') ?? null
+
   return panel !== null && panel.style.display !== 'none'
 }
 

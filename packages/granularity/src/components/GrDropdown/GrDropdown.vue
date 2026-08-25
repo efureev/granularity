@@ -1,16 +1,12 @@
 <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, onMounted, ref, useId, watch } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 
-import { usePortalTarget } from '../../composables/usePortalTarget'
-
-import { vClickOutside } from '../../directives'
-import { useFloating, type UseFloatingPlacement } from '../../composables/useFloating'
-import { useOverlayLayer } from '../../composables/useOverlayLayer'
+import type { UseFloatingPlacement } from '../../composables/useFloating'
 import { useControlledOpen } from '../../composables/internal/useControlledOpen'
 import { useMenuItemsFocus } from '../../composables/internal/useMenuItemsFocus'
+import GrPopover from '../GrPopover/GrPopover.vue'
 import {
   grDropdownContentClass,
-  grDropdownOriginClass,
   type GrDropdownWidth,
 } from './grDropdownStyles'
 
@@ -52,9 +48,19 @@ export interface GrDropdownEmits {
   (e: 'update:open', value: boolean): void
 }
 
-import { useGrThemeAttrs } from '../GrConfigProvider/context'
-import { panelPopTransition } from '../shared/overlayTransition'
-
+/**
+ * Меню поверх `GrPopover`.
+ *
+ * Панель, слой, портал, позиционирование, наведение с задержками и возврат
+ * фокуса принадлежат примитиву. До этого здесь жила вторая их реализация:
+ * карта `transform-origin` совпадала с поповерской дословно все двенадцать
+ * записей, поверхность панели — шесть утилит — была скопирована, а сборка слоя
+ * и портала повторяла его же. Расходились бы молча.
+ *
+ * Меню оставляет себе то, что меню и есть: кольцо фокуса по пунктам, поиск по
+ * буквам, клавиатуру открытия и ширину панели. Тот же приём, что у
+ * `GrContextMenu`, который так устроен с самого начала.
+ */
 const props = withDefaults(defineProps<GrDropdownProps>(), {
   placement: 'bottom-end',
   offset: 8,
@@ -77,18 +83,36 @@ const { open: isOpen, setOpen } = useControlledOpen(
   next => emit('update:open', next),
 )
 
-const rootEl = ref<HTMLElement | null>(null)
-const panelEl = ref<HTMLElement | null>(null)
-const clickOutsideExclude = [() => panelEl.value]
-
-const panelId = useId()
+/**
+ * Контейнер пунктов — он же контейнер кольца фокуса.
+ *
+ * Панель `GrPopover` рисует `v-show`, поэтому содержимое слота существует в DOM
+ * с монтирования: ссылка готова до первого открытия, и `focusAt` не приходится
+ * ждать отрисовки панели.
+ */
+const menuEl = ref<HTMLElement | null>(null)
 
 // Кольцо фокуса и поиск по буквам — общие с `GrContextMenu`: паттерн `menu`
 // один, и вторая его реализация разошлась бы с первой незаметно для тестов.
 const menu = useMenuItemsFocus({
-  container: () => panelEl.value,
+  container: () => menuEl.value,
   close: () => close(),
 })
+
+function open(): void {
+  if (props.disabled)
+    return
+
+  setOpen(true)
+}
+
+function close(): void {
+  setOpen(false)
+}
+
+function toggle(): void {
+  isOpen.value ? close() : open()
+}
 
 async function openWithFocus(first: boolean): Promise<void> {
   if (props.disabled)
@@ -100,21 +124,25 @@ async function openWithFocus(first: boolean): Promise<void> {
 }
 
 /**
- * Пропсы для реального фокусируемого триггера (кнопки). Консьюмер биндит их на
- * элемент внутри слота `#trigger`: `<GrButton v-bind="triggerProps">`. Даёт
- * `aria-haspopup`/`aria-expanded`/`aria-controls`, клавиатуру и **клик**.
+ * Что меню добавляет к `triggerProps` примитива.
  *
- * Клик живёт здесь, а не на обёртке слота: обёртка ловила бы и клики по
- * вложенным кнопкам и ссылкам, переключая панель мимо намерения пользователя.
+ * Примитив отдаёт ARIA и клик; стрелки, открывающие меню с первого или
+ * последнего пункта, принадлежат паттерну `menu` и живут здесь.
+ *
+ * И `aria-disabled` вместо нативного `disabled`. Расхождение намеренное:
+ * нативный атрибут убирает кнопку из таб-порядка, а у меню триггер обязан
+ * оставаться фокусируемым — иначе пользователь клавиатуры не найдёт его вовсе и
+ * не узнает, почему меню недоступно. Форм-контролу (`GrColorPicker`) верно
+ * обратное, поэтому примитив оставляет нативный, а меню его перекрывает.
  */
-const triggerProps = computed(() => ({
-  'aria-haspopup': 'menu' as const,
-  'aria-expanded': isOpen.value,
-  'aria-controls': isOpen.value ? panelId : undefined,
-  'aria-disabled': props.disabled ? true : undefined,
-  'onClick': toggle,
-  'onKeydown': onTriggerKeydown,
-}))
+function menuTriggerProps(popoverProps: Record<string, unknown>): Record<string, unknown> {
+  return {
+    ...popoverProps,
+    'disabled': undefined,
+    'aria-disabled': props.disabled || undefined,
+    'onKeydown': onTriggerKeydown,
+  }
+}
 
 function onTriggerKeydown(event: KeyboardEvent): void {
   if (props.disabled)
@@ -139,81 +167,6 @@ function onTriggerKeydown(event: KeyboardEvent): void {
       break
   }
 }
-
-const { floatingStyle, resolvedPlacement, update: updateFloatingPosition } = useFloating(
-  rootEl,
-  panelEl,
-  isOpen,
-  {
-    placement: () => props.placement,
-    // Геттер, а не значение: иначе проп замрёт на моменте `setup`.
-    get offsetPx() { return props.offset },
-    zIndexVar: '--gr-z-dropdown',
-  },
-)
-
-// ————— Открытие по наведению. Задержки нужны обе: без `openDelay` панель
-// выпрыгивает на любое пересечение курсором, без `closeDelay` её не удержать
-// при переходе с триггера на панель — между ними зазор `offset`.
-let hoverTimer: ReturnType<typeof setTimeout> | undefined
-
-function open(): void {
-  if (props.disabled)
-    return
-
-  clearTimeout(hoverTimer)
-  setOpen(true)
-}
-
-function toggle(): void {
-  if (props.disabled)
-    return
-
-  clearTimeout(hoverTimer)
-  setOpen(!isOpen.value)
-}
-
-function close(): void {
-  clearTimeout(hoverTimer)
-  setOpen(false)
-}
-
-function scheduleHover(next: boolean, delayMs: number): void {
-  clearTimeout(hoverTimer)
-
-  if (delayMs <= 0) {
-    setOpen(next)
-    return
-  }
-
-  hoverTimer = setTimeout(setOpen, delayMs, next)
-}
-
-function onHoverEnter(): void {
-  if (props.disabled || props.trigger !== 'hover')
-    return
-  scheduleHover(true, props.openDelay)
-}
-
-function onHoverLeave(): void {
-  if (props.trigger !== 'hover')
-    return
-  scheduleHover(false, props.closeDelay)
-}
-
-// Возврат фокуса — из контракта слоя: он запоминает активный элемент при
-// открытии и возвращает фокус, только если на момент закрытия тот всё ещё
-// внутри панели. Прежняя эвристика «возвращать, если открыли с клавиатуры»
-// промахивалась в обе стороны.
-useOverlayLayer(isOpen, close, { root: panelEl })
-
-watch(
-  () => [props.placement, props.offset],
-  () => {
-    if (isOpen.value)
-      updateFloatingPosition()
-  },
-)
 
 watch(
   () => props.disabled,
@@ -248,50 +201,11 @@ function toCssLength(value: GrDropdownWidth): string | undefined {
 
 const panelStyle = computed(() => {
   const width = toCssLength(props.width)
-  return width ? { ...floatingStyle.value, width } : floatingStyle.value
+
+  return width ? { width } : undefined
 })
 
 const contentClasses = computed(() => grDropdownContentClass(props.contentClass))
-
-const panelClasses = computed(() => grDropdownOriginClass(resolvedPlacement.value))
-
-function onContentClick(): void {
-  if (props.closeOnContentClick) {
-    close()
-  }
-}
-
-// Триггер без `v-bind="triggerProps"` — это триггер без клика, без клавиатуры и
-// без ARIA. Молчать об этом нельзя: панель просто не открывалась бы, и искать
-// причину пришлось бы в чужом коде.
-onMounted(() => {
-  if (!__GR_DEV__)
-    return
-  if (rootEl.value?.querySelector('[aria-haspopup]'))
-    return
-
-  console.warn(
-    '[GrDropdown] триггер не привязан: добавьте `v-bind="triggerProps"` на элемент '
-    + 'внутри слота #trigger — <template #trigger="{ triggerProps }">'
-    + '<GrButton v-bind="triggerProps">…</GrButton></template>. '
-    + 'Без этого у триггера нет ни клика, ни клавиатуры, ни aria-haspopup/aria-expanded.',
-  )
-})
-
-onBeforeUnmount(() => {
-  menu.reset()
-  clearTimeout(hoverTimer)
-})
-
-// Телепорт включается только ПОСЛЕ монтирования: иначе первый клиентский
-// рендер не совпадает с серверным и ломается гидрация (см. композабл).
-const { target: portalTarget, enabled: teleportEnabled } = usePortalTarget(() => props.teleportTo)
-
-// Тема поддерева на телепортированную панель: в DOM она уезжает в `body`, то
-// есть вне обёртки провайдера, и `data-theme` с неё не наследуется. В дереве
-// компонентов панель остаётся внутри — `inject` доходит, и тему она ставит себе
-// сама.
-const themeAttrs = useGrThemeAttrs()
 
 defineExpose({ open, close, toggle })
 
@@ -299,7 +213,7 @@ defineSlots<{
   /**
    * Триггер панели. `triggerProps` обязаны попасть на сам интерактивный
    * элемент, а не на обёртку вокруг него: `aria-expanded` и `aria-controls`
-   * читаются с того узла, который получает фокус.
+   * читаются с того узла, который получает фокус, а клик приезжает вместе с ними.
    */
   trigger?: (props: {
     open: boolean
@@ -314,47 +228,43 @@ defineSlots<{
 
 <template>
   <div data-gr-dropdown>
-    <div
-      ref="rootEl"
-      v-click-outside="{ handler: close, enabled: isOpen, exclude: clickOutsideExclude }"
-      data-gr-dropdown-trigger
-      class="inline-block max-w-full"
-      @mouseenter="onHoverEnter"
-      @mouseleave="onHoverLeave"
+    <GrPopover
+      role="menu"
+      padding="none"
+      :open="isOpen"
+      :placement="placement"
+      :offset-px="offset"
+      :trigger="trigger"
+      :open-delay="openDelay"
+      :close-delay="closeDelay"
+      :disabled="disabled"
+      :close-on-content-click="closeOnContentClick"
+      :teleport-to="teleportTo"
+      :auto-focus="false"
+      @update:open="setOpen"
     >
-      <slot name="trigger" :open="isOpen" :toggle="toggle" :close="close" :trigger-props="triggerProps" />
-    </div>
+      <template #trigger="{ triggerProps: popoverTriggerProps }">
+        <slot
+          name="trigger"
+          :open="isOpen"
+          :toggle="toggle"
+          :close="close"
+          :trigger-props="menuTriggerProps(popoverTriggerProps)"
+        />
+      </template>
 
-    <teleport :to="portalTarget" :disabled="!teleportEnabled">
-      <transition
-        :enter-active-class="panelPopTransition.enter"
-        :enter-from-class="panelPopTransition.enterFrom"
-        :enter-to-class="panelPopTransition.enterTo"
-        :leave-active-class="panelPopTransition.leave"
-        :leave-from-class="panelPopTransition.leaveFrom"
-        :leave-to-class="panelPopTransition.leaveTo"
-      >
+      <template #content="{ close: closePanel }">
         <div
-          v-show="isOpen"
-          :id="panelId"
-          ref="panelEl"
-          v-bind="themeAttrs"
+          ref="menuEl"
           data-gr-dropdown-panel
-          data-gr-overlay-root
-          role="menu"
-          tabindex="-1"
-          :class="panelClasses"
           :style="panelStyle"
-          @click="onContentClick"
           @keydown="menu.onKeydown"
-          @mouseenter="onHoverEnter"
-          @mouseleave="onHoverLeave"
         >
           <div data-gr-dropdown-content :class="contentClasses">
-            <slot name="content" :close="close" />
+            <slot name="content" :close="closePanel" />
           </div>
         </div>
-      </transition>
-    </teleport>
+      </template>
+    </GrPopover>
   </div>
 </template>
