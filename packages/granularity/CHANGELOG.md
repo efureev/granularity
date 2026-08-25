@@ -7,6 +7,8 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.34.2] 2026-08-25
+
 ### Fixed
 
 - **`GrTabs` now shows that the row continues past the edge.** The tab row scrolls, but its
