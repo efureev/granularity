@@ -140,7 +140,7 @@ export const sizes = {
 
 `GrAutocomplete`, `GrAvatar`, `GrBottomNav`, `GrButton`, `GrCheckbox`, `GrCheckboxGroup`,
 `GrCollapse`, `GrDataTable`, `GrFileUpload`, `GrFormFile`, `GrIcon`, `GrInput`, `GrLink`, `GrNumberInput`,
-`GrPagination`, `GrProgressBar`, `GrRating`, `GrSegmented`, `GrSelect`,
+`GrNavbar`, `GrPagination`, `GrProgressBar`, `GrRating`, `GrSegmented`, `GrSelect`,
 `GrSlider`, `GrStatistic`, `GrSwitch`, `GrTable`, `GrTabs`, `GrTextarea`,
 `GrTooltip`, `GrTree`.
 

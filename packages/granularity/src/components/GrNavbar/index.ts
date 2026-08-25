@@ -1,6 +1,7 @@
 export { default } from './GrNavbar.vue'
 export { default as GrNavbar } from './GrNavbar.vue'
 export type { GrNavbarProps } from './GrNavbar.vue'
+export type { GrNavbarConfigurableProps } from './defaults'
 export { grNavbarConfig } from './config'
 export { grNavbarSafelist } from './safelist'
 export type { GrNavbarEmits } from './GrNavbar.vue'

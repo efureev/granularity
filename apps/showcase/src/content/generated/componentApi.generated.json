@@ -7117,6 +7117,13 @@
             "default": "undefined"
           },
           {
+            "name": "size",
+            "description": "Ступень кнопки меню — и только её: остальное в шапке принадлежит потребителю, а высоту ряда задаёт `--gr-navbar-height`. Фолбэк — `sm` (32px), а не общий для пакета `md`: кнопка была этого размера с самого начала, и подъём по умолчанию сдвинул бы шапку у всех. Нужен тач-таргет — `size=\"lg\"` даёт 44px, ровно то, чего требуют WCAG 2.5.5 и Apple HIG; в 56px ряда он помещается.",
+            "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "showMenuButton",
             "description": "",
             "type": "boolean | undefined",

@@ -39,6 +39,7 @@ import GrJsonViewer from '../components/GrJsonViewer/GrJsonViewer.vue'
 import GrInputTag from '../components/GrInputTag/GrInputTag.vue'
 import GrKbd from '../components/GrKbd/GrKbd.vue'
 import GrLink from '../components/GrLink/GrLink.vue'
+import GrNavbar from '../components/GrNavbar/GrNavbar.vue'
 import GrNumberInput from '../components/GrNumberInput/GrNumberInput.vue'
 import GrPagination from '../components/GrPagination/GrPagination.vue'
 import GrPopover from '../components/GrPopover/GrPopover.vue'
@@ -152,6 +153,12 @@ const harnesses: { name: string, render: () => unknown }[] = [
   { name: 'GrInputTag', render: () => h(GrInputTag, { modelValue: ['a'] }) },
   { name: 'GrKbd', render: () => h(GrKbd, null, { default: () => 'K' }) },
   { name: 'GrLink', render: () => h(GrLink, { href: '#' }, { default: () => 'L' }) },
+  {
+    // Ступень у шапки принадлежит только кнопке меню, поэтому без неё стенд
+    // сравнивал бы две одинаковые разметки и зеленел бы на любом коде.
+    name: 'GrNavbar',
+    render: () => h(GrNavbar, { showMenuButton: true }),
+  },
   { name: 'GrNumberInput', render: () => h(GrNumberInput, { modelValue: null }) },
   { name: 'GrPagination', render: () => h(GrPagination, { page: 1, pageSize: 10, total: 100 }) },
   {

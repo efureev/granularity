@@ -25,6 +25,21 @@ to [Semantic Versioning](https://semver.org/).
 
   Tab rows get taller wherever `md` or `lg` is in use.
 
+### Added
+
+- **`GrNavbar`: a `size` prop for the menu button.** The burger was rendered with a hardcoded
+  `size="sm"`, and `GrNavbar` had neither a `size` prop nor a `defaults.ts` — so it was absent from
+  the `componentDefaults` registry and a consumer had no way to reach it short of fighting the
+  cascade through `menuButtonClass`. On a phone that left a 32×32 target with no lever.
+
+  The prop resolves through `GrConfigProvider` like everywhere else, and the icon inside now follows
+  the step instead of a hardcoded 16px.
+
+  Its fallback is `sm`, not the package-wide `md`: the button has been 32px since it was introduced,
+  and raising it by default would have shifted every consumer's header. `size="lg"` gives 44px and
+  fits the 56px row.
+
+
 ## [v0.34.2] 2026-08-25
 
 ### Fixed

@@ -6,6 +6,7 @@ import IconMenu from '~icons/lucide/menu'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 import GrButton from '../GrButton/GrButton.vue'
 import GrIcon from '../GrIcon/GrIcon.vue'
+import { type GrComponentSize, useGrComponentSize } from '../GrConfigProvider/context'
 
 import {
   grNavbarRootClass,
@@ -28,6 +29,16 @@ export interface GrNavbarProps {
   /** Заголовок строкой. Слот `#title` сильнее и позволяет обойтись без пропа. */
   title?: string
   showMenuButton?: boolean
+  /**
+   * Ступень кнопки меню — и только её: остальное в шапке принадлежит
+   * потребителю, а высоту ряда задаёт `--gr-navbar-height`.
+   *
+   * Фолбэк — `sm` (32px), а не общий для пакета `md`: кнопка была этого размера
+   * с самого начала, и подъём по умолчанию сдвинул бы шапку у всех. Нужен
+   * тач-таргет — `size="lg"` даёт 44px, ровно то, чего требуют WCAG 2.5.5 и
+   * Apple HIG; в 56px ряда он помещается.
+   */
+  size?: GrComponentSize
   /** Extra classes applied to the menu button wrapper (e.g. `sm:hidden`). */
   menuButtonClass?: string
   /**
@@ -44,6 +55,7 @@ export interface GrNavbarEmits {
 const props = withDefaults(defineProps<GrNavbarProps>(), {
   title: undefined,
   showMenuButton: false,
+  size: undefined,
   menuButtonClass: '',
   sticky: false,
 })
@@ -64,6 +76,8 @@ const emit = defineEmits<GrNavbarEmits>()
 const { t } = useGranularityTranslations()
 
 const menuAriaLabel = computed(() => t('gr.navbar.openMenu', 'Open menu'))
+
+const menuSize = useGrComponentSize(() => props.size, { component: 'GrNavbar', fallback: 'sm' })
 
 // Пустой блок заголовка съедал бы отступ ряда, поэтому рендерим его только при
 // наличии содержимого — проп `title` для этого не обязателен.
@@ -93,13 +107,13 @@ const rightClass = computed(() => [
         v-if="showMenuButton"
         data-gr-navbar-menu
         variant="ghost"
-        size="sm"
+        :size="menuSize"
         square
         :aria-label="menuAriaLabel"
         :class="menuButtonClass"
         @click="emit('menu')"
       >
-        <GrIcon :size="16">
+        <GrIcon :size="menuSize">
           <IconMenu aria-hidden="true" />
         </GrIcon>
       </GrButton>
