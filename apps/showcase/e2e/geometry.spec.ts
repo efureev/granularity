@@ -21,22 +21,33 @@ async function lineStart(page: import('@playwright/test').Page, panelId: string)
   arcInner: number
 }> {
   return page.evaluate((id) => {
-    // Скругление и поле живут на боксе содержимого, а `aria-controls` ведёт на
-    // корень слоя — он их не несёт.
+    // Скругление и рамку несёт поверхность панели, а её рисует `GrPopover`:
+    // меню стоит на нём и добавляет внутри только поле. Меряем от поверхности,
+    // а не от ближайшей обёртки, — сколько узлов между ними, вопрос сборки
+    // компонента, а геометрия угла от этого не зависит.
     const layer = document.getElementById(id)
-    const panel = layer?.matches('[data-gr-dropdown-content]')
+    const surface = layer?.matches('[data-gr-popover-panel]')
       ? layer
-      : layer?.querySelector('[data-gr-dropdown-content]')
-    const list = panel?.querySelector('[data-gr-dropdown-menu-list]')
-    if (!panel || !list)
-      throw new Error('панель или список не найдены')
+      : (layer?.querySelector('[data-gr-popover-panel]')
+        ?? layer?.closest('[data-gr-popover-panel]'))
+    const list = surface?.querySelector('[data-gr-dropdown-menu-list]')
+    if (!surface || !list)
+      throw new Error('поверхность панели или список не найдены')
 
-    const panelStyle = getComputedStyle(panel)
-    const radius = Number.parseFloat(panelStyle.borderTopLeftRadius)
-    const border = Number.parseFloat(panelStyle.borderTopWidth)
-    const depth = border + Number.parseFloat(panelStyle.paddingTop)
+    const surfaceStyle = getComputedStyle(surface)
+    const radius = Number.parseFloat(surfaceStyle.borderTopLeftRadius)
+    const border = Number.parseFloat(surfaceStyle.borderTopWidth)
+    if (!(radius > 0))
+      throw new Error(`поверхность не несёт скругления (radius=${surfaceStyle.borderTopLeftRadius}) — замер измеряет не тот узел`)
 
-    const listLeft = list.getBoundingClientRect().left - panel.getBoundingClientRect().left
+    const surfaceRect = surface.getBoundingClientRect()
+    const listRect = list.getBoundingClientRect()
+
+    // Линия рисуется по верхнему краю списка, поэтому глубина — расстояние от
+    // внешнего края поверхности до него: в него уже входят и рамка, и все поля
+    // по дороге.
+    const depth = listRect.top - surfaceRect.top
+    const listLeft = listRect.left - surfaceRect.left
 
     // Линия рамкой начинается у самого края бокса; линия псевдоэлементом —
     // на его инсете. Меряем то, что реально нарисовано.
@@ -204,3 +215,4 @@ test.describe('подсветка строки дерева', () => {
     expect(Math.abs(after - before), 'фон строки не изменился — подсветки нет').toBeGreaterThan(4)
   })
 })
+
