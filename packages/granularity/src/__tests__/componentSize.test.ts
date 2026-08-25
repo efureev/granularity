@@ -55,6 +55,8 @@ import GrStatistic from '../components/GrStatistic/GrStatistic.vue'
 import GrSwitch from '../components/GrSwitch/GrSwitch.vue'
 import GrTable from '../components/GrTable/GrTable.vue'
 import GrTabs from '../components/GrTabs/GrTabs.vue'
+import { sizes as buttonSizes } from '../components/GrButton/grButtonStyles'
+import { tabSizes } from '../components/GrTabs/grTabsStyles'
 import GrTextarea from '../components/GrTextarea/GrTextarea.vue'
 import GrTooltip from '../components/GrTooltip/GrTooltip.vue'
 import GrTree from '../components/GrTree/GrTree.vue'
@@ -282,7 +284,30 @@ function panelMarkup(html: string): string {
   return panel ? panel[0] : html
 }
 
+/** Высота из набора утилит — `h-10` → `10`. */
+function heightUnit(classes: string): string {
+  return classes.match(/\bh-(\d+(?:\.\d+)?)\b/)?.[1] ?? ''
+}
+
 describe('контракт размера', () => {
+  /**
+   * Вкладки часто стоят с кнопкой в один ряд, и `grTabsStyles.ts` объявляет это
+   * прямо: «Высота вкладки повторяет шкалу `GrButton`». Обещание разъехалось
+   * молча — на `md` и `lg` вкладка была на 4px ниже, и ни одна ступень не
+   * давала 44px, из-за чего тач-таргет был недостижим никаким пропом.
+   * Комментарий сам себя не проверяет, поэтому проверка здесь.
+   */
+  it('шкала `GrTabs` совпадает со шкалой `GrButton` по высоте', () => {
+    const mismatched = (['xs', 'sm', 'md', 'lg'] as const)
+      .map(size => ({ size, tab: heightUnit(tabSizes[size]), button: heightUnit(buttonSizes[size]) }))
+      .filter(item => item.tab !== item.button)
+
+    expect(
+      mismatched,
+      mismatched.map(item => `${item.size}: вкладка h-${item.tab} против кнопки h-${item.button}`).join('; '),
+    ).toEqual([])
+  })
+
   it('каждый компонент с настраиваемым `size` покрыт гейтом', () => {
     const covered = new Set([...harnesses, ...overlayHarnesses].map(item => item.name))
     const missing = componentsWithConfigurableSize().filter(name => !covered.has(name))

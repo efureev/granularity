@@ -16,8 +16,8 @@ export type GrTabsOrientation = 'horizontal' | 'vertical'
 export const tabSizes: Record<GrTabsSize, string> = {
   xs: 'h-7 px-2 text-[length:var(--gr-text-xs)] leading-[var(--gr-leading-xs)]',
   sm: 'h-8 px-2.5 text-[length:var(--gr-text-xs)] leading-[var(--gr-leading-xs)]',
-  md: 'h-9 px-3 text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)]',
-  lg: 'h-10 px-4 text-[length:var(--gr-text-base)] leading-[var(--gr-leading-base)]',
+  md: 'h-10 px-3 text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)]',
+  lg: 'h-11 px-4 text-[length:var(--gr-text-base)] leading-[var(--gr-leading-base)]',
 }
 
 /** Счётчик у вкладки: на ступень мельче подписи. */

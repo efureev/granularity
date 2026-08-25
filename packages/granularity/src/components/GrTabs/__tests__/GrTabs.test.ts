@@ -340,7 +340,7 @@ describe('GrTabs — пустой ряд', () => {
     const wrapper = mount(GrTabs, { props: { ...emptyProps, size: 'lg' } })
 
     // Иначе соседние блоки прыгают, когда закрыли последнюю вкладку.
-    expect(wrapper.get('[data-gr-tabs-empty]').classes()).toContain('h-10')
+    expect(wrapper.get('[data-gr-tabs-empty]').classes()).toContain('h-11')
   })
 })
 

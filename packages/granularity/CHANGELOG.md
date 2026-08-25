@@ -7,6 +7,24 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+
+- **`GrTabs`: the height scale now matches `GrButton`, as its own code claimed it did.**
+  `grTabsStyles.ts` states "the tab height repeats the `GrButton` scale: tabs often stand next to one
+  in the same row". That held for `xs` and `sm` and had quietly drifted for the other two: `md` was
+  36px against the button's 40, `lg` was 40 against 44.
+
+  Two consequences, and the second is the one that bit. A tab row next to a button was four pixels
+  short, which reads as a layout mistake. And **no step reached 44px** — the target size WCAG 2.5.5
+  and Apple HIG ask for on touch — so a consumer could not get one out of `GrTabs` by any prop.
+
+  `md` is now `h-10` and `lg` is `h-11`. Type sizes were already correct and are untouched, so this
+  restores a stated invariant rather than introducing a new one. A gate in
+  `src/__tests__/componentSize.test.ts` compares the two scales step by step, because a comment does
+  not check itself.
+
+  Tab rows get taller wherever `md` or `lg` is in use.
+
 ## [v0.34.2] 2026-08-25
 
 ### Fixed
