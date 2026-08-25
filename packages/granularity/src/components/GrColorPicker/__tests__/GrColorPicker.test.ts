@@ -276,4 +276,18 @@ describe('GrColorPicker', () => {
 
     wrapper.unmount()
   })
+
+  /**
+   * Пикер — форм-контрол, и его `triggerBaseClass` объявляет `w-full`, как у
+   * `GrInput`, `GrSelect` и `GrNumberInput`. Но обёртка `GrPopover` по умолчанию
+   * `inline-block` и обжимает содержимое, поэтому `w-full` резолвился
+   * относительно неё: в поле формы шириной 384px пикер рисовался на 113px.
+   */
+  it('триггер занимает всю ширину поля, как остальные форм-контролы', () => {
+    const wrapper = mountPicker()
+
+    const trigger = wrapper.get('[data-gr-popover-trigger]')
+    expect(trigger.classes()).toContain('w-full')
+    expect(trigger.classes()).not.toContain('inline-block')
+  })
 })

@@ -276,6 +276,7 @@ const trackVars = computed<Record<string, string>>(() => {
 
     <GrPopover
       v-model:open="panelOpen"
+      block
       :size="resolvedSize"
       :placement="placement"
       :disabled="isDisabled"
