@@ -420,4 +420,29 @@ describe('GrContextMenu — выбор и разметка', () => {
     expect(isOpen()).toBe(true)
     expect(document.body.querySelector('[data-custom]')).not.toBeNull()
   })
+
+  /**
+   * `minWidth` меню лежит на списке внутри панели, а панель по умолчанию
+   * ограничена `22rem`. Два предела на одну ширину — снаружи и изнутри —
+   * противоречат друг другу: список не сжимается и вылезает за скруглённый край,
+   * потому что у панели `overflow: visible`. Замер в браузере: `min-width: 500px`
+   * при потолке 352px даёт вылет в 161px. Потому внешний предел и снят.
+   */
+  it('панель не держит потолок ширины: его задаёт `minWidth` меню', async () => {
+    const wrapper = mountMenu({ minWidth: 500 })
+    rightClick(wrapper.get('[data-row]').element)
+    await settle()
+
+    expect(panelEl()?.className).toContain('[--gr-popover-max-width:100vw]')
+  })
+
+  it('`contentClass` потребителя не теряется при этом', async () => {
+    const wrapper = mountMenu({ contentClass: 'my-menu' })
+    rightClick(wrapper.get('[data-row]').element)
+    await settle()
+
+    const cls = panelEl()?.className ?? ''
+    expect(cls).toContain('my-menu')
+    expect(cls).toContain('[--gr-popover-max-width:100vw]')
+  })
 })

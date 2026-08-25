@@ -125,6 +125,21 @@ const listStyle = computed(() => ({
 }))
 
 /**
+ * Потолок ширины панели снят: ширину меню определяет его собственный `minWidth`.
+ *
+ * По умолчанию `GrPopover` держит `22rem` — читаемую ширину колонки текста. Но
+ * `minWidth` этого меню лежит на списке **внутри** панели, а список не сжимается:
+ * `minWidth` крупнее потолка вылезал бы за скруглённый край панели наружу, потому
+ * что у неё `overflow: visible`. Замер: `min-width: 500px` при потолке 352px даёт
+ * вылет в 161px.
+ *
+ * Два предела на одну ширину — один снаружи, другой изнутри — противоречат друг
+ * другу по построению, поэтому внешний снимается. «Не шире вьюпорта» остаётся: он
+ * второй операнд `min()` и хуком не снимается.
+ */
+const panelClass = computed(() => ['[--gr-popover-max-width:100vw]', props.contentClass].filter(Boolean).join(' '))
+
+/**
  * Меню без единого действия не открывается: фокусировать в нём нечего, и оно
  * становится ловушкой, из которой есть только Esc.
  */
@@ -362,7 +377,7 @@ defineSlots<{
       :placement="placement"
       :offset-px="offsetPx"
       :teleport-to="teleportTo"
-      :content-class="contentClass"
+      :content-class="panelClass"
       :aria-label="labelledBy ? undefined : resolvedAriaLabel"
       :labelled-by="labelledBy"
       role="menu"
