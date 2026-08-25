@@ -481,6 +481,38 @@ describe('GrRichText — пузырьковый тулбар', () => {
     wrapper.unmount()
   })
 
+  /**
+   * Регрессия: панель поповера ограничена `max-width` в 22rem, а квадратная
+   * кнопка не сжимается (`min-w` в `GrButton`). Десять кнопок ступени `sm`
+   * давали 356px против 330px доступных — последняя вылезала за скруглённый
+   * край панели наружу, потому что у неё `overflow: visible`.
+   *
+   * Проверяются оба замка сразу: ступень кнопки не растёт вслед за полем, а
+   * ряд умеет переноситься — иначе следующее добавленное действие вернёт
+   * ту же поломку.
+   */
+  it('ряд кнопок не может вылезти за панель', async () => {
+    for (const size of ['xs', 'sm', 'md', 'lg'] as const) {
+      const wrapper = mountEditor({ modelValue: '<p>текст</p>', schema: 'article', toolbar: 'bubble', size })
+      await ready(wrapper)
+      await selectAllWithBubble(wrapper)
+
+      const buttons = bubbleButtons()
+      expect(buttons.length).toBe(10)
+
+      // Ступень кнопки пузырька одна на все размеры поля: панель сверху растёт
+      // вместе с полем, а пузырёк висит над текстом и остаётся компактным.
+      // `data-size` у `GrButton` нет — ступень видна по дефолту квадрата.
+      for (const button of buttons)
+        expect(button.className).toContain('--gr-button-square-size,1.75rem')
+
+      const row = document.body.querySelector('[data-gr-rich-text-bubble]')
+      expect(row?.className).toContain('flex-wrap')
+
+      wrapper.unmount()
+    }
+  })
+
   it('в режиме панели не появляется', async () => {
     const wrapper = mountEditor({ modelValue: '<p>текст</p>', toolbar: true })
     await ready(wrapper)

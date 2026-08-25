@@ -23,7 +23,9 @@ import { createSchema } from '../../editor/schemas'
 import { iconPathsFor } from './icons'
 import type { GrRichTextSize } from './grRichTextStyles'
 import {
+  bubbleButtonSize,
   bubbleClass,
+  bubblePanelClass,
   contentClass,
   fieldFooterClass,
   fieldHeaderClass,
@@ -35,6 +37,7 @@ import {
   sizeClasses,
   toolbarButtonSize,
   toolbarClass,
+  toolbarGroupClass,
   toolbarSeparatorClass,
 } from './grRichTextStyles'
 
@@ -354,10 +357,27 @@ const roving = useRovingFocus<string>({
   orientation: () => 'horizontal',
 })
 
-/** Разделитель ставится там, где меняется группа: панель читается блоками. */
-function startsGroup(index: number): boolean {
-  return index > 0 && actions.value[index]?.group !== actions.value[index - 1]?.group
-}
+/**
+ * Действия, разложенные по группам схемы.
+ *
+ * Группа рисуется одной обёрткой и потому переносится целиком: панель умеет
+ * переноситься, а разрыв внутри группы разлучил бы кнопки одного смысла —
+ * «Заголовок» в одной строке, «Подзаголовок» в другой, без разделителя между
+ * ними. Порядок групп — порядок действий схемы, своей сортировки здесь нет.
+ */
+const actionGroups = computed(() => {
+  const groups: Array<{ group: GrRichTextAction['group'], items: GrRichTextAction[] }> = []
+
+  for (const action of actions.value) {
+    const last = groups.at(-1)
+
+    if (last && last.group === action.group)
+      last.items.push(action)
+    else groups.push({ group: action.group, items: [action] })
+  }
+
+  return groups
+})
 
 // ————— Пузырьковое меню.
 
@@ -457,39 +477,43 @@ const rootClasses = computed(() => [
       :class="toolbarClass"
       @keydown="roving.handleNavigationKeys"
     >
-      <template v-for="(action, index) in actions" :key="action.key">
-        <span v-if="startsGroup(index)" :class="toolbarSeparatorClass" aria-hidden="true" />
+      <template v-for="(actionGroup, groupIndex) in actionGroups" :key="actionGroup.group">
+        <span v-if="groupIndex > 0" :class="toolbarSeparatorClass" aria-hidden="true" />
 
-        <GrButton
-          :ref="element => setButtonEl(action.key, (element as { $el?: unknown } | null)?.$el ?? element)"
-          data-gr-rich-text-action
-          :data-key="action.key"
-          :size="toolbarButtonSize[resolvedSize]"
-          variant="ghost"
-          square
-          :disabled="field.locked.value"
-          :aria-pressed="isActive(action)"
-          :aria-label="t(action.labelKey, action.labelFallback)"
-          :tabindex="roving.tabindexFor(action.key)"
-          :title="t(action.labelKey, action.labelFallback)"
-          @click="run(action)"
-          @focus="roving.setActive(action.key)"
-        >
-          <slot :name="`action-${action.key}`" :action="action" :active="isActive(action)">
-            <svg
-              :class="iconClass"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              aria-hidden="true"
-            >
-              <path v-for="(d, path) in iconPathsFor(action.key)" :key="path" :d="d" />
-            </svg>
-          </slot>
-        </GrButton>
+        <div :class="toolbarGroupClass">
+          <GrButton
+            v-for="action in actionGroup.items"
+            :key="action.key"
+            :ref="element => setButtonEl(action.key, (element as { $el?: unknown } | null)?.$el ?? element)"
+            data-gr-rich-text-action
+            :data-key="action.key"
+            :size="toolbarButtonSize[resolvedSize]"
+            variant="ghost"
+            square
+            :disabled="field.locked.value"
+            :aria-pressed="isActive(action)"
+            :aria-label="t(action.labelKey, action.labelFallback)"
+            :tabindex="roving.tabindexFor(action.key)"
+            :title="t(action.labelKey, action.labelFallback)"
+            @click="run(action)"
+            @focus="roving.setActive(action.key)"
+          >
+            <slot :name="`action-${action.key}`" :action="action" :active="isActive(action)">
+              <svg
+                :class="iconClass"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path v-for="(d, path) in iconPathsFor(action.key)" :key="path" :d="d" />
+              </svg>
+            </slot>
+          </GrButton>
+        </div>
       </template>
     </div>
 
@@ -512,6 +536,8 @@ const rootClasses = computed(() => [
       :anchor="bubbleRect"
       placement="top"
       size="sm"
+      padding="none"
+      :content-class="bubblePanelClass"
       :close-on-content-click="false"
       :auto-focus="false"
       :close-on-click-outside="false"
@@ -523,33 +549,39 @@ const rootClasses = computed(() => [
                пузырёк держится на фокусе в тексте, и уход фокуса на кнопку гасит
                его блюром прямо под курсором — второй формат подряд применить уже
                нечем. Панель сверху от фокуса не зависит и обходится без этого. -->
-          <GrButton
-            v-for="action in actions"
-            :key="action.key"
-            data-gr-rich-text-bubble-action
-            :data-key="action.key"
-            :size="toolbarButtonSize[resolvedSize]"
-            variant="ghost"
-            square
-            :aria-pressed="isActive(action)"
-            :aria-label="t(action.labelKey, action.labelFallback)"
-            :title="t(action.labelKey, action.labelFallback)"
-            @mousedown.prevent
-            @click="run(action)"
-          >
-            <svg
-              :class="iconClass"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              aria-hidden="true"
-            >
-              <path v-for="(d, path) in iconPathsFor(action.key)" :key="path" :d="d" />
-            </svg>
-          </GrButton>
+          <template v-for="(actionGroup, groupIndex) in actionGroups" :key="actionGroup.group">
+            <span v-if="groupIndex > 0" :class="toolbarSeparatorClass" aria-hidden="true" />
+
+            <div :class="toolbarGroupClass">
+              <GrButton
+                v-for="action in actionGroup.items"
+                :key="action.key"
+                data-gr-rich-text-bubble-action
+                :data-key="action.key"
+                :size="bubbleButtonSize[resolvedSize]"
+                variant="ghost"
+                square
+                :aria-pressed="isActive(action)"
+                :aria-label="t(action.labelKey, action.labelFallback)"
+                :title="t(action.labelKey, action.labelFallback)"
+                @mousedown.prevent
+                @click="run(action)"
+              >
+                <svg
+                  :class="iconClass"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <path v-for="(d, path) in iconPathsFor(action.key)" :key="path" :d="d" />
+                </svg>
+              </GrButton>
+            </div>
+          </template>
         </div>
       </template>
     </GrPopover>

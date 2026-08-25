@@ -25,6 +25,23 @@ export const toolbarButtonSize = {
   lg: 'sm',
 } as const satisfies Record<GrRichTextSize, 'xs' | 'sm'>
 
+/**
+ * Кнопка пузырька — всегда самая мелкая ступень, независимо от размера поля.
+ *
+ * Панель сверху живёт в раме поля и растёт вместе с ним; пузырёк висит **над
+ * текстом**, который читают, и там уместна наименьшая площадь, дающая цель
+ * нажатия 28×28 — выше требуемых WCAG 2.2 двадцати четырёх.
+ *
+ * Это решение об оформлении, а не обход ограничения: ширину панели пузырёк
+ * снимает хуком `--gr-popover-max-width`, и в потолок не упирается.
+ */
+export const bubbleButtonSize = {
+  xs: 'xs',
+  sm: 'xs',
+  md: 'xs',
+  lg: 'xs',
+} as const satisfies Record<GrRichTextSize, 'xs'>
+
 export const rootClass = 'relative overflow-hidden rounded-[var(--gr-radius-lg)] border border-[var(--gr-brd)] bg-[var(--gr-bg)] transition-colors duration-[var(--gr-duration-fast)] ease-[var(--gr-ease-out)]'
 
 export const rootFocusClass = 'focus-within:border-[var(--gr-primary)] focus-within:ring-2 focus-within:ring-[var(--gr-ring)]'
@@ -37,7 +54,41 @@ export const toolbarClass = 'flex flex-wrap items-center gap-1 border-b border-[
 
 export const toolbarSeparatorClass = 'mx-1 h-4 w-px bg-[var(--gr-brd)]'
 
-export const bubbleClass = 'flex items-center gap-1'
+/**
+ * Группа кнопок — единица переноса, а не просто набор соседей.
+ *
+ * `flex-wrap` на самой панели рвёт ряд там, где кончилось место, и разлучает
+ * кнопки одного смысла: «Заголовок» уезжает в одну строку, «Подзаголовок» — в
+ * другую, хотя между ними нет даже разделителя. Обёртка с `flex-none` этого не
+ * допускает: переносится целая группа со своим разделителем, и строки читаются
+ * теми же блоками, что и один ряд.
+ */
+export const toolbarGroupClass = 'flex flex-none items-center gap-1'
+
+/**
+ * Пузырёк несёт своё поле, а поповер получает `padding="none"`: 20px поля панели
+ * — это две трети кнопки, а места в пузырьке считаный десяток пикселей.
+ *
+ * `flex-wrap` — не украшение, а гарантия: квадратная кнопка не сжимается
+ * (`min-w` в `GrButton`), поэтому строка, не поместившаяся в панель, вылезала бы
+ * за её край наружу — панель `overflow: visible`. Потолок ширины пузырёк снял,
+ * но предел вьюпорта не снимается ничем, и на узком экране перенос — это то, что
+ * между «встало второй строкой» и «уехало за край».
+ */
+/**
+ * Снятый потолок ширины для панели пузырька.
+ *
+ * Класс, а не инлайновый стиль: панель `GrPopover` телепортируется в портал, и
+ * кастомное свойство, поставленное на обёртку триггера, до неё не наследуется —
+ * она ей не потомок. Единственный путь на саму панель — `contentClass`.
+ *
+ * Зачем вообще: по умолчанию поповер держит `22rem` — читаемую ширину колонки
+ * текста, — а пузырёк несёт тулбар, которому эта мера чужая. Предел «не шире
+ * вьюпорта» остаётся: он второй операнд `min()` и хуком не снимается.
+ */
+export const bubblePanelClass = '[--gr-popover-max-width:100vw]'
+
+export const bubbleClass = 'flex flex-wrap items-center gap-1 p-1'
 
 export const contentClass = 'px-3 py-2 outline-none'
 
@@ -70,7 +121,9 @@ export const grRichTextSafelist: string[] = [
   ...splitClassTokens(rootDisabledClass),
   ...splitClassTokens(toolbarClass),
   ...splitClassTokens(toolbarSeparatorClass),
+  ...splitClassTokens(toolbarGroupClass),
   ...splitClassTokens(bubbleClass),
+  ...splitClassTokens(bubblePanelClass),
   ...splitClassTokens(contentClass),
   ...splitClassTokens(fieldHeaderClass),
   ...splitClassTokens(fieldFooterClass),
