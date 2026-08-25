@@ -7,6 +7,27 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+
+- **`GrTimeline` now shrinks in a narrow column instead of pushing itself out of it.** Every row is
+  a grid whose flexible tracks were declared as a bare `1fr`. That is `minmax(auto, 1fr)`, and the
+  minimum of such a track is the largest minimum contribution of its items — which, for a grid item
+  with `overflow: visible`, is its min-content size. With `white-space: nowrap` coming from a
+  consumer's `truncate`, that is the full width of the string.
+
+  So the track grew to fit the text and the row overflowed its container, while the `truncate` that
+  was supposed to prevent exactly this never engaged: there was nothing to truncate. Measured on a
+  260px column, an `layout="time"` timeline overflowed by 278px.
+
+  Flexible tracks are now `minmax(0, 1fr)` and the items standing in them
+  (`[data-gr-timeline-content]`, `[data-gr-timeline-group-title]`, `[data-gr-timeline-aside]`) carry
+  `min-width: 0`. Both are needed: the first lifts the track's minimum, the second lifts the item's.
+  Truncation stays where it belongs — with the consumer — but it now works.
+
+  Nothing changes at widths where the content fits: `minmax(0, 1fr)` differs from `1fr` only once
+  the content no longer does.
+
+
 ## [v0.34.1] 2026-08-25
 
 ### Fixed

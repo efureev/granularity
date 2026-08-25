@@ -436,6 +436,7 @@ export const demoPathByPreviewKey = {
   'gr-timeline-basic': 'components/gr-timeline/GrTimelineBasicDemo.vue',
   'gr-timeline-grouped': 'components/gr-timeline/GrTimelineGroupedDemo.vue',
   'gr-timeline-layouts': 'components/gr-timeline/GrTimelineLayoutsDemo.vue',
+  'gr-timeline-narrow': 'components/gr-timeline/GrTimelineNarrowDemo.vue',
   'gr-toaster-action': 'components/gr-toaster/GrToasterActionDemo.vue',
   'gr-toaster-action-slot': 'components/gr-toaster/GrToasterActionSlotDemo.vue',
   'gr-toaster-builder': 'components/gr-toaster/GrToasterBuilderDemo.vue',

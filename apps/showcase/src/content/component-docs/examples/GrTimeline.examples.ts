@@ -22,4 +22,11 @@ export const grTimelineExamples: ShowcaseComponentExampleDoc[] = [
     status: 'ready',
     previewKey: 'gr-timeline-grouped',
   },
+  {
+    id: 'timeline-narrow',
+    title: 'Узкая колонка',
+    description: 'Лента сжимается по доступному месту, а не выносит строку за край: гибкие треки объявлены `minmax(0, 1fr)`, поэтому `truncate` на заголовке наконец срабатывает. Ширину колонки времени задаёт хук `--gr-timeline-time-width`.',
+    status: 'ready',
+    previewKey: 'gr-timeline-narrow',
+  },
 ]

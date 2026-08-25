@@ -275,3 +275,45 @@ test.describe('высота якорной панели', () => {
     expect(measured.overflow).toBeGreaterThan(0)
   })
 })
+
+/**
+ * Лента в узкой колонке.
+ *
+ * Трек `1fr` — это `minmax(auto, 1fr)`, и его минимум равен наибольшему
+ * минимальному вкладу элементов. У грид-элемента с `overflow: visible` этот
+ * вклад равен min-content, то есть для строки с `white-space: nowrap` — её
+ * полной ширине. Пока это было так, `truncate` потребителя не срабатывал вовсе:
+ * усекать было нечего, колонка раздавалась под текст и выносила строку за край.
+ * В jsdom дефекта не существует — раскладки там нет.
+ */
+test.describe('лента в узкой колонке', () => {
+  test('строка сжимается и усекает текст, а не выносит себя за край', async ({ page }) => {
+    await page.goto(componentPath('GrTimeline'))
+    await page.locator('#live-examples').waitFor()
+
+    // Демо стартует на самой узкой ступени — переключать ничего не нужно.
+    const box = page.locator('[data-demo-narrow-box]')
+    await expect(box).toBeVisible()
+
+    const measured = await box.evaluate((el) => {
+      const title = el.querySelector('[data-gr-timeline-title] .truncate')
+        ?? el.querySelector('[data-gr-timeline-title]')
+
+      return {
+        boxOverflow: el.scrollWidth - el.clientWidth,
+        titleScroll: title ? title.scrollWidth : 0,
+        titleClient: title ? title.clientWidth : 0,
+        titleOverflow: title ? getComputedStyle(title).textOverflow : '',
+      }
+    })
+
+    // Ровно то число, которым дефект был записан в аудите потребителя.
+    expect(measured.boxOverflow).toBe(0)
+
+    // И текст именно усечён, а не уместился случайно: без этой проверки тест
+    // зеленел бы на коротком заголовке, ничего не доказывая.
+    expect(measured.titleOverflow).toBe('ellipsis')
+    expect(measured.titleScroll).toBeGreaterThan(measured.titleClient)
+  })
+})
+

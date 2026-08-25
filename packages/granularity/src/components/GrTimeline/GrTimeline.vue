@@ -287,15 +287,15 @@ if (__GR_DEV__) {
  */
 
 [data-gr-timeline] {
-  --gr-timeline-columns: auto 1fr;
+  --gr-timeline-columns: auto minmax(0, 1fr);
 }
 
 [data-gr-timeline][data-layout='time'] {
-  --gr-timeline-columns: var(--gr-timeline-time-width, 5.5rem) auto 1fr;
+  --gr-timeline-columns: var(--gr-timeline-time-width, 5.5rem) auto minmax(0, 1fr);
 }
 
 [data-gr-timeline][data-layout='alternate'] {
-  --gr-timeline-columns: 1fr auto 1fr;
+  --gr-timeline-columns: minmax(0, 1fr) auto minmax(0, 1fr);
 }
 
 [data-gr-timeline-list] {
@@ -310,6 +310,27 @@ if (__GR_DEV__) {
   grid-template-columns: var(--gr-timeline-columns);
   column-gap: var(--gr-timeline-gap, 0.75rem);
   align-items: start;
+}
+
+/*
+ * Сжатие строки.
+ *
+ * Трек `1fr` — это `minmax(auto, 1fr)`, а его минимум равен наибольшему
+ * минимальному вкладу элементов. У грид-элемента с `overflow: visible` этот
+ * вклад равен min-content, то есть для строки с `white-space: nowrap` — её
+ * полной ширине. Поэтому лента не сжималась, а `truncate` потребителя не
+ * срабатывал: усекать было нечего, трек раздавался под текст. Явные
+ * `minmax(0, …)` у треков и `min-width: 0` у элементов снимают оба минимума.
+ *
+ * Метка времени стоит в треке фиксированной длины, и её трек от этого не
+ * меняется — но без `min-width: 0` длинная метка из слота `#time` раздаёт
+ * min-content всей строки.
+ */
+
+[data-gr-timeline-aside],
+[data-gr-timeline-content],
+[data-gr-timeline-group-title] {
+  min-width: 0;
 }
 
 [data-gr-timeline-aside] {
@@ -422,7 +443,7 @@ if (__GR_DEV__) {
 /* Двухсторонняя лента в узкой колонке нечитаема — там она односторонняя. */
 @media (max-width: 640px) {
   [data-gr-timeline][data-layout='alternate'] {
-    --gr-timeline-columns: auto 1fr;
+    --gr-timeline-columns: auto minmax(0, 1fr);
   }
 
   [data-gr-timeline][data-layout='alternate'] [data-gr-timeline-rail],
@@ -445,7 +466,7 @@ if (__GR_DEV__) {
 }
 
 [data-gr-timeline][data-orientation='horizontal'] [data-gr-timeline-item] {
-  grid-template-columns: 1fr;
+  grid-template-columns: minmax(0, 1fr);
   min-width: var(--gr-timeline-item-min-width, 12rem);
   padding-inline-end: var(--gr-timeline-gap, 0.75rem);
 }
