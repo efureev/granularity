@@ -1,7 +1,7 @@
 {
   "name": "@feugene/granularity-datasource",
   "description": "List state for @feugene/granularity: sorting, filters, paging, URL sync and race-free fetching behind one composable.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "license": "SEE LICENSE IN LICENSE",
   "author": {
     "name": "Evgeniy Fureev",

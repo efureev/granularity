@@ -7,6 +7,8 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.1.1] 2026-08-25
+
 ### Fixed
 
 - **The package tarball now ships `LICENSE`.** The manifest has always declared

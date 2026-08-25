@@ -7,6 +7,8 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.33.0] 2026-08-25
+
 ### Fixed
 
 - **`GrTable`: the scroller is now a containing block.** Its wrapper had `overflow-x-auto`
