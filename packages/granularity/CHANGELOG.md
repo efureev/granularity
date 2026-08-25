@@ -7,6 +7,16 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+
+- **`GrTable`: the scroller is now a containing block.** Its wrapper had `overflow-x-auto`
+  without `relative`, so an absolutely positioned descendant resolved its coordinates against
+  the document instead of the scroller and escaped the box. Inside the table itself only the
+  `sr-only` hint on the sort button is positioned that way, but cell markup belongs to the
+  consumer — any absolute element in a cell landed outside. The visible symptom is not a
+  misplaced element: on a narrow screen a wide table stopped dragging only itself sideways and
+  started dragging the whole page.
+
 ### Added
 
 - **`GrBadge` — slot `#icon`.** A status is rarely just a word: «processing»

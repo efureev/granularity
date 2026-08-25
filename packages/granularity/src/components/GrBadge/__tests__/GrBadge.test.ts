@@ -143,7 +143,6 @@ describe('GrBadge — снятое имя пропа', () => {
     }
   })
 
-
   describe('слот `icon`', () => {
     it('без слота узла иконки нет', () => {
       const wrapper = mount(GrBadge, { slots: { default: 'Готово' } })
