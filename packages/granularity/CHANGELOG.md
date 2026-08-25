@@ -7,6 +7,8 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.35.0] 2026-08-25
+
 ### Fixed
 
 - **`GrTabs`: the height scale now matches `GrButton`, as its own code claimed it did.**
