@@ -29,4 +29,18 @@ export const grPopoverExamples: ShowcaseComponentExampleDoc[] = [
     status: 'ready',
     previewKey: 'gr-popover-placement',
   },
+  {
+    id: 'popover-width',
+    title: 'Ширина: потолок и источник',
+    description: 'Две независимые оси. Потолок содержимого — CSS-хук `--gr-popover-max-width`, источник ширины — проп `matchWidth`. Сочетаются, а не спорят: «шириной с триггер, но не шире читаемого».',
+    status: 'ready',
+    previewKey: 'gr-popover-width',
+  },
+  {
+    id: 'popover-trigger',
+    title: 'Чем открывается и что считается триггером',
+    description: 'Клик и наведение с задержками. Триггером считается элемент с `triggerProps`, а не весь слот: соседняя кнопка внутри слота панель не открывает.',
+    status: 'ready',
+    previewKey: 'gr-popover-trigger',
+  },
 ]

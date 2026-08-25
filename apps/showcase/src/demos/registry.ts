@@ -334,6 +334,8 @@ export const demoPathByPreviewKey = {
   'gr-popover-form': 'components/gr-popover/GrPopoverFormDemo.vue',
   'gr-popover-modal': 'components/gr-popover/GrPopoverModalDemo.vue',
   'gr-popover-placement': 'components/gr-popover/GrPopoverPlacementDemo.vue',
+  'gr-popover-trigger': 'components/gr-popover/GrPopoverTriggerDemo.vue',
+  'gr-popover-width': 'components/gr-popover/GrPopoverWidthDemo.vue',
   'gr-progress-bar-basic-flow': 'components/gr-progress-bar/GrProgressBarBasicDemo.vue',
   'gr-progress-bar-borderless': 'components/gr-progress-bar/GrProgressBarBorderlessDemo.vue',
   'gr-progress-bar-clamped-values': 'components/gr-progress-bar/GrProgressBarClampDemo.vue',
