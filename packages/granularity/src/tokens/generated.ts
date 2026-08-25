@@ -3183,6 +3183,20 @@ export const grComponentTokens: GrComponentToken[] = [
     "description": "Цвет рамки дорожки переключателя."
   },
   {
+    "owner": "GrTabs",
+    "name": "--gr-tabs-scroll-fade",
+    "kind": "hook",
+    "default": "1.5rem",
+    "description": "Ширина затухания у края горизонтального ряда вкладок — того края, за которым ряд продолжается. Тем же значением задан `scroll-padding` ряда, поэтому вкладка, подтянутая в видимую часть, не встаёт под затухание."
+  },
+  {
+    "owner": "GrTabs",
+    "name": "--gr-tabs-mask",
+    "kind": "css",
+    "default": "не задана, пока ряд влезает целиком",
+    "description": "Маска затухания. Задаётся собственным CSS компонента по `data-overflow`: у какого края есть продолжение, тот и гаснет. Вертикальный ряд не прокручивается, и маски у него нет."
+  },
+  {
     "owner": "GrTimeline",
     "name": "--gr-timeline-axis-width",
     "kind": "hook",

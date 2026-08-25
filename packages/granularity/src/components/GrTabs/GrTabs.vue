@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { computed, nextTick, ref, watch, type Component } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch, type Component } from 'vue'
 
 import IconX from '~icons/lucide/x'
 
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 import { useRovingFocus } from '../../composables/useRovingFocus'
 import { iconClass, iconTag } from '../shared/icon'
+import { resolveScrollOverflow, type GrScrollOverflow } from '../shared/scrollOverflow'
 import { useGrComponentProp, useGrComponentSize } from '../GrConfigProvider/context'
 import {
   grTabsBadgeClass,
@@ -234,6 +235,64 @@ watch(() => props.modelValue, async () => {
     scrollIntoView(activeIndex.value)
 })
 
+/**
+ * Признак того, что ряд продолжается за краем.
+ *
+ * Полоса прокрутки у ряда скрыта намеренно, и без этого признака продолжение
+ * не выдаёт себя ничем: вкладки за краем достижимы стрелками, но о том, что они
+ * там есть, догадаться нечем. Затухание рисует CSS по `data-overflow`.
+ *
+ * Вертикальный ряд не скроллится вовсе — он растёт вниз, — поэтому состояние
+ * считается только для горизонтального.
+ */
+const tablistEl = ref<HTMLElement | null>(null)
+const scrollOverflow = ref<GrScrollOverflow>('none')
+
+let resizeObserver: ResizeObserver | null = null
+let scheduled = false
+
+function measureOverflow(): void {
+  const el = tablistEl.value
+
+  if (!el || props.orientation === 'vertical') {
+    scrollOverflow.value = 'none'
+    return
+  }
+
+  scrollOverflow.value = resolveScrollOverflow(el.scrollLeft, el.scrollWidth, el.clientWidth)
+}
+
+function scheduleMeasure(): void {
+  if (scheduled)
+    return
+
+  scheduled = true
+  void nextTick(() => {
+    scheduled = false
+    measureOverflow()
+  })
+}
+
+onMounted(() => {
+  scheduleMeasure()
+
+  // На сервере и в jsdom `ResizeObserver` отсутствует — измерять там нечего.
+  if (typeof ResizeObserver === 'undefined')
+    return
+
+  resizeObserver = new ResizeObserver(scheduleMeasure)
+  if (tablistEl.value)
+    resizeObserver.observe(tablistEl.value)
+})
+
+onBeforeUnmount(() => {
+  resizeObserver?.disconnect()
+  resizeObserver = null
+})
+
+// Состав ряда меняет его ширину, ориентация — само наличие прокрутки.
+watch(() => [props.tabs.length, props.orientation], scheduleMeasure)
+
 async function selectByIndex(index: number, focus = false): Promise<void> {
   const tab = props.tabs[index]
   if (!tab || !isEnabled(tab))
@@ -345,11 +404,14 @@ function onClick(event: MouseEvent, tab: GrTab, index: number): void {
 
   <div
     v-else
+    ref="tablistEl"
     role="tablist"
     data-gr-tabs
     :aria-orientation="orientation"
+    :data-overflow="orientation === 'vertical' ? undefined : scrollOverflow"
     :class="tablistClass"
     @keydown="onKeydown"
+    @scroll.passive="scheduleMeasure"
   >
     <button
       v-for="(tab, index) in tabs"
@@ -400,3 +462,60 @@ function onClick(event: MouseEvent, tab: GrTab, index: number): void {
     </button>
   </div>
 </template>
+
+<style>
+/*
+ * Затухание у края, за которым ряд продолжается.
+ *
+ * Здесь, а не утилитами, по двум причинам сразу. `mask-image` в `presetMini` не
+ * выражается — это уже зафиксировано отказом в `GrImageCrop`. И маской, а не
+ * градиентом-подложкой, потому что фон полосы у вариантов разный: `pills` несёт
+ * свой непрозрачный `--gr-muted`, а `line` прозрачен и лежит на фоне родителя,
+ * которого компонент не знает. Градиенту пришлось бы красить в цвет подложки —
+ * для `line` его неоткуда взять. Маска гасит содержимое независимо от того, что
+ * под ним.
+ *
+ * Состояние считается логически (начало/конец ряда), а направление градиента в
+ * CSS выражается только физически — отсюда зеркальные правила для RTL.
+ */
+
+[data-gr-tabs] {
+  /*
+   * `scrollIntoView({ inline: 'nearest' })` из кольца фокуса прижимает вкладку
+   * вплотную к краю. Без отступа прокрутки кольцо фокуса у клавиатурного
+   * пользователя оказалось бы ровно под затуханием.
+   */
+  scroll-padding-inline: var(--gr-tabs-scroll-fade, 1.5rem);
+}
+
+[data-gr-tabs][data-overflow='start'] {
+  --gr-tabs-mask: linear-gradient(to right, transparent 0, #000 var(--gr-tabs-scroll-fade, 1.5rem));
+}
+
+[data-gr-tabs][data-overflow='end'] {
+  --gr-tabs-mask: linear-gradient(to right, #000 calc(100% - var(--gr-tabs-scroll-fade, 1.5rem)), transparent 100%);
+}
+
+[data-gr-tabs][data-overflow='both'] {
+  --gr-tabs-mask: linear-gradient(
+    to right,
+    transparent 0,
+    #000 var(--gr-tabs-scroll-fade, 1.5rem),
+    #000 calc(100% - var(--gr-tabs-scroll-fade, 1.5rem)),
+    transparent 100%
+  );
+}
+
+[dir='rtl'] [data-gr-tabs][data-overflow='start'] {
+  --gr-tabs-mask: linear-gradient(to left, transparent 0, #000 var(--gr-tabs-scroll-fade, 1.5rem));
+}
+
+[dir='rtl'] [data-gr-tabs][data-overflow='end'] {
+  --gr-tabs-mask: linear-gradient(to left, #000 calc(100% - var(--gr-tabs-scroll-fade, 1.5rem)), transparent 100%);
+}
+
+[data-gr-tabs]:is([data-overflow='start'], [data-overflow='end'], [data-overflow='both']) {
+  -webkit-mask-image: var(--gr-tabs-mask);
+  mask-image: var(--gr-tabs-mask);
+}
+</style>

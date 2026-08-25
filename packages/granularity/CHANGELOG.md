@@ -9,6 +9,28 @@ to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- **`GrTabs` now shows that the row continues past the edge.** The tab row scrolls, but its
+  scrollbar is hidden on purpose, so a row that did not fit gave no sign of it: tabs beyond the edge
+  stayed reachable with the arrow keys, yet nothing suggested they were there. Measured on a 375px
+  screen, a five-tab row was 487px wide against 341px of space — two tabs invisible and unannounced.
+
+  The edge that has more tabs behind it now fades out: the right one at the start of the row, the
+  left one at the end, both in the middle, none at all when the row fits.
+
+  It is a mask rather than a gradient underlay, and that follows from the row's own background
+  differing per variant: `pills` carries an opaque `--gr-muted` of its own, while `line` is
+  transparent and sits on whatever the parent paints — which the component cannot know. A gradient
+  would have nowhere to take that colour from; a mask fades the content regardless of what is behind
+  it.
+
+  The fade width is the `--gr-tabs-scroll-fade` hook (`1.5rem` by default). The same value is the
+  row's `scroll-padding`, so a tab pulled into view by keyboard navigation never comes to rest under
+  the fade and its focus ring stays readable.
+
+  The keyboard contract is untouched: tabs were always reachable, and `scrollIntoView` on focus and
+  on external `modelValue` changes already worked. A vertical row does not scroll and has no fade.
+
+
 - **`GrTimeline` now shrinks in a narrow column instead of pushing itself out of it.** Every row is
   a grid whose flexible tracks were declared as a bare `1fr`. That is `minmax(auto, 1fr)`, and the
   minimum of such a track is the largest minimum contribution of its items — which, for a grid item

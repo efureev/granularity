@@ -45,4 +45,11 @@ export const grTabsExamples: ShowcaseComponentExampleDoc[] = [
     status: 'ready',
     previewKey: 'gr-tabs-sizes',
   },
+  {
+    id: 'tabs-overflow',
+    title: 'Ряд не влезает',
+    description: 'Полоса прокрутки скрыта, поэтому продолжение выдаёт затухание у того края, за которым ещё есть вкладки. Маской, а не градиентом: фон полосы у `line` компоненту неизвестен.',
+    status: 'ready',
+    previewKey: 'gr-tabs-overflow',
+  },
 ]

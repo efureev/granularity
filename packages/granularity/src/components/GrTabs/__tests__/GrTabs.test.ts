@@ -279,6 +279,21 @@ describe('GrTabs — вид и содержимое вкладки', () => {
     expect(list.classes()).not.toContain('overflow-x-auto')
   })
 
+  /**
+   * Затухание рисует CSS по этому атрибуту, поэтому проверяется он, а не вид:
+   * в jsdom раскладки нет, все размеры нули — состояние там всегда `none`.
+   * Само вычисление проверено отдельно, в `shared/__tests__/scrollOverflow`.
+   */
+  it('горизонтальный ряд объявляет переполнение, вертикальный — нет', async () => {
+    const horizontal = mount(GrTabs, { props: baseProps })
+    await nextTick()
+    expect(horizontal.get('[role="tablist"]').attributes('data-overflow')).toBe('none')
+
+    const vertical = mount(GrTabs, { props: { ...baseProps, orientation: 'vertical' } })
+    await nextTick()
+    expect(vertical.get('[role="tablist"]').attributes('data-overflow')).toBeUndefined()
+  })
+
   it('смена активной вкладки подтягивает её в видимую часть ряда', async () => {
     const wrapper = mount(GrTabs, { props: baseProps, attachTo: document.body })
     const scrolled: unknown[] = []

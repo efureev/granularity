@@ -86,7 +86,7 @@ describe('component docs metadata', () => {
     expect(paginationDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(paginationDoc.examples.every(example => example.previewKey?.startsWith('gr-pagination'))).toBe(true)
 
-    expect(tabsDoc.examples).toHaveLength(6)
+    expect(tabsDoc.examples).toHaveLength(7)
     expect(tabsDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(tabsDoc.examples.every(example => example.previewKey?.startsWith('gr-tabs'))).toBe(true)
 

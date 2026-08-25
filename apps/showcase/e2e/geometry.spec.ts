@@ -317,3 +317,44 @@ test.describe('лента в узкой колонке', () => {
   })
 })
 
+/**
+ * Ряд вкладок, который не влезает.
+ *
+ * Полоса прокрутки у ряда скрыта намеренно, поэтому продолжение за краем не
+ * выдаёт себя ничем: вкладки достижимы стрелками, но догадаться, что они там
+ * есть, нечем. Признак — затухание маской у того края, за которым ещё есть
+ * вкладки. Ни состояние, ни маска в jsdom не существуют: размеры там нули.
+ */
+test.describe('ряд вкладок за краем', () => {
+  test('гаснет тот край, за которым есть продолжение', async ({ page }) => {
+    await page.goto(componentPath('GrTabs'))
+    await page.locator('#live-examples').waitFor()
+
+    // Демо стартует на самой узкой ступени — переключать ничего не нужно.
+    const tablist = page.locator('[data-demo-tabs-box] [role="tablist"]')
+    await expect(tablist).toBeVisible()
+
+    // В начале ряда продолжение только справа.
+    await expect(tablist).toHaveAttribute('data-overflow', 'end')
+
+    // И оно именно нарисовано, а не только записано в атрибут.
+    const masked = await tablist.evaluate(el => getComputedStyle(el).maskImage)
+    expect(masked).not.toBe('none')
+    expect(masked).toContain('gradient')
+
+    async function scrollTo(ratio: number): Promise<void> {
+      await tablist.evaluate((el, value) => {
+        el.scrollLeft = (el.scrollWidth - el.clientWidth) * value
+      }, ratio)
+    }
+
+    await scrollTo(0.5)
+    await expect(tablist).toHaveAttribute('data-overflow', 'both')
+
+    await scrollTo(1)
+    await expect(tablist).toHaveAttribute('data-overflow', 'start')
+
+    await scrollTo(0)
+    await expect(tablist).toHaveAttribute('data-overflow', 'end')
+  })
+})
