@@ -7,6 +7,8 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.34.1] 2026-08-25
+
 ### Fixed
 
 - **An anchored panel is no longer taller than the space it has.** `flip` moves a panel to the
