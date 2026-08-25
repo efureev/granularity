@@ -49,121 +49,125 @@ to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
-- **`GrDropdown` перестроен поверх `GrPopover`.** Он был второй реализацией того же примитива:
-  панель, слой, портал, позиционирование, наведение с задержками и возврат фокуса дублировали
-  поповер, а карта `transform-origin` совпадала с его картой дословно все двенадцать записей.
-  Расходились бы молча — разница в одной фазе или одном токене видна только рядом с эталоном.
+- **`GrDropdown` rebuilt on top of `GrPopover`.** It was a second implementation of the same
+  primitive: the panel, the layer, the portal, positioning, hover with delays and focus return all
+  duplicated the popover, and its `transform-origin` map matched the popover's word for word across
+  all twelve entries. They would have drifted apart silently — a difference in one easing or one
+  token is visible only next to the original.
 
-  Меню оставило себе то, что меню и есть: кольцо фокуса по пунктам, поиск по буквам, клавиатуру
-  открытия и ширину панели. Тот же приём, что у `GrContextMenu`, который так устроен с самого
-  начала. Компонент похудел с 360 строк до 256.
+  The menu kept what makes it a menu: the focus ring across items, type-ahead, the keyboard for
+  opening, and panel width. Same approach as `GrContextMenu`, which has been built that way from the
+  start. The component went from 360 lines down to 256.
 
-  **Публичный API не изменился:** те же пропы, события, слоты и `defineExpose`. Одно расхождение
-  сохранено намеренно — триггер меню объявляется `aria-disabled`, а не нативным `disabled`:
-  нативный убирает кнопку из таб-порядка, а у меню триггер обязан оставаться фокусируемым. Для
-  форм-контрола (`GrColorPicker`) верно обратное, поэтому примитив оставляет нативный, а меню его
-  перекрывает.
+  **The public API did not change:** same props, events, slots and `defineExpose`. One divergence is
+  kept deliberately — the menu trigger declares `aria-disabled` rather than native `disabled`: the
+  native one removes the button from tab order, and a menu trigger must stay focusable. For a form
+  control (`GrColorPicker`) the opposite is true, so the primitive keeps the native one and the menu
+  overrides it.
 
-  Внутренняя разметка стала на уровень глубже: `v-show`, `role="menu"` и позиционирование теперь на
-  панели `GrPopover`, а `[data-gr-dropdown-panel]` — контейнер пунктов внутри неё, несущий ширину и
-  клавиатуру. Визуально ничего не изменилось: 144 эталона зелёные без пересъёмки.
+  The internal markup gained one level: `v-show`, `role="menu"` and positioning now live on the
+  `GrPopover` panel, and `[data-gr-dropdown-panel]` is the item container inside it, carrying width
+  and the keyboard. Nothing changed visually: 144 baselines green without re-shooting.
 
-- **`GrPopover`: клик триггера переехал из обёртки слота в `triggerProps`.** Обёртка ловила любой
-  клик внутри `#trigger` — в том числе по вложенной кнопке, ссылке в карточке-триггере или крестику
-  на чипе: панель открывалась мимо намерения пользователя. Проверено монтированием — слот с двумя
-  кнопками, `triggerProps` на первой, клик по **второй** открывал панель. `GrDropdown` эту ошибку
-  не повторял с самого начала, и в его коде записано, почему.
+- **`GrPopover`: the trigger click moved from the slot wrapper into `triggerProps`.** The wrapper
+  caught any click inside `#trigger` — including one on a nested button, a link in a card trigger, or
+  the dismiss cross on a chip: the panel opened against the user's intent. Verified by mounting — a
+  slot with two buttons, `triggerProps` on the first, and a click on the **second** opened the panel.
+  `GrDropdown` never made this mistake, and its code records why.
 
-  **Совместимость сохранена.** Слот без `v-bind="triggerProps"` до сих пор открывался кликом по
-  обёртке, и молча отнять это нельзя: обёртка срабатывает ровно тогда, когда привязанного триггера
-  внутри нет. Определяется по `aria-expanded`, который `triggerProps` ставят всегда, при любой
-  роли, — и проверяется в момент клика, а не при монтировании, потому что содержимое слота
-  реактивно. Такой триггер теперь предупреждает о себе в dev-сборке: клик у него есть, а клавиатуры
-  и ARIA — нет.
+  **Compatibility is preserved.** A slot without `v-bind="triggerProps"` used to open on a click
+  anywhere in the wrapper, and taking that away silently is not an option: the wrapper now fires
+  exactly when there is no bound trigger inside. That is detected via `aria-expanded`, which
+  `triggerProps` always set whatever the role, and it is checked at click time rather than on mount,
+  because slot content is reactive. Such a trigger now warns about itself in dev builds: it has a
+  click, but no keyboard and no ARIA.
 
-- **Поверхность всплывающей панели и её `transform-origin` вынесены в общие модули.** Карта origin
-  жила копиями в `GrPopover` и `GrDropdown` — двенадцать записей, совпадавших дословно. Поверхность
-  панели — шесть утилит — была скопирована пять раз: у поповера, выпадающего меню и трёх списков
-  выбора. Расходились бы молча: разница в одном токене видна только рядом с эталоном, а эталоны у
-  компонентов свои.
+- **The popup panel surface and its `transform-origin` moved into shared modules.** The origin map
+  lived as copies in `GrPopover` and `GrDropdown` — twelve entries, identical word for word. The
+  panel surface — six utilities — had been copied five times: in the popover, the dropdown menu and
+  three select lists. They would have drifted apart silently: a difference in one token is visible
+  only next to the original, and each component had its own.
 
-  Заодно исправлен разъехавшийся контракт темы. Четыре компонента из пяти брали фоном `--gr-card`,
-  тогда как `--gr-popover` в `tokens/themes/*.json` описан как «фон popover-, dropdown- и
-  overlay-поверхностей» — то есть заведён ровно под этот случай. Значения совпадают в обеих темах,
-  поэтому разницы не было видно; увидел бы её первый, кто перекрасил бы `--gr-popover`, чтобы
-  отличать всплывающие поверхности от карточек. Теперь все пятеро на нём.
+  A theme contract that had come apart is fixed along the way. Four of the five took `--gr-card` as
+  their background, while `--gr-popover` is described in `tokens/themes/*.json` as "background of
+  popover, dropdown and overlay surfaces" — that is, introduced for exactly this case. The values
+  match in both themes, so the difference was invisible; the first person to recolour `--gr-popover`
+  in order to tell popup surfaces from cards would have seen it. All five are on it now.
 
-  Модулей два, а не один: списки выбора берут поверхность, но своей анимации роста не имеют, и
-  общий модуль затащил бы им в чанк восемь классов origin, которыми они не пользуются. Гейт
-  `safelist.test.ts` назвал их поимённо — и был прав.
+  There are two modules, not one: the select lists take the surface but have no growth animation of
+  their own, and a single module would have dragged eight origin classes they never use into their
+  chunk. The `safelist.test.ts` gate named them one by one — and it was right.
 
-  Визуальных изменений нет: 144 эталона зелёные без пересъёмки.
+  No visual changes: 144 baselines green without re-shooting.
 
-- **`GrPopover`: `trigger="hover"` с задержками `openDelay` и `closeDelay`.** Режим открытия
-  принадлежит примитиву — он уже владеет `trigger`, — а до сих пор наведение существовало только
-  внутри `GrDropdown`. Наведение слушает и панель, поэтому курсор, переехавший с триггера на неё
-  через зазор `offsetPx`, её не гасит. Клик в этом режиме продолжает работать: с клавиатуры и с
-  тачскрина наведения не бывает.
+- **`GrPopover`: `trigger="hover"` with `openDelay` and `closeDelay`.** The opening mode belongs to
+  the primitive — it already owns `trigger` — yet until now hover existed only inside `GrDropdown`.
+  The panel listens for hover as well, so a cursor moving from the trigger onto it across the
+  `offsetPx` gap does not dismiss it. Click keeps working in this mode: there is no hover from a
+  keyboard or a touchscreen.
 
-- **`GrColorPicker`: триггер занимает всю ширину поля, как остальные форм-контролы.** Его
-  `triggerBaseClass` всегда объявлял `w-full` — как `GrInput`, `GrSelect` и `GrNumberInput`, — но
-  обёртка триггера `GrPopover` это `inline-block`, обжимающий содержимое, и `w-full` резолвился
-  относительно неё. В `GrFormField` шириной 384px пикер рисовался на 113px рядом с полем ввода на
-  все 384px: код объявлял одно, страница показывала другое.
+- **`GrColorPicker`: the trigger takes the full width of the field, like every other form control.**
+  Its `triggerBaseClass` always declared `w-full` — like `GrInput`, `GrSelect` and `GrNumberInput` —
+  but the `GrPopover` trigger wrapper is an `inline-block` that shrinks to its content, and `w-full`
+  resolved against it. Inside a 384px `GrFormField` the picker rendered at 113px next to a text field
+  taking the full 384px: the code declared one thing and the page showed another.
 
-  У `GrPopover` появился проп `block` — обёртка растягивается на всю ширину родителя. Имя то же,
-  что у `GrButton` и `GrSegmented`. Панель пикера не изменилась, изменилась только ширина триггера;
-  визуальные эталоны пересняты.
+  `GrPopover` gained a `block` prop — the wrapper stretches to the full width of its parent. The name
+  is the same as in `GrButton` and `GrSegmented`. The picker panel did not change, only the trigger
+  width; visual baselines were re-shot.
 
-- **`GrContextMenu`: `minWidth` меню больше не может вылезти за панель.** Проп кладёт `min-width`
-  на список **внутри** панели, а панель по умолчанию ограничена `22rem` — два предела на одну
-  ширину, снаружи и изнутри, противоречащие друг другу по построению. Список не сжимается, а у
-  панели `overflow: visible`, поэтому `minWidth` крупнее потолка выносило содержимое поверх
-  скруглённого края. Замер на живой панели: `min-width: 500px` при потолке 352px даёт вылет в
-  161px.
+- **`GrContextMenu`: the menu's `minWidth` can no longer escape the panel.** The prop puts
+  `min-width` on the list **inside** the panel, while the panel is capped at `22rem` by default — two
+  limits on one width, outside and inside, contradicting each other by construction. The list does
+  not shrink, and the panel has `overflow: visible`, so a `minWidth` larger than the ceiling pushed
+  content out over the rounded edge. Measured on a live panel: `min-width: 500px` against a 352px
+  ceiling spills by 161px.
 
-  Внешний предел снят хуком `--gr-popover-max-width`: ширину меню определяет его собственный
-  `minWidth` и содержимое. Предел «не шире вьюпорта» остаётся. `contentClass` потребителя при этом
-  не теряется — он приезжает вместе с хуком.
+  The outer limit is lifted with the `--gr-popover-max-width` hook: the menu's width is decided by
+  its own `minWidth` and its content. The "no wider than the viewport" limit stays. The consumer's
+  `contentClass` is not lost in the process — it arrives together with the hook.
 
-  Видимого изменения нет: по умолчанию `minWidth` равен `11rem`, и потолок в 22rem никогда не
-  доставался. Проверено визуальной регрессией — 144 эталона в обеих темах зелёные.
+  Nothing visible changed: `minWidth` defaults to `11rem`, and the 22rem ceiling was never reached.
+  Verified by visual regression — 144 baselines green in both themes.
 
 ### Added
 
-- **`GrPopover`: потолок ширины стал хуком `--gr-popover-max-width`, ширина от триггера — пропом
-  `matchWidth`.** Примитив объявлен как «якорный оверлей с произвольным содержимым, а что внутри
-  панели — дело потребителя», и при этом сам решал за содержимое ширину: `max-width` в 22rem был
-  зашит в базовый класс панели. Управлять им снаружи было нечем — `contentClass` приезжает классом
-  равной специфичности, и победителя выбрал бы порядок правил в сгенерированном CSS.
+- **`GrPopover`: the width ceiling became the `--gr-popover-max-width` hook, and width from the
+  trigger became the `matchWidth` prop.** The primitive is declared as "an anchored overlay with
+  arbitrary content, and what goes inside the panel is the consumer's business" — while deciding the
+  content's width itself: a 22rem `max-width` was baked into the panel's base class. There was no way
+  to control it from outside — `contentClass` arrives as a class of equal specificity, and the winner
+  would have been decided by rule order in the generated CSS.
 
-  Ширина панели — две независимые оси, и раньше не было ни одной. Потолок содержимого стал
-  значением (`--gr-popover-max-width`, дефолт `22rem`), источник ширины — поведением
-  (`matchWidth: boolean | 'min'`, проброс в `useFloating`, где это уже было реализовано и чем уже
-  пользуются `GrSelect`, `GrAutocomplete` и `GrTreeSelect`). Сочетаются они, а не спорят: ширину
-  задаёт триггер, потолок её ограничивает.
+  Panel width is two independent axes, and previously there was not one. The content ceiling became a
+  value (`--gr-popover-max-width`, default `22rem`) and the source of width became behaviour
+  (`matchWidth: boolean | 'min'`, passed through to `useFloating`, where it was already implemented
+  and already used by `GrSelect`, `GrAutocomplete` and `GrTreeSelect`). They compose rather than
+  compete: the trigger sets the width, the ceiling caps it.
 
-  Потолок — хуком, а не пропом, по трём причинам: спор специфичности не возникает вовсе, потому
-  что кастомное свойство разрешается каскадом на самом элементе; потолок можно менять по
-  брейкпоинту и по теме, чего пропом не сделать; и словарь компонента не растёт. Так же устроена
-  высота списка у `GrCommandPalette`.
+  The ceiling is a hook rather than a prop for three reasons: no specificity argument arises at all,
+  because a custom property is resolved by the cascade on the element itself; the ceiling can be
+  changed per breakpoint and per theme, which a prop cannot do; and the component's vocabulary does
+  not grow. The list height in `GrCommandPalette` is built the same way.
 
-  Предел «не шире вьюпорта» при этом стал **неотключаемым по построению**: он стоит вторым
-  операндом `min()`, и снять его нельзя ничем, включая `--gr-popover-max-width: 100vw`. Раньше он
-  жил в одной утилите с потолком, и любой, кто перебил бы `max-width`, снёс бы заодно и его.
+  The "no wider than the viewport" limit became **non-negotiable by construction**: it stands as the
+  second operand of `min()` and cannot be removed by anything, including
+  `--gr-popover-max-width: 100vw`. It used to live in the same utility as the ceiling, so anyone
+  overriding `max-width` would have taken it out along the way.
 
-  Поведение по умолчанию не изменилось: без переопределений класс панели даёт тот же `22rem`.
+  Default behaviour did not change: with no overrides the panel class still yields the same `22rem`.
 
-  **Хук доставляется через `contentClass`, а не инлайновым стилем.** Панель телепортируется в
-  портал, поэтому обёртка триггера ей не предок: `<GrPopover style="--gr-popover-max-width: …">`
-  ляжет на обёртку и до панели не дойдёт — молча, без ошибки. Рабочая запись —
-  `content-class="[--gr-popover-max-width:100vw]"`; глобально (в теме, на `:root`) хук работает как
-  обычно, потому что портал лежит в `body`. Оба факта закреплены тестами.
+  **The hook is delivered through `contentClass`, not an inline style.** The panel is teleported into
+  the portal, so the trigger wrapper is not its ancestor:
+  `<GrPopover style="--gr-popover-max-width: …">` lands on the wrapper and never reaches the panel —
+  silently, without an error. The working form is
+  `content-class="[--gr-popover-max-width:100vw]"`; globally (in a theme, on `:root`) the hook works
+  as usual, because the portal lives in `body`. Both facts are locked down by tests.
 
-  Ещё одна неочевидность, которую стоит знать заранее: `matchWidth="min"` ставит **пол**, а не
-  ширину, и в CSS `min-width` сильнее `max-width` — триггер шире потолка перевесит потолок. Это
-  смысл режима, а не изъян; нужен именно потолок — `matchWidth` без `min`.
-
+  One more non-obvious point worth knowing up front: `matchWidth="min"` sets a **floor**, not a
+  width, and in CSS `min-width` beats `max-width` — a trigger wider than the ceiling will outweigh
+  the ceiling. That is the meaning of the mode, not a flaw; if you want a ceiling, use `matchWidth`
+  without `min`.
 
 ## [v0.33.0] 2026-08-25
 
