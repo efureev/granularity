@@ -37,6 +37,13 @@ export const grPopoverExamples: ShowcaseComponentExampleDoc[] = [
     previewKey: 'gr-popover-width',
   },
   {
+    id: 'popover-height',
+    title: 'Высота: потолок и доступное место',
+    description: 'Панель не выше, чем осталось до края экрана: слой пишет замер, панель сжимается со скроллом. Потолок содержимого — CSS-хук `--gr-popover-max-height`.',
+    status: 'ready',
+    previewKey: 'gr-popover-height',
+  },
+  {
     id: 'popover-trigger',
     title: 'Чем открывается и что считается триггером',
     description: 'Клик и наведение с задержками. Триггером считается элемент с `triggerProps`, а не весь слот: соседняя кнопка внутри слота панель не открывает.',
