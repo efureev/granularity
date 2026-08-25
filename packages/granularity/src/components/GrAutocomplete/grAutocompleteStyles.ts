@@ -1,4 +1,5 @@
 import type { GrComponentSize } from '../shared/sizes'
+import { overlayPanelSurfaceClass } from '../shared/overlayPanelSurface'
 
 export type GrAutocompleteSize = GrComponentSize
 /**
@@ -95,4 +96,4 @@ export const autocompleteStateClass = 'flex items-center justify-center gap-2 px
  * (card + бордер + shadow-2 + скругление). Держим локальную копию строки,
  * чтобы не тянуть зависимость от `GrSelect` (компоненты гранулярно независимы).
  */
-export const autocompletePanelClasses = 'rounded-[var(--gr-radius-xl)] border border-[var(--gr-brd)] bg-[var(--gr-card)] text-[var(--gr-card-fg)] shadow-[var(--gr-shadow-2)] overflow-hidden'
+export const autocompletePanelClasses = `${overlayPanelSurfaceClass} overflow-hidden`

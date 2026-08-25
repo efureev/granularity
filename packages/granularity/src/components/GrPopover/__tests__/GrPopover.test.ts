@@ -1,6 +1,6 @@
 import { mount } from '@vue/test-utils'
 import { nextTick } from 'vue'
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import GrPopover from '../GrPopover.vue'
 
@@ -26,6 +26,7 @@ function mountPopover(props: Record<string, unknown> = {}) {
 }
 
 afterEach(() => {
+  vi.restoreAllMocks()
   // Панель телепортируется в `body` и переживает размонтирование wrapper'а —
   // без уборки следующий тест нашёл бы чужую.
   mounted?.unmount()
@@ -34,6 +35,46 @@ afterEach(() => {
 })
 
 /** Панель живёт в `body` (телепорт), а не внутри wrapper'а. */
+/**
+ * `computePosition` асинхронен, и `autoUpdate` доводит позицию не в том же тике,
+ * в котором панель появилась: одних `nextTick` мало, нужен ещё макрозадачный шаг.
+ */
+async function waitFloating(): Promise<void> {
+  for (let i = 0; i < 10; i += 1) {
+    await nextTick()
+    await Promise.resolve()
+  }
+
+  await new Promise(resolve => setTimeout(resolve, 32))
+  await nextTick()
+}
+
+function rect(left: number, top: number, width: number, height: number): DOMRect {
+  return {
+    x: left,
+    y: top,
+    top,
+    right: left + width,
+    bottom: top + height,
+    left,
+    width,
+    height,
+    toJSON: () => ({}),
+  }
+}
+
+/** `computePosition` асинхронен: позиция появляется макрозадачей позже. */
+function flushFloatingUpdate(): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, 0))
+}
+
+/** Панель либо скрыта стилем, либо не отрисована вовсе. */
+function isClosed(): boolean {
+  const panel = panelEl()
+
+  return panel === null || panel.style.display === 'none'
+}
+
 function panelEl(): HTMLElement | null {
   return document.body.querySelector('[data-gr-popover-panel]')
 }
@@ -44,7 +85,15 @@ function isPanelVisible(): boolean {
   return el !== null && el.style.display !== 'none'
 }
 
-const trigger = (wrapper: ReturnType<typeof mountPopover>) => wrapper.find('[data-gr-popover-trigger]')
+/**
+ * Кнопка с привязанным `triggerProps`, а не обёртка вокруг неё.
+ *
+ * Клик триггера живёт в `triggerProps`, поэтому обёртка на него не реагирует,
+ * пока внутри есть привязанный элемент — иначе панель открывал бы любой клик по
+ * слоту, включая клик по вложенной кнопке. Пользователь нажимает кнопку, и тест
+ * обязан делать то же.
+ */
+const trigger = (wrapper: ReturnType<typeof mountPopover>) => wrapper.find('[data-gr-popover-trigger] button')
 
 /** Esc гасится стеком слоёв в capture-фазе на `window`. */
 async function pressEscape(): Promise<void> {
@@ -429,5 +478,303 @@ describe('GrPopover — поле панели', () => {
     const className = panelEl()?.className ?? ''
     expect(className).not.toContain('p-3')
     expect(className).toContain('text-[length:var(--gr-control-text-md)]')
+  })
+
+  /**
+   * Ширина панели — две независимые оси и один неотключаемый предел.
+   *
+   * Потолок содержимого — дефолт `22rem`, снимается хуком. Предел слоя —
+   * `calc(100vw-1rem)` — стоит вторым операндом `min()` и снаружи не
+   * отключается ничем: это и проверяется, потому что раньше он держался на
+   * честном слове вместе с потолком, в одной утилите.
+   */
+  describe('ширина панели', () => {
+    it('без переопределений потолок прежний — 22rem', async () => {
+      mountPopover({ open: true })
+      await nextTick()
+
+      expect(panelEl()?.className).toContain('max-w-[min(var(--gr-popover-max-width,22rem),calc(100vw-1rem))]')
+    })
+
+    it('предел вьюпорта стоит в той же утилите и снаружи не отключается', async () => {
+      mountPopover({ open: true })
+      await nextTick()
+
+      const width = [...(panelEl()?.classList ?? [])].find(cls => cls.startsWith('max-w-'))
+
+      // Хук — только первый операнд `min()`. Что бы ему ни присвоили снаружи,
+      // второй остаётся: панель не выйдет за вьюпорт даже при `100vw`.
+      expect(width).toContain('var(--gr-popover-max-width,22rem)')
+      expect(width).toContain('calc(100vw-1rem)')
+      expect(width?.startsWith('max-w-[min(')).toBe(true)
+    })
+
+    it('`matchWidth: min` доезжает до `useFloating`', async () => {
+      mountPopover({ open: true, matchWidth: 'min' })
+      await waitFloating()
+
+      // `size`-мидлвар в режиме `min` ставит `width: max-content` и `min-width`
+      // от триггера — по инлайновому стилю видно, что проп дошёл.
+      expect(panelEl()?.style.width).toBe('max-content')
+    })
+
+    it('по умолчанию ширина у триггера не берётся', async () => {
+      mountPopover({ open: true })
+      await waitFloating()
+
+      expect(panelEl()?.style.width).toBe('')
+    })
+
+    /**
+     * Панель живёт в портале, поэтому обёртка триггера ей не предок: хук,
+     * поставленный инлайновым стилем на компонент, до панели не доходит.
+     * Единственный путь — `contentClass`. Тест держит это поведение зафиксированным,
+     * потому что промах здесь молчаливый: стиль применился, эффекта нет.
+     */
+    it('хук доезжает до панели через `contentClass`', async () => {
+      mountPopover({ open: true, contentClass: '[--gr-popover-max-width:100vw]' })
+      await nextTick()
+
+      expect(panelEl()?.className).toContain('[--gr-popover-max-width:100vw]')
+    })
+
+    it('панель — не потомок обёртки триггера, и это причина предыдущего теста', async () => {
+      const wrapper = mountPopover({ open: true })
+      await nextTick()
+
+      expect(wrapper.element.contains(panelEl())).toBe(false)
+    })
+
+    /**
+     * `min` — это пол, а не источник ширины, и в CSS `min-width` сильнее
+     * `max-width`. Значит триггер шире потолка перевесит потолок — поведение
+     * верное, но неочевидное, поэтому зафиксировано тестом, а не только доком.
+     */
+    it('`matchWidth: min` ставит пол, а не ширину — он и перевесит потолок', async () => {
+      mountPopover({ open: true, matchWidth: 'min' })
+      await waitFloating()
+
+      expect(panelEl()?.style.width).toBe('max-content')
+      expect(panelEl()?.style.minWidth).not.toBe('')
+    })
+
+    it('`matchWidth: true` задаёт ширину, и её потолок срезает', async () => {
+      mountPopover({ open: true, matchWidth: true })
+      await waitFloating()
+
+      // Ширина ставится инлайново, потолок остаётся классом и срежет её при превышении.
+      expect(panelEl()?.style.width).not.toBe('max-content')
+      expect(panelEl()?.style.minWidth).toBe('')
+    })
+
+    it('`matchWidth` не трогает потолок: оси независимы', async () => {
+      mountPopover({ open: true, matchWidth: 'min' })
+      await waitFloating()
+
+      // Ширину задаёт мидлвар инлайновым стилем, потолок остаётся классом:
+      // «шириной с триггер, но не шире читаемого».
+      expect(panelEl()?.style.width).toBe('max-content')
+      expect(panelEl()?.className).toContain('max-w-[min(var(--gr-popover-max-width,22rem)')
+    })
+  })
+
+  /**
+   * Обёртка триггера — `inline-block`, и это верно для кнопки: панель встаёт у
+   * её края, а не у края колонки. Но форм-контрол объявляет себя `w-full`, и
+   * относительно обжатой обёртки это даёт ширину по содержимому: пикер цвета в
+   * поле формы шириной 384px рисовался на 113px рядом с полем ввода на все 384px.
+   */
+  describe('раскладка обёртки триггера', () => {
+    it('по умолчанию обжимает содержимое', async () => {
+      const wrapper = mountPopover()
+      await nextTick()
+
+      const trigger = wrapper.get('[data-gr-popover-trigger]')
+      expect(trigger.classes()).toContain('inline-block')
+      expect(trigger.classes()).not.toContain('w-full')
+    })
+
+    it('`block` растягивает её на всю ширину родителя', async () => {
+      const wrapper = mountPopover({ block: true })
+      await nextTick()
+
+      const trigger = wrapper.get('[data-gr-popover-trigger]')
+      expect(trigger.classes()).toContain('block')
+      expect(trigger.classes()).toContain('w-full')
+      expect(trigger.classes()).not.toContain('inline-block')
+    })
+  })
+
+  /**
+   * Наведение переехало сюда из `GrDropdown`: режим открытия принадлежит
+   * примитиву, он уже владеет `trigger`, и та же нужда есть у второго
+   * компонента. Задержки нужны обе — без `openDelay` панель выпрыгивает на
+   * любое пересечение курсором, без `closeDelay` её не удержать при переходе
+   * с триггера на панель через зазор `offsetPx`.
+   */
+  describe('открытие по наведению', () => {
+    it('без задержек открывается и закрывается сразу', async () => {
+      const wrapper = mountPopover({ trigger: 'hover', openDelay: 0, closeDelay: 0 })
+      const trigger = wrapper.get('[data-gr-popover-trigger]')
+
+      await trigger.trigger('mouseenter')
+      await nextTick()
+      expect(panelEl()?.style.display).not.toBe('none')
+
+      await trigger.trigger('mouseleave')
+      await nextTick()
+      expect(isClosed()).toBe(true)
+    })
+
+    it('клик в режиме наведения продолжает работать', async () => {
+      // С клавиатуры и с тачскрина наведения не бывает: панель, открываемая
+      // только курсором, для них не существует вовсе.
+      const wrapper = mountPopover({ trigger: 'hover', openDelay: 0 })
+      await trigger(wrapper).trigger('click')
+      await nextTick()
+
+      expect(panelEl()?.style.display).not.toBe('none')
+    })
+
+    it('в режиме клика наведение панель не открывает', async () => {
+      const wrapper = mountPopover({ trigger: 'click', openDelay: 0 })
+      await wrapper.get('[data-gr-popover-trigger]').trigger('mouseenter')
+      await nextTick()
+
+      expect(isClosed()).toBe(true)
+    })
+
+    it('`disabled` не открывается наведением', async () => {
+      const wrapper = mountPopover({ trigger: 'hover', openDelay: 0, disabled: true })
+      await wrapper.get('[data-gr-popover-trigger]').trigger('mouseenter')
+      await nextTick()
+
+      expect(isClosed()).toBe(true)
+    })
+  })
+
+  /**
+   * Клик триггера живёт в `triggerProps`, а не на обёртке слота.
+   *
+   * Обёртка ловит и клики по вложенным элементам: кнопка рядом с триггером,
+   * ссылка в карточке-триггере, крестик на чипе открывали бы панель мимо
+   * намерения пользователя. `GrDropdown` эту ошибку не повторял с самого начала.
+   *
+   * Обёртка при этом не онемела: слот без `v-bind="triggerProps"` до правки
+   * открывался кликом по ней, и молча отнять это у тех, кто на это опирался,
+   * нельзя. Она срабатывает ровно тогда, когда привязанного триггера внутри нет.
+   */
+  describe('клик по триггеру', () => {
+    const NESTED = `<template #trigger="{ triggerProps }">
+      <div><button v-bind="triggerProps" data-main>Открыть</button><button data-nested>Другое</button></div>
+    </template>`
+
+    function mountNested() {
+      mounted = mount(GrPopover, {
+        props: { ariaLabel: 'Панель' },
+        slots: { trigger: NESTED, content: CONTENT },
+        attachTo: document.body,
+      })
+
+      return mounted as ReturnType<typeof mountPopover>
+    }
+
+    it('вложенная кнопка панель не открывает', async () => {
+      const wrapper = mountNested()
+
+      await wrapper.get('[data-nested]').trigger('click')
+      await nextTick()
+
+      expect(isClosed()).toBe(true)
+    })
+
+    it('привязанный триггер — открывает', async () => {
+      const wrapper = mountNested()
+
+      await wrapper.get('[data-main]').trigger('click')
+      await nextTick()
+
+      expect(panelEl()?.style.display).not.toBe('none')
+    })
+
+    it('слот без `triggerProps` продолжает открываться кликом по обёртке', async () => {
+      // Совместимость: так делали до правки, и это не должно перестать работать.
+      mounted = mount(GrPopover, {
+        props: { ariaLabel: 'Панель' },
+        slots: { trigger: '<template #trigger><span data-bare>Открыть</span></template>', content: CONTENT },
+        attachTo: document.body,
+      })
+
+      await (mounted as ReturnType<typeof mountPopover>).get('[data-gr-popover-trigger]').trigger('click')
+      await nextTick()
+
+      expect(panelEl()?.style.display).not.toBe('none')
+    })
+
+    it('привязанный триггер гасит запасной путь: одного клика хватает на один переключ', async () => {
+      // Клик по кнопке всплывает и до обёртки. Сработай оба — панель открылась
+      // бы и тут же закрылась, а пользователь увидел бы, что «кнопка не жмётся».
+      const wrapper = mountNested()
+
+      await wrapper.get('[data-main]').trigger('click')
+      await nextTick()
+      expect(panelEl()?.style.display).not.toBe('none')
+
+      await wrapper.get('[data-main]').trigger('click')
+      await nextTick()
+      expect(isClosed()).toBe(true)
+    })
+  })
+
+  /**
+   * Геометрия панели относительно триггера.
+   *
+   * Проверки пришли из `GrDropdown`: пока он вёл собственное позиционирование,
+   * они жили у него, а после переезда меню на этот примитив стали проверять его
+   * работу через обёртку. Здесь они на месте — и покрытие не потерялось.
+   */
+  describe('позиционирование относительно триггера', () => {
+    it('правый край панели совпадает с правым краем триггера при `bottom-end`', async () => {
+      vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function mocked(this: HTMLElement) {
+        const text = this.textContent ?? ''
+
+        // Панель без измеренной ширины (0) не сдвигается влево — привязка идёт
+        // по правому краю триггера, а не по вычисленной ширине панели.
+        return text.includes('Открыть') && !text.includes('Внутри')
+          ? rect(100, 20, 200, 32)
+          : rect(0, 0, 0, 0)
+      })
+
+      const wrapper = mountPopover({ placement: 'bottom-end' })
+      await trigger(wrapper).trigger('click')
+      await nextTick()
+      await flushFloatingUpdate()
+
+      const panel = panelEl()
+
+      expect(panel?.style.left).toBe('300px')
+      expect(panel?.style.top).toBe('60px')
+      expect(panel?.className).toContain('origin-top-right')
+    })
+
+    it('привязка идёт к триггеру, а не к растянутому layout-контейнеру', async () => {
+      const wrapper = mountPopover({ placement: 'bottom-end' })
+
+      const layoutContainer = wrapper.element as HTMLElement
+      const triggerWrapper = wrapper.get('[data-gr-popover-trigger]').element as HTMLElement
+
+      vi.spyOn(layoutContainer, 'getBoundingClientRect').mockImplementation(() => rect(0, 20, 900, 48))
+      vi.spyOn(triggerWrapper, 'getBoundingClientRect').mockImplementation(() => rect(24, 20, 240, 40))
+
+      await trigger(wrapper).trigger('click')
+      await nextTick()
+      await flushFloatingUpdate()
+
+      const panel = panelEl()
+
+      expect(panel?.style.left).toBe('264px')
+      expect(panel?.style.top).toBe('68px')
+      expect(panel?.className).toContain('origin-top-right')
+    })
   })
 })

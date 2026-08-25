@@ -21,7 +21,7 @@
  *   наружу, иначе немодальный слой запирает пользователя на странице, которая
  *   не заблокирована. Проп `modal` включает второй режим — см. ниже.
  */
-import { computed, nextTick, ref, useId, useSlots, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, useId, useSlots, watch } from 'vue'
 
 import { useControlledOpen } from '../../composables/internal/useControlledOpen'
 import { useModalOverlay } from '../../composables/internal/useModalOverlay'
@@ -63,10 +63,24 @@ export interface GrPopoverProps {
   /** `id` видимого заголовка внутри панели — альтернатива `ariaLabel`. */
   labelledBy?: string
   /**
-   * `manual` — открывать только программно (через `v-model:open`). Нужно для
-   * контекстного меню и подтверждений, где момент открытия решает потребитель.
+   * Чем открывается панель.
+   *
+   * `manual` — только программно (через `v-model:open`): нужно контекстному меню
+   * и подтверждениям, где момент открытия решает потребитель. `hover` — по
+   * наведению, с задержками из `openDelay` и `closeDelay`; клик и клавиатура в
+   * этом режиме продолжают работать.
    */
-  trigger?: 'click' | 'manual'
+  trigger?: 'click' | 'manual' | 'hover'
+  /**
+   * Задержка открытия по наведению, мс.
+   *
+   * Обе задержки нужны, и каждая по своей причине: без `openDelay` панель
+   * выпрыгивает на любое пересечение курсором, без `closeDelay` её не удержать
+   * при переходе с триггера на панель — между ними зазор `offsetPx`.
+   */
+  openDelay?: number
+  /** Задержка закрытия после ухода курсора, мс. */
+  closeDelay?: number
   closeOnEsc?: boolean
   closeOnClickOutside?: boolean
   /** Закрывать по клику внутри панели — удобно для меню, вредно для формы. */
@@ -97,6 +111,30 @@ export interface GrPopoverProps {
   anchor?: GrFloatingAnchorRect | null
   /** Поле панели. `none` — содержимое рисует своё (меню, список опций). */
   padding?: GrPopoverPadding
+  /**
+   * Брать ширину у триггера: `true` — точно его ширина, `'min'` — не уже его,
+   * дальше по содержимому. Панель у поля или у широкой кнопки, оказавшаяся уже
+   * своего триггера, читается как ошибка вёрстки.
+   *
+   * С потолком `--gr-popover-max-width` сочетается, а не спорит: ширину задаёт
+   * триггер, потолок её ограничивает — «шириной с триггер, но не шире
+   * читаемого». Поэтому это отдельный проп, а не значение одного перечисления
+   * вместе с потолком: оси независимы, и сочетание осмысленно.
+   */
+  matchWidth?: boolean | 'min'
+  /**
+   * Обёртка триггера занимает всю ширину родителя вместо того, чтобы обжимать
+   * содержимое.
+   *
+   * Нужно форм-контролам: обёртка `inline-block` схлопывается по содержимому, и
+   * `w-full` у самого триггера начинает резолвиться относительно неё, а не
+   * относительно поля. Контрол, объявивший себя во всю ширину, рисуется по
+   * содержимому — рядом с полем ввода это читается как сбитая вёрстка.
+   *
+   * Имя то же, что у `GrButton` и `GrSegmented`: в ядре это устоявшееся слово
+   * для «во всю ширину».
+   */
+  block?: boolean
 }
 
 export interface GrPopoverEmits {
@@ -113,6 +151,8 @@ const props = withDefaults(defineProps<GrPopoverProps>(), {
   ariaLabel: undefined,
   labelledBy: undefined,
   trigger: 'click',
+  openDelay: 120,
+  closeDelay: 160,
   closeOnEsc: true,
   closeOnClickOutside: true,
   closeOnContentClick: false,
@@ -122,6 +162,8 @@ const props = withDefaults(defineProps<GrPopoverProps>(), {
   disabled: false,
   anchor: undefined,
   padding: 'default',
+  matchWidth: false,
+  block: false,
 })
 
 const emit = defineEmits<GrPopoverEmits>()
@@ -141,13 +183,20 @@ const panelId = useId()
 
 const clickOutsideExclude = [() => panelEl.value]
 
+let hoverTimer: ReturnType<typeof setTimeout> | undefined
+
 function open(): void {
   if (props.disabled)
     return
+
+  // Явное действие отменяет отложенное наведение: иначе таймер, заведённый
+  // курсором, догонит и закроет панель, открытую кликом.
+  clearTimeout(hoverTimer)
   setOpen(true)
 }
 
 function close(): void {
+  clearTimeout(hoverTimer)
   setOpen(false)
 }
 
@@ -176,6 +225,7 @@ const { floatingStyle, resolvedPlacement, update: updateFloatingPosition } = use
     // немодальных оверлеев и обязаны лежать на одной высоте, иначе начнут
     // перекрывать друг друга в зависимости от порядка открытия.
     zIndexVar: '--gr-z-dropdown',
+    matchWidth: () => props.matchWidth,
   },
 )
 
@@ -228,8 +278,12 @@ const HASPOPUP_ROLES = ['dialog', 'menu', 'listbox', 'grid'] as const
 
 /**
  * Пропсы для реального фокусируемого триггера: `<button v-bind="triggerProps">`.
- * Клик вешается на обёртку, а ARIA — сюда, потому что `aria-expanded` обязан
- * жить на самом интерактивном элементе, а не на `div` вокруг него.
+ *
+ * Здесь и ARIA, и **клик**. ARIA — потому что `aria-expanded` обязан жить на том
+ * узле, который получает фокус, а не на `div` вокруг него. Клик — потому что
+ * обёртка ловит и клики по вложенным элементам: кнопка «Ещё» рядом с триггером,
+ * ссылка в карточке-триггере, крестик на чипе открывали бы панель мимо намерения
+ * пользователя. То же решение и по той же причине — в `GrDropdown`.
  */
 const triggerProps = computed(() => ({
   // `aria-haspopup` принимает не любую роль: `group` в его списке нет, и
@@ -241,12 +295,92 @@ const triggerProps = computed(() => ({
   'aria-expanded': isOpen.value,
   'aria-controls': isOpen.value ? panelId : undefined,
   'disabled': props.disabled || undefined,
+  'onClick': onTriggerClick,
 }))
 
 function onTriggerClick(): void {
-  if (props.trigger === 'click')
+  // `hover` не отменяет клика: с клавиатуры и с тачскрина наведения не бывает,
+  // и панель, открываемая только курсором, для них не существует вовсе.
+  if (props.trigger === 'click' || props.trigger === 'hover')
     toggle()
 }
+
+/** Привязан ли `triggerProps`: `aria-expanded` он ставит всегда, при любой роли. */
+function hasBoundTrigger(): boolean {
+  return rootEl.value?.querySelector('[aria-expanded]') != null
+}
+
+/**
+ * Клик по обёртке — совместимость, а не механизм.
+ *
+ * Клик триггера живёт в `triggerProps`. Но слот, оставленный без
+ * `v-bind="triggerProps"`, до этой правки открывался кликом по обёртке, и молча
+ * отнимать это у тех, кто на это опирался, нельзя. Поэтому обёртка срабатывает
+ * ровно тогда, когда привязанного триггера внутри нет.
+ *
+ * Проверка на месте клика, а не при монтировании: содержимое слота реактивно, и
+ * триггер может появиться позже. `querySelector` по одному узлу на клик дешевле
+ * подписки на мутации.
+ */
+function onWrapperClick(): void {
+  if (hasBoundTrigger())
+    return
+
+  onTriggerClick()
+}
+
+/**
+ * Открытие по наведению.
+ *
+ * Таймер один на обе стороны и сбрасывается при каждом событии: курсор,
+ * прошедший триггер насквозь, не должен оставить за собой отложенное открытие.
+ * Нулевая задержка выполняется сразу, а не через `setTimeout(0)`, — иначе
+ * открытие уезжало бы на следующий тик и ломало тесты, которые ждут синхронности.
+ */
+function scheduleHover(next: boolean, delayMs: number): void {
+  clearTimeout(hoverTimer)
+
+  if (delayMs <= 0) {
+    setOpen(next)
+    return
+  }
+
+  hoverTimer = setTimeout(setOpen, delayMs, next)
+}
+
+function onHoverEnter(): void {
+  if (props.disabled || props.trigger !== 'hover')
+    return
+
+  scheduleHover(true, props.openDelay)
+}
+
+function onHoverLeave(): void {
+  if (props.trigger !== 'hover')
+    return
+
+  scheduleHover(false, props.closeDelay)
+}
+
+// Триггер без `v-bind="triggerProps"` работает по совместимости, но остаётся без
+// клавиатуры и без ARIA: панель для скринридера не объявлена, и с `Tab` до неё не
+// добраться. Молчать нельзя — снаружи это выглядит как «поповер почти работает».
+onMounted(() => {
+  if (!__GR_DEV__ || !hasTrigger.value || hasBoundTrigger())
+    return
+
+  console.warn(
+    '[GrPopover] триггер не привязан: добавьте `v-bind="triggerProps"` на элемент '
+    + 'внутри слота #trigger — <template #trigger="{ triggerProps }">'
+    + '<GrButton v-bind="triggerProps">…</GrButton></template>. '
+    + 'Клик по обёртке пока работает, но у триггера нет ни клавиатуры, ни '
+    + 'aria-haspopup/aria-expanded, а клик по вложенным элементам открывает панель.',
+  )
+})
+
+onBeforeUnmount(() => {
+  clearTimeout(hoverTimer)
+})
 
 function onContentClick(): void {
   if (props.closeOnContentClick)
@@ -283,8 +417,10 @@ defineSlots<{
       ref="rootEl"
       v-click-outside="{ handler: close, enabled: isOpen && closeOnClickOutside, exclude: clickOutsideExclude }"
       data-gr-popover-trigger
-      class="inline-block max-w-full"
-      @click="onTriggerClick"
+      :class="block ? 'block w-full' : 'inline-block max-w-full'"
+      @click="onWrapperClick"
+      @mouseenter="onHoverEnter"
+      @mouseleave="onHoverLeave"
     >
       <slot
         name="trigger"
@@ -320,6 +456,8 @@ defineSlots<{
           tabindex="-1"
           :class="panelClasses"
           :style="floatingStyle"
+          @mouseenter="onHoverEnter"
+          @mouseleave="onHoverLeave"
           @click="onContentClick"
         >
           <slot name="content" :close="close" />

@@ -1,5 +1,7 @@
 import type { Placement } from '@floating-ui/dom'
 
+import { overlayOriginClass } from '../shared/overlayOrigin'
+import { overlayPanelSurfaceClass } from '../shared/overlayPanelSurface'
 import type { GrComponentSize } from '../shared/sizes'
 
 export type GrPopoverSize = GrComponentSize
@@ -25,34 +27,25 @@ export const panelSizes: Record<GrPopoverSize, string> = {
 }
 
 /**
- * `transform-origin` для scale-анимации: координаты панели уже посчитал
- * `useFloating`, здесь остаётся направление «роста» относительно триггера.
+ * Поверхность панели.
  *
- * Ключ — `resolvedPlacement`, то есть положение **после** `flip`: если снизу не
- * хватило места и панель перевернуло вверх, origin переворачивается вместе с ней.
- */
-export const originClassByPlacement: Partial<Record<Placement, string>> = {
-  'bottom': 'origin-top',
-  'bottom-start': 'origin-top-left',
-  'bottom-end': 'origin-top-right',
-  'top': 'origin-bottom',
-  'top-start': 'origin-bottom-left',
-  'top-end': 'origin-bottom-right',
-  'left': 'origin-right',
-  'left-start': 'origin-top-right',
-  'left-end': 'origin-bottom-right',
-  'right': 'origin-left',
-  'right-start': 'origin-top-left',
-  'right-end': 'origin-bottom-left',
-}
-
-export function grPopoverOriginClass(placement: Placement): string {
-  return originClassByPlacement[placement] ?? 'origin-top'
-}
-
-/**
- * Поверхность панели. `max-w-[min(...)]` не даёт поповеру вылезти за узкий
- * экран: `useFloating` смещает панель в пределах viewport, но не сужает её.
+ * Ширина — `min()` из двух пределов, и они разной природы. Первый, `22rem`, —
+ * потолок содержимого: читаемая ширина колонки текста. Он **дефолт**, а не
+ * закон, и снимается хуком `--gr-popover-max-width` — примитив объявил, что
+ * содержимое панели дело потребителя, и навязывать ему форму не вправе.
+ * Тулбар, палитра и сетка шире прозы законно.
+ *
+ * Второй, `calc(100vw-1rem)`, — инвариант слоя: `useFloating` смещает панель в
+ * пределах вьюпорта, но не сужает её. Он не настраивается ничем и снаружи не
+ * отключается, потому что стоит вторым операндом `min()`: даже
+ * `--gr-popover-max-width: 100vw` его не снимает, а лишь уступает ему место.
+ *
+ * Хуком, а не пропом, — по трём причинам. Спор специфичности не возникает
+ * вовсе: кастомное свойство разрешается каскадом на самом элементе, а не
+ * порядком правил в сгенерированном CSS (та же ловушка, что описана у
+ * `panelSizesFlush`). Потолок можно менять по брейкпоинту и по теме — пропом
+ * этого не сделать. И словарь компонента не растёт: значение остаётся
+ * значением. Так же устроена высота списка у `GrCommandPalette`.
  */
 /**
  * Кегль без поля.
@@ -68,7 +61,7 @@ export const panelSizesFlush: Record<GrPopoverSize, string> = {
   lg: 'text-[length:var(--gr-control-text-lg)] leading-[var(--gr-leading-base)]',
 }
 
-export const popoverPanelBaseClass = 'rounded-[var(--gr-radius-xl)] border border-[var(--gr-brd)] bg-[var(--gr-popover)] text-[var(--gr-popover-fg)] shadow-[var(--gr-shadow-2)] max-w-[min(22rem,calc(100vw-1rem))] focus:outline-none'
+export const popoverPanelBaseClass = `${overlayPanelSurfaceClass} max-w-[min(var(--gr-popover-max-width,22rem),calc(100vw-1rem))] focus:outline-none`
 
 export function grPopoverPanelClass(
   size: GrPopoverSize,
@@ -79,7 +72,7 @@ export function grPopoverPanelClass(
   return [
     popoverPanelBaseClass,
     padding === 'none' ? panelSizesFlush[size] : panelSizes[size],
-    grPopoverOriginClass(placement),
+    overlayOriginClass(placement),
     extra ?? '',
   ].filter(Boolean).join(' ')
 }

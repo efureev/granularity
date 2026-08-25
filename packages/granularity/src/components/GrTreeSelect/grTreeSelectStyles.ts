@@ -1,4 +1,5 @@
 import type { GrControlState } from '../shared/sizes'
+import { overlayPanelSurfaceClass } from '../shared/overlayPanelSurface'
 
 import type { GrInputSize } from '../GrInput'
 
@@ -61,7 +62,7 @@ export function grTreeSelectClass(options: {
   ].join(' ')
 }
 
-export const grTreeSelectPanelClass = 'rounded-[var(--gr-radius-xl)] border border-[var(--gr-brd)] bg-[var(--gr-card)] text-[var(--gr-card-fg)] shadow-[var(--gr-shadow-2)] overflow-hidden'
+export const grTreeSelectPanelClass = `${overlayPanelSurfaceClass} overflow-hidden`
 
 /**
  * Строка состояния панели: загрузка и «нет данных». По центру и с двойным

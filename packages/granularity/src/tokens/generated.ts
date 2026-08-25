@@ -2728,6 +2728,13 @@ export const grComponentTokens: GrComponentToken[] = [
     "description": "Высота шапки. Ею же считается отступ содержимого под прилипшей шапкой."
   },
   {
+    "owner": "GrPopover",
+    "name": "--gr-popover-max-width",
+    "kind": "hook",
+    "default": "22rem",
+    "description": "Потолок ширины панели. Содержимое шире прозы — тулбар, палитра, сетка — снимает потолок значением `100vw`. Шире вьюпорта панель не станет и тогда: этот предел — второй операнд `min()` и снаружи не отключается."
+  },
+  {
     "owner": "GrProgressBar",
     "name": "--gr-progress-bg",
     "kind": "theme",

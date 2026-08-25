@@ -1,4 +1,5 @@
 import type { GrComponentSize, GrControlState } from '../shared/sizes'
+import { overlayPanelSurfaceClass } from '../shared/overlayPanelSurface'
 
 export type GrSelectView = 'default' | 'link'
 export type GrSelectSize = GrComponentSize
@@ -244,7 +245,7 @@ export function grSelectTriggerClass(options: {
   ].join(' ')
 }
 
-export const grSelectPanelClasses = 'rounded-[var(--gr-radius-xl)] border border-[var(--gr-brd)] bg-[var(--gr-card)] text-[var(--gr-card-fg)] shadow-[var(--gr-shadow-2)] overflow-hidden'
+export const grSelectPanelClasses = `${overlayPanelSurfaceClass} overflow-hidden`
 
 /** Общая подсветка наведения и активной опции панели. */
 const selectOptionHighlight = 'bg-[color-mix(in_srgb,var(--gr-muted)_30%,transparent)]'
