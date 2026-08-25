@@ -135,6 +135,11 @@ const closeClass = computed(() => grTabsCloseClass(resolvedSize.value))
 const closeIconClass = computed(() => tabCloseIconSizes[resolvedSize.value])
 const emptyClass = computed(() => grTabsEmptyClass(resolvedSize.value))
 
+/**
+ * Пустой ряд — не пустой `tablist`: роль обязана владеть потомками `tab`,
+ * и текст внутри неё был бы нарушением, а не пустым состоянием. Поэтому
+ * пустое состояние рисуется отдельной веткой, а не содержимым `tablist`.
+ */
 const isEmpty = computed(() => props.tabs.length === 0)
 const resolvedEmptyText = computed(() => props.emptyText ?? t('gr.tabs.empty', 'Nothing here yet'))
 const closeTitle = computed(() => t('gr.tabs.close', 'Close tab'))
@@ -332,10 +337,6 @@ function onClick(event: MouseEvent, tab: GrTab, index: number): void {
 </script>
 
 <template>
-  <!--
-    Пустой ряд — не пустой `tablist`: роль обязана владеть потомками `tab`,
-    и текст внутри неё был бы нарушением, а не пустым состоянием.
-  -->
   <div v-if="isEmpty" data-gr-tabs-empty :class="emptyClass">
     <slot name="empty">
       {{ resolvedEmptyText }}

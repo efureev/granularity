@@ -29,7 +29,6 @@ defineProps<{
 </script>
 
 <template>
-  <!-- Скрытый режим: `sr-only` на обёртке, а не на таблице — см. докблок выше. -->
   <div v-if="!visible" class="sr-only">
     <table data-gr-chart-table>
       <caption>{{ model.caption }}</caption>

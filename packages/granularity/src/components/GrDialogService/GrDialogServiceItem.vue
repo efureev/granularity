@@ -301,10 +301,15 @@ const sharedProps = computed(() => {
     confirmTone: o.confirmTone,
   }
 })
+
+/**
+ * `alert` рисуется тем же `GrConfirmDialog`, что и `confirm`, но без кнопки
+ * отмены: у сообщения нет второго исхода, и лишняя кнопка предлагала бы выбор,
+ * которого нет.
+ */
 </script>
 
 <template>
-  <!-- prompt -->
   <GrPromptDialog
     v-if="request.kind === 'prompt'"
     v-bind="sharedProps"
@@ -333,7 +338,6 @@ const sharedProps = computed(() => {
     @cancel="handleCancel"
   />
 
-  <!-- alert: confirm-диалог без кнопки Cancel -->
   <GrConfirmDialog
     v-else-if="request.kind === 'alert'"
     :model-value="open"
@@ -361,7 +365,6 @@ const sharedProps = computed(() => {
     </template>
   </GrConfirmDialog>
 
-  <!-- confirm -->
   <GrConfirmDialog
     v-else
     :model-value="open"
