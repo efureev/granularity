@@ -30,7 +30,6 @@
 | Нужно | Берите |
 | --- | --- |
 | Поле одно и правил нет | [`GrFormField`](./GrFormField.md) + [`GrInput`](./GrInput.md) |
-| Одно поле с кнопкой отправки | `XgQuickForm` из `@feugene/extra-granularity` |
 | Запросить одно значение окном | [`GrPromptDialog`](./GrPromptDialog.md) |
 | Только раскладка и подписи, проверка на сервере | [`GrFormField`](./GrFormField.md) |
 

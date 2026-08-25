@@ -40,7 +40,6 @@ const PACKAGES = [
   { dir: 'packages/granularity-editor', label: 'editor' },
   { dir: 'packages/granularity-forms-schema', label: 'forms-schema' },
   { dir: 'packages/granularity-media', label: 'media' },
-  { dir: 'packages/extra-granularity', label: 'extra' },
 ]
 
 class MapError extends Error {}

@@ -8,8 +8,7 @@ Companion-пакет уместен, когда компонент **не дол
 (так был устроен снятый `@feugene/granularity-datepicker` — обёртка над `@vuepic/vue-datepicker`),
 либо просто не относится к ядру: календарь и пикеры даты и времени вынесены в
 [`@feugene/granularity-chrono`](../../granularity-chrono/README.md) без единой внешней зависимости.
-Ещё вариант — композит бизнес-уровня
-([`@feugene/extra-granularity`](../../extra-granularity/README.md)). Ядро остаётся lean, а спутник
+Ещё вариант — композит бизнес-уровня поверх примитивов ядра. Ядро остаётся lean, а спутник
 имеет собственный релизный цикл и `peerDependency` на `@feugene/granularity`.
 
 > **Референс.** Рабочий пример, на который ссылается этот гайд, — `packages/granularity-chrono`.

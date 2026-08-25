@@ -3,7 +3,7 @@
 Ответ на вопрос «какой компонент взять под эту задачу» — по всем пакетам сразу:
 ядро `@feugene/granularity` и спутники `granularity-charts`, `granularity-chrono`,
 `granularity-dashboard`, `granularity-datasource`, `granularity-editor`,
-`granularity-forms-schema`, `granularity-media`, `extra-granularity`.
+`granularity-forms-schema` и `granularity-media`.
 
 Читается сверху вниз: **Развилки** ставят различающий вопрос и приводят к одному
 компоненту, **Решение — не компонент** ловит задачи, которые компонентом не
@@ -104,7 +104,6 @@
 | правила валидации, блокировка отправки, скролл к ошибке | [`GrForm`](../packages/granularity/docs/components/GrForm.md) |
 | смысловой блок полей с заголовком | [`GrFormSection`](../packages/granularity/docs/components/GrFormSection.md) |
 | дефолты, размер, локаль и тема на всё поддерево | [`GrConfigProvider`](../packages/granularity/docs/components/GrConfigProvider.md) |
-| готовая мини-форма из трёх примитивов | [`XgQuickForm`](../packages/extra-granularity/docs/components/XgQuickForm.md) |
 | поля описаны схемой бэкенда — zod, JSON Schema, OpenAPI | [`GrSchemaForm`](../packages/granularity-forms-schema/docs/components/GrSchemaForm.md) |
 
 Контролы про форму не знают: оркестрация подключается через `GrFormField` по
@@ -471,7 +470,6 @@
 | [`GrTreeSelect`](../packages/granularity/docs/components/GrTreeSelect.md) | ядро | варианты вложены |
 | [`GrValue`](../packages/granularity/docs/components/GrValue.md) | ядро | пишете свой компонент с величиной |
 | [`GrVideoPlayer`](../packages/granularity-media/docs/components/GrVideoPlayer.md) | media | ролик внутри страницы продукта |
-| [`XgQuickForm`](../packages/extra-granularity/docs/components/XgQuickForm.md) | extra | форма из одного поля |
 <!-- component-map:generated:end -->
 
 ## Чего в экосистеме нет

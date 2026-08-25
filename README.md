@@ -19,7 +19,7 @@ with components, styles, and a UnoCSS preset that supports granular subpath expo
 
 **Which component do I reach for?** [`docs/COMPONENT-MAP.md`](./docs/COMPONENT-MAP.md) answers that across
 every package at once: forks that ask the distinguishing question first, then an alphabetical
-index of all 85 components.
+index of every component across all packages.
 
 ## Requirements
 

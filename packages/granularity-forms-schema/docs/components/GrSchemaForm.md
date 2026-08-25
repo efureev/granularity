@@ -30,7 +30,6 @@
 | --- | --- |
 | Полей немного и они известны заранее | [`GrForm`](../../../granularity/docs/components/GrForm.md) |
 | Обвязка одного поля: подпись, ошибка, подсказка | [`GrFormField`](../../../granularity/docs/components/GrFormField.md) |
-| Одно поле с кнопкой отправки | `XgQuickForm` из `@feugene/extra-granularity` |
 | Запросить одно значение окном | [`GrPromptDialog`](../../../granularity/docs/components/GrPromptDialog.md) |
 | Конструктор форм перетаскиванием | ничего: это продукт, а не компонент |
 
