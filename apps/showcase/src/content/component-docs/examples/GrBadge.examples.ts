@@ -24,6 +24,14 @@ export const grBadgeExamples: ShowcaseComponentExampleDoc[] = [
     previewKey: 'gr-badge-size-radius',
   },
   {
+    id: 'badge-status-icon',
+    title: 'Status badge with a leading icon',
+    description: 'Слот `#icon` ставит значок перед подписью: спиннер у идущей работы, галочку у результата, крестик у ошибки. Размер иконки идёт за `size` бейджа, поэтому ряд статусов не разъезжается.',
+    status: 'ready',
+    previewKey: 'gr-badge-status-icon',
+    note: 'Спиннер — обычная иконка с `animate-spin`. `GrProgressCircle` в бейдж не кладут: его нижняя ступень равна 2rem и разносит плашку.',
+  },
+  {
     id: 'badge-toolbar-filters',
     title: 'Badges inside action toolbars',
     description: 'Компонент часто используется не сам по себе, а как secondary marker внутри toolbar/filter buttons. Этот сценарий показывает composition-паттерн.',

@@ -8,6 +8,8 @@ export type { GrBadgeRadius, GrBadgeSize, GrBadgeTone } from './grBadgeStyles'
 import { warnRenamedProp } from '../shared/renamedProp'
 
 import {
+  badgeIconClass,
+  badgeIconSizeClassBySize,
   grBadgeClass,
   type GrBadgeRadius,
   type GrBadgeSize,
@@ -52,9 +54,22 @@ const className = computed(() => {
   })
 })
 
+const iconSizeClass = computed(() => badgeIconSizeClassBySize[resolvedSize.value])
+
 defineSlots<{
   /** Содержимое метки. */
   default?: () => any
+  /**
+   * Иконка перед подписью: статус со спиннером, флаг, значок типа.
+   *
+   * Размер задаёт обёртка по ступени `size`, поэтому содержимое слота тянется
+   * до неё — `class="h-full w-full"`, как у `GrChip`. Вращение спиннера —
+   * `animate-spin` на самой иконке.
+   *
+   * `GrProgressCircle` сюда не кладут: у кругового индикатора шкала виджетная,
+   * нижняя ступень — `2rem`, и в строку бейджа он не помещается.
+   */
+  icon?: () => any
 }>()
 </script>
 
@@ -64,6 +79,13 @@ defineSlots<{
       :class="className"
   >
     <span class="gr-badge__label">
+      <span
+        v-if="$slots.icon"
+        data-gr-badge-icon
+        :class="[badgeIconClass, iconSizeClass]"
+      >
+        <slot name="icon" />
+      </span>
       <span class="gr-badge__text">
         <slot />
       </span>
@@ -83,10 +105,15 @@ defineSlots<{
  * Обрезка обязана жить на вложенном узле, а не на самом тексте: `text-box-trim`
  * уменьшает line-box, и повесь его прямо на текст — вместе с ним просядет
  * высота контента, а за ней и весь бейдж.
+ *
+ * `gap` задан в `em`, чтобы просвет перед иконкой шёл за кеглем ступени, а не
+ * за корневым размером. Бейджа без иконки он не касается: у flex-контейнера с
+ * единственным ребёнком просветов нет.
  */
 .gr-badge__label {
   display: flex;
   align-items: center;
+  gap: 0.25em;
   min-height: 1lh;
 }
 

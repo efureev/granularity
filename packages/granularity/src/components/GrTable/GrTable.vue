@@ -226,6 +226,13 @@ defineSlots<{
 </script>
 
 <template>
+  <!--
+    `relative` на скроллере — не для потомков с координатами, а чтобы он стал
+    containing block. Без него абсолютные потомки (`sr-only`-подсказка у кнопки
+    сортировки — единственный такой в самой таблице, но разметка ячеек чужая)
+    считают позицию от документа и выпадают из прокрутки наружу: на узком экране
+    широкая таблица начинает тащить вбок всю страницу, а не только себя.
+  -->
   <div
     ref="scrollEl"
     data-gr-table-scroll
@@ -233,7 +240,7 @@ defineSlots<{
     :aria-label="regionLabel"
     :aria-busy="loading ? 'true' : undefined"
     tabindex="0"
-    class="overflow-x-auto rounded-[var(--gr-radius-lg)] border border-[var(--gr-brd)] bg-[var(--gr-card)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]"
+    class="relative overflow-x-auto rounded-[var(--gr-radius-lg)] border border-[var(--gr-brd)] bg-[var(--gr-card)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]"
     :style="scrollStyle"
   >
     <table

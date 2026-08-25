@@ -124,6 +124,7 @@ export const demoPathByPreviewKey = {
   'gr-avatar-team-row': 'components/gr-avatar/GrAvatarTeamRowDemo.vue',
   'gr-badge-builder': 'components/gr-badge/GrBadgeBuilderDemo.vue',
   'gr-badge-size-radius': 'components/gr-badge/GrBadgeSizeRadiusDemo.vue',
+  'gr-badge-status-icon': 'components/gr-badge/GrBadgeStatusIconDemo.vue',
   'gr-badge-toolbar-filters': 'components/gr-badge/GrBadgeToolbarFiltersDemo.vue',
   'gr-badge-variant-scale': 'components/gr-badge/GrBadgeVariantScaleDemo.vue',
   'gr-badge-wrap-counter': 'components/gr-badge-wrap/GrBadgeWrapCounterDemo.vue',

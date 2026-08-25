@@ -48,4 +48,9 @@ yarn dev:showcase          # run the showcase locally
 
 ## License
 
-[Apache License 2.0](./LICENSE) © Evgeniy Fureev
+[Apache License 2.0 with an Additional Ethical Use Clause](./LICENSE) © Evgeniy Fureev
+
+The clause adds a use restriction on top of Apache-2.0, so this is a **source-available**
+license and not an OSI-approved open-source one. Every package therefore declares
+`"license": "SEE LICENSE IN LICENSE"` rather than an SPDX identifier. Read
+[`LICENSE`](./LICENSE) in full before adopting the packages.

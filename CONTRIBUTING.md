@@ -45,4 +45,7 @@ yarn install
 
 ## License
 
-By contributing code, you agree that it is released under the [Apache-2.0](./LICENSE) license.
+By contributing code, you agree that it is released under the terms of [`LICENSE`](./LICENSE) —
+Apache License 2.0 with an Additional Ethical Use Clause. The clause adds a use restriction on
+top of Apache-2.0, so the project is source-available rather than OSI-approved open source;
+it binds contributions exactly as it binds the rest of the code.

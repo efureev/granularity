@@ -143,6 +143,47 @@ describe('GrBadge — снятое имя пропа', () => {
     }
   })
 
+
+  describe('слот `icon`', () => {
+    it('без слота узла иконки нет', () => {
+      const wrapper = mount(GrBadge, { slots: { default: 'Готово' } })
+
+      expect(wrapper.find('[data-gr-badge-icon]').exists()).toBe(false)
+    })
+
+    it('рендерит иконку перед подписью', () => {
+      const wrapper = mount(GrBadge, {
+        slots: {
+          icon: '<svg data-testid="spinner" />',
+          default: 'На распознании',
+        },
+      })
+
+      const icon = wrapper.find('[data-gr-badge-icon]')
+
+      expect(icon.exists()).toBe(true)
+      expect(icon.find('[data-testid="spinner"]').exists()).toBe(true)
+      // Порядок узлов, а не только факт наличия: иконка стоит перед подписью.
+      expect(wrapper.find('.gr-badge__label').element.firstElementChild)
+        .toBe(icon.element)
+    })
+
+    it.each([
+      ['xs', 'h-3'],
+      ['sm', 'h-3.5'],
+      ['md', 'h-4'],
+      ['lg', 'h-4'],
+    ] as const)('size `%s` → размер иконки `%s`', (size, expected) => {
+      const wrapper = mount(GrBadge, {
+        props: { size },
+        slots: { icon: '<svg />', default: 'Метка' },
+      })
+
+      expect(wrapper.find('[data-gr-badge-icon]').classes()).toContain(expected)
+      expect(wrapper.find('[data-gr-badge-icon]').classes()).toContain('shrink-0')
+    })
+  })
+
   it('на `tone` не жалуется', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
 

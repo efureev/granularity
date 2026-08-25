@@ -7,6 +7,27 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- **`GrBadge` — slot `#icon`.** A status is rarely just a word: «processing»
+  without a spinner reads as a final state rather than as work in progress. The
+  badge had a single `default` slot, so the only way to get an icon in was to
+  hand-roll an `inline-flex` wrapper inside the label — and with nothing sizing
+  the icon, a `GrProgressCircle` dropped in there rendered at its smallest step,
+  `2rem`, inside an 18px line box: the arc escaped the pill and pushed the text
+  out of its own background. That is exactly what happened downstream, in
+  `@efureev/ft-extra-granularity`.
+
+  The slot follows `GrChip`, which already solved this: the wrapper carries the
+  size class for the step (`badgeIconSizeClassBySize`), and the slot content
+  stretches to it with `h-full w-full`. Sizes grow slower than the type scale —
+  at the lower steps an icon matched one-to-one with the text would stretch the
+  pill. The icon is a *sibling* of the trimmed label, not its content, so
+  `text-box-trim` never reaches it and the badge keeps its height.
+
+  A badge without the slot is unchanged: the `gap` added to the label is on a
+  flex container with a single child.
+
 ### Changed
 
 - **Peer range for `@feugene/fint-i18n` widened to `>=0.6.0 <1.0.0`.** On `0.x`

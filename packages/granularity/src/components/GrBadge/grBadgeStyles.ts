@@ -11,6 +11,24 @@ export const sizeClassBySize: Record<GrBadgeSize, string> = {
   md: 'px-3 py-1 text-[length:var(--gr-control-text-sm)] leading-[var(--gr-control-leading-sm)]',
   lg: 'px-3.5 py-1.5 text-[length:var(--gr-control-text-md)] leading-[var(--gr-control-leading-md)]',
 }
+/**
+ * Иконка перед подписью растёт медленнее кегля: на нижних ступенях плашка
+ * узкая, и иконка «один в один с текстом» разгоняла бы её по высоте.
+ *
+ * Своя карта, а не заимствованная у `GrChip`: у чипа фиксированная высота
+ * плитки и своя шкала кегля, и совпадение значений на средних ступенях —
+ * совпадение, а не общий контракт.
+ */
+export const badgeIconSizeClassBySize: Record<GrBadgeSize, string> = {
+  xs: 'h-3 w-3',
+  sm: 'h-3.5 w-3.5',
+  md: 'h-4 w-4',
+  lg: 'h-4 w-4',
+}
+
+/** Иконка не жмётся: подпись бейджа не переносится, сжиматься должно нечему. */
+export const badgeIconClass = 'shrink-0'
+
 export const semiRadiusClassBySize: Record<GrBadgeSize, string> = {
   xs: 'rounded-[var(--gr-badge-semi-radius-xs,3px)]',
   sm: 'rounded-[var(--gr-badge-semi-radius-sm,3px)]',

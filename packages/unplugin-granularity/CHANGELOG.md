@@ -7,6 +7,24 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+
+- **The package tarball now ships `LICENSE`.** The manifest has always declared
+  `"license": "SEE LICENSE IN LICENSE"`, and the file it points at was not there: `npm` adds
+  `LICENSE` to a tarball on its own, but only when the file exists in the package directory.
+  A consumer's compliance scanner reads a licence reference that resolves to nothing and flags
+  the dependency as unlicensed — a refusal on formal grounds, before anyone reads the terms.
+
+  The copy is byte-identical to the one at the repository root and is kept that way by
+  `yarn check:licenses`, a gate in CI: eleven copies of a 598-line file drift silently, and they
+  drift exactly when the licence text is being edited.
+
+- **The readme no longer calls the licence `Apache-2.0`.** It is Apache License 2.0 *plus* an
+  Additional Ethical Use Clause — a use restriction on top, which makes the licence
+  source-available rather than OSI-approved open source. The readme ships inside the tarball and
+  is what npm renders on the package page, so the claim was wrong in the one place a consumer is
+  most likely to read it.
+
 ## [v0.6.0] 2026-08-22
 
 Behaviour change: `importStyle` is now off by default.

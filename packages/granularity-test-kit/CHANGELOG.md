@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **The package tarball now ships `LICENSE`.** The manifest has always declared
+  `"license": "SEE LICENSE IN LICENSE"`, and the file it points at was not there: `npm` adds
+  `LICENSE` to a tarball on its own, but only when the file exists in the package directory.
+  A consumer's compliance scanner reads a licence reference that resolves to nothing and flags
+  the dependency as unlicensed — a refusal on formal grounds, before anyone reads the terms.
+
+  The copy is byte-identical to the one at the repository root and is kept that way by
+  `yarn check:licenses`, a gate in CI: eleven copies of a 598-line file drift silently, and they
+  drift exactly when the licence text is being edited.
+
 ## [v0.7.3] 2026-08-23
 
 ### Fixed

@@ -77,6 +77,15 @@ describe('GrTable', () => {
     expect(scrollNo.attributes('tabindex')).toBe('0')
   })
 
+  // `relative` держит абсолютных потомков внутри прокрутки. Без него
+  // `sr-only`-подсказка кнопки сортировки считает позицию от документа, вылезает
+  // за скроллер и на узком экране тащит вбок всю страницу, а не только таблицу.
+  it('скролл-контейнер — containing block для абсолютных потомков', () => {
+    const wrapper = mount(GrTable, { slots: { default: '<tr><td>x</td></tr>' } })
+
+    expect(wrapper.get('[data-gr-table-scroll]').classes()).toContain('relative')
+  })
+
   it('пробрасывает aria-label / aria-labelledby на <table>', () => {
     const wrapperLabel = mount(GrTable, {
       props: { ariaLabel: 'Users' },
