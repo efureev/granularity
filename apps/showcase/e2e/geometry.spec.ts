@@ -216,3 +216,62 @@ test.describe('подсветка строки дерева', () => {
   })
 })
 
+/**
+ * Панель не выше, чем есть места.
+ *
+ * `flip` переворачивает панель на другую сторону, `shift` двигает её вдоль края —
+ * но сжать её не может ни тот, ни другой. Панель выше вьюпорта после обоих
+ * остаётся выше вьюпорта, а слой позиционируется `fixed`, поэтому страница до её
+ * низа не доскроллит: содержимое просто недостижимо. Дефект чисто геометрический
+ * и виден только замером в живом браузере — в jsdom раскладки нет вовсе.
+ */
+test.describe('высота якорной панели', () => {
+  test('длинная панель у нижнего края сжимается со скроллом, а не уезжает за экран', async ({ page }) => {
+    await page.goto(componentPath('GrPopover'))
+    await page.locator('#live-examples').waitFor()
+
+    const trigger = page.getByRole('button', { name: /Открыть длинную панель/ })
+    await trigger.scrollIntoViewIfNeeded()
+
+    // Ставим триггер к нижнему краю: там, где места под панель заведомо мало.
+    await page.evaluate(() => {
+      const el = [...document.querySelectorAll('button')]
+        .find(b => b.textContent?.includes('Открыть длинную панель'))
+      const box = el!.getBoundingClientRect()
+      window.scrollBy(0, box.top - (window.innerHeight - box.height - 40))
+    })
+
+    await trigger.click()
+
+    // Панелей на странице столько же, сколько поповеров в примерах; свою
+    // находим по `aria-controls` триггера, как и в тесте выше.
+    const panelId = await trigger.getAttribute('aria-controls')
+    if (!panelId)
+      throw new Error('у триггера нет `aria-controls`')
+
+    const panel = page.locator(`#${panelId}`)
+    await expect(panel).toBeVisible()
+
+    const measured = await panel.evaluate((el) => {
+      const box = el.getBoundingClientRect()
+      return {
+        top: box.top,
+        bottom: box.bottom,
+        viewport: window.innerHeight,
+        overflow: el.scrollHeight - el.clientHeight,
+        available: el.style.getPropertyValue('--gr-floating-available-height'),
+      }
+    })
+
+    // Слой сообщил замер — без него потолок разрешился бы в фолбэк `100vh`.
+    expect(measured.available).toMatch(/^\d+px$/)
+
+    // Панель целиком на экране: это и есть то, чего не давали `flip` и `shift`.
+    expect(measured.top).toBeGreaterThanOrEqual(-1)
+    expect(measured.bottom).toBeLessThanOrEqual(measured.viewport + 1)
+
+    // И содержимое при этом не обрезано, а прокручивается: потолок без скролла
+    // прятал бы низ панели ровно так же, как раньше его прятал край экрана.
+    expect(measured.overflow).toBeGreaterThan(0)
+  })
+})

@@ -61,7 +61,26 @@ export const panelSizesFlush: Record<GrPopoverSize, string> = {
   lg: 'text-[length:var(--gr-control-text-lg)] leading-[var(--gr-leading-base)]',
 }
 
-export const popoverPanelBaseClass = `${overlayPanelSurfaceClass} max-w-[min(var(--gr-popover-max-width,22rem),calc(100vw-1rem))] focus:outline-none`
+/**
+ * Высота — тоже `min()` из двух пределов, но устроена иначе, чем ширина.
+ *
+ * Потолок ширины статичен: `calc(100vw-1rem)` не зависит от того, где стоит
+ * триггер. Потолок высоты статичным быть не может — доступное место есть
+ * расстояние до края вьюпорта на той стороне, куда панель встала, и меняется
+ * оно на каждом скролле. Поэтому второй операнд здесь — не константа, а замер
+ * слоя (`--gr-floating-available-height`, см. `useFloating`), и он пересчитан
+ * уже **после** `flip`: сторона окончательная.
+ *
+ * `overflow-y: auto` идёт с потолком одной строкой намеренно. Потолок без
+ * скролла не ограничивает, а обрезает: содержимое молча уходит под нижний край
+ * панели, и добраться до него нельзя ничем. Пока потолок не упёрся, полоса не
+ * рисуется, так что для коротких панелей не меняется ничего.
+ *
+ * Хук `--gr-popover-max-height` по умолчанию `100vh` — то есть «мнения нет»,
+ * и высоту диктует замер. Он же служит фолбэком, пока позиция не посчитана
+ * (первый кадр, SSR): панель не схлопывается в ноль, а просто не ограничена.
+ */
+export const popoverPanelBaseClass = `${overlayPanelSurfaceClass} max-w-[min(var(--gr-popover-max-width,22rem),calc(100vw-1rem))] max-h-[min(var(--gr-popover-max-height,100vh),var(--gr-floating-available-height,100vh))] overflow-y-auto focus:outline-none`
 
 export function grPopoverPanelClass(
   size: GrPopoverSize,

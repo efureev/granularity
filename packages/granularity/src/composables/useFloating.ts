@@ -8,6 +8,22 @@ import { floatingLayerZIndex } from './internal/overlayStack'
 export type UseFloatingPlacement = Placement
 
 /**
+ * Кастомное свойство, в которое слой пишет доступное место по вертикали —
+ * расстояние от панели до края вьюпорта на той стороне, куда её в итоге
+ * поставило.
+ *
+ * Свойство ставится на сам плавающий элемент при каждом пересчёте позиции, в
+ * том числе на скролле и ресайзе. Слой **сообщает замер, а не применяет его**:
+ * ограничивать ли себя этим числом и что при этом скроллить — решает панель,
+ * потому что скролл принадлежит её содержимому.
+ *
+ * Ширину так публиковать незачем: её потолок статичен (`calc(100vw - 1rem)`) и
+ * замера не требует. Высота статичной быть не может — доступное место зависит
+ * от того, где стоит триггер.
+ */
+export const floatingAvailableHeightVar = '--gr-floating-available-height'
+
+/**
  * Device pixel ratio плавающего элемента. Нужен, чтобы округлять координаты к сетке
  * физических пикселей (см. `roundByDPR`) — иначе субпиксельные `left/top` дают размытый
  * текст/границы панели на не-целочисленных позициях и HiDPI-экранах. Подход перенят у
@@ -181,26 +197,36 @@ export function useFloating(
     ]
 
     const matchWidth = resolveMatchWidth()
-    if (matchWidth) {
-      middleware.push(
-        sizeMiddleware({
-          apply({ rects, elements }) {
-            if (matchWidth === 'min') {
-              Object.assign(elements.floating.style, {
-                width: 'max-content',
-                minWidth: `${rects.reference.width}px`,
-              })
-              return
-            }
+    middleware.push(
+      sizeMiddleware({
+        padding: options.boundaryPadding ?? 8,
+        apply({ rects, elements, availableHeight }) {
+          // Сколько места осталось до края вьюпорта на той стороне, куда панель
+          // в итоге встала. Считается после `flip`, поэтому сторона уже
+          // окончательная. Слой только сообщает замер — решает панель.
+          elements.floating.style.setProperty(
+            floatingAvailableHeightVar,
+            `${Math.max(0, Math.round(availableHeight))}px`,
+          )
 
+          if (!matchWidth)
+            return
+
+          if (matchWidth === 'min') {
             Object.assign(elements.floating.style, {
-              width: `${rects.reference.width}px`,
-              minWidth: '',
+              width: 'max-content',
+              minWidth: `${rects.reference.width}px`,
             })
-          },
-        }),
-      )
-    }
+            return
+          }
+
+          Object.assign(elements.floating.style, {
+            width: `${rects.reference.width}px`,
+            minWidth: '',
+          })
+        },
+      }),
+    )
 
     const { x, y, placement } = await computePosition(reference, floating, {
       placement: resolveRequestedPlacement(),

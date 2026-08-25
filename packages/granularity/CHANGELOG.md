@@ -7,6 +7,44 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+
+- **An anchored panel is no longer taller than the space it has.** `flip` moves a panel to the
+  opposite side and `shift` slides it along the edge, but neither can shrink it: a panel taller than
+  the viewport stayed taller than the viewport, and because the layer is positioned `fixed`, the page
+  could not scroll to its bottom. A long `GrContextMenu` or `GrDropdown` opened near the bottom edge
+  slid upwards instead of compressing, and past a certain length its last items were simply
+  unreachable.
+
+  `useFloating` now runs the `size` middleware unconditionally and publishes the measurement on the
+  floating element as `--gr-floating-available-height` — the distance to the viewport edge on the
+  side the panel actually ended up on. It is computed after `flip`, so that side is final, and it is
+  refreshed with the position, on scroll and resize included.
+
+  The layer reports the measurement but does not apply it: what to constrain and what to scroll
+  belongs to the panel, because the scroll belongs to its content. `GrPopover` consumes it, which
+  covers everything built on top of it — `GrDropdown` and `GrContextMenu`.
+
+  Previously the middleware was installed only under `matchWidth`, so every panel that did not ask
+  for trigger-matched width got no measurement at all — that is, most of them.
+
+### Added
+
+- **`GrPopover`: a height ceiling as the `--gr-popover-max-height` hook.** It mirrors the width
+  ceiling, with one difference that is not cosmetic: the second operand of `min()` is not a constant
+  but the layer's measurement. `100vw` is known in advance; how much room sits below a trigger is
+  not.
+
+  The default is `100vh` — no opinion, the measurement decides. Set it when a panel must be *shorter*
+  than the available room. Like the width hook it is delivered through `contentClass`, because the
+  panel is teleported into the portal and an inline style would land on the trigger wrapper and
+  silently never reach it.
+
+  The ceiling ships together with `overflow-y: auto` on purpose: a ceiling without a scroll does not
+  constrain, it truncates — content slips under the panel's bottom edge with no way to reach it.
+  Until the ceiling binds there is no scrollbar, so nothing changes for short panels.
+
+
 ## [v0.34.0] 2026-08-25
 
 ### Fixed

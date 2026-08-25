@@ -3,7 +3,7 @@ import type { Ref } from 'vue'
 import { defineComponent, nextTick, ref, watchEffect } from 'vue'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { computePosition } from '@floating-ui/dom'
+import { computePosition, size as sizeMiddleware } from '@floating-ui/dom'
 
 import { pushOverlayLayer, removeOverlayLayer, resetOverlayStack } from '../internal/overlayStack'
 import type { GrFloatingAnchorRect } from '../useFloating'
@@ -351,5 +351,85 @@ describe('useFloating — виртуальный якорь', () => {
     expect(autoUpdateMock.mock.calls[1]?.[0]).toBe(anchorEl)
 
     wrapper.unmount()
+  })
+})
+
+/**
+ * Замер доступного места.
+ *
+ * `size`-мидлвар мокнут вместе со всем пакетом, поэтому его `apply` не вызывает
+ * никто — зовём руками. Это и есть контракт слоя в чистом виде: что он пишет,
+ * когда его позвали с таким-то замером.
+ */
+describe('useFloating — доступное место по вертикали', () => {
+  interface SizeApplyArgs {
+    rects: { reference: { width: number } }
+    elements: { floating: HTMLElement }
+    availableHeight: number
+  }
+
+  function lastSizeApply(): (args: SizeApplyArgs) => void {
+    const options = vi.mocked(sizeMiddleware).mock.calls.at(-1)?.[0] as
+      { apply?: (args: SizeApplyArgs) => void } | undefined
+
+    if (!options?.apply)
+      throw new Error('`size`-мидлвар не подключён')
+
+    return options.apply
+  }
+
+  function applyWith(availableHeight: number): HTMLElement {
+    const floating = document.createElement('div')
+    lastSizeApply()({
+      rects: { reference: { width: 120 } },
+      elements: { floating },
+      availableHeight,
+    })
+    return floating
+  }
+
+  beforeEach(() => {
+    vi.mocked(sizeMiddleware).mockClear()
+  })
+
+  async function openHarness(): Promise<void> {
+    const { open } = mountHarness()
+    open.value = true
+    await nextTick()
+    await nextTick()
+  }
+
+  /**
+   * Раньше мидлвар подключался только под `matchWidth`, и все, кому ширина по
+   * триггеру не нужна, замера не получали вовсе — то есть большинство панелей.
+   */
+  it('подключается и без `matchWidth`', async () => {
+    await openHarness()
+
+    expect(sizeMiddleware).toHaveBeenCalled()
+  })
+
+  it('пишет замер в кастомное свойство плавающего элемента', async () => {
+    await openHarness()
+
+    expect(applyWith(240).style.getPropertyValue('--gr-floating-available-height')).toBe('240px')
+  })
+
+  /**
+   * Панель у самого края вьюпорта может получить отрицательный остаток. В
+   * `max-height` он бы дал ноль высоты, поэтому режется здесь, а не в панели.
+   */
+  it('отрицательный остаток не проливается в панель', async () => {
+    await openHarness()
+
+    expect(applyWith(-12).style.getPropertyValue('--gr-floating-available-height')).toBe('0px')
+  })
+
+  it('без `matchWidth` ширину не трогает: оси независимы', async () => {
+    await openHarness()
+
+    const floating = applyWith(240)
+    expect(floating.style.width).toBe('')
+    expect(floating.style.minWidth).toBe('')
   })
 })
