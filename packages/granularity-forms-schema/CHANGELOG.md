@@ -7,7 +7,23 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.3.4] 2026-08-26
+
 ### Changed
+
+- **Перевод читается композаблом ядра `useGranularityTranslations`.** Свой резолвер
+  (`src/internal/i18n.ts`) удалён — он расходился с ядром по трём пунктам, и каждое
+  расхождение проявлялось молча:
+
+  - видел только инстанс `fint-i18n` по `Symbol.for('FintI18n')`, поэтому адаптер,
+    отданный приложением по `GRANULARITY_I18N_KEY`, оставался невидимым — приложение
+    на `vue-i18n` или `i18next` получало английский fallback;
+  - спрашивал «есть ли перевод» сравнением `t(key) === key` вместо `te()`, а это врёт
+    на словаре, где значение совпадает с ключом;
+  - не разэкранировал `{{`/`}}` во fallback и не подставлял `{name}`, когда параметры
+    не переданы.
+
+  Публичный API не менялся; `@feugene/granularity` у пакета и так обязательный peer.
 
 - **Peer range for `@feugene/fint-i18n` widened to `>=0.6.0 <1.0.0`.** On `0.x`
   versions a caret does not admit the next minor, so `^0.6.0` excluded `0.7.0` —
