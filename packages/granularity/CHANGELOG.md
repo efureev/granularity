@@ -7,6 +7,8 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.36.0] 2026-08-27
+
 ### Fixed
 
 - **`GrModal` swallowed clicks for 150 ms after closing.** While the leave animation played, the
