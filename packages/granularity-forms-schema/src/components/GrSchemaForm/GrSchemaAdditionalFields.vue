@@ -19,7 +19,7 @@ import GrButton from '@feugene/granularity/components/GrButton'
 import GrInput from '@feugene/granularity/components/GrInput'
 import { useAnnouncer } from '@feugene/granularity/composables/useAnnouncer'
 
-import { useTranslations } from '../../internal/i18n'
+import { useGranularityTranslations } from '@feugene/granularity/composables/useGranularityTranslations'
 import type { GrSchemaNode, GrSchemaObjectNode } from '../../model'
 import { createInitialItem, joinPath } from '../../model'
 
@@ -52,7 +52,7 @@ const props = withDefaults(defineProps<{
 })
 
 const form = useSchemaForm()
-const { t } = useTranslations()
+const { t } = useGranularityTranslations()
 const announcer = useAnnouncer()
 
 const rootEl = ref<HTMLElement | null>(null)

@@ -37,7 +37,7 @@ import type { GrUiColumns, GrUiSchema, GrUiSection } from '../../ui-schema'
 import { applyOrder, evaluateCondition, createConditionContext } from '../../ui-schema'
 import type { GrSchemaRuleCompilerOptions } from '../../validation'
 import { compileRules, includesTier } from '../../validation'
-import { useTranslations } from '../../internal/i18n'
+import { useGranularityTranslations } from '@feugene/granularity/composables/useGranularityTranslations'
 
 import { useGrComponentProp } from '@feugene/granularity/composables/useGrComponentConfig'
 
@@ -125,7 +125,7 @@ const props = withDefaults(defineProps<GrSchemaFormProps<TModel>>(), {
 
 const emit = defineEmits<GrSchemaFormEmits<TModel>>()
 
-const { t } = useTranslations()
+const { t } = useGranularityTranslations()
 const formRef = ref<GrFormInstance | null>(null)
 
 /** Разбор схемы: `schemaModel` сильнее — её могли разобрать заранее или на сервере. */

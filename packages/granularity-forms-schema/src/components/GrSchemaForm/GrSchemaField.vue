@@ -14,7 +14,7 @@ import { computed, ref } from 'vue'
 
 import GrFormField from '@feugene/granularity/components/GrFormField'
 
-import { useTranslations } from '../../internal/i18n'
+import { useGranularityTranslations } from '@feugene/granularity/composables/useGranularityTranslations'
 import type { GrSchemaNode } from '../../model'
 import type { GrSchemaRendererRegistry } from '../../renderers'
 import { coreRenderers, createSchemaRendererRegistry } from '../../renderers'
@@ -90,7 +90,7 @@ const props = withDefaults(defineProps<GrSchemaFieldProps>(), {
 const emit = defineEmits<GrSchemaFieldEmits>()
 
 const form = useSchemaForm()
-const { t } = useTranslations()
+const { t } = useGranularityTranslations()
 
 const fallbackRegistry = createSchemaRendererRegistry(coreRenderers)
 const registry = computed(() => props.renderers ?? form?.renderers.value ?? fallbackRegistry)
