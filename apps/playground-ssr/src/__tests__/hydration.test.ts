@@ -6,6 +6,7 @@ import { resolve } from 'node:path'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { createApp } from '../app'
+import Catalog from '../catalog/Catalog.vue'
 import ChartsPage from '../ChartsPage.vue'
 import DashboardPage from '../DashboardPage.vue'
 import EditorPage from '../EditorPage.vue'
@@ -39,6 +40,7 @@ const byPath = JSON.parse(
 ) as Record<string, SsrSnapshot>
 
 const snapshots = {
+  catalog: byPath['/']!,
   app: byPath['/app']!,
   teleport: byPath['/teleport']!,
   risky: byPath['/risky']!,
@@ -527,5 +529,23 @@ describe('гидрация companion-пакета editor', () => {
   /** Значение приходит с сервера, но как проп, а не как напечатанный HTML. */
   it('сохранённая разметка в серверный HTML не попадает', () => {
     expect(snapshots.editor.html).not.toContain('Текст, сохранённый ранее')
+  })
+})
+
+/**
+ * Каталог собран из компонентов пакета, а не из голой разметки, — значит и
+ * проверяться обязан как страница, а не как оглавление: сотня ссылок внутри
+ * `GrCard` это ещё и связка «карточка + значок» в одном дереве.
+ */
+describe('гидрация каталога', () => {
+  it('проходит без единого расхождения', async () => {
+    const problems = hydrationProblems(await hydrate(snapshots.catalog, { root: Catalog }))
+
+    expect(problems, problems.join('\n')).toEqual([])
+  })
+
+  it('серверный HTML содержит карточки пакетов и ссылки на компоненты', () => {
+    expect(snapshots.catalog.html).toMatch(/data-gr-card/)
+    expect(snapshots.catalog.html).toMatch(/href="\/c\/GrButton"/)
   })
 })
