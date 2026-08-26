@@ -7,6 +7,21 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.2.3] 2026-08-26
+
+### Fixed
+
+- **Словарь пакета экспортируется под своим именем.** Подпуть `./i18n` отдавал
+  `grChronoMessages` и `GrChronoLocale` — имена соседнего пакета. Докблок при этом
+  утверждал неймспейс `gr` и приводил ключ `gr.calendar.previousMonth`, тогда как блок
+  пакета — `grEditor`, а ключи выглядят как `grEditor.richText.toolbar`. Теперь экспорты
+  называются `grEditorMessages` и `GrEditorLocale`.
+
+  Корневой `index.ts` эти имена не реэкспортирует, поэтому смена задевает только прямой
+  импорт из `@feugene/granularity-editor/i18n`. Лоадеры локалей (`en`, `ru`, `es`) и
+  константа блока `GR_EDITOR_I18N_BLOCK` не менялись — приложения, подключающие словарь
+  штатным способом, правок не требуют.
+
 ## [v0.2.2] 2026-08-25
 
 ### Fixed
