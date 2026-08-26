@@ -1,9 +1,9 @@
 /**
  * Локали пакета в форме, которую понимает `fint-i18n`.
  *
- * Блок — свой (`grChrono`), а не `gr` ядра: чужой блок companion-пакету брать
+ * Блок — свой (`grEditor`), а не `gr` ядра: чужой блок companion-пакету брать
  * нельзя, иначе словари столкнутся на первом же совпавшем верхнем ключе. Ключи
- * компонентов выглядят как `grEditor.calendar.previousMonth`.
+ * компонентов выглядят как `grEditor.richText.toolbar`.
  *
  * ```ts
  * import { en, ru, GR_EDITOR_I18N_BLOCK } from '@feugene/granularity-editor/i18n'
