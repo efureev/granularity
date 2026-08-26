@@ -62,7 +62,7 @@
 `GrFormSection`, `GrIcon`, `GrInput`, `GrInputTag`, `GrKbd`, `GrLink`, `GrList`,
 `GrLoading`, `GrNavbar`, `GrNumberInput`, `GrPagination`, `GrProgressBar`,
 `GrPromptDialog`, `GrRadio`, `GrRadioGroup`, `GrRating`,
-`GrResponseErrorBanner`, `GrSidebar`, `GrSkeleton`, `GrStatistic`, `GrSwitch`,
+`GrResponseErrorBanner`, `GrSidebar`, `GrSkeleton`, `GrSwitch`,
 `GrTabPanels`, `GrTable`, `GrTabs`, `GrTextarea`, `GrTree`.
 
 `GrConfirmDialog`, `GrDialog` и `GrPromptDialog` попали сюда потому, что вся DOM-механика у них — в `GrModal`, на
@@ -166,8 +166,10 @@ CSS пакета статичен и на серверный рендер не �
 
 1. DOM — только в `onMounted`/`onBeforeUnmount` и обработчиках. Ни одного обращения в теле `setup` и на уровне модуля.
 2. Нужен `document`/`window` вне хука — гард `typeof window === 'undefined'`, а не `try/catch`.
-3. Телепортируешь — `:disabled="!teleportEnabled"` из `useTeleportEnabled()`. Не `typeof window`: он даёт разный
-   результат на сервере и на первом клиентском рендере, и это ломает гидрацию.
+3. Телепортируешь — `:disabled="!enabled"` из `usePortalTarget()`. Не `typeof window`: он даёт разный
+   результат на сервере и на первом клиентском рендере, и это ломает гидрацию. Внутренний
+   `useTeleportEnabled()` наружу не экспортируется — из публичного API доступен `usePortalTarget`,
+   и он же отдаёт `enabled`.
 4. Браузерные API, которых может не быть и в браузере (`ResizeObserver`,
    `matchMedia`), проверять на существование — образец в `GrSegmented`.
 5. DOM-идентификаторы — только `useId()`. Ни `instance.uid` (сквозной счётчик приложения: на сервере растёт между
