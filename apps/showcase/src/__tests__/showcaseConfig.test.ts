@@ -63,7 +63,10 @@ describe('showcase bootstrap config', () => {
     expect(showcasePackageJson).toContain('"generate:search": "node ./scripts/generate-showcase-search-index.mjs"')
     expect(showcasePackageJson).toContain('"generate:search:local": "yarn prepare:granularity && node ./scripts/generate-showcase-search-index.mjs"')
     expect(showcasePackageJson).toContain('"prepare:granularity": "yarn workspace @feugene/granularity build"')
-    expect(showcasePackageJson).toContain('"build": "yarn generate:api && yarn generate:search && vite build"')
+    expect(showcasePackageJson).toContain('"build": "yarn generate:api && yarn generate:search && vite build && yarn verify:locales"')
+    // Проверка состава локалей идёт после сборки и в самой сборке: иначе её
+    // забудут запустить, а разъехавшийся импорт заметен только по размеру dist.
+    expect(showcasePackageJson).toContain('"verify:locales": "node ./checks/verify-locales.mjs"')
     expect(showcasePackageJson).toContain('"build:analyze": "yarn generate:api && yarn generate:search && vite build --mode analyze"')
     expect(showcasePackageJson).toContain('"test:run": "yarn generate:api && yarn generate:search && vitest run --config vitest.config.ts"')
     expect(showcaseBuildAnalyzeMode).toBe('analyze')
@@ -94,22 +97,22 @@ describe('showcase bootstrap config', () => {
     expect(existsSync(showcaseI18nMessagesPath)).toBe(true)
     expect(showcaseI18nEntry).toContain('import { createFintI18n } from \'@feugene/fint-i18n/core\'')
     expect(showcaseI18nEntry).toContain('import { installI18n } from \'@feugene/fint-i18n/vue\'')
-    expect(showcaseI18nEntry).toContain('import { GRANULARITY_I18N_BLOCK } from \'@feugene/granularity/i18n\'')
+    expect(showcaseI18nEntry).toContain('GRANULARITY_I18N_BLOCK')
     expect(showcaseI18nEntry).toContain('SHOWCASE_I18N_BLOCK')
     expect(showcaseI18nEntry).toContain('showcaseLocaleLoaders')
-    // Словарь companion-пакета — отдельной строкой: без него календарь и
+    // Словарь каждого companion-пакета — отдельной строкой: без него календарь и
     // пикеры показывают английский fallback на любом языке витрины, и заметить
     // это можно было только глазами.
-    expect(showcaseI18nEntry).toContain('from \'@feugene/granularity-chrono/i18n/all\'')
-    expect(showcaseI18nEntry).toContain('...grChronoLocales')
-    expect(showcaseI18nEntry).toContain('from \'@feugene/granularity-charts/i18n/all\'')
-    expect(showcaseI18nEntry).toContain('...grChartsLocales')
-    expect(showcaseI18nEntry).toContain('from \'@feugene/granularity-dashboard/i18n/all\'')
-    expect(showcaseI18nEntry).toContain('from \'@feugene/granularity-forms-schema/i18n/all\'')
-    expect(showcaseI18nEntry).toContain('...grFormsSchemaLocales')
-    expect(showcaseI18nEntry).toContain('from \'@feugene/granularity-editor/i18n/all\'')
-    expect(showcaseI18nEntry).toContain('...grEditorLocales, ...grMediaLocales]')
-    expect(showcaseI18nEntry).toContain('...grDashboardLocales')
+    //
+    // Именно ИМЕНОВАННЫЕ локали, а не агрегат `<pkg>/i18n/all`: переключатель
+    // предлагает два языка, а агрегат тянет все, что есть у пакета — лишние уезжают
+    // в `dist` ленивыми чанками, которых никто не запрашивает. Состав `dist` сторожит
+    // `checks/verify-locales.mjs`, здесь держится сама форма импорта.
+    for (const pkg of ['chrono', 'charts', 'dashboard', 'forms-schema', 'editor', 'media']) {
+      expect(showcaseI18nEntry).toContain(`from '@feugene/granularity-${pkg}/i18n'`)
+      expect(showcaseI18nEntry).not.toContain(`from '@feugene/granularity-${pkg}/i18n/all'`)
+    }
+    expect(showcaseI18nEntry).not.toContain('from \'@feugene/granularity/i18n/all\'')
     expect(showcaseI18nEntry).toContain('registerBlocks([SHOWCASE_I18N_BLOCK, GRANULARITY_I18N_BLOCK, GR_CHRONO_I18N_BLOCK, GR_CHARTS_I18N_BLOCK, GR_DASHBOARD_I18N_BLOCK, GR_FORMS_SCHEMA_I18N_BLOCK, GR_EDITOR_I18N_BLOCK, GR_MEDIA_I18N_BLOCK])')
     expect(showcaseI18nMessagesEntry).toContain('export const SHOWCASE_I18N_BLOCK = \'showcase\'')
     expect(showcaseI18nMessagesEntry).toContain('\'./locales/en/showcase.json\'')

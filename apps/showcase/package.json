@@ -44,7 +44,8 @@
     "zod": "^4.0.0"
   },
   "scripts": {
-    "build": "yarn generate:api && yarn generate:search && vite build",
+    "build": "yarn generate:api && yarn generate:search && vite build && yarn verify:locales",
+    "verify:locales": "node ./checks/verify-locales.mjs",
     "build:analyze": "yarn generate:api && yarn generate:search && vite build --mode analyze",
     "lint": "eslint . --cache",
     "lint:fix": "eslint . --cache --fix",
