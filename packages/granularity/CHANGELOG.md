@@ -9,6 +9,19 @@ to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- **`GrSelect` never emitted `change` in its default rendering mode.** The event is declared on the
+  type and documented as "the same value on a separate channel", with no exception noted — but it
+  was emitted from exactly one place, `emitValue`, and the native `<select>` handler went straight
+  past it to `emit('update:modelValue')`. Since `optionsView` defaults to `native`, the defect sat
+  on the most travelled path: a consumer's `@change` simply never fired.
+
+  It failed silently rather than loudly, which is why it survived. A declared emit is removed from
+  `$attrs`, so `@change` never becomes a native listener on the root either, and the `<select>`'s own
+  bubbling `change` does not reach the consumer. Not a wrong payload — nothing at all. Found on live
+  consumer code (a locale switcher that changed value and did nothing), where the silence cost
+  several rounds of diagnosis. The native branch now goes through `emitValue`, so both rendering
+  modes share one event channel, and a gate covers both — the panel-only tests were green throughout.
+
 - **A missing required prop no longer renders plausible-looking nonsense.** `GrPagination` given no
   `page` printed `Page NaN of 5` and a page row of `1 2 4 5` — the number three simply absent out of
   five — because `Math.trunc(undefined)` is `NaN` and it spread through the clamp, the status line
@@ -30,6 +43,26 @@ to [Semantic Versioning](https://semver.org/).
   nothing. Restoring it at build level is not an option: `@vitejs/plugin-vue` feeds one
   `isProduction` flag to both the script and the template compiler, and the template side would lose
   static hoisting and start shipping source comments.
+
+- **`GrPagination` explains the `v-model` mistake instead of rendering it.** The prop is named `page`,
+  so `v-model="page"` sends `modelValue`, which falls through to the root element as
+  `modelvalue="2"` and leaves the component without a page. In development the component now names
+  the mistake directly. This is the call that produced every symptom above.
+
+### Changed
+
+### Changed
+
+- **Clearing a `GrInput` now emits `change` as well.** Clearing is a value commitment just like
+  losing focus, and a listener watching `change` for "the value settled" was missing exactly that.
+  `GrInput` was the only control in the ecosystem whose clear button stayed silent: `GrAutocomplete`,
+  `GrFormFile`, `GrInputTag`, `GrNumberInput`, `GrSelect`, `GrTextarea`, `GrTreeSelect`, `GrRating`
+  and all four `chrono` pickers already emitted it — including `GrTextarea`, whose event contract is
+  worded identically. The native analogue agrees: the clear affordance on `<input type="search">`
+  fires `input` and `change`.
+
+  The order is `update:modelValue` → `change` → `clear`. If you subscribe to `change` on a text field
+  and treat every occurrence as user typing, the clear button now reaches that handler too.
 
 ## [v0.35.0] 2026-08-25
 

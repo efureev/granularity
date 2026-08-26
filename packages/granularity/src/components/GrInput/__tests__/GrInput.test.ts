@@ -311,6 +311,25 @@ describe('GrInput — события и императивный API', () => {
     expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([''])
   })
 
+  // Очистка — такая же фиксация значения, как уход фокуса: слушающий `change`
+  // ради «значение установилось» пропускал бы ровно её. Соседняя `GrTextarea`
+  // так и делает, а текстовое поле из этого ряда выпадало.
+  it('очистка кнопкой фиксирует значение событием change', async () => {
+    const wrapper = mount(GrInput, { props: { modelValue: 'hello', clearable: true } })
+
+    await wrapper.get('[data-gr-input-clear]').trigger('click')
+
+    expect(wrapper.emitted('change')).toEqual([['']])
+    // Порядок важен: сначала значение, потом его фиксация, и только затем
+    // «стёрто кнопкой» — обработчик `clear` вправе рассчитывать на свежую модель.
+    // Сверяем порядок трёх, а не весь список: `clear()` возвращает фокус в поле,
+    // и `focus` в хвосте к контракту очистки отношения не имеет.
+    const order = Object.keys(wrapper.emitted())
+      .filter(name => ['update:modelValue', 'change', 'clear'].includes(name))
+
+    expect(order).toEqual(['update:modelValue', 'change', 'clear'])
+  })
+
   it('expose отдаёт focus/blur/select', async () => {
     const wrapper = mount(GrInput, { props: { modelValue: 'hello' }, attachTo: document.body })
     const api = wrapper.vm as unknown as { focus: () => void, blur: () => void, select: () => void }

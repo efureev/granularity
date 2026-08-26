@@ -822,13 +822,16 @@ function onChange(e: Event): void {
     return
   }
 
-  if (props.multiple) {
-    emit('update:modelValue', Array.from(el.selectedOptions, o => fromDomValue(o.value)))
-    return
-  }
-
-  // Пустая строка — это «очистить», а не значение: восстанавливать её не нужно.
-  emit('update:modelValue', (el.value === '' ? '' : fromDomValue(el.value)) as TValue)
+  // Только через `emitValue`: он единственный источник пары
+  // `update:modelValue` + `change`, и канал события обязан быть один на оба
+  // режима отрисовки. Прямой `emit` отсюда оставил бы `change` без нативного
+  // пути — молча, потому что объявленный emit уходит из `$attrs`.
+  emitValue(
+    props.multiple
+      ? Array.from(el.selectedOptions, o => fromDomValue(o.value))
+      // Пустая строка — это «очистить», а не значение: восстанавливать её не нужно.
+      : ((el.value === '' ? '' : fromDomValue(el.value)) as TValue),
+  )
 }
 
 function clearSelection(): void {

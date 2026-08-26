@@ -996,3 +996,58 @@ describe('GrSelect — readonly в native-режиме', () => {
     wrapper.unmount()
   })
 })
+
+/**
+ * `change` объявлен в типе и обещан докой как «то же значение, отдельным
+ * каналом», без оговорок про режим отрисовки. Гейт держит обещание в обоих
+ * режимах: у `GrSelect` их два, и раньше событие жило только в одном.
+ *
+ * Ассерт несущий — не «событие было», а «тот же payload тем же числом раз».
+ * Проверка на наличие пропустила бы расхождение значений.
+ */
+describe('GrSelect — change приходит в обоих режимах отрисовки', () => {
+  afterEach(() => {
+    document.body.innerHTML = ''
+  })
+
+  const options = [
+    { value: 'a', label: 'Alpha' },
+    { value: 'b', label: 'Beta' },
+  ]
+
+  it.each(['native', 'panel'] as const)('в режиме %s change зеркалит update:modelValue', async (optionsView) => {
+    const wrapper = mount(GrSelect, {
+      props: { modelValue: 'a', options, optionsView, ariaLabel: 'Stack' },
+    })
+    await nextTick()
+
+    if (optionsView === 'native') {
+      const select = wrapper.get('select')
+      ;(select.element as HTMLSelectElement).value = 'b'
+      await select.trigger('change')
+    }
+    else {
+      await wrapper.get('[data-testid="gr-select-trigger"]').trigger('click')
+      getTeleportedOptions()[1].click()
+      await nextTick()
+    }
+
+    expect(wrapper.emitted('update:modelValue')).toEqual([['b']])
+    expect(wrapper.emitted('change')).toEqual(wrapper.emitted('update:modelValue'))
+  })
+
+  it('в нативном multiple change отдаёт тот же массив, что и модель', async () => {
+    const wrapper = mount(GrSelect, {
+      props: { modelValue: ['a'], options, multiple: true, ariaLabel: 'Stack' },
+    })
+    await nextTick()
+
+    const select = wrapper.get('select')
+    for (const option of (select.element as HTMLSelectElement).options)
+      option.selected = true
+    await select.trigger('change')
+
+    expect(wrapper.emitted('update:modelValue')).toEqual([[['a', 'b']]])
+    expect(wrapper.emitted('change')).toEqual(wrapper.emitted('update:modelValue'))
+  })
+})

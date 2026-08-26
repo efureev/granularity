@@ -294,6 +294,9 @@ const liveMessage = computed(() =>
 
 function clear(): void {
   emit('update:modelValue', '')
+  // Очистка — такая же фиксация значения, как уход фокуса: без `change`
+  // подписка «значение установилось» пропускала бы ровно её.
+  emit('change', '')
   emit('clear')
   inputEl.value?.focus()
 }
