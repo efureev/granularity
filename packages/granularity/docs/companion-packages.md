@@ -260,43 +260,14 @@ export default all
 
 ### 5.3. Как компонент читает перевод
 
-Чтобы **не делать `@feugene/fint-i18n` обязательной рантайм-зависимостью**, резолвер ищет инстанс по
-глобальному символу `Symbol.for('FintI18n')` (его кладёт `installI18n(app, i18n)` на стороне
-приложения) — прямого импорта из `fint-i18n` не нужно. Если инстанса нет или ключ не найден,
-компонент показывает **fallback-текст** и UI не ломается. Это ровно тот же подход, что во внутреннем
-`packages/granularity/src/internal/granularityI18n.ts` — можно скопировать его целиком:
-
-```ts
-// src/internal/i18n.ts
-import { getCurrentInstance, inject } from 'vue'
-
-const FINT_I18N_KEY: symbol = Symbol.for('FintI18n')
-
-type I18nLike = { t: (key: string, params?: Record<string, any>) => string }
-
-export function useTranslations() {
-  const i18n = getCurrentInstance()
-    ? inject<I18nLike | null>(FINT_I18N_KEY, null)
-    : null
-
-  // t(ключ, fallback, params): при отсутствии перевода возвращается fallback.
-  const t = (key: string, fallback: string, params?: Record<string, any>): string => {
-    if (!i18n)
-      return fallback
-    const result = i18n.t(key, params)
-    return result === key ? fallback : result
-  }
-
-  return { t }
-}
-```
+Берите готовый композабл ядра — своего резолвера писать не нужно:
 
 ```vue
 <!-- src/components/GrMyThing/GrMyThing.vue -->
 <script setup lang="ts">
-import { useTranslations } from '../../internal/i18n'
+import { useGranularityTranslations } from '@feugene/granularity/composables/useGranularityTranslations'
 
-const { t } = useTranslations()
+const { t } = useGranularityTranslations()
 </script>
 
 <template>
@@ -306,10 +277,30 @@ const { t } = useTranslations()
 </template>
 ```
 
+Ядро у спутника и так обязательный peer, так что новой зависимости это не создаёт. Так
+делают все шесть спутников кольца.
+
+Что композабл берёт на себя:
+
+- **два источника инстанса.** Ищется и абстрактный адаптер ядра
+  (`GRANULARITY_I18N_KEY`), и инстанс `fint-i18n` по глобальному символу
+  `Symbol.for('FintI18n')`, который кладёт `installI18n(app, i18n)`. Приложение на
+  `vue-i18n` или `i18next` отдаёт адаптер по ключу ядра, и пакет его видит;
+- **`te()` вместо эвристики.** «Есть ли перевод» спрашивается напрямую, если адаптер
+  это умеет. Сравнение `t(key) === key` врёт на словаре, где значение совпадает с
+  ключом (технические словари кодов): такой перевод считался бы отсутствующим;
+- **`{{`/`}}`-экранирование во fallback** и подстановка `{name}` независимо от того,
+  переданы ли параметры, — как в самом `fint-i18n`;
+- **`locale`** активного адаптера — для `Intl.*` и `localeCompare`.
+
+Своего резолвера в пакете быть не должно: каждая копия расходится с ядром по этим
+четырём пунктам молча.
+
+Нет адаптера — возвращается **fallback-текст**, и UI не ломается: `@feugene/fint-i18n`
+остаётся optional peer, прямого импорта из него у пакета нет.
+
 > Ключ (`myPkg.thing.submit`) и fallback (`'Submit'`) держите рядом: fallback обязан совпадать с
-> английским словарём, чтобы UI выглядел одинаково с переводом и без него. Для интерполяции
-> `{name}`-плейсхолдеров во fallback (когда i18n не подключён) возьмите `interpolateFallback` из
-> того же `granularityI18n.ts`.
+> английским словарём, чтобы UI выглядел одинаково с переводом и без него.
 
 ### 5.4. `package.json` и `vite.config.ts`
 
@@ -614,6 +605,6 @@ npx --yes publint@latest --pack npm   # проверка соответстви�
 - [ ] (Опц., если есть встроенные строки) `src/i18n`: уникальный блок (не `gr`), per-locale loaders, `all.ts` вне barrel; экспорты `./i18n` + `./i18n/all`, `fint-i18n` — optional peer; компоненты читают перевод через резолвер с fallback.
 - [ ] Granular-provider: `shared.ts` + browser/node entry, зарегистрирован в приложении рядом с ядром.
 - [ ] (Опц.) `./resolver` на `createGranularResolver` (whitelist + `importStyle: false`), optional peers, регистрируется раньше core-резолвера.
-- [ ] Гейты: пять фабрик из `@feugene/granularity-test-kit/gates` + `defineGateCoverage`; свои гейты домена — рядом.
+- [ ] Гейты: восемь фабрик из `@feugene/granularity-test-kit/gates` (актуальный список — `REQUIRED_GATES` в `gates/coverage.ts`, его же сверяет `defineGateCoverage`); свои гейты домена — рядом.
 - [ ] Доки: сквозные `model` / `a11y` / `keyboard` / `theming` / `ssr`, страница на каждый компонент в `docs/components/`, индекс `docs/components.md`, компоненты в развилках `docs/COMPONENT-MAP.md`.
 - [ ] `build` зелёный, `publint` — `All good!`.
