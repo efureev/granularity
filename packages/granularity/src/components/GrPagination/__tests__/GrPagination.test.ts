@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils'
-import { describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import GrPagination, { type GrPaginationProps } from '../GrPagination.vue'
 import type { GranularityI18nAdapter } from '../../../i18n/adapter'
@@ -284,5 +284,55 @@ describe('GrPagination — крайние значения и клавиатур
     expect(wrapper.get('[data-gr-pagination-next]').attributes('disabled')).toBeDefined()
     expect(wrapper.get('[data-gr-pagination-last]').attributes('disabled')).toBeDefined()
     expect(wrapper.get('[data-gr-pagination-prev]').attributes('disabled')).toBeUndefined()
+  })
+})
+
+describe('GrPagination — обязательный проп не доехал', () => {
+  let warn: ReturnType<typeof vi.spyOn>
+
+  beforeEach(() => {
+    warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+  })
+
+  afterEach(() => {
+    warn.mockRestore()
+  })
+
+  function warnings(): string {
+    return warn.mock.calls.flat().join('\n')
+  }
+
+  it('без `page` рисует первую страницу, а не NaN', () => {
+    const wrapper = mount(GrPagination, {
+      props: { pageSize: 10, total: 50 } as unknown as GrPaginationProps,
+    })
+
+    expect(wrapper.html()).not.toContain('NaN')
+    expect(wrapper.findAll('[data-gr-pagination-page]').map(b => b.text())).toEqual(['1', '2', '3', '4', '5'])
+    expect(wrapper.get('[data-gr-pagination-status]').text()).toBe('Page 1 of 5')
+
+    const active = wrapper.findAll('[data-gr-pagination-page]').find(b => b.attributes('aria-current') === 'page')
+    expect(active!.text()).toBe('1')
+    expect(warnings()).toContain('обязательный проп `page`')
+  })
+
+  it('без `total` диапазон и число страниц остаются числами', () => {
+    const wrapper = mount(GrPagination, {
+      props: { page: 1, pageSize: 10, showTotal: true } as unknown as GrPaginationProps,
+    })
+
+    expect(wrapper.get('[data-gr-pagination-total]').text()).toBe('0–0 of 0')
+    expect(wrapper.get('[data-gr-pagination-status]').text()).toBe('Page 1 of 1')
+    expect(warnings()).toContain('обязательный проп `total`')
+  })
+
+  it('`v-model` вместо `v-model:page` объясняется предупреждением', () => {
+    const wrapper = mount(GrPagination, {
+      props: { modelValue: 2, pageSize: 10, total: 50 } as unknown as GrPaginationProps,
+    })
+
+    // Необъявленный проп уезжает на корень — по этому следу дефект и находят.
+    expect(wrapper.get('[role="navigation"]').attributes('modelvalue')).toBe('2')
+    expect(warnings()).toContain('`v-model:page`, а не `v-model`')
   })
 })

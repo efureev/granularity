@@ -468,3 +468,15 @@ describe('GrStatistic — аффиксы величины', () => {
       .toContain('text-[var(--gr-value-prefix-color,inherit)]')
   })
 })
+
+describe('GrStatistic — обязательный проп не доехал', () => {
+  it('без `value` плитка показывает прочерк, а не слово undefined', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const wrapper = mount(GrStatistic, { props: {} as never })
+
+    expect(wrapper.get('[data-testid="gr-statistic-value"]').text()).toBe('—')
+    expect(warn.mock.calls.flat().join('\n')).toContain('обязательный проп `value`')
+
+    warn.mockRestore()
+  })
+})

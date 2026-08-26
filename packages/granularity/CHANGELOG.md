@@ -7,6 +7,30 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+
+- **A missing required prop no longer renders plausible-looking nonsense.** `GrPagination` given no
+  `page` printed `Page NaN of 5` and a page row of `1 2 4 5` — the number three simply absent out of
+  five — because `Math.trunc(undefined)` is `NaN` and it spread through the clamp, the status line
+  and the boundary/sibling algorithm. `GrProgressBar` emitted `aria-valuenow="NaN"`, which a screen
+  reader announces and axe flags: its guard tested `Number.isNaN(value)`, and `Number.isNaN(undefined)`
+  is `false`. `GrSlider` did the same, and put `left: NaN%` on the thumb as well. `GrStatistic`
+  printed the word `undefined` on the tile. All four now substitute a sane default — page one, zero,
+  the lower bound, an em dash — and say what went wrong under `__GR_DEV__`.
+
+  These four are the whole silent class, established by rendering every one of the 37 components
+  that declare a required prop with no props at all: eight others throw outright, which a consumer
+  sees immediately, and the rest render cleanly. `GrJsonViewer` shows `undefined` on purpose —
+  it inspects arbitrary data, and `undefined` is part of what it is asked to display.
+
+  Nothing warned before. The production SFC compile strips `type` and `required` from the runtime
+  props declaration, so `required: true` does not appear anywhere in `dist`: the consumer never gets
+  Vue's "Missing required prop", in development or in production. `vue-tsc` catches it only in
+  projects with template type-checking — a JS project, a `v-bind` spread or an auto-import catches
+  nothing. Restoring it at build level is not an option: `@vitejs/plugin-vue` feeds one
+  `isProduction` flag to both the script and the template compiler, and the template side would lose
+  static hoisting and start shipping source comments.
+
 ## [v0.35.0] 2026-08-25
 
 ### Fixed

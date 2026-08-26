@@ -1,6 +1,6 @@
 import { mount } from '@vue/test-utils'
 import { defineComponent, nextTick } from 'vue'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import GrConfigProvider from '../../GrConfigProvider/GrConfigProvider.vue'
 import { granularityGlobal, mockRect, move, press, type MockRect } from '../../../testing'
@@ -325,5 +325,18 @@ describe('GrSlider — name (нативная форма)', () => {
     const wrapper = mount(GrSlider, { props: { modelValue: 30, ariaLabel: 'Volume' } })
     expect(wrapper.find('input[type="hidden"]').exists()).toBe(false)
     wrapper.unmount()
+  })
+})
+
+describe('GrSlider — обязательный проп не доехал', () => {
+  it('без `modelValue` бегунок встаёт на нижнюю границу, а не в NaN', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const wrapper = mount(GrSlider, { props: {} as never })
+
+    expect(wrapper.get('[role="slider"]').attributes('aria-valuenow')).toBe('0')
+    expect(wrapper.html()).not.toContain('NaN')
+    expect(warn.mock.calls.flat().join('\n')).toContain('обязательный проп `modelValue`')
+
+    warn.mockRestore()
   })
 })

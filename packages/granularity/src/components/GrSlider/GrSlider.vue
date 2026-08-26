@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, watchEffect } from 'vue'
 
 import { useGrComponentSize } from '../GrConfigProvider/context'
 
@@ -179,15 +179,35 @@ function percent(value: number): number {
 // уходит — иначе смысл режима теряется.
 const draftValues = ref<number[] | null>(null)
 
+// Не доехавшее значение (промах вызова, асинхронный стор) увело бы в `NaN`
+// и смещение бегунка, и `aria-valuenow`; нижняя граница — честный старт.
+function toFiniteValue(value: number | undefined): number {
+  return Number.isFinite(value) ? (value as number) : props.min
+}
+
 // ————— Значения бегунков как массив (single = один бегунок).
 const modelValues = computed<number[]>(() => {
   if (props.range) {
     const v = Array.isArray(props.modelValue) ? props.modelValue : [props.min, props.min]
-    return [snap(v[0] ?? props.min), snap(v[1] ?? props.min)]
+    return [snap(toFiniteValue(v[0])), snap(toFiniteValue(v[1]))]
   }
-  const v = Array.isArray(props.modelValue) ? (props.modelValue[0] ?? props.min) : props.modelValue
-  return [snap(v)]
+  const v = Array.isArray(props.modelValue) ? props.modelValue[0] : props.modelValue
+  return [snap(toFiniteValue(v))]
 })
+
+if (__GR_DEV__) {
+  watchEffect(() => {
+    const missing = props.range
+      ? !Array.isArray(props.modelValue)
+      : !Number.isFinite(props.modelValue)
+
+    if (missing) {
+      console.warn(
+        `[granularity] GrSlider: обязательный проп \`modelValue\` должен быть ${props.range ? 'парой чисел' : 'числом'} — получено ${String(props.modelValue)}.`,
+      )
+    }
+  })
+}
 
 const values = computed<number[]>(() => draftValues.value ?? modelValues.value)
 

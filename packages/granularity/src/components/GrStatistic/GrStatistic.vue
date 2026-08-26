@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useGrComponentProp, useGrComponentSize } from '../GrConfigProvider/context'
-import { computed, markRaw, onBeforeUnmount, onMounted, ref, useSlots, watch, type Component } from 'vue'
+import { computed, markRaw, onBeforeUnmount, onMounted, ref, useSlots, watch, watchEffect, type Component } from 'vue'
 
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 import { deltaTone, type GrDeltaPolarity } from '../GrDelta/deltaTone'
@@ -150,7 +150,12 @@ const resolvedLocale = computed(() => props.locale ?? locale.value)
  */
 const frameValue = ref<number | null>(null)
 
-const formatted = computed(() => formatStatisticValue(frameValue.value ?? props.value, {
+// Обязательное значение может не доехать — промах вызова, асинхронный
+// источник, — и плитка напечатала бы слово `undefined`. Прочерк — тот же знак
+// пустоты, которым `GrDelta` рисует отсутствующую величину.
+const resolvedValue = computed<number | string>(() => props.value ?? '—')
+
+const formatted = computed(() => formatStatisticValue(frameValue.value ?? resolvedValue.value, {
   precision: props.precision,
   groupSeparator: props.groupSeparator,
   decimalSeparator: props.decimalSeparator,
@@ -158,7 +163,7 @@ const formatted = computed(() => formatStatisticValue(frameValue.value ?? props.
 }))
 
 /** Конечное значение — то, что читает диктор, пока на экране идёт перебор. */
-const finalFormatted = computed(() => formatStatisticValue(props.value, {
+const finalFormatted = computed(() => formatStatisticValue(resolvedValue.value, {
   precision: props.precision,
   groupSeparator: props.groupSeparator,
   decimalSeparator: props.decimalSeparator,
@@ -166,6 +171,16 @@ const finalFormatted = computed(() => formatStatisticValue(props.value, {
 }))
 
 const isCounting = computed(() => frameValue.value !== null)
+
+if (__GR_DEV__) {
+  watchEffect(() => {
+    if (props.value === undefined || props.value === null) {
+      console.warn(
+        `[granularity] GrStatistic: обязательный проп \`value\` не передан — получено ${String(props.value)}.`,
+      )
+    }
+  })
+}
 
 const hasTitle = computed(() => Boolean(props.title || slots.title))
 

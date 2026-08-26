@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, ref, useAttrs, watch, watchEffect } from 'vue'
 
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 import GrButton from '../GrButton/GrButton.vue'
@@ -96,15 +96,24 @@ const navButtonSize = computed(() => navButtonSizes[resolvedSize.value])
 
 const emit = defineEmits<GrPaginationEmits>()
 
+// Обязательный проп может не доехать — промах вызова, асинхронный стор, —
+// и `Math.trunc(undefined)` разнёс бы `NaN` по номерам, статусу и диапазону.
+// Разметка при этом остаётся правдоподобной на вид, поэтому нечисловое
+// значение подменяется дефолтом, а dev-гард в конце файла называет виновника.
+function toFiniteInt(value: number, fallback: number): number {
+  return Number.isFinite(value) ? Math.trunc(value) : fallback
+}
+
 // Делитель клампится: `pageSize: 0` дал бы `Infinity` страниц и бесконечный
 // цикл в `range()`.
-const resolvedPageSize = computed(() => Math.max(1, Math.trunc(props.pageSize)))
-const pageCount = computed(() => Math.max(1, Math.ceil(props.total / resolvedPageSize.value)))
+const resolvedPageSize = computed(() => Math.max(1, toFiniteInt(props.pageSize, 1)))
+const resolvedTotal = computed(() => Math.max(0, toFiniteInt(props.total, 0)))
+const pageCount = computed(() => Math.max(1, Math.ceil(resolvedTotal.value / resolvedPageSize.value)))
 
 // Рендер идёт от зажатого номера: вотчер ниже просит родителя подтянуть `page`,
 // но на первом рендере он молчит, и без клампа пагинация осталась бы вовсе без
 // активной страницы.
-const currentPage = computed(() => Math.min(Math.max(Math.trunc(props.page), 1), pageCount.value))
+const currentPage = computed(() => Math.min(Math.max(toFiniteInt(props.page, 1), 1), pageCount.value))
 
 // Контролируемый компонент: если `total`/`pageSize` уменьшились и текущая `page`
 // вышла за диапазон — просим родителя подтянуть её к последней странице.
@@ -125,8 +134,8 @@ const pageSizeOptions = computed(() =>
   })),
 )
 
-const rangeFrom = computed(() => (props.total === 0 ? 0 : (currentPage.value - 1) * resolvedPageSize.value + 1))
-const rangeTo = computed(() => Math.min(currentPage.value * resolvedPageSize.value, props.total))
+const rangeFrom = computed(() => (resolvedTotal.value === 0 ? 0 : (currentPage.value - 1) * resolvedPageSize.value + 1))
+const rangeTo = computed(() => Math.min(currentPage.value * resolvedPageSize.value, resolvedTotal.value))
 
 type PaginationItem = number | 'ellipsis-start' | 'ellipsis-end'
 
@@ -217,8 +226,30 @@ const statusText = computed(() =>
   t('gr.pagination.status', 'Page {page} of {count}', { page: currentPage.value, count: pageCount.value }),
 )
 const totalText = computed(() =>
-  t('gr.pagination.total', '{from}–{to} of {total}', { from: rangeFrom.value, to: rangeTo.value, total: props.total }),
+  t('gr.pagination.total', '{from}–{to} of {total}', { from: rangeFrom.value, to: rangeTo.value, total: resolvedTotal.value }),
 )
+
+if (__GR_DEV__) {
+  const attrs = useAttrs()
+
+  watchEffect(() => {
+    // Промах закономерен: в большинстве библиотек этот проп зовётся `modelValue`,
+    // а необъявленный проп молча уезжает на корень через fallthrough.
+    if ('modelValue' in attrs) {
+      console.warn(
+        '[granularity] GrPagination: страницу задаёт `v-model:page`, а не `v-model` — проп `modelValue` компонент не читает.',
+      )
+    }
+
+    for (const name of ['page', 'pageSize', 'total'] as const) {
+      if (!Number.isFinite(props[name])) {
+        console.warn(
+          `[granularity] GrPagination: обязательный проп \`${name}\` должен быть числом — получено ${String(props[name])}.`,
+        )
+      }
+    }
+  })
+}
 </script>
 
 <template>
@@ -235,7 +266,7 @@ const totalText = computed(() =>
       class="text-[var(--gr-muted-fg)] tabular-nums"
       :class="labelClass"
     >
-      <slot name="total" :from="rangeFrom" :to="rangeTo" :total="total">
+      <slot name="total" :from="rangeFrom" :to="rangeTo" :total="resolvedTotal">
         {{ totalText }}
       </slot>
     </div>

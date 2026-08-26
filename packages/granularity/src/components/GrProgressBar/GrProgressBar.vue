@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, watchEffect } from 'vue'
 
 import { useGrComponentProp, useGrComponentSize } from '../GrConfigProvider/context'
 import {
@@ -19,7 +19,7 @@ import {
  * по `indeterminate`, необязательный слой буфера и подпись значения.
  */
 export interface GrProgressBarProps {
-  /** Текущее значение `0..100`; выходящие за границы клампятся, `NaN` → `0`. */
+  /** Текущее значение `0..100`; выходящие за границы клампятся, нечисловое → `0`. */
   value: number
   /** Загружено с запасом: слой позади заливки, `0..100`. Не задан — слоя нет. */
   buffer?: number
@@ -57,8 +57,10 @@ const trackClassName = computed(() => trackSizes[resolvedSize.value])
 const rowGapClassName = computed(() => rowGaps[resolvedSize.value])
 const valueClassName = computed(() => valueTextSizes[resolvedSize.value])
 
+// Проверка именно на конечность, а не на `NaN`: `Number.isNaN(undefined)` —
+// `false`, и не доехавший обязательный проп утёк бы в `aria-valuenow="NaN"`.
 function clampValue(value: number): number {
-  if (Number.isNaN(value))
+  if (!Number.isFinite(value))
     return 0
   return Math.min(100, Math.max(0, value))
 }
@@ -67,6 +69,16 @@ const safe = computed(() => clampValue(props.value))
 const safeBuffer = computed(() => (props.buffer === undefined ? undefined : clampValue(props.buffer)))
 
 const fillClassName = computed(() => grProgressBarFillClass(props.tone))
+
+if (__GR_DEV__) {
+  watchEffect(() => {
+    if (!props.indeterminate && !Number.isFinite(props.value)) {
+      console.warn(
+        `[granularity] GrProgressBar: обязательный проп \`value\` должен быть числом — получено ${String(props.value)}.`,
+      )
+    }
+  })
+}
 
 /**
  * `aria-valuetext` нужен только со своим форматом: «45» при `aria-valuemax="100"`

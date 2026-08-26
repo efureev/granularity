@@ -1,6 +1,6 @@
 import { mount } from '@vue/test-utils'
 import { defineComponent } from 'vue'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import GrConfigProvider from '../../GrConfigProvider/GrConfigProvider.vue'
 import GrProgressBar from '../GrProgressBar.vue'
@@ -231,5 +231,18 @@ describe('GrProgressBar — оформление и размеры', () => {
     })
 
     expect(wrapper.html()).not.toMatch(/opacity-\d/)
+  })
+})
+
+describe('GrProgressBar — обязательный проп не доехал', () => {
+  it('без `value` полоса пуста, а `aria-valuenow` остаётся числом', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const wrapper = mount(GrProgressBar, { props: {} as never })
+
+    expect(wrapper.get(TRACK).attributes('aria-valuenow')).toBe('0')
+    expect(wrapper.get(FILL).attributes('style')).toContain('width: 0%')
+    expect(warn.mock.calls.flat().join('\n')).toContain('обязательный проп `value`')
+
+    warn.mockRestore()
   })
 })
