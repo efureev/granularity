@@ -843,7 +843,9 @@ jobs:
   # Стенд рендерит и ядро, и companion-пакет: у обоих в setup есть браузерный
   # API, телепорты и живые регионы, а расхождения видны только на гидрации.
   test-playground-ssr:
-    # Стенд рендерит страницы обоих компаньонов, поэтому ему нужен и их dist.
+    # Стенд поднимает каждый компонент экосистемы на своей странице, поэтому
+    # ему нужен dist всех пакетов, а не только тех, у кого есть тематическая
+    # страница.
     needs:
       - build-granularity
       - build-granularity-chrono
@@ -851,6 +853,7 @@ jobs:
       - build-granularity-dashboard
       - build-granularity-editor
       - build-granularity-forms-schema
+      - build-granularity-media
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -897,6 +900,15 @@ jobs:
         with:
           name: granularity-forms-schema-dist
           path: packages/granularity-forms-schema/dist
+
+      - name: Download granularity-media dist
+        uses: actions/download-artifact@v8
+        with:
+          name: granularity-media-dist
+          path: packages/granularity-media/dist
+
+      - name: Typecheck SSR playground
+        run: yarn typecheck:playground-ssr
 
       - name: Test SSR playground
         run: yarn test:playground-ssr

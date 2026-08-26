@@ -33,17 +33,20 @@ interface SsrSnapshot {
 }
 
 // В jsdom `import.meta.url` не file-scheme, поэтому путь — от cwd приложения.
-const snapshots = JSON.parse(
+// Ключ снимка — адрес страницы (`test/ssr-snapshot.ts`).
+const byPath = JSON.parse(
   readFileSync(resolve(process.cwd(), 'node_modules/.cache/ssr-snapshot.json'), 'utf8'),
-) as {
-  app: SsrSnapshot
-  teleport: SsrSnapshot
-  risky: SsrSnapshot
-  overlayStack: SsrSnapshot
-  chrono: SsrSnapshot
-  charts: SsrSnapshot
-  dashboard: SsrSnapshot
-  editor: SsrSnapshot
+) as Record<string, SsrSnapshot>
+
+const snapshots = {
+  app: byPath['/app']!,
+  teleport: byPath['/teleport']!,
+  risky: byPath['/risky']!,
+  overlayStack: byPath['/overlay-stack']!,
+  chrono: byPath['/chrono']!,
+  charts: byPath['/charts']!,
+  dashboard: byPath['/dashboard']!,
+  editor: byPath['/editor']!,
 }
 
 function captureConsole(): string[] {

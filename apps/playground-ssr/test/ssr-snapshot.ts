@@ -1,14 +1,8 @@
 import { mkdir, writeFile } from 'node:fs/promises'
 import { dirname, resolve } from 'node:path'
 
-import ChartsPage from '../src/ChartsPage.vue'
-import ChronoPage from '../src/ChronoPage.vue'
-import DashboardPage from '../src/DashboardPage.vue'
-import EditorPage from '../src/EditorPage.vue'
-import OverlayStackPage from '../src/OverlayStackPage.vue'
-import RiskyPage from '../src/RiskyPage.vue'
-import TeleportPage from '../src/TeleportPage.vue'
-import { render } from '../src/entry-server'
+import { ALL_PAGES } from '../src/pages'
+import { render, type SsrResult } from '../src/entry-server'
 
 /**
  * `globalSetup` витеста выполняется в НАСТОЯЩЕМ Node — без jsdom.
@@ -21,30 +15,30 @@ import { render } from '../src/entry-server'
  *
  * Поэтому серверный HTML снимается здесь и кладётся на диск, а тест гидрации
  * (jsdom) читает уже готовый снимок.
+ *
+ * Снимаются **все** страницы разом — и тематические, и по одной на компонент.
+ * Ключ снимка — адрес страницы: перечислять их именами, как было при восьми,
+ * на сотне уже нельзя, да и любая новая страница тогда молча оставалась бы
+ * неснятой.
  */
 
 export const SSR_SNAPSHOT_PATH = resolve(process.cwd(), 'node_modules/.cache/ssr-snapshot.json')
 
+export type SsrSnapshots = Record<string, SsrResult & { error?: string }>
+
 export default async function setup(): Promise<void> {
-  // `app` — демо-страница целиком, `teleport` — сжатый набор только из
-  // телепортирующих компонентов (регрессионный гейт к ANALYSIS §60),
-  // `risky` — компоненты с браузерным API, `navigator` и авто-id в setup,
-  // `overlayStack` — два открытых оверлея и чтение темы,
-  // `chrono` — companion-пакет: часы в отрисовке, ленивые панели, `useAnnouncer`,
-  // `charts` — companion-пакет: `ResizeObserver`, `useId()` в разметке SVG,
-  // `dashboard` — companion-пакет: `ResizeObserver` и `IntersectionObserver` в выборе раскладки,
-  // `editor` — companion-пакет: ProseMirror требует DOM, и на сервере области ввода нет вовсе.
-  const [app, teleport, risky, overlayStack, chrono, charts, dashboard, editor] = await Promise.all([
-    render(),
-    render(TeleportPage),
-    render(RiskyPage),
-    render(OverlayStackPage),
-    render(ChronoPage),
-    render(ChartsPage),
-    render(DashboardPage),
-    render(EditorPage),
-  ])
+  const entries = await Promise.all(ALL_PAGES.map(async (page) => {
+    try {
+      return [page.path, await render(page.component)] as const
+    }
+    catch (error) {
+      // Падение одной страницы не должно уносить снимок целиком: иначе первый
+      // же компонент, роняющий серверный рендер, скрывает состояние остальных
+      // ста. Ошибка едет в снимок и предъявляется тестом этой страницы.
+      return [page.path, { html: '', teleports: {}, error: String(error) }] as const
+    }
+  }))
 
   await mkdir(dirname(SSR_SNAPSHOT_PATH), { recursive: true })
-  await writeFile(SSR_SNAPSHOT_PATH, JSON.stringify({ app, teleport, risky, overlayStack, chrono, charts, dashboard, editor }), 'utf8')
+  await writeFile(SSR_SNAPSHOT_PATH, JSON.stringify(Object.fromEntries(entries)), 'utf8')
 }
