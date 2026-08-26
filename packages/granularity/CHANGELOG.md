@@ -9,6 +9,17 @@ to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- **`GrModal` swallowed clicks for 150 ms after closing.** While the leave animation played, the
+  layer stayed in the DOM stretched across the viewport and kept `pointer-events: auto`, so a click
+  landing in that window went to the disappearing overlay instead of the element beneath it and was
+  lost — no error, no trace, and the user simply clicks again. The root now carries
+  `pointer-events: none` while the layer is present but no longer visible.
+
+  Taking hit-testing off the backdrop alone would not have been enough: the layer has three
+  full-viewport elements (root, shell, backdrop), and neutralising the topmost one just hands the
+  interception to its neighbour one level up — measured. `GrDrawer` and `GrImageViewer` share the
+  structure and the defect; they are left as they are for now, recorded with the measurement.
+
 - **`GrSelect` never emitted `change` in its default rendering mode.** The event is declared on the
   type and documented as "the same value on a separate channel", with no exception noted — but it
   was emitted from exactly one place, `emitValue`, and the native `<select>` handler went straight

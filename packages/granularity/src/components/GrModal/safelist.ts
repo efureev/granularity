@@ -12,6 +12,7 @@ import {
   panelTransition,
   panelWidthBySize,
   root,
+  rootClosingClass,
   shellBase,
   shellByScroll,
   shellPaddingBySize,
@@ -31,7 +32,7 @@ type GrModalClassTokens = {
 }
 
 export const grModalClassTokens: GrModalClassTokens = {
-  root: splitClassTokens(root),
+  root: [...splitClassTokens(root), ...splitClassTokens(rootClosingClass)],
   shell: [
     ...splitClassTokens(shellBase),
     ...Object.values(shellPaddingBySize).flatMap(splitClassTokens),

@@ -14,6 +14,16 @@ export type GrModalScrollBehavior = 'outside' | 'inside'
 export const root = 'fixed inset-0 z-[var(--gr-z-modal)]'
 export const overlay = 'fixed inset-0 z-0 bg-[var(--gr-overlay-bg)]'
 
+/**
+ * Слой доигрывает уход: в DOM он ещё есть, но пользователю уже не адресован.
+ *
+ * Без этого клик в 150 мс анимации достаётся слою, а не элементу под ним, и
+ * пропадает бесследно. Класс нужен именно на корне: полноэкранных элементов
+ * здесь три (корень, оболочка, подложка), и снятие попадаемости с одной лишь
+ * подложки передало бы перехват соседу уровнем выше.
+ */
+export const rootClosingClass = 'pointer-events-none'
+
 export const shellBase = 'fixed inset-0'
 
 // Поля вокруг панели. У `full` их нет вовсе: размер означает «во весь экран», а

@@ -41,7 +41,8 @@ import {
   panelBodyScrollClass,
   panelSectionClass,
   panelTransition,
-  root as rootClass,
+  root as rootBaseClass,
+  rootClosingClass,
 } from './grModalStyles'
 
 export type { GrModalScrollBehavior }
@@ -278,6 +279,13 @@ const {
   // потребитель не указал цель явно.
   initialFocus: () => props.initialFocus ?? panelRef.value,
 })
+
+// Поддерево слоя живёт до конца leave-анимации панели, а корень растянут на
+// вьюпорт — значит всё это время он и перехватывает клики.
+const rootClass = computed(() => [
+  rootBaseClass,
+  isMounted.value && !isVisible.value ? rootClosingClass : '',
+].filter(Boolean))
 
 function onPanelAfterLeave(): void {
   releasePresence()

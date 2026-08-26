@@ -731,3 +731,40 @@ describe('GrModal — высота слоя', () => {
     wrapper.unmount()
   })
 })
+
+/**
+ * Пока слой доигрывает уход, он остаётся в DOM и растянут на вьюпорт: корень,
+ * оболочка и подложка — все три `fixed inset-0`. Без снятия попадаемости клик
+ * в эти 150 мс достаётся слою, а не элементу под ним, и пропадает бесследно.
+ *
+ * Наблюдаемо это в jsdom потому, что VTU заглушает `<Transition>` и
+ * `@after-leave` не приходит: слой залипает ровно в состоянии «идёт уход».
+ */
+describe('GrModal — уход не перехватывает указатель', () => {
+  afterEach(() => {
+    document.body.innerHTML = ''
+    resetScrollLock()
+  })
+
+  it('корень открытого окна указатель ловит, а закрывающегося — нет', async () => {
+    const wrapper = mount(GrModal, {
+      attachTo: document.body,
+      props: { modelValue: true, ariaLabel: 'X' },
+      slots: { default: '<div />' },
+    })
+    await settle()
+
+    const root = () => q('[data-gr-overlay-root]')
+
+    expect(root()!.getAttribute('class')).not.toContain('pointer-events-none')
+
+    await wrapper.setProps({ modelValue: false })
+    await nextTick()
+
+    // Поддерево ещё здесь — панель доигрывает уход, — но указателю не адресовано.
+    expect(root(), 'слой обязан оставаться в DOM до конца анимации').not.toBeNull()
+    expect(root()!.getAttribute('class')).toContain('pointer-events-none')
+
+    wrapper.unmount()
+  })
+})
