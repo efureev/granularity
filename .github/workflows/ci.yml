@@ -1424,6 +1424,10 @@ jobs:
   # (без них типизированные правила ESLint видят `any` и падают лавиной), а из
   # `dist/web-types.json` генерируется карта обязательных пропов.
   build-granularity-devtools:
+    # Пропуск зависимости распространяется по цепочке: `test-granularity`
+    # выключается на теге технического пакета, и без этого условия сюда
+    # доходит `skipped` — через `build-granularity`, хотя тот отработал.
+    if: ${{ !failure() && !cancelled() }}
     needs:
       - build-granularity
     runs-on: ubuntu-latest
@@ -1469,7 +1473,7 @@ jobs:
   publish-npm-granularity-devtools:
     needs:
       - build-granularity-devtools
-    if: startsWith(github.ref, 'refs/tags/granularity-devtools-v')
+    if: ${{ !failure() && !cancelled() && (startsWith(github.ref, 'refs/tags/granularity-devtools-v')) }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -1509,7 +1513,7 @@ jobs:
   publish-gpr-granularity-devtools:
     needs:
       - build-granularity-devtools
-    if: startsWith(github.ref, 'refs/tags/granularity-devtools-v')
+    if: ${{ !failure() && !cancelled() && (startsWith(github.ref, 'refs/tags/granularity-devtools-v')) }}
     runs-on: ubuntu-latest
     continue-on-error: true
     permissions:
@@ -1547,6 +1551,10 @@ jobs:
   # unplugin-vue-components). Артефакт нужен и для валидации (publint),
   # и для последующей публикации по тегу `unplugin-granularity-v*`.
   build-unplugin-granularity:
+    # Пропуск зависимости распространяется по цепочке: `test-granularity`
+    # выключается на теге технического пакета, и без этого условия сюда
+    # доходит `skipped` — через `build-granularity`, хотя тот отработал.
+    if: ${{ !failure() && !cancelled() }}
     needs:
       - quality-granularity
       - build-granularity
@@ -1592,7 +1600,7 @@ jobs:
   publish-npm-unplugin-granularity:
     needs:
       - build-unplugin-granularity
-    if: startsWith(github.ref, 'refs/tags/unplugin-granularity-v')
+    if: ${{ !failure() && !cancelled() && (startsWith(github.ref, 'refs/tags/unplugin-granularity-v')) }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -1633,7 +1641,7 @@ jobs:
   publish-gpr-unplugin-granularity:
     needs:
       - build-unplugin-granularity
-    if: startsWith(github.ref, 'refs/tags/unplugin-granularity-v')
+    if: ${{ !failure() && !cancelled() && (startsWith(github.ref, 'refs/tags/unplugin-granularity-v')) }}
     runs-on: ubuntu-latest
     continue-on-error: true
     permissions:
