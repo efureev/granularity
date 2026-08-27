@@ -37,6 +37,9 @@ export interface StubMatchMediaOptions {
  */
 export function stubMatchMedia(options: StubMatchMediaOptions = {}): () => void {
   const { reducedMotion = false, matches = false } = options
+  // Ссылка только сохраняется и возвращается на место — вызова в отрыве от
+  // `window` нет, поэтому терять `this` тут нечему.
+  // eslint-disable-next-line ts/unbound-method
   const original = window.matchMedia
 
   window.matchMedia = (query: string) => ({

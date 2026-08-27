@@ -7,19 +7,26 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.10.0] 2026-08-27
+
 ### Changed
 
-- **Peer range for `@feugene/fint-i18n` widened to `>=0.6.0 <1.0.0`.** On `0.x`
-  versions a caret does not admit the next minor, so `^0.6.0` excluded `0.7.0` —
-  the release consumers had already moved to. The peer is optional, so nothing
-  ever failed to install; the mismatch surfaced as a warning in every consumer's
-  install log.
+- **Peer floors on `@feugene/*` raised to the current minor.** Every peer this package
+  declares on the ecosystem now starts at the version the monorepo actually ships:
 
-  Nothing was removed in `0.7.0`: it adds locale negotiation and changes how a
-  regional tag falls back to its base language, and this package touches
-  neither. Compatibility is verified rather than assumed — the dev dependency
-  now points at `^0.7.0`, so the suite runs against the version the peer range
-  claims to support.
+  - `@feugene/fint-i18n` → `>=0.7.0 <1.0.0`
+  - `@feugene/granularity` → `>=0.36.0 <1.0.0`
+  - `@feugene/unocss-preset-granular` → `>=0.13.0 <1.0.0`
+  - `@feugene/unplugin-granularity` → `>=0.7.0 <1.0.0`
+
+  The floors had drifted far behind — some still admitted releases from a year of
+  development ago — and a range that claims support it was never tested against is
+  worse than a narrow one: the install succeeds and the breakage surfaces later, in
+  the consumer's app.
+
+  **This is breaking for anyone below a floor.** Installing against an older
+  `@feugene/granularity` now produces a peer conflict instead of silence. The fix is
+  to move the core up; nothing in this package's own API changed.
 
 ## [v0.9.1] 2026-08-23
 

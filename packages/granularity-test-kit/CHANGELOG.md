@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v0.8.0] 2026-08-27
+
+### Changed
+
+- **Peer floors on `@feugene/*` raised to the current minor.** Every peer this package
+  declares on the ecosystem now starts at the version the monorepo actually ships:
+
+  - `@feugene/unocss-preset-granular` → `>=0.13.0 <1.0.0`
+
+  The floors had drifted far behind — some still admitted releases from a year of
+  development ago — and a range that claims support it was never tested against is
+  worse than a narrow one: the install succeeds and the breakage surfaces later, in
+  the consumer's app.
+
+  **This is breaking for anyone below a floor.** Installing against an older
+  `@feugene/granularity` now produces a peer conflict instead of silence. The fix is
+  to move the core up; nothing in this package's own API changed.
+
 ## [v0.7.4] 2026-08-25
 
 ### Fixed

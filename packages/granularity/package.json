@@ -591,7 +591,7 @@
     "./package.json": "./package.json"
   },
   "peerDependencies": {
-    "@feugene/fint-i18n": ">=0.6.0 <1.0.0",
+    "@feugene/fint-i18n": ">=0.7.0 <1.0.0",
     "@feugene/unocss-preset-granular": ">=0.13.0 <1.0.0",
     "@floating-ui/dom": "^1.8.0",
     "vue": "^3.5.0"
@@ -605,28 +605,28 @@
     }
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^9.1.0",
+    "@antfu/eslint-config": "^9.3.0",
     "@feugene/fint-i18n": "^0.7.0",
-    "@feugene/granularity-test-kit": "^0.7.4",
+    "@feugene/granularity-test-kit": "^0.8.0",
     "@feugene/unocss-preset-granular": "^0.13.0",
     "@floating-ui/dom": "^1.8.0",
-    "@iconify-json/lucide": "^1.2.117",
+    "@iconify-json/lucide": "^1.2.126",
     "@types/node": "^25.9.5",
-    "@unocss/eslint-plugin": "^66.7.5",
+    "@unocss/eslint-plugin": "^66.8.1",
     "@vitejs/plugin-vue": "^6.0.8",
-    "@vitest/coverage-v8": "^4.1.10",
+    "@vitest/coverage-v8": "^4.1.11",
     "@vue/test-utils": "^2.4.11",
-    "eslint": "^10.7.0",
-    "globals": "^17.7.0",
+    "eslint": "^10.9.1",
+    "globals": "^17.11.0",
     "jsdom": "^29.1.1",
-    "typescript": "^6.0.2",
-    "unocss": "^66.7.5",
+    "typescript": "^6.0.3",
+    "unocss": "^66.8.1",
     "unplugin-icons": "^23.0.1",
-    "vite": "^8.1.5",
+    "vite": "^8.2.2",
     "vite-plugin-lib-inject-css": "^2.2.2",
-    "vitest": "^4.1.10",
-    "vue": "^3.5.40",
-    "vue-tsc": "^3.3.7"
+    "vitest": "^4.1.11",
+    "vue": "^3.5.42",
+    "vue-tsc": "^3.3.11"
   },
   "scripts": {
     "build": "vite build && gr-check-dist-dev-guard && node scripts/check-dist-no-tests.mjs && node scripts/generate-web-types.mjs && vue-tsc -p tsconfig.build.json && node scripts/check-dist-exports.mjs",

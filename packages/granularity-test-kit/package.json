@@ -1,7 +1,7 @@
 {
   "name": "@feugene/granularity-test-kit",
   "description": "Test gates for @feugene/granularity design-system packages — token, registry and defaults contracts as reusable factories.",
-  "version": "0.7.4",
+  "version": "0.8.0",
   "license": "SEE LICENSE IN LICENSE",
   "author": {
     "name": "Evgeniy Fureev",
@@ -72,7 +72,7 @@
   },
   "peerDependencies": {
     "@axe-core/playwright": ">=4.10",
-    "@feugene/unocss-preset-granular": ">=0.11.0 <1.0.0",
+    "@feugene/unocss-preset-granular": ">=0.13.0 <1.0.0",
     "@playwright/test": ">=1.50",
     "@vue/test-utils": ">=2.4",
     "axe-core": ">=4.10",
@@ -103,20 +103,20 @@
     }
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^9.1.0",
-    "@axe-core/playwright": "^4.12.1",
+    "@antfu/eslint-config": "^9.3.0",
+    "@axe-core/playwright": "^4.13.0",
     "@feugene/unocss-preset-granular": "^0.13.0",
-    "@playwright/test": "^1.61.1",
-    "@types/node": "^26.1.1",
+    "@playwright/test": "^1.62.1",
+    "@types/node": "^26.4.0",
     "@vue/test-utils": "^2.4.11",
-    "axe-core": "~4.12.1",
-    "eslint": "^10.7.0",
+    "axe-core": "~4.13.0",
+    "eslint": "^10.9.1",
     "globals": "^16.5.0",
     "jsdom": "^29.1.1",
-    "typescript": "^6.0.2",
-    "vite": "^8.1.5",
-    "vitest": "^4.1.10",
-    "vue": "^3.5.40"
+    "typescript": "^6.0.3",
+    "vite": "^8.2.2",
+    "vitest": "^4.1.11",
+    "vue": "^3.5.42"
   },
   "scripts": {
     "build": "vite build && tsc -p tsconfig.build.json",
