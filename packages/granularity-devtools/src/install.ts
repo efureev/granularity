@@ -8,6 +8,7 @@ import { resolveOptions } from './options'
 import { interceptConsole } from './internal/consoleIntercept'
 import { registerComponentConfig } from './plugin/componentConfig'
 import { registerAnnouncer } from './plugin/announcer'
+import { registerComponentStyles } from './plugin/componentStyles'
 import { registerComponentTokens } from './plugin/componentTokens'
 import { registerComponentVirtualList } from './plugin/componentVirtualList'
 import { registerI18nState } from './plugin/i18nState'
@@ -88,6 +89,7 @@ export function installGranularityDevtools(options: GranularityDevtoolsOptions =
           registerOverlays(api, issues)
           registerComponentConfig(api, issues, resolved.checks)
           registerComponentTokens(api)
+          registerComponentStyles(api)
           registerComponentVirtualList(api)
           registerAnnouncer(api)
           registerIssues(api, issues)

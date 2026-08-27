@@ -35,6 +35,10 @@ to [Semantic Versioning](https://semver.org/).
 - **"Granularity app" section** — state that belongs to the application rather than to a component: the theme
   with its **source** (saved by the user, system preference, or persistence off — the answer to "why is it dark,
   I picked light") and the toast queue.
+- **"Classes without rules" section** — classes on the component's root and descendants that no CSS rule matches.
+  This is what a safelist miss looks like from the browser: sizes work, colours are transparent, focus rings are
+  gone. The selector index is built once per session and invalidated when `<style>`/`<link>` nodes change;
+  cross-origin sheets cannot be read, and the section says the list is incomplete instead of staying silent.
 - **Options**: `checks: 'all' | 'off'` turns off the missing-required-prop scan that runs on every tree node, and
   `eventLimit` sets the depth of the core's event buffer.
 - **JSON report** action in the overlays section: layers, virtual lists, warnings and versions, copied to the
