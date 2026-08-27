@@ -7,6 +7,49 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- **Console bridge `window.__GR_DEVTOOLS__`** with `snapshot()`, `waitFor(predicate, options)` and `version`.
+  Tests see only the DOM, so "wait until the overlay layer is registered" used to be written as "wait 300 ms";
+  the bridge answers that from the same snapshot the panel draws for a human. It works **without the panel
+  being open**: the issue log and the channel subscription now live in `installGranularityDevtools()` rather
+  than inside the DevTools setup, which only runs once someone opens the tab.
+- E2E on the showcase covering the bridge — the overlay stack is asserted without a single `waitForTimeout`.
+
+- **Layers are named after the component that opened them** — `GrPromptDialog #3` instead of `Modal #3` — in the
+  tree, in the state and in the timeline.
+- **Focus section for each layer**: whether focus is still inside, whether it will be restored on close and to which
+  element. "Focus is inside" and "focus will be restored" are separate rows on purpose: they diverge for a layer
+  opened with `restoreFocus: false`.
+- The inspector and the bridge now read the stack **on demand** via `readLayers()` instead of replaying the last
+  event, so focus is shown as it is now rather than as it was when the stack last changed.
+
+- **"Granularity toasts" section** — the queue behind the visible stack: how many are alive, the ceiling
+  (`maxToasts`) above which the oldest are evicted, each toast's tone, remaining timer and dedupe key. Without
+  `app.use(granularityToastPlugin)` the queue lives in a module singleton and cannot be read from outside — the
+  section says so instead of showing an empty list that reads as "no toasts".
+- **Virtual list section on the component**: rendered against total, the window `[start, end)`, the size estimate
+  and the measured average, with a note when the two drift far enough to make the list jump. Measured on the
+  showcase: `GrDataTable` with 10 000 rows renders 14, window `[0, 14)`, estimate 49 px against 45 px measured.
+
+- **"Granularity app" section** — state that belongs to the application rather than to a component: the theme
+  with its **source** (saved by the user, system preference, or persistence off — the answer to "why is it dark,
+  I picked light") and the toast queue.
+- **"Classes without rules" section** — classes on the component's root and descendants that no CSS rule matches.
+  This is what a safelist miss looks like from the browser: sizes work, colours are transparent, focus rings are
+  gone. The selector index is built once per session and invalidated when `<style>`/`<link>` nodes change;
+  cross-origin sheets cannot be read, and the section says the list is incomplete instead of staying silent.
+- **Options**: `checks: 'all' | 'off'` turns off the missing-required-prop scan that runs on every tree node, and
+  `eventLimit` sets the depth of the core's event buffer.
+- **JSON report** action in the overlays section: layers, virtual lists, warnings and versions, copied to the
+  console and — when the browser allows it — to the clipboard.
+
+### Changed
+
+- The console interception moved from the "Issues" section to `install`, and the log gained `subscribe()`:
+  the section now follows the log instead of filling it. Restoring the console puts back the original
+  functions, not `bind`-ed copies — the previous version layered a wrapper on every attach cycle.
+
 ## [v0.1.1] 2026-08-27
 
 ### Changed

@@ -1,5 +1,8 @@
+import { createRequire } from 'node:module'
 import { fileURLToPath, URL } from 'node:url'
 import { defineConfig } from 'vite'
+
+const pkg = createRequire(import.meta.url)('./package.json') as { version: string }
 
 /**
  * Сборка dev-инструмента: одна ESM-entry, никакого CSS — панель рисует Vue
@@ -10,6 +13,12 @@ import { defineConfig } from 'vite'
  * буфер плагинов и панель не увидит ни одного раздела.
  */
 export default defineConfig({
+  define: {
+    // Версия нужна консольному мосту: тест, снявший снимок, должен понимать, с
+    // какой версией панели говорит. Читается из `package.json`, чтобы не
+    // разъезжаться с ним при бампе.
+    __GR_DEVTOOLS_VERSION__: JSON.stringify(pkg.version),
+  },
   build: {
     target: 'esnext',
     minify: 'oxc',

@@ -1,5 +1,7 @@
 import type { ComputedRef, Ref } from 'vue'
-import { computed, onScopeDispose, ref, watch } from 'vue'
+import { computed, getCurrentInstance, onScopeDispose, ref, watch } from 'vue'
+
+import { registerGrVirtualList } from '../internal/devHook'
 
 /**
  * Виртуализация длинного списка: в DOM живёт только окно вокруг вьюпорта.
@@ -421,10 +423,35 @@ export function useVirtualList(options: UseVirtualListOptions): UseVirtualListRe
     }
   }
 
+  // Наблюдателю окно отдаётся реестром, а не событием: оно меняется на каждом
+  // кадре прокрутки, и лента событий тут была бы бессмысленным потоком.
+  const unregisterFromDevtools = __GR_DEV__
+    ? (() => {
+        const instance = getCurrentInstance()
+        const owner = (instance?.type as { __name?: string, name?: string } | undefined)?.__name ?? null
+
+        return registerGrVirtualList(() => {
+          const sizes = [...measured.values()]
+          const window = range.value
+
+          return {
+            owner,
+            uid: instance?.uid ?? null,
+            total: options.count(),
+            rendered: Math.max(0, window.end - window.start),
+            range: { start: window.start, end: window.end },
+            estimated: estimateOf(window.start),
+            measured: sizes.length > 0 ? sizes.reduce((sum, size) => sum + size, 0) / sizes.length : null,
+          }
+        })
+      })()
+    : null
+
   onScopeDispose(() => {
     detach()
     sizeObserver?.disconnect()
     viewportObserver?.disconnect()
+    unregisterFromDevtools?.()
   })
 
   return { range, totalSize: total, offset, offsetEnd, spacerStyle, measure, scrollToIndex, invalidate }

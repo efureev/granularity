@@ -16,9 +16,25 @@
  * порядок не гарантирован), а логика эмита при этом живёт в одном месте, здесь.
  */
 
+/** Фокус вокруг слоя: то, чего не видно ни в DOM, ни в браузерном инспекторе. */
+export interface GrLayerFocus {
+  /** Фокус сейчас внутри слоя. */
+  inside: boolean
+  /**
+   * Вернётся ли фокус при закрытии. Правило нетривиальное — «только если на
+   * момент закрытия фокус ещё внутри слоя», — и снаружи непроверяемо.
+   */
+  willRestore: boolean
+  /** Куда вернётся: описание элемента, а не ссылка (буфер не должен держать DOM). */
+  restoreTo: string | null
+}
+
 /** Слой оверлея в том виде, в каком его видит наблюдатель. */
 export interface GrOverlaySnapshot {
   id: number
+  /** Компонент, открывший слой: `GrSelect`, `GrModal`. `null` — слой заведён вне компонента. */
+  owner: string | null
+  focus: GrLayerFocus | null
   modal: boolean
   /** Верхний слой любого рода: ему адресован Esc. */
   topmostForEscape: boolean
@@ -32,14 +48,55 @@ export interface GrOverlaySnapshot {
 
 export type GrDevEvent
   = | { type: 'overlay:sync', layers: GrOverlaySnapshot[] }
-    | { type: 'overlay:push', id: number, modal: boolean }
+    | { type: 'overlay:push', id: number, modal: boolean, owner: string | null }
     | { type: 'overlay:remove', id: number }
     | { type: 'overlay:escape', id: number, closed: boolean }
+
+/**
+ * Окно виртуализатора глазами наблюдателя.
+ *
+ * Число узлов в DOM браузер покажет и сам; невидимо другое — какие индексы
+ * отрисованы, сколько всего элементов и насколько оценка высоты разошлась с
+ * замером. Расхождение и есть тихий дефект: список начинает прыгать, а узлов
+ * по-прежнему «правильные десятки».
+ */
+export interface GrVirtualListSnapshot {
+  /** Компонент, которому принадлежит список. */
+  owner: string | null
+  /** `uid` инстанса: панель связывает снимок с выбранным компонентом. */
+  uid: number | null
+  total: number
+  rendered: number
+  range: { start: number, end: number }
+  /** Оценка высоты элемента, с которой список считает окно. */
+  estimated: number
+  /** Средний фактический замер; `null` — пока ничего не измерено. */
+  measured: number | null
+}
 
 export interface GrDevHook {
   /** Последние события — чтобы подключившийся позже не начинал с пустого экрана. */
   events: GrDevEvent[]
   listeners: Set<(event: GrDevEvent) => void>
+  /**
+   * Глубина буфера, если наблюдатель попросил другую. Ставит её он же: сколько
+   * истории нужно, знает только тот, кто её читает.
+   */
+  bufferLimit?: number
+  /**
+   * Живые виртуализаторы. Реестр, а не событие: окно меняется на каждый кадр
+   * прокрутки, и слать его лентой значило бы залить канал.
+   */
+  virtualLists?: Set<() => GrVirtualListSnapshot>
+  /**
+   * Свежий снимок стека по требованию.
+   *
+   * События дают картину на момент изменения стека, а часть состояния меняется
+   * между ними: фокус уходит из слоя от обычного клика, и ни одного события при
+   * этом не случается. Наблюдателю нужно спросить «как сейчас», а не «как было
+   * при последнем push».
+   */
+  readLayers?: () => GrOverlaySnapshot[]
 }
 
 type GlobalWithDevHook = typeof globalThis & { __GR_DEV_HOOK__?: GrDevHook }
@@ -61,12 +118,33 @@ function ensureHook(): GrDevHook {
   return hook
 }
 
+/**
+ * Регистрирует виртуализатор в реестре наблюдателя. Возвращает снятие —
+ * список обязан исчезнуть вместе с компонентом.
+ */
+export function registerGrVirtualList(read: () => GrVirtualListSnapshot): () => void {
+  const hook = ensureHook()
+  hook.virtualLists ??= new Set()
+  hook.virtualLists.add(read)
+
+  return () => {
+    hook.virtualLists?.delete(read)
+  }
+}
+
+/** Ядро отдаёт наблюдателю читалку стека. Вызывается один раз, из стека слоёв. */
+export function provideGrDevLayers(read: () => GrOverlaySnapshot[]): void {
+  ensureHook().readLayers = read
+}
+
 export function emitGrDevEvent(event: GrDevEvent): void {
   const hook = ensureHook()
 
+  const limit = hook.bufferLimit ?? BUFFER_LIMIT
+
   hook.events.push(event)
-  if (hook.events.length > BUFFER_LIMIT)
-    hook.events.splice(0, hook.events.length - BUFFER_LIMIT)
+  if (hook.events.length > limit)
+    hook.events.splice(0, hook.events.length - limit)
 
   for (const listener of hook.listeners) {
     // Слушатель — чужой код, и его исключение не должно ронять то, за чем он

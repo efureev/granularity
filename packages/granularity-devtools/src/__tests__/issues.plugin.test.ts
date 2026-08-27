@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import { registerIssues } from '../plugin/issues'
 import { createGrIssueLog } from '../resolve/issues'
@@ -18,49 +18,47 @@ function fakeApi() {
   }
 }
 
-const originalWarn = console.warn
-
-afterEach(() => {
-  console.warn = originalWarn
-})
-
 describe('раздел «Issues»', () => {
-  it('перехватывает предупреждения пакета, не глотая их', () => {
-    const printed = vi.fn()
-    console.warn = printed
-
+  it('показывает то, что собрал журнал', () => {
     const api = fakeApi()
-    registerIssues(api as never, createGrIssueLog())
-    console.warn('[GrSlider] обязательный проп')
+    const log = createGrIssueLog()
+    registerIssues(api as never, log)
+
+    log.add('warning', ['[GrSlider] обязательный проп'])
 
     const payload = { inspectorId: 'granularity:issues', rootNodes: [] as unknown[] }
     api.handlers.tree?.(payload)
 
-    expect(printed).toHaveBeenCalledWith('[GrSlider] обязательный проп')
     expect(payload.rootNodes).toHaveLength(1)
   })
 
-  it('чужие предупреждения в список не попадают', () => {
-    console.warn = vi.fn()
+  it('обновляет дерево, когда журнал пополнился без участия панели', () => {
+    const api = fakeApi()
+    const log = createGrIssueLog()
+    registerIssues(api as never, log)
 
+    log.record('error', 'GrBreadcrumbs', 'missing required prop: `items`')
+
+    expect(api.sendInspectorTree).toHaveBeenCalledWith('granularity:issues')
+  })
+
+  it('чужой инспектор не перехватывается', () => {
     const api = fakeApi()
     registerIssues(api as never, createGrIssueLog())
-    console.warn('[vue] чужое предупреждение')
 
-    const payload = { inspectorId: 'granularity:issues', rootNodes: [] as unknown[] }
+    const payload = { inspectorId: 'pinia', rootNodes: ['нетронуто'] }
     api.handlers.tree?.(payload)
 
-    expect(payload.rootNodes).toHaveLength(0)
-    expect(api.sendInspectorTree).not.toHaveBeenCalled()
+    expect(payload.rootNodes).toEqual(['нетронуто'])
   })
 
   it('состояние записи показывает источник и число повторов', () => {
-    console.warn = vi.fn()
-
     const api = fakeApi()
-    registerIssues(api as never, createGrIssueLog())
-    console.warn('[GrModal] дважды')
-    console.warn('[GrModal] дважды')
+    const log = createGrIssueLog()
+    registerIssues(api as never, log)
+
+    log.add('warning', ['[GrModal] дважды'])
+    log.add('warning', ['[GrModal] дважды'])
 
     const tree = { inspectorId: 'granularity:issues', rootNodes: [] as { id: string }[] }
     api.handlers.tree?.(tree)

@@ -1,6 +1,9 @@
+import type { Ref } from 'vue'
 import { mount } from '@vue/test-utils'
 import { defineComponent, nextTick, ref } from 'vue'
 import { afterEach, describe, expect, it, vi } from 'vitest'
+
+import type { GrDevEvent, GrOverlaySnapshot } from '../internal/devHook'
 
 import { useOverlayLayer } from '../composables/useOverlayLayer'
 import {
@@ -23,6 +26,20 @@ import {
  *    слой сверху модалку не «понижает» — иначе окно ушло бы в `inert` вместе со
  *    своим же открытым дропдауном и перестало отвечать.
  */
+
+/**
+ * Свежий снимок стека глазами наблюдателя.
+ *
+ * Спрашиваем читалку, а не последнее событие: фокус меняется от обычного клика,
+ * и события стека при этом не происходит вовсе.
+ */
+function grDevHookSnapshot(): GrOverlaySnapshot[] {
+  const hook = (globalThis as typeof globalThis & {
+    __GR_DEV_HOOK__?: { events: GrDevEvent[], readLayers?: () => GrOverlaySnapshot[] }
+  }).__GR_DEV_HOOK__
+
+  return hook?.readLayers?.() ?? []
+}
 
 function pressEscape(init: KeyboardEventInit = {}): KeyboardEvent {
   const event = new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true, ...init })
@@ -269,5 +286,76 @@ describe('глубина модального слоя', () => {
 
   it('снаружи окон панель остаётся на своей шкале', () => {
     expect(floatingLayerZIndex('--gr-z-dropdown')).toBe('var(--gr-z-dropdown)')
+  })
+})
+
+/**
+ * Наблюдатель видит то же решение о фокусе, что принимает сам слой.
+ *
+ * Условие возврата вынесено в общую функцию именно ради этого: разъедься они —
+ * панель показывала бы «фокус вернётся», а пакет бы его не вернул.
+ */
+describe('useOverlayLayer: картина фокуса для наблюдателя', () => {
+  function mountLayer(root: Ref<HTMLElement | null>) {
+    const open = ref(true)
+    const component = defineComponent({
+      setup() {
+        useOverlayLayer(open, () => {
+          open.value = false
+        }, { modal: true, root })
+        return () => null
+      },
+    })
+    return { open, wrapper: mount(component) }
+  }
+
+  afterEach(() => resetOverlayStack())
+
+  it('пока фокус внутри слоя, наблюдатель видит обещание вернуть его', async () => {
+    const trigger = document.createElement('button')
+    trigger.textContent = 'Открыть'
+    document.body.append(trigger)
+    trigger.focus()
+
+    const root = ref<HTMLElement | null>(document.createElement('div'))
+    const inside = document.createElement('button')
+    root.value!.append(inside)
+    document.body.append(root.value!)
+
+    const { wrapper } = mountLayer(root)
+    await nextTick()
+
+    // Ловушка фокуса переводит его внутрь слоя — воспроизводим это руками:
+    // сам `useOverlayLayer` ловушкой не занимается, она отдельный примитив.
+    inside.focus()
+
+    const focus = grDevHookSnapshot()[0]?.focus
+    expect(focus).toMatchObject({ inside: true, willRestore: true })
+    expect(focus?.restoreTo).toContain('button')
+
+    wrapper.unmount()
+    trigger.remove()
+  })
+
+  it('ушёл фокус из слоя — наблюдатель говорит, что возврата не будет', async () => {
+    const trigger = document.createElement('button')
+    document.body.append(trigger)
+    trigger.focus()
+
+    const root = ref<HTMLElement | null>(document.createElement('div'))
+    document.body.append(root.value!)
+    const { wrapper } = mountLayer(root)
+    await nextTick()
+
+    // Пользователь ушёл сам — в поле вне слоя.
+    const elsewhere = document.createElement('input')
+    document.body.append(elsewhere)
+    elsewhere.focus()
+
+    expect(grDevHookSnapshot()[0]).toMatchObject({ focus: { inside: false, willRestore: false } })
+
+    wrapper.unmount()
+    trigger.remove()
+    elsewhere.remove()
   })
 })

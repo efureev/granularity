@@ -7,6 +7,24 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- **Dev channel now carries who opened a layer and what happens to focus.** A layer used to be a bare `id`, so on a
+  page with a dozen selects "which one holds the top layer" had no answer. The snapshot now names the component
+  (`GrSelect`, `GrModal`) and describes focus: is it still inside the layer, will it be restored on close, and to
+  what element. The restore rule is non-trivial — "only if focus is still inside at closing time" — and was
+  unobservable from outside; the predicate is now one function used both by the restore itself and by the observer,
+  so the two cannot drift apart.
+- **Virtual lists register themselves in the dev channel.** A registry rather than events: the window changes on
+  every scroll frame, and streaming that would flood the channel. Each entry reports the owning component, the
+  rendered range against the total, the size estimate the window is computed from and the average measured size —
+  a drift between the last two is what makes a list jump while the DOM still holds the "correct dozens" of nodes.
+- The event buffer depth is now configurable through the hook: how much history is needed is known only by whoever
+  reads it.
+- `__GR_DEV_HOOK__.readLayers()` — a fresh snapshot on demand. Events describe the stack at the moment it changed,
+  but focus moves on an ordinary click with no stack event at all: an observer reading only the event log would show
+  a stale picture. All of it stays behind `__GR_DEV__`.
+
 ## [v0.37.0] 2026-08-27
 
 ### Fixed

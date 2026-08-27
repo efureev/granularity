@@ -1,12 +1,20 @@
 import type { App, Plugin } from 'vue'
 import { setupDevtoolsPlugin } from '@vue/devtools-api'
 
+import type { GranularityDevtoolsOptions } from './options'
+import { installGrDevtoolsBridge } from './internal/bridge'
+import { setGrDevEventLimit } from './internal/devChannel'
+import { resolveOptions } from './options'
+import { interceptConsole } from './internal/consoleIntercept'
 import { registerComponentConfig } from './plugin/componentConfig'
 import { registerAnnouncer } from './plugin/announcer'
+import { registerComponentStyles } from './plugin/componentStyles'
 import { registerComponentTokens } from './plugin/componentTokens'
+import { registerComponentVirtualList } from './plugin/componentVirtualList'
 import { registerI18nState } from './plugin/i18nState'
 import { registerIssues } from './plugin/issues'
 import { registerOverlays } from './plugin/overlays'
+import { registerAppState } from './plugin/app'
 import { createGrIssueLog } from './resolve/issues'
 
 const PLUGIN_ID = 'org.feugene.granularity'
@@ -48,12 +56,22 @@ function isProduction(): boolean {
  * Гард у вызывающего — не перестраховка, а единственный способ убрать вызов из
  * прод-бандла целиком: см. `isProduction` выше.
  */
-export function installGranularityDevtools(): Plugin {
+export function installGranularityDevtools(options: GranularityDevtoolsOptions = {}): Plugin {
+  const resolved = resolveOptions(options)
+
   return {
     install(app: App) {
       // Панели нет ни на сервере, ни в проде: она рисуется расширением браузера.
       if (typeof window === 'undefined' || isProduction())
         return
+
+      // Журнал, перехват консоли и мост живут независимо от панели: тест её не
+      // открывает, а состояние ему нужно то же самое.
+      const issues = createGrIssueLog()
+      if (resolved.eventLimit !== null)
+        setGrDevEventLimit(resolved.eventLimit)
+      interceptConsole(issues)
+      installGrDevtoolsBridge(issues)
 
       setupDevtoolsPlugin(
         {
@@ -68,15 +86,14 @@ export function installGranularityDevtools(): Plugin {
           app,
         },
         (api) => {
-          // Журнал один на панель: обход дерева пишет в него найденные дефекты,
-          // раздел «Issues» их показывает.
-          const issues = createGrIssueLog()
-
-          registerOverlays(api)
-          registerComponentConfig(api, issues)
+          registerOverlays(api, issues)
+          registerComponentConfig(api, issues, resolved.checks)
           registerComponentTokens(api)
+          registerComponentStyles(api)
+          registerComponentVirtualList(api)
           registerAnnouncer(api)
           registerIssues(api, issues)
+          registerAppState(api, app)
           registerI18nState(api, app, issues)
         },
       )

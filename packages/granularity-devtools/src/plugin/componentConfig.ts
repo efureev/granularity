@@ -47,13 +47,16 @@ function componentName(instance: InstanceLike | undefined): string | undefined {
  * передал» от «сработал дефолт» по нему нельзя. Зато можно по `vnode.props` —
  * это ровно то, что написал вызывающий, до подстановки дефолтов.
  */
-export function registerComponentConfig(api: DevtoolsApi, log: GrIssueLog): void {
+export function registerComponentConfig(api: DevtoolsApi, log: GrIssueLog, checks: 'all' | 'off' = 'all'): void {
   api.on.visitComponentTree((payload: VisitPayload) => {
     const name = componentName(payload.componentInstance)
     if (!name?.startsWith('Gr'))
       return
 
     payload.treeNode.tags.push(TAG_GRANULARITY)
+
+    if (checks === 'off')
+      return
 
     // Обход дерева — единственный момент, когда панель видит все экземпляры
     // сразу: `inspectComponent` приходит только на выбранный пользователем.

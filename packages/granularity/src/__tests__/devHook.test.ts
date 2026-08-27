@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import type { GrDevEvent, GrDevHook, GrOverlaySnapshot } from '../internal/devHook'
-import { emitGrDevEvent, resetGrDevHook } from '../internal/devHook'
+import { emitGrDevEvent, registerGrVirtualList, resetGrDevHook } from '../internal/devHook'
 import {
   pushOverlayLayer,
   removeOverlayLayer,
@@ -95,6 +95,33 @@ describe('dev-канал: картина стека', () => {
   })
 })
 
+describe('dev-канал: владелец слоя и фокус', () => {
+  it('слой, заведённый вне компонента, владельца не имеет', () => {
+    const seen = listen()
+    pushOverlayLayer(layer(true))
+
+    expect(snapshot(seen)[0]).toMatchObject({ owner: null, focus: null })
+  })
+
+  it('владелец доезжает и до события, и до снимка', () => {
+    const seen = listen()
+    const id = pushOverlayLayer({ ...layer(true), owner: 'GrModal' })
+
+    expect(seen).toContainEqual({ type: 'overlay:push', id, modal: true, owner: 'GrModal' })
+    expect(snapshot(seen)[0]?.owner).toBe('GrModal')
+  })
+
+  it('картину фокуса слой рассказывает сам — в момент снимка, а не регистрации', () => {
+    const seen = listen()
+    const describeFocus = vi.fn(() => ({ inside: true, willRestore: true, restoreTo: 'button «Открыть»' }))
+
+    pushOverlayLayer({ ...layer(true), describeFocus })
+    expect(describeFocus).toHaveBeenCalledTimes(1)
+
+    expect(snapshot(seen)[0]?.focus).toEqual({ inside: true, willRestore: true, restoreTo: 'button «Открыть»' })
+  })
+})
+
 describe('dev-канал: незаметность для пакета', () => {
   it('без подписчиков стек работает как обычно', () => {
     const close = vi.fn()
@@ -143,5 +170,61 @@ describe('dev-канал: незаметность для пакета', () => {
     expect(() => emitGrDevEvent({ type: 'overlay:remove', id: 1 })).not.toThrow()
 
     vi.unstubAllGlobals()
+  })
+})
+
+/**
+ * Виртуализаторы отдаются реестром, а не лентой: окно меняется на каждом кадре
+ * прокрутки, и события тут были бы потоком без пользы.
+ */
+describe('dev-канал: реестр виртуализаторов', () => {
+  function virtualList(uid: number) {
+    return () => ({
+      owner: 'GrDataTable',
+      uid,
+      total: 1000,
+      rendered: 12,
+      range: { start: 40, end: 52 },
+      estimated: 44,
+      measured: 47.5,
+    })
+  }
+
+  it('зарегистрированный список читается по требованию', () => {
+    emitGrDevEvent({ type: 'overlay:sync', layers: [] })
+    registerGrVirtualList(virtualList(1))
+
+    expect([...hook().virtualLists!].map(read => read())).toMatchObject([
+      { owner: 'GrDataTable', total: 1000, rendered: 12, range: { start: 40, end: 52 } },
+    ])
+  })
+
+  it('снятие убирает список из реестра: он не должен пережить компонент', () => {
+    emitGrDevEvent({ type: 'overlay:sync', layers: [] })
+    const unregister = registerGrVirtualList(virtualList(2))
+    unregister()
+
+    expect(hook().virtualLists?.size).toBe(0)
+  })
+
+  it('несколько списков на странице не смешиваются', () => {
+    emitGrDevEvent({ type: 'overlay:sync', layers: [] })
+    registerGrVirtualList(virtualList(3))
+    registerGrVirtualList(virtualList(4))
+
+    expect([...hook().virtualLists!].map(read => read().uid)).toEqual([3, 4])
+  })
+})
+
+describe('dev-канал: глубина буфера', () => {
+  it('наблюдатель может попросить свою глубину', () => {
+    emitGrDevEvent({ type: 'overlay:remove', id: 0 })
+    hook().bufferLimit = 3
+
+    for (let index = 1; index <= 10; index += 1)
+      emitGrDevEvent({ type: 'overlay:remove', id: index })
+
+    expect(hook().events).toHaveLength(3)
+    expect(hook().events.at(-1)).toEqual({ type: 'overlay:remove', id: 10 })
   })
 })

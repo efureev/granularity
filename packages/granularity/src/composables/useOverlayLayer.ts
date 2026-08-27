@@ -1,5 +1,5 @@
 import type { Ref } from 'vue'
-import { nextTick, onUnmounted, ref, watch } from 'vue'
+import { getCurrentInstance, nextTick, onUnmounted, ref, watch } from 'vue'
 
 import { layerRootsAbove, pushOverlayLayer, removeOverlayLayer } from './internal/overlayStack'
 
@@ -59,6 +59,20 @@ export interface OverlayLayerHandle {
 }
 
 /**
+ * Куда вернётся фокус — строкой: буфер наблюдателя не должен удерживать DOM
+ * закрытых слоёв.
+ */
+function describeElement(element: HTMLElement | null): string | null {
+  if (!element)
+    return null
+
+  const tag = element.tagName.toLowerCase()
+  const id = element.id ? `#${element.id}` : ''
+  const label = element.getAttribute('aria-label') ?? element.textContent?.trim().slice(0, 24) ?? ''
+  return `${tag}${id}${label ? ` «${label}»` : ''}`
+}
+
+/**
  * Регистрирует оверлей в общем стеке слоёв, пока `open` истинно.
  *
  * Один контракт на порядок Esc, `inert` и возврат фокуса — три механизма,
@@ -86,6 +100,9 @@ export function useOverlayLayer(
   let layerId: number | null = null
   let previouslyFocused: HTMLElement | null = null
   const depth = ref(0)
+  // Снимается здесь, а не в `register()`: тот вызывается и из `watch`, где
+  // инстанса уже нет. Под гардом — в проде имя компонента никому не нужно.
+  const owner = __GR_DEV__ ? (getCurrentInstance()?.type as { __name?: string, name?: string } | undefined)?.__name ?? null : null
 
   function register(): void {
     if (layerId !== null)
@@ -109,6 +126,16 @@ export function useOverlayLayer(
       setTopmost: options.onTopmostChange,
       setDepth: (value) => { depth.value = value },
       root: () => options.root?.value ?? null,
+      // Владелец и фокус нужны только наблюдателю; в проде оба выражения
+      // сворачиваются вместе с гардом.
+      owner: __GR_DEV__ ? owner : undefined,
+      describeFocus: __GR_DEV__
+        ? () => ({
+            inside: focusStillInside(),
+            willRestore: options.restoreFocus !== false && previouslyFocused !== null && focusStillInside(),
+            restoreTo: describeElement(previouslyFocused),
+          })
+        : undefined,
     })
   }
 
@@ -119,6 +146,22 @@ export function useOverlayLayer(
     layerId = null
 
     restoreFocus()
+  }
+
+  /**
+   * Фокус сейчас внутри слоя (или ещё не уходил из него).
+   *
+   * Вынесено отдельной функцией не ради красоты: то же условие спрашивает
+   * наблюдатель (`describeFocus`), и разъедься они — панель показывала бы
+   * решение, которого пакет не принимает.
+   */
+  function focusStillInside(): boolean {
+    if (typeof document === 'undefined')
+      return false
+
+    const active = document.activeElement
+    const root = options.root?.value
+    return !(root && active && active !== document.body && !root.contains(active))
   }
 
   function restoreFocus(): void {
@@ -132,9 +175,7 @@ export function useOverlayLayer(
 
     // Фокус уже вне слоя — пользователь ушёл сам, отбирать нельзя. Решение
     // принимаем сейчас, пока слой ещё в DOM, а применяем следующим тиком.
-    const active = document.activeElement
-    const root = options.root?.value
-    if (root && active && active !== document.body && !root.contains(active))
+    if (!focusStillInside())
       return
 
     // Возврат откладывается намеренно: ловушка фокуса того же слоя снимает свои
