@@ -6,9 +6,11 @@ import { interceptConsole } from './internal/consoleIntercept'
 import { registerComponentConfig } from './plugin/componentConfig'
 import { registerAnnouncer } from './plugin/announcer'
 import { registerComponentTokens } from './plugin/componentTokens'
+import { registerComponentVirtualList } from './plugin/componentVirtualList'
 import { registerI18nState } from './plugin/i18nState'
 import { registerIssues } from './plugin/issues'
 import { registerOverlays } from './plugin/overlays'
+import { registerToasts } from './plugin/toasts'
 import { createGrIssueLog } from './resolve/issues'
 
 const PLUGIN_ID = 'org.feugene.granularity'
@@ -79,8 +81,10 @@ export function installGranularityDevtools(): Plugin {
           registerOverlays(api)
           registerComponentConfig(api, issues)
           registerComponentTokens(api)
+          registerComponentVirtualList(api)
           registerAnnouncer(api)
           registerIssues(api, issues)
+          registerToasts(api, app)
           registerI18nState(api, app, issues)
         },
       )

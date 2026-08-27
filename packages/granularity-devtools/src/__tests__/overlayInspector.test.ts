@@ -105,7 +105,7 @@ describe('владелец и фокус в разделе', () => {
   })
 
   it('слой без данных о фокусе не добавляет пустых строк', () => {
-    const behaviour = overlayState([layer({ id: 8 })], overlayNodeId(8)).Behaviour
+    const behaviour = overlayState([layer({ id: 8 })], overlayNodeId(8)).Behaviour ?? []
 
     expect(behaviour.map(entry => entry.key)).toEqual(['owns Escape', 'closes on Escape', 'inert'])
   })

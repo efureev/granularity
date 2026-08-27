@@ -52,10 +52,37 @@ export type GrDevEvent
     | { type: 'overlay:remove', id: number }
     | { type: 'overlay:escape', id: number, closed: boolean }
 
+/**
+ * Окно виртуализатора глазами наблюдателя.
+ *
+ * Число узлов в DOM браузер покажет и сам; невидимо другое — какие индексы
+ * отрисованы, сколько всего элементов и насколько оценка высоты разошлась с
+ * замером. Расхождение и есть тихий дефект: список начинает прыгать, а узлов
+ * по-прежнему «правильные десятки».
+ */
+export interface GrVirtualListSnapshot {
+  /** Компонент, которому принадлежит список. */
+  owner: string | null
+  /** `uid` инстанса: панель связывает снимок с выбранным компонентом. */
+  uid: number | null
+  total: number
+  rendered: number
+  range: { start: number, end: number }
+  /** Оценка высоты элемента, с которой список считает окно. */
+  estimated: number
+  /** Средний фактический замер; `null` — пока ничего не измерено. */
+  measured: number | null
+}
+
 export interface GrDevHook {
   /** Последние события — чтобы подключившийся позже не начинал с пустого экрана. */
   events: GrDevEvent[]
   listeners: Set<(event: GrDevEvent) => void>
+  /**
+   * Живые виртуализаторы. Реестр, а не событие: окно меняется на каждый кадр
+   * прокрутки, и слать его лентой значило бы залить канал.
+   */
+  virtualLists?: Set<() => GrVirtualListSnapshot>
   /**
    * Свежий снимок стека по требованию.
    *
@@ -84,6 +111,20 @@ function ensureHook(): GrDevHook {
   const hook: GrDevHook = { events: [], listeners: new Set() }
   target.__GR_DEV_HOOK__ = hook
   return hook
+}
+
+/**
+ * Регистрирует виртуализатор в реестре наблюдателя. Возвращает снятие —
+ * список обязан исчезнуть вместе с компонентом.
+ */
+export function registerGrVirtualList(read: () => GrVirtualListSnapshot): () => void {
+  const hook = ensureHook()
+  hook.virtualLists ??= new Set()
+  hook.virtualLists.add(read)
+
+  return () => {
+    hook.virtualLists?.delete(read)
+  }
 }
 
 /** Ядро отдаёт наблюдателю читалку стека. Вызывается один раз, из стека слоёв. */

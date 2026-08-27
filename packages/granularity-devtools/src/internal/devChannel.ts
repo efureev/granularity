@@ -30,11 +30,23 @@ export type GrDevEvent
     | { type: 'overlay:remove', id: number }
     | { type: 'overlay:escape', id: number, closed: boolean }
 
+export interface GrVirtualListSnapshot {
+  owner: string | null
+  uid: number | null
+  total: number
+  rendered: number
+  range: { start: number, end: number }
+  estimated: number
+  measured: number | null
+}
+
 interface GrDevHook {
   events: GrDevEvent[]
   listeners: Set<(event: GrDevEvent) => void>
   /** Свежий снимок стека: часть состояния (фокус) меняется без событий. */
   readLayers?: () => GrOverlaySnapshot[]
+  /** Живые виртуализаторы: окно меняется на каждом кадре прокрутки. */
+  virtualLists?: Set<() => GrVirtualListSnapshot>
 }
 
 type GlobalWithDevHook = typeof globalThis & { __GR_DEV_HOOK__?: GrDevHook }
@@ -69,6 +81,12 @@ function ensureHook(): GrDevHook {
  */
 export function readGrOverlayLayers(): GrOverlaySnapshot[] | null {
   return (globalThis as GlobalWithDevHook).__GR_DEV_HOOK__?.readLayers?.() ?? null
+}
+
+/** Виртуализаторы, живые прямо сейчас. */
+export function readGrVirtualLists(): GrVirtualListSnapshot[] {
+  const registry = (globalThis as GlobalWithDevHook).__GR_DEV_HOOK__?.virtualLists
+  return registry ? [...registry].map(read => read()) : []
 }
 
 export function subscribeToGrDevEvents(listener: (event: GrDevEvent) => void): () => void {

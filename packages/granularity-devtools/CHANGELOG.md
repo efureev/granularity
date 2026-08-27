@@ -24,6 +24,14 @@ to [Semantic Versioning](https://semver.org/).
 - The inspector and the bridge now read the stack **on demand** via `readLayers()` instead of replaying the last
   event, so focus is shown as it is now rather than as it was when the stack last changed.
 
+- **"Granularity toasts" section** — the queue behind the visible stack: how many are alive, the ceiling
+  (`maxToasts`) above which the oldest are evicted, each toast's tone, remaining timer and dedupe key. Without
+  `app.use(granularityToastPlugin)` the queue lives in a module singleton and cannot be read from outside — the
+  section says so instead of showing an empty list that reads as "no toasts".
+- **Virtual list section on the component**: rendered against total, the window `[start, end)`, the size estimate
+  and the measured average, with a note when the two drift far enough to make the list jump. Measured on the
+  showcase: `GrDataTable` with 10 000 rows renders 14, window `[0, 14)`, estimate 49 px against 45 px measured.
+
 ### Changed
 
 - The console interception moved from the "Issues" section to `install`, and the log gained `subscribe()`:

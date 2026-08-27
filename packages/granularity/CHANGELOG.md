@@ -15,6 +15,10 @@ to [Semantic Versioning](https://semver.org/).
   what element. The restore rule is non-trivial — "only if focus is still inside at closing time" — and was
   unobservable from outside; the predicate is now one function used both by the restore itself and by the observer,
   so the two cannot drift apart.
+- **Virtual lists register themselves in the dev channel.** A registry rather than events: the window changes on
+  every scroll frame, and streaming that would flood the channel. Each entry reports the owning component, the
+  rendered range against the total, the size estimate the window is computed from and the average measured size —
+  a drift between the last two is what makes a list jump while the DOM still holds the "correct dozens" of nodes.
 - `__GR_DEV_HOOK__.readLayers()` — a fresh snapshot on demand. Events describe the stack at the moment it changed,
   but focus moves on an ordinary click with no stack event at all: an observer reading only the event log would show
   a stale picture. All of it stays behind `__GR_DEV__`.
