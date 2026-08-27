@@ -25,10 +25,10 @@ import { GRANULARITY_CHARTS_COMPONENTS } from './src/componentNames'
  */
 export default defineConfig({
   plugins: [vue(), libInjectCss()],
-  // Дословно как в ядре: скобки обязательны — без них подстановка склеивается с
-  // соседним оператором и меняет приоритет. Разбор — `packages/granularity/vite.config.ts`.
+  // Дословно как в ядре: скобки обязательны, а `typeof process` в выражении быть не
+  // должно — оно гасило бы гард в браузере. Разбор — `packages/granularity/vite.config.ts`.
   define: {
-    __GR_DEV__: '(typeof process !== \'undefined\' && process.env.NODE_ENV !== \'production\')',
+    __GR_DEV__: '(process.env.NODE_ENV !== \'production\')',
   },
   build: {
     target: 'esnext',

@@ -30,7 +30,8 @@ export default defineConfig({
   define: {
     // Тот же гард, что в ядре: подстановка текстом, чтобы бандлер потребителя
     // свернул предупреждения вместе с веткой. Скобки обязательны — без них
-    // `!__GR_DEV__` развернулось бы в `!typeof process !== 'undefined' && …`.
-    __GR_DEV__: '(typeof process !== \'undefined\' && process.env.NODE_ENV !== \'production\')',
+    // Скобки обязательны, а `typeof process` в выражении быть не должно — оно
+    // гасило бы гард в браузере целиком. Разбор — `packages/granularity/vite.config.ts`.
+    __GR_DEV__: '(process.env.NODE_ENV !== \'production\')',
   },
 })

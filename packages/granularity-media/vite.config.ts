@@ -75,8 +75,8 @@ export default defineConfig({
     },
   },
   define: {
-    // Скобки обязательны: `!__GR_DEV__` без них развернулось бы в
-    // `!typeof process !== 'undefined' && …`.
-    __GR_DEV__: '(typeof process !== \'undefined\' && process.env.NODE_ENV !== \'production\')',
+    // Скобки обязательны, а `typeof process` в выражении быть не должно — оно
+    // гасило бы гард в браузере целиком. Разбор — `packages/granularity/vite.config.ts`.
+    __GR_DEV__: '(process.env.NODE_ENV !== \'production\')',
   },
 })

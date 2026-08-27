@@ -53,11 +53,20 @@ export default defineConfig({
    * целиком, — но в исходниках остаётся один символ вместо повторяющегося
    * выражения.
    *
+   * **Проверки `typeof process` здесь быть не должно.** Она выглядит как
+   * страховка от `ReferenceError`, а на деле гасит гард целиком: в браузере
+   * `process` не определён, и всё выражение схлопывается в `false` — в dev тоже.
+   * Замерено на `apps/playground`: бандлер потребителя заменяет текст
+   * `process.env.NODE_ENV` на `"development"`, но `typeof process` оставляет как
+   * есть, поэтому ни одно предупреждение пакета до браузера не доходило.
+   * Подстановка снимает и риск `ReferenceError`: к рантайму от выражения
+   * остаётся литерал. Так же устроен `__DEV__` в esm-bundler-сборке Vue.
+   *
    * Скобки обязательны: `!__GR_DEV__` без них развернулось бы в
-   * `!typeof process !== 'undefined' && …`.
+   * `!process.env.NODE_ENV !== 'production'`.
    */
   define: {
-    __GR_DEV__: '(typeof process !== \'undefined\' && process.env.NODE_ENV !== \'production\')',
+    __GR_DEV__: '(process.env.NODE_ENV !== \'production\')',
   },
   plugins: [
     vue(),
