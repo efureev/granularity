@@ -7,6 +7,8 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.38.0] 2026-08-28
+
 ### Added
 
 - **Dev channel now carries who opened a layer and what happens to focus.** A layer used to be a bare `id`, so on a

@@ -1,19 +1,40 @@
 # `apps/playground`
 
-Стенд для сценариев подключения CSS пакета. Проверяет, что все документированные
-способы (`packages/granularity/docs/styling.md` → «Сценарии подключения CSS») реально
-работают на собранном `dist`, а не только на бумаге.
+Стенд для сценариев подключения CSS пакета. Проверяет, что все документированные способы
+(`packages/granularity/docs/styling.md` → «Сценарии подключения CSS») реально работают на собранном `dist`, а не только
+на бумаге.
+
+## Панель Granularity DevTools
+
+Стенд подключает `@feugene/granularity-devtools` (`src/main.ts`, за гардом
+`import.meta.env.DEV`) и `vite-plugin-vue-devtools`, поэтому панель открывается прямо в странице — расширение браузера
+не нужно:
+
+```bash
+yarn dev:playground        # http://localhost:5173/playground/
+```
+
+Дальше в открытой странице — **⌥⇧D** (`Option`+`Shift`+`D`), и в колонке плагинов появляются разделы «Granularity
+overlays», «Granularity app» и «Granularity issues». Панель можно открыть и отдельным окном:
+`http://localhost:5173/playground/__devtools__/`.
+
+Что смотреть на этом стенде: откройте модалку — в «Granularity overlays» появится слой с именем открывшего компонента,
+тем, кому адресован `Esc`, и судьбой фокуса. Секции пропов и токенов живут в штатном инспекторе компонентов, на
+выбранном `Gr*`.
+
+Лента событий пишется, **только когда включена запись** — кнопка в правом верхнем углу вкладки Timeline. Пустая лента
+чаще всего значит именно это.
 
 ## Что здесь проверяется
 
 `src/main.ts` держит четыре варианта закомментированными — раскомментировать нужный:
 
-| Вариант | Импорт | Что подключает |
-| --- | --- | --- |
-| 1 | `@granularity-foundation` | только foundation-слой пакета |
-| 2 | `@granularity-styles` | весь пакетный CSS целиком |
-| 3 | `@granularity-button-css` | bundle одного компонента (`GrButton`) — внутри уже foundation, utility-стили кнопки и темы `light`/`dark` |
-| 4 | `uno.config.ts` | granular-сборка через `presetGranularNode`: foundation, стили выбранных компонентов, встроенные темы и тема приложения |
+| Вариант | Импорт                    | Что подключает                                                                                                         |
+|---------|---------------------------|------------------------------------------------------------------------------------------------------------------------|
+| 1       | `@granularity-foundation` | только foundation-слой пакета                                                                                          |
+| 2       | `@granularity-styles`     | весь пакетный CSS целиком                                                                                              |
+| 3       | `@granularity-button-css` | bundle одного компонента (`GrButton`) — внутри уже foundation, utility-стили кнопки и темы `light`/`dark`              |
+| 4       | `uno.config.ts`           | granular-сборка через `presetGranularNode`: foundation, стили выбранных компонентов, встроенные темы и тема приложения |
 
 Алиасы `@granularity-*` объявлены в `vite.config.ts` и целят прямо в артефакты
 `packages/granularity/dist/**` — стенд намеренно работает с опубликованными файлами.
@@ -23,8 +44,7 @@
 `tokens.css` провайдера.
 
 `src/App.vue` — набор компонентов через корневой импорт (`GrButton`, `GrModal`,
-`GrPromptDialog`, `GrSelect`). `src/AppUno.vue` — та же кнопка, но subpath-импортом,
-для сравнения гранулярности.
+`GrPromptDialog`, `GrSelect`). `src/AppUno.vue` — та же кнопка, но subpath-импортом, для сравнения гранулярности.
 
 ## Тест
 

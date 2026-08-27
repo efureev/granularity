@@ -1,4 +1,3 @@
-import {fileURLToPath, URL} from 'node:url'
 import {
     defineConfig,
     presetAttributify,
@@ -15,10 +14,24 @@ import {
 } from '@feugene/unocss-preset-granular/node'
 import granularityProvider from '@feugene/granularity/granular-provider/node'
 
-const granularPresetComponents = ['GrButton'] as const
-
-const granularPresetThemeFiles = [
-    fileURLToPath(new URL('./src/styles/light-app.css', import.meta.url)),
+/**
+ * Компоненты, для которых пресет генерирует CSS.
+ *
+ * Список обязан совпадать с тем, что стенд реально рендерит: `presetGranularNode`
+ * собирает утилиты и safelist ровно по нему. Пока здесь была одна кнопка, у
+ * `GrModal` не находилось правил для `shadow-[var(--gr-shadow-2)]` и
+ * `overflow-hidden`, а у триггера `GrSelect` — для
+ * `rounded-[var(--gr-radius-control)]`: окно рисовалось без панели, иконки
+ * селекта вываливались под поле. Симптом ровно тот, что описан в
+ * `.claude/docs/fix-workflow.md` как промах safelist — «размеры работают, цвета
+ * прозрачные».
+ */
+const granularPresetComponents = [
+    'GrButton',
+    'GrDialog',
+    'GrModal',
+    'GrPromptDialog',
+    'GrSelect',
 ] as const
 
 const granularOptions: PresetGranularNodeOptions = {
@@ -26,10 +39,25 @@ const granularOptions: PresetGranularNodeOptions = {
     components: [
         {provider: '@feugene/granularity', names: [...granularPresetComponents]},
     ],
-    themes: {
-        // Приложение явно добавляет свой CSS с токенами как override tokens.css провайдера
-        tokensFile: granularPresetThemeFiles[0],
-    },
+    /**
+     * Тема приложения подключается **импортом** в `main.ts`, а не отсюда.
+     *
+     * Проверено на этом стенде, чтобы не гадать:
+     *
+     *  - `themes.tokensFile` — замена `tokens.css` провайдера целиком. Прежняя
+     *    версия конфига подставляла туда `light-app.css` из двух десятков
+     *    переменных, и вся шкала радиусов исчезала: `GrModal` рисовался с
+     *    прямыми углами, `rounded-*` сворачивался в ноль;
+     *  - `themes.tokenOverrides` перебивает токены **тем** (цепочка в
+     *    `themes-and-tokens.md`: provider.tokenDefinitions → component →
+     *    define → tokenOverrides), а `--gr-primary` объявлен в базовом
+     *    `tokens.css`, который эмитится последним. В `__uno.css` это видно
+     *    буквально: override на строке 368, канон — на 416, оба в слое
+     *    `granular`, побеждает второй.
+     *
+     * Для базовых токенов остаётся каскад: файл, подключённый после
+     * `virtual:uno.css`, выигрывает по порядку. Так же устроена витрина.
+     */
 }
 
 export default defineConfig({

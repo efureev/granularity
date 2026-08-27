@@ -3,6 +3,7 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { visualizer } from 'rollup-plugin-visualizer'
 import Icons from 'unplugin-icons/vite'
+import VueDevtools from 'vite-plugin-vue-devtools'
 import UnoCSS from 'unocss/vite'
 
 export const playgroundGranularityEntry = fileURLToPath(new URL('../../packages/granularity/dist/index.js', import.meta.url))
@@ -44,6 +45,9 @@ export default defineConfig(({ mode }) => ({
     },
   },
   plugins: [
+    // Встроенная панель Vue DevTools: раздел «Granularity» виден по ⌥⇧D без
+    // расширения браузера. Только в dev — в прод-сборку плагин ничего не кладёт.
+    VueDevtools(),
     vue(),
     mode === playgroundBuildAnalyzeMode && visualizer(playgroundBuildVisualizerConfig),
     Icons({
