@@ -25,6 +25,34 @@ permissions:
   contents: read
 
 jobs:
+  # Что вообще нужно прогонять на этом ref.
+  #
+  # Тег технического пакета (тест-кит, панель devtools, резолвер авто-импорта,
+  # адаптер данных) витрины не касается: она их не рендерит, а всё нужное для
+  # публикации делает собственная `build`-джоба пакета. Сам коммит к моменту
+  # тега уже прошёл полный конвейер на `main`, поэтому витрина, SSR-стенд и
+  # сборки компонентных спутников здесь были бы повтором на восемь минут.
+  #
+  # Список живёт **только здесь** — заводя технический пакет, правьте один
+  # `case`, а не условие в дюжине джоб.
+  release-scope:
+    runs-on: ubuntu-latest
+    outputs:
+      showcase: ${{ steps.resolve.outputs.showcase }}
+    steps:
+      - name: Resolve scope
+        id: resolve
+        run: |
+          case "$GITHUB_REF_NAME" in
+            granularity-test-kit-v*|granularity-devtools-v*|granularity-datasource-v*|unplugin-granularity-v*)
+              echo 'showcase=false' >> "$GITHUB_OUTPUT"
+              echo "::notice::Тег технического пакета ($GITHUB_REF_NAME): витрина, SSR-стенд и сборки компонентных спутников пропускаются."
+              ;;
+            *)
+              echo 'showcase=true' >> "$GITHUB_OUTPUT"
+              ;;
+          esac
+
   # Гейты токенов, реестров и дефолтов живут фабриками в
   # @feugene/granularity-test-kit — ядро и все спутники зовут их из собранного
   # `dist`, поэтому пакет проверяется первым и ни от чего не зависит сам.
@@ -328,7 +356,9 @@ jobs:
   # Зависит от сборок пакетов: витрина типизируется против собранного `dist`,
   # как и её тесты.
   build-granularity-editor:
+    if: needs.release-scope.outputs.showcase == 'true'
     needs:
+      - release-scope
       - quality-granularity
       - build-granularity
       - build-unplugin-granularity
@@ -477,7 +507,9 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   build-granularity-media:
+    if: needs.release-scope.outputs.showcase == 'true'
     needs:
+      - release-scope
       - quality-granularity
       - build-granularity
       - build-unplugin-granularity
@@ -626,7 +658,9 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   quality-showcase:
+    if: needs.release-scope.outputs.showcase == 'true'
     needs:
+      - release-scope
       - build-granularity
       - build-unplugin-granularity
       - build-granularity-chrono
@@ -854,7 +888,9 @@ jobs:
     # Стенд поднимает каждый компонент экосистемы на своей странице, поэтому
     # ему нужен dist всех пакетов, а не только тех, у кого есть тематическая
     # страница.
+    if: needs.release-scope.outputs.showcase == 'true'
     needs:
+      - release-scope
       - build-granularity
       - build-granularity-chrono
       - build-granularity-charts
@@ -927,7 +963,9 @@ jobs:
     # @feugene/granularity-charts, а `uno.config.ts` читает провайдеры тех же
     # пакетов — их dist нужен уже при загрузке vite/vitest-конфига, поэтому
     # скачиваем все четыре.
+    if: needs.release-scope.outputs.showcase == 'true'
     needs:
+      - release-scope
       - build-granularity
       - build-unplugin-granularity
       - build-granularity-chrono
@@ -1016,7 +1054,9 @@ jobs:
   # поэтому падает любое новое serious/critical нарушение. Платформонезависим:
   # axe анализирует дерево доступности, а не рендер.
   test-a11y:
+    if: needs.release-scope.outputs.showcase == 'true'
     needs:
+      - release-scope
       - build-granularity
       - build-unplugin-granularity
       - build-granularity-chrono
@@ -1137,7 +1177,9 @@ jobs:
           if-no-files-found: ignore
 
   build-showcase:
+    if: needs.release-scope.outputs.showcase == 'true'
     needs:
+      - release-scope
       - test-showcase
       - build-granularity-chrono
       - build-granularity-charts
@@ -1614,7 +1656,9 @@ jobs:
   # (для vue-tsc нужны его собранные типы) и от @feugene/unplugin-granularity —
   # на его фабрике `createGranularResolver` построен резолвер пакета.
   build-granularity-chrono:
+    if: needs.release-scope.outputs.showcase == 'true'
     needs:
+      - release-scope
       - quality-granularity
       - build-granularity
       - build-unplugin-granularity
@@ -1768,7 +1812,9 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   build-granularity-charts:
+    if: needs.release-scope.outputs.showcase == 'true'
     needs:
+      - release-scope
       - quality-granularity
       - build-granularity
       - build-unplugin-granularity
@@ -1921,7 +1967,9 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   build-granularity-dashboard:
+    if: needs.release-scope.outputs.showcase == 'true'
     needs:
+      - release-scope
       - quality-granularity
       - build-granularity
       - build-unplugin-granularity
@@ -2076,7 +2124,9 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   build-granularity-forms-schema:
+    if: needs.release-scope.outputs.showcase == 'true'
     needs:
+      - release-scope
       - quality-granularity
       - build-granularity
       - build-unplugin-granularity
