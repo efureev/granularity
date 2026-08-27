@@ -42,6 +42,8 @@ export interface GrVirtualListSnapshot {
 
 interface GrDevHook {
   events: GrDevEvent[]
+  /** Глубина буфера ядра, если панель попросила свою. */
+  bufferLimit?: number
   listeners: Set<(event: GrDevEvent) => void>
   /** Свежий снимок стека: часть состояния (фокус) меняется без событий. */
   readLayers?: () => GrOverlaySnapshot[]
@@ -81,6 +83,13 @@ function ensureHook(): GrDevHook {
  */
 export function readGrOverlayLayers(): GrOverlaySnapshot[] | null {
   return (globalThis as GlobalWithDevHook).__GR_DEV_HOOK__?.readLayers?.() ?? null
+}
+
+/** Просит ядро держать в буфере столько событий, сколько нужно панели. */
+export function setGrDevEventLimit(limit: number): void {
+  const target = globalThis as GlobalWithDevHook
+  target.__GR_DEV_HOOK__ ??= { events: [], listeners: new Set() }
+  target.__GR_DEV_HOOK__.bufferLimit = limit
 }
 
 /** Виртуализаторы, живые прямо сейчас. */

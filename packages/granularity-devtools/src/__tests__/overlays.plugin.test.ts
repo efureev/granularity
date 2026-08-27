@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import type { GrDevEvent } from '../internal/devChannel'
 import { subscribeToGrDevEvents } from '../internal/devChannel'
 import { registerOverlays } from '../plugin/overlays'
+import { createGrIssueLog } from '../resolve/issues'
 
 type Hook = { events: GrDevEvent[], listeners: Set<(event: GrDevEvent) => void> }
 
@@ -44,7 +45,7 @@ describe('раздел «Overlay layers»', () => {
     emit({ type: 'overlay:sync', layers: [{ id: 1, owner: 'GrModal', focus: null, modal: true, topmostForEscape: true, inert: false, depth: 0, closesOnEscape: true }] })
 
     const api = fakeApi()
-    registerOverlays(api as never)
+    registerOverlays(api as never, createGrIssueLog())
 
     const payload = { inspectorId: 'granularity:overlays', rootNodes: [] as unknown[] }
     api.handlers.tree?.(payload)
@@ -54,7 +55,7 @@ describe('раздел «Overlay layers»', () => {
 
   it('обновляет дерево на каждый снимок', () => {
     const api = fakeApi()
-    registerOverlays(api as never)
+    registerOverlays(api as never, createGrIssueLog())
 
     emit({ type: 'overlay:sync', layers: [] })
 
@@ -64,7 +65,7 @@ describe('раздел «Overlay layers»', () => {
 
   it('в ленту идут происшествия, а не снимки', () => {
     const api = fakeApi()
-    registerOverlays(api as never)
+    registerOverlays(api as never, createGrIssueLog())
 
     emit({ type: 'overlay:push', id: 1, modal: true, owner: 'GrModal' })
     emit({ type: 'overlay:sync', layers: [] })
@@ -75,7 +76,7 @@ describe('раздел «Overlay layers»', () => {
 
   it('чужой инспектор не перехватывается', () => {
     const api = fakeApi()
-    registerOverlays(api as never)
+    registerOverlays(api as never, createGrIssueLog())
 
     const payload = { inspectorId: 'pinia', rootNodes: ['нетронуто'] }
     api.handlers.tree?.(payload)

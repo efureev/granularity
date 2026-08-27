@@ -215,3 +215,16 @@ describe('dev-канал: реестр виртуализаторов', () => {
     expect([...hook().virtualLists!].map(read => read().uid)).toEqual([3, 4])
   })
 })
+
+describe('dev-канал: глубина буфера', () => {
+  it('наблюдатель может попросить свою глубину', () => {
+    emitGrDevEvent({ type: 'overlay:remove', id: 0 })
+    hook().bufferLimit = 3
+
+    for (let index = 1; index <= 10; index += 1)
+      emitGrDevEvent({ type: 'overlay:remove', id: index })
+
+    expect(hook().events).toHaveLength(3)
+    expect(hook().events.at(-1)).toEqual({ type: 'overlay:remove', id: 10 })
+  })
+})

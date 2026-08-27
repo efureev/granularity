@@ -19,6 +19,8 @@ to [Semantic Versioning](https://semver.org/).
   every scroll frame, and streaming that would flood the channel. Each entry reports the owning component, the
   rendered range against the total, the size estimate the window is computed from and the average measured size —
   a drift between the last two is what makes a list jump while the DOM still holds the "correct dozens" of nodes.
+- The event buffer depth is now configurable through the hook: how much history is needed is known only by whoever
+  reads it.
 - `__GR_DEV_HOOK__.readLayers()` — a fresh snapshot on demand. Events describe the stack at the moment it changed,
   but focus moves on an ordinary click with no stack event at all: an observer reading only the event log would show
   a stale picture. All of it stays behind `__GR_DEV__`.

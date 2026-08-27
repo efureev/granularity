@@ -79,6 +79,11 @@ export interface GrDevHook {
   events: GrDevEvent[]
   listeners: Set<(event: GrDevEvent) => void>
   /**
+   * Глубина буфера, если наблюдатель попросил другую. Ставит её он же: сколько
+   * истории нужно, знает только тот, кто её читает.
+   */
+  bufferLimit?: number
+  /**
    * Живые виртуализаторы. Реестр, а не событие: окно меняется на каждый кадр
    * прокрутки, и слать его лентой значило бы залить канал.
    */
@@ -135,9 +140,11 @@ export function provideGrDevLayers(read: () => GrOverlaySnapshot[]): void {
 export function emitGrDevEvent(event: GrDevEvent): void {
   const hook = ensureHook()
 
+  const limit = hook.bufferLimit ?? BUFFER_LIMIT
+
   hook.events.push(event)
-  if (hook.events.length > BUFFER_LIMIT)
-    hook.events.splice(0, hook.events.length - BUFFER_LIMIT)
+  if (hook.events.length > limit)
+    hook.events.splice(0, hook.events.length - limit)
 
   for (const listener of hook.listeners) {
     // Слушатель — чужой код, и его исключение не должно ронять то, за чем он

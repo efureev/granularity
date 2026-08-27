@@ -32,6 +32,14 @@ to [Semantic Versioning](https://semver.org/).
   and the measured average, with a note when the two drift far enough to make the list jump. Measured on the
   showcase: `GrDataTable` with 10 000 rows renders 14, window `[0, 14)`, estimate 49 px against 45 px measured.
 
+- **"Granularity app" section** — state that belongs to the application rather than to a component: the theme
+  with its **source** (saved by the user, system preference, or persistence off — the answer to "why is it dark,
+  I picked light") and the toast queue.
+- **Options**: `checks: 'all' | 'off'` turns off the missing-required-prop scan that runs on every tree node, and
+  `eventLimit` sets the depth of the core's event buffer.
+- **JSON report** action in the overlays section: layers, virtual lists, warnings and versions, copied to the
+  console and — when the browser allows it — to the clipboard.
+
 ### Changed
 
 - The console interception moved from the "Issues" section to `install`, and the log gained `subscribe()`:
