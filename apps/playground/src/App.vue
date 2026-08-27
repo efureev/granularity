@@ -159,7 +159,7 @@ const tagOptions = [
         </GrButton>
       </div>
 
-      <GrModal v-model="isModalOpen" size="lg">
+      <GrModal v-model="isModalOpen" size="lg" aria-label="GrModal в playground">
         <div class="space-y-4 p-6 text-slate-900">
           <div class="space-y-2">
             <h3 class="text-xl font-semibold leading-tight">

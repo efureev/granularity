@@ -7,6 +7,28 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.37.0] 2026-08-27
+
+### Fixed
+
+- **Development warnings never reached the browser.** The `__GR_DEV__` guard expanded to
+  `typeof process !== 'undefined' && process.env.NODE_ENV !== 'production'`, and `process` is undefined in the
+  browser, so the whole expression collapsed to `false` — in development too. Measured on `apps/playground`:
+  the consumer's bundler replaces the text `process.env.NODE_ENV` with `"development"` but leaves
+  `typeof process` alone. The guard now expands to `process.env.NODE_ENV !== 'production'`, the same shape Vue
+  uses in its esm-bundler build; the substitution also removes the `ReferenceError` risk the `typeof` check
+  appeared to guard against. All 36 guarded warnings across 29 files start working for consumers; production
+  bundles are unaffected — the branch is still dropped.
+
+### Added
+
+- **Dev channel (`internal/devHook.ts`).** Under `__GR_DEV__` the overlay layer stack now publishes what it
+  does — `overlay:push`, `overlay:remove`, `overlay:escape` and a full `overlay:sync` snapshot (who owns Esc,
+  which modals go `inert`, each modal's depth) — to `globalThis.__GR_DEV_HOOK__`. The stack stays private:
+  observers see the picture, not the levers. The hook buffers the last 50 events so an observer attaching
+  later does not start from an empty screen, and a throwing listener cannot break the package it watches.
+  Consumed by `@feugene/granularity-devtools`.
+
 ## [v0.36.0] 2026-08-27
 
 ### Fixed

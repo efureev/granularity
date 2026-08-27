@@ -24,8 +24,12 @@ import process from 'node:process'
 
 const distDir = resolve(process.cwd(), process.argv[2] ?? 'dist')
 
-const GUARD = 'process.env.NODE_ENV !== \'production\''
-const GUARD_DOUBLE = 'process.env.NODE_ENV !== "production"'
+/**
+ * Сравнение ищется в обе стороны: минификатор вправе нормализовать форму, и
+ * `!(NODE_ENV !== 'production')` он сворачивает в `NODE_ENV === 'production'`.
+ * Гейт, знавший только `!==`, объявлял такой пакет несобравшимся.
+ */
+const GUARD = /process\.env\.NODE_ENV\s*[!=]==\s*['"]production['"]/
 
 function jsFiles(dir) {
   return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
@@ -52,7 +56,7 @@ for (const file of files) {
 
   if (source.includes('__GR_DEV__'))
     leaked.push(rel)
-  if (source.includes(GUARD) || source.includes(GUARD_DOUBLE))
+  if (GUARD.test(source))
     expanded += 1
 }
 

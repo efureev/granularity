@@ -1,0 +1,39 @@
+# Changelog
+
+All notable changes to the [`@feugene/granularity-devtools`](.) package are documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
+to [Semantic Versioning](https://semver.org/).
+
+## [Unreleased]
+
+## [v0.1.0] 2026-08-27
+
+### Added
+
+- Package scaffold: `installGranularityDevtools()` registers a "Granularity" plugin in Vue DevTools via
+  the plugin API of `@vue/devtools-api` 8.x. The descriptor sets `enableEarlyProxy` so that the setup
+  runs before the user opens the DevTools tab — overlay layers and live-region announcements happen
+  earlier than that, and without it the panel would start from an empty picture.
+- **"Overlay layers" section.** A live inspector over the core's overlay stack: which layer owns Escape, which
+  modals went `inert`, each modal's depth — plus a timeline of pushes, closes and Escape presses. An Escape
+  that a layer swallowed (`closeOnEsc` off) is logged as a warning: that is exactly what "Escape does not
+  work" looks like from the outside.
+- **Component config section.** In the standard component inspector every prop is grouped by where its value
+  came from: the markup, `componentDefaults` of the nearest `GrConfigProvider`, its global `size`, or the
+  component's own default. "Was it passed?" is answered by `vnode.props` — the prop declaration cannot answer
+  it, because a production SFC build strips `type` and `required`.
+- **Component tokens section.** Declared tokens of the component with their computed values, the ones that
+  stayed empty, and `--gr-*` variables set on the element that no registry knows — usually a typo.
+- **Issues section.** Package warnings collected into one list with repeat counts, plus **missing required
+  props**: the check Vue cannot perform after a production SFC build, restored from a map generated out of the
+  core's `web-types.json` (38 components).
+- **Announcements timeline.** What a screen reader would have said, observed through the live region's
+  `data-gr-announcer-region` nodes — no core changes needed.
+- **i18n check on startup.** With no adapter provided, components silently fall back to their built-in English
+  strings; the panel now says so out loud. Key misses are out of scope — counting them would mean wrapping
+  someone else's adapter.
+- The plugin is a no-op on the server and under `NODE_ENV=production`. That guard alone is not enough under
+  Vite, where `process` is undefined in the browser in both dev and production builds, so the documented way
+  to mount the plugin wraps the call in `import.meta.env.DEV` — that is what keeps the call and the
+  `@vue/devtools-api` import out of production bundles.

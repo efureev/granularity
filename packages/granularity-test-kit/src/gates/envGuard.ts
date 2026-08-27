@@ -5,9 +5,9 @@ import { readSources, stripComments } from '../sources'
 /**
  * Гейт на dev-гард: проверка окружения в пакете одна и записывается одним символом.
  *
- * `__GR_DEV__` разворачивается в `typeof process !== 'undefined' &&
- * process.env.NODE_ENV !== 'production'` на сборке пакета (`define` в
- * `vite.config.ts`), в тестах равен `true`. Гейт следит за двумя вещами.
+ * `__GR_DEV__` разворачивается в `process.env.NODE_ENV !== 'production'` на
+ * сборке пакета (`define` в `vite.config.ts`), в тестах равен `true`. Гейт
+ * следит за двумя вещами.
  *
  * **Первая — чтобы вместо гарда не появилось написанное руками условие.**
  * Появлялось оно трижды и в трёх диалектах: голое `process.env.NODE_ENV`

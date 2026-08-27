@@ -1,3 +1,4 @@
+import {installGranularityDevtools} from '@feugene/granularity-devtools'
 import {createApp} from 'vue'
 
 import App from './App.vue'
@@ -24,4 +25,12 @@ import App from './App.vue'
 import '@unocss/reset/tailwind-compat.css'
 import 'virtual:uno.css'
 
-createApp(App).mount('#app')
+const app = createApp(App)
+
+// Гард на стороне вызывающего снимает из прод-бандла и сам вызов: рантайм-гард
+// внутри пакета оставил бы мёртвую функцию, потому что её всё равно зовут.
+if (import.meta.env.DEV) {
+    app.use(installGranularityDevtools())
+}
+
+app.mount('#app')
