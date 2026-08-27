@@ -1,7 +1,7 @@
 {
   "name": "@feugene/granularity-media",
   "description": "Media components for @feugene/granularity: image cropping, camera capture, code scanning and video playback.",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "license": "SEE LICENSE IN LICENSE",
   "author": {
     "name": "Evgeniy Fureev",
@@ -87,7 +87,7 @@
   },
   "peerDependencies": {
     "@feugene/fint-i18n": ">=0.7.0 <1.0.0",
-    "@feugene/granularity": ">=0.36.0 <1.0.0",
+    "@feugene/granularity": ">=0.37.0 <1.0.0",
     "@feugene/unocss-preset-granular": ">=0.13.0 <1.0.0",
     "@feugene/unplugin-granularity": ">=0.7.0 <1.0.0",
     "unplugin-vue-components": ">=0.26.0",
@@ -119,8 +119,8 @@
   "devDependencies": {
     "@antfu/eslint-config": "^9.3.0",
     "@feugene/fint-i18n": "^0.7.0",
-    "@feugene/granularity": "^0.36.0",
-    "@feugene/granularity-test-kit": "^0.8.0",
+    "@feugene/granularity": "^0.37.0",
+    "@feugene/granularity-test-kit": "^0.8.1",
     "@feugene/unocss-preset-granular": "^0.13.0",
     "@feugene/unplugin-granularity": "^0.7.0",
     "@types/node": "^26.4.0",

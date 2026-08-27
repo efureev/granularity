@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v0.7.1] 2026-08-27
+
+### Fixed
+
+- Development warnings never reached the browser: the `__GR_DEV__` guard included a `typeof process` check, and
+  `process` is undefined in the browser, so the whole expression collapsed to `false` in development too. The
+  guard now matches the core package. Production bundles are unaffected — the branch is still dropped.
+
 ## [v0.7.0] 2026-08-27
 
 ### Changed

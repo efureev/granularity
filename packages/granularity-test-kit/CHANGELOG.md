@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v0.8.1] 2026-08-27
+
+### Fixed
+
+- `gr-check-dist-dev-guard` now recognises the guard in either comparison direction. A minifier is free to
+  normalise `!(NODE_ENV !== 'production')` into `NODE_ENV === 'production'`, and the gate — which only knew
+  `!==` — failed the build of a package whose guard was expanded correctly.
+
 ## [v0.8.0] 2026-08-27
 
 ### Changed
