@@ -39,6 +39,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       showcase: ${{ steps.resolve.outputs.showcase }}
+      core: ${{ steps.resolve.outputs.core }}
     steps:
       - name: Resolve scope
         id: resolve
@@ -46,10 +47,12 @@ jobs:
           case "$GITHUB_REF_NAME" in
             granularity-test-kit-v*|granularity-devtools-v*|granularity-datasource-v*|unplugin-granularity-v*)
               echo 'showcase=false' >> "$GITHUB_OUTPUT"
-              echo "::notice::Тег технического пакета ($GITHUB_REF_NAME): витрина, SSR-стенд и сборки компонентных спутников пропускаются."
+              echo 'core=false' >> "$GITHUB_OUTPUT"
+              echo "::notice::Тег технического пакета ($GITHUB_REF_NAME): витрина, SSR-стенд, сборки компонентных спутников и перепроверка ядра пропускаются."
               ;;
             *)
               echo 'showcase=true' >> "$GITHUB_OUTPUT"
+              echo 'core=true' >> "$GITHUB_OUTPUT"
               ;;
           esac
 
@@ -756,7 +759,9 @@ jobs:
         run: yarn typecheck:showcase
 
   docs-granularity:
+    if: needs.release-scope.outputs.core == 'true'
     needs:
+      - release-scope
       - build-granularity
     runs-on: ubuntu-latest
     steps:
@@ -781,6 +786,9 @@ jobs:
         run: yarn docs:audit:check
 
   test-granularity:
+    if: needs.release-scope.outputs.core == 'true'
+    needs:
+      - release-scope
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -799,7 +807,9 @@ jobs:
         run: yarn test:granularity
 
   coverage-granularity:
+    if: needs.release-scope.outputs.core == 'true'
     needs:
+      - release-scope
       - test-granularity
     runs-on: ubuntu-latest
     steps:
