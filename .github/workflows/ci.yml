@@ -1332,10 +1332,14 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   # Сборка @feugene/granularity-devtools — панели Vue DevTools по дизайн-системе.
-  # Джоба ни от чего не зависит: пакет не импортирует ядро, а читает состояние
-  # приложения через provide/inject и dev-канал ядра уже в рантайме потребителя,
-  # поэтому `dist` ядра ей на сборке не нужен.
+  #
+  # `dist` ядра нужен, хотя рантайм пакета читает состояние приложения через
+  # provide/inject: из `dist/types/**` резолвятся типы публичных subpath ядра
+  # (без них типизированные правила ESLint видят `any` и падают лавиной), а из
+  # `dist/web-types.json` генерируется карта обязательных пропов.
   build-granularity-devtools:
+    needs:
+      - build-granularity
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -1346,6 +1350,12 @@ jobs:
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
+
+      - name: Download granularity dist
+        uses: actions/download-artifact@v8
+        with:
+          name: granularity-dist
+          path: packages/granularity/dist
 
       - name: Lint package
         run: yarn lint:devtools
