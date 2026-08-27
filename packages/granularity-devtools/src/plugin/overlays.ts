@@ -24,7 +24,12 @@ export function registerOverlays(api: DevtoolsApi): void {
 
   api.addInspector({
     id: INSPECTOR_ID,
-    label: 'Overlay layers',
+    // Имя раздела начинается с пакета: в колонке разделов панели у плагинов
+    // видны только иконки, а имя показывается тултипом и в шапке — без префикса
+    // «Overlay layers» и «Issues» не отличить от чужих.
+    label: 'Granularity overlays',
+    // Панель разворачивает это имя в класс `custom-ic-baseline-<icon>`, то есть
+    // ждёт имя из набора Material Icons.
     icon: 'layers',
     noSelectionText: 'Select a layer to see who owns Escape and which modals are inert',
   })
