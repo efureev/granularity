@@ -1,0 +1,147 @@
+import { afterEach, describe, expect, it, vi } from 'vitest'
+
+import type { GrDevEvent, GrDevHook, GrOverlaySnapshot } from '../internal/devHook'
+import { emitGrDevEvent, resetGrDevHook } from '../internal/devHook'
+import {
+  pushOverlayLayer,
+  removeOverlayLayer,
+  resetOverlayStack,
+} from '../composables/internal/overlayStack'
+
+/**
+ * Гейт dev-канала ядра.
+ *
+ * Канал существует ради наблюдателя, но платит за это пакет: он обязан быть
+ * незаметен для поведения. Отсюда две группы проверок — «картина совпадает с
+ * тем, что стек раздал слоям» и «наблюдатель не влияет ни на что».
+ */
+
+function hook(): GrDevHook {
+  return (globalThis as typeof globalThis & { __GR_DEV_HOOK__?: GrDevHook }).__GR_DEV_HOOK__!
+}
+
+function listen(): GrDevEvent[] {
+  const seen: GrDevEvent[] = []
+  emitGrDevEvent({ type: 'overlay:sync', layers: [] })
+  hook().listeners.add(event => seen.push(event))
+  hook().events.splice(0, hook().events.length)
+  return seen
+}
+
+function layer(modal: boolean, shouldClose = () => true) {
+  return { modal, shouldClose, close: () => {} }
+}
+
+function snapshot(events: GrDevEvent[]): GrOverlaySnapshot[] {
+  const last = [...events].reverse().find(event => event.type === 'overlay:sync')
+  return last?.type === 'overlay:sync' ? last.layers : []
+}
+
+afterEach(() => {
+  resetOverlayStack()
+  resetGrDevHook()
+})
+
+describe('dev-канал: картина стека', () => {
+  it('снимок повторяет порядок регистрации слоёв', () => {
+    const seen = listen()
+
+    const first = pushOverlayLayer(layer(true))
+    const second = pushOverlayLayer(layer(false))
+
+    expect(snapshot(seen).map(item => item.id)).toEqual([first, second])
+  })
+
+  it('Esc адресован последнему слою любого рода, `inert` — модалкам ниже последней модальной', () => {
+    const seen = listen()
+
+    pushOverlayLayer(layer(true))
+    pushOverlayLayer(layer(true))
+    pushOverlayLayer(layer(false))
+
+    expect(snapshot(seen)).toMatchObject([
+      { modal: true, topmostForEscape: false, inert: true, depth: 0 },
+      { modal: true, topmostForEscape: false, inert: false, depth: 1 },
+      { modal: false, topmostForEscape: true, inert: false, depth: null },
+    ])
+  })
+
+  it('слой, не закрывающийся по Esc, виден таким в снимке', () => {
+    const seen = listen()
+
+    pushOverlayLayer(layer(true, () => false))
+
+    expect(snapshot(seen)[0]?.closesOnEscape).toBe(false)
+  })
+
+  it('снятие слоя пересчитывает картину', () => {
+    const seen = listen()
+
+    const first = pushOverlayLayer(layer(true))
+    const second = pushOverlayLayer(layer(true))
+    removeOverlayLayer(second)
+
+    expect(seen.some(event => event.type === 'overlay:remove' && event.id === second)).toBe(true)
+    expect(snapshot(seen)).toMatchObject([{ id: first, topmostForEscape: true, inert: false, depth: 0 }])
+  })
+
+  it('Esc сообщает, кому достался и закрыл ли', () => {
+    const seen = listen()
+    const id = pushOverlayLayer(layer(true, () => false))
+
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true }))
+
+    expect(seen).toContainEqual({ type: 'overlay:escape', id, closed: false })
+  })
+})
+
+describe('dev-канал: незаметность для пакета', () => {
+  it('без подписчиков стек работает как обычно', () => {
+    const close = vi.fn()
+    const id = pushOverlayLayer({ modal: true, shouldClose: () => true, close })
+
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true }))
+
+    expect(close).toHaveBeenCalledTimes(1)
+    expect(hook().events.some(event => event.type === 'overlay:push' && event.id === id)).toBe(true)
+  })
+
+  it('исключение в слушателе не ломает того, за кем он наблюдает', () => {
+    const close = vi.fn()
+    emitGrDevEvent({ type: 'overlay:sync', layers: [] })
+    hook().listeners.add(() => {
+      throw new Error('наблюдатель сломался')
+    })
+
+    expect(() => pushOverlayLayer({ modal: true, shouldClose: () => true, close })).not.toThrow()
+
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true }))
+    expect(close).toHaveBeenCalledTimes(1)
+  })
+
+  it('буфер отдаёт накопленное тому, кто подключился позже', () => {
+    pushOverlayLayer(layer(true))
+    pushOverlayLayer(layer(false))
+
+    expect(hook().events.filter(event => event.type === 'overlay:push')).toHaveLength(2)
+    expect(snapshot(hook().events)).toHaveLength(2)
+  })
+
+  it('буфер не растёт бесконечно', () => {
+    for (let index = 0; index < 200; index += 1)
+      emitGrDevEvent({ type: 'overlay:remove', id: index })
+
+    const events = hook().events
+    expect(events).toHaveLength(50)
+    expect(events[events.length - 1]).toEqual({ type: 'overlay:remove', id: 199 })
+  })
+
+  it('эмит не требует ни window, ни document', () => {
+    vi.stubGlobal('window', undefined)
+    vi.stubGlobal('document', undefined)
+
+    expect(() => emitGrDevEvent({ type: 'overlay:remove', id: 1 })).not.toThrow()
+
+    vi.unstubAllGlobals()
+  })
+})

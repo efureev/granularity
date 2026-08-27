@@ -23,6 +23,8 @@
  * монтируются отдельным `render()` в `body`) и знает их корни.
  */
 
+import type { GrOverlaySnapshot } from '../../internal/devHook'
+import { emitGrDevEvent } from '../../internal/devHook'
 import { isComposingEvent } from '../../internal/keyboard'
 
 export interface OverlayLayer {
@@ -76,6 +78,31 @@ function syncModalLayers(): void {
     layer.setTopmost?.(layer === top)
     layer.setDepth?.(index)
   })
+
+  if (__GR_DEV__)
+    emitGrDevEvent({ type: 'overlay:sync', layers: snapshotLayers() })
+}
+
+/**
+ * Снимок стека для dev-канала.
+ *
+ * Считается здесь же, где `syncModalLayers` раздаёт то же самое слоям, и по тем
+ * же выражениям: разъедься они — наблюдатель показывал бы картину, которой в
+ * пакете нет, и отладка по ней уводила бы в сторону.
+ */
+function snapshotLayers(): GrOverlaySnapshot[] {
+  const modals = stack.filter(layer => layer.modal)
+  const topModal = modals[modals.length - 1]
+  const top = stack[stack.length - 1]
+
+  return stack.map(layer => ({
+    id: layer.id,
+    modal: layer.modal,
+    topmostForEscape: layer === top,
+    inert: layer.modal && layer !== topModal,
+    depth: layer.modal ? modals.indexOf(layer) : null,
+    closesOnEscape: layer.shouldClose(),
+  }))
 }
 
 function handleKeydown(event: KeyboardEvent): void {
@@ -96,7 +123,12 @@ function handleKeydown(event: KeyboardEvent): void {
   if (typeof event.stopImmediatePropagation === 'function')
     event.stopImmediatePropagation()
 
-  if (top.shouldClose())
+  const closes = top.shouldClose()
+
+  if (__GR_DEV__)
+    emitGrDevEvent({ type: 'overlay:escape', id: top.id, closed: closes })
+
+  if (closes)
     top.close()
 }
 
@@ -125,6 +157,10 @@ export function pushOverlayLayer(layer: Omit<OverlayLayer, 'id'>): number {
   const id = nextId++
   stack.push({ ...layer, id })
   startListening()
+
+  if (__GR_DEV__)
+    emitGrDevEvent({ type: 'overlay:push', id, modal: layer.modal })
+
   syncModalLayers()
   return id
 }
@@ -136,6 +172,10 @@ export function removeOverlayLayer(id: number): void {
     stack.splice(index, 1)
   if (stack.length === 0)
     stopListening()
+
+  if (__GR_DEV__ && index >= 0)
+    emitGrDevEvent({ type: 'overlay:remove', id })
+
   syncModalLayers()
 }
 
@@ -212,4 +252,7 @@ export function modalLayerZIndex(depth: number, zIndexVar = '--gr-z-modal'): str
 export function resetOverlayStack(): void {
   stack.splice(0, stack.length)
   stopListening()
+
+  if (__GR_DEV__)
+    emitGrDevEvent({ type: 'overlay:sync', layers: [] })
 }
