@@ -1,5 +1,6 @@
 import { createApp } from 'vue'
 
+import { installGranularityDevtools } from '@feugene/granularity-devtools'
 import { initThemeEarly } from '@feugene/granularity'
 
 import '@unocss/reset/tailwind-compat.css'
@@ -21,10 +22,16 @@ initThemeEarly()
 async function bootstrap(): Promise<void> {
   const i18n = await setupShowcaseI18n()
 
-  createApp(App)
+  const app = createApp(App)
     .use(i18n)
     .use(router)
-    .mount('#app')
+
+  // Гард у вызывающего, а не внутри пакета: он убирает из прод-бандла и сам
+  // вызов, и импорт `@vue/devtools-api`.
+  if (import.meta.env.DEV)
+    app.use(installGranularityDevtools())
+
+  app.mount('#app')
 }
 
 void bootstrap()

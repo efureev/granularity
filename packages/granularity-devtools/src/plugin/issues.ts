@@ -44,8 +44,8 @@ function issueState(issues: GrIssue[], nodeId: string): CustomInspectorState {
 export function registerIssues(api: DevtoolsApi, log: GrIssueLog): void {
   api.addInspector({
     id: INSPECTOR_ID,
-    label: 'Issues',
-    icon: 'warning',
+    label: 'Granularity issues',
+    icon: 'report_problem',
     noSelectionText: 'Design-system warnings show up here as they happen',
     actions: [{
       icon: 'delete',

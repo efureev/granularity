@@ -88,5 +88,11 @@ production-сборке Vite `process` в браузере не определё
 
 Аналог для сборщиков без `import.meta.env` — `process.env.NODE_ENV !== 'production'`.
 
+## Лента событий не пишется, пока не нажата запись
+
+Таймлайн Vue DevTools по умолчанию выключен: пустые «Granularity overlays» и
+«Granularity announcements» чаще всего значат, что запись не включена, а не что
+событий не было. Кнопка записи — в правом верхнем углу вкладки Timeline.
+
 Требуются [Vue DevTools](https://devtools.vuejs.org/) — расширение браузера,
 standalone-приложение или встроенная панель.

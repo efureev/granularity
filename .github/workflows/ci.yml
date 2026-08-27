@@ -636,6 +636,7 @@ jobs:
       - build-granularity-datasource
       - build-granularity-editor
       - build-granularity-media
+      - build-granularity-devtools
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -706,6 +707,12 @@ jobs:
         with:
           name: granularity-media-dist
           path: packages/granularity-media/dist
+
+      - name: Download granularity-devtools dist
+        uses: actions/download-artifact@v8
+        with:
+          name: granularity-devtools-dist
+          path: packages/granularity-devtools/dist
 
       - name: Lint showcase
         run: yarn lint:showcase
@@ -930,6 +937,7 @@ jobs:
       - build-granularity-datasource
       - build-granularity-editor
       - build-granularity-media
+      - build-granularity-devtools
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -995,6 +1003,12 @@ jobs:
           name: granularity-media-dist
           path: packages/granularity-media/dist
 
+      - name: Download granularity-devtools dist
+        uses: actions/download-artifact@v8
+        with:
+          name: granularity-devtools-dist
+          path: packages/granularity-devtools/dist
+
       - name: Test showcase
         run: yarn test:showcase
 
@@ -1012,6 +1026,7 @@ jobs:
       - build-granularity-datasource
       - build-granularity-editor
       - build-granularity-media
+      - build-granularity-devtools
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -1083,6 +1098,12 @@ jobs:
           name: granularity-media-dist
           path: packages/granularity-media/dist
 
+      - name: Download granularity-devtools dist
+        uses: actions/download-artifact@v8
+        with:
+          name: granularity-devtools-dist
+          path: packages/granularity-devtools/dist
+
       - name: Install Playwright browsers
         working-directory: apps/showcase
         run: npx playwright install --with-deps chromium
@@ -1125,6 +1146,7 @@ jobs:
       - build-granularity-datasource
       - build-granularity-editor
       - build-granularity-media
+      - build-granularity-devtools
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -1189,6 +1211,12 @@ jobs:
         with:
           name: granularity-media-dist
           path: packages/granularity-media/dist
+
+      - name: Download granularity-devtools dist
+        uses: actions/download-artifact@v8
+        with:
+          name: granularity-devtools-dist
+          path: packages/granularity-devtools/dist
 
       - name: Build showcase
         run: yarn build:showcase
