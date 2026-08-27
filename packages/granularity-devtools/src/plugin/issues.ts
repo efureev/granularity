@@ -67,24 +67,10 @@ export function registerIssues(api: DevtoolsApi, log: GrIssueLog): void {
       payload.state = issueState(log.list(), payload.nodeId)
   })
 
-  interceptConsole(log, () => {
+  // Журнал наполняется в `install` независимо от панели, поэтому раздел на него
+  // подписывается, а не собирает сам.
+  log.subscribe(() => {
     api.sendInspectorTree(INSPECTOR_ID)
     api.sendInspectorState(INSPECTOR_ID)
   })
-}
-
-type ConsoleMethod = 'warn' | 'error'
-
-function interceptConsole(log: GrIssueLog, onCollected: () => void): void {
-  const kinds: Record<ConsoleMethod, 'warning' | 'error'> = { warn: 'warning', error: 'error' }
-
-  for (const method of Object.keys(kinds) as ConsoleMethod[]) {
-    const original = console[method].bind(console)
-
-    console[method] = (...args: unknown[]) => {
-      original(...args)
-      if (log.add(kinds[method], args))
-        onCollected()
-    }
-  }
 }

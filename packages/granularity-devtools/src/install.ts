@@ -1,6 +1,8 @@
 import type { App, Plugin } from 'vue'
 import { setupDevtoolsPlugin } from '@vue/devtools-api'
 
+import { installGrDevtoolsBridge } from './internal/bridge'
+import { interceptConsole } from './internal/consoleIntercept'
 import { registerComponentConfig } from './plugin/componentConfig'
 import { registerAnnouncer } from './plugin/announcer'
 import { registerComponentTokens } from './plugin/componentTokens'
@@ -55,6 +57,12 @@ export function installGranularityDevtools(): Plugin {
       if (typeof window === 'undefined' || isProduction())
         return
 
+      // Журнал, перехват консоли и мост живут независимо от панели: тест её не
+      // открывает, а состояние ему нужно то же самое.
+      const issues = createGrIssueLog()
+      interceptConsole(issues)
+      installGrDevtoolsBridge(issues)
+
       setupDevtoolsPlugin(
         {
           id: PLUGIN_ID,
@@ -68,10 +76,6 @@ export function installGranularityDevtools(): Plugin {
           app,
         },
         (api) => {
-          // Журнал один на панель: обход дерева пишет в него найденные дефекты,
-          // раздел «Issues» их показывает.
-          const issues = createGrIssueLog()
-
           registerOverlays(api)
           registerComponentConfig(api, issues)
           registerComponentTokens(api)

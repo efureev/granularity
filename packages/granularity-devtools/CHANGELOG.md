@@ -7,6 +7,21 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- **Console bridge `window.__GR_DEVTOOLS__`** with `snapshot()`, `waitFor(predicate, options)` and `version`.
+  Tests see only the DOM, so "wait until the overlay layer is registered" used to be written as "wait 300 ms";
+  the bridge answers that from the same snapshot the panel draws for a human. It works **without the panel
+  being open**: the issue log and the channel subscription now live in `installGranularityDevtools()` rather
+  than inside the DevTools setup, which only runs once someone opens the tab.
+- E2E on the showcase covering the bridge — the overlay stack is asserted without a single `waitForTimeout`.
+
+### Changed
+
+- The console interception moved from the "Issues" section to `install`, and the log gained `subscribe()`:
+  the section now follows the log instead of filling it. Restoring the console puts back the original
+  functions, not `bind`-ed copies — the previous version layered a wrapper on every attach cycle.
+
 ## [v0.1.1] 2026-08-27
 
 ### Changed

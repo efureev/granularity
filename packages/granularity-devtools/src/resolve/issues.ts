@@ -55,20 +55,38 @@ export interface GrIssueLog {
   record: (kind: GrIssueKind, component: string | null, message: string) => boolean
   list: () => GrIssue[]
   clear: () => void
+  /**
+   * Уведомление об изменении. Журнал наполняется независимо от того, открыта ли
+   * панель (перехват консоли живёт в `install`), поэтому её обновление —
+   * подписка, а не вызов изнутри записи.
+   */
+  subscribe: (listener: () => void) => () => void
 }
 
 export function createGrIssueLog(): GrIssueLog {
   const issues = new Map<string, GrIssue>()
+  const listeners = new Set<() => void>()
+
+  function notify(): void {
+    for (const listener of listeners) {
+      // Подписчик — код панели; его исключение не должно ломать сбор.
+      try {
+        listener()
+      }
+      catch {
+        // ignore
+      }
+    }
+  }
 
   function record(kind: GrIssueKind, component: string | null, message: string): boolean {
     const key = `${kind}:${component ?? ''}:${message}`
     const existing = issues.get(key)
-    if (existing) {
+    if (existing)
       existing.count += 1
-      return true
-    }
+    else issues.set(key, { key, kind, component, message, count: 1 })
 
-    issues.set(key, { key, kind, component, message, count: 1 })
+    notify()
     return true
   }
 
@@ -82,6 +100,13 @@ export function createGrIssueLog(): GrIssueLog {
     },
     record,
     list: () => [...issues.values()],
-    clear: () => issues.clear(),
+    clear: () => {
+      issues.clear()
+      notify()
+    },
+    subscribe(listener) {
+      listeners.add(listener)
+      return () => listeners.delete(listener)
+    },
   }
 }
