@@ -7,6 +7,8 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.2.0] 2026-08-28
+
 ### Added
 
 - **Console bridge `window.__GR_DEVTOOLS__`** with `snapshot()`, `waitFor(predicate, options)` and `version`.

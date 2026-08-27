@@ -87,7 +87,7 @@
   },
   "peerDependencies": {
     "@feugene/fint-i18n": ">=0.7.0 <1.0.0",
-    "@feugene/granularity": ">=0.37.0 <1.0.0",
+    "@feugene/granularity": ">=0.38.0 <1.0.0",
     "@feugene/unocss-preset-granular": ">=0.13.0 <1.0.0",
     "@feugene/unplugin-granularity": ">=0.7.0 <1.0.0",
     "unplugin-vue-components": ">=0.26.0",
@@ -119,7 +119,7 @@
   "devDependencies": {
     "@antfu/eslint-config": "^9.3.0",
     "@feugene/fint-i18n": "^0.7.0",
-    "@feugene/granularity": "^0.37.0",
+    "@feugene/granularity": "^0.38.0",
     "@feugene/granularity-test-kit": "^0.8.1",
     "@feugene/unocss-preset-granular": "^0.13.0",
     "@feugene/unplugin-granularity": "^0.7.0",
