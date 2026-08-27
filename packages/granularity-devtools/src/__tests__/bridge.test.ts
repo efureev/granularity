@@ -23,7 +23,7 @@ function emit(event: GrDevEvent): void {
 }
 
 function layer(id: number) {
-  return { id, modal: true, topmostForEscape: true, inert: false, depth: 0, closesOnEscape: true }
+  return { id, owner: 'GrModal', focus: null, modal: true, topmostForEscape: true, inert: false, depth: 0, closesOnEscape: true }
 }
 
 function bridge(): GrDevtoolsBridge {

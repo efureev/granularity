@@ -16,6 +16,14 @@ to [Semantic Versioning](https://semver.org/).
   than inside the DevTools setup, which only runs once someone opens the tab.
 - E2E on the showcase covering the bridge — the overlay stack is asserted without a single `waitForTimeout`.
 
+- **Layers are named after the component that opened them** — `GrPromptDialog #3` instead of `Modal #3` — in the
+  tree, in the state and in the timeline.
+- **Focus section for each layer**: whether focus is still inside, whether it will be restored on close and to which
+  element. "Focus is inside" and "focus will be restored" are separate rows on purpose: they diverge for a layer
+  opened with `restoreFocus: false`.
+- The inspector and the bridge now read the stack **on demand** via `readLayers()` instead of replaying the last
+  event, so focus is shown as it is now rather than as it was when the stack last changed.
+
 ### Changed
 
 - The console interception moved from the "Issues" section to `install`, and the log gained `subscribe()`:

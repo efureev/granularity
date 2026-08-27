@@ -16,9 +16,25 @@
  * порядок не гарантирован), а логика эмита при этом живёт в одном месте, здесь.
  */
 
+/** Фокус вокруг слоя: то, чего не видно ни в DOM, ни в браузерном инспекторе. */
+export interface GrLayerFocus {
+  /** Фокус сейчас внутри слоя. */
+  inside: boolean
+  /**
+   * Вернётся ли фокус при закрытии. Правило нетривиальное — «только если на
+   * момент закрытия фокус ещё внутри слоя», — и снаружи непроверяемо.
+   */
+  willRestore: boolean
+  /** Куда вернётся: описание элемента, а не ссылка (буфер не должен держать DOM). */
+  restoreTo: string | null
+}
+
 /** Слой оверлея в том виде, в каком его видит наблюдатель. */
 export interface GrOverlaySnapshot {
   id: number
+  /** Компонент, открывший слой: `GrSelect`, `GrModal`. `null` — слой заведён вне компонента. */
+  owner: string | null
+  focus: GrLayerFocus | null
   modal: boolean
   /** Верхний слой любого рода: ему адресован Esc. */
   topmostForEscape: boolean
@@ -32,7 +48,7 @@ export interface GrOverlaySnapshot {
 
 export type GrDevEvent
   = | { type: 'overlay:sync', layers: GrOverlaySnapshot[] }
-    | { type: 'overlay:push', id: number, modal: boolean }
+    | { type: 'overlay:push', id: number, modal: boolean, owner: string | null }
     | { type: 'overlay:remove', id: number }
     | { type: 'overlay:escape', id: number, closed: boolean }
 
@@ -40,6 +56,15 @@ export interface GrDevHook {
   /** Последние события — чтобы подключившийся позже не начинал с пустого экрана. */
   events: GrDevEvent[]
   listeners: Set<(event: GrDevEvent) => void>
+  /**
+   * Свежий снимок стека по требованию.
+   *
+   * События дают картину на момент изменения стека, а часть состояния меняется
+   * между ними: фокус уходит из слоя от обычного клика, и ни одного события при
+   * этом не случается. Наблюдателю нужно спросить «как сейчас», а не «как было
+   * при последнем push».
+   */
+  readLayers?: () => GrOverlaySnapshot[]
 }
 
 type GlobalWithDevHook = typeof globalThis & { __GR_DEV_HOOK__?: GrDevHook }
@@ -59,6 +84,11 @@ function ensureHook(): GrDevHook {
   const hook: GrDevHook = { events: [], listeners: new Set() }
   target.__GR_DEV_HOOK__ = hook
   return hook
+}
+
+/** Ядро отдаёт наблюдателю читалку стека. Вызывается один раз, из стека слоёв. */
+export function provideGrDevLayers(read: () => GrOverlaySnapshot[]): void {
+  ensureHook().readLayers = read
 }
 
 export function emitGrDevEvent(event: GrDevEvent): void {

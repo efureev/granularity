@@ -1,6 +1,6 @@
 import type { GrIssue, GrIssueLog } from '../resolve/issues'
 import type { GrOverlaySnapshot } from './devChannel'
-import { subscribeToGrDevEvents } from './devChannel'
+import { readGrOverlayLayers, subscribeToGrDevEvents } from './devChannel'
 
 /**
  * Консольный мост: то же состояние, что у панели, — но доступное коду.
@@ -47,7 +47,9 @@ export function installGrDevtoolsBridge(issues: GrIssueLog): () => void {
   })
 
   function snapshot(): GrDevtoolsSnapshot {
-    return { version: __GR_DEVTOOLS_VERSION__, layers: [...layers], issues: issues.list() }
+    // Читалка ядра знает про фокус «сейчас»; события — только про момент
+    // изменения стека. Копию делаем в любом случае: снимок отдаётся наружу.
+    return { version: __GR_DEVTOOLS_VERSION__, layers: [...(readGrOverlayLayers() ?? layers)], issues: issues.list() }
   }
 
   const bridge: GrDevtoolsBridge = {

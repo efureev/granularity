@@ -7,8 +7,16 @@
  * установкой, а не молчаливым несовпадением формы события.
  */
 
+export interface GrLayerFocus {
+  inside: boolean
+  willRestore: boolean
+  restoreTo: string | null
+}
+
 export interface GrOverlaySnapshot {
   id: number
+  owner: string | null
+  focus: GrLayerFocus | null
   modal: boolean
   topmostForEscape: boolean
   inert: boolean
@@ -18,13 +26,15 @@ export interface GrOverlaySnapshot {
 
 export type GrDevEvent
   = | { type: 'overlay:sync', layers: GrOverlaySnapshot[] }
-    | { type: 'overlay:push', id: number, modal: boolean }
+    | { type: 'overlay:push', id: number, modal: boolean, owner: string | null }
     | { type: 'overlay:remove', id: number }
     | { type: 'overlay:escape', id: number, closed: boolean }
 
 interface GrDevHook {
   events: GrDevEvent[]
   listeners: Set<(event: GrDevEvent) => void>
+  /** Свежий снимок стека: часть состояния (фокус) меняется без событий. */
+  readLayers?: () => GrOverlaySnapshot[]
 }
 
 type GlobalWithDevHook = typeof globalThis & { __GR_DEV_HOOK__?: GrDevHook }
@@ -49,6 +59,18 @@ function ensureHook(): GrDevHook {
  * Подписка на канал. Сначала отдаёт то, что ядро успело накопить до подключения
  * панели, — иначе открытая до этого модалка была бы панели не видна.
  */
+/**
+ * Картина стека на «сейчас», а не на момент последнего события.
+ *
+ * Фокус уходит из слоя от обычного клика, и события стека при этом не
+ * происходит вовсе — по одной ленте событий панель показывала бы устаревшее.
+ * `null` означает, что ядро читалку не предоставило: старая версия или слоёв
+ * не было вовсе.
+ */
+export function readGrOverlayLayers(): GrOverlaySnapshot[] | null {
+  return (globalThis as GlobalWithDevHook).__GR_DEV_HOOK__?.readLayers?.() ?? null
+}
+
 export function subscribeToGrDevEvents(listener: (event: GrDevEvent) => void): () => void {
   const hook = ensureHook()
 

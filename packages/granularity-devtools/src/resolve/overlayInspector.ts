@@ -18,10 +18,16 @@ export function overlayNodeId(id: number): string {
   return `layer:${id}`
 }
 
+/** Подпись слоя: имя открывшего компонента информативнее номера. */
+function layerLabel(layer: GrOverlaySnapshot): string {
+  const kind = layer.modal ? 'Modal' : 'Layer'
+  return layer.owner ? `${layer.owner} #${layer.id}` : `${kind} #${layer.id}`
+}
+
 export function overlayTree(layers: GrOverlaySnapshot[]): CustomInspectorNode[] {
   return layers.map(layer => ({
     id: overlayNodeId(layer.id),
-    label: layer.modal ? `Modal #${layer.id}` : `Layer #${layer.id}`,
+    label: layerLabel(layer),
     tags: [
       ...(layer.modal ? [TAG_MODAL] : []),
       ...(layer.topmostForEscape ? [TAG_ESCAPE] : []),
@@ -35,9 +41,20 @@ export function overlayState(layers: GrOverlaySnapshot[], nodeId: string): Custo
   if (!layer)
     return {}
 
+  const focus = layer.focus
+    ? [
+        { key: 'focus inside layer', value: layer.focus.inside },
+        // Разделено намеренно: «фокус внутри» и «фокус вернётся» расходятся,
+        // когда слой открыт с `restoreFocus: false`.
+        { key: 'will restore focus', value: layer.focus.willRestore },
+        { key: 'restore to', value: layer.focus.restoreTo ?? '—' },
+      ]
+    : []
+
   return {
     Layer: [
       { key: 'id', value: layer.id },
+      { key: 'opened by', value: layer.owner ?? '—' },
       { key: 'modal', value: layer.modal },
       // Немодальные слои в этой арифметике не участвуют вовсе, и `null` здесь
       // честнее нуля: нулевая глубина — это «самое нижнее окно», а не «не окно».
@@ -47,6 +64,7 @@ export function overlayState(layers: GrOverlaySnapshot[], nodeId: string): Custo
       { key: 'owns Escape', value: layer.topmostForEscape },
       { key: 'closes on Escape', value: layer.closesOnEscape },
       { key: 'inert', value: layer.inert },
+      ...focus,
     ],
   }
 }
@@ -55,7 +73,7 @@ export function overlayState(layers: GrOverlaySnapshot[], nodeId: string): Custo
 export function overlayTimelineEvent(event: GrDevEvent): { title: string, subtitle?: string, logType?: 'default' | 'warning' } | null {
   switch (event.type) {
     case 'overlay:push':
-      return { title: event.modal ? `Modal #${event.id} opened` : `Layer #${event.id} opened` }
+      return { title: `${event.owner ?? (event.modal ? 'Modal' : 'Layer')} #${event.id} opened` }
     case 'overlay:remove':
       return { title: `Layer #${event.id} closed` }
     case 'overlay:escape':

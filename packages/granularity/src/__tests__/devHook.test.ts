@@ -95,6 +95,33 @@ describe('dev-канал: картина стека', () => {
   })
 })
 
+describe('dev-канал: владелец слоя и фокус', () => {
+  it('слой, заведённый вне компонента, владельца не имеет', () => {
+    const seen = listen()
+    pushOverlayLayer(layer(true))
+
+    expect(snapshot(seen)[0]).toMatchObject({ owner: null, focus: null })
+  })
+
+  it('владелец доезжает и до события, и до снимка', () => {
+    const seen = listen()
+    const id = pushOverlayLayer({ ...layer(true), owner: 'GrModal' })
+
+    expect(seen).toContainEqual({ type: 'overlay:push', id, modal: true, owner: 'GrModal' })
+    expect(snapshot(seen)[0]?.owner).toBe('GrModal')
+  })
+
+  it('картину фокуса слой рассказывает сам — в момент снимка, а не регистрации', () => {
+    const seen = listen()
+    const describeFocus = vi.fn(() => ({ inside: true, willRestore: true, restoreTo: 'button «Открыть»' }))
+
+    pushOverlayLayer({ ...layer(true), describeFocus })
+    expect(describeFocus).toHaveBeenCalledTimes(1)
+
+    expect(snapshot(seen)[0]?.focus).toEqual({ inside: true, willRestore: true, restoreTo: 'button «Открыть»' })
+  })
+})
+
 describe('dev-канал: незаметность для пакета', () => {
   it('без подписчиков стек работает как обычно', () => {
     const close = vi.fn()

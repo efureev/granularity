@@ -41,7 +41,7 @@ afterEach(() => {
 describe('раздел «Overlay layers»', () => {
   it('показывает слой, открытый до подключения панели', () => {
     subscribeToGrDevEvents(() => {})
-    emit({ type: 'overlay:sync', layers: [{ id: 1, modal: true, topmostForEscape: true, inert: false, depth: 0, closesOnEscape: true }] })
+    emit({ type: 'overlay:sync', layers: [{ id: 1, owner: 'GrModal', focus: null, modal: true, topmostForEscape: true, inert: false, depth: 0, closesOnEscape: true }] })
 
     const api = fakeApi()
     registerOverlays(api as never)
@@ -66,7 +66,7 @@ describe('раздел «Overlay layers»', () => {
     const api = fakeApi()
     registerOverlays(api as never)
 
-    emit({ type: 'overlay:push', id: 1, modal: true })
+    emit({ type: 'overlay:push', id: 1, modal: true, owner: 'GrModal' })
     emit({ type: 'overlay:sync', layers: [] })
     emit({ type: 'overlay:escape', id: 1, closed: true })
 

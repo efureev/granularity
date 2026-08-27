@@ -23,8 +23,8 @@
  * монтируются отдельным `render()` в `body`) и знает их корни.
  */
 
-import type { GrOverlaySnapshot } from '../../internal/devHook'
-import { emitGrDevEvent } from '../../internal/devHook'
+import type { GrLayerFocus, GrOverlaySnapshot } from '../../internal/devHook'
+import { emitGrDevEvent, provideGrDevLayers } from '../../internal/devHook'
 import { isComposingEvent } from '../../internal/keyboard'
 
 export interface OverlayLayer {
@@ -57,6 +57,16 @@ export interface OverlayLayer {
    * вне DOM-поддерева окна, но для пользователя это тот же слой.
    */
   root?: () => HTMLElement | null
+  /**
+   * Компонент, открывший слой. Только для наблюдателя: стеку он не нужен, но
+   * без него слой в панели — безымянный номер.
+   */
+  owner?: string | null
+  /**
+   * Картина фокуса глазами самого слоя. Геттер, а не значение: она меняется от
+   * каждого клика, а спрашивают её только в момент снимка.
+   */
+  describeFocus?: () => GrLayerFocus | null
 }
 
 const stack: OverlayLayer[] = []
@@ -97,6 +107,8 @@ function snapshotLayers(): GrOverlaySnapshot[] {
 
   return stack.map(layer => ({
     id: layer.id,
+    owner: layer.owner ?? null,
+    focus: layer.describeFocus?.() ?? null,
     modal: layer.modal,
     topmostForEscape: layer === top,
     inert: layer.modal && layer !== topModal,
@@ -159,7 +171,7 @@ export function pushOverlayLayer(layer: Omit<OverlayLayer, 'id'>): number {
   startListening()
 
   if (__GR_DEV__)
-    emitGrDevEvent({ type: 'overlay:push', id, modal: layer.modal })
+    emitGrDevEvent({ type: 'overlay:push', id, modal: layer.modal, owner: layer.owner ?? null })
 
   syncModalLayers()
   return id
@@ -247,6 +259,11 @@ export function floatingLayerZIndex(zIndexVar: string): string {
 export function modalLayerZIndex(depth: number, zIndexVar = '--gr-z-modal'): string {
   return depth > 0 ? `calc(var(${zIndexVar}) + ${depth})` : `var(${zIndexVar})`
 }
+
+// Читалка регистрируется на загрузке модуля: наблюдатель может подключиться
+// раньше первого открытого слоя, и тогда спросить ему было бы нечего.
+if (__GR_DEV__)
+  provideGrDevLayers(snapshotLayers)
 
 /** Тестовая/служебная очистка стека. */
 export function resetOverlayStack(): void {
