@@ -5,6 +5,7 @@ import { defineConfig, type Plugin } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { visualizer } from 'rollup-plugin-visualizer'
 import Icons from 'unplugin-icons/vite'
+import VueDevtools from 'vite-plugin-vue-devtools'
 import Components from 'unplugin-vue-components/vite'
 import UnoCSS from 'unocss/vite'
 
@@ -62,6 +63,10 @@ export default defineConfig(({ command, mode }) => ({
   },
   plugins: [
     vue(),
+    // Встроенная панель Vue DevTools: в ней виден раздел «Granularity»
+    // (`@feugene/granularity-devtools`). Только в dev — в прод-сборку плагин
+    // ничего не добавляет.
+    VueDevtools(),
     // Авто-импорт компонентов дизайн-системы в шаблонах (ядро + companion-датапикер).
     Components({
       dts: fileURLToPath(new URL('./src/components.d.ts', import.meta.url)),
