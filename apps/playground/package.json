@@ -9,13 +9,14 @@
   },
   "devDependencies": {
     "@feugene/granularity-devtools": "^0.2.0",
-    "@vitejs/plugin-vue": "^6.0.8",
     "@unocss/reset": "^66.8.1",
+    "@vitejs/plugin-vue": "^6.0.8",
     "rollup-plugin-visualizer": "^7.1.1",
     "typescript": "^6.0.3",
     "unocss": "^66.8.1",
     "unplugin-icons": "^23.0.1",
     "vite": "^8.2.2",
+    "vite-plugin-vue-devtools": "^8.2.1",
     "vitest": "^4.1.11"
   },
   "scripts": {
