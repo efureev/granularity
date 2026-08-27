@@ -1,0 +1,80 @@
+{
+  "name": "@feugene/granularity-devtools",
+  "description": "Vue DevTools panel for @feugene/granularity — where a prop value came from, the overlay layer stack and design-system warnings.",
+  "version": "0.1.0",
+  "license": "SEE LICENSE IN LICENSE",
+  "author": {
+    "name": "Evgeniy Fureev",
+    "url": "https://github.com/efureev"
+  },
+  "homepage": "https://efureev.github.io/granularity",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/efureev/granularity.git",
+    "directory": "packages/granularity-devtools"
+  },
+  "bugs": {
+    "url": "https://github.com/efureev/granularity/issues"
+  },
+  "keywords": [
+    "vue",
+    "vue3",
+    "devtools",
+    "vue-devtools",
+    "debugging",
+    "granularity",
+    "design-system"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.js",
+  "types": "./dist/types/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "dependencies": {
+    "@vue/devtools-api": "^8.2.1",
+    "@vue/devtools-kit": "^8.2.1"
+  },
+  "peerDependencies": {
+    "@feugene/granularity": ">=0.37.0 <1.0.0",
+    "vue": "^3.5.0"
+  },
+  "devDependencies": {
+    "@antfu/eslint-config": "^9.3.0",
+    "@feugene/granularity": "^0.37.0",
+    "@types/node": "^26.4.0",
+    "eslint": "^10.9.1",
+    "globals": "^16.5.0",
+    "jsdom": "^29.1.1",
+    "typescript": "^6.0.3",
+    "vite": "^8.2.2",
+    "vitest": "^4.1.11",
+    "vue": "^3.5.42"
+  },
+  "scripts": {
+    "build": "yarn generate:required-map && vite build && tsc -p tsconfig.build.json",
+    "generate:required-map": "node scripts/generate-required-map.mjs",
+    "dev": "vite build --watch",
+    "lint": "eslint . --cache",
+    "lint:fix": "eslint . --cache --fix",
+    "test": "vitest --config vitest.config.ts",
+    "test:run": "vitest run --config vitest.config.ts",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  }
+}

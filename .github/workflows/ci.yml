@@ -14,6 +14,7 @@ on:
       - 'granularity-datasource-v*'
       - 'granularity-editor-v*'
       - 'granularity-media-v*'
+      - 'granularity-devtools-v*'
   pull_request:
     branches: [ main ]
   # Ручной перезапуск: push тега тем же значением события не создаёт, и упавший
@@ -1326,6 +1327,122 @@ jobs:
 
       - name: Publish to GitHub Packages
         working-directory: packages/granularity
+        run: npm publish --ignore-scripts --no-provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # Сборка @feugene/granularity-devtools — панели Vue DevTools по дизайн-системе.
+  # Джоба ни от чего не зависит: пакет не импортирует ядро, а читает состояние
+  # приложения через provide/inject и dev-канал ядра уже в рантайме потребителя,
+  # поэтому `dist` ядра ей на сборке не нужен.
+  build-granularity-devtools:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Lint package
+        run: yarn lint:devtools
+
+      - name: Typecheck package
+        run: yarn typecheck:devtools
+
+      - name: Test package
+        run: yarn test:devtools
+
+      - name: Build package
+        run: yarn build:devtools
+
+      - name: Validate package metadata (publint)
+        working-directory: packages/granularity-devtools
+        run: npx --yes publint@latest --pack npm
+
+      - name: Upload dist
+        uses: actions/upload-artifact@v7
+        with:
+          name: granularity-devtools-dist
+          path: packages/granularity-devtools/dist/
+
+  # Публикация @feugene/granularity-devtools по тегу `granularity-devtools-v<semver>`.
+  publish-npm-granularity-devtools:
+    needs:
+      - build-granularity-devtools
+    if: startsWith(github.ref, 'refs/tags/granularity-devtools-v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Verify tag matches package version
+        working-directory: packages/granularity-devtools
+        run: |
+          PKG_VERSION=$(node -p "require('./package.json').version")
+          TAG_VERSION="${GITHUB_REF_NAME#granularity-devtools-v}"
+          echo "package.json version: $PKG_VERSION"
+          echo "git tag version:      $TAG_VERSION"
+          if [ "$PKG_VERSION" != "$TAG_VERSION" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match package.json version $PKG_VERSION"
+            exit 1
+          fi
+
+      - name: Download dist
+        uses: actions/download-artifact@v8
+        with:
+          name: granularity-devtools-dist
+          path: packages/granularity-devtools/dist
+
+      - name: Publish to npm
+        run: npm publish --access public --provenance
+        working-directory: packages/granularity-devtools
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  # Зеркало в GitHub Packages под scope владельца репозитория.
+  publish-gpr-granularity-devtools:
+    needs:
+      - build-granularity-devtools
+    if: startsWith(github.ref, 'refs/tags/granularity-devtools-v')
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@efureev'
+
+      - name: Download dist
+        uses: actions/download-artifact@v8
+        with:
+          name: granularity-devtools-dist
+          path: packages/granularity-devtools/dist
+
+      - name: Prepare package for GitHub Packages
+        working-directory: packages/granularity-devtools
+        run: |
+          npm pkg set name='@efureev/granularity-devtools'
+          npm pkg delete publishConfig.provenance
+          npm pkg set publishConfig.registry='https://npm.pkg.github.com'
+          node -e "const p=require('./package.json');console.log('publishing as:',p.name,'@',p.version)"
+
+      - name: Publish to GitHub Packages
+        working-directory: packages/granularity-devtools
         run: npm publish --ignore-scripts --no-provenance
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
