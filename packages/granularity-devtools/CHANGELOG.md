@@ -7,6 +7,20 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.1.1] 2026-08-27
+
+### Changed
+
+- Inspector sections are now named after the package — `Granularity overlays` and `Granularity issues`. In the
+  panel's plugin column only icons are visible, and the previous names (`Overlay layers`, `Issues`) were
+  indistinguishable from other plugins' sections until you clicked one. The issues icon uses the canonical
+  Material name `report_problem`: the panel expands `icon` into a `custom-ic-baseline-<icon>` class.
+
+### Note
+
+- The DevTools timeline does not record until you press its record button — an empty "Granularity overlays"
+  timeline usually means recording is off, not that events are missing.
+
 ## [v0.1.0] 2026-08-27
 
 ### Added
