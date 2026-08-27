@@ -24,6 +24,9 @@ import App from './App.vue'
 // Keep UnoCSS only for the playground shell. Package button styles must come from built dist artifacts.
 import '@unocss/reset/tailwind-compat.css'
 import 'virtual:uno.css'
+// После `virtual:uno.css`, иначе базовые токены пакета перебьют тему: они
+// эмитятся последними внутри слоя `granular`.
+import './styles/light-app.css'
 
 const app = createApp(App)
 

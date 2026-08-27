@@ -76,20 +76,24 @@ describe('playground config', () => {
     })
   })
 
-  it('сканирует исходники приложения и только выбранные dist-компоненты granularity, не подхватывая лишние артефакты', () => {
-    // filesystem нацелен строго на выбранный компонент (`GrButton`) в `dist/`,
-    // а не на произвольные dist-артефакты.
-    expect(
-      distPlaygroundContent.filesystem.some(glob => /packages\/granularity\/dist\/components\/GrButton\//.test(glob)),
-    ).toBe(true)
+  it('сканирует исходники приложения и dist каждого используемого компонента, не подхватывая лишние артефакты', () => {
+    // Скан обязан покрывать **все** компоненты стенда, а не только кнопку:
+    // пока в списке был один `GrButton`, у `GrModal` не находилось правил для
+    // `shadow-*` и `rounded-*`, и окно рисовалось без панели.
+    for (const name of ['GrButton', 'GrModal', 'GrSelect', 'GrPromptDialog']) {
+      expect(
+        distPlaygroundContent.filesystem.some(glob => glob.includes(`/packages/granularity/dist/components/${name}/`)),
+        `нет скана для ${name}`,
+      ).toBe(true)
+    }
 
     // Шаблоны исходников приложения (`.vue`) подхватываются стандартным фильтром.
     expect(distPlaygroundContentIncludes.some(re => re.test('/repo/apps/playground/src/App.vue'))).toBe(true)
 
-    // Таргетированный include разрешает только директорию выбранного компонента,
-    // не затрагивая невыбранные компоненты и произвольные dist-артефакты.
+    // Таргетированный include разрешает директории выбранных компонентов и не
+    // распахивается на произвольные dist-артефакты.
     expect(distPlaygroundContentIncludes.some(re => re.test(distPlaygroundGrButtonFile))).toBe(true)
-    expect(distPlaygroundContentIncludes.some(re => re.test(distPlaygroundGrModalFile))).toBe(false)
+    expect(distPlaygroundContentIncludes.some(re => re.test(distPlaygroundGrModalFile))).toBe(true)
     expect(distPlaygroundContentIncludes.some(re => re.test('/repo/dist/index.js'))).toBe(false)
   })
 
@@ -98,6 +102,14 @@ describe('playground config', () => {
     expect(distPlaygroundMainEntry).toContain("// import '@granularity-styles'")
     expect(distPlaygroundMainEntry).toContain("// import '@granularity-button-css'")
     expect(distPlaygroundMainEntry).toContain('// Вариант 4: granular-подключение через `presetGranularNode`.')
+
+    // Тема приложения — после `virtual:uno.css`: базовые токены пакета
+    // эмитятся последними внутри слоя `granular`, и файл, подключённый раньше,
+    // они бы перебили.
+    // Ищем именно активный импорт: в сценариях 1–3 тот же путь стоит
+    // закомментированным и встречается раньше.
+    expect(distPlaygroundMainEntry.indexOf("\nimport './styles/light-app.css'"))
+      .toBeGreaterThan(distPlaygroundMainEntry.indexOf("import 'virtual:uno.css'"))
     expect(distPlaygroundMainEntry).not.toContain('setThemes(')
     expect(distPlaygroundMainEntry).not.toContain('../../legacy/playground/src/App.vue')
   })
@@ -112,12 +124,19 @@ describe('playground config', () => {
     expect(distPlaygroundUnoConfig).toContain('presetGranularNode')
     expect(distPlaygroundUnoConfig).toContain('granularContent')
     expect(distPlaygroundUnoConfig).toContain("import granularityProvider from '@feugene/granularity/granular-provider/node'")
-    expect(distPlaygroundUnoConfig).toContain("const granularPresetComponents = ['GrButton'] as const")
-    expect(distPlaygroundUnoConfig).toContain('fileURLToPath')
     expect(distPlaygroundUnoConfig).toContain('presetGranularNode(granularOptions)')
     expect(distPlaygroundUnoConfig).toContain('granularContent(granularOptions)')
     expect(distPlaygroundUnoConfig).toContain('providers: [granularityProvider]')
     expect(distPlaygroundUnoConfig).toContain("{provider: '@feugene/granularity', names: [...granularPresetComponents]}")
-    expect(distPlaygroundUnoConfig).toContain('tokensFile: granularPresetThemeFiles[0]')
+
+    // Список компонентов пресета обязан покрывать то, что стенд рендерит.
+    for (const name of ['GrButton', 'GrDialog', 'GrModal', 'GrPromptDialog', 'GrSelect'])
+      expect(distPlaygroundUnoConfig, `${name} не объявлен в granularPresetComponents`).toContain(`'${name}'`)
+
+    // `tokensFile` подменяет `tokens.css` провайдера целиком — вместе со шкалой
+    // радиусов и всем, чего нет в файле приложения. Тема стенда подключается
+    // импортом в `main.ts`, после `virtual:uno.css`.
+    // Ключа, а не упоминания: в комментарии рядом объяснено, почему его нет.
+    expect(distPlaygroundUnoConfig).not.toContain('tokensFile:')
   })
 })

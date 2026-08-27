@@ -1,24 +1,23 @@
 :root {
-  /* Slate Neutrals */
-  --bg: #f8fafc;
-  --fg: #0f172a;
-  --card: #ffffff;
-  --card-fg: #0f172a;
-  --popover: #ffffff;
-  --popover-fg: #0f172a;
-  --muted: #f1f5f9;
-  --muted-fg: #64748b;
-  --secondary: #e2e8f0;
-  --secondary-fg: #1e293b;
-  --brd: #e2e8f0;
-  --input: #e2e8f0;
-  --ring: #6366f1;
+  /*
+   * Тема приложения для сценариев 1–3 (`@granularity-foundation`,
+   * `@granularity-styles`, `@granularity-button-css`): там CSS подключается
+   * импортом, а не через `uno.config.ts`, поэтому переопределения нужны файлом.
+   * Для сценария 4 то же самое делает `themes.tokenOverrides` в `uno.config.ts`.
+   *
+   * Здесь только то, что отличается от токенов пакета. Прежняя версия файла
+   * объявляла два десятка переменных в старом формате (`--bg`, `--card`,
+   * `--primary`), которых ядро не читает вовсе: канонический префикс — `--gr-*`,
+   * алиасов обратной совместимости пакет не заводит.
+   */
 
-  /* Indigo / Deep Accents */
-  --primary: #e546bd;
-  --primary-fg: #ffffff;
-  --accent: #eef2ff;
-  --accent-fg: #3730a3;
-  --destructive: #dc2626;
-  --destructive-fg: #ffffff;
+  /*
+   * Розовый вместо индиго: на стенде сразу видно, применилась ли тема.
+   *
+   * Одной строки достаточно — производные считаются от неё сами:
+   * `--gr-primary-solid: var(--gr-primary)`, а `-hover`/`-active` собираются
+   * из `--gr-primary` через `color-mix`. Дублировать формулы здесь значило бы
+   * разойтись с ядром на первой же правке пропорций.
+   */
+  --gr-primary: #e546bd;
 }
