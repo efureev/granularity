@@ -1,6 +1,8 @@
 import type { PluginSetupFunction } from '@vue/devtools-kit'
 
 import type { TokenReading } from '../resolve/tokenUsage'
+import { stylesheetIndex } from '../internal/stylesheetIndex'
+import { emptyTokens } from '../resolve/emptyTokens'
 import { tokenSections } from '../resolve/tokenUsage'
 
 type DevtoolsApi = Parameters<PluginSetupFunction>[0]
@@ -51,10 +53,21 @@ export function registerComponentTokens(api: DevtoolsApi): void {
       inlineNames: Array.from(el.style),
     })
 
+    const index = stylesheetIndex()
+    const resolved = emptyTokens(el, index.consumed, {
+      read: (element, token) => getComputedStyle(element).getPropertyValue(token),
+    })
+
     payload.instanceData.state.push(
       ...entries('granularity tokens', sections.applied),
       ...entries('granularity tokens · unset', sections.unset),
       ...entries('granularity tokens · not declared', sections.unknown),
+      ...resolved.empty.map(finding => ({
+        type: 'granularity tokens · consumed but empty',
+        key: finding.token,
+        value: `read by .${finding.className} without a fallback — the declaration is dropped`,
+        editable: false,
+      })),
     )
   })
 }

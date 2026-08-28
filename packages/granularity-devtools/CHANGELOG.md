@@ -7,6 +7,30 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.3.0] 2026-08-28
+
+### Added
+
+- **"Tokens resolving to nothing" section** on the component inspector — a `--gr-*` token that a rule of the
+  component reads **without a fallback** while the browser resolves it to empty. Such a declaration is dropped
+  at computed-value time, so the component renders with no background, no border, square corners — on a green
+  build and valid CSS.
+
+  The idea comes from `token-undefined`, added to `granular doctor` in preset `0.14.0`. The static check is
+  blind where applications get it wrong most often: `themes.tokensFile` **replaces** the package's `tokens.css`,
+  but the doctor treats the union of both files as defined. Measured on `apps/playground` against `0.14.1`,
+  which closed the same gap for `themes.themeFiles` but not for `themes.tokensFile`: with the token file
+  swapped, `getGranularThemeCss` drops from 22 504 to 15 703 bytes and loses `--gr-radius-control`, the doctor
+  still reports the same 17 findings as before, and the panel names 11 empty typography and motion tokens.
+
+  Only `--gr-*` counts. UnoCSS reads its own `--un-shadow-inset`, `--un-ring-inset` and `--un-space-y-reverse`
+  without fallbacks across the utility layer; on a clean stand that is three findings of somebody else's
+  internal machinery.
+
+- The stylesheet index now also maps class → tokens its rules read without a fallback, reusing the same walk
+  that backs "classes without rules": `@media` / `@supports` / `@layer` included, the last `var()` of a fallback
+  chain counted (empty, it drops the declaration just the same).
+
 ## [v0.2.0] 2026-08-28
 
 ### Added

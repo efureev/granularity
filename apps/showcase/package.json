@@ -10,11 +10,11 @@
     "@feugene/granularity-chrono": "^0.10.0",
     "@feugene/granularity-dashboard": "^0.6.0",
     "@feugene/granularity-datasource": "^0.1.2",
-    "@feugene/granularity-devtools": "^0.2.0",
+    "@feugene/granularity-devtools": "^0.3.0",
     "@feugene/granularity-editor": "^0.3.1",
     "@feugene/granularity-forms-schema": "^0.4.0",
     "@feugene/granularity-media": "^0.7.1",
-    "@feugene/unocss-preset-granular": "^0.13.0",
+    "@feugene/unocss-preset-granular": "^0.14.1",
     "@floating-ui/dom": "^1.8.0",
     "vue": "^3.5.42",
     "vue-router": "^4.6.4"
