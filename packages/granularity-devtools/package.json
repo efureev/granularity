@@ -1,7 +1,7 @@
 {
   "name": "@feugene/granularity-devtools",
   "description": "Vue DevTools panel for @feugene/granularity — where a prop value came from, the overlay layer stack and design-system warnings.",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "license": "SEE LICENSE IN LICENSE",
   "author": {
     "name": "Evgeniy Fureev",

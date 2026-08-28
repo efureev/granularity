@@ -166,7 +166,7 @@
     "@feugene/granularity": "^0.38.0",
     "@feugene/granularity-chrono": "^0.10.0",
     "@feugene/granularity-test-kit": "^0.8.1",
-    "@feugene/unocss-preset-granular": "^0.13.0",
+    "@feugene/unocss-preset-granular": "^0.14.1",
     "@feugene/unplugin-granularity": "^0.7.0",
     "@types/node": "^26.4.0",
     "@vitejs/plugin-vue": "^6.0.8",
@@ -188,7 +188,7 @@
   "scripts": {
     "build": "vite build && vue-tsc -p tsconfig.build.json",
     "dev": "vite build --watch",
-    "doctor": "granular doctor ./granular.options.mjs --strict",
+    "doctor": "node ../../scripts/granular-doctor.mjs ./granular.options.mjs",
     "generate:registry": "node scripts/generate-registry.mjs",
     "check:messages": "fint-i18n-check-messages src/i18n/locales",
     "lint": "eslint . --cache",
