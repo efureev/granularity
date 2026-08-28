@@ -7,6 +7,20 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.3.1] 2026-08-28
+
+### Changed
+
+- The rationale for "tokens resolving to nothing" is corrected in the README. Preset `0.15.0` closed the
+  `themes.tokensFile` blind spot the section was justified by — the fix landed on the feedback this package
+  filed. Swapping the token file on `apps/playground` now moves `doctor` from 8 findings to 52.
+
+  What the panel adds is no longer "the static check is blind here" but "the static check answers a different
+  question": not «does any layer define this token in this configuration» but «is it empty right now, on this
+  element». Measured on the same stand — healthy: `doctor` 8, panel 0; swapped: `doctor` 52, panel 11. The eight
+  on a healthy stand are tokens `GrAlert` assigns itself with an inline style, which static analysis cannot tell
+  apart from undefined.
+
 ## [v0.3.0] 2026-08-28
 
 ### Added

@@ -133,7 +133,7 @@
     "@feugene/fint-i18n": "^0.7.0",
     "@feugene/granularity": "^0.38.0",
     "@feugene/granularity-test-kit": "^0.8.1",
-    "@feugene/unocss-preset-granular": "^0.14.1",
+    "@feugene/unocss-preset-granular": "^0.15.0",
     "@feugene/unplugin-granularity": "^0.7.0",
     "@types/node": "^26.4.0",
     "@vitejs/plugin-vue": "^6.0.8",
