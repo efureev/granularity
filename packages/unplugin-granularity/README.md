@@ -68,10 +68,10 @@ import '@feugene/granularity/components/GrInput/styles.css'
 
 ```ts
 GranularityResolver({
-  prefix: 'Gr',       // префикс компонентов; default 'Gr'
+  prefix: 'Gr', // префикс компонентов; default 'Gr'
   importStyle: false, // подтягивать <pkg>/components/<Name>/styles.css; default false
-  directives: true,   // авто-импорт директив (v-hotkey и т.п.); default true
-  exclude: /^GrIn/,   // игнорировать имена по RegExp
+  directives: true, // авто-импорт директив (v-hotkey и т.п.); default true
+  exclude: /^GrIn/, // игнорировать имена по RegExp
 })
 ```
 

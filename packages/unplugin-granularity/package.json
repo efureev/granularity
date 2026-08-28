@@ -1,7 +1,7 @@
 {
   "name": "@feugene/unplugin-granularity",
   "description": "unplugin-vue-components resolver for @feugene/granularity — granular auto-import for components and directives.",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "license": "SEE LICENSE IN LICENSE",
   "author": {
     "name": "Evgeniy Fureev",
@@ -54,17 +54,22 @@
     "unplugin-vue-components": ">=0.26.0"
   },
   "devDependencies": {
+    "@antfu/eslint-config": "^9.3.0",
     "@feugene/granularity": "^0.38.0",
     "@types/node": "^25.9.5",
+    "eslint": "^10.9.1",
+    "globals": "^16.5.0",
     "typescript": "^6.0.3",
     "unplugin-vue-components": "^32.1.0",
     "vite": "^8.2.2",
-    "vue-tsc": "^3.3.11",
-    "vitest": "^4.1.11"
+    "vitest": "^4.1.11",
+    "vue-tsc": "^3.3.11"
   },
   "scripts": {
     "build": "vite build && vue-tsc -p tsconfig.build.json",
     "dev": "vite build --watch",
+    "lint": "eslint . --cache",
+    "lint:fix": "eslint . --cache --fix",
     "typecheck": "vue-tsc --noEmit -p tsconfig.json",
     "test": "vitest --config vitest.config.ts",
     "test:run": "vitest run --config vitest.config.ts"
