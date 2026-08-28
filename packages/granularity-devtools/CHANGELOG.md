@@ -7,6 +7,8 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.3.1] 2026-08-28
+
 ### Changed
 
 - The rationale for "tokens resolving to nothing" is corrected in the README. Preset `0.15.0` closed the
