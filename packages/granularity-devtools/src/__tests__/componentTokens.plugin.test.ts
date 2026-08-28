@@ -74,3 +74,34 @@ describe('секция «токены, разрешающиеся в пусто�
     expect(inspect(mount('<div class="trigger"></div>'), 'RouterView')).toEqual([])
   })
 })
+
+describe('секции потребляемых токенов', () => {
+  it('раскладывает по владельцу: своё, чужое компонентное, базовое', () => {
+    addStyle('.alert { background: var(--gr-alert-bg); border-radius: var(--gr-radius-control) }')
+    addStyle('.alert { gap: var(--gr-button-radius) }')
+
+    const state = inspect(mount('<div class="alert"></div>'), 'GrAlert')
+    const of = (type: string) => state.filter(row => row.type === type).map(row => row.key)
+
+    expect(of('granularity tokens · used · own')).toEqual(['--gr-alert-bg'])
+    expect(of('granularity tokens · used · foundation')).toEqual(['--gr-radius-control'])
+    expect(of('granularity tokens · used · from other components')).toEqual(['--gr-button-radius'])
+  })
+
+  it('в строке чужого токена виден владелец', () => {
+    addStyle('.alert { gap: var(--gr-button-radius) }')
+
+    const state = inspect(mount('<div class="alert"></div>'), 'GrAlert')
+    const row = state.find(item => item.key === '--gr-button-radius')
+
+    expect(row?.value).toContain('GrButton')
+  })
+
+  it('чтение с запасом помечено — пустым оно не ломается', () => {
+    addStyle('.alert { color: var(--gr-fg, #111) }')
+
+    const state = inspect(mount('<div class="alert"></div>'), 'GrAlert')
+
+    expect(state.find(row => row.key === '--gr-fg')?.value).toContain('has fallback')
+  })
+})

@@ -27,7 +27,17 @@ to [Semantic Versioning](https://semver.org/).
   without fallbacks across the utility layer; on a clean stand that is three findings of somebody else's
   internal machinery.
 
-- The stylesheet index now also maps class → tokens its rules read without a fallback, reusing the same walk
+- **"Tokens the component reads" — four sections by owner**: `own`, `from other components` (named, so it is
+  clear whose token a change would also touch), `foundation` and `unregistered`. Each row carries the value from
+  computed style and a `has fallback` mark.
+
+  This is the reverse of the existing "component tokens" section, and neither set contains the other: a declared
+  token may go unconsumed, while what a component consumes is mostly somebody else's. A live `GrButton` on the
+  playground reads twelve tokens, two of them its own. The chain is visible too — `--gr-button-primary-bg`, the
+  customisation point, resolves to `#e546bd` because its fallback is `--gr-primary`, which the app repainted.
+
+- The stylesheet index now also maps class → tokens its rules read, with a per-token "read without a fallback at
+  least once" flag, reusing the same walk
   that backs "classes without rules": `@media` / `@supports` / `@layer` included, the last `var()` of a fallback
   chain counted (empty, it drops the declaration just the same).
 

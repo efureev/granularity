@@ -11,29 +11,43 @@ import { classNamesFromSelector } from '../resolve/unstyledClasses'
 export interface StylesheetIndex {
   styled: Set<string>
   /**
-   * Класс → токены, которые его правила читают БЕЗ запасного значения.
+   * Класс → токены, которые читают его правила, и флаг «хоть раз без запаса».
    *
    * `var(--x)` без запасного значения — валидный CSS, который при пустом
    * токене не красит вовсе: свойство становится недействительным на этапе
-   * вычисления. С запасным значением такого класса отказов нет, поэтому
-   * `var(--x, …)` сюда не попадает.
+   * вычисления. С `var(--x, …)` такого класса отказов нет, поэтому флаг у него
+   * `false`. Само потребление записывается в обоих случаях: «какие токены
+   * читает компонент» — вопрос отдельный от «где он сломается».
    */
-  consumed: Map<string, Set<string>>
+  consumed: Map<string, Map<string, ConsumedToken>>
   /** Листы, которые не удалось прочитать: кросс-доменные бросают `SecurityError`. */
   unreadableSheets: number
 }
 
+export interface ConsumedToken {
+  /**
+   * Хотя бы одно потребление записано как `var(--x)` без запаса. Достаточно
+   * одного: пустой токен уронит именно это объявление, сколько бы соседних
+   * ни было написано с запасом.
+   */
+  strict: boolean
+}
+
 /**
- * Токены, читаемые объявлением без запасного значения.
+ * Токены, читаемые объявлением.
  *
  * Различает `var(--x)` и `var(--x, …)` по символу за именем: запятая — запас
  * есть. Вложенные `var()` внутри запасного значения находятся тем же проходом,
  * потому что разбор идёт по всем вхождениям, а не по одному верхнему.
  */
-function tokensWithoutFallback(value: string, into: Set<string>): void {
+function readTokens(value: string, into: Map<string, ConsumedToken>): void {
   for (const match of value.matchAll(/var\(\s*(--[\w-]+)\s*([,)])/g)) {
-    if (match[2] === ')')
-      into.add(match[1]!)
+    const name = match[1]!
+    const strict = match[2] === ')'
+    const known = into.get(name)
+    if (known)
+      known.strict ||= strict
+    else into.set(name, { strict })
   }
 }
 
@@ -45,7 +59,11 @@ let observer: MutationObserver | null = null
  * коллекции старого образца, и итератора у них нет ни в jsdom, ни в части
  * браузерных сред.
  */
-function collectFromRules(rules: CSSRuleList, styled: Set<string>, consumed: Map<string, Set<string>>): void {
+function collectFromRules(
+  rules: CSSRuleList,
+  styled: Set<string>,
+  consumed: Map<string, Map<string, ConsumedToken>>,
+): void {
   for (let index = 0; index < rules.length; index += 1) {
     const rule = rules.item(index)
     if (!rule)
@@ -61,16 +79,20 @@ function collectFromRules(rules: CSSRuleList, styled: Set<string>, consumed: Map
       for (const name of names)
         styled.add(name)
 
-      const read = new Set<string>()
+      const read = new Map<string, ConsumedToken>()
       const declarations = (rule as CSSStyleRule).style
       for (let property = 0; property < (declarations?.length ?? 0); property += 1)
-        tokensWithoutFallback(declarations.getPropertyValue(declarations.item(property)), read)
+        readTokens(declarations.getPropertyValue(declarations.item(property)), read)
 
       if (read.size) {
         for (const name of names) {
-          const bucket = consumed.get(name) ?? new Set<string>()
-          for (const token of read)
-            bucket.add(token)
+          const bucket = consumed.get(name) ?? new Map<string, ConsumedToken>()
+          for (const [token, usage] of read) {
+            const known = bucket.get(token)
+            if (known)
+              known.strict ||= usage.strict
+            else bucket.set(token, { strict: usage.strict })
+          }
           consumed.set(name, bucket)
         }
       }
@@ -88,7 +110,7 @@ function collectFromRules(rules: CSSRuleList, styled: Set<string>, consumed: Map
 
 function build(): StylesheetIndex {
   const styled = new Set<string>()
-  const consumed = new Map<string, Set<string>>()
+  const consumed = new Map<string, Map<string, ConsumedToken>>()
   let unreadableSheets = 0
 
   const sheets = document.styleSheets

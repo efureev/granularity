@@ -16,6 +16,8 @@
  * `:hover`). Здесь наоборот: пусто И потребляется без запаса.
  */
 
+import type { ConsumedToken } from '../internal/stylesheetIndex'
+
 export interface EmptyToken {
   token: string
   /** Класс, чьё правило читает токен, — с него начинать поиск причины. */
@@ -39,6 +41,8 @@ export interface EmptyTokenReport {
  */
 const OWN_PREFIX = '--gr-'
 
+export type ConsumedIndex = ReadonlyMap<string, ReadonlyMap<string, ConsumedToken>>
+
 export interface EmptyTokenProbe {
   /** Значение токена в вычисленном стиле конкретного элемента. */
   read: (element: Element, token: string) => string
@@ -51,7 +55,7 @@ export interface EmptyTokenProbe {
  */
 export function emptyTokens(
   root: Element,
-  consumed: ReadonlyMap<string, ReadonlySet<string>>,
+  consumed: ConsumedIndex,
   probe: EmptyTokenProbe,
 ): EmptyTokenReport {
   const empty: EmptyToken[] = []
@@ -60,8 +64,10 @@ export function emptyTokens(
 
   for (const element of [root, ...root.querySelectorAll('*')]) {
     for (const className of element.classList) {
-      for (const token of consumed.get(className) ?? []) {
-        if (!token.startsWith(OWN_PREFIX))
+      for (const [token, usage] of consumed.get(className) ?? []) {
+        // Потребление с запасом при пустом токене не ломается — оно рисует
+        // запасным значением, и находкой быть не может.
+        if (!usage.strict || !token.startsWith(OWN_PREFIX))
           continue
 
         checked += 1
