@@ -1,8 +1,8 @@
 export {
   createGranularResolver,
   GranularityResolver,
-  type GranularResolverOptions,
   type GranularityResolverOptions,
+  type GranularResolverOptions,
 } from './resolver'
 export {
   GRANULARITY_DEFAULT_PREFIX,

@@ -7,6 +7,35 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.7.1] 2026-08-28
+
+Internal only: the resolver's behaviour and its public surface are unchanged.
+
+### Added
+
+- **Drift gate: the whitelist is checked against what the core actually ships.** The manifest is maintained by
+  hand on purpose — that keeps the resolver deterministic and free of I/O — but nothing punished it for drifting.
+  The package's own tests compare the resolver's output against the same literals that are baked into it, so they
+  stay green when a directive is renamed in the core or a component subpath stops existing. Component packages get
+  that from `granular doctor`; the resolver has no granular provider, so the doctor has nothing to inspect here.
+
+  The gate reads the core's `package.json#exports`, not its sources: what the resolver hands a consumer is an
+  import string, and it lives exactly as long as that key is published. It checks both directions — every
+  whitelisted directive points at a live subpath and really exports its named binding, and every `./directives/*`
+  the core publishes is known to the resolver (`globalDirectives` excepted as an aggregate) — plus that every
+  component subpath the core exports resolves back into itself. Verified by mutation: renaming a module in the
+  manifest reddens three tests, dropping a directive reddens one.
+
+  One more assertion keeps a docblock honest: the core still publishes no `components/<Name>/styles.css`, which
+  is the whole reason `importStyle` defaults to `false`. Should that change, the default is to be revisited
+  rather than left running on inertia.
+
+- **`lint` script and an ESLint config.** This was the only package in the monorepo without either, so its
+  sources were never linted — in CI or locally. The config matches `granularity-datasource` (Node + TypeScript,
+  no Vue); `vitest.config.ts` joined `tsconfig.json#include`, without which typed rules cannot parse it. The
+  first run found eight problems, all fixed. The root `lint` alias and the `build-unplugin-granularity` CI job
+  run it now.
+
 ## [v0.7.0] 2026-08-27
 
 ### Changed
