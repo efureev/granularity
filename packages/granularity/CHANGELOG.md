@@ -31,6 +31,24 @@ to [Semantic Versioning](https://semver.org/).
   freezes a property that already holds rather than fixing a defect. Verified by falsification: dropping one declared
   dependency turns 4 entries red through the transitive closure.
 
+### Fixed
+
+- **The family roster is now generated, like every other registry in this package.** `docs/getting-started.md` — the
+  page a consumer starts from — was frozen at core `0.20.0` with 68 subpaths, listed four packages out of eleven, and
+  every version in its table was several minors behind: chrono `0.2.1` against `0.10.0`, the preset `0.9.1` against
+  `0.15.0`. The README shipped to npm mentioned no companion package at all, so nothing on the package page said the
+  other ten exist.
+
+  A roster is a registry, and this repository generates its registries. `yarn docs:ecosystem` now derives one from the
+  workspace — name, version, components, i18n block, resolver — and writes it into all three places that need it: this
+  README, the repository README and the getting-started page. Descriptions come from each `package.json#description`,
+  the same text npm shows, so the two cannot say different things about one package.
+
+  `yarn docs:ecosystem:check` gates it in CI, and additionally rejects any `@feugene/*` version named anywhere in the
+  docs that excludes the version in the repository. That is the failure mode a reader hits first and a writer never
+  sees: an example range stays syntactically valid forever and only breaks at `yarn add`. It found three on the first
+  run, all of them fixed here.
+
 ## [v0.38.0] 2026-08-28
 
 ### Added

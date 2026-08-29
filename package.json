@@ -41,6 +41,8 @@
     "test:devtools": "yarn workspace @feugene/granularity-devtools test:run",
     "docs:map": "node scripts/generate-component-map.mjs",
     "docs:check": "node scripts/generate-component-map.mjs --check",
+    "docs:ecosystem": "node scripts/generate-ecosystem.mjs",
+    "docs:ecosystem:check": "node scripts/generate-ecosystem.mjs --check",
     "docs:audit": "node scripts/docs-audit.mjs --report",
     "docs:audit:check": "node scripts/docs-audit.mjs --check",
     "lint": "yarn lint:test-kit && yarn lint:granularity && yarn lint:chrono && yarn lint:charts && yarn lint:dashboard && yarn lint:forms-schema && yarn lint:datasource && yarn lint:editor && yarn lint:media && yarn lint:devtools && yarn lint:unplugin && yarn lint:showcase",

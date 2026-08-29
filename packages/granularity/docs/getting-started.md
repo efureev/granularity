@@ -132,13 +132,13 @@ my-app/
     "typecheck": "vue-tsc --noEmit -p tsconfig.json"
   },
   "dependencies": {
-    "@feugene/granularity": "^0.21.0",
+    "@feugene/granularity": "^0.38.0",
     "@floating-ui/dom": "^1.8.0",
     "@unocss/reset": "^66.7.5",
     "vue": "^3.5.40"
   },
   "devDependencies": {
-    "@feugene/unocss-preset-granular": "^0.9.1",
+    "@feugene/unocss-preset-granular": "^0.15.0",
     "@vitejs/plugin-vue": "^6.0.8",
     "typescript": "^6.0.2",
     "unocss": "^66.7.5",
@@ -753,21 +753,31 @@ export async function setupI18n() {
 
 ### Что есть в семействе
 
-| Пакет                            | Версия | Компоненты                                                                                              | Блок i18n     | Резолвер                       |
-|----------------------------------|--------|---------------------------------------------------------------------------------------------------------|---------------|--------------------------------|
-| `@feugene/granularity`           | 0.20.0 | ядро, 68 subpath-экспортов `./components/Gr*`                                                           | `gr`          | `GranularityResolver`          |
-| `@feugene/granularity-chrono`    | 0.2.1  | `GrCalendar`, `GrDatePicker`, `GrDateRangePicker`, `GrDateTimePicker`, `GrTimePicker`, `GrRelativeTime` | `grChrono`    | `GranularityChronoResolver`    |
-| `@feugene/granularity-charts`    | 0.3.0  | `GrChartArea`, `GrChartBar`, `GrChartLine`, `GrChartPie`, `GrChartRadar`, `GrSparkline`                 | `grCharts`    | `GranularityChartsResolver`    |
-| `@feugene/granularity-dashboard` | 0.1.0  | `GrDashboard`, `GrDashboardItem`, `GrDashboardPalette`, `GrDashboardToolbar`                            | `grDashboard` | `GranularityDashboardResolver` |
+<!-- ecosystem:generated:start -->
+| Пакет | Версия | Компоненты | Блок i18n | Резолвер |
+| --- | --- | --- | --- | --- |
+| `@feugene/granularity` | 0.38.0 | ядро, 98 subpath-экспортов `./components/Gr*` | `gr` | `GranularityResolver` (из `@feugene/unplugin-granularity`) |
+| `@feugene/granularity-charts` | 0.10.1 | `GrChartArea`, `GrChartBar`, `GrChartBullet`, `GrChartFunnel`, `GrChartHeatmap`, `GrChartLine`, `GrChartPie`, `GrChartRadar`, `GrChartWaterfall`, `GrSparkline` | `grCharts` | `GranularityChartsResolver` |
+| `@feugene/granularity-chrono` | 0.10.0 | `GrCalendar`, `GrDatePicker`, `GrDateRangePicker`, `GrDateTimePicker`, `GrDuration`, `GrRelativeTime`, `GrTimePicker` | `grChrono` | `GranularityChronoResolver` |
+| `@feugene/granularity-dashboard` | 0.6.0 | `GrDashboard`, `GrDashboardItem`, `GrDashboardItemSettings`, `GrDashboardPalette`, `GrDashboardToolbar` | `grDashboard` | `GranularityDashboardResolver` |
+| `@feugene/granularity-editor` | 0.3.1 | `GrRichText` | `grEditor` | `GranularityEditorResolver` |
+| `@feugene/granularity-forms-schema` | 0.4.0 | `GrSchemaForm` | `grForms` | `GranularityFormsSchemaResolver` |
+| `@feugene/granularity-media` | 0.7.1 | `GrCameraCapture`, `GrCodeScanner`, `GrImageCrop`, `GrVideoPlayer` | `grMedia` | `GranularityMediaResolver` |
+
+Компонентов не добавляют, но входят в семейство:
+
+- [`@feugene/granularity-datasource`](../../granularity-datasource) `0.1.2`
+- [`@feugene/granularity-devtools`](../../granularity-devtools) `0.3.1`
+- [`@feugene/granularity-test-kit`](../../granularity-test-kit) `0.8.1`
+- [`@feugene/unplugin-granularity`](../../unplugin-granularity) `0.7.1`
+<!-- ecosystem:generated:end -->
 
 Резолвер каждый спутник экспортирует сам — из subpath `./resolver`. Кроме
 компонентов спутники публикуют прикладное API: `./chart` и `useChartScale` у
 charts, `./layout` и `useDashboardLayout` у dashboard, `useChronoNow` у chrono.
 
-Ещё один пакет семейства компонентов не добавляет:
-
-- **`@feugene/unocss-preset-granular`** `0.9.1` — сам пресет; на нём построено
-  всё подключение. Живёт в `devDependencies`, в бандл приложения не попадает.
+Сам пресет `@feugene/unocss-preset-granular` живёт в отдельном репозитории и
+подключается из `devDependencies`: в бандл приложения он не попадает.
 
 ### Авто-импорт компонентов
 
