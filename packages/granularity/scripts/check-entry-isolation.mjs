@@ -3,7 +3,7 @@ import { dirname, relative, resolve } from 'node:path'
 import process from 'node:process'
 import { fileURLToPath } from 'node:url'
 
-import { collectEntryFiles } from './entrySizes.mjs'
+import { collectEntryFiles } from '../../../scripts/entrySizes.mjs'
 import { componentEntries, dependencyClosure, inspectEntry } from './entryIsolation.mjs'
 import { readDeclaredDependencies } from './declaredDependencies.mjs'
 

@@ -31,6 +31,16 @@ to [Semantic Versioning](https://semver.org/).
   freezes a property that already holds rather than fixing a defect. Verified by falsification: dropping one declared
   dependency turns 4 entries red through the transitive closure.
 
+- **The weight report is no longer the core's alone.** `scripts/entrySizes.mjs` and its runner moved to the repository
+  root and take a package as an argument, the way `granular doctor` already does. Six companion packages sell the same
+  subpath granularity and measured nothing; they measure now. The walk is worth sharing rather than copying — a
+  component entry is nearly empty and the code lives in shared chunks, so a report that stops at the entry file is
+  wrong by a factor, and six copies of that walk would drift apart silently.
+
+  `yarn sizes:check` at the root keeps a package with component subpaths from shipping unmeasured: it reads manifests,
+  needs no `dist`, and runs beside the other cheap checks. Without it the next companion is founded unmeasured in
+  silence — which is exactly how all six got there.
+
 ### Fixed
 
 - **The family roster is now generated, like every other registry in this package.** `docs/getting-started.md` — the

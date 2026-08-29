@@ -82,10 +82,17 @@ packages/<my-package>/
   },
   "scripts": {
     "build": "vite build && vue-tsc -p tsconfig.build.json",
-    "typecheck": "vue-tsc --noEmit -p tsconfig.json"
+    "typecheck": "vue-tsc --noEmit -p tsconfig.json",
+    "sizes": "node ../../scripts/report-entry-sizes.mjs ."
   }
 }
 ```
+
+- `sizes` — отчёт о весе гранулярных импортов (`scripts/report-entry-sizes.mjs`, общий на монорепо).
+  Обязателен для пакета, отдающего компоненты подпутями: `yarn sizes:check` в корне роняет CI, если
+  такой пакет веса не меряет. Шаг `Entry sizes (gzip)` ставится в сборочную джобу пакета сразу после
+  `Granular doctor` — таблица уезжает в сводку прогона. Гейтом отчёт не сделан намеренно: порог,
+  взятый с потолка, краснеет на честном росте компонента, и его научатся поднимать не глядя.
 
 - `@feugene/granularity`, `@feugene/unocss-preset-granular`, `vue` — **peer**-зависимости (одна версия
   рантайма на всё приложение).

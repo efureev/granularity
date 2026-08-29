@@ -46,6 +46,7 @@
     "docs:audit": "node scripts/docs-audit.mjs --report",
     "docs:audit:check": "node scripts/docs-audit.mjs --check",
     "lint": "yarn lint:test-kit && yarn lint:granularity && yarn lint:chrono && yarn lint:charts && yarn lint:dashboard && yarn lint:forms-schema && yarn lint:datasource && yarn lint:editor && yarn lint:media && yarn lint:devtools && yarn lint:unplugin && yarn lint:showcase",
+    "sizes:check": "node scripts/report-entry-sizes.mjs --check-coverage",
     "check:ranges": "node scripts/check-workspace-ranges.mjs",
     "check:licenses": "node scripts/check-license-copies.mjs",
     "lint:test-kit": "yarn workspace @feugene/granularity-test-kit lint",

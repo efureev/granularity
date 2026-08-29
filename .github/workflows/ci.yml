@@ -361,6 +361,13 @@ jobs:
         if: always()
         run: yarn docs:ecosystem:check
 
+      # Пакет с компонентными подпутями обязан мерить вес: без этого следующий
+      # спутник заводится молча незамеренным — ровно так и вышло у всех шести.
+      # Проверка манифестов, `dist` ей не нужен.
+      - name: Entry size coverage
+        if: always()
+        run: yarn sizes:check
+
   # Витрина — самый большой код репозитория, который до сих пор не проверял
   # никто: скрипт `lint` у неё был, джобы не было, а `typecheck` не существовало
   # вовсе (не было ни скрипта, ни `vue-tsc`). Первый прогон нашёл 106 ошибок.
@@ -428,6 +435,14 @@ jobs:
       - name: Granular doctor
         working-directory: packages/granularity-editor
         run: yarn doctor
+
+      # Вес гранулярного импорта — сумма по всему, что тянет entry. Не гейт,
+      # а видимость: порог с потолка краснел бы на честном росте и его подняли
+      # бы не глядя. Таблица уезжает в сводку прогона, чтобы скачок заметили
+      # в ревью. Булево свойство держит `isolation` у ядра.
+      - name: Entry sizes (gzip)
+        working-directory: packages/granularity-editor
+        run: yarn sizes
 
       - name: Validate package metadata (publint)
         working-directory: packages/granularity-editor
@@ -579,6 +594,14 @@ jobs:
       - name: Granular doctor
         working-directory: packages/granularity-media
         run: yarn doctor
+
+      # Вес гранулярного импорта — сумма по всему, что тянет entry. Не гейт,
+      # а видимость: порог с потолка краснел бы на честном росте и его подняли
+      # бы не глядя. Таблица уезжает в сводку прогона, чтобы скачок заметили
+      # в ревью. Булево свойство держит `isolation` у ядра.
+      - name: Entry sizes (gzip)
+        working-directory: packages/granularity-media
+        run: yarn sizes
 
       - name: Validate package metadata (publint)
         working-directory: packages/granularity-media
@@ -1756,6 +1779,14 @@ jobs:
         working-directory: packages/granularity-chrono
         run: yarn doctor
 
+      # Вес гранулярного импорта — сумма по всему, что тянет entry. Не гейт,
+      # а видимость: порог с потолка краснел бы на честном росте и его подняли
+      # бы не глядя. Таблица уезжает в сводку прогона, чтобы скачок заметили
+      # в ревью. Булево свойство держит `isolation` у ядра.
+      - name: Entry sizes (gzip)
+        working-directory: packages/granularity-chrono
+        run: yarn sizes
+
       - name: Validate package metadata (publint)
         working-directory: packages/granularity-chrono
         run: npx --yes publint@latest --pack npm
@@ -1911,6 +1942,14 @@ jobs:
         working-directory: packages/granularity-charts
         run: yarn doctor
 
+      # Вес гранулярного импорта — сумма по всему, что тянет entry. Не гейт,
+      # а видимость: порог с потолка краснел бы на честном росте и его подняли
+      # бы не глядя. Таблица уезжает в сводку прогона, чтобы скачок заметили
+      # в ревью. Булево свойство держит `isolation` у ядра.
+      - name: Entry sizes (gzip)
+        working-directory: packages/granularity-charts
+        run: yarn sizes
+
       - name: Validate package metadata (publint)
         working-directory: packages/granularity-charts
         run: npx --yes publint@latest --pack npm
@@ -2065,6 +2104,14 @@ jobs:
       - name: Granular doctor
         working-directory: packages/granularity-dashboard
         run: yarn doctor
+
+      # Вес гранулярного импорта — сумма по всему, что тянет entry. Не гейт,
+      # а видимость: порог с потолка краснел бы на честном росте и его подняли
+      # бы не глядя. Таблица уезжает в сводку прогона, чтобы скачок заметили
+      # в ревью. Булево свойство держит `isolation` у ядра.
+      - name: Entry sizes (gzip)
+        working-directory: packages/granularity-dashboard
+        run: yarn sizes
 
       - name: Validate package metadata (publint)
         working-directory: packages/granularity-dashboard
@@ -2232,6 +2279,14 @@ jobs:
       - name: Granular doctor
         working-directory: packages/granularity-forms-schema
         run: yarn doctor
+
+      # Вес гранулярного импорта — сумма по всему, что тянет entry. Не гейт,
+      # а видимость: порог с потолка краснел бы на честном росте и его подняли
+      # бы не глядя. Таблица уезжает в сводку прогона, чтобы скачок заметили
+      # в ревью. Булево свойство держит `isolation` у ядра.
+      - name: Entry sizes (gzip)
+        working-directory: packages/granularity-forms-schema
+        run: yarn sizes
 
       - name: Validate package metadata (publint)
         working-directory: packages/granularity-forms-schema

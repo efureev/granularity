@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 // @ts-expect-error — скрипт сборки на .mjs, типов у него нет и не нужно.
-import { collectEntryFiles, entriesFromExports, formatReport, parseImports } from '../../scripts/entrySizes.mjs'
+import { collectEntryFiles, entriesFromExports, formatReport, parseImports } from '../../../../scripts/entrySizes.mjs'
 
 /**
  * Замер веса гранулярного импорта.

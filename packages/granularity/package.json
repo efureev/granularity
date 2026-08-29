@@ -637,7 +637,7 @@
     "generate:tokens": "node --experimental-strip-types scripts/generate-tokens.mjs",
     "lint": "eslint . --cache",
     "lint:fix": "eslint . --cache --fix",
-    "sizes": "node scripts/report-entry-sizes.mjs",
+    "sizes": "node ../../scripts/report-entry-sizes.mjs .",
     "isolation": "node scripts/check-entry-isolation.mjs",
     "test": "vitest --config vitest.config.ts",
     "test:coverage": "vitest run --config vitest.config.ts --coverage",

@@ -108,6 +108,7 @@
     "build": "vite build && gr-check-dist-dev-guard && vue-tsc -p tsconfig.build.json",
     "dev": "vite build --watch",
     "doctor": "node ../../scripts/granular-doctor.mjs ./granular.options.mjs",
+    "sizes": "node ../../scripts/report-entry-sizes.mjs .",
     "generate:registry": "node scripts/generate-registry.mjs",
     "lint": "eslint . --cache",
     "lint:fix": "eslint . --cache --fix",
