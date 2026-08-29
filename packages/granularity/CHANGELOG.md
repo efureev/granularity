@@ -7,6 +7,8 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.39.0] 2026-08-29
+
 ### Added
 
 - **A gate for what the package is named after.** Taking `@feugene/granularity/components/GrX` is supposed to bring
