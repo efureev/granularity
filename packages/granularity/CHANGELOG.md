@@ -41,6 +41,21 @@ to [Semantic Versioning](https://semver.org/).
   needs no `dist`, and runs beside the other cheap checks. Without it the next companion is founded unmeasured in
   silence — which is exactly how all six got there.
 
+- **The granularity claim now carries a number, on the npm page itself.** A subpath export is the reason this package
+  exists, and the README argued it in prose. `yarn sizes:docs` puts a generated block there instead: the barrel, the
+  lightest component, the median one, and the five heaviest taken together. Every package with component subpaths gets
+  the same block; the per-component table lands in `docs/entry-sizes.md`, which is generated whole, like `docs/tokens.md`.
+
+  The number published is a **union, not a sum**. Per-entry weights do not add up — shared code is counted again in
+  every row but paid for once — and a list of them invites the reader to add five rows of the core, land on 381 kB and
+  walk away from a set that actually costs 171. Publishing them without the union would make the package look heavier
+  than it is, which is the opposite of what the block is for.
+
+  The rows are derived, not chosen: picking "representative" components would be fitting the shop window to the number
+  we wanted. The worst case, named as the worst case, argues better anyway — the five heaviest components of the core
+  together are 32 % of the barrel. And the figure is stated for what it is: an upper bound, the gzip of everything a
+  subpath pulls out of `dist`, before the application bundler shakes it further.
+
 ### Fixed
 
 - **The family roster is now generated, like every other registry in this package.** `docs/getting-started.md` — the

@@ -444,6 +444,13 @@ jobs:
         working-directory: packages/granularity-editor
         run: yarn sizes
 
+      # Блок веса в README и полная таблица в доках считаются по этому же
+      # `dist`. Числа уезжают на страницу npm, поэтому расхождение — не
+      # косметика: устаревшая цифра там живёт до следующего релиза.
+      - name: Entry sizes docs drift
+        working-directory: packages/granularity-editor
+        run: yarn sizes:docs --check
+
       - name: Validate package metadata (publint)
         working-directory: packages/granularity-editor
         run: npx --yes publint@latest --pack npm
@@ -602,6 +609,13 @@ jobs:
       - name: Entry sizes (gzip)
         working-directory: packages/granularity-media
         run: yarn sizes
+
+      # Блок веса в README и полная таблица в доках считаются по этому же
+      # `dist`. Числа уезжают на страницу npm, поэтому расхождение — не
+      # косметика: устаревшая цифра там живёт до следующего релиза.
+      - name: Entry sizes docs drift
+        working-directory: packages/granularity-media
+        run: yarn sizes:docs --check
 
       - name: Validate package metadata (publint)
         working-directory: packages/granularity-media
@@ -920,6 +934,13 @@ jobs:
       - name: Entry sizes (gzip)
         working-directory: packages/granularity
         run: yarn sizes
+
+      # Блок веса в README и полная таблица в доках считаются по этому же
+      # `dist`. Числа уезжают на страницу npm, поэтому расхождение — не
+      # косметика: устаревшая цифра там живёт до следующего релиза.
+      - name: Entry sizes docs drift
+        working-directory: packages/granularity
+        run: yarn sizes:docs --check
 
       - name: Upload dist
         uses: actions/upload-artifact@v7
@@ -1787,6 +1808,13 @@ jobs:
         working-directory: packages/granularity-chrono
         run: yarn sizes
 
+      # Блок веса в README и полная таблица в доках считаются по этому же
+      # `dist`. Числа уезжают на страницу npm, поэтому расхождение — не
+      # косметика: устаревшая цифра там живёт до следующего релиза.
+      - name: Entry sizes docs drift
+        working-directory: packages/granularity-chrono
+        run: yarn sizes:docs --check
+
       - name: Validate package metadata (publint)
         working-directory: packages/granularity-chrono
         run: npx --yes publint@latest --pack npm
@@ -1950,6 +1978,13 @@ jobs:
         working-directory: packages/granularity-charts
         run: yarn sizes
 
+      # Блок веса в README и полная таблица в доках считаются по этому же
+      # `dist`. Числа уезжают на страницу npm, поэтому расхождение — не
+      # косметика: устаревшая цифра там живёт до следующего релиза.
+      - name: Entry sizes docs drift
+        working-directory: packages/granularity-charts
+        run: yarn sizes:docs --check
+
       - name: Validate package metadata (publint)
         working-directory: packages/granularity-charts
         run: npx --yes publint@latest --pack npm
@@ -2112,6 +2147,13 @@ jobs:
       - name: Entry sizes (gzip)
         working-directory: packages/granularity-dashboard
         run: yarn sizes
+
+      # Блок веса в README и полная таблица в доках считаются по этому же
+      # `dist`. Числа уезжают на страницу npm, поэтому расхождение — не
+      # косметика: устаревшая цифра там живёт до следующего релиза.
+      - name: Entry sizes docs drift
+        working-directory: packages/granularity-dashboard
+        run: yarn sizes:docs --check
 
       - name: Validate package metadata (publint)
         working-directory: packages/granularity-dashboard
@@ -2287,6 +2329,13 @@ jobs:
       - name: Entry sizes (gzip)
         working-directory: packages/granularity-forms-schema
         run: yarn sizes
+
+      # Блок веса в README и полная таблица в доках считаются по этому же
+      # `dist`. Числа уезжают на страницу npm, поэтому расхождение — не
+      # косметика: устаревшая цифра там живёт до следующего релиза.
+      - name: Entry sizes docs drift
+        working-directory: packages/granularity-forms-schema
+        run: yarn sizes:docs --check
 
       - name: Validate package metadata (publint)
         working-directory: packages/granularity-forms-schema

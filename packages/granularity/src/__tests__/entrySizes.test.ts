@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 // @ts-expect-error — скрипт сборки на .mjs, типов у него нет и не нужно.
-import { collectEntryFiles, entriesFromExports, formatReport, parseImports } from '../../../../scripts/entrySizes.mjs'
+import { collectEntryFiles, componentEntries, entriesFromExports, entryOwner, formatReport, measureSet, parseImports } from '../../../../scripts/entrySizes.mjs'
 
 /**
  * Замер веса гранулярного импорта.
@@ -105,5 +105,53 @@ describe('formatReport', () => {
     expect(report).not.toContain('GrA')
     // Урезание объявляется: молча показанный хвост читался бы как весь список.
     expect(report).toContain('из 3')
+  })
+})
+
+describe('entryOwner', () => {
+  it('часть составного компонента принадлежит родителю, а не себе', () => {
+    expect(entryOwner('./dist/components/GrDialog/index.js')).toBe('GrDialog')
+  })
+
+  it('подпуть вне компонентов владельца не имеет', () => {
+    expect(entryOwner('./dist/composables/index.js')).toBe(null)
+  })
+})
+
+describe('measureSet', () => {
+  const tree: Record<string, string> = {
+    '/pkg/dist/components/GrA/index.js': 'import "../../chunks/shared.js"',
+    '/pkg/dist/components/GrB/index.js': 'import "../../chunks/shared.js"',
+    '/pkg/dist/chunks/shared.js': 'export const a = 1',
+  }
+
+  /**
+   * Общий чанк оплачивается один раз, а поэнтрийный отчёт считает его в каждой
+   * строке заново — на пяти тяжёлых компонентах ядра это завышение вдвое.
+   */
+  it('общий файл двух компонентов считается один раз', () => {
+    const files = measureSet('/pkg', [
+      { file: './dist/components/GrA/index.js' },
+      { file: './dist/components/GrB/index.js' },
+    ], (path: string) => tree[path] ?? '', () => new Uint8Array())
+
+    expect(files.files).toBe(3)
+  })
+})
+
+describe('componentEntries', () => {
+  /**
+   * Пять подпутей `forms-schema` ведут на одну entry: пять одинаковых строк
+   * читались бы как пять компонентов, каждый в свой вес.
+   */
+  it('псевдонимы частей схлопываются в одну строку', () => {
+    const rows = componentEntries('/pkg', {
+      '.': { import: './dist/index.js' },
+      './components/GrDialog': { import: './dist/components/GrDialog/index.js' },
+      './components/GrDialogHeader': { import: './dist/components/GrDialog/index.js' },
+      './styles.css': './dist/styles.css',
+    }, () => '', () => new Uint8Array())
+
+    expect(rows.map((row: { owner: string }) => row.owner)).toEqual(['GrDialog'])
   })
 })

@@ -66,6 +66,9 @@
   упаковка, granular-provider и авто-импорт через `createGranularResolver`.
 - [`packaging.md`](./packaging.md) — почему пакет один и не делится на подпакеты, что вместо этого
   даёт гранулярность и при каком условии решение пересматривается.
+- [`entry-sizes.md`](./entry-sizes.md) — сколько весит каждый компонент подпутём (генерируется
+  `yarn sizes:docs` по собранному `dist`, руками не править). Числа не складываются: общий чанк
+  посчитан в каждой строке заново, а платится один раз.
 - [`localization.md`](./localization.md) — как `granularity` работает с локализацией приложения и fallback-текстами.
 - [`directives.md`](./directives.md) — все опубликованные директивы и их назначение.
 - [`file-validation.md`](./file-validation.md) — `fileValidation` API и повторное использование логики валидации файлов.

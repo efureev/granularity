@@ -18,9 +18,9 @@ import { entriesFromExports, formatKb, formatReport, measureEntries } from './en
  * графа тут неочевиден, а ошибка в нём делает число вдвое меньше правды.
  *
  * `--check-coverage` не меряет ничего и `dist` не требует: он следит, чтобы
- * пакет с компонентными подпутями не остался без скрипта `sizes`. Без этого
- * следующий спутник заводится молча незамеренным — ровно так и вышло у всех
- * шести существующих.
+ * пакет с компонентными подпутями не остался без замера и без публикации веса —
+ * оба скрипта на месте, блок в README заведён. Без этого следующий спутник
+ * заводится молча незамеренным, ровно как эти шесть.
  */
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 
@@ -39,19 +39,31 @@ function granularPackages() {
 }
 
 function checkCoverage() {
-  const uncovered = granularPackages()
-    .filter(({ manifest }) => !manifest.scripts?.sizes)
-    .map(({ manifest }) => manifest.name)
+  const packages = granularPackages()
+  const gaps = []
 
-  if (uncovered.length > 0) {
+  for (const { dir, manifest } of packages) {
+    const readme = resolve(dir, 'README.md')
+    const missing = [
+      !manifest.scripts?.sizes && 'скрипт `sizes`',
+      !manifest.scripts?.['sizes:docs'] && 'скрипт `sizes:docs`',
+      (!existsSync(readme) || !readFileSync(readme, 'utf8').includes('entry-sizes:generated:start'))
+      && 'маркер блока в README',
+    ].filter(Boolean)
+
+    if (missing.length > 0)
+      gaps.push(`  ${manifest.name}: нет ${missing.join(', ')}`)
+  }
+
+  if (gaps.length > 0) {
     throw new SizesError(
-      `${uncovered.length} пакетов отдают компоненты подпутями, но веса не меряют:\n`
-      + `${uncovered.map(name => `  ${name}`).join('\n')}\n`
-      + '  Добавь `"sizes": "node ../../scripts/report-entry-sizes.mjs ."` и шаг в сборочную джобу.',
+      `${gaps.length} пакетов отдают компоненты подпутями, но вес у них не замерен и не опубликован:\n`
+      + `${gaps.join('\n')}\n`
+      + '  Образец — `packages/granularity-chrono`; разбор в `docs/companion-packages.md`.',
     )
   }
 
-  console.log(`[entry-sizes] покрытие OK — вес меряют все ${granularPackages().length} пакетов с компонентными подпутями.`)
+  console.log(`[entry-sizes] покрытие OK — вес меряют и публикуют все ${packages.length} пакетов с компонентными подпутями.`)
 }
 
 function report(packageDir) {

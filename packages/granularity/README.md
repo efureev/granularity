@@ -86,6 +86,23 @@ For a finer setup take the layers apart — `@feugene/granularity/styles/tokens.
 preset. There is no per-component stylesheet to import: a component that has CSS of its own imports it
 from its own chunk, so a granular import already brings everything it needs.
 
+## Granular imports, in numbers
+
+<!-- entry-sizes:generated:start lang=en -->
+| What you import | gzip | of the barrel |
+| --- | ---: | ---: |
+| the whole package from the root | 542.9 kB | 100 % |
+| the lightest component — `GrButtonGroup` | 1.8 kB | < 1 % |
+| the median component — `GrNavbar` | 15.4 kB | 3 % |
+| the 5 heaviest together | 171.1 kB | 32 % |
+
+These numbers **do not add up**: shared code is counted again in every row but paid for once, which is why
+the set is shown as a union rather than a sum. They are an upper bound — the gzip of everything a subpath
+pulls out of `dist`, before the application bundler shakes it further and minifies it again.
+
+The weight of every component — [`docs/entry-sizes.md`](./docs/entry-sizes.md).
+<!-- entry-sizes:generated:end -->
+
 ## The rest of the family
 
 The core ships the general-purpose components. Anything that carries a heavy dependency, belongs to a
@@ -113,6 +130,7 @@ on this one — the core stays lean, and you install only what you reach for.
 - [`docs/installation.md`](./docs/installation.md) — installation, public entrypoints, and adoption strategies
 - [`docs/styling.md`](./docs/styling.md) — style layers, themes, and import order
 - [`docs/tokens.md`](./docs/tokens.md) — design token reference (generated from `tokens/*.json`)
+- [`docs/entry-sizes.md`](./docs/entry-sizes.md) — the weight of every component as a subpath (generated from the build)
 - [`docs/theming.md`](./docs/theming.md) — building a custom theme (roles, contrast rules, wiring)
 - [`docs/keyboard.md`](./docs/keyboard.md) — keyboard contract per component
 - [`docs/overlays.md`](./docs/overlays.md) — overlay contract: portal, layer stack, Esc, `inert`, focus

@@ -124,3 +124,58 @@ export function entriesFromExports(exportsMap) {
 
   return entries
 }
+
+/**
+ * Компонент, которому принадлежит подпуть.
+ *
+ * Части составного компонента (`./components/GrDialogHeader`) — псевдонимы на
+ * entry родителя: своей сборки у них нет. Владелец берётся из пути файла, а не
+ * из имени подпути, иначе одна и та же сборка считалась бы несколько раз.
+ */
+export function entryOwner(file) {
+  return /dist[\\/]components[\\/](Gr[A-Za-z0-9]+)[\\/]/.exec(file)?.[1] ?? null
+}
+
+/**
+ * Вес набора компонентов — по объединению файлов, а не по сумме строк.
+ *
+ * Числа поэнтрийного отчёта **не складываются**: общий чанк посчитан в каждой
+ * строке заново. Сумма пяти самых тяжёлых компонентов ядра даёт 381 kB там, где
+ * потребитель заплатит 171 — завышение вдвое. Публиковать построчные веса, не
+ * дав рядом объединение, значит учить читателя складывать то, что не
+ * складывается, и получать пакет тяжелее, чем он есть.
+ */
+export function measureSet(packageDir, entries, readFile, readBuffer) {
+  const union = new Set()
+
+  for (const entry of entries) {
+    for (const file of collectEntryFiles(resolve(packageDir, entry.file), readFile))
+      union.add(file)
+  }
+
+  return { gzip: gzipSize([...union], readBuffer), files: union.size }
+}
+
+/**
+ * Компонентные entry пакета, по одной на компонент, от лёгкой к тяжёлой.
+ *
+ * Псевдонимы схлопываются по файлу сборки: пять подпутей `forms-schema` ведут
+ * на одну и ту же entry, и пять одинаковых строк в отчёте читались бы как пять
+ * компонентов.
+ */
+export function componentEntries(packageDir, exportsMap, readFile, readBuffer) {
+  const byFile = new Map()
+
+  for (const entry of entriesFromExports(exportsMap)) {
+    const owner = entryOwner(entry.file)
+
+    if (!owner || byFile.has(entry.file))
+      continue
+
+    byFile.set(entry.file, { ...entry, owner })
+  }
+
+  return [...byFile.values()]
+    .map(entry => ({ ...entry, ...measureSet(packageDir, [entry], readFile, readBuffer) }))
+    .sort((a, b) => a.gzip - b.gzip || a.owner.localeCompare(b.owner))
+}

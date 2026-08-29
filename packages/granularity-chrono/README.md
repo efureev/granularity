@@ -12,6 +12,23 @@ integer maths; everything locale-dependent — the first day of the week, month
 and weekday names, the 12/24-hour default — comes from `Intl`. Installing this
 package pulls in no date library and no third-party widget.
 
+## Granular imports, in numbers
+
+<!-- entry-sizes:generated:start lang=en -->
+| What you import | gzip | of the barrel |
+| --- | ---: | ---: |
+| the whole package from the root | 43.6 kB | 100 % |
+| the lightest component — `GrDuration` | 3.2 kB | 7 % |
+| the median component — `GrTimePicker` | 14.5 kB | 33 % |
+| the 5 heaviest together | 35.4 kB | 81 % |
+
+These numbers **do not add up**: shared code is counted again in every row but paid for once, which is why
+the set is shown as a union rather than a sum. They are an upper bound — the gzip of everything a subpath
+pulls out of `dist`, before the application bundler shakes it further and minifies it again.
+
+The weight of every component — [`docs/entry-sizes.md`](./docs/entry-sizes.md).
+<!-- entry-sizes:generated:end -->
+
 ## Documentation
 
 - [`docs/model.md`](./docs/model.md) — the value: why `Date` lives only at the

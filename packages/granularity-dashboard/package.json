@@ -156,6 +156,7 @@
     "dev": "vite build --watch",
     "doctor": "node ../../scripts/granular-doctor.mjs ./granular.options.mjs",
     "sizes": "node ../../scripts/report-entry-sizes.mjs .",
+    "sizes:docs": "node ../../scripts/generate-entry-sizes.mjs .",
     "generate:registry": "node scripts/generate-registry.mjs",
     "check:messages": "fint-i18n-check-messages src/i18n/locales",
     "lint": "eslint . --cache",

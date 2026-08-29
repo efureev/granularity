@@ -1,6 +1,8 @@
 import { existsSync, readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 
+import { entryOwner } from '../../../scripts/entrySizes.mjs'
+
 /**
  * Изоляция гранулярного импорта: что приезжает потребителю, взявшему один
  * компонент.
@@ -78,18 +80,6 @@ export function dependencyClosure(component, declaredOf, closed = new Set()) {
   }
 
   return closed
-}
-
-/**
- * Компонент, которому принадлежит подпуть.
- *
- * Части составного компонента (`./components/GrDialogHeader`) — псевдонимы на
- * entry родителя, и вес у них общий с ним. Владелец берётся из пути файла, а не
- * из имени подпути: иначе часть выглядела бы компонентом, который тянет чужую
- * разметку, хотя это разметка его же родителя.
- */
-export function entryOwner(file) {
-  return /dist[\\/]components[\\/](Gr[A-Za-z0-9]+)[\\/]/.exec(file)?.[1] ?? null
 }
 
 /**

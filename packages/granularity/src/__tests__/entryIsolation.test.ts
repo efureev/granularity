@@ -3,7 +3,6 @@ import { describe, expect, it } from 'vitest'
 import {
   componentEntries,
   dependencyClosure,
-  entryOwner,
   inspectEntry,
   isReexportOnly,
   isVirtualOnly,
@@ -90,16 +89,6 @@ describe('dependencyClosure', () => {
     const cyclic: Record<string, string[]> = { GrA: ['GrB'], GrB: ['GrA'] }
 
     expect([...dependencyClosure('GrA', (c: string) => cyclic[c] ?? [])].sort()).toEqual(['GrA', 'GrB'])
-  })
-})
-
-describe('entryOwner', () => {
-  it('часть составного компонента принадлежит родителю, а не себе', () => {
-    expect(entryOwner('./dist/components/GrDialog/index.js')).toBe('GrDialog')
-  })
-
-  it('подпуть вне компонентов владельца не имеет', () => {
-    expect(entryOwner('./dist/composables/index.js')).toBe(null)
   })
 })
 
