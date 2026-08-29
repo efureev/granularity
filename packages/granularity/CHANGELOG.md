@@ -56,6 +56,12 @@ to [Semantic Versioning](https://semver.org/).
   together are 32 % of the barrel. And the figure is stated for what it is: an upper bound, the gzip of everything a
   subpath pulls out of `dist`, before the application bundler shakes it further.
 
+  What CI gates is the version in the table header and the set of components in it, not the kilobytes: `zlib`
+  compresses one and the same `dist` differently across environments — the barrel measures 542.9 kB on macOS and
+  549.3 kB on a Linux runner, off a module graph identical down to the file. A gate no two environments can satisfy
+  at once is fixed by changing what it checks, not by fudging the number. Freshness rides on the version instead:
+  a bump forces a regeneration, so the weights are never more than one release old.
+
 ### Fixed
 
 - **The family roster is now generated, like every other registry in this package.** `docs/getting-started.md` — the

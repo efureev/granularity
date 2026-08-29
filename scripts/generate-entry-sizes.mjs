@@ -25,6 +25,18 @@ import { componentEntries, entriesFromExports, formatKb, measureSet } from './en
  * Язык блока объявлен в маркере (`lang=ru` / `lang=en`), а не угадан по тексту
  * README: READMEs пакетов написаны на обоих языках, и эвристика ошибалась бы
  * молча.
+ *
+ * `--check` сверяет **структуру**, а не байты: версию в шапке таблицы и состав
+ * компонентов в ней. Точные килобайты сверять нельзя — `zlib` сжимает один и
+ * тот же `dist` по-разному в разных средах: на macOS барель вышел 542.9 kB, на
+ * линуксовом раннере 549.3 kB при совпадающем до файла графе (263 файла в
+ * обоих). Это тот же класс, из-за которого в репозитории нет визуального гейта
+ * в CI (`.claude/rules/testing.md`), и гейт, который нельзя удовлетворить в
+ * двух средах сразу, чинят не подгонкой числа, а сменой предмета проверки.
+ *
+ * Свежесть самих чисел держит не сверка, а версия в шапке: она обязана
+ * совпасть с `package.json`, поэтому каждый бамп версии требует перегенерации,
+ * и веса не бывают старше одного релиза.
  */
 
 const START = /<!-- entry-sizes:generated:start lang=(ru|en) -->/
@@ -156,6 +168,39 @@ function renderDoc(manifest, summary) {
   ].join('\n')
 }
 
+/**
+ * Что таблица описывает не ту сборку: другую версию пакета или другой состав
+ * компонентов. Килобайты сюда не входят — почему, сказано в шапке файла.
+ */
+function checkStructure(manifest, docPath, summary) {
+  if (!existsSync(docPath))
+    throw new SizesDocError(`${manifest.name}: нет ${DOC} — прогони \`yarn sizes:docs\``)
+
+  const doc = readFileSync(docPath, 'utf8')
+  const stated = /пакета `[^`]+` (\S+)\./.exec(doc)?.[1]
+
+  if (stated !== manifest.version) {
+    throw new SizesDocError(
+      `${manifest.name}: ${DOC} описывает версию ${stated ?? '—'}, а в манифесте ${manifest.version}.`
+      + ' Прогони `yarn build` и `yarn sizes:docs`',
+    )
+  }
+
+  const listed = new Set([...doc.matchAll(/^\| `(Gr[A-Za-z0-9]+)` \|/gm)].map(match => match[1]))
+  const actual = new Set(summary.components.map(row => row.owner))
+  const missing = [...actual].filter(name => !listed.has(name))
+  const extra = [...listed].filter(name => !actual.has(name))
+
+  if (missing.length > 0 || extra.length > 0) {
+    throw new SizesDocError(
+      `${manifest.name}: состав ${DOC} разошёлся со сборкой.`
+      + `${missing.length ? `\n  нет в таблице: ${missing.join(', ')}` : ''}`
+      + `${extra.length ? `\n  лишние в таблице: ${extra.join(', ')}` : ''}`
+      + '\n  Прогони `yarn sizes:docs`',
+    )
+  }
+}
+
 function main() {
   const check = process.argv.includes('--check')
   const target = process.argv[2] && !process.argv[2].startsWith('--') ? process.argv[2] : '.'
@@ -193,12 +238,10 @@ function main() {
   const staleReadme = nextReadme !== readme
 
   if (check) {
-    const stale = [staleReadme && 'README.md', staleDoc && DOC].filter(Boolean)
+    checkStructure(manifest, docPath, summary)
 
-    if (stale.length > 0)
-      throw new SizesDocError(`${manifest.name}: со сборкой разошлось — ${stale.join(', ')}. Прогони \`yarn sizes:docs\``)
-
-    console.log(`[entry-sizes] ${manifest.name}: блок и таблица актуальны (${summary.components.length} компонентов)`)
+    console.log(`[entry-sizes] ${manifest.name}: версия и состав таблицы сходятся`
+      + ` (${summary.components.length} компонентов, ${manifest.version})`)
     return
   }
 
