@@ -629,7 +629,7 @@
     "vue-tsc": "^3.3.11"
   },
   "scripts": {
-    "build": "vite build && gr-check-dist-dev-guard && node scripts/check-dist-no-tests.mjs && node scripts/generate-web-types.mjs && vue-tsc -p tsconfig.build.json && node scripts/check-dist-exports.mjs",
+    "build": "vite build && gr-check-dist-dev-guard && node scripts/check-dist-no-tests.mjs && node scripts/generate-web-types.mjs && vue-tsc -p tsconfig.build.json && node scripts/check-dist-exports.mjs && node scripts/check-entry-isolation.mjs",
     "check:messages": "fint-i18n-check-messages src/i18n/locales",
     "dev": "vite build --watch",
     "doctor": "node ../../scripts/granular-doctor.mjs ./granular.options.mjs",
@@ -638,6 +638,7 @@
     "lint": "eslint . --cache",
     "lint:fix": "eslint . --cache --fix",
     "sizes": "node scripts/report-entry-sizes.mjs",
+    "isolation": "node scripts/check-entry-isolation.mjs",
     "test": "vitest --config vitest.config.ts",
     "test:coverage": "vitest run --config vitest.config.ts --coverage",
     "test:run": "vitest run --config vitest.config.ts",

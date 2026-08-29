@@ -1,6 +1,9 @@
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import { resolve } from 'node:path'
 
+// @ts-expect-error — скрипт сборки на .mjs, типов у него нет и не нужно.
+import { readDeclaredDependencies as readDeclared } from '../../scripts/declaredDependencies.mjs'
+
 // В jsdom `import.meta.url` не file-scheme — пути от cwd пакета, как в `cssContrast.ts`.
 const pkgDir = process.cwd()
 const componentsDir = resolve(pkgDir, 'src/components')
@@ -141,16 +144,12 @@ export function parseDependencyUsages(
 }
 
 /**
- * Объявленные зависимости — читаются из текста `config.ts`, а не из дескриптора:
- * `defineGranularComponent` подставляет `dependencies: []` там, где поля не было,
- * и «не объявлено» становится неотличимо от «объявлено пустым».
+ * Объявленные зависимости. Разбор живёт в `scripts/declaredDependencies.mjs`:
+ * тот же `config.dependencies` читает гейт изоляции от `dist`, и разойдись
+ * разборы — гейты начали бы спорить о том, что компонент объявил.
  */
 export function readDeclaredDependencies(component: string): string[] {
-  const config = readFileSync(resolve(componentsDir, component, 'config.ts'), 'utf8')
-  const block = stripComments(config).match(/dependencies:\s*\[([^\]]*)\]/)
-  if (!block)
-    return []
-  return [...block[1].matchAll(/['"]([^'"]+)['"]/g)].map(match => match[1])
+  return readDeclared(componentsDir, component)
 }
 
 export function isComponentDir(name: string): boolean {

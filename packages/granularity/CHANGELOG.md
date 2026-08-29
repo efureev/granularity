@@ -7,6 +7,30 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- **A gate for what the package is named after.** Taking `@feugene/granularity/components/GrX` is supposed to bring
+  `GrX` and its declared dependencies — and nobody's markup beyond that. Nothing checked it. The existing gates look
+  elsewhere: `componentDependencies` reads the sources and watches the opposite direction (that `config.dependencies`
+  does not fall behind the imports), and an edge that only appears at build time — a shared chunk that took a
+  stranger along with what was needed — is invisible in sources. `granular doctor` reads `dist` but diagnoses tokens
+  and classes, not module reach.
+
+  The new gate reads `dist` and walks the module graph from every component entry. A foreign `.ts` is not a leak:
+  the `GrConfigProvider` context, the scales in `components/shared/`, the composables are the package's shared
+  runtime and ship by definition (`docs/packaging.md`). A leak is foreign **markup** — an SFC drags along its
+  layout, its classes and its safelist, which is exactly the weight the subpath exists to avoid. Attribution goes
+  through source maps, since a minified chunk holds no component name.
+
+  A gate that cannot see must not report success, so blindness is a failure of its own: a chunk with no map and code
+  of its own fails the run rather than passing quietly. Build helpers with no file on disk (`\0`-prefixed virtual
+  modules) are recognised structurally, from the module ids the build writes into the chunk, not from a file name —
+  the name carries a content hash and changes on every build.
+
+  Runs as part of `yarn build`; `yarn isolation` runs it alone for diagnosis. All 78 entries pass today, so the gate
+  freezes a property that already holds rather than fixing a defect. Verified by falsification: dropping one declared
+  dependency turns 4 entries red through the transitive closure.
+
 ## [v0.38.0] 2026-08-28
 
 ### Added
