@@ -138,7 +138,7 @@ my-app/
     "vue": "^3.5.40"
   },
   "devDependencies": {
-    "@feugene/unocss-preset-granular": "^0.15.0",
+    "@feugene/unocss-preset-granular": "^0.16.0",
     "@vitejs/plugin-vue": "^6.0.8",
     "typescript": "^6.0.2",
     "unocss": "^66.7.5",
