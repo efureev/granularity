@@ -7,6 +7,8 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [v0.11.0] 2026-08-30
+
 ### Added
 
 - **Chart components declare the layer tokens their frame reads.** The tooltip
