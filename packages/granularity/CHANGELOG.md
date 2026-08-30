@@ -7,6 +7,43 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.40.0] 2026-08-30
+
+### Added
+
+- **Components now declare the tokens whose names they build at runtime.** A
+  `var()` assembled from a variable is invisible to every static analysis: the
+  name arrives as a parameter and `var(--gr-z-dropdown)` never appears in the
+  sources. A consumer who turns on token pruning in the preset
+  (`pruneTokens`, `@feugene/unocss-preset-granular` 0.16.0) therefore sees such
+  a token as unused and drops its declaration — silently. The build stays
+  green, `z-index` resolves to `unset`, and a panel slides under its
+  neighbour. No existing gate could see that, because the CSS remains valid.
+
+  The package has exactly three such sites and all of them lead into
+  `composables/internal/overlayStack.ts`. Eight components declare what they
+  read: `GrPopover`, `GrAutocomplete`, `GrTreeSelect` and `GrSelect` their own
+  dropdown layer, `GrTooltip` its tooltip layer, and `GrModal`, `GrDrawer` and
+  `GrImageViewer` the modal one. Every caller of `useFloating` also declares
+  `gr-z-modal`: the `calc(var(--gr-z-modal) + N)` branch is what lifts a panel
+  opened *inside* a modal above it.
+
+  The field is about **consumption, not ownership** — `GrPopover` declares a
+  token owned by `GrModal` because it reads it. And it lives on the component
+  rather than on the provider on purpose: a provider-level list would hold the
+  token in every application, including the ones that never pull the component,
+  which is exactly the overhead granular selection exists to remove.
+
+  `GrLoading` deliberately declares nothing: its `zIndexVar` prop is documented
+  as an escape hatch, the name belongs to the **application**, and keeping it is
+  the consumer's business. Its own layer is a static `z-[var(--gr-z-loading)]`.
+
+  The gate is `src/__tests__/dynamicTokens.test.ts`. It knows about both
+  composables, catches any new source of runtime `var()` assembly, and checks
+  that every declared name still exists. Verified by falsification: removing one
+  declaration turns two tests red.
+
+
 ## [v0.39.0] 2026-08-29
 
 ### Added

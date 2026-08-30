@@ -55,7 +55,7 @@
   },
   "devDependencies": {
     "@antfu/eslint-config": "^9.3.0",
-    "@feugene/granularity": "^0.39.0",
+    "@feugene/granularity": "^0.40.0",
     "@types/node": "^25.9.5",
     "eslint": "^10.9.1",
     "globals": "^16.5.0",

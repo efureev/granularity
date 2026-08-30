@@ -7,6 +7,24 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- **Chart components declare the layer tokens their frame reads.** The tooltip
+  of `GrChartFrame` is positioned by the core's `useFloating`: the layer name is
+  passed to it as a parameter and the `var()` is assembled at runtime inside the
+  core's `overlayStack.ts`. Neither `var(--gr-z-tooltip)` nor
+  `var(--gr-z-modal)` appears anywhere in this package.
+
+  Measured with `granular prune` before the change: `gr-z-tooltip` survived only
+  because the `GrChartFrame` group ships its shared SFC into a scanned
+  directory, while `gr-z-modal` was removed outright — a chart opened inside a
+  modal would have lost its tooltip stacking. Nine components now declare both.
+
+  Gated by `src/__tests__/dynamicTokens.test.ts`, which scans the component
+  directory together with the shared directory of its group, since it is the
+  frame that calls the composable.
+
+
 ## [v0.10.1] 2026-08-27
 
 ### Fixed
