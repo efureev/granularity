@@ -102,6 +102,7 @@ src/components/<ComponentName>/
 - `safelist`;
 - `dependencies` на другие granular-компоненты;
 - `cssFiles`, если у компонента есть локальные CSS-файлы;
+- `dynamicTokens` — токены, чьё ИМЯ компонент собирает в рантайме;
 - имя итогового component style asset.
 
 Пример для компонента без собственных CSS-файлов:
@@ -116,6 +117,36 @@ export const grButtonConfig = defineGranularComponent(import.meta.url, {
   safelist: grButtonSafelist,
 })
 ```
+
+#### `dynamicTokens` — если имя токена собирается в рантайме
+
+`var()`, собранный из переменной, статический анализ не находит. Приложение с
+включённой обрезкой (`pruneTokens` в пресете) сочтёт токен ненужным и удалит
+его объявление — молча: сборка зелёная, `z-index` разрешается в `unset`,
+панель уезжает под соседний слой.
+
+Так работают оба композабла слоёв (`composables/internal/overlayStack.ts`):
+имя приходит параметром, а `var(--gr-z-dropdown)` в исходниках не встречается
+ни разу. Компонент обязан объявить, что он читает:
+
+```ts
+export const grPopoverConfig = defineGranularComponent(import.meta.url, {
+  name: 'GrPopover',
+  dynamicTokens: ['gr-z-dropdown', 'gr-z-modal'],
+  safelist: grPopoverSafelist,
+})
+```
+
+Имена БЕЗ префикса `--`; допускается `*` в конце. Поле про ПОТРЕБЛЕНИЕ, а не
+про владение: `GrPopover` объявляет `gr-z-modal`, потому что читает его из
+ветки `calc(var(--gr-z-modal) + N)`, хотя владеет им `GrModal`.
+
+Правило простое: **написал `var(` не с литеральным именем внутри — объяви.**
+Обратное тоже верно: имя, которое передаёт ПРИЛОЖЕНИЕ (проп `zIndexVar` у
+`GrLoading`), объявлять нечего — держать его забота потребителя.
+
+Держит гейт `src/__tests__/dynamicTokens.test.ts`: он знает про оба композабла
+и ловит любой новый источник сборки `var()`.
 
 Пример для компонента с зависимостями:
 
@@ -319,6 +350,9 @@ Foundation публикуется одним файлом — `@feugene/granular
    компонента молча не попадают в CSS; ловится `granular doctor --strict`.
 4. При необходимости обновлён `packages/granularity/package.json`.
 5. Локальные CSS-файлы добавлены в `config.ts` только если они реально есть.
+5.1. Если компонент собирает имя токена в рантайме (`var(${…})`, свой
+   `zIndexVar`) — оно объявлено в `dynamicTokens`. Иначе обрезка токенов у
+   потребителя снесёт объявление молча; ловит `src/__tests__/dynamicTokens.test.ts`.
 6. Прогнан `yarn test:granularity` целиком: сквозные гейты сами скажут, чего не хватает.
 7. Для компонента добавлены все ожидаемые публичные entrypoint'ы и связанные style asset'ы.
 8. Заведена `docs/components/<ComponentName>.md` с обеими обязательными секциями,

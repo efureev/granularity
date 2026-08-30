@@ -4,6 +4,12 @@ import { grImageViewerSafelist } from './safelist'
 
 export const grImageViewerConfig = defineGranularComponent(import.meta.url, {
   name: 'GrImageViewer',
+  /**
+   * Высоту слоя задаёт `useModalOverlay` → `modalLayerZIndex`: имя приходит
+   * параметром (дефолт живёт в `overlayStack.ts`), а `var()` собирается в
+   * рантайме. Статический скан такое не видит.
+   */
+  dynamicTokens: ['gr-z-modal'],
   dependencies: ['GrIcon'],
   safelist: grImageViewerSafelist,
   tokenDefinitionsRef: {
