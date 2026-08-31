@@ -1,7 +1,7 @@
 {
   "name": "@feugene/granularity-code",
   "description": "Code surfaces for @feugene/granularity: view, edit and diff — the viewer and the diff carry no dependencies at all.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "license": "SEE LICENSE IN LICENSE",
   "author": {
     "name": "Evgeniy Fureev",
@@ -98,7 +98,7 @@
     "./package.json": "./package.json"
   },
   "peerDependencies": {
-    "@feugene/granularity": ">=0.40.0 <1.0.0",
+    "@feugene/granularity": ">=0.41.0 <1.0.0",
     "@feugene/unocss-preset-granular": ">=0.16.0 <1.0.0",
     "vue": "^3.5.0",
     "@feugene/unplugin-granularity": ">=0.7.0 <1.0.0",

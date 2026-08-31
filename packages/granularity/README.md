@@ -114,7 +114,7 @@ on this one — the core stays lean, and you install only what you reach for.
 | --- | --- | --- |
 | [`@feugene/granularity-charts`](../granularity-charts) | 0.11.0 | Charts — own SVG, zero dependencies, drawn with theme tokens. |
 | [`@feugene/granularity-chrono`](../granularity-chrono) | 0.10.0 | Calendar, date and time components — no third-party date widget, no date library. |
-| [`@feugene/granularity-code`](../granularity-code) | 0.1.0 | Code surfaces: view, edit and diff — the viewer and the diff carry no dependencies at all. |
+| [`@feugene/granularity-code`](../granularity-code) | 0.1.1 | Code surfaces: view, edit and diff — the viewer and the diff carry no dependencies at all. |
 | [`@feugene/granularity-dashboard`](../granularity-dashboard) | 0.6.0 | Widget grid — drag, resize, breakpoints and layout persistence, zero dependencies. |
 | [`@feugene/granularity-datasource`](../granularity-datasource) | 0.1.2 | List state: sorting, filters, paging, URL sync and race-free fetching behind one composable. |
 | [`@feugene/granularity-devtools`](../granularity-devtools) | 0.3.2 | Vue DevTools panel — where a prop value came from, the overlay layer stack and design-system warnings. |

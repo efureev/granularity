@@ -7,6 +7,14 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.1.1] 2026-08-31
+
+### Fixed
+
+- **The peer floor on the core is `>=0.41.0`, not `>=0.40.0`.** `GrCodeBlock` left the core in 0.41.0, so with
+  0.40.0 installed the component would arrive twice — once from the core barrel and once from here, with two
+  granular providers declaring the same name. The floor now states what the package actually needs.
+
 ## [v0.1.0] 2026-08-31
 
 ### Added
