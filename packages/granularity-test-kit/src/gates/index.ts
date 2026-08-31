@@ -2,6 +2,13 @@ export { type ComponentDefaultsGateOptions, defineComponentDefaultsGate } from '
 export { type ComponentDocsGateOptions, defineComponentDocsGate, REQUIRED_DOC_SECTIONS } from './componentDocs'
 export { type ComponentTokensGateOptions, defineComponentTokensGate, type RegisteredToken, TOKEN_KINDS } from './componentTokens'
 export { collectEmitDeclarations, defineEmitNamingGate, type EmitDeclaration, type EmitNamingGateOptions } from './emitNaming'
+export {
+  defineDynamicTokensGate,
+  type DynamicTokenComposable,
+  type DynamicTokensComponentConfig,
+  type DynamicTokensGateOptions,
+  OVERLAY_COMPOSABLES,
+} from './dynamicTokens'
 export { defineEnvGuardGate, type EnvGuardGateOptions } from './envGuard'
 export { defineGateCoverage, type GateCoverageOptions, REQUIRED_GATES } from './coverage'
 export { defineLocaleCompletenessGate, type LocaleCompletenessGateOptions } from './localeCompleteness'

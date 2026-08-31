@@ -121,7 +121,7 @@ on this one — the core stays lean, and you install only what you reach for.
 | [`@feugene/granularity-editor`](../granularity-editor) | 0.3.1 | Rich-text editing: a TipTap-backed GrRichText field with a design-system toolbar. |
 | [`@feugene/granularity-forms-schema`](../granularity-forms-schema) | 0.4.0 | Schema-driven forms — zod and JSON Schema into real form fields, zero dependencies. |
 | [`@feugene/granularity-media`](../granularity-media) | 0.7.1 | Media components: image cropping, camera capture, code scanning and video playback. |
-| [`@feugene/granularity-test-kit`](../granularity-test-kit) | 0.8.1 | Test gates for @feugene/granularity design-system packages — token, registry and defaults contracts as reusable factories. |
+| [`@feugene/granularity-test-kit`](../granularity-test-kit) | 0.9.0 | Test gates for @feugene/granularity design-system packages — token, registry and defaults contracts as reusable factories. |
 | [`@feugene/unplugin-granularity`](../unplugin-granularity) | 0.7.1 | unplugin-vue-components resolver — granular auto-import for components and directives. |
 <!-- ecosystem:generated:end -->
 
