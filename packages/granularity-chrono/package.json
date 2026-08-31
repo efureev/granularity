@@ -2,7 +2,7 @@
   "name": "@feugene/granularity-chrono",
   "description": "Calendar, date and time components for the @feugene/granularity design system — no third-party date widget, no date library.",
   "version": "0.10.0",
-  "license": "SEE LICENSE IN LICENSE",
+  "license": "LicenseRef-Granularity-EUC-1.1",
   "author": {
     "name": "Evgeniy Fureev",
     "url": "https://github.com/efureev"

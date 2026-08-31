@@ -2,7 +2,7 @@
   "name": "@feugene/granularity-charts",
   "description": "Charts for the @feugene/granularity design system — own SVG, zero dependencies, drawn with theme tokens.",
   "version": "0.11.0",
-  "license": "SEE LICENSE IN LICENSE",
+  "license": "LicenseRef-Granularity-EUC-1.1",
   "author": {
     "name": "Evgeniy Fureev",
     "url": "https://github.com/efureev"

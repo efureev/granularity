@@ -66,6 +66,13 @@ yarn dev:showcase          # run the showcase locally
 [Apache License 2.0 with an Additional Ethical Use Clause](./LICENSE) © Evgeniy Fureev
 
 The clause adds a use restriction on top of Apache-2.0, so this is a **source-available**
-license and not an OSI-approved open-source one. Every package therefore declares
-`"license": "SEE LICENSE IN LICENSE"` rather than an SPDX identifier. Read
-[`LICENSE`](./LICENSE) in full before adopting the packages.
+license and not an OSI-approved open-source one. Read [`LICENSE`](./LICENSE) in full
+before adopting the packages.
+
+For a licence register, every package declares the SPDX expression
+`LicenseRef-Granularity-EUC-1.1`. A plain-language explanation for legal and compliance
+teams — what the clause does and does not restrict, and answers for vendor
+questionnaires — is at <https://granularity.tech/legal/licensing>.
+
+Contributions require a [contributor licence agreement](./CLA.md). You keep every right
+in your contribution; it grants a non-exclusive licence, not ownership.

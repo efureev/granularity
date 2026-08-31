@@ -2,7 +2,7 @@
   "name": "@feugene/granularity-editor",
   "description": "Rich-text editing for @feugene/granularity: a TipTap-backed GrRichText field with a design-system toolbar.",
   "version": "0.3.1",
-  "license": "SEE LICENSE IN LICENSE",
+  "license": "LicenseRef-Granularity-EUC-1.1",
   "author": {
     "name": "Evgeniy Fureev",
     "url": "https://github.com/efureev"

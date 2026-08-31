@@ -2,7 +2,7 @@
   "name": "@feugene/granularity-code",
   "description": "Code surfaces for @feugene/granularity: view, edit and diff — the viewer and the diff carry no dependencies at all.",
   "version": "0.1.1",
-  "license": "SEE LICENSE IN LICENSE",
+  "license": "LicenseRef-Granularity-EUC-1.1",
   "author": {
     "name": "Evgeniy Fureev",
     "url": "https://github.com/efureev"

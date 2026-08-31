@@ -1,0 +1,7 @@
+{
+  "version": 1,
+  "agreement": "CLA.md, version 1.0",
+  "signatures": [
+    { "login": "efureev", "name": "Evgeniy Fureev", "date": "2026-08-31", "note": "Author and copyright holder" }
+  ]
+}
