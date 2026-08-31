@@ -187,6 +187,9 @@ const grTheme = EditorView.theme({
     backgroundColor: 'var(--gr-code-editor-selection, var(--gr-info-light))',
   },
   '.cm-activeLine': { backgroundColor: 'var(--gr-code-editor-active-line, transparent)' },
+  // Свой цвет обязателен: дефолтный `#888` CodeMirror даёт 3.2:1 на светлой
+  // подложке и 2.9:1 на тёмной — ниже AA в обеих темах.
+  '.cm-placeholder': { color: 'var(--gr-code-editor-placeholder, var(--gr-muted-fg))' },
   '.cm-gutters': {
     backgroundColor: 'transparent',
     color: 'var(--gr-code-block-line-number, var(--gr-muted-fg))',

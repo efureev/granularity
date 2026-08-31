@@ -7,6 +7,21 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+
+- **The editor placeholder failed AA contrast in both themes.** `grTheme` styled the background,
+  caret, selection, active line and gutters but left `.cm-placeholder` to CodeMirror's built-in
+  `#888`: 3.2:1 on the light surface and 2.9:1 on the dark one, against the 4.5:1 threshold. It now
+  reads `--gr-code-editor-placeholder`, defaulting to `--gr-muted-fg` — 5.7:1 and 5.0:1.
+
+  Nothing caught it because the showcase page was outside the axe sweep: the package was never
+  wired into `apps/showcase/e2e/components.ts`, so `GrCodeBlock`, `GrCodeEditor` and `GrDiff`
+  were scanned by neither axe nor the visual layer. The sweep now covers them.
+
+### Added
+
+- `--gr-code-editor-placeholder` — hook token for the empty-editor hint colour.
+
 ## [v0.1.1] 2026-08-31
 
 ### Fixed

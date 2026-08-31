@@ -29,6 +29,21 @@ function pressTab(wrapper: { get: (selector: string) => { element: Element } }):
 }
 
 describe('GrCodeEditor', () => {
+  /**
+   * Дефолтный `#888` CodeMirror не проходит AA ни на одной из тем пакета
+   * (3.2:1 на светлой подложке, 2.9:1 на тёмной), а axe видит подсказку только
+   * тогда, когда чанк редактора успел загрузиться, — то есть пропускал бы её.
+   */
+  it('подсказка пустого редактора красится токеном пакета, а не дефолтом CodeMirror', async () => {
+    const wrapper = await mountEditor({ modelValue: '', placeholder: '{ }' })
+
+    expect(wrapper.find('.cm-placeholder').exists()).toBe(true)
+    const injected = [...document.querySelectorAll('style')].map(node => node.textContent ?? '').join('\n')
+    expect(injected).toContain('--gr-code-editor-placeholder')
+
+    wrapper.unmount()
+  })
+
   it('монтирует редактор и показывает текст', async () => {
     const wrapper = await mountEditor()
 
