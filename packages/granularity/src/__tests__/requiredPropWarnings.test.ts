@@ -1,5 +1,6 @@
-import { mount } from '@vue/test-utils'
+import { renderToString } from '@vue/server-renderer'
 import { afterEach, describe, expect, it, vi } from 'vitest'
+import { createSSRApp } from 'vue'
 
 import GrBreadcrumbs from '../components/GrBreadcrumbs/GrBreadcrumbs.vue'
 import GrDataTable from '../components/GrDataTable/GrDataTable.vue'
@@ -13,9 +14,9 @@ import GrTabs from '../components/GrTabs/GrTabs.vue'
 /**
  * Пропущенный обязательный проп у этих восьми кончается исключением при
  * отрисовке, и до гардов потребитель видел только `Cannot read properties of
- * undefined`. Имени компонента и пропа в этом сообщении нет, а от Vue их ждать
- * нечего: production-сборка SFC снимает `required` с рантайм-объявления, и
- * «Missing required prop» не печатается ни в dev, ни в prod.
+ * undefined`. Имени компонента и пропа там нет, а от Vue их ждать нечего:
+ * production-сборка SFC снимает `required` с рантайм-объявления, и «Missing
+ * required prop» не печатается ни в dev, ни в prod.
  *
  * Гард не подменяет значение и падения не отменяет — он называет виновника
  * раньше, чем оно случится.
@@ -35,12 +36,20 @@ afterEach(() => {
   vi.restoreAllMocks()
 })
 
-function warningsFromBareMount(component: unknown): string {
+/**
+ * Рендер серверный, а не `mount`: гард живёт в setup, а клиентское
+ * монтирование вдобавок заводит `onMounted`. У `GrSegmented` тот через
+ * `nextTick` меряет индикатор и падает уже вне `try`, оставляя необработанный
+ * reject, — прогон краснел бы при всех зелёных тестах.
+ */
+async function warningsFromBareRender(component: unknown): Promise<string> {
   const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+  const app = createSSRApp(component as never)
+  app.config.warnHandler = () => {}
 
   try {
-    // Падение здесь ожидаемо и не проверяется: гард обязан отработать до него.
-    mount(component as never)
+    // Падение ожидаемо и не проверяется: гард обязан отработать до него.
+    await renderToString(app)
   }
   catch {}
 
@@ -48,8 +57,8 @@ function warningsFromBareMount(component: unknown): string {
 }
 
 describe('обязательные пропы: гард называет виновника до падения', () => {
-  it.each(CASES.map(entry => [entry.name, entry] as const))('%s', (_name, entry) => {
-    const printed = warningsFromBareMount(entry.component)
+  it.each(CASES.map(entry => [entry.name, entry] as const))('%s', async (_name, entry) => {
+    const printed = await warningsFromBareRender(entry.component)
 
     for (const prop of entry.props)
       expect(printed).toContain(`[granularity] ${entry.name}: обязательный проп \`${prop}\``)
