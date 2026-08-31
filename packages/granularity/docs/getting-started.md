@@ -769,7 +769,7 @@ export async function setupI18n() {
 
 - [`@feugene/granularity-datasource`](../../granularity-datasource) `0.1.2`
 - [`@feugene/granularity-devtools`](../../granularity-devtools) `0.3.2`
-- [`@feugene/granularity-test-kit`](../../granularity-test-kit) `0.9.0`
+- [`@feugene/granularity-test-kit`](../../granularity-test-kit) `0.10.0`
 - [`@feugene/unplugin-granularity`](../../unplugin-granularity) `0.7.1`
 <!-- ecosystem:generated:end -->
 
