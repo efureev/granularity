@@ -11,8 +11,9 @@ import { grDerivedTokens, grFoundationTokens, grThemeTokens } from '../tokens'
  * разрешается в `unset`, панель уезжает под соседний слой. Остальные гейты
  * этого не видят: CSS остаётся валидным.
  *
- * В пакете источник один — `composables/internal/overlayStack.ts`, и его
- * знает фабрика (`OVERLAY_COMPOSABLES`).
+ * Имена, которые читают композаблы слоёв, фабрика вычитывает из их кода
+ * (`OVERLAY_COMPOSABLES` перечисляет модули, а не токены): записанное имя
+ * разошлось бы с кодом молча.
  */
 defineDynamicTokensGate({
   componentConfigs: granularityComponentConfigs,
