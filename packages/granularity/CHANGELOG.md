@@ -7,6 +7,23 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- **A missing required prop now names itself in dev.** `GrBreadcrumbs`, `GrDataTable`,
+  `GrInputTag`, `GrNumberInput`, `GrSegmented`, `GrSortableList`, `GrSteps` and `GrTabs` threw
+  `Cannot read properties of undefined` and nothing else: neither the component nor the prop
+  appeared anywhere in the message. Vue's own "Missing required prop" never fires here — the
+  production SFC compiler strips `type` and `required` from the runtime declaration, so the whole
+  `dist` carries `required: true` exactly zero times.
+
+  Each of the eight now warns under `__GR_DEV__` before the crash, naming component, prop and the
+  value received. The crash itself stays: the component genuinely cannot render, and hiding that
+  behind a substituted default would trade a loud defect for a quiet one.
+
+  This closes the class. Re-measured on the built `dist` by rendering all 77 components without
+  props: eight crash and all eight are guarded, four warn without crashing (`GrPagination`,
+  `GrProgressBar`, `GrSlider`, `GrStatistic` — guarded earlier), the remaining 65 render clean.
+
 ## [v0.41.0] 2026-08-31
 
 ### Removed

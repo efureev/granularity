@@ -2,7 +2,7 @@
 import type { InputHTMLAttributes } from 'vue'
 
 import { useGrComponentProp, useGrComponentSize } from '../GrConfigProvider/context'
-import { computed, onBeforeUnmount, ref } from 'vue'
+import { computed, onBeforeUnmount, ref, watchEffect } from 'vue'
 
 import {
   clearButtonClass,
@@ -628,6 +628,16 @@ function clear(): void {
   emit('change', null)
   emit('clear')
   focus()
+}
+
+if (__GR_DEV__) {
+  watchEffect(() => {
+    if (props.modelValue === undefined) {
+      console.warn(
+        `[granularity] GrNumberInput: обязательный проп \`modelValue\` не передан — получено ${String(props.modelValue)}.`,
+      )
+    }
+  })
 }
 </script>
 

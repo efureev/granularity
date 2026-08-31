@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch, type Component } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch, watchEffect, type Component } from 'vue'
 
 import IconX from '~icons/lucide/x'
 
@@ -392,6 +392,22 @@ function onClick(event: MouseEvent, tab: GrTab, index: number): void {
 
   if (tab.value !== props.modelValue)
     emit('update:modelValue', tab.value)
+}
+
+if (__GR_DEV__) {
+  watchEffect(() => {
+    if (props.modelValue === undefined) {
+      console.warn(
+        `[granularity] GrTabs: обязательный проп \`modelValue\` не передан — получено ${String(props.modelValue)}.`,
+      )
+    }
+
+    if (!Array.isArray(props.tabs)) {
+      console.warn(
+        `[granularity] GrTabs: обязательный проп \`tabs\` должен быть массивом — получено ${String(props.tabs)}.`,
+      )
+    }
+  })
 }
 </script>
 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, onMounted, ref, useId, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, useId, watch, watchEffect } from 'vue'
 
 import { useGrComponentProp, useGrComponentSize } from '../GrConfigProvider/context'
 import { useGrFormFieldContext } from '../GrFormField/context'
@@ -438,6 +438,22 @@ onBeforeUnmount(() => {
   observedRoot = null
   observedItem = null
 })
+
+if (__GR_DEV__) {
+  watchEffect(() => {
+    if (props.modelValue === undefined) {
+      console.warn(
+        `[granularity] GrSegmented: обязательный проп \`modelValue\` не передан — получено ${String(props.modelValue)}.`,
+      )
+    }
+
+    if (!Array.isArray(props.options)) {
+      console.warn(
+        `[granularity] GrSegmented: обязательный проп \`options\` должен быть массивом — получено ${String(props.options)}.`,
+      )
+    }
+  })
+}
 </script>
 
 <template>

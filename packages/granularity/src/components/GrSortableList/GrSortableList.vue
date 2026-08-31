@@ -1,5 +1,5 @@
 <script setup lang="ts" generic="T">
-import { computed, nextTick, ref } from 'vue'
+import { computed, nextTick, ref, watchEffect } from 'vue'
 
 import GrCard, { type GrCardVariant } from '../GrCard'
 import { useAnnouncer } from '../../composables/useAnnouncer'
@@ -294,6 +294,16 @@ defineExpose({
   move: (from: number, to: number) => applyMove(from, to),
   focusItem: (index: number) => roving.focusKey(keys.value[index]),
 })
+
+if (__GR_DEV__) {
+  watchEffect(() => {
+    if (!Array.isArray(props.modelValue)) {
+      console.warn(
+        `[granularity] GrSortableList: обязательный проп \`modelValue\` должен быть массивом — получено ${String(props.modelValue)}.`,
+      )
+    }
+  })
+}
 </script>
 
 <template>

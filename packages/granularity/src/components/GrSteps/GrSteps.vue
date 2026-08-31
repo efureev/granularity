@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Component } from 'vue'
-import { computed } from 'vue'
+import { computed, watchEffect } from 'vue'
 
 import IconCheck from '~icons/lucide/check'
 
@@ -226,6 +226,22 @@ defineExpose({
   isFirst: computed(() => previousEnterableIndex(props.steps, currentIndex.value) === -1),
   isLast: computed(() => nextEnterableIndex(props.steps, currentIndex.value) === -1),
 })
+
+if (__GR_DEV__) {
+  watchEffect(() => {
+    if (props.modelValue === undefined) {
+      console.warn(
+        `[granularity] GrSteps: обязательный проп \`modelValue\` не передан — получено ${String(props.modelValue)}.`,
+      )
+    }
+
+    if (!Array.isArray(props.steps)) {
+      console.warn(
+        `[granularity] GrSteps: обязательный проп \`steps\` должен быть массивом — получено ${String(props.steps)}.`,
+      )
+    }
+  })
+}
 </script>
 
 <template>

@@ -1,5 +1,5 @@
 <script setup lang="ts" generic="TRow extends Record<string, unknown> = Record<string, unknown>">
-import { computed, nextTick, onMounted, onUnmounted, ref, useId, watch } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, ref, useId, watch, watchEffect } from 'vue'
 
 import GrTable from '../GrTable/GrTable.vue'
 import GrIcon from '../GrIcon/GrIcon.vue'
@@ -266,6 +266,24 @@ const props = withDefaults(defineProps<GrDataTableProps<TRow>>(), {
   resizableColumns: false,
   columnWidths: undefined,
 })
+
+// Раньше остальных проверок: таблица читает `rows` уже в setup, и гард,
+// стоящий в хвосте, до предупреждения бы не дожил.
+if (__GR_DEV__) {
+  watchEffect(() => {
+    if (!Array.isArray(props.rows)) {
+      console.warn(
+        `[granularity] GrDataTable: обязательный проп \`rows\` должен быть массивом — получено ${String(props.rows)}.`,
+      )
+    }
+
+    if (!Array.isArray(props.columns)) {
+      console.warn(
+        `[granularity] GrDataTable: обязательный проп \`columns\` должен быть массивом — получено ${String(props.columns)}.`,
+      )
+    }
+  })
+}
 
 const emit = defineEmits<GrDataTableEmits<TRow>>()
 

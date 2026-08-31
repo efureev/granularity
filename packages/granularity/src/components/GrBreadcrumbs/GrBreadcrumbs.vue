@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch, watchEffect } from 'vue'
 
 import GrLink from '../GrLink/GrLink.vue'
 import { useGrComponentProp, useGrComponentSize } from '../GrConfigProvider/context'
@@ -336,6 +336,16 @@ async function expand(): Promise<void> {
   const before = Math.max(0, Math.min(props.itemsBeforeCollapse, props.items.length))
   const revealed = rootEl.value?.querySelectorAll<HTMLElement>('[data-gr-breadcrumbs-item]')
   revealed?.[before]?.focus()
+}
+
+if (__GR_DEV__) {
+  watchEffect(() => {
+    if (!Array.isArray(props.items)) {
+      console.warn(
+        `[granularity] GrBreadcrumbs: обязательный проп \`items\` должен быть массивом — получено ${String(props.items)}.`,
+      )
+    }
+  })
 }
 </script>
 

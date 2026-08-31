@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, ref } from 'vue'
+import { computed, nextTick, ref, watchEffect } from 'vue'
 
 import type { GrBadgeRadius, GrBadgeSize, GrBadgeTone } from '../GrBadge'
 import GrChip from '../GrChip/GrChip.vue'
@@ -520,6 +520,16 @@ const showClearAll = computed(() => resolvedClearable.value && canEdit.value && 
 const placeholderText = computed(() => props.modelValue.length > 0 ? undefined : props.placeholder)
 
 defineExpose({ focus, blur, clear: clearAll })
+
+if (__GR_DEV__) {
+  watchEffect(() => {
+    if (!Array.isArray(props.modelValue)) {
+      console.warn(
+        `[granularity] GrInputTag: обязательный проп \`modelValue\` должен быть массивом — получено ${String(props.modelValue)}.`,
+      )
+    }
+  })
+}
 </script>
 
 <template>
