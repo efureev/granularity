@@ -8,6 +8,7 @@ import { granularityDashboardComponentConfigs } from '@feugene/granularity-dashb
 import { granularityFormsSchemaComponentConfigs } from '@feugene/granularity-forms-schema/granular-provider'
 import { granularityEditorComponentConfigs } from '@feugene/granularity-editor/granular-provider'
 import { granularityMediaComponentConfigs } from '@feugene/granularity-media/granular-provider'
+import { granularityCodeComponentConfigs } from '@feugene/granularity-code/granular-provider'
 
 /**
  * Что сканируют e2e и откуда берётся список.
@@ -65,6 +66,7 @@ export const companionComponentNames: string[] = [
   ...Object.keys(granularityFormsSchemaComponentConfigs),
   ...Object.keys(granularityEditorComponentConfigs),
   ...Object.keys(granularityMediaComponentConfigs),
+  ...Object.keys(granularityCodeComponentConfigs),
   ...composableCompanionNames,
 ].sort()
 

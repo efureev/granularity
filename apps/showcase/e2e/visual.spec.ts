@@ -125,7 +125,6 @@ const VISUAL_COMPONENTS = [
   'GrChip',
   'GrContextMenu',
   'GrChipGroup',
-  'GrCodeBlock',
   'GrDelta',
   'GrDescriptionList',
   'GrFilePreview',
