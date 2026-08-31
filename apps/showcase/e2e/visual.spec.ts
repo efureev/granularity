@@ -69,16 +69,19 @@ async function hideChrome(page: import('@playwright/test').Page): Promise<void> 
 }
 
 /**
- * Всё, что выведено из часов, из кадра исключается: «5 секунд назад» меняется
- * между съёмкой и прогоном, и эталон протухал бы через минуту после создания.
+ * Часы страницы останавливаются на константе.
  *
- * Селектор не перечисляет демо, а спрашивает у разметки: `data-allow-mismatch`
- * компонент ставит ровно там, где читает часы. Новое живое демо попадёт под
- * маску само.
+ * Маска, стоявшая здесь раньше, задачу не решала: прямоугольник Playwright
+ * рисует по границам элемента, а они едут вслед за длиной строки («только что»
+ * → «2 минуты назад»), поэтому эталон всё равно расходился — измерено на
+ * `GrRelativeTime`, где маска оказалась шире эталонной на 68px. Заодно маска
+ * закрывала от гейта настоящую разметку.
+ *
+ * `setFixedTime`, а не `install`: подменяется только `Date`, таймеры продолжают
+ * идти. Общие часы `useChronoNow` тикают как обычно и каждый раз читают одно и
+ * то же значение, так что текст детерминирован без остановки страницы.
  */
-function clockDriven(page: import('@playwright/test').Page) {
-  return page.locator('[data-gr-relative-time][data-allow-mismatch]')
-}
+const FROZEN_NOW = new Date('2026-06-15T12:00:00.000Z')
 
 const VISUAL_COMPONENTS = [
   // Форм-контролы: на них завязана бо́льшая часть цветовых токенов.
@@ -186,6 +189,7 @@ for (const theme of ['light', 'dark'] as const) {
          * `GrSkeleton` гасится медиазапросом), поэтому маска не нужна —
          * достаточно попросить страницу не двигаться.
          */
+        await page.clock.setFixedTime(FROZEN_NOW)
         await page.emulateMedia({ colorScheme: theme, reducedMotion: 'reduce' })
         await pinAppearance(page, theme)
 
@@ -207,6 +211,7 @@ for (const theme of ['light', 'dark'] as const) {
   test.describe(`visual companion (${theme})`, () => {
     for (const name of VISUAL_COMPANIONS) {
       test(`${name} live examples`, async ({ page }) => {
+        await page.clock.setFixedTime(FROZEN_NOW)
         await page.emulateMedia({ colorScheme: theme, reducedMotion: 'reduce' })
         await pinAppearance(page, theme)
 
@@ -217,9 +222,7 @@ for (const theme of ['light', 'dark'] as const) {
 
         await hideChrome(page)
 
-        await expect(examples).toHaveScreenshot(`${companionPath(name).replace('/', '-')}-${theme}.png`, {
-          mask: [clockDriven(page)],
-        })
+        await expect(examples).toHaveScreenshot(`${companionPath(name).replace('/', '-')}-${theme}.png`)
       })
     }
   })
