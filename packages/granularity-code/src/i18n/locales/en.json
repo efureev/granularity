@@ -1,0 +1,39 @@
+{
+  "block": {
+    "copy": "Copy code",
+    "copied": "Code copied",
+    "copyFailed": "Could not copy code"
+  },
+  "editor": {
+    "label": "Code editor",
+    "escHint": "Press Escape, then Tab, to leave the editor",
+    "severity": {
+      "error": "Error",
+      "warning": "Warning",
+      "info": "Note"
+    }
+  },
+  "diff": {
+    "label": "Comparison",
+    "summary": "Lines added: {added}, removed: {removed}",
+    "unchanged": "No changes",
+    "expand": {
+      "one": "Show {n} more line",
+      "other": "Show {n} more lines"
+    },
+    "empty": "Nothing to compare",
+    "budgetExceeded": "The comparison is too large, showing a coarser result",
+    "expandTop": {
+      "one": "Show {n} line at the top of the gap",
+      "other": "Show {n} lines at the top of the gap"
+    },
+    "expandBottom": {
+      "one": "Show {n} line at the bottom of the gap",
+      "other": "Show {n} lines at the bottom of the gap"
+    },
+    "hidden": {
+      "one": "{n} line hidden",
+      "other": "{n} lines hidden"
+    }
+  }
+}

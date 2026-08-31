@@ -5,6 +5,7 @@ import editorPkg from '@feugene/granularity-editor/package.json'
 import formsSchemaPkg from '@feugene/granularity-forms-schema/package.json'
 import mediaPkg from '@feugene/granularity-media/package.json'
 import chronoPkg from '@feugene/granularity-chrono/package.json'
+import codePkg from '@feugene/granularity-code/package.json'
 
 import type { ShowcaseApiSectionMeta } from '../model.ts'
 import type { ShowcaseComponentOverviewDoc } from '../component-docs/types'
@@ -2340,6 +2341,224 @@ import type { DataSourceUrlAdapter } from '@feugene/granularity-datasource/url'`
               { name: 'setPage / setPerPage / setSort / setSearch', type: '(value) => void', description: 'Точечные правки состояния.' },
               { name: 'setFilter / setFilters', type: '(name, value) · (filters) => void', description: 'Один фильтр или весь набор разом.' },
               { name: 'reset / reload', type: '() => void · () => Promise<void>', description: '`reset` возвращает умолчания; `reload` повторяет запрос текущего состояния — например после правки строки.' },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'granularity-code',
+    npmName: '@feugene/granularity-code',
+    label: 'Code',
+    version: codePkg.version,
+    description: 'Три действия над кодом — показать, править, сравнить. Блок и дифф не тянут ни одной зависимости; CodeMirror нужен только редактору и объявлен опциональным peer\'ом.',
+    dependencies: [],
+    components: [
+      {
+        name: 'GrCodeBlock',
+        slug: 'gr-code-block',
+        title: 'GrCodeBlock',
+        summary: 'Показать код: лог, ответ API, конфиг в карточке записи. Ноль зависимостей.',
+        importPath: '@feugene/granularity-code/components/GrCodeBlock',
+        overview: {
+          paragraphs: [
+            'Показывает текст или значение как код: моноширинно, с ролями подсветки, номерами строк и кнопкой копирования. Значение приходит `unknown` — сериализация переживает циклы, `BigInt` и несериализуемое, потому что данные приходят из базы и уронить страницу права не имеют.',
+            'Не правит и не сворачивает узлы. Правка — `GrCodeEditor`, обход чужого `unknown` с раскрытием веток — `GrJsonViewer` ядра.',
+          ],
+          features: [
+            'Ноль зависимостей: JSON и обычный текст разбирает встроенный токенизатор.',
+            'Подсветка любого языка — функцией от приложения, а не вшитой библиотекой.',
+            'Копируется исходник, а не экран: номера строк в буфер не попадают.',
+            'Скроллер достижим с клавиатуры, кнопка копирования объявляет результат живым регионом.',
+          ],
+        },
+        examples: [
+          {
+            id: 'basic',
+            title: 'Ответ сервиса как есть',
+            description: 'Объект, а не строка: сериализация не имеет права уронить страницу. Копируется исходник, а не экран — номера строк в буфер не попадают.',
+            previewKey: 'extra-code-block-basic',
+          },
+          {
+            id: 'wrap',
+            title: 'Длинная строка: перенести или прокрутить',
+            description: 'Лог не помещается в колонку. Перенос читается целиком, прокрутка сохраняет выравнивание — выбор за экраном, а не за компонентом. Кнопку копирования можно убрать: не всякий блок предлагают унести.',
+            previewKey: 'extra-code-block-wrap',
+          },
+          {
+            id: 'highlight',
+            title: 'Подсветка любого языка',
+            description: 'Выключите переключатель — и это ровно тот вид, который блок имел в ядре: JSON и текст, ноль зависимостей. Подсветка приходит функцией, поэтому её поставщика выбирает приложение.',
+            previewKey: 'extra-code-block-highlight',
+          },
+          {
+            id: 'shiki-theme',
+            title: 'Shiki и любая его тема',
+            description: 'Разбирает Shiki, красит тема приложения: токен несёт роль, а не цвет. Поэтому «подключить тему» — это переопределить одиннадцать переменных, зато она ложится на блок и дифф разом и слушается светлой/тёмной схемы.',
+            previewKey: 'extra-code-block-shiki-theme',
+          },
+        ],
+        apiSections: [
+          {
+            key: 'props',
+            title: 'Props',
+            origin: 'manual',
+            items: [
+              { name: 'code', type: 'unknown', description: 'Строка или значение: объект сериализуется с отступом. Цикл печатается `[Circular]`, несериализуемое — `[Unserializable]`.' },
+              { name: 'language', type: 'string', default: `'json'`, description: '`json` и `text` разбирает встроенный токенизатор. Любая другая строка уходит подключённой подсветке; её нет — показывается обычным текстом.' },
+              { name: 'highlighter', type: 'GrCodeTokenizer', description: 'Подсветка для языков сверх встроенных. Не задана — берётся из `provide` приложения.' },
+              { name: 'lineNumbers / wrap', type: 'boolean', description: 'Жёлоб с номерами и перенос длинных строк вместо горизонтальной прокрутки.' },
+              { name: 'copyable', type: 'boolean', default: 'true', description: 'Кнопка копирования. Без защищённого контекста не рисуется вовсе.' },
+              { name: 'maxHeight', type: 'string | number', description: 'Высота, после которой включается вертикальная прокрутка. Задана — блок встаёт в таб-порядок.' },
+              { name: 'size', type: 'GrComponentSize', description: 'Кегль и отступы. Шкала общая с редактором и диффом.' },
+            ],
+          },
+        ],
+      },
+      {
+        name: 'GrCodeEditor',
+        slug: 'gr-code-editor',
+        title: 'GrCodeEditor',
+        summary: 'Править код: JSON и YAML-конфиги в админке, шаблоны писем. Форм-контрол на CodeMirror 6.',
+        importPath: '@feugene/granularity-code/components/GrCodeEditor',
+        overview: {
+          paragraphs: [
+            'Поле формы, в котором значение — код. Ведёт себя как остальные контролы: `disabled`, `readonly`, `invalid`, связка с подписью и текстом ошибки через `GrFormField`.',
+            'Не IDE: без LSP, без множественных курсоров, без файлового дерева. Всё, чего не покрывают пропы, доступно через `getView()` — живой `EditorView`, объявленный escape hatch\'ем без контракта.',
+          ],
+          features: [
+            '`Tab` уводит фокус: редактор в форме не имеет права запирать клавиатуру.',
+            'Правка родителем не сбрасывает курсор — применяется минимальная замена, а не новый документ.',
+            'Валидация пропом, а не линтером: тем же контрактом принимается ответ серверной проверки.',
+            'CodeMirror — опциональный peer: пакет, взятый ради блока или диффа, ставить его не обязан.',
+          ],
+        },
+        examples: [
+          {
+            id: 'config',
+            title: 'Конфиг в форме',
+            description: 'Сотрите запятую — ошибка появится под полем и свяжется с ним через `aria-describedby`. Переключатель показывает главное решение: `Tab` по умолчанию уводит фокус, потому что редактор, из которого нельзя выйти клавиатурой, прячет за собой кнопку «Сохранить».',
+            previewKey: 'extra-code-editor-config',
+          },
+          {
+            id: 'languages',
+            title: 'TypeScript, PHP и Go',
+            description: 'Каждый язык CodeMirror — отдельный npm-пакет, и грузит их приложение. Переключите вкладку: грамматика приезжает по выбору, а не тремя пакетами в бандле сразу.',
+            previewKey: 'extra-code-editor-languages',
+          },
+          {
+            id: 'lazy-lang',
+            title: 'Язык приезжает позже текста',
+            description: 'Проп `language` принимает и готовую грамматику, и тик — функцию с промисом. Границей динамического импорта владеет приложение, а редактор не ждёт язык, чтобы показать текст.',
+            previewKey: 'extra-code-editor-lazy-lang',
+          },
+          {
+            id: 'states',
+            title: 'Состояния формы',
+            description: 'Ведёт себя как остальные контролы: `readonly` не даёт править, `disabled` выключает, `invalid` связывает поле с текстом ошибки. Пустое значение показывает placeholder, а `focus()` и `getView()` доступны через ref.',
+            previewKey: 'extra-code-editor-states',
+          },
+          {
+            id: 'theme',
+            title: 'Своя тема CodeMirror',
+            description: 'Пакет тем не несёт: своя палитра собрана из токенов и слушается темы страницы. Но `extensions` берёт любое расширение, а тема CodeMirror и есть расширение — готовая из npm или собранная на месте.',
+            previewKey: 'extra-code-editor-theme',
+          },
+        ],
+        apiSections: [
+          {
+            key: 'props',
+            title: 'Props',
+            origin: 'manual',
+            items: [
+              { name: 'modelValue', type: 'string', description: '`v-model`. Входящее изменение применяется транзакцией с минимальной заменой: курсор, выделение и история undo не сбрасываются.' },
+              { name: 'language', type: 'string | LanguageSupport | Extension[] | (() => Promise<LanguageSupport>)', description: 'Строка — имя языка для серверной разметки. Объект или массив — грамматика CodeMirror. Тик — ленивая её загрузка.' },
+              { name: 'validate', type: '(value) => GrCodeIssue[] | Promise<GrCodeIssue[]>', description: 'Замечания к коду. Контракт, а не линтер: тем же пропом отдаётся результат `JSON.parse`, схема YAML или ответ серверной валидации.' },
+              { name: 'tabIndents', type: 'boolean', default: 'false', description: '`Tab` вставляет отступ вместо перехода фокуса. Включён — освободить фокус можно `Esc`, и подсказка об этом стоит под полем.' },
+              { name: 'extensions', type: 'readonly Extension[]', description: 'Сырые расширения CodeMirror — escape hatch для всего, чего нет в пропах.' },
+              { name: 'disabled / readonly / invalid / required', type: 'boolean', description: 'Контракт форм-контрола: сводится с контекстом `GrFormField` по «или».' },
+              { name: 'lineNumbers / wrap / maxHeight / size', type: 'boolean · boolean · string | number · GrComponentSize', description: 'Те же, что у блока: семейство обязано совпадать.' },
+            ],
+          },
+          {
+            key: 'events',
+            title: 'Events',
+            origin: 'manual',
+            items: [
+              { name: 'update:modelValue', type: '(value: string)', description: 'Правка в редакторе. Изменение, пришедшее пропом, обратно не эмитится — эхо-петли не возникает.' },
+              { name: 'change', type: '(value: string)', description: 'На потере фокуса — для форм, где сохранять на каждую букву не надо.' },
+            ],
+          },
+        ],
+      },
+      {
+        name: 'GrDiff',
+        slug: 'gr-diff',
+        title: 'GrDiff',
+        summary: 'Сравнить две версии: что изменилось в записи, между ревизиями, между конфигами. Ноль зависимостей.',
+        importPath: '@feugene/granularity-code/components/GrDiff',
+        overview: {
+          paragraphs: [
+            'Считает и показывает разницу двух текстов или значений: построчно, с пословной подсветкой внутри изменённой строки и схлопыванием неизменного. Не-строка сериализуется устойчивым порядком ключей — иначе разный порядок дал бы выдуманные различия.',
+            'Не редактирует и не разрешает конфликты: «принять блок» — задача резолвера, другого компонента.',
+          ],
+          features: [
+            'Ноль зависимостей: свой алгоритм вместо готового merge-вида, поэтому чтение диффа не платит за редактор.',
+            'Бюджет: сравнение двух больших разных файлов огрубляется, а не вешает вкладку.',
+            'Пословная подсветка внутри строки — правка слова не читается как «строка другая».',
+            'Знак в жёлобе рядом с цветом: дифф читается и на монохромной печати.',
+          ],
+        },
+        examples: [
+          {
+            id: 'modes',
+            title: 'Одной колонкой или двумя',
+            description: 'Внутри изменённой строки отмечено изменённое слово, а не строка целиком: иначе правка одного значения читалась бы как «строка другая». Сводка сверху — живой регион.',
+            previewKey: 'extra-code-diff-modes',
+          },
+          {
+            id: 'hunks',
+            title: 'Дифф пришёл с сервера',
+            description: 'Git уже посчитал участки — считать заново нечего, `hunks` сильнее `before`/`after`. Слоты дают свою сводку, своё пустое состояние и действие на строке: в обзоре кода там живут «обсудить» и «скопировать».',
+            previewKey: 'extra-code-diff-hunks',
+          },
+          {
+            id: 'objects',
+            title: 'Сравнение записей, а не строк',
+            description: 'Две ревизии приходят объектами с разным порядком ключей. Устойчивая сериализация не даёт показать правку там, где её не было.',
+            previewKey: 'extra-code-diff-objects',
+          },
+          {
+            id: 'scale',
+            title: 'Тысячи строк',
+            description: 'Пропуск открывается шагами с любого края — как в обзоре кода, и шаг настраивается. Неизменное свёрнуто, остальное режется окном отрисовки: в DOM десятки строк независимо от размера. Низкий бюджет показывает отказ, который увидит пользователь, а не разработчик.',
+            previewKey: 'extra-code-diff-scale',
+          },
+        ],
+        apiSections: [
+          {
+            key: 'props',
+            title: 'Props',
+            origin: 'manual',
+            items: [
+              { name: 'before / after', type: 'unknown', description: 'Стороны сравнения. Не строка — сериализуется устойчивым порядком ключей.' },
+              { name: 'hunks', type: 'GrDiffHunk[]', description: 'Готовый дифф с бэкенда. Сильнее `before`/`after`: считать заново нечего.' },
+              { name: 'mode', type: `'unified' | 'split'`, default: `'unified'`, description: 'В `split` замена строки встаёт одной парой колонок — так её и читают.' },
+              { name: 'context', type: 'number', default: '3', description: 'Неизменных строк вокруг изменения. `0` — только изменения, `Infinity` — не сворачивать.' },
+              { name: 'expandStep', type: 'number', default: '10', description: 'Сколько строк открывает одно нажатие на пропуск. Остаток меньше шага открывается целиком.' },
+              { name: 'budget', type: 'number', default: '2000', description: 'Предел работы алгоритма. Сложность Майерса зависит от дистанции редактирования, и без предела два разных больших файла — замерший таб. За пределом разбор огрубляется и сообщает об этом.' },
+              { name: 'language / highlighter', type: 'string · GrCodeTokenizer', description: 'Подсветка строк — тем же словарём, что у блока.' },
+              { name: 'lineNumbers / wrap / maxHeight / size', type: 'boolean · boolean · string | number · GrComponentSize', description: 'Те же, что у блока.' },
+            ],
+          },
+          {
+            key: 'events',
+            title: 'Events',
+            origin: 'manual',
+            items: [
+              { name: 'expand', type: `(gapId: string, edge: 'top' | 'bottom')`, description: 'Пропуск раскрыт с края. Идентификатор — позиция первой строки участка, поэтому раскрытие не сдвигает ни его, ни соседний.' },
+              { name: 'budgetExceeded', type: '()', description: 'Бюджет исчерпан, разбор огрублён. Дифф остаётся верным, просто менее подробным.' },
             ],
           },
         ],

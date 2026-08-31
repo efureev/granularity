@@ -9,7 +9,7 @@ const componentGroups = {
   navigation: ['GrBottomNav', 'GrBreadcrumbs', 'GrCommandPalette', 'GrNavbar', 'GrPagination', 'GrSidebar', 'GrSteps', 'GrTabs', 'GrTabPanels', 'GrTooltip'],
   overlays: ['GrCollapse', 'GrConfirmDialog', 'GrContextMenu', 'GrDialog', 'GrDrawer', 'GrDropdown', 'GrDropdownMenu', 'GrImageViewer', 'GrModal', 'GrPopover', 'GrPromptDialog'],
   forms: ['GrAutocomplete', 'GrCheckbox', 'GrCheckboxGroup', 'GrColorPicker', 'GrFileUpload', 'GrForm', 'GrFormFile', 'GrFormField', 'GrFormSection', 'GrInput', 'GrNumberInput', 'GrInputTag', 'GrRadio', 'GrRadioGroup', 'GrRating', 'GrSegmented', 'GrSelect', 'GrSlider', 'GrSwitch', 'GrTextarea', 'GrTreeSelect'],
-  data: ['GrAvatar', 'GrCard', 'GrChip', 'GrChipGroup', 'GrCodeBlock', 'GrFilePreview', 'GrDataTable', 'GrDelta', 'GrDescriptionList', 'GrDivider', 'GrIcon', 'GrJsonViewer', 'GrKbd', 'GrList', 'GrSortableList', 'GrStatistic', 'GrTable', 'GrTimeline', 'GrTree', 'GrValue'],
+  data: ['GrAvatar', 'GrCard', 'GrChip', 'GrChipGroup', 'GrFilePreview', 'GrDataTable', 'GrDelta', 'GrDescriptionList', 'GrDivider', 'GrIcon', 'GrJsonViewer', 'GrKbd', 'GrList', 'GrSortableList', 'GrStatistic', 'GrTable', 'GrTimeline', 'GrTree', 'GrValue'],
   utilities: ['GrConfigProvider', 'GrSplitter'],
 } as const satisfies Record<string, readonly string[]>
 
@@ -82,7 +82,6 @@ const componentSummaryOverrides = {
   GrChip: 'An interactive tag: removable, selectable, with an icon.'
     + ' Where GrBadge only shows a status, a chip answers to a click.',
   GrChipGroup: 'A set of chips sharing one value: list filters, record labels, a quick pick.',
-  GrCodeBlock: 'Shows raw JSON or text with highlighting, line numbers and a copy button.',
   GrJsonViewer: 'Walks an unknown value as a tree: collapsible nodes, search by key or value, copy a node with its path.',
   GrFilePreview: 'Shows a stored file as a tile: the image itself, or an icon for its type.',
   GrDelta: 'Shows a signed value with its sign, tone and arrow inline in a sentence.',
@@ -180,10 +179,6 @@ export const showcaseEntityMetadataOverrides: Record<string, ShowcaseEntityMetad
     tags: ['new'],
   },
   'component:GrChipGroup': {
-    group: 'data',
-    tags: ['new'],
-  },
-  'component:GrCodeBlock': {
     group: 'data',
     tags: ['new'],
   },

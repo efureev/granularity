@@ -10,6 +10,7 @@ import { GR_MEDIA_I18N_BLOCK, en as grMediaEn, ru as grMediaRu } from '@feugene/
 import { GR_CHARTS_I18N_BLOCK, en as grChartsEn, ru as grChartsRu } from '@feugene/granularity-charts/i18n'
 import { GR_DASHBOARD_I18N_BLOCK, en as grDashboardEn, ru as grDashboardRu } from '@feugene/granularity-dashboard/i18n'
 import { GR_FORMS_SCHEMA_I18N_BLOCK, en as grFormsSchemaEn, ru as grFormsSchemaRu } from '@feugene/granularity-forms-schema/i18n'
+import { GR_CODE_I18N_BLOCK, en as grCodeEn, ru as grCodeRu } from '@feugene/granularity-code/i18n'
 
 import { SHOWCASE_I18N_BLOCK, showcaseLocaleLoaders } from './messages'
 
@@ -42,6 +43,8 @@ const packageLoaders = [
   grEditorRu,
   grMediaEn,
   grMediaRu,
+  grCodeEn,
+  grCodeRu,
 ]
 
 export async function setupShowcaseI18n() {
@@ -69,7 +72,7 @@ export async function setupShowcaseI18n() {
   // `showcaseLocaleLoaders` сюда НЕ входят намеренно: их поднимает `useI18nScope`
   // на своей странице, и ранняя регистрация свела бы ленивую загрузку словарей
   // демо к нулю.
-  i18n.registerBlocks([SHOWCASE_I18N_BLOCK, GRANULARITY_I18N_BLOCK, GR_CHRONO_I18N_BLOCK, GR_CHARTS_I18N_BLOCK, GR_DASHBOARD_I18N_BLOCK, GR_FORMS_SCHEMA_I18N_BLOCK, GR_EDITOR_I18N_BLOCK, GR_MEDIA_I18N_BLOCK])
+  i18n.registerBlocks([SHOWCASE_I18N_BLOCK, GRANULARITY_I18N_BLOCK, GR_CHRONO_I18N_BLOCK, GR_CHARTS_I18N_BLOCK, GR_DASHBOARD_I18N_BLOCK, GR_FORMS_SCHEMA_I18N_BLOCK, GR_EDITOR_I18N_BLOCK, GR_MEDIA_I18N_BLOCK, GR_CODE_I18N_BLOCK])
   // `PersistencePlugin` уже мог восстановить сохранённый в localStorage (`showcase-locale`)
   // язык в `i18n.locale.value` во время `createFintI18n`. Грузим блоки именно для активного
   // языка, а не для `defaultLocale`, иначе после перезагрузки страница остаётся на английском

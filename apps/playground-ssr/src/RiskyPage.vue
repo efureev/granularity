@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
+import { GrCodeBlock } from '@feugene/granularity-code/components/GrCodeBlock'
+
 import {
-  GrCodeBlock,
   GrCollapse,
   GrCollapseItem,
   GrCommandPalette,

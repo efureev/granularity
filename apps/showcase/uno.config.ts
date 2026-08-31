@@ -16,9 +16,10 @@ import mediaProvider from '@feugene/granularity-media/granular-provider/node'
 import chartsProvider from '@feugene/granularity-charts/granular-provider/node'
 import dashboardProvider from '@feugene/granularity-dashboard/granular-provider/node'
 import formsSchemaProvider from '@feugene/granularity-forms-schema/granular-provider/node'
+import codeProvider from '@feugene/granularity-code/granular-provider/node'
 
 export const showcaseGranularOptions: PresetGranularNodeOptions = {
-    providers: [granularityProvider, chronoProvider, chartsProvider, dashboardProvider, formsSchemaProvider, editorProvider, mediaProvider],
+    providers: [granularityProvider, chronoProvider, chartsProvider, dashboardProvider, formsSchemaProvider, editorProvider, mediaProvider, codeProvider],
     components: 'all',
     themes: {names: ['light', 'dark']},
     layer: 'granular' as const,

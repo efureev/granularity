@@ -5,11 +5,13 @@ import { granularityDashboardComponentConfigs } from '@feugene/granularity-dashb
 import { granularityEditorComponentConfigs } from '@feugene/granularity-editor/granular-provider'
 import { granularityFormsSchemaComponentConfigs } from '@feugene/granularity-forms-schema/granular-provider'
 import { granularityMediaComponentConfigs } from '@feugene/granularity-media/granular-provider'
+import { granularityCodeComponentConfigs } from '@feugene/granularity-code/granular-provider'
 
 import type { ComponentFixture } from '../fixture'
 
 import {
   chartsFixtures,
+  codeFixtures,
   chronoFixtures,
   dashboardFixtures,
   editorFixtures,
@@ -41,6 +43,7 @@ export const FIXTURE_PACKAGES: readonly FixturePackage[] = [
   { key: 'editor', title: '@feugene/granularity-editor', registry: Object.keys(granularityEditorComponentConfigs), fixtures: editorFixtures },
   { key: 'forms-schema', title: '@feugene/granularity-forms-schema', registry: Object.keys(granularityFormsSchemaComponentConfigs), fixtures: formsSchemaFixtures },
   { key: 'media', title: '@feugene/granularity-media', registry: Object.keys(granularityMediaComponentConfigs), fixtures: mediaFixtures },
+  { key: 'code', title: '@feugene/granularity-code', registry: Object.keys(granularityCodeComponentConfigs), fixtures: codeFixtures },
 ]
 
 export const ALL_FIXTURES: readonly ComponentFixture[] = FIXTURE_PACKAGES.flatMap(pkg => pkg.fixtures)

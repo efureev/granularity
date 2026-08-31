@@ -1,0 +1,177 @@
+{
+  "name": "@feugene/granularity-code",
+  "description": "Code surfaces for @feugene/granularity: view, edit and diff — the viewer and the diff carry no dependencies at all.",
+  "version": "0.1.0",
+  "license": "SEE LICENSE IN LICENSE",
+  "author": {
+    "name": "Evgeniy Fureev",
+    "url": "https://github.com/efureev"
+  },
+  "homepage": "https://efureev.github.io/granularity",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/efureev/granularity.git",
+    "directory": "packages/granularity-code"
+  },
+  "bugs": {
+    "url": "https://github.com/efureev/granularity/issues"
+  },
+  "keywords": [
+    "vue",
+    "vue3",
+    "code",
+    "diff",
+    "editor",
+    "syntax-highlighting",
+    "codemirror",
+    "granularity",
+    "design-system",
+    "tree-shakeable",
+    "typescript"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/types/index.d.ts",
+  "files": [
+    "dist",
+    "docs"
+  ],
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./components/GrCodeBlock": {
+      "types": "./dist/types/components/GrCodeBlock/index.d.ts",
+      "import": "./dist/components/GrCodeBlock/index.js"
+    },
+    "./components/GrCodeEditor": {
+      "types": "./dist/types/components/GrCodeEditor/index.d.ts",
+      "import": "./dist/components/GrCodeEditor/index.js"
+    },
+    "./components/GrDiff": {
+      "types": "./dist/types/components/GrDiff/index.d.ts",
+      "import": "./dist/components/GrDiff/index.js"
+    },
+    "./diff": {
+      "types": "./dist/types/diff/index.d.ts",
+      "import": "./dist/diff/index.js"
+    },
+    "./highlight": {
+      "types": "./dist/types/highlight/index.d.ts",
+      "import": "./dist/highlight/index.js"
+    },
+    "./i18n": {
+      "types": "./dist/types/i18n/index.d.ts",
+      "import": "./dist/i18n/index.js"
+    },
+    "./i18n/all": {
+      "types": "./dist/types/i18n/all.d.ts",
+      "import": "./dist/i18n/all.js"
+    },
+    "./granular-provider": {
+      "types": "./dist/types/granular-provider/index.d.ts",
+      "import": "./dist/granular-provider.js",
+      "default": "./dist/granular-provider.js"
+    },
+    "./granular-provider/node": {
+      "types": "./dist/types/granular-provider/node.d.ts",
+      "import": "./dist/granular-provider-node.js",
+      "default": "./dist/granular-provider-node.js"
+    },
+    "./resolver": {
+      "types": "./dist/types/resolver.d.ts",
+      "import": "./dist/resolver.js",
+      "default": "./dist/resolver.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "peerDependencies": {
+    "@feugene/granularity": ">=0.40.0 <1.0.0",
+    "@feugene/unocss-preset-granular": ">=0.16.0 <1.0.0",
+    "vue": "^3.5.0",
+    "@feugene/unplugin-granularity": ">=0.7.0 <1.0.0",
+    "unplugin-vue-components": ">=0.26.0",
+    "@feugene/fint-i18n": ">=0.7.0 <1.0.0",
+    "@codemirror/state": "^6.0.0",
+    "@codemirror/view": "^6.0.0",
+    "@codemirror/language": "^6.0.0",
+    "@codemirror/commands": "^6.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@feugene/unplugin-granularity": {
+      "optional": true
+    },
+    "unplugin-vue-components": {
+      "optional": true
+    },
+    "@feugene/fint-i18n": {
+      "optional": true
+    },
+    "@codemirror/state": {
+      "optional": true
+    },
+    "@codemirror/view": {
+      "optional": true
+    },
+    "@codemirror/language": {
+      "optional": true
+    },
+    "@codemirror/commands": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@antfu/eslint-config": "^9.3.0",
+    "@codemirror/commands": "^6.8.0",
+    "@codemirror/language": "^6.11.0",
+    "@codemirror/state": "^6.5.0",
+    "@codemirror/view": "^6.36.0",
+    "@feugene/fint-i18n": "^0.7.0",
+    "@feugene/granularity": "^0.41.0",
+    "@feugene/granularity-test-kit": "^0.8.1",
+    "@feugene/unocss-preset-granular": "^0.16.0",
+    "@feugene/unplugin-granularity": "^0.7.0",
+    "@types/node": "^26.4.0",
+    "@vitejs/plugin-vue": "^6.0.8",
+    "@vitest/coverage-v8": "^4.1.11",
+    "@vue/test-utils": "^2.4.11",
+    "axe-core": "~4.13.0",
+    "eslint": "^10.9.1",
+    "globals": "^16.5.0",
+    "jsdom": "^29.1.1",
+    "typescript": "^6.0.3",
+    "unplugin-vue-components": "^32.1.0",
+    "vite": "^8.2.2",
+    "vite-plugin-lib-inject-css": "^2.2.2",
+    "vitest": "^4.1.11",
+    "vue": "^3.5.42",
+    "vue-tsc": "^3.3.11"
+  },
+  "scripts": {
+    "build": "vite build && vue-tsc -p tsconfig.build.json",
+    "dev": "vite build --watch",
+    "doctor": "node ../../scripts/granular-doctor.mjs ./granular.options.mjs",
+    "sizes": "node ../../scripts/report-entry-sizes.mjs .",
+    "sizes:docs": "node ../../scripts/generate-entry-sizes.mjs .",
+    "generate:registry": "node scripts/generate-registry.mjs",
+    "lint": "eslint . --cache",
+    "lint:fix": "eslint . --cache --fix",
+    "test": "vitest --config vitest.config.ts",
+    "test:run": "vitest run --config vitest.config.ts",
+    "test:coverage": "vitest run --config vitest.config.ts --coverage",
+    "typecheck": "vue-tsc --noEmit -p tsconfig.json",
+    "check:messages": "fint-i18n-check-messages src/i18n/locales"
+  }
+}

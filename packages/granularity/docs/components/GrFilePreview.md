@@ -35,7 +35,7 @@
 | Файл как значение поля формы | [`GrFormFile`](./GrFormFile.md) |
 | Открыть картинку во весь экран | [`GrImageViewer`](./GrImageViewer.md) |
 | Аватар человека или сущности | [`GrAvatar`](./GrAvatar.md) |
-| Показать содержимое файла текстом | [`GrCodeBlock`](./GrCodeBlock.md) |
+| Показать содержимое файла текстом | `GrCodeBlock` (пакет `@feugene/granularity-code`) |
 
 ## Тип решает `mime`, а не расширение
 

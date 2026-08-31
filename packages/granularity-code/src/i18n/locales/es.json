@@ -1,0 +1,39 @@
+{
+  "block": {
+    "copy": "Copiar código",
+    "copied": "Código copiado",
+    "copyFailed": "No se pudo copiar el código"
+  },
+  "editor": {
+    "label": "Editor de código",
+    "escHint": "Pulsa Escape y luego Tab para salir del editor",
+    "severity": {
+      "error": "Error",
+      "warning": "Advertencia",
+      "info": "Nota"
+    }
+  },
+  "diff": {
+    "label": "Comparación",
+    "summary": "Líneas añadidas: {added}, eliminadas: {removed}",
+    "unchanged": "Sin cambios",
+    "expand": {
+      "one": "Mostrar {n} línea más",
+      "other": "Mostrar {n} líneas más"
+    },
+    "empty": "Nada que comparar",
+    "budgetExceeded": "La comparación es demasiado grande, se muestra un resultado aproximado",
+    "expandTop": {
+      "one": "Mostrar {n} línea al principio del bloque",
+      "other": "Mostrar {n} líneas al principio del bloque"
+    },
+    "expandBottom": {
+      "one": "Mostrar {n} línea al final del bloque",
+      "other": "Mostrar {n} líneas al final del bloque"
+    },
+    "hidden": {
+      "one": "{n} línea oculta",
+      "other": "{n} líneas ocultas"
+    }
+  }
+}

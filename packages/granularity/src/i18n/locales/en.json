@@ -341,11 +341,6 @@
     "dropped": "Dropped at position {position} of {count}",
     "cancelled": "Move cancelled"
   },
-  "codeBlock": {
-    "copy": "Copy code",
-    "copied": "Code copied",
-    "copyFailed": "Could not copy code"
-  },
   "jsonViewer": {
     "search": "Search key or value",
     "expandAll": "Expand all",

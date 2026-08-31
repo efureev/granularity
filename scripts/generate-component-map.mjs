@@ -35,6 +35,7 @@ const END = '<!-- component-map:generated:end -->'
 const PACKAGES = [
   { dir: 'packages/granularity', label: 'ядро' },
   { dir: 'packages/granularity-charts', label: 'charts' },
+  { dir: 'packages/granularity-code', label: 'code' },
   { dir: 'packages/granularity-chrono', label: 'chrono' },
   { dir: 'packages/granularity-dashboard', label: 'dashboard' },
   { dir: 'packages/granularity-editor', label: 'editor' },

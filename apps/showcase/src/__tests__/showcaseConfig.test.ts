@@ -113,7 +113,7 @@ describe('showcase bootstrap config', () => {
       expect(showcaseI18nEntry).not.toContain(`from '@feugene/granularity-${pkg}/i18n/all'`)
     }
     expect(showcaseI18nEntry).not.toContain('from \'@feugene/granularity/i18n/all\'')
-    expect(showcaseI18nEntry).toContain('registerBlocks([SHOWCASE_I18N_BLOCK, GRANULARITY_I18N_BLOCK, GR_CHRONO_I18N_BLOCK, GR_CHARTS_I18N_BLOCK, GR_DASHBOARD_I18N_BLOCK, GR_FORMS_SCHEMA_I18N_BLOCK, GR_EDITOR_I18N_BLOCK, GR_MEDIA_I18N_BLOCK])')
+    expect(showcaseI18nEntry).toContain('registerBlocks([SHOWCASE_I18N_BLOCK, GRANULARITY_I18N_BLOCK, GR_CHRONO_I18N_BLOCK, GR_CHARTS_I18N_BLOCK, GR_DASHBOARD_I18N_BLOCK, GR_FORMS_SCHEMA_I18N_BLOCK, GR_EDITOR_I18N_BLOCK, GR_MEDIA_I18N_BLOCK, GR_CODE_I18N_BLOCK])')
     expect(showcaseI18nMessagesEntry).toContain('export const SHOWCASE_I18N_BLOCK = \'showcase\'')
     expect(showcaseI18nMessagesEntry).toContain('\'./locales/en/showcase.json\'')
     expect(showcaseI18nMessagesEntry).toContain('\'./locales/ru/showcase.json\'')
@@ -136,6 +136,7 @@ describe('showcase bootstrap config', () => {
       '@feugene/granularity-forms-schema',
       '@feugene/granularity-editor',
       '@feugene/granularity-media',
+      '@feugene/granularity-code',
     ])
     expect(showcaseGranularOptions.components).toBe('all')
     expect(showcaseGranularOptions.themes).toEqual({ names: ['light', 'dark'] })

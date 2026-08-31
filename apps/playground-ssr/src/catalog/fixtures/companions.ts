@@ -29,6 +29,7 @@ import {
   GrDashboardToolbar,
 } from '@feugene/granularity-dashboard'
 import { GrRichText } from '@feugene/granularity-editor'
+import { GrCodeBlock, GrCodeEditor, GrDiff } from '@feugene/granularity-code'
 import { GrSchemaForm } from '@feugene/granularity-forms-schema'
 import { jsonSchemaAdapter, type JsonSchemaDocument } from '@feugene/granularity-forms-schema/json-schema'
 import { GrCameraCapture, GrCodeScanner, GrImageCrop, GrVideoPlayer } from '@feugene/granularity-media'
@@ -92,6 +93,15 @@ export const dashboardFixtures: ComponentFixture[] = [
 
 export const editorFixtures: ComponentFixture[] = [
   { name: 'GrRichText', about: 'ProseMirror требует DOM: с сервера приходит только оболочка и тулбар', render: () => h(GrRichText, { modelValue: '<p>Текст</p>' }) },
+]
+
+export const codeFixtures: ComponentFixture[] = [
+  { name: 'GrCodeBlock', about: 'подсветка на сервере, без обращения к document', render: () => h(GrCodeBlock, { code: { a: 1, b: [2, 3] }, language: 'json' }) },
+  { name: 'GrDiff', about: 'дифф и окно отрисовки считаются от объявленного размера, а не от замера', render: () => h(GrDiff, { before: 'a\nb\nc', after: 'a\nx\nc' }) },
+  // CodeMirror на сервере не инстанцируется вовсе: с сервера приходит разметка
+  // блока, а редактор встаёт на её место после гидрации. Ровно тот класс
+  // дефектов, ради которого стенд существует.
+  { name: 'GrCodeEditor', about: 'серверная разметка — `<pre>` блока; CodeMirror поднимается после гидрации', render: () => h(GrCodeEditor, { modelValue: '{\n  "a": 1\n}', language: 'json' }) },
 ]
 
 export const formsSchemaFixtures: ComponentFixture[] = [

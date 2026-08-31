@@ -7,6 +7,31 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.41.0] 2026-08-31
+
+### Removed
+
+- **`GrCodeBlock` moved to `@feugene/granularity-code`.** Breaking: the
+  `@feugene/granularity/components/GrCodeBlock` subpath and the root-barrel export are gone.
+
+  ```diff
+  - import { GrCodeBlock } from '@feugene/granularity'
+  + import { GrCodeBlock } from '@feugene/granularity-code/components/GrCodeBlock'
+  ```
+
+  Props are unchanged and so are the `--gr-code-block-*` tokens, so an application that themed the block keeps
+  its overrides; the import is the whole migration.
+
+  The reason is a ceiling, not tidiness. Inside the core the block could never gain highlighting for an
+  arbitrary language: that needs a dependency, and the core takes none for this — hence its own
+  `tokenizeJson` and a `language` prop that only ever accepted `'json' | 'text'`. In the companion the
+  ceiling lifts, and the same component now shows TypeScript, SQL or a Dockerfile through a highlighter the
+  application supplies.
+
+  Doing it before 1.0 is the point: `PACKAGES.md` states that taking something out of a frozen core costs a
+  major, and after 1.0 this move would cost one across the whole ecosystem. Technically it was cheap — the
+  block was a leaf here, nothing in the core depended on it, and `GrJsonViewer` (which stays) never used it.
+
 ## [v0.40.0] 2026-08-30
 
 ### Added

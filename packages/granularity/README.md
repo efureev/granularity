@@ -91,9 +91,9 @@ from its own chunk, so a granular import already brings everything it needs.
 <!-- entry-sizes:generated:start lang=en -->
 | What you import | gzip | of the barrel |
 | --- | ---: | ---: |
-| the whole package from the root | 544.9 kB | 100 % |
+| the whole package from the root | 537.9 kB | 100 % |
 | the lightest component — `GrButtonGroup` | 1.8 kB | < 1 % |
-| the median component — `GrNavbar` | 15.4 kB | 3 % |
+| the median component — `GrSegmented` | 15.1 kB | 3 % |
 | the 5 heaviest together | 171.7 kB | 32 % |
 
 These numbers **do not add up**: shared code is counted again in every row but paid for once, which is why
@@ -114,9 +114,10 @@ on this one — the core stays lean, and you install only what you reach for.
 | --- | --- | --- |
 | [`@feugene/granularity-charts`](../granularity-charts) | 0.11.0 | Charts — own SVG, zero dependencies, drawn with theme tokens. |
 | [`@feugene/granularity-chrono`](../granularity-chrono) | 0.10.0 | Calendar, date and time components — no third-party date widget, no date library. |
+| [`@feugene/granularity-code`](../granularity-code) | 0.1.0 | Code surfaces: view, edit and diff — the viewer and the diff carry no dependencies at all. |
 | [`@feugene/granularity-dashboard`](../granularity-dashboard) | 0.6.0 | Widget grid — drag, resize, breakpoints and layout persistence, zero dependencies. |
 | [`@feugene/granularity-datasource`](../granularity-datasource) | 0.1.2 | List state: sorting, filters, paging, URL sync and race-free fetching behind one composable. |
-| [`@feugene/granularity-devtools`](../granularity-devtools) | 0.3.1 | Vue DevTools panel — where a prop value came from, the overlay layer stack and design-system warnings. |
+| [`@feugene/granularity-devtools`](../granularity-devtools) | 0.3.2 | Vue DevTools panel — where a prop value came from, the overlay layer stack and design-system warnings. |
 | [`@feugene/granularity-editor`](../granularity-editor) | 0.3.1 | Rich-text editing: a TipTap-backed GrRichText field with a design-system toolbar. |
 | [`@feugene/granularity-forms-schema`](../granularity-forms-schema) | 0.4.0 | Schema-driven forms — zod and JSON Schema into real form fields, zero dependencies. |
 | [`@feugene/granularity-media`](../granularity-media) | 0.7.1 | Media components: image cropping, camera capture, code scanning and video playback. |

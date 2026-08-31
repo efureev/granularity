@@ -10,7 +10,6 @@ export const GR_REQUIRED_PROPS: Record<string, readonly string[]> = {
   GrBottomNav: ['modelValue', 'items'],
   GrBreadcrumbs: ['items'],
   GrCheckboxGroup: ['modelValue'],
-  GrCodeBlock: ['code'],
   GrColorPicker: ['modelValue'],
   GrCommandPalette: ['modelValue'],
   GrConfirmDialog: ['modelValue'],

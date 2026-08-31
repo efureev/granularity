@@ -48,7 +48,7 @@
 | картинку снимают камерой прямо сейчас | [`GrCameraCapture`](../packages/granularity-media/docs/components/GrCameraCapture.md) |
 | камерой читают QR или штрихкод | [`GrCodeScanner`](../packages/granularity-media/docs/components/GrCodeScanner.md) |
 | видео проигрывают на странице | [`GrVideoPlayer`](../packages/granularity-media/docs/components/GrVideoPlayer.md) |
-| показать содержимое файла текстом | [`GrCodeBlock`](../packages/granularity/docs/components/GrCodeBlock.md) |
+| показать содержимое файла текстом | [`GrCodeBlock`](../packages/granularity-code/docs/components/GrCodeBlock.md) |
 
 Различитель `GrCodeScanner` / `GrCameraCapture` — **что уходит наружу**: у
 первого строка из кода, у второго файл. Сканер кадр не сохраняет вовсе.
@@ -248,13 +248,20 @@
 
 | Что происходит | Компонент |
 | --- | --- |
-| текст или JSON читают целиком и копируют | [`GrCodeBlock`](../packages/granularity/docs/components/GrCodeBlock.md) |
+| текст или JSON читают целиком и копируют | [`GrCodeBlock`](../packages/granularity-code/docs/components/GrCodeBlock.md) |
+| код **правят**, а не читают | [`GrCodeEditor`](../packages/granularity-code/docs/components/GrCodeEditor.md) |
+| две версии **сравнивают**: что изменилось | [`GrDiff`](../packages/granularity-code/docs/components/GrDiff.md) |
 | по чужому `unknown` ходят: сворачивают узлы, ищут ключ | [`GrJsonViewer`](../packages/granularity/docs/components/GrJsonViewer.md) |
 | дерево своих данных: выбор узла, чекбоксы, перенос | [`GrTree`](../packages/granularity/docs/components/GrTree.md) |
 | данные разложены по колонкам и известны заранее | [`GrDataTable`](../packages/granularity/docs/components/GrDataTable.md) |
 | это пара «характеристика → значение», а не документ | [`GrDescriptionList`](../packages/granularity/docs/components/GrDescriptionList.md) |
 
-Различитель между первыми двумя — **читают или ищут**. Ответ на двести строк
+Первые три — один пакет `@feugene/granularity-code` и один вопрос из трёх слов:
+**показать, править, сравнить**. Различитель между ними — глагол, и другого не
+нужно. Платит за это только тот, кому нужен редактор: блок и дифф не тянут ни
+одной зависимости, CodeMirror приезжает лишь с `GrCodeEditor`.
+
+Различитель между `GrCodeBlock` и `GrJsonViewer` — **читают или ищут**. Ответ на двести строк
 копируют в тикет целиком (`GrCodeBlock`); в ответе на две тысячи узлов ищут одно
 поле (`GrJsonViewer`). Между `GrJsonViewer` и `GrTree` различитель другой — чьи
 данные: первый разбирает `unknown` сам, второму дерево приносят готовым.
@@ -389,7 +396,8 @@
 | [`GrCheckboxGroup`](../packages/granularity/docs/components/GrCheckboxGroup.md) | ядро | значений несколько из короткого набора |
 | [`GrChip`](../packages/granularity/docs/components/GrChip.md) | ядро | снимаемая метка у сущности |
 | [`GrChipGroup`](../packages/granularity/docs/components/GrChipGroup.md) | ядро | фильтры списка строкой |
-| [`GrCodeBlock`](../packages/granularity/docs/components/GrCodeBlock.md) | ядро | показать ответ сервиса как есть |
+| [`GrCodeBlock`](../packages/granularity-code/docs/components/GrCodeBlock.md) | code | показать ответ сервиса как есть |
+| [`GrCodeEditor`](../packages/granularity-code/docs/components/GrCodeEditor.md) | code | Конфиг в админке |
 | [`GrCodeScanner`](../packages/granularity-media/docs/components/GrCodeScanner.md) | media | вход по QR |
 | [`GrCollapse`](../packages/granularity/docs/components/GrCollapse.md) | ядро | содержимого много, а нужно не всё сразу |
 | [`GrColorPicker`](../packages/granularity/docs/components/GrColorPicker.md) | ядро | цвет задаёт пользователь |
@@ -410,6 +418,7 @@
 | [`GrDescriptionList`](../packages/granularity/docs/components/GrDescriptionList.md) | ядро | карточка объекта |
 | [`GrDialog`](../packages/granularity/docs/components/GrDialog.md) | ядро | окно с шапкой, телом и подвалом |
 | [`GrDialogService`](../packages/granularity/docs/components/GrDialogService.md) | ядро | окно вызывается из кода |
+| [`GrDiff`](../packages/granularity-code/docs/components/GrDiff.md) | code | Журнал аудита |
 | [`GrDivider`](../packages/granularity/docs/components/GrDivider.md) | ядро | блоки надо разделить |
 | [`GrDrawer`](../packages/granularity/docs/components/GrDrawer.md) | ядро | панель приходит от края |
 | [`GrDropdown`](../packages/granularity/docs/components/GrDropdown.md) | ядро | меню со своими пунктами |

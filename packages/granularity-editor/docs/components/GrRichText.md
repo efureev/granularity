@@ -27,7 +27,7 @@
 | --- | --- |
 | Простой текст в несколько строк, без разметки | [`GrTextarea`](../../../granularity/docs/components/GrTextarea.md) |
 | Строка в одну линию | [`GrInput`](../../../granularity/docs/components/GrInput.md) |
-| Показать готовый код с подсветкой, а не править текст | [`GrCodeBlock`](../../../granularity/docs/components/GrCodeBlock.md) |
+| Показать готовый код с подсветкой, а не править текст | [`GrCodeBlock`](../../../granularity-code/docs/components/GrCodeBlock.md) |
 | Набор своих меток-тегов, а не текст | [`GrInputTag`](../../../granularity/docs/components/GrInputTag.md) |
 
 ## Схема — она же санитайзер

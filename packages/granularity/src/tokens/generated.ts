@@ -2336,62 +2336,6 @@ export const grComponentTokens: GrComponentToken[] = [
     "description": "Рамка выключенного чипа."
   },
   {
-    "owner": "GrCodeBlock",
-    "name": "--gr-code-block-bg",
-    "kind": "hook",
-    "default": "var(--gr-muted)",
-    "description": "Фон блока кода."
-  },
-  {
-    "owner": "GrCodeBlock",
-    "name": "--gr-code-block-fg",
-    "kind": "hook",
-    "default": "var(--gr-fg)",
-    "description": "Цвет обычного текста и пунктуации внутри блока."
-  },
-  {
-    "owner": "GrCodeBlock",
-    "name": "--gr-code-block-key",
-    "kind": "hook",
-    "default": "var(--gr-primary-text)",
-    "description": "Цвет имени поля JSON. Ключ отличается от строки только идущим следом двоеточием, поэтому цвет — единственное, чем они различимы глазом."
-  },
-  {
-    "owner": "GrCodeBlock",
-    "name": "--gr-code-block-string",
-    "kind": "hook",
-    "default": "var(--gr-success-text)",
-    "description": "Цвет строкового значения."
-  },
-  {
-    "owner": "GrCodeBlock",
-    "name": "--gr-code-block-number",
-    "kind": "hook",
-    "default": "var(--gr-azure-text)",
-    "description": "Цвет числа. Взят от `azure`, а не от `info`: `info` — синий в двух шагах от индиго `primary`, и пара «ключ ↔ число» сливалась бы в `{\"count\": 42}`."
-  },
-  {
-    "owner": "GrCodeBlock",
-    "name": "--gr-code-block-literal",
-    "kind": "hook",
-    "default": "var(--gr-warning-text)",
-    "description": "Цвет литералов `true`, `false`, `null`."
-  },
-  {
-    "owner": "GrCodeBlock",
-    "name": "--gr-code-block-line-number",
-    "kind": "hook",
-    "default": "var(--gr-muted-fg)",
-    "description": "Цвет номера строки. Номер рисуется CSS-счётчиком и текстом в разметке не существует — в выделение мышью он не попадает."
-  },
-  {
-    "owner": "GrCodeBlock",
-    "name": "--gr-code-block-line-number-width",
-    "kind": "hook",
-    "default": "2.5em",
-    "description": "Ширина колонки номеров. В `em`, а не в пикселях: колонка обязана следовать за кеглем блока. Ответ на тысячу строк требует четырёх знаков — тогда её расширяют."
-  },
-  {
     "owner": "GrColorPicker",
     "name": "--gr-color-picker-checker-size",
     "kind": "hook",

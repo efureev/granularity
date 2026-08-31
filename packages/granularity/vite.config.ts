@@ -141,9 +141,6 @@ export default defineConfig({
         'components/GrChipGroup/index': fileURLToPath(
           new URL('./src/components/GrChipGroup/index.ts', import.meta.url),
         ),
-        'components/GrCodeBlock/index': fileURLToPath(
-          new URL('./src/components/GrCodeBlock/index.ts', import.meta.url),
-        ),
         'components/GrCollapse/index': fileURLToPath(
           new URL('./src/components/GrCollapse/index.ts', import.meta.url),
         ),
