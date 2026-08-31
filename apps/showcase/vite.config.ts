@@ -66,7 +66,11 @@ export default defineConfig(({ command, mode }) => ({
     // Встроенная панель Vue DevTools: в ней виден раздел «Granularity»
     // (`@feugene/granularity-devtools`). Только в dev — в прод-сборку плагин
     // ничего не добавляет.
-    VueDevtools(),
+    //
+    // В e2e её нет: панель висит `position: fixed` поверх страницы и попадает
+    // в каждый снимок, которого не было в эталоне. Плюс плавающая кнопка
+    // перехватывает клики там, где оказалась.
+    !process.env.SHOWCASE_E2E && VueDevtools(),
     // Авто-импорт компонентов дизайн-системы в шаблонах (ядро + companion-датапикер).
     Components({
       dts: fileURLToPath(new URL('./src/components.d.ts', import.meta.url)),

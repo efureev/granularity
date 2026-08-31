@@ -59,6 +59,8 @@ export default defineConfig({
 
   webServer: {
     command: `yarn vite --port ${PORT} --strictPort`,
+    // Панель Vue DevTools в кадре не нужна — см. `vite.config.ts`.
+    env: { SHOWCASE_E2E: '1' },
     url: `http://localhost:${PORT}/`,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
