@@ -9,6 +9,13 @@ to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- **`GrCodeEditor`: a failed validation moved the form to the editor without putting the caret in
+  it.** `GrForm` finds the control of a field by selector —
+  `input, select, textarea, button, [tabindex]:not([tabindex="-1"])` — and that is how both
+  `scrollToField` and the focus-first-error path work. A `contenteditable` node is focusable
+  without `tabindex`, but it does not match that selector, so the form found nothing inside the
+  field at all. `.cm-content` now carries `tabindex="0"`, on the same node that carries the role.
+
 - **`GrDiff`: added and removed lines are no longer distinguished by colour alone.** The row tone
   carried the whole message: the `+`/`−` sign next to it is `aria-hidden`, deliberately, so that
   a screen reader would not read "plus" before every line. The side effect was that it read nothing

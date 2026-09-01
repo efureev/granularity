@@ -223,3 +223,34 @@ describe('GrCodeEditor', () => {
     })
   })
 })
+
+/**
+ * `GrForm` ищет контрол поля селектором
+ * `input, select, textarea, button, [tabindex]:not([tabindex="-1"])` — так он
+ * ставит курсор в первое поле с ошибкой и так работает `scrollToField`.
+ * `contenteditable` фокусируется и без `tabindex`, но под селектор не попадает:
+ * форма прокручивала к редактору и не фокусировала ничего.
+ */
+describe('GrCodeEditor: форма находит редактор', () => {
+  const FORM_FOCUSABLE = 'input, select, textarea, button, [tabindex]:not([tabindex="-1"])'
+
+  it('редактируемый узел попадает под селектор GrForm', async () => {
+    const wrapper = await mountEditor()
+    const found = (wrapper.element as HTMLElement).querySelector(FORM_FOCUSABLE)
+
+    expect(found).not.toBeNull()
+    expect(found?.classList.contains('cm-content')).toBe(true)
+
+    wrapper.unmount()
+  })
+
+  it('и остаётся именно тем узлом, на котором роль', async () => {
+    const wrapper = await mountEditor()
+    const found = (wrapper.element as HTMLElement).querySelector(FORM_FOCUSABLE)
+
+    expect(found?.getAttribute('role')).toBe('textbox')
+    expect(found?.getAttribute('contenteditable')).toBe('true')
+
+    wrapper.unmount()
+  })
+})

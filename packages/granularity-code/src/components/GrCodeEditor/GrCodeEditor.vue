@@ -196,6 +196,12 @@ const contentAttributes = computed<Record<string, string>>(() => {
     ? { 'aria-labelledby': labelledBy }
     : { 'aria-label': props.ariaLabel ?? t('grCode.editor.label', 'Code editor') }
 
+  // `contenteditable` фокусируется и без `tabindex`, но `GrForm` ищет контрол
+  // селектором `input, select, textarea, button, [tabindex]:not([tabindex="-1"])`
+  // — без атрибута он не находит внутри поля ничего, и провалившаяся валидация
+  // прокручивает к редактору, не ставя в него курсор.
+  attributes.tabindex = '0'
+
   if (describedBy.value)
     attributes['aria-describedby'] = describedBy.value
 
