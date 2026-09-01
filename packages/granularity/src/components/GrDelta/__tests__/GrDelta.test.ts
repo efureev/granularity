@@ -62,7 +62,8 @@ describe('GrDelta', () => {
       props: { value: 10, prefix: '$', showSign: false, locale: 'en-US' },
     })
     expect(plus.find('[data-gr-delta-sign]').exists()).toBe(false)
-    expect(plus.text()).toBe('$10')
+    // Видимая запись, а не весь текст: рядом лежит слово направления для диктора.
+    expect(plus.get('[data-gr-value]').text()).toBe('$10')
 
     const minus = mount(GrDelta, {
       props: { value: -10, prefix: '$', showSign: false, locale: 'en-US' },
@@ -249,5 +250,53 @@ describe('GrDelta', () => {
     const wrapper = mount(Harness)
     expect(wrapper.get('[data-case="tone"]').attributes('data-tone')).toBe('danger')
     expect(wrapper.get('[data-case="empty"]').text()).toBe('н/д')
+  })
+})
+
+/**
+ * Две дыры одного происхождения: смысл величины держался на том, чего в
+ * доступном дереве нет. Направление роста — на цвете (`showSign: false` убирает
+ * плюс, а минус у падения `Intl` печатает всегда), и забытый обязательный проп —
+ * на прочерке, неотличимом от честного `null`.
+ */
+describe('GrDelta: смысл не только цветом', () => {
+  it('без знака рост объявляется словом', () => {
+    const wrapper = mount(GrDelta, { props: { value: 5, suffix: '%', showSign: false } })
+
+    expect(wrapper.get('[data-gr-delta-direction]').classes()).toContain('sr-only')
+    expect(wrapper.get('[data-gr-value]').text()).toBe('5%')
+  })
+
+  it('падение слова не требует — минус печатается', () => {
+    const wrapper = mount(GrDelta, { props: { value: -5, showSign: false } })
+
+    expect(wrapper.find('[data-gr-delta-direction]').exists()).toBe(false)
+    expect(wrapper.text()).toContain('-5')
+  })
+
+  it('со знаком слово не дублируется', () => {
+    const wrapper = mount(GrDelta, { props: { value: 5, showSign: true } })
+
+    expect(wrapper.find('[data-gr-delta-direction]').exists()).toBe(false)
+  })
+
+  it('у нуля и у пустой величины направления нет', () => {
+    expect(mount(GrDelta, { props: { value: 0, showSign: false } })
+      .find('[data-gr-delta-direction]').exists()).toBe(false)
+    expect(mount(GrDelta, { props: { value: null, showSign: false } })
+      .find('[data-gr-delta-direction]').exists()).toBe(false)
+  })
+
+  it('забытый `value` объявляется вслух, а `null` — нет', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+
+    mount(GrDelta, { props: {} as never })
+    expect(warn.mock.calls.map(call => String(call[0])).join('\n')).toContain('GrDelta')
+
+    warn.mockClear()
+    mount(GrDelta, { props: { value: null } })
+    expect(warn).not.toHaveBeenCalled()
+
+    warn.mockRestore()
   })
 })

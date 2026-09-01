@@ -121,6 +121,7 @@ describe('GrDescriptionList', () => {
     // До измерения действует заданная раскладка — это же и серверный рендер.
     expect(wrapper.get('dt').attributes('style')).toContain('width')
 
+    await nextTick()
     observers[0]([{ contentRect: { width: 320 } }])
     await nextTick()
     expect(wrapper.get('dt').attributes('style')).toBeUndefined()
@@ -172,6 +173,7 @@ describe('GrDescriptionList', () => {
       props: { items, layout: 'flow', stackBelow: 480 },
     })
 
+    await nextTick()
     observers[0]([{ contentRect: { width: 320 } }])
     await nextTick()
 
@@ -324,4 +326,80 @@ describe('GrDescriptionList', () => {
 
 afterEach(() => {
   vi.unstubAllGlobals()
+})
+
+/**
+ * Порог приходит и после монтирования — из конфига приложения, из переключателя.
+ * Наблюдатель, заведённый один раз в `onMounted`, такого пропа не видел вовсе, а
+ * вердикт, хранимый в `ref`, залипал при смене и снятии порога: в неподвижном
+ * окне следующего изменения размера не наступает никогда.
+ */
+describe('GrDescriptionList: stackBelow реактивен', () => {
+  function stubObserver() {
+    const callbacks: Array<(entries: Array<{ contentRect: { width: number } }>) => void> = []
+    let built = 0
+
+    vi.stubGlobal('ResizeObserver', class {
+      constructor(callback: (entries: Array<{ contentRect: { width: number } }>) => void) {
+        built += 1
+        callbacks.push(callback)
+      }
+
+      observe() {}
+      disconnect() {}
+    })
+
+    return { callbacks, count: () => built }
+  }
+
+  const isStacked = (wrapper: { get: (s: string) => { attributes: (a: string) => string | undefined } }) =>
+    wrapper.get('dt').attributes('style') === undefined
+
+  it('порог, заданный после монтирования, заводит наблюдателя', async () => {
+    const observer = stubObserver()
+    const wrapper = mount(GrDescriptionList, { props: { items } })
+
+    expect(observer.count()).toBe(0)
+
+    await wrapper.setProps({ stackBelow: 400 })
+    await nextTick()
+
+    expect(observer.count()).toBe(1)
+
+    observer.callbacks[0]([{ contentRect: { width: 320 } }])
+    await nextTick()
+
+    expect(isStacked(wrapper)).toBe(true)
+  })
+
+  it('смена порога переоценивает последний замер, не дожидаясь нового', async () => {
+    const observer = stubObserver()
+    const wrapper = mount(GrDescriptionList, { props: { items, stackBelow: 480 } })
+    await nextTick()
+
+    observer.callbacks[0]([{ contentRect: { width: 320 } }])
+    await nextTick()
+    expect(isStacked(wrapper)).toBe(true)
+
+    // 320 уже не «уже двухсот» — раскладка обязана вернуться сразу.
+    await wrapper.setProps({ stackBelow: 200 })
+    await nextTick()
+
+    expect(isStacked(wrapper)).toBe(false)
+  })
+
+  it('снятый порог возвращает заданную раскладку', async () => {
+    const observer = stubObserver()
+    const wrapper = mount(GrDescriptionList, { props: { items, stackBelow: 480 } })
+    await nextTick()
+
+    observer.callbacks[0]([{ contentRect: { width: 320 } }])
+    await nextTick()
+    expect(isStacked(wrapper)).toBe(true)
+
+    await wrapper.setProps({ stackBelow: undefined })
+    await nextTick()
+
+    expect(isStacked(wrapper)).toBe(false)
+  })
 })

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, watchEffect } from 'vue'
 
 import { formatNumberToParts, splitLeadingSign } from '../../internal/granularityFormat'
 import GrValue from '../GrValue'
@@ -69,7 +69,7 @@ const props = withDefaults(defineProps<GrDeltaProps>(), {
   size: undefined,
 })
 
-const { locale } = useGranularityTranslations()
+const { locale, t } = useGranularityTranslations()
 
 const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrDelta' })
 const resolvedLocale = computed(() => props.locale ?? locale.value ?? 'en')
@@ -129,6 +129,32 @@ const arrowIcon = computed(() => {
   return IconMinus
 })
 
+/**
+ * Направление словом — когда знака в записи нет.
+ *
+ * `showSign: false` убирает плюс у роста, и направление остаётся на тоне, то
+ * есть на цвете: WCAG 1.4.1. Падение этим не задето — минус `Intl` печатает
+ * всегда, а у нуля направления нет вовсе.
+ */
+const spokenDirection = computed(() => (
+  !isEmpty.value && !resolvedShowSign.value && direction.value === 'up'
+    ? t('gr.delta.increase', 'increase')
+    : ''
+))
+
+if (__GR_DEV__) {
+  watchEffect(() => {
+    // `null` — заявленное «величины нет», `undefined` — забытый проп. На экране
+    // они неотличимы, и промах выглядит как честный прочерк.
+    if (props.value === undefined) {
+      console.warn(
+        '[granularity] GrDelta: обязательный проп `value` не передан — нарисован прочерк. '
+        + 'Отсутствие величины объявляется явным `null`.',
+      )
+    }
+  })
+}
+
 const rootClass = computed(() => [
   deltaRootClass,
   deltaSizeClass[resolvedSize.value],
@@ -157,6 +183,9 @@ const rootClass = computed(() => [
       <template v-if="sign" #lead>
         <span data-gr-delta-sign>{{ sign }}</span>
       </template>
+
     </GrValue>
+
+    <span v-if="spokenDirection" data-gr-delta-direction class="sr-only">{{ spokenDirection }}</span>
   </span>
 </template>

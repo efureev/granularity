@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref, useSlots } from 'vue'
+import { computed, onBeforeUnmount, ref, useSlots, watch } from 'vue'
 
 import { useGrComponentProp, useGrComponentSize } from '../GrConfigProvider/context'
 
@@ -98,7 +98,9 @@ const resolvedLabelWidth = useGrComponentProp('GrDescriptionList', 'labelWidth',
 const resolvedEmptyText = useGrComponentProp('GrDescriptionList', 'emptyText', () => props.emptyText, '—')
 
 const rootEl = ref<HTMLElement | null>(null)
-const narrow = ref(false)
+
+/** Последний замер контейнера. `null` — ещё не мерили: сервер и первый кадр. */
+const containerWidth = ref<number | null>(null)
 
 /**
  * `stackBelow` меряет контейнер, а не вьюпорт: пары живут и в узкой карточке
@@ -107,21 +109,41 @@ const narrow = ref(false)
  */
 let observer: ResizeObserver | null = null
 
-onMounted(() => {
-  if (props.stackBelow === undefined || typeof ResizeObserver === 'undefined')
+function stopObserving(): void {
+  observer?.disconnect()
+  observer = null
+}
+
+/**
+ * Наблюдатель заводится и снимается по пропу, а не один раз на монтировании:
+ * `stackBelow` приходит и позже — из конфига приложения, из переключателя, — и
+ * однократная проверка оставляла бы порог невыполненным молча.
+ */
+watch([() => props.stackBelow, rootEl], ([threshold, el]) => {
+  stopObserving()
+
+  if (threshold === undefined || el === null || typeof ResizeObserver === 'undefined')
     return
 
   observer = new ResizeObserver(([entry]) => {
-    narrow.value = entry.contentRect.width < (props.stackBelow as number)
+    containerWidth.value = entry.contentRect.width
   })
-  if (rootEl.value)
-    observer.observe(rootEl.value)
-})
+  observer.observe(el)
+}, { immediate: true })
 
-onBeforeUnmount(() => {
-  observer?.disconnect()
-  observer = null
-})
+onBeforeUnmount(stopObserving)
+
+/**
+ * Вердикт считается по последнему замеру, а не хранится наблюдателем: смена
+ * порога и его снятие обязаны действовать сразу. Держи ответ в `ref`, который
+ * пишет только колбэк, — и оба случая ждали бы следующего изменения размера,
+ * то есть в неподвижном окне не наступали бы никогда.
+ */
+const narrow = computed(() => (
+  props.stackBelow !== undefined
+  && containerWidth.value !== null
+  && containerWidth.value < props.stackBelow
+))
 
 /**
  * До монтирования действует заданная раскладка — это же и есть серверный рендер.

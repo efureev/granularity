@@ -116,17 +116,50 @@ const nodes = computed(() => jsonToNodes(props.value, {
  *
  * Контролируемого `expandedKeys` у `GrTree` нет, но `defaultExpandedKeys` —
  * не «начальное значение»: дерево следит за пропом и заменяет набор целиком.
- * Этого хватает и глубине по умолчанию, и кнопкам «раскрыть/свернуть всё»;
- * ручное раскрытие пользователя при этом сбрасывается — от этих кнопок ровно
- * того и ждут.
+ * Значит набор обязан быть зеркалом того, что открыто, а не только того, что
+ * открыли кнопки: разойдись они — первое же обновление данных вернуло бы дерево
+ * к памяти просмотрщика, то есть закрыло бы раскрытое руками.
  */
 const expandedPaths = ref<string[]>([])
 
+/** Глубина по умолчанию раскладывается один раз — на первом дереве с ветками. */
+let depthApplied = false
+
+/**
+ * Обновление данных раскрытие не сбрасывает.
+ *
+ * Ответ сервиса опрашивают раз в N секунд, и объект каждый раз новый; сброс на
+ * каждую смену складывал бы дерево под руками. Из набора выпадают только
+ * исчезнувшие ветки, а глубина применяется заново лишь тогда, когда изменилась
+ * она сама.
+ */
 watch(
   [nodes, resolvedDepth],
-  ([list, depth]) => { expandedPaths.value = pathsToDepth(list, depth) },
+  ([list, depth], previous) => {
+    const branches = branchPaths(list)
+    const depthChanged = previous !== undefined && previous[1] !== depth
+
+    if (depthChanged || (!depthApplied && branches.length > 0)) {
+      depthApplied = branches.length > 0
+      expandedPaths.value = pathsToDepth(list, depth)
+      return
+    }
+
+    const alive = new Set(branches)
+    expandedPaths.value = expandedPaths.value.filter(path => alive.has(path))
+  },
   { immediate: true },
 )
+
+/** Дерево держит раскрытие у себя и сообщает о нём событиями — слушаем оба. */
+function rememberExpanded(node: GrJsonNode): void {
+  if (!expandedPaths.value.includes(node.path))
+    expandedPaths.value = [...expandedPaths.value, node.path]
+}
+
+function forgetExpanded(node: GrJsonNode): void {
+  expandedPaths.value = expandedPaths.value.filter(path => path !== node.path)
+}
 
 function expandAll(): void {
   expandedPaths.value = branchPaths(nodes.value)
@@ -247,6 +280,8 @@ defineExpose({ filter, expandAll, collapseAll })
       :max-height="maxHeight"
       :size="resolvedSize"
       :aria-label="ariaLabel"
+      @node-expand="rememberExpanded"
+      @node-collapse="forgetExpanded"
     >
       <template #default="{ data }">
         <span data-gr-json-viewer-row :class="[jsonViewerRowClass, jsonViewerGroupClass]">

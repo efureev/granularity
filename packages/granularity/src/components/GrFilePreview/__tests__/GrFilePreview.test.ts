@@ -307,3 +307,47 @@ describe('GrFilePreview: ссылка в новой вкладке', () => {
     expect(root.attributes('rel')).toBeUndefined()
   })
 })
+
+/**
+ * Имя интерактивной плитке даёт содержимое: `alt` картинки или подпись заглушки,
+ * и то и другое из `name`. Без него кнопка выходила с пустым `alt`, а ссылка —
+ * пустой: axe зовёт это `button-name` и `link-name`, а скринридер не зовёт никак.
+ */
+describe('GrFilePreview: интерактивная плитка всегда названа', () => {
+  const label = (props: Record<string, unknown>) =>
+    mount(GrFilePreview, { props }).get('[data-gr-file-preview]').attributes('aria-label')
+
+  it('кнопка с картинкой и без `name` получает родовое имя', () => {
+    expect(label({ clickable: true, src: '/x.png', mime: 'image/png' })).toBeTruthy()
+  })
+
+  it('кнопка без картинки и без `name` — тоже', () => {
+    expect(label({ clickable: true, mime: 'application/pdf' })).toBeTruthy()
+  })
+
+  it('ссылка без `name` — тоже', () => {
+    expect(label({ href: '/f.pdf', mime: 'application/pdf' })).toBeTruthy()
+  })
+
+  it('`name` даёт имя содержимым, и родовое не навязывается', () => {
+    expect(label({ clickable: true, src: '/x.png', mime: 'image/png', name: 'счёт.png' })).toBeUndefined()
+  })
+
+  it('`ariaLabel` сильнее всего', () => {
+    expect(label({ clickable: true, name: 'счёт.png', ariaLabel: 'Открыть счёт' })).toBe('Открыть счёт')
+  })
+
+  it('неинтерактивной плитке имя не навязывается — она не контрол', () => {
+    expect(label({ src: '/x.png', mime: 'image/png' })).toBeUndefined()
+  })
+
+  it('о промахе потребителю говорят вслух', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+
+    mount(GrFilePreview, { props: { clickable: true, src: '/x.png' } })
+
+    expect(warn.mock.calls.map(call => String(call[0])).join('\n')).toContain('GrFilePreview')
+
+    warn.mockRestore()
+  })
+})

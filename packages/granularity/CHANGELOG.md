@@ -9,6 +9,38 @@ to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- **`GrDescriptionList`: `stackBelow` only worked when it was set at mount.** The observer was
+  created once in `onMounted` and skipped entirely when the prop was still `undefined`, so a
+  threshold arriving later — from app config, from a toggle — never took effect. Two more holes came
+  from the same root: the observer stored the *verdict* rather than the measurement, so changing the
+  threshold or dropping it left the previous answer standing until the next resize, which in a still
+  window never comes. The observer now records the width only; "is it narrow" is derived, and both
+  cases apply immediately.
+
+- **`GrJsonViewer`: refreshing the data no longer collapses the tree.** A polled response arrives as
+  a new object every time, and the whole expansion set was rewritten on each change. Worse, expansion
+  by click was never tracked at all — `nodeExpand` from the tree was ignored, so the set and the
+  picture disagreed and `defaultExpandedKeys`, which the tree applies wholesale, pulled the tree back
+  to what the viewer remembered. The set now mirrors the tree: both events are heard, a data update
+  only drops branches that disappeared, and the default depth applies to the first tree that has
+  branches and again only when the depth itself changes.
+
+- **`GrFilePreview`: an interactive tile is never nameless.** The name comes from content — the
+  image `alt` or the fallback caption, both fed by `name`. Without it a clickable tile shipped as a
+  button with an empty `alt` and a linked tile as an empty `<a>`: `button-name` and `link-name`.
+  A generic localized name is worse than a meaningful one but better than none, and a dev guard now
+  asks for the file name out loud.
+
+- **`GrDelta`: growth was carried by colour alone, and a forgotten `value` looked deliberate.**
+  With `showSign: false` the plus is dropped while `Intl` still prints the minus, so only increases
+  lost their direction — a screen reader heard a bare number. Increases now carry a visually hidden
+  direction word. Separately, an omitted required `value` rendered the same dash as an explicit
+  `null`; `undefined` now warns under `__GR_DEV__` while `null` stays silent, as documented.
+
+### Added
+
+- `gr.filePreview.label` and `gr.delta.increase` in all three locales.
+
 - **`GrFilePreview`: a tile opening in a new tab no longer hands over `window.opener`.**
   The component declared neither `target` nor `rel`, so `target="_blank"` reached the `<a>`
   through fallthrough attrs and `rel` stayed empty — reverse tabnabbing on any attachment tile

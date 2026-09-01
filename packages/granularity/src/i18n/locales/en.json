@@ -266,6 +266,12 @@
     "recent": "Recent",
     "loading": "Loading…"
   },
+  "delta": {
+    "increase": "increase"
+  },
+  "filePreview": {
+    "label": "File"
+  },
   "fileValidation": {
     "accept": "File \"{fileName}\" does not match accept=\"{accept}\"",
     "extension": "File \"{fileName}\" has disallowed extension \".{extension}\"",

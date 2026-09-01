@@ -270,6 +270,12 @@
     "recent": "Недавние",
     "loading": "Загрузка…"
   },
+  "delta": {
+    "increase": "рост"
+  },
+  "filePreview": {
+    "label": "Файл"
+  },
   "fileValidation": {
     "accept": "Файл «{fileName}» не подходит под accept=\"{accept}\"",
     "extension": "У файла «{fileName}» недопустимое расширение «.{extension}»",

@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { computed, markRaw, ref, watch, type Component } from 'vue'
+import { computed, markRaw, ref, watch, watchEffect, type Component } from 'vue'
 
+import { useGranularityTranslations } from '../../internal/granularityI18n'
 import { useGrComponentProp } from '../GrConfigProvider/context'
 import GrSkeleton from '../GrSkeleton/GrSkeleton.vue'
 
@@ -96,6 +97,8 @@ const props = withDefaults(defineProps<GrFilePreviewProps>(), {
 
 const emit = defineEmits<GrFilePreviewEmits>()
 
+const { t } = useGranularityTranslations()
+
 const resolvedTileSize = useGrComponentProp('GrFilePreview', 'tileSize', () => props.tileSize, 'md')
 const resolvedRatio = useGrComponentProp('GrFilePreview', 'ratio', () => props.ratio, '1:1')
 const resolvedLoading = useGrComponentProp('GrFilePreview', 'loading', () => props.loading, 'lazy')
@@ -185,6 +188,36 @@ const rootStyle = computed(() => (
  */
 const alt = computed(() => props.name ?? '')
 
+/**
+ * Интерактивная плитка без имени не отгружается.
+ *
+ * Имя ей даёт содержимое: `alt` картинки или подпись заглушки — и то и другое
+ * приходит из `name`. Без `name` содержимого нет вовсе: кнопка выходит с пустым
+ * `alt`, ссылка — пустой, и axe справедливо зовёт это `button-name` и
+ * `link-name`. Родовое имя из локали хуже осмысленного, но лучше пустого —
+ * потребителю о промахе говорит гард ниже.
+ */
+const resolvedAriaLabel = computed(() => {
+  if (props.ariaLabel)
+    return props.ariaLabel
+
+  if (!isInteractive.value || props.name)
+    return undefined
+
+  return t('gr.filePreview.label', 'File')
+})
+
+if (__GR_DEV__) {
+  watchEffect(() => {
+    if (isInteractive.value && !props.ariaLabel && !props.name) {
+      console.warn(
+        '[granularity] GrFilePreview: интерактивная плитка без `name` и без `ariaLabel` остаётся '
+        + 'без осмысленного имени — скринридер объявит её родовым словом. Передайте имя файла.',
+      )
+    }
+  })
+}
+
 function onClick(event: MouseEvent): void {
   emit('click', event)
 }
@@ -201,7 +234,7 @@ function onClick(event: MouseEvent): void {
     :rel="rootRel"
     :class="rootClass"
     :style="rootStyle"
-    :aria-label="ariaLabel"
+    :aria-label="resolvedAriaLabel"
     @click="onClick"
   >
     <GrSkeleton

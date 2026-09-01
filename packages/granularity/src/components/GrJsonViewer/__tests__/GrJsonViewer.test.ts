@@ -2,6 +2,7 @@ import { mount } from '@vue/test-utils'
 import { nextTick } from 'vue'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import GrTree from '../../GrTree/GrTree.vue'
 import GrJsonViewer from '../GrJsonViewer.vue'
 
 /** Буфер в jsdom не реализован — ставим свой и отдаём шпион на `writeText`. */
@@ -158,5 +159,94 @@ describe('GrJsonViewer — разметка строки', () => {
     })
 
     expect(wrapper.find('b.custom').exists()).toBe(true)
+  })
+})
+
+/**
+ * Ответ сервиса опрашивают раз в N секунд, и объект каждый раз новый. Пока набор
+ * путей перезаписывался на каждую смену данных, дерево складывалось под руками —
+ * вместе с тем, что пользователь открыл кликом: его раскрытие просмотрщик не
+ * слышал вовсе, а `defaultExpandedKeys` дерево заменяет целиком.
+ */
+describe('GrJsonViewer: раскрытие переживает обновление данных', () => {
+  /** Дерево дженерик, и его тип через `findComponent` не выводится — берём эмиттер. */
+  const treeOf = (wrapper: ReturnType<typeof mount>) =>
+    (wrapper.findComponent(GrTree) as unknown as {
+      vm: { $emit: (event: string, ...args: unknown[]) => void }
+    }).vm
+
+  const paths = (wrapper: ReturnType<typeof mount>) =>
+    (wrapper.vm as never as { $: { setupState: { expandedPaths: string[] } } }).$.setupState.expandedPaths
+
+  it('раскрытие кликом попадает в набор', async () => {
+    const wrapper = mount(GrJsonViewer, { props: { value: { a: { b: 1 } }, defaultExpandDepth: 1 } })
+    await nextTick()
+
+    treeOf(wrapper).$emit('nodeExpand', { path: '$.a' }, {})
+    await nextTick()
+
+    expect(paths(wrapper)).toContain('$.a')
+  })
+
+  it('свёртка кликом из набора выпадает', async () => {
+    const wrapper = mount(GrJsonViewer, { props: { value: { a: { b: 1 } }, defaultExpandDepth: 2 } })
+    await nextTick()
+
+    expect(paths(wrapper)).toContain('$.a')
+
+    treeOf(wrapper).$emit('nodeCollapse', { path: '$.a' }, {})
+    await nextTick()
+
+    expect(paths(wrapper)).not.toContain('$.a')
+  })
+
+  it('те же данные новым объектом раскрытие сохраняют', async () => {
+    const wrapper = mount(GrJsonViewer, { props: { value: { a: { b: { c: 1 } } }, defaultExpandDepth: 1 } })
+    await nextTick()
+
+    ;(wrapper.vm as never as { expandAll: () => void }).expandAll()
+    await nextTick()
+    const before = [...paths(wrapper)]
+    expect(before.length).toBeGreaterThan(1)
+
+    await wrapper.setProps({ value: { a: { b: { c: 1 } } } })
+    await nextTick()
+
+    expect(paths(wrapper)).toEqual(before)
+  })
+
+  it('исчезнувшая ветка из набора выпадает', async () => {
+    const wrapper = mount(GrJsonViewer, { props: { value: { a: { b: 1 }, keep: { x: 1 } }, defaultExpandDepth: 3 } })
+    await nextTick()
+
+    expect(paths(wrapper)).toContain('$.a')
+
+    await wrapper.setProps({ value: { keep: { x: 1 } } })
+    await nextTick()
+
+    expect(paths(wrapper)).not.toContain('$.a')
+    expect(paths(wrapper)).toContain('$.keep')
+  })
+
+  it('данные, приехавшие позже, всё же получают глубину по умолчанию', async () => {
+    const wrapper = mount(GrJsonViewer, { props: { value: undefined, defaultExpandDepth: 2 } })
+    await nextTick()
+
+    await wrapper.setProps({ value: { a: { b: 1 } } })
+    await nextTick()
+
+    expect(paths(wrapper)).toContain('$')
+    expect(paths(wrapper)).toContain('$.a')
+  })
+
+  it('смена глубины перекладывает набор заново', async () => {
+    const wrapper = mount(GrJsonViewer, { props: { value: { a: { b: { c: 1 } } }, defaultExpandDepth: 1 } })
+    await nextTick()
+    expect(paths(wrapper)).toEqual(['$'])
+
+    await wrapper.setProps({ defaultExpandDepth: 3 })
+    await nextTick()
+
+    expect(paths(wrapper)).toContain('$.a')
   })
 })
