@@ -7,6 +7,16 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+
+- **`GrFilePreview`: a tile opening in a new tab no longer hands over `window.opener`.**
+  The component declared neither `target` nor `rel`, so `target="_blank"` reached the `<a>`
+  through fallthrough attrs and `rel` stayed empty — reverse tabnabbing on any attachment tile
+  linking to the original. `GrLink` and `GrButton` have guarded this for a while, deriving the
+  protection from the actual target rather than from an `external` prop; the tile now follows the
+  same rule. Both are props now, so the attribute can no longer slip past the component.
+
+
 ### Added
 
 - **A missing required prop now names itself in dev.** `GrBreadcrumbs`, `GrDataTable`,

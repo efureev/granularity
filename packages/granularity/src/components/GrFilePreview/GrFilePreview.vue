@@ -53,6 +53,14 @@ export interface GrFilePreviewProps {
   ratio?: GrFilePreviewRatio
   /** Ссылка на оригинал — для не-картинок и для перехода мимо просмотрщика. */
   href?: string
+  /**
+   * Куда открывать ссылку. Объявлен пропом, а не оставлен на fallthrough:
+   * иначе `_blank` уезжал бы на `<a>` мимо компонента, и защитный `rel`
+   * подставить было бы негде.
+   */
+  target?: string
+  /** Своё значение `rel`. Задано — отменяет автоподстановку. */
+  rel?: string
   /** Свой корневой тег (`RouterLink`, `Link` от Inertia). Сильнее `href`. */
   as?: string | Component
   /** Плитка кликабельна и эмитит `click` — обычно чтобы открыть просмотрщик. */
@@ -78,6 +86,8 @@ const props = withDefaults(defineProps<GrFilePreviewProps>(), {
   tileSize: undefined,
   ratio: undefined,
   href: undefined,
+  target: undefined,
+  rel: undefined,
   as: undefined,
   clickable: false,
   loading: undefined,
@@ -140,13 +150,23 @@ const rootTag = computed<string | Component>(() => {
 })
 
 /**
- * Компонент-ссылка (`Link` от Inertia, `RouterLink`) рендерит `<a>` сам, и без
- * `href` он ведёт в никуда. Строковый тег, кроме `a`, атрибут не понимает —
- * там он и гасится.
+ * Ссылка, открывающаяся в новой вкладке, получает защиту без спроса — по факту
+ * `_blank`, а не по отдельному пропу: то же правило, что у `GrLink` и
+ * `GrButton`. Без `rel` открытая страница получает `window.opener` и может
+ * переписать вкладку-источник.
  */
-const rootHref = computed(() => (
-  typeof rootTag.value === 'string' && rootTag.value !== 'a' ? undefined : props.href
-))
+const resolvedRel = computed(() => props.rel ?? (props.target === '_blank' ? 'noopener noreferrer' : undefined))
+
+/**
+ * Компонент-ссылка (`Link` от Inertia, `RouterLink`) рендерит `<a>` сам, и без
+ * `href` он ведёт в никуда. Строковый тег, кроме `a`, ссылочных атрибутов не
+ * понимает — там они и гасятся.
+ */
+const isAnchorLike = computed(() => typeof rootTag.value !== 'string' || rootTag.value === 'a')
+
+const rootHref = computed(() => (isAnchorLike.value ? props.href : undefined))
+const rootTarget = computed(() => (isAnchorLike.value ? props.target : undefined))
+const rootRel = computed(() => (isAnchorLike.value ? resolvedRel.value : undefined))
 
 const rootClass = computed(() => [
   filePreviewRootClass,
@@ -177,6 +197,8 @@ function onClick(event: MouseEvent): void {
     :data-kind="kind"
     :type="rootTag === 'button' ? 'button' : undefined"
     :href="rootHref"
+    :target="rootTarget"
+    :rel="rootRel"
     :class="rootClass"
     :style="rootStyle"
     :aria-label="ariaLabel"

@@ -268,3 +268,42 @@ describe('GrFilePreview — размер и загрузка', () => {
     expect(tile.get('[data-gr-file-preview-image]').attributes('loading')).toBe('eager')
   })
 })
+
+/**
+ * Ссылка, открытая в новой вкладке, отдаёт странице-получателю `window.opener`,
+ * если её не закрыть `rel`. Правило пакета — подставлять защиту по факту
+ * `_blank`, а не по отдельному пропу (`GrLink`, `GrButton`); плитка до этого
+ * `target` вовсе не объявляла, и он уезжал на `<a>` мимо компонента.
+ */
+describe('GrFilePreview: ссылка в новой вкладке', () => {
+  it('`_blank` получает защитный `rel` без спроса', () => {
+    const wrapper = mount(GrFilePreview, {
+      props: { href: 'https://example.test/f.pdf', mime: 'application/pdf', target: '_blank' },
+    })
+
+    expect(wrapper.get('[data-gr-file-preview]').attributes('rel')).toBe('noopener noreferrer')
+  })
+
+  it('своё значение `rel` сильнее автоподстановки', () => {
+    const wrapper = mount(GrFilePreview, {
+      props: { href: 'https://example.test/f.pdf', target: '_blank', rel: 'nofollow' },
+    })
+
+    expect(wrapper.get('[data-gr-file-preview]').attributes('rel')).toBe('nofollow')
+  })
+
+  it('без `_blank` защита не навязывается', () => {
+    const wrapper = mount(GrFilePreview, { props: { href: '/f.pdf' } })
+
+    expect(wrapper.get('[data-gr-file-preview]').attributes('rel')).toBeUndefined()
+  })
+
+  it('на кнопке ссылочных атрибутов нет вовсе', () => {
+    const wrapper = mount(GrFilePreview, { props: { clickable: true, target: '_blank' } })
+    const root = wrapper.get('[data-gr-file-preview]')
+
+    expect(root.element.tagName).toBe('BUTTON')
+    expect(root.attributes('target')).toBeUndefined()
+    expect(root.attributes('rel')).toBeUndefined()
+  })
+})
