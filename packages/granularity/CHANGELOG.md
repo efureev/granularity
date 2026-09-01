@@ -9,6 +9,17 @@ to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- **`GrKbd`: modifier glyphs no longer render smaller than the letters.** The keycap declared no
+  font of its own, so it inherited whatever the host gives `<kbd>`: the UA monospace default, or a
+  reset's mono stack on top of it. Monospace faces draw those symbols small — measured in
+  JetBrains Mono, `⌘` is 73% of the letter's ink height, `⇧` 76%, `⌥` 66% — and next to a `K`
+  that reads as a different size, most visibly at `xs`. The same glyphs in `--gr-font-ui` come out
+  at 103%, 103% and 100%.
+
+  The font is declared on the keycap now, and on the inner key as well: a key inside a merged plate
+  is a `<kbd>` too, and a host reset that styles the tag by name beats inheritance from the parent.
+  Typography of the component no longer depends on the host.
+
 - **`GrDescriptionList`: `stackBelow` only worked when it was set at mount.** The observer was
   created once in `onMounted` and skipped entirely when the prop was still `undefined`, so a
   threshold arriving later — from app config, from a toggle — never took effect. Two more holes came
