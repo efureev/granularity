@@ -130,7 +130,6 @@ const VISUAL_COMPONENTS = [
   'GrChipGroup',
   'GrDelta',
   'GrDescriptionList',
-  'GrFilePreview',
   'GrJsonViewer',
   'GrValue',
   /**
@@ -146,6 +145,15 @@ const VISUAL_COMPONENTS = [
    * `GrNavbar`, `GrSidebar`, `GrBottomNav` считают раскладку от ширины окна
    * раннера; `GrConfigProvider` и `GrForm` своей разметки не рисуют вовсе, и
    * снимок мерил бы демо; у `GrDialogService` нет страницы — это сервис.
+   *
+   * `GrFilePreview` снят по другой причине — его эталон нестабилен by design
+   * гейта. Демо рисует полтора десятка плиток картинками из `data:` с
+   * градиентами, и растеризация градиента гуляет между прогонами: замер трёх
+   * прогонов подряд давал максимум **2 из 255** на 75 тысячах пикселей. Порог
+   * здесь абсолютный (`maxDiffPixels: 300` при `threshold: 0`), поэтому такой
+   * разброс его пробивает, ничего не сообщая о раскладке. Что гейт ловил бы
+   * уникально, остаётся за axe (страница из него **не** исключена) и за
+   * `componentTokens`/`styleTokens` — та же развязка, что у графиков.
    */
   'GrBadgeWrap',
   'GrCheckboxGroup',
