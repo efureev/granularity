@@ -7,6 +7,27 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.42.0] 2026-09-01
+
+### Added
+
+- **A missing required prop now names itself in dev.** `GrBreadcrumbs`, `GrDataTable`,
+  `GrInputTag`, `GrNumberInput`, `GrSegmented`, `GrSortableList`, `GrSteps` and `GrTabs` threw
+  `Cannot read properties of undefined` and nothing else: neither the component nor the prop
+  appeared anywhere in the message. Vue's own "Missing required prop" never fires here — the
+  production SFC compiler strips `type` and `required` from the runtime declaration, so the whole
+  `dist` carries `required: true` exactly zero times.
+
+  Each of the eight now warns under `__GR_DEV__` before the crash, naming component, prop and the
+  value received. The crash itself stays: the component genuinely cannot render, and hiding that
+  behind a substituted default would trade a loud defect for a quiet one.
+
+  This closes the class. Re-measured on the built `dist` by rendering all 77 components without
+  props: eight crash and all eight are guarded, four warn without crashing (`GrPagination`,
+  `GrProgressBar`, `GrSlider`, `GrStatistic` — guarded earlier), the remaining 65 render clean.
+
+- `gr.filePreview.label` and `gr.delta.increase` in all three locales.
+
 ### Fixed
 
 - **`GrKbd`: modifier glyphs no longer render smaller than the letters.** The keycap declared no
@@ -48,34 +69,12 @@ to [Semantic Versioning](https://semver.org/).
   direction word. Separately, an omitted required `value` rendered the same dash as an explicit
   `null`; `undefined` now warns under `__GR_DEV__` while `null` stays silent, as documented.
 
-### Added
-
-- `gr.filePreview.label` and `gr.delta.increase` in all three locales.
-
 - **`GrFilePreview`: a tile opening in a new tab no longer hands over `window.opener`.**
   The component declared neither `target` nor `rel`, so `target="_blank"` reached the `<a>`
   through fallthrough attrs and `rel` stayed empty — reverse tabnabbing on any attachment tile
   linking to the original. `GrLink` and `GrButton` have guarded this for a while, deriving the
   protection from the actual target rather than from an `external` prop; the tile now follows the
   same rule. Both are props now, so the attribute can no longer slip past the component.
-
-
-### Added
-
-- **A missing required prop now names itself in dev.** `GrBreadcrumbs`, `GrDataTable`,
-  `GrInputTag`, `GrNumberInput`, `GrSegmented`, `GrSortableList`, `GrSteps` and `GrTabs` threw
-  `Cannot read properties of undefined` and nothing else: neither the component nor the prop
-  appeared anywhere in the message. Vue's own "Missing required prop" never fires here — the
-  production SFC compiler strips `type` and `required` from the runtime declaration, so the whole
-  `dist` carries `required: true` exactly zero times.
-
-  Each of the eight now warns under `__GR_DEV__` before the crash, naming component, prop and the
-  value received. The crash itself stays: the component genuinely cannot render, and hiding that
-  behind a substituted default would trade a loud defect for a quiet one.
-
-  This closes the class. Re-measured on the built `dist` by rendering all 77 components without
-  props: eight crash and all eight are guarded, four warn without crashing (`GrPagination`,
-  `GrProgressBar`, `GrSlider`, `GrStatistic` — guarded earlier), the remaining 65 render clean.
 
 ## [v0.41.0] 2026-08-31
 

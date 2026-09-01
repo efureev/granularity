@@ -13,10 +13,10 @@ The published packages:
 
 <!-- Generated from the workspace by `yarn docs:ecosystem`; `yarn docs:ecosystem:check` gates it. -->
 <!-- ecosystem:generated:start -->
-- [`@feugene/granularity`](./packages/granularity/README.md) `0.41.0` — Granularity design system package with Vue 3 components, consumed via the `@feugene/unocss-preset-granular` preset.
+- [`@feugene/granularity`](./packages/granularity/README.md) `0.42.0` — Granularity design system package with Vue 3 components, consumed via the `@feugene/unocss-preset-granular` preset.
 - [`@feugene/granularity-charts`](./packages/granularity-charts/README.md) `0.11.0` — Charts for the @feugene/granularity design system — own SVG, zero dependencies, drawn with theme tokens.
 - [`@feugene/granularity-chrono`](./packages/granularity-chrono/README.md) `0.10.0` — Calendar, date and time components for the @feugene/granularity design system — no third-party date widget, no date library.
-- [`@feugene/granularity-code`](./packages/granularity-code/README.md) `0.1.1` — Code surfaces for @feugene/granularity: view, edit and diff — the viewer and the diff carry no dependencies at all.
+- [`@feugene/granularity-code`](./packages/granularity-code/README.md) `0.2.0` — Code surfaces for @feugene/granularity: view, edit and diff — the viewer and the diff carry no dependencies at all.
 - [`@feugene/granularity-dashboard`](./packages/granularity-dashboard/README.md) `0.6.0` — Widget grid for the @feugene/granularity design system — drag, resize, breakpoints and layout persistence, zero dependencies.
 - [`@feugene/granularity-datasource`](./packages/granularity-datasource/README.md) `0.1.2` — List state for @feugene/granularity: sorting, filters, paging, URL sync and race-free fetching behind one composable.
 - [`@feugene/granularity-devtools`](./packages/granularity-devtools/README.md) `0.3.2` — Vue DevTools panel for @feugene/granularity — where a prop value came from, the overlay layer stack and design-system warnings.

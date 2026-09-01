@@ -91,9 +91,9 @@ from its own chunk, so a granular import already brings everything it needs.
 <!-- entry-sizes:generated:start lang=en -->
 | What you import | gzip | of the barrel |
 | --- | ---: | ---: |
-| the whole package from the root | 537.9 kB | 100 % |
+| the whole package from the root | 541.7 kB | 100 % |
 | the lightest component — `GrButtonGroup` | 1.8 kB | < 1 % |
-| the median component — `GrSegmented` | 15.1 kB | 3 % |
+| the median component — `GrSegmented` | 15.2 kB | 3 % |
 | the 5 heaviest together | 171.7 kB | 32 % |
 
 These numbers **do not add up**: shared code is counted again in every row but paid for once, which is why
@@ -114,7 +114,7 @@ on this one — the core stays lean, and you install only what you reach for.
 | --- | --- | --- |
 | [`@feugene/granularity-charts`](../granularity-charts) | 0.11.0 | Charts — own SVG, zero dependencies, drawn with theme tokens. |
 | [`@feugene/granularity-chrono`](../granularity-chrono) | 0.10.0 | Calendar, date and time components — no third-party date widget, no date library. |
-| [`@feugene/granularity-code`](../granularity-code) | 0.1.1 | Code surfaces: view, edit and diff — the viewer and the diff carry no dependencies at all. |
+| [`@feugene/granularity-code`](../granularity-code) | 0.2.0 | Code surfaces: view, edit and diff — the viewer and the diff carry no dependencies at all. |
 | [`@feugene/granularity-dashboard`](../granularity-dashboard) | 0.6.0 | Widget grid — drag, resize, breakpoints and layout persistence, zero dependencies. |
 | [`@feugene/granularity-datasource`](../granularity-datasource) | 0.1.2 | List state: sorting, filters, paging, URL sync and race-free fetching behind one composable. |
 | [`@feugene/granularity-devtools`](../granularity-devtools) | 0.3.2 | Vue DevTools panel — where a prop value came from, the overlay layer stack and design-system warnings. |
