@@ -4374,6 +4374,20 @@
             "default": "undefined"
           },
           {
+            "name": "target",
+            "description": "Куда открывать ссылку. Объявлен пропом, а не оставлен на fallthrough: иначе `_blank` уезжал бы на `<a>` мимо компонента, и защитный `rel` подставить было бы негде.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "rel",
+            "description": "Своё значение `rel`. Задано — отменяет автоподстановку.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "clickable",
             "description": "Плитка кликабельна и эмитит `click` — обычно чтобы открыть просмотрщик.",
             "type": "boolean | undefined",
