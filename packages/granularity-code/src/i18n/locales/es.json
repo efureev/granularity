@@ -34,6 +34,8 @@
     "hidden": {
       "one": "{n} línea oculta",
       "other": "{n} líneas ocultas"
-    }
+    },
+    "lineAdded": "añadida",
+    "lineRemoved": "eliminada"
   }
 }

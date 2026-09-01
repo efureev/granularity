@@ -417,6 +417,27 @@ const isEmpty = computed(() => {
 
 const signOf = (op: GrDiffLine['op']): string => op === 'add' ? '+' : op === 'remove' ? '−' : ' '
 
+/**
+ * То же, что знак, но словом и только для доступного дерева.
+ *
+ * Знак `+`/`−` спрятан `aria-hidden`: озвученный на каждой строке, он читается
+ * «плюс», а не «добавлено». Без подписи же признак изменения нёс бы только тон
+ * строки — то есть для скринридера дифф не отличался бы от двух копий текста
+ * подряд, и смысл компонента до пользователя не доходил бы вовсе.
+ *
+ * Помечаются только изменённые строки: контекст вокруг них молчит, иначе
+ * подпись была бы у каждой строки файла.
+ */
+function opLabel(op: GrDiffLine['op']): string {
+  if (op === 'add')
+    return t('grCode.diff.lineAdded', 'added')
+
+  if (op === 'remove')
+    return t('grCode.diff.lineRemoved', 'removed')
+
+  return ''
+}
+
 defineExpose({
   /** Прокрутить к ряду по индексу — для «следующее изменение» у потребителя. */
   scrollToRow: virtual.scrollToIndex,
@@ -507,6 +528,7 @@ defineExpose({
           <span v-if="resolvedLineNumbers" :class="[diffGutterCellClass, diffGutterClass]">{{ entry.line.beforeNumber ?? '' }}</span>
           <span v-if="resolvedLineNumbers" :class="[diffGutterCellClass, diffGutterClass]">{{ entry.line.afterNumber ?? '' }}</span>
           <span :class="diffSignClass" aria-hidden="true">{{ signOf(entry.line.op) }}</span>
+          <span v-if="entry.line.op !== 'equal'" class="sr-only">{{ opLabel(entry.line.op) }}</span>
           <span class="flex-1">
             <template v-if="wordPairs.get(entry.line)">
               <span
@@ -536,6 +558,7 @@ defineExpose({
           <div class="flex" :class="[diffSplitCellClass, entry.left ? diffRowTone[entry.left.op] : '']">
             <span v-if="resolvedLineNumbers" :class="[diffGutterCellClass, diffGutterClass]">{{ entry.left?.beforeNumber ?? '' }}</span>
             <span :class="diffSignClass" aria-hidden="true">{{ entry.left ? signOf(entry.left.op) : ' ' }}</span>
+            <span v-if="entry.left && entry.left.op !== 'equal'" class="sr-only">{{ opLabel(entry.left.op) }}</span>
             <span class="flex-1">
               <template v-if="entry.left && wordPairs.get(entry.left)">
                 <span
@@ -556,6 +579,7 @@ defineExpose({
           <div class="flex" :class="[diffSplitCellClass, entry.right ? diffRowTone[entry.right.op] : '']">
             <span v-if="resolvedLineNumbers" :class="[diffGutterCellClass, diffGutterClass]">{{ entry.right?.afterNumber ?? '' }}</span>
             <span :class="diffSignClass" aria-hidden="true">{{ entry.right ? signOf(entry.right.op) : ' ' }}</span>
+            <span v-if="entry.right && entry.right.op !== 'equal'" class="sr-only">{{ opLabel(entry.right.op) }}</span>
             <span class="flex-1">
               <template v-if="entry.right && wordPairs.get(entry.right)">
                 <span

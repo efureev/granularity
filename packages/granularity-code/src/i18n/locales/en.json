@@ -34,6 +34,8 @@
     "hidden": {
       "one": "{n} line hidden",
       "other": "{n} lines hidden"
-    }
+    },
+    "lineAdded": "added",
+    "lineRemoved": "removed"
   }
 }

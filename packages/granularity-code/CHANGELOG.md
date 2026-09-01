@@ -9,6 +9,21 @@ to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- **`GrDiff`: added and removed lines are no longer distinguished by colour alone.** The row tone
+  carried the whole message: the `+`/`−` sign next to it is `aria-hidden`, deliberately, so that
+  a screen reader would not read "plus" before every line. The side effect was that it read nothing
+  at all — added, removed and unchanged lines came out identical, and a diff that cannot say what
+  changed is not a diff. Changed lines now carry a visually hidden label (`added` / `removed`,
+  translated) in both layouts; context lines stay silent so the marker does not appear on every
+  line of the file. Axe never caught this — roles and contrast were fine all along.
+
+### Added
+
+- `grCode.diff.lineAdded` / `grCode.diff.lineRemoved` in all three locales.
+
+
+### Fixed
+
 - **The editor placeholder failed AA contrast in both themes.** `grTheme` styled the background,
   caret, selection, active line and gutters but left `.cm-placeholder` to CodeMirror's built-in
   `#888`: 3.2:1 on the light surface and 2.9:1 on the dark one, against the 4.5:1 threshold. It now

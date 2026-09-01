@@ -387,3 +387,46 @@ describe('GrDiff', () => {
     })
   })
 })
+
+/**
+ * Признак изменения не может держаться на одном цвете: строка отличается тоном,
+ * а знак `+`/`−` спрятан от доступного дерева. Без подписи скринридер читает
+ * дифф как две копии текста подряд — то есть не читает его вовсе.
+ */
+describe('GrDiff: изменение доступно не только цветом', () => {
+  it('добавленная и удалённая строки подписаны для скринридера', async () => {
+    const wrapper = mount(GrDiff, { props: { before: 'a\nb', after: 'a\nc' } })
+    await flushPromises()
+
+    const labels = wrapper.findAll('.sr-only').map(node => node.text())
+
+    expect(labels).toContain('removed')
+    expect(labels).toContain('added')
+  })
+
+  it('неизменённые строки молчат — иначе подпись была бы у каждой строки', async () => {
+    const wrapper = mount(GrDiff, { props: { before: 'a\nb', after: 'a\nb' } })
+    await flushPromises()
+
+    expect(wrapper.findAll('.sr-only')).toHaveLength(0)
+  })
+
+  it('в split-раскладке подписана каждая сторона', async () => {
+    const wrapper = mount(GrDiff, { props: { before: 'a', after: 'b', mode: 'split' } })
+    await flushPromises()
+
+    const labels = wrapper.findAll('.sr-only').map(node => node.text())
+
+    expect(labels).toContain('removed')
+    expect(labels).toContain('added')
+  })
+
+  it('визуальный знак остаётся скрытым от доступного дерева', async () => {
+    const wrapper = mount(GrDiff, { props: { before: 'a', after: 'b' } })
+    await flushPromises()
+
+    const signs = wrapper.findAll('[aria-hidden="true"]').map(node => node.text())
+
+    expect(signs.some(text => text === '+' || text === '−')).toBe(true)
+  })
+})
