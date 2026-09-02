@@ -1,6 +1,7 @@
 import { h } from 'vue'
 
 import {
+  GrAffix,
   GrAlert,
   GrAutocomplete,
   GrAvatar,
@@ -96,6 +97,7 @@ import GrTimelinePage from './pages/GrTimelinePage.vue'
  * компоненты с настраиваемым `size`.
  */
 export const coreFixtures: ComponentFixture[] = [
+  { name: 'GrAffix', about: 'сентинел приезжает с сервера, состояние «прилипло» — выключенным: наблюдатель работает только в браузере', render: () => h(GrAffix, { offset: 64 }, { default: () => 'Липкая панель' }) },
   { name: 'GrAlert', about: 'живой регион и роль в первом рендере', render: () => h(GrAlert, { title: 'Заголовок', tone: 'info' }, { default: () => 'Текст сообщения' }) },
   { name: 'GrAutocomplete', about: 'combobox: панель на месте, а не в body', render: () => h(GrAutocomplete, { modelValue: '', options: [{ value: 'a', label: 'A' }] }) },
   { name: 'GrAvatar', about: 'изображение и запасные инициалы без замеров DOM', render: () => h(GrAvatar, { name: 'Ада Лавлейс' }) },

@@ -99,6 +99,9 @@ export default defineConfig({
       entry: {
         'index': fileURLToPath(new URL('./src/index.ts', import.meta.url)),
         // <granularity:components> — блок генерируется `yarn generate:registry`
+        'components/GrAffix/index': fileURLToPath(
+          new URL('./src/components/GrAffix/index.ts', import.meta.url),
+        ),
         'components/GrAlert/index': fileURLToPath(
           new URL('./src/components/GrAlert/index.ts', import.meta.url),
         ),

@@ -284,6 +284,7 @@
 | Что нужно | Компонент |
 | --- | --- |
 | поверхность с рамкой, фоном и тенью | [`GrCard`](../packages/granularity/docs/components/GrCard.md) |
+| блок остаётся на виду при прокрутке | [`GrAffix`](../packages/granularity/docs/components/GrAffix.md) |
 | разделить контент линией | [`GrDivider`](../packages/granularity/docs/components/GrDivider.md) |
 | две панели, границу двигает пользователь | [`GrSplitter`](../packages/granularity/docs/components/GrSplitter.md) |
 | содержимого много, показывают не всё сразу | [`GrCollapse`](../packages/granularity/docs/components/GrCollapse.md) |
@@ -310,6 +311,11 @@
 Различитель `GrCarousel` / `GrCollapse` — **сколько показано разом**. Аккордеон
 раскрывает несколько секций сразу и растёт вниз; карусель всегда показывает одно
 окно постоянной ширины и двигает его вбок.
+
+Различитель `GrAffix` / `GrNavbar` — **чей это край**. Шапка приложения одна, она
+лендмарк и всегда непрозрачна; аффикс — любой блок внутри своего блока, и фон с
+тенью он получает только прилипнув. Заголовок `GrTable` и закреплённые колонки
+`GrDataTable` — тот же приём внутри таблицы, отдельного компонента для них не надо.
 
 ### График
 
@@ -400,6 +406,7 @@
 <!-- component-map:generated:start -->
 | Компонент | Пакет | Берут, когда |
 | --- | --- | --- |
+| [`GrAffix`](../packages/granularity/docs/components/GrAffix.md) | ядро | действия длинной формы |
 | [`GrAlert`](../packages/granularity/docs/components/GrAlert.md) | ядро | сообщение относится к месту на странице |
 | [`GrAutocomplete`](../packages/granularity/docs/components/GrAutocomplete.md) | ядро | вариантов слишком много для списка |
 | [`GrAvatar`](../packages/granularity/docs/components/GrAvatar.md) | ядро | человека или сущность узнают по картинке |

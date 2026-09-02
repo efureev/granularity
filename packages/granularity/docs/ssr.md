@@ -68,9 +68,9 @@
 `GrConfirmDialog`, `GrDialog` и `GrPromptDialog` попали сюда потому, что вся DOM-механика у них — в `GrModal`, на
 котором они построены.
 
-## DOM только в обработчиках и хуках (7)
+## DOM только в обработчиках и хуках (8)
 
-`GrCarousel`, `GrCommandPalette`, `GrDialogService`, `GrSegmented`, `GrSlider`, `GrStatistic`, `GrTransfer`.
+`GrAffix`, `GrCarousel`, `GrCommandPalette`, `GrDialogService`, `GrSegmented`, `GrSlider`, `GrStatistic`, `GrTransfer`.
 
 Серверный рендер безопасен: обращения живут в `onMounted`/`onBeforeUnmount` и в слушателях событий, которые на сервере
 не выполняются. Конкретно:
@@ -95,7 +95,14 @@
 - `GrTransfer` — `getBoundingClientRect` панелей и строк только внутри идущего жеста,
   `window.addEventListener('keydown'…)` для `Esc` на время переноса и `requestAnimationFrame`
   автопрокрутки. В `setup` среды не касается: раскладка панелей от неё не зависит, а id идут
-  из `useId()`.
+  из `useId()`.;
+- `GrAffix` — `getComputedStyle` (замер отступа и обход предков в поисках скроллера) и
+  `IntersectionObserver`, оба в `onMounted` и в `remeasure()`. На сервере состояние «прилипло»
+  стартует выключенным, `data-stuck` и классы поверхности отсутствуют, поэтому первый
+  клиентский рендер повторяет серверный; сентинел рендерится на обеих сторонах — иначе была бы
+  расходимость. Отсутствие наблюдателя (сервер, jsdom, старый движок) компонент переживает,
+  включая поверхность постоянно: прилипшая прозрачная панель пропускала бы сквозь себя
+  содержимое.
 
 ## Композаблы и директивы
 

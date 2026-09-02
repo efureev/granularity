@@ -239,7 +239,7 @@
     "kindLabel": "Section",
     "context": "Components",
     "searchableTitle": "components component catalog",
-    "searchableContent": "components каталог компонентных страниц с поиском, группировкои и отдельнои витринои на каждыи публичныи компонент пакета. catalog component catalog здесь будет index-страница со всеми публичными компонентами и быстрои группировкои по категориям. источник правды `packages/granularity/src/granular-provider/shared.ts` с текущим покрытием в 78 компонентных сущностеи . навигация по компонентам должна быть мгновеннои и search-friendly. каждыи компонент получит отдельныи route и собственную страницу."
+    "searchableContent": "components каталог компонентных страниц с поиском, группировкои и отдельнои витринои на каждыи публичныи компонент пакета. catalog component catalog здесь будет index-страница со всеми публичными компонентами и быстрои группировкои по категориям. источник правды `packages/granularity/src/granular-provider/shared.ts` с текущим покрытием в 79 компонентных сущностеи . навигация по компонентам должна быть мгновеннои и search-friendly. каждыи компонент получит отдельныи route и собственную страницу."
   },
   {
     "id": "page:components:section:live-demos",
@@ -438,6 +438,17 @@
     "context": "Utilities",
     "searchableTitle": "utilities future coverage",
     "searchableContent": "utilities раздел для package-level утилит, начиная с `filevalidation` и прикладных сценариев использования. future-coverage future coverage раздел останется расширяемым, чтобы безопасно включать новые package-level helpers по мере роста пакета. подготовка структуры под новые utilities. единыи формат для narrative notes и runnable examples. согласованность с поиском и generated metadata в будущих этапах."
+  },
+  {
+    "id": "entity:component:GrAffix",
+    "title": "GrAffix",
+    "description": "Keeps a block in view while the page scrolls — a section header, a table of contents, form actions.",
+    "href": "/components/gr-affix",
+    "kind": "entity",
+    "kindLabel": "component",
+    "context": "utilities / component",
+    "searchableTitle": "graffix",
+    "searchableContent": "graffix graffix keeps a block in view while the page scrolls a section header, a table of contents, form actions. utilities component /components/gr-affix packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/graffix generated public-api components components gr-affix gr affix"
   },
   {
     "id": "entity:component:GrAlert",
@@ -1516,6 +1527,50 @@
     "context": "ungrouped / utility",
     "searchableTitle": "maxtotalsizebytesvalidator",
     "searchableContent": "maxtotalsizebytesvalidator maxtotalsizebytesvalidator публичная file validation utility maxtotalsizebytesvalidator из package exports. ungrouped utility /utilities/max-total-size-bytes-validator packages/granularity/src/filevalidation/index.ts @feugene/granularity/filevalidation generated public-api utilities utilities max-total-size-bytes-validator max total size bytes validator"
+  },
+  {
+    "id": "entity:component:GrAffix:section:overview",
+    "title": "GrAffix / Component overview",
+    "description": "Краткий контекст по месту компонента в пакете, registry metadata и текущему покрытию showcase.",
+    "href": "/components/gr-affix#overview",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrAffix",
+    "searchableTitle": "graffix component overview",
+    "searchableContent": "graffix keeps a block in view while the page scrolls a section header, a table of contents, form actions. overview component overview краткии контекст по месту компонента в пакете, registry metadata и текущему покрытию showcase. показываем роль компонента в каталоге и его hand-authored summary. отражаем generated api coverage и package-level source links. фиксируем, какие сценарии уже реализованы в showcase, а какие еще планируются."
+  },
+  {
+    "id": "entity:component:GrAffix:section:live-examples",
+    "title": "GrAffix / Live examples",
+    "description": "Компонентные сценарии должны раскрывать одну конкретную возможность за карточку, а не сваливать всё в один demo.",
+    "href": "/components/gr-affix#live-examples",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrAffix",
+    "searchableTitle": "graffix live examples",
+    "searchableContent": "graffix keeps a block in view while the page scrolls a section header, a table of contents, form actions. live-examples live examples компонентные сценарии должны раскрывать одну конкретную возможность за карточку, а не сваливать все в один demo. каждыи example card содержит живои preview, snippet и краткое пояснение. сначала покрываем самые показательные capability-сценарии, затем сложные edge cases. плановые сценарии явно отмечаются, чтобы roadmap был виден прямо на странице компонента."
+  },
+  {
+    "id": "entity:component:GrAffix:section:api",
+    "title": "GrAffix / Generated API",
+    "description": "Страница использует автогенерированные `props` / `slots` / `events` / `methods` и не дублирует API вручную.",
+    "href": "/components/gr-affix#api",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrAffix",
+    "searchableTitle": "graffix generated api",
+    "searchableContent": "graffix keeps a block in view while the page scrolls a section header, a table of contents, form actions. api generated api страница использует автогенерированные `props` / `slots` / `events` / `methods` и не дублирует api вручную. generated metadata остае тся основным источником правды для api-таблиц. fallback metadata применяется только там, где extraction-слоя недостаточно. usage snippet живе т рядом с таблицами api и не расходится с публичным экспортом пакета."
+  },
+  {
+    "id": "entity:component:GrAffix:section:integration-notes",
+    "title": "GrAffix / Integration notes",
+    "description": "Дополнительные замечания по доступности, зависимостям и связанным package-level артефактам.",
+    "href": "/components/gr-affix#integration-notes",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrAffix",
+    "searchableTitle": "graffix integration notes",
+    "searchableContent": "graffix keeps a block in view while the page scrolls a section header, a table of contents, form actions. integration-notes integration notes дополнительные замечания по доступности, зависимостям и связанным package-level артефактам. keyboard/accessibility пункты выделяются отдельно от визуальных примеров. dependency notes показывают, есть ли связки с другими компонентами в registry. source/export ссылки помогают быстро переи ти к исходникам и публичному import path."
   },
   {
     "id": "entity:component:GrAlert:section:overview",

@@ -58,6 +58,10 @@
       "types": "./dist/types/composables/useAnnouncer.d.ts",
       "import": "./dist/composables/useAnnouncer.js"
     },
+    "./components/GrAffix": {
+      "types": "./dist/types/components/GrAffix/index.d.ts",
+      "import": "./dist/components/GrAffix/index.js"
+    },
     "./components/GrAlert": {
       "types": "./dist/types/components/GrAlert/index.d.ts",
       "import": "./dist/components/GrAlert/index.js"

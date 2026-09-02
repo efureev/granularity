@@ -1,4 +1,5 @@
 // <granularity:components> — блок генерируется `yarn generate:registry` из `src/components/`
+export * from './components/GrAffix'
 export * from './components/GrAlert'
 export * from './components/GrAutocomplete'
 export * from './components/GrAvatar'

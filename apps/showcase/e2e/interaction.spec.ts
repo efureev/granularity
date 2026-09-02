@@ -766,3 +766,149 @@ test.describe('GrTransfer', () => {
     await expect(targetList.locator('[data-gr-transfer-option]')).toHaveCount(before + 1)
   })
 })
+
+/**
+ * `GrAffix`: прилипание. В jsdom нет ни прокрутки, ни раскладки, ни UnoCSS — то
+ * есть нет ничего, из чего состоит этот компонент: там не проверяются ни момент
+ * переключения состояния, ни то, что классы фона и тени вообще превратились в CSS.
+ *
+ * Прокрутка везде колесом, а не присвоением `scrollTop`: программная прокрутка
+ * из скрипта не даёт `IntersectionObserver` записи, и тест молча проверял бы
+ * компонент, который не получил ни одного вызова.
+ */
+test.describe('GrAffix: прилипание', () => {
+  /** Прямоугольник скроллпорта, внутри которого живёт панель. */
+  async function scrollerBox(affix: import('@playwright/test').Locator) {
+    return affix.evaluate((el) => {
+      let scroller = el.parentElement
+      while (scroller && !['auto', 'scroll'].includes(getComputedStyle(scroller).overflowY))
+        scroller = scroller.parentElement
+
+      const rect = scroller!.getBoundingClientRect()
+
+      return { x: rect.x, y: rect.y, width: rect.width, height: rect.height }
+    })
+  }
+
+  async function wheelOver(page: import('@playwright/test').Page, box: { x: number, y: number, width: number, height: number }, delta: number) {
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2)
+    await page.mouse.wheel(0, delta)
+  }
+
+  test.beforeEach(async ({ page }) => {
+    await page.goto(componentPath('GrAffix'))
+    await page.locator('#live-examples').waitFor()
+    await page.locator('[data-gr-affix]').first().waitFor()
+  })
+
+  test('панель прилипает к краю своего скроллера, а не к окну', async ({ page }) => {
+    const affix = page.locator('[data-gr-affix][data-placement="top"]').first()
+    await affix.scrollIntoViewIfNeeded()
+
+    const scroller = await scrollerBox(affix)
+    await wheelOver(page, scroller, 200)
+
+    await expect(affix).toHaveAttribute('data-stuck', 'true')
+
+    const pinned = (await affix.boundingBox())!
+    // Верх панели совпал с верхом блока, а не с верхом вьюпорта: корнем
+    // наблюдателя стал ближайший скроллпорт.
+    expect(Math.abs(pinned.y - scroller.y)).toBeLessThanOrEqual(2)
+    expect(scroller.y).toBeGreaterThan(4)
+  })
+
+  test('фон и тень приезжают вместе с прилипанием и уезжают с ним', async ({ page }) => {
+    const affix = page.locator('[data-gr-affix][data-placement="top"]').first()
+    await affix.scrollIntoViewIfNeeded()
+
+    const surface = () => affix.evaluate((el) => {
+      const style = getComputedStyle(el)
+
+      return { shadow: style.boxShadow, alpha: style.backgroundColor.includes('rgba(0, 0, 0, 0)') ? 0 : 1 }
+    })
+
+    // Проверка того, что класс вообще превратился в CSS: в jsdom это
+    // недостижимо, там `boxShadow` пуст у любого элемента.
+    expect(await surface()).toEqual({ shadow: 'none', alpha: 0 })
+
+    const scroller = await scrollerBox(affix)
+    await wheelOver(page, scroller, 200)
+    await expect(affix).toHaveAttribute('data-stuck', 'true')
+
+    // Ожидающие утверждения, а не мгновенный снимок: фон и тень едут переходом,
+    // и первый кадр после переключения состояния ещё держит прежние значения.
+    await expect.poll(async () => (await surface()).alpha, {
+      message: 'прилипшая панель обязана быть непрозрачной',
+    }).toBe(1)
+    await expect.poll(async () => (await surface()).shadow).not.toBe('none')
+
+    await wheelOver(page, scroller, -400)
+    await expect(affix).not.toHaveAttribute('data-stuck', 'true')
+    await expect.poll(async () => (await surface()).shadow).toBe('none')
+  })
+
+  test('раскладка не дёргается в момент прилипания', async ({ page }) => {
+    const affix = page.locator('[data-gr-affix][data-placement="top"]').first()
+    await affix.scrollIntoViewIfNeeded()
+
+    const before = (await affix.boundingBox())!
+    const scroller = await scrollerBox(affix)
+    await wheelOver(page, scroller, 200)
+    await expect(affix).toHaveAttribute('data-stuck', 'true')
+
+    const after = (await affix.boundingBox())!
+    // Ради этого граница сделана тенью, а не рамкой: рамка добавила бы высоту
+    // ровно в момент прилипания.
+    expect(after.height).toBe(before.height)
+  })
+
+  test('нижняя панель прилипла с самого начала и отпускается в конце формы', async ({ page }) => {
+    const affix = page.locator('[data-gr-affix][data-placement="bottom"]').first()
+    await affix.scrollIntoViewIfNeeded()
+
+    // Первую запись наблюдатель отдаёт сразу после `observe()`, поэтому
+    // состояние верно ещё до единой прокрутки.
+    await expect(affix).toHaveAttribute('data-stuck', 'true')
+
+    const scroller = await scrollerBox(affix)
+    const pinned = (await affix.boundingBox())!
+    expect(Math.abs((pinned.y + pinned.height) - (scroller.y + scroller.height))).toBeLessThanOrEqual(2)
+
+    await wheelOver(page, scroller, 2000)
+    await expect(affix).not.toHaveAttribute('data-stuck', 'true')
+  })
+
+  test('прилипшая панель перекрывает уезжающее под неё содержимое', async ({ page }) => {
+    const affix = page.locator('[data-gr-affix][data-placement="top"]').first()
+    await affix.scrollIntoViewIfNeeded()
+
+    const scroller = await scrollerBox(affix)
+    await wheelOver(page, scroller, 200)
+    await expect(affix).toHaveAttribute('data-stuck', 'true')
+
+    // Порядок отрисовки проверяется попаданием точки, а не числом `z-index`:
+    // числа локальны, а важно, кто оказался сверху.
+    const onTop = await affix.evaluate((el) => {
+      const rect = el.getBoundingClientRect()
+      const hit = document.elementFromPoint(rect.x + rect.width / 2, rect.y + rect.height / 2)
+
+      return Boolean(hit && el.contains(hit))
+    })
+
+    expect(onTop, 'строка списка оказалась поверх прилипшей панели').toBe(true)
+  })
+
+  test('выключенная панель не прилипает и остаётся в потоке', async ({ page }) => {
+    const toggle = page.getByRole('switch').first()
+    await toggle.scrollIntoViewIfNeeded()
+
+    // Демо с переключателем — последнее на странице, поэтому и панель последняя.
+    const affix = page.locator('[data-gr-affix]').last()
+    await expect(affix).toHaveClass(/sticky/)
+
+    await toggle.click()
+
+    await expect(affix).not.toHaveClass(/sticky/)
+    await expect(affix).not.toHaveAttribute('data-stuck', 'true')
+  })
+})

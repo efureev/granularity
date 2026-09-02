@@ -9,6 +9,51 @@ to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **New `GrAffix` — a panel that stays in view, and knows that it does.** A section heading
+  in a long list, a table of contents, the Save/Cancel bar under a long form: the panel
+  travels with the page and stops at the edge — of its own scrolling block or of the window.
+  Three implementations of this already lived in the package (`GrNavbar`, `stickyHeader` in
+  `GrTable`, pinned columns in `GrDataTable`) and each author rediscovered the same three
+  rules; consumers meanwhile wrote `sticky top-28` by hand, magic constant included.
+
+  **`position: sticky` does the positioning; the observer only reports.** A one-pixel
+  sentinel next to the panel marks where it would stand if it were not sticky, and an
+  `IntersectionObserver` whose root edge is pulled in by exactly the offset turns that root
+  edge into the line of attachment. State is read from the entry's rectangles rather than
+  from `isIntersecting`, which means both "has not arrived yet" and "has already left". The
+  component root is the sticky box itself, never a wrapper: a wrapper is the containing
+  block, and a panel that cannot travel inside it does not stick at all.
+
+  **The surface arrives with the state.** A detached action bar sits inside the form and has
+  to look like part of it, so background and shadow appear only once the panel is attached —
+  unlike `GrNavbar` and the `GrTable` header, which are opaque always. The background is not
+  optional: without it the content sliding underneath shows straight through. The separator
+  is a shadow rather than a border, because a border adds height exactly at the moment of
+  attachment and the layout would jump by a pixel.
+
+  **The offset can belong to a group.** The `offset` prop is instance data; a shared offset
+  for a whole region is `--gr-affix-offset` on the container or on `:root`. The measurement
+  reads the computed style, so the cascade, `4rem`, `var(--gr-navbar-height)` and `calc(…)`
+  all work the same way and are all picked up by the observer — which is why the component
+  has no `defaults.ts`. `remeasure()` re-reads an offset that moved without the prop moving.
+
+  **The layer stays local — `z-index: 10` inside the panel's own stacking context.** The
+  50-step gap in the `--gr-z-*` scale exists so an application can wedge its own sticky
+  header between levels, and this is that header; there is no package-wide answer to
+  "above or below the bottom navigation". An application that needs a scale layer writes
+  `--gr-affix-z: var(--gr-z-navbar)`.
+
+  **State is readable without JavaScript.** `data-stuck` on the attached panel, `stuck` in
+  the default slot, `stickyChange` on the way out. `disabled` turns attachment off without
+  unmounting, so focus and typed text survive a breakpoint change.
+
+  **Where sticky dies silently, the component says so.** An ancestor with an `overflow`
+  other than `visible` and nothing to scroll becomes a scrollport in which `sticky` never
+  moves — the build stays green, the class is in the markup, and nothing tells you. In dev
+  the offending ancestor is named. The walk reads the computed `overflow-y`, stops at the
+  first real scroller and never reaches `<body>`, so neither an `overflow-x: hidden` wrapper
+  nor the scroll lock of an open modal produces a false alarm.
+
 - **New `GrTransfer` — two lists side by side and a way across.** Assigning members to a
   project, permissions to a role, columns to a report: the directory stays on the left, what
   has been picked stands on the right, and both are visible at once. `GrSelect` with

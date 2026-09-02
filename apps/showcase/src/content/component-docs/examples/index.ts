@@ -1,3 +1,4 @@
+export { grAffixExamples } from './GrAffix.examples'
 export { grButtonExamples } from './GrButton.examples'
 export { grAutocompleteExamples } from './GrAutocomplete.examples'
 export { grSelectExamples } from './GrSelect.examples'

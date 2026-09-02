@@ -64,6 +64,7 @@ import {
   grBadgeExamples,
   grBadgeWrapExamples,
   grCardExamples,
+  grAffixExamples,
   grCarouselExamples,
   grBottomNavExamples,
   grNavbarExamples,
@@ -120,6 +121,21 @@ const grAutocompleteOverview: ShowcaseComponentOverviewDoc = {
     'Можно разрешить свои значения, которых нет в списке.',
     'Полностью управляется с клавиатуры и доступен для скринридеров.',
     'Кнопка очистки, кастомизация вида опций и пустых состояний, аккуратная интеграция с формами.',
+  ],
+}
+
+const grAffixOverview: ShowcaseComponentOverviewDoc = {
+  paragraphs: [
+    'Держит нужный кусок интерфейса на виду при прокрутке: заголовок раздела, оглавление, кнопки «Сохранить» под длинной формой. Панель едет вместе со страницей и останавливается у края — своего блока или окна.',
+    'Знает, что уже прилипла, и это видно: фон и тень появляются ровно в этот момент, а содержимое можно поменять — убрать подзаголовок, ужать кнопку до иконки.',
+  ],
+  features: [
+    'Верхний и нижний край — заголовок сверху, панель действий снизу.',
+    'Отступ от края числом, любой CSS-длиной или общей переменной на группу.',
+    'Фон и тень только в прилипшем виде: в потоке панель остаётся частью страницы.',
+    'Состояние в слоте, в событии и в `data-stuck` — реагировать можно и без JavaScript.',
+    'Работает внутри своей прокручиваемой области, а не только относительно окна.',
+    'Выключается пропом, не теряя фокус и введённые данные.',
   ],
 }
 
@@ -542,6 +558,7 @@ export const componentDocOverrides: Partial<Record<string, ShowcaseComponentDocM
   GrBadge: createComponentDocMeta(grBadgeExamples),
   GrBadgeWrap: createComponentDocMeta(grBadgeWrapExamples),
   GrCard: createComponentDocMeta(grCardExamples),
+  GrAffix: createComponentDocMeta(grAffixExamples, grAffixOverview),
   GrCarousel: createComponentDocMeta(grCarouselExamples, grCarouselOverview),
   GrBottomNav: createComponentDocMeta(grBottomNavExamples),
   GrBreadcrumbs: createComponentDocMeta(grBreadcrumbsExamples, grBreadcrumbsOverview),

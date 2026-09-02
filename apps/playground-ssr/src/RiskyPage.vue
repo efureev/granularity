@@ -4,6 +4,7 @@ import { ref } from 'vue'
 import { GrCodeBlock } from '@feugene/granularity-code/components/GrCodeBlock'
 
 import {
+  GrAffix,
   GrCarousel,
   GrCarouselSlide,
   GrCollapse,
@@ -144,6 +145,15 @@ const images = [
 
     <!-- Без `name`: имя скрытого input'а берётся из авто-id. -->
     <GrSegmented v-model="view" :options="views" />
+
+    <!--
+      Сентинел обязан приехать с сервера: рендерить его только на клиенте значило
+      бы разойтись по наличию узла. Состояние «прилипло» на сервере выключено, и
+      первый клиентский рендер обязан повторить это, не заглядывая в наблюдателя.
+    -->
+    <GrAffix :offset="64">
+      Липкая панель
+    </GrAffix>
 
     <!-- `useAnnouncer()` в setup: на сервере хост не должен даже пытаться встать. -->
     <GrInputTag v-model="tags" aria-label="Теги" />

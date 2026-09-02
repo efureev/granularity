@@ -1,4 +1,80 @@
 {
+  "GrAffix": {
+    "name": "GrAffix",
+    "sourcePath": "packages/granularity/src/components/GrAffix/GrAffix.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "placement",
+            "description": "Край, к которому прилипает панель.",
+            "type": "\"top\" | \"bottom\" | undefined",
+            "required": false,
+            "default": "\"top\""
+          },
+          {
+            "name": "offset",
+            "description": "Отступ от края в прилипшем состоянии. Число — пиксели, строка — как есть (`4rem`, `var(--gr-navbar-height)`, `calc(…)`). Общий отступ для группы панелей задаётся не пропом, а токеном `--gr-affix-offset` на контейнере или на `:root`: наблюдатель читает вычисленный стиль и подхватывает его так же, как значение пропа.",
+            "type": "string | number | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "disabled",
+            "description": "Прилипание выключено: разметка та же, `sticky` не ставится. Именно проп, а не `v-if` снаружи: размонтирование убило бы фокус на кнопке панели и состояние вложенных контролов.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "default",
+            "description": "Содержимое панели. `stuck` позволяет менять его в прилипшем виде.",
+            "type": "{ stuck: boolean; }"
+          }
+        ]
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "stickyChange",
+            "description": "",
+            "type": "[stuck: boolean]",
+            "signature": "(event: \"stickyChange\", stuck: boolean): void"
+          }
+        ]
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "stuck",
+            "description": "",
+            "type": "boolean"
+          },
+          {
+            "name": "remeasure",
+            "description": "",
+            "type": "() => void"
+          }
+        ]
+      }
+    ]
+  },
   "GrAlert": {
     "name": "GrAlert",
     "sourcePath": "packages/granularity/src/components/GrAlert/GrAlert.vue",
@@ -652,6 +728,13 @@
         "origin": "generated",
         "items": [
           {
+            "name": "placement",
+            "description": "",
+            "type": "\"top-right\" | \"top-left\" | \"bottom-right\" | \"bottom-left\" | undefined",
+            "required": false,
+            "default": "\"top-right\""
+          },
+          {
             "name": "tone",
             "description": "",
             "type": "\"primary\" | \"neutral\" | \"success\" | \"warning\" | \"danger\" | \"info\" | \"slate\" | \"azure\" | undefined",
@@ -692,13 +775,6 @@
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
-          },
-          {
-            "name": "placement",
-            "description": "",
-            "type": "\"top-right\" | \"top-left\" | \"bottom-right\" | \"bottom-left\" | undefined",
-            "required": false,
-            "default": "\"top-right\""
           },
           {
             "name": "animate",
@@ -966,6 +1042,20 @@
         "origin": "generated",
         "items": [
           {
+            "name": "disabled",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "type",
+            "description": "",
+            "type": "\"button\" | \"submit\" | \"reset\" | undefined",
+            "required": false,
+            "default": "\"button\""
+          },
+          {
             "name": "tone",
             "description": "",
             "type": "\"primary\" | \"neutral\" | \"success\" | \"warning\" | \"danger\" | \"info\" | \"slate\" | \"azure\" | undefined",
@@ -978,20 +1068,6 @@
             "type": "GrButtonVariant | undefined",
             "required": false,
             "default": "undefined"
-          },
-          {
-            "name": "type",
-            "description": "",
-            "type": "\"button\" | \"submit\" | \"reset\" | undefined",
-            "required": false,
-            "default": "\"button\""
-          },
-          {
-            "name": "disabled",
-            "description": "",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "false"
           },
           {
             "name": "size",
@@ -1551,15 +1627,15 @@
         "origin": "generated",
         "items": [
           {
-            "name": "modelValue",
-            "description": "Не задан внутри `GrCheckboxGroup` — состояние берётся из группы.",
+            "name": "disabled",
+            "description": "",
             "type": "boolean | undefined",
             "required": false,
             "default": "undefined"
           },
           {
-            "name": "disabled",
-            "description": "",
+            "name": "modelValue",
+            "description": "Не задан внутри `GrCheckboxGroup` — состояние берётся из группы.",
             "type": "boolean | undefined",
             "required": false,
             "default": "undefined"
@@ -1715,18 +1791,18 @@
         "origin": "generated",
         "items": [
           {
-            "name": "options",
-            "description": "",
-            "type": "GrCheckboxGroupOption[] | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
             "name": "disabled",
             "description": "",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
+          },
+          {
+            "name": "options",
+            "description": "",
+            "type": "GrCheckboxGroupOption[] | undefined",
+            "required": false,
+            "default": "undefined"
           },
           {
             "name": "readonly",
@@ -1857,6 +1933,13 @@
         "origin": "generated",
         "items": [
           {
+            "name": "disabled",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
             "name": "tone",
             "description": "",
             "type": "\"primary\" | \"neutral\" | \"success\" | \"warning\" | \"danger\" | \"info\" | \"slate\" | \"azure\" | undefined",
@@ -1866,13 +1949,6 @@
           {
             "name": "closable",
             "description": "Крестик. Внутри виджета он не кнопка — см. блок про роли ниже.",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "false"
-          },
-          {
-            "name": "disabled",
-            "description": "",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
@@ -2019,6 +2095,13 @@
         "origin": "generated",
         "items": [
           {
+            "name": "disabled",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
             "name": "tone",
             "description": "",
             "type": "\"primary\" | \"neutral\" | \"success\" | \"warning\" | \"danger\" | \"info\" | \"slate\" | \"azure\" | undefined",
@@ -2038,13 +2121,6 @@
             "type": "GrChipValue | GrChipValue[] | null | undefined",
             "required": false,
             "default": "undefined"
-          },
-          {
-            "name": "disabled",
-            "description": "",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "false"
           },
           {
             "name": "readonly",
@@ -2189,18 +2265,18 @@
         "origin": "generated",
         "items": [
           {
-            "name": "modelValue",
-            "description": "",
-            "type": "GrCollapseValue | GrCollapseValue[] | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
             "name": "disabled",
             "description": "",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
+          },
+          {
+            "name": "modelValue",
+            "description": "",
+            "type": "GrCollapseValue | GrCollapseValue[] | undefined",
+            "required": false,
+            "default": "undefined"
           },
           {
             "name": "size",
@@ -2321,11 +2397,11 @@
         "origin": "generated",
         "items": [
           {
-            "name": "open",
-            "description": "Контролируемое состояние панели (`v-model:open`).",
-            "type": "boolean | undefined",
+            "name": "placement",
+            "description": "Сторона, с которой раскрывается панель.",
+            "type": "\"bottom-start\" | \"bottom-end\" | \"top-start\" | \"top-end\" | undefined",
             "required": false,
-            "default": "undefined"
+            "default": "\"bottom-start\""
           },
           {
             "name": "disabled",
@@ -2333,6 +2409,13 @@
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
+          },
+          {
+            "name": "open",
+            "description": "Контролируемое состояние панели (`v-model:open`).",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "undefined"
           },
           {
             "name": "readonly",
@@ -2375,13 +2458,6 @@
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
-          },
-          {
-            "name": "placement",
-            "description": "Сторона, с которой раскрывается панель.",
-            "type": "\"bottom-start\" | \"bottom-end\" | \"top-start\" | \"top-end\" | undefined",
-            "required": false,
-            "default": "\"bottom-start\""
           },
           {
             "name": "alpha",
@@ -2982,11 +3058,11 @@
         "origin": "generated",
         "items": [
           {
-            "name": "open",
-            "description": "Открыто ли меню. Без пропа компонент ведёт состояние сам.",
-            "type": "boolean | undefined",
+            "name": "placement",
+            "description": "",
+            "type": "Placement | undefined",
             "required": false,
-            "default": "undefined"
+            "default": "\"bottom-start\""
           },
           {
             "name": "disabled",
@@ -2996,18 +3072,18 @@
             "default": "false"
           },
           {
+            "name": "open",
+            "description": "Открыто ли меню. Без пропа компонент ведёт состояние сам.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "ariaLabel",
             "description": "",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
-          },
-          {
-            "name": "placement",
-            "description": "",
-            "type": "Placement | undefined",
-            "required": false,
-            "default": "\"bottom-start\""
           },
           {
             "name": "items",
@@ -3862,16 +3938,16 @@
         "origin": "generated",
         "items": [
           {
-            "name": "variant",
-            "description": "Начертание линии. Не задано — берётся из `GrConfigProvider`, иначе `solid`.",
-            "type": "GrDividerVariant | undefined",
+            "name": "length",
+            "description": "Длина линии: высота вертикального разделителя, ширина горизонтального. Нужна вертикальному вне flex-родителя — там ему не от чего растянуться.",
+            "type": "string | number | undefined",
             "required": false,
             "default": "undefined"
           },
           {
-            "name": "length",
-            "description": "Длина линии: высота вертикального разделителя, ширина горизонтального. Нужна вертикальному вне flex-родителя — там ему не от чего растянуться.",
-            "type": "string | number | undefined",
+            "name": "variant",
+            "description": "Начертание линии. Не задано — берётся из `GrConfigProvider`, иначе `solid`.",
+            "type": "GrDividerVariant | undefined",
             "required": false,
             "default": "undefined"
           },
@@ -4155,11 +4231,18 @@
         "origin": "generated",
         "items": [
           {
-            "name": "open",
-            "description": "Контролируемое состояние панели (`v-model:open`). Без пропа панель ведёт себя сама (uncontrolled), с ним — слушайте `update:open` и меняйте проп.",
-            "type": "boolean | undefined",
+            "name": "placement",
+            "description": "Размещение панели относительно триггера; `flip` при нехватке места остаётся.",
+            "type": "Placement | undefined",
             "required": false,
-            "default": "undefined"
+            "default": "\"bottom-end\""
+          },
+          {
+            "name": "offset",
+            "description": "Зазор между триггером и панелью, px.",
+            "type": "number | undefined",
+            "required": false,
+            "default": "8"
           },
           {
             "name": "disabled",
@@ -4169,11 +4252,11 @@
             "default": "false"
           },
           {
-            "name": "placement",
-            "description": "Размещение панели относительно триггера; `flip` при нехватке места остаётся.",
-            "type": "Placement | undefined",
+            "name": "open",
+            "description": "Контролируемое состояние панели (`v-model:open`). Без пропа панель ведёт себя сама (uncontrolled), с ним — слушайте `update:open` и меняйте проп.",
+            "type": "boolean | undefined",
             "required": false,
-            "default": "\"bottom-end\""
+            "default": "undefined"
           },
           {
             "name": "trigger",
@@ -4202,13 +4285,6 @@
             "type": "GrDropdownWidth | undefined",
             "required": false,
             "default": "\"12rem\""
-          },
-          {
-            "name": "offset",
-            "description": "Зазор между триггером и панелью, px.",
-            "type": "number | undefined",
-            "required": false,
-            "default": "8"
           },
           {
             "name": "openDelay",
@@ -4292,11 +4368,18 @@
         "origin": "generated",
         "items": [
           {
-            "name": "open",
-            "description": "Контролируемое состояние панели (`v-model:open`) — прокидывается в `GrDropdown`. Без пропа меню ведёт себя само (uncontrolled).",
-            "type": "boolean | undefined",
+            "name": "placement",
+            "description": "Размещение панели относительно триггера; переворот при нехватке места остаётся.",
+            "type": "Placement | undefined",
             "required": false,
-            "default": "undefined"
+            "default": "\"bottom-end\""
+          },
+          {
+            "name": "offset",
+            "description": "Зазор между триггером и панелью, px.",
+            "type": "number | undefined",
+            "required": false,
+            "default": "8"
           },
           {
             "name": "disabled",
@@ -4306,11 +4389,11 @@
             "default": "false"
           },
           {
-            "name": "placement",
-            "description": "Размещение панели относительно триггера; переворот при нехватке места остаётся.",
-            "type": "Placement | undefined",
+            "name": "open",
+            "description": "Контролируемое состояние панели (`v-model:open`) — прокидывается в `GrDropdown`. Без пропа меню ведёт себя само (uncontrolled).",
+            "type": "boolean | undefined",
             "required": false,
-            "default": "\"bottom-end\""
+            "default": "undefined"
           },
           {
             "name": "items",
@@ -4360,13 +4443,6 @@
             "type": "GrDropdownWidth | undefined",
             "required": false,
             "default": "\"12rem\""
-          },
-          {
-            "name": "offset",
-            "description": "Зазор между триггером и панелью, px.",
-            "type": "number | undefined",
-            "required": false,
-            "default": "8"
           },
           {
             "name": "openDelay",
@@ -5126,7 +5202,7 @@
           {
             "name": "labelPosition",
             "description": "Подпись сверху (по умолчанию) или сбоку — для плотных форм.",
-            "type": "\"start\" | \"top\" | undefined",
+            "type": "\"top\" | \"start\" | undefined",
             "required": false,
             "default": "undefined"
           },
@@ -5225,14 +5301,14 @@
         "origin": "generated",
         "items": [
           {
-            "name": "multiple",
+            "name": "disabled",
             "description": "",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
           },
           {
-            "name": "disabled",
+            "name": "multiple",
             "description": "",
             "type": "boolean | undefined",
             "required": false,
@@ -5891,6 +5967,13 @@
         "origin": "generated",
         "items": [
           {
+            "name": "disabled",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
             "name": "type",
             "description": "",
             "type": "\"number\" | \"search\" | \"text\" | \"email\" | \"password\" | \"tel\" | \"url\" | undefined",
@@ -5903,13 +5986,6 @@
             "type": "string | undefined",
             "required": false,
             "default": "\"\""
-          },
-          {
-            "name": "disabled",
-            "description": "",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "false"
           },
           {
             "name": "readonly",
@@ -6190,6 +6266,13 @@
         "origin": "generated",
         "items": [
           {
+            "name": "disabled",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
             "name": "tagTone",
             "description": "",
             "type": "\"primary\" | \"neutral\" | \"success\" | \"warning\" | \"danger\" | \"info\" | \"slate\" | \"azure\" | undefined",
@@ -6216,13 +6299,6 @@
             "type": "GrBadgeRadius | undefined",
             "required": false,
             "default": "\"round\""
-          },
-          {
-            "name": "disabled",
-            "description": "",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "false"
           },
           {
             "name": "readonly",
@@ -6655,18 +6731,18 @@
         "origin": "generated",
         "items": [
           {
-            "name": "variant",
-            "description": "`merged` (по умолчанию) — сочетание одной плашкой, как его пишут сами системы: `⌘K` на macOS, `Ctrl+K` на прочих. `split` — по плашке на клавишу. `sequence` — аккорд «G затем I»: клавиши нажимают одну за другой.",
-            "type": "\"split\" | \"merged\" | \"sequence\" | undefined",
-            "required": false,
-            "default": "\"merged\""
-          },
-          {
             "name": "keys",
             "description": "Сочетание: строкой (`\"mod+shift+K\"`) или набором токенов (`['mod', 'K']`). Токен `mod` — Cmd на macOS, Ctrl на остальных.",
             "type": "string | string[] | undefined",
             "required": false,
             "default": "undefined"
+          },
+          {
+            "name": "variant",
+            "description": "`merged` (по умолчанию) — сочетание одной плашкой, как его пишут сами системы: `⌘K` на macOS, `Ctrl+K` на прочих. `split` — по плашке на клавишу. `sequence` — аккорд «G затем I»: клавиши нажимают одну за другой.",
+            "type": "\"split\" | \"merged\" | \"sequence\" | undefined",
+            "required": false,
+            "default": "\"merged\""
           },
           {
             "name": "size",
@@ -6727,6 +6803,13 @@
         "origin": "generated",
         "items": [
           {
+            "name": "disabled",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
             "name": "tone",
             "description": "Семантический цвет ссылки из палитры `GrTone`.",
             "type": "\"primary\" | \"neutral\" | \"success\" | \"warning\" | \"danger\" | \"info\" | \"slate\" | \"azure\" | undefined",
@@ -6739,13 +6822,6 @@
             "type": "GrLinkVariant | undefined",
             "required": false,
             "default": "\"default\""
-          },
-          {
-            "name": "disabled",
-            "description": "",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "false"
           },
           {
             "name": "size",
@@ -7798,11 +7874,11 @@
         "origin": "generated",
         "items": [
           {
-            "name": "open",
-            "description": "Открыт ли поповер. Без этого пропа компонент ведёт состояние сам (uncontrolled), с ним — слушайте `update:open`.",
-            "type": "boolean | undefined",
+            "name": "placement",
+            "description": "",
+            "type": "Placement | undefined",
             "required": false,
-            "default": "undefined"
+            "default": "\"bottom-start\""
           },
           {
             "name": "disabled",
@@ -7810,6 +7886,13 @@
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
+          },
+          {
+            "name": "open",
+            "description": "Открыт ли поповер. Без этого пропа компонент ведёт состояние сам (uncontrolled), с ним — слушайте `update:open`.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "undefined"
           },
           {
             "name": "size",
@@ -7824,13 +7907,6 @@
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
-          },
-          {
-            "name": "placement",
-            "description": "",
-            "type": "Placement | undefined",
-            "required": false,
-            "default": "\"bottom-start\""
           },
           {
             "name": "block",
@@ -8541,6 +8617,13 @@
         "origin": "generated",
         "items": [
           {
+            "name": "disabled",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "variant",
             "description": "",
             "type": "GrRadioVariant | undefined",
@@ -8551,13 +8634,6 @@
             "name": "modelValue",
             "description": "",
             "type": "GrRadioValue | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
-            "name": "disabled",
-            "description": "",
-            "type": "boolean | undefined",
             "required": false,
             "default": "undefined"
           },
@@ -8694,6 +8770,13 @@
         "origin": "generated",
         "items": [
           {
+            "name": "disabled",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
             "name": "variant",
             "description": "",
             "type": "GrRadioGroupVariant | undefined",
@@ -8706,13 +8789,6 @@
             "type": "GrRadioGroupOption[] | undefined",
             "required": false,
             "default": "undefined"
-          },
-          {
-            "name": "disabled",
-            "description": "",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "false"
           },
           {
             "name": "readonly",
@@ -8843,6 +8919,13 @@
         "origin": "generated",
         "items": [
           {
+            "name": "disabled",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
             "name": "tone",
             "description": "Тон заливки; точечно перекрывается переменной `--gr-rating-color`.",
             "type": "\"primary\" | \"neutral\" | \"success\" | \"warning\" | \"danger\" | \"info\" | \"slate\" | \"azure\" | undefined",
@@ -8855,13 +8938,6 @@
             "type": "string | Component | undefined",
             "required": false,
             "default": "undefined"
-          },
-          {
-            "name": "disabled",
-            "description": "",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "false"
           },
           {
             "name": "readonly",
@@ -9185,18 +9261,18 @@
         "origin": "generated",
         "items": [
           {
-            "name": "variant",
-            "description": "",
-            "type": "GrSegmentedVariant | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
             "name": "disabled",
             "description": "",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
+          },
+          {
+            "name": "variant",
+            "description": "",
+            "type": "GrSegmentedVariant | undefined",
+            "required": false,
+            "default": "undefined"
           },
           {
             "name": "readonly",
@@ -10273,18 +10349,18 @@
         "origin": "generated",
         "items": [
           {
-            "name": "modelValue",
-            "description": "Доля первой панели в процентах. Поддерживает `v-model`; без него компонент помнит размер сам.",
-            "type": "number | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
             "name": "disabled",
             "description": "Разделитель не тянется, не фокусируется и не отвечает на клавиши.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
+          },
+          {
+            "name": "modelValue",
+            "description": "Доля первой панели в процентах. Поддерживает `v-model`; без него компонент помнит размер сам.",
+            "type": "number | undefined",
+            "required": false,
+            "default": "undefined"
           },
           {
             "name": "ariaLabel",
@@ -10763,15 +10839,15 @@
         "origin": "generated",
         "items": [
           {
-            "name": "modelValue",
-            "description": "Значение переключателя. Необязательное: без `v-model` контрол рисуется выключенным — так же, как `GrCheckbox`. Обязательный проп заставлял бы заводить `ref` даже там, где переключатель presentational.",
+            "name": "disabled",
+            "description": "",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
           },
           {
-            "name": "disabled",
-            "description": "",
+            "name": "modelValue",
+            "description": "Значение переключателя. Необязательное: без `v-model` контрол рисуется выключенным — так же, как `GrCheckbox`. Обязательный проп заставлял бы заводить `ref` даже там, где переключатель presentational.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
@@ -11742,11 +11818,11 @@
         "origin": "generated",
         "items": [
           {
-            "name": "open",
-            "description": "Управляемая видимость. Без неё компонент ведёт видимость сам.",
-            "type": "boolean | undefined",
+            "name": "placement",
+            "description": "Предпочтительная сторона панели; `flip` может её изменить.",
+            "type": "Placement | undefined",
             "required": false,
-            "default": "undefined"
+            "default": "\"top\""
           },
           {
             "name": "disabled",
@@ -11756,18 +11832,18 @@
             "default": "false"
           },
           {
+            "name": "open",
+            "description": "Управляемая видимость. Без неё компонент ведёт видимость сам.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "size",
             "description": "Размер панели и дефолтной триггер-иконки.",
             "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
             "required": false,
             "default": "undefined"
-          },
-          {
-            "name": "placement",
-            "description": "Предпочтительная сторона панели; `flip` может её изменить.",
-            "type": "Placement | undefined",
-            "required": false,
-            "default": "\"top\""
           },
           {
             "name": "offsetPx",

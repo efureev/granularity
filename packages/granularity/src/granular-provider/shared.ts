@@ -14,6 +14,7 @@ import {
   resolvePackageBaseUrl,
 } from '@feugene/unocss-preset-granular/contract'
 // <granularity:components:imports> — блок генерируется `yarn generate:registry`
+import { grAffixConfig } from '../components/GrAffix/config'
 import { grAlertConfig } from '../components/GrAlert/config'
 import { grAutocompleteConfig } from '../components/GrAutocomplete/config'
 import { grAvatarConfig } from '../components/GrAvatar/config'
@@ -125,6 +126,7 @@ const theme = {
  */
 export const granularityComponentConfigs = {
   // <granularity:components:registry> — блок генерируется `yarn generate:registry`
+  GrAffix: grAffixConfig,
   GrAlert: grAlertConfig,
   GrAutocomplete: grAutocompleteConfig,
   GrAvatar: grAvatarConfig,

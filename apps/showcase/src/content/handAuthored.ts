@@ -10,7 +10,7 @@ const componentGroups = {
   overlays: ['GrCollapse', 'GrConfirmDialog', 'GrContextMenu', 'GrDialog', 'GrDrawer', 'GrDropdown', 'GrDropdownMenu', 'GrImageViewer', 'GrModal', 'GrPopover', 'GrPromptDialog'],
   forms: ['GrAutocomplete', 'GrCheckbox', 'GrCheckboxGroup', 'GrColorPicker', 'GrFileUpload', 'GrForm', 'GrFormFile', 'GrFormField', 'GrFormSection', 'GrInput', 'GrNumberInput', 'GrInputTag', 'GrRadio', 'GrRadioGroup', 'GrRating', 'GrSegmented', 'GrSelect', 'GrSlider', 'GrTransfer', 'GrSwitch', 'GrTextarea', 'GrTreeSelect'],
   data: ['GrAvatar', 'GrCard', 'GrCarousel', 'GrChip', 'GrChipGroup', 'GrFilePreview', 'GrDataTable', 'GrDelta', 'GrDescriptionList', 'GrDivider', 'GrIcon', 'GrJsonViewer', 'GrKbd', 'GrList', 'GrSortableList', 'GrStatistic', 'GrTable', 'GrTimeline', 'GrTree', 'GrValue'],
-  utilities: ['GrConfigProvider', 'GrSplitter'],
+  utilities: ['GrAffix', 'GrConfigProvider', 'GrSplitter'],
 } as const satisfies Record<string, readonly string[]>
 
 export const componentGroupOrder: readonly string[] = [...Object.keys(componentGroups), 'misc']
@@ -19,6 +19,7 @@ export const componentGroupOrder: readonly string[] = [...Object.keys(componentG
 // (`showcase.entitySummaries.component.<name>`), накладываются при рендере через
 // `useShowcasePageI18n().localizeEntity` / `localizeEntitySummary`.
 const componentSummaryOverrides = {
+  GrAffix: 'Keeps a block in view while the page scrolls — a section header, a table of contents, form actions.',
   GrAlert: 'Shows an important message, warning or action status.',
   GrAutocomplete: 'A combobox with type-ahead search over options, async loading and multi-select chips.',
   GrAvatar: 'Displays a user photo, or initials / a fallback when it is missing.',

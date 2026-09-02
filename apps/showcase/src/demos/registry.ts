@@ -12,6 +12,11 @@ import { defineAsyncComponent } from 'vue'
  * Порядок — алфавитный по ключу, его держит гейт `examplePreviews.test.ts`.
  */
 export const demoPathByPreviewKey = {
+  'gr-affix-disabled': 'components/gr-affix/GrAffixDisabledDemo.vue',
+  'gr-affix-form-actions': 'components/gr-affix/GrAffixFormActionsDemo.vue',
+  'gr-affix-offset': 'components/gr-affix/GrAffixOffsetDemo.vue',
+  'gr-affix-sections': 'components/gr-affix/GrAffixSectionsDemo.vue',
+  'gr-affix-state': 'components/gr-affix/GrAffixStateDemo.vue',
   'extra-charts-area-basic': 'extra/granularity-charts/GrChartAreaBasicDemo.vue',
   'extra-charts-area-share': 'extra/granularity-charts/GrChartAreaShareDemo.vue',
   'extra-charts-area-stacked': 'extra/granularity-charts/GrChartAreaStackedDemo.vue',
