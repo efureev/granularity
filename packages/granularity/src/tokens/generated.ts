@@ -3324,10 +3324,31 @@ export const grComponentTokens: GrComponentToken[] = [
   },
   {
     "owner": "GrTransfer",
+    "name": "--gr-transfer-fade",
+    "kind": "hook",
+    "default": "1.25rem",
+    "description": "Высота затухания у края списка. Полоса прокрутки панели на части систем невидима, и без затухания обрезанная посередине строка читается как дефект отрисовки."
+  },
+  {
+    "owner": "GrTransfer",
+    "name": "--gr-transfer-list-mask",
+    "kind": "css",
+    "default": "не задана, пока список влезает целиком",
+    "description": "Маска затухания списка. Задаётся собственным CSS компонента по `data-overflow`: у какого края есть продолжение, тот и гаснет."
+  },
+  {
+    "owner": "GrTransfer",
     "name": "--gr-transfer-selected-bg",
     "kind": "hook",
     "default": "12 % от `--gr-primary` через `color-mix`",
     "description": "Подложка отмеченной строки. Тон, а не заливка: текст остаётся обычным `--gr-fg`, и контраст не приходится выверять заново."
+  },
+  {
+    "owner": "GrTransfer",
+    "name": "--gr-transfer-arrived-bg",
+    "kind": "hook",
+    "default": "32 % от `--gr-primary` через `color-mix`",
+    "description": "Начальный кадр подсветки строки, только что приехавшей из соседней панели. Подсветка гаснет сама и под `prefers-reduced-motion` не показывается вовсе."
   },
   {
     "owner": "GrTransfer",

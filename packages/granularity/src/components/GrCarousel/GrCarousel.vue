@@ -9,7 +9,7 @@ import { useGranularityTranslations } from '../../internal/granularityI18n'
 import { useGrComponentProp } from '../GrConfigProvider/context'
 import { resolveScrollOverflow } from '../shared/scrollOverflow'
 import type { GrScrollOverflow } from '../shared/scrollOverflow'
-import { clampIndex, stepIndex } from './carouselNavigation'
+import { clampIndex, stepIndex, stripScrollLeft } from './carouselNavigation'
 import { useCarouselAutoplay } from './composables/useCarouselAutoplay'
 import { useCarouselSwipe } from './composables/useCarouselSwipe'
 import { GR_CAROUSEL_CONTEXT } from './grCarouselContext'
@@ -28,6 +28,7 @@ import {
   grCarouselIndicatorsClass,
 } from './grCarouselStyles'
 import type { GrCarouselActivationMode, GrCarouselIndicators } from './grCarouselStyles'
+import type { GrTone } from '../shared/tones'
 
 import IconChevronLeft from '~icons/lucide/chevron-left'
 import IconChevronRight from '~icons/lucide/chevron-right'
@@ -45,6 +46,8 @@ export interface GrCarouselProps {
   loop?: boolean
   /** Вид переключателя кадров. `none` меняет и роль самих слайдов. */
   indicators?: GrCarouselIndicators
+  /** Тон текущего переключателя по общей шкале пакета. */
+  tone?: GrTone
   /** Листает ли стрелка по переключателям сразу или только двигает фокус. */
   activationMode?: GrCarouselActivationMode
   /** Стрелки «назад/вперёд». */
@@ -77,6 +80,7 @@ const props = withDefaults(defineProps<GrCarouselProps>(), {
   // Дефолт живёт в резолвере: Vue подставил бы свой раньше `GrConfigProvider`,
   // и «пользователь передал» стало бы неотличимо от «сработал дефолт».
   indicators: undefined,
+  tone: undefined,
   activationMode: undefined,
   arrows: true,
   swipe: true,
@@ -95,6 +99,13 @@ const emit = defineEmits<GrCarouselEmits>()
 defineSlots<{
   /** Кадры ленты — `GrCarouselSlide`. */
   default?: () => unknown
+  /**
+   * Своя иконка кнопки «назад». Заменяет содержимое кнопки, но не её саму:
+   * имя, `aria-disabled` и поведение на краю остаются за компонентом.
+   */
+  prev?: (props: { disabled: boolean }) => unknown
+  /** Своя иконка кнопки «вперёд». */
+  next?: (props: { disabled: boolean }) => unknown
 }>()
 
 const { t } = useGranularityTranslations()
@@ -102,6 +113,7 @@ const { announce } = useAnnouncer()
 
 const resolvedIndicators = useGrComponentProp('GrCarousel', 'indicators', () => props.indicators, 'dots')
 const resolvedActivation = useGrComponentProp('GrCarousel', 'activationMode', () => props.activationMode, 'automatic')
+const resolvedTone = useGrComponentProp('GrCarousel', 'tone', () => props.tone, 'primary')
 
 const rootEl = ref<HTMLElement | null>(null)
 const viewportEl = ref<HTMLElement | null>(null)
@@ -280,8 +292,28 @@ watch(total, (count) => {
   }
 })
 
+/**
+ * Прокрутка **полосы**, а не страницы.
+ *
+ * `scrollIntoView` двигает всех предков, включая документ: карусель, уехавшая
+ * под сгиб, на каждом шаге автопрокрутки утаскивала бы страницу обратно к себе.
+ * Поэтому позиция считается сама и присваивается `scrollLeft` полосы.
+ */
 function scrollTabIntoView(index: number): void {
-  tabRefs.value[index]?.scrollIntoView?.({ block: 'nearest', inline: 'nearest' })
+  const strip = indicatorsEl.value
+  const tab = tabRefs.value[index]
+  if (!strip || !tab)
+    return
+
+  const next = stripScrollLeft(
+    strip.scrollLeft,
+    strip.clientWidth,
+    tab.offsetLeft,
+    tab.offsetLeft + tab.offsetWidth,
+  )
+
+  if (next !== strip.scrollLeft)
+    strip.scrollLeft = next
 }
 
 function setTabRef(el: Element | ComponentPublicInstance | null, index: number): void {
@@ -525,7 +557,9 @@ defineExpose({
         :aria-label="prevLabel ?? t('gr.carousel.previous', 'Previous slide')"
         @click="atStart ? undefined : step(-1)"
       >
-        <IconChevronLeft :class="carouselIconClass" aria-hidden="true" />
+        <slot name="prev" :disabled="atStart">
+          <IconChevronLeft :class="carouselIconClass" aria-hidden="true" />
+        </slot>
       </button>
 
       <button
@@ -537,7 +571,9 @@ defineExpose({
         :aria-label="nextLabel ?? t('gr.carousel.next', 'Next slide')"
         @click="atEnd ? undefined : step(1)"
       >
-        <IconChevronRight :class="carouselIconClass" aria-hidden="true" />
+        <slot name="next" :disabled="atEnd">
+          <IconChevronRight :class="carouselIconClass" aria-hidden="true" />
+        </slot>
       </button>
     </div>
 
@@ -565,7 +601,7 @@ defineExpose({
         :aria-controls="entry.id"
         :aria-label="indicatorName(index)"
         :tabindex="roving.tabindexFor(index)"
-        :class="grCarouselIndicatorClass(resolvedIndicators, index === currentIndex)"
+        :class="grCarouselIndicatorClass(resolvedIndicators, index === currentIndex, resolvedTone)"
         @click="onIndicatorClick(index)"
       >
         <component :is="entry.thumbnail" v-if="isThumbnails && entry.hasThumbnail()" />

@@ -12,13 +12,18 @@ const options = [
 </script>
 
 <template>
-  <div class="flex max-w-lg flex-col gap-4">
+  <div class="flex w-full flex-col gap-4">
     <GrSegmented v-model="count" :options="options" aria-label="Сколько кадров в ленте" />
 
-    <GrCarousel aria-label="Лента переменного состава">
+    <GrCarousel aria-label="Лента переменного состава" tone="success">
       <GrCarouselSlide v-for="frame in count" :key="frame" :label="`Кадр ${frame}`">
-        <div class="flex h-40 items-center justify-center bg-[var(--gr-muted)]">
-          Кадр {{ frame }}
+        <div class="flex h-48 flex-col items-center justify-center gap-1 rounded-[var(--gr-radius-md)] border border-dashed border-[var(--gr-brd)] bg-[var(--gr-muted)]">
+          <span class="text-[length:var(--gr-text-lg)] leading-[var(--gr-leading-lg)] font-600">
+            Кадр {{ frame }}
+          </span>
+          <span class="text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)] text-[var(--gr-muted-fg)]">
+            из {{ count }}
+          </span>
         </div>
       </GrCarouselSlide>
     </GrCarousel>

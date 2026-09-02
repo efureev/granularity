@@ -6,6 +6,8 @@
     "toTarget": "Mover a seleccionados",
     "toSource": "Devolver a disponibles",
     "selectAll": "Seleccionar todo lo mostrado",
+    "moveUp": "Subir",
+    "moveDown": "Bajar",
     "selected": "{count} de {total}",
     "shown": "Mostrando {shown} de {total}",
     "empty": "Aquí no hay nada todavía",

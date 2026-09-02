@@ -7,6 +7,7 @@ import {
   stepIndex,
   SWIPE_RESISTANCE,
   SWIPE_THRESHOLD_PX,
+  stripScrollLeft,
   swipeThresholdFor,
 } from '../carouselNavigation'
 
@@ -104,5 +105,27 @@ describe('stepIndex', () => {
 
   it('на пустой ленте даёт ноль', () => {
     expect(stepIndex(0, 1, 0, true)).toBe(0)
+  })
+})
+
+describe('stripScrollLeft', () => {
+  it('видимый кадр полосу не двигает', () => {
+    expect(stripScrollLeft(0, 200, 40, 90)).toBe(0)
+  })
+
+  it('кадр левее видимой части — подтягивает к нему', () => {
+    expect(stripScrollLeft(100, 200, 40, 90)).toBe(40)
+  })
+
+  it('кадр правее — подтягивает минимально, а не центрирует', () => {
+    expect(stripScrollLeft(0, 200, 260, 300)).toBe(100)
+  })
+
+  it('за левый край не уезжает', () => {
+    expect(stripScrollLeft(50, 200, 10, 40, 100)).toBe(0)
+  })
+
+  it('нулевая ширина полосы — в jsdom она всегда такая — ничего не меняет', () => {
+    expect(stripScrollLeft(30, 0, 100, 200)).toBe(30)
   })
 })

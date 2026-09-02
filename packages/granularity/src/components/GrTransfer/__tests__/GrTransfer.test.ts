@@ -1,6 +1,6 @@
 import { mount } from '@vue/test-utils'
 import { afterEach, describe, expect, it } from 'vitest'
-import { nextTick } from 'vue'
+import { nextTick, ref } from 'vue'
 
 import { resetGranularityDom } from '../../../testing'
 import GrTransfer from '../GrTransfer.vue'
@@ -282,5 +282,86 @@ describe('GrTransfer: поиск', () => {
     const wrapper = mountTransfer({ searchable: false })
 
     expect(wrapper.findAll('input[type="search"]')).toHaveLength(0)
+  })
+})
+
+describe('GrTransfer: обратная связь и перестановка кнопками', () => {
+  it('приехавшие строки коротко подсвечиваются', async () => {
+    // Модель обязана быть живой: без неё правая панель не пополняется вовсе,
+    // и проверять было бы нечего.
+    const model = ref<string[]>([])
+    const wrapper = mount({
+      components: { GrTransfer },
+      setup: () => ({ model, catalog }),
+      template: `<GrTransfer v-model="model" :items="catalog" aria-label="Права" />`,
+    }, { attachTo: document.body })
+    await nextTick()
+
+    await wrapper.findAll('[data-gr-transfer-option]')[0].trigger('dblclick')
+    await nextTick()
+    await nextTick()
+
+    const target = wrapper.get('[data-gr-transfer-list="target"]').findAll('[data-gr-transfer-option]')
+    expect(target).toHaveLength(1)
+    expect(target[0].classes()).toContain('gr-transfer-arrived')
+  })
+
+  it('подсветка не остаётся на строках, которые никуда не ехали', async () => {
+    const model = ref<string[]>(['b'])
+    const wrapper = mount({
+      components: { GrTransfer },
+      setup: () => ({ model, catalog }),
+      template: `<GrTransfer v-model="model" :items="catalog" aria-label="Права" />`,
+    }, { attachTo: document.body })
+    await nextTick()
+
+    await wrapper.get('[data-gr-transfer-list="source"]')
+      .findAll('[data-gr-transfer-option]')[0]
+      .trigger('dblclick')
+    await nextTick()
+    await nextTick()
+
+    const marked = wrapper.get('[data-gr-transfer-list="target"]')
+      .findAll('[data-gr-transfer-option]')
+      .filter(row => row.classes().includes('gr-transfer-arrived'))
+    expect(marked).toHaveLength(1)
+  })
+
+  it('кнопки перестановки видны у правой панели и двигают выделение', async () => {
+    const wrapper = mountTransfer({ modelValue: ['a', 'b', 'c'] })
+    await optionsOf(wrapper, 'target')[0].trigger('click')
+    await wrapper.get('[data-gr-transfer-move-down]').trigger('click')
+    await nextTick()
+
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([['b', 'a', 'c']])
+  })
+
+  it('перестановка кнопкой вверх', async () => {
+    const wrapper = mountTransfer({ modelValue: ['a', 'b', 'c'] })
+    await optionsOf(wrapper, 'target')[2].trigger('click')
+    await wrapper.get('[data-gr-transfer-move-up]').trigger('click')
+    await nextTick()
+
+    expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([['a', 'c', 'b']])
+  })
+
+  it('без sortable кнопок перестановки нет', () => {
+    const wrapper = mountTransfer({ modelValue: ['a', 'b'], sortable: false })
+
+    expect(wrapper.find('[data-gr-transfer-move-up]').exists()).toBe(false)
+  })
+
+  it('на одном кадре справа кнопок перестановки нет', () => {
+    const wrapper = mountTransfer({ modelValue: ['a'] })
+
+    expect(wrapper.find('[data-gr-transfer-move-up]').exists()).toBe(false)
+  })
+
+  it('кнопка без выбора погашена, но остаётся в таб-порядке', () => {
+    const wrapper = mountTransfer({ modelValue: ['a', 'b'] })
+    const up = wrapper.get('[data-gr-transfer-move-up]')
+
+    expect(up.attributes('disabled')).toBeUndefined()
+    expect(up.attributes('aria-label')).toBe('Move up')
   })
 })

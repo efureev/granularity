@@ -15,7 +15,7 @@ const permissions = [
 </script>
 
 <template>
-  <div class="max-w-2xl">
+  <div class="w-full">
     <GrTransfer
       v-model="granted"
       :items="permissions"

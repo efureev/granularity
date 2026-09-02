@@ -1,9 +1,34 @@
+import type { GrTone } from '../shared/tones'
+
 /**
  * Вид переключателя слайдов. `none` меняет не только внешность, но и роль самих
  * слайдов: без переключателя `tabpanel` не к чему привязать — см. `GrCarousel.vue`.
  */
 export const GR_CAROUSEL_INDICATORS = ['dots', 'thumbnails', 'none'] as const
 export type GrCarouselIndicators = typeof GR_CAROUSEL_INDICATORS[number]
+
+/**
+ * Тон текущего переключателя. Своей шкалы компонент не заводит: она одна на
+ * пакет, и хук `--gr-carousel-dot-active` перебивает её точечно.
+ */
+const dotToneVars: Record<GrTone, string> = {
+  primary: 'var(--gr-carousel-dot-active,var(--gr-primary))',
+  neutral: 'var(--gr-carousel-dot-active,var(--gr-secondary))',
+  success: 'var(--gr-carousel-dot-active,var(--gr-success))',
+  warning: 'var(--gr-carousel-dot-active,var(--gr-warning))',
+  danger: 'var(--gr-carousel-dot-active,var(--gr-danger))',
+  info: 'var(--gr-carousel-dot-active,var(--gr-info))',
+  slate: 'var(--gr-carousel-dot-active,var(--gr-slate))',
+  azure: 'var(--gr-carousel-dot-active,var(--gr-azure))',
+}
+
+export function grCarouselDotActiveClass(tone: GrTone): string {
+  return `bg-[${dotToneVars[tone]}]`
+}
+
+export function grCarouselThumbActiveClass(tone: GrTone): string {
+  return `border-[${dotToneVars[tone]}]`
+}
 
 /** `automatic` — стрелка по индикаторам сразу листает; `manual` — только двигает фокус. */
 export const GR_CAROUSEL_ACTIVATION_MODES = ['automatic', 'manual'] as const
@@ -67,14 +92,12 @@ export const carouselIndicatorBase = 'shrink-0 transition-colors focus:outline-n
 export const carouselDotBase = 'rounded-[var(--gr-radius-full)] h-[var(--gr-carousel-dot-size,0.5rem)] w-[var(--gr-carousel-dot-size,0.5rem)]'
 
 export const carouselDotStates = {
-  active: 'bg-[var(--gr-carousel-dot-active,var(--gr-primary))]',
   idle: 'bg-[var(--gr-carousel-dot,var(--gr-brd))] hover:bg-[var(--gr-muted-fg)]',
 } as const
 
 export const carouselThumbBase = 'overflow-hidden rounded-[var(--gr-radius-md)] border-2 w-[var(--gr-carousel-thumb-width,4rem)] h-[var(--gr-carousel-thumb-height,2.5rem)]'
 
 export const carouselThumbStates = {
-  active: 'border-[var(--gr-carousel-dot-active,var(--gr-primary))]',
   idle: 'border-[var(--gr-brd)] hover:border-[var(--gr-muted-fg)]',
 } as const
 
@@ -95,18 +118,22 @@ export function grCarouselIndicatorsClass(variant: GrCarouselIndicators): string
   return [carouselIndicatorsBase, carouselIndicatorsVariants[variant]].filter(Boolean).join(' ')
 }
 
-export function grCarouselIndicatorClass(variant: GrCarouselIndicators, active: boolean): string {
+export function grCarouselIndicatorClass(
+  variant: GrCarouselIndicators,
+  active: boolean,
+  tone: GrTone = 'primary',
+): string {
   if (variant === 'thumbnails') {
     return [
       carouselIndicatorBase,
       carouselThumbBase,
-      active ? carouselThumbStates.active : carouselThumbStates.idle,
+      active ? grCarouselThumbActiveClass(tone) : carouselThumbStates.idle,
     ].join(' ')
   }
 
   return [
     carouselIndicatorBase,
     carouselDotBase,
-    active ? carouselDotStates.active : carouselDotStates.idle,
+    active ? grCarouselDotActiveClass(tone) : carouselDotStates.idle,
   ].join(' ')
 }

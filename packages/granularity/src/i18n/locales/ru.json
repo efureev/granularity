@@ -6,6 +6,8 @@
     "toTarget": "Перенести к выбранным",
     "toSource": "Вернуть к доступным",
     "selectAll": "Выбрать всё показанное",
+    "moveUp": "Выше",
+    "moveDown": "Ниже",
     "selected": "{count} из {total}",
     "shown": "Показано {shown} из {total}",
     "empty": "Здесь пока пусто",

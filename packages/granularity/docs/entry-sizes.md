@@ -20,8 +20,8 @@
 | `GrColorPicker` | 64.6 kB | 35 | 11 % |
 | `GrJsonViewer` | 58.6 kB | 35 | 10 % |
 | `GrAutocomplete` | 56.6 kB | 37 | 10 % |
+| `GrTransfer` | 54.0 kB | 37 | 9 % |
 | `GrConfirmDialog` | 53.2 kB | 28 | 9 % |
-| `GrTransfer` | 50.4 kB | 34 | 9 % |
 | `GrDataTable` | 50.4 kB | 32 | 9 % |
 | `GrCommandPalette` | 50.1 kB | 27 | 9 % |
 | `GrContextMenu` | 50.1 kB | 26 | 9 % |
@@ -39,10 +39,10 @@
 | `GrFormFile` | 27.4 kB | 23 | 5 % |
 | `GrTooltip` | 26.2 kB | 18 | 5 % |
 | `GrResponseErrorBanner` | 26.2 kB | 14 | 5 % |
+| `GrCarousel` | 25.3 kB | 17 | 4 % |
 | `GrSortableList` | 24.2 kB | 16 | 4 % |
-| `GrCarousel` | 24.1 kB | 16 | 4 % |
 | `GrList` | 22.5 kB | 16 | 4 % |
-| `GrNumberInput` | 20.6 kB | 18 | 4 % |
+| `GrNumberInput` | 20.8 kB | 19 | 4 % |
 | `GrBreadcrumbs` | 19.6 kB | 13 | 3 % |
 | `GrSidebar` | 19.0 kB | 16 | 3 % |
 | `GrCollapse` | 18.8 kB | 14 | 3 % |
@@ -78,11 +78,11 @@
 | `GrFormField` | 9.8 kB | 10 | 2 % |
 | `GrAlert` | 9.6 kB | 9 | 2 % |
 | `GrBottomNav` | 8.9 kB | 7 | 2 % |
-| `GrBadge` | 8.5 kB | 10 | 2 % |
+| `GrBadge` | 8.5 kB | 10 | 1 % |
 | `GrDescriptionList` | 8.3 kB | 5 | 1 % |
 | `GrCard` | 8.3 kB | 5 | 1 % |
 | `GrConfigProvider` | 7.4 kB | 6 | 1 % |
-| `GrProgressBar` | 7.1 kB | 7 | 1 % |
+| `GrProgressBar` | 7.2 kB | 8 | 1 % |
 | `GrBadgeWrap` | 6.3 kB | 7 | 1 % |
 | `GrIcon` | 6.2 kB | 7 | 1 % |
 | `GrDivider` | 6.1 kB | 5 | 1 % |
@@ -92,4 +92,4 @@
 | `GrTabPanels` | 1.9 kB | 3 | < 1 % |
 | `GrButtonGroup` | 1.8 kB | 5 | < 1 % |
 
-Весь пакет из корня — 568.2 kB.
+Весь пакет из корня — 571.1 kB.

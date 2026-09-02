@@ -1337,6 +1337,13 @@
         "origin": "generated",
         "items": [
           {
+            "name": "tone",
+            "description": "Тон текущего переключателя по общей шкале пакета.",
+            "type": "\"primary\" | \"neutral\" | \"success\" | \"warning\" | \"danger\" | \"info\" | \"slate\" | \"azure\" | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "modelValue",
             "description": "Индекс текущего кадра. Не передан — лента ведёт позицию сама.",
             "type": "number | undefined",
@@ -1459,6 +1466,16 @@
             "name": "default",
             "description": "Кадры ленты — `GrCarouselSlide`.",
             "type": "any"
+          },
+          {
+            "name": "prev",
+            "description": "Своя иконка кнопки «назад». Заменяет содержимое кнопки, но не её саму: имя, `aria-disabled` и поведение на краю остаются за компонентом.",
+            "type": "{ disabled: boolean; }"
+          },
+          {
+            "name": "next",
+            "description": "Своя иконка кнопки «вперёд».",
+            "type": "{ disabled: boolean; }"
           }
         ]
       },

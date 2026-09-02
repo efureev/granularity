@@ -87,3 +87,32 @@ export function stepIndex(index: number, delta: number, count: number, loop: boo
 
   return clampIndex(next, count)
 }
+
+/**
+ * Насколько прокрутить полосу переключателей, чтобы кадр был виден.
+ *
+ * Считается своей арифметикой, а не `scrollIntoView`: тот прокручивает **всех**
+ * предков, включая документ, — и карусель, уехавшая под сгиб, на каждом шаге
+ * автопрокрутки утаскивала бы страницу обратно к себе. Здесь двигается только
+ * сама полоса.
+ *
+ * Движение минимальное: элемент уже виден — `scrollLeft` не меняется вовсе.
+ */
+export function stripScrollLeft(
+  scrollLeft: number,
+  viewport: number,
+  itemStart: number,
+  itemEnd: number,
+  padding = 0,
+): number {
+  if (viewport <= 0)
+    return scrollLeft
+
+  if (itemStart - padding < scrollLeft)
+    return Math.max(0, itemStart - padding)
+
+  if (itemEnd + padding > scrollLeft + viewport)
+    return itemEnd + padding - viewport
+
+  return scrollLeft
+}

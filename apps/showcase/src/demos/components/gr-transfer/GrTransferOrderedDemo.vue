@@ -16,7 +16,7 @@ const available = [
 </script>
 
 <template>
-  <div class="max-w-2xl">
+  <div class="w-full">
     <GrTransfer
       v-model="columns"
       :items="available"
@@ -27,7 +27,8 @@ const available = [
 
     <p class="mt-3 text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)] text-[var(--gr-muted-fg)]">
       Значение — <code>{{ JSON.stringify(columns) }}</code>. Порядок правой панели и есть порядок
-      колонок: тащите строку мышью или двигайте её <kbd>Alt</kbd> + <kbd>↑</kbd> / <kbd>↓</kbd>.
+      колонок: отметьте строку и двигайте её кнопками в шапке панели, перетаскиванием
+      или <kbd>Alt</kbd> + <kbd>↑</kbd> / <kbd>↓</kbd>.
     </p>
   </div>
 </template>

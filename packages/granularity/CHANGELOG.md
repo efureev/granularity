@@ -45,6 +45,15 @@ to [Semantic Versioning](https://semver.org/).
   dropped from the tab order cannot explain why it is unavailable, and the focus would land
   in `<body>` right after the last click.
 
+  **Reordering is a visible control, not only a chord.** `Alt` with an arrow is the
+  accelerator; the buttons in the target panel's header are the contract. A chord nobody
+  can discover is not an interface, and on macOS nearly every modifier is already spoken
+  for by the system. A transfer also *shows* itself: the arriving rows light up briefly in
+  the destination panel, because the static outcome — a checked row, a changed counter —
+  says what happened but not that anything moved. A panel whose list runs past its edge
+  fades that edge, since the scrollbar is invisible on some systems and a row cut in half
+  reads as a rendering bug rather than as "scroll me".
+
   Each panel is a `listbox` with `aria-multiselectable`, its rows are `option`s carrying
   `aria-selected`, and each panel holds one `Tab` stop with roving focus inside it. Panels are
   named, because there are two of them. The row's own mark is decorative: a `GrCheckbox`
@@ -53,6 +62,14 @@ to [Semantic Versioning](https://semver.org/).
   `GrFormField` — the field's `id`, label, description, `aria-invalid`, `aria-required` and
   `aria-readonly` land on the right panel, which is the value — and reads `size` and
   `draggable` from `GrConfigProvider`.
+- **`GrCarousel`: own arrow icons and a tone for the picker.** `#prev` and `#next` replace
+  the *content* of the arrow buttons rather than the buttons themselves — the accessible
+  name, `aria-disabled` and the edge behaviour stay with the component, because a custom
+  arrow otherwise inherits the duty of restating the whole contract, and it rarely does.
+  `tone` colours the current dot or thumbnail border from the package-wide scale; the
+  `--gr-carousel-dot-active` hook still overrides it point-blank, so the prop names the role
+  and the hook names the value.
+
 - **i18n:** `gr.transfer.sourceTitle`, `targetTitle`, `search`, `toTarget`, `toSource`,
   `selectAll`, `selected`, `shown`, `empty`, `emptyFiltered`, `moved`, `reordered`,
   `reorderFiltered` and `cancelled` in `en`, `ru` and `es`.
@@ -106,6 +123,15 @@ to [Semantic Versioning](https://semver.org/).
   for the parent's module, the way `GrCollapseItem` and `GrTimelineItem` already are.
 - **i18n:** `gr.carousel.roledescription`, `slideRoledescription`, `slidePosition`, `previous`,
   `next`, `play`, `pause`, `indicators` and `autoplayStopped` in `en`, `ru` and `es`.
+
+### Fixed
+
+- **`GrCarousel`: an autoplaying carousel no longer drags the page back to itself.** Scrolling
+  the current thumbnail into view went through `scrollIntoView`, which moves *every* ancestor
+  including the document: with the carousel below the fold, each automatic step yanked the
+  reader back up — measured at nearly four thousand pixels a step on the showcase page. The
+  strip now computes the offset itself and assigns its own `scrollLeft`, so nothing outside it
+  moves.
 
 ## [v0.42.0] 2026-09-01
 

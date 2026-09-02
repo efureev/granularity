@@ -315,3 +315,39 @@ describe('GrCarousel: клавиатура', () => {
     expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual([0])
   })
 })
+
+describe('GrCarousel: тон и свои иконки', () => {
+  it('тон красит текущую точку по общей шкале', async () => {
+    const wrapper = await mountCarousel({ props: { tone: 'success' } })
+    const active = wrapper.findAll('[data-gr-carousel-indicator]')[0]
+
+    expect(active.classes().some(name => name.includes('--gr-success'))).toBe(true)
+  })
+
+  it('по умолчанию тон primary', async () => {
+    const wrapper = await mountCarousel()
+    const active = wrapper.findAll('[data-gr-carousel-indicator]')[0]
+
+    expect(active.classes().some(name => name.includes('--gr-primary'))).toBe(true)
+  })
+
+  it('слоты подменяют иконки стрелок, оставляя кнопку и её имя', async () => {
+    const wrapper = mount(GrCarousel, {
+      attachTo: document.body,
+      props: { ariaLabel: 'Галерея' },
+      slots: {
+        default: () => [0, 1].map(index =>
+          h(GrCarouselSlide, { key: index }, { default: () => `кадр ${index}` })),
+        prev: () => h('span', { 'data-own-prev': '' }, '←'),
+        next: () => h('span', { 'data-own-next': '' }, '→'),
+      },
+    })
+    await nextTick()
+    await nextTick()
+
+    const prev = wrapper.get('[data-gr-carousel-prev]')
+    expect(prev.find('[data-own-prev]').exists()).toBe(true)
+    expect(prev.attributes('aria-label')).toBe('Previous slide')
+    expect(wrapper.get('[data-gr-carousel-next]').find('[data-own-next]').exists()).toBe(true)
+  })
+})

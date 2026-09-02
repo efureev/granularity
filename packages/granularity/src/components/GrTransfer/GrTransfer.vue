@@ -1,5 +1,5 @@
 <script setup lang="ts" generic="TItem extends Record<string, unknown> = Record<string, unknown>">
-import { computed, nextTick, ref, useId, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, useId, watch } from 'vue'
 
 import { useAnnouncer } from '../../composables/useAnnouncer'
 import { useFocusWithin } from '../../composables/internal/useFocusWithin'
@@ -12,6 +12,8 @@ import GrCheckbox from '../GrCheckbox'
 import { useGrComponentProp, useGrComponentSize } from '../GrConfigProvider/context'
 import GrInput from '../GrInput'
 import { matchesQueryParts, normalizeOptionQuery } from '../shared/optionFilter'
+import type { GrScrollOverflow } from '../shared/scrollOverflow'
+import { resolveScrollOverflow } from '../shared/scrollOverflow'
 import type { GrComponentSize } from '../shared/sizes'
 import {
   grTransferActionsClass,
@@ -20,6 +22,7 @@ import {
   grTransferMarkClass,
   grTransferOptionClass,
   grTransferPanelClass,
+  grTransferReorderClass,
   grTransferSearchClass,
   transferActionIconClass,
   transferActionInertClass,
@@ -27,6 +30,7 @@ import {
   transferLabelClass,
   transferListBase,
   transferMarkIconClass,
+  transferReorderIconClass,
   transferRootBase,
   transferStatusClass,
   transferTitleClass,
@@ -54,8 +58,10 @@ import {
 } from './transferSelection'
 
 import IconCheck from '~icons/lucide/check'
+import IconChevronDown from '~icons/lucide/chevron-down'
 import IconChevronLeft from '~icons/lucide/chevron-left'
 import IconChevronRight from '~icons/lucide/chevron-right'
+import IconChevronUp from '~icons/lucide/chevron-up'
 
 export type GrTransferItemKey<T> = string | ((item: T) => GrTransferKey)
 export type GrTransferItemLabel<T> = string | ((item: T) => string)
@@ -358,6 +364,7 @@ async function transfer(keys: GrTransferKey[], direction: GrTransferDirection): 
     [to]: { keys: new Set(keys), anchor: keys[0] },
   }
 
+  markArrived(keys)
   emit('transfer', keys, direction)
   announce(t('gr.transfer.moved', '{count} moved to {list}', {
     count: keys.length,
@@ -483,6 +490,94 @@ function rovingOf(side: GrTransferSide) {
   return side === 'source' ? sourceRoving : targetRoving
 }
 
+/**
+ * Признак того, что список продолжается за краем.
+ *
+ * Полоса прокрутки у панели своя и на macOS невидима, поэтому обрезанная
+ * посередине строка читается как дефект отрисовки, а не как «прокрути». Затухание
+ * рисует CSS по `data-overflow` — тот же приём, что у ряда вкладок `GrTabs`.
+ */
+const listOverflow = ref<Record<GrTransferSide, GrScrollOverflow>>({ source: 'none', target: 'none' })
+let overflowObserver: ResizeObserver | null = null
+let overflowScheduled = false
+
+function measureOverflow(): void {
+  const next = { source: 'none', target: 'none' } as Record<GrTransferSide, GrScrollOverflow>
+
+  for (const side of ['source', 'target'] as GrTransferSide[]) {
+    const el = listEls.value[side]
+    if (el)
+      next[side] = resolveScrollOverflow(el.scrollTop, el.scrollHeight, el.clientHeight)
+  }
+
+  listOverflow.value = next
+}
+
+function scheduleOverflow(): void {
+  if (overflowScheduled)
+    return
+
+  overflowScheduled = true
+  void nextTick(() => {
+    overflowScheduled = false
+    measureOverflow()
+  })
+}
+
+onMounted(() => {
+  scheduleOverflow()
+
+  // На сервере и в jsdom `ResizeObserver` отсутствует — измерять там нечего.
+  if (typeof ResizeObserver === 'undefined')
+    return
+
+  overflowObserver = new ResizeObserver(scheduleOverflow)
+  for (const side of ['source', 'target'] as GrTransferSide[]) {
+    const el = listEls.value[side]
+    if (el)
+      overflowObserver.observe(el)
+  }
+})
+
+onBeforeUnmount(() => {
+  overflowObserver?.disconnect()
+  overflowObserver = null
+})
+
+watch([split, visible], scheduleOverflow)
+
+/** Есть ли что переставлять: иначе кнопки в шапке гасятся, оставаясь в таб-порядке. */
+const canReorder = computed(() => reorderAllowed.value
+  && itemsOf('target').length > 1
+  && (movableOf('target').length > 0 || blockUnderFocus('target').length > 0))
+
+/**
+ * Ключи, только что приехавшие в панель: подсветка живёт ~1.2 с и снимается сама.
+ * Таймер один на компонент — быстрый повторный перенос перезапускает его, а не
+ * копит хвосты.
+ */
+const arrived = ref<Set<GrTransferKey>>(new Set())
+let arrivedTimer: number | null = null
+
+function markArrived(keys: readonly GrTransferKey[]): void {
+  if (typeof window === 'undefined')
+    return
+
+  arrived.value = new Set(keys)
+  if (arrivedTimer !== null)
+    clearTimeout(arrivedTimer)
+
+  arrivedTimer = window.setTimeout(() => {
+    arrivedTimer = null
+    arrived.value = new Set()
+  }, 1200)
+}
+
+onBeforeUnmount(() => {
+  if (arrivedTimer !== null)
+    clearTimeout(arrivedTimer)
+})
+
 const dragging = useTransferDrag({
   disabled: () => isLocked.value || !resolvedDraggable.value,
   visibleKeys: side => visibleKeys.value[side],
@@ -510,6 +605,7 @@ const dragging = useTransferDrag({
 
     if (spot.side === 'target') {
       commit(insertKeys(model, [...session.keys], spot.before))
+      markArrived(session.keys)
       emit('transfer', [...session.keys], 'toTarget')
       announce(t('gr.transfer.moved', '{count} moved to {list}', {
         count: session.keys.length,
@@ -520,6 +616,7 @@ const dragging = useTransferDrag({
     }
 
     commit(removeKeys(model, [...session.keys]))
+    markArrived(session.keys)
     emit('transfer', [...session.keys], 'toSource')
     announce(t('gr.transfer.moved', '{count} moved to {list}', {
       count: session.keys.length,
@@ -780,6 +877,33 @@ defineExpose({
             :class="transferTitleClass"
           >{{ titles[side] }}</span>
           <span :class="transferCounterClass">{{ counterText(side) }}</span>
+
+          <!--
+            Перестановка видимым органом управления, а не только сочетанием
+            `Alt` + стрелка: аккорд её ускоряет, но сам по себе неоткрываем.
+          -->
+          <template v-if="side === 'target' && sortable && visible[side].length > 1">
+            <button
+              type="button"
+              data-gr-transfer-move-up
+              :class="grTransferReorderClass(resolvedSize)"
+              :aria-disabled="canReorder ? undefined : 'true'"
+              :aria-label="t('gr.transfer.moveUp', 'Move up')"
+              @click="canReorder && moveBlock(-1)"
+            >
+              <IconChevronUp :class="transferReorderIconClass" aria-hidden="true" />
+            </button>
+            <button
+              type="button"
+              data-gr-transfer-move-down
+              :class="grTransferReorderClass(resolvedSize)"
+              :aria-disabled="canReorder ? undefined : 'true'"
+              :aria-label="t('gr.transfer.moveDown', 'Move down')"
+              @click="canReorder && moveBlock(1)"
+            >
+              <IconChevronDown :class="transferReorderIconClass" aria-hidden="true" />
+            </button>
+          </template>
         </div>
       </slot>
 
@@ -814,6 +938,7 @@ defineExpose({
         :id="side === 'source' ? sourceListId : (fieldId ?? targetListId)"
         :ref="el => { listEls[side] = el as HTMLElement | null }"
         :data-gr-transfer-list="side"
+        :data-overflow="listOverflow[side]"
         role="listbox"
         aria-multiselectable="true"
         :class="transferListBase"
@@ -826,6 +951,7 @@ defineExpose({
         :aria-readonly="side === 'target' && isReadonly ? 'true' : undefined"
         :aria-disabled="isDisabled ? 'true' : undefined"
         @keydown="(event: KeyboardEvent) => onListKeydown(side, event)"
+        @scroll.passive="scheduleOverflow"
       >
         <div
           v-for="(item, index) in visible[side]"
@@ -841,6 +967,7 @@ defineExpose({
             selected: selections[side].keys.has(keyOf(item)),
             disabled: disabledOf(item),
             dragging: isDraggingKey(side, keyOf(item)),
+            arrived: arrived.has(keyOf(item)),
             indicator: indicatorFor(side, keyOf(item)),
           })"
           @pointerdown="(event: PointerEvent) => onRowPointerDown(side, keyOf(item), event)"
@@ -922,12 +1049,49 @@ defineExpose({
 [data-gr-transfer] > [data-gr-transfer-panel='source'] { order: 0; }
 [data-gr-transfer] > [data-gr-transfer-panel='target'] { order: 2; }
 
+[data-gr-transfer-list][data-overflow='start'] {
+  --gr-transfer-list-mask: linear-gradient(to bottom, transparent 0, #000 var(--gr-transfer-fade, 1.25rem));
+}
+
+[data-gr-transfer-list][data-overflow='end'] {
+  --gr-transfer-list-mask: linear-gradient(to bottom, #000 calc(100% - var(--gr-transfer-fade, 1.25rem)), transparent 100%);
+}
+
+[data-gr-transfer-list][data-overflow='both'] {
+  --gr-transfer-list-mask: linear-gradient(
+    to bottom,
+    transparent 0,
+    #000 var(--gr-transfer-fade, 1.25rem),
+    #000 calc(100% - var(--gr-transfer-fade, 1.25rem)),
+    transparent 100%
+  );
+}
+
+[data-gr-transfer-list]:is([data-overflow='start'], [data-overflow='end'], [data-overflow='both']) {
+  -webkit-mask-image: var(--gr-transfer-list-mask);
+  mask-image: var(--gr-transfer-list-mask);
+}
+
 /*
  * Гашение кнопки, которой некуда переносить. Селектор по атрибуту внутри корня
  * сильнее одноклассовой утилиты `GrButton`, поэтому фон не зависит от порядка
  * правил в собранном CSS. Фоном, а не `opacity`: прозрачность разбавляет
  * выверенные на AA токены текста.
  */
+/*
+ * Подсветка прибытия. Без `animation-fill-mode`, исходный кадр — обычная строка:
+ * глобальный кламп `prefers-reduced-motion` доигрывает её за 0.01ms и оставляет
+ * ровно тот вид, что и так был бы.
+ */
+@keyframes gr-transfer-arrive {
+  from { background: var(--gr-transfer-arrived-bg, color-mix(in srgb, var(--gr-primary) 32%, transparent)); }
+  to { background: transparent; }
+}
+
+[data-gr-transfer] .gr-transfer-arrived {
+  animation: gr-transfer-arrive var(--gr-duration-slow) var(--gr-ease-out);
+}
+
 [data-gr-transfer] button[aria-disabled='true'] {
   background: var(--gr-muted);
   color: var(--gr-disabled-fg);

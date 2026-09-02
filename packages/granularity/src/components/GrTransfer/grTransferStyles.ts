@@ -2,7 +2,7 @@ import type { GrComponentSize } from '../shared/sizes'
 
 export type GrTransferSize = GrComponentSize
 
-export const transferRootBase = 'flex items-stretch gap-3'
+export const transferRootBase = 'flex items-stretch gap-4'
 
 export const transferPanelBase = 'flex min-w-0 flex-1 flex-col overflow-hidden rounded-[var(--gr-radius-md)] border border-[var(--gr-brd)] bg-[var(--gr-card)]'
 
@@ -37,6 +37,16 @@ export const transferOptionStates = {
   disabled: 'cursor-not-allowed bg-[var(--gr-muted)] text-[var(--gr-disabled-fg)]',
 } as const
 
+/**
+ * Строка, только что приехавшая из соседней панели.
+ *
+ * Статичный итог перенос уже показывает — строка приходит отмеченной, счётчики
+ * меняются, — но само **движение** ничем не выдано: строки просто возникают.
+ * Короткая подсветка связывает «нажал» и «появилось». Под `prefers-reduced-motion`
+ * её гасит глобальный кламп, и остаётся тот же статичный итог.
+ */
+export const transferOptionArrivedClass = 'gr-transfer-arrived'
+
 /** Переносимый блок на время жеста: видно, что именно уедет. */
 export const transferOptionDraggingClass = 'bg-[var(--gr-transfer-dragging-bg,var(--gr-muted))]'
 
@@ -67,6 +77,26 @@ export const transferIndicatorAfterClass = 'after:absolute after:inset-x-0 after
 export const transferEmptyClass = 'flex h-full items-center justify-center px-4 py-6 text-center text-[var(--gr-muted-fg)]'
 
 export const transferActionsClass = 'flex shrink-0 items-center'
+
+/**
+ * Кнопки перестановки в шапке правой панели. Перестановка обязана быть видимой:
+ * сочетание `Alt` + стрелка её ускоряет, но само по себе неоткрываемо, а на
+ * macOS ещё и неудобно — почти все мета-клавиши там заняты системой.
+ */
+export const transferReorderBase = 'inline-flex shrink-0 items-center justify-center rounded-[var(--gr-radius-sm)] text-[var(--gr-muted-fg)] transition-colors hover:bg-[var(--gr-muted)] hover:text-[var(--gr-fg)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]'
+
+export const transferReorderSizes: Record<GrTransferSize, string> = {
+  xs: 'h-5 w-5',
+  sm: 'h-5 w-5',
+  md: 'h-6 w-6',
+  lg: 'h-7 w-7',
+}
+
+export const transferReorderIconClass = 'h-3.5 w-3.5'
+
+export function grTransferReorderClass(size: GrTransferSize): string {
+  return [transferReorderBase, transferReorderSizes[size]].join(' ')
+}
 
 export const transferActionIconClass = 'h-4 w-4 shrink-0'
 
@@ -127,6 +157,7 @@ export interface GrTransferOptionClassOptions {
   selected: boolean
   disabled: boolean
   dragging: boolean
+  arrived: boolean
   indicator: 'before' | 'after' | null
 }
 
@@ -140,6 +171,7 @@ export function grTransferOptionClass(options: GrTransferOptionClassOptions): st
     transferOptionSizes[options.size],
     state,
     options.dragging ? transferOptionDraggingClass : '',
+    options.arrived ? transferOptionArrivedClass : '',
     options.indicator === 'before' ? transferIndicatorBeforeClass : '',
     options.indicator === 'after' ? transferIndicatorAfterClass : '',
   ].filter(Boolean).join(' ')

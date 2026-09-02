@@ -1,4 +1,5 @@
 import { splitClassTokens } from '../shared/classTokens'
+import { GR_TONES } from '../shared/tones'
 import {
   carouselControlBase,
   carouselControlPositions,
@@ -16,12 +17,17 @@ import {
   carouselThumbImageClass,
   carouselThumbStates,
   carouselToggleClass,
+  grCarouselDotActiveClass,
+  grCarouselThumbActiveClass,
   carouselTrackBase,
   carouselViewportBase,
   carouselViewportSwipeClass,
 } from './grCarouselStyles'
 
 export const grCarouselSafelist = [...new Set([
+  // Тон приходит пропом, поэтому в скан попадает не он, а вся шкала.
+  ...GR_TONES.flatMap(tone => splitClassTokens(grCarouselDotActiveClass(tone))),
+  ...GR_TONES.flatMap(tone => splitClassTokens(grCarouselThumbActiveClass(tone))),
   ...Object.values(carouselControlPositions).flatMap(splitClassTokens),
   ...Object.values(carouselControlStates).flatMap(splitClassTokens),
   ...Object.values(carouselIndicatorsVariants).flatMap(splitClassTokens),

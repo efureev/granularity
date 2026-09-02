@@ -9,22 +9,27 @@ const reviews = [
 </script>
 
 <template>
-  <div class="max-w-xl">
-    <GrCarousel aria-label="Отзывы клиентов" :loop="false">
+  <div class="w-full">
+    <GrCarousel aria-label="Отзывы клиентов" tone="slate" :loop="false">
       <GrCarouselSlide v-for="review in reviews" :key="review.id" :label="review.name">
-        <div class="px-12 py-1">
+        <div class="px-14 py-1">
           <GrCard>
-            <div class="flex items-start gap-3">
-              <GrAvatar :name="review.name" />
-              <div class="min-w-0">
-                <p class="text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)]">
-                  {{ review.text }}
-                </p>
-                <p class="mt-2 text-[length:var(--gr-text-xs)] leading-[var(--gr-leading-xs)] text-[var(--gr-muted-fg)]">
-                  {{ review.name }} — {{ review.role }}
-                </p>
-              </div>
-            </div>
+            <blockquote class="flex flex-col gap-4">
+              <p class="text-[length:var(--gr-text-base)] leading-[var(--gr-leading-base)]">
+                «{{ review.text }}»
+              </p>
+              <footer class="flex items-center gap-3">
+                <GrAvatar :name="review.name" size="sm" />
+                <span class="min-w-0">
+                  <span class="block truncate text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)] font-600">
+                    {{ review.name }}
+                  </span>
+                  <span class="block truncate text-[length:var(--gr-text-xs)] leading-[var(--gr-leading-xs)] text-[var(--gr-muted-fg)]">
+                    {{ review.role }}
+                  </span>
+                </span>
+              </footer>
+            </blockquote>
           </GrCard>
         </div>
       </GrCarouselSlide>
