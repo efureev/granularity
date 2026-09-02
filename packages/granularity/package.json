@@ -1,7 +1,7 @@
 {
   "name": "@feugene/granularity",
   "description": "Granularity design system package with Vue 3 components, consumed via the `@feugene/unocss-preset-granular` preset.",
-  "version": "0.42.0",
+  "version": "0.43.0",
   "license": "LicenseRef-Granularity-EUC-1.1",
   "author": {
     "name": "Evgeniy Fureev",

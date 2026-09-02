@@ -7,6 +7,8 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.43.0] 2026-09-02
+
 ### Added
 
 - **New `GrAffix` — a panel that stays in view, and knows that it does.** A section heading
