@@ -3373,6 +3373,20 @@ export const grComponentTokens: GrComponentToken[] = [
   },
   {
     "owner": "GrTransfer",
+    "name": "--gr-transfer-ghost-bg",
+    "kind": "hook",
+    "default": "var(--gr-card)",
+    "description": "Подложка предпросмотра, который едет за курсором. Он и есть ответ на «где сейчас элемент»: без него строка оставалась на месте, и жест выглядел так, будто ничего не происходит."
+  },
+  {
+    "owner": "GrTransfer",
+    "name": "--gr-transfer-drop-bg",
+    "kind": "hook",
+    "default": "6 % от `--gr-primary` через `color-mix`",
+    "description": "Подложка панели-приёмника. Одной рамки мало: на широком экране она за пределами взгляда, занятого курсором."
+  },
+  {
+    "owner": "GrTransfer",
     "name": "--gr-transfer-drop-brd",
     "kind": "hook",
     "default": "var(--gr-primary)",

@@ -6,8 +6,13 @@ export const transferRootBase = 'flex items-stretch gap-4'
 
 export const transferPanelBase = 'flex min-w-0 flex-1 flex-col overflow-hidden rounded-[var(--gr-radius-md)] border border-[var(--gr-brd)] bg-[var(--gr-card)]'
 
-/** Панель под указателем во время переноса: подсветка рамкой, а не заливкой. */
-export const transferPanelDropClass = 'border-[var(--gr-transfer-drop-brd,var(--gr-primary))]'
+/**
+ * Панель под указателем во время переноса.
+ *
+ * Одной рамки мало: на широком экране она за пределами взгляда, занятого
+ * курсором. Мягкая подложка сообщает «сюда» там, где человек и смотрит.
+ */
+export const transferPanelDropClass = 'border-[var(--gr-transfer-drop-brd,var(--gr-primary))] bg-[var(--gr-transfer-drop-bg,color-mix(in_srgb,var(--gr-primary)_6%,transparent))]'
 
 export const transferHeaderBase = 'flex items-center gap-2 border-b border-[var(--gr-brd)]'
 
@@ -23,7 +28,12 @@ export const transferSearchBase = 'border-b border-[var(--gr-brd)]'
  */
 export const transferListBase = 'relative min-h-0 flex-1 overflow-y-auto'
 
-export const transferOptionBase = 'relative flex w-full cursor-pointer select-none items-center gap-2 text-start transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] focus-visible:ring-inset'
+export const transferOptionBase = 'relative flex w-full select-none items-center gap-2 text-start transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] focus-visible:ring-inset'
+
+/** Строку можно взять — курсор обязан это предложить до нажатия, а не после. */
+export const transferOptionGrabClass = 'cursor-grab'
+
+export const transferOptionPlainClass = 'cursor-pointer'
 
 export const transferOptionStates = {
   // Тон, а не заливка: строка остаётся читаемой обычным `--gr-fg`, и контраст
@@ -47,8 +57,14 @@ export const transferOptionStates = {
  */
 export const transferOptionArrivedClass = 'gr-transfer-arrived'
 
-/** Переносимый блок на время жеста: видно, что именно уедет. */
-export const transferOptionDraggingClass = 'bg-[var(--gr-transfer-dragging-bg,var(--gr-muted))]'
+/**
+ * Место, откуда строку унесли.
+ *
+ * Правило живёт в `<style>` компонента, а не утилитой: цвет текста строки задаёт
+ * класс состояния той же специфичности, и кто победит, решал бы порядок правил в
+ * собранном CSS — та же ловушка, что записана в `grTabsStyles.ts`.
+ */
+export const transferOptionDraggingClass = 'gr-transfer-vacated'
 
 /**
  * Отметка строки декоративна: `GrCheckbox` внутрь `role="option"` вложить
@@ -70,9 +86,9 @@ export const transferLabelClass = 'min-w-0 flex-1 truncate'
  * Место вставки — псевдоэлемент строки-соседа, а не отдельный узел: лишний узел
  * между строками ломает подсчёт позиций и разделители.
  */
-export const transferIndicatorBeforeClass = 'before:absolute before:inset-x-0 before:top-0 before:h-[var(--gr-transfer-indicator-width,2px)] before:bg-[var(--gr-transfer-indicator,var(--gr-primary))] before:content-empty'
+export const transferIndicatorBeforeClass = 'before:absolute before:inset-x-0 before:top-0 before:h-[var(--gr-transfer-indicator-width,3px)] before:rounded-[var(--gr-radius-full)] before:bg-[var(--gr-transfer-indicator,var(--gr-primary))] before:content-empty'
 
-export const transferIndicatorAfterClass = 'after:absolute after:inset-x-0 after:bottom-0 after:h-[var(--gr-transfer-indicator-width,2px)] after:bg-[var(--gr-transfer-indicator,var(--gr-primary))] after:content-empty'
+export const transferIndicatorAfterClass = 'after:absolute after:inset-x-0 after:bottom-0 after:h-[var(--gr-transfer-indicator-width,3px)] after:rounded-[var(--gr-radius-full)] after:bg-[var(--gr-transfer-indicator,var(--gr-primary))] after:content-empty'
 
 export const transferEmptyClass = 'flex h-full items-center justify-center px-4 py-6 text-center text-[var(--gr-muted-fg)]'
 
@@ -117,6 +133,20 @@ export const transferActionIconClass = 'h-4 w-4 shrink-0'
  * решал бы порядок в сгенерированном CSS, то есть через раз.
  */
 export const transferActionInertClass = 'cursor-not-allowed'
+
+/**
+ * Предпросмотр переносимого: он и есть ответ на «где сейчас элемент».
+ *
+ * Без него строка оставалась на месте, а за курсором не двигалось ничего — жест
+ * выглядел так, будто ничего не происходит. Узел не ловит указатель
+ * (`pointer-events: none`), иначе он перехватывал бы попадание у самих панелей.
+ */
+export const transferGhostClass = 'pointer-events-none fixed left-0 top-0 z-10 flex max-w-[16rem] items-center gap-2 rounded-[var(--gr-radius-md)] border border-[var(--gr-brd)] bg-[var(--gr-transfer-ghost-bg,var(--gr-card))] px-3 py-1.5 text-[var(--gr-fg)] shadow-[var(--gr-shadow-2)]'
+
+export const transferGhostLabelClass = 'min-w-0 flex-1 truncate text-[length:var(--gr-control-text-sm)] leading-[var(--gr-control-leading-sm)]'
+
+/** Сколько строк едет разом: одну видно по подписи, остальные — числом. */
+export const transferGhostCountClass = 'shrink-0 rounded-[var(--gr-radius-full)] bg-[var(--gr-primary)] px-1.5 text-[length:var(--gr-control-text-xs)] leading-[var(--gr-control-leading-xs)] text-[var(--gr-primary-fg)] tabular-nums'
 
 export const transferStatusClass = 'sr-only'
 
@@ -166,6 +196,7 @@ export interface GrTransferOptionClassOptions {
   size: GrTransferSize
   selected: boolean
   disabled: boolean
+  draggable: boolean
   dragging: boolean
   arrived: boolean
   indicator: 'before' | 'after' | null
@@ -178,6 +209,7 @@ export function grTransferOptionClass(options: GrTransferOptionClassOptions): st
 
   return [
     transferOptionBase,
+    options.draggable && !options.disabled ? transferOptionGrabClass : transferOptionPlainClass,
     transferOptionSizes[options.size],
     state,
     options.dragging ? transferOptionDraggingClass : '',

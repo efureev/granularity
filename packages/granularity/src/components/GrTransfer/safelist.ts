@@ -5,6 +5,9 @@ import {
   transferActionsClass,
   transferActionsSizes,
   transferCounterClass,
+  transferGhostClass,
+  transferGhostCountClass,
+  transferGhostLabelClass,
   transferEmptyClass,
   transferEmptySizes,
   transferHeaderBase,
@@ -18,7 +21,8 @@ import {
   transferMarkSizes,
   transferMarkStates,
   transferOptionBase,
-  transferOptionDraggingClass,
+  transferOptionGrabClass,
+  transferOptionPlainClass,
   transferOptionSizes,
   transferOptionStates,
   transferPanelBase,
@@ -33,6 +37,8 @@ import {
   transferTitleClass,
 } from './grTransferStyles'
 
+// `gr-transfer-vacated` и `gr-transfer-arrived` сюда не входят: это обычные
+// классы из `<style>` компонента, а не утилиты — генерировать их нечем.
 export const grTransferSafelist = [...new Set([
   ...Object.values(transferHeaderSizes).flatMap(splitClassTokens),
   ...Object.values(transferOptionSizes).flatMap(splitClassTokens),
@@ -49,10 +55,14 @@ export const grTransferSafelist = [...new Set([
   ...splitClassTokens(transferHeaderBase),
   ...splitClassTokens(transferTitleClass),
   ...splitClassTokens(transferCounterClass),
+  ...splitClassTokens(transferGhostClass),
+  ...splitClassTokens(transferGhostLabelClass),
+  ...splitClassTokens(transferGhostCountClass),
   ...splitClassTokens(transferSearchBase),
   ...splitClassTokens(transferListBase),
   ...splitClassTokens(transferOptionBase),
-  ...splitClassTokens(transferOptionDraggingClass),
+  ...splitClassTokens(transferOptionGrabClass),
+  ...splitClassTokens(transferOptionPlainClass),
   ...splitClassTokens(transferMarkBase),
   ...splitClassTokens(transferMarkIconClass),
   ...splitClassTokens(transferLabelClass),

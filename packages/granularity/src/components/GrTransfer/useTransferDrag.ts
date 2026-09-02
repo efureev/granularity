@@ -39,6 +39,8 @@ export interface UseTransferDragOptions {
 export interface UseTransferDragReturn {
   session: Readonly<ShallowRef<GrTransferDragSession | null>>
   spot: Readonly<ShallowRef<GrTransferDropSpot | null>>
+  /** Где указатель прямо сейчас: за ним едет предпросмотр переносимого. */
+  pointer: Readonly<ShallowRef<GrTransferPoint>>
   /** Был ли жест — чтобы следующий `click` не схлопнул выделение. */
   consumeClick: () => boolean
   startFrom: (side: GrTransferSide, key: GrTransferKey) => (event: PointerEvent) => void
@@ -66,6 +68,7 @@ export function useTransferDrag(options: UseTransferDragOptions): UseTransferDra
   const session = shallowRef<GrTransferDragSession | null>(null)
   const spot = shallowRef<GrTransferDropSpot | null>(null)
   const moved: Ref<boolean> = ref(false)
+  const pointer = shallowRef<GrTransferPoint>({ x: 0, y: 0 })
 
   let origin: GrTransferPoint = { x: 0, y: 0 }
   let pending: GrTransferDragSession | null = null
@@ -110,6 +113,7 @@ export function useTransferDrag(options: UseTransferDragOptions): UseTransferDra
     lastSide = null
     stopAutoScroll()
     detachEscape()
+    unlockSelection()
   }
 
   function onEscape(event: KeyboardEvent): void {
@@ -119,6 +123,40 @@ export function useTransferDrag(options: UseTransferDragOptions): UseTransferDra
     event.preventDefault()
     event.stopPropagation()
     abort()
+  }
+
+  /**
+   * Выделение текста на время жеста.
+   *
+   * `select-none` на самих строках недостаточно: выделение **начинается** внутри
+   * компонента, а тянется по всему документу — и пользователь, ведя строку через
+   * страницу, подсвечивает попутно чужие заголовки и абзацы. Гасим на теле
+   * документа и возвращаем прежнее значение, а не пустую строку: потребитель мог
+   * задать своё.
+   */
+  let selectionLock: { userSelect: string, webkitUserSelect: string } | null = null
+
+  function lockSelection(): void {
+    if (typeof document === 'undefined' || selectionLock !== null)
+      return
+
+    const style = document.body.style as CSSStyleDeclaration & { webkitUserSelect?: string }
+    selectionLock = { userSelect: style.userSelect, webkitUserSelect: style.webkitUserSelect ?? '' }
+    style.userSelect = 'none'
+    style.webkitUserSelect = 'none'
+
+    // Уже начатое выделение снимаем: иначе оно остаётся подсвеченным весь жест.
+    window.getSelection?.()?.removeAllRanges()
+  }
+
+  function unlockSelection(): void {
+    if (typeof document === 'undefined' || selectionLock === null)
+      return
+
+    const style = document.body.style as CSSStyleDeclaration & { webkitUserSelect?: string }
+    style.userSelect = selectionLock.userSelect
+    style.webkitUserSelect = selectionLock.webkitUserSelect
+    selectionLock = null
   }
 
   let escapeAttached = false
@@ -177,6 +215,7 @@ export function useTransferDrag(options: UseTransferDragOptions): UseTransferDra
     disabled: options.disabled,
     onMove: (event) => {
       cursor = { x: event.clientX, y: event.clientY }
+      pointer.value = cursor
 
       if (session.value === null) {
         if (pending === null || !passedThreshold(origin, cursor))
@@ -184,6 +223,7 @@ export function useTransferDrag(options: UseTransferDragOptions): UseTransferDra
 
         session.value = pending
         moved.value = true
+        lockSelection()
         attachEscape()
         scheduleAutoScroll()
       }
@@ -219,6 +259,7 @@ export function useTransferDrag(options: UseTransferDragOptions): UseTransferDra
   return {
     session,
     spot,
+    pointer,
     consumeClick: () => {
       const was = moved.value
       moved.value = false

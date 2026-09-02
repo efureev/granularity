@@ -224,3 +224,142 @@ describe('GrTransfer: жест и выделение', () => {
     expect(selected).toHaveLength(2)
   })
 })
+
+describe('GrTransfer: жест видно', () => {
+  it('за курсором едет предпросмотр с подписью строки', async () => {
+    const wrapper = mountTransfer()
+
+    press(rowsOf(wrapper, 'source')[1].element, { clientX: 50, clientY: 30 })
+    move({ clientX: 250, clientY: 100 })
+    await nextTick()
+
+    const ghost = document.querySelector('[data-gr-transfer-ghost]')
+    expect(ghost).not.toBeNull()
+    expect(ghost?.textContent).toContain('Запись')
+
+    release({ clientX: 250, clientY: 100 })
+  })
+
+  it('предпросмотр называет первую строку и считает остальные', async () => {
+    const wrapper = mountTransfer()
+
+    await rowsOf(wrapper, 'source')[0].trigger('click')
+    await rowsOf(wrapper, 'source')[1].trigger('click', { ctrlKey: true })
+
+    press(rowsOf(wrapper, 'source')[0].element, { clientX: 50, clientY: 10 })
+    move({ clientX: 250, clientY: 100 })
+    await nextTick()
+
+    expect(document.querySelector('[data-gr-transfer-ghost]')?.textContent).toContain('+1')
+
+    release({ clientX: 250, clientY: 100 })
+  })
+
+  it('предпросмотр исчезает после отпускания', async () => {
+    const wrapper = mountTransfer()
+
+    press(rowsOf(wrapper, 'source')[0].element, { clientX: 50, clientY: 10 })
+    move({ clientX: 250, clientY: 100 })
+    await nextTick()
+    expect(document.querySelector('[data-gr-transfer-ghost]')).not.toBeNull()
+
+    release({ clientX: 250, clientY: 100 })
+    await nextTick()
+    expect(document.querySelector('[data-gr-transfer-ghost]')).toBeNull()
+  })
+
+  it('на месте взятой строки остаётся пустота', async () => {
+    const wrapper = mountTransfer()
+
+    press(rowsOf(wrapper, 'source')[1].element, { clientX: 50, clientY: 30 })
+    move({ clientX: 250, clientY: 100 })
+    await nextTick()
+
+    expect(rowsOf(wrapper, 'source')[1].classes()).toContain('gr-transfer-vacated')
+
+    release({ clientX: 250, clientY: 100 })
+  })
+
+  it('панель-приёмник помечена, а панель-источник — нет', async () => {
+    const wrapper = mountTransfer()
+
+    press(rowsOf(wrapper, 'source')[0].element, { clientX: 50, clientY: 10 })
+    move({ clientX: 250, clientY: 100 })
+    await nextTick()
+
+    const target = wrapper.get('[data-gr-transfer-panel="target"]').attributes('class') ?? ''
+    const source = wrapper.get('[data-gr-transfer-panel="source"]').attributes('class') ?? ''
+    expect(target).toContain('gr-transfer-drop-brd')
+    expect(source).not.toContain('gr-transfer-drop-brd')
+
+    release({ clientX: 250, clientY: 100 })
+  })
+
+  it('пока строка в руке, корень помечен для курсора', async () => {
+    const wrapper = mountTransfer()
+
+    press(rowsOf(wrapper, 'source')[0].element, { clientX: 50, clientY: 10 })
+    move({ clientX: 250, clientY: 100 })
+    await nextTick()
+    expect(wrapper.get('[data-gr-transfer]').attributes('data-dragging')).toBe('true')
+
+    release({ clientX: 250, clientY: 100 })
+    await nextTick()
+    expect(wrapper.get('[data-gr-transfer]').attributes('data-dragging')).toBeUndefined()
+  })
+})
+
+describe('GrTransfer: жест не выделяет страницу', () => {
+  it('на время переноса выделение гасится на документе', async () => {
+    const wrapper = mountTransfer()
+
+    press(rowsOf(wrapper, 'source')[0].element, { clientX: 50, clientY: 10 })
+    move({ clientX: 250, clientY: 100 })
+    await nextTick()
+
+    expect(document.body.style.userSelect).toBe('none')
+
+    release({ clientX: 250, clientY: 100 })
+    await nextTick()
+    expect(document.body.style.userSelect).toBe('')
+  })
+
+  it('прежнее значение возвращается, а не затирается пустым', async () => {
+    document.body.style.userSelect = 'text'
+    const wrapper = mountTransfer()
+
+    press(rowsOf(wrapper, 'source')[0].element, { clientX: 50, clientY: 10 })
+    move({ clientX: 250, clientY: 100 })
+    await nextTick()
+    expect(document.body.style.userSelect).toBe('none')
+
+    release({ clientX: 250, clientY: 100 })
+    await nextTick()
+    expect(document.body.style.userSelect).toBe('text')
+
+    document.body.style.userSelect = ''
+  })
+
+  it('обрыв жеста тоже снимает запрет', async () => {
+    const wrapper = mountTransfer()
+
+    press(rowsOf(wrapper, 'source')[0].element, { clientX: 50, clientY: 10 })
+    move({ clientX: 250, clientY: 100 })
+    cancelPointer({ clientX: 250, clientY: 100 })
+    await nextTick()
+
+    expect(document.body.style.userSelect).toBe('')
+  })
+
+  it('нажатие без движения запрет не ставит', async () => {
+    const wrapper = mountTransfer()
+
+    press(rowsOf(wrapper, 'source')[0].element, { clientX: 50, clientY: 10 })
+    move({ clientX: 51, clientY: 11 })
+    await nextTick()
+
+    expect(document.body.style.userSelect).toBe('')
+
+    release({ clientX: 51, clientY: 11 })
+  })
+})

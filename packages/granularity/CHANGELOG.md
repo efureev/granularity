@@ -53,8 +53,18 @@ to [Semantic Versioning](https://semver.org/).
   columns, export fields, things read left to right — not a position on screen. Giving the
   chord the same axis was not an option, because `Alt` with a horizontal arrow is Back and
   Forward in Chrome and Firefox on Windows and Linux. (Safari puts that on `Cmd`, so the
-  combination is free there — but the package ships to everyone.) A transfer also *shows* itself: the arriving rows light up briefly in
-  the destination panel, because the static outcome — a checked row, a changed counter —
+  combination is free there — but the package ships to everyone.) A drag also *shows* itself at every step. The row offers a `grab`
+  cursor before the press and the whole component switches to `grabbing` once the gesture
+  starts; a preview rides with the pointer, naming the first row and counting the rest;
+  the place it left keeps a dashed outline; the receiving panel lights up by border **and**
+  fill, since a border alone sits outside the eye that is following the cursor. Text
+  selection is suppressed on the whole document for the duration, not just on the rows: a
+  selection *starts* inside the component but stretches across the page, so dragging a row
+  used to highlight unrelated headings and paragraphs on the way. The previous value is put
+  back on release rather than cleared — the consumer may have set one. Without the
+  preview the row simply stayed where it was under a pale tint, and the whole gesture looked
+  like nothing was happening — which is exactly what it was reported as. The arriving rows
+  then light up briefly, because the static outcome — a checked row, a changed counter —
   says what happened but not that anything moved. A panel whose list runs past its edge
   fades that edge, since the scrollbar is invisible on some systems and a row cut in half
   reads as a rendering bug rather than as "scroll me".

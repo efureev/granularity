@@ -19,8 +19,8 @@
 | `GrSelect` | 67.8 kB | 41 | 12 % |
 | `GrColorPicker` | 64.6 kB | 35 | 11 % |
 | `GrJsonViewer` | 58.6 kB | 35 | 10 % |
+| `GrTransfer` | 57.4 kB | 36 | 10 % |
 | `GrAutocomplete` | 56.6 kB | 37 | 10 % |
-| `GrTransfer` | 54.0 kB | 35 | 9 % |
 | `GrConfirmDialog` | 53.2 kB | 28 | 9 % |
 | `GrDataTable` | 50.4 kB | 32 | 9 % |
 | `GrCommandPalette` | 50.1 kB | 27 | 9 % |
@@ -55,7 +55,7 @@
 | `GrSegmented` | 15.2 kB | 10 | 3 % |
 | `GrSteps` | 14.8 kB | 11 | 3 % |
 | `GrInput` | 14.6 kB | 13 | 3 % |
-| `GrDelta` | 14.3 kB | 11 | 3 % |
+| `GrDelta` | 14.3 kB | 11 | 2 % |
 | `GrForm` | 13.7 kB | 8 | 2 % |
 | `GrTimeline` | 13.6 kB | 11 | 2 % |
 | `GrKbd` | 13.2 kB | 9 | 2 % |
@@ -92,4 +92,4 @@
 | `GrTabPanels` | 1.9 kB | 3 | < 1 % |
 | `GrButtonGroup` | 1.8 kB | 5 | < 1 % |
 
-Весь пакет из корня — 572.4 kB.
+Весь пакет из корня — 574.1 kB.

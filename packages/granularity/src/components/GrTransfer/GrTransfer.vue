@@ -2,6 +2,7 @@
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, useId, useSlots, watch } from 'vue'
 
 import { useAnnouncer } from '../../composables/useAnnouncer'
+import { usePortalTarget } from '../../composables/usePortalTarget'
 import { useFocusWithin } from '../../composables/internal/useFocusWithin'
 import { useGrFormControl } from '../../composables/useGrFormControl'
 import { useRovingFocus } from '../../composables/useRovingFocus'
@@ -27,6 +28,9 @@ import {
   transferActionIconClass,
   transferActionInertClass,
   transferCounterClass,
+  transferGhostClass,
+  transferGhostCountClass,
+  transferGhostLabelClass,
   transferLabelClass,
   transferListBase,
   transferMarkIconClass,
@@ -167,6 +171,7 @@ const hasHeaderSlot = computed(() => Boolean(slots.header))
 
 const { t } = useGranularityTranslations()
 const { announce } = useAnnouncer()
+const { target: portalTarget, enabled: teleportEnabled } = usePortalTarget()
 
 const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrTransfer' })
 const resolvedDraggable = useGrComponentProp('GrTransfer', 'draggable', () => props.draggable, true)
@@ -646,6 +651,28 @@ function onRowPointerDown(side: GrTransferSide, key: GrTransferKey, event: Point
   dragging.startFrom(side, key)(event)
 }
 
+/**
+ * Подпись переносимого. Первая строка блока названа, остальные — числом: список
+ * из десяти имён под курсором закрыл бы то самое место, куда человек целится.
+ */
+const ghost = computed(() => {
+  const session = dragging.session.value
+  if (!session || session.keys.length === 0)
+    return null
+
+  const first = itemsOf(session.side).find(item => keyOf(item) === session.keys[0])
+
+  return {
+    label: first ? labelOf(first) : String(session.keys[0]),
+    rest: session.keys.length - 1,
+  }
+})
+
+const ghostStyle = computed(() => ({
+  // Смещение от курсора: под остриём должно оставаться видно, куда целишься.
+  transform: `translate3d(${dragging.pointer.value.x + 12}px, ${dragging.pointer.value.y + 12}px, 0)`,
+}))
+
 function indicatorFor(side: GrTransferSide, key: GrTransferKey): 'before' | 'after' | null {
   const spot: GrTransferDropSpot | null = dragging.spot.value
   if (!spot || spot.side !== side)
@@ -844,6 +871,7 @@ defineExpose({
   <div
     ref="rootEl"
     data-gr-transfer
+    :data-dragging="dragging.session.value ? 'true' : undefined"
     role="group"
     :class="transferRootBase"
     :aria-label="ariaLabel"
@@ -979,6 +1007,7 @@ defineExpose({
             size: resolvedSize,
             selected: selections[side].keys.has(keyOf(item)),
             disabled: disabledOf(item),
+            draggable: resolvedDraggable && !isLocked,
             dragging: isDraggingKey(side, keyOf(item)),
             arrived: arrived.has(keyOf(item)),
             indicator: indicatorFor(side, keyOf(item)),
@@ -1017,6 +1046,19 @@ defineExpose({
         </p>
       </slot>
     </div>
+
+    <Teleport :to="portalTarget" :disabled="!teleportEnabled">
+      <div
+        v-if="ghost"
+        data-gr-transfer-ghost
+        aria-hidden="true"
+        :class="transferGhostClass"
+        :style="ghostStyle"
+      >
+        <span :class="transferGhostLabelClass">{{ ghost.label }}</span>
+        <span v-if="ghost.rest > 0" :class="transferGhostCountClass">+{{ ghost.rest }}</span>
+      </div>
+    </Teleport>
 
     <div :class="grTransferActionsClass(resolvedSize)" style="order: 1">
       <slot
@@ -1103,6 +1145,29 @@ defineExpose({
 
 [data-gr-transfer] .gr-transfer-arrived {
   animation: gr-transfer-arrive var(--gr-duration-slow) var(--gr-ease-out);
+}
+
+/* Пока строка «в руке», курсор обязан это показывать везде, а не только над ней. */
+[data-gr-transfer][data-dragging='true'],
+[data-gr-transfer][data-dragging='true'] * {
+  cursor: grabbing !important;
+  user-select: none;
+}
+
+/*
+ * Пустое место на время жеста: пунктир и приглушённый текст читаются как «строка
+ * сейчас в руке», тогда как прежняя бледная подложка оставляла её почти обычной.
+ */
+/*
+ * Селектор нарочно длиннее одноклассового: строка при нажатии получает фокус, а
+ * `focus:outline-none` сбрасывает `outline` утилитой той же специфичности —
+ * пунктир проигрывал бы ей по порядку правил.
+ */
+[data-gr-transfer] [data-gr-transfer-option].gr-transfer-vacated {
+  background: var(--gr-transfer-dragging-bg, var(--gr-muted));
+  color: var(--gr-muted-fg);
+  outline: 1px dashed var(--gr-brd);
+  outline-offset: -3px;
 }
 
 [data-gr-transfer] button[aria-disabled='true'] {
