@@ -31,37 +31,38 @@ const paragraphs = [
       role="group"
       aria-label="Текст регламента"
     >
-      <div class="p-4">
-        <!--
-          Содержимое меняется от состояния: подзаголовок нужен, пока панель стоит
-          на своём месте, и только мешает, когда она прижата к краю.
-        -->
-        <GrAffix @sticky-change="onStickyChange">
-          <template #default="{ stuck }">
-            <div class="flex items-center justify-between gap-3 py-2">
-              <div class="min-w-0">
-                <h3 class="truncate text-[length:var(--gr-control-text-sm)] leading-[var(--gr-leading-sm)] font-600">
-                  Регламент согласования закупок
-                </h3>
-                <p v-if="!stuck" class="truncate text-[length:var(--gr-text-xs)] leading-[var(--gr-leading-xs)] text-[var(--gr-muted-fg)]">
-                  Редакция от 12 марта, действует до конца года
-                </p>
-              </div>
-              <GrButton :size="stuck ? 'xs' : 'sm'" variant="secondary">
-                Скачать
-              </GrButton>
-            </div>
-          </template>
-        </GrAffix>
+      <!--
+        Содержимое меняется от состояния: подзаголовок нужен, пока панель стоит
+        на своём месте, и только мешает, когда она прижата к краю.
 
-        <p
-          v-for="(text, index) in paragraphs"
-          :key="index"
-          class="mt-4 text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)]"
-        >
-          {{ text }}
-        </p>
-      </div>
+        Отступы — на самой панели и на абзацах, а не на общей обёртке: панель
+        обязана перекрывать текст во всю ширину блока.
+      -->
+      <GrAffix @sticky-change="onStickyChange">
+        <template #default="{ stuck }">
+          <div class="flex items-center justify-between gap-3 px-4 py-3">
+            <div class="min-w-0">
+              <h3 class="truncate text-[length:var(--gr-control-text-sm)] leading-[var(--gr-leading-sm)] font-600">
+                Регламент согласования закупок
+              </h3>
+              <p v-if="!stuck" class="truncate text-[length:var(--gr-text-xs)] leading-[var(--gr-leading-xs)] text-[var(--gr-muted-fg)]">
+                Редакция от 12 марта, действует до конца года
+              </p>
+            </div>
+            <GrButton :size="stuck ? 'xs' : 'sm'" variant="secondary">
+              Скачать
+            </GrButton>
+          </div>
+        </template>
+      </GrAffix>
+
+      <p
+        v-for="(text, index) in paragraphs"
+        :key="index"
+        class="px-4 pb-4 text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)]"
+      >
+        {{ text }}
+      </p>
     </div>
 
     <div class="flex flex-wrap items-center gap-2">

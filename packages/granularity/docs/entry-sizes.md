@@ -12,7 +12,7 @@
 
 | Компонент | gzip | файлов | от бареля |
 | --- | ---: | ---: | ---: |
-| `GrDialogService` | 89.3 kB | 44 | 16 % |
+| `GrDialogService` | 89.3 kB | 44 | 15 % |
 | `GrPromptDialog` | 78.6 kB | 42 | 14 % |
 | `GrPagination` | 76.1 kB | 45 | 13 % |
 | `GrTreeSelect` | 70.8 kB | 42 | 12 % |
@@ -25,7 +25,7 @@
 | `GrDataTable` | 50.4 kB | 32 | 9 % |
 | `GrCommandPalette` | 50.1 kB | 27 | 9 % |
 | `GrContextMenu` | 50.1 kB | 26 | 9 % |
-| `GrDropdownMenu` | 48.8 kB | 27 | 9 % |
+| `GrDropdownMenu` | 48.8 kB | 27 | 8 % |
 | `GrImageViewer` | 42.4 kB | 25 | 7 % |
 | `GrDropdown` | 41.3 kB | 23 | 7 % |
 | `GrDialog` | 37.8 kB | 24 | 7 % |
@@ -33,13 +33,13 @@
 | `GrDrawer` | 36.8 kB | 24 | 6 % |
 | `GrTree` | 36.4 kB | 23 | 6 % |
 | `GrInputTag` | 33.9 kB | 25 | 6 % |
-| `GrToaster` | 31.7 kB | 25 | 6 % |
+| `GrToaster` | 31.7 kB | 25 | 5 % |
 | `GrFileUpload` | 31.0 kB | 21 | 5 % |
 | `GrModal` | 29.4 kB | 17 | 5 % |
 | `GrFormFile` | 27.4 kB | 23 | 5 % |
 | `GrTooltip` | 26.2 kB | 18 | 5 % |
 | `GrResponseErrorBanner` | 26.2 kB | 14 | 5 % |
-| `GrCarousel` | 26.0 kB | 17 | 5 % |
+| `GrCarousel` | 26.0 kB | 17 | 4 % |
 | `GrSortableList` | 24.2 kB | 16 | 4 % |
 | `GrList` | 22.5 kB | 16 | 4 % |
 | `GrNumberInput` | 20.6 kB | 18 | 4 % |
@@ -82,6 +82,7 @@
 | `GrDescriptionList` | 8.3 kB | 5 | 1 % |
 | `GrCard` | 8.3 kB | 5 | 1 % |
 | `GrConfigProvider` | 7.4 kB | 6 | 1 % |
+| `GrAffix` | 7.3 kB | 4 | 1 % |
 | `GrProgressBar` | 7.2 kB | 8 | 1 % |
 | `GrBadgeWrap` | 6.3 kB | 7 | 1 % |
 | `GrIcon` | 6.2 kB | 7 | 1 % |
@@ -92,4 +93,4 @@
 | `GrTabPanels` | 1.9 kB | 3 | < 1 % |
 | `GrButtonGroup` | 1.8 kB | 5 | < 1 % |
 
-Весь пакет из корня — 574.1 kB.
+Весь пакет из корня — 580.9 kB.

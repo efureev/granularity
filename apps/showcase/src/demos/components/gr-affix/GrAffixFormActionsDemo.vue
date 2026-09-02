@@ -21,13 +21,16 @@ const fields = ref({
     aria-label="Карточка договора"
   >
     <!--
+      Отступы живут на содержимом, а не на прокручиваемом блоке: панель обязана
+      быть во всю его ширину, иначе поля контейнера остаются по бокам от неё и
+      уезжающая форма видна в этих просветах.
+
       Панель — прямой ребёнок формы: её containing block и есть форма, вдоль
       которой панель едет. Обёртка вокруг панели зажала бы `sticky` и он
-      перестал бы работать вовсе. Поля собраны в свой блок, чтобы `gap`
-      формы не доставался сентинелу.
+      перестал бы работать вовсе.
     -->
-    <form class="p-4" @submit.prevent>
-      <div class="flex flex-col gap-4">
+    <form @submit.prevent>
+      <div class="flex flex-col gap-4 p-4">
         <GrFormField label="Название">
           <GrInput v-model="fields.title" />
         </GrFormField>
@@ -49,7 +52,7 @@ const fields = ref({
       </div>
 
       <GrAffix placement="bottom">
-        <div class="flex justify-end gap-2 py-3">
+        <div class="flex justify-end gap-2 px-4 py-3">
           <GrButton variant="ghost">
             Отмена
           </GrButton>

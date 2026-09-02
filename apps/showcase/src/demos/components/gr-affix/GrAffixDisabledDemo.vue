@@ -36,23 +36,21 @@ const files = [
       role="group"
       aria-label="Список вложений"
     >
-      <div class="p-3">
-        <GrAffix :disabled="!sticky">
-          <div class="py-1">
-            <GrInput v-model="query" size="sm" placeholder="Поиск по вложениям" aria-label="Поиск по вложениям" />
-          </div>
-        </GrAffix>
+      <GrAffix :disabled="!sticky">
+        <div class="px-3 py-3">
+          <GrInput v-model="query" size="sm" placeholder="Поиск по вложениям" aria-label="Поиск по вложениям" />
+        </div>
+      </GrAffix>
 
-        <ul>
-          <li
-            v-for="file in files"
-            :key="file"
-            class="border-b border-[var(--gr-brd)] py-3 text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)] last:border-b-0"
-          >
-            {{ file }}
-          </li>
-        </ul>
-      </div>
+      <ul>
+        <li
+          v-for="file in files"
+          :key="file"
+          class="border-b border-[var(--gr-brd)] px-3 py-3 text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)] last:border-b-0"
+        >
+          {{ file }}
+        </li>
+      </ul>
     </div>
   </div>
 </template>
