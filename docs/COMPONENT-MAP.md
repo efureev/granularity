@@ -68,7 +68,8 @@
 
 ### Выбор из набора готовых значений
 
-Различитель — **сколько вариантов** и **просматривают их или ищут**.
+Различитель — **сколько вариантов**, **просматривают их или ищут** и **какова
+судьба выбранного**.
 
 | Что происходит | Компонент |
 | --- | --- |
@@ -78,6 +79,7 @@
 | несколько значений из короткого списка | [`GrCheckboxGroup`](../packages/granularity/docs/components/GrCheckboxGroup.md) |
 | 5–50 вариантов, список закрыт, их просматривают | [`GrSelect`](../packages/granularity/docs/components/GrSelect.md) |
 | десятки и больше, их ищут вводом | [`GrAutocomplete`](../packages/granularity/docs/components/GrAutocomplete.md) |
+| выбранное — само список: его видят целиком и упорядочивают | [`GrTransfer`](../packages/granularity/docs/components/GrTransfer.md) |
 | варианты — дерево с уровнями | [`GrTreeSelect`](../packages/granularity/docs/components/GrTreeSelect.md) |
 | справочника нет, значения вводят свои | [`GrInputTag`](../packages/granularity/docs/components/GrInputTag.md) |
 | выбирают команду приложения, а не значение поля | [`GrCommandPalette`](../packages/granularity/docs/components/GrCommandPalette.md) |
@@ -85,6 +87,15 @@
 `GrSelect` против `GrAutocomplete` — не режим одного компонента: там пользователь
 выбирает из готового списка, здесь ищет вводом, и роль `combobox` носят разные
 элементы.
+
+`GrCheckboxGroup`, `GrSelect` с `multiple` и `GrTransfer` — три ответа на «выбрать
+несколько», и различает их **судьба выбранного**: у группы чекбоксов оно совпадает
+со списком вариантов, у селекта сжато в строку триггера, у трансфера это
+самостоятельная панель со своим порядком. Порядок и есть водораздел — он значим
+только в третьем случае.
+
+`GrTransfer` против `GrSortableList` — **один список или два**: первый переносит
+через границу, второй переставляет внутри неё.
 
 ### Двоичный выбор и переключение режима
 
@@ -145,6 +156,7 @@
 | таблица данных: сортировка, выбор строк, колонки, итог | [`GrDataTable`](../packages/granularity/docs/components/GrDataTable.md) |
 | разметку `<tr>`/`<td>` пишет потребитель | [`GrTable`](../packages/granularity/docs/components/GrTable.md) |
 | строки вложены друг в друга | [`GrTree`](../packages/granularity/docs/components/GrTree.md) |
+| строки переносят из одного списка в другой | [`GrTransfer`](../packages/granularity/docs/components/GrTransfer.md) |
 | порядок строк меняет пользователь | [`GrSortableList`](../packages/granularity/docs/components/GrSortableList.md) |
 | строки — события во времени | [`GrTimeline`](../packages/granularity/docs/components/GrTimeline.md) |
 | строк больше, чем помещается на экран | [`GrPagination`](../packages/granularity/docs/components/GrPagination.md) |
@@ -493,6 +505,7 @@
 | [`GrTimePicker`](../packages/granularity-chrono/docs/components/GrTimePicker.md) | chrono | время без даты |
 | [`GrToaster`](../packages/granularity/docs/components/GrToaster.md) | ядро | действие завершилось |
 | [`GrTooltip`](../packages/granularity/docs/components/GrTooltip.md) | ядро | подпись к иконочной кнопке |
+| [`GrTransfer`](../packages/granularity/docs/components/GrTransfer.md) | ядро | состав набирают из справочника |
 | [`GrTree`](../packages/granularity/docs/components/GrTree.md) | ядро | данные вложены |
 | [`GrTreeSelect`](../packages/granularity/docs/components/GrTreeSelect.md) | ядро | варианты вложены |
 | [`GrValue`](../packages/granularity/docs/components/GrValue.md) | ядро | пишете свой компонент с величиной |
@@ -504,8 +517,7 @@
 Здесь перечислено то, за чем нет смысла идти в карту: компонента не существует
 ни в одном пакете, и ближайший сосед задачу не закрывает.
 
-**Планируется в ядро.** `GrTransfer` — перенос
-между двумя списками; `GrAffix` — прилипание к краю
+**Планируется в ядро.** `GrAffix` — прилипание к краю
 при скролле; `GrMenu` — вертикальное меню навигации (меню действий по правому
 клику закрывает `GrContextMenu`, вложенных подменю нет ни у кого).
 

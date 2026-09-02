@@ -324,6 +324,9 @@ export default defineConfig({
         'components/GrTooltip/index': fileURLToPath(
           new URL('./src/components/GrTooltip/index.ts', import.meta.url),
         ),
+        'components/GrTransfer/index': fileURLToPath(
+          new URL('./src/components/GrTransfer/index.ts', import.meta.url),
+        ),
         'components/GrTree/index': fileURLToPath(
           new URL('./src/components/GrTree/index.ts', import.meta.url),
         ),

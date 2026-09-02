@@ -1,4 +1,20 @@
 {
+  "transfer": {
+    "sourceTitle": "Доступны",
+    "targetTitle": "Выбраны",
+    "search": "Поиск",
+    "toTarget": "Перенести к выбранным",
+    "toSource": "Вернуть к доступным",
+    "selectAll": "Выбрать всё показанное",
+    "selected": "{count} из {total}",
+    "shown": "Показано {shown} из {total}",
+    "empty": "Здесь пока пусто",
+    "emptyFiltered": "Ничего не найдено",
+    "moved": "{count} перенесено в «{list}»",
+    "reordered": "Позиция {position} из {count}",
+    "reorderFiltered": "Пока включён поиск, порядок не меняется",
+    "cancelled": "Перенос отменён"
+  },
   "carousel": {
     "roledescription": "карусель",
     "slideRoledescription": "слайд",

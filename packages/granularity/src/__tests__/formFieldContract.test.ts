@@ -11,6 +11,7 @@ import GrFormField from '../components/GrFormField/GrFormField.vue'
 import GrFormFile from '../components/GrFormFile/GrFormFile.vue'
 import GrInput from '../components/GrInput/GrInput.vue'
 import GrInputTag from '../components/GrInputTag/GrInputTag.vue'
+import GrTransfer from '../components/GrTransfer/GrTransfer.vue'
 import GrNumberInput from '../components/GrNumberInput/GrNumberInput.vue'
 import GrRadioGroup from '../components/GrRadioGroup/GrRadioGroup.vue'
 import GrRating from '../components/GrRating/GrRating.vue'
@@ -37,7 +38,7 @@ const ERROR_TEXT = 'Поле обязательно'
 const LABEL_TEXT = 'Подпись поля'
 
 /** Контролы, у которых виджет — не labelable-элемент (span/div с ARIA-ролью). */
-const ARIA_LABELLED = new Set(['GrCheckbox', 'GrCheckboxGroup', 'GrRadioGroup'])
+const ARIA_LABELLED = new Set(['GrCheckbox', 'GrCheckboxGroup', 'GrRadioGroup', 'GrTransfer'])
 
 const controls: { name: string, render: () => unknown }[] = [
   { name: 'GrInput', render: () => h(GrInput, { modelValue: '' }) },
@@ -46,6 +47,7 @@ const controls: { name: string, render: () => unknown }[] = [
   { name: 'GrSelect', render: () => h(GrSelect, { modelValue: '', options: [] }) },
   { name: 'GrAutocomplete', render: () => h(GrAutocomplete, { modelValue: '', options: [] }) },
   { name: 'GrInputTag', render: () => h(GrInputTag, { modelValue: [] }) },
+  { name: 'GrTransfer', render: () => h(GrTransfer, { modelValue: [], items: [{ id: 'a', label: 'A' }] }) },
   { name: 'GrSlider', render: () => h(GrSlider, { modelValue: 0 }) },
   { name: 'GrRating', render: () => h(GrRating, { modelValue: 0 }) },
   { name: 'GrCheckbox', render: () => h(GrCheckbox, { modelValue: false }) },

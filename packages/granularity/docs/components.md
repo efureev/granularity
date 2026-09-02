@@ -175,6 +175,7 @@ GrSelect>` для них не работает, такой компонент к
 - [`GrTimeline`](./components/GrTimeline.md)
 - [`GrToaster`](./components/GrToaster.md)
 - [`GrTooltip`](./components/GrTooltip.md)
+- [`GrTransfer`](./components/GrTransfer.md)
 - [`GrTree`](./components/GrTree.md)
 - [`GrTreeSelect`](./components/GrTreeSelect.md)
 - [`GrValue`](./components/GrValue.md)
@@ -248,7 +249,7 @@ GrSelect>` для них не работает, такой компонент к
 
 ## Контракт форм-контрола
 
-Шестнадцать компонентов — форм-контролы, и у них общий контракт: пропы
+Восемнадцать компонентов — форм-контролы, и у них общий контракт: пропы
 (`disabled`/`readonly`/`invalid`/`required`/`ariaLabel`), методы `focus()`/`blur()` и события
 `update:modelValue`/`change`/`focus`/`blur`/`clear`. Он существует ради того, чтобы обёртка,
 написанная над одним контролом, работала над любым — подробности в

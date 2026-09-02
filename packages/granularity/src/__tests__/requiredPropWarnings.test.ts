@@ -10,6 +10,7 @@ import GrSegmented from '../components/GrSegmented/GrSegmented.vue'
 import GrSortableList from '../components/GrSortableList/GrSortableList.vue'
 import GrSteps from '../components/GrSteps/GrSteps.vue'
 import GrTabs from '../components/GrTabs/GrTabs.vue'
+import GrTransfer from '../components/GrTransfer/GrTransfer.vue'
 
 /**
  * Пропущенный обязательный проп у этих восьми кончается исключением при
@@ -30,6 +31,7 @@ const CASES = [
   { name: 'GrSortableList', component: GrSortableList, props: ['modelValue'] },
   { name: 'GrSteps', component: GrSteps, props: ['modelValue', 'steps'] },
   { name: 'GrTabs', component: GrTabs, props: ['modelValue', 'tabs'] },
+  { name: 'GrTransfer', component: GrTransfer, props: ['modelValue', 'items'] },
 ] as const
 
 afterEach(() => {

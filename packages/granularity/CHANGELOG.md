@@ -9,6 +9,54 @@ to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **New `GrTransfer` — two lists side by side and a way across.** Assigning members to a
+  project, permissions to a role, columns to a report: the directory stays on the left, what
+  has been picked stands on the right, and both are visible at once. `GrSelect` with
+  `multiple` remains the neighbour it was — folding the selection into the trigger is the
+  right trade when space is short and the selection is short with it. Here the selection is
+  the point: it is a list of its own, and it is ordered.
+
+  **`v-model` is an ordered array of keys, not of items.** The right panel is `modelValue`
+  read in order, so reordering it *is* editing the value, and the consumer stores one array
+  rather than a set plus a sort. A key present in the model but absent from `items` is kept
+  and reported in dev rather than dropped: a directory often arrives after the saved
+  selection, and dropping it would delete on the first render what the server still has.
+  Every mutation emits a new array — the input is never touched.
+
+  **Three ways across, and all three are equal.** Buttons move the current selection; a
+  pointer drag moves a block and drops it at a position; the keyboard does both. `Space`
+  toggles a row and does nothing else, `Shift` with an arrow extends the range from the
+  anchor, `Enter` transfers — and inside the right panel `Alt` with an arrow moves the whole
+  selection at once. That last one is why `GrSortableList` is not embedded here: its `Space`
+  enters a "row grabbed" mode, and in a multi-select list both keys would be claimed twice.
+  Making reordering a command rather than a mode keeps `Space` meaning exactly one thing, and
+  moves several rows in one keystroke, which grab-and-drop cannot do at all.
+
+  **Search narrows the view, never the value.** Each panel filters independently; a row that
+  is selected and then hidden by a query stays selected and still travels with the rest —
+  otherwise typing in a search field would silently undo work already done. The header
+  counter therefore counts the whole panel rather than the visible part, and a transfer
+  announces how many moved. While a search is active in the right panel, reordering is off
+  and says so: "move down" over a filtered list either skips invisible rows or produces an
+  order nobody could predict.
+
+  **The transfer buttons are never natively `disabled`.** With nothing to move they carry
+  `aria-disabled`, stay in the tab order and dim through a background token — a control
+  dropped from the tab order cannot explain why it is unavailable, and the focus would land
+  in `<body>` right after the last click.
+
+  Each panel is a `listbox` with `aria-multiselectable`, its rows are `option`s carrying
+  `aria-selected`, and each panel holds one `Tab` stop with roving focus inside it. Panels are
+  named, because there are two of them. The row's own mark is decorative: a `GrCheckbox`
+  inside `role="option"` would be `nested-interactive`, so state lives on the row and the real
+  checkbox sits in the header, where "select everything shown" belongs. Integrates with
+  `GrFormField` — the field's `id`, label, description, `aria-invalid`, `aria-required` and
+  `aria-readonly` land on the right panel, which is the value — and reads `size` and
+  `draggable` from `GrConfigProvider`.
+- **i18n:** `gr.transfer.sourceTitle`, `targetTitle`, `search`, `toTarget`, `toSource`,
+  `selectAll`, `selected`, `shown`, `empty`, `emptyFiltered`, `moved`, `reordered`,
+  `reorderFiltered` and `cancelled` in `en`, `ru` and `es`.
+
 - **New `GrCarousel` — a band of slides in the page flow.** A product gallery, an onboarding
   run, a row of testimonials wider than the screen: full-width frames with arrows, dots, a
   thumbnail strip and a swipe, none of which needed a gesture library. Slides come from the

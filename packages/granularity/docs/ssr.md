@@ -16,7 +16,7 @@
 касаются не безопасности, а того, что именно приходит с сервера.
 
 - **47 компонентов** не касаются DOM вообще.
-- **5** трогают DOM только в обработчиках и хуках.
+- **6** трогают DOM только в обработчиках и хуках.
 - **9 телепортирующих** (`GrSelect` в режиме `panel`, `GrAutocomplete`,
   `GrDropdown`, `GrTreeSelect`, `GrTooltip`, `GrModal` и всё на нём, `GrDrawer`,
   `GrToaster`, `GrImageViewer`) рендерят свои панели **на месте**, а в `body`
@@ -68,9 +68,9 @@
 `GrConfirmDialog`, `GrDialog` и `GrPromptDialog` попали сюда потому, что вся DOM-механика у них — в `GrModal`, на
 котором они построены.
 
-## DOM только в обработчиках и хуках (6)
+## DOM только в обработчиках и хуках (7)
 
-`GrCarousel`, `GrCommandPalette`, `GrDialogService`, `GrSegmented`, `GrSlider`, `GrStatistic`.
+`GrCarousel`, `GrCommandPalette`, `GrDialogService`, `GrSegmented`, `GrSlider`, `GrStatistic`, `GrTransfer`.
 
 Серверный рендер безопасен: обращения живут в `onMounted`/`onBeforeUnmount` и в слушателях событий, которые на сервере
 не выполняются. Конкретно:
@@ -91,7 +91,11 @@
   серверным. Полоса переключателей на сервере выходит пустой — состав ленты компонент узнаёт
   от самих кадров при монтировании, — и заполняется следующим тактом, одинаково на обеих
   сторонах. Направление письма для жеста снимается `getComputedStyle` в обработчике
-  `pointerdown`, а не в `setup`.
+  `pointerdown`, а не в `setup`;
+- `GrTransfer` — `getBoundingClientRect` панелей и строк только внутри идущего жеста,
+  `window.addEventListener('keydown'…)` для `Esc` на время переноса и `requestAnimationFrame`
+  автопрокрутки. В `setup` среды не касается: раскладка панелей от неё не зависит, а id идут
+  из `useId()`.
 
 ## Композаблы и директивы
 

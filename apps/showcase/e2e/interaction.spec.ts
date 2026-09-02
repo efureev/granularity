@@ -697,3 +697,72 @@ test.describe('GrCarousel', () => {
     await expect(track).toHaveAttribute('style', /--gr-carousel-index:\s*1/)
   })
 })
+
+/**
+ * `GrTransfer`: таб-порядок, активация кнопки и попадание указателя между двумя
+ * панелями. В jsdom нет ни перемещения фокуса по `Tab`, ни активации по `Enter`,
+ * ни раскладки — прямоугольники там нулевые, и геометрию задаёт сам тест.
+ */
+test.describe('GrTransfer', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto(componentPath('GrTransfer'))
+    await page.locator('#live-examples').waitFor()
+    await page.locator('[data-gr-transfer]').first().waitFor()
+  })
+
+  test('каждая панель держит ровно одну остановку Tab', async ({ page }) => {
+    const transfer = page.locator('[data-gr-transfer]').first()
+    const stops = await transfer.locator('[data-gr-transfer-option][tabindex="0"]').count()
+    const total = await transfer.locator('[data-gr-transfer-option]').count()
+
+    expect(total, 'на странице нет строк — тест бесполезен').toBeGreaterThan(1)
+    // По одной остановке на панель: слева и справа.
+    expect(stops).toBeLessThanOrEqual(2)
+  })
+
+  test('Enter на кнопке переноса действительно переносит', async ({ page }) => {
+    const transfer = page.locator('[data-gr-transfer]').first()
+    const source = transfer.locator('[data-gr-transfer-list="source"] [data-gr-transfer-option]')
+    const target = transfer.locator('[data-gr-transfer-list="target"] [data-gr-transfer-option]')
+
+    const before = await target.count()
+    await source.first().click()
+    await transfer.locator('[data-gr-transfer-to-target]').focus()
+    await page.keyboard.press('Enter')
+
+    await expect(target).toHaveCount(before + 1)
+  })
+
+  test('Shift-клик берёт диапазон настоящим модификатором', async ({ page }) => {
+    const source = page.locator('[data-gr-transfer]').first().locator('[data-gr-transfer-list="source"] [data-gr-transfer-option]')
+
+    await source.nth(0).click()
+    await source.nth(2).click({ modifiers: ['Shift'] })
+
+    const selected = page.locator('[data-gr-transfer-list="source"] [data-gr-transfer-option][aria-selected="true"]')
+    await expect(selected).toHaveCount(3)
+  })
+
+  test('строка перетаскивается из левой панели в правую', async ({ page }) => {
+    const transfer = page.locator('[data-gr-transfer]').first()
+    const source = transfer.locator('[data-gr-transfer-list="source"] [data-gr-transfer-option]')
+    const targetList = transfer.locator('[data-gr-transfer-list="target"]')
+
+    const before = await targetList.locator('[data-gr-transfer-option]').count()
+
+    // Прокрутка обязательна: `boundingBox()` отдаёт координаты относительно
+    // вьюпорта, а демо лежит ниже сгиба — без неё указатель уезжает мимо строки
+    // и жест не начинается вовсе, молча.
+    await source.first().scrollIntoViewIfNeeded()
+    const from = await source.first().boundingBox()
+    const to = await targetList.boundingBox()
+    expect(from && to, 'нет раскладки — тест бесполезен').toBeTruthy()
+
+    await page.mouse.move(from!.x + from!.width / 2, from!.y + from!.height / 2)
+    await page.mouse.down()
+    await page.mouse.move(to!.x + to!.width / 2, to!.y + to!.height / 2, { steps: 12 })
+    await page.mouse.up()
+
+    await expect(targetList.locator('[data-gr-transfer-option]')).toHaveCount(before + 1)
+  })
+})

@@ -1,4 +1,20 @@
 {
+  "transfer": {
+    "sourceTitle": "Available",
+    "targetTitle": "Selected",
+    "search": "Search",
+    "toTarget": "Move to selected",
+    "toSource": "Move back to available",
+    "selectAll": "Select everything shown",
+    "selected": "{count} of {total}",
+    "shown": "Showing {shown} of {total}",
+    "empty": "Nothing here yet",
+    "emptyFiltered": "Nothing matches the search",
+    "moved": "{count} moved to {list}",
+    "reordered": "Position {position} of {count}",
+    "reorderFiltered": "Reordering is off while a search is active",
+    "cancelled": "Move cancelled"
+  },
   "carousel": {
     "roledescription": "carousel",
     "slideRoledescription": "slide",

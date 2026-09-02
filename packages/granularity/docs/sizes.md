@@ -142,7 +142,7 @@ export const sizes = {
 `GrCollapse`, `GrDataTable`, `GrFileUpload`, `GrFormFile`, `GrIcon`, `GrInput`, `GrLink`, `GrNumberInput`,
 `GrNavbar`, `GrPagination`, `GrProgressBar`, `GrRating`, `GrSegmented`, `GrSelect`,
 `GrSlider`, `GrStatistic`, `GrSwitch`, `GrTable`, `GrTabs`, `GrTextarea`,
-`GrTooltip`, `GrTree`.
+`GrTooltip`, `GrTransfer`, `GrTree`.
 
 Гейт — `src/__tests__/componentSize.test.ts`. Он проверяет не факт вызова композабла, а отрендеренный DOM, и список
 компонентов берёт из файловой системы: компонент, объявивший `size` в своём `defaults.ts`, обязан иметь в гейте стенд.

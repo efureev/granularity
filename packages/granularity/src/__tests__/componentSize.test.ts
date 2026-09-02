@@ -59,6 +59,7 @@ import { sizes as buttonSizes } from '../components/GrButton/grButtonStyles'
 import { tabSizes } from '../components/GrTabs/grTabsStyles'
 import GrTextarea from '../components/GrTextarea/GrTextarea.vue'
 import GrTooltip from '../components/GrTooltip/GrTooltip.vue'
+import GrTransfer from '../components/GrTransfer/GrTransfer.vue'
 import GrTree from '../components/GrTree/GrTree.vue'
 import GrTreeSelect from '../components/GrTreeSelect/GrTreeSelect.vue'
 
@@ -200,6 +201,15 @@ const harnesses: { name: string, render: () => unknown }[] = [
   },
   { name: 'GrTextarea', render: () => h(GrTextarea, { modelValue: '' }) },
   { name: 'GrTooltip', render: () => h(GrTooltip, { text: 'T' }) },
+  {
+    // Каталог обязан быть непустым: на пустых панелях обе разметки совпали бы,
+    // и стенд зеленел бы на любом коде.
+    name: 'GrTransfer',
+    render: () => h(GrTransfer, {
+      modelValue: ['a'],
+      items: [{ id: 'a', label: 'A' }, { id: 'b', label: 'B' }],
+    }),
+  },
   { name: 'GrTree', render: () => h(GrTree, { data: [{ id: '1', label: 'A' }] }) },
   {
     name: 'GrTreeSelect',

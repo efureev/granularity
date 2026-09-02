@@ -49,7 +49,7 @@ const DOMAIN_SLOTS: Record<string, string[]> = {
   // Пункт ленты шагов. Не `item`: у соседей это строка списка, а здесь —
   // этап процесса со своим статусом, и общее имя стёрло бы разницу.
   'step': ['GrSteps'],
-  'item': ['GrBottomNav', 'GrBreadcrumbs', 'GrCommandPalette', 'GrList', 'GrSortableList', 'GrTimeline'],
+  'item': ['GrBottomNav', 'GrBreadcrumbs', 'GrCommandPalette', 'GrList', 'GrSortableList', 'GrTimeline', 'GrTransfer'],
   // Не `value`: у `GrSelect` это выбранное значение в контроле, здесь — лист
   // дерева. Одно имя на два смысла и есть то, что этот словарь ловит.
   'leaf': ['GrJsonViewer'],

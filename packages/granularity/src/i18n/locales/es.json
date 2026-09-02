@@ -1,4 +1,20 @@
 {
+  "transfer": {
+    "sourceTitle": "Disponibles",
+    "targetTitle": "Seleccionados",
+    "search": "Buscar",
+    "toTarget": "Mover a seleccionados",
+    "toSource": "Devolver a disponibles",
+    "selectAll": "Seleccionar todo lo mostrado",
+    "selected": "{count} de {total}",
+    "shown": "Mostrando {shown} de {total}",
+    "empty": "Aquí no hay nada todavía",
+    "emptyFiltered": "No hay coincidencias",
+    "moved": "{count} movidos a «{list}»",
+    "reordered": "Posición {position} de {count}",
+    "reorderFiltered": "El orden no cambia mientras haya búsqueda",
+    "cancelled": "Movimiento cancelado"
+  },
   "carousel": {
     "roledescription": "carrusel",
     "slideRoledescription": "diapositiva",

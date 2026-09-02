@@ -93,6 +93,7 @@ describe('readonly: ни одна клавиша не меняет значен�
     'GrSegmented',
     'GrSlider',
     'GrSwitch',
+    'GrTransfer',
   ]
 
   it('состав клавиатурно-управляемых контролов не изменился', async () => {

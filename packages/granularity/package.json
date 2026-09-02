@@ -438,6 +438,10 @@
       "types": "./dist/types/components/GrTooltip/index.d.ts",
       "import": "./dist/components/GrTooltip/index.js"
     },
+    "./components/GrTransfer": {
+      "types": "./dist/types/components/GrTransfer/index.d.ts",
+      "import": "./dist/components/GrTransfer/index.js"
+    },
     "./components/GrTree": {
       "types": "./dist/types/components/GrTree/index.d.ts",
       "import": "./dist/components/GrTree/index.js"

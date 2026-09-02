@@ -11827,6 +11827,219 @@
       }
     ]
   },
+  "GrTransfer": {
+    "name": "GrTransfer",
+    "sourcePath": "packages/granularity/src/components/GrTransfer/GrTransfer.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "items",
+            "description": "Каталог целиком: обе панели — одна его раскладка.",
+            "type": "TItem[]",
+            "required": true
+          },
+          {
+            "name": "modelValue",
+            "description": "Ключи правой панели **в её порядке**: порядок и есть значение.",
+            "type": "GrTransferKey[]",
+            "required": true
+          },
+          {
+            "name": "itemKey",
+            "description": "",
+            "type": "GrTransferItemKey<TItem> | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "itemLabel",
+            "description": "",
+            "type": "GrTransferItemLabel<TItem> | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "itemDisabled",
+            "description": "",
+            "type": "GrTransferItemFlag<TItem> | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "sourceTitle",
+            "description": "Имя левой панели. Это доступное имя её `listbox`, а не украшение.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "targetTitle",
+            "description": "Имя правой панели.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "searchable",
+            "description": "Поле поиска в каждой панели.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          },
+          {
+            "name": "filter",
+            "description": "Свой матчер: встроенный ищет по `itemLabel`, а строка может показывать больше.",
+            "type": "((item: TItem, query: string) => boolean) | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "sortable",
+            "description": "Правую панель можно переставлять.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          },
+          {
+            "name": "draggable",
+            "description": "Перетаскивание строк указателем. Усиление поверх кнопок, а не контракт.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "maxHeight",
+            "description": "Высота панелей: обе одинаковы и прокручиваются внутри себя.",
+            "type": "string | number | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "size",
+            "description": "",
+            "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "disabled",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "readonly",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "invalid",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "required",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "ariaLabel",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "item",
+            "description": "Своя строка. Слот доменный: у соседей `item` — строка списка, здесь тоже.",
+            "type": "{ item: TItem; side: GrTransferSide; index: number; selected: boolean; disabled: boolean; }"
+          },
+          {
+            "name": "header",
+            "description": "Своя шапка панели: имя, счётчик, отметка «выбрать всё».",
+            "type": "{ side: GrTransferSide; title: string; selected: number; total: number; shown: number; }"
+          },
+          {
+            "name": "actions",
+            "description": "Своя колонка кнопок между панелями.",
+            "type": "{ toTarget: () => void; toSource: () => void; canToTarget: boolean; canToSource: boolean; }"
+          },
+          {
+            "name": "empty",
+            "description": "Пустая панель. `filtered` — пусто из-за поиска, а не по сути.",
+            "type": "{ side: GrTransferSide; filtered: boolean; }"
+          }
+        ]
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "update:modelValue",
+            "description": "",
+            "type": "[GrTransferKey[]]",
+            "signature": "(e: \"update:modelValue\", value: GrTransferKey[]): void"
+          },
+          {
+            "name": "change",
+            "description": "",
+            "type": "[GrTransferKey[]]",
+            "signature": "(e: \"change\", value: GrTransferKey[]): void"
+          },
+          {
+            "name": "transfer",
+            "description": "",
+            "type": "[GrTransferKey[], GrTransferDirection]",
+            "signature": "(e: \"transfer\", keys: GrTransferKey[], direction: GrTransferDirection): void"
+          },
+          {
+            "name": "search",
+            "description": "",
+            "type": "[string, GrTransferSide]",
+            "signature": "(e: \"search\", query: string, side: GrTransferSide): void"
+          },
+          {
+            "name": "focus",
+            "description": "",
+            "type": "[FocusEvent]",
+            "signature": "(e: \"focus\", event: FocusEvent): void"
+          },
+          {
+            "name": "blur",
+            "description": "",
+            "type": "[FocusEvent]",
+            "signature": "(e: \"blur\", event: FocusEvent): void"
+          }
+        ]
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": []
+      }
+    ]
+  },
   "GrTree": {
     "name": "GrTree",
     "sourcePath": "packages/granularity/src/components/GrTree/GrTree.vue",

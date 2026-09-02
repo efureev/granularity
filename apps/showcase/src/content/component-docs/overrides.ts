@@ -37,6 +37,7 @@ import {
   grKbdExamples,
   grDividerExamples,
   grTabPanelsExamples,
+  grTransferExamples,
   grTreeExamples,
   grTreeSelectExamples,
   grValueExamples,
@@ -90,6 +91,21 @@ function createComponentDocMeta(
     overview,
     examples,
   }
+}
+
+const grTransferOverview: ShowcaseComponentOverviewDoc = {
+  paragraphs: [
+    'Два списка рядом и перенос между ними: слева справочник, справа то, что отобрали. Назначение прав, состав рассылки, колонки отчёта — там, где важно видеть обе стороны сразу.',
+    'Правая панель — не просто «выбранное»: её можно переставлять, и порядок уезжает в модель. Именно этим компонент отличается от мультиселекта, где выбранное сжато в строку триггера.',
+  ],
+  features: [
+    'Мультивыбор строк: `Ctrl` добавляет по одной, `Shift` берёт диапазон, «выбрать всё показанное» — одну отфильтрованную пачку.',
+    'Перенос кнопками, перетаскиванием и с клавиатуры — все три пути равноправны и объявляются скринридеру.',
+    'Поиск в каждой панели по отдельности: длинный справочник сужается, уже отобранное при этом не теряется.',
+    'Порядок правой панели меняется перетаскиванием и `Alt` + стрелкой — и это и есть значение `v-model`.',
+    'Своя строка слотом `#item`, поэлементные запреты, состояния `disabled` и `readonly`.',
+    'Интеграция с `GrFormField` и кастомизация через переменные `--gr-transfer-*`.',
+  ],
 }
 
 const grAutocompleteOverview: ShowcaseComponentOverviewDoc = {
@@ -500,6 +516,7 @@ export const componentDocOverrides: Partial<Record<string, ShowcaseComponentDocM
   GrJsonViewer: createComponentDocMeta(grJsonViewerExamples),
   GrKbd: createComponentDocMeta(grKbdExamples),
   GrDivider: createComponentDocMeta(grDividerExamples),
+  GrTransfer: createComponentDocMeta(grTransferExamples, grTransferOverview),
   GrTree: createComponentDocMeta(grTreeExamples),
   GrTreeSelect: createComponentDocMeta(grTreeSelectExamples),
   GrValue: createComponentDocMeta(grValueExamples),

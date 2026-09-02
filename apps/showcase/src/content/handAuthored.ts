@@ -8,7 +8,7 @@ const componentGroups = {
   feedback: ['GrAlert', 'GrBadge', 'GrBadgeWrap', 'GrEmptyState', 'GrLoading', 'GrProgressBar', 'GrProgressCircle', 'GrResponseErrorBanner', 'GrSkeleton', 'GrToaster'],
   navigation: ['GrBottomNav', 'GrBreadcrumbs', 'GrCommandPalette', 'GrNavbar', 'GrPagination', 'GrSidebar', 'GrSteps', 'GrTabs', 'GrTabPanels', 'GrTooltip'],
   overlays: ['GrCollapse', 'GrConfirmDialog', 'GrContextMenu', 'GrDialog', 'GrDrawer', 'GrDropdown', 'GrDropdownMenu', 'GrImageViewer', 'GrModal', 'GrPopover', 'GrPromptDialog'],
-  forms: ['GrAutocomplete', 'GrCheckbox', 'GrCheckboxGroup', 'GrColorPicker', 'GrFileUpload', 'GrForm', 'GrFormFile', 'GrFormField', 'GrFormSection', 'GrInput', 'GrNumberInput', 'GrInputTag', 'GrRadio', 'GrRadioGroup', 'GrRating', 'GrSegmented', 'GrSelect', 'GrSlider', 'GrSwitch', 'GrTextarea', 'GrTreeSelect'],
+  forms: ['GrAutocomplete', 'GrCheckbox', 'GrCheckboxGroup', 'GrColorPicker', 'GrFileUpload', 'GrForm', 'GrFormFile', 'GrFormField', 'GrFormSection', 'GrInput', 'GrNumberInput', 'GrInputTag', 'GrRadio', 'GrRadioGroup', 'GrRating', 'GrSegmented', 'GrSelect', 'GrSlider', 'GrTransfer', 'GrSwitch', 'GrTextarea', 'GrTreeSelect'],
   data: ['GrAvatar', 'GrCard', 'GrCarousel', 'GrChip', 'GrChipGroup', 'GrFilePreview', 'GrDataTable', 'GrDelta', 'GrDescriptionList', 'GrDivider', 'GrIcon', 'GrJsonViewer', 'GrKbd', 'GrList', 'GrSortableList', 'GrStatistic', 'GrTable', 'GrTimeline', 'GrTree', 'GrValue'],
   utilities: ['GrConfigProvider', 'GrSplitter'],
 } as const satisfies Record<string, readonly string[]>
@@ -94,6 +94,7 @@ const componentSummaryOverrides = {
   GrTextarea: 'A multi-line field for long text and comments.',
   GrToaster: 'Shows brief pop-up notifications about the result of actions.',
   GrTooltip: 'Shows a short hint on hover or focus.',
+  GrTransfer: 'Moves items between two lists — pick from a directory on the left, order what you picked on the right.',
   GrTree: 'Shows a hierarchy of items with node expansion and selection.',
   GrTreeSelect: 'Selection of a value from a tree structure in a single control.',
   GrValue: 'A quantity with its affixes: prefix, value, suffix — and nothing else.',

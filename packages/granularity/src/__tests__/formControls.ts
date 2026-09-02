@@ -14,6 +14,7 @@ import GrSelect from '../components/GrSelect/GrSelect.vue'
 import GrSlider from '../components/GrSlider/GrSlider.vue'
 import GrSwitch from '../components/GrSwitch/GrSwitch.vue'
 import GrTextarea from '../components/GrTextarea/GrTextarea.vue'
+import GrTransfer from '../components/GrTransfer/GrTransfer.vue'
 import GrTreeSelect from '../components/GrTreeSelect/GrTreeSelect.vue'
 
 /**
@@ -65,6 +66,11 @@ export const controls: { component: unknown, meta: Control }[] = [
   { component: GrNumberInput, meta: { name: 'GrNumberInput', props: { modelValue: '' }, widget: 'input', filled: { modelValue: 5 } } },
   { component: GrSelect, meta: { name: 'GrSelect', props: { modelValue: '', options: [] }, widget: '[data-gr-select-native]', keyboardTarget: '[data-gr-select-trigger]', filled: { modelValue: 'a', options: [{ value: 'a', label: 'A' }, { value: 'b', label: 'B' }] } } },
   { component: GrAutocomplete, meta: { name: 'GrAutocomplete', props: { modelValue: '', options: [] }, widget: 'input', filled: { modelValue: 'a', options: [{ value: 'a', label: 'A' }, { value: 'b', label: 'B' }] } } },
+  // `widget` — правая панель: значение контрола это её содержимое, и роль
+  // `listbox` (в отличие от `group` на корне) поддерживает `aria-required`
+  // и `aria-readonly`. `keyboardTarget` — строка, а не панель: клавиши
+  // слушает она, и тест, отправивший их в контейнер, зеленел бы впустую.
+  { component: GrTransfer, meta: { name: 'GrTransfer', props: { modelValue: [], items: [] }, widget: '[data-gr-transfer-list="target"]', keyboardTarget: '[data-gr-transfer-option]', filled: { modelValue: ['a'], items: [{ id: 'a', label: 'A' }, { id: 'b', label: 'B' }] } } },
   { component: GrTreeSelect, meta: { name: 'GrTreeSelect', props: { modelValue: null, data: [], nodeKey: 'id' }, widget: '[data-gr-tree-select-trigger]', filled: { modelValue: '1', data: [{ id: '1', label: 'Один' }, { id: '2', label: 'Два' }], nodeKey: 'id' } } },
   { component: GrInputTag, meta: { name: 'GrInputTag', props: { modelValue: [] }, widget: 'input', filled: { modelValue: ['раз'] } } },
   { component: GrCheckbox, meta: { name: 'GrCheckbox', props: { modelValue: false }, widget: '[role="checkbox"]', filled: { modelValue: true } } },

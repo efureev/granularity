@@ -3316,6 +3316,48 @@ export const grComponentTokens: GrComponentToken[] = [
     "description": "Ширина стека тостов. Проп `width` задаёт её же, поэтому одно и то же настраивается и разметкой, и темой."
   },
   {
+    "owner": "GrTransfer",
+    "name": "--gr-transfer-panel-max-h",
+    "kind": "hook",
+    "default": "18rem",
+    "description": "Высота панели. Обе панели обязаны быть одной высоты и прокручиваться внутри себя — иначе перенос двигает вёрстку страницы под курсором."
+  },
+  {
+    "owner": "GrTransfer",
+    "name": "--gr-transfer-selected-bg",
+    "kind": "hook",
+    "default": "12 % от `--gr-primary` через `color-mix`",
+    "description": "Подложка отмеченной строки. Тон, а не заливка: текст остаётся обычным `--gr-fg`, и контраст не приходится выверять заново."
+  },
+  {
+    "owner": "GrTransfer",
+    "name": "--gr-transfer-dragging-bg",
+    "kind": "hook",
+    "default": "var(--gr-muted)",
+    "description": "Подложка строк, которые сейчас переносят указателем: видно, что именно уедет."
+  },
+  {
+    "owner": "GrTransfer",
+    "name": "--gr-transfer-drop-brd",
+    "kind": "hook",
+    "default": "var(--gr-primary)",
+    "description": "Рамка панели под указателем во время переноса."
+  },
+  {
+    "owner": "GrTransfer",
+    "name": "--gr-transfer-indicator",
+    "kind": "hook",
+    "default": "var(--gr-primary)",
+    "description": "Цвет линии, показывающей место вставки."
+  },
+  {
+    "owner": "GrTransfer",
+    "name": "--gr-transfer-indicator-width",
+    "kind": "hook",
+    "default": "2px",
+    "description": "Толщина линии места вставки."
+  },
+  {
     "owner": "GrTree",
     "name": "--gr-tree-gap",
     "kind": "css",

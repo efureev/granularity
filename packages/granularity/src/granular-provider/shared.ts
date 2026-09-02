@@ -89,6 +89,7 @@ import { grTextareaConfig } from '../components/GrTextarea/config'
 import { grTimelineConfig } from '../components/GrTimeline/config'
 import { grToasterConfig } from '../components/GrToaster/config'
 import { grTooltipConfig } from '../components/GrTooltip/config'
+import { grTransferConfig } from '../components/GrTransfer/config'
 import { grTreeConfig } from '../components/GrTree/config'
 import { grTreeSelectConfig } from '../components/GrTreeSelect/config'
 import { grValueConfig } from '../components/GrValue/config'
@@ -199,6 +200,7 @@ export const granularityComponentConfigs = {
   GrTimeline: grTimelineConfig,
   GrToaster: grToasterConfig,
   GrTooltip: grTooltipConfig,
+  GrTransfer: grTransferConfig,
   GrTree: grTreeConfig,
   GrTreeSelect: grTreeSelectConfig,
   GrValue: grValueConfig,
