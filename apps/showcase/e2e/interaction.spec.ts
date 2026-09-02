@@ -648,3 +648,52 @@ test.describe('GrTimeline: ось сквозь заголовок группы',
     expect(axis.unwantedGap, 'ось рвётся на границе групп').toBeLessThanOrEqual(0.5)
   })
 })
+
+/**
+ * Карусель: `inert` и живая прокрутка полосы.
+ *
+ * В jsdom `inert` — просто атрибут: фокус он там не блокирует, и утверждение
+ * «`Tab` не заходит в невидимый кадр» юнит-тестом недоказуемо. Прокрутка полосы
+ * миниатюр и её признак переполнения тоже требуют раскладки, которой в jsdom
+ * нет вовсе.
+ */
+test.describe('GrCarousel', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto(componentPath('GrCarousel'))
+    await page.locator('#live-examples').waitFor()
+  })
+
+  test('Tab не заходит в кадры, которых не видно', async ({ page }) => {
+    // Интерактив внутри кадра есть не у каждого демо: ищем по всей странице, а
+    // не в первой карусели, иначе тест молча уходил бы в skip и не проверял ничего.
+    const hidden = page.locator('[data-gr-carousel-slide][inert]').locator('a, button')
+
+    // Ожидающее утверждение, а не `count()`: демо страницы монтируются
+    // постепенно, и мгновенный снимок ловил пустую страницу примерно в одном
+    // прогоне из четырёх — тест уходил в ложное падение.
+    await expect(hidden.first(), 'на странице нет невидимого кадра с интерактивом — тест бесполезен').toBeAttached()
+
+    await page.keyboard.press('Tab')
+    for (let step = 0; step < 40; step += 1) {
+      const inInert = await page.evaluate(() =>
+        Boolean(document.activeElement?.closest('[data-gr-carousel-slide][inert]')))
+      expect(inInert, 'фокус попал в кадр, помеченный inert').toBe(false)
+      await page.keyboard.press('Tab')
+    }
+  })
+
+  test('полоса миниатюр объявляет, что продолжается за краем', async ({ page }) => {
+    const strip = page.locator('[data-gr-carousel-indicators][data-variant="thumbnails"]').first()
+    await expect(strip).toHaveAttribute('data-overflow', /none|start|end|both/)
+  })
+
+  test('стрелка листает ленту в живом браузере', async ({ page }) => {
+    const carousel = page.locator('[data-gr-carousel]').first()
+    const track = carousel.locator('[data-gr-carousel-track]')
+
+    await expect(track).toHaveAttribute('style', /--gr-carousel-index:\s*0/)
+
+    await carousel.locator('[data-gr-carousel-next]').click()
+    await expect(track).toHaveAttribute('style', /--gr-carousel-index:\s*1/)
+  })
+})

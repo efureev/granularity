@@ -44,6 +44,7 @@
 | --- | --- |
 | плитка вложения в ленте: картинка либо иконка по типу | [`GrFilePreview`](../packages/granularity/docs/components/GrFilePreview.md) |
 | картинку рассматривают во весь экран | [`GrImageViewer`](../packages/granularity/docs/components/GrImageViewer.md) |
+| набор картинок листают прямо на странице | [`GrCarousel`](../packages/granularity/docs/components/GrCarousel.md) |
 | из картинки вырезают кадр перед отправкой | [`GrImageCrop`](../packages/granularity-media/docs/components/GrImageCrop.md) |
 | картинку снимают камерой прямо сейчас | [`GrCameraCapture`](../packages/granularity-media/docs/components/GrCameraCapture.md) |
 | камерой читают QR или штрихкод | [`GrCodeScanner`](../packages/granularity-media/docs/components/GrCodeScanner.md) |
@@ -274,6 +275,7 @@
 | разделить контент линией | [`GrDivider`](../packages/granularity/docs/components/GrDivider.md) |
 | две панели, границу двигает пользователь | [`GrSplitter`](../packages/granularity/docs/components/GrSplitter.md) |
 | содержимого много, показывают не всё сразу | [`GrCollapse`](../packages/granularity/docs/components/GrCollapse.md) |
+| кадры листают вбок, по одному за раз | [`GrCarousel`](../packages/granularity/docs/components/GrCarousel.md) |
 | сетка виджетов, которую двигает пользователь | [`GrDashboard`](../packages/granularity-dashboard/docs/components/GrDashboard.md) |
 | виджет на такой сетке | [`GrDashboardItem`](../packages/granularity-dashboard/docs/components/GrDashboardItem.md) |
 | переключатель режима и сброс раскладки | [`GrDashboardToolbar`](../packages/granularity-dashboard/docs/components/GrDashboardToolbar.md) |
@@ -282,6 +284,20 @@
 
 `GrSplitter` — про размер двух областей, `GrDashboard` — про положение многих
 виджетов на сетке. Общего у них только жест.
+
+Различитель `GrCarousel` / `GrTabs` — **назван ли раздел**. У вкладок каждый
+раздел имеет имя, и пользователь выбирает конкретный («Доставка», «Отзывы»); у
+карусели кадры равноправны и безымянны, их листают по порядку. Отсюда и разные
+роли: `tablist` с `tabpanel` против `group` с `aria-roledescription="carousel"`.
+
+Различитель `GrCarousel` / `GrImageViewer` — **где происходит просмотр**. Карусель
+живёт в потоке страницы, и страница остаётся рабочей; просмотрщик открывает кадр
+поверх неё, с масштабом и поворотом. Пара штатная: карусель отдаёт клик по кадру,
+просмотрщик открывает приложение.
+
+Различитель `GrCarousel` / `GrCollapse` — **сколько показано разом**. Аккордеон
+раскрывает несколько секций сразу и растёт вниз; карусель всегда показывает одно
+окно постоянной ширины и двигает его вбок.
 
 ### График
 
@@ -352,6 +368,7 @@
 | Родитель | Части |
 | --- | --- |
 | [`GrAvatar`](../packages/granularity/docs/components/GrAvatar.md) | `GrAvatarGroup` |
+| [`GrCarousel`](../packages/granularity/docs/components/GrCarousel.md) | `GrCarouselSlide` |
 | [`GrCollapse`](../packages/granularity/docs/components/GrCollapse.md) | `GrCollapseItem` |
 | [`GrDialog`](../packages/granularity/docs/components/GrDialog.md) | `GrDialogHeader`, `GrDialogFooter`, `GrDialogCloseButton` |
 | [`GrDialogService`](../packages/granularity/docs/components/GrDialogService.md) | `GrDialogServiceHost` |
@@ -383,6 +400,7 @@
 | [`GrCalendar`](../packages/granularity-chrono/docs/components/GrCalendar.md) | chrono | календарь и есть экран |
 | [`GrCameraCapture`](../packages/granularity-media/docs/components/GrCameraCapture.md) | media | аватар без файлового менеджера |
 | [`GrCard`](../packages/granularity/docs/components/GrCard.md) | ядро | контенту нужна поверхность |
+| [`GrCarousel`](../packages/granularity/docs/components/GrCarousel.md) | ядро | галерея товара или объекта |
 | [`GrChartArea`](../packages/granularity-charts/docs/components/GrChartArea.md) | charts | целое и вклад частей в него во времени |
 | [`GrChartBar`](../packages/granularity-charts/docs/components/GrChartBar.md) | charts | сколько у каждой категории |
 | [`GrChartBullet`](../packages/granularity-charts/docs/components/GrChartBullet.md) | charts | метрика с порогами, которые уже есть в данных |
@@ -487,7 +505,7 @@
 ни в одном пакете, и ближайший сосед задачу не закрывает.
 
 **Планируется в ядро.** `GrTransfer` — перенос
-между двумя списками; `GrCarousel` — карусель; `GrAffix` — прилипание к краю
+между двумя списками; `GrAffix` — прилипание к краю
 при скролле; `GrMenu` — вертикальное меню навигации (меню действий по правому
 клику закрывает `GrContextMenu`, вложенных подменю нет ни у кого).
 

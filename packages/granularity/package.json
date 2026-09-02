@@ -102,6 +102,14 @@
       "types": "./dist/types/components/GrCard/index.d.ts",
       "import": "./dist/components/GrCard/index.js"
     },
+    "./components/GrCarousel": {
+      "types": "./dist/types/components/GrCarousel/index.d.ts",
+      "import": "./dist/components/GrCarousel/index.js"
+    },
+    "./components/GrCarouselSlide": {
+      "types": "./dist/types/components/GrCarousel/index.d.ts",
+      "import": "./dist/components/GrCarousel/index.js"
+    },
     "./components/GrCheckbox": {
       "types": "./dist/types/components/GrCheckbox/index.d.ts",
       "import": "./dist/components/GrCheckbox/index.js"

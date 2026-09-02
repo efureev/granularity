@@ -110,6 +110,7 @@ GrSelect>` для них не работает, такой компонент к
 - [`GrButton`](./components/GrButton.md)
 - [`GrButtonGroup`](./components/GrButtonGroup.md)
 - [`GrCard`](./components/GrCard.md)
+- [`GrCarousel`](./components/GrCarousel.md)
 - [`GrCheckbox`](./components/GrCheckbox.md)
 - [`GrCheckboxGroup`](./components/GrCheckboxGroup.md)
 - [`GrChip`](./components/GrChip.md)

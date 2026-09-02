@@ -1,4 +1,15 @@
 {
+  "carousel": {
+    "roledescription": "карусель",
+    "slideRoledescription": "слайд",
+    "slidePosition": "{index} из {total}",
+    "previous": "Предыдущий слайд",
+    "next": "Следующий слайд",
+    "play": "Запустить автопоказ",
+    "pause": "Остановить автопоказ",
+    "indicators": "Слайды",
+    "autoplayStopped": "Автопоказ остановлен"
+  },
   "chip": {
     "remove": "Убрать",
     "removeNamed": "Убрать {label}"

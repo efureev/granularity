@@ -63,6 +63,7 @@ import {
   grBadgeExamples,
   grBadgeWrapExamples,
   grCardExamples,
+  grCarouselExamples,
   grBottomNavExamples,
   grNavbarExamples,
   grSidebarExamples,
@@ -103,6 +104,34 @@ const grAutocompleteOverview: ShowcaseComponentOverviewDoc = {
     'Можно разрешить свои значения, которых нет в списке.',
     'Полностью управляется с клавиатуры и доступен для скринридеров.',
     'Кнопка очистки, кастомизация вида опций и пустых состояний, аккуратная интеграция с формами.',
+  ],
+}
+
+const grCarouselOverview: ShowcaseComponentOverviewDoc = {
+  paragraphs: [
+    'Галерея, которую листают: кадры на всю ширину, стрелки по краям, точки под лентой или полоса миниатюр. Свайп пальцем и мышью — из коробки, отдельная библиотека жестов не нужна.',
+    'Кадр — ваша разметка внутри `GrCarouselSlide`: фотография товара, карточка отзыва, экран знакомства с сервисом. Компонент отвечает за ленту, роли и клавиатуру, содержимое остаётся вашим.',
+  ],
+  features: [
+    'Стрелки, точки и полоса миниатюр — включаются по отдельности.',
+    'Свайп пальцем и протяжка мышью, без сторонних зависимостей.',
+    'Автопрокрутка с кнопкой паузы: наведение и фокус останавливают её сами.',
+    'Клавиатура по WAI-ARIA: стрелки по переключателям, `Home`/`End` — к краям.',
+    '`prefers-reduced-motion` гасит и переход к кадру, и автолистание.',
+    'Один кадр и пустая лента — валидные состояния: лишние кнопки не рисуются.',
+    'Кастомизация через CSS-переменные (`--gr-carousel-*`), без новых пропов.',
+  ],
+  lists: [
+    {
+      title: 'CSS-переменные для кастомизации',
+      items: [
+        '`--gr-carousel-control-bg` — подложка стрелок и кнопки паузы. По умолчанию `--gr-bg`.',
+        '`--gr-carousel-dot-active` — цвет текущей точки и рамки текущей миниатюры.',
+        '`--gr-carousel-dot-size` — диаметр точки-индикатора.',
+        '`--gr-carousel-thumb-width` / `--gr-carousel-thumb-height` — размер миниатюры.',
+        '`--gr-carousel-gap` — просвет между переключателями.',
+      ],
+    },
   ],
 }
 
@@ -496,6 +525,7 @@ export const componentDocOverrides: Partial<Record<string, ShowcaseComponentDocM
   GrBadge: createComponentDocMeta(grBadgeExamples),
   GrBadgeWrap: createComponentDocMeta(grBadgeWrapExamples),
   GrCard: createComponentDocMeta(grCardExamples),
+  GrCarousel: createComponentDocMeta(grCarouselExamples, grCarouselOverview),
   GrBottomNav: createComponentDocMeta(grBottomNavExamples),
   GrBreadcrumbs: createComponentDocMeta(grBreadcrumbsExamples, grBreadcrumbsOverview),
   GrNavbar: createComponentDocMeta(grNavbarExamples),

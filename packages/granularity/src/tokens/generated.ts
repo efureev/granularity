@@ -2315,6 +2315,97 @@ export const grComponentTokens: GrComponentToken[] = [
     "description": "Скругление внешних углов группы. По умолчанию наследует радиус кнопки — внутренние углы группа гасит сама."
   },
   {
+    "owner": "GrCarousel",
+    "name": "--gr-carousel-index",
+    "kind": "inline",
+    "default": "0",
+    "description": "Номер текущего слайда. Компонент присваивает его сам, а сдвиг ленты считает CSS: так позиция переживает серверный рендер и гасится глобальным клампом `prefers-reduced-motion` вместе с переходом."
+  },
+  {
+    "owner": "GrCarousel",
+    "name": "--gr-carousel-drag",
+    "kind": "inline",
+    "default": "0px",
+    "description": "Смещение ленты за указателем на время жеста. Вне жеста — ноль."
+  },
+  {
+    "owner": "GrCarousel",
+    "name": "--gr-carousel-control-bg",
+    "kind": "hook",
+    "default": "var(--gr-bg)",
+    "description": "Подложка стрелок и тумблера автопрокрутки. Они лежат поверх произвольного содержимого слайда, поэтому подложка обязательна: на светлом кадре иконка без неё пропадает."
+  },
+  {
+    "owner": "GrCarousel",
+    "name": "--gr-carousel-control-bg-hover",
+    "kind": "hook",
+    "default": "var(--gr-muted)",
+    "description": "Подложка стрелки и тумблера под курсором."
+  },
+  {
+    "owner": "GrCarousel",
+    "name": "--gr-carousel-control-fg",
+    "kind": "hook",
+    "default": "var(--gr-fg)",
+    "description": "Цвет иконок стрелок и тумблера."
+  },
+  {
+    "owner": "GrCarousel",
+    "name": "--gr-carousel-gap",
+    "kind": "hook",
+    "default": "0.5rem",
+    "description": "Просвет между переключателями в полосе."
+  },
+  {
+    "owner": "GrCarousel",
+    "name": "--gr-carousel-dot",
+    "kind": "hook",
+    "default": "var(--gr-brd)",
+    "description": "Цвет неактивной точки-индикатора."
+  },
+  {
+    "owner": "GrCarousel",
+    "name": "--gr-carousel-dot-active",
+    "kind": "hook",
+    "default": "var(--gr-primary)",
+    "description": "Цвет текущей точки; он же — рамка текущей миниатюры."
+  },
+  {
+    "owner": "GrCarousel",
+    "name": "--gr-carousel-dot-size",
+    "kind": "hook",
+    "default": "0.5rem",
+    "description": "Диаметр точки-индикатора."
+  },
+  {
+    "owner": "GrCarousel",
+    "name": "--gr-carousel-thumb-width",
+    "kind": "hook",
+    "default": "4rem",
+    "description": "Ширина миниатюры в полосе."
+  },
+  {
+    "owner": "GrCarousel",
+    "name": "--gr-carousel-thumb-height",
+    "kind": "hook",
+    "default": "2.5rem",
+    "description": "Высота миниатюры. Пропорцию задаёт потребитель парой с шириной: у галереи товара и у ленты обложек она разная."
+  },
+  {
+    "owner": "GrCarousel",
+    "name": "--gr-carousel-thumbs-fade",
+    "kind": "hook",
+    "default": "1.5rem",
+    "description": "Ширина затухания у края полосы миниатюр. Она же — отступ прокрутки, иначе фокус-кольцо крайней миниатюры оказывается под затуханием."
+  },
+  {
+    "owner": "GrCarousel",
+    "name": "--gr-carousel-thumbs-mask",
+    "kind": "css",
+    "default": "не задана, пока полоса влезает целиком",
+    "description": "Маска затухания полосы миниатюр. Задаётся собственным CSS компонента по `data-overflow`: у какого края есть продолжение, тот и гаснет."
+  },
+  {
     "owner": "GrChip",
     "name": "--gr-chip-disabled-bg",
     "kind": "hook",

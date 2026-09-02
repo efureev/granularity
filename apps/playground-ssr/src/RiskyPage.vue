@@ -4,6 +4,8 @@ import { ref } from 'vue'
 import { GrCodeBlock } from '@feugene/granularity-code/components/GrCodeBlock'
 
 import {
+  GrCarousel,
+  GrCarouselSlide,
   GrCollapse,
   GrCollapseItem,
   GrCommandPalette,
@@ -103,6 +105,18 @@ const images = [
     <GrImageViewer v-model="viewerOpen" :url-list="images" />
 
     <GrCommandPalette v-model="paletteOpen" :items="commands" hotkey="mod+k" />
+
+    <!--
+      Карусель читает `matchMedia`, вешает `visibilitychange` и `ResizeObserver`,
+      а состав ленты узнаёт от самих кадров при монтировании — на сервере полоса
+      переключателей пуста. Автопрокрутка выключена намеренно: таймер на стенде
+      производил бы те самые расхождения, ради поиска которых стенд существует.
+    -->
+    <GrCarousel aria-label="Кадры" indicators="thumbnails">
+      <GrCarouselSlide v-for="frame in 3" :key="frame" :label="`Кадр ${frame}`">
+        Кадр {{ frame }}
+      </GrCarouselSlide>
+    </GrCarousel>
 
     <!-- Тот же дефект в отдельном примитиве: `mod` рисуется по `navigator`. -->
     <GrKbd keys="mod+k" />

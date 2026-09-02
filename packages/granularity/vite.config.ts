@@ -129,6 +129,9 @@ export default defineConfig({
         'components/GrCard/index': fileURLToPath(
           new URL('./src/components/GrCard/index.ts', import.meta.url),
         ),
+        'components/GrCarousel/index': fileURLToPath(
+          new URL('./src/components/GrCarousel/index.ts', import.meta.url),
+        ),
         'components/GrCheckbox/index': fileURLToPath(
           new URL('./src/components/GrCheckbox/index.ts', import.meta.url),
         ),

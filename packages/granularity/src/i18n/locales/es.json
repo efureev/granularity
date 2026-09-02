@@ -1,4 +1,15 @@
 {
+  "carousel": {
+    "roledescription": "carrusel",
+    "slideRoledescription": "diapositiva",
+    "slidePosition": "{index} de {total}",
+    "previous": "Diapositiva anterior",
+    "next": "Diapositiva siguiente",
+    "play": "Iniciar la reproducción automática",
+    "pause": "Detener la reproducción automática",
+    "indicators": "Diapositivas",
+    "autoplayStopped": "Reproducción automática detenida"
+  },
   "chip": {
     "remove": "Quitar",
     "removeNamed": "Quitar {label}"

@@ -11,6 +11,8 @@ import {
   GrButton,
   GrButtonGroup,
   GrCard,
+  GrCarousel,
+  GrCarouselSlide,
   GrCheckbox,
   GrCheckboxGroup,
   GrChip,
@@ -103,6 +105,9 @@ export const coreFixtures: ComponentFixture[] = [
   { name: 'GrButton', about: 'чистая разметка', render: () => h(GrButton, null, { default: () => 'Кнопка' }) },
   { name: 'GrButtonGroup', about: 'контекст группы доезжает до кнопок на сервере', render: () => h(GrButtonGroup, { ariaLabel: 'Действия' }, { default: () => [h(GrButton, null, { default: () => 'Один' }), h(GrButton, null, { default: () => 'Два' })] }) },
   { name: 'GrCard', about: 'чистая разметка', render: () => h(GrCard, null, { default: () => 'Тело карточки' }) },
+  { name: 'GrCarousel', about: 'кадры регистрируются при монтировании: на сервере полоса переключателей пуста', render: () => h(GrCarousel, { ariaLabel: 'Кадры' }, {
+    default: () => [1, 2, 3].map(frame => h(GrCarouselSlide, { key: frame, label: `Кадр ${frame}` }, { default: () => `Кадр ${frame}` })),
+  }) },
   { name: 'GrCheckbox', about: 'роль виджета и состояние в серверном HTML', render: () => h(GrCheckbox, { modelValue: true }, { default: () => 'Согласен' }) },
   { name: 'GrCheckboxGroup', about: 'общий `name` из useId()', render: () => h(GrCheckboxGroup, { modelValue: ['a'], options: [{ value: 'a', label: 'A' }, { value: 'b', label: 'B' }] }) },
   { name: 'GrChip', about: 'чистая разметка', render: () => h(GrChip, { label: 'Метка' }) },

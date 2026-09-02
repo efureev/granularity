@@ -13,10 +13,10 @@
 | Компонент | gzip | файлов | от бареля |
 | --- | ---: | ---: | ---: |
 | `GrDialogService` | 89.3 kB | 44 | 16 % |
-| `GrPromptDialog` | 78.6 kB | 42 | 15 % |
+| `GrPromptDialog` | 78.6 kB | 42 | 14 % |
 | `GrPagination` | 76.1 kB | 45 | 14 % |
 | `GrTreeSelect` | 70.6 kB | 41 | 13 % |
-| `GrSelect` | 67.8 kB | 41 | 13 % |
+| `GrSelect` | 67.8 kB | 41 | 12 % |
 | `GrColorPicker` | 64.6 kB | 35 | 12 % |
 | `GrJsonViewer` | 58.4 kB | 34 | 11 % |
 | `GrAutocomplete` | 56.6 kB | 37 | 10 % |
@@ -26,7 +26,7 @@
 | `GrContextMenu` | 50.1 kB | 26 | 9 % |
 | `GrDropdownMenu` | 48.8 kB | 27 | 9 % |
 | `GrImageViewer` | 42.4 kB | 25 | 8 % |
-| `GrDropdown` | 41.3 kB | 23 | 8 % |
+| `GrDropdown` | 41.3 kB | 23 | 7 % |
 | `GrDialog` | 37.8 kB | 24 | 7 % |
 | `GrPopover` | 37.2 kB | 19 | 7 % |
 | `GrDrawer` | 36.8 kB | 24 | 7 % |
@@ -38,15 +38,16 @@
 | `GrFormFile` | 27.4 kB | 23 | 5 % |
 | `GrTooltip` | 26.2 kB | 18 | 5 % |
 | `GrResponseErrorBanner` | 26.2 kB | 14 | 5 % |
+| `GrCarousel` | 24.1 kB | 16 | 4 % |
 | `GrSortableList` | 23.9 kB | 15 | 4 % |
 | `GrList` | 22.5 kB | 16 | 4 % |
 | `GrNumberInput` | 20.6 kB | 18 | 4 % |
 | `GrBreadcrumbs` | 19.6 kB | 13 | 4 % |
-| `GrSidebar` | 19.0 kB | 16 | 4 % |
+| `GrSidebar` | 19.0 kB | 16 | 3 % |
 | `GrCollapse` | 18.8 kB | 14 | 3 % |
 | `GrStatistic` | 18.2 kB | 14 | 3 % |
 | `GrRadioGroup` | 17.3 kB | 14 | 3 % |
-| `GrTabs` | 16.2 kB | 11 | 3 % |
+| `GrTabs` | 16.4 kB | 12 | 3 % |
 | `GrSlider` | 15.4 kB | 13 | 3 % |
 | `GrChip` | 15.4 kB | 13 | 3 % |
 | `GrNavbar` | 15.4 kB | 14 | 3 % |
@@ -54,8 +55,8 @@
 | `GrSteps` | 14.8 kB | 11 | 3 % |
 | `GrInput` | 14.6 kB | 13 | 3 % |
 | `GrDelta` | 14.3 kB | 11 | 3 % |
-| `GrForm` | 13.7 kB | 8 | 3 % |
-| `GrTimeline` | 13.6 kB | 11 | 3 % |
+| `GrForm` | 13.7 kB | 8 | 2 % |
+| `GrTimeline` | 13.6 kB | 11 | 2 % |
 | `GrKbd` | 13.2 kB | 9 | 2 % |
 | `GrFilePreview` | 12.8 kB | 9 | 2 % |
 | `GrCheckboxGroup` | 12.2 kB | 11 | 2 % |
@@ -77,8 +78,8 @@
 | `GrAlert` | 9.6 kB | 9 | 2 % |
 | `GrBottomNav` | 8.9 kB | 7 | 2 % |
 | `GrBadge` | 8.5 kB | 10 | 2 % |
-| `GrDescriptionList` | 8.3 kB | 5 | 2 % |
-| `GrCard` | 8.3 kB | 5 | 2 % |
+| `GrDescriptionList` | 8.3 kB | 5 | 1 % |
+| `GrCard` | 8.3 kB | 5 | 1 % |
 | `GrConfigProvider` | 7.4 kB | 6 | 1 % |
 | `GrProgressBar` | 7.1 kB | 7 | 1 % |
 | `GrBadgeWrap` | 6.3 kB | 7 | 1 % |
@@ -90,4 +91,4 @@
 | `GrTabPanels` | 1.9 kB | 3 | < 1 % |
 | `GrButtonGroup` | 1.8 kB | 5 | < 1 % |
 
-Весь пакет из корня — 541.7 kB.
+Весь пакет из корня — 553.4 kB.

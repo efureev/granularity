@@ -1327,6 +1327,203 @@
       }
     ]
   },
+  "GrCarousel": {
+    "name": "GrCarousel",
+    "sourcePath": "packages/granularity/src/components/GrCarousel/GrCarousel.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "modelValue",
+            "description": "Индекс текущего кадра. Не передан — лента ведёт позицию сама.",
+            "type": "number | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "ariaLabel",
+            "description": "Имя карусели. APG требует его: `aria-roledescription` именем не считается.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "autoplay",
+            "description": "Запустить показ. Под `prefers-reduced-motion` не стартует — тумблер остаётся.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "autoplayInterval",
+            "description": "Пауза между кадрами, мс.",
+            "type": "number | undefined",
+            "required": false,
+            "default": "5000"
+          },
+          {
+            "name": "loop",
+            "description": "Замкнуть ленту. Выключено — стрелки на краях гаснут.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          },
+          {
+            "name": "indicators",
+            "description": "Вид переключателя кадров. `none` меняет и роль самих слайдов.",
+            "type": "\"none\" | \"dots\" | \"thumbnails\" | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "activationMode",
+            "description": "Листает ли стрелка по переключателям сразу или только двигает фокус.",
+            "type": "\"automatic\" | \"manual\" | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "arrows",
+            "description": "Стрелки «назад/вперёд».",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          },
+          {
+            "name": "swipe",
+            "description": "Листание протяжкой указателя.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          },
+          {
+            "name": "landmark",
+            "description": "Сделать карусель ориентиром страницы (`role=\"region\"`).",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "ariaLabelledby",
+            "description": "Имя из заголовка на странице. Сильнее `ariaLabel`.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "prevLabel",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "nextLabel",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "playLabel",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "pauseLabel",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "indicatorsLabel",
+            "description": "Имя полосы переключателей.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "default",
+            "description": "Кадры ленты — `GrCarouselSlide`.",
+            "type": "any"
+          }
+        ]
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "update:modelValue",
+            "description": "",
+            "type": "[index: number]",
+            "signature": "(event: \"update:modelValue\", index: number): void"
+          }
+        ]
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "index",
+            "description": "Текущий кадр — единственный способ прочитать позицию без `v-model`.",
+            "type": "number"
+          },
+          {
+            "name": "count",
+            "description": "Число кадров: состав живёт в слоте, снаружи его посчитать нечем.",
+            "type": "number"
+          },
+          {
+            "name": "playing",
+            "description": "Идёт ли показ. Пауза под курсором его не выключает.",
+            "type": "boolean"
+          },
+          {
+            "name": "next",
+            "description": "",
+            "type": "() => void"
+          },
+          {
+            "name": "prev",
+            "description": "",
+            "type": "() => void"
+          },
+          {
+            "name": "goTo",
+            "description": "",
+            "type": "(index: number) => void"
+          },
+          {
+            "name": "play",
+            "description": "",
+            "type": "() => void"
+          },
+          {
+            "name": "pause",
+            "description": "",
+            "type": "() => void"
+          }
+        ]
+      }
+    ]
+  },
   "GrCheckbox": {
     "name": "GrCheckbox",
     "sourcePath": "packages/granularity/src/components/GrCheckbox/GrCheckbox.vue",
@@ -1400,15 +1597,15 @@
             "default": "\"on\""
           },
           {
-            "name": "form",
-            "description": "",
+            "name": "id",
+            "description": "Пробрасывается на скрытый нативный `<input>`, чтобы работал `<label for=\"...\">`.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
-            "name": "id",
-            "description": "Пробрасывается на скрытый нативный `<input>`, чтобы работал `<label for=\"...\">`.",
+            "name": "form",
+            "description": "",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
@@ -4903,16 +5100,16 @@
             "default": "undefined"
           },
           {
-            "name": "labelPosition",
-            "description": "Подпись сверху (по умолчанию) или сбоку — для плотных форм.",
-            "type": "\"start\" | \"top\" | undefined",
+            "name": "label",
+            "description": "",
+            "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
-            "name": "label",
-            "description": "",
-            "type": "string | undefined",
+            "name": "labelPosition",
+            "description": "Подпись сверху (по умолчанию) или сбоку — для плотных форм.",
+            "type": "\"start\" | \"top\" | undefined",
             "required": false,
             "default": "undefined"
           },
@@ -5380,6 +5577,20 @@
             "default": "undefined"
           },
           {
+            "name": "prevLabel",
+            "description": "i18n: aria-label кнопки «предыдущее изображение».",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "nextLabel",
+            "description": "i18n: aria-label кнопки «следующее изображение».",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "emptyText",
             "description": "i18n: текст в пустом состоянии (нет изображений).",
             "type": "string | undefined",
@@ -5466,20 +5677,6 @@
           {
             "name": "zIndexVar",
             "description": "Имя CSS-переменной слоя — escape-hatch мимо `--gr-z-modal`. Сырое число компонент не принимает: слой задаётся шкалой, см. `docs/z-index.md`.",
-            "type": "string | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
-            "name": "prevLabel",
-            "description": "i18n: aria-label кнопки «предыдущее изображение».",
-            "type": "string | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
-            "name": "nextLabel",
-            "description": "i18n: aria-label кнопки «следующее изображение».",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
@@ -7633,6 +7830,13 @@
             "default": "\"default\""
           },
           {
+            "name": "anchor",
+            "description": "Якорь-прямоугольник в координатах вьюпорта вместо обёртки слота `#trigger`: панель встаёт у точки курсора или у строки списка. Нужен контекстному меню, у которого триггера-элемента нет вовсе. `triggerProps` в этом режиме некому потребить, и своих ARIA-атрибутов поповер никуда не вешает: `aria-haspopup` невалиден вне интерактивного элемента, а `aria-expanded` без хозяина — шум. Связь с содержимым страницы объявляет тот, кто открывает.",
+            "type": "GrFloatingAnchorRect | null | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "closeOnEsc",
             "description": "",
             "type": "boolean | undefined",
@@ -7671,13 +7875,6 @@
             "name": "contentClass",
             "description": "",
             "type": "string | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
-            "name": "anchor",
-            "description": "Якорь-прямоугольник в координатах вьюпорта вместо обёртки слота `#trigger`: панель встаёт у точки курсора или у строки списка. Нужен контекстному меню, у которого триггера-элемента нет вовсе. `triggerProps` в этом режиме некому потребить, и своих ARIA-атрибутов поповер никуда не вешает: `aria-haspopup` невалиден вне интерактивного элемента, а `aria-expanded` без хозяина — шум. Связь с содержимым страницы объявляет тот, кто открывает.",
-            "type": "GrFloatingAnchorRect | null | undefined",
             "required": false,
             "default": "undefined"
           },
@@ -8383,14 +8580,14 @@
             "default": "undefined"
           },
           {
-            "name": "form",
+            "name": "id",
             "description": "",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
-            "name": "id",
+            "name": "form",
             "description": "",
             "type": "string | undefined",
             "required": false,
@@ -9570,18 +9767,18 @@
             "default": "\"left\""
           },
           {
-            "name": "width",
-            "description": "Ширина в развёрнутом состоянии.",
-            "type": "string | undefined",
-            "required": false,
-            "default": "\"240px\""
-          },
-          {
             "name": "landmark",
             "description": "Лендмарк корня. `complementary` (по умолчанию) — `<aside>`; `navigation` — `<nav>` для панели, которая действительно является навигацией. Вложенный `<nav>` внутрь `<aside>` не заводим: два лендмарка на одну панель засоряют обзор, а панель фильтров навигацией не является вовсе.",
             "type": "\"complementary\" | \"navigation\" | undefined",
             "required": false,
             "default": "\"complementary\""
+          },
+          {
+            "name": "width",
+            "description": "Ширина в развёрнутом состоянии.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"240px\""
           },
           {
             "name": "subtitle",
@@ -9680,6 +9877,13 @@
             "default": "\"text\""
           },
           {
+            "name": "count",
+            "description": "Сколько заглушек подряд. Больше одной — они уезжают в общую обёртку.",
+            "type": "number | undefined",
+            "required": false,
+            "default": "1"
+          },
+          {
             "name": "width",
             "description": "",
             "type": "string | undefined",
@@ -9699,13 +9903,6 @@
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
-          },
-          {
-            "name": "count",
-            "description": "Сколько заглушек подряд. Больше одной — они уезжают в общую обёртку.",
-            "type": "number | undefined",
-            "required": false,
-            "default": "1"
           }
         ]
       },
@@ -10755,6 +10952,13 @@
             "default": "false"
           },
           {
+            "name": "ariaLabelledby",
+            "description": "ID элемента-заголовка, связанного с `<table>` через `aria-labelledby`.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "empty",
             "description": "Таблица пуста. По умолчанию определяется по содержимому слота.",
             "type": "boolean | undefined",
@@ -10778,13 +10982,6 @@
           {
             "name": "caption",
             "description": "Текст caption для screen reader'ов. Рендерится как `<caption class=\"sr-only\">`, если не передан слот `#caption`.",
-            "type": "string | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
-            "name": "ariaLabelledby",
-            "description": "ID элемента-заголовка, связанного с `<table>` через `aria-labelledby`.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
@@ -10997,6 +11194,13 @@
             "default": "\"horizontal\""
           },
           {
+            "name": "activationMode",
+            "description": "`automatic` (по умолчанию) — стрелка сразу переключает вкладку; `manual` — стрелка двигает только фокус, выбор подтверждается `Enter`/`Space`. Второй режим для вкладок с тяжёлой загрузкой: перебор стрелками иначе тянет каждую панель.",
+            "type": "GrTabsActivationMode | undefined",
+            "required": false,
+            "default": "\"automatic\""
+          },
+          {
             "name": "emptyText",
             "description": "Текст, когда список вкладок пуст. Слот `#empty` сильнее.",
             "type": "string | undefined",
@@ -11009,13 +11213,6 @@
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
-          },
-          {
-            "name": "activationMode",
-            "description": "`automatic` (по умолчанию) — стрелка сразу переключает вкладку; `manual` — стрелка двигает только фокус, выбор подтверждается `Enter`/`Space`. Второй режим для вкладок с тяжёлой загрузкой: перебор стрелками иначе тянет каждую панель.",
-            "type": "GrTabsActivationMode | undefined",
-            "required": false,
-            "default": "\"automatic\""
           },
           {
             "name": "modelValue",

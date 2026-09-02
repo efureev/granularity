@@ -9,7 +9,7 @@ const componentGroups = {
   navigation: ['GrBottomNav', 'GrBreadcrumbs', 'GrCommandPalette', 'GrNavbar', 'GrPagination', 'GrSidebar', 'GrSteps', 'GrTabs', 'GrTabPanels', 'GrTooltip'],
   overlays: ['GrCollapse', 'GrConfirmDialog', 'GrContextMenu', 'GrDialog', 'GrDrawer', 'GrDropdown', 'GrDropdownMenu', 'GrImageViewer', 'GrModal', 'GrPopover', 'GrPromptDialog'],
   forms: ['GrAutocomplete', 'GrCheckbox', 'GrCheckboxGroup', 'GrColorPicker', 'GrFileUpload', 'GrForm', 'GrFormFile', 'GrFormField', 'GrFormSection', 'GrInput', 'GrNumberInput', 'GrInputTag', 'GrRadio', 'GrRadioGroup', 'GrRating', 'GrSegmented', 'GrSelect', 'GrSlider', 'GrSwitch', 'GrTextarea', 'GrTreeSelect'],
-  data: ['GrAvatar', 'GrCard', 'GrChip', 'GrChipGroup', 'GrFilePreview', 'GrDataTable', 'GrDelta', 'GrDescriptionList', 'GrDivider', 'GrIcon', 'GrJsonViewer', 'GrKbd', 'GrList', 'GrSortableList', 'GrStatistic', 'GrTable', 'GrTimeline', 'GrTree', 'GrValue'],
+  data: ['GrAvatar', 'GrCard', 'GrCarousel', 'GrChip', 'GrChipGroup', 'GrFilePreview', 'GrDataTable', 'GrDelta', 'GrDescriptionList', 'GrDivider', 'GrIcon', 'GrJsonViewer', 'GrKbd', 'GrList', 'GrSortableList', 'GrStatistic', 'GrTable', 'GrTimeline', 'GrTree', 'GrValue'],
   utilities: ['GrConfigProvider', 'GrSplitter'],
 } as const satisfies Record<string, readonly string[]>
 
@@ -29,6 +29,7 @@ const componentSummaryOverrides = {
   GrButton: 'Triggers the primary action in a form, dialog or panel.',
   GrButtonGroup: 'Groups related buttons into a compact action cluster.',
   GrCard: 'A container for a meaningful block of content and actions.',
+  GrCarousel: 'Shows a set of slides one screen at a time — swipe, arrows, dots and thumbnails, with autoplay you can pause.',
   GrColorPicker: 'Picks a color for theme and branding settings: hue, saturation, lightness and opacity sliders, a hex field and a palette.',
   GrConfigProvider: 'Provides global defaults (control size, per-component props, i18n) to nested components — imperative dialogs included.',
   GrDivider: 'Separates content with a line, optionally with a centered label.',

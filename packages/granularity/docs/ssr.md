@@ -16,7 +16,7 @@
 касаются не безопасности, а того, что именно приходит с сервера.
 
 - **47 компонентов** не касаются DOM вообще.
-- **4** трогают DOM только в обработчиках и хуках.
+- **5** трогают DOM только в обработчиках и хуках.
 - **9 телепортирующих** (`GrSelect` в режиме `panel`, `GrAutocomplete`,
   `GrDropdown`, `GrTreeSelect`, `GrTooltip`, `GrModal` и всё на нём, `GrDrawer`,
   `GrToaster`, `GrImageViewer`) рендерят свои панели **на месте**, а в `body`
@@ -68,9 +68,9 @@
 `GrConfirmDialog`, `GrDialog` и `GrPromptDialog` попали сюда потому, что вся DOM-механика у них — в `GrModal`, на
 котором они построены.
 
-## DOM только в обработчиках и хуках (5)
+## DOM только в обработчиках и хуках (6)
 
-`GrCommandPalette`, `GrDialogService`, `GrSegmented`, `GrSlider`, `GrStatistic`.
+`GrCarousel`, `GrCommandPalette`, `GrDialogService`, `GrSegmented`, `GrSlider`, `GrStatistic`.
 
 Серверный рендер безопасен: обращения живут в `onMounted`/`onBeforeUnmount` и в слушателях событий, которые на сервере
 не выполняются. Конкретно:
@@ -84,7 +84,14 @@
   `typeof document` на входе;
 - `GrStatistic` — при `animate` перебирает числа через `requestAnimationFrame` и читает
   `matchMedia('(prefers-reduced-motion: reduce)')`. Оба обращения — в `onMounted` и в watcher'е значения; первый
-  клиентский рендер повторяет серверный (значение уже конечное), твин стартует после монтирования.
+  клиентский рендер повторяет серверный (значение уже конечное), твин стартует после монтирования;
+- `GrCarousel` — `matchMedia('(prefers-reduced-motion: reduce)')`, `visibilitychange`,
+  `ResizeObserver` полосы миниатюр и таймер автопрокрутки: всё в `onMounted`. Позиция ленты
+  едет CSS-переменной, на сервере она нулевая, поэтому первый клиентский рендер совпадает с
+  серверным. Полоса переключателей на сервере выходит пустой — состав ленты компонент узнаёт
+  от самих кадров при монтировании, — и заполняется следующим тактом, одинаково на обеих
+  сторонах. Направление письма для жеста снимается `getComputedStyle` в обработчике
+  `pointerdown`, а не в `setup`.
 
 ## Композаблы и директивы
 

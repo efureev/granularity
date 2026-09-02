@@ -24,6 +24,7 @@ import { grBreadcrumbsConfig } from '../components/GrBreadcrumbs/config'
 import { grButtonConfig } from '../components/GrButton/config'
 import { grButtonGroupConfig } from '../components/GrButtonGroup/config'
 import { grCardConfig } from '../components/GrCard/config'
+import { grCarouselConfig } from '../components/GrCarousel/config'
 import { grCheckboxConfig } from '../components/GrCheckbox/config'
 import { grCheckboxGroupConfig } from '../components/GrCheckboxGroup/config'
 import { grChipConfig } from '../components/GrChip/config'
@@ -133,6 +134,7 @@ export const granularityComponentConfigs = {
   GrButton: grButtonConfig,
   GrButtonGroup: grButtonGroupConfig,
   GrCard: grCardConfig,
+  GrCarousel: grCarouselConfig,
   GrCheckbox: grCheckboxConfig,
   GrCheckboxGroup: grCheckboxGroupConfig,
   GrChip: grChipConfig,

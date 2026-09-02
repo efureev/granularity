@@ -1,4 +1,15 @@
 {
+  "carousel": {
+    "roledescription": "carousel",
+    "slideRoledescription": "slide",
+    "slidePosition": "{index} of {total}",
+    "previous": "Previous slide",
+    "next": "Next slide",
+    "play": "Start automatic slide show",
+    "pause": "Stop automatic slide show",
+    "indicators": "Slides",
+    "autoplayStopped": "Automatic slide show stopped"
+  },
   "chip": {
     "remove": "Remove",
     "removeNamed": "Remove {label}"

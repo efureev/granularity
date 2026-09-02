@@ -7,6 +7,58 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- **New `GrCarousel` — a band of slides in the page flow.** A product gallery, an onboarding
+  run, a row of testimonials wider than the screen: full-width frames with arrows, dots, a
+  thumbnail strip and a swipe, none of which needed a gesture library. Slides come from the
+  slot as `GrCarouselSlide`, not from an `items` prop — the markup of a frame differs in every
+  consumer, and an array would have forced either a render function or one template prop per
+  kind of frame. `GrImageViewer` stays the neighbour it was: it opens a frame *over* the page
+  with zoom and rotation, the carousel keeps the page working underneath, and the pair is the
+  normal composition — the carousel emits the click, the application opens the viewer.
+
+  **The band is a transform track, not a scroller.** A native scroller with `scroll-snap` would
+  have added a second, continuous source of truth next to the index that already drives the
+  model, the autoplay, the looping and the announcements — and `scrollLeft` and `clientWidth`
+  are both zero under jsdom, so "which slide is current" would have stopped being provable in
+  unit tests and moved wholesale into end-to-end. The track also gets `prefers-reduced-motion`
+  for free: the global clamp in `base.css` shortens its CSS transition, whereas
+  `scrollTo({ behavior: 'smooth' })` overrides `scroll-behavior` by specification and the clamp
+  never reaches it.
+
+  **Dots and thumbnails are one `tablist` in two skins.** Had the dots been a group of buttons
+  and the thumbnails a tablist, the role of the *slides* would have depended on a cosmetic prop
+  — `tab` requires a paired `tabpanel` — and an accessibility contract cannot change with the
+  shape of a control. What does change the slide's role is whether a picker exists at all:
+  with one the slide is a `tabpanel`, with `indicators="none"` it is a `group`. Either way it
+  carries `aria-roledescription="slide"`, and every slide that is not current is `inert` —
+  without it `Tab` walks into a clipped, invisible frame and the browser scrolls the container
+  out of step with the track.
+
+  **Autoplay stops on its own.** Hover, an active gesture and a hidden tab *pause* the
+  countdown and keep the remainder; focus entering the band *stops* it and does not resume,
+  because a frame sliding away while someone reads a link inside it is the defect the APG rule
+  exists for. The pause button is always rendered when `autoplay` is set — a moving carousel
+  without a way to stop it is a violation, not a configuration. Under `prefers-reduced-motion`
+  the show does not start, but the button stays and offers to start it: asking for less motion
+  is not the same as being denied the choice. That path is the component's own — the global
+  clamp covers CSS, and the scroll a timer performs is JavaScript.
+
+  **A single slide and a shrinking band are states, not edge cases.** With one frame the
+  arrows, dots and thumbnails are not rendered at all rather than rendered disabled — a
+  disabled control claims there is somewhere to go. When a slide disappears from under the
+  current index, the index is clamped **and** emitted: silently diverging from the consumer's
+  model is how the picture and the data drift apart.
+- **`GrCarouselSlide`** — the frame itself. It carries its position and name, registers with
+  the band on mount, and renders whatever the consumer puts inside. Its `#thumbnail` slot is
+  drawn by the strip rather than by the slide, so a thumbnail can be arbitrary markup; a
+  `thumbnail` URL prop and, failing both, the frame number cover the simpler cases. It has no
+  entry of its own — the subpath `@feugene/granularity/components/GrCarouselSlide` is an alias
+  for the parent's module, the way `GrCollapseItem` and `GrTimelineItem` already are.
+- **i18n:** `gr.carousel.roledescription`, `slideRoledescription`, `slidePosition`, `previous`,
+  `next`, `play`, `pause`, `indicators` and `autoplayStopped` in `en`, `ru` and `es`.
+
 ## [v0.42.0] 2026-09-01
 
 ### Added

@@ -239,7 +239,7 @@
     "kindLabel": "Section",
     "context": "Components",
     "searchableTitle": "components component catalog",
-    "searchableContent": "components каталог компонентных страниц с поиском, группировкои и отдельнои витринои на каждыи публичныи компонент пакета. catalog component catalog здесь будет index-страница со всеми публичными компонентами и быстрои группировкои по категориям. источник правды `packages/granularity/src/granular-provider/shared.ts` с текущим покрытием в 76 компонентных сущностеи . навигация по компонентам должна быть мгновеннои и search-friendly. каждыи компонент получит отдельныи route и собственную страницу."
+    "searchableContent": "components каталог компонентных страниц с поиском, группировкои и отдельнои витринои на каждыи публичныи компонент пакета. catalog component catalog здесь будет index-страница со всеми публичными компонентами и быстрои группировкои по категориям. источник правды `packages/granularity/src/granular-provider/shared.ts` с текущим покрытием в 77 компонентных сущностеи . навигация по компонентам должна быть мгновеннои и search-friendly. каждыи компонент получит отдельныи route и собственную страницу."
   },
   {
     "id": "page:components:section:live-demos",
@@ -548,6 +548,17 @@
     "context": "data / component",
     "searchableTitle": "grcard",
     "searchableContent": "grcard grcard a container for a meaningful block of content and actions. data component /components/gr-card packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/grcard generated public-api components components gr-card gr card"
+  },
+  {
+    "id": "entity:component:GrCarousel",
+    "title": "GrCarousel",
+    "description": "Shows a set of slides one screen at a time — swipe, arrows, dots and thumbnails, with autoplay you can pause.",
+    "href": "/components/gr-carousel",
+    "kind": "entity",
+    "kindLabel": "component",
+    "context": "data / component",
+    "searchableTitle": "grcarousel",
+    "searchableContent": "grcarousel grcarousel shows a set of slides one screen at a time swipe, arrows, dots and thumbnails, with autoplay you can pause. data component /components/gr-carousel packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/grcarousel generated public-api components components gr-carousel gr carousel"
   },
   {
     "id": "entity:component:GrCheckbox",
@@ -1934,6 +1945,50 @@
     "context": "GrCard",
     "searchableTitle": "grcard integration notes",
     "searchableContent": "grcard a container for a meaningful block of content and actions. integration-notes integration notes дополнительные замечания по доступности, зависимостям и связанным package-level артефактам. keyboard/accessibility пункты выделяются отдельно от визуальных примеров. dependency notes показывают, есть ли связки с другими компонентами в registry. source/export ссылки помогают быстро переи ти к исходникам и публичному import path."
+  },
+  {
+    "id": "entity:component:GrCarousel:section:overview",
+    "title": "GrCarousel / Component overview",
+    "description": "Краткий контекст по месту компонента в пакете, registry metadata и текущему покрытию showcase.",
+    "href": "/components/gr-carousel#overview",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrCarousel",
+    "searchableTitle": "grcarousel component overview",
+    "searchableContent": "grcarousel shows a set of slides one screen at a time swipe, arrows, dots and thumbnails, with autoplay you can pause. overview component overview краткии контекст по месту компонента в пакете, registry metadata и текущему покрытию showcase. показываем роль компонента в каталоге и его hand-authored summary. отражаем generated api coverage и package-level source links. фиксируем, какие сценарии уже реализованы в showcase, а какие еще планируются."
+  },
+  {
+    "id": "entity:component:GrCarousel:section:live-examples",
+    "title": "GrCarousel / Live examples",
+    "description": "Компонентные сценарии должны раскрывать одну конкретную возможность за карточку, а не сваливать всё в один demo.",
+    "href": "/components/gr-carousel#live-examples",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrCarousel",
+    "searchableTitle": "grcarousel live examples",
+    "searchableContent": "grcarousel shows a set of slides one screen at a time swipe, arrows, dots and thumbnails, with autoplay you can pause. live-examples live examples компонентные сценарии должны раскрывать одну конкретную возможность за карточку, а не сваливать все в один demo. каждыи example card содержит живои preview, snippet и краткое пояснение. сначала покрываем самые показательные capability-сценарии, затем сложные edge cases. плановые сценарии явно отмечаются, чтобы roadmap был виден прямо на странице компонента."
+  },
+  {
+    "id": "entity:component:GrCarousel:section:api",
+    "title": "GrCarousel / Generated API",
+    "description": "Страница использует автогенерированные `props` / `slots` / `events` / `methods` и не дублирует API вручную.",
+    "href": "/components/gr-carousel#api",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrCarousel",
+    "searchableTitle": "grcarousel generated api",
+    "searchableContent": "grcarousel shows a set of slides one screen at a time swipe, arrows, dots and thumbnails, with autoplay you can pause. api generated api страница использует автогенерированные `props` / `slots` / `events` / `methods` и не дублирует api вручную. generated metadata остае тся основным источником правды для api-таблиц. fallback metadata применяется только там, где extraction-слоя недостаточно. usage snippet живе т рядом с таблицами api и не расходится с публичным экспортом пакета."
+  },
+  {
+    "id": "entity:component:GrCarousel:section:integration-notes",
+    "title": "GrCarousel / Integration notes",
+    "description": "Дополнительные замечания по доступности, зависимостям и связанным package-level артефактам.",
+    "href": "/components/gr-carousel#integration-notes",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrCarousel",
+    "searchableTitle": "grcarousel integration notes",
+    "searchableContent": "grcarousel shows a set of slides one screen at a time swipe, arrows, dots and thumbnails, with autoplay you can pause. integration-notes integration notes дополнительные замечания по доступности, зависимостям и связанным package-level артефактам. keyboard/accessibility пункты выделяются отдельно от визуальных примеров. dependency notes показывают, есть ли связки с другими компонентами в registry. source/export ссылки помогают быстро переи ти к исходникам и публичному import path."
   },
   {
     "id": "entity:component:GrCheckbox:section:overview",
