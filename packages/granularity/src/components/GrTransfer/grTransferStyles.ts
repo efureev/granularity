@@ -82,6 +82,16 @@ export const transferActionsClass = 'flex shrink-0 items-center'
  * Кнопки перестановки в шапке правой панели. Перестановка обязана быть видимой:
  * сочетание `Alt` + стрелка её ускоряет, но само по себе неоткрываемо, а на
  * macOS ещё и неудобно — почти все мета-клавиши там заняты системой.
+ *
+ * Стрелки горизонтальные, потому что порядок — это **последовательность**, а не
+ * положение на экране: правая панель задаёт порядок колонок отчёта или полей
+ * выгрузки, и они читаются слева направо.
+ *
+ * Сочетание при этом остаётся вертикальным (`Alt` + `↑`/`↓`), и расхождение с
+ * иконками намеренное: в Chrome и Firefox под Windows и Linux `Alt` + `←`/`→` —
+ * это «назад/вперёд» в истории браузера. В Safari навигация висит на
+ * `Cmd` + стрелках, то есть там сочетание было бы свободно, — но пакет едет ко
+ * всем, и ориентироваться на одну платформу нельзя.
  */
 export const transferReorderBase = 'inline-flex shrink-0 items-center justify-center rounded-[var(--gr-radius-sm)] text-[var(--gr-muted-fg)] transition-colors hover:bg-[var(--gr-muted)] hover:text-[var(--gr-fg)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]'
 

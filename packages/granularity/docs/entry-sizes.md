@@ -20,7 +20,7 @@
 | `GrColorPicker` | 64.6 kB | 35 | 11 % |
 | `GrJsonViewer` | 58.6 kB | 35 | 10 % |
 | `GrAutocomplete` | 56.6 kB | 37 | 10 % |
-| `GrTransfer` | 54.0 kB | 37 | 9 % |
+| `GrTransfer` | 54.0 kB | 35 | 9 % |
 | `GrConfirmDialog` | 53.2 kB | 28 | 9 % |
 | `GrDataTable` | 50.4 kB | 32 | 9 % |
 | `GrCommandPalette` | 50.1 kB | 27 | 9 % |
@@ -29,7 +29,7 @@
 | `GrImageViewer` | 42.4 kB | 25 | 7 % |
 | `GrDropdown` | 41.3 kB | 23 | 7 % |
 | `GrDialog` | 37.8 kB | 24 | 7 % |
-| `GrPopover` | 37.2 kB | 19 | 7 % |
+| `GrPopover` | 37.2 kB | 19 | 6 % |
 | `GrDrawer` | 36.8 kB | 24 | 6 % |
 | `GrTree` | 36.4 kB | 23 | 6 % |
 | `GrInputTag` | 33.9 kB | 25 | 6 % |
@@ -39,10 +39,10 @@
 | `GrFormFile` | 27.4 kB | 23 | 5 % |
 | `GrTooltip` | 26.2 kB | 18 | 5 % |
 | `GrResponseErrorBanner` | 26.2 kB | 14 | 5 % |
-| `GrCarousel` | 25.3 kB | 17 | 4 % |
+| `GrCarousel` | 26.0 kB | 17 | 5 % |
 | `GrSortableList` | 24.2 kB | 16 | 4 % |
 | `GrList` | 22.5 kB | 16 | 4 % |
-| `GrNumberInput` | 20.8 kB | 19 | 4 % |
+| `GrNumberInput` | 20.6 kB | 18 | 4 % |
 | `GrBreadcrumbs` | 19.6 kB | 13 | 3 % |
 | `GrSidebar` | 19.0 kB | 16 | 3 % |
 | `GrCollapse` | 18.8 kB | 14 | 3 % |
@@ -92,4 +92,4 @@
 | `GrTabPanels` | 1.9 kB | 3 | < 1 % |
 | `GrButtonGroup` | 1.8 kB | 5 | < 1 % |
 
-Весь пакет из корня — 571.1 kB.
+Весь пакет из корня — 572.4 kB.

@@ -91,7 +91,7 @@ from its own chunk, so a granular import already brings everything it needs.
 <!-- entry-sizes:generated:start lang=en -->
 | What you import | gzip | of the barrel |
 | --- | ---: | ---: |
-| the whole package from the root | 571.1 kB | 100 % |
+| the whole package from the root | 572.4 kB | 100 % |
 | the lightest component — `GrButtonGroup` | 1.8 kB | < 1 % |
 | the median component — `GrNavbar` | 15.4 kB | 3 % |
 | the 5 heaviest together | 171.9 kB | 30 % |

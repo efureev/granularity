@@ -1,5 +1,5 @@
 <script setup lang="ts" generic="TItem extends Record<string, unknown> = Record<string, unknown>">
-import { computed, nextTick, onBeforeUnmount, onMounted, ref, useId, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, useId, useSlots, watch } from 'vue'
 
 import { useAnnouncer } from '../../composables/useAnnouncer'
 import { useFocusWithin } from '../../composables/internal/useFocusWithin'
@@ -58,10 +58,10 @@ import {
 } from './transferSelection'
 
 import IconCheck from '~icons/lucide/check'
-import IconChevronDown from '~icons/lucide/chevron-down'
+import IconArrowLeft from '~icons/lucide/arrow-left'
+import IconArrowRight from '~icons/lucide/arrow-right'
 import IconChevronLeft from '~icons/lucide/chevron-left'
 import IconChevronRight from '~icons/lucide/chevron-right'
-import IconChevronUp from '~icons/lucide/chevron-up'
 
 export type GrTransferItemKey<T> = string | ((item: T) => GrTransferKey)
 export type GrTransferItemLabel<T> = string | ((item: T) => string)
@@ -154,6 +154,16 @@ defineSlots<{
   /** Пустая панель. `filtered` — пусто из-за поиска, а не по сути. */
   empty?: (props: { side: GrTransferSide, filtered: boolean }) => unknown
 }>()
+
+const slots = useSlots()
+
+/**
+ * Свой `#header` уносит с собой заголовок панели, а вместе с ним и `id`, на
+ * который смотрит `aria-labelledby` списка: панель осталась бы без доступного
+ * имени, и axe ловит это как `aria-input-field-name`. Имя поэтому не зависит от
+ * разметки потребителя — при своей шапке оно приходит из `aria-label`.
+ */
+const hasHeaderSlot = computed(() => Boolean(slots.header))
 
 const { t } = useGranularityTranslations()
 const { announce } = useAnnouncer()
@@ -888,20 +898,20 @@ defineExpose({
               data-gr-transfer-move-up
               :class="grTransferReorderClass(resolvedSize)"
               :aria-disabled="canReorder ? undefined : 'true'"
-              :aria-label="t('gr.transfer.moveUp', 'Move up')"
+              :aria-label="t('gr.transfer.moveUp', 'Move earlier')"
               @click="canReorder && moveBlock(-1)"
             >
-              <IconChevronUp :class="transferReorderIconClass" aria-hidden="true" />
+              <IconArrowLeft :class="transferReorderIconClass" aria-hidden="true" />
             </button>
             <button
               type="button"
               data-gr-transfer-move-down
               :class="grTransferReorderClass(resolvedSize)"
               :aria-disabled="canReorder ? undefined : 'true'"
-              :aria-label="t('gr.transfer.moveDown', 'Move down')"
+              :aria-label="t('gr.transfer.moveDown', 'Move later')"
               @click="canReorder && moveBlock(1)"
             >
-              <IconChevronDown :class="transferReorderIconClass" aria-hidden="true" />
+              <IconArrowRight :class="transferReorderIconClass" aria-hidden="true" />
             </button>
           </template>
         </div>
@@ -942,9 +952,12 @@ defineExpose({
         role="listbox"
         aria-multiselectable="true"
         :class="transferListBase"
-        :aria-labelledby="side === 'target' && fieldLabelId
-          ? `${fieldLabelId} ${targetTitleId}`
-          : (side === 'source' ? sourceTitleId : targetTitleId)"
+        :aria-label="hasHeaderSlot ? titles[side] : undefined"
+        :aria-labelledby="hasHeaderSlot
+          ? (side === 'target' ? fieldLabelId : undefined)
+          : (side === 'target' && fieldLabelId
+            ? `${fieldLabelId} ${targetTitleId}`
+            : (side === 'source' ? sourceTitleId : targetTitleId))"
         :aria-describedby="side === 'target' ? describedBy : undefined"
         :aria-invalid="side === 'target' && isInvalid ? 'true' : undefined"
         :aria-required="side === 'target' && isRequired ? 'true' : undefined"

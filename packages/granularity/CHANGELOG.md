@@ -48,11 +48,21 @@ to [Semantic Versioning](https://semver.org/).
   **Reordering is a visible control, not only a chord.** `Alt` with an arrow is the
   accelerator; the buttons in the target panel's header are the contract. A chord nobody
   can discover is not an interface, and on macOS nearly every modifier is already spoken
-  for by the system. A transfer also *shows* itself: the arriving rows light up briefly in
+  for by the system. Those buttons point left and right while the chord stays vertical, and
+  the mismatch is deliberate: the order of the right-hand panel is a *sequence* — report
+  columns, export fields, things read left to right — not a position on screen. Giving the
+  chord the same axis was not an option, because `Alt` with a horizontal arrow is Back and
+  Forward in Chrome and Firefox on Windows and Linux. (Safari puts that on `Cmd`, so the
+  combination is free there — but the package ships to everyone.) A transfer also *shows* itself: the arriving rows light up briefly in
   the destination panel, because the static outcome — a checked row, a changed counter —
   says what happened but not that anything moved. A panel whose list runs past its edge
   fades that edge, since the scrollbar is invisible on some systems and a row cut in half
   reads as a rendering bug rather than as "scroll me".
+
+  Overriding `#header` does not cost a panel its name: the heading *is* the accessible name,
+  so when the consumer replaces it the name comes straight from `sourceTitle`/`targetTitle`
+  instead of pointing at markup that no longer exists. Nothing about that is visible on
+  screen — only a screen reader would have noticed.
 
   Each panel is a `listbox` with `aria-multiselectable`, its rows are `option`s carrying
   `aria-selected`, and each panel holds one `Tab` stop with roving focus inside it. Panels are
@@ -126,6 +136,14 @@ to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- **`GrCarousel`: the current dot is now actually distinguishable.** It differed from its
+  neighbours by hue alone, and at eight pixels across that is not a difference — on a muted
+  `tone` it all but vanished. The current dot now carries a ring in the same colour, so the
+  cue is a shape as well as a colour and survives for anyone who does not separate the two.
+  The ring is drawn with `outline` rather than a `ring`: it sits outside the layout and needs
+  no colour behind its gap, whereas `ring-offset` would have to be painted in a page
+  background the component does not know. Widths are hooks
+  (`--gr-carousel-dot-ring-width`, `--gr-carousel-dot-ring-offset`).
 - **`GrCarousel`: an autoplaying carousel no longer drags the page back to itself.** Scrolling
   the current thumbnail into view went through `scrollIntoView`, which moves *every* ancestor
   including the document: with the carousel below the fold, each automatic step yanked the

@@ -362,6 +362,31 @@ describe('GrTransfer: обратная связь и перестановка к
     const up = wrapper.get('[data-gr-transfer-move-up]')
 
     expect(up.attributes('disabled')).toBeUndefined()
-    expect(up.attributes('aria-label')).toBe('Move up')
+    expect(up.attributes('aria-label')).toBe('Move earlier')
+  })
+})
+
+describe('GrTransfer: своя шапка не уносит доступное имя', () => {
+  it('со своим #header панель именуется через aria-label', () => {
+    const wrapper = mount(GrTransfer, {
+      attachTo: document.body,
+      props: { items: catalog, modelValue: [], ariaLabel: 'Права' },
+      slots: { header: '<div>своя шапка</div>' },
+    })
+
+    for (const side of ['source', 'target'] as const) {
+      const list = wrapper.get(`[data-gr-transfer-list="${side}"]`)
+      expect(list.attributes('aria-label')).toBeTruthy()
+      expect(list.attributes('aria-labelledby')).toBeUndefined()
+    }
+  })
+
+  it('со штатной шапкой имя приходит ссылкой на заголовок', () => {
+    const wrapper = mountTransfer()
+    const list = wrapper.get('[data-gr-transfer-list="source"]')
+    const id = list.attributes('aria-labelledby')
+
+    expect(id).toBeTruthy()
+    expect(wrapper.get(`#${id}`).text()).toBe('Available')
   })
 })

@@ -16,6 +16,22 @@ export const grTransferExamples: ShowcaseComponentExampleDoc[] = [
     previewKey: 'gr-transfer-ordered',
   },
   {
+    id: 'transfer-slots',
+    title: 'Своя шапка, кнопки и пустота',
+    description: 'Слоты `#header`, `#actions` и `#empty` заменяют части панели целиком: счётчик формулируется словами, пара стрелок уступает место «Взять всех» и «Сброс», а пустая правая панель объясняет, что делать дальше — у каждой стороны пустота значит своё.',
+    status: 'ready',
+    previewKey: 'gr-transfer-slots',
+  },
+  {
+    id: 'transfer-builder',
+    title: 'Конструктор: все настройки разом',
+    description: 'Размер, поиск, перестановка, перетаскивание, `readonly` и `disabled` — на одном экране, со сниппетом и журналом событий `transfer` и `search` под ним.',
+    status: 'ready',
+    previewKey: 'gr-transfer-builder',
+    hideCode: true,
+    note: 'Один сценарий покрывает настраиваемые пропы целиком — удобно проверить, что `readonly` оставляет выбор, но запрещает перенос, а `disabled` запрещает и то и другое.',
+  },
+  {
     id: 'transfer-custom',
     title: 'Своя строка и запреты',
     description: 'Слот `#item` рисует строку целиком, а `itemDisabled` помечает то, что переносить нельзя. Запрещённая строка остаётся видимой и достижимой с клавиатуры — иначе скринридер не узнает, что она есть.',

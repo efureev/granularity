@@ -2372,6 +2372,20 @@ export const grComponentTokens: GrComponentToken[] = [
   },
   {
     "owner": "GrCarousel",
+    "name": "--gr-carousel-dot-ring-width",
+    "kind": "hook",
+    "default": "2px",
+    "description": "Толщина обвода вокруг текущей точки. Обвод — второй признак текущего кадра помимо заливки: при диаметре в 8 пикселей одного оттенка мало, и на приглушённом тоне разница почти пропадает."
+  },
+  {
+    "owner": "GrCarousel",
+    "name": "--gr-carousel-dot-ring-offset",
+    "kind": "hook",
+    "default": "2px",
+    "description": "Зазор между точкой и её обводом."
+  },
+  {
+    "owner": "GrCarousel",
     "name": "--gr-carousel-dot-size",
     "kind": "hook",
     "default": "0.5rem",

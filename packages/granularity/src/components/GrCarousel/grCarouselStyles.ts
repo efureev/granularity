@@ -22,12 +22,52 @@ const dotToneVars: Record<GrTone, string> = {
   azure: 'var(--gr-carousel-dot-active,var(--gr-azure))',
 }
 
+/**
+ * Текущая точка: заливка **и** обвод вокруг неё.
+ *
+ * Одной заливки мало: при диаметре в 8 пикселей текущая точка отличалась от
+ * соседних только оттенком, а на тон вроде `slate` разница почти пропадала. Обвод
+ * добавляет второй признак — форму, — и работает там, где цвет не различают.
+ *
+ * `outline`, а не `ring`: он рисуется вне потока и не требует цвета подложки под
+ * зазор, тогда как `ring-offset` пришлось бы красить в фон страницы, которого
+ * компонент не знает.
+ */
+/**
+ * Скобки приносит хелпер, а не литерал.
+ *
+ * Гейт safelist читает класс-литералы `.ts`-хелперов статически, и запись вида
+ * `` `bg-[${color}]` `` он видит как класс, которого в safelist нет. Приём взят
+ * у `GrProgressBar`: в литерале скобок не остаётся вовсе.
+ */
+function arbitrary(value: string): string {
+  return `[${value}]`
+}
+
+/**
+ * Текущая точка: заливка **и** обвод вокруг неё.
+ *
+ * Одной заливки мало: при диаметре в 8 пикселей текущая точка отличалась от
+ * соседних только оттенком, а на приглушённом тоне разница почти пропадала.
+ * Обвод добавляет второй признак — форму, — и работает там, где цвет не
+ * различают.
+ *
+ * `outline`, а не `ring`: он рисуется вне потока и не требует цвета подложки под
+ * зазор, тогда как `ring-offset` пришлось бы красить в фон страницы, которого
+ * компонент не знает.
+ */
 export function grCarouselDotActiveClass(tone: GrTone): string {
-  return `bg-[${dotToneVars[tone]}]`
+  const color = dotToneVars[tone]
+
+  return [
+    `bg-${arbitrary(color)}`,
+    arbitrary(`outline:var(--gr-carousel-dot-ring-width,2px)_solid_${color}`),
+    arbitrary('outline-offset:var(--gr-carousel-dot-ring-offset,2px)'),
+  ].join(' ')
 }
 
 export function grCarouselThumbActiveClass(tone: GrTone): string {
-  return `border-[${dotToneVars[tone]}]`
+  return `border-${arbitrary(dotToneVars[tone])}`
 }
 
 /** `automatic` — стрелка по индикаторам сразу листает; `manual` — только двигает фокус. */
@@ -82,7 +122,9 @@ export const carouselIconClass = 'h-4 w-4 shrink-0'
 export const carouselIndicatorsBase = 'flex max-w-full items-center overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'
 
 export const carouselIndicatorsVariants = {
-  dots: 'justify-center gap-[var(--gr-carousel-gap,0.5rem)] pt-3',
+  // Поля по вертикали не украшение: полоса — скроллер, а `overflow-x: auto`
+  // по спецификации обрезает и по вертикали, и обвод текущей точки срезался бы.
+  dots: 'justify-center gap-[var(--gr-carousel-gap,0.5rem)] px-1 pt-3.5 pb-1.5',
   thumbnails: 'gap-[var(--gr-carousel-gap,0.5rem)] pt-3',
   none: '',
 } as const
