@@ -64,8 +64,29 @@ async function pinAppearance(page: import('@playwright/test').Page, theme: 'ligh
  * всю отрисовку разом и не трогает раскладку: шапка липкая и места в потоке
  * `#live-examples` не занимает.
  */
+/**
+ * Градиенты витрины гасятся по той же причине, что скрывается шапка: они хром, а
+ * не предмет гейта.
+ *
+ * Растеризация большого плавного перехода недетерминирована на ±1 из 255, и это
+ * не теория: на снимке `GrButton` расходились 8225 пикселей, **все** ровно на
+ * единицу — `230,232,250` против `230,231,250`. Страница у него самая длинная в
+ * наборе, поэтому именно она первой перебирала абсолютный порог в 300 пикселей,
+ * проходя в одиночку и падая под параллельной нагрузкой.
+ *
+ * Ослаблять `threshold` в ответ нельзя — он равен нулю намеренно, иначе гейт
+ * слепнет к перекрашенному токену. Поэтому убирается сам источник шума: заливка
+ * вместо перехода. Цвета компонентов от этого не меняются, а порог остаётся
+ * строгим.
+ */
 async function hideChrome(page: import('@playwright/test').Page): Promise<void> {
-  await page.addStyleTag({ content: '.showcase-header { visibility: hidden !important; }' })
+  await page.addStyleTag({
+    content: `
+      .showcase-header { visibility: hidden !important; }
+      .showcase-shell { background-image: none !important; }
+      :root, [data-theme='dark'] { --preview-surface: var(--gr-bg) !important; }
+    `,
+  })
 }
 
 /**
