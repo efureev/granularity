@@ -7,6 +7,8 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.45.0] 2026-09-03
+
 ### Added
 
 - **`useTree` is public — the tree model without any markup.** Expansion, checking with
