@@ -6,7 +6,7 @@ import {
   pruneToTree,
   resolveCheckStates,
   toggleCheckedKeys,
-} from '../grTreeChecking'
+} from '../../../composables/internal/treeChecking'
 import type { GrTreeNode } from '../grTreeTypes'
 
 /**

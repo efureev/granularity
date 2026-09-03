@@ -44,5 +44,6 @@ export const GR_REQUIRED_PROPS: Record<string, readonly string[]> = {
   GrTextarea: ['modelValue'],
   GrTransfer: ['items', 'modelValue'],
   GrTree: ['data'],
+  GrTreeSections: ['data'],
   GrTreeSelect: ['modelValue', 'data'],
 }

@@ -855,7 +855,7 @@ floating-компоненты не выходят по построению (v-c
 | --- | --- | --- | --- |
 | `--gr-tree-gap` | CSS компонента | 2px | Просвет между строками дерева. |
 | `--gr-tree-children-pl` | CSS компонента | 10px | Отступ вложенного списка от левого края родителя. |
-| `--gr-tree-indent-step` | CSS компонента | calc(24px + var(--gr-tree-children-pl) + var(--gr-tree-branch-line-width)) | Шаг отступа уровня. Складывается из переключателя, отступа вложенного списка и толщины направляющей — линия обязана попадать ровно между ними. |
+| `--gr-tree-indent-step` | CSS компонента | calc(12px + var(--gr-tree-children-pl) + var(--gr-tree-branch-line-width)) | Шаг отступа уровня. Складывается из переключателя, отступа вложенного списка и толщины направляющей — линия обязана попадать ровно между ними. |
 | `--gr-tree-row-indent` | инлайн-стиль | шаг отступа × глубина узла | Готовый отступ конкретной строки: шаг уровня, умноженный на её глубину. |
 | `--gr-tree-row-min-height` | инлайн-стиль | 22px / 24px / 28px / 32px по ступеням `xs…lg` | Минимальная высота строки. |
 | `--gr-tree-row-px` | инлайн-стиль | 4px / 6px / 8px / 10px по ступеням `xs…lg` | Горизонтальные поля строки. |
@@ -864,8 +864,9 @@ floating-компоненты не выходят по построению (v-c
 | `--gr-tree-row-radius` | CSS компонента | 8px | Скругление подсветки строки. |
 | `--gr-tree-row-color` | CSS компонента | var(--gr-fg) | Цвет текста строки. |
 | `--gr-tree-row-hover-bg` | CSS компонента | color-mix(in srgb, var(--gr-primary) 10%, transparent) | Фон строки под курсором. |
-| `--gr-tree-row-current-bg` | CSS компонента | color-mix(in srgb, var(--gr-primary) 5%, transparent) | Фон текущей (выбранной) строки. |
+| `--gr-tree-row-current-bg` | CSS компонента | color-mix(in srgb, var(--gr-primary) 14%, transparent) | Фон текущей (выбранной) строки. |
 | `--gr-tree-row-current-hover-bg` | CSS компонента | color-mix(in srgb, var(--gr-primary) 16%, transparent) | Фон текущей строки под курсором. |
+| `--gr-tree-row-current-color` | CSS компонента | var(--gr-tree-row-color) | Цвет текста выбранной строки. Отдельно от --gr-tree-row-color, потому что насыщенная подложка выбора требует своего текста: без этого сплошную плашку выбора нельзя сделать читаемой. |
 | `--gr-tree-font-size` | инлайн-стиль | 12px / 13px / inherit / 15px по ступеням `xs…lg` | Кегль подписи узла. |
 | `--gr-tree-content-gap` | инлайн-стиль | 4px / 6px / 8px / 10px по ступеням `xs…lg` | Просвет между иконкой и подписью узла. |
 | `--gr-tree-icon-size` | инлайн-стиль | 12px / 14px / 16px / 20px по ступеням `xs…lg` | Размер иконки узла. |
@@ -892,7 +893,8 @@ floating-компоненты не выходят по построению (v-c
 | `--gr-tree-checkbox-checked-bg` | CSS компонента | var(--gr-primary) | Фон отмеченного чекбокса. |
 | `--gr-tree-checkbox-checked-fg` | CSS компонента | var(--gr-primary-fg) | Цвет галочки в отмеченном чекбоксе. |
 | `--gr-tree-branch-line-width` | CSS компонента | 2px | Толщина направляющей линии уровня. |
-| `--gr-tree-branch-line-offset` | CSS компонента | 24px | Сдвиг направляющей от левого края строки. |
+| `--gr-tree-branch-elbow-width` | CSS компонента | 8px | Длина горизонтального колена от направляющей к строке при branchLine="elbow". Колено соединяет узлы, а не только отмечает уровень. |
+| `--gr-tree-branch-line-offset` | CSS компонента | 12px | Сдвиг направляющей от левого края строки. |
 | `--gr-tree-branch-line-default-color` | CSS компонента | var(--gr-tree-row-current-bg) | Цвет направляющей по умолчанию. |
 | `--gr-tree-branch-line-color` | инлайн-стиль | var(--gr-tree-branch-line-default-color) | Цвет направляющей конкретной ветки — им подсвечивается путь до текущего узла. |
 

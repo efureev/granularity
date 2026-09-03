@@ -45,6 +45,7 @@ const DOMAIN_SLOTS: Record<string, string[]> = {
   'ellipsis': ['GrBreadcrumbs'],
   'end': ['GrSplitter'],
   'extra': ['GrCollapse'],
+  'heading': ['GrTreeSections'],
   'hint': ['GrFormField'],
   // Пункт ленты шагов. Не `item`: у соседей это строка списка, а здесь —
   // этап процесса со своим статусом, и общее имя стёрло бы разницу.

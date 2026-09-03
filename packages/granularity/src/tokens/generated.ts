@@ -3480,7 +3480,7 @@ export const grComponentTokens: GrComponentToken[] = [
     "owner": "GrTree",
     "name": "--gr-tree-indent-step",
     "kind": "css",
-    "default": "calc(24px + var(--gr-tree-children-pl) + var(--gr-tree-branch-line-width))",
+    "default": "calc(12px + var(--gr-tree-children-pl) + var(--gr-tree-branch-line-width))",
     "description": "Шаг отступа уровня. Складывается из переключателя, отступа вложенного списка и толщины направляющей — линия обязана попадать ровно между ними."
   },
   {
@@ -3543,7 +3543,7 @@ export const grComponentTokens: GrComponentToken[] = [
     "owner": "GrTree",
     "name": "--gr-tree-row-current-bg",
     "kind": "css",
-    "default": "color-mix(in srgb, var(--gr-primary) 5%, transparent)",
+    "default": "color-mix(in srgb, var(--gr-primary) 14%, transparent)",
     "description": "Фон текущей (выбранной) строки."
   },
   {
@@ -3552,6 +3552,13 @@ export const grComponentTokens: GrComponentToken[] = [
     "kind": "css",
     "default": "color-mix(in srgb, var(--gr-primary) 16%, transparent)",
     "description": "Фон текущей строки под курсором."
+  },
+  {
+    "owner": "GrTree",
+    "name": "--gr-tree-row-current-color",
+    "kind": "css",
+    "default": "var(--gr-tree-row-color)",
+    "description": "Цвет текста выбранной строки. Отдельно от --gr-tree-row-color, потому что насыщенная подложка выбора требует своего текста: без этого сплошную плашку выбора нельзя сделать читаемой."
   },
   {
     "owner": "GrTree",
@@ -3737,9 +3744,16 @@ export const grComponentTokens: GrComponentToken[] = [
   },
   {
     "owner": "GrTree",
+    "name": "--gr-tree-branch-elbow-width",
+    "kind": "css",
+    "default": "8px",
+    "description": "Длина горизонтального колена от направляющей к строке при branchLine=\"elbow\". Колено соединяет узлы, а не только отмечает уровень."
+  },
+  {
+    "owner": "GrTree",
     "name": "--gr-tree-branch-line-offset",
     "kind": "css",
-    "default": "24px",
+    "default": "12px",
     "description": "Сдвиг направляющей от левого края строки."
   },
   {

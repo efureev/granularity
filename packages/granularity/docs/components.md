@@ -179,6 +179,7 @@ GrSelect>` для них не работает, такой компонент к
 - [`GrTooltip`](./components/GrTooltip.md)
 - [`GrTransfer`](./components/GrTransfer.md)
 - [`GrTree`](./components/GrTree.md)
+- [`GrTreeSections`](./components/GrTreeSections.md)
 - [`GrTreeSelect`](./components/GrTreeSelect.md)
 - [`GrValue`](./components/GrValue.md)
 

@@ -18,6 +18,8 @@ export type GrTreePropsMap = {
 
 export type GrTreeFilterNodeMethod<T extends object = any> = (value: string, data: T, node?: GrTreeNode<T>) => boolean
 
+export type GrTreeBranchLine = 'line' | 'elbow'
+
 export type GrTreeBranchLineColor<T extends object = any> = string | ((node: GrTreeNode<T>) => string | undefined | null)
 
 export type GrTreeVisibleRow<T extends object> = {
@@ -106,7 +108,13 @@ export type GrTreeViewProps<T extends object> = {
   /** Иконка раскрытого узла. Не задана — та же встроенная стрелка, повёрнутая. */
   collapseIcon?: string | Component
   toggleIconRotate?: boolean
-  branchLine?: boolean
+  /**
+   * Направляющие уровней. `true` — то же, что `'line'`: одна вертикаль на
+   * уровень. `'elbow'` добавляет горизонтальное колено к строке и обрывает
+   * линию на середине последнего ребёнка — так видно не только уровень, но и
+   * то, какие ветки ещё продолжаются.
+   */
+  branchLine?: boolean | GrTreeBranchLine
   branchLineColor?: GrTreeBranchLineColor<T>
   branchLineActiveColor?: GrTreeBranchLineColor<T>
   rowClass?: GrTreeNodeClass<T>

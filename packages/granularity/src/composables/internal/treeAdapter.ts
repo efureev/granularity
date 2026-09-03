@@ -1,8 +1,8 @@
-import type { GrTreeKey } from './grTreeTypes'
+import type { GrTreeKey } from '../../components/GrTree/grTreeTypes'
 import type {
   GrTreeDataProps,
   GrTreePropsMap,
-} from './grTreeProps'
+} from '../../components/GrTree/grTreeProps'
 
 const DEFAULT_CHILDREN_KEY = 'children'
 const DEFAULT_LABEL_KEY = 'label'
@@ -31,7 +31,7 @@ function resolveMapValue(map: GrTreePropsMap | undefined, key: keyof GrTreeProps
   return map?.[key] ?? fallback
 }
 
-export function createGrTreeDataAdapter<T extends Record<string, any> = any>(
+export function createGrTreeDataAdapter<T extends object>(
   options: GrTreeDataAdapterOptions<T>,
 ): GrTreeDataAdapter<T> {
   function hasNodeKey() {

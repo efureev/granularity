@@ -5,46 +5,78 @@ import type {
   GrTreeNode,
   GrTreeNodeDropType,
   GrTreeNodeTarget,
-} from './grTreeTypes'
-import type { GrTreeDataAdapter } from './grTreeDataAdapter'
-import type { GrTreeDataProps, GrTreeFilterNodeMethod, GrTreeLoad } from './grTreeProps'
-import type { GrTreeCheckState, GrTreeCheckStates } from './grTreeChecking'
+} from '../components/GrTree/grTreeTypes'
+import type { GrTreeDataAdapter } from './internal/treeAdapter'
+import { createGrTreeDataAdapter } from './internal/treeAdapter'
+import type { GrTreeDataProps, GrTreeLoad, GrTreePropsMap, GrTreeVisibleRow } from '../components/GrTree/grTreeProps'
+import type { GrTreeCheckState, GrTreeCheckStates } from './internal/treeChecking'
 import {
   collectCheckedKeys,
   collectHalfCheckedKeys,
   pruneToTree,
   resolveCheckStates,
   toggleCheckedKeys,
-} from './grTreeChecking'
+} from './internal/treeChecking'
 
-type TreeModel<T extends object> = {
+export type GrTreeModel<T extends object> = {
   roots: GrTreeNode<T>[]
   byKey: Map<GrTreeKey, GrTreeNode<T>>
   byData: WeakMap<T, GrTreeNode<T>>
 }
 
-type FilterInfo = {
+export type GrTreeFilterInfo = {
   isActive: boolean
   subtreeHasMatch: Map<GrTreeKey, boolean>
   matchedKeys: Set<GrTreeKey>
   autoExpandKeys: Set<GrTreeKey>
 }
 
-export type GrTreeStoreOptions<T extends object> = {
+export type UseTreeOptions<T extends object> = {
   data: MaybeRefOrGetter<GrTreeDataProps<T>['data']>
   defaultExpandedKeys?: MaybeRefOrGetter<GrTreeDataProps<T>['defaultExpandedKeys']>
   defaultExpandAll?: MaybeRefOrGetter<boolean | undefined>
-  filterNodeMethod?: MaybeRefOrGetter<GrTreeFilterNodeMethod<T> | undefined>
+  /**
+   * Совпал ли узел с запросом фильтра.
+   *
+   * Обычная функция, а не `MaybeRefOrGetter`: `toValue` не отличает геттер от
+   * значения-функции и вызвал бы её вместо того, чтобы вернуть. Реактивность
+   * при этом не теряется — потребитель читает своё состояние внутри вызова.
+   */
+  /**
+   * Совпал ли узел с запросом. Вернуть `undefined` — оставить решение модели
+   * (подстрочный матч по подписи).
+   */
+  filterNodeMethod?: (value: string, data: T, node: GrTreeNode<T>) => boolean | undefined
   defaultCheckedKeys?: MaybeRefOrGetter<GrTreeKey[] | undefined>
   /** Внешние отмеченные ключи (`v-model:checked-keys`), если потребитель их ведёт. */
   checkedKeys?: MaybeRefOrGetter<GrTreeKey[] | undefined>
   checkStrictly?: MaybeRefOrGetter<boolean | undefined>
   lazy?: MaybeRefOrGetter<boolean | undefined>
-  load?: MaybeRefOrGetter<GrTreeLoad<T> | undefined>
-  adapter: GrTreeDataAdapter<T>
+  /** Загрузка детей ветки. Обычная функция — по той же причине, что `filterNodeMethod`. */
+  load?: GrTreeLoad<T>
+  /** Форма данных: поля детей, подписи и признака листа. */
+  props?: GrTreePropsMap
+  /** Поле-идентификатор узла. */
+  nodeKey?: GrTreeDataProps<T>['nodeKey']
+  /**
+   * Готовый адаптер. Не задан — собирается из `props` и `nodeKey`.
+   *
+   * Необязателен намеренно: фабрика адаптера наружу не публикуется, и
+   * требовать её значило бы сделать композабл невызываемым вне пакета.
+   * Компонент передаёт свой, потому что уже собрал его для себя.
+   */
+  adapter?: GrTreeDataAdapter<T>
+  /**
+   * Цвет направляющей уровня для узла. Не задан — `branchColors` у строк
+   * остаётся пустым: направляющие рисует потребитель, и модель о них не знает.
+   *
+   * Обычная функция, а не `MaybeRefOrGetter`: `toValue` не отличает геттер от
+   * значения-функции и вызвал бы её вместо того, чтобы вернуть.
+   */
+  branchColorFor?: (node: GrTreeNode<T>) => string | undefined | null
 }
 
-export type GrTreeStore<T extends object> = {
+export type UseTreeReturn<T extends object> = {
   filterValue: Ref<string>
   expandedKeys: ShallowRef<Set<GrTreeKey>>
   checkedKeys: ShallowRef<Set<GrTreeKey>>
@@ -53,8 +85,14 @@ export type GrTreeStore<T extends object> = {
   loadedKeys: ShallowRef<Set<GrTreeKey>>
   loadedChildren: ShallowRef<Map<GrTreeKey, T[]>>
   currentKey: Ref<GrTreeKey | undefined>
-  treeModel: ComputedRef<TreeModel<T>>
-  filterInfo: ComputedRef<FilterInfo>
+  /**
+   * Видимые строки одним плоским списком в порядке отображения — то, из чего
+   * строится разметка. Иерархию несут `node.level`, `posInSet` и `setSize`:
+   * в плоском DOM группы нет, и структуру диктору сообщают они.
+   */
+  visibleRows: ComputedRef<GrTreeVisibleRow<T>[]>
+  treeModel: ComputedRef<GrTreeModel<T>>
+  filterInfo: ComputedRef<GrTreeFilterInfo>
   filter: (value: string) => void
   isExpandedKey: (key: GrTreeKey) => boolean
   setExpandedKey: (key: GrTreeKey, expanded: boolean) => void
@@ -83,9 +121,12 @@ export type GrTreeStore<T extends object> = {
   ensureLoaded: (node: GrTreeNode<T>) => void
 }
 
-export function createGrTreeStore<T extends Record<string, any> = any>(
-  options: GrTreeStoreOptions<T>,
-): GrTreeStore<T> {
+export function useTree<T extends object>(
+  options: UseTreeOptions<T>,
+): UseTreeReturn<T> {
+  const adapter = options.adapter
+    ?? createGrTreeDataAdapter<T>({ props: options.props, nodeKey: options.nodeKey })
+
   const filterValue = ref('')
   const expandedKeys = shallowRef<Set<GrTreeKey>>(new Set())
   const checkedKeys = shallowRef<Set<GrTreeKey>>(new Set(toValue(options.defaultCheckedKeys) ?? []))
@@ -97,7 +138,7 @@ export function createGrTreeStore<T extends Record<string, any> = any>(
   const loadedChildren = shallowRef<Map<GrTreeKey, T[]>>(new Map())
   const currentKey = ref<GrTreeKey | undefined>(undefined)
   const getData = () => toValue(options.data) ?? []
-  const getFilterNodeMethod = () => toValue(options.filterNodeMethod)
+  const getFilterNodeMethod = () => options.filterNodeMethod
 
   watch(
     () => toValue(options.defaultExpandedKeys),
@@ -118,15 +159,15 @@ export function createGrTreeStore<T extends Record<string, any> = any>(
     { immediate: true },
   )
 
-  const treeModel = computed<TreeModel<T>>(() => {
+  const treeModel = computed<GrTreeModel<T>>(() => {
     const byKey = new Map<GrTreeKey, GrTreeNode<T>>()
     const byData = new WeakMap<T, GrTreeNode<T>>()
 
     const build = (items: T[], parent: GrTreeNode<T> | undefined, level: number): GrTreeNode<T>[] => {
       return items.map((item, index) => {
         const node: GrTreeNode<T> = {
-          key: options.adapter.getNodeKey(item, index, parent?.key),
-          label: options.adapter.getLabel(item),
+          key: adapter.getNodeKey(item, index, parent?.key),
+          label: adapter.getLabel(item),
           data: item,
           level,
           parent,
@@ -136,7 +177,7 @@ export function createGrTreeStore<T extends Record<string, any> = any>(
         byKey.set(node.key, node)
         byData.set(item, node)
 
-        const ownChildren = options.adapter.getChildren(item)
+        const ownChildren = adapter.getChildren(item)
         const lazyChildren = loadedChildren.value.get(node.key) ?? []
         node.childNodes = build([...ownChildren, ...lazyChildren], node, level + 1)
 
@@ -175,7 +216,7 @@ export function createGrTreeStore<T extends Record<string, any> = any>(
       expandedKeys.value = next
   }, { immediate: true })
 
-  const filterInfo = computed<FilterInfo>(() => {
+  const filterInfo = computed<GrTreeFilterInfo>(() => {
     const value = filterValue.value
     const isActive = value.trim().length > 0
     const valueLower = value.toLowerCase()
@@ -193,9 +234,13 @@ export function createGrTreeStore<T extends Record<string, any> = any>(
     }
 
     const match = (node: GrTreeNode<T>): boolean => {
-      const filterNodeMethod = getFilterNodeMethod()
-      if (filterNodeMethod)
-        return filterNodeMethod(value, node.data, node)
+      // `undefined` от метода означает «решай сам»: обёртка компонента отдаёт
+      // его, когда своего правила потребитель не задал, — иначе она не смогла
+      // бы вернуть модель к дефолту, оставаясь обычной функцией.
+      const custom = getFilterNodeMethod()?.(value, node.data, node)
+
+      if (custom !== undefined)
+        return custom
 
       return node.label.toLowerCase().includes(valueLower)
     }
@@ -258,7 +303,7 @@ export function createGrTreeStore<T extends Record<string, any> = any>(
     if (isTreeNode(target))
       return getNode(target.key) ?? target
 
-    const key = options.adapter.getExplicitNodeKey(target)
+    const key = adapter.getExplicitNodeKey(target)
     if (key != null)
       return getNode(key)
 
@@ -266,17 +311,17 @@ export function createGrTreeStore<T extends Record<string, any> = any>(
   }
 
   function getNodeContainer(node: GrTreeNode<T>) {
-    const items = node.parent ? options.adapter.ensureChildren(node.parent.data) : getData()
+    const items = node.parent ? adapter.ensureChildren(node.parent.data) : getData()
 
     let index = items.findIndex(item => item === node.data)
     if (index >= 0)
       return { items, index }
 
-    const key = options.adapter.getExplicitNodeKey(node.data)
+    const key = adapter.getExplicitNodeKey(node.data)
     if (key == null)
       return undefined
 
-    index = items.findIndex(item => options.adapter.getExplicitNodeKey(item) === key)
+    index = items.findIndex(item => adapter.getExplicitNodeKey(item) === key)
     if (index < 0)
       return undefined
 
@@ -381,7 +426,7 @@ export function createGrTreeStore<T extends Record<string, any> = any>(
   }
 
   function resolveInsertedNode(data: T) {
-    const key = options.adapter.getExplicitNodeKey(data)
+    const key = adapter.getExplicitNodeKey(data)
     if (key != null)
       return getNode(key)
 
@@ -406,7 +451,7 @@ export function createGrTreeStore<T extends Record<string, any> = any>(
     let destinationIndex: number
 
     if (dropType === 'inner') {
-      destinationItems = options.adapter.ensureChildren(targetNode.data)
+      destinationItems = adapter.ensureChildren(targetNode.data)
       destinationIndex = destinationItems.length
     }
     else {
@@ -438,14 +483,14 @@ export function createGrTreeStore<T extends Record<string, any> = any>(
     if (!parentNode)
       return undefined
 
-    options.adapter.ensureChildren(parentNode.data).push(data)
+    adapter.ensureChildren(parentNode.data).push(data)
     setExpandedKey(parentNode.key, true)
     sanitizeTreeState()
     return resolveInsertedNode(data)
   }
 
   function removeNode(node: GrTreeNodeTarget<T>) {
-    if (!options.adapter.hasNodeKey())
+    if (!adapter.hasNodeKey())
       return false
 
     const targetNode = resolveNodeTarget(node)
@@ -542,7 +587,7 @@ export function createGrTreeStore<T extends Record<string, any> = any>(
     if (!toValue(options.lazy))
       return true
 
-    const declared = options.adapter.getIsLeaf(node.data)
+    const declared = adapter.getIsLeaf(node.data)
     if (declared !== undefined)
       return declared
 
@@ -565,7 +610,7 @@ export function createGrTreeStore<T extends Record<string, any> = any>(
   }
 
   function ensureLoaded(node: GrTreeNode<T>) {
-    const load = toValue(options.load)
+    const load = options.load
     if (!toValue(options.lazy) || !load)
       return
 
@@ -593,7 +638,50 @@ export function createGrTreeStore<T extends Record<string, any> = any>(
     filterValue.value = value
   }
 
+  /**
+   * Плоско — потому что рекурсивный рендер стоил по инстансу компонента на
+   * каждый раскрытый узел: дерево на 2 000 видимых строк превращалось в 2 000
+   * компонентов со своими вычислениями и подписками.
+   */
+  const visibleRows = computed<GrTreeVisibleRow<T>[]>(() => {
+    const { roots } = treeModel.value
+    const { isActive, subtreeHasMatch, matchedKeys, autoExpandKeys } = filterInfo.value
+    const rows: GrTreeVisibleRow<T>[] = []
+
+    const walk = (nodes: GrTreeNode<T>[], ancestorColors: string[]): void => {
+      const siblings = isActive ? nodes.filter(node => subtreeHasMatch.get(node.key)) : nodes
+
+      siblings.forEach((node, index) => {
+        const isLeaf = isLeafNode(node)
+        const isExpanded = isExpandedKey(node.key) || (isActive && autoExpandKeys.has(node.key))
+
+        rows.push({
+          node,
+          isExpanded,
+          isLeaf,
+          isMatched: matchedKeys.has(node.key),
+          posInSet: index + 1,
+          setSize: siblings.length,
+          isLoading: isLoadingKey(node.key),
+          branchColors: ancestorColors,
+        })
+
+        if (!isExpanded || node.childNodes.length === 0)
+          return
+
+        const color = options.branchColorFor?.(node)
+
+        walk(node.childNodes, color ? [...ancestorColors, color] : ancestorColors)
+      })
+    }
+
+    walk(roots, [])
+
+    return rows
+  })
+
   return {
+    visibleRows,
     filterValue,
     expandedKeys,
     loadedChildren,

@@ -78,6 +78,7 @@ export * from './components/GrToaster'
 export * from './components/GrTooltip'
 export * from './components/GrTransfer'
 export * from './components/GrTree'
+export * from './components/GrTreeSections'
 export * from './components/GrTreeSelect'
 export * from './components/GrValue'
 // </granularity:components>
@@ -94,6 +95,13 @@ export { usePortalTarget } from './composables/usePortalTarget'
 export type { PortalTarget } from './composables/usePortalTarget'
 export { useOverlayLayer } from './composables/useOverlayLayer'
 export type { OverlayLayerHandle, UseOverlayLayerOptions } from './composables/useOverlayLayer'
+export { useTree } from './composables/useTree'
+export type {
+  GrTreeFilterInfo,
+  GrTreeModel,
+  UseTreeOptions,
+  UseTreeReturn,
+} from './composables/useTree'
 export { useScrollSpy } from './composables/useScrollSpy'
 export type { UseScrollSpyOptions, UseScrollSpyReturn } from './composables/useScrollSpy'
 export { useRovingFocus } from './composables/useRovingFocus'

@@ -12382,10 +12382,10 @@
           },
           {
             "name": "branchLine",
-            "description": "",
-            "type": "boolean | undefined",
+            "description": "Направляющие уровней. `true` — то же, что `'line'`: одна вертикаль на уровень. `'elbow'` добавляет горизонтальное колено к строке и обрывает линию на середине последнего ребёнка — так видно не только уровень, но и то, какие ветки ещё продолжаются.",
+            "type": "boolean | GrTreeBranchLine | undefined",
             "required": false,
-            "default": "false"
+            "default": "\"line\""
           },
           {
             "name": "branchLineColor",
@@ -12618,6 +12618,157 @@
             "description": "",
             "type": "[T, GrTreeNode<T>, { checkedKeys: GrTreeKey[]; halfCheckedKeys: GrTreeKey[]; }]",
             "signature": "(e: \"check\", data: T, node: GrTreeNode<T>, info: { checkedKeys: GrTreeKey[]; halfCheckedKeys: GrTreeKey[]; }): void"
+          }
+        ]
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": []
+      }
+    ]
+  },
+  "GrTreeSections": {
+    "name": "GrTreeSections",
+    "sourcePath": "packages/granularity/src/components/GrTreeSections/GrTreeSections.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "data",
+            "description": "Данные обычного дерева. Корни становятся заголовками, их дети — деревьями.",
+            "type": "T[]",
+            "required": true
+          },
+          {
+            "name": "nodeKey",
+            "description": "",
+            "type": "\"id\" | Extract<keyof T, string> | undefined",
+            "required": false,
+            "default": "\"id\" as never"
+          },
+          {
+            "name": "props",
+            "description": "",
+            "type": "GrTreePropsMap | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "size",
+            "description": "",
+            "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "headingLevel",
+            "description": "Уровень заголовка группы под структуру страницы.",
+            "type": "2 | 3 | 4 | 5 | 6 | undefined",
+            "required": false,
+            "default": "3"
+          },
+          {
+            "name": "showCount",
+            "description": "Показывать число узлов первого уровня в группе.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "showCheckbox",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "checkStrictly",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "branchLine",
+            "description": "",
+            "type": "boolean | GrTreeBranchLine | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "indent",
+            "description": "",
+            "type": "number | undefined",
+            "required": false,
+            "default": "0"
+          },
+          {
+            "name": "defaultExpandedKeys",
+            "description": "",
+            "type": "GrTreeKey[] | undefined",
+            "required": false,
+            "default": "[]"
+          },
+          {
+            "name": "currentKey",
+            "description": "",
+            "type": "GrTreeKey | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "checkedKeys",
+            "description": "",
+            "type": "GrTreeKey[] | undefined",
+            "required": false,
+            "default": "undefined"
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "heading",
+            "description": "Заголовок группы целиком — вместо подписи корневого узла.",
+            "type": "{ data: T; label: string; count: number; }"
+          },
+          {
+            "name": "default",
+            "description": "Строка внутри группы, как у `GrTree`.",
+            "type": "{ node: GrTreeNode<T>; data: T; }"
+          }
+        ]
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "update:currentKey",
+            "description": "",
+            "type": "[GrTreeKey | undefined]",
+            "signature": "(e: \"update:currentKey\", key: GrTreeKey | undefined): void"
+          },
+          {
+            "name": "update:checkedKeys",
+            "description": "",
+            "type": "[GrTreeKey[]]",
+            "signature": "(e: \"update:checkedKeys\", keys: GrTreeKey[]): void"
+          },
+          {
+            "name": "nodeClick",
+            "description": "",
+            "type": "[any, GrTreeNode<any>]",
+            "signature": "(e: \"nodeClick\", data: any, node: GrTreeNode<any>): void"
           }
         ]
       },

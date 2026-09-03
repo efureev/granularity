@@ -272,6 +272,7 @@
 | две версии **сравнивают**: что изменилось | [`GrDiff`](../packages/granularity-code/docs/components/GrDiff.md) |
 | по чужому `unknown` ходят: сворачивают узлы, ищут ключ | [`GrJsonViewer`](../packages/granularity/docs/components/GrJsonViewer.md) |
 | дерево своих данных: выбор узла, чекбоксы, перенос | [`GrTree`](../packages/granularity/docs/components/GrTree.md) |
+| то же, но верхний уровень — рубрика, а не узел | [`GrTreeSections`](../packages/granularity/docs/components/GrTreeSections.md) |
 | данные разложены по колонкам и известны заранее | [`GrDataTable`](../packages/granularity/docs/components/GrDataTable.md) |
 | это пара «характеристика → значение», а не документ | [`GrDescriptionList`](../packages/granularity/docs/components/GrDescriptionList.md) |
 
@@ -521,10 +522,16 @@
 | [`GrTooltip`](../packages/granularity/docs/components/GrTooltip.md) | ядро | подпись к иконочной кнопке |
 | [`GrTransfer`](../packages/granularity/docs/components/GrTransfer.md) | ядро | состав набирают из справочника |
 | [`GrTree`](../packages/granularity/docs/components/GrTree.md) | ядро | данные вложены |
+| [`GrTreeSections`](../packages/granularity/docs/components/GrTreeSections.md) | ядро | корни — категории, а не элементы |
 | [`GrTreeSelect`](../packages/granularity/docs/components/GrTreeSelect.md) | ядро | варианты вложены |
 | [`GrValue`](../packages/granularity/docs/components/GrValue.md) | ядро | пишете свой компонент с величиной |
 | [`GrVideoPlayer`](../packages/granularity-media/docs/components/GrVideoPlayer.md) | media | ролик внутри страницы продукта |
 <!-- component-map:generated:end -->
+
+Различитель `GrTreeSections` / `GrTree` — **выбирается ли корень**. У дерева
+корень такой же узел, как любой другой; у секций он стал заголовком раздела, и
+внутри это не одно дерево с заголовками между строк, а несколько отдельных —
+`role="tree"` требует, чтобы его детьми были `treeitem`.
 
 ## Чего в экосистеме нет
 

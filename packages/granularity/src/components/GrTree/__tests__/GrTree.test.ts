@@ -119,7 +119,7 @@ describe('GrTree', () => {
     expect(rows[1].attributes('style')).toContain('--gr-tree-row-indent: calc(20px * 1)')
   })
 
-  it('не показывает полосу ветки по умолчанию', () => {
+  it('показывает направляющие уровней по умолчанию', () => {
     const wrapper = mount(GrTree<Item>, {
       props: {
         data: tree(),
@@ -129,7 +129,44 @@ describe('GrTree', () => {
       },
     })
 
+    // Дерево без направляющих читается как список с отступами: уровень видно
+    // только по сдвигу подписи. Поэтому база их показывает, а отказ стал явным.
+    expect(wrapper.findAll('[data-gr-tree-branch-guide]').length).toBeGreaterThan(0)
+  })
+
+  it('направляющие убираются явным отказом', () => {
+    const wrapper = mount(GrTree<Item>, {
+      props: {
+        data: tree(),
+        nodeKey: 'id',
+        props: { children: 'children', label: 'label' },
+        defaultExpandedKeys: [1],
+        branchLine: false,
+      },
+    })
+
     expect(wrapper.findAll('[data-gr-tree-branch-guide]')).toHaveLength(0)
+  })
+
+  it('колено ставится только своему уровню и обрывается у последнего ребёнка', () => {
+    const wrapper = mount(GrTree<Item>, {
+      props: {
+        data: tree(),
+        nodeKey: 'id',
+        props: { children: 'children', label: 'label' },
+        defaultExpandedKeys: [1],
+        branchLine: 'elbow',
+      },
+    })
+
+    // У транзитных предков горизонтальная черта указывала бы на чужую строку,
+    // поэтому колено получает только направляющая собственного уровня.
+    const guides = wrapper.findAll('[data-gr-tree-branch-guide]')
+    const elbows = wrapper.findAll('.gr-tree__branch-guide--elbow')
+
+    expect(elbows.length).toBeGreaterThan(0)
+    expect(elbows.length).toBeLessThan(guides.length + 1)
+    expect(wrapper.findAll('.gr-tree__branch-guide--last').length).toBeGreaterThan(0)
   })
 
   it('включает полосу ветки и активирует её для выбранной ноды и её прямых детей', async () => {

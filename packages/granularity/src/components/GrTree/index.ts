@@ -18,10 +18,11 @@ export type {
   GrTreeSelectionProps,
   GrTreeVisibleRow,
 } from './grTreeProps'
-export type { GrTreeCheckState } from './grTreeChecking'
+export type { GrTreeCheckState } from '../../composables/internal/treeChecking'
 export { grTreeConfig } from './config'
 // Реэкспорт затягивает `defaults.ts` (и его аугментацию реестра) к потребителю.
 export type { GrTreeConfigurableProps } from './defaults'
-export type { GrTreeSize } from './grTreeStyles'
+export { grTreeViewVars } from './grTreeStyles'
+export type { GrTreeSize, GrTreeView } from './grTreeStyles'
 export { grTreeSafelist } from './safelist'
 export type { GrTreeEmits } from './GrTree.vue'

@@ -1,4 +1,4 @@
-import type { GrTreeKey, GrTreeNode } from './grTreeTypes'
+import type { GrTreeKey, GrTreeNode } from '../../components/GrTree/grTreeTypes'
 
 /**
  * Состояние отметки узла. `half` — часть потомков отмечена: в ARIA это

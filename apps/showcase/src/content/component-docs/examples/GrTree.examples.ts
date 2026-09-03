@@ -68,4 +68,11 @@ export const grTreeExamples: ShowcaseComponentExampleDoc[] = [
     previewKey: 'gr-tree-virtual',
     note: '`aria-setsize`/`aria-posinset` остаются от полного набора, а не от окна. Перетаскивание при этом работает по отрисованным строкам: уронить узел на тот, которого нет на экране, нельзя.',
   },
+  {
+    id: 'tree-views',
+    title: 'Готовые виды и колена связей',
+    description: 'Вид — набор значений тех же `--gr-tree-*`, что задаёт `size`, а не проп: второй канал спорил бы с размером за одни переменные. Слева `explorer` с `branch-line="elbow"` — колено соединяет узлы и обрывается у последнего ребёнка; справа `rail`, где выбор стал сплошной плашкой с перекрашенным текстом.',
+    status: 'ready',
+    previewKey: 'gr-tree-views',
+  },
 ]

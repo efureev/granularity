@@ -66,6 +66,7 @@ import {
   grCardExamples,
   grAffixExamples,
   grScrollSpyExamples,
+  grTreeSectionsExamples,
   grCarouselExamples,
   grBottomNavExamples,
   grNavbarExamples,
@@ -153,6 +154,20 @@ const grScrollSpyOverview: ShowcaseComponentOverviewDoc = {
     'Два уровня вложенности с отступом и объявлением глубины диктору.',
     'Работает внутри своей прокручиваемой области, а не только относительно окна.',
     'Логика доступна отдельно композаблом `useScrollSpy` — для своего оглавления.',
+  ],
+}
+
+const grTreeSectionsOverview: ShowcaseComponentOverviewDoc = {
+  paragraphs: [
+    'Дерево, у которого верхний уровень стал рубрикой: корни рендерятся заголовками, а их дети — обычными деревьями под ними. Так устроены настройки, права доступа и справочники, где выбирать саму рубрику бессмысленно, а называть её нужно.',
+    'Заголовок получает настоящий уровень в структуре страницы, а рядом с ним — счётчик, чтобы объём раздела был виден без раскрытия.',
+  ],
+  features: [
+    'Корни данных превращаются в заголовки — менять форму данных не нужно.',
+    'Каждая группа объявляет себя сама: имя дерева берётся из подписи рубрики.',
+    'Выбранный узел один на все группы.',
+    'Чекбоксы работают внутри группы, а ключи наружу собираются объединением.',
+    'Уровень заголовка задаётся под структуру страницы.',
   ],
 }
 
@@ -577,6 +592,7 @@ export const componentDocOverrides: Partial<Record<string, ShowcaseComponentDocM
   GrCard: createComponentDocMeta(grCardExamples),
   GrAffix: createComponentDocMeta(grAffixExamples, grAffixOverview),
   GrScrollSpy: createComponentDocMeta(grScrollSpyExamples, grScrollSpyOverview),
+  GrTreeSections: createComponentDocMeta(grTreeSectionsExamples, grTreeSectionsOverview),
   GrCarousel: createComponentDocMeta(grCarouselExamples, grCarouselOverview),
   GrBottomNav: createComponentDocMeta(grBottomNavExamples),
   GrBreadcrumbs: createComponentDocMeta(grBreadcrumbsExamples, grBreadcrumbsOverview),

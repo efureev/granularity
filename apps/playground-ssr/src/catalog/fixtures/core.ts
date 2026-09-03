@@ -73,6 +73,7 @@ import {
   GrTooltip,
   GrTransfer,
   GrTree,
+  GrTreeSections,
   GrTreeSelect,
   GrValue,
 } from '@feugene/granularity'
@@ -183,6 +184,7 @@ export const coreFixtures: ComponentFixture[] = [
     'aria-label': 'Права роли',
   }) },
   { name: 'GrTree', about: 'roving tabindex и id узлов с сервера', render: () => h(GrTree, { data: [{ id: '1', label: 'Корень', children: [{ id: '2', label: 'Лист' }] }] }) },
+  { name: 'GrTreeSections', about: 'корни становятся заголовками, дети — отдельными деревьями: `role="tree"` требует, чтобы его детьми были `treeitem`', render: () => h(GrTreeSections, { data: [{ id: 'a', label: 'Раздел A', children: [{ id: 'a1', label: 'Пункт' }] }], nodeKey: 'id' }) },
   { name: 'GrTreeSelect', about: 'панель на месте, дерево внутри неё', render: () => h(GrTreeSelect, { modelValue: null, data: [{ id: '1', label: 'Корень' }] }) },
   { name: 'GrValue', about: 'чистая разметка', render: () => h(GrValue, { value: 1234.5, prefix: '₽' }) },
 ]

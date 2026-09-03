@@ -7,6 +7,89 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- **`useTree` is public — the tree model without any markup.** Expansion, checking with
+  inheritance, filtering, lazy loading, node moves and — the part that makes it worth
+  publishing — the flat list of visible rows with level, position among siblings and set
+  size. It is what `GrTree` itself runs on, so it is enough for anyone.
+
+  The move is physical, not a facade: `composables/useTree.ts` plus
+  `composables/internal/treeChecking.ts` and `treeAdapter.ts`. A facade would have left
+  the runtime inside the component directory, and `libInjectCss` puts a component's CSS
+  into its chunks — so importing only the model would have dragged the tree's styles
+  along. Measured on the built output: the model chunk is 16 KB with zero imports and zero
+  CSS references.
+
+  Two things about the shape, both found by calling the composable the way a consumer
+  will — from outside, without a component. The data adapter is optional and built from
+  `props`/`nodeKey`, because its factory is not published and requiring it would have made
+  the composable uncallable. And `filterNodeMethod` and `load` are plain functions rather
+  than `MaybeRefOrGetter`: `toValue` cannot tell a getter from a function value and would
+  have *invoked* them. A `filterNodeMethod` returning `undefined` hands the decision back
+  to the model, so a wrapper can defer to the built-in substring match.
+
+  This is what makes checkboxes orthogonal in code and not just in looks. Custom markup
+  gets inheritance and the mixed state from the model and draws its own box; the flat rows
+  carry `aria-level`, `aria-posinset` and `aria-setsize` ready to use — which is what a
+  tree whose top level is a section heading, and therefore not a `treeitem`, needs.
+
+- **New `GrTreeSections` — a tree whose top level is a rubric.** Roots render as headings,
+  their children as ordinary trees underneath. This is how settings, permissions and
+  reference books are shaped: selecting the rubric itself is meaningless, naming it is not.
+
+  Inside it is not one tree with headings between rows but **several trees**, and that is a
+  requirement rather than an implementation detail: `role="tree"` obliges its children to
+  be `treeitem`, so a heading among them either breaks the role or stays a row and lies
+  about what it is. Headings *between* separate trees are legitimate, and each group names
+  itself. The consequence worth knowing up front: the keyboard ring is per group, so `Tab`
+  moves between them — correct, since the groups are independent, but different from one
+  tree where the arrows run through the whole list.
+
+  Selection is single across groups because keys are unique; checked keys are merged by
+  union, which is lossless precisely because the groups share no parent.
+
+- **`grTreeViewVars` — ready-made views as token sets.** `explorer` for dense file trees,
+  `rail` for navigation, `outline` for a table of contents standing next to running text.
+  Deliberately not a prop: a second channel would fight `size` over
+  the same `--gr-tree-*` variables, and the component's own size scale is documented as
+  setting defaults for them rather than arguing with them through another channel. A set
+  spreads into `style`, composes with `size`, and is overridden one line at a time.
+
+### Changed
+
+- **`branchLine` is now an enum — `true | 'line' | 'elbow'`, and it defaults to `'line'`.**
+  A tree without guides reads as a list with indents: the level is visible only from how
+  far the label sits. `'elbow'` adds a horizontal connector to the row and cuts the
+  vertical at the middle of the last child, so the line starts *joining nodes* rather than
+  merely marking a level, and it becomes visible which branches still continue. Only the
+  guide of the row's own level gets an elbow — on a transit ancestor the connector would
+  point at a row it has nothing to do with.
+
+- **The default look was rebuilt, and every number came from a measurement.** The row was
+  42 px tall for a 13–14 px label, in a component that lives in a narrow panel where
+  vertical space costs the most; the indent step was 36 px, leaving a dead gap the guide
+  could never cross; a branch was set exactly like a leaf, so a folder and a file were
+  told apart only by a chevron the leaf does not have.
+
+  | | before | after |
+  |---|---:|---:|
+  | row (`md`) | 42 px | 32 px |
+  | indent step | 36 px | 24 px |
+  | current row | 5 % primary | 14 % |
+  | level guides | off | on |
+  | branch vs leaf | identical | 600 vs 400 |
+
+  The selection number deserves its own line: at 5 % against hover's 10 %, **the selected
+  row was fainter than the one merely under the cursor**.
+
+- **`--gr-tree-row-current-color`** — the text colour of the selected row, separate from
+  `--gr-tree-row-color`. Without it a saturated selection surface could not be made
+  readable, which is why a solid selection pill was impossible before.
+
+  Trees inside `GrJsonViewer`, `GrContextMenu` and the `GrTreeSelect` renderer of
+  `GrSchemaForm` change with it — they render the same component.
+
 ## [v0.44.0] 2026-09-03
 
 ### Added

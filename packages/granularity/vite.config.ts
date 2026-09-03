@@ -336,6 +336,9 @@ export default defineConfig({
         'components/GrTree/index': fileURLToPath(
           new URL('./src/components/GrTree/index.ts', import.meta.url),
         ),
+        'components/GrTreeSections/index': fileURLToPath(
+          new URL('./src/components/GrTreeSections/index.ts', import.meta.url),
+        ),
         'components/GrTreeSelect/index': fileURLToPath(
           new URL('./src/components/GrTreeSelect/index.ts', import.meta.url),
         ),
@@ -372,6 +375,9 @@ export default defineConfig({
         ),
         'composables/useOverlayLayer': fileURLToPath(
           new URL('./src/composables/useOverlayLayer.ts', import.meta.url),
+        ),
+        'composables/useTree': fileURLToPath(
+          new URL('./src/composables/useTree.ts', import.meta.url),
         ),
         'composables/useScrollSpy': fileURLToPath(
           new URL('./src/composables/useScrollSpy.ts', import.meta.url),

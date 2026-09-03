@@ -454,6 +454,10 @@
       "types": "./dist/types/components/GrTree/index.d.ts",
       "import": "./dist/components/GrTree/index.js"
     },
+    "./components/GrTreeSections": {
+      "types": "./dist/types/components/GrTreeSections/index.d.ts",
+      "import": "./dist/components/GrTreeSections/index.js"
+    },
     "./components/GrTreeSelect": {
       "types": "./dist/types/components/GrTreeSelect/index.d.ts",
       "import": "./dist/components/GrTreeSelect/index.js"
@@ -489,6 +493,10 @@
     "./composables/useOverlayLayer": {
       "types": "./dist/types/composables/useOverlayLayer.d.ts",
       "import": "./dist/composables/useOverlayLayer.js"
+    },
+    "./composables/useTree": {
+      "types": "./dist/types/composables/useTree.d.ts",
+      "import": "./dist/composables/useTree.js"
     },
     "./composables/useScrollSpy": {
       "types": "./dist/types/composables/useScrollSpy.d.ts",

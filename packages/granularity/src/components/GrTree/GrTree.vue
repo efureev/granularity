@@ -7,11 +7,11 @@ import type {
   GrTreeNode,
   GrTreeNodeDropType,
 } from './grTreeTypes'
-import { createGrTreeDataAdapter } from './grTreeDataAdapter'
+import { createGrTreeDataAdapter } from '../../composables/internal/treeAdapter'
 import type { GrTreeDropTarget } from './grTreeInteractionContext'
 import { createGrTreeInteractionContext } from './grTreeInteractionContext'
-import type { GrTreeCheckState } from './grTreeChecking'
-import { createGrTreeStore } from './grTreeStore'
+import type { GrTreeCheckState } from '../../composables/internal/treeChecking'
+import { useTree } from '../../composables/useTree'
 import { treeSizeVars } from './grTreeStyles'
 import { useGrComponentSize } from '../GrConfigProvider/context'
 import { useAnnouncer } from '../../composables/useAnnouncer'
@@ -83,7 +83,7 @@ const props = withDefaults(defineProps<GrTreeProps<T>>(), {
   expandIcon: undefined,
   collapseIcon: undefined,
   toggleIconRotate: true,
-  branchLine: false,
+  branchLine: 'line',
   branchLineColor: undefined,
   branchLineActiveColor: undefined,
   draggable: false,
@@ -105,18 +105,21 @@ defineSlots<{
   default?: (props: { node: GrTreeNode<T>, data: T }) => any
 }>()
 
-const dataAdapter = createGrTreeDataAdapter(props)
-const treeStore = createGrTreeStore({
+const dataAdapter = createGrTreeDataAdapter<T>(props)
+const treeStore = useTree({
   adapter: dataAdapter,
+  // Цвет направляющей — решение компонента, а не модели: она лишь копит цепочку
+  // предков. Выключенный `branchLine` не даёт цвета вовсе, и цепочка пуста.
+  branchColorFor: branchColorForNode,
   data: () => props.data,
   defaultExpandedKeys: () => props.defaultExpandedKeys,
   defaultExpandAll: () => props.defaultExpandAll,
-  filterNodeMethod: () => props.filterNodeMethod,
+  filterNodeMethod: filterNodeForModel,
   defaultCheckedKeys: () => props.defaultCheckedKeys,
   checkedKeys: () => props.checkedKeys,
   checkStrictly: () => props.checkStrictly,
   lazy: () => props.lazy,
-  load: () => props.load,
+  load: loadForModel,
 })
 const interactionContext = createGrTreeInteractionContext(props, {
   emitNodeClick: (data, node) => emit('nodeClick', data, node),
@@ -168,45 +171,11 @@ watch(() => treeProps.filterValue, (value) => {
 const treeRootEl = ref<HTMLElement | null>(null)
 
 /**
- * Видимые строки одним плоским списком в порядке отображения.
- *
- * Плоско — потому что рекурсивный рендер стоил по инстансу компонента на каждый
- * раскрытый узел: дерево на 2 000 видимых строк превращалось в 2 000
- * компонентов со своими вычислениями и подписками. Иерархию несут `aria-level`,
- * `aria-posinset` и `aria-setsize`, отступ — `padding-left` строки.
+ * Видимые строки считает модель (`useTree`): в плоском DOM группы нет, и
+ * структуру дерева диктору сообщают `aria-level`, `aria-posinset` и
+ * `aria-setsize` — всё это приходит из неё готовым.
  */
-const visibleRows = computed<GrTreeVisibleRow<T>[]>(() => {
-  const { roots } = treeStore.treeModel.value
-  const { isActive, subtreeHasMatch, matchedKeys, autoExpandKeys } = treeStore.filterInfo.value
-  const branch = treeProps.branchLine
-  const rows: GrTreeVisibleRow<T>[] = []
-
-  const walk = (nodes: GrTreeNode<T>[], ancestorColors: string[]): void => {
-    const siblings = isActive ? nodes.filter(node => subtreeHasMatch.get(node.key)) : nodes
-
-    siblings.forEach((node, index) => {
-      const isLeaf = treeStore.isLeafNode(node)
-      const isExpanded = treeStore.isExpandedKey(node.key) || (isActive && autoExpandKeys.has(node.key))
-
-      rows.push({
-        node,
-        isExpanded,
-        isLeaf,
-        isMatched: matchedKeys.has(node.key),
-        posInSet: index + 1,
-        setSize: siblings.length,
-        isLoading: treeStore.isLoadingKey(node.key),
-        branchColors: ancestorColors,
-      })
-
-      if (isExpanded && node.childNodes.length)
-        walk(node.childNodes, branch ? [...ancestorColors, resolveBranchLineColor(node)] : ancestorColors)
-    })
-  }
-
-  walk(roots, [])
-  return rows
-})
+const visibleRows = treeStore.visibleRows
 
 /**
  * Кольцо roving-фокуса: ровно один `treeitem` на всё дерево держит `tabindex=0`.
@@ -577,6 +546,46 @@ function rowStyle(row: GrTreeVisibleRow<T>) {
  * Направляющая уровня-предка. Считается от того же шага отступа, что и сам
  * отступ строки, — иначе линия и содержимое разъедутся на вложенных уровнях.
  */
+/**
+ * Колено рисуется только у направляющей собственного уровня строки: остальные
+ * — это транзит предков, и горизонтальная черта у них указывала бы на строку,
+ * к которой они не относятся.
+ *
+ * У последнего ребёнка вертикаль обрывается на середине: продолжать её значит
+ * обещать сиблинга, которого нет.
+ */
+/**
+ * Цвет направляющей уровня для модели. Объявление функцией, а не стрелкой на
+ * месте вызова: `treeProps` определяются ниже, и ссылка на них в выражении
+ * читалась бы до объявления.
+ */
+/**
+ * Обёртки над пропами для модели: объявлением, а не стрелкой на месте вызова —
+ * `treeProps` определяются ниже. `undefined` от фильтра означает «решай сам»:
+ * так обёртка возвращает модель к её подстрочному матчу, когда своего правила
+ * потребитель не задал.
+ */
+function filterNodeForModel(value: string, data: T, node: GrTreeNode<T>) {
+  return treeProps.filterNodeMethod?.(value, data, node)
+}
+
+function loadForModel(node: GrTreeNode<T>, resolve: (children: T[]) => void) {
+  treeProps.load?.(node, resolve)
+}
+
+function branchColorForNode(node: GrTreeNode<T>) {
+  return treeProps.branchLine ? resolveBranchLineColor(node) : undefined
+}
+
+function branchGuideModifiers(row: GrTreeVisibleRow<T>, index: number) {
+  if (treeProps.branchLine !== 'elbow' || index !== row.branchColors.length - 1)
+    return undefined
+
+  return row.posInSet === row.setSize
+    ? 'gr-tree__branch-guide--elbow gr-tree__branch-guide--last'
+    : 'gr-tree__branch-guide--elbow'
+}
+
 function branchGuideStyle(row: GrTreeVisibleRow<T>, index: number) {
   const step = treeProps.indent && treeProps.indent > 0
     ? `${treeProps.indent}px`
@@ -877,6 +886,7 @@ defineExpose<GrTreeInstance<T>>({
           class="gr-tree__row"
           :class="[
           treeProps.highlightCurrent && currentKey === row.node.key ? 'gr-tree__row--current' : '',
+          row.isLeaf ? 'gr-tree__row--leaf' : '',
           row.isMatched ? 'gr-tree__row--matched' : '',
           dropTarget?.key === row.node.key && dropTarget.allowed && dropTarget.type === 'inner' ? 'gr-tree__row--drop-inner' : '',
           dropTarget?.key === row.node.key && dropTarget.allowed && dropTarget.type === 'prev' ? 'gr-tree__row--drop-prev' : '',
@@ -900,6 +910,7 @@ defineExpose<GrTreeInstance<T>>({
             :key="guideIndex"
             data-gr-tree-branch-guide
             class="gr-tree__branch-guide"
+            :class="branchGuideModifiers(row, guideIndex)"
             :style="branchGuideStyle(row, guideIndex)"
             aria-hidden="true"
         />
@@ -1009,7 +1020,7 @@ defineExpose<GrTreeInstance<T>>({
     --gr-tree-font-size: inherit;
     --gr-tree-row-color: var(--gr-fg);
     --gr-tree-row-hover-bg: color-mix(in srgb, var(--gr-primary) 10%, transparent);
-    --gr-tree-row-current-bg: color-mix(in srgb, var(--gr-primary) 5%, transparent);
+    --gr-tree-row-current-bg: color-mix(in srgb, var(--gr-primary) 14%, transparent);
     --gr-tree-row-current-hover-bg: color-mix(in srgb, var(--gr-primary) 16%, transparent);
     --gr-tree-drag-handle-size: 24px;
     --gr-tree-drag-handle-mr: 0;
@@ -1032,8 +1043,10 @@ defineExpose<GrTreeInstance<T>>({
     --gr-tree-branch-line-width: 2px;
     /* Шаг отступа уровня: переключатель, отступ вложенного списка и толщина
        направляющей — линия обязана попадать между ними. */
-    --gr-tree-indent-step: calc(24px + var(--gr-tree-children-pl) + var(--gr-tree-branch-line-width));
-    --gr-tree-branch-line-offset: 24px;
+    --gr-tree-indent-step: calc(12px + var(--gr-tree-children-pl) + var(--gr-tree-branch-line-width));
+    --gr-tree-row-current-color: var(--gr-tree-row-color);
+    --gr-tree-branch-elbow-width: 8px;
+    --gr-tree-branch-line-offset: 12px;
     --gr-tree-checkbox-size: 16px;
     --gr-tree-checkbox-radius: 4px;
     --gr-tree-checkbox-brd: var(--gr-brd);
@@ -1106,6 +1119,24 @@ defineExpose<GrTreeInstance<T>>({
 
 /* Направляющая тянется в зазор между строками: иначе линия ветки распалась бы
    на штрихи по числу строк. */
+/* Колено: горизонтальная черта от направляющей к строке. Цвет берётся
+   `inherit`, потому что сама направляющая красится инлайновой переменной —
+   повторять её резолв в псевдоэлементе значило бы завести второй источник. */
+.gr-tree__branch-guide--elbow::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: var(--gr-tree-branch-elbow-width);
+    height: var(--gr-tree-branch-line-width);
+    background-color: inherit;
+    transform: translateY(-50%);
+}
+
+.gr-tree__branch-guide--last {
+    bottom: 50%;
+}
+
 .gr-tree__branch-guide {
     position: absolute;
     top: calc(var(--gr-tree-gap) / -2);
@@ -1152,6 +1183,10 @@ defineExpose<GrTreeInstance<T>>({
     box-shadow: inset 0 0 0 2px var(--gr-primary);
 }
 
+.gr-tree__row--current {
+    color: var(--gr-tree-row-current-color);
+}
+
 .gr-tree__row--current::before {
     background: var(--gr-tree-row-current-bg);
 }
@@ -1161,6 +1196,12 @@ defineExpose<GrTreeInstance<T>>({
 }
 
 .gr-tree__row--matched .gr-tree__label {
+    font-weight: 600;
+}
+
+/* Ветка набирается плотнее листа: без этого «Операции» и «Эскалации» выглядят
+   одним и тем же, и различает их только шеврон, которого у листа нет. */
+.gr-tree__row:not(.gr-tree__row--leaf) .gr-tree__label {
     font-weight: 600;
 }
 

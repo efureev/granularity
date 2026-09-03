@@ -93,6 +93,7 @@ import { grToasterConfig } from '../components/GrToaster/config'
 import { grTooltipConfig } from '../components/GrTooltip/config'
 import { grTransferConfig } from '../components/GrTransfer/config'
 import { grTreeConfig } from '../components/GrTree/config'
+import { grTreeSectionsConfig } from '../components/GrTreeSections/config'
 import { grTreeSelectConfig } from '../components/GrTreeSelect/config'
 import { grValueConfig } from '../components/GrValue/config'
 // </granularity:components:imports>
@@ -206,6 +207,7 @@ export const granularityComponentConfigs = {
   GrTooltip: grTooltipConfig,
   GrTransfer: grTransferConfig,
   GrTree: grTreeConfig,
+  GrTreeSections: grTreeSectionsConfig,
   GrTreeSelect: grTreeSelectConfig,
   GrValue: grValueConfig,
   // </granularity:components:registry>
