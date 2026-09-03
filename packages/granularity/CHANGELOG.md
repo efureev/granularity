@@ -9,6 +9,16 @@ to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **A fourth ready-made view, `picker`** — the density for a tree you mark up rather than
+  navigate: 38 px rows and a larger box, so the tap target is the box itself and not the
+  label. It does not switch checkboxes on; those are an orthogonal axis (`showCheckbox`)
+  that works in any view, and the preset only sizes the row around them. Its
+  `--gr-tree-checkbox-brd-width` (default `1px`) is new for the same reason: a hairline
+  border stops reading as a border once the box grows.
+- **GrTreeSections carries its own row look** instead of rendering default tree rows under
+  styled headings: 32 px rows, and the current row marked by the bar at the edge of the
+  list. The values sit on the component's attribute rather than in a `style` binding, so a
+  consumer's inline style replaces them outright instead of competing with them.
 - **Three GrTree tokens the ready-made views needed.** `--gr-tree-branch-font-weight`
   (default `600`) so a view where weight encodes level rather than branchiness can turn
   the branch emphasis off; `--gr-tree-row-current-bar-width` / `-color` (default `0px`,

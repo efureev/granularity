@@ -3576,6 +3576,13 @@ export const grComponentTokens: GrComponentToken[] = [
   },
   {
     "owner": "GrTree",
+    "name": "--gr-tree-checkbox-brd-width",
+    "kind": "css",
+    "default": "1px",
+    "description": "Толщина рамки квадрата отметки. Вынесена отдельно от размера: на увеличенном квадрате волосяная рамка перестаёт читаться как рамка."
+  },
+  {
+    "owner": "GrTree",
     "name": "--gr-tree-branch-font-weight",
     "kind": "css",
     "default": "600",

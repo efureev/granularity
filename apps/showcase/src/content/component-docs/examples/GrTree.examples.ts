@@ -89,4 +89,11 @@ export const grTreeExamples: ShowcaseComponentExampleDoc[] = [
     status: 'ready',
     previewKey: 'gr-tree-outline',
   },
+  {
+    id: 'tree-picker',
+    title: 'Вид «Отбор»: дерево, которое размечают',
+    description: 'Отметки — ортогональная ось (`showCheckbox`), она включается на любом наборе; вид задаёт под неё плотность. Строка 38px и увеличенный квадрат делают целью нажатия сам квадрат, а не подпись, — иначе отбор пальцем превращается в лотерею. Счётчик «N из M» стоит у веток, где выбрано не всё: это ровно то, что скрывает свёрнутая ветка.',
+    status: 'ready',
+    previewKey: 'gr-tree-picker',
+  },
 ]

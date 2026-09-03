@@ -12,6 +12,7 @@ import {
   treeSectionsGroupClass,
   treeSectionsHeadClass,
   treeSectionsRootClass,
+  treeSectionsRowVars,
 } from './grTreeSectionsStyles'
 
 /**
@@ -156,6 +157,7 @@ if (__GR_DEV__) {
       </component>
 
       <GrTree
+        :style="treeSectionsRowVars"
         :data="group.children"
         :node-key="nodeKey"
         :props="props.props"

@@ -1052,6 +1052,7 @@ defineExpose<GrTreeInstance<T>>({
     --gr-tree-branch-line-offset: 12px;
     --gr-tree-checkbox-size: 16px;
     --gr-tree-checkbox-radius: 4px;
+    --gr-tree-checkbox-brd-width: 1px;
     --gr-tree-checkbox-brd: var(--gr-brd);
     --gr-tree-checkbox-bg: transparent;
     --gr-tree-checkbox-checked-bg: var(--gr-primary);
@@ -1162,7 +1163,7 @@ defineExpose<GrTreeInstance<T>>({
     width: var(--gr-tree-checkbox-size);
     height: var(--gr-tree-checkbox-size);
     margin-right: var(--gr-tree-checkbox-mr);
-    border: 1px solid var(--gr-tree-checkbox-brd);
+    border: var(--gr-tree-checkbox-brd-width) solid var(--gr-tree-checkbox-brd);
     border-radius: var(--gr-tree-checkbox-radius);
     background: var(--gr-tree-checkbox-bg);
     color: var(--gr-tree-checkbox-checked-fg);

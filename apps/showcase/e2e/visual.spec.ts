@@ -202,6 +202,7 @@ const VISUAL_COMPONENTS = [
   'GrSortableList',
   'GrTabPanels',
   'GrTree',
+  'GrTreeSections',
   'GrTreeSelect',
 ]
 

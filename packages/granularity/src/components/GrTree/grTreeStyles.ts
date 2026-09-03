@@ -75,7 +75,7 @@ export const treeSizeVars: Record<GrTreeSize, GrTreeSizeVars> = {
  * значки — это `expandIcon`/`collapseIcon` и слот строки, то есть решение
  * потребителя, а не вида.
  */
-export type GrTreeView = 'explorer' | 'rail' | 'outline'
+export type GrTreeView = 'explorer' | 'rail' | 'outline' | 'picker'
 
 export const grTreeViewVars: Record<GrTreeView, Record<string, string>> = {
   /**
@@ -125,6 +125,30 @@ export const grTreeViewVars: Record<GrTreeView, Record<string, string>> = {
     /* Рельс — нейтральная шина уровня, а не подсветка: цвет по умолчанию
        выведен из подложки выбора и на ней же дублировался бы акцентом. */
     '--gr-tree-branch-line-default-color': 'var(--gr-brd)',
+  },
+
+  /**
+   * Отбор: дерево, по которому не ходят, а которое размечают. Строка просторнее
+   * остальных видов, потому что цель нажатия здесь — квадрат отметки, а не
+   * подпись: 38px и увеличенный квадрат делают её достижимой и пальцем.
+   *
+   * Сам по себе вид отметок не включает — это ортогональная ось (`showCheckbox`),
+   * и она же работает в любом другом виде. Набор задаёт только плотность под неё.
+   */
+  picker: {
+    '--gr-tree-row-min-height': '38px',
+    '--gr-tree-row-py': '7px',
+    '--gr-tree-row-px': '6px',
+    '--gr-tree-row-pr': '10px',
+    '--gr-tree-row-radius': '9px',
+    '--gr-tree-content-gap': '9px',
+    '--gr-tree-indent-step': '22px',
+    '--gr-tree-checkbox-size': '17px',
+    '--gr-tree-checkbox-radius': '5px',
+    '--gr-tree-checkbox-mr': '9px',
+    /* Квадрат крупнее обычного, и волосяная граница на нём теряется: при 17px
+       она перестаёт читаться как рамка и выглядит серым контуром заливки. */
+    '--gr-tree-checkbox-brd-width': '1.5px',
   },
 
   /**

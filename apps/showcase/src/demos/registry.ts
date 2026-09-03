@@ -489,6 +489,7 @@ export const demoPathByPreviewKey = {
   'gr-tree-lazy': 'components/gr-tree/GrTreeLazyDemo.vue',
   'gr-tree-explorer': 'components/gr-tree/GrTreeExplorerDemo.vue',
   'gr-tree-outline': 'components/gr-tree/GrTreeOutlineDemo.vue',
+  'gr-tree-picker': 'components/gr-tree/GrTreePickerDemo.vue',
   'gr-tree-rail': 'components/gr-tree/GrTreeRailDemo.vue',
   'gr-tree-sections-basic': 'components/gr-tree-sections/GrTreeSectionsBasicDemo.vue',
   'gr-tree-sections-permissions': 'components/gr-tree-sections/GrTreeSectionsPermissionsDemo.vue',
