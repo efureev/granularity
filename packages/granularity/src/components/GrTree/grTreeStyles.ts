@@ -90,16 +90,47 @@ export const grTreeViewVars: Record<GrTreeView, Record<string, string>> = {
     '--gr-tree-branch-line-offset': '8px',
     '--gr-tree-branch-elbow-width': '10px',
     '--gr-tree-content-gap': '6px',
+    /* Волосяная нейтральная линия вместо акцентной по умолчанию: на шести
+       уровнях акцент превращается в частокол и спорит со значками папок,
+       которые в этом виде и несут акцент. */
+    '--gr-tree-branch-line-width': '1px',
+    '--gr-tree-branch-line-default-color': 'var(--gr-brd)',
+    /* Кегль входит в набор, хотя семейство — нет: 24px строки при базовом
+       кегле недостижимы, высоту держит текст, а не `min-height`. */
+    '--gr-tree-font-size': '12.5px',
+    '--gr-tree-toggle-size': '16px',
+    '--gr-tree-icon-size': '14px',
+    /* Ветвистость здесь читается значком папки и шевроном, поэтому вес подписи
+       свободен: жирные ветки в плотном моноширинном списке дают полосатость. */
+    '--gr-tree-branch-font-weight': '400',
+    '--gr-tree-row-current-color': 'var(--gr-primary-text)',
   },
   /**
-   * Навигация: выбранная строка — сплошная плашка, обрезанная слева по отступу
-   * уровня. Текст на ней перекрашивается своим токеном, иначе на насыщенной
-   * подложке он остался бы нечитаемым.
+   * Навигация: выбранная строка — сплошная плашка, скруглённая только справа.
+   * Плоский левый край — не украшение: плашка начинается от отступа уровня, и
+   * скругление с той стороны читалось бы как отдельная кнопка, оторванная от
+   * рельса. Текст перекрашивается своим токеном, иначе на насыщенной подложке
+   * он остался бы нечитаемым.
    */
+  rail: {
+    '--gr-tree-row-min-height': '30px',
+    /* Высоту держит `min-height`, а поля лишь не дают строке распереть её:
+       при базовом кегле строчный бокс уже 24px, и пять пикселей сверху и снизу
+       увели бы строку на 34 — рельс перестал бы быть рельсом. */
+    '--gr-tree-row-py': '3px',
+    '--gr-tree-row-radius': '0 999px 999px 0',
+    '--gr-tree-row-current-bg': 'var(--gr-primary)',
+    '--gr-tree-row-current-hover-bg': 'var(--gr-primary-hover, var(--gr-primary))',
+    '--gr-tree-row-current-color': 'var(--gr-primary-fg)',
+    /* Рельс — нейтральная шина уровня, а не подсветка: цвет по умолчанию
+       выведен из подложки выбора и на ней же дублировался бы акцентом. */
+    '--gr-tree-branch-line-default-color': 'var(--gr-brd)',
+  },
+
   /**
    * Оглавление: иерархию несёт набор, а не хром. Направляющие и подложки
-   * гасятся, выбор отмечается цветом и весом — вид рассчитан на то, чтобы
-   * стоять рядом с читаемым текстом и не спорить с ним.
+   * гасятся, выбор отмечается полосой у края списка, цветом и весом — вид
+   * рассчитан на то, чтобы стоять рядом с читаемым текстом и не спорить с ним.
    *
    * Ступени кегля по уровням задаются `rowClass`: это единственное, чего набор
    * значений сделать не может — уровень строки знает только разметка.
@@ -107,21 +138,17 @@ export const grTreeViewVars: Record<GrTreeView, Record<string, string>> = {
   outline: {
     '--gr-tree-row-min-height': '26px',
     '--gr-tree-row-py': '3px',
-    '--gr-tree-row-px': '4px',
+    '--gr-tree-row-px': '6px',
+    '--gr-tree-row-radius': '6px',
     '--gr-tree-row-hover-bg': 'transparent',
     '--gr-tree-row-current-bg': 'transparent',
     '--gr-tree-row-current-hover-bg': 'transparent',
     '--gr-tree-row-current-color': 'var(--gr-primary-text)',
+    '--gr-tree-row-current-bar-width': '2px',
     '--gr-tree-children-pl': '4px',
     '--gr-tree-branch-line-offset': '6px',
-  },
-
-  rail: {
-    '--gr-tree-row-min-height': '30px',
-    '--gr-tree-row-py': '5px',
-    '--gr-tree-row-radius': '999px',
-    '--gr-tree-row-current-bg': 'var(--gr-primary)',
-    '--gr-tree-row-current-hover-bg': 'var(--gr-primary-hover, var(--gr-primary))',
-    '--gr-tree-row-current-color': 'var(--gr-primary-fg)',
+    /* Вес здесь означает уровень, а не ветвистость: без этого лист первого
+       уровня выглядел бы младше ветки третьего. */
+    '--gr-tree-branch-font-weight': 'inherit',
   },
 }

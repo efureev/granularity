@@ -38,6 +38,27 @@ const current = ref<GrTreeKey | undefined>('duty')
       node-key="id"
       :style="grTreeViewVars.rail"
       :default-expanded-keys="['ops', 'rules', 'billing']"
-    />
+    >
+      <template #default="{ node }">
+        <span class="truncate">{{ node.label }}</span>
+        <span
+          v-if="node.childNodes.length"
+          class="rail-count ml-auto pl-3 text-[0.85em] [font-variant-numeric:tabular-nums]"
+        >{{ node.childNodes.length }}</span>
+      </template>
+    </GrTree>
   </div>
 </template>
+
+<style scoped>
+/* Счётчик приглушён на обычных строках и берёт полный цвет строки на выбранной:
+   на насыщенной подложке приглушение съело бы контраст, а прозрачность —
+   разбавила бы выверенный токен текста. */
+.rail-count {
+  color: var(--gr-muted-fg);
+}
+
+.gr-tree__row--current .rail-count {
+  color: inherit;
+}
+</style>

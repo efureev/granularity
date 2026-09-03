@@ -7,13 +7,46 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- **Three GrTree tokens the ready-made views needed.** `--gr-tree-branch-font-weight`
+  (default `600`) so a view where weight encodes level rather than branchiness can turn
+  the branch emphasis off; `--gr-tree-row-current-bar-width` / `-color` (default `0px`,
+  no bar) for marking the current row without a background. The bar is painted on the row
+  itself, not on the highlight layer: the highlight is inset by the level indent, so a bar
+  drawn there would drift right with nesting instead of lining the selected rows up
+  against the edge of the list.
+
+### Changed
+
+- **Row font size and colour are declared on the tree and inherited by rows.** They used
+  to be declared on the row, which quietly beat `rowClass` — a consumer class and a
+  component class weigh the same, so whichever stylesheet loads later wins, and that is
+  always the component. `rowClass` is documented as the way to style a row from node data,
+  and for the two most obvious properties it did nothing: the outline view's per-level type
+  scale never applied. Inheritance loses to any consumer class, while the row's own
+  modifiers (`--current`) still win.
+- **Row content grows to the full row width.** The slot was shrink-wrapped, so a trailing
+  element — a child count, a badge, a status dot — could not be pushed to the right edge
+  from inside the slot at all. Backgrounds and highlighting live on the row, so markup
+  without a trailing element is unaffected.
+
 ### Fixed
 
-- **The explorer view's elbow now reaches the label.** At 6 px the stub stopped in empty
-  space and read as a rendering artifact rather than as a connector between the guide and
-  the node; `grTreeViewVars.explorer` sets `--gr-tree-branch-elbow-width` to 10 px. Found
-  by looking at a six-level tree on the showcase page — the value is fine on two levels,
-  where the eye still pairs the stub with the nearest label by proximity.
+- **The `outline` view was missing from the documented view table**, and the `explorer` and
+  `rail` entries described behaviour the presets did not have.
+- **`rail` selection is a plate rounded on the right only**, as its own doc comment already
+  claimed; it was fully rounded, which read as a detached button rather than something
+  seated on the rail. Its rows were also 34 px rather than the intended 30 — with the base
+  type size the line box alone is 24 px, and 5 px of vertical padding pushed past the
+  `min-height`.
+- **`explorer` guides are hairline and neutral** instead of 2 px accent: at six levels the
+  accent turned into a picket fence and competed with the folder glyphs, which are what
+  carries the accent in that view. Its rows now reach the intended 24 px, which needs the
+  type size in the preset — the height is held by the text, not by `min-height`. The elbow
+  stub went from 6 px to 10 px so that it spans the gap between the guide and the start of
+  the row content; what it points at is the node's glyph, which is why that view's demo
+  ships one.
 
 ## [v0.45.0] 2026-09-03
 

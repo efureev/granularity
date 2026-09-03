@@ -1045,6 +1045,9 @@ defineExpose<GrTreeInstance<T>>({
        направляющей — линия обязана попадать между ними. */
     --gr-tree-indent-step: calc(12px + var(--gr-tree-children-pl) + var(--gr-tree-branch-line-width));
     --gr-tree-row-current-color: var(--gr-tree-row-color);
+    --gr-tree-row-current-bar-width: 0px;
+    --gr-tree-row-current-bar-color: var(--gr-primary);
+    --gr-tree-branch-font-weight: 600;
     --gr-tree-branch-elbow-width: 8px;
     --gr-tree-branch-line-offset: 12px;
     --gr-tree-checkbox-size: 16px;
@@ -1057,6 +1060,13 @@ defineExpose<GrTreeInstance<T>>({
     display: flex;
     flex-direction: column;
     gap: var(--gr-tree-gap);
+    /* Кегль и цвет объявлены на дереве, а строка их наследует. На строке они
+       были бы объявлением, и класс из `rowClass` — при равном весе и более
+       раннем подключении — молча проигрывал бы: ступени кегля по уровням у
+       оглавления не применялись вовсе. Наследование уступает любому классу
+       потребителя, а модификаторы строки (`--current`) остаются выше. */
+    font-size: var(--gr-tree-font-size);
+    color: var(--gr-tree-row-color);
 }
 
 [data-gr-virtual]::before,
@@ -1081,11 +1091,9 @@ defineExpose<GrTreeInstance<T>>({
     min-height: var(--gr-tree-row-min-height);
     padding: var(--gr-tree-row-py) var(--gr-tree-row-pr) var(--gr-tree-row-py)
         calc(var(--gr-tree-row-px) + var(--gr-tree-row-indent, 0px));
-    font-size: var(--gr-tree-font-size);
     cursor: default;
     user-select: none;
     outline: none;
-    color: var(--gr-tree-row-color);
     isolation: isolate;
 }
 
@@ -1200,9 +1208,18 @@ defineExpose<GrTreeInstance<T>>({
 }
 
 /* Ветка набирается плотнее листа: без этого «Операции» и «Эскалации» выглядят
-   одним и тем же, и различает их только шеврон, которого у листа нет. */
+   одним и тем же, и различает их только шеврон, которого у листа нет. Вид, где
+   вес несёт уровень, а не ветвистость (оглавление), гасит это токеном. */
 .gr-tree__row:not(.gr-tree__row--leaf) .gr-tree__label {
-    font-weight: 600;
+    font-weight: var(--gr-tree-branch-font-weight);
+}
+
+/* Полоса у текущей строки рисуется на самой строке, а не на подсветке:
+   подсветка отступает на отступ уровня, а полоса обязана стоять у края
+   списка — иначе она уезжает вправо вместе с вложенностью и перестаёт
+   собирать выбранные строки разных уровней в один вертикальный ряд. */
+.gr-tree__row--current {
+    box-shadow: inset var(--gr-tree-row-current-bar-width) 0 0 0 var(--gr-tree-row-current-bar-color);
 }
 
 .gr-tree__drag-handle {
@@ -1293,7 +1310,12 @@ defineExpose<GrTreeInstance<T>>({
     display: inline-block;
 }
 
+/* Растёт на всю свободную ширину строки: без этого слот сжат по содержимому, и
+   хвост строки — счётчик, метка, значок статуса — невозможно прижать вправо
+   ничем, кроме внешней ширины, которой у слота нет. Фон и подсветка лежат на
+   строке, поэтому у разметки без хвоста рост ничего не меняет. */
 .gr-tree__content {
+    flex: 1;
     min-width: 0;
     display: flex;
     align-items: center;

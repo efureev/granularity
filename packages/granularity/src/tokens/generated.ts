@@ -3562,6 +3562,27 @@ export const grComponentTokens: GrComponentToken[] = [
   },
   {
     "owner": "GrTree",
+    "name": "--gr-tree-row-current-bar-width",
+    "kind": "css",
+    "default": "0px",
+    "description": "Ширина полосы у левого края выбранной строки. По умолчанию полосы нет; вид, отмечающий выбор без подложки, включает её одной строкой. Рисуется на самой строке, поэтому стоит у края списка, а не уезжает вправо с отступом уровня."
+  },
+  {
+    "owner": "GrTree",
+    "name": "--gr-tree-row-current-bar-color",
+    "kind": "css",
+    "default": "var(--gr-primary)",
+    "description": "Цвет полосы у выбранной строки."
+  },
+  {
+    "owner": "GrTree",
+    "name": "--gr-tree-branch-font-weight",
+    "kind": "css",
+    "default": "600",
+    "description": "Начертание подписи ветки. Плотнее листа, чтобы ветка и лист не выглядели одинаково. Гасится там, где вес несёт уровень, а не ветвистость."
+  },
+  {
+    "owner": "GrTree",
     "name": "--gr-tree-font-size",
     "kind": "inline",
     "default": "12px / 13px / inherit / 15px по ступеням `xs…lg`",
