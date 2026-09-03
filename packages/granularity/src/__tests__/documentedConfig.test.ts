@@ -104,6 +104,11 @@ describe('документированный конфиг генерирует C
     return [...new Set(tokens)].filter(t => !t.startsWith(ICON_PREFIX) && !isMarker(t))
   }
 
+  /*
+   * Порог поднят как у safelist-гейта: тест прогоняет через генератор весь
+   * объявленный safelist пакета — тысячи токенов, — и под параллельной
+   * нагрузкой полного набора перебирал дефолтные 5 с.
+   */
   it('safelist каждого компонента генерируется', async () => {
     const tokens = candidates(safelistTokens())
     expect(tokens.length).toBeGreaterThan(100)
@@ -111,7 +116,7 @@ describe('документированный конфиг генерирует C
     const dead = await ungeneratable(tokens)
 
     expect(dead, `объявлены в safelist, но CSS не дают: ${dead.join(', ')}`).toEqual([])
-  })
+  }, 30_000)
 
   it('утилиты вне presetMini, встречающиеся в шаблонах, генерируются', async () => {
     const tokens = candidates(scannedFragileTokens())
