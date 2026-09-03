@@ -2952,6 +2952,34 @@ export const grComponentTokens: GrComponentToken[] = [
     "description": "Кегль подписи на ступени `lg`: между `md` и `lg` шкалы контролов."
   },
   {
+    "owner": "GrScrollSpy",
+    "name": "--gr-scroll-spy-offset",
+    "kind": "inline",
+    "default": "0px",
+    "description": "Отступ линии активации от верха скроллпорта. Пишется инлайн из пропа `offset`; заданный в каскаде работает общим дефолтом и подхватывается замером. Почти всегда равен `--gr-affix-offset` липкой шапки."
+  },
+  {
+    "owner": "GrScrollSpy",
+    "name": "--gr-scroll-spy-marker",
+    "kind": "hook",
+    "default": "var(--gr-primary)",
+    "description": "Цвет рельса у активного пункта. Один из трёх признаков активности — рядом с ним меняются вес и цвет текста."
+  },
+  {
+    "owner": "GrScrollSpy",
+    "name": "--gr-scroll-spy-rail",
+    "kind": "hook",
+    "default": "var(--gr-brd)",
+    "description": "Цвет рельса у остальных пунктов."
+  },
+  {
+    "owner": "GrScrollSpy",
+    "name": "--gr-scroll-spy-indent",
+    "kind": "hook",
+    "default": "0.75rem",
+    "description": "Шаг отступа для вложенного уровня оглавления."
+  },
+  {
     "owner": "GrSegmented",
     "name": "--gr-segmented-track-bg",
     "kind": "inline",

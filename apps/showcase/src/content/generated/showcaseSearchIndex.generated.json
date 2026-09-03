@@ -239,7 +239,7 @@
     "kindLabel": "Section",
     "context": "Components",
     "searchableTitle": "components component catalog",
-    "searchableContent": "components каталог компонентных страниц с поиском, группировкои и отдельнои витринои на каждыи публичныи компонент пакета. catalog component catalog здесь будет index-страница со всеми публичными компонентами и быстрои группировкои по категориям. источник правды `packages/granularity/src/granular-provider/shared.ts` с текущим покрытием в 79 компонентных сущностеи . навигация по компонентам должна быть мгновеннои и search-friendly. каждыи компонент получит отдельныи route и собственную страницу."
+    "searchableContent": "components каталог компонентных страниц с поиском, группировкои и отдельнои витринои на каждыи публичныи компонент пакета. catalog component catalog здесь будет index-страница со всеми публичными компонентами и быстрои группировкои по категориям. источник правды `packages/granularity/src/granular-provider/shared.ts` с текущим покрытием в 80 компонентных сущностеи . навигация по компонентам должна быть мгновеннои и search-friendly. каждыи компонент получит отдельныи route и собственную страницу."
   },
   {
     "id": "page:components:section:live-demos",
@@ -1076,6 +1076,17 @@
     "context": "feedback / component",
     "searchableTitle": "grresponseerrorbanner",
     "searchableContent": "grresponseerrorbanner grresponseerrorbanner a universal generic banner for server or network response errors: it takes a raw error/response, runs it through a chain of parsers (http statuses, laravel/json:api/rfc 7807 validation, file/network/abort) and renders a title, main message, an optional list of per-field details and retry/dismiss actions without knowing anything about a specific feature (file upload, forms, transactions). feedback component /components/gr-response-error-banner packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/grresponseerrorbanner generated public-api components components gr-response-error-banner gr response error banner"
+  },
+  {
+    "id": "entity:component:GrScrollSpy",
+    "title": "GrScrollSpy",
+    "description": "A table of contents that highlights the section you are reading and scrolls to the one you pick.",
+    "href": "/components/gr-scroll-spy",
+    "kind": "entity",
+    "kindLabel": "component",
+    "context": "navigation / component",
+    "searchableTitle": "grscrollspy",
+    "searchableContent": "grscrollspy grscrollspy a table of contents that highlights the section you are reading and scrolls to the one you pick. navigation component /components/gr-scroll-spy packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/grscrollspy generated public-api components components gr-scroll-spy gr scroll spy"
   },
   {
     "id": "entity:component:GrSegmented",
@@ -4079,6 +4090,50 @@
     "context": "GrResponseErrorBanner",
     "searchableTitle": "grresponseerrorbanner integration notes",
     "searchableContent": "grresponseerrorbanner a universal generic banner for server or network response errors: it takes a raw error/response, runs it through a chain of parsers (http statuses, laravel/json:api/rfc 7807 validation, file/network/abort) and renders a title, main message, an optional list of per-field details and retry/dismiss actions without knowing anything about a specific feature (file upload, forms, transactions). integration-notes integration notes дополнительные замечания по доступности, зависимостям и связанным package-level артефактам. keyboard/accessibility пункты выделяются отдельно от визуальных примеров. dependency notes показывают, есть ли связки с другими компонентами в registry. source/export ссылки помогают быстро переи ти к исходникам и публичному import path."
+  },
+  {
+    "id": "entity:component:GrScrollSpy:section:overview",
+    "title": "GrScrollSpy / Component overview",
+    "description": "Краткий контекст по месту компонента в пакете, registry metadata и текущему покрытию showcase.",
+    "href": "/components/gr-scroll-spy#overview",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrScrollSpy",
+    "searchableTitle": "grscrollspy component overview",
+    "searchableContent": "grscrollspy a table of contents that highlights the section you are reading and scrolls to the one you pick. overview component overview краткии контекст по месту компонента в пакете, registry metadata и текущему покрытию showcase. показываем роль компонента в каталоге и его hand-authored summary. отражаем generated api coverage и package-level source links. фиксируем, какие сценарии уже реализованы в showcase, а какие еще планируются."
+  },
+  {
+    "id": "entity:component:GrScrollSpy:section:live-examples",
+    "title": "GrScrollSpy / Live examples",
+    "description": "Компонентные сценарии должны раскрывать одну конкретную возможность за карточку, а не сваливать всё в один demo.",
+    "href": "/components/gr-scroll-spy#live-examples",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrScrollSpy",
+    "searchableTitle": "grscrollspy live examples",
+    "searchableContent": "grscrollspy a table of contents that highlights the section you are reading and scrolls to the one you pick. live-examples live examples компонентные сценарии должны раскрывать одну конкретную возможность за карточку, а не сваливать все в один demo. каждыи example card содержит живои preview, snippet и краткое пояснение. сначала покрываем самые показательные capability-сценарии, затем сложные edge cases. плановые сценарии явно отмечаются, чтобы roadmap был виден прямо на странице компонента."
+  },
+  {
+    "id": "entity:component:GrScrollSpy:section:api",
+    "title": "GrScrollSpy / Generated API",
+    "description": "Страница использует автогенерированные `props` / `slots` / `events` / `methods` и не дублирует API вручную.",
+    "href": "/components/gr-scroll-spy#api",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrScrollSpy",
+    "searchableTitle": "grscrollspy generated api",
+    "searchableContent": "grscrollspy a table of contents that highlights the section you are reading and scrolls to the one you pick. api generated api страница использует автогенерированные `props` / `slots` / `events` / `methods` и не дублирует api вручную. generated metadata остае тся основным источником правды для api-таблиц. fallback metadata применяется только там, где extraction-слоя недостаточно. usage snippet живе т рядом с таблицами api и не расходится с публичным экспортом пакета."
+  },
+  {
+    "id": "entity:component:GrScrollSpy:section:integration-notes",
+    "title": "GrScrollSpy / Integration notes",
+    "description": "Дополнительные замечания по доступности, зависимостям и связанным package-level артефактам.",
+    "href": "/components/gr-scroll-spy#integration-notes",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrScrollSpy",
+    "searchableTitle": "grscrollspy integration notes",
+    "searchableContent": "grscrollspy a table of contents that highlights the section you are reading and scrolls to the one you pick. integration-notes integration notes дополнительные замечания по доступности, зависимостям и связанным package-level артефактам. keyboard/accessibility пункты выделяются отдельно от визуальных примеров. dependency notes показывают, есть ли связки с другими компонентами в registry. source/export ссылки помогают быстро переи ти к исходникам и публичному import path."
   },
   {
     "id": "entity:component:GrSegmented:section:overview",

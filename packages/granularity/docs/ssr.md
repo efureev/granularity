@@ -68,9 +68,9 @@
 `GrConfirmDialog`, `GrDialog` и `GrPromptDialog` попали сюда потому, что вся DOM-механика у них — в `GrModal`, на
 котором они построены.
 
-## DOM только в обработчиках и хуках (8)
+## DOM только в обработчиках и хуках (9)
 
-`GrAffix`, `GrCarousel`, `GrCommandPalette`, `GrDialogService`, `GrSegmented`, `GrSlider`, `GrStatistic`, `GrTransfer`.
+`GrAffix`, `GrCarousel`, `GrCommandPalette`, `GrDialogService`, `GrScrollSpy`, `GrSegmented`, `GrSlider`, `GrStatistic`, `GrTransfer`.
 
 Серверный рендер безопасен: обращения живут в `onMounted`/`onBeforeUnmount` и в слушателях событий, которые на сервере
 не выполняются. Конкретно:
@@ -102,7 +102,12 @@
   клиентский рендер повторяет серверный; сентинел рендерится на обеих сторонах — иначе была бы
   расходимость. Отсутствие наблюдателя (сервер, jsdom, старый движок) компонент переживает,
   включая поверхность постоянно: прилипшая прозрачная панель пропускала бы сквозь себя
-  содержимое.
+  содержимое.;
+- `GrScrollSpy` — `IntersectionObserver` за разделами, `scroll`-слушатель скроллпорта и
+  `getBoundingClientRect` при пересчёте: всё в `onMounted` и в `refresh()`. `matchMedia`
+  спрашивается в момент клика, а не в `setup`. Активный раздел на сервере и на первом
+  клиентском кадре — `null`, поэтому `aria-current` не появляется ни у кого и разметка
+  совпадает. Композабл `useScrollSpy` тех же правил держится и годится сам по себе.
 
 ## Композаблы и директивы
 

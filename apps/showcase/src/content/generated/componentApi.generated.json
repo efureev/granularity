@@ -9251,6 +9251,127 @@
       }
     ]
   },
+  "GrScrollSpy": {
+    "name": "GrScrollSpy",
+    "sourcePath": "packages/granularity/src/components/GrScrollSpy/GrScrollSpy.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "offset",
+            "description": "Отступ линии активации от верха скроллпорта. Число — пиксели, строка — как есть. Почти всегда равен отступу липкой шапки (`--gr-affix-offset`).",
+            "type": "string | number | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "disabled",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "ariaLabel",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "scroller",
+            "description": "Скроллпорт: элемент или селектор. Не задан — ищется от первого раздела.",
+            "type": "string | HTMLElement | null | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "updateHash",
+            "description": "Обновлять `#hash` адреса при переходе.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          },
+          {
+            "name": "behavior",
+            "description": "Плавность прокрутки. Под `prefers-reduced-motion` всегда мгновенная.",
+            "type": "ScrollBehavior | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "focusTarget",
+            "description": "Переносить фокус на раздел, как это делает переход по якорю.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          },
+          {
+            "name": "sections",
+            "description": "Разделы в порядке их следования на странице.",
+            "type": "GrScrollSpySection[]",
+            "required": true
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "item",
+            "description": "Пункт целиком. `activate` повторяет клик по нему.",
+            "type": "{ section: GrScrollSpySection; active: boolean; ancestor: boolean; activate: () => void; }"
+          }
+        ]
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "select",
+            "description": "",
+            "type": "[id: string, event: MouseEvent]",
+            "signature": "(event: \"select\", id: string, event: MouseEvent): void"
+          },
+          {
+            "name": "activeChange",
+            "description": "",
+            "type": "[id: string | null]",
+            "signature": "(event: \"activeChange\", id: string | null): void"
+          }
+        ]
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "active",
+            "description": "",
+            "type": "string | null"
+          },
+          {
+            "name": "scrollTo",
+            "description": "",
+            "type": "(id: string, options?: { behavior?: ScrollBehavior | undefined; } | undefined) => void"
+          },
+          {
+            "name": "refresh",
+            "description": "",
+            "type": "() => void"
+          }
+        ]
+      }
+    ]
+  },
   "GrSegmented": {
     "name": "GrSegmented",
     "sourcePath": "packages/granularity/src/components/GrSegmented/GrSegmented.vue",

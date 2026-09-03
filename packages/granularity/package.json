@@ -358,6 +358,10 @@
       "types": "./dist/types/components/GrResponseErrorBanner/index.d.ts",
       "import": "./dist/components/GrResponseErrorBanner/index.js"
     },
+    "./components/GrScrollSpy": {
+      "types": "./dist/types/components/GrScrollSpy/index.d.ts",
+      "import": "./dist/components/GrScrollSpy/index.js"
+    },
     "./components/GrSegmented": {
       "types": "./dist/types/components/GrSegmented/index.d.ts",
       "import": "./dist/components/GrSegmented/index.js"
@@ -485,6 +489,10 @@
     "./composables/useOverlayLayer": {
       "types": "./dist/types/composables/useOverlayLayer.d.ts",
       "import": "./dist/composables/useOverlayLayer.js"
+    },
+    "./composables/useScrollSpy": {
+      "types": "./dist/types/composables/useScrollSpy.d.ts",
+      "import": "./dist/composables/useScrollSpy.js"
     },
     "./composables/useRovingFocus": {
       "types": "./dist/types/composables/useRovingFocus.d.ts",

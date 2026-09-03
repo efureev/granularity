@@ -912,3 +912,157 @@ test.describe('GrAffix: прилипание', () => {
     await expect(affix).not.toHaveAttribute('data-stuck', 'true')
   })
 })
+
+/**
+ * `GrScrollSpy`: подсветка по прокрутке. В jsdom нет ни прокрутки, ни раскладки,
+ * ни UnoCSS — то есть нет ничего, из чего этот компонент состоит: там не
+ * проверяются ни момент смены активного раздела, ни то, что классы вообще
+ * превратились в CSS.
+ *
+ * Прокрутка везде колесом, а не присвоением `scrollTop`: программная прокрутка
+ * из скрипта не даёт `IntersectionObserver` записи, и тест молча проверял бы
+ * компонент, который не получил ни одного вызова.
+ */
+test.describe('GrScrollSpy: подсветка', () => {
+  /** Прямоугольник скроллпорта, внутри которого лежат разделы этого оглавления. */
+  async function scrollerBox(page: import('@playwright/test').Page, sectionId: string) {
+    return page.evaluate((id) => {
+      let scroller = document.getElementById(id)?.parentElement ?? null
+
+      while (scroller && !['auto', 'scroll'].includes(getComputedStyle(scroller).overflowY))
+        scroller = scroller.parentElement
+
+      const rect = scroller!.getBoundingClientRect()
+
+      return { x: rect.x, y: rect.y, width: rect.width, height: rect.height }
+    }, sectionId)
+  }
+
+  async function wheelOver(page: import('@playwright/test').Page, box: { x: number, y: number, width: number, height: number }, delta: number) {
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2)
+    await page.mouse.wheel(0, delta)
+  }
+
+  test.beforeEach(async ({ page }) => {
+    await page.goto(componentPath('GrScrollSpy'))
+    await page.locator('#live-examples').waitFor()
+    await page.locator('[data-gr-scroll-spy]').first().waitFor()
+  })
+
+  test('активный пункт едет по разделам вместе с прокруткой', async ({ page }) => {
+    const nav = page.locator('[data-gr-scroll-spy]').first()
+    await nav.scrollIntoViewIfNeeded()
+
+    await expect(nav.locator('[aria-current="location"]')).toHaveText('Назначение')
+
+    const box = await scrollerBox(page, 'spy-basic-purpose')
+    await wheelOver(page, box, 150)
+
+    await expect(nav.locator('[aria-current="location"]')).not.toHaveText('Назначение')
+    // Текущим объявлен ровно один пункт: «текущее место» может быть только одно.
+    await expect(nav.locator('[aria-current="location"]')).toHaveCount(1)
+  })
+
+  test('дно скроллпорта активирует последний раздел', async ({ page }) => {
+    const nav = page.locator('[data-gr-scroll-spy]').first()
+    await nav.scrollIntoViewIfNeeded()
+
+    const box = await scrollerBox(page, 'spy-basic-purpose')
+    // Последний раздел короче остатка экрана: до линии он не доезжает никогда,
+    // и без отдельного правила остался бы недостижим.
+    await wheelOver(page, box, 2000)
+
+    await expect(nav.locator('[aria-current="location"]')).toHaveText('Исключения')
+  })
+
+  test('классы активного пункта превратились в CSS', async ({ page }) => {
+    const nav = page.locator('[data-gr-scroll-spy]').first()
+    await nav.scrollIntoViewIfNeeded()
+
+    const colors = await nav.evaluate((el) => {
+      const active = el.querySelector('[aria-current="location"]')!
+      const idle = [...el.querySelectorAll('[data-gr-scroll-spy-item]')].find(item => item !== active)!
+
+      return {
+        activeRail: getComputedStyle(active).borderInlineStartColor,
+        idleRail: getComputedStyle(idle).borderInlineStartColor,
+        activeWeight: getComputedStyle(active).fontWeight,
+        idleWeight: getComputedStyle(idle).fontWeight,
+      }
+    })
+
+    // Активность различима не только цветом — иначе она не существует при
+    // монохромном зрении.
+    expect(colors.activeRail).not.toBe(colors.idleRail)
+    expect(colors.activeWeight).not.toBe(colors.idleWeight)
+  })
+
+  test('клик не прогоняет подсветку по промежуточным пунктам', async ({ page }) => {
+    const nav = page.locator('[data-gr-scroll-spy]').first()
+    await nav.scrollIntoViewIfNeeded()
+
+    // Считаем смены активного пункта за время перехода. Проверки нет нигде,
+    // кроме живого браузера: подсветка мигала бы только на плавной прокрутке.
+    await page.evaluate(() => {
+      const target = document.querySelectorAll('[data-gr-scroll-spy]')[0]
+      const seen: string[] = []
+      const observer = new MutationObserver(() => {
+        const active = target.querySelector('[aria-current="location"]')?.textContent?.trim() ?? ''
+
+        if (seen.at(-1) !== active)
+          seen.push(active)
+      })
+
+      observer.observe(target, { attributes: true, subtree: true, attributeFilter: ['aria-current'] })
+      Object.assign(window, { __spySeen: seen, __spyObserver: observer })
+    })
+
+    await nav.getByText('Исключения').click()
+    await page.waitForTimeout(1200)
+
+    const seen = await page.evaluate(() => {
+      ;(window as unknown as { __spyObserver: MutationObserver }).__spyObserver.disconnect()
+
+      return (window as unknown as { __spySeen: string[] }).__spySeen
+    })
+
+    expect(seen.at(-1)).toBe('Исключения')
+    expect(seen, `подсветка прошлась по промежуточным пунктам: ${seen.join(' → ')}`).toHaveLength(1)
+  })
+
+  test('переход обновляет адрес, не заводя запись в истории', async ({ page }) => {
+    const nav = page.locator('[data-gr-scroll-spy]').first()
+    await nav.scrollIntoViewIfNeeded()
+
+    const before = await page.evaluate(() => history.length)
+    await nav.getByText('Сроки').click()
+
+    await expect.poll(async () => new URL(page.url()).hash).toBe('#spy-basic-terms')
+    // `pushState` превратил бы «Назад» в отмену прокрутки вместо возврата.
+    expect(await page.evaluate(() => history.length)).toBe(before)
+  })
+
+  test('заголовок приземляется под липкой шапкой', async ({ page }) => {
+    const nav = page.locator('[data-gr-scroll-spy]').nth(2)
+    await nav.scrollIntoViewIfNeeded()
+
+    // Раздел из середины, а не с конца: у последних прокрутка упирается в свой
+    // предел, цель зажимается, и приземление честно оказывается ниже линии.
+    await nav.getByText('Предмет договора').click()
+    await page.waitForTimeout(800)
+
+    const gap = await page.evaluate(() => {
+      const section = document.getElementById('spy-affix-subject')!
+      let scroller = section.parentElement
+
+      while (scroller && !['auto', 'scroll'].includes(getComputedStyle(scroller).overflowY))
+        scroller = scroller.parentElement
+
+      const offset = Number.parseFloat(getComputedStyle(scroller!).getPropertyValue('--gr-scroll-spy-offset'))
+
+      return section.getBoundingClientRect().top - (scroller!.getBoundingClientRect().top + offset)
+    })
+
+    expect(Math.abs(gap), 'раздел приземлился не на линию активации').toBeLessThanOrEqual(2)
+  })
+})

@@ -17,6 +17,7 @@ import {
   GrImageViewer,
   GrInputTag,
   GrKbd,
+  GrScrollSpy,
   GrSegmented,
   GrSlider,
   GrSplitter,
@@ -154,6 +155,14 @@ const images = [
     <GrAffix :offset="64">
       Липкая панель
     </GrAffix>
+
+    <!--
+      Активный раздел на сервере неизвестен, и `aria-current` не появляется ни у
+      кого: иначе первый клиентский кадр разошёлся бы с серверным атрибутом.
+    -->
+    <GrScrollSpy :sections="[{ id: 'risky-a', label: 'Первый' }, { id: 'risky-b', label: 'Второй' }]" />
+    <section id="risky-a">Первый раздел</section>
+    <section id="risky-b">Второй раздел</section>
 
     <!-- `useAnnouncer()` в setup: на сервере хост не должен даже пытаться встать. -->
     <GrInputTag v-model="tags" aria-label="Теги" />

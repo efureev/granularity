@@ -167,6 +167,9 @@
   "navbar": {
     "openMenu": "Abrir menú"
   },
+  "scrollSpy": {
+    "label": "En esta página"
+  },
   "responseError": {
     "networkTitle": "Sin conexión con el servidor",
     "networkMessage": "Compruebe su conexión a internet e inténtelo de nuevo.",

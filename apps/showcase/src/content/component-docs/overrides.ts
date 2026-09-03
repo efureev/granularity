@@ -65,6 +65,7 @@ import {
   grBadgeWrapExamples,
   grCardExamples,
   grAffixExamples,
+  grScrollSpyExamples,
   grCarouselExamples,
   grBottomNavExamples,
   grNavbarExamples,
@@ -136,6 +137,22 @@ const grAffixOverview: ShowcaseComponentOverviewDoc = {
     'Состояние в слоте, в событии и в `data-stuck` — реагировать можно и без JavaScript.',
     'Работает внутри своей прокручиваемой области, а не только относительно окна.',
     'Выключается пропом, не теряя фокус и введённые данные.',
+  ],
+}
+
+const grScrollSpyOverview: ShowcaseComponentOverviewDoc = {
+  paragraphs: [
+    'Оглавление длинной страницы, которое знает, до какого раздела дочитали: пункт подсвечивается по мере чтения, клик ведёт к разделу. Читателю всегда видно, где он находится, и куда можно перейти не отматывая.',
+    'Разделы при этом никуда не прячутся — они все на странице. Это отличает оглавление от вкладок, где в разметке живёт только текущий раздел.',
+  ],
+  features: [
+    'Активный раздел определяется по позиции чтения, а не по «самому видимому».',
+    'Последний короткий раздел активируется на дне страницы, а не остаётся недостижимым.',
+    'Клик ведёт к разделу и не мигает подсветкой по дороге.',
+    'Пункт остаётся ссылкой: «копировать ссылку» и открытие в новой вкладке работают сами.',
+    'Два уровня вложенности с отступом и объявлением глубины диктору.',
+    'Работает внутри своей прокручиваемой области, а не только относительно окна.',
+    'Логика доступна отдельно композаблом `useScrollSpy` — для своего оглавления.',
   ],
 }
 
@@ -559,6 +576,7 @@ export const componentDocOverrides: Partial<Record<string, ShowcaseComponentDocM
   GrBadgeWrap: createComponentDocMeta(grBadgeWrapExamples),
   GrCard: createComponentDocMeta(grCardExamples),
   GrAffix: createComponentDocMeta(grAffixExamples, grAffixOverview),
+  GrScrollSpy: createComponentDocMeta(grScrollSpyExamples, grScrollSpyOverview),
   GrCarousel: createComponentDocMeta(grCarouselExamples, grCarouselOverview),
   GrBottomNav: createComponentDocMeta(grBottomNavExamples),
   GrBreadcrumbs: createComponentDocMeta(grBreadcrumbsExamples, grBreadcrumbsOverview),

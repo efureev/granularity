@@ -207,6 +207,7 @@
 | нижняя панель разделов на мобильном | [`GrBottomNav`](../packages/granularity/docs/components/GrBottomNav.md) |
 | путь до текущей страницы | [`GrBreadcrumbs`](../packages/granularity/docs/components/GrBreadcrumbs.md) |
 | разделы внутри одной страницы | [`GrTabs`](../packages/granularity/docs/components/GrTabs.md) + [`GrTabPanels`](../packages/granularity/docs/components/GrTabPanels.md) |
+| оглавление длинной страницы, подсветка по прокрутке | [`GrScrollSpy`](../packages/granularity/docs/components/GrScrollSpy.md) |
 | этапы процесса по порядку | [`GrSteps`](../packages/granularity/docs/components/GrSteps.md) |
 | страницы длинного списка | [`GrPagination`](../packages/granularity/docs/components/GrPagination.md) |
 | одиночный переход | [`GrLink`](../packages/granularity/docs/components/GrLink.md) |
@@ -214,6 +215,11 @@
 Различитель между вкладками и шагами — **порядок**: вкладки равноправны и
 переключаются как угодно, шаги идут один за другим, помнят пройденное и умеют не
 пустить вперёд. Отсюда у шагов `aria-current`, а у вкладок `aria-selected`.
+
+Различитель `GrScrollSpy` / `GrTabs` — **скрыты ли разделы**. У вкладок в DOM живёт
+только текущая панель, и пользователь выбирает раздел; у оглавления все разделы на
+странице сразу, читатель идёт по ним подряд, а оглавление лишь показывает, где он.
+Отсюда и роли: `tablist` с `tabpanel` против `navigation` со ссылками.
 
 ### Действие
 
@@ -493,6 +499,7 @@
 | [`GrResponseErrorBanner`](../packages/granularity/docs/components/GrResponseErrorBanner.md) | ядро | запрос упал |
 | [`GrRichText`](../packages/granularity-editor/docs/components/GrRichText.md) | editor | текст, который читатель увидит оформленным |
 | [`GrSchemaForm`](../packages/granularity-forms-schema/docs/components/GrSchemaForm.md) | forms-schema | бэкенд уже описывает контракт |
+| [`GrScrollSpy`](../packages/granularity/docs/components/GrScrollSpy.md) | ядро | длинная страница с разделами |
 | [`GrSegmented`](../packages/granularity/docs/components/GrSegmented.md) | ядро | переключение вида одного и того же |
 | [`GrSelect`](../packages/granularity/docs/components/GrSelect.md) | ядро | поле формы со списком значений |
 | [`GrSidebar`](../packages/granularity/docs/components/GrSidebar.md) | ядро | разделов много и они постоянны |
@@ -524,9 +531,8 @@
 Здесь перечислено то, за чем нет смысла идти в карту: компонента не существует
 ни в одном пакете, и ближайший сосед задачу не закрывает.
 
-**Планируется в ядро.** `GrAffix` — прилипание к краю
-при скролле; `GrMenu` — вертикальное меню навигации (меню действий по правому
-клику закрывает `GrContextMenu`, вложенных подменю нет ни у кого).
+**Планируется в ядро.** `GrMenu` — вертикальное меню навигации (меню действий по
+правому клику закрывает `GrContextMenu`, вложенных подменю нет ни у кого).
 
 **Планируется отдельными пакетами.** Просмотр markdown, календарь событий и
 Гант, редактор кода и diff, выгрузка в XLSX и PDF, карта, схема связей,

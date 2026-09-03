@@ -276,6 +276,9 @@ export default defineConfig({
         'components/GrResponseErrorBanner/index': fileURLToPath(
           new URL('./src/components/GrResponseErrorBanner/index.ts', import.meta.url),
         ),
+        'components/GrScrollSpy/index': fileURLToPath(
+          new URL('./src/components/GrScrollSpy/index.ts', import.meta.url),
+        ),
         'components/GrSegmented/index': fileURLToPath(
           new URL('./src/components/GrSegmented/index.ts', import.meta.url),
         ),
@@ -369,6 +372,9 @@ export default defineConfig({
         ),
         'composables/useOverlayLayer': fileURLToPath(
           new URL('./src/composables/useOverlayLayer.ts', import.meta.url),
+        ),
+        'composables/useScrollSpy': fileURLToPath(
+          new URL('./src/composables/useScrollSpy.ts', import.meta.url),
         ),
         'composables/useRovingFocus': fileURLToPath(
           new URL('./src/composables/useRovingFocus.ts', import.meta.url),

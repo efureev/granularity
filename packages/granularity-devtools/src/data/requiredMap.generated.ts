@@ -32,6 +32,7 @@ export const GR_REQUIRED_PROPS: Record<string, readonly string[]> = {
   GrRadioGroup: ['modelValue'],
   GrRating: ['modelValue'],
   GrResponseErrorBanner: ['error'],
+  GrScrollSpy: ['sections'],
   GrSegmented: ['modelValue', 'options'],
   GrSelect: ['modelValue'],
   GrSlider: ['modelValue'],

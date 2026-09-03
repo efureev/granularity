@@ -6,7 +6,7 @@ import type {
 const componentGroups = {
   actions: ['GrButton', 'GrButtonGroup', 'GrLink'],
   feedback: ['GrAlert', 'GrBadge', 'GrBadgeWrap', 'GrEmptyState', 'GrLoading', 'GrProgressBar', 'GrProgressCircle', 'GrResponseErrorBanner', 'GrSkeleton', 'GrToaster'],
-  navigation: ['GrBottomNav', 'GrBreadcrumbs', 'GrCommandPalette', 'GrNavbar', 'GrPagination', 'GrSidebar', 'GrSteps', 'GrTabs', 'GrTabPanels', 'GrTooltip'],
+  navigation: ['GrBottomNav', 'GrBreadcrumbs', 'GrCommandPalette', 'GrNavbar', 'GrPagination', 'GrScrollSpy', 'GrSidebar', 'GrSteps', 'GrTabs', 'GrTabPanels', 'GrTooltip'],
   overlays: ['GrCollapse', 'GrConfirmDialog', 'GrContextMenu', 'GrDialog', 'GrDrawer', 'GrDropdown', 'GrDropdownMenu', 'GrImageViewer', 'GrModal', 'GrPopover', 'GrPromptDialog'],
   forms: ['GrAutocomplete', 'GrCheckbox', 'GrCheckboxGroup', 'GrColorPicker', 'GrFileUpload', 'GrForm', 'GrFormFile', 'GrFormField', 'GrFormSection', 'GrInput', 'GrNumberInput', 'GrInputTag', 'GrRadio', 'GrRadioGroup', 'GrRating', 'GrSegmented', 'GrSelect', 'GrSlider', 'GrTransfer', 'GrSwitch', 'GrTextarea', 'GrTreeSelect'],
   data: ['GrAvatar', 'GrCard', 'GrCarousel', 'GrChip', 'GrChipGroup', 'GrFilePreview', 'GrDataTable', 'GrDelta', 'GrDescriptionList', 'GrDivider', 'GrIcon', 'GrJsonViewer', 'GrKbd', 'GrList', 'GrSortableList', 'GrStatistic', 'GrTable', 'GrTimeline', 'GrTree', 'GrValue'],
@@ -71,6 +71,7 @@ const componentSummaryOverrides = {
   GrRadio: 'A single choice within a group of mutually exclusive options.',
   GrRadioGroup: 'Combines radio options into a single-choice selection flow.',
   GrResponseErrorBanner: 'A universal generic banner for server or network response errors: it takes a raw error/response, runs it through a chain of parsers (HTTP statuses, Laravel/JSON:API/RFC 7807 validation, file/network/abort) and renders a title, main message, an optional list of per-field details and retry/dismiss actions — without knowing anything about a specific feature (file upload, forms, transactions).',
+  GrScrollSpy: 'A table of contents that highlights the section you are reading and scrolls to the one you pick.',
   GrSegmented: 'A compact single-choice control with a pills/button presentation and a moving selection indicator.',
   GrSelect: 'Selection of one or several values from a list of options.',
   GrSidebar: 'Side navigation for sections, filters and supporting actions.',

@@ -168,6 +168,9 @@
   "navbar": {
     "openMenu": "Открыть меню"
   },
+  "scrollSpy": {
+    "label": "На этой странице"
+  },
   "responseError": {
     "networkTitle": "Нет связи с сервером",
     "networkMessage": "Проверьте подключение к интернету и попробуйте ещё раз.",

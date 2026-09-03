@@ -1,3 +1,4 @@
+export { grScrollSpyExamples } from './GrScrollSpy.examples'
 export { grAffixExamples } from './GrAffix.examples'
 export { grButtonExamples } from './GrButton.examples'
 export { grAutocompleteExamples } from './GrAutocomplete.examples'

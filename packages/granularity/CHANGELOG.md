@@ -7,6 +7,69 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- **New `GrScrollSpy` and `useScrollSpy` — a table of contents that knows where you are
+  reading.** The audit row this closes was one line with two halves; `GrAffix` took the
+  first (keep the contents in view), this takes the second (say which section is being
+  read). Nothing in the repository highlighted an anchor before: the showcase sidebar
+  computes activity from `route.path` alone, so an anchor item was never active, and there
+  was not a single scroll listener in the whole app.
+
+  **The composable owns everything that follows from scroll position; the component owns
+  everything that follows from an item being a link.** That is why there are two: an
+  application with its own contents markup takes `useScrollSpy` and writes the rest, the
+  way `GrSortableList` sits on `useDragSort`. The pure arithmetic lives in
+  `composables/internal/`, not beside the component — a module in a component directory
+  ends up in that component's chunk, and `libInjectCss` puts the component's CSS there too.
+
+  **Active is the section whose heading you passed last, not the most visible one.**
+  Ratio-based rules fail twice over: a long section beats a short one regardless of what
+  is being read, and the highlight jumps backwards the moment the next section peeks in
+  from below. A separate rule covers the last section — shorter than the remaining
+  viewport, its top never reaches the activation line, because scrolling ends first.
+  The declared order does not affect the answer either; a list that disagrees with the
+  page still highlights correctly rather than producing something impossible to debug.
+
+  **The observer alone is not enough, and that is not redundancy.** `IntersectionObserver`
+  answers "did anything cross the line" and is never called for the last stretch of
+  scrolling, where no edge crosses anything. So a cheap `scroll` listener reads exactly one
+  number — whether the bottom is reached — and doubles as the release for the pin below.
+
+  **A click pins rather than suppresses.** The chosen section becomes active immediately
+  and stays that way until scrolling settles; otherwise the highlight would run through
+  every section on the way. Four mechanisms, each covering the previous one's blind spot:
+  `scrollend` where it exists, an idle detector where it does not, `wheel`/`touch`/`keydown`
+  for a user takeover (the browser cancels smooth scrolling then, so the target is never
+  reached), and release on the first scroll after settling — which is the answer for
+  dragging the scrollbar, where no wheel or touch event ever arrives. A fixed timeout was
+  rejected: the browser picks smooth-scroll duration from the distance, so any constant is
+  either too short or too long.
+
+  **`aria-current="location"`, not `page`.** The package writes `page` everywhere, but its
+  real invariant is "the token names what changes": breadcrumbs, bottom navigation and the
+  sidebar change the page, `GrSteps` changes the step, this changes the location. The risk
+  is nil — ARIA treats an unrecognised token as `true` — while `page` on an in-page anchor
+  announces "current page" on a page that never changed.
+
+  The item stays `<a href="#id">`: only a plain left click is intercepted, so `Cmd`-click
+  and the middle button keep working. Scrolling is our own arithmetic rather than
+  `scrollIntoView`, which moves every ancestor and cannot take the offset. The address is
+  updated with `replaceState`, not `pushState` — a history entry per item would turn Back
+  into an undo for scrolling. Focus moves to the section, restoring what `preventDefault`
+  takes away from the anchor: without it a keyboard reader keeps tabbing inside the
+  contents instead of continuing from the section.
+
+### Fixed
+
+- **`GrAffix` inside a grid or flex parent needs a wrapper, and the page now says so.**
+  The component is a fragment — sentinel plus sticky box — so in a grid the sentinel takes
+  a cell of its own and pushes the neighbours around; found while building the pair demo,
+  where the contents column ended up on the second row. The page previously stated flatly
+  that a wrapper is impossible. It is impossible only when the wrapper is sized by the
+  panel; a grid cell stretches to the row, so a wrapper there keeps its height and stays a
+  containing block the panel can travel inside.
+
 ## [v0.43.0] 2026-09-02
 
 ### Added

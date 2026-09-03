@@ -159,6 +159,7 @@ GrSelect>` для них не работает, такой компонент к
 - [`GrRadioGroup`](./components/GrRadioGroup.md)
 - [`GrRating`](./components/GrRating.md)
 - [`GrResponseErrorBanner`](./components/GrResponseErrorBanner.md)
+- [`GrScrollSpy`](./components/GrScrollSpy.md)
 - [`GrSegmented`](./components/GrSegmented.md)
 - [`GrSelect`](./components/GrSelect.md)
 - [`GrSidebar`](./components/GrSidebar.md)

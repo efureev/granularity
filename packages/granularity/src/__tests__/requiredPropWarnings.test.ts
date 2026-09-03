@@ -7,6 +7,7 @@ import GrDataTable from '../components/GrDataTable/GrDataTable.vue'
 import GrInputTag from '../components/GrInputTag/GrInputTag.vue'
 import GrNumberInput from '../components/GrNumberInput/GrNumberInput.vue'
 import GrSegmented from '../components/GrSegmented/GrSegmented.vue'
+import GrScrollSpy from '../components/GrScrollSpy/GrScrollSpy.vue'
 import GrSortableList from '../components/GrSortableList/GrSortableList.vue'
 import GrSteps from '../components/GrSteps/GrSteps.vue'
 import GrTabs from '../components/GrTabs/GrTabs.vue'
@@ -28,6 +29,7 @@ const CASES = [
   { name: 'GrInputTag', component: GrInputTag, props: ['modelValue'] },
   { name: 'GrNumberInput', component: GrNumberInput, props: ['modelValue'] },
   { name: 'GrSegmented', component: GrSegmented, props: ['modelValue', 'options'] },
+  { name: 'GrScrollSpy', component: GrScrollSpy, props: ['sections'] },
   { name: 'GrSortableList', component: GrSortableList, props: ['modelValue'] },
   { name: 'GrSteps', component: GrSteps, props: ['modelValue', 'steps'] },
   { name: 'GrTabs', component: GrTabs, props: ['modelValue', 'tabs'] },
