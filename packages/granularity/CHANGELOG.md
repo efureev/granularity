@@ -7,6 +7,8 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.44.0] 2026-09-03
+
 ### Added
 
 - **New `GrScrollSpy` and `useScrollSpy` — a table of contents that knows where you are
