@@ -105,7 +105,7 @@ describe('component docs metadata', () => {
     const treeDoc = getShowcaseComponentDoc(treeEntity!)
     const treeSelectDoc = getShowcaseComponentDoc(treeSelectEntity!)
 
-    expect(treeDoc.examples).toHaveLength(10)
+    expect(treeDoc.examples).toHaveLength(12)
     expect(treeDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(treeDoc.examples.every(example => example.previewKey?.startsWith('gr-tree'))).toBe(true)
 

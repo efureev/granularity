@@ -487,6 +487,9 @@ export const demoPathByPreviewKey = {
   'gr-tree-filtering': 'components/gr-tree/GrTreeFilteringDemo.vue',
   'gr-tree-keyboard': 'components/gr-tree/GrTreeKeyboardDemo.vue',
   'gr-tree-lazy': 'components/gr-tree/GrTreeLazyDemo.vue',
+  'gr-tree-explorer': 'components/gr-tree/GrTreeExplorerDemo.vue',
+  'gr-tree-outline': 'components/gr-tree/GrTreeOutlineDemo.vue',
+  'gr-tree-rail': 'components/gr-tree/GrTreeRailDemo.vue',
   'gr-tree-sections-basic': 'components/gr-tree-sections/GrTreeSectionsBasicDemo.vue',
   'gr-tree-sections-permissions': 'components/gr-tree-sections/GrTreeSectionsPermissionsDemo.vue',
   'gr-tree-select-addons': 'components/gr-tree-select/GrTreeSelectAddonsDemo.vue',
@@ -496,7 +499,6 @@ export const demoPathByPreviewKey = {
   'gr-tree-select-path-display': 'components/gr-tree-select/GrTreeSelectPathDisplayDemo.vue',
   'gr-value-affixes': 'components/gr-value/GrValueAffixesDemo.vue',
   'gr-tree-sizes': 'components/gr-tree/GrTreeSizesDemo.vue',
-  'gr-tree-views': 'components/gr-tree/GrTreeViewsDemo.vue',
   'gr-tree-virtual': 'components/gr-tree/GrTreeVirtualDemo.vue',
 } as const
 

@@ -88,7 +88,7 @@ export const grTreeViewVars: Record<GrTreeView, Record<string, string>> = {
     '--gr-tree-row-radius': '4px',
     '--gr-tree-children-pl': '6px',
     '--gr-tree-branch-line-offset': '8px',
-    '--gr-tree-branch-elbow-width': '6px',
+    '--gr-tree-branch-elbow-width': '10px',
     '--gr-tree-content-gap': '6px',
   },
   /**

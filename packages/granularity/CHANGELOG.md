@@ -7,6 +7,14 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+
+- **The explorer view's elbow now reaches the label.** At 6 px the stub stopped in empty
+  space and read as a rendering artifact rather than as a connector between the guide and
+  the node; `grTreeViewVars.explorer` sets `--gr-tree-branch-elbow-width` to 10 px. Found
+  by looking at a six-level tree on the showcase page — the value is fine on two levels,
+  where the eye still pairs the stub with the nearest label by proximity.
+
 ## [v0.45.0] 2026-09-03
 
 ### Added
