@@ -34,7 +34,7 @@ const checked = ref<GrTreeKey[]>(['sales-read'])
       :data="scopes"
       node-key="id"
       show-checkbox
-      heading-level="4"
+      :heading-level="4"
       :default-expanded-keys="['sales']"
     />
 
