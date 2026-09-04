@@ -1,29 +1,27 @@
 <script setup lang="ts" generic="TRow extends Record<string, unknown> = Record<string, unknown>">
-import { computed, nextTick, onMounted, onUnmounted, ref, useId, watch, watchEffect } from 'vue'
+import { computed, nextTick, onMounted, ref, useId, watchEffect } from 'vue'
 
 import GrTable from '../GrTable/GrTable.vue'
 import GrIcon from '../GrIcon/GrIcon.vue'
 import GrCheckbox from '../GrCheckbox/GrCheckbox.vue'
 import { useGrComponentSize } from '../GrConfigProvider/context'
 import { useAnnouncer } from '../../composables/useAnnouncer'
-import { useDragGesture } from '../../composables/useDragGesture'
-import { useDragSort } from '../../composables/useDragSort'
-import { useRovingFocus } from '../../composables/useRovingFocus'
 import { useVirtualList } from '../../composables/useVirtualList'
-import { insertionIndex, moveItem } from '../../composables/internal/dragSortGeometry'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
-import { sortRows, type GrDataTableSortDir } from './grDataTableSort'
+import type { GrDataTableSortDir } from './grDataTableSort'
+import { useDataTableRowKeys } from './composables/useDataTableRowKeys'
+import { useDataTableSort } from './composables/useDataTableSort'
+import { useDataTableSelection } from './composables/useDataTableSelection'
+import { useDataTableColumnOrder } from './composables/useDataTableColumnOrder'
+import { MIN_COLUMN_WIDTH, useDataTableColumnWidths } from './composables/useDataTableColumnWidths'
+import { SELECT_COLUMN_KEY, useDataTableLayout } from './composables/useDataTableLayout'
 import {
   type GrDataTableSize,
   cellPaddings,
   columnDraggingClass,
-  columnDropAfterClass,
-  columnDropBeforeClass,
   columnHandleActiveClass,
   columnHandleClass,
   columnPinnedClass,
-  columnPinnedLeftEdgeClass,
-  columnPinnedRightEdgeClass,
   columnResizerClass,
   columnResizerHoverClass,
   columnResizerLineActiveClass,
@@ -292,61 +290,28 @@ const { announce } = useAnnouncer()
 const resolvedLoadingText = computed(() => props.loadingText ?? t('gr.dataTable.loading', 'Loading…'))
 const resolvedEmptyText = computed(() => props.emptyText ?? t('gr.dataTable.empty', 'No data'))
 
-// Uncontrolled-состояние; в controlled-режиме перекрывается пропами `sortKey`/`sortDir`.
-const internalSortKey = ref<string>(props.initialSortKey ?? '')
-const internalSortDir = ref<GrDataTableSortDir>(props.initialSortDir)
-
-const isSortKeyControlled = computed(() => props.sortKey !== undefined)
-const isSortDirControlled = computed(() => props.sortDir !== undefined)
-
-const currentSortKey = computed(() => props.sortKey ?? internalSortKey.value)
-const currentSortDir = computed<GrDataTableSortDir>(() => props.sortDir ?? internalSortDir.value)
-
-function applySort(key: string, dir: GrDataTableSortDir): void {
-  if (!isSortKeyControlled.value)
-    internalSortKey.value = key
-  if (!isSortDirControlled.value)
-    internalSortDir.value = dir
-
-  emit('update:sortKey', key)
-  emit('update:sortDir', dir)
-  emit('sortChange', { key, dir })
-}
-
-const sortedRows = computed(() => {
-  // Внешняя сортировка: `rows` уже отсортированы потребителем — не трогаем.
-  if (props.externalSort)
-    return [...props.rows]
-
-  const key = currentSortKey.value
-  if (!key)
-    return [...props.rows]
-
-  return sortRows(props.rows, key, currentSortDir.value, locale.value)
+const {
+  currentSortKey,
+  currentSortDir,
+  sortedRows,
+  toggleSort,
+  clearSort,
+  ariaSortFor,
+} = useDataTableSort<TRow>({
+  rows: () => props.rows,
+  sortKey: () => props.sortKey,
+  sortDir: () => props.sortDir,
+  initialSortKey: () => props.initialSortKey,
+  initialSortDir: () => props.initialSortDir,
+  externalSort: () => props.externalSort,
+  sortCycle: () => props.sortCycle,
+  locale: () => locale.value,
+  onSortChange: (key, dir) => {
+    emit('update:sortKey', key)
+    emit('update:sortDir', dir)
+    emit('sortChange', { key, dir })
+  },
 })
-
-function toggleSort(col: GrDataColumn<TRow>): void {
-  if (!col.sortable)
-    return
-
-  if (currentSortKey.value !== col.key) {
-    applySort(col.key, 'asc')
-    return
-  }
-
-  if (currentSortDir.value === 'asc') {
-    applySort(col.key, 'desc')
-    return
-  }
-
-  // Третье состояние: сортировка снимается, порядок возвращается к исходному.
-  if (props.sortCycle === 'asc-desc-none') {
-    applySort('', 'asc')
-    return
-  }
-
-  applySort(col.key, 'asc')
-}
 
 function cellAlign(col: GrDataColumn<TRow>): string {
   if (col.align === 'right')
@@ -356,60 +321,7 @@ function cellAlign(col: GrDataColumn<TRow>): string {
   return 'text-left'
 }
 
-/**
- * Синтетические ключи для строк, у которых поле `rowKey` пустое.
- *
- * Без них строка получила бы `String(undefined ?? '')` — **один и тот же** ключ
- * на всю таблицу: Vue переиспользовал бы DOM не по назначению, а выбор одной
- * строки помечал бы выбранными все. Ключ привязан к идентичности объекта,
- * поэтому переживает сортировку и не зависит от индекса.
- */
-const syntheticKeys = new WeakMap<object, string>()
-let syntheticKeyCounter = 0
-const missingKeyWarned = ref(false)
-
-function syntheticRowKey(row: TRow): string {
-  const existing = syntheticKeys.get(row)
-  if (existing !== undefined)
-    return existing
-
-  syntheticKeyCounter += 1
-  const generated = `gr-row-${syntheticKeyCounter}`
-  syntheticKeys.set(row, generated)
-
-  if (!missingKeyWarned.value && __GR_DEV__) {
-    missingKeyWarned.value = true
-    console.warn(
-      `[GrDataTable] У строки нет значения по ключу "${String(props.rowKey)}". `
-      + 'Задайте `rowKey` (поле или функцию) — иначе выбор строк и переиспользование '
-      + 'DOM работают по синтетическому ключу, который не переживёт перезагрузку данных.',
-    )
-  }
-
-  return generated
-}
-
-function rowKeyValue(row: TRow): string | number {
-  const rk = props.rowKey
-  if (typeof rk === 'function')
-    return rk(row)
-
-  const value = (row as Record<string, unknown>)[rk as string]
-  if (typeof value === 'string' && value !== '')
-    return value
-  if (typeof value === 'number')
-    return value
-
-  return syntheticRowKey(row)
-}
-
-function ariaSortFor(col: GrDataColumn<TRow>): 'ascending' | 'descending' | 'none' | undefined {
-  if (!col.sortable)
-    return undefined
-  if (currentSortKey.value !== col.key)
-    return 'none'
-  return currentSortDir.value === 'asc' ? 'ascending' : 'descending'
-}
+const { rowKeyValue } = useDataTableRowKeys<TRow>({ rowKey: () => props.rowKey })
 
 /**
  * Подсказка «что сделает нажатие» — visually hidden текстом **после** подписи
@@ -485,97 +397,11 @@ const totalColumns = computed(() => props.columns.length + (props.selectable ? 1
 
 // ————— Порядок колонок.
 
-/** Uncontrolled-состояние; в controlled-режиме перекрывается пропом `columnOrder`. */
-const internalColumnOrder = ref<string[]>(props.columns.map(col => String(col.key)))
-
 /**
- * Колонки в пользовательском порядке.
- *
- * Состав задаёт `columns`, порядок — только порядок: ключ, которого в наборе
- * нет, игнорируется, а колонка, которой нет в порядке (её только что добавили),
- * встаёт в конец. Иначе правка `columns` теряла бы колонки молча.
+ * Карты живут в компоненте, а не в модуле: наполняет их шаблон, а читают все
+ * три колоночных модуля — порядок тянет за ячейку, ширина её замеряет,
+ * раскладка считает по ней смещения закрепления.
  */
-const orderedColumns = computed<GrDataColumn<TRow>[]>(() => {
-  const order = props.columnOrder ?? internalColumnOrder.value
-  const remaining = new Map(props.columns.map(col => [String(col.key), col]))
-  const ordered: GrDataColumn<TRow>[] = []
-
-  for (const key of order) {
-    const col = remaining.get(key)
-    if (!col)
-      continue
-
-    remaining.delete(key)
-    ordered.push(col)
-  }
-
-  for (const col of props.columns) {
-    if (remaining.has(String(col.key)))
-      ordered.push(col)
-  }
-
-  // Закреплённые колонки стоят своими группами у своих краёв — иначе
-  // «закреплена слева» не означало бы «слева». Сортировка устойчивая, поэтому
-  // внутри группы порядок остаётся пользовательским.
-  return ordered.sort((a, b) => pinGroupOf(a) - pinGroupOf(b))
-})
-
-/** Группа закрепления: 0 — слева, 1 — обычная колонка, 2 — справа. */
-function pinGroupOf(col: GrDataColumn<TRow>): number {
-  if (col.pinned === 'left')
-    return 0
-  if (col.pinned === 'right')
-    return 2
-
-  return 1
-}
-
-/**
- * Сумма заданных ширин — минимальная ширина таблицы.
- *
- * Без неё фиксированная раскладка вписывает таблицу в контейнер и делит место
- * пропорционально: колонка, которую пользователь растянул, ужимается обратно, а
- * горизонтальной прокрутки — той самой, ради которой закрепляют колонки, — не
- * возникает. Считается, только когда ширина известна у **всех** колонок: с
- * одной неизвестной сумма врала бы.
- */
-const tableMinWidth = computed<number | undefined>(() => {
-  const cols = orderedColumns.value
-  if (cols.length === 0)
-    return undefined
-
-  let total = 0
-  for (const col of cols) {
-    const width = widthOf(col)
-    if (typeof width !== 'number')
-      return undefined
-
-    total += width
-  }
-
-  return total
-})
-
-const columnKeys = computed(() => orderedColumns.value.map(col => String(col.key)))
-
-const tableProps = computed(() => ({
-  size: resolvedSize.value,
-  ariaLabel: props.ariaLabel,
-  ariaLabelledby: props.ariaLabelledby,
-  regionLabel: props.regionLabel,
-  stickyHeader: props.stickyHeader,
-  maxHeight: props.maxHeight,
-  rowCount: ariaRowCount.value,
-  // Пользовательская ширина требует фиксированной раскладки: на авторазметке
-  // браузер пересчитывает колонки по содержимому, и заданная ширина пропадает.
-  fixedLayout: props.virtual || props.resizableColumns,
-  tableMinWidth: tableMinWidth.value,
-}))
-
-function indexOfColumn(key: string): number {
-  return columnKeys.value.indexOf(key)
-}
-
 const headerCellEls = new Map<string, HTMLElement>()
 const columnHandleEls = new Map<string, HTMLElement>()
 
@@ -592,379 +418,92 @@ function registerEl(store: Map<string, HTMLElement>, key: string, el: unknown): 
     store.delete(key)
 }
 
-function applyColumnMove(from: number, to: number): void {
-  const keys = columnKeys.value
-  if (from < 0 || to < 0 || to >= keys.length || from === to)
-    return
-  if (!sameGroup(from, to))
-    return
-
-  const key = keys[from]
-  // Подпись берётся до перестановки: `orderedColumns` — computed, и после
-  // записи порядка по индексу `from` стоит уже другая колонка.
-  const label = orderedColumns.value[from]?.label ?? key
-  const next = moveItem(keys, from, to)
-
-  internalColumnOrder.value = next
-  emit('update:columnOrder', next)
-  emit('columnReorder', { key, from, to })
-
-  announce(t('gr.dataTable.columnMoved', 'Column {label} moved to position {position} of {count}', {
-    label,
-    position: to + 1,
-    count: keys.length,
-  }))
-}
-
-const columnSort = useDragSort<string, number>({
-  items: () => columnKeys.value,
-  elementFor: key => headerCellEls.get(key) ?? null,
-  orientation: () => 'horizontal',
-  disabled: () => !props.reorderableColumns || props.loading,
-  resolveTarget: (hit, source) => {
-    const to = insertionIndex(hit, indexOfColumn(source), columnKeys.value.length)
-
-    // Через границу закрепления не переносим: группы у краёв постоянны.
-    return sameGroup(indexOfColumn(source), to) ? to : null
+const {
+  orderedColumns,
+  columnKeys,
+  draggingColumnKey,
+  columnDropClass,
+  onColumnHandleKeydown,
+  columnSort,
+  columnRoving,
+} = useDataTableColumnOrder<TRow>({
+  columns: () => props.columns,
+  columnOrder: () => props.columnOrder,
+  reorderableColumns: () => props.reorderableColumns,
+  loading: () => props.loading,
+  headerCellEls,
+  columnHandleEls,
+  onOrderChange: (order, moved) => {
+    emit('update:columnOrder', order)
+    emit('columnReorder', moved)
   },
-  onDrop: (source, to) => applyColumnMove(indexOfColumn(source), to),
+  announceMove: (label, position, count) => {
+    announce(t('gr.dataTable.columnMoved', 'Column {label} moved to position {position} of {count}', {
+      label,
+      position,
+      count,
+    }))
+  },
 })
 
-function sameGroup(from: number, to: number): boolean {
-  const cols = orderedColumns.value
-  if (!cols[from] || !cols[to])
-    return false
-
-  return pinGroupOf(cols[from]) === pinGroupOf(cols[to])
-}
-
-/**
- * Кольцо роверного фокуса по ручкам: одна остановка `Tab` на всю шапку.
- * Иначе таблица из десяти колонок добавляла бы десять таб-стопов подряд.
- */
-const columnRoving = useRovingFocus<string>({
-  items: () => (props.reorderableColumns ? columnKeys.value : []),
-  elementFor: key => columnHandleEls.get(key) ?? null,
-  orientation: () => 'horizontal',
-  wrap: () => false,
+const {
+  columnWidths,
+  setMeasuredWidths,
+  widthOf,
+  tableMinWidth,
+  resizingKey,
+  onResizerPointerDown,
+  onResizerKeydown,
+  resetColumnWidth,
+  resizerValue,
+} = useDataTableColumnWidths<TRow>({
+  orderedColumns: () => orderedColumns.value,
+  columnWidths: () => props.columnWidths,
+  resizableColumns: () => props.resizableColumns,
+  loading: () => props.loading,
+  headerCellEls,
+  onWidthsChange: widths => emit('update:columnWidths', widths),
+  onColumnResize: (key, width) => emit('columnResize', { key, width }),
+  announceWidth: (label, width) => {
+    announce(t('gr.dataTable.columnResized', 'Column {label} is {width} pixels wide', { label, width }))
+  },
 })
 
-async function onColumnHandleKeydown(event: KeyboardEvent, key: string): Promise<void> {
-  if (!props.reorderableColumns)
-    return
+const { hasPinnedLeft, pinnedStyleOf, pinnedCellClass } = useDataTableLayout<TRow>({
+  orderedColumns: () => orderedColumns.value,
+  columnKeys: () => columnKeys.value,
+  selectable: () => props.selectable,
+  resizableColumns: () => props.resizableColumns,
+  headerCellEls,
+  watchSources: () => [orderedColumns.value, columnWidths.value, props.loading, props.rows.length] as const,
+  onMeasuredWidths: setMeasuredWidths,
+})
 
-  // `Shift` со стрелкой двигает колонку, голая стрелка — фокус между ручками.
-  // Раскладка та же, что у переноса узла в `GrTree`.
-  if (event.shiftKey && (event.key === 'ArrowLeft' || event.key === 'ArrowRight')) {
-    event.preventDefault()
-
-    const from = indexOfColumn(key)
-    applyColumnMove(from, event.key === 'ArrowLeft' ? from - 1 : from + 1)
-
-    // Шапка перерисовывается: без возврата фокуса следующий `Shift` было бы
-    // некуда адресовать.
-    await nextTick()
-    await columnRoving.focusKey(key)
-    return
-  }
-
-  columnRoving.handleNavigationKeys(event)
-}
-
-const draggingColumnKey = computed(() => (columnSort.mode.value === null ? null : columnSort.source.value))
-
-/** Полоса места вставки — на колонке-соседе, со стороны движения. */
-function columnDropClass(index: number): string {
-  const target = columnSort.target.value
-  if (!columnSort.isActive.value || target === null || target !== index)
-    return ''
-
-  const active = columnSort.source.value === null ? -1 : indexOfColumn(columnSort.source.value)
-  if (index === active)
-    return ''
-
-  return target < active ? columnDropBeforeClass : columnDropAfterClass
-}
+const tableProps = computed(() => ({
+  size: resolvedSize.value,
+  ariaLabel: props.ariaLabel,
+  ariaLabelledby: props.ariaLabelledby,
+  regionLabel: props.regionLabel,
+  stickyHeader: props.stickyHeader,
+  maxHeight: props.maxHeight,
+  rowCount: ariaRowCount.value,
+  // Пользовательская ширина требует фиксированной раскладки: на авторазметке
+  // браузер пересчитывает колонки по содержимому, и заданная ширина пропадает.
+  fixedLayout: props.virtual || props.resizableColumns,
+  tableMinWidth: tableMinWidth.value,
+}))
 
 function columnHandleLabel(col: GrDataColumn<TRow>): string {
   return t('gr.dataTable.moveColumn', 'Move column {label}', { label: col.label })
-}
-
-// ————— Ширина колонок.
-
-/** Уже колонки не бывает: в неё перестаёт помещаться даже стрелка сортировки. */
-const MIN_COLUMN_WIDTH = 48
-/** Шаг клавиатуры и крупный шаг — как у `GrSplitter`. */
-const RESIZE_STEP = 16
-const RESIZE_BIG_STEP = 48
-
-const internalColumnWidths = ref<Record<string, number>>({})
-const columnWidths = computed(() => props.columnWidths ?? internalColumnWidths.value)
-
-/** Фактические ширины шапки: заполняются замером, см. `measureLayout`. */
-const measuredColumnWidths = ref<Record<string, number>>({})
-
-/** Ширина колонки: заданная пользователем сильнее объявленной в `columns`. */
-function widthOf(col: GrDataColumn<TRow>): string | number | undefined {
-  return columnWidths.value[String(col.key)] ?? col.width
-}
-
-const resizingKey = ref<string | null>(null)
-let pendingResizeKey: string | null = null
-let resizeStartX = 0
-let resizeStartWidth = 0
-let widthBeforeResize: number | undefined
-
-function setColumnWidth(key: string, width: number): void {
-  const next = { ...columnWidths.value, [key]: Math.max(MIN_COLUMN_WIDTH, Math.round(width)) }
-
-  internalColumnWidths.value = next
-  emit('update:columnWidths', next)
-}
-
-function announceWidth(key: string): void {
-  const col = orderedColumns.value.find(item => String(item.key) === key)
-  if (!col)
-    return
-
-  announce(t('gr.dataTable.columnResized', 'Column {label} is {width} pixels wide', {
-    label: col.label,
-    width: columnWidths.value[key] ?? 0,
-  }))
-}
-
-const resizeGesture = useDragGesture({
-  disabled: () => !props.resizableColumns || props.loading,
-  onStart: (event) => {
-    const key = pendingResizeKey
-    const el = key === null ? null : headerCellEls.get(key)
-    if (key === null || !el)
-      return false
-
-    resizeStartX = event.clientX
-    // Стартовая ширина — измеренная, а не объявленная: колонка могла жить на
-    // авторазметке, и тянуть её надо от того, что видно.
-    resizeStartWidth = el.getBoundingClientRect().width
-    widthBeforeResize = columnWidths.value[key]
-    resizingKey.value = key
-  },
-  onMove: (event) => {
-    if (resizingKey.value === null)
-      return
-
-    // Против выделения текста заголовка во время протяжки.
-    event.preventDefault()
-    setColumnWidth(resizingKey.value, resizeStartWidth + (event.clientX - resizeStartX))
-  },
-  onEnd: () => {
-    const key = resizingKey.value
-    resizingKey.value = null
-    if (key === null)
-      return
-
-    emit('columnResize', { key, width: columnWidths.value[key] ?? Math.round(resizeStartWidth) })
-    announceWidth(key)
-  },
-  onCancel: () => {
-    const key = resizingKey.value
-    resizingKey.value = null
-    if (key === null)
-      return
-
-    // Оборванный жест возвращает ширину, которая была до нажатия.
-    const next = { ...columnWidths.value }
-    if (widthBeforeResize === undefined)
-      delete next[key]
-    else next[key] = widthBeforeResize
-
-    internalColumnWidths.value = next
-    emit('update:columnWidths', next)
-  },
-})
-
-function onResizerPointerDown(event: PointerEvent, key: string): void {
-  pendingResizeKey = key
-  resizeGesture.start(event)
-}
-
-/** Сброс к авторазметке: колонка снова считается по содержимому. */
-function resetColumnWidth(key: string): void {
-  if (columnWidths.value[key] === undefined)
-    return
-
-  const next = { ...columnWidths.value }
-  delete next[key]
-
-  internalColumnWidths.value = next
-  emit('update:columnWidths', next)
-  emit('columnResize', { key, width: 0 })
-}
-
-function resizeByKeyboard(key: string, delta: number): void {
-  const measured = headerCellEls.get(key)?.getBoundingClientRect().width ?? MIN_COLUMN_WIDTH
-  const current = columnWidths.value[key] ?? measured
-
-  setColumnWidth(key, current + delta)
-  emit('columnResize', { key, width: columnWidths.value[key] ?? current })
-  announceWidth(key)
-}
-
-function onResizerKeydown(event: KeyboardEvent, key: string): void {
-  if (!props.resizableColumns || props.loading)
-    return
-
-  const step = event.shiftKey ? RESIZE_BIG_STEP : RESIZE_STEP
-
-  if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
-    event.preventDefault()
-    resizeByKeyboard(key, event.key === 'ArrowLeft' ? -step : step)
-    return
-  }
-
-  // Отдельной клавиши «авто» в паттерне нет, поэтому её роль берёт `Enter` —
-  // тот же смысл, что двойной клик по ручке.
-  if (event.key === 'Enter') {
-    event.preventDefault()
-    resetColumnWidth(key)
-  }
 }
 
 function resizerLabel(col: GrDataColumn<TRow>): string {
   return t('gr.dataTable.resizeColumn', 'Width of column {label}', { label: col.label })
 }
 
-/**
- * Ручка ресайза — фокусируемый `separator`, а значит обязана называть текущее
- * значение с первого рендера, до всякого перетаскивания. Заданной ширины у
- * колонки может не быть вовсе (авторазметка), поэтому за значением идём к
- * измеренной; до замера остаётся объявленная в `columns`, а её тоже может не
- * быть — тогда минимум.
- */
-function resizerValue(col: GrDataColumn<TRow>): number {
-  const key = String(col.key)
-  const declared = typeof col.width === 'number' ? col.width : undefined
+// ————— Ширина колонок.
 
-  return columnWidths.value[key] ?? measuredColumnWidths.value[key] ?? declared ?? MIN_COLUMN_WIDTH
-}
-
-// ————— Закреплённые колонки.
-
-/** Служебная колонка выбора в реестре ячеек: своего ключа у неё нет. */
-const SELECT_COLUMN_KEY = '__select__'
-
-const hasPinnedLeft = computed(() => orderedColumns.value.some(col => col.pinned === 'left'))
-const pinnedOffsets = ref<Record<string, number>>({})
-
-/**
- * Смещения липких колонок считаются по **измеренным** ширинам соседей: колонка
- * может жить на авторазметке, и тогда взять смещение больше неоткуда. Отсюда же
- * порядок: замер после отрисовки, а не в вычислении.
- */
-function measurePinnedOffsets(): void {
-  const next: Record<string, number> = {}
-  const cols = orderedColumns.value
-
-  let left = props.selectable && hasPinnedLeft.value
-    ? headerCellEls.get(SELECT_COLUMN_KEY)?.getBoundingClientRect().width ?? 0
-    : 0
-
-  for (const col of cols) {
-    if (col.pinned !== 'left')
-      continue
-
-    next[String(col.key)] = left
-    left += headerCellEls.get(String(col.key))?.getBoundingClientRect().width ?? 0
-  }
-
-  let right = 0
-  for (let index = cols.length - 1; index >= 0; index -= 1) {
-    const col = cols[index]
-    if (col.pinned !== 'right')
-      continue
-
-    next[String(col.key)] = right
-    right += headerCellEls.get(String(col.key))?.getBoundingClientRect().width ?? 0
-  }
-
-  pinnedOffsets.value = next
-}
-
-function measureColumnWidths(): void {
-  if (!props.resizableColumns)
-    return
-
-  const next: Record<string, number> = {}
-
-  for (const col of orderedColumns.value) {
-    const key = String(col.key)
-    const width = headerCellEls.get(key)?.getBoundingClientRect().width
-
-    if (width)
-      next[key] = Math.round(width)
-  }
-
-  measuredColumnWidths.value = next
-}
-
-function measureLayout(): void {
-  measurePinnedOffsets()
-  measureColumnWidths()
-}
-
-function pinnedStyleOf(col: GrDataColumn<TRow>): Record<string, string> | undefined {
-  if (!col.pinned)
-    return undefined
-
-  const offset = pinnedOffsets.value[String(col.key)] ?? 0
-
-  return col.pinned === 'left' ? { left: `${offset}px` } : { right: `${offset}px` }
-}
-
-/** Тень рисует только крайняя колонка группы — иначе полос было бы столько же, сколько колонок. */
-function pinnedEdgeClass(col: GrDataColumn<TRow>, index: number): string {
-  if (col.pinned === 'left')
-    return orderedColumns.value[index + 1]?.pinned === 'left' ? '' : columnPinnedLeftEdgeClass
-  if (col.pinned === 'right')
-    return orderedColumns.value[index - 1]?.pinned === 'right' ? '' : columnPinnedRightEdgeClass
-
-  return ''
-}
-
-function pinnedCellClass(col: GrDataColumn<TRow>, index: number): string[] {
-  if (!col.pinned)
-    return []
-
-  return [columnPinnedClass, pinnedEdgeClass(col, index)]
-}
-
-/**
- * Ширину колонки меняет не только правка пропов: окно, шрифт и содержимое
- * ячейки двигают её сами. `ResizeObserver` — единственный способ узнать об этом;
- * в jsdom и на сервере его нет, там хватает пересчёта по изменению данных.
- */
-let layoutObserver: ResizeObserver | null = null
-
-onMounted(() => {
-  measureLayout()
-
-  if (typeof ResizeObserver === 'undefined')
-    return
-
-  layoutObserver = new ResizeObserver(() => measureLayout())
-  const el = headerCellEls.get(SELECT_COLUMN_KEY) ?? headerCellEls.get(columnKeys.value[0])
-  if (el?.parentElement)
-    layoutObserver.observe(el.parentElement)
-})
-
-onUnmounted(() => {
-  layoutObserver?.disconnect()
-  layoutObserver = null
-})
-
-watch(
-  () => [orderedColumns.value, columnWidths.value, props.loading, props.rows.length] as const,
-  () => void nextTick(measureLayout),
-)
+/** Уже колонки не бывает: в неё перестаёт помещаться даже стрелка сортировки. */
 
 /**
  * Живой регион существует с первого рендера и пуст, пока объявлять нечего.
@@ -996,64 +535,21 @@ function onRowClick(row: TRow, index: number, event: MouseEvent): void {
 // Uncontrolled-режим, как у сортировки выше: без `v-model:selected` чекбоксы
 // рисовались, кликались и никогда не отмечались — состояние выбора целиком
 // выводилось из пропа, а внутреннего не было вовсе.
-const internalSelected = ref<Array<string | number>>([])
-const isSelectedControlled = computed(() => props.selected !== undefined)
-
-const selectedKeys = computed<Set<string | number>>(
-  () => new Set(props.selected ?? internalSelected.value),
-)
-
-function isRowSelectable(row: TRow): boolean {
-  return props.selectableRow ? props.selectableRow(row) : true
-}
-
-function isRowSelected(row: TRow): boolean {
-  return selectedKeys.value.has(rowKeyValue(row))
-}
-
-/** «Выбрать все» работает по видимым и выбираемым строкам — они же считают состояние шапки. */
-const selectableRows = computed(() => sortedRows.value.filter(isRowSelectable))
-
-const allSelected = computed(() =>
-  selectableRows.value.length > 0 && selectableRows.value.every(isRowSelected),
-)
-const someSelected = computed(() =>
-  selectableRows.value.some(isRowSelected) && !allSelected.value,
-)
-
-function emitSelected(next: Set<string | number>): void {
-  if (!isSelectedControlled.value)
-    internalSelected.value = [...next]
-
-  emit('update:selected', [...next])
-}
-
-function toggleRow(row: TRow): void {
-  if (!isRowSelectable(row))
-    return
-
-  const key = rowKeyValue(row)
-  const next = new Set(selectedKeys.value)
-  if (next.has(key))
-    next.delete(key)
-  else
-    next.add(key)
-  emitSelected(next)
-}
-
-function toggleAll(): void {
-  const next = new Set(selectedKeys.value)
-
-  if (allSelected.value) {
-    // Снимаем выбор только с видимых строк, сохраняя внешние ключи.
-    for (const row of selectableRows.value) next.delete(rowKeyValue(row))
-    emitSelected(next)
-    return
-  }
-
-  for (const row of selectableRows.value) next.add(rowKeyValue(row))
-  emitSelected(next)
-}
+const {
+  isRowSelectable,
+  isRowSelected,
+  selectableRows,
+  allSelected,
+  someSelected,
+  toggleRow,
+  toggleAll,
+} = useDataTableSelection<TRow>({
+  rows: () => sortedRows.value,
+  selected: () => props.selected,
+  selectableRow: () => props.selectableRow,
+  rowKeyValue,
+  onSelectedChange: keys => emit('update:selected', keys),
+})
 
 // ————— Императивный API.
 const tableRef = ref<InstanceType<typeof GrTable> | null>(null)
@@ -1152,10 +648,6 @@ function findRowEl(rowKey: string): HTMLElement | undefined {
 
 function scrollTo(options: ScrollToOptions): void {
   scrollEl()?.scrollTo(options)
-}
-
-function clearSort(): void {
-  applySort('', 'asc')
 }
 
 defineExpose({

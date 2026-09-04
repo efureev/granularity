@@ -7,6 +7,26 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+
+- **`GrDataTable` internals now live in six modules** next to the component —
+  row keys, sorting, selection, column order, column widths and pinned-column
+  layout. Nothing about the public API moved: props, emits, slots and the
+  exposed methods are byte-identical, and all 94 of the component's tests pass
+  unedited.
+
+  The point is not a shorter file. Measured on this package, decomposition and
+  file length are unrelated: `GrTree` *grew* from 1289 to 1353 lines after its
+  whole model moved out to `useTree`. What changes is that the logic is now
+  readable without scrolling past a thousand lines of template, and the three
+  parts that never touch the DOM — keys, sorting, selection — can be reasoned
+  about on their own.
+
+  The split follows the dependency chain rather than taste: sorting feeds
+  selection ("select all" counts visible rows), and column order feeds widths,
+  which feed the pinned-column offsets. Element maps stay in the component,
+  because the template fills them and all three column modules read them.
+
 ## [v0.46.0] 2026-09-04
 
 ### Added
