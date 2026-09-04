@@ -7,6 +7,8 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.46.0] 2026-09-04
+
 ### Added
 
 - **A fourth ready-made view, `picker`** — the density for a tree you mark up rather than
