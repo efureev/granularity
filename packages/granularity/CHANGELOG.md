@@ -27,6 +27,24 @@ to [Semantic Versioning](https://semver.org/).
   which feed the pinned-column offsets. Element maps stay in the component,
   because the template fills them and all three column modules read them.
 
+- **`GrAutocomplete` grew five modules** — remote options, the value model, the
+  panel contents, virtualisation and keyboard navigation. Public API untouched;
+  its 55 tests pass unedited.
+
+  Virtualisation and navigation are one seam, not two: the keyboard walks the
+  same `[«Add …»?] + options` set the virtualiser windows, so navigation borrows
+  `addOffset` and `scrollToIndex` from it rather than recomputing either. An
+  option outside the window is absent from the DOM, and scrolling to it has to
+  move the window first — otherwise `aria-activedescendant` points at nothing.
+
+  `useRemoteOptions` is the one worth naming. Debounce, abort of the in-flight
+  request, and a sequence counter so a reply that started earlier and arrived
+  later loses to the latest one — separately each looks optional, together they
+  are the whole reason the module exists. It touches no DOM, so it can be
+  tested without mounting anything. It stays component-local for now because it
+  has exactly one consumer; the moment `GrTransfer` gets its async loading, it
+  belongs in `composables/internal/`.
+
 ## [v0.46.0] 2026-09-04
 
 ### Added

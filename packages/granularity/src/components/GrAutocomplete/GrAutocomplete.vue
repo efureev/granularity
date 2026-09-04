@@ -1,5 +1,5 @@
 <script setup lang="ts" generic="TValue extends GrAutocompleteValue = string">
-import { computed, nextTick, onBeforeUnmount, ref, shallowRef, useId, watch } from 'vue'
+import { computed, nextTick, ref, useId, watch } from 'vue'
 
 import { usePortalTarget } from '../../composables/usePortalTarget'
 
@@ -8,16 +8,18 @@ import { useGrComponentProp, useGrComponentSize, useGrThemeAttrs } from '../GrCo
 import { vClickOutside } from '../../directives'
 import { useFloating } from '../../composables/useFloating'
 import { useDismissible } from '../../composables/useDismissible'
-import { useVirtualList } from '../../composables/useVirtualList'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
+import { useRemoteOptions } from './composables/useRemoteOptions'
+import { useAutocompleteValues } from './composables/useAutocompleteValues'
+import { useAutocompletePanel } from './composables/useAutocompletePanel'
+import { useAutocompleteVirtual } from './composables/useAutocompleteVirtual'
+import { useAutocompleteNavigation } from './composables/useAutocompleteNavigation'
 import { isComposingEvent } from '../../internal/keyboard'
 import { useGrFormFieldContext } from '../GrFormField/context'
 import { useGrFormControl } from '../../composables/useGrFormControl'
 import { useFocusWithin } from '../../composables/internal/useFocusWithin'
 import { useControlledOpen } from '../../composables/internal/useControlledOpen'
-import { useComboboxNavigation } from '../../composables/useComboboxNavigation'
 import { useRovingFocus } from '../../composables/useRovingFocus'
-import { filterOptions, resolveSelectedOptions } from '../shared/optionFilter'
 import { useControlAddons } from '../../composables/internal/useControlAddons'
 
 import type { GrBadgeRadius, GrBadgeSize, GrBadgeTone } from '../GrBadge/grBadgeStyles'
@@ -277,68 +279,32 @@ const describedBy = computed(() => field?.describedById.value)
 // оставался бы ARIA-атрибутом без поведения.
 const locked = computed(() => isDisabled.value || isReadonly.value)
 
-// Ответ последнего `fetchOptions`. До первого ответа показываем `options` —
-// с ними компонент рисует стартовый список, не дожидаясь сервера.
-const remoteOptions = shallowRef<GrAutocompleteOption<TValue>[]>([])
-const remoteAnswered = ref(false)
-const remoteLoading = ref(false)
+const { remoteOptions, remoteAnswered, remoteLoading, scheduleSearch } = useRemoteOptions<TValue>({
+  fetchOptions: () => props.fetchOptions,
+  options: () => props.options,
+  debounce: () => props.debounce,
+  minQueryLength: () => props.minQueryLength,
+  onSearch: value => emit('search', value),
+  onSearchError: error => emit('searchError', error),
+})
 
-const optionsResolved = computed<GrAutocompleteOption<TValue>[]>(() =>
-  props.fetchOptions && remoteAnswered.value ? remoteOptions.value : (props.options ?? []),
-)
-
-/**
- * Подпись состава стартового списка. Сравнивать идентичность массива нельзя:
- * инлайн-литерал `:options="[...]"` пересоздаётся каждым ререндером родителя —
- * в том числе тем, который вызвал сам компонент своим `update:modelValue`, —
- * и remote-результаты исчезали бы прямо посреди выбора.
- */
-function optionsSignature(options: GrAutocompleteOption<TValue>[] | undefined): string {
-  return (options ?? []).map(o => `${String(o.value)}\u0000${o.label}`).join('\u0001')
-}
-
-// Родитель сменил стартовый список — он снова источник до следующего ответа
-// сервера, а летящий запрос относится к прежнему набору данных и отменяется.
-watch(() => optionsSignature(props.options), () => {
-  if (!props.fetchOptions)
-    return
-  cancelSearch()
-  remoteAnswered.value = false
-  remoteOptions.value = []
+const {
+  optionsResolved,
+  modelSingle,
+  selectedValues,
+  hasSelection,
+  selectedOptions,
+  singleSelectedLabel,
+} = useAutocompleteValues<TValue>({
+  modelValue: () => props.modelValue,
+  options: () => props.options,
+  multiple: () => props.multiple,
+  fetchOptions: () => props.fetchOptions,
+  remoteOptions,
+  remoteAnswered,
 })
 
 const isLoading = computed(() => props.loading || remoteLoading.value)
-
-/** `0` — валидное значение, поэтому «пусто» проверяется явно, а не через falsy. */
-function isEmptyValue(value: unknown): boolean {
-  return value === undefined || value === null || value === ''
-}
-
-function toArray(value: GrAutocompleteModelValue<TValue>): TValue[] {
-  if (Array.isArray(value))
-    return value
-  if (isEmptyValue(value))
-    return []
-  return [value]
-}
-
-const modelSingle = computed<TValue | ''>(() => {
-  const raw = Array.isArray(props.modelValue) ? props.modelValue[0] : props.modelValue
-  return isEmptyValue(raw) ? '' : (raw as TValue)
-})
-const selectedValues = computed(() => (props.multiple ? toArray(props.modelValue) : (isEmptyValue(modelSingle.value) ? [] : [modelSingle.value as TValue])))
-const hasSelection = computed(() => selectedValues.value.length > 0)
-
-function labelFor(value: GrAutocompleteValue): string {
-  return optionsResolved.value.find(o => o.value === value)?.label ?? String(value)
-}
-
-/** Опции выбранных значений (для chips в multiple). Неизвестные значения показываем как есть. */
-const selectedOptions = computed<GrAutocompleteOption<TValue>[]>(() =>
-  resolveSelectedOptions(selectedValues.value, optionsResolved.value),
-)
-
-const singleSelectedLabel = computed(() => (props.multiple || isEmptyValue(modelSingle.value) ? '' : labelFor(modelSingle.value)))
 
 // ————— Состояние.
 const query = ref('')
@@ -389,52 +355,20 @@ const { floatingStyle } = useFloating(rootEl, panelEl, open, {
 
 useDismissible(open, closeDropdown)
 
-// ————— Фильтрация.
-const searchQuery = computed(() => {
-  // При `fetchOptions` фильтрует сервер: локальный матчер отсеял бы то, что он
-  // уже прислал в ответ на этот же запрос.
-  if (!props.filterable || props.fetchOptions)
-    return ''
-  // single: пока пользователь не начал вводить — показываем весь список.
-  if (!props.multiple && !dirty.value)
-    return ''
-  return query.value.trim()
+const { belowMinQuery, effectiveOptions, canAddCustom, showEmpty } = useAutocompletePanel<TValue>({
+  optionsResolved,
+  query,
+  dirty,
+  filterable: () => props.filterable,
+  filter: () => props.filter,
+  fetchOptions: () => props.fetchOptions,
+  multiple: () => props.multiple,
+  minQueryLength: () => props.minQueryLength,
+  allowCustomValue: () => props.allowCustomValue,
+  selectedValues,
+  modelSingle,
+  isLoading,
 })
-
-const filteredOptions = computed<GrAutocompleteOption<TValue>[]>(() =>
-  filterOptions(optionsResolved.value, searchQuery.value, props.filter),
-)
-
-const belowMinQuery = computed(() => props.minQueryLength > 0 && query.value.trim().length < props.minQueryLength)
-
-/**
- * Опции к показу и навигации. Ниже `minQueryLength` — пусто: список ещё
- * относится к прошлому запросу, показывать его под подсказкой «введите ещё N»
- * значит дезинформировать.
- */
-const effectiveOptions = computed<GrAutocompleteOption<TValue>[]>(() =>
-  belowMinQuery.value ? [] : filteredOptions.value,
-)
-
-const canAddCustom = computed(() => {
-  if (!props.allowCustomValue)
-    return false
-  // Кастомное значение набирается текстом — оно строковое по природе;
-  // при числовом `TValue` эта ветка неприменима (см. docs/components.md).
-  const v = query.value.trim() as TValue
-  if (!v)
-    return false
-  if (props.multiple && selectedValues.value.includes(v))
-    return false
-  if (!props.multiple && v === modelSingle.value)
-    return false
-  // Не предлагаем «Add», если такое значение/метка уже есть среди опций.
-  return !optionsResolved.value.some(o => o.value === v || o.label === v)
-})
-
-const showEmpty = computed(() =>
-  !isLoading.value && effectiveOptions.value.length === 0 && !canAddCustom.value,
-)
 
 // ————— Панель: id/aria-activedescendant.
 const listboxId = useId()
@@ -449,127 +383,42 @@ function optionDomId(index: number): string {
 }
 const addOptionDomId = computed(() => `${listboxId}-add`)
 
-/**
- * Виртуализация панели.
- *
- * Набор — `[«Add …»?] + filteredOptions`, тот же, по которому ходит клавиатура
- * (`navigableItems` ниже). Иначе верхняя распорка вытолкнула бы строку «Add …»
- * вниз: она отрисована внутри listbox'а первой и является полноценной опцией.
- */
-
-/** Оценка высоты опции: `py-2` вокруг строки кегля `sm`. Уточняется замером. */
-const OPTION_SIZE_ESTIMATE = 36
-
-const addOffset = computed(() => (canAddCustom.value ? 1 : 0))
-const virtualCount = computed(() => effectiveOptions.value.length + addOffset.value)
-
-const virtualizer = useVirtualList({
-  container: listboxEl,
-  count: () => (props.virtual ? virtualCount.value : 0),
-  // Фильтрация/remote-ответ пересобирают набор — замеры прошлого невалидны.
-  source: () => effectiveOptions.value,
-  itemSize: OPTION_SIZE_ESTIMATE,
-  // Панель скрыта `v-show`, пока закрыта, поэтому `clientHeight` контейнера —
-  // ноль. Окно считается от объявленной высоты до первого настоящего замера.
-  viewportSize: () => props.dropdownMaxHeight,
+const {
+  addOffset,
+  virtualizer,
+  showAddOption,
+  renderedOptions,
+  optionSetProps,
+  listboxStyle,
+} = useAutocompleteVirtual<TValue>({
+  listboxEl,
+  effectiveOptions,
+  canAddCustom,
+  virtual: () => props.virtual,
+  dropdownMaxHeight: () => props.dropdownMaxHeight,
 })
-
-/** Виден ли «Add …»: вне виртуального окна его рисовать нельзя — он элемент набора. */
-const showAddOption = computed(() => {
-  if (!canAddCustom.value)
-    return false
-  return !props.virtual || virtualizer.range.value.start === 0
-})
-
-/** Опции к отрисовке вместе с их абсолютным индексом в `filteredOptions`. */
-const renderedOptions = computed(() => {
-  const all = effectiveOptions.value
-  if (!props.virtual)
-    return all.map((option, index) => ({ option, index }))
-
-  const { start, end } = virtualizer.range.value
-  const from = Math.max(0, start - addOffset.value)
-  const to = Math.max(0, end - addOffset.value)
-
-  return all.slice(from, to).map((option, offset) => ({ option, index: from + offset }))
-})
-
-/**
- * Размер набора и позиция в нём объявляются только при виртуализации: в обычном
- * режиме диктор выводит их из DOM, а при неполном наборе получил бы «3 из 15»
- * на списке в десять тысяч.
- */
-function optionSetProps(virtualIndex: number): Record<string, number> | undefined {
-  if (!props.virtual)
-    return undefined
-  return { 'aria-setsize': virtualCount.value, 'aria-posinset': virtualIndex + 1 }
-}
-
-const listboxStyle = computed(() => {
-  const base: Record<string, string> = { maxHeight: `${props.dropdownMaxHeight}px` }
-  if (!props.virtual)
-    return base
-
-  return {
-    ...base,
-    ...virtualizer.spacerStyle.value,
-  }
-})
-
-/**
- * Клавиатурная навигация ходит и по опциям, и по варианту «добавить своё»:
- * иначе при непустом списке Enter всегда уходил бы в активную опцию, и
- * закоммитить произвольное значение с клавиатуры было бы нечем.
- */
-type NavigableItem
-  = | { kind: 'add' }
-    | { kind: 'option', option: GrAutocompleteOption<TValue>, index: number }
-
-const navigableItems = computed<NavigableItem[]>(() => {
-  const items: NavigableItem[] = canAddCustom.value ? [{ kind: 'add' }] : []
-  effectiveOptions.value.forEach((option, index) => {
-    if (!option.disabled)
-      items.push({ kind: 'option', option, index })
-  })
-  return items
-})
-
-function isSelected(value: TValue): boolean {
-  return selectedValues.value.includes(value)
-}
-
-function navigableIndexOf(value: TValue): number {
-  return navigableItems.value.findIndex(item => item.kind === 'option' && item.option.value === value)
-}
-
-/** Прокрутка к активному: сперва окно виртуального списка, затем доводка. */
-async function scrollActiveIntoView(item: NavigableItem): Promise<void> {
-  // Вне окна активной опции в DOM нет: `getElementById` вернул бы `null`,
-  // прокрутка не случилась бы, а `aria-activedescendant` указал бы в пустоту.
-  if (props.virtual)
-    virtualizer.scrollToIndex(item.kind === 'add' ? 0 : item.index + addOffset.value)
-
-  await nextTick()
-  const id = item.kind === 'add' ? addOptionDomId.value : optionDomId(item.index)
-  document.getElementById(id)?.scrollIntoView?.({ block: 'nearest' })
-}
 
 const {
+  isSelected,
+  navigableIndexOf,
   activeIndex,
   activeItem,
   activeDescendantId,
-  init: initActiveIndex,
-  reset: resetActive,
+  activeValue,
+  initActiveIndex,
+  resetActive,
   handleNavigationKeys,
-} = useComboboxNavigation<NavigableItem>({
-  items: () => navigableItems.value,
-  open: () => open.value,
-  idOf: item => (item.kind === 'add' ? addOptionDomId.value : optionDomId(item.index)),
-  initialIndex: () => navigableItems.value.findIndex(item => item.kind === 'option' && isSelected(item.option.value)),
-  scrollTo: item => scrollActiveIntoView(item),
+} = useAutocompleteNavigation<TValue>({
+  effectiveOptions,
+  canAddCustom,
+  selectedValues,
+  open,
+  virtual: () => props.virtual,
+  addOffset,
+  scrollToIndex: index => virtualizer.scrollToIndex(index),
+  optionDomId,
+  addOptionDomId,
 })
-
-const activeValue = computed(() => (activeItem.value?.kind === 'option' ? activeItem.value.option.value : undefined))
 
 // ————— Открытие/закрытие.
 function openDropdown(): void {
@@ -585,76 +434,6 @@ function closeDropdown(): void {
 function focusInput(): void {
   inputEl.value?.focus()
 }
-
-// ————— Дебаунснутый поиск для remote-загрузки.
-let searchTimer: ReturnType<typeof setTimeout> | null = null
-// Счётчик запросов: ответ, стартовавший раньше, но пришедший позже, обязан
-// проиграть последнему — иначе список показывает результат старого запроса.
-let searchSeq = 0
-let inflight: AbortController | null = null
-
-function isAbortError(error: unknown): boolean {
-  return error instanceof Error && error.name === 'AbortError'
-}
-
-async function runFetch(query: string): Promise<void> {
-  const fetchOptions = props.fetchOptions
-  if (!fetchOptions)
-    return
-
-  inflight?.abort()
-  const controller = new AbortController()
-  inflight = controller
-  const seq = ++searchSeq
-  remoteLoading.value = true
-
-  try {
-    const result = await fetchOptions(query, controller.signal)
-    if (seq !== searchSeq)
-      return
-    remoteOptions.value = result
-    remoteAnswered.value = true
-  }
-  catch (error) {
-    if (seq !== searchSeq || isAbortError(error))
-      return
-    remoteOptions.value = []
-    remoteAnswered.value = true
-    emit('searchError', error)
-  }
-  finally {
-    if (seq === searchSeq)
-      remoteLoading.value = false
-  }
-}
-
-function scheduleSearch(value: string): void {
-  if (searchTimer)
-    clearTimeout(searchTimer)
-  searchTimer = setTimeout(() => {
-    if (props.minQueryLength > 0 && value.trim().length < props.minQueryLength)
-      return
-    emit('search', value.trim())
-    void runFetch(value.trim())
-  }, props.debounce)
-}
-
-/**
- * Снять запланированный и летящий запрос. Инкремент `searchSeq` обязателен
- * вместе со снятием `remoteLoading`: после него `finally` в `runFetch` считает
- * себя устаревшим и флаг не тронет — спиннер остался бы навсегда.
- */
-function cancelSearch(): void {
-  if (searchTimer)
-    clearTimeout(searchTimer)
-  searchTimer = null
-  inflight?.abort()
-  inflight = null
-  searchSeq += 1
-  remoteLoading.value = false
-}
-
-onBeforeUnmount(cancelSearch)
 
 // ————— Ввод.
 function onInput(event: Event): void {
