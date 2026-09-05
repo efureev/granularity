@@ -9,6 +9,19 @@ to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- **`GrFormField` now documents how a `group`-role control declares required.**
+  The `required` prop said "marker `*` + `aria-required` on the control", as if
+  the path were the same for every role. It is not: the marker is `aria-hidden`,
+  so the control is the only source — and `role="group"` does not allow
+  `aria-required` at all (axe reports critical `aria-allowed-attr`). A control
+  group delegates the declaration to its focusable children, the way
+  `GrCheckboxGroup` already does, while `aria-invalid` stays on the group so a
+  screen reader does not repeat "invalid value" once per checkbox.
+
+  Nothing in the package changed behaviour — this was already how it worked.
+  What changed is that the general contract says so, instead of leaving each
+  author of a custom group widget to rediscover the axe failure.
+
 - **`GrDataTable` internals now live in six modules** next to the component —
   row keys, sorting, selection, column order, column widths and pinned-column
   layout. Nothing about the public API moved: props, emits, slots and the
