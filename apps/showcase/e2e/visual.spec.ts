@@ -1,5 +1,7 @@
 import { expect, test } from '@playwright/test'
 
+import { waitForOpaque } from '@feugene/granularity-test-kit/e2e'
+
 import { companionPath, componentPath, registryComponentNames, visualCompanionComponentNames } from './components'
 
 /**
@@ -13,10 +15,10 @@ import { companionPath, componentPath, registryComponentNames, visualCompanionCo
  * абсолютный `maxDiffPixels`): цель слоя — ловить именно цветовые регрессии
  * токенов, а они при дефолтных допусках не видны в принципе.
  *
- * Список — не весь реестр, а выборка по визуальному «языку»: форм-контролы,
- * поверхности, данные, состояния. Компонент попадает сюда, если его вид завязан на
- * токены и стабилен без взаимодействия; оверлеи, открывающиеся по клику, и всё с
- * асинхронным содержимым — нет, они дают мигающие эталоны.
+ * Наборов два. `VISUAL_COMPONENTS` — компоненты, снимаемые страницей: их вид
+ * завязан на токены и стабилен без взаимодействия. `VISUAL_OVERLAYS` — слои,
+ * которые сперва раскрывают, а снимают саму панель: закрытый оверлей это
+ * кнопка, и предмет гейта у него весь в раскрытом состоянии.
  *
  * Выборка при этом обязана быть полной относительно реестра: каждое имя либо
  * снимается, либо лежит в `VISUAL_EXCLUDED` с причиной. Держит это тест в конце
@@ -209,22 +211,6 @@ const VISUAL_COMPONENTS = [
  * ли компонент внести, и «см. выше» на этот вопрос не отвечает.
  */
 const VISUAL_EXCLUDED: Record<string, string> = {
-  // Оверлеи за кликом: снимок ловит фазу появления, эталон мигает. Снимаемы
-  // приёмом `GrColorPicker` ниже — клик по триггеру и снимок самой панели, —
-  // но это отдельная работа на каждый.
-  GrModal: 'оверлей за кликом — мигающий эталон',
-  GrDrawer: 'оверлей за кликом — мигающий эталон',
-  GrDialog: 'оверлей за кликом — мигающий эталон',
-  GrConfirmDialog: 'оверлей за кликом — мигающий эталон',
-  GrPromptDialog: 'оверлей за кликом — мигающий эталон',
-  GrDropdown: 'оверлей за кликом — мигающий эталон',
-  GrDropdownMenu: 'оверлей за кликом — мигающий эталон',
-  GrPopover: 'оверлей за кликом — мигающий эталон',
-  GrTooltip: 'оверлей за кликом — мигающий эталон',
-  GrToaster: 'оверлей за кликом — мигающий эталон',
-  GrCommandPalette: 'оверлей за кликом — мигающий эталон',
-  GrImageViewer: 'оверлей за кликом — мигающий эталон',
-
   // Раскладка считается от ширины окна раннера, а не от токенов: эталон, снятый
   // на одной ширине, на другой расходится целиком.
   GrNavbar: 'раскладка зависит от ширины окна раннера',
@@ -343,6 +329,90 @@ for (const theme of ['light', 'dark'] as const) {
 }
 
 /**
+ * Оверлеи: снимок раскрытой панели, а не страницы.
+ *
+ * Закрытый оверлей — это кнопка, а всё, ради чего гейт существует (поверхность
+ * панели, тень, радиус, подложка), живёт в раскрытом состоянии. Приём тот же,
+ * что у панели `GrColorPicker` выше: открыть и снять сам слой. Плавающее
+ * позиционирование в эталон не попадает — снимается элемент, а не вьюпорт.
+ *
+ * **`waitForOpaque` здесь обязателен, а не желателен.** Панель появляется
+ * с переходом прозрачности, и снимок посреди него ловит случайный кадр — это
+ * и есть «мигающий эталон», из-за которого оверлеи держали вне набора. Ждём
+ * конца перехода, а не паузой: пауза угадывает, а не измеряет.
+ */
+type OverlayTarget = {
+  name: string
+  /** Панель, которая идёт в кадр. */
+  panel: string
+  /** Как раскрыть. По умолчанию — клик по первой кнопке первого превью. */
+  open?: (page: import('@playwright/test').Page) => Promise<void>
+}
+
+async function clickFirstPreviewButton(page: import('@playwright/test').Page): Promise<void> {
+  // Триггер по позиции, а не по подписи: подпись приходит из локали витрины.
+  await page.locator('[data-example-preview] button').first().click()
+}
+
+const VISUAL_OVERLAYS: OverlayTarget[] = [
+  // Семейство модальных: `GrDialog` и оба его пресета рисуются через `GrModal`,
+  // поэтому панель у всех четырёх одна и та же.
+  { name: 'GrModal', panel: '[data-gr-modal-panel]' },
+  { name: 'GrDialog', panel: '[data-gr-modal-panel]' },
+  { name: 'GrConfirmDialog', panel: '[data-gr-modal-panel]' },
+  { name: 'GrPromptDialog', panel: '[data-gr-modal-panel]' },
+  { name: 'GrDrawer', panel: '[data-gr-drawer-panel]' },
+  { name: 'GrCommandPalette', panel: '[data-gr-command-palette]' },
+  { name: 'GrImageViewer', panel: '[data-gr-image-viewer-panel]' },
+  { name: 'GrDropdown', panel: '[data-gr-dropdown-panel]' },
+  { name: 'GrDropdownMenu', panel: '[data-gr-dropdown-panel]' },
+  {
+    name: 'GrPopover',
+    panel: '[data-gr-popover-panel]',
+    open: page => page.locator('[data-gr-popover-trigger]').first().click(),
+  },
+  {
+    // Тултип раскрывается наведением, а не кликом.
+    name: 'GrTooltip',
+    panel: '[data-gr-tooltip-panel]',
+    open: page => page.locator('[data-gr-tooltip-trigger]').first().hover(),
+  },
+  { name: 'GrToaster', panel: '[data-gr-toaster]' },
+]
+
+for (const theme of ['light', 'dark'] as const) {
+  test.describe(`visual overlay (${theme})`, () => {
+    for (const target of VISUAL_OVERLAYS) {
+      test(`${target.name} panel`, async ({ page }) => {
+        /*
+         * Часы здесь НЕ замораживаются, в отличие от снимков страниц.
+         * `page.clock.setFixedTime` не даёт оверлею раскрыться вовсе: панель не
+         * появляется в DOM, и тест падает на ожидании, а не на диффе. Проверено
+         * прямым замером — с этой строкой не открывался ни один из двенадцати,
+         * без неё открылись все. Времязависимого текста в панелях нет, так что
+         * замораживать нечего.
+         */
+        await page.emulateMedia({ colorScheme: theme, reducedMotion: 'reduce' })
+        await pinAppearance(page, theme)
+
+        await page.goto(componentPath(target.name))
+        await page.locator('#live-examples').waitFor()
+        await page.waitForLoadState('networkidle')
+
+        await (target.open ?? clickFirstPreviewButton)(page)
+
+        const panel = page.locator(`${target.panel}:visible`).first()
+        await expect(panel).toBeVisible()
+        await waitForOpaque(page, target.panel)
+
+        const slug = componentPath(target.name).split('/')[1]
+        await expect(panel).toHaveScreenshot(`${slug}-panel-${theme}.png`)
+      })
+    }
+  })
+}
+
+/**
  * Сторож источника набора — зеркало теста полноты в `a11y.spec.ts`.
  *
  * Набор ядра здесь набирается руками (в отличие от компаньонов, которые
@@ -360,7 +430,8 @@ for (const theme of ['light', 'dark'] as const) {
  */
 test('каждый компонент реестра либо снимается, либо исключён с причиной', () => {
   const excluded = Object.keys(VISUAL_EXCLUDED)
-  const accounted = new Set([...VISUAL_COMPONENTS, ...excluded])
+  const overlayNames = VISUAL_OVERLAYS.map(target => target.name)
+  const accounted = new Set([...VISUAL_COMPONENTS, ...overlayNames, ...excluded])
 
   const unaccounted = registryComponentNames.filter(name => !accounted.has(name))
   expect(
@@ -377,7 +448,7 @@ test('каждый компонент реестра либо снимается
     + 'Переименован или удалён — запись обязана уехать следом.',
   ).toEqual([])
 
-  const contradictory = VISUAL_COMPONENTS.filter(name => name in VISUAL_EXCLUDED)
+  const contradictory = [...VISUAL_COMPONENTS, ...overlayNames].filter(name => name in VISUAL_EXCLUDED)
   expect(
     contradictory,
     `Одновременно в наборе и в исключениях: ${contradictory.join(', ')}.`,
