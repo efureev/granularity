@@ -4,13 +4,13 @@ import {
   jumperSizes,
   labelSizes,
   pageListGaps,
-  pageSizes,
+  pageBoxSizes,
   pageSizeSelectWidths,
   rowGaps,
 } from './grPaginationStyles'
 
 export const grPaginationSafelist = [...new Set([
-  ...Object.values(pageSizes).flatMap(splitClassTokens),
+  ...Object.values(pageBoxSizes).flatMap(splitClassTokens),
   ...Object.values(ellipsisSizes).flatMap(splitClassTokens),
   ...Object.values(labelSizes).flatMap(splitClassTokens),
   ...Object.values(jumperSizes).flatMap(splitClassTokens),

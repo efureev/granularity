@@ -12,7 +12,7 @@ import {
   labelSizes,
   navButtonSizes,
   pageListGaps,
-  pageSizes,
+  pageBoxSizes,
   pageSizeSelectWidths,
   rowGaps,
 } from './grPaginationStyles'
@@ -25,11 +25,24 @@ import {
  * (алгоритм boundary/sibling, как у MUI): всегда видны первая/последняя страница
  * и `siblingCount` соседей вокруг текущей.
  */
+/**
+ * Вариант размера страницы: число либо пара «значение + подпись».
+ *
+ * Пара нужна там, где подпись не равна числу («50 / стр.», «Все»): собрать её
+ * из голого `number[]` было нельзя, а обходной путь — свой `GrSelect` рядом —
+ * терял связь с пагинацией.
+ */
+export type GrPaginationPageSizeOption = number | { value: number, label: string }
+
 export interface GrPaginationProps {
   page: number
   pageSize: number
   total: number
-  pageSizes?: number[]
+  /**
+   * Варианты размера страницы. Число — подпись равна значению; пара — своя
+   * подпись при том же значении («50 / стр.»), которую иначе было не собрать.
+   */
+  pageSizes?: GrPaginationPageSizeOption[]
   /** Сколько соседних страниц показывать вокруг текущей. По умолчанию `1`. */
   siblingCount?: number
   /** Сколько крайних страниц всегда показывать с каждого края. По умолчанию `1`. */
@@ -87,7 +100,7 @@ const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrPagina
 
 const rowClass = computed(() => rowGaps[resolvedSize.value])
 const pageListClass = computed(() => pageListGaps[resolvedSize.value])
-const pageClass = computed(() => pageSizes[resolvedSize.value])
+const pageClass = computed(() => pageBoxSizes[resolvedSize.value])
 const jumperClass = computed(() => jumperSizes[resolvedSize.value])
 const ellipsisClass = computed(() => ellipsisSizes[resolvedSize.value])
 const labelClass = computed(() => labelSizes[resolvedSize.value])
@@ -128,10 +141,9 @@ const pageSizeModel = computed({
 })
 
 const pageSizeOptions = computed(() =>
-  props.pageSizes.map(pageSize => ({
-    value: String(pageSize),
-    label: String(pageSize),
-  })),
+  props.pageSizes.map(option => (typeof option === 'number'
+    ? { value: String(option), label: String(option) }
+    : { value: String(option.value), label: option.label })),
 )
 
 const rangeFrom = computed(() => (resolvedTotal.value === 0 ? 0 : (currentPage.value - 1) * resolvedPageSize.value + 1))

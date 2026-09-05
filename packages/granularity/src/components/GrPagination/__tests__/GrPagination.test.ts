@@ -2,6 +2,7 @@ import { mount } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import GrPagination, { type GrPaginationProps } from '../GrPagination.vue'
+import { navButtonSizes, pageBoxSizes } from '../grPaginationStyles'
 import type { GranularityI18nAdapter } from '../../../i18n/adapter'
 import { granularityGlobal } from '../../../testing'
 
@@ -334,5 +335,56 @@ describe('GrPagination — обязательный проп не доехал',
     // Необъявленный проп уезжает на корень — по этому следу дефект и находят.
     expect(wrapper.get('[role="navigation"]').attributes('modelvalue')).toBe('2')
     expect(warnings()).toContain('`v-model:page`, а не `v-model`')
+  })
+})
+
+describe('GrPagination — размеры страницы своей подписью', () => {
+  it('число задаёт подпись, равную значению', () => {
+    const wrapper = mount(GrPagination, {
+      props: { total: 100, pageSize: 10, showPageSize: true, pageSizes: [10, 50] },
+    })
+
+    const options = wrapper.findComponent({ name: 'GrSelect' }).props('options') as Array<{ value: string, label: string }>
+    expect(options).toEqual([
+      { value: '10', label: '10' },
+      { value: '50', label: '50' },
+    ])
+  })
+
+  /**
+   * Ради этого проп и расширен: подпись «50 / стр.» из голого `number[]` было
+   * не собрать, а свой `GrSelect` рядом терял связь с пагинацией.
+   */
+  it('пара задаёт свою подпись при том же значении', () => {
+    const wrapper = mount(GrPagination, {
+      props: {
+        total: 100,
+        pageSize: 10,
+        showPageSize: true,
+        pageSizes: [10, { value: 50, label: '50 / стр.' }],
+      },
+    })
+
+    const options = wrapper.findComponent({ name: 'GrSelect' }).props('options') as Array<{ value: string, label: string }>
+    expect(options).toEqual([
+      { value: '10', label: '10' },
+      { value: '50', label: '50 / стр.' },
+    ])
+  })
+})
+
+describe('GrPagination — рост коробки совпадает с GrButton', () => {
+  /**
+   * Номера и навигационные кнопки стоят в одном ряду: разойдись шкалы —
+   * ряд поедет. Раньше `sm` и `md` были одной коробкой `h-8`, и кнопке
+   * приходилось выдавать размер на ступень ниже собственного имени.
+   */
+  it('sm и md — разные коробки, и кнопке достаётся её же размер', () => {
+    expect(pageBoxSizes.sm).toContain('h-8')
+    expect(pageBoxSizes.md).toContain('h-10')
+    expect(pageBoxSizes.sm).not.toBe(pageBoxSizes.md)
+
+    for (const size of ['xs', 'sm', 'md', 'lg'] as const)
+      expect(navButtonSizes[size]).toBe(size)
   })
 })

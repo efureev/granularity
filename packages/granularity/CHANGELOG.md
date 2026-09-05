@@ -9,6 +9,25 @@ to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- **`GrPagination` boxes now share the `GrButton` height scale**, so `sm` and
+  `md` are different sizes rather than the same `h-8` box with a different type
+  size. Numbers and navigation buttons stand in one row, so the two scales
+  diverging is visible directly: the row steps. It also removes a workaround —
+  `navButtonSizes` used to hand the button a size one step below its own name,
+  because pagination's `md` was as tall as the button's `sm`.
+
+  Rows on `md` and `lg` grow by 8px and 4px. Nothing else about the component
+  changed, and the visual baselines were re-shot in the same commit.
+
+- **`pageSizes` accepts a label, not just a number.** `[10, 20, { value: 50,
+  label: '50 / стр.' }]` — a caption that is not the number itself could not be
+  built from a bare `number[]`, and the way around it, a `GrSelect` of your own
+  beside the pagination, lost the connection to it.
+
+  The styles export of the same name is now `pageBoxSizes`: one name for two
+  different things inside one component reads as a mistake, and here it was the
+  page-size list on one side and height classes on the other.
+
 - **`state="success"` and `"warning"` no longer speak in colour alone** — in all
   five controls that have the prop: `GrInput`, `GrTextarea`, `GrNumberInput`,
   `GrInputTag` and `GrTreeSelect`. A coloured border was the only carrier of meaning,
