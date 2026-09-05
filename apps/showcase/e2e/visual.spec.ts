@@ -2,6 +2,8 @@ import { expect, test } from '@playwright/test'
 
 import { waitForOpaque } from '@feugene/granularity-test-kit/e2e'
 
+import { waitForSettledPreviews } from './readiness'
+
 import { companionPath, componentPath, registryComponentNames, visualCompanionComponentNames } from './components'
 
 /**
@@ -273,6 +275,7 @@ for (const theme of ['light', 'dark'] as const) {
         await examples.waitFor()
         // Даём шрифтам/иконкам дорисоваться.
         await page.waitForLoadState('networkidle')
+        await waitForSettledPreviews(page)
 
         await hideChrome(page)
 
@@ -294,6 +297,7 @@ for (const theme of ['light', 'dark'] as const) {
         const examples = page.locator('#live-examples')
         await examples.waitFor()
         await page.waitForLoadState('networkidle')
+        await waitForSettledPreviews(page)
 
         await hideChrome(page)
 

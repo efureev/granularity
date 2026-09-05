@@ -3,6 +3,7 @@ import { expect, test } from '@playwright/test'
 import { a11yRegressions, createA11yBaseline, expectNoA11yRegressions } from '@feugene/granularity-test-kit/e2e'
 
 import { a11yKnownIssues } from './a11y-baseline'
+import { waitForSettledPreviews } from './readiness'
 import { companionComponentNames, registryComponentNames, scanTargets } from './components'
 
 /**
@@ -38,12 +39,7 @@ for (const target of scanTargets) {
   test(`a11y: ${target.name} has no un-baselined serious/critical violations`, async ({ page }) => {
     await page.goto(target.path)
     await page.locator(target.ready).waitFor()
-    // Демо приезжают асинхронными компонентами, а `ready` — это заголовок
-    // секции: он появляется раньше них. Без ожидания axe успевал просканировать
-    // пустые рамки превью и объявить страницу чистой, ничего не проверив.
-    await expect.poll(async () => page.evaluate(() => [...document.querySelectorAll('[data-example-preview]')]
-      .filter(preview => preview.childElementCount === 0)
-      .length)).toBe(0)
+    await waitForSettledPreviews(page)
 
     await expectNoA11yRegressions(page, {
       include: '[data-example-preview]',
