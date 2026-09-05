@@ -21,11 +21,20 @@ import {
   type GrTextareaState,
 } from './grTextareaStyles'
 import IconX from '~icons/lucide/x'
+import IconCheckCircle from '~icons/lucide/check-circle'
+import IconAlertTriangle from '~icons/lucide/alert-triangle'
 import { vAutosize } from '../../directives'
 import { useGrComponentProp, useGrComponentSize } from '../GrConfigProvider/context'
 import { useGrFormFieldContext } from '../GrFormField/context'
 import { useGrFormControl } from '../../composables/useGrFormControl'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
+import {
+  controlSignalState,
+  controlStateFallbackText,
+  controlStateIconClass,
+  controlStateIconColors,
+  controlStateTextKey,
+} from '../shared/controlState'
 
 export interface GrTextareaProps {
   modelValue: string
@@ -115,15 +124,7 @@ const resolvedId = computed(() => props.id ?? field?.id.value)
 // не слышно — при том что ограничение длины и есть его смысл.
 const countId = useId()
 const lineCountId = useId()
-const describedBy = computed(() =>
-  [
-    field?.describedById.value,
-    props.showCount ? countId : undefined,
-    props.showLineCount ? lineCountId : undefined,
-  ]
-    .filter(Boolean)
-    .join(' ') || undefined,
-)
+const stateTextId = useId()
 
 /** Обёртка нужна любому из счётчиков — и кнопке очистки. */
 const hasCounters = computed(() => props.showCount || props.showLineCount)
@@ -139,6 +140,27 @@ const {
   required: isRequired,
   readonly: isReadonly,
 } = useGrFormControl(() => props)
+
+/**
+ * Небуквенный признак состояния: иконка для глаз, скрытая подпись для
+ * скринридера. Разбор — `shared/controlState`.
+ */
+const signalState = computed(() => controlSignalState(props.state, isInvalid.value))
+const stateIcon = computed(() => (signalState.value === 'success' ? IconCheckCircle : IconAlertTriangle))
+const stateIconClass = computed(() => (signalState.value
+  ? `${controlStateIconClass} ${controlStateIconColors[signalState.value]}`
+  : ''))
+
+const describedBy = computed(() =>
+  [
+    field?.describedById.value,
+    props.showCount ? countId : undefined,
+    props.showLineCount ? lineCountId : undefined,
+    signalState.value ? stateTextId : undefined,
+  ]
+    .filter(Boolean)
+    .join(' ') || undefined,
+)
 
 const textareaEl = ref<HTMLTextAreaElement | null>(null)
 
@@ -156,6 +178,10 @@ const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrTextar
 const resolvedClearable = useGrComponentProp('GrTextarea', 'clearable', () => props.clearable, false)
 
 const { t } = useGranularityTranslations()
+
+const stateText = computed(() => (signalState.value
+  ? t(controlStateTextKey[signalState.value], controlStateFallbackText[signalState.value])
+  : ''))
 const resolvedClearLabel = computed(() => props.clearLabel ?? t('gr.input.clear', 'Clear'))
 
 /** С `maxLines` — «3 / 10», без него — локализованная подпись с формой числа. */
@@ -251,6 +277,17 @@ function onBlur(e: FocusEvent): void {
       <IconX class="h-4 w-4" aria-hidden="true" />
     </button>
 
+    <span
+      v-if="signalState"
+      data-gr-textarea-state
+      class="absolute top-2" :class="[stateIconClass, showClear ? 'right-10' : 'right-2']"
+      aria-hidden="true"
+    >
+      <component :is="stateIcon" class="h-4 w-4" />
+    </span>
+
+    <span v-if="signalState" :id="stateTextId" data-gr-textarea-state-text class="sr-only">{{ stateText }}</span>
+
     <div :class="countRowClass">
       <div
         v-if="showLineCount"
@@ -275,9 +312,10 @@ function onBlur(e: FocusEvent): void {
     </div>
   </div>
 
-  <!-- Обёртка появляется только под кнопку очистки: без неё поле остаётся
-       корневым элементом — на этом стоит контракт fallthrough-атрибутов. -->
-  <div v-else-if="resolvedClearable" class="relative w-full">
+  <!-- Обёртка появляется под кнопку очистки и под признак состояния: без них
+       поле остаётся корневым элементом — на этом стоит контракт
+       fallthrough-атрибутов. -->
+  <div v-else-if="resolvedClearable || signalState" class="relative w-full">
     <textarea
       ref="textareaEl"
       v-autosize="autosize"
@@ -298,6 +336,17 @@ function onBlur(e: FocusEvent): void {
     >
       <IconX class="h-4 w-4" aria-hidden="true" />
     </button>
+
+    <span
+      v-if="signalState"
+      data-gr-textarea-state
+      class="absolute top-2" :class="[stateIconClass, showClear ? 'right-10' : 'right-2']"
+      aria-hidden="true"
+    >
+      <component :is="stateIcon" class="h-4 w-4" />
+    </span>
+
+    <span v-if="signalState" :id="stateTextId" data-gr-textarea-state-text class="sr-only">{{ stateText }}</span>
   </div>
 
   <textarea

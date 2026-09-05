@@ -457,3 +457,33 @@ describe('GrInputTag — name (нативная форма)', () => {
     wrapper.unmount()
   })
 })
+
+describe('GrInputTag — признак состояния', () => {
+  it('success и warning несут не только цвет: иконка плюс подпись в описании поля', () => {
+    for (const state of ['success', 'warning'] as const) {
+      const wrapper = mount(GrInputTag, { props: { ...{ modelValue: [] }, state } })
+
+      // Иконка — для глаз, поэтому от скринридера скрыта: смысл ему несёт подпись.
+      expect(wrapper.get('[data-gr-input-tag-state]').attributes('aria-hidden')).toBe('true')
+
+      const text = wrapper.get('[data-gr-input-tag-state-text]')
+      expect(text.text()).not.toBe('')
+
+      // Без этой связи подпись видна только глазами — то есть не существует.
+      const describedBy = wrapper.get('input').attributes('aria-describedby') ?? ''
+      expect(describedBy.split(' ')).toContain(text.attributes('id'))
+    }
+  })
+
+  it('у default и danger признака нет', () => {
+    for (const state of ['default', 'danger'] as const) {
+      const wrapper = mount(GrInputTag, { props: { ...{ modelValue: [] }, state } })
+      expect(wrapper.find('[data-gr-input-tag-state]').exists()).toBe(false)
+    }
+  })
+
+  it('невалидность гасит признак, даже если state=success', () => {
+    const wrapper = mount(GrInputTag, { props: { ...{ modelValue: [] }, state: 'success', invalid: true } })
+    expect(wrapper.find('[data-gr-input-tag-state]').exists()).toBe(false)
+  })
+})

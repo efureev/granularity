@@ -9,6 +9,33 @@ to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- **`state="success"` and `"warning"` no longer speak in colour alone** — in all
+  five controls that have the prop: `GrInput`, `GrTextarea`, `GrNumberInput`,
+  `GrInputTag` and `GrTreeSelect`. A coloured border was the only carrier of meaning,
+  which is WCAG 1.4.1. Now the state also draws an icon, and a visually hidden
+  label joins the field's `aria-describedby`.
+
+  Both halves are needed, and for different reasons. The icon adds shape, so the
+  state survives for anyone who does not separate the two hues. The label adds a
+  programmatic channel, which these two states simply do not have: `danger` maps
+  onto `aria-invalid`, while "valid" and "warning" have no ARIA equivalent at
+  all — the only way to announce them is text.
+
+  `danger` deliberately gets no icon: its meaning already travels through
+  `aria-invalid` and the error text from `GrFormField`, and a third marker beside
+  them is noise. The signal also disappears the moment the field is marked
+  invalid — a check mark next to `aria-invalid="true"` would contradict it.
+
+  The icon colour is the `-text` role rather than the saturated tone: `--gr-success`
+  is tuned as a fill and does not reach AA as text. The `styleTokens` gate catches
+  that, and it caught it here.
+
+  Placement is per control rather than shared, because the right edge is already
+  taken by something different in each: steppers in `GrNumberInput`, chips in
+  `GrInputTag`, a clear button or chevron in `GrTreeSelect`. The logic and the
+  strings are shared (`components/shared/controlState.ts`); only the position is
+  each component's own.
+
 - **`GrFormField` now documents how a `group`-role control declares required.**
   The `required` prop said "marker `*` + `aria-required` on the control", as if
   the path were the same for every role. It is not: the marker is `aria-hidden`,

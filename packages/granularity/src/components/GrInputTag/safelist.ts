@@ -1,4 +1,5 @@
 import { splitClassTokens } from '../shared/classTokens'
+import { controlStateIconClass, controlStateIconColors } from '../shared/controlState'
 import {
   clearButtonClass,
   inputSizeClassBySize,
@@ -21,4 +22,8 @@ export const grInputTagSafelist = [...new Set([
   ...splitClassTokens(wrapperDisabledClass),
   ...splitClassTokens(clearButtonClass),
   ...splitClassTokens(spinnerClass),
+  // Общий модуль лежит в чанке без адреса — его классы объявляет каждый импортёр.
+  ...splitClassTokens(controlStateIconClass),
+  ...Object.values(controlStateIconColors).flatMap(splitClassTokens),
+  ...splitClassTokens('sr-only'),
 ])]

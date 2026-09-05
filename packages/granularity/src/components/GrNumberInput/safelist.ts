@@ -1,4 +1,5 @@
 import { splitClassTokens } from '../shared/classTokens'
+import { controlStateIconClass, controlStateIconColors } from '../shared/controlState'
 import {
   borderClassByState,
   clearButtonClass,
@@ -22,4 +23,8 @@ export const grNumberInputSafelist = [...new Set([
   ...splitClassTokens(stepperCompactClass),
   ...splitClassTokens(stepperWideClass),
   ...splitClassTokens(clearButtonClass),
+  // Общий модуль лежит в чанке без адреса — его классы объявляет каждый импортёр.
+  ...splitClassTokens(controlStateIconClass),
+  ...Object.values(controlStateIconColors).flatMap(splitClassTokens),
+  ...splitClassTokens('absolute top-1/2 -translate-y-1/2 sr-only'),
 ])]

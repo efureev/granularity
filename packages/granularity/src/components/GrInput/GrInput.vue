@@ -1,5 +1,12 @@
 <script setup lang="ts">
 import type { GrComponentSize } from '../shared/sizes'
+import {
+  controlSignalState,
+  controlStateFallbackText,
+  controlStateIconClass,
+  controlStateIconColors,
+  controlStateTextKey,
+} from '../shared/controlState'
 import { computed, ref, useId } from 'vue'
 
 import { useControlAddons } from '../../composables/internal/useControlAddons'
@@ -13,6 +20,8 @@ import { addonInlinePrefixClass, addonInlineSuffixClass, addonSegmentPrefixClass
 
 import IconLoader from '~icons/lucide/loader-2'
 import IconX from '~icons/lucide/x'
+import IconCheckCircle from '~icons/lucide/check-circle'
+import IconAlertTriangle from '~icons/lucide/alert-triangle'
 import IconEye from '~icons/lucide/eye'
 import IconEyeOff from '~icons/lucide/eye-off'
 
@@ -170,11 +179,6 @@ const resolvedId = computed(() => props.id ?? field?.id.value)
 // Счётчик обязан быть частью описания поля: иначе «12 / 60» видно глазами, но
 // не слышно — при том, что ограничение длины и есть смысл счётчика.
 const countId = useId()
-const describedBy = computed(() =>
-  [field?.describedById.value, props.showCount ? countId : undefined]
-    .filter(Boolean)
-    .join(' ') || undefined,
-)
 const {
   disabled: isDisabled,
   invalid: isInvalid,
@@ -217,7 +221,25 @@ const resolvedType = computed(() => (props.type === 'password' && passwordVisibl
 const showPasswordToggle = computed(() => props.passwordToggle && props.type === 'password' && !isDisabled.value)
 const showClear = computed(() => resolvedClearable.value && props.modelValue.length > 0 && !isDisabled.value && !isReadonly.value)
 
-const trailingCount = computed(() => (showClear.value ? 1 : 0) + (showPasswordToggle.value ? 1 : 0) + (props.loading ? 1 : 0))
+/**
+ * Небуквенный признак состояния: иконка для глаз плюс скрытая подпись для
+ * скринридера. Смысл `success`/`warning` иначе несёт один цвет рамки — WCAG
+ * 1.4.1. Подробности и почему `danger` его не получает — `shared/controlState`.
+ */
+const signalState = computed(() => controlSignalState(props.state, isInvalid.value))
+const stateIcon = computed(() => (signalState.value === 'success' ? IconCheckCircle : IconAlertTriangle))
+const stateIconClass = computed(() => (signalState.value
+  ? `${controlStateIconClass} ${controlStateIconColors[signalState.value]}`
+  : ''))
+
+const stateTextId = useId()
+const describedBy = computed(() =>
+  [field?.describedById.value, props.showCount ? countId : undefined, signalState.value ? stateTextId : undefined]
+    .filter(Boolean)
+    .join(' ') || undefined,
+)
+
+const trailingCount = computed(() => (showClear.value ? 1 : 0) + (showPasswordToggle.value ? 1 : 0) + (props.loading ? 1 : 0) + (signalState.value ? 1 : 0))
 const trailingReserve = computed(() => (trailingCount.value > 0 ? `${trailingCount.value * 28}px` : '0px'))
 
 const isInlineAddon = computed(() => props.addon === 'inline')
@@ -271,6 +293,10 @@ function onBlur(e: FocusEvent): void {
 
 // ————— Trailing-контролы: очистка, переключатель пароля, счётчик символов.
 const { t } = useGranularityTranslations()
+
+const stateText = computed(() => (signalState.value
+  ? t(controlStateTextKey[signalState.value], controlStateFallbackText[signalState.value])
+  : ''))
 const resolvedClearLabel = computed(() => props.clearLabel ?? t('gr.input.clear', 'Clear'))
 const resolvedPasswordShowLabel = computed(() => props.passwordShowLabel ?? t('gr.input.showPassword', 'Show password'))
 const resolvedPasswordHideLabel = computed(() => props.passwordHideLabel ?? t('gr.input.hidePassword', 'Hide password'))
@@ -356,6 +382,15 @@ function togglePassword(): void {
           class="absolute inset-y-0 right-1 flex items-center gap-0.5"
       >
         <span
+            v-if="signalState"
+            data-gr-input-state
+            :class="stateIconClass"
+            aria-hidden="true"
+        >
+          <component :is="stateIcon" class="h-4 w-4" />
+        </span>
+
+        <span
             v-if="loading"
             data-gr-input-spinner
             class="flex h-6 w-6 items-center justify-center text-[var(--gr-muted-fg)]"
@@ -401,6 +436,8 @@ function togglePassword(): void {
         <slot name="suffix" />
       </div>
     </div>
+
+    <span v-if="signalState" :id="stateTextId" data-gr-input-state-text class="sr-only">{{ stateText }}</span>
 
     <div
         v-if="showCount"

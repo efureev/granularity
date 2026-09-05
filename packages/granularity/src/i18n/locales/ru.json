@@ -37,7 +37,9 @@
     "cancel": "Отмена",
     "add": "Добавить",
     "clear": "Очистить",
-    "close": "Закрыть"
+    "close": "Закрыть",
+    "stateSuccess": "Корректно",
+    "stateWarning": "Предупреждение"
   },
   "loading": {
     "defaultText": "Загрузка..."

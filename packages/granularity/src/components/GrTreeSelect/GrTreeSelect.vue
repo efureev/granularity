@@ -13,6 +13,13 @@ import { useGrFormControl } from '../../composables/useGrFormControl'
 import { useFocusWithin } from '../../composables/internal/useFocusWithin'
 import { useGrFormFieldContext } from '../GrFormField/context'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
+import {
+  controlSignalState,
+  controlStateFallbackText,
+  controlStateIconClass,
+  controlStateIconColors,
+  controlStateTextKey,
+} from '../shared/controlState'
 import GrInput from '../GrInput/GrInput.vue'
 import GrTree, {
   type GrTreeInstance,
@@ -26,6 +33,8 @@ import { grTreeSelectClass, grTreeSelectPanelClass, grTreeSelectStateClass, padd
 
 import IconCheck from '~icons/lucide/check'
 import IconChevronDown from '~icons/lucide/chevron-down'
+import IconCheckCircle from '~icons/lucide/check-circle'
+import IconAlertTriangle from '~icons/lucide/alert-triangle'
 import IconLoaderCircle from '~icons/lucide/loader-circle'
 import IconX from '~icons/lucide/x'
 
@@ -107,13 +116,33 @@ const treeId = `gr-tree-select-tree-${useId()}`
 // Контекст `GrFormField` + общий контракт форм-контрола.
 const field = useGrFormFieldContext()
 const fieldId = computed(() => field?.id.value)
-const describedBy = computed(() => field?.describedById.value)
+const stateTextId = useId()
 const {
   disabled: isDisabled,
   invalid: isInvalid,
   required: isRequired,
   readonly: isReadonly,
 } = useGrFormControl(() => props)
+
+/**
+ * Небуквенный признак состояния: иконка для глаз, скрытая подпись для
+ * скринридера. Разбор — `shared/controlState`. Встаёт левее крестика и
+ * шеврона: правый край триггера занят одним из них всегда.
+ */
+const signalState = computed(() => controlSignalState(props.state, isInvalid.value))
+const stateIcon = computed(() => (signalState.value === 'success' ? IconCheckCircle : IconAlertTriangle))
+const stateIconClass = computed(() => (signalState.value
+  ? `${controlStateIconClass} ${controlStateIconColors[signalState.value]}`
+  : ''))
+const stateText = computed(() => (signalState.value
+  ? t(controlStateTextKey[signalState.value], controlStateFallbackText[signalState.value])
+  : ''))
+
+const describedBy = computed(() =>
+  [field?.describedById.value, signalState.value ? stateTextId : undefined]
+    .filter(Boolean)
+    .join(' ') || undefined,
+)
 
 function focus(): void {
   triggerEl.value?.focus()
@@ -607,6 +636,18 @@ const themeAttrs = useGrThemeAttrs()
         @focus="onTriggerFocus"
         @keydown="onTriggerKeydown"
       >
+
+      <span
+        v-if="signalState"
+        data-gr-tree-select-state
+        class="absolute top-1/2 -translate-y-1/2 right-9"
+        :class="stateIconClass"
+        aria-hidden="true"
+      >
+        <component :is="stateIcon" class="h-4 w-4" />
+      </span>
+
+      <span v-if="signalState" :id="stateTextId" data-gr-tree-select-state-text class="sr-only">{{ stateText }}</span>
 
       <button
         v-if="clearable && hasSelection && !disabled && !isReadonly"

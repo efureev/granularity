@@ -37,7 +37,9 @@
     "cancel": "Cancel",
     "add": "Add",
     "clear": "Clear",
-    "close": "Close"
+    "close": "Close",
+    "stateSuccess": "Valid",
+    "stateWarning": "Warning"
   },
   "loading": {
     "defaultText": "Loading..."

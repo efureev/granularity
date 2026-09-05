@@ -2,7 +2,7 @@
 import type { InputHTMLAttributes } from 'vue'
 
 import { useGrComponentProp, useGrComponentSize } from '../GrConfigProvider/context'
-import { computed, onBeforeUnmount, ref, watchEffect } from 'vue'
+import { computed, onBeforeUnmount, ref, useId, watchEffect } from 'vue'
 
 import {
   clearButtonClass,
@@ -25,8 +25,17 @@ import IconChevronLeft from '~icons/lucide/chevron-left'
 import IconChevronRight from '~icons/lucide/chevron-right'
 import IconChevronUp from '~icons/lucide/chevron-up'
 import IconX from '~icons/lucide/x'
+import IconCheckCircle from '~icons/lucide/check-circle'
+import IconAlertTriangle from '~icons/lucide/alert-triangle'
 import { addLen } from '../../composables/internal/useAddonMeasurement'
 import { useControlAddons } from '../../composables/internal/useControlAddons'
+import {
+  controlSignalState,
+  controlStateFallbackText,
+  controlStateIconClass,
+  controlStateIconColors,
+  controlStateTextKey,
+} from '../shared/controlState'
 
 defineOptions({
   inheritAttrs: false,
@@ -177,7 +186,7 @@ const props = withDefaults(defineProps<GrNumberInputProps>(), {
 const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrNumberInput' })
 
 const resolvedId = computed(() => props.id ?? field?.id.value)
-const describedBy = computed(() => field?.describedById.value)
+
 const {
   disabled: isDisabled,
   invalid: isInvalid,
@@ -271,6 +280,7 @@ const clearButtonStyle = computed(() => {
 
   return { right: addLen(addLen(suffixLen.value, controls), '6px') }
 })
+
 const horizontalLeftControlsStyle = computed(() => addonStyle('left', prefixLen.value))
 const horizontalRightControlsStyle = computed(() => addonStyle('right', suffixLen.value))
 
@@ -622,6 +632,36 @@ const clearVisible = computed(() =>
   resolvedClearable.value && !isDisabled.value && !isReadonly.value && props.modelValue !== null,
 )
 
+/**
+ * Небуквенный признак состояния: иконка для глаз, скрытая подпись для
+ * скринридера (`shared/controlState`). Встаёт левее крестика по той же
+ * арифметике — правая зона тут занята суффиксом и кнопками ±, и место
+ * приходится отсчитывать, а не полагаться на поток.
+ */
+const signalState = computed(() => controlSignalState(props.state, isInvalid.value))
+const stateIcon = computed(() => (signalState.value === 'success' ? IconCheckCircle : IconAlertTriangle))
+const stateIconClass = computed(() => (signalState.value
+  ? `${controlStateIconClass} ${controlStateIconColors[signalState.value]}`
+  : ''))
+const stateIconStyle = computed(() => {
+  const controls = rightControlsCount.value > 0 ? px(addonPx.value * rightControlsCount.value) : '0px'
+  // Крестик 20px плюс зазор: без сдвига признак лёг бы под него.
+  const clear = clearVisible.value ? '26px' : '0px'
+
+  return { right: addLen(addLen(addLen(suffixLen.value, controls), clear), '6px') }
+})
+
+const stateText = computed(() => (signalState.value
+  ? t(controlStateTextKey[signalState.value], controlStateFallbackText[signalState.value])
+  : ''))
+
+const stateTextId = useId()
+const describedBy = computed(() =>
+  [field?.describedById.value, signalState.value ? stateTextId : undefined]
+    .filter(Boolean)
+    .join(' ') || undefined,
+)
+
 function clear(): void {
   draft.value = null
   emit('update:modelValue', null)
@@ -703,6 +743,19 @@ if (__GR_DEV__) {
     >
       <slot name="suffix" />
     </div>
+
+    <span
+      v-if="signalState"
+      data-gr-number-input-state
+      class="absolute top-1/2 -translate-y-1/2"
+      :class="stateIconClass"
+      :style="stateIconStyle"
+      aria-hidden="true"
+    >
+      <component :is="stateIcon" class="h-4 w-4" />
+    </span>
+
+    <span v-if="signalState" :id="stateTextId" data-gr-number-input-state-text class="sr-only">{{ stateText }}</span>
 
     <button
       v-if="clearVisible"

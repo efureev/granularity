@@ -1,4 +1,5 @@
 import { flattenTransitionTokens, splitClassTokens } from '../shared/classTokens'
+import { controlStateIconClass, controlStateIconColors } from '../shared/controlState'
 import { panelPopTransition } from '../shared/overlayTransition'
 import {
   borderClassByState,
@@ -23,4 +24,8 @@ export const grTreeSelectSafelist = [...new Set([
   // модулем в `shared/`: в `dist` он лежит в общем чанке, который пресет не
   // сканирует, поэтому объявить его обязан каждый потребитель.
   ...flattenTransitionTokens(panelPopTransition),
+  // Общий модуль лежит в чанке без адреса — его классы объявляет каждый импортёр.
+  ...splitClassTokens(controlStateIconClass),
+  ...Object.values(controlStateIconColors).flatMap(splitClassTokens),
+  ...splitClassTokens('absolute top-1/2 -translate-y-1/2 right-9 sr-only'),
 ])]

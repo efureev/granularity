@@ -1,4 +1,5 @@
 import { splitClassTokens } from '../shared/classTokens'
+import { controlStateIconClass, controlStateIconColors } from '../shared/controlState'
 import {
   borderClassByState,
   countClass,
@@ -21,4 +22,8 @@ export const grTextareaSafelist = [...new Set([
   ...splitClassTokens(countClass),
   ...splitClassTokens(countRowClass),
   ...splitClassTokens(lineCountClass),
+  // Общий модуль лежит в чанке без адреса — его классы объявляет каждый импортёр.
+  ...splitClassTokens(controlStateIconClass),
+  ...Object.values(controlStateIconColors).flatMap(splitClassTokens),
+  ...splitClassTokens('absolute top-2 right-10 right-2 sr-only'),
 ])]

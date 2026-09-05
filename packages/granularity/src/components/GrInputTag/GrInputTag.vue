@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import { computed, nextTick, ref, watchEffect } from 'vue'
+import { computed, nextTick, ref, useId, watchEffect } from 'vue'
 
 import type { GrBadgeRadius, GrBadgeSize, GrBadgeTone } from '../GrBadge'
 import GrChip from '../GrChip/GrChip.vue'
 import { chipSizeForBadgeScale } from '../GrChip/grChipStyles'
 import GrIcon from '../GrIcon/GrIcon.vue'
 import IconClose from '~icons/lucide/x'
+import IconCheckCircle from '~icons/lucide/check-circle'
+import IconAlertTriangle from '~icons/lucide/alert-triangle'
 import IconLoader from '~icons/lucide/loader-2'
 import { useGrComponentProp, useGrComponentSize } from '../GrConfigProvider/context'
 import { useControlAddons } from '../../composables/internal/useControlAddons'
@@ -15,6 +17,13 @@ import { useRovingFocus } from '../../composables/useRovingFocus'
 import { useGrFormControl } from '../../composables/useGrFormControl'
 import { useFocusWithin } from '../../composables/internal/useFocusWithin'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
+import {
+  controlSignalState,
+  controlStateFallbackText,
+  controlStateIconClass,
+  controlStateIconColors,
+  controlStateTextKey,
+} from '../shared/controlState'
 import { isComposingEvent } from '../../internal/keyboard'
 
 import {
@@ -149,7 +158,6 @@ defineSlots<{
 // как у GrInput и GrSelect: контрол не знает про форму, знает только про поле.
 const field = useGrFormFieldContext()
 const resolvedId = computed(() => field?.id.value)
-const describedBy = computed(() => field?.describedById.value)
 const {
   disabled: isDisabled,
   invalid: isInvalid,
@@ -179,6 +187,26 @@ const { hasPrefix, hasSuffix, prefixEl, suffixEl, prefixStyle, suffixStyle } = u
 const resolvedClearable = useGrComponentProp('GrInputTag', 'clearable', () => props.clearable, false)
 
 const { t } = useGranularityTranslations()
+
+/**
+ * Небуквенный признак состояния: иконка для глаз, скрытая подпись для
+ * скринридера. Разбор — `shared/controlState`.
+ */
+const stateTextId = useId()
+const signalState = computed(() => controlSignalState(props.state, isInvalid.value))
+const stateIcon = computed(() => (signalState.value === 'success' ? IconCheckCircle : IconAlertTriangle))
+const stateIconClass = computed(() => (signalState.value
+  ? `${controlStateIconClass} ${controlStateIconColors[signalState.value]}`
+  : ''))
+const stateText = computed(() => (signalState.value
+  ? t(controlStateTextKey[signalState.value], controlStateFallbackText[signalState.value])
+  : ''))
+
+const describedBy = computed(() =>
+  [field?.describedById.value, signalState.value ? stateTextId : undefined]
+    .filter(Boolean)
+    .join(' ') || undefined,
+)
 const resolvedClearAllLabel = computed(() => props.clearAllLabel ?? t('gr.inputTag.clearAll', 'Clear all tags'))
 
 function removeTagLabelFor(tag: string): string {
@@ -635,6 +663,17 @@ if (__GR_DEV__) {
         <IconLoader class="animate-spin" />
       </GrIcon>
     </span>
+
+    <span
+      v-if="signalState"
+      data-gr-input-tag-state
+      :class="stateIconClass"
+      aria-hidden="true"
+    >
+      <component :is="stateIcon" class="h-4 w-4" />
+    </span>
+
+    <span v-if="signalState" :id="stateTextId" data-gr-input-tag-state-text class="sr-only">{{ stateText }}</span>
 
     <button
       v-if="showClearAll"

@@ -689,3 +689,38 @@ describe('GrTreeSelect — name (нативная форма)', () => {
     wrapper.unmount()
   })
 })
+
+describe('GrTreeSelect — признак состояния', () => {
+  const NODES = [
+    { id: 1, label: 'Food' },
+    { id: 2, label: 'Travel' },
+  ]
+
+  it('success и warning несут не только цвет: иконка плюс подпись в описании поля', () => {
+    for (const state of ['success', 'warning'] as const) {
+      const wrapper = mount(GrTreeSelect, { props: { ...{ modelValue: null, data: NODES, nodeKey: 'id' }, state } })
+
+      // Иконка — для глаз, поэтому от скринридера скрыта: смысл ему несёт подпись.
+      expect(wrapper.get('[data-gr-tree-select-state]').attributes('aria-hidden')).toBe('true')
+
+      const text = wrapper.get('[data-gr-tree-select-state-text]')
+      expect(text.text()).not.toBe('')
+
+      // Без этой связи подпись видна только глазами — то есть не существует.
+      const describedBy = wrapper.get('input').attributes('aria-describedby') ?? ''
+      expect(describedBy.split(' ')).toContain(text.attributes('id'))
+    }
+  })
+
+  it('у default и danger признака нет', () => {
+    for (const state of ['default', 'danger'] as const) {
+      const wrapper = mount(GrTreeSelect, { props: { ...{ modelValue: null, data: NODES, nodeKey: 'id' }, state } })
+      expect(wrapper.find('[data-gr-tree-select-state]').exists()).toBe(false)
+    }
+  })
+
+  it('невалидность гасит признак, даже если state=success', () => {
+    const wrapper = mount(GrTreeSelect, { props: { ...{ modelValue: null, data: NODES, nodeKey: 'id' }, state: 'success', invalid: true } })
+    expect(wrapper.find('[data-gr-tree-select-state]').exists()).toBe(false)
+  })
+})

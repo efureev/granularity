@@ -419,3 +419,38 @@ describe('GrInput — режим аддонов', () => {
     expect(wrapper.get('input').attributes('style') ?? '').toContain('padding-left')
   })
 })
+
+describe('GrInput — признак состояния', () => {
+  it('success и warning несут не только цвет: иконка плюс подпись в описании поля', () => {
+    for (const state of ['success', 'warning'] as const) {
+      const wrapper = mount(GrInput, { props: { modelValue: '', state } })
+
+      const icon = wrapper.get('[data-gr-input-state]')
+      // Иконка — для глаз, поэтому от скринридера скрыта: смысл ему несёт подпись.
+      expect(icon.attributes('aria-hidden')).toBe('true')
+
+      const text = wrapper.get('[data-gr-input-state-text]')
+      expect(text.text()).not.toBe('')
+
+      // Без этой связи подпись видна только глазами — то есть не существует.
+      const describedBy = wrapper.get('input').attributes('aria-describedby') ?? ''
+      expect(describedBy.split(' ')).toContain(text.attributes('id'))
+    }
+  })
+
+  it('у default и danger признака нет', () => {
+    for (const state of ['default', 'danger'] as const) {
+      const wrapper = mount(GrInput, { props: { modelValue: '', state } })
+      expect(wrapper.find('[data-gr-input-state]').exists()).toBe(false)
+    }
+  })
+
+  /**
+   * Галочка «корректно» рядом с `aria-invalid="true"` противоречила бы ему:
+   * глаза читали бы одно, диктор — другое.
+   */
+  it('невалидность гасит признак, даже если state=success', () => {
+    const wrapper = mount(GrInput, { props: { modelValue: '', state: 'success', invalid: true } })
+    expect(wrapper.find('[data-gr-input-state]').exists()).toBe(false)
+  })
+})

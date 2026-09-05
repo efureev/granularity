@@ -242,3 +242,37 @@ describe('GrTextarea — clearable', () => {
     wrapper.unmount()
   })
 })
+
+describe('GrTextarea — признак состояния', () => {
+  it('success и warning несут не только цвет: иконка плюс подпись в описании поля', () => {
+    for (const state of ['success', 'warning'] as const) {
+      const wrapper = mount(GrTextarea, { props: { modelValue: '', state } })
+
+      expect(wrapper.get('[data-gr-textarea-state]').attributes('aria-hidden')).toBe('true')
+
+      const text = wrapper.get('[data-gr-textarea-state-text]')
+      expect(text.text()).not.toBe('')
+
+      const describedBy = wrapper.get('textarea').attributes('aria-describedby') ?? ''
+      expect(describedBy.split(' ')).toContain(text.attributes('id'))
+    }
+  })
+
+  /**
+   * Без очистки и без счётчиков поле остаётся корневым элементом — на этом
+   * стоит контракт fallthrough-атрибутов. Признак заводит обёртку так же, как
+   * её заводит кнопка очистки.
+   */
+  it('признак заводит обёртку там, где её иначе нет', () => {
+    const bare = mount(GrTextarea, { props: { modelValue: '' } })
+    expect(bare.element.tagName).toBe('TEXTAREA')
+
+    const signalled = mount(GrTextarea, { props: { modelValue: '', state: 'success' } })
+    expect(signalled.find('[data-gr-textarea-state]').exists()).toBe(true)
+  })
+
+  it('невалидность гасит признак, даже если state=success', () => {
+    const wrapper = mount(GrTextarea, { props: { modelValue: '', state: 'success', invalid: true } })
+    expect(wrapper.find('[data-gr-textarea-state]').exists()).toBe(false)
+  })
+})

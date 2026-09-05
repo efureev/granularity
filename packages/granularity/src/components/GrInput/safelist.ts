@@ -1,4 +1,5 @@
 import { splitClassTokens } from '../shared/classTokens'
+import { controlStateIconClass, controlStateIconColors } from '../shared/controlState'
 import {
   addonInlinePrefixClass,
   addonInlineSuffixClass,
@@ -25,4 +26,7 @@ export const grInputSafelist = [...new Set([
   ...splitClassTokens(addonSegmentSuffixClass),
   ...splitClassTokens(addonInlinePrefixClass),
   ...splitClassTokens(addonInlineSuffixClass),
+  // Общий модуль лежит в чанке без адреса — его классы объявляет каждый импортёр.
+  ...splitClassTokens(controlStateIconClass),
+  ...Object.values(controlStateIconColors).flatMap(splitClassTokens),
 ])]
