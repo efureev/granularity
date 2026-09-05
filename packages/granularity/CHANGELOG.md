@@ -7,6 +7,8 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.47.0] 2026-09-05
+
 ### Changed
 
 - **`GrPagination` boxes now share the `GrButton` height scale**, so `sm` and

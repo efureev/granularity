@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "type": "module",
   "dependencies": {
-    "@feugene/granularity": "^0.46.0",
+    "@feugene/granularity": "^0.47.0",
     "@feugene/granularity-charts": "^0.11.0",
     "@feugene/granularity-chrono": "^0.10.0",
     "@feugene/granularity-code": "^0.2.0",

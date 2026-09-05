@@ -139,7 +139,7 @@
     "@codemirror/state": "^6.5.0",
     "@codemirror/view": "^6.36.0",
     "@feugene/fint-i18n": "^0.7.0",
-    "@feugene/granularity": "^0.46.0",
+    "@feugene/granularity": "^0.47.0",
     "@feugene/granularity-test-kit": "^0.10.0",
     "@feugene/unocss-preset-granular": "^0.16.0",
     "@feugene/unplugin-granularity": "^0.7.0",

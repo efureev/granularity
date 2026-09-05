@@ -341,7 +341,7 @@ describe('GrPagination — обязательный проп не доехал',
 describe('GrPagination — размеры страницы своей подписью', () => {
   it('число задаёт подпись, равную значению', () => {
     const wrapper = mount(GrPagination, {
-      props: { total: 100, pageSize: 10, showPageSize: true, pageSizes: [10, 50] },
+      props: { page: 1, total: 100, pageSize: 10, showPageSize: true, pageSizes: [10, 50] },
     })
 
     const options = wrapper.findComponent({ name: 'GrSelect' }).props('options') as Array<{ value: string, label: string }>
@@ -358,6 +358,7 @@ describe('GrPagination — размеры страницы своей подпи
   it('пара задаёт свою подпись при том же значении', () => {
     const wrapper = mount(GrPagination, {
       props: {
+        page: 1,
         total: 100,
         pageSize: 10,
         showPageSize: true,
