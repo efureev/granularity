@@ -7,6 +7,8 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.49.0] 2026-09-06
+
 ### Added
 
 - **`GrOtpInput` — a field for a code of known length**: an SMS confirmation, a
