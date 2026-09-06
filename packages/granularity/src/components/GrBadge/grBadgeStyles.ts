@@ -3,6 +3,25 @@ import type { GrComponentSize } from '../shared/sizes'
 import type { GrTone } from '../shared/tones'
 
 export type GrBadgeTone = GrTone
+
+/**
+ * Тон маркера — отдельным литеральным перечислением, а не `GrTone`.
+ *
+ * Компилятор SFC выводит рантайм-типы пропов из TypeScript, но `GrTone` это
+ * `typeof GR_TONES[number]`, и развернуть его в конструкторы он не умеет. У
+ * `dot?: GrTone | boolean` из объединения выживал один `Boolean`, и строковый
+ * тон отбраковывался предупреждением Vue у каждого потребителя — при том, что
+ * компонент работал. Литеральное объединение разрешается и даёт
+ * `type: [Boolean, String]`; так же написан `showTooltip` у `GrSlider`.
+ *
+ * От расхождения с `GR_TONES` держит `assertDotToneCoversTones` ниже: списки
+ * обязаны совпадать в обе стороны, иначе `vue-tsc` роняет сборку.
+ */
+export type GrBadgeDotTone = 'primary' | 'neutral' | 'success' | 'warning' | 'danger' | 'info' | 'slate' | 'azure'
+
+type AssertMutual<A, B> = [A] extends [B] ? ([B] extends [A] ? true : never) : never
+
+export const assertDotToneCoversTones: AssertMutual<GrBadgeDotTone, GrTone> = true
 export type GrBadgeSize = GrComponentSize
 export type GrBadgeRadius = 'square' | 'semi' | 'round'
 export const sizeClassBySize: Record<GrBadgeSize, string> = {
@@ -91,5 +110,70 @@ export function grBadgeClass(options: { tone: GrBadgeTone, dark: boolean, size: 
     radiusClass(options.radius, options.size),
     sizeClassBySize[options.size],
     toneClass(options.tone, options.dark),
+  ].join(' ')
+}
+
+/**
+ * Точка-маркер перед подписью.
+ *
+ * Кружок мельче иконки и растёт медленнее: маркер обязан оставаться маркером,
+ * а не превращаться в третий элемент строки. Повтор значений на концах шкалы —
+ * тот же приём, что у `badgeIconSizeClassBySize`.
+ */
+export const badgeDotSizeClassBySize: Record<GrBadgeSize, string> = {
+  xs: 'h-1.5 w-1.5',
+  sm: 'h-1.5 w-1.5',
+  md: 'h-2 w-2',
+  lg: 'h-2 w-2',
+}
+
+/** Маркер не жмётся: подпись бейджа не переносится, сжиматься нечему. */
+export const badgeDotClass = 'shrink-0 rounded-[var(--gr-radius-full)]'
+
+/**
+ * Маркер на мягкой подложке красится **тем же покомпонентным слоем**, что и
+ * заливка filled-бейджа, и это не экономия на токенах.
+ *
+ * Роль тона напрямую здесь не работает ни в одном виде, и обе ветки измерены:
+ * `--gr-{tone}` в светлой теме — яркая заливка под тёмный текст, как маркер она
+ * не берёт 3:1 **ни на одной** подложке (`success` 2.06–2.32, `warning`
+ * 2.27–2.56); `--gr-{tone}-solid` берёт светлую тему и заваливает тёмную
+ * (до 1.37). Слой `--gr-badge-{tone}-bg` как раз и означает «насыщенный вес,
+ * который читается в этой теме»: `-solid` в светлой, роль тона в тёмной.
+ *
+ * На нём проходят все 128 пар «тон маркера × тон бейджа × тема», включая
+ * одноимённую, — поэтому булев `dot` берёт тон самого бейджа, а не отдельный
+ * цвет. Гейт — `__tests__/grBadgeContrast.test.ts`.
+ */
+export const badgeDotToneClass: Record<GrBadgeTone, string> = {
+  neutral: 'bg-[var(--gr-badge-neutral-bg)]',
+  primary: 'bg-[var(--gr-badge-primary-bg)]',
+  success: 'bg-[var(--gr-badge-success-bg)]',
+  warning: 'bg-[var(--gr-badge-warning-bg)]',
+  danger: 'bg-[var(--gr-badge-danger-bg)]',
+  info: 'bg-[var(--gr-badge-info-bg)]',
+  slate: 'bg-[var(--gr-badge-slate-bg)]',
+  azure: 'bg-[var(--gr-badge-azure-bg)]',
+}
+
+/**
+ * Маркер на **заливке** — цветом текста бейджа.
+ *
+ * Тон здесь не годится по построению: подложка filled-бейджа сама берётся из
+ * `--gr-badge-{tone}-bg`, и маркер того же тона слился бы с ней в один цвет.
+ * `currentColor` равен тексту бейджа, а он поверен на AA 4.5:1 — то есть
+ * заведомо проходит порог для графики.
+ */
+export const badgeDotCurrentColorClass = 'bg-[currentColor]'
+
+export function badgeDotClassFor(options: {
+  tone: GrBadgeTone
+  dark: boolean
+  size: GrBadgeSize
+}): string {
+  return [
+    badgeDotClass,
+    badgeDotSizeClassBySize[options.size],
+    options.dark ? badgeDotCurrentColorClass : badgeDotToneClass[options.tone],
   ].join(' ')
 }

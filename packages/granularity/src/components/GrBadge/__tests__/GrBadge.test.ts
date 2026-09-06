@@ -2,6 +2,11 @@ import { mount } from '@vue/test-utils'
 import { describe, expect, it, vi } from 'vitest'
 
 import GrBadge from '../GrBadge.vue'
+import {
+  badgeDotCurrentColorClass,
+  badgeDotSizeClassBySize,
+  badgeDotToneClass,
+} from '../grBadgeStyles'
 
 describe('GrBadge', () => {
   it('рендерит light-tone по указанному tone', () => {
@@ -194,6 +199,97 @@ describe('GrBadge — снятое имя пропа', () => {
     }
     finally {
       warn.mockRestore()
+    }
+  })
+})
+
+describe('GrBadge · точка-маркер', () => {
+  it('по умолчанию маркера нет', () => {
+    const wrapper = mount(GrBadge, { slots: { default: 'Черновик' } })
+
+    expect(wrapper.find('[data-gr-badge-dot]').exists()).toBe(false)
+  })
+
+  it('булев `dot` берёт тон самого бейджа', () => {
+    const wrapper = mount(GrBadge, {
+      props: { tone: 'success', dot: true },
+      slots: { default: 'Оплачено' },
+    })
+
+    expect(wrapper.get('[data-gr-badge-dot]').classes()).toContain(badgeDotToneClass.success)
+  })
+
+  it('названный тон красит маркер отдельно от плашки', () => {
+    const wrapper = mount(GrBadge, {
+      props: { tone: 'neutral', dot: 'warning' },
+      slots: { default: 'Ждёт оплаты' },
+    })
+    const dot = wrapper.get('[data-gr-badge-dot]')
+
+    // Ради этой пары паттерн и существует: тихая плашка, цветной маркер.
+    expect(dot.classes()).toContain(badgeDotToneClass.warning)
+    expect(dot.classes()).not.toContain(badgeDotToneClass.neutral)
+  })
+
+  it('на заливке маркер всегда цвета текста, и названный тон предупреждает', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+
+    try {
+      const wrapper = mount(GrBadge, {
+        props: { tone: 'neutral', dark: true, dot: 'success' },
+        slots: { default: 'Активен' },
+      })
+      const dot = wrapper.get('[data-gr-badge-dot]')
+
+      // Подложка filled-бейджа берётся из того же слоя — тон слился бы с ней.
+      expect(dot.classes()).toContain(badgeDotCurrentColorClass)
+      expect(dot.classes()).not.toContain(badgeDotToneClass.success)
+      expect(warn).toHaveBeenCalledTimes(1)
+      expect(warn.mock.calls[0][0]).toContain('success')
+    }
+    finally {
+      warn.mockRestore()
+    }
+  })
+
+  it('иконка вытесняет маркер и объясняет это', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+
+    try {
+      const wrapper = mount(GrBadge, {
+        props: { dot: 'danger' },
+        slots: { default: 'Ошибка', icon: '<svg />' },
+      })
+
+      expect(wrapper.find('[data-gr-badge-dot]').exists()).toBe(false)
+      expect(wrapper.find('[data-gr-badge-icon]').exists()).toBe(true)
+      expect(warn).toHaveBeenCalledTimes(1)
+    }
+    finally {
+      warn.mockRestore()
+    }
+  })
+
+  it('маркер декоративен и не лезет в обрезанный текст', () => {
+    const wrapper = mount(GrBadge, {
+      props: { dot: 'info' },
+      slots: { default: 'Активен' },
+    })
+    const dot = wrapper.get('[data-gr-badge-dot]')
+
+    expect(dot.attributes('aria-hidden')).toBe('true')
+    // `text-box-trim` живёт на подписи; попади маркер внутрь — потянул бы высоту.
+    expect(dot.element.parentElement?.classList.contains('gr-badge__label')).toBe(true)
+    expect(wrapper.get('.gr-badge__text').find('[data-gr-badge-dot]').exists()).toBe(false)
+  })
+
+  it('размер маркера идёт за ступенью бейджа', () => {
+    for (const size of (['xs', 'sm', 'md', 'lg'] as const)) {
+      const wrapper = mount(GrBadge, { props: { size, dot: true }, slots: { default: 'X' } })
+      const classes = wrapper.get('[data-gr-badge-dot]').classes()
+
+      for (const token of badgeDotSizeClassBySize[size].split(' '))
+        expect(classes, size).toContain(token)
     }
   })
 })

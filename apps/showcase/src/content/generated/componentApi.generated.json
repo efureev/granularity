@@ -691,6 +691,13 @@
             "type": "GrBadgeRadius | undefined",
             "required": false,
             "default": "undefined"
+          },
+          {
+            "name": "dot",
+            "description": "Точка-маркер перед подписью: «● Активен». Имя тона красит маркер отдельно от плашки — ради пары «тихая плашка + цветной маркер», из-за которой паттерн и существует. `true` берёт тон самого бейджа. На заливке (`dark`) маркер всегда цвета текста: тон там слился бы с подложкой, взятой из того же слоя.",
+            "type": "boolean | GrBadgeDotTone | undefined",
+            "required": false,
+            "default": "false"
           }
         ]
       },
@@ -756,18 +763,18 @@
             "default": "undefined"
           },
           {
-            "name": "value",
-            "description": "",
-            "type": "string | number | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
             "name": "dot",
             "description": "Точка вместо числа: чистая декорация, если не задан `ariaLabel`.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
+          },
+          {
+            "name": "value",
+            "description": "",
+            "type": "string | number | undefined",
+            "required": false,
+            "default": "undefined"
           },
           {
             "name": "max",

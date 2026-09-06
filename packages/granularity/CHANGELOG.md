@@ -9,6 +9,37 @@ to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **`GrBadge` takes a status marker** — `dot` draws a small circle before the
+  label. Naming a tone colours the marker *separately from the pill*, which is
+  the whole point of the pattern: in a list of ten rows, ten coloured pills
+  compete for attention, while a quiet pill with a coloured dot reads line by
+  line. A boolean `dot` takes the badge's own tone.
+
+  The marker is painted from the badge's own theme layer (`--gr-badge-{tone}-bg`)
+  rather than the tone role, and both alternatives were measured before the
+  choice: `--gr-{tone}` fails 3:1 against *every* backing in the light theme
+  (2.06–2.56) because there it is a bright fill meant to sit under dark text;
+  `--gr-{tone}-solid` passes light and fails dark (down to 1.37). The component
+  layer means "the saturated weight that reads in this theme", and on it all 128
+  marker-tone × badge-tone × theme pairs clear 3:1 (WCAG 1.4.11 — the dot is a
+  graphical object, recognised by shape and position rather than by letterform).
+
+  On the filled weight the marker is always the text colour: the filled backing
+  comes from that same layer, so a same-family marker would merge into it. A
+  named tone there is ignored with a dev warning.
+
+  `dot` and the `icon` slot occupy the same place and exclude each other — pass
+  both and the icon wins, since it carries more than colour does.
+
+### Fixed
+
+- **`GrBadgeWrap` docs no longer show the component without a child** — two
+  examples did. The mark is positioned absolutely against the root, and an empty
+  root has zero size, so the dot rendered around a zero-width point: no footprint
+  in layout and overlapping whatever stood next to it.
+
+### Added
+
 - **`GrSwitch` can put the state inside the track** — `showStateText` writes
   "on"/"off" on whichever side the thumb has left free, so the state reads on its
   own instead of by comparison with the switch next to it. Texts come from the

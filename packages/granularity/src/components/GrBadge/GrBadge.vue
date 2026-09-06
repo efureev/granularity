@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, useAttrs } from 'vue'
+import { computed, useAttrs, watchEffect } from 'vue'
 
 import { useGrComponentProp } from '../GrConfigProvider/context'
 
@@ -8,9 +8,11 @@ export type { GrBadgeRadius, GrBadgeSize, GrBadgeTone } from './grBadgeStyles'
 import { warnRenamedProp } from '../shared/renamedProp'
 
 import {
+  badgeDotClassFor,
   badgeIconClass,
   badgeIconSizeClassBySize,
   grBadgeClass,
+  type GrBadgeDotTone,
   type GrBadgeRadius,
   type GrBadgeSize,
   type GrBadgeTone,
@@ -21,6 +23,17 @@ export interface GrBadgeProps {
   dark?: boolean
   size?: GrBadgeSize
   radius?: GrBadgeRadius
+  /**
+   * Точка-маркер перед подписью: «● Активен».
+   *
+   * Имя тона красит маркер отдельно от плашки — ради пары «тихая плашка +
+   * цветной маркер», из-за которой паттерн и существует. `true` берёт тон
+   * самого бейджа.
+   *
+   * На заливке (`dark`) маркер всегда цвета текста: тон там слился бы с
+   * подложкой, взятой из того же слоя.
+   */
+  dot?: GrBadgeDotTone | boolean
 }
 
 const props = withDefaults(
@@ -32,8 +45,25 @@ const props = withDefaults(
     dark: false,
     size: undefined,
     radius: undefined,
+    dot: false,
   },
 )
+
+const slots = defineSlots<{
+  /** Содержимое метки. */
+  default?: () => any
+  /**
+   * Иконка перед подписью: статус со спиннером, флаг, значок типа.
+   *
+   * Размер задаёт обёртка по ступени `size`, поэтому содержимое слота тянется
+   * до неё — `class="h-full w-full"`, как у `GrChip`. Вращение спиннера —
+   * `animate-spin` на самой иконке.
+   *
+   * `GrProgressCircle` сюда не кладут: у кругового индикатора шкала виджетная,
+   * нижняя ступень — `2rem`, и в строку бейджа он не помещается.
+   */
+  icon?: () => any
+}>()
 
 // Эффективные значения: локальный проп → `GrConfigProvider` → дефолт компонента.
 const resolvedTone = useGrComponentProp('GrBadge', 'tone', () => props.tone, 'neutral')
@@ -56,21 +86,34 @@ const className = computed(() => {
 
 const iconSizeClass = computed(() => badgeIconSizeClassBySize[resolvedSize.value])
 
-defineSlots<{
-  /** Содержимое метки. */
-  default?: () => any
-  /**
-   * Иконка перед подписью: статус со спиннером, флаг, значок типа.
-   *
-   * Размер задаёт обёртка по ступени `size`, поэтому содержимое слота тянется
-   * до неё — `class="h-full w-full"`, как у `GrChip`. Вращение спиннера —
-   * `animate-spin` на самой иконке.
-   *
-   * `GrProgressCircle` сюда не кладут: у кругового индикатора шкала виджетная,
-   * нижняя ступень — `2rem`, и в строку бейджа он не помещается.
-   */
-  icon?: () => any
-}>()
+// Иконка и маркер стоят на одном месте и говорят об одном; два подряд — шум.
+// Выигрывает иконка: она несёт больше, чем цвет.
+const showDot = computed(() => Boolean(props.dot) && !slots.icon)
+
+const dotClass = computed(() => badgeDotClassFor({
+  tone: typeof props.dot === 'string' ? props.dot : resolvedTone.value,
+  dark: props.dark,
+  size: resolvedSize.value,
+}))
+
+if (__GR_DEV__) {
+  watchEffect(() => {
+    if (props.dot && slots.icon) {
+      console.warn(
+        '[granularity] GrBadge: `dot` и слот `icon` заняли бы одно место перед подписью — '
+        + 'нарисована иконка, маркер пропущен.',
+      )
+    }
+
+    if (props.dark && typeof props.dot === 'string') {
+      console.warn(
+        `[granularity] GrBadge: маркер тона \`${props.dot}\` на заливке не рисуется — `
+        + 'подложка filled-бейджа берётся из того же слоя цветов, и маркер слился бы с ней. '
+        + 'На заливке он всегда цвета текста.',
+      )
+    }
+  })
+}
 </script>
 
 <template>
@@ -79,6 +122,12 @@ defineSlots<{
       :class="className"
   >
     <span class="gr-badge__label">
+      <span
+        v-if="showDot"
+        data-gr-badge-dot
+        :class="dotClass"
+        aria-hidden="true"
+      />
       <span
         v-if="$slots.icon"
         data-gr-badge-icon
@@ -106,9 +155,9 @@ defineSlots<{
  * уменьшает line-box, и повесь его прямо на текст — вместе с ним просядет
  * высота контента, а за ней и весь бейдж.
  *
- * `gap` задан в `em`, чтобы просвет перед иконкой шёл за кеглем ступени, а не
- * за корневым размером. Бейджа без иконки он не касается: у flex-контейнера с
- * единственным ребёнком просветов нет.
+ * `gap` задан в `em`, чтобы просвет перед маркером или иконкой шёл за кеглем
+ * ступени, а не за корневым размером. Бейджа без них он не касается: у
+ * flex-контейнера с единственным ребёнком просветов нет.
  */
 .gr-badge__label {
   display: flex;

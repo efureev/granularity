@@ -11,7 +11,7 @@ import {
   themeVarsByName,
   type ThemeName,
 } from '../../../__tests__/cssContrast'
-import { darkToneClassByTone, lightToneClassByTone } from '../grBadgeStyles'
+import { badgeDotToneClass, darkToneClassByTone, lightToneClassByTone } from '../grBadgeStyles'
 
 /**
  * Контрастная гарантия для `GrBadge` — по образцу теста `GrButton`.
@@ -28,6 +28,12 @@ import { darkToneClassByTone, lightToneClassByTone } from '../grBadgeStyles'
  */
 
 const AA_NORMAL_TEXT = 4.5
+
+/**
+ * Порог для графического объекта (WCAG 1.4.11). Он ниже текстового не по
+ * снисхождению: кружок опознаётся формой и положением, а не начертанием.
+ */
+const AA_NON_TEXT = 3
 const THEMES: ThemeName[] = ['light', 'dark']
 
 type BadgeMode = { name: string, dark: boolean }
@@ -131,5 +137,46 @@ describe('GrBadge · контраст', () => {
         expect(className, `${name}/${tone}`).not.toMatch(/#[0-9a-f]{3,8}\b/i)
       }
     }
+  })
+})
+
+/**
+ * Точка-маркер лежит **на подложке бейджа**, а не на фоне страницы, поэтому
+ * пары мерятся против неё.
+ *
+ * Гейт нужен именно здесь: на светлом весе подложка сама тонирована, и маркер
+ * того же семейства на ней теряется. Пара «`--gr-success` на
+ * `--gr-success-light`» даёт 2.24:1 — не проходит даже порог для графики,
+ * и ровно из-за неё булев `dot` красится `currentColor`, а не тоном.
+ */
+describe('GrBadge · контраст точки-маркера', () => {
+  it('маркер различим на подложке во всех парах тонов и обеих темах', () => {
+    const failures: string[] = []
+
+    for (const theme of THEMES) {
+      const vars = { ...themeVarsByName[theme], ...readComponentThemeVars('GrBadge', theme) }
+
+      for (const badgeTone of GR_TONES) {
+        const background = getColorClassExpression(lightToneClassByTone[badgeTone], 'bg-[')
+        if (!background)
+          throw new Error(`GrBadge: не удалось извлечь подложку для ${badgeTone}`)
+
+        for (const dotTone of GR_TONES) {
+          const dot = getColorClassExpression(badgeDotToneClass[dotTone], 'bg-[')
+          if (!dot)
+            throw new Error(`GrBadge: не удалось извлечь цвет маркера ${dotTone}`)
+
+          const ratio = getContrastRatio(
+            resolveColorExpression(dot, vars, derivedThemeVars),
+            resolveColorExpression(background, vars, derivedThemeVars),
+          )
+
+          if (ratio < AA_NON_TEXT)
+            failures.push(`${theme}:badge=${badgeTone}:dot=${dotTone}:${ratio.toFixed(2)}`)
+        }
+      }
+    }
+
+    expect(failures).toEqual([])
   })
 })

@@ -32,6 +32,13 @@ export const grBadgeExamples: ShowcaseComponentExampleDoc[] = [
     note: 'Спиннер — обычная иконка с `animate-spin`. `GrProgressCircle` в бейдж не кладут: его нижняя ступень равна 2rem и разносит плашку.',
   },
   {
+    id: 'badge-dot-status',
+    title: 'Status marker inside the badge',
+    description: 'Тихая плашка с цветным маркером: `dot` красится отдельным тоном, поэтому в плотном списке цвет несёт статус, а не соревнуется за внимание. Булев `dot` берёт тон самого бейджа.',
+    status: 'ready',
+    previewKey: 'gr-badge-dot-status',
+  },
+  {
     id: 'badge-toolbar-filters',
     title: 'Badges inside action toolbars',
     description: 'Компонент часто используется не сам по себе, а как secondary marker внутри toolbar/filter buttons. Этот сценарий показывает composition-паттерн.',
