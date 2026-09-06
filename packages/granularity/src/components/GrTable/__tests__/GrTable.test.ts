@@ -163,8 +163,11 @@ describe('GrTable — состояния', () => {
     })
 
     const tbody = wrapper.get('tbody')
-    expect(tbody.attributes('class')).toContain('nth-child(even)')
-    expect(tbody.attributes('class')).toContain('tr:hover')
+    // Чётность считается мимо служебных строк (`data-gr-table-off-grid`):
+    // подробности раскрытой строки и распорки виртуализатора не входят в набор,
+    // и обычный `:not()` снаружи чётность бы не перенумеровал.
+    expect(tbody.attributes('class')).toContain('nth-child(even_of_:not([data-gr-table-off-grid]))')
+    expect(tbody.attributes('class')).toContain('tr:not([data-gr-table-off-grid]):hover')
   })
 })
 

@@ -94,7 +94,15 @@
     "moveColumn": "Переставить колонку {label}",
     "columnMoved": "Колонка {label} перемещена на позицию {position} из {count}",
     "resizeColumn": "Ширина колонки {label}",
-    "columnResized": "Ширина колонки {label} — {width} пикселей"
+    "columnResized": "Ширина колонки {label} — {width} пикселей",
+    "expandRow": "Показать подробности",
+    "collapseRow": "Скрыть подробности",
+    "detailLoading": "Загружаем подробности…",
+    "detailError": "Не удалось загрузить подробности",
+    "detailRetry": "Повторить",
+    "detailExpanded": "Подробности строки раскрыты",
+    "detailCollapsed": "Подробности строки свёрнуты",
+    "detailReady": "Подробности строки загружены"
   },
   "breadcrumbs": {
     "label": "Навигационная цепочка",

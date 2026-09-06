@@ -21,9 +21,23 @@ export const tableSizes: Record<GrTableSize, string> = {
   lg: 'text-[length:var(--gr-control-text-lg)] leading-[var(--gr-leading-base)]',
 }
 
-/** Чередование строк и подсветка под курсором — на `<tbody>`, а не на ячейках. */
-export const stripedClass = '[&>tr:nth-child(even)]:bg-[color-mix(in_srgb,var(--gr-muted)_35%,transparent)]'
-export const hoverableClass = '[&>tr:hover]:bg-[color-mix(in_srgb,var(--gr-muted)_45%,transparent)]'
+/**
+ * Строка, которая не входит в набор: подробности раскрытой строки, распорки
+ * виртуализатора. Помеченная ею `<tr>` не полосатится, не подсвечивается и
+ * **не участвует в счёте чётности** соседей.
+ */
+export const DETAIL_ROW_ATTR = 'data-gr-table-off-grid'
+
+/**
+ * Чередование строк и подсветка под курсором — на `<tbody>`, а не на ячейках.
+ *
+ * `of :not(…)` здесь обязателен, и `:not()` снаружи его не заменяет: `nth-child`
+ * считает позицию среди **всех** сиблингов, поэтому обычный фильтр убрал бы
+ * полосу с самой служебной строки, но сдвинул бы чётность у всех, кто ниже.
+ * Форма `of S` перенумеровывает по отфильтрованному набору — это и нужно.
+ */
+export const stripedClass = `[&>tr:nth-child(even_of_:not([${DETAIL_ROW_ATTR}]))]:bg-[color-mix(in_srgb,var(--gr-muted)_35%,transparent)]`
+export const hoverableClass = `[&>tr:not([${DETAIL_ROW_ATTR}]):hover]:bg-[color-mix(in_srgb,var(--gr-muted)_45%,transparent)]`
 
 export const emptyCellClass = 'px-4 py-8 text-center text-[var(--gr-muted-fg)]'
 export const loadingRowCellClass = 'px-4 py-3'

@@ -42,8 +42,15 @@ const COMMON_SLOTS = new Set([
 const DOMAIN_SLOTS: Record<string, string[]> = {
   'caption': ['GrTable', 'GrDataTable'],
   'center': ['GrNavbar'],
+  // Второй ярус строки таблицы. Не `content` и не `expanded`: у соседей
+  // первое — тело панели, второе — состояние, а здесь это отдельная
+  // сущность с собственными состояниями загрузки и отказа.
+  'detail': ['GrDataTable'],
+  'detail-error': ['GrDataTable'],
+  'detail-loading': ['GrDataTable'],
   'ellipsis': ['GrBreadcrumbs'],
   'end': ['GrSplitter'],
+  'expand-icon': ['GrDataTable'],
   'extra': ['GrCollapse'],
   'heading': ['GrTreeSections'],
   'hint': ['GrFormField'],

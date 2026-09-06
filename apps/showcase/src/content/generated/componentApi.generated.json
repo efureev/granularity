@@ -3458,6 +3458,48 @@
             "type": "Record<string, number> | undefined",
             "required": false,
             "default": "undefined"
+          },
+          {
+            "name": "expandable",
+            "description": "Второй ярус строки: колонка с кнопкой раскрытия и блок подробностей под строкой. Содержимое рисует слот `#detail`.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "expandedKeys",
+            "description": "Контролируемый список раскрытых ключей (`v-model:expandedKeys`).",
+            "type": "(string | number)[] | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "expandableRow",
+            "description": "У какой строки есть второй ярус. Остальные кнопки не получают.",
+            "type": "((row: TRow) => boolean) | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "loadDetail",
+            "description": "Подгрузка подробностей в момент раскрытия. Без неё содержимое берётся из самой строки. `signal` обязателен: строку сворачивают чаще, чем ждут.",
+            "type": "((row: TRow, signal: AbortSignal) => Promise<unknown>) | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "accordion",
+            "description": "Раскрыта не больше одной строки.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "expandColumn",
+            "description": "Рисовать ли служебную колонку с собственной кнопкой раскрытия. `false` — колонки нет, и раскрытием управляет разметка потребителя: слоты ячеек получают `expanded` и `toggleExpand`, чтобы кнопку можно было поставить в свой столбец действий рядом с остальными. Тогда `aria-expanded` и доступное имя ложатся на неё же — компоненту их вешать не на что.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
           }
         ]
       },
@@ -3546,6 +3588,30 @@
             "description": "",
             "type": "[{ key: string; width: number; }]",
             "signature": "(e: \"columnResize\", payload: { key: string; width: number; }): void"
+          },
+          {
+            "name": "update:expandedKeys",
+            "description": "",
+            "type": "[(string | number)[]]",
+            "signature": "(e: \"update:expandedKeys\", value: (string | number)[]): void"
+          },
+          {
+            "name": "expand",
+            "description": "",
+            "type": "[{ row: TRow; key: string | number; }]",
+            "signature": "(e: \"expand\", payload: { row: TRow; key: string | number; }): void"
+          },
+          {
+            "name": "collapse",
+            "description": "",
+            "type": "[{ row: TRow; key: string | number; }]",
+            "signature": "(e: \"collapse\", payload: { row: TRow; key: string | number; }): void"
+          },
+          {
+            "name": "detailLoadError",
+            "description": "",
+            "type": "[{ row: TRow; key: string | number; error: unknown; }]",
+            "signature": "(e: \"detailLoadError\", payload: { row: TRow; key: string | number; error: unknown; }): void"
           }
         ]
       },

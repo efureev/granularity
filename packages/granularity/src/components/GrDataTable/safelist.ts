@@ -2,6 +2,14 @@ import { splitClassTokens } from '../shared/classTokens'
 import {
   cellPaddings,
   columnDraggingClass,
+  detailCellClass,
+  detailContentClass,
+  detailErrorClass,
+  detailPaddings,
+  detailRowClass,
+  expandButtonClass,
+  expandIconClass,
+  expandIconOpenClass,
   columnDropAfterClass,
   columnDropBeforeClass,
   columnHandleActiveClass,
@@ -43,4 +51,15 @@ export const grDataTableSafelist = [...new Set([
   ...splitClassTokens(columnPinnedRightEdgeClass),
   ...splitClassTokens(rowSelectedClass),
   ...splitClassTokens(summaryRowClass),
+  // Второй ярус строки: классы приходят из `.ts`-хелпера, а такие литералы
+  // пресет не видит.
+  ...splitClassTokens(detailRowClass),
+  ...splitClassTokens(detailCellClass),
+  ...splitClassTokens(detailContentClass),
+  ...splitClassTokens(detailErrorClass),
+  ...Object.values(detailPaddings).flatMap(splitClassTokens),
+  ...splitClassTokens(expandButtonClass),
+  ...splitClassTokens(expandIconClass),
+  ...splitClassTokens(expandIconOpenClass),
+  ...splitClassTokens('h-5 w-5 h-6 w-6'),
 ])]

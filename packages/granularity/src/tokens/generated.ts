@@ -2686,6 +2686,20 @@ export const grComponentTokens: GrComponentToken[] = [
     "description": "Тень на границе группы колонок, закреплённых справа."
   },
   {
+    "owner": "GrDataTable",
+    "name": "--gr-datatable-detail-bg",
+    "kind": "theme",
+    "default": "color-mix(in srgb, var(--gr-muted) 45%, transparent)",
+    "description": "Фон строки с подробностями. Мягче строки набора: второй ярус читается как вложенное, а не как следующая строка."
+  },
+  {
+    "owner": "GrDataTable",
+    "name": "--gr-datatable-detail-accent",
+    "kind": "theme",
+    "default": "var(--gr-primary)",
+    "description": "Полоса слева у строки подробностей. Связывает её со своей строкой, когда между ними прокрутили."
+  },
+  {
     "owner": "GrDescriptionList",
     "name": "--gr-description-list-column-min",
     "kind": "hook",

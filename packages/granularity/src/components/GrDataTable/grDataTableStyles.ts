@@ -141,3 +141,40 @@ export const sortIconSizes: Record<GrDataTableSize, GrComponentSize> = {
   md: 'sm',
   lg: 'md',
 }
+
+/**
+ * Второй ярус строки: подробности под ней.
+ *
+ * Фон мягче строки набора, а не ярче: подробности обязаны читаться как
+ * вложенное в строку, а не как следующая строка. Акцентная полоса слева
+ * связывает деталь с её строкой, когда между ними уже прокрутили.
+ */
+export const detailRowClass = 'bg-[var(--gr-datatable-detail-bg,color-mix(in_srgb,var(--gr-muted)_45%,transparent))]'
+
+export const detailCellClass = 'border-t border-[var(--gr-brd)] border-l-2 border-l-[var(--gr-datatable-detail-accent,var(--gr-primary))]'
+
+/** Содержимое липнет к левому краю: иначе при горизонтальной прокрутке его не видно. */
+export const detailContentClass = 'sticky left-0'
+
+export const detailPaddings: Record<GrDataTableSize, string> = {
+  xs: 'px-2 py-2',
+  sm: 'px-3 py-2.5',
+  md: 'px-4 py-3',
+  lg: 'px-5 py-4',
+}
+
+/** Колонка кнопки раскрытия — той же ширины, что колонка выбора: шапка не должна съезжать. */
+export const expandColumnWidths = selectColumnWidths
+
+export const expandButtonClass = 'inline-flex items-center justify-center rounded-[var(--gr-radius-sm)] text-[var(--gr-muted-fg)] transition-colors hover:bg-[var(--gr-muted)] hover:text-[var(--gr-fg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]'
+
+/**
+ * Поворот шеврона. Своего `motion-reduce:` здесь нет намеренно: движение пакет
+ * гасит одним глобальным блоком в `base.css`, а под `presetMini` этот вариант
+ * вдобавок не генерирует CSS вовсе (`docs/motion.md`).
+ */
+export const expandIconClass = 'h-4 w-4 transition-transform duration-[var(--gr-duration-fast)]'
+
+export const expandIconOpenClass = 'rotate-90'
+
+export const detailErrorClass = 'flex flex-wrap items-center gap-2 text-[var(--gr-invalid-text)]'

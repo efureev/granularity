@@ -9,6 +9,54 @@ to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **`GrDataTable` rows can open a second tier** — `expandable` adds a service
+  column with a button, and `#detail` renders under the row. Content comes from
+  the row itself, or from `loadDetail(row, signal)` fetched the moment the row
+  opens.
+
+  A button opens it, not a click on the row: the row click is already taken by
+  `rowClick` and selection, and putting expansion there would take navigation
+  away from the consumer. The column sits *before* the selection column —
+  expansion is about the whole row, selection is about its data.
+
+  State is keyed by row key rather than index, so sorting never shows one row's
+  details under another. `accordion` keeps a single row open.
+
+  The async half is modelled on `useRemoteOptions`, not on the tree's lazy
+  loading: a collapsed row aborts its request through the `AbortSignal`, a reply
+  that started earlier and arrived later loses to the newest, and a failure shows
+  a retry rather than an empty box — the tree's callback loading has no error
+  path at all, and a node that never resolves loads forever. Loaded details
+  survive collapse and re-expansion; replacing the `rows` array clears them, and
+  `invalidateDetail(key?)` clears them on demand.
+
+  `expand-column="false"` drops the service column entirely: cell slots receive
+  `expanded` and `toggleExpand`, so the trigger can be your own button sitting in
+  an actions column with the rest. `aria-expanded` then belongs to that button —
+  the component has nothing of its own left to put it on.
+
+  **Not yet available together with `virtual`**, where it disables itself with a
+  dev warning. The virtualiser measures the height of the row element, and the
+  second tier is a sibling `<tr>` whose height never enters that measurement —
+  the spacers would drift silently. It lifts once the pair moves into its own
+  `<tbody>`.
+
+### Fixed
+
+- **Striping and hover no longer count service rows.** `striped` and `hoverable`
+  are written from `<tbody>` over direct `<tr>` children, so any row that is not
+  part of the set — expanded details, the virtualiser's spacers — shifted the
+  parity of every row below it and lit up under the cursor as if it were
+  clickable. Rows marked `data-gr-table-off-grid` are now excluded, and the
+  selector uses `nth-child(even of :not(…))` rather than a plain `:not()`:
+  filtering alone would drop the stripe from the service row but leave its
+  neighbours renumbered.
+
+  This was already reachable by hand: `GrTable` documents writing your own rows,
+  and a consumer who added a second `<tr>` has been getting broken striping.
+
+### Added
+
 - **`GrAvatar` can colour itself from the name** — `autoColor`, off by default.
   The same name always maps to the same slot, so a person in a list is
   recognisable by the patch of colour before the initials are read.

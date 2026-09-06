@@ -94,7 +94,15 @@
     "moveColumn": "Mover la columna {label}",
     "columnMoved": "Columna {label} movida a la posición {position} de {count}",
     "resizeColumn": "Ancho de la columna {label}",
-    "columnResized": "La columna {label} mide {width} píxeles"
+    "columnResized": "La columna {label} mide {width} píxeles",
+    "expandRow": "Mostrar detalles",
+    "collapseRow": "Ocultar detalles",
+    "detailLoading": "Cargando detalles…",
+    "detailError": "No se pudieron cargar los detalles",
+    "detailRetry": "Reintentar",
+    "detailExpanded": "Detalles de la fila mostrados",
+    "detailCollapsed": "Detalles de la fila ocultos",
+    "detailReady": "Detalles de la fila cargados"
   },
   "breadcrumbs": {
     "label": "Ruta de navegación",

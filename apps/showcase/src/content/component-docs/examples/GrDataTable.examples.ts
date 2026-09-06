@@ -93,4 +93,11 @@ export const grDataTableExamples: ShowcaseComponentExampleDoc[] = [
     previewKey: 'gr-data-table-column-layout',
     note: 'Ручка ширины — `role="separator"` с паттерном window splitter: стрелки меняют ширину, `Shift` — крупным шагом, `Enter` и двойной клик возвращают колонку к авторазметке.',
   },
+  {
+    id: 'data-table-expand',
+    title: 'Expandable row with details',
+    description: 'Второй ярус строки: подробности из самой строки или подгруженные при раскрытии, с состояниями загрузки и отказа.',
+    status: 'ready',
+    previewKey: 'gr-data-table-expand',
+  },
 ]

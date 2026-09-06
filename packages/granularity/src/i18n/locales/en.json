@@ -94,7 +94,15 @@
     "moveColumn": "Move column {label}",
     "columnMoved": "Column {label} moved to position {position} of {count}",
     "resizeColumn": "Width of column {label}",
-    "columnResized": "Column {label} is {width} pixels wide"
+    "columnResized": "Column {label} is {width} pixels wide",
+    "expandRow": "Show details",
+    "collapseRow": "Hide details",
+    "detailLoading": "Loading details…",
+    "detailError": "Could not load details",
+    "detailRetry": "Retry",
+    "detailExpanded": "Row details shown",
+    "detailCollapsed": "Row details hidden",
+    "detailReady": "Row details loaded"
   },
   "breadcrumbs": {
     "label": "Breadcrumb",

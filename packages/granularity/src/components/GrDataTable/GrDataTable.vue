@@ -4,6 +4,8 @@ import { computed, nextTick, onMounted, ref, useId, watchEffect } from 'vue'
 import GrTable from '../GrTable/GrTable.vue'
 import GrIcon from '../GrIcon/GrIcon.vue'
 import GrCheckbox from '../GrCheckbox/GrCheckbox.vue'
+import GrButton from '../GrButton/GrButton.vue'
+import GrSkeleton from '../GrSkeleton/GrSkeleton.vue'
 import { useGrComponentSize } from '../GrConfigProvider/context'
 import { useAnnouncer } from '../../composables/useAnnouncer'
 import { useVirtualList } from '../../composables/useVirtualList'
@@ -15,10 +17,20 @@ import { useDataTableSelection } from './composables/useDataTableSelection'
 import { useDataTableColumnOrder } from './composables/useDataTableColumnOrder'
 import { MIN_COLUMN_WIDTH, useDataTableColumnWidths } from './composables/useDataTableColumnWidths'
 import { SELECT_COLUMN_KEY, useDataTableLayout } from './composables/useDataTableLayout'
+import { useDataTableExpansion } from './composables/useDataTableExpansion'
 import {
   type GrDataTableSize,
   cellPaddings,
   columnDraggingClass,
+  detailCellClass,
+  detailContentClass,
+  detailErrorClass,
+  detailPaddings,
+  detailRowClass,
+  expandButtonClass,
+  expandColumnWidths,
+  expandIconClass,
+  expandIconOpenClass,
   columnHandleActiveClass,
   columnHandleClass,
   columnPinnedClass,
@@ -42,6 +54,7 @@ import IconArrowUp from '~icons/lucide/arrow-up'
 import IconGripVertical from '~icons/lucide/grip-vertical'
 import IconLoaderCircle from '~icons/lucide/loader-circle'
 import IconArrowDown from '~icons/lucide/arrow-down'
+import IconChevronRight from '~icons/lucide/chevron-right'
 
 /**
  * Ключ колонки. Собственные поля строки подсказываются автодополнением, но
@@ -204,6 +217,31 @@ export interface GrDataTableProps<TRow extends Record<string, unknown> = Record<
    * Не заданы — ширины компонент помнит сам.
    */
   columnWidths?: Record<string, number>
+  /**
+   * Второй ярус строки: колонка с кнопкой раскрытия и блок подробностей под
+   * строкой. Содержимое рисует слот `#detail`.
+   */
+  expandable?: boolean
+  /** Контролируемый список раскрытых ключей (`v-model:expandedKeys`). */
+  expandedKeys?: Array<string | number>
+  /** У какой строки есть второй ярус. Остальные кнопки не получают. */
+  expandableRow?: (row: TRow) => boolean
+  /**
+   * Подгрузка подробностей в момент раскрытия. Без неё содержимое берётся из
+   * самой строки. `signal` обязателен: строку сворачивают чаще, чем ждут.
+   */
+  loadDetail?: (row: TRow, signal: AbortSignal) => Promise<unknown>
+  /** Раскрыта не больше одной строки. */
+  accordion?: boolean
+  /**
+   * Рисовать ли служебную колонку с собственной кнопкой раскрытия.
+   *
+   * `false` — колонки нет, и раскрытием управляет разметка потребителя: слоты
+   * ячеек получают `expanded` и `toggleExpand`, чтобы кнопку можно было
+   * поставить в свой столбец действий рядом с остальными. Тогда `aria-expanded`
+   * и доступное имя ложатся на неё же — компоненту их вешать не на что.
+   */
+  expandColumn?: boolean
 }
 
 export interface GrDataTableEmits<TRow extends Record<string, unknown> = Record<string, unknown>> {
@@ -216,6 +254,10 @@ export interface GrDataTableEmits<TRow extends Record<string, unknown> = Record<
   (e: 'columnReorder', payload: { key: string, from: number, to: number }): void
   (e: 'update:columnWidths', value: Record<string, number>): void
   (e: 'columnResize', payload: { key: string, width: number }): void
+  (e: 'update:expandedKeys', value: Array<string | number>): void
+  (e: 'expand', payload: { row: TRow, key: string | number }): void
+  (e: 'collapse', payload: { row: TRow, key: string | number }): void
+  (e: 'detailLoadError', payload: { row: TRow, key: string | number, error: unknown }): void
 }
 
 /**
@@ -229,7 +271,7 @@ export interface GrDataTableEmits<TRow extends Record<string, unknown> = Record<
  * `#footer` — для свободной разметки под итогом: несколько строк, примечание,
  * `colspan`. Рендерится внутрь того же `<tfoot>`, то есть его содержимое тоже
  * строки таблицы (`<tr><td>`), а скоуп отдаёт `columns` (в текущем порядке) и
- * `totalColumns` (с колонкой выбора).
+ * `totalColumns` (со служебными колонками выбора и раскрытия).
  *
  * Сортировка, включая крайние случаи с пустыми и смешанными значениями, живёт
  * в `grDataTableSort.ts` — см. `docs/components/GrDataTable.md`.
@@ -263,6 +305,12 @@ const props = withDefaults(defineProps<GrDataTableProps<TRow>>(), {
   columnOrder: undefined,
   resizableColumns: false,
   columnWidths: undefined,
+  expandable: false,
+  expandedKeys: undefined,
+  expandableRow: undefined,
+  loadDetail: undefined,
+  accordion: false,
+  expandColumn: true,
 })
 
 // Раньше остальных проверок: таблица читает `rows` уже в setup, и гард,
@@ -393,7 +441,18 @@ function summaryValue(key: string): unknown {
 
 // Общее число колонок с учётом ведущей чекбокс-колонки — для `colspan`
 // строк loading/empty.
-const totalColumns = computed(() => props.columns.length + (props.selectable ? 1 : 0))
+/**
+ * Раскрытие выключено при виртуализации целиком — см. предупреждение ниже.
+ * Объявлено здесь, а не рядом с ним: от него зависит `colspan` служебных строк.
+ */
+const expandEnabled = computed(() => props.expandable && !props.virtual)
+
+/** Своя колонка с кнопкой: её может не быть, если кнопку ставит потребитель. */
+const expandColumnVisible = computed(() => expandEnabled.value && props.expandColumn)
+
+const totalColumns = computed(() => (
+  props.columns.length + (props.selectable ? 1 : 0) + (expandColumnVisible.value ? 1 : 0)
+))
 
 // ————— Порядок колонок.
 
@@ -551,6 +610,58 @@ const {
   onSelectedChange: keys => emit('update:selected', keys),
 })
 
+const expandDetailId = useId()
+
+const {
+  isRowExpandable,
+  isRowExpanded,
+  toggleRow: toggleRowExpanded,
+  detailStateOf,
+  detailDataOf,
+  retryDetail,
+  invalidateDetail,
+} = useDataTableExpansion<TRow>({
+  expandedKeys: () => props.expandedKeys,
+  rows: () => props.rows,
+  expandableRow: () => props.expandableRow,
+  loadDetail: () => props.loadDetail,
+  accordion: () => props.accordion,
+  rowKeyValue,
+  onExpandedChange: keys => emit('update:expandedKeys', keys),
+  onExpand: (row, key) => {
+    emit('expand', { row, key })
+    announce(t('gr.dataTable.detailExpanded', 'Row details shown'))
+  },
+  onCollapse: (row, key) => {
+    emit('collapse', { row, key })
+    announce(t('gr.dataTable.detailCollapsed', 'Row details hidden'))
+  },
+  onDetailLoadError: (row, key, error) => emit('detailLoadError', { row, key, error }),
+})
+
+/** Id строки подробностей: адресат `aria-controls` у кнопки. */
+function detailRowId(row: TRow): string {
+  return `${expandDetailId}-${rowKeyValue(row)}`
+}
+
+/**
+ * Раскрытие и виртуализация вместе пока не работают: замер виртуализатора висит
+ * на самой строке, и высота второго яруса в него не попадает — распорка
+ * разъедется молча. Запрет снимется, когда пара строк переедет в свою группу
+ * `<tbody>`; до тех пор лучше предупредить, чем показать прыгающую таблицу.
+ */
+if (__GR_DEV__) {
+  watchEffect(() => {
+    if (props.expandable && props.virtual) {
+      console.warn(
+        '[granularity] GrDataTable: `expandable` вместе с `virtual` пока не поддержан — '
+        + 'раскрытие выключено. Замер виртуализатора висит на строке и не видит высоту '
+        + 'подробностей, поэтому распорки разъезжаются.',
+      )
+    }
+  })
+}
+
 // ————— Императивный API.
 const tableRef = ref<InstanceType<typeof GrTable> | null>(null)
 const rootId = useId()
@@ -659,6 +770,12 @@ defineExpose({
   clearSort,
   /** Отметить/снять все выбираемые строки. */
   toggleAll,
+  /**
+   * Сбросить загруженные подробности: у одной строки либо у всех.
+   * Нужен, когда запись изменилась на сервере, — само по себе раскрытие
+   * держит загруженное, пока строка жива.
+   */
+  invalidateDetail,
 })
 
 /**
@@ -706,6 +823,14 @@ defineSlots<{
 
     <template #header>
       <tr data-gr-datatable-header :aria-rowindex="virtual ? 1 : undefined">
+        <!-- Пустой заголовок служебной колонки: подписи у неё нет, но место
+             занять обязана, иначе шапка съедет относительно тела. -->
+        <th
+          v-if="expandColumnVisible"
+          data-gr-datatable-expand-head
+          scope="col"
+          :class="[expandColumnWidths[resolvedSize], cellClass]"
+        />
         <th
           v-if="selectable"
           :ref="el => registerEl(headerCellEls, SELECT_COLUMN_KEY, el)"
@@ -855,14 +980,14 @@ defineSlots<{
         v-if="virtual && spacerBefore > 0"
         aria-hidden="true"
         data-gr-datatable-spacer="before"
+        data-gr-table-off-grid
         :style="{ pointerEvents: 'none' }"
       >
         <td :colspan="totalColumns" :style="{ height: `${spacerBefore}px`, padding: '0', border: '0' }" />
       </tr>
 
+      <template v-for="{ row, index } in renderedRows" :key="rowKeyValue(row)">
       <tr
-        v-for="{ row, index } in renderedRows"
-        :key="rowKeyValue(row)"
         :ref="(el) => virtual && virtualizer.measure(index, el as Element | null)"
         class="border-t border-[var(--gr-brd)]"
         :class="[
@@ -876,6 +1001,33 @@ defineSlots<{
         v-bind="rowProps?.(row, index)"
         @click="onRowClick(row, index, $event)"
       >
+      <td
+        v-if="expandColumnVisible"
+        data-gr-datatable-expand-cell
+        class="text-left"
+        :class="[expandColumnWidths[resolvedSize], cellClass]"
+      >
+        <!-- `.stop` на кнопке, а не на ячейке: гасить навигационный клик есть
+             смысл только там, где стоит контрол. Иначе ячейка строки без
+             второго яруса становится мёртвой зоной. -->
+        <button
+          v-if="isRowExpandable(row)"
+          type="button"
+          data-gr-datatable-expand
+          :class="[expandButtonClass, checkboxSize === 'xs' ? 'h-5 w-5' : 'h-6 w-6']"
+          :aria-expanded="isRowExpanded(row)"
+          :aria-controls="detailRowId(row)"
+          :aria-label="isRowExpanded(row)
+            ? t('gr.dataTable.collapseRow', 'Hide details')
+            : t('gr.dataTable.expandRow', 'Show details')"
+          @click.stop="toggleRowExpanded(row)"
+        >
+          <slot name="expand-icon" :expanded="isRowExpanded(row)" :row="row">
+            <IconChevronRight :class="[expandIconClass, isRowExpanded(row) ? expandIconOpenClass : '']" />
+          </slot>
+        </button>
+      </td>
+
       <td
         v-if="selectable"
         class="text-left"
@@ -911,16 +1063,66 @@ defineSlots<{
         ]"
         :style="{ ...columnWidthStyle(widthOf(col)), ...pinnedStyleOf(col) }"
       >
-          <slot :name="`cell-${col.key}`" :row="row" :index="index">
+          <slot
+            :name="`cell-${col.key}`"
+            :row="row"
+            :index="index"
+            :expanded="isRowExpanded(row)"
+            :toggle-expand="() => toggleRowExpanded(row)"
+          >
             <span>{{ cellValue(row, col.key) }}</span>
           </slot>
         </td>
       </tr>
 
+      <!--
+        Второй ярус идёт отдельной `<tr>` следом за своей строкой.
+        `data-gr-table-off-grid` снимает с неё полосатость и подсветку и
+        выключает её из счёта чётности соседей: она не строка набора.
+        `aria-rowindex` ей тоже не положен по той же причине.
+      -->
+      <tr
+        v-if="isRowExpanded(row)"
+        :id="detailRowId(row)"
+        data-gr-datatable-detail
+        data-gr-table-off-grid
+        :class="detailRowClass"
+      >
+        <td :colspan="totalColumns" :class="[detailCellClass, detailPaddings[resolvedSize]]">
+          <div :class="detailContentClass">
+            <div v-if="detailStateOf(row) === 'loading'" data-gr-datatable-detail-loading>
+              <slot name="detail-loading" :row="row">
+                <GrSkeleton :count="2" />
+              </slot>
+            </div>
+
+            <div v-else-if="detailStateOf(row) === 'error'" :class="detailErrorClass" data-gr-datatable-detail-error>
+              <slot name="detail-error" :row="row" :retry="() => retryDetail(row)">
+                <span>{{ t('gr.dataTable.detailError', 'Could not load details') }}</span>
+                <GrButton size="xs" tone="danger" variant="outline" @click="retryDetail(row)">
+                  {{ t('gr.dataTable.detailRetry', 'Retry') }}
+                </GrButton>
+              </slot>
+            </div>
+
+            <slot
+              v-else
+              name="detail"
+              :row="row"
+              :index="index"
+              :data="detailDataOf(row)"
+              :state="detailStateOf(row)"
+            />
+          </div>
+        </td>
+      </tr>
+      </template>
+
       <tr
         v-if="virtual && spacerAfter > 0"
         aria-hidden="true"
         data-gr-datatable-spacer="after"
+        data-gr-table-off-grid
         :style="{ pointerEvents: 'none' }"
       >
         <td :colspan="totalColumns" :style="{ height: `${spacerAfter}px`, padding: '0', border: '0' }" />
