@@ -289,3 +289,29 @@ describe('GrDataTable — своя кнопка вместо служебной 
     expect(wrapper.get('[data-gr-datatable-detail] td').attributes('colspan')).toBe('1')
   })
 })
+
+describe('GrDataTable — раскрытие переживает перестановку строк', () => {
+  /**
+   * Состояние живёт по ключу строки, а не по индексу. Привязка к позиции
+   * показала бы подробности соседа: после сортировки на месте раскрытой
+   * строки стоит уже другая.
+   */
+  it('после сортировки раскрытой остаётся та же строка', async () => {
+    const wrapper = mountTable({ initialSortKey: 'name', initialSortDir: 'asc' })
+
+    // По возрастанию имени первой идёт Ada (ключ 1).
+    await wrapper.findAll('[data-gr-datatable-expand]')[0].trigger('click')
+    expect(wrapper.emitted('update:expandedKeys')?.at(-1)).toEqual([[1]])
+
+    await wrapper.setProps({ sortDir: 'desc' })
+
+    // Порядок перевернулся: Ada теперь последняя, но раскрыта по-прежнему она.
+    const rows = wrapper.findAll('[data-gr-datatable-row]')
+    const detailRow = wrapper.get('[data-gr-datatable-detail]')
+    expect(rows.at(-1)?.attributes('data-row-key')).toBe('1')
+    expect(detailRow.attributes('id')).toContain('1')
+
+    // И ровно одна: раскрытие не «переехало» на соседа по позиции.
+    expect(wrapper.findAll('[data-gr-datatable-detail]')).toHaveLength(1)
+  })
+})
