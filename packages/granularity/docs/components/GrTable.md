@@ -87,7 +87,10 @@ Sticky-заголовок использует локальный `z-[1]` вну
 Пометьте такую строку `data-gr-table-off-grid`:
 
 ```vue
-<tr><td>Заказ 42</td></tr>
+<tr>
+  <td>Заказ 42</td>
+</tr>
+
 <tr data-gr-table-off-grid>
   <td colspan="3">Подробности заказа</td>
 </tr>

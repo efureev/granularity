@@ -7,6 +7,8 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.48.0] 2026-09-06
+
 ### Added
 
 - **`GrDataTable` rows can open a second tier** — `expandable` adds a service
