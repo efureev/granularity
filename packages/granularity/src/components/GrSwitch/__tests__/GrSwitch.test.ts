@@ -12,6 +12,8 @@ import {
   stateTextPaddings,
   stateTextRoom,
   stateTextSizes,
+  thumbContentColorClass,
+  thumbContentSizes,
   thumbPositions,
   thumbSizes,
   trackAutoSizes,
@@ -527,5 +529,96 @@ describe('GrSwitch — геометрия растущей подписи', () =
       expect(pixels(stateTextAutoPaddings[size].checked, 'pr-'), size)
         .toBeGreaterThan(pixels(thumbSizes[size], 'w-') + SWITCH_THUMB_GAP)
     }
+  })
+})
+
+describe('GrSwitch — иконка действия на бегунке', () => {
+  it('без слотов обёртки в бегунке нет вовсе', () => {
+    const wrapper = mount(GrSwitch, { props: { modelValue: true } })
+
+    expect(wrapper.find('[data-testid="gr-switch-thumb-icon"]').exists()).toBe(false)
+  })
+
+  it('знак меняется вместе с состоянием', async () => {
+    const wrapper = mount(GrSwitch, {
+      props: { modelValue: true },
+      slots: {
+        'checked-icon': '<i data-test="on" />',
+        'unchecked-icon': '<i data-test="off" />',
+      },
+    })
+    const icon = () => wrapper.get('[data-testid="gr-switch-thumb-icon"]')
+
+    expect(icon().find('[data-test="on"]').exists()).toBe(true)
+
+    await wrapper.setProps({ modelValue: false })
+    expect(icon().find('[data-test="off"]').exists()).toBe(true)
+    expect(icon().find('[data-test="on"]').exists()).toBe(false)
+  })
+
+  it('слоты независимы: знак может быть только в одном состоянии', async () => {
+    const wrapper = mount(GrSwitch, {
+      props: { modelValue: true },
+      slots: { 'checked-icon': '<i data-test="on" />' },
+    })
+
+    expect(wrapper.find('[data-testid="gr-switch-thumb-icon"]').exists()).toBe(true)
+
+    await wrapper.setProps({ modelValue: false })
+    expect(wrapper.find('[data-testid="gr-switch-thumb-icon"]').exists()).toBe(false)
+  })
+
+  it('лоадер вытесняет знак: «меняется» важнее, чем «каким стало»', () => {
+    const wrapper = mount(GrSwitch, {
+      props: { modelValue: true, loading: true },
+      slots: { 'checked-icon': '<i data-test="on" />' },
+    })
+
+    expect(wrapper.find('[data-gr-switch-spinner]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="gr-switch-thumb-icon"]').exists()).toBe(false)
+  })
+
+  it('размер знака идёт за ступенью и совпадает со спиннером', () => {
+    for (const size of GR_COMPONENT_SIZES) {
+      const icon = mount(GrSwitch, {
+        props: { modelValue: true, size },
+        slots: { 'checked-icon': '<i />' },
+      }).get('[data-testid="gr-switch-thumb-icon"]')
+
+      const spinner = mount(GrSwitch, {
+        props: { modelValue: true, size, loading: true },
+      }).get('[data-gr-switch-spinner]')
+
+      for (const token of thumbContentSizes[size].split(' ')) {
+        expect(icon.classes(), size).toContain(token)
+        expect(spinner.classes(), size).toContain(token)
+      }
+    }
+  })
+
+  it('знак декоративен: он внутри бегунка, а тот скрыт от диктора', () => {
+    const wrapper = mount(GrSwitch, {
+      props: { modelValue: true, ariaLabel: 'Автосохранение' },
+      slots: { 'checked-icon': '<i data-test="on" />' },
+    })
+
+    const thumb = wrapper.get('[data-testid="gr-switch-thumb"]')
+    expect(thumb.attributes('aria-hidden')).toBe('true')
+    expect(thumb.find('[data-testid="gr-switch-thumb-icon"]').exists()).toBe(true)
+    // Состояние диктор берёт отсюда, а не из знака.
+    expect(wrapper.get('[role="switch"]').attributes('aria-checked')).toBe('true')
+    expect(wrapper.get('[role="switch"]').attributes('aria-label')).toBe('Автосохранение')
+  })
+
+  it('цвет содержимого приходит хуком в классе, а не инлайном', () => {
+    const wrapper = mount(GrSwitch, {
+      props: { modelValue: true },
+      slots: { 'checked-icon': '<i />' },
+    })
+    const icon = wrapper.get('[data-testid="gr-switch-thumb-icon"]')
+
+    // Инлайн победил бы CSS потребителя, и переопределить цвет было бы нечем.
+    expect(icon.attributes('style')).toBeUndefined()
+    expect(icon.classes()).toContain(thumbContentColorClass)
   })
 })

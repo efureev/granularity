@@ -442,6 +442,7 @@ export const demoPathByPreviewKey = {
   'gr-switch-disabled-labeled': 'components/gr-switch/GrSwitchDisabledDemo.vue',
   'gr-switch-size-scale': 'components/gr-switch/GrSwitchSizesDemo.vue',
   'gr-switch-state-text': 'components/gr-switch/GrSwitchStateTextDemo.vue',
+  'gr-switch-thumb-icon': 'components/gr-switch/GrSwitchThumbIconDemo.vue',
   'gr-tab-panels-basic': 'components/gr-tab-panels/GrTabPanelsBasicDemo.vue',
   'gr-tab-panels-keep-alive': 'components/gr-tab-panels/GrTabPanelsKeepAliveDemo.vue',
   'gr-table-basic-rows': 'components/gr-table/GrTableBasicRowsDemo.vue',

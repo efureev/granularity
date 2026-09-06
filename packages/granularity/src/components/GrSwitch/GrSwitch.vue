@@ -14,6 +14,7 @@ import {
   grSwitchSpinnerClass,
   grSwitchStateTextClass,
   grSwitchThumbClass,
+  grSwitchThumbIconClass,
   grSwitchTrackClass,
   isGrSwitchStateTextSize,
   stateTextGhostClass,
@@ -124,6 +125,23 @@ const props = withDefaults(
 
 // Контекст `GrFormField`: id для `<label for>`, описание ошибкой, невалидность.
 // `<button>` — labelable-элемент, поэтому клик по подписи фокусирует переключатель.
+const slots = defineSlots<{
+  /** Подпись переключателя. */
+  'default'?: () => any
+  /**
+   * Знак на бегунке во включённом состоянии — галочка, замок, что угодно.
+   *
+   * Размер задаёт обёртка по ступени `size`, поэтому содержимое слота тянется
+   * до неё: `class="h-full w-full"`, как у `GrBadge` и `GrChip`.
+   *
+   * Знак декоративен — бегунок целиком `aria-hidden`, а состояние диктор берёт
+   * из `aria-checked`. Смысла, которого нет больше нигде, сюда класть нельзя.
+   */
+  'checked-icon'?: () => any
+  /** То же для выключенного состояния. Слоты независимы. */
+  'unchecked-icon'?: () => any
+}>()
+
 const field = useGrFormFieldContext()
 const fieldId = computed(() => field?.id.value)
 const describedBy = computed(() => field?.describedById.value)
@@ -155,10 +173,6 @@ const resolvedSize = useGrComponentSize(() => props.size, {
 })
 
 const emit = defineEmits<GrSwitchEmits>()
-defineSlots<{
-  /** Подпись переключателя. */
-  default?: () => any
-}>()
 
 const resolvedShowStateText = useGrComponentProp(
   'GrSwitch',
@@ -216,6 +230,12 @@ const trackStyle = computed(() => {
 const thumbClass = computed(() => grSwitchThumbClass({ size: resolvedSize.value, checked: props.modelValue }))
 
 const spinnerClass = computed(() => grSwitchSpinnerClass(resolvedSize.value))
+
+// Спиннер и иконка занимают центр бегунка: пока идёт запрос, важнее «состояние
+// меняется», чем «каким оно стало».
+const thumbIconSlot = computed(() => (props.modelValue ? slots['checked-icon'] : slots['unchecked-icon']))
+
+const thumbIconClass = computed(() => grSwitchThumbIconClass(resolvedSize.value))
 
 const labelClass = computed(() => grSwitchLabelClass(resolvedSize.value, isDisabled.value))
 
@@ -338,6 +358,15 @@ function toggle(): void {
           aria-hidden="true"
       >
         <IconLoader v-if="loading" data-gr-switch-spinner :class="spinnerClass" />
+        <span
+            v-else-if="thumbIconSlot"
+            data-testid="gr-switch-thumb-icon"
+            data-gr-switch-thumb-icon
+            :class="thumbIconClass"
+        >
+          <slot v-if="modelValue" name="checked-icon" />
+          <slot v-else name="unchecked-icon" />
+        </span>
       </span>
     </span>
     <span

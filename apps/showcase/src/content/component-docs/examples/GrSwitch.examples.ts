@@ -31,6 +31,13 @@ export const grSwitchExamples: ShowcaseComponentExampleDoc[] = [
     previewKey: 'gr-switch-state-text',
   },
   {
+    id: 'switch-thumb-icon',
+    title: 'Action icon on the thumb',
+    description: 'Знак на самом бегунке, свой у каждого состояния: галочка и крестик, луна и солнце. Размер идёт за ступенью переключателя, а на время запроса знак сменяет спиннер.',
+    status: 'ready',
+    previewKey: 'gr-switch-thumb-icon',
+  },
+  {
     id: 'switch-auto-width',
     title: 'Track that grows with the label',
     description: 'Отдельный режим `autoWidth`: дорожка растягивается под подпись, а ступень размера остаётся нижней границей. Ширина не дёргается при переключении — её держит невидимый дубль противоположного текста.',

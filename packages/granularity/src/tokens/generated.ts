@@ -3400,6 +3400,13 @@ export const grComponentTokens: GrComponentToken[] = [
     "description": "Кегль подписи состояния. Собственный, а не ступень шкалы: минимальный --gr-text-xs (12px) в дорожку не помещается. Один токен на обе ступени."
   },
   {
+    "owner": "GrSwitch",
+    "name": "--gr-switch-thumb-fg",
+    "kind": "hook",
+    "default": "var(--gr-muted-fg)",
+    "description": "Цвет содержимого бегунка — один на спиннер загрузки и иконку действия. По состоянию не ветвится: бегунок остаётся var(--gr-card) в любом из них."
+  },
+  {
     "owner": "GrTabs",
     "name": "--gr-tabs-scroll-fade",
     "kind": "hook",

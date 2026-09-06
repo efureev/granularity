@@ -50,15 +50,33 @@ export const thumbSizes: Record<GrSwitchSize, string> = {
   lg: 'h-6 w-6',
 }
 
-/** Спиннер загрузки живёт в бегунке, поэтому мельче его на ступень. */
-export const thumbSpinnerSizes: Record<GrSwitchSize, string> = {
+/**
+ * Содержимое бегунка — спиннер загрузки или иконка действия — мельче его на
+ * ступень: иначе знак упирается в края круга и теряет форму.
+ */
+export const thumbContentSizes: Record<GrSwitchSize, string> = {
   xs: 'h-2 w-2',
   sm: 'h-2.5 w-2.5',
   md: 'h-3 w-3',
   lg: 'h-4 w-4',
 }
 
-export const thumbSpinnerBase = 'animate-spin text-[var(--gr-muted-fg)]'
+/**
+ * Цвет содержимого бегунка — один на спиннер и иконку.
+ *
+ * Хук с фолбэком в самом классе, а не инлайн-значение: инлайн победил бы CSS
+ * потребителя, и переопределить цвет было бы нечем.
+ *
+ * По состоянию цвет не ветвится и в `disabled` не тускнеет: гасится дорожка, а
+ * бегунок остаётся `--gr-card` в любом состоянии — содержимое, меняющее цвет,
+ * разошлось бы со своей же подложкой.
+ */
+export const thumbContentColorClass = 'text-[var(--gr-switch-thumb-fg,var(--gr-muted-fg))]'
+
+export const thumbSpinnerBase = `animate-spin ${thumbContentColorClass}`
+
+/** Обёртка иконки держит размер, содержимое слота тянется до неё `h-full w-full`. */
+export const thumbIconBase = `inline-flex shrink-0 items-center justify-center ${thumbContentColorClass}`
 
 /**
  * Зазор бегунка со всех сторон, px.
@@ -124,7 +142,11 @@ export function grSwitchThumbClass(options: GrSwitchThumbClassOptions): string {
 }
 
 export function grSwitchSpinnerClass(size: GrSwitchSize): string {
-  return [thumbSpinnerBase, thumbSpinnerSizes[size]].join(' ')
+  return [thumbSpinnerBase, thumbContentSizes[size]].join(' ')
+}
+
+export function grSwitchThumbIconClass(size: GrSwitchSize): string {
+  return [thumbIconBase, thumbContentSizes[size]].join(' ')
 }
 
 export function grSwitchLabelClass(size: GrSwitchSize, disabled = false): string {

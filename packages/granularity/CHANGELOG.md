@@ -9,6 +9,32 @@ to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **`GrSwitch` takes an action icon on the thumb** — `checked-icon` and
+  `unchecked-icon` put a mark on the thumb itself, one per state. The wrapper
+  holds the size for the step and the content stretches to it (`h-full w-full`),
+  the same contract `GrBadge` and `GrChip` use, so the mark scales with the
+  switch rather than with the call site. The slots are independent: pass only one
+  and the other state simply has no mark.
+
+  Every step qualifies, including `xs` and `sm` where the in-track state text
+  does not fit — a mark shrinks without losing recognisability, a three-letter
+  word does not. Inside the thumb it gets 8 / 10 / 12 / 16px.
+
+  `loading` displaces the mark: while a request is in flight, "the state is
+  changing" matters more than "what it became".
+
+  The mark is decorative — the thumb is `aria-hidden` as a whole and the state
+  comes from `aria-checked`.
+
+  Both the mark and the loading spinner now take their colour from one hook,
+  `--gr-switch-thumb-fg`; the spinner previously hard-coded `--gr-muted-fg`, so
+  the thumb's contents could not be recoloured at all. The colour does not branch
+  by state and does not dim when disabled: the track dims, the thumb stays
+  `--gr-card`, and contents that changed colour would part company with their own
+  backing.
+
+### Added
+
 - **`GrBadge` takes a status marker** — `dot` draws a small circle before the
   label. Naming a tone colours the marker *separately from the pill*, which is
   the whole point of the pattern: in a list of ten rows, ten coloured pills

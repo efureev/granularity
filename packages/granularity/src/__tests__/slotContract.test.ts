@@ -41,6 +41,11 @@ const COMMON_SLOTS = new Set([
  */
 const DOMAIN_SLOTS: Record<string, string[]> = {
   'caption': ['GrTable', 'GrDataTable'],
+  // Знак на бегунке переключателя, свой у каждого состояния. Не `icon`: тот в
+  // общем словаре значит «иконка компонента», а здесь их две и различаются они
+  // состоянием — тот же довод, что у `prev`/`next` карусели.
+  'checked-icon': ['GrSwitch'],
+  'unchecked-icon': ['GrSwitch'],
   'center': ['GrNavbar'],
   // Второй ярус строки таблицы. Не `content` и не `expanded`: у соседей
   // первое — тело панели, второе — состояние, а здесь это отдельная
