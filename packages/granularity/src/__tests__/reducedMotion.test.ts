@@ -38,11 +38,14 @@ const REQUIRED_DECLARATIONS = [
  * случайным углом кадр; для «попа» счётчика `GrBadgeWrap` — `transform: none`,
  * то есть бейдж на своём месте и в своём размере.
  *
+ * `GrOtpInput` мигает кареткой, и остановленная кламп-ом каретка остаётся
+ * видимой — то есть ровно тем, чем и должна быть в поле под фокусом.
+ *
  * `GrToaster` в списке нет намеренно: у его полосы прогресса `fill-mode: forwards`,
  * из-за чего кламп фиксировал бы её на `scaleX(0)` — таймер выглядел бы истёкшим
  * при живом тосте. Он обязан иметь собственный блок.
  */
-const CLAMP_SAFE_KEYFRAMES = new Set<string>(['GrBadgeWrap', 'GrTransfer'])
+const CLAMP_SAFE_KEYFRAMES = new Set<string>(['GrBadgeWrap', 'GrOtpInput', 'GrTransfer'])
 
 function readStyle(name: string): string {
   return readFileSync(resolve(stylesDir, name), 'utf8')

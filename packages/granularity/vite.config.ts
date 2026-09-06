@@ -249,6 +249,9 @@ export default defineConfig({
         'components/GrNumberInput/index': fileURLToPath(
           new URL('./src/components/GrNumberInput/index.ts', import.meta.url),
         ),
+        'components/GrOtpInput/index': fileURLToPath(
+          new URL('./src/components/GrOtpInput/index.ts', import.meta.url),
+        ),
         'components/GrPagination/index': fileURLToPath(
           new URL('./src/components/GrPagination/index.ts', import.meta.url),
         ),

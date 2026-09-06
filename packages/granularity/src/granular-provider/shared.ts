@@ -64,6 +64,7 @@ import { grLoadingConfig } from '../components/GrLoading/config'
 import { grModalConfig } from '../components/GrModal/config'
 import { grNavbarConfig } from '../components/GrNavbar/config'
 import { grNumberInputConfig } from '../components/GrNumberInput/config'
+import { grOtpInputConfig } from '../components/GrOtpInput/config'
 import { grPaginationConfig } from '../components/GrPagination/config'
 import { grPopoverConfig } from '../components/GrPopover/config'
 import { grProgressBarConfig } from '../components/GrProgressBar/config'
@@ -178,6 +179,7 @@ export const granularityComponentConfigs = {
   GrModal: grModalConfig,
   GrNavbar: grNavbarConfig,
   GrNumberInput: grNumberInputConfig,
+  GrOtpInput: grOtpInputConfig,
   GrPagination: grPaginationConfig,
   GrPopover: grPopoverConfig,
   GrProgressBar: grProgressBarConfig,

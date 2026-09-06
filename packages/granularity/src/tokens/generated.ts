@@ -2903,6 +2903,27 @@ export const grComponentTokens: GrComponentToken[] = [
     "description": "Высота шапки. Ею же считается отступ содержимого под прилипшей шапкой."
   },
   {
+    "owner": "GrOtpInput",
+    "name": "--gr-otp-input-cell-size",
+    "kind": "hook",
+    "default": "1.75rem / 2rem / 2.5rem / 2.75rem по ступеням xs…lg",
+    "description": "Сторона ячейки. Повторяет высоту GrInput на той же ступени: код стоит в форме рядом с полями и обязан садиться с ними в одну линию. Через хук — квадратная ячейка это решение оформления, и макет вправе сделать её шире."
+  },
+  {
+    "owner": "GrOtpInput",
+    "name": "--gr-otp-input-active-brd",
+    "kind": "hook",
+    "default": "var(--gr-primary)",
+    "description": "Цвет рамки активной ячейки — той, в которой стоит каретка."
+  },
+  {
+    "owner": "GrOtpInput",
+    "name": "--gr-otp-input-caret",
+    "kind": "hook",
+    "default": "var(--gr-primary)",
+    "description": "Цвет каретки. Она рисуется своей: настоящая скрыта вместе с текстом поля."
+  },
+  {
     "owner": "GrPopover",
     "name": "--gr-popover-max-width",
     "kind": "hook",

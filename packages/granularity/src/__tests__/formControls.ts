@@ -7,6 +7,7 @@ import GrFormFile from '../components/GrFormFile/GrFormFile.vue'
 import GrInput from '../components/GrInput/GrInput.vue'
 import GrInputTag from '../components/GrInputTag/GrInputTag.vue'
 import GrNumberInput from '../components/GrNumberInput/GrNumberInput.vue'
+import GrOtpInput from '../components/GrOtpInput/GrOtpInput.vue'
 import GrRadioGroup from '../components/GrRadioGroup/GrRadioGroup.vue'
 import GrRating from '../components/GrRating/GrRating.vue'
 import GrSegmented from '../components/GrSegmented/GrSegmented.vue'
@@ -64,6 +65,9 @@ export const controls: { component: unknown, meta: Control }[] = [
   { component: GrInput, meta: { name: 'GrInput', props: { modelValue: '' }, widget: 'input', filled: { modelValue: 'текст' } } },
   { component: GrTextarea, meta: { name: 'GrTextarea', props: { modelValue: '' }, widget: 'textarea', filled: { modelValue: 'текст' } } },
   { component: GrNumberInput, meta: { name: 'GrNumberInput', props: { modelValue: '' }, widget: 'input', filled: { modelValue: 5 } } },
+  // `widget` — настоящее поле под ячейками: оно и есть контрол, ячейки
+  // `aria-hidden` и атрибутов не несут.
+  { component: GrOtpInput, meta: { name: 'GrOtpInput', props: { modelValue: '' }, widget: '[data-gr-otp-input-field]', filled: { modelValue: '123456' } } },
   { component: GrSelect, meta: { name: 'GrSelect', props: { modelValue: '', options: [] }, widget: '[data-gr-select-native]', keyboardTarget: '[data-gr-select-trigger]', filled: { modelValue: 'a', options: [{ value: 'a', label: 'A' }, { value: 'b', label: 'B' }] } } },
   { component: GrAutocomplete, meta: { name: 'GrAutocomplete', props: { modelValue: '', options: [] }, widget: 'input', filled: { modelValue: 'a', options: [{ value: 'a', label: 'A' }, { value: 'b', label: 'B' }] } } },
   // `widget` — правая панель: значение контрола это её содержимое, и роль

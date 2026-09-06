@@ -8,7 +8,7 @@ const componentGroups = {
   feedback: ['GrAlert', 'GrBadge', 'GrBadgeWrap', 'GrEmptyState', 'GrLoading', 'GrProgressBar', 'GrProgressCircle', 'GrResponseErrorBanner', 'GrSkeleton', 'GrToaster'],
   navigation: ['GrBottomNav', 'GrBreadcrumbs', 'GrCommandPalette', 'GrNavbar', 'GrPagination', 'GrScrollSpy', 'GrSidebar', 'GrSteps', 'GrTabs', 'GrTabPanels', 'GrTooltip'],
   overlays: ['GrCollapse', 'GrConfirmDialog', 'GrContextMenu', 'GrDialog', 'GrDrawer', 'GrDropdown', 'GrDropdownMenu', 'GrImageViewer', 'GrModal', 'GrPopover', 'GrPromptDialog'],
-  forms: ['GrAutocomplete', 'GrCheckbox', 'GrCheckboxGroup', 'GrColorPicker', 'GrFileUpload', 'GrForm', 'GrFormFile', 'GrFormField', 'GrFormSection', 'GrInput', 'GrNumberInput', 'GrInputTag', 'GrRadio', 'GrRadioGroup', 'GrRating', 'GrSegmented', 'GrSelect', 'GrSlider', 'GrTransfer', 'GrSwitch', 'GrTextarea', 'GrTreeSelect'],
+  forms: ['GrAutocomplete', 'GrCheckbox', 'GrCheckboxGroup', 'GrColorPicker', 'GrFileUpload', 'GrForm', 'GrFormFile', 'GrFormField', 'GrFormSection', 'GrInput', 'GrNumberInput', 'GrOtpInput', 'GrInputTag', 'GrRadio', 'GrRadioGroup', 'GrRating', 'GrSegmented', 'GrSelect', 'GrSlider', 'GrTransfer', 'GrSwitch', 'GrTextarea', 'GrTreeSelect'],
   data: ['GrAvatar', 'GrCard', 'GrCarousel', 'GrChip', 'GrChipGroup', 'GrFilePreview', 'GrDataTable', 'GrDelta', 'GrDescriptionList', 'GrDivider', 'GrIcon', 'GrJsonViewer', 'GrKbd', 'GrList', 'GrSortableList', 'GrStatistic', 'GrTable', 'GrTimeline', 'GrTree', 'GrTreeSections', 'GrValue'],
   utilities: ['GrAffix', 'GrConfigProvider', 'GrSplitter'],
 } as const satisfies Record<string, readonly string[]>
@@ -63,6 +63,7 @@ const componentSummaryOverrides = {
   GrModal: 'A modal window for an important scenario that temporarily blocks the background.',
   GrNavbar: 'Top navigation for the main sections and global actions.',
   GrNumberInput: 'A number field with stepper controls and range constraints.',
+  GrOtpInput: 'A field for a code of known length: an SMS confirmation, a one-time password, a PIN.',
   GrPagination: 'Splits a long list into pages and manages navigation between them.',
   GrPopover: 'An anchored panel for a short form, settings or a confirmation right next to the trigger.',
   GrProgressBar: 'Shows the progress of a task or a loading process.',

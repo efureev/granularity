@@ -119,6 +119,7 @@ const VISUAL_COMPONENTS = [
   'GrInput',
   'GrTextarea',
   'GrNumberInput',
+  'GrOtpInput',
   'GrSelect',
   'GrAutocomplete',
   'GrCheckbox',

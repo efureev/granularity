@@ -25,6 +25,7 @@
 | текст в несколько строк | [`GrTextarea`](../packages/granularity/docs/components/GrTextarea.md) |
 | текст с форматированием: абзацы, списки, заголовки | [`GrRichText`](../packages/granularity-editor/docs/components/GrRichText.md) |
 | число со ступенями и границами | [`GrNumberInput`](../packages/granularity/docs/components/GrNumberInput.md) |
+| код известной длины: из SMS, из приложения, PIN | [`GrOtpInput`](../packages/granularity/docs/components/GrOtpInput.md) |
 | число перетаскиванием, диапазон «от–до» | [`GrSlider`](../packages/granularity/docs/components/GrSlider.md) |
 | оценку символами | [`GrRating`](../packages/granularity/docs/components/GrRating.md) |
 | цвет | [`GrColorPicker`](../packages/granularity/docs/components/GrColorPicker.md) |
@@ -488,6 +489,7 @@
 | [`GrModal`](../packages/granularity/docs/components/GrModal.md) | ядро | своя раскладка поверх страницы |
 | [`GrNavbar`](../packages/granularity/docs/components/GrNavbar.md) | ядро | у приложения есть верхняя панель |
 | [`GrNumberInput`](../packages/granularity/docs/components/GrNumberInput.md) | ядро | значение числовое |
+| [`GrOtpInput`](../packages/granularity/docs/components/GrOtpInput.md) | ядро | код приходит извне |
 | [`GrPagination`](../packages/granularity/docs/components/GrPagination.md) | ядро | список не помещается на экран |
 | [`GrPopover`](../packages/granularity/docs/components/GrPopover.md) | ядро | своё содержимое у якоря |
 | [`GrProgressBar`](../packages/granularity/docs/components/GrProgressBar.md) | ядро | доля выполненного известна |

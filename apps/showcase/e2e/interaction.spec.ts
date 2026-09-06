@@ -1066,3 +1066,120 @@ test.describe('GrScrollSpy: подсветка', () => {
     expect(Math.abs(gap), 'раздел приземлился не на линию активации').toBeLessThanOrEqual(2)
   })
 })
+
+/**
+ * `GrOtpInput` держится на настоящей каретке настоящего поля, а её в jsdom нет
+ * вовсе: `selectionStart` там не двигается ни стрелками, ни кликом. Поэтому
+ * половина контракта поля проверяется только здесь.
+ */
+test.describe('GrOtpInput', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto(componentPath('GrOtpInput'))
+    await page.locator('[data-gr-otp-input]').first().waitFor()
+  })
+
+  function otp(page: import('@playwright/test').Page) {
+    const root = page.locator('[data-gr-otp-input]').first()
+
+    return { root, field: root.locator('[data-gr-otp-input-field]'), cells: root.locator('[data-gr-otp-input-cell]') }
+  }
+
+  test('печать раскладывает код по ячейкам, а лишний символ не влезает', async ({ page }) => {
+    const { field, cells } = otp(page)
+
+    await field.click()
+    await page.keyboard.type('1234567')
+
+    await expect(cells).toHaveText(['1', '2', '3', '4', '5', '6'])
+    // Седьмой символ печатать некуда, и сдвигать набранное он не должен.
+    await expect(field).toHaveValue('123456')
+  })
+
+  test('буква в цифровое поле не попадает', async ({ page }) => {
+    const { field } = otp(page)
+
+    await field.click()
+    await page.keyboard.type('12ab34')
+
+    await expect(field).toHaveValue('1234')
+  })
+
+  test('стрелка возвращает каретку, и печать заменяет символ, не двигая хвост', async ({ page }) => {
+    const { field, cells } = otp(page)
+
+    await field.click()
+    await page.keyboard.type('123456')
+
+    await page.keyboard.press('ArrowLeft')
+    await page.keyboard.press('ArrowLeft')
+    await page.keyboard.press('ArrowLeft')
+    await page.keyboard.press('ArrowLeft')
+    await page.keyboard.type('9')
+
+    await expect(cells).toHaveText(['1', '2', '9', '4', '5', '6'])
+  })
+
+  test('Backspace стирает слева, а каретка ходит к краям строки', async ({ page }) => {
+    const { field, cells } = otp(page)
+
+    await field.click()
+    await page.keyboard.type('123456')
+
+    await page.keyboard.press('Backspace')
+    await expect(cells).toHaveText(['1', '2', '3', '4', '5', ''])
+
+    // Не `Home`: на macOS он каретку в поле не двигает вовсе. Компонент живёт
+    // на нативной каретке, а значит и на нативных сочетаниях платформы —
+    // `ControlOrMeta+←` даёт начало строки и там, и на Linux в CI.
+    await page.keyboard.press('ControlOrMeta+ArrowLeft')
+    await page.keyboard.type('9')
+    await expect(cells).toHaveText(['9', '2', '3', '4', '5', ''])
+
+    await page.keyboard.press('ControlOrMeta+ArrowRight')
+    await page.keyboard.type('7')
+    await expect(cells).toHaveText(['9', '2', '3', '4', '5', '7'])
+  })
+
+  test('Ctrl+A с перепечаткой заменяет код целиком', async ({ page }) => {
+    const { field, cells } = otp(page)
+
+    await field.click()
+    await page.keyboard.type('123456')
+
+    await page.keyboard.press('ControlOrMeta+a')
+    await page.keyboard.type('9')
+
+    await expect(cells).toHaveText(['9', '', '', '', '', ''])
+  })
+
+  test('клик по дальней ячейке ставит каретку в первую пустую', async ({ page }) => {
+    const { field, cells } = otp(page)
+
+    await field.click()
+    await page.keyboard.type('12')
+
+    // Кликаем по настоящему полю в координатах дальней ячейки: ячейки лежат
+    // под ним, и попасть по ним мышью нельзя — в этом и смысл устройства.
+    const box = (await cells.nth(5).boundingBox())!
+    const field_ = (await field.boundingBox())!
+    await field.click({ position: { x: box.x - field_.x + box.width / 2, y: box.height / 2 } })
+    await page.keyboard.type('3')
+
+    // Ячейки — декорация: попадание мышью по невидимому тексту ничего не значит,
+    // и «продолжить с того места, где остановился» — единственное ожидаемое.
+    await expect(cells).toHaveText(['1', '2', '3', '', '', ''])
+  })
+
+  test('всё поле — одна остановка Tab, а не шесть', async ({ page }) => {
+    const { field } = otp(page)
+
+    await field.focus()
+    await page.keyboard.press('Tab')
+
+    // Сравниваем с этим самым полем: на странице их несколько, и проверка «фокус
+    // не на каком-нибудь OTP-поле» зеленела бы, уехав на соседнее демо.
+    const stillHere = await field.evaluate(node => node === document.activeElement)
+
+    expect(stillHere, 'Tab остался внутри поля — значит остановок больше одной').toBe(false)
+  })
+})

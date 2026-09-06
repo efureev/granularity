@@ -7799,6 +7799,221 @@
       }
     ]
   },
+  "GrOtpInput": {
+    "name": "GrOtpInput",
+    "sourcePath": "packages/granularity/src/components/GrOtpInput/GrOtpInput.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "disabled",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "length",
+            "description": "Число ячеек.",
+            "type": "number | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "type",
+            "description": "Допустимый алфавит и раскладка мобильной клавиатуры.",
+            "type": "\"text\" | \"numeric\" | \"alphanumeric\" | undefined",
+            "required": false,
+            "default": "\"numeric\""
+          },
+          {
+            "name": "modelValue",
+            "description": "Код целиком, без разделителей.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"\""
+          },
+          {
+            "name": "readonly",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "invalid",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "required",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "size",
+            "description": "",
+            "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "placeholder",
+            "description": "Знак в пустой ячейке.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "\"\""
+          },
+          {
+            "name": "ariaLabel",
+            "description": "",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "name",
+            "description": "Имя поля для нативной отправки формы.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "form",
+            "description": "`id` формы, если поле лежит вне неё.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "pattern",
+            "description": "Свой алфавит регуляркой на **один символ**. Перекрывает `type`.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "groups",
+            "description": "Разбивка на группы: `[3, 3]` рисует `123 – 456`. Сумма обязана равняться `length`.",
+            "type": "number[] | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "masked",
+            "description": "Точки вместо символов — сценарий PIN. На `modelValue` не влияет.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "autofocus",
+            "description": "",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "oneTimeCode",
+            "description": "`autocomplete=\"one-time-code\"`: код из SMS подставляется на iOS и macOS.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
+          },
+          {
+            "name": "webOtp",
+            "description": "Приём кода из SMS на Android через WebOTP. Выключен: требует HTTPS и особого хвоста в тексте сообщения, который добавляет бэкенд.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "cell",
+            "description": "Своё оформление ячейки. Размер и рамку по-прежнему держит компонент.",
+            "type": "{ char: string; index: number; active: boolean; filled: boolean; masked: boolean; }"
+          },
+          {
+            "name": "separator",
+            "description": "Знак между группами. По умолчанию — тире.",
+            "type": "{ index: number; }"
+          }
+        ]
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "update:modelValue",
+            "description": "",
+            "type": "[value: string]",
+            "signature": "(event: \"update:modelValue\", value: string): void"
+          },
+          {
+            "name": "change",
+            "description": "",
+            "type": "[value: string]",
+            "signature": "(event: \"change\", value: string): void"
+          },
+          {
+            "name": "focus",
+            "description": "",
+            "type": "[event: FocusEvent]",
+            "signature": "(event: \"focus\", event: FocusEvent): void"
+          },
+          {
+            "name": "blur",
+            "description": "",
+            "type": "[event: FocusEvent]",
+            "signature": "(event: \"blur\", event: FocusEvent): void"
+          },
+          {
+            "name": "complete",
+            "description": "",
+            "type": "[value: string]",
+            "signature": "(event: \"complete\", value: string): void"
+          }
+        ]
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "focus",
+            "description": "",
+            "type": "() => void"
+          },
+          {
+            "name": "blur",
+            "description": "",
+            "type": "() => void"
+          },
+          {
+            "name": "clear",
+            "description": "",
+            "type": "() => void"
+          }
+        ]
+      }
+    ]
+  },
   "GrPagination": {
     "name": "GrPagination",
     "sourcePath": "packages/granularity/src/components/GrPagination/GrPagination.vue",

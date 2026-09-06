@@ -52,6 +52,7 @@ import GrSteps from '../components/GrSteps/GrSteps.vue'
 import GrSelect from '../components/GrSelect/GrSelect.vue'
 import GrSlider from '../components/GrSlider/GrSlider.vue'
 import GrStatistic from '../components/GrStatistic/GrStatistic.vue'
+import GrOtpInput from '../components/GrOtpInput/GrOtpInput.vue'
 import GrSwitch from '../components/GrSwitch/GrSwitch.vue'
 import GrTable from '../components/GrTable/GrTable.vue'
 import GrTabs from '../components/GrTabs/GrTabs.vue'
@@ -193,6 +194,7 @@ const harnesses: { name: string, render: () => unknown }[] = [
   },
   { name: 'GrSlider', render: () => h(GrSlider, { modelValue: 0 }) },
   { name: 'GrStatistic', render: () => h(GrStatistic, { value: 42 }) },
+  { name: 'GrOtpInput', render: () => h(GrOtpInput, { modelValue: '' }) },
   { name: 'GrSwitch', render: () => h(GrSwitch, { modelValue: false }) },
   { name: 'GrTable', render: () => h(GrTable, null, { default: () => h('tr', h('td', 'x')) }) },
   {

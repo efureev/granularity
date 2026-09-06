@@ -150,6 +150,7 @@ GrSelect>` для них не работает, такой компонент к
 - [`GrModal`](./components/GrModal.md)
 - [`GrNavbar`](./components/GrNavbar.md)
 - [`GrNumberInput`](./components/GrNumberInput.md)
+- [`GrOtpInput`](./components/GrOtpInput.md)
 - [`GrPagination`](./components/GrPagination.md)
 - [`GrPopover`](./components/GrPopover.md)
 - [`GrProgressBar`](./components/GrProgressBar.md)

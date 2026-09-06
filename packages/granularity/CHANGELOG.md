@@ -9,6 +9,46 @@ to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **`GrOtpInput` — a field for a code of known length**: an SMS confirmation, a
+  one-time password, a PIN. `complete` fires the moment the last character lands,
+  so verification needs no button.
+
+  It draws a row of cells, but in the DOM it is **one `<input>`** stretched over
+  the row with the cells as `aria-hidden` decoration. That is the load-bearing
+  decision and nearly everything follows from it: paste, `autocomplete="one-time-code"`
+  (iOS fills the code from the SMS itself), selection, undo and the whole caret
+  with its arrow keys are native. The package rule "a composite widget is one Tab
+  stop" holds by construction rather than through a roving tabindex, and a screen
+  reader announces one field instead of six unnamed ones.
+
+  One behaviour is deliberately not native: typing **replaces** the character
+  under the caret instead of shifting the tail. The rule is unconditional rather
+  than "when the field is full" — otherwise the same keystroke at the start of a
+  code would sometimes replace a character and sometimes move the whole
+  remainder, depending on how many cells happened to be filled.
+
+  Characters outside the alphabet are dropped silently instead of blocking input:
+  `123-456` pasted from a messenger yields `123456`. Normalisation hangs on
+  `input` rather than `beforeinput` because mobile keyboards and autofill deliver
+  a whole string in one event — a single character typed by hand and six arriving
+  from an SMS cannot be told apart, and must not be.
+
+  A click puts the caret in the first empty cell rather than where the pointer
+  landed: the cells are decoration, so hitting invisible text means nothing,
+  while "carry on where you left off" is the only thing anyone expects.
+
+  `webOtp` adds the Android half of autofill through WebOTP; it is off by default
+  because it needs HTTPS and a specific tail in the SMS body that the backend has
+  to add. The request lives in `onMounted` and is aborted on completion and on
+  unmount.
+
+  Also in: `groups` splits the code the way a card number is split, `masked`
+  covers the PIN case without breaking `one-time-code` (the mask is visual only),
+  and the `cell` and `separator` slots change the look while the component keeps
+  the size, the border and the caret.
+
+### Added
+
 - **`GrSwitch` takes an action icon on the thumb** — `checked-icon` and
   `unchecked-icon` put a mark on the thumb itself, one per state. The wrapper
   holds the size for the step and the content stretches to it (`h-full w-full`),

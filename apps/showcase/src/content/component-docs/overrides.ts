@@ -45,6 +45,7 @@ import {
   grTooltipExamples,
   grInputExamples,
   grNumberInputExamples,
+  grOtpInputExamples,
   grTextareaExamples,
   grSwitchExamples,
   grCheckboxExamples,
@@ -572,6 +573,19 @@ export const componentDocOverrides: Partial<Record<string, ShowcaseComponentDocM
   GrTimeline: createComponentDocMeta(grTimelineExamples),
   GrInput: createComponentDocMeta(grInputExamples),
   GrNumberInput: createComponentDocMeta(grNumberInputExamples),
+  GrOtpInput: createComponentDocMeta(grOtpInputExamples, {
+    paragraphs: [
+      'Поле для кода известной длины: подтверждение из SMS, одноразовый пароль из приложения-аутентификатора, PIN. Оно заранее знает, сколько символов ждёт, и потому раскладывает их по ячейкам само.',
+      'Код из сообщения подставляется без участия пользователя: на iOS — сразу, на Android — по включению WebOTP.',
+    ],
+    features: [
+      'Проверка запускается сама, как только набран последний символ',
+      'Вставка «123-456» отсеивает лишнее и не требует чистить строку руками',
+      'Разбивка на группы: код читается так же, как номер карты',
+      'Маска для PIN, не ломающая автозаполнение',
+      'Своё оформление ячейки слотом — поведение остаётся штатным',
+    ],
+  }),
   GrTextarea: createComponentDocMeta(grTextareaExamples),
   GrSwitch: createComponentDocMeta(grSwitchExamples),
   GrCheckbox: createComponentDocMeta(grCheckboxExamples),

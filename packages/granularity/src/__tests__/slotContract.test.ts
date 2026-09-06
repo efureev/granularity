@@ -41,6 +41,9 @@ const COMMON_SLOTS = new Set([
  */
 const DOMAIN_SLOTS: Record<string, string[]> = {
   'caption': ['GrTable', 'GrDataTable'],
+  // Ячейка кода. Не `item`: у соседей это строка списка, а здесь — одна позиция
+  // значения, и рендерит её не сам символ, а поле фиксированной длины.
+  'cell': ['GrOtpInput'],
   // Знак на бегунке переключателя, свой у каждого состояния. Не `icon`: тот в
   // общем словаре значит «иконка компонента», а здесь их две и различаются они
   // состоянием — тот же довод, что у `prev`/`next` карусели.
@@ -87,7 +90,7 @@ const DOMAIN_SLOTS: Record<string, string[]> = {
   'node': ['GrTreeSelect'],
   'option': ['GrSelect', 'GrAutocomplete'],
   'progress': ['GrFileUpload'],
-  'separator': ['GrBreadcrumbs'],
+  'separator': ['GrBreadcrumbs', 'GrOtpInput'],
   'shortcut': ['GrDropdownMenu'],
   'start': ['GrSplitter'],
   'subtitle': ['GrSidebar'],

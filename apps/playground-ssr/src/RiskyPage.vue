@@ -17,6 +17,7 @@ import {
   GrImageViewer,
   GrInputTag,
   GrKbd,
+  GrOtpInput,
   GrScrollSpy,
   GrSegmented,
   GrSlider,
@@ -92,6 +93,8 @@ const commands = [
   { id: 'save', label: 'Сохранить' },
 ]
 
+const otp = ref('')
+
 const images = [
   'https://example.invalid/a.png',
   'https://example.invalid/b.png',
@@ -122,6 +125,14 @@ const images = [
 
     <!-- Тот же дефект в отдельном примитиве: `mod` рисуется по `navigator`. -->
     <GrKbd keys="mod+k" />
+
+    <!--
+      WebOTP включён намеренно: `navigator.credentials` в теле setup уронил бы
+      серверный рендер, и стенд обязан ловить именно эту ошибку. Само API на
+      сервере отсутствует, поэтому запрос не уходит никуда — проверяется, что
+      компонент до него и не добирается.
+    -->
+    <GrOtpInput v-model="otp" web-otp aria-label="Код из SMS" />
 
     <!--
       Кнопка копирования зависит от `navigator.clipboard`: на сервере его нет, и

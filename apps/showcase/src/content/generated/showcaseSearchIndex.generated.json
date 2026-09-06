@@ -239,7 +239,7 @@
     "kindLabel": "Section",
     "context": "Components",
     "searchableTitle": "components component catalog",
-    "searchableContent": "components каталог компонентных страниц с поиском, группировкои и отдельнои витринои на каждыи публичныи компонент пакета. catalog component catalog здесь будет index-страница со всеми публичными компонентами и быстрои группировкои по категориям. источник правды `packages/granularity/src/granular-provider/shared.ts` с текущим покрытием в 81 компонентных сущностеи . навигация по компонентам должна быть мгновеннои и search-friendly. каждыи компонент получит отдельныи route и собственную страницу."
+    "searchableContent": "components каталог компонентных страниц с поиском, группировкои и отдельнои витринои на каждыи публичныи компонент пакета. catalog component catalog здесь будет index-страница со всеми публичными компонентами и быстрои группировкои по категориям. источник правды `packages/granularity/src/granular-provider/shared.ts` с текущим покрытием в 82 компонентных сущностеи . навигация по компонентам должна быть мгновеннои и search-friendly. каждыи компонент получит отдельныи route и собственную страницу."
   },
   {
     "id": "page:components:section:live-demos",
@@ -977,6 +977,17 @@
     "context": "forms / component",
     "searchableTitle": "grnumberinput",
     "searchableContent": "grnumberinput grnumberinput a number field with stepper controls and range constraints. forms component /components/gr-number-input packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/grnumberinput generated public-api components components gr-number-input gr number input"
+  },
+  {
+    "id": "entity:component:GrOtpInput",
+    "title": "GrOtpInput",
+    "description": "A field for a code of known length: an SMS confirmation, a one-time password, a PIN.",
+    "href": "/components/gr-otp-input",
+    "kind": "entity",
+    "kindLabel": "component",
+    "context": "forms / component",
+    "searchableTitle": "grotpinput",
+    "searchableContent": "grotpinput grotpinput a field for a code of known length: an sms confirmation, a one-time password, a pin. forms component /components/gr-otp-input packages/granularity/src/granular-provider/shared.ts @feugene/granularity/components/grotpinput generated public-api components components gr-otp-input gr otp input"
   },
   {
     "id": "entity:component:GrPagination",
@@ -3705,6 +3716,50 @@
     "context": "GrNumberInput",
     "searchableTitle": "grnumberinput integration notes",
     "searchableContent": "grnumberinput a number field with stepper controls and range constraints. integration-notes integration notes дополнительные замечания по доступности, зависимостям и связанным package-level артефактам. keyboard/accessibility пункты выделяются отдельно от визуальных примеров. dependency notes показывают, есть ли связки с другими компонентами в registry. source/export ссылки помогают быстро переи ти к исходникам и публичному import path."
+  },
+  {
+    "id": "entity:component:GrOtpInput:section:overview",
+    "title": "GrOtpInput / Component overview",
+    "description": "Краткий контекст по месту компонента в пакете, registry metadata и текущему покрытию showcase.",
+    "href": "/components/gr-otp-input#overview",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrOtpInput",
+    "searchableTitle": "grotpinput component overview",
+    "searchableContent": "grotpinput a field for a code of known length: an sms confirmation, a one-time password, a pin. overview component overview краткии контекст по месту компонента в пакете, registry metadata и текущему покрытию showcase. показываем роль компонента в каталоге и его hand-authored summary. отражаем generated api coverage и package-level source links. фиксируем, какие сценарии уже реализованы в showcase, а какие еще планируются."
+  },
+  {
+    "id": "entity:component:GrOtpInput:section:live-examples",
+    "title": "GrOtpInput / Live examples",
+    "description": "Компонентные сценарии должны раскрывать одну конкретную возможность за карточку, а не сваливать всё в один demo.",
+    "href": "/components/gr-otp-input#live-examples",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrOtpInput",
+    "searchableTitle": "grotpinput live examples",
+    "searchableContent": "grotpinput a field for a code of known length: an sms confirmation, a one-time password, a pin. live-examples live examples компонентные сценарии должны раскрывать одну конкретную возможность за карточку, а не сваливать все в один demo. каждыи example card содержит живои preview, snippet и краткое пояснение. сначала покрываем самые показательные capability-сценарии, затем сложные edge cases. плановые сценарии явно отмечаются, чтобы roadmap был виден прямо на странице компонента."
+  },
+  {
+    "id": "entity:component:GrOtpInput:section:api",
+    "title": "GrOtpInput / Generated API",
+    "description": "Страница использует автогенерированные `props` / `slots` / `events` / `methods` и не дублирует API вручную.",
+    "href": "/components/gr-otp-input#api",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrOtpInput",
+    "searchableTitle": "grotpinput generated api",
+    "searchableContent": "grotpinput a field for a code of known length: an sms confirmation, a one-time password, a pin. api generated api страница использует автогенерированные `props` / `slots` / `events` / `methods` и не дублирует api вручную. generated metadata остае тся основным источником правды для api-таблиц. fallback metadata применяется только там, где extraction-слоя недостаточно. usage snippet живе т рядом с таблицами api и не расходится с публичным экспортом пакета."
+  },
+  {
+    "id": "entity:component:GrOtpInput:section:integration-notes",
+    "title": "GrOtpInput / Integration notes",
+    "description": "Дополнительные замечания по доступности, зависимостям и связанным package-level артефактам.",
+    "href": "/components/gr-otp-input#integration-notes",
+    "kind": "section",
+    "kindLabel": "Section",
+    "context": "GrOtpInput",
+    "searchableTitle": "grotpinput integration notes",
+    "searchableContent": "grotpinput a field for a code of known length: an sms confirmation, a one-time password, a pin. integration-notes integration notes дополнительные замечания по доступности, зависимостям и связанным package-level артефактам. keyboard/accessibility пункты выделяются отдельно от визуальных примеров. dependency notes показывают, есть ли связки с другими компонентами в registry. source/export ссылки помогают быстро переи ти к исходникам и публичному import path."
   },
   {
     "id": "entity:component:GrPagination:section:overview",

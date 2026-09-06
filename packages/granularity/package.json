@@ -322,6 +322,10 @@
       "types": "./dist/types/components/GrNumberInput/index.d.ts",
       "import": "./dist/components/GrNumberInput/index.js"
     },
+    "./components/GrOtpInput": {
+      "types": "./dist/types/components/GrOtpInput/index.d.ts",
+      "import": "./dist/components/GrOtpInput/index.js"
+    },
     "./components/GrPagination": {
       "types": "./dist/types/components/GrPagination/index.d.ts",
       "import": "./dist/components/GrPagination/index.js"
