@@ -143,7 +143,9 @@
     "ok": "OK"
   },
   "switch": {
-    "loading": "Saving…"
+    "loading": "Saving…",
+    "on": "ON",
+    "off": "OFF"
   },
   "slider": {
     "min": "min",

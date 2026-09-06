@@ -144,7 +144,9 @@
     "ok": "OK"
   },
   "switch": {
-    "loading": "Guardando…"
+    "loading": "Guardando…",
+    "on": "SÍ",
+    "off": "NO"
   },
   "slider": {
     "min": "mínimo",

@@ -5,11 +5,20 @@ import {
   labelSizes,
   rootBase,
   rootLabelPositions,
+  stateTextAutoPaddings,
+  stateTextBase,
+  stateTextColors,
+  stateTextGhostClass,
+  stateTextLayouts,
+  stateTextPaddings,
+  stateTextSizes,
+  stateTextStackClass,
   thumbBase,
   thumbSizes,
   thumbSpinnerBase,
   thumbSpinnerSizes,
-  thumbTranslations,
+  thumbPositions,
+  trackAutoSizes,
   trackBase,
   trackSizes,
 } from './grSwitchStyles'
@@ -18,18 +27,33 @@ export const grSwitchClassTokens = {
   rootBase: splitClassTokens(rootBase),
   rootLabelPositions: Object.values(rootLabelPositions).flatMap(splitClassTokens),
   trackBase: splitClassTokens(trackBase),
-  trackSizes: Object.values(trackSizes).flatMap(splitClassTokens),
+  trackSizes: [
+    ...Object.values(trackSizes).flatMap(splitClassTokens),
+    ...Object.values(trackAutoSizes).flatMap(splitClassTokens),
+  ],
   thumbBase: splitClassTokens(thumbBase),
   thumbSizes: Object.values(thumbSizes).flatMap(splitClassTokens),
   thumbSpinner: [
     ...splitClassTokens(thumbSpinnerBase),
     ...Object.values(thumbSpinnerSizes).flatMap(splitClassTokens),
   ],
-  thumbTranslations: Object.values(thumbTranslations).flatMap(({ checked, unchecked }) => {
-    return [...splitClassTokens(checked), ...splitClassTokens(unchecked)]
-  }),
+  thumbPositions: Object.values(thumbPositions).flatMap(splitClassTokens),
   labelBase: [...splitClassTokens(labelBase), ...splitClassTokens(labelDisabledClass)],
   labelSizes: Object.values(labelSizes).flatMap(splitClassTokens),
+  stateText: [
+    ...splitClassTokens(stateTextBase),
+    ...splitClassTokens(stateTextStackClass),
+    ...splitClassTokens(stateTextGhostClass),
+    ...Object.values(stateTextLayouts).flatMap(splitClassTokens),
+    ...Object.values(stateTextSizes).flatMap(splitClassTokens),
+    ...Object.values(stateTextColors).flatMap(splitClassTokens),
+    ...[stateTextPaddings, stateTextAutoPaddings].flatMap(map => (
+      Object.values(map).flatMap(({ checked, unchecked }) => [
+        ...splitClassTokens(checked),
+        ...splitClassTokens(unchecked),
+      ])
+    )),
+  ],
 } as const
 
 export const grSwitchSafelist = [...new Set([
@@ -40,7 +64,8 @@ export const grSwitchSafelist = [...new Set([
   ...grSwitchClassTokens.thumbBase,
   ...grSwitchClassTokens.thumbSizes,
   ...grSwitchClassTokens.thumbSpinner,
-  ...grSwitchClassTokens.thumbTranslations,
+  ...grSwitchClassTokens.thumbPositions,
   ...grSwitchClassTokens.labelBase,
   ...grSwitchClassTokens.labelSizes,
+  ...grSwitchClassTokens.stateText,
 ])]

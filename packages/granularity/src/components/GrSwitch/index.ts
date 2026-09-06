@@ -8,6 +8,11 @@ export { grSwitchConfig } from './config'
 export type { GrSwitchConfigurableProps } from './defaults'
 export { grSwitchSafelist } from './safelist'
 
-export type { GrSwitchLabelPosition, GrSwitchProps, GrSwitchSize } from './GrSwitch.vue'
+export type {
+  GrSwitchLabelPosition,
+  GrSwitchProps,
+  GrSwitchSize,
+  GrSwitchStateTextSize,
+} from './GrSwitch.vue'
 export type { GrSwitchEmits } from './GrSwitch.vue'
 export type GrSwitchInstance = ComponentExposed<typeof GrSwitchComponent>

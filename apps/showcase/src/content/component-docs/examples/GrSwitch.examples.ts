@@ -24,6 +24,20 @@ export const grSwitchExamples: ShowcaseComponentExampleDoc[] = [
     previewKey: 'gr-switch-disabled-labeled',
   },
   {
+    id: 'switch-state-text',
+    title: 'On/off labels inside the track',
+    description: 'Состояние читается без сравнения с соседями: подпись стоит в свободной части дорожки. Тексты берутся из локали или задаются пропами; на `xs` и `sm` подписи нет — там для неё нет места.',
+    status: 'ready',
+    previewKey: 'gr-switch-state-text',
+  },
+  {
+    id: 'switch-auto-width',
+    title: 'Track that grows with the label',
+    description: 'Отдельный режим `autoWidth`: дорожка растягивается под подпись, а ступень размера остаётся нижней границей. Ширина не дёргается при переключении — её держит невидимый дубль противоположного текста.',
+    status: 'ready',
+    previewKey: 'gr-switch-auto-width',
+  },
+  {
     id: 'switch-custom-colors',
     title: 'Custom active and inactive colors',
     description: 'Фиксируем одну из ключевых интеграционных возможностей компонента: локально переопределять цвета трека без изменения глобальной темы.',

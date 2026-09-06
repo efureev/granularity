@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, watchEffect } from 'vue'
 import IconLoader from '~icons/lucide/loader-circle'
 
 import { useGrComponentSize } from '../GrConfigProvider/context'
 import { useGrFormFieldContext } from '../GrFormField/context'
+import { useGrComponentProp } from '../../composables/useGrComponentConfig'
 import { useGrFormControl } from '../../composables/useGrFormControl'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 
@@ -11,13 +12,23 @@ import {
   grSwitchLabelClass,
   grSwitchRootClass,
   grSwitchSpinnerClass,
+  grSwitchStateTextClass,
   grSwitchThumbClass,
   grSwitchTrackClass,
+  isGrSwitchStateTextSize,
+  stateTextGhostClass,
+  stateTextRoom,
+  stateTextStackClass,
   type GrSwitchLabelPosition,
   type GrSwitchSize,
+  type GrSwitchStateTextSize,
 } from './grSwitchStyles'
 
-export type { GrSwitchLabelPosition, GrSwitchSize } from './grSwitchStyles'
+export type {
+  GrSwitchLabelPosition,
+  GrSwitchSize,
+  GrSwitchStateTextSize,
+} from './grSwitchStyles'
 
 /**
  * Пропсы публичного GR-примитива «Switch».
@@ -54,6 +65,20 @@ export interface GrSwitchProps {
   activeBackgroundColor?: string
   /** Кастомный цвет фона в неактивном состоянии. Если не задан — `var(--gr-muted)`. */
   inactiveBackgroundColor?: string
+  /**
+   * Подпись состояния внутри дорожки — на свободной от бегунка стороне.
+   * Помещается только на `md` и `lg`; на мелких ступенях не рисуется.
+   */
+  showStateText?: boolean
+  /** Текст включённого состояния. Без него — `gr.switch.on` из локали. */
+  checkedText?: string
+  /** Текст выключенного состояния. Без него — `gr.switch.off` из локали. */
+  uncheckedText?: string
+  /**
+   * Дорожка растягивается под подпись, а ступень размера становится нижней
+   * границей ширины. Без `showStateText` смысла не имеет: тянуться не под что.
+   */
+  autoWidth?: boolean
 }
 
 export interface GrSwitchEmits {
@@ -88,6 +113,12 @@ const props = withDefaults(
     form: undefined,
     activeBackgroundColor: undefined,
     inactiveBackgroundColor: undefined,
+    // `undefined`, а не `false`: Vue приводит отсутствующий boolean к `false`,
+    // и дефолт из `GrConfigProvider` до компонента бы не доехал.
+    showStateText: undefined,
+    checkedText: undefined,
+    uncheckedText: undefined,
+    autoWidth: undefined,
   },
 )
 
@@ -129,9 +160,33 @@ defineSlots<{
   default?: () => any
 }>()
 
+const resolvedShowStateText = useGrComponentProp(
+  'GrSwitch',
+  'showStateText',
+  () => props.showStateText,
+  false,
+)
+
+const resolvedAutoWidth = useGrComponentProp(
+  'GrSwitch',
+  'autoWidth',
+  () => props.autoWidth,
+  false,
+)
+
+// Ступень, на которой подпись помещается в дорожку, — иначе её нет вовсе.
+const stateTextSize = computed<GrSwitchStateTextSize | undefined>(() => {
+  if (!resolvedShowStateText.value)
+    return undefined
+
+  return isGrSwitchStateTextSize(resolvedSize.value) ? resolvedSize.value : undefined
+})
+
+const hasStateText = computed(() => stateTextSize.value !== undefined)
+
 const rootClass = computed(() => grSwitchRootClass(props.labelPosition))
 
-const trackClass = computed(() => grSwitchTrackClass(resolvedSize.value))
+const trackClass = computed(() => grSwitchTrackClass(resolvedSize.value, hasStateText.value && resolvedAutoWidth.value))
 
 const trackStyle = computed(() => {
   const isChecked = props.modelValue
@@ -165,6 +220,50 @@ const spinnerClass = computed(() => grSwitchSpinnerClass(resolvedSize.value))
 const labelClass = computed(() => grSwitchLabelClass(resolvedSize.value, isDisabled.value))
 
 const resolvedLoadingText = computed(() => props.loadingText ?? t('gr.switch.loading', 'Saving…'))
+
+const stateTextClass = computed(() => (stateTextSize.value
+  ? grSwitchStateTextClass({
+      size: stateTextSize.value,
+      checked: props.modelValue,
+      disabled: isDisabled.value,
+      autoWidth: resolvedAutoWidth.value,
+    })
+  : ''))
+
+const checkedStateText = computed(() => props.checkedText ?? t('gr.switch.on', 'ON'))
+const uncheckedStateText = computed(() => props.uncheckedText ?? t('gr.switch.off', 'OFF'))
+
+const resolvedStateText = computed(() => (
+  props.modelValue ? checkedStateText.value : uncheckedStateText.value
+))
+
+// Невидимый дубль держит ширину: без него дорожка меняла бы размер на каждом
+// щелчке, потому что «вкл» и «выкл» почти никогда не равны по ширине.
+const ghostStateText = computed(() => (
+  props.modelValue ? uncheckedStateText.value : checkedStateText.value
+))
+
+if (__GR_DEV__) {
+  watchEffect(() => {
+    if (resolvedAutoWidth.value && !resolvedShowStateText.value) {
+      console.warn(
+        '[granularity] GrSwitch: `autoWidth` без `showStateText` ничего не делает — '
+        + 'дорожке не подо что растягиваться.',
+      )
+    }
+  })
+
+  watchEffect(() => {
+    if (!resolvedShowStateText.value || isGrSwitchStateTextSize(resolvedSize.value))
+      return
+
+    console.warn(
+      `[granularity] GrSwitch: подпись состояния не нарисована на ступени \`${resolvedSize.value}\`: `
+      + `рядом с бегунком ${stateTextRoom[resolvedSize.value]}px, а минимально читаемой подписи нужен `
+      + `${stateTextRoom.md}px. Подписи живут на \`md\` и \`lg\`.`,
+    )
+  })
+}
 
 // Выключенный переключатель не отправляется вовсе — так устроен чекбокс в HTML,
 // и сервер отличает «выкл» по отсутствию ключа.
@@ -218,6 +317,20 @@ function toggle(): void {
         :class="trackClass"
         :style="trackStyle"
     >
+      <span
+          v-if="stateTextSize"
+          data-testid="gr-switch-state-text"
+          data-gr-switch-state-text
+          :class="stateTextClass"
+          aria-hidden="true"
+      >
+        <span :class="stateTextStackClass">{{ resolvedStateText }}</span>
+        <span
+            v-if="resolvedAutoWidth"
+            data-gr-switch-state-text-ghost
+            :class="stateTextGhostClass"
+        >{{ ghostStateText }}</span>
+      </span>
       <span
           data-testid="gr-switch-thumb"
           data-gr-switch-thumb

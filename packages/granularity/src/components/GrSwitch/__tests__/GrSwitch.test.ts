@@ -1,11 +1,37 @@
 import { mount } from '@vue/test-utils'
 import { defineComponent } from 'vue'
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import GrConfigProvider from '../../GrConfigProvider/GrConfigProvider.vue'
 import GrSwitch from '../GrSwitch.vue'
 import { GR_COMPONENT_SIZES } from '../../shared/sizes'
-import { thumbSizes, thumbTranslations, trackSizes } from '../grSwitchStyles'
+import {
+  GR_SWITCH_STATE_TEXT_SIZES,
+  SWITCH_THUMB_GAP,
+  stateTextAutoPaddings,
+  stateTextPaddings,
+  stateTextRoom,
+  stateTextSizes,
+  thumbPositions,
+  thumbSizes,
+  trackAutoSizes,
+  trackSizes,
+} from '../grSwitchStyles'
+
+/** `h-6` → 24, `w-11` → 44, `min-w-11` → 44, `pr-[21px]` → 21. */
+function pixels(className: string, prefix: 'h-' | 'w-' | 'min-w-' | 'pl-' | 'pr-'): number {
+  const token = className.split(' ').find(part => part.startsWith(prefix))
+  if (!token)
+    throw new Error(`нет класса ${prefix}* в «${className}»`)
+
+  const value = token.slice(prefix.length)
+  const arbitrary = value.match(/^\[(\d+(?:\.\d+)?)px\]$/)
+  if (arbitrary)
+    return Number.parseFloat(arbitrary[1])
+
+  // Шкала Uno: 1 = 0.25rem = 4px.
+  return Number.parseFloat(value) * 4
+}
 
 describe('GrSwitch', () => {
   it('рендерит checked-state, label и вычисляет custom active color', () => {
@@ -31,7 +57,7 @@ describe('GrSwitch', () => {
     expect(track.attributes('style')).toContain('--gr-switch-track-brd: #10b981')
 
     const thumb = wrapper.get('[data-testid="gr-switch-thumb"]')
-    expect(thumb.attributes('class')).toContain('translate-x-[21px]')
+    expect(thumb.attributes('class')).toContain('-translate-x-full')
     expect(wrapper.text()).toContain('Enabled')
   })
 
@@ -69,7 +95,7 @@ describe('GrSwitch', () => {
     const thumb = wrapper.get('[data-testid="gr-switch-thumb"]')
     expect(thumb.attributes('class')).toContain('h-6')
     expect(thumb.attributes('class')).toContain('w-6')
-    expect(thumb.attributes('class')).toContain('translate-x-[29px]')
+    expect(thumb.attributes('class')).toContain('-translate-x-full')
 
     const label = wrapper.get('[data-gr-switch-label]')
     expect(label.attributes('class')).toContain('text-[length:var(--gr-text-base)]')
@@ -210,60 +236,296 @@ describe('GrSwitch — состояния и события', () => {
 })
 
 /**
- * Арифметика зазоров бегунка — таблицей, а не глазами.
+ * Зазоры бегунка — таблицей, а не глазами.
  *
  * Зазоры расходились: у `xs`/`sm` справа оставался 1px против 2px слева, у `lg` —
- * 2 против 3, верно было только у `md`. Считаем заново из тех же карт, что и
- * рендер: смена любой ступени размера обязана сразу показать разъезд.
+ * 2 против 3, верно было только у `md`. Горизонталь теперь задана структурно
+ * (`left: calc(100% − зазор)` плюс `translateX(-100%)`), поэтому проверять надо
+ * две вещи: что вертикаль сходится с той же константой на каждой ступени и что
+ * классы действительно выражают этот механизм, а не вернулись к числам.
  */
 describe('GrSwitch — геометрия бегунка', () => {
-  /** `h-6` → 24, `w-11` → 44, `translate-x-[21px]` → 21. */
-  function pixels(className: string, prefix: 'h-' | 'w-' | 'translate-x-'): number {
-    const token = className.split(' ').find(part => part.startsWith(prefix))
-    if (!token)
-      throw new Error(`нет класса ${prefix}* в «${className}»`)
-
-    const value = token.slice(prefix.length)
-    const arbitrary = value.match(/^\[(\d+(?:\.\d+)?)px\]$/)
-    if (arbitrary)
-      return Number.parseFloat(arbitrary[1])
-
-    // Шкала Uno: 1 = 0.25rem = 4px.
-    return Number.parseFloat(value) * 4
-  }
-
-  it('зазор одинаков слева, справа и по вертикали на каждой ступени', () => {
-    const rows = GR_COMPONENT_SIZES.map((size) => {
-      // Дорожка — `border-box` с рамкой 1px, бегунок двигается внутри content-box.
-      const trackWidth = pixels(trackSizes[size], 'w-') - 2
+  it('вертикальный зазор равен константе на каждой ступени', () => {
+    for (const size of GR_COMPONENT_SIZES) {
+      // Дорожка — `border-box` с рамкой 1px, бегунок центруется в content-box.
       const trackHeight = pixels(trackSizes[size], 'h-') - 2
-      const thumb = pixels(thumbSizes[size], 'w-')
+      const gap = (trackHeight - pixels(thumbSizes[size], 'h-')) / 2
 
-      const rest = pixels(thumbTranslations[size].unchecked, 'translate-x-')
-      const end = pixels(thumbTranslations[size].checked, 'translate-x-')
-
-      return {
-        size,
-        left: rest,
-        right: trackWidth - thumb - end,
-        vertical: (trackHeight - pixels(thumbSizes[size], 'h-')) / 2,
-      }
-    })
-
-    for (const row of rows) {
-      expect(row.right, `${row.size}: зазор справа против зазора слева`).toBe(row.left)
-      expect(row.vertical, `${row.size}: зазор по вертикали против горизонтального`).toBe(row.left)
+      expect(gap, `${size}: вертикальный зазор`).toBe(SWITCH_THUMB_GAP)
     }
   })
 
-  it('бегунок не вылезает за дорожку ни в покое, ни в крайнем положении', () => {
+  it('горизонталь не зависит от ширины дорожки', () => {
+    expect(thumbPositions.unchecked).toContain(`left-[${SWITCH_THUMB_GAP}px]`)
+    // Ровно эта пара и делает возможным `autoWidth`: ни одного числа от ширины.
+    expect(thumbPositions.checked).toContain(`left-[calc(100%_-_${SWITCH_THUMB_GAP}px)]`)
+    expect(thumbPositions.checked).toContain('-translate-x-full')
+    expect(JSON.stringify(thumbPositions)).not.toMatch(/translate-x-\[\d/)
+  })
+
+  it('бегунок с зазорами укладывается в дорожку на каждой ступени', () => {
     for (const size of GR_COMPONENT_SIZES) {
       const trackWidth = pixels(trackSizes[size], 'w-') - 2
-      const thumb = pixels(thumbSizes[size], 'w-')
-      const end = pixels(thumbTranslations[size].checked, 'translate-x-')
 
-      expect(pixels(thumbTranslations[size].unchecked, 'translate-x-'), size).toBeGreaterThan(0)
-      expect(end + thumb, size).toBeLessThanOrEqual(trackWidth)
+      expect(pixels(thumbSizes[size], 'w-') + SWITCH_THUMB_GAP * 2, size)
+        .toBeLessThanOrEqual(trackWidth)
+    }
+  })
+
+  it('растущая дорожка берёт ту же ступень нижней границей', () => {
+    for (const size of GR_COMPONENT_SIZES) {
+      expect(pixels(trackAutoSizes[size], 'min-w-'), size).toBe(pixels(trackSizes[size], 'w-'))
+      // Тянется только строка: высота остаётся ступенью.
+      expect(pixels(trackAutoSizes[size], 'h-'), size).toBe(pixels(trackSizes[size], 'h-'))
+    }
+  })
+})
+
+describe('GrSwitch — подпись состояния в дорожке', () => {
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
+  it('по умолчанию подписи нет', () => {
+    const wrapper = mount(GrSwitch, { props: { modelValue: true } })
+
+    expect(wrapper.find('[data-testid="gr-switch-state-text"]').exists()).toBe(false)
+  })
+
+  it('текст меняется вместе с состоянием и уходит на свободную сторону', async () => {
+    const wrapper = mount(GrSwitch, { props: { modelValue: false, showStateText: true } })
+    const stateText = () => wrapper.get('[data-testid="gr-switch-state-text"]')
+
+    // Бегунок слева — подпись отступает от него слева и стоит справа.
+    expect(stateText().text()).toBe('OFF')
+    expect(stateText().classes()).toContain('pl-[21px]')
+
+    await wrapper.setProps({ modelValue: true })
+    expect(stateText().text()).toBe('ON')
+    expect(stateText().classes()).toContain('pr-[21px]')
+  })
+
+  it('подпись скрыта от диктора: состояние уже объявлено через aria-checked', () => {
+    const wrapper = mount(GrSwitch, {
+      props: { modelValue: true, showStateText: true, ariaLabel: 'Wi-Fi' },
+    })
+
+    // Дорожка лежит внутри `<button role="switch">`, поэтому видимый текст
+    // вошёл бы в доступное имя: «Wi-Fi ON» вместо «Wi-Fi».
+    expect(wrapper.get('[data-testid="gr-switch-state-text"]').attributes('aria-hidden')).toBe('true')
+    expect(wrapper.get('[role="switch"]').attributes('aria-label')).toBe('Wi-Fi')
+    expect(wrapper.get('[role="switch"]').attributes('aria-checked')).toBe('true')
+  })
+
+  it('свои тексты перекрывают локаль', async () => {
+    const wrapper = mount(GrSwitch, {
+      props: {
+        modelValue: true,
+        showStateText: true,
+        checkedText: 'ДА',
+        uncheckedText: 'НЕТ',
+      },
+    })
+
+    expect(wrapper.get('[data-testid="gr-switch-state-text"]').text()).toBe('ДА')
+
+    await wrapper.setProps({ modelValue: false })
+    expect(wrapper.get('[data-testid="gr-switch-state-text"]').text()).toBe('НЕТ')
+  })
+
+  it('на мелких ступенях подписи нет, и dev объясняет почему', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+
+    const wrapper = mount(GrSwitch, {
+      props: { modelValue: true, showStateText: true, size: 'sm' },
+    })
+
+    expect(wrapper.find('[data-testid="gr-switch-state-text"]').exists()).toBe(false)
+    expect(warn).toHaveBeenCalledTimes(1)
+    // В предупреждении числа, а не «не поддерживается»: иначе проп выглядит сломанным.
+    expect(warn.mock.calls[0][0]).toContain('17px')
+    expect(warn.mock.calls[0][0]).toContain('21px')
+  })
+
+  it('на поддержанной ступени предупреждения нет', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+
+    mount(GrSwitch, { props: { modelValue: true, showStateText: true, size: 'lg' } })
+
+    expect(warn).not.toHaveBeenCalled()
+  })
+
+  it('цвет подписи — хук с фолбэком по состоянию, а не инлайн-значение', async () => {
+    const wrapper = mount(GrSwitch, { props: { modelValue: true, showStateText: true } })
+    const stateText = () => wrapper.get('[data-testid="gr-switch-state-text"]')
+
+    // Инлайн победил бы CSS потребителя, и переопределить токен было бы нечем.
+    expect(stateText().attributes('style')).toBeUndefined()
+    expect(stateText().classes()).toContain('text-[var(--gr-switch-state-text-fg,var(--gr-primary-fg))]')
+
+    await wrapper.setProps({ modelValue: false })
+    expect(stateText().classes()).toContain('text-[var(--gr-switch-state-text-fg,var(--gr-muted-fg))]')
+
+    await wrapper.setProps({ disabled: true })
+    expect(stateText().classes()).toContain('text-[var(--gr-switch-state-text-fg,var(--gr-disabled-fg))]')
+  })
+
+  it('кегль берётся ступенью, а не одной константой на обе', () => {
+    const md = mount(GrSwitch, { props: { modelValue: true, showStateText: true } })
+    const lg = mount(GrSwitch, { props: { modelValue: true, showStateText: true, size: 'lg' } })
+
+    expect(md.get('[data-testid="gr-switch-state-text"]').classes()).toContain(stateTextSizes.md)
+    expect(lg.get('[data-testid="gr-switch-state-text"]').classes()).toContain(stateTextSizes.lg)
+    expect(stateTextSizes.md).not.toBe(stateTextSizes.lg)
+  })
+
+  it('showStateText из GrConfigProvider доходит до переключателя', () => {
+    const Harness = defineComponent({
+      components: { GrConfigProvider, GrSwitch },
+      template: `
+        <GrConfigProvider :component-defaults="{ GrSwitch: { showStateText: true } }">
+          <GrSwitch :model-value="true" />
+        </GrConfigProvider>
+      `,
+    })
+
+    expect(mount(Harness).find('[data-testid="gr-switch-state-text"]').exists()).toBe(true)
+  })
+})
+
+/**
+ * Место под подпись — тот же расчёт, что и у бегунка: отступ со стороны бегунка
+ * равен `бегунок + зазор`, а остаток и есть свободная ширина. Считаем заново из
+ * `trackSizes`/`thumbSizes`, чтобы смена ступени размера сразу показала, что
+ * подпись поехала на бегунок.
+ */
+describe('GrSwitch — геометрия подписи', () => {
+  function room(size: typeof GR_COMPONENT_SIZES[number]): { padding: number, free: number } {
+    const trackWidth = pixels(trackSizes[size], 'w-') - 2
+    const padding = pixels(thumbSizes[size], 'w-') + SWITCH_THUMB_GAP
+
+    return { padding, free: trackWidth - padding }
+  }
+
+  it('отступ равен бегунку с зазором на каждой поддержанной ступени', () => {
+    for (const size of GR_SWITCH_STATE_TEXT_SIZES) {
+      const { padding } = room(size)
+
+      expect(pixels(stateTextPaddings[size].checked, 'pr-'), size).toBe(padding)
+      expect(pixels(stateTextPaddings[size].unchecked, 'pl-'), size).toBe(padding)
+    }
+  })
+
+  it('таблица свободного места сходится с геометрией дорожки', () => {
+    for (const size of GR_COMPONENT_SIZES)
+      expect(stateTextRoom[size], size).toBe(room(size).free)
+  })
+
+  it('подпись живёт ровно там, где места хватает', () => {
+    for (const size of GR_COMPONENT_SIZES) {
+      const supported = (GR_SWITCH_STATE_TEXT_SIZES as readonly string[]).includes(size)
+
+      expect(stateTextRoom[size] >= stateTextRoom.md, size).toBe(supported)
+    }
+  })
+})
+
+describe('GrSwitch — растущая дорожка', () => {
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
+  it('по умолчанию ширина фиксирована', () => {
+    const wrapper = mount(GrSwitch, { props: { modelValue: true, showStateText: true } })
+    const track = wrapper.get('[data-testid="gr-switch-track"]')
+
+    expect(track.classes()).toContain('w-11')
+    expect(track.classes()).not.toContain('min-w-11')
+    // Подпись накрывает дорожку и на её размер не влияет.
+    expect(wrapper.get('[data-testid="gr-switch-state-text"]').classes()).toContain('absolute')
+  })
+
+  it('autoWidth отдаёт ширину подписи, оставляя ступень нижней границей', () => {
+    const wrapper = mount(GrSwitch, {
+      props: { modelValue: true, showStateText: true, autoWidth: true },
+    })
+    const track = wrapper.get('[data-testid="gr-switch-track"]')
+
+    expect(track.classes()).toContain('min-w-11')
+    expect(track.classes()).not.toContain('w-11')
+
+    const stateText = wrapper.get('[data-testid="gr-switch-state-text"]')
+    expect(stateText.classes()).not.toContain('absolute')
+    // Со свободной стороны появляется отступ: центровать текст больше нечем.
+    expect(stateText.classes()).toContain('pl-[8px]')
+    expect(stateText.classes()).toContain('pr-[29px]')
+  })
+
+  it('невидимый дубль держит ширину при переключении', async () => {
+    const wrapper = mount(GrSwitch, {
+      props: { modelValue: true, showStateText: true, autoWidth: true },
+    })
+    const ghost = () => wrapper.get('[data-gr-switch-state-text-ghost]')
+
+    // Дубль — всегда противоположное состояние, отсюда максимум из двух ширин.
+    expect(ghost().text()).toBe('OFF')
+    expect(ghost().classes()).toContain('invisible')
+
+    await wrapper.setProps({ modelValue: false })
+    expect(ghost().text()).toBe('ON')
+  })
+
+  it('при фиксированной ширине дубля нет вовсе', () => {
+    const wrapper = mount(GrSwitch, { props: { modelValue: true, showStateText: true } })
+
+    expect(wrapper.find('[data-gr-switch-state-text-ghost]').exists()).toBe(false)
+    expect(wrapper.get('[data-testid="gr-switch-state-text"]').text()).toBe('ON')
+  })
+
+  it('autoWidth без подписи ничего не растягивает и говорит об этом', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+
+    const wrapper = mount(GrSwitch, { props: { modelValue: true, autoWidth: true } })
+
+    expect(wrapper.get('[data-testid="gr-switch-track"]').classes()).toContain('w-11')
+    expect(warn).toHaveBeenCalledTimes(1)
+    expect(warn.mock.calls[0][0]).toContain('showStateText')
+  })
+
+  it('autoWidth из GrConfigProvider доходит до переключателя', () => {
+    const Harness = defineComponent({
+      components: { GrConfigProvider, GrSwitch },
+      template: `
+        <GrConfigProvider :component-defaults="{ GrSwitch: { showStateText: true, autoWidth: true } }">
+          <GrSwitch :model-value="true" />
+        </GrConfigProvider>
+      `,
+    })
+
+    expect(mount(Harness).get('[data-testid="gr-switch-track"]').classes()).toContain('min-w-11')
+  })
+})
+
+/** Отступы растущей дорожки считаются из той же геометрии, что и фиксированной. */
+describe('GrSwitch — геометрия растущей подписи', () => {
+  it('со стороны бегунка отступ больше фиксированного ровно на воздух', () => {
+    for (const size of GR_SWITCH_STATE_TEXT_SIZES) {
+      const air = pixels(stateTextAutoPaddings[size].checked, 'pl-')
+
+      expect(pixels(stateTextAutoPaddings[size].checked, 'pr-'), size)
+        .toBe(pixels(stateTextPaddings[size].checked, 'pr-') + air)
+      // Воздух одинаков с обеих сторон, иначе подпись стоит не по центру остатка.
+      expect(pixels(stateTextAutoPaddings[size].unchecked, 'pr-'), size).toBe(air)
+      expect(pixels(stateTextAutoPaddings[size].unchecked, 'pl-'), size)
+        .toBe(pixels(stateTextPaddings[size].unchecked, 'pl-') + air)
+    }
+  })
+
+  it('отступ со стороны бегунка перекрывает сам бегунок с зазором', () => {
+    for (const size of GR_SWITCH_STATE_TEXT_SIZES) {
+      // Иначе текст лёг бы на бегунок, как только дорожка перестала центровать.
+      expect(pixels(stateTextAutoPaddings[size].checked, 'pr-'), size)
+        .toBeGreaterThan(pixels(thumbSizes[size], 'w-') + SWITCH_THUMB_GAP)
     }
   })
 })

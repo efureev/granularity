@@ -3386,6 +3386,20 @@ export const grComponentTokens: GrComponentToken[] = [
     "description": "Цвет рамки дорожки переключателя."
   },
   {
+    "owner": "GrSwitch",
+    "name": "--gr-switch-state-text-fg",
+    "kind": "hook",
+    "default": "var(--gr-primary-fg) во включённом состоянии, var(--gr-muted-fg) в выключенном, var(--gr-disabled-fg) в недоступном",
+    "description": "Цвет подписи состояния внутри дорожки. Задан для того, кто красит дорожку своим цветом: контраст текста на произвольной заливке библиотека не вычислит."
+  },
+  {
+    "owner": "GrSwitch",
+    "name": "--gr-switch-state-text-size",
+    "kind": "hook",
+    "default": "9px на md, 11px на lg",
+    "description": "Кегль подписи состояния. Собственный, а не ступень шкалы: минимальный --gr-text-xs (12px) в дорожку не помещается. Один токен на обе ступени."
+  },
+  {
     "owner": "GrTabs",
     "name": "--gr-tabs-scroll-fade",
     "kind": "hook",

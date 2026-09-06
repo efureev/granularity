@@ -11136,6 +11136,34 @@
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
+          },
+          {
+            "name": "showStateText",
+            "description": "Подпись состояния внутри дорожки — на свободной от бегунка стороне. Помещается только на `md` и `lg`; на мелких ступенях не рисуется.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "checkedText",
+            "description": "Текст включённого состояния. Без него — `gr.switch.on` из локали.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "uncheckedText",
+            "description": "Текст выключенного состояния. Без него — `gr.switch.off` из локали.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "autoWidth",
+            "description": "Дорожка растягивается под подпись, а ступень размера становится нижней границей ширины. Без `showStateText` смысла не имеет: тянуться не под что.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "undefined"
           }
         ]
       },

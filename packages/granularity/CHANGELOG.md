@@ -7,6 +7,51 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- **`GrSwitch` can put the state inside the track** — `showStateText` writes
+  "on"/"off" on whichever side the thumb has left free, so the state reads on its
+  own instead of by comparison with the switch next to it. Texts come from the
+  locale (`gr.switch.on` / `gr.switch.off`) and are overridden per instance with
+  `checkedText` / `uncheckedText`.
+
+  The label is drawn on `md` and `lg` only, and a dev build says why on the
+  smaller steps. The room beside the thumb is 13 / 17 / 21 / 29px across
+  `xs`…`lg`, while a three-letter word takes about 19px even at a 9px type size —
+  and the track does not stretch to fit text, because its width is what the
+  thumb travel is computed from.
+
+  That measurement also sets the Russian default to «ДА» / «НЕТ»: «ВЫКЛ» is 31px
+  wide and fits no step at all.
+
+  The text is `aria-hidden`. The track lives inside `<button role="switch">`, so
+  a visible string would join the accessible name — "Wi-Fi ON" instead of
+  "Wi-Fi" — while `aria-checked` already carries the state.
+
+  Colour and type size are hooks (`--gr-switch-state-text-fg`,
+  `--gr-switch-state-text-size`) rather than inline values: whoever paints the
+  track with `activeBackgroundColor` also names a readable colour for the text
+  on it, and an inline value would beat their CSS.
+
+- **`GrSwitch` can let the track grow — as an opt-in** — `autoWidth` turns the
+  size step into a *minimum* width and lets the label decide the rest, so a
+  label of any length fits. The height never changes; only the row stretches.
+
+  Fixed stays the default on purpose: a column of switches with different labels
+  turns ragged, and anyone who laid out a column at the step's width would get a
+  skew. That is the consumer's call, not the component's.
+
+  The width does not jump on toggle even though "on" and "off" are rarely the
+  same width: an invisible copy of the opposite text sits in the same grid cell,
+  so the width is the maximum of the two.
+
+  The thumb now travels with no number that depends on the track width — `left:
+  calc(100% - gap)` paired with `translateX(-100%)` measures percentages against
+  two different boxes, the track and the thumb itself. Both animate, so the
+  travel stays linear, and elasticity needs neither measurement nor a
+  `ResizeObserver`. The fixed layout is unchanged down to the pixel, which the
+  visual baselines confirm.
+
 ## [v0.48.0] 2026-09-06
 
 ### Added

@@ -121,7 +121,7 @@ describe('component docs metadata', () => {
 
     const doc = getShowcaseComponentDoc(switchEntity!)
 
-    expect(doc.examples).toHaveLength(4)
+    expect(doc.examples).toHaveLength(6)
     expect(doc.examples[0]).toMatchObject({
       id: 'switch-builder',
       previewKey: 'gr-switch-builder',
@@ -172,7 +172,7 @@ describe('component docs metadata', () => {
     expect(textareaDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(textareaDoc.examples.every(example => example.previewKey?.startsWith('gr-textarea'))).toBe(true)
 
-    expect(switchDoc.examples).toHaveLength(4)
+    expect(switchDoc.examples).toHaveLength(6)
     expect(switchDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(switchDoc.examples.every(example => example.previewKey?.startsWith('gr-switch'))).toBe(true)
   })

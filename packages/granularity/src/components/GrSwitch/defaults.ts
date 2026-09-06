@@ -7,6 +7,8 @@ import type { GrSwitchSize } from './grSwitchStyles'
  */
 export interface GrSwitchConfigurableProps {
   size: GrSwitchSize
+  showStateText: boolean
+  autoWidth: boolean
 }
 
 declare module '../../composables/useGrComponentConfig' {
