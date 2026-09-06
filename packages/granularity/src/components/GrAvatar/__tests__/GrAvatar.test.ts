@@ -4,8 +4,8 @@ import { describe, expect, it } from 'vitest'
 
 import GrConfigProvider from '../../GrConfigProvider/GrConfigProvider.vue'
 import GrAvatar from '../GrAvatar.vue'
+import { avatarToneClasses, avatarToneIndex, avatarFontSizePx, initialsFrom } from '../grAvatarStyles'
 import GrAvatarGroup from '../GrAvatarGroup.vue'
-import { avatarFontSizePx, initialsFrom } from '../grAvatarStyles'
 
 describe('GrAvatar', () => {
   it('по умолчанию рендерит слот и круглую форму', () => {
@@ -254,5 +254,80 @@ describe('GrAvatarGroup', () => {
 
     expect(fontOf(avatar.attributes('style'))).toBe('19px')
     expect(fontOf(badge.attributes('style'))).toBe(fontOf(avatar.attributes('style')))
+  })
+})
+
+describe('GrAvatar — автоцвет по имени', () => {
+  it('выключен по умолчанию: аватар остаётся нейтральным', () => {
+    const wrapper = mount(GrAvatar, { props: { name: 'Ada Lovelace' } })
+    expect(wrapper.classes()).toContain('bg-[var(--gr-muted)]')
+  })
+
+  it('включённый берёт слот палитры, а не собственный цвет', () => {
+    const wrapper = mount(GrAvatar, { props: { name: 'Ada Lovelace', autoColor: true } })
+    const tone = avatarToneClasses[avatarToneIndex('Ada Lovelace')]
+
+    for (const token of tone.split(' '))
+      expect(wrapper.classes()).toContain(token)
+
+    expect(wrapper.classes()).not.toContain('bg-[var(--gr-muted)]')
+  })
+
+  /**
+   * Узнаваемость и есть смысл автоцвета: разъедься цвет между рендерами —
+   * аватар мигал бы на гидрации, а человека нельзя было бы узнать по пятну.
+   */
+  it('один человек — один цвет, сколько бы раз ни рисовали', () => {
+    const first = mount(GrAvatar, { props: { name: 'Ada Lovelace', autoColor: true } })
+    const second = mount(GrAvatar, { props: { name: 'Ada Lovelace', autoColor: true } })
+
+    expect(first.classes()).toEqual(second.classes())
+  })
+
+  it('под картинкой не красит: фона там не видно', () => {
+    const wrapper = mount(GrAvatar, {
+      props: { name: 'Ada Lovelace', autoColor: true, src: 'https://example.test/a.png' },
+    })
+
+    expect(wrapper.classes()).toContain('bg-[var(--gr-muted)]')
+  })
+
+  it('включается глобально через GrConfigProvider', () => {
+    const host = defineComponent({
+      components: { GrConfigProvider, GrAvatar },
+      template: `
+        <GrConfigProvider :component-defaults="{ GrAvatar: { autoColor: true } }">
+          <GrAvatar name="Ada Lovelace" />
+        </GrConfigProvider>
+      `,
+    })
+
+    const wrapper = mount(host)
+    const tone = avatarToneClasses[avatarToneIndex('Ada Lovelace')]
+    expect(wrapper.getComponent(GrAvatar).classes()).toEqual(expect.arrayContaining(tone.split(' ')))
+  })
+})
+
+describe('avatarToneIndex', () => {
+  it('индекс всегда внутри палитры', () => {
+    const names = ['A', 'Ada Lovelace', 'Грейс Хоппер', '甲乙丙', '', '   ', 'x'.repeat(400)]
+
+    for (const name of names) {
+      const index = avatarToneIndex(name)
+      expect(Number.isInteger(index)).toBe(true)
+      expect(index).toBeGreaterThanOrEqual(0)
+      expect(index).toBeLessThan(avatarToneClasses.length)
+    }
+  })
+
+  it('пробелы по краям на слот не влияют: это то же имя', () => {
+    expect(avatarToneIndex('  Ada Lovelace  ')).toBe(avatarToneIndex('Ada Lovelace'))
+  })
+
+  it('палитра расходуется, а не сводится к одному слоту', () => {
+    const names = ['Ada', 'Grace', 'Linus', 'Barbara', 'Alan', 'Katherine', 'Donald', 'Margaret']
+    const used = new Set(names.map(avatarToneIndex))
+
+    expect(used.size).toBeGreaterThan(1)
   })
 })

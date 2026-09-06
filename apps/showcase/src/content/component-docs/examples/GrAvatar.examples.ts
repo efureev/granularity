@@ -16,6 +16,13 @@ export const grAvatarExamples: ShowcaseComponentExampleDoc[] = [
     previewKey: 'gr-avatar-image-fallback',
   },
   {
+    id: 'avatar-auto-color',
+    title: 'Auto colour from the name',
+    description: 'Цвет выводится из имени и не меняется между сессиями, поэтому человека можно узнать по пятну ещё до чтения инициалов. Палитру задаёт тема, а не компонент.',
+    status: 'ready',
+    previewKey: 'gr-avatar-auto-color',
+  },
+  {
     id: 'avatar-team-row',
     title: 'Composition inside user or team rows',
     description: 'На практике `GrAvatar` почти всегда живёт рядом с именем, ролью и secondary text — поэтому документируем и такой composed layout.',

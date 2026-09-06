@@ -1,0 +1,35 @@
+/*
+ * Палитра автоцвета аватара — только ссылки на роли тонов.
+ *
+ * Слоты живут здесь, а не в глобальной теме, потому что нужны ровно одному
+ * компоненту: в глобальной за них платил бы и тот, кто `GrAvatar` не берёт.
+ *
+ * **Тёмного файла у палитры нет, и это не пропуск.** У `GrBadge` и `GrButton`
+ * он есть потому, что там переопределяются `--gr-{tone}` и `-solid`, которые в
+ * тёмной теме означают другое. Здесь слот ссылается на пару `-light`/`-text`,
+ * а она сама переключается вместе с темой — переопределять нечего, и второй
+ * файл только дублировал бы первый.
+ *
+ * Состав палитры — шесть тонов с полным набором ролей. `primary` не входит:
+ * у него нет `-light` (мягкая подложка бренда называется `--gr-accent`).
+ * Приложение вправе переназначить любой слот, не трогая компонент.
+ */
+:root {
+  --gr-avatar-1-bg: var(--gr-info-light);
+  --gr-avatar-1-fg: var(--gr-info-text);
+
+  --gr-avatar-2-bg: var(--gr-warning-light);
+  --gr-avatar-2-fg: var(--gr-warning-text);
+
+  --gr-avatar-3-bg: var(--gr-success-light);
+  --gr-avatar-3-fg: var(--gr-success-text);
+
+  --gr-avatar-4-bg: var(--gr-danger-light);
+  --gr-avatar-4-fg: var(--gr-danger-text);
+
+  --gr-avatar-5-bg: var(--gr-azure-light);
+  --gr-avatar-5-fg: var(--gr-azure-text);
+
+  --gr-avatar-6-bg: var(--gr-slate-light);
+  --gr-avatar-6-fg: var(--gr-slate-text);
+}

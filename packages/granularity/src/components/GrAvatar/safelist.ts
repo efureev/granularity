@@ -1,11 +1,13 @@
 import { splitClassTokens } from '../shared/classTokens'
 import {
+  avatarToneClasses,
   groupBaseClass,
   groupItemClass,
   groupOverflowClass,
   mediaClass,
   mediaClipClass,
   rootBaseClass,
+  rootNeutralClass,
   rootStatusClass,
   shapes,
   statusDotClass,
@@ -14,7 +16,13 @@ import {
 
 export const grAvatarClassTokens = {
   shapes: Object.values(shapes).flatMap(splitClassTokens),
-  root: [...splitClassTokens(rootBaseClass), ...splitClassTokens(rootStatusClass)],
+  root: [
+    ...splitClassTokens(rootBaseClass),
+    ...splitClassTokens(rootNeutralClass),
+    ...splitClassTokens(rootStatusClass),
+    // Палитра автоцвета живёт в `.ts`-хелпере: её литералы пресет не видит.
+    ...avatarToneClasses.flatMap(splitClassTokens),
+  ],
   media: [...splitClassTokens(mediaClass), ...splitClassTokens(mediaClipClass)],
   status: [
     ...splitClassTokens(statusDotClass),

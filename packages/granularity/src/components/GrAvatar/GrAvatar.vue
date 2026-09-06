@@ -13,7 +13,10 @@ import {
   initialsFrom,
   mediaClass,
   mediaClipClass,
+  avatarToneClasses,
+  avatarToneIndex,
   rootBaseClass,
+  rootNeutralClass,
   rootStatusClass,
   statusDotClass,
   statusToneClass,
@@ -46,6 +49,14 @@ export interface GrAvatarProps {
   /** Имя участника: даёт инициалы и доступное имя аватара. */
   name?: string
   shape?: GrAvatarShape
+  /**
+   * Красить фон по имени: одинаковое имя всегда даёт одинаковый цвет.
+   *
+   * Выключен по умолчанию — серый аватар это осознанный нейтральный дефолт, а
+   * цветной может спорить с оформлением продукта. Палитру задаёт тема
+   * (`--gr-avatar-N-bg`/`-fg`), компонент только выбирает слот.
+   */
+  autoColor?: boolean
   /** Статус участника. Точка декоративна — рядом идёт скрытая подпись. */
   status?: GrAvatarStatus
 }
@@ -59,6 +70,9 @@ const props = withDefaults(defineProps<GrAvatarProps>(), {
   // Дефолт живёт в резолвере: Vue подставил бы свой раньше, чем компонент
   // заглянет в `GrConfigProvider`.
   shape: undefined,
+  // По той же причине, что `shape`: булев проп без этой строки Vue приводит к
+  // `false` сам, и резолвер уже не отличит «не задано» от «выключено явно».
+  autoColor: undefined,
   status: undefined,
 })
 
@@ -84,6 +98,8 @@ const resolvedShape = useGrComponentProp(
   () => props.shape ?? group?.shape,
   'circle',
 )
+
+const resolvedAutoColor = useGrComponentProp('GrAvatar', 'autoColor', () => props.autoColor, false)
 
 const sizePx = computed(() => (
   typeof localSize.value === 'number' ? localSize.value : GR_AVATAR_SIZE_PX[resolvedScaleSize.value]
@@ -150,8 +166,19 @@ const accessibleName = computed(() => props.alt ?? props.name ?? '')
 
 const rootIsImage = computed(() => !activeSrc.value && accessibleName.value !== '')
 
+/**
+ * Автоцвет виден только под инициалами: картинка закрывает фон целиком, а у
+ * пустого аватара красить нечего.
+ */
+const toneClass = computed(() => (
+  resolvedAutoColor.value && showInitials.value && props.name
+    ? avatarToneClasses[avatarToneIndex(props.name)]
+    : rootNeutralClass
+))
+
 const rootClass = computed(() => [
   rootBaseClass,
+  toneClass.value,
   grAvatarClass(resolvedShape.value),
   props.status ? rootStatusClass : '',
 ])

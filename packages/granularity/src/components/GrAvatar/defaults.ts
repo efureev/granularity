@@ -10,6 +10,7 @@ import type { GrAvatarShape } from './grAvatarStyles'
 export interface GrAvatarConfigurableProps {
   size: GrComponentSize
   shape: GrAvatarShape
+  autoColor: boolean
 }
 
 declare module '../../composables/useGrComponentConfig' {

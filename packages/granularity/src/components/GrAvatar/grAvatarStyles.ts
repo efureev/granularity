@@ -9,7 +9,48 @@ export const shapes: Record<GrAvatarShape, string> = {
   square: 'rounded-[var(--gr-avatar-square-radius,10px)]',
 }
 
-export const rootBaseClass = 'relative inline-flex shrink-0 items-center justify-center overflow-hidden border border-[var(--gr-brd)] bg-[var(--gr-muted)] text-[var(--gr-muted-fg)] font-700'
+export const rootBaseClass = 'relative inline-flex shrink-0 items-center justify-center overflow-hidden border border-[var(--gr-brd)] font-700'
+
+/** Цвет по умолчанию. Отделён от базы, иначе он спорил бы с автоцветом порядком правил. */
+export const rootNeutralClass = 'bg-[var(--gr-muted)] text-[var(--gr-muted-fg)]'
+
+/**
+ * Палитра автоцвета: подложка и инициалы одним классом на слот.
+ *
+ * Цвета сюда не попадают — только имена слотов. Что стоит за слотом, решает
+ * тема (`--gr-avatar-N-bg`/`-fg` ссылаются на пары `-light`/`-text` тонов), и
+ * приложение вправе переопределить любой, не трогая компонент.
+ *
+ * Классы статические: UnoCSS сканирует литералы, и собранный в рантайме
+ * `bg-[var(--gr-avatar-${n}-bg)]` в CSS не превратился бы.
+ */
+export const avatarToneClasses: string[] = [
+  'bg-[var(--gr-avatar-1-bg)] text-[var(--gr-avatar-1-fg)]',
+  'bg-[var(--gr-avatar-2-bg)] text-[var(--gr-avatar-2-fg)]',
+  'bg-[var(--gr-avatar-3-bg)] text-[var(--gr-avatar-3-fg)]',
+  'bg-[var(--gr-avatar-4-bg)] text-[var(--gr-avatar-4-fg)]',
+  'bg-[var(--gr-avatar-5-bg)] text-[var(--gr-avatar-5-fg)]',
+  'bg-[var(--gr-avatar-6-bg)] text-[var(--gr-avatar-6-fg)]',
+]
+
+/**
+ * Слот палитры по имени: тот же человек — тот же цвет.
+ *
+ * Стабильность здесь и есть смысл функции: цвет не должен меняться ни между
+ * сессиями, ни между сервером и клиентом, иначе аватар мигает на гидрации, а
+ * узнаваемость — то, ради чего автоцвет и заводят, — теряется. Отсюда обычный
+ * детерминированный перебор кодов, а не хеш из окружения.
+ *
+ * `>>> 0` обязателен: без него сумма уходит в отрицательные на длинных именах,
+ * и остаток от деления даёт отрицательный индекс.
+ */
+export function avatarToneIndex(name: string): number {
+  let hash = 0
+  for (const char of name.trim())
+    hash = (hash * 31 + (char.codePointAt(0) ?? 0)) >>> 0
+
+  return hash % avatarToneClasses.length
+}
 
 /** Индикатор статуса: кольцо цветом фона отделяет точку от самого аватара. */
 export const statusDotClass = 'absolute bottom-0 right-0 block h-1/4 w-1/4 min-h-2 min-w-2 rounded-[var(--gr-radius-full)] ring-2 ring-[var(--gr-bg)]'

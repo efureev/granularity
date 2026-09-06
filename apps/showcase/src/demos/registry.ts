@@ -139,6 +139,7 @@ export const demoPathByPreviewKey = {
   'gr-autocomplete-virtual': 'components/gr-autocomplete/GrAutocompleteVirtualDemo.vue',
   'gr-avatar-image-fallback': 'components/gr-avatar/GrAvatarImageFallbackDemo.vue',
   'gr-avatar-size-shape': 'components/gr-avatar/GrAvatarSizeShapeDemo.vue',
+  'gr-avatar-auto-color': 'components/gr-avatar/GrAvatarAutoColorDemo.vue',
   'gr-avatar-team-row': 'components/gr-avatar/GrAvatarTeamRowDemo.vue',
   'gr-badge-builder': 'components/gr-badge/GrBadgeBuilderDemo.vue',
   'gr-badge-size-radius': 'components/gr-badge/GrBadgeSizeRadiusDemo.vue',

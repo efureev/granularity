@@ -7,6 +7,41 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- **`GrAvatar` can colour itself from the name** — `autoColor`, off by default.
+  The same name always maps to the same slot, so a person in a list is
+  recognisable by the patch of colour before the initials are read.
+
+  **The palette is not in the component, and not in the global theme either.**
+  Six slots (`--gr-avatar-1-bg`/`-fg` … `-6-`) live in the component's own theme
+  (`components/GrAvatar/themes/`), each pointing by default at a `-light` /
+  `-text` pair of an existing tone — the same pairing the soft `GrBadge` variant
+  already stands on. The component only computes which slot a name lands in, so
+  an application narrows or repaints the palette by redefining a slot.
+
+  Component-local rather than global because the palette serves exactly one
+  component: in the global theme every consumer would carry it, including those
+  who never render an avatar. There is no dark file for it, unlike `GrBadge` and
+  `GrButton`: those redefine `--gr-{tone}` and `-solid`, which mean something
+  different in the dark theme, while a slot here points at a role that already
+  switches with the theme on its own.
+
+  Three of the six tones are semantic, and a person's avatar can come out pale
+  green or pale red. That is a choice: the tints are pale, and among people
+  colour reads as identity rather than state. Redefining a slot is the way out
+  for anyone who disagrees.
+
+  The hash is deliberately plain and environment-free — the colour must not
+  shift between sessions or between server and client, or the avatar would
+  flicker on hydration and stop being recognisable, which is the whole point.
+
+  A new gate (`src/__tests__/avatarPalette.test.ts`) holds both halves in both
+  themes: initials keep AA on their own backing, and no two slots collapse into
+  the same colour. Neither was covered before — `toneContrast` measures
+  foreground tokens against `--gr-card`/`--gr-muted`, not against a tone's own
+  `-light`, and axe only walks the light theme.
+
 ## [v0.47.0] 2026-09-05
 
 ### Changed

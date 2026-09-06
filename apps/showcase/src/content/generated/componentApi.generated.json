@@ -614,6 +614,13 @@
             "default": "undefined"
           },
           {
+            "name": "autoColor",
+            "description": "Красить фон по имени: одинаковое имя всегда даёт одинаковый цвет. Выключен по умолчанию — серый аватар это осознанный нейтральный дефолт, а цветной может спорить с оформлением продукта. Палитру задаёт тема (`--gr-avatar-N-bg`/`-fg`), компонент только выбирает слот.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "status",
             "description": "Статус участника. Точка декоративна — рядом идёт скрытая подпись.",
             "type": "\"online\" | \"offline\" | \"busy\" | \"away\" | undefined",
@@ -7758,8 +7765,8 @@
           },
           {
             "name": "pageSizes",
-            "description": "",
-            "type": "number[] | undefined",
+            "description": "Варианты размера страницы. Число — подпись равна значению; пара — своя подпись при том же значении («50 / стр.»), которую иначе было не собрать.",
+            "type": "GrPaginationPageSizeOption[] | undefined",
             "required": false,
             "default": "[10, 20, 50]"
           },
