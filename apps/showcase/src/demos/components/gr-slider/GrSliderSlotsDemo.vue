@@ -6,7 +6,7 @@ import IconSnowflake from '~icons/lucide/snowflake'
 import { GrCard, GrSlider } from '@feugene/granularity'
 
 const temperature = ref(22)
-const budget = ref<number[]>([30, 70])
+const budget = ref<[number, number]>([30, 70])
 </script>
 
 <template>
