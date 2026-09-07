@@ -1,7 +1,8 @@
 import type { Ref, ShallowRef } from 'vue'
 import { onBeforeUnmount, ref, shallowRef, watch } from 'vue'
 
-import type { GrAutocompleteOption, GrAutocompleteValue } from '../GrAutocomplete.vue'
+import { isAutocompleteOptionGroup } from '../grAutocompleteStyles'
+import type { GrAutocompleteOptionOrGroup, GrAutocompleteValue } from '../GrAutocomplete.vue'
 
 /**
  * Дебаунснутая удалённая загрузка опций.
@@ -18,9 +19,9 @@ import type { GrAutocompleteOption, GrAutocompleteValue } from '../GrAutocomplet
  * делает потребитель) — модулю место в `composables/internal/`.
  */
 export interface UseRemoteOptionsOptions<TValue extends GrAutocompleteValue> {
-  fetchOptions: () => ((query: string, signal: AbortSignal) => Promise<GrAutocompleteOption<TValue>[]>) | undefined
+  fetchOptions: () => ((query: string, signal: AbortSignal) => Promise<GrAutocompleteOptionOrGroup<TValue>[]>) | undefined
   /** Стартовый список: его смена сбрасывает ответ сервера. */
-  options: () => GrAutocompleteOption<TValue>[] | undefined
+  options: () => GrAutocompleteOptionOrGroup<TValue>[] | undefined
   debounce: () => number
   minQueryLength: () => number
   onSearch: (query: string) => void
@@ -28,7 +29,7 @@ export interface UseRemoteOptionsOptions<TValue extends GrAutocompleteValue> {
 }
 
 export interface RemoteOptions<TValue extends GrAutocompleteValue> {
-  remoteOptions: ShallowRef<GrAutocompleteOption<TValue>[]>
+  remoteOptions: ShallowRef<GrAutocompleteOptionOrGroup<TValue>[]>
   remoteAnswered: Ref<boolean>
   remoteLoading: Ref<boolean>
   scheduleSearch: (value: string) => void
@@ -40,7 +41,7 @@ export function useRemoteOptions<TValue extends GrAutocompleteValue>(
 ): RemoteOptions<TValue> {
   // Ответ последнего `fetchOptions`. До первого ответа показываем `options` —
   // с ними компонент рисует стартовый список, не дожидаясь сервера.
-  const remoteOptions = shallowRef<GrAutocompleteOption<TValue>[]>([])
+  const remoteOptions = shallowRef<GrAutocompleteOptionOrGroup<TValue>[]>([])
   const remoteAnswered = ref(false)
   const remoteLoading = ref(false)
 
@@ -117,8 +118,14 @@ export function useRemoteOptions<TValue extends GrAutocompleteValue>(
    * в том числе тем, который вызвал сам компонент своим `update:modelValue`, —
    * и remote-результаты исчезали бы прямо посреди выбора.
    */
-  function optionsSignature(list: GrAutocompleteOption<TValue>[] | undefined): string {
-    return (list ?? []).map(o => `${String(o.value)}\u0000${o.label}`).join('\u0001')
+  function optionsSignature(list: GrAutocompleteOptionOrGroup<TValue>[] | undefined): string {
+    // Группа опознаётся по вложенному списку; её подпись — подписи детей, иначе
+    // смена содержимого группы прошла бы незамеченной.
+    return (list ?? [])
+      .map(item => (isAutocompleteOptionGroup(item)
+        ? `${item.label}\u0000${optionsSignature(item.options)}`
+        : `${String(item.value)}\u0000${item.label}`))
+      .join('\u0001')
   }
 
   // Родитель сменил стартовый список — он снова источник до следующего ответа

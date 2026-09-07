@@ -2,6 +2,7 @@ import type { ComputedRef, Ref } from 'vue'
 import { computed, nextTick } from 'vue'
 
 import { useComboboxNavigation } from '../../../composables/useComboboxNavigation'
+import type { GrAutocompletePanelItem } from './useAutocompletePanel'
 import type { GrAutocompleteOption, GrAutocompleteValue } from '../GrAutocomplete.vue'
 
 /**
@@ -11,10 +12,16 @@ import type { GrAutocompleteOption, GrAutocompleteValue } from '../GrAutocomplet
  */
 export type GrAutocompleteNavigableItem<TValue extends GrAutocompleteValue>
   = | { kind: 'add' }
+  /**
+   * `index` — позиция в `panelItems`, а не среди опций: заголовки групп занимают
+   * в наборе такие же строки, и по этому же индексу считаются `id` опции и окно
+   * виртуализации. Индекс «среди опций» разошёлся бы с обоими, как только
+   * появилась первая группа.
+   */
     | { kind: 'option', option: GrAutocompleteOption<TValue>, index: number }
 
 export interface UseAutocompleteNavigationOptions<TValue extends GrAutocompleteValue> {
-  effectiveOptions: ComputedRef<GrAutocompleteOption<TValue>[]>
+  panelItems: ComputedRef<GrAutocompletePanelItem<TValue>[]>
   canAddCustom: ComputedRef<boolean>
   selectedValues: ComputedRef<TValue[]>
   open: Ref<boolean>
@@ -29,7 +36,8 @@ export interface UseAutocompleteNavigationOptions<TValue extends GrAutocompleteV
 export interface AutocompleteNavigation<TValue extends GrAutocompleteValue> {
   navigableItems: ComputedRef<Array<GrAutocompleteNavigableItem<TValue>>>
   isSelected: (value: TValue) => boolean
-  navigableIndexOf: (value: TValue) => number
+  /** Индекс навигации по позиции строки в панели — для наведения мышью. */
+  navigableIndexOfPanelIndex: (index: number) => number
   activeIndex: Ref<number>
   activeItem: ComputedRef<GrAutocompleteNavigableItem<TValue> | undefined>
   activeDescendantId: ComputedRef<string | undefined>
@@ -46,10 +54,12 @@ export function useAutocompleteNavigation<TValue extends GrAutocompleteValue>(
 
   const navigableItems = computed<Item[]>(() => {
     const items: Item[] = options.canAddCustom.value ? [{ kind: 'add' }] : []
-    options.effectiveOptions.value.forEach((option, index) => {
-      if (!option.disabled)
-        items.push({ kind: 'option', option, index })
+
+    options.panelItems.value.forEach((item, index) => {
+      if (item.kind === 'option' && !item.option.disabled)
+        items.push({ kind: 'option', option: item.option, index })
     })
+
     return items
   })
 
@@ -57,8 +67,24 @@ export function useAutocompleteNavigation<TValue extends GrAutocompleteValue>(
     return options.selectedValues.value.includes(value)
   }
 
-  function navigableIndexOf(value: TValue): number {
-    return navigableItems.value.findIndex(item => item.kind === 'option' && item.option.value === value)
+  /**
+   * Navigable-индекс по позиции в `panelItems` — O(1) на каждое движение мыши
+   * вместо поиска по значению.
+   *
+   * Поиск по значению здесь ещё и неверен: одно и то же значение может стоять в
+   * двух группах, и наведение на вторую опцию подсвечивало бы первую.
+   */
+  const navigableIndexByPanelIndex = computed(() => {
+    const map = new Map<number, number>()
+    navigableItems.value.forEach((item, navIndex) => {
+      if (item.kind === 'option')
+        map.set(item.index, navIndex)
+    })
+    return map
+  })
+
+  function navigableIndexOfPanelIndex(index: number): number {
+    return navigableIndexByPanelIndex.value.get(index) ?? -1
   }
 
   /** Прокрутка к активному: сперва окно виртуального списка, затем доводка. */
@@ -97,7 +123,7 @@ export function useAutocompleteNavigation<TValue extends GrAutocompleteValue>(
   return {
     navigableItems,
     isSelected,
-    navigableIndexOf,
+    navigableIndexOfPanelIndex,
     activeIndex,
     activeItem,
     activeDescendantId,

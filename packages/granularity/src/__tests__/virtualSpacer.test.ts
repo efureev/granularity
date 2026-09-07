@@ -99,10 +99,35 @@ function readComponentSources(dir: string): { markup: string, sources: string } 
   return { markup, sources }
 }
 
+/**
+ * Источник общего модуля панели: компонент, делегировавший ему виртуализацию,
+ * доказательства «имена переменных отдаёт `spacerStyle`» в своих файлах уже не
+ * содержит — оно переехало вместе с вызовом. Разметка и распорки при этом
+ * остались у компонента, поэтому спрашивать с него надо по-прежнему.
+ */
+const SHARED_PANEL = resolve(componentsDir, 'shared/optionPanel.ts')
+const SHARED_PANEL_SOURCE = readFileSync(SHARED_PANEL, 'utf-8')
+
 const consumers: VirtualConsumer[] = readdirSync(componentsDir)
   .filter(dir => dir.startsWith('Gr'))
-  .map(dir => ({ name: dir, ...readComponentSources(dir) }))
-  .filter(consumer => consumer.sources.includes('useVirtualList('))
+  .map((dir) => {
+    const read = readComponentSources(dir)
+
+    return {
+      name: dir,
+      markup: read.markup,
+      sources: read.sources.includes('useOptionPanelVirtualization')
+        ? read.sources + SHARED_PANEL_SOURCE
+        : read.sources,
+    }
+  })
+  // Вызов примитива может уехать не только в свой композабл, но и в общий
+  // (`shared/optionPanel` — панель списка с группами, одна на `GrSelect` и
+  // `GrAutocomplete`). Разметка и распорки при этом остаются у компонента, то
+  // есть контракт с него спрашивается прежний, а поиск по одному имени
+  // примитива тихо перестал бы его находить.
+  .filter(consumer => consumer.sources.includes('useVirtualList(')
+    || consumer.sources.includes('useOptionPanelVirtualization'))
 
 /**
  * Разметка строк-распорок целиком.

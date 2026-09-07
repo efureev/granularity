@@ -12,8 +12,8 @@ import { useGranularityTranslations } from '../../internal/granularityI18n'
 import { useRemoteOptions } from './composables/useRemoteOptions'
 import { useAutocompleteValues } from './composables/useAutocompleteValues'
 import { useAutocompletePanel } from './composables/useAutocompletePanel'
-import { useAutocompleteVirtual } from './composables/useAutocompleteVirtual'
 import { useAutocompleteNavigation } from './composables/useAutocompleteNavigation'
+import { useOptionPanelVirtualization } from '../shared/optionPanel'
 import { isComposingEvent } from '../../internal/keyboard'
 import { useGrFormFieldContext } from '../GrFormField/context'
 import { useGrFormControl } from '../../composables/useGrFormControl'
@@ -34,6 +34,7 @@ import {
   autocompleteStateClass,
   type GrAutocompleteModelValue,
   type GrAutocompleteOption,
+  type GrAutocompleteOptionOrGroup,
   type GrAutocompleteValue,
   type GrAutocompleteSize,
 } from './grAutocompleteStyles'
@@ -46,6 +47,8 @@ import IconX from '~icons/lucide/x'
 export type {
   GrAutocompleteModelValue,
   GrAutocompleteOption,
+  GrAutocompleteOptionGroup,
+  GrAutocompleteOptionOrGroup,
   GrAutocompleteSize,
   GrAutocompleteValue,
 } from './grAutocompleteStyles'
@@ -67,7 +70,7 @@ export interface GrAutocompleteProps<TValue extends GrAutocompleteValue = string
    * Для remote-режима (`filterable=false`) — список, который родитель обновляет
    * в ответ на событие `search`.
    */
-  options?: GrAutocompleteOption<TValue>[]
+  options?: GrAutocompleteOptionOrGroup<TValue>[]
   multiple?: boolean
   /**
    * Вид чипов выбранных значений в режиме `multiple`. Рисует их `GrChip`, но
@@ -111,7 +114,7 @@ export interface GrAutocompleteProps<TValue extends GrAutocompleteValue = string
    * выключена: список фильтрует сервер. Альтернатива — событие `search`, если
    * запрос ведёт само приложение.
    */
-  fetchOptions?: (query: string, signal: AbortSignal) => Promise<GrAutocompleteOption<TValue>[]>
+  fetchOptions?: (query: string, signal: AbortSignal) => Promise<GrAutocompleteOptionOrGroup<TValue>[]>
   /** Минимальная длина запроса до эмита `search` (для дебаунса remote-загрузки). */
   minQueryLength?: number
   /** Задержка дебаунса события `search`, мс. */
@@ -290,6 +293,7 @@ const { remoteOptions, remoteAnswered, remoteLoading, scheduleSearch } = useRemo
 
 const {
   optionsResolved,
+  flatOptions,
   modelSingle,
   selectedValues,
   hasSelection,
@@ -355,8 +359,9 @@ const { floatingStyle } = useFloating(rootEl, panelEl, open, {
 
 useDismissible(open, closeDropdown)
 
-const { belowMinQuery, effectiveOptions, canAddCustom, showEmpty } = useAutocompletePanel<TValue>({
+const { belowMinQuery, panelItems, panelRows, canAddCustom, showEmpty } = useAutocompletePanel<TValue>({
   optionsResolved,
+  flatOptions,
   query,
   dirty,
   filterable: () => props.filterable,
@@ -384,38 +389,46 @@ function optionDomId(index: number): string {
 const addOptionDomId = computed(() => `${listboxId}-add`)
 
 const {
+  virtualEnabled,
   addOffset,
-  virtualizer,
-  showAddOption,
-  renderedOptions,
+  scrollToIndex: scrollVirtualToIndex,
+  measure: measureVirtualRow,
   optionSetProps,
+  leadingRowSetProps,
+  showLeadingRow: showAddOption,
+  renderedPanelRows,
   listboxStyle,
-} = useAutocompleteVirtual<TValue>({
+} = useOptionPanelVirtualization<GrAutocompleteOption<TValue>>({
+  panelItems,
+  panelRows,
+  hasLeadingRow: canAddCustom,
   listboxEl,
-  effectiveOptions,
-  canAddCustom,
-  virtual: () => props.virtual,
-  dropdownMaxHeight: () => props.dropdownMaxHeight,
+  enabled: () => props.virtual,
+  maxHeight: () => props.dropdownMaxHeight,
 })
+
+/** Имя группы для `aria-labelledby`: заголовок живёт внутри своей группы. */
+function groupLabelId(groupKey: string): string {
+  return `${listboxId}-${groupKey}`
+}
 
 const {
   isSelected,
-  navigableIndexOf,
+  navigableIndexOfPanelIndex,
   activeIndex,
   activeItem,
   activeDescendantId,
-  activeValue,
   initActiveIndex,
   resetActive,
   handleNavigationKeys,
 } = useAutocompleteNavigation<TValue>({
-  effectiveOptions,
+  panelItems,
   canAddCustom,
   selectedValues,
   open,
   virtual: () => props.virtual,
   addOffset,
-  scrollToIndex: index => virtualizer.scrollToIndex(index),
+  scrollToIndex: scrollVirtualToIndex,
   optionDomId,
   addOptionDomId,
 })
@@ -841,7 +854,7 @@ const themeAttrs = useGrThemeAttrs()
               строкой состояния, и «ничего не найдено» выглядело прижатым к низу.
             -->
             <div
-              v-if="showAddOption || renderedOptions.length"
+              v-if="showAddOption || renderedPanelRows.length"
               :id="listboxId"
               ref="listboxEl"
               data-gr-autocomplete-listbox
@@ -865,7 +878,7 @@ const themeAttrs = useGrThemeAttrs()
                 role="option"
                 aria-selected="false"
                 tabindex="-1"
-                v-bind="optionSetProps(0)"
+                v-bind="leadingRowSetProps"
                 data-testid="gr-autocomplete-add-option"
                 data-gr-autocomplete-add-option
                 :class="autocompleteOptionClass({ disabled: false, active: activeItem?.kind === 'add' })"
@@ -876,36 +889,93 @@ const themeAttrs = useGrThemeAttrs()
                 {{ t('gr.autocomplete.addOption', 'Add "{value}"', { value: query.trim() }) }}
               </button>
 
-              <button
-                v-for="{ option, index: optionIndex } in renderedOptions"
-                :id="optionDomId(optionIndex)"
-                :key="option.value"
-                :ref="(el) => virtual && virtualizer.measure(optionIndex + addOffset, el as Element | null)"
-                data-gr-autocomplete-option
-                type="button"
-                role="option"
-                tabindex="-1"
-                v-bind="optionSetProps(optionIndex + addOffset)"
-                :disabled="option.disabled"
-                :aria-selected="isSelected(option.value) ? 'true' : 'false'"
-                :aria-disabled="option.disabled ? 'true' : undefined"
-                :class="autocompleteOptionClass({
-                  disabled: !!option.disabled,
-                  active: activeValue === option.value,
-                })"
-                @mousedown.prevent
-                @click="chooseOption(option)"
-                @mousemove="activeIndex = navigableIndexOf(option.value)"
-              >
-                <slot name="option" :option="option" :selected="isSelected(option.value)">
-                  <span class="flex items-center gap-2 min-w-0">
-                    <span class="inline-block h-4 w-4 shrink-0" aria-hidden="true">
-                      <IconCheck v-if="isSelected(option.value)" class="block h-4 w-4 text-[var(--gr-primary-text)]" />
+              <template v-for="row in renderedPanelRows" :key="row.key">
+                <!--
+                  Группа: заголовок внутри неё и даёт ей имя. При виртуализации
+                  окно может начаться ниже заголовка — тогда его в DOM нет, и
+                  имя группы идёт напрямую в `aria-label`.
+                -->
+                <div
+                  v-if="row.kind === 'group'"
+                  data-gr-autocomplete-group
+                  role="group"
+                  :class="virtualEnabled ? 'flex flex-col' : ''"
+                  :aria-labelledby="virtualEnabled ? undefined : groupLabelId(row.key)"
+                  :aria-label="virtualEnabled ? row.label : undefined"
+                >
+                  <div
+                    v-if="row.labelVisible !== false"
+                    :id="groupLabelId(row.key)"
+                    :ref="(el) => virtualEnabled && row.labelIndex !== undefined && measureVirtualRow(row.labelIndex + addOffset, el as Element | null)"
+                    data-gr-autocomplete-group-label
+                    role="presentation"
+                    class="px-3 pt-2 pb-1 text-[length:var(--gr-text-xs)] leading-[var(--gr-leading-xs)] font-semibold uppercase tracking-wide text-[var(--gr-muted-fg)]"
+                  >
+                    {{ row.label }}
+                  </div>
+
+                  <button
+                    v-for="child in row.options"
+                    :id="optionDomId(child.index)"
+                    :key="child.key"
+                    :ref="(el) => virtualEnabled && measureVirtualRow(child.index + addOffset, el as Element | null)"
+                    data-gr-autocomplete-option
+                    type="button"
+                    role="option"
+                    tabindex="-1"
+                    v-bind="optionSetProps(child.index)"
+                    :disabled="child.option.disabled"
+                    :aria-selected="isSelected(child.option.value) ? 'true' : 'false'"
+                    :aria-disabled="child.option.disabled ? 'true' : undefined"
+                    :class="autocompleteOptionClass({
+                      disabled: !!child.option.disabled,
+                      active: activeItem?.kind === 'option' && activeItem.index === child.index,
+                    })"
+                    @mousedown.prevent
+                    @click="chooseOption(child.option)"
+                    @mousemove="activeIndex = navigableIndexOfPanelIndex(child.index)"
+                  >
+                    <slot name="option" :option="child.option" :selected="isSelected(child.option.value)">
+                      <span class="flex items-center gap-2 min-w-0">
+                        <span class="inline-block h-4 w-4 shrink-0" aria-hidden="true">
+                          <IconCheck v-if="isSelected(child.option.value)" class="block h-4 w-4 text-[var(--gr-primary-text)]" />
+                        </span>
+                        <span class="truncate">{{ child.option.label }}</span>
+                      </span>
+                    </slot>
+                  </button>
+                </div>
+
+                <button
+                  v-else
+                  :id="optionDomId(row.index)"
+                  :ref="(el) => virtualEnabled && measureVirtualRow(row.index + addOffset, el as Element | null)"
+                  data-gr-autocomplete-option
+                  type="button"
+                  role="option"
+                  tabindex="-1"
+                  v-bind="optionSetProps(row.index)"
+                  :disabled="row.option.disabled"
+                  :aria-selected="isSelected(row.option.value) ? 'true' : 'false'"
+                  :aria-disabled="row.option.disabled ? 'true' : undefined"
+                  :class="autocompleteOptionClass({
+                    disabled: !!row.option.disabled,
+                    active: activeItem?.kind === 'option' && activeItem.index === row.index,
+                  })"
+                  @mousedown.prevent
+                  @click="chooseOption(row.option)"
+                  @mousemove="activeIndex = navigableIndexOfPanelIndex(row.index)"
+                >
+                  <slot name="option" :option="row.option" :selected="isSelected(row.option.value)">
+                    <span class="flex items-center gap-2 min-w-0">
+                      <span class="inline-block h-4 w-4 shrink-0" aria-hidden="true">
+                        <IconCheck v-if="isSelected(row.option.value)" class="block h-4 w-4 text-[var(--gr-primary-text)]" />
+                      </span>
+                      <span class="truncate">{{ row.option.label }}</span>
                     </span>
-                    <span class="truncate">{{ option.label }}</span>
-                  </span>
-                </slot>
-              </button>
+                  </slot>
+                </button>
+              </template>
             </div>
 
             <!--

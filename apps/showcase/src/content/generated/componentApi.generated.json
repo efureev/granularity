@@ -223,7 +223,7 @@
           {
             "name": "options",
             "description": "Доступные опции. Для локального режима — полный список (фильтруется на клиенте). Для remote-режима (`filterable=false`) — список, который родитель обновляет в ответ на событие `search`.",
-            "type": "GrAutocompleteOption<TValue>[] | undefined",
+            "type": "GrAutocompleteOptionOrGroup<TValue>[] | undefined",
             "required": false,
             "default": "undefined"
           },
@@ -342,7 +342,7 @@
           {
             "name": "fetchOptions",
             "description": "Удалённая загрузка опций под управлением компонента: дебаунс, отмена устаревшего запроса и `loading` берёт на себя он. Ответ на отменённый запрос игнорируется — при быстром вводе в списке всегда результат последнего запроса, а не того, который вернулся позже. `signal` пробрасывается в `fetch`. Локальная фильтрация в этом режиме выключена: список фильтрует сервер. Альтернатива — событие `search`, если запрос ведёт само приложение.",
-            "type": "((query: string, signal: AbortSignal) => Promise<GrAutocompleteOption<TValue>[]>) | undefined",
+            "type": "((query: string, signal: AbortSignal) => Promise<GrAutocompleteOptionOrGroup<TValue>[]>) | undefined",
             "required": false,
             "default": "undefined"
           },
@@ -763,18 +763,18 @@
             "default": "undefined"
           },
           {
-            "name": "dot",
-            "description": "Точка вместо числа: чистая декорация, если не задан `ariaLabel`.",
-            "type": "boolean | undefined",
-            "required": false,
-            "default": "false"
-          },
-          {
             "name": "value",
             "description": "",
             "type": "string | number | undefined",
             "required": false,
             "default": "undefined"
+          },
+          {
+            "name": "dot",
+            "description": "Точка вместо числа: чистая декорация, если не задан `ariaLabel`.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
           },
           {
             "name": "max",
@@ -1982,6 +1982,13 @@
             "default": "undefined"
           },
           {
+            "name": "value",
+            "description": "Значение чипа в группе. Вне `GrChipGroup` не используется.",
+            "type": "GrChipValue | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "dark",
             "description": "",
             "type": "boolean | undefined",
@@ -1992,13 +1999,6 @@
             "name": "radius",
             "description": "",
             "type": "GrBadgeRadius | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
-            "name": "value",
-            "description": "Значение чипа в группе. Вне `GrChipGroup` не используется.",
-            "type": "GrChipValue | undefined",
             "required": false,
             "default": "undefined"
           },
@@ -8497,18 +8497,18 @@
             "default": "undefined"
           },
           {
-            "name": "shape",
-            "description": "Замкнутое кольцо или дуга с вырезом снизу.",
-            "type": "\"circle\" | \"dashboard\" | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
             "name": "value",
             "description": "Текущее значение `0..100`; выходящие за границы клампятся, `NaN` → `0`.",
             "type": "number | undefined",
             "required": false,
             "default": "0"
+          },
+          {
+            "name": "shape",
+            "description": "Замкнутое кольцо или дуга с вырезом снизу.",
+            "type": "\"circle\" | \"dashboard\" | undefined",
+            "required": false,
+            "default": "undefined"
           },
           {
             "name": "indeterminate",

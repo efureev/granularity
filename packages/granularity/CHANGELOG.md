@@ -7,6 +7,34 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- **`GrAutocomplete` groups its options** — parity with `GrSelect`, which had
+  `<optgroup>` while the combobox had no grouping mechanism at all. The data
+  shape is the same one `GrSelect` takes, because two neighbouring controls whose
+  lists differ only in how you type into them must accept data identically;
+  groups and standalone options mix in one array, and `fetchOptions` may return
+  groups too.
+
+  Filtering hides a group whole when nothing in it matched: a heading above
+  emptiness reads as a fault rather than as "nothing here". The keyboard walks
+  options only — the heading lives *inside* its group and names it through
+  `aria-labelledby`, because the direct children of `role="listbox"` must be
+  options. Under virtualization the window may start below a heading, and the
+  group's name then goes to `aria-label` so the group stays named either way.
+
+  The same value in two groups no longer collapses into one node, and hovering
+  highlights the option the pointer is on rather than the first one carrying that
+  value — the row key and the hover target are both keyed by position now.
+
+### Changed
+
+- **Panel-with-groups machinery is shared** — `GrSelect` and `GrAutocomplete`
+  build their rows and virtualize them through one module
+  (`components/shared/optionPanel.ts`) instead of two copies of the same
+  algorithm. The module knows nothing about an option beyond its place in the
+  set, so it is generic over the option rather than over the value.
+
 ## [v0.49.0] 2026-09-06
 
 ### Added

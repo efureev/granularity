@@ -2,9 +2,11 @@ import type { ComputedRef, Ref, ShallowRef } from 'vue'
 import { computed } from 'vue'
 
 import { resolveSelectedOptions } from '../../shared/optionFilter'
+import { isAutocompleteOptionGroup } from '../grAutocompleteStyles'
 import type {
   GrAutocompleteModelValue,
   GrAutocompleteOption,
+  GrAutocompleteOptionOrGroup,
   GrAutocompleteValue,
 } from '../GrAutocomplete.vue'
 
@@ -17,15 +19,18 @@ import type {
  */
 export interface UseAutocompleteValuesOptions<TValue extends GrAutocompleteValue> {
   modelValue: () => GrAutocompleteModelValue<TValue>
-  options: () => GrAutocompleteOption<TValue>[] | undefined
+  options: () => GrAutocompleteOptionOrGroup<TValue>[] | undefined
   multiple: () => boolean
   fetchOptions: () => unknown
-  remoteOptions: ShallowRef<GrAutocompleteOption<TValue>[]>
+  remoteOptions: ShallowRef<GrAutocompleteOptionOrGroup<TValue>[]>
   remoteAnswered: Ref<boolean>
 }
 
 export interface AutocompleteValues<TValue extends GrAutocompleteValue> {
-  optionsResolved: ComputedRef<GrAutocompleteOption<TValue>[]>
+  /** Список как его задал потребитель — с группами, если они есть. */
+  optionsResolved: ComputedRef<GrAutocompleteOptionOrGroup<TValue>[]>
+  /** Тот же список без групп: по нему ищут метку выбранного и проверяют дубли. */
+  flatOptions: ComputedRef<GrAutocompleteOption<TValue>[]>
   isEmptyValue: (value: unknown) => boolean
   modelSingle: ComputedRef<TValue | ''>
   selectedValues: ComputedRef<TValue[]>
@@ -38,10 +43,18 @@ export interface AutocompleteValues<TValue extends GrAutocompleteValue> {
 export function useAutocompleteValues<TValue extends GrAutocompleteValue>(
   options: UseAutocompleteValuesOptions<TValue>,
 ): AutocompleteValues<TValue> {
-  const optionsResolved = computed<GrAutocompleteOption<TValue>[]>(() =>
+  const optionsResolved = computed<GrAutocompleteOptionOrGroup<TValue>[]>(() =>
     options.fetchOptions() && options.remoteAnswered.value
       ? options.remoteOptions.value
       : (options.options() ?? []),
+  )
+
+  /**
+   * Плоский список: метку выбранного значения и проверку «такое уже есть» группы
+   * не касаются — они про показ, а не про состав.
+   */
+  const flatOptions = computed<GrAutocompleteOption<TValue>[]>(() =>
+    optionsResolved.value.flatMap(item => (isAutocompleteOptionGroup(item) ? item.options : [item])),
   )
 
   /** `0` — валидное значение, поэтому «пусто» проверяется явно, а не через falsy. */
@@ -72,12 +85,12 @@ export function useAutocompleteValues<TValue extends GrAutocompleteValue>(
   const hasSelection = computed(() => selectedValues.value.length > 0)
 
   function labelFor(value: GrAutocompleteValue): string {
-    return optionsResolved.value.find(o => o.value === value)?.label ?? String(value)
+    return flatOptions.value.find(o => o.value === value)?.label ?? String(value)
   }
 
   /** Опции выбранных значений (для chips в multiple). Неизвестные значения показываем как есть. */
   const selectedOptions = computed<GrAutocompleteOption<TValue>[]>(() =>
-    resolveSelectedOptions(selectedValues.value, optionsResolved.value),
+    resolveSelectedOptions(selectedValues.value, flatOptions.value),
   )
 
   const singleSelectedLabel = computed(() => (
@@ -86,6 +99,7 @@ export function useAutocompleteValues<TValue extends GrAutocompleteValue>(
 
   return {
     optionsResolved,
+    flatOptions,
     isEmptyValue,
     modelSingle,
     selectedValues,

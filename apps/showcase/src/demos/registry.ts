@@ -135,6 +135,7 @@ export const demoPathByPreviewKey = {
   'gr-autocomplete-addons': 'components/gr-autocomplete/GrAutocompleteAddonsDemo.vue',
   'gr-autocomplete-async': 'components/gr-autocomplete/GrAutocompleteAsyncDemo.vue',
   'gr-autocomplete-basic': 'components/gr-autocomplete/GrAutocompleteBasicDemo.vue',
+  'gr-autocomplete-groups': 'components/gr-autocomplete/GrAutocompleteGroupsDemo.vue',
   'gr-autocomplete-multiple': 'components/gr-autocomplete/GrAutocompleteMultipleDemo.vue',
   'gr-autocomplete-virtual': 'components/gr-autocomplete/GrAutocompleteVirtualDemo.vue',
   'gr-avatar-image-fallback': 'components/gr-avatar/GrAvatarImageFallbackDemo.vue',

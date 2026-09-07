@@ -17,6 +17,13 @@ export const grAutocompleteExamples: ShowcaseComponentExampleDoc[] = [
     note: 'В отличие от GrSelect, combobox-ом здесь является сам инпут: набранный текст — это поисковый запрос, а выбор опции заполняет поле.',
   },
   {
+    id: 'autocomplete-groups',
+    title: 'Grouped options',
+    description: 'Опции делятся на группы той же формой данных, что у `GrSelect`. Фильтр прячет группу целиком, если в ней ничего не совпало, а клавиатура ходит только по опциям — заголовок стрелками не выбирается.',
+    status: 'ready',
+    previewKey: 'gr-autocomplete-groups',
+  },
+  {
     id: 'autocomplete-multiple',
     title: 'Multiple with removable chips',
     description: 'Режим `multiple` рендерит выбранные значения как удаляемые chips перед инпутом. Backspace при пустом запросе удаляет последний тег, а `allow-custom-value` позволяет добавить значение, которого нет в списке (Enter).',

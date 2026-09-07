@@ -14,6 +14,29 @@ export type GrAutocompleteOption<TValue extends GrAutocompleteValue = string> = 
   label: string
   disabled?: boolean
 }
+/**
+ * Группа опций: заголовок `label` + вложенные опции `options`.
+ *
+ * Форма та же, что у `GrSelect`: два соседних контрола, у которых списки
+ * различаются только способом ввода, обязаны принимать данные одинаково.
+ */
+export type GrAutocompleteOptionGroup<TValue extends GrAutocompleteValue = string> = {
+  label: string
+  options: GrAutocompleteOption<TValue>[]
+}
+
+/** Элемент списка: либо одиночная опция, либо группа. */
+export type GrAutocompleteOptionOrGroup<TValue extends GrAutocompleteValue = string>
+  = | GrAutocompleteOption<TValue>
+    | GrAutocompleteOptionGroup<TValue>
+
+/** Группа опознаётся по наличию вложенного списка, а не по служебному полю. */
+export function isAutocompleteOptionGroup<TValue extends GrAutocompleteValue>(
+  item: GrAutocompleteOptionOrGroup<TValue>,
+): item is GrAutocompleteOptionGroup<TValue> {
+  return Array.isArray((item as GrAutocompleteOptionGroup<TValue>).options)
+}
+
 export type GrAutocompleteModelValue<TValue extends GrAutocompleteValue = string> = TValue | TValue[]
 
 /**

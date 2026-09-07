@@ -9,6 +9,8 @@ export type { GrAutocompleteConfigurableProps } from './defaults'
 export type {
   GrAutocompleteModelValue,
   GrAutocompleteOption,
+  GrAutocompleteOptionGroup,
+  GrAutocompleteOptionOrGroup,
   GrAutocompleteProps,
   GrAutocompleteSize,
 } from './GrAutocomplete.vue'
