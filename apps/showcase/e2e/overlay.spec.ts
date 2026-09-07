@@ -3,6 +3,7 @@ import { expect, test } from '@playwright/test'
 import { expectNoA11yRegressions, expectTabCycle, waitForOpaque } from '@feugene/granularity-test-kit/e2e'
 
 import { SERVICE_ENTITIES, componentPath } from './components'
+import { waitForSettledPreviews } from './readiness'
 
 /**
  * Модальный слой в открытом состоянии.
@@ -147,12 +148,14 @@ test.describe('панель автокомплита', () => {
     await page.locator('#live-examples').waitFor()
 
     // Демо приезжают асинхронно, и появление каждого следующего сдвигает
-    // страницу: клик, попавший в этот момент, уходит мимо поля. Ждём их все и
-    // при промахе повторяем.
-    const inputs = page.locator('[data-testid="gr-autocomplete-input"]')
-    await expect(inputs).toHaveCount(5)
+    // страницу: клик, попавший в этот момент, уходит мимо поля.
+    //
+    // Ждём готовности страницы общим помощником, а не числом полей: счётчик
+    // ломался ровно при добавлении демо — гейт оверлеев не должен знать,
+    // сколько превью на чужой странице. При промахе клик повторяется.
+    await waitForSettledPreviews(page)
 
-    const input = inputs.first()
+    const input = page.locator('[data-testid="gr-autocomplete-input"]').first()
     await expect.poll(async () => {
       if (await input.getAttribute('aria-expanded') !== 'true')
         await input.click()
