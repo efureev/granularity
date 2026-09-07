@@ -9,6 +9,28 @@ to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **`GrNavbar` can make its title a real heading** — `headingLevel` renders the
+  title as `h1`…`h6`. The default stays a `div` on purpose: a logo or a product
+  name is not a heading, and an `h1` on the brand would distort the page
+  structure — most navbars are exactly that. But a section header in an admin
+  panel, or the name of an open document, *is* the heading, and without this the
+  page cannot be walked by structure at all: after its `h1` there is nothing.
+
+  Level 1 is allowed, unlike `GrCard`, whose scale starts at 2 — a card is never
+  the page title, a section header is.
+
+  The level is deliberately not configurable through `GrConfigProvider`: "no
+  heading" cannot be expressed there, so a shared default would have to be some
+  level, and every consumer's brand navbar would silently gain a heading. A shell
+  has one navbar anyway, so a global default would configure a single call site.
+
+  The heading's browser margin is zeroed explicitly. The package preflight resets
+  `margin` only on `body`, so an application with a tailwind-compatible reset
+  would never see it — but the navbar's height must not depend on whether the
+  consumer pulled in someone else's reset.
+
+### Added
+
 - **`GrCarousel` closes the ring without rewinding** — `loop` is on by default,
   and it used to simply reset the index: the strip **scrolled back through every
   frame**. On a ten-frame carousel with autoplay every tenth step was a long

@@ -16,6 +16,7 @@ import {
   navbarSideGrowClass,
   navbarTitleClass,
 } from './grNavbarStyles'
+import type { GrNavbarHeadingLevel } from './grNavbarStyles'
 
 /**
  * GrNavbar — верхняя панель приложения (header) с тремя зонами: слева заголовок
@@ -28,6 +29,20 @@ import {
 export interface GrNavbarProps {
   /** Заголовок строкой. Слот `#title` сильнее и позволяет обойтись без пропа. */
   title?: string
+  /**
+   * Сделать заголовок настоящим `h1`…`h6`.
+   *
+   * По умолчанию заголовок — `div`, и это верно для большинства шапок: логотип
+   * и название приложения заголовками не являются, и `h1` на них исказил бы
+   * структуру страницы. Но шапка раздела админки или имя документа — заголовок
+   * и есть, а обойти такую страницу по структуре иначе нечем.
+   *
+   * Через `GrConfigProvider` не настраивается намеренно: «заголовка нет» там не
+   * выразить (`useGrComponentProp` требует не-nullable фолбэк), то есть общим
+   * дефолтом стал бы какой-то уровень. Да и шапка у оболочки одна — глобальный
+   * дефолт настраивал бы единственное место вызова.
+   */
+  headingLevel?: GrNavbarHeadingLevel
   showMenuButton?: boolean
   /**
    * Ступень кнопки меню — и только её: остальное в шапке принадлежит
@@ -54,6 +69,7 @@ export interface GrNavbarEmits {
 
 const props = withDefaults(defineProps<GrNavbarProps>(), {
   title: undefined,
+  headingLevel: undefined,
   showMenuButton: false,
   size: undefined,
   menuButtonClass: '',
@@ -82,6 +98,9 @@ const menuSize = useGrComponentSize(() => props.size, { component: 'GrNavbar', f
 // Пустой блок заголовка съедал бы отступ ряда, поэтому рендерим его только при
 // наличии содержимого — проп `title` для этого не обязателен.
 const hasTitle = computed(() => Boolean(props.title || slots.title))
+
+/** Без уровня заголовок остаётся `div`: бренд заголовком не является. */
+const titleTag = computed(() => (props.headingLevel ? `h${props.headingLevel}` : 'div'))
 
 const rootClass = computed(() => grNavbarRootClass(props.sticky))
 
@@ -118,11 +137,16 @@ const rightClass = computed(() => [
         </GrIcon>
       </GrButton>
 
-      <div v-if="hasTitle" data-gr-navbar-title :class="navbarTitleClass">
+      <component
+          :is="titleTag"
+          v-if="hasTitle"
+          data-gr-navbar-title
+          :class="navbarTitleClass"
+      >
         <slot name="title">
           {{ title }}
         </slot>
-      </div>
+      </component>
 
       <slot name="left" />
     </div>
