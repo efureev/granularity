@@ -1,6 +1,7 @@
 import { splitClassTokens } from '../shared/classTokens'
 import { GR_TONES } from '../shared/tones'
 import {
+  carouselControlAxis,
   carouselControlBase,
   carouselControlPositions,
   carouselControlStates,
@@ -10,7 +11,9 @@ import {
   carouselIndicatorBase,
   carouselIndicatorsBase,
   carouselIndicatorsVariants,
+  carouselRootAxis,
   carouselRootBase,
+  carouselSlideAxis,
   carouselSlideBase,
   carouselThumbBase,
   carouselThumbFallbackClass,
@@ -19,16 +22,25 @@ import {
   carouselToggleClass,
   grCarouselDotActiveClass,
   grCarouselThumbActiveClass,
+  carouselTrackAxis,
   carouselTrackBase,
+  carouselViewportAxis,
   carouselViewportBase,
   carouselViewportSwipeClass,
+  carouselViewportTouchAction,
 } from './grCarouselStyles'
 
 export const grCarouselSafelist = [...new Set([
   // Тон приходит пропом, поэтому в скан попадает не он, а вся шкала.
   ...GR_TONES.flatMap(tone => splitClassTokens(grCarouselDotActiveClass(tone))),
   ...GR_TONES.flatMap(tone => splitClassTokens(grCarouselThumbActiveClass(tone))),
-  ...Object.values(carouselControlPositions).flatMap(splitClassTokens),
+  ...Object.values(carouselControlPositions).flatMap(positions => Object.values(positions).flatMap(splitClassTokens)),
+  ...Object.values(carouselControlAxis).flatMap(splitClassTokens),
+  ...Object.values(carouselTrackAxis).flatMap(splitClassTokens),
+  ...Object.values(carouselSlideAxis).flatMap(splitClassTokens),
+  ...Object.values(carouselViewportTouchAction).flatMap(splitClassTokens),
+  ...Object.values(carouselRootAxis).flatMap(splitClassTokens),
+  ...Object.values(carouselViewportAxis).flatMap(splitClassTokens),
   ...Object.values(carouselControlStates).flatMap(splitClassTokens),
   ...Object.values(carouselIndicatorsVariants).flatMap(splitClassTokens),
   ...Object.values(carouselDotStates).flatMap(splitClassTokens),

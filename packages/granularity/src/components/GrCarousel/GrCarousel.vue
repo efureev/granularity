@@ -16,22 +16,32 @@ import { GR_CAROUSEL_CONTEXT } from './grCarouselContext'
 import type { GrCarouselSlideEntry } from './grCarouselContext'
 import {
   carouselIconClass,
+  carouselRootAxis,
   carouselRootBase,
   carouselThumbFallbackClass,
   carouselThumbImageClass,
   carouselToggleClass,
+  carouselTrackAxis,
   carouselTrackBase,
+  carouselViewportAxis,
   carouselViewportBase,
   carouselViewportSwipeClass,
+  carouselViewportTouchAction,
   grCarouselControlClass,
   grCarouselIndicatorClass,
   grCarouselIndicatorsClass,
 } from './grCarouselStyles'
-import type { GrCarouselActivationMode, GrCarouselIndicators } from './grCarouselStyles'
+import type {
+  GrCarouselActivationMode,
+  GrCarouselIndicators,
+  GrCarouselOrientation,
+} from './grCarouselStyles'
 import type { GrTone } from '../shared/tones'
 
+import IconChevronDown from '~icons/lucide/chevron-down'
 import IconChevronLeft from '~icons/lucide/chevron-left'
 import IconChevronRight from '~icons/lucide/chevron-right'
+import IconChevronUp from '~icons/lucide/chevron-up'
 import IconPause from '~icons/lucide/pause'
 import IconPlay from '~icons/lucide/play'
 
@@ -44,6 +54,25 @@ export interface GrCarouselProps {
   autoplayInterval?: number
   /** Замкнуть ленту. Выключено — стрелки на краях гаснут. */
   loop?: boolean
+  /**
+   * Ось движения ленты. По вертикали вьюпорту нужна **определённая высота**:
+   * шаг считается от неё, и без высоты лента вырождается в столбец кадров.
+   */
+  orientation?: GrCarouselOrientation
+  /**
+   * Не рисовать содержимое кадров вдали от текущего.
+   *
+   * Виртуализируется **нутро кадра, а не кадр**: кадры приходят слотом, и не
+   * отрисовать чужой узел лента не может. Пустая обёртка держит место в ряду и
+   * почти ничего не весит, а картинки и карточки из DOM уходят.
+   */
+  virtual?: boolean
+  /**
+   * Сколько кадров по обе стороны от текущего рисовать сверх него. Меньше
+   * единицы ставить нельзя: следующий кадр обязан быть готов **до** перехода,
+   * иначе лента поедет на пустоту, а содержимое проявится уже на месте.
+   */
+  virtualOverscan?: number
   /** Вид переключателя кадров. `none` меняет и роль самих слайдов. */
   indicators?: GrCarouselIndicators
   /** Тон текущего переключателя по общей шкале пакета. */
@@ -77,6 +106,9 @@ const props = withDefaults(defineProps<GrCarouselProps>(), {
   autoplay: false,
   autoplayInterval: 5000,
   loop: true,
+  orientation: 'horizontal',
+  virtual: false,
+  virtualOverscan: 1,
   // Дефолт живёт в резолвере: Vue подставил бы свой раньше `GrConfigProvider`,
   // и «пользователь передал» стало бы неотличимо от «сработал дефолт».
   indicators: undefined,
@@ -164,8 +196,140 @@ function register(entry: GrCarouselSlideEntry): () => void {
   }
 }
 
+/**
+ * Потолок ожидания конца перехода ленты. `--gr-duration-base` — 240ms; запас
+ * нужен на прерванный переход и на среду, где переходов нет вовсе.
+ */
+const WRAP_FALLBACK_MS = 600
+
 const internalIndex = ref(0)
 const currentIndex = computed(() => clampIndex(props.modelValue ?? internalIndex.value, total.value))
+
+/**
+ * Замыкание кольца: `1` — идём с последнего кадра на первый, `-1` — обратно,
+ * `0` — обычный шаг.
+ *
+ * Раньше `loop` просто сбрасывал индекс, и лента **прокручивалась назад через
+ * все кадры**: на десятикадровой карусели с автопрокруткой каждый десятый шаг
+ * был длинным обратным ходом. Теперь крайний слайд временно переезжает на
+ * противоположный конец, лента доезжает до него как до соседа, и уже после
+ * перехода индекс снимается без анимации.
+ */
+const wrapStep = ref<-1 | 0 | 1>(0)
+
+/** Сама лента: по ней делается принудительная перерисовка при снятии кольца. */
+const trackEl = ref<HTMLElement | null>(null)
+
+/** На время снятия индекса переход выключается — иначе снятие само поедет. */
+const suppressTransition = ref(false)
+
+let wrapFallback: ReturnType<typeof setTimeout> | undefined
+
+/** Позиция ленты: при замыкании она уезжает на один кадр за край. */
+const trackIndex = computed(() => {
+  if (wrapStep.value === 1)
+    return total.value
+  if (wrapStep.value === -1)
+    return -1
+  return currentIndex.value
+})
+
+/**
+ * Смещение слайда, изображающего соседа за краем. Вперёд — первый кадр уезжает
+ * за последний, назад — последний встаёт перед первым.
+ */
+function displacementOf(id: string): number {
+  if (wrapStep.value === 0 || total.value < 2)
+    return 0
+
+  const index = entries.value.findIndex(entry => entry.id === id)
+  if (wrapStep.value === 1)
+    return index === 0 ? total.value * 100 : 0
+
+  return index === total.value - 1 ? total.value * -100 : 0
+}
+
+/**
+ * Попадает ли кадр в окно отрисовки. Окно замкнуто вместе с лентой: при `loop`
+ * соседи последнего кадра — первые, и не нарисовать их значит показать пустоту
+ * ровно в момент замыкания кольца.
+ */
+function shouldRender(id: string): boolean {
+  if (!props.virtual)
+    return true
+
+  const count = total.value
+  if (count === 0)
+    return true
+
+  const index = entries.value.findIndex(entry => entry.id === id)
+  if (index < 0)
+    return true
+
+  const overscan = Math.max(1, Math.trunc(props.virtualOverscan))
+  const distance = Math.abs(index - currentIndex.value)
+
+  return props.loop
+    ? Math.min(distance, count - distance) <= overscan
+    : distance <= overscan
+}
+
+/**
+ * Конец замыкания: лента возвращается с позиции «за краем» на настоящий индекс.
+ *
+ * Модель здесь уже давно на новом кадре — её обновил `startWrap`. Отложи мы её
+ * до этого момента, `update:modelValue` опаздывал бы на длительность перехода,
+ * а там, где переходов нет вовсе, — на страховочный таймер.
+ */
+function finishWrap(): void {
+  if (wrapStep.value === 0)
+    return
+
+  clearTimeout(wrapFallback)
+  wrapFallback = undefined
+
+  suppressTransition.value = true
+  wrapStep.value = 0
+
+  /*
+   * Переход возвращается после **принудительной перерисовки**, а не через
+   * `requestAnimationFrame`: в фоновой вкладке кадры не идут вовсе, и лента
+   * осталась бы с выключенным переходом навсегда — то есть дальше дёргалась бы
+   * вместо движения. Чтение `offsetHeight` фиксирует новое положение
+   * синхронно, и это работает в любой вкладке.
+   */
+  void nextTick().then(() => {
+    void trackEl.value?.offsetHeight
+    suppressTransition.value = false
+  })
+}
+
+/**
+ * Замкнуть кольцо в сторону `direction`. Возвращает `false`, если шаг обычный
+ * и его надо выполнить как раньше.
+ */
+function startWrap(direction: 1 | -1): boolean {
+  if (!props.loop || total.value < 2)
+    return false
+
+  const atLast = currentIndex.value === total.value - 1
+  const atFirst = currentIndex.value === 0
+  if (!(direction === 1 ? atLast : atFirst))
+    return false
+
+  finishWrap()
+  wrapStep.value = direction
+  // Модель — сразу: она про то, какой кадр показан, а не про то, доехала ли
+  // лента. Смещение и позиция «за краем» держатся до конца перехода.
+  setIndex(direction === 1 ? 0 : total.value - 1)
+
+  // `transitionend` в jsdom не наступает вовсе, а в живом браузере может не
+  // прийти при прерванном переходе. Страховка возвращает ленту сама.
+  wrapFallback = setTimeout(finishWrap, WRAP_FALLBACK_MS)
+  return true
+}
+
+onBeforeUnmount(() => clearTimeout(wrapFallback))
 
 function setIndex(next: number): void {
   const value = clampIndex(next, total.value)
@@ -202,10 +366,11 @@ const liveMode = computed<'off' | 'polite'>(() => (playing.value ? 'off' : 'poli
 const swipeGesture = useCarouselSwipe({
   disabled: () => !props.swipe || total.value <= 1,
   viewport: () => viewportEl.value,
+  orientation: () => props.orientation,
   atEdge: direction => (direction === 1 ? atEnd.value : atStart.value),
   onStart: stopAutoplay,
   onSwipe: (direction) => {
-    void commitUserNavigation(stepIndex(currentIndex.value, direction, total.value, props.loop))
+    void stepBy(direction)
   },
 })
 
@@ -214,12 +379,16 @@ const autoplayTimer = useCarouselAutoplay({
   enabled: () => playing.value,
   paused: () => hovered.value || documentHidden.value || swipeGesture.isDragging.value,
   advance: () => {
+    if (startWrap(1))
+      return
+
     const next = stepIndex(currentIndex.value, 1, total.value, props.loop)
     // Упёрлись в край без `loop` — показ окончен, а не зациклился.
     if (next === currentIndex.value) {
       userIntent.value = false
       return
     }
+    finishWrap()
     setIndex(next)
   },
 })
@@ -242,7 +411,34 @@ async function commitUserNavigation(next: number): Promise<void> {
     await nextTick()
   }
 
+  finishWrap()
   setIndex(next)
+}
+
+/**
+ * Шаг на соседний кадр. На краю кольца замыкание идёт через смещение крайнего
+ * слайда, а не через сброс индекса: сброс прокручивал бы ленту назад через всё.
+ */
+async function stepBy(delta: 1 | -1): Promise<void> {
+  if (playing.value) {
+    stopAutoplay()
+    await nextTick()
+  }
+
+  if (startWrap(delta))
+    return
+
+  finishWrap()
+  setIndex(stepIndex(currentIndex.value, delta, total.value, props.loop))
+}
+
+/**
+ * Переход ленты доехал — можно снимать замыкание. Слушаем только свой узел
+ * (`.self`): всплывший переход дочернего кадра снял бы кольцо раньше времени.
+ */
+function onTrackTransitionEnd(event: TransitionEvent): void {
+  if (event.propertyName === 'transform')
+    finishWrap()
 }
 
 function toggleAutoplay(): void {
@@ -260,7 +456,7 @@ function goTo(index: number): void {
 }
 
 function step(delta: 1 | -1): void {
-  void commitUserNavigation(stepIndex(currentIndex.value, delta, total.value, props.loop))
+  void stepBy(delta as 1 | -1)
 }
 
 const roving = useRovingFocus<number>({
@@ -431,7 +627,7 @@ function tabDomId(index: number): string {
 
 const trackStyle = computed(() => {
   const style: Record<string, string> = {
-    '--gr-carousel-index': String(currentIndex.value),
+    '--gr-carousel-index': String(trackIndex.value),
     '--gr-carousel-drag': `${swipeGesture.offset.value}px`,
   }
 
@@ -459,9 +655,28 @@ provide(GR_CAROUSEL_CONTEXT, {
     const index = entries.value.findIndex(entry => entry.id === id)
     return positionLabelAt(index >= 0 ? index : 0)
   },
+  displacementOf,
+  orientation: computed(() => props.orientation),
+  shouldRender,
 })
 
 if (__GR_DEV__) {
+  onMounted(() => {
+    if (props.orientation !== 'vertical')
+      return
+
+    // Высота вьюпорта — обязательное условие вертикальной ленты, и молчаливый
+    // отказ тут хуже ошибки: карусель превращается в столбец кадров, а причина
+    // не видна ни в разметке, ни в консоли.
+    if ((viewportEl.value?.clientHeight ?? 0) === 0) {
+      console.warn(
+        '[granularity] GrCarousel: у вертикальной ленты нулевая высота вьюпорта — '
+        + 'шаг считается от неё. Задайте высоту классом или стилем, иначе кадры '
+        + 'встанут столбцом.',
+      )
+    }
+  })
+
   watchEffect(() => {
     if (!props.ariaLabel && !props.ariaLabelledby) {
       console.warn(
@@ -509,7 +724,7 @@ defineExpose({
   <div
     ref="rootEl"
     data-gr-carousel
-    :class="carouselRootBase"
+    :class="[carouselRootBase, carouselRootAxis[props.orientation]]"
     :role="landmark ? 'region' : 'group'"
     :aria-roledescription="t('gr.carousel.roledescription', 'carousel')"
     :aria-label="ariaLabelledby ? undefined : ariaLabel"
@@ -522,15 +737,24 @@ defineExpose({
     <div
       ref="viewportEl"
       data-gr-carousel-viewport
-      :class="[carouselViewportBase, props.swipe ? carouselViewportSwipeClass : '']"
+      :class="[
+        carouselViewportBase,
+        carouselViewportAxis[props.orientation],
+        carouselViewportTouchAction[props.orientation],
+        props.swipe ? carouselViewportSwipeClass : '',
+      ]"
       :aria-live="liveMode"
       aria-atomic="true"
       @pointerdown="swipeGesture.start"
     >
       <div
+        ref="trackEl"
         data-gr-carousel-track
-        :class="carouselTrackBase"
+        :data-gr-carousel-vertical="props.orientation === 'vertical' ? '' : undefined"
+        :data-gr-carousel-wrapping="suppressTransition ? '' : undefined"
+        :class="[carouselTrackBase, carouselTrackAxis[props.orientation]]"
         :style="trackStyle"
+        @transitionend.self="onTrackTransitionEnd"
       >
         <slot />
       </div>
@@ -552,13 +776,17 @@ defineExpose({
         v-if="showArrows"
         type="button"
         data-gr-carousel-prev
-        :class="grCarouselControlClass('prev', atStart)"
+        :class="grCarouselControlClass('prev', atStart, props.orientation)"
         :aria-disabled="atStart ? 'true' : undefined"
         :aria-label="prevLabel ?? t('gr.carousel.previous', 'Previous slide')"
         @click="atStart ? undefined : step(-1)"
       >
         <slot name="prev" :disabled="atStart">
-          <IconChevronLeft :class="carouselIconClass" aria-hidden="true" />
+          <component
+            :is="props.orientation === 'vertical' ? IconChevronUp : IconChevronLeft"
+            :class="carouselIconClass"
+            aria-hidden="true"
+          />
         </slot>
       </button>
 
@@ -566,13 +794,17 @@ defineExpose({
         v-if="showArrows"
         type="button"
         data-gr-carousel-next
-        :class="grCarouselControlClass('next', atEnd)"
+        :class="grCarouselControlClass('next', atEnd, props.orientation)"
         :aria-disabled="atEnd ? 'true' : undefined"
         :aria-label="nextLabel ?? t('gr.carousel.next', 'Next slide')"
         @click="atEnd ? undefined : step(1)"
       >
         <slot name="next" :disabled="atEnd">
-          <IconChevronRight :class="carouselIconClass" aria-hidden="true" />
+          <component
+            :is="props.orientation === 'vertical' ? IconChevronDown : IconChevronRight"
+            :class="carouselIconClass"
+            aria-hidden="true"
+          />
         </slot>
       </button>
     </div>
@@ -622,6 +854,27 @@ defineExpose({
 <style>
 [data-gr-carousel-track] {
   transform: translateX(calc(var(--gr-carousel-index, 0) * -100% + var(--gr-carousel-drag, 0px)));
+}
+
+/*
+ * Снятие индекса после замыкания кольца обязано пройти без анимации: иначе
+ * лента поедет обратно через все кадры — ровно тот ход, ради устранения
+ * которого замыкание и сделано.
+ */
+[data-gr-carousel-track][data-gr-carousel-wrapping] {
+  transition: none;
+}
+
+/*
+ * Вертикальная лента: шаг считается от **высоты вьюпорта**, а не от высоты
+ * самой ленты. Поэтому вьюпорту нужна определённая высота — без неё колонка
+ * кадров растёт по содержимому, и `-100%` означает всю ленту разом.
+ *
+ * Направление письма вертикали не касается, поэтому RTL-зеркала здесь нет.
+ */
+[data-gr-carousel-track][data-gr-carousel-vertical],
+[dir='rtl'] [data-gr-carousel-track][data-gr-carousel-vertical] {
+  transform: translateY(calc(var(--gr-carousel-index, 0) * -100% + var(--gr-carousel-drag, 0px)));
 }
 
 /*

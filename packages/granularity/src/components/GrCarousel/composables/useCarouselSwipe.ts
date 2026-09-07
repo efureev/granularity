@@ -26,6 +26,11 @@ export interface UseCarouselSwipeOptions {
   atEdge: (direction: 1 | -1) => boolean
   /** Жест начался: показ пора ставить на паузу. */
   onStart?: () => void
+  /**
+   * Ось движения ленты. По вертикали ведущей становится `dy`, а поперечная
+   * прокрутка страницы отдаётся ей же — иначе карусель перехватывала бы скролл.
+   */
+  orientation?: () => 'horizontal' | 'vertical'
 }
 
 export interface UseCarouselSwipeReturn {
@@ -75,8 +80,10 @@ export function useCarouselSwipe(options: UseCarouselSwipeOptions): UseCarouselS
       // протяжка выделяет текст слайда.
       event.preventDefault()
 
-      const dx = event.clientX - startX
-      const dy = event.clientY - startY
+      // По вертикали оси меняются ролями: ведущей становится `dy`.
+      const vertical = options.orientation?.() === 'vertical'
+      const dx = vertical ? event.clientY - startY : event.clientX - startX
+      const dy = vertical ? event.clientX - startX : event.clientY - startY
 
       // Пока жест выглядит вертикальным, лента не двигается: это прокрутка
       // страницы, и перехватывать её карусель не вправе.
@@ -90,7 +97,11 @@ export function useCarouselSwipe(options: UseCarouselSwipeOptions): UseCarouselS
     },
     onEnd: (event) => {
       const direction = event
-        ? resolveSwipeDirection(event.clientX - startX, event.clientY - startY, threshold)
+        ? resolveSwipeDirection(
+            options.orientation?.() === 'vertical' ? event.clientY - startY : event.clientX - startX,
+            options.orientation?.() === 'vertical' ? event.clientX - startX : event.clientY - startY,
+            threshold,
+          )
         : 0
 
       reset()

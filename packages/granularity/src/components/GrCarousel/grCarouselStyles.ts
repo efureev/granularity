@@ -76,29 +76,93 @@ export type GrCarouselActivationMode = typeof GR_CAROUSEL_ACTIVATION_MODES[numbe
 
 export const carouselRootBase = 'relative w-full'
 
+/**
+ * Вертикальная лента: высоту задаёт потребитель **на корне**, а вьюпорт обязан
+ * её получить.
+ *
+ * Иначе высота вьюпорта выводится из содержимого, процентная `flex-basis`
+ * кадров упирается в неопределённый размер и вырождается в высоту содержимого —
+ * кадры встают столбцом, а лента честно считает шаг от суммы. Отсюда колонка на
+ * корне и `flex-1 min-h-0` на вьюпорте: полоса переключателей остаётся под ним,
+ * а вьюпорт забирает остаток.
+ */
+export const carouselRootAxis: Record<GrCarouselOrientation, string> = {
+  horizontal: '',
+  vertical: 'flex flex-col',
+}
+
+export const carouselViewportAxis: Record<GrCarouselOrientation, string> = {
+  horizontal: '',
+  vertical: 'min-h-0 flex-1',
+}
+
 export const carouselViewportBase = 'relative w-full overflow-hidden'
 
 /**
  * Вертикальная прокрутка страницы остаётся браузеру, горизонталь забирает лента.
  * `select-none` — против выделения текста слайда протяжкой.
  */
-export const carouselViewportSwipeClass = '[touch-action:pan-y] select-none'
+export const carouselViewportSwipeClass = 'select-none'
 
-export const carouselTrackBase = 'flex w-full will-change-transform transition-transform duration-[var(--gr-duration-base)] ease-[var(--gr-ease-out)]'
+export const carouselTrackBase = 'flex will-change-transform transition-transform duration-[var(--gr-duration-base)] ease-[var(--gr-ease-out)]'
 
-export const carouselSlideBase = 'w-full min-w-0 shrink-0 grow-0 basis-full'
+export const GR_CAROUSEL_ORIENTATIONS = ['horizontal', 'vertical'] as const
+export type GrCarouselOrientation = typeof GR_CAROUSEL_ORIENTATIONS[number]
+
+export const carouselSlideBase = 'shrink-0 grow-0 basis-full'
+
+/**
+ * Кадр занимает вьюпорт целиком по оси движения. Поперёк оси он не ограничен:
+ * там размер задаёт содержимое, как и раньше.
+ */
+export const carouselSlideAxis: Record<GrCarouselOrientation, string> = {
+  horizontal: 'w-full min-w-0',
+  vertical: 'h-full min-h-0',
+}
+
+/**
+ * Направление ленты. По вертикали ей нужна **определённая высота вьюпорта**:
+ * `translateY(-100%)` считается от высоты самой ленты, а она у колонки равна
+ * сумме кадров, если вьюпорт высоту не задал.
+ */
+export const carouselTrackAxis: Record<GrCarouselOrientation, string> = {
+  horizontal: 'w-full',
+  vertical: 'h-full flex-col',
+}
+
+/** Жест по оси движения перехватывается лентой, поперёк — отдаётся странице. */
+export const carouselViewportTouchAction: Record<GrCarouselOrientation, string> = {
+  horizontal: '[touch-action:pan-y]',
+  vertical: '[touch-action:pan-x]',
+}
+
+/**
+ * Стрелки стоят по оси движения. По горизонтали позиции логические
+ * (`start`/`end`) — они зеркалятся под RTL; по вертикали направление письма ни
+ * при чём, поэтому там физические `top`/`bottom`.
+ */
+export const carouselControlAxis: Record<GrCarouselOrientation, string> = {
+  horizontal: 'top-1/2 -translate-y-1/2',
+  vertical: 'left-1/2 -translate-x-1/2',
+}
 
 /**
  * Стрелки лежат поверх произвольного содержимого, поэтому несут собственную
  * подложку: на светлом кадре иконка без неё пропадает. `z-10` — порядок внутри
  * собственного stacking-контекста компонента, а не слой страницы.
  */
-export const carouselControlBase = 'absolute top-1/2 z-10 inline-flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-[var(--gr-radius-full)] border border-[var(--gr-brd)] bg-[var(--gr-carousel-control-bg,var(--gr-bg))] text-[var(--gr-carousel-control-fg,var(--gr-fg))] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]'
+export const carouselControlBase = 'absolute z-10 inline-flex h-9 w-9 items-center justify-center rounded-[var(--gr-radius-full)] border border-[var(--gr-brd)] bg-[var(--gr-carousel-control-bg,var(--gr-bg))] text-[var(--gr-carousel-control-fg,var(--gr-fg))] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]'
 
-export const carouselControlPositions = {
-  prev: 'start-2',
-  next: 'end-2',
-} as const
+export const carouselControlPositions: Record<GrCarouselOrientation, Record<'prev' | 'next', string>> = {
+  horizontal: {
+    prev: 'start-2',
+    next: 'end-2',
+  },
+  vertical: {
+    prev: 'top-2',
+    next: 'bottom-2',
+  },
+}
 
 /**
  * Стрелка на краю без `loop` гасится фоном, а не `opacity`: прозрачность
@@ -148,10 +212,15 @@ export const carouselThumbImageClass = 'h-full w-full object-cover'
 /** Миниатюры не дали — плитка держит ритм полосы номером слайда. */
 export const carouselThumbFallbackClass = 'flex h-full w-full items-center justify-center bg-[var(--gr-muted)] text-[var(--gr-muted-fg)] text-[length:var(--gr-control-text-xs)] leading-[var(--gr-control-leading-xs)]'
 
-export function grCarouselControlClass(direction: 'prev' | 'next', disabled: boolean): string {
+export function grCarouselControlClass(
+  direction: 'prev' | 'next',
+  disabled: boolean,
+  orientation: GrCarouselOrientation = 'horizontal',
+): string {
   return [
     carouselControlBase,
-    carouselControlPositions[direction],
+    carouselControlAxis[orientation],
+    carouselControlPositions[orientation][direction],
     disabled ? carouselControlStates.disabled : carouselControlStates.idle,
   ].join(' ')
 }

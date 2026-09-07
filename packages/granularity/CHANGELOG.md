@@ -9,6 +9,36 @@ to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **`GrCarousel` closes the ring without rewinding** — `loop` is on by default,
+  and it used to simply reset the index: the strip **scrolled back through every
+  frame**. On a ten-frame carousel with autoplay every tenth step was a long
+  reverse run. Now the edge frame moves to the opposite end for the duration of
+  the step, the strip reaches it like any neighbour, and the position is snapped
+  back without animation once the transition ends. There is no clone and cannot
+  be one: frames arrive through a slot, and a copy of someone else's node would
+  carry its state and refs along. The model updates immediately — `modelValue` is
+  about which frame is shown, not about whether the strip has arrived.
+
+- **`orientation="vertical"`** — the axis the strip travels along. A vertical
+  strip needs a **definite viewport height**: the step is measured from it, and
+  without one the column of frames grows by content while "one frame" comes to
+  mean the whole strip. The height is set on the component root and propagated
+  down; a zero height is reported in dev rather than silently rendered as a
+  column. Arrows move onto the axis of travel, cross-axis page scrolling stays
+  with the page, and the switch strip stays horizontal — it is about picking a
+  frame, not about the direction of travel.
+
+- **`virtual`** — frames far from the current one stop rendering their contents.
+  What is virtualized is **the inside of a frame, not the frame**: frames arrive
+  through a slot, and the strip cannot decline to render someone else's node —
+  but it can ask that node not to draw its own insides. An empty wrapper holds
+  its place in the row and weighs almost nothing, while images and cards leave
+  the DOM. `virtualOverscan` never goes below one: the next frame must be ready
+  *before* the transition, or the strip travels onto emptiness and the content
+  appears only after arrival.
+
+### Added
+
 - **`GrAutocomplete` groups its options** — parity with `GrSelect`, which had
   `<optgroup>` while the combobox had no grouping mechanism at all. The data
   shape is the same one `GrSelect` takes, because two neighbouring controls whose

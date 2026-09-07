@@ -179,6 +179,7 @@ export const demoPathByPreviewKey = {
   'gr-carousel-gallery': 'components/gr-carousel/GrCarouselGalleryDemo.vue',
   'gr-carousel-onboarding': 'components/gr-carousel/GrCarouselOnboardingDemo.vue',
   'gr-carousel-states': 'components/gr-carousel/GrCarouselStatesDemo.vue',
+  'gr-carousel-vertical': 'components/gr-carousel/GrCarouselVerticalDemo.vue',
   'gr-checkbox-group-basic': 'components/gr-checkbox-group/GrCheckboxGroupBasicDemo.vue',
   'gr-checkbox-group-form': 'components/gr-checkbox-group/GrCheckboxGroupFormDemo.vue',
   'gr-checkbox-interactive-label': 'components/gr-checkbox/GrCheckboxInteractiveLabelDemo.vue',

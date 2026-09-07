@@ -23,6 +23,13 @@ export const grCarouselExamples: ShowcaseComponentExampleDoc[] = [
     previewKey: 'gr-carousel-cards',
   },
   {
+    id: 'carousel-vertical',
+    title: 'Vertical track',
+    description: 'Ось движения задаётся пропом `orientation`. Вертикальной ленте нужна определённая высота вьюпорта: шаг считается от неё, и без высоты кадры встают столбцом — компонент говорит об этом в dev.',
+    status: 'ready',
+    previewKey: 'gr-carousel-vertical',
+  },
+  {
     id: 'carousel-builder',
     title: 'Конструктор: все настройки разом',
     description: 'Переключатель точками или миниатюрами, тон текущего кадра из общей шкалы, стрелки, замкнутая лента, свайп, автопрокрутка и режим активации — на одном экране, со сниппетом под ним. Стрелки здесь заменены слотами `#prev` и `#next`: кнопка, её имя и поведение на краю остаются за компонентом.',

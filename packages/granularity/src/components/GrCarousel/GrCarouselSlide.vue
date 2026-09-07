@@ -2,7 +2,7 @@
 import { computed, inject, onBeforeUnmount, ref, useId, useSlots } from 'vue'
 
 import { GR_CAROUSEL_CONTEXT } from './grCarouselContext'
-import { carouselSlideBase } from './grCarouselStyles'
+import { carouselSlideAxis, carouselSlideBase } from './grCarouselStyles'
 
 export interface GrCarouselSlideProps {
   /** Имя слайда: подпись его переключателя и доступное имя самого кадра. */
@@ -54,6 +54,16 @@ onBeforeUnmount(carousel.register({
 }))
 
 const isCurrent = computed(() => carousel.isCurrent(slideId))
+const renders = computed(() => carousel.shouldRender(slideId))
+
+/**
+ * Слайд не анимирует своё смещение намеренно: он обязан оказаться на новом
+ * месте **до** того, как поедет лента, иначе кадр гнался бы за ней.
+ */
+const displacementStyle = computed(() => {
+  const percent = carousel.displacementOf(slideId)
+  return percent === 0 ? undefined : { transform: `translateX(${percent}%)` }
+})
 const labelledBy = computed(() => carousel.tabIdFor(slideId))
 const accessibleName = computed(() => props.label ?? carousel.positionLabel(slideId))
 </script>
@@ -63,13 +73,14 @@ const accessibleName = computed(() => props.label ?? carousel.positionLabel(slid
     :id="slideId"
     ref="rootEl"
     data-gr-carousel-slide
-    :class="carouselSlideBase"
+    :class="[carouselSlideBase, carouselSlideAxis[carousel!.orientation.value]]"
     :role="carousel!.slideRole.value"
     :aria-roledescription="carousel!.slideRoledescription.value"
     :aria-labelledby="labelledBy"
     :aria-label="labelledBy ? undefined : accessibleName"
     :inert="isCurrent ? undefined : true"
+    :style="displacementStyle"
   >
-    <slot />
+    <slot v-if="renders" />
   </div>
 </template>
