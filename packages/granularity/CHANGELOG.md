@@ -9,6 +9,38 @@ to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **`GrSlider` takes slots for its marks and its thumb** — it had none at all, so
+  a two-line mark label, an icon on a division or a value inside the knob meant
+  forking the component.
+
+  Both slots render **inside** the existing nodes rather than replacing them. The
+  thumb carries `role="slider"`, `tabindex`, eight `aria-*` — including
+  `aria-valuemin`/`max`, which for a range are measured against the neighbouring
+  thumb — plus the keyboard handler and the positioning. Handing that markup to
+  the consumer would hand over the whole widget contract with it. The knob's own
+  look is already token-driven (`--gr-slider-thumb-bg`, `-border`, `-size`), so
+  "a completely different knob" is tokens plus slot.
+
+  The mark slot receives `active` — whether the division falls inside the filled
+  part of the track. That is the reason the slot is usually reached for, and it
+  cannot be computed from outside: the model does not otherwise reach the scope.
+  For a range the fill runs *between* the thumbs rather than from zero, so a
+  division left of the first thumb is not "passed" — `active` is computed the
+  same way the fill is.
+
+  The tooltip stays beside the thumb slot instead of being displaced by it: a
+  glyph in the knob should not cost the consumer the value readout.
+
+### Fixed
+
+- **The slider thumb now centres its contents.** It had no centring at all,
+  which nobody noticed while the knob was always empty; with a slot the content
+  would have been pinned to the circle's top-left corner and every consumer would
+  have had to centre it themselves. An empty knob is unaffected — it is
+  absolutely positioned and sized.
+
+### Added
+
 - **`GrDelta` has its own customization points** — four `--gr-delta-*` hooks
   where it previously had none, inheriting its whole appearance from `GrValue`.
 

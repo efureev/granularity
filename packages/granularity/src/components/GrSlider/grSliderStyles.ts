@@ -89,7 +89,13 @@ export function sliderFillClass(disabled: boolean): string {
 
 // Окантовка бегунка: цветной border (по умолчанию = fill) + тонкая контрастная
 // обводка (`ring`), чтобы бегунок не сливался ни с фоном страницы, ни с заливкой.
-export const sliderThumbBaseClass = 'absolute rounded-[var(--gr-radius-full)] border-2 border-[var(--gr-slider-thumb-border,var(--gr-slider-fill,var(--gr-primary)))] bg-[var(--gr-slider-thumb-bg,var(--gr-bg))] ring-1 ring-[color-mix(in_srgb,var(--gr-fg)_22%,transparent)] shadow-[var(--gr-shadow-1)] transition-[box-shadow,transform] duration-[var(--gr-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--gr-bg)]'
+/*
+ * `inline-flex` с центрированием — ради слота `#thumb`: без него содержимое
+ * ручки прижималось бы к её верхнему левому углу, и центрировать его пришлось
+ * бы каждому потребителю. Пустой ручке объявление ничего не меняет: она
+ * позиционирована абсолютно и имеет заданный размер.
+ */
+export const sliderThumbBaseClass = 'absolute inline-flex items-center justify-center overflow-visible rounded-[var(--gr-radius-full)] border-2 border-[var(--gr-slider-thumb-border,var(--gr-slider-fill,var(--gr-primary)))] bg-[var(--gr-slider-thumb-bg,var(--gr-bg))] ring-1 ring-[color-mix(in_srgb,var(--gr-fg)_22%,transparent)] shadow-[var(--gr-shadow-1)] transition-[box-shadow,transform] duration-[var(--gr-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--gr-bg)]'
 
 /** Бегунок центрируется поперёк дорожки, а вдоль неё его ведёт inline-стиль. */
 export const sliderThumbOrientationClass: Record<GrSliderOrientation, string> = {

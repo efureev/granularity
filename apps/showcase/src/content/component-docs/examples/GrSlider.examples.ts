@@ -25,6 +25,13 @@ export const grSliderExamples: ShowcaseComponentExampleDoc[] = [
     previewKey: 'gr-slider-marks',
   },
   {
+    id: 'slider-slots',
+    title: 'Custom marks and thumb content',
+    description: 'Слоты `#mark` и `#thumb` наполняют существующие узлы, а не заменяют их: позиция, `role="slider"`, клавиатура и `aria-*` остаются за компонентом. У метки в скоуп приходит `active` — попало ли деление в закрашенную часть.',
+    status: 'ready',
+    previewKey: 'gr-slider-slots',
+  },
+  {
     id: 'slider-custom',
     title: 'Custom colors & size (CSS variables)',
     description: 'Внешний вид настраивается CSS-переменными на самом слайдере (или любом предке) — без новых пропов: `--gr-slider-fill` (активная часть), `--gr-slider-rail` (фон дорожки), `--gr-slider-thumb-bg` / `--gr-slider-thumb-border` (заливка и окантовка бегунка), `--gr-slider-thumb-size` и `--gr-slider-track-height` (размеры). Незаданные переменные откатываются к дефолтам темы/размера.',

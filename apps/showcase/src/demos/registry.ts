@@ -427,6 +427,7 @@ export const demoPathByPreviewKey = {
   'gr-slider-custom': 'components/gr-slider/GrSliderCustomDemo.vue',
   'gr-slider-marks': 'components/gr-slider/GrSliderMarksDemo.vue',
   'gr-slider-range': 'components/gr-slider/GrSliderRangeDemo.vue',
+  'gr-slider-slots': 'components/gr-slider/GrSliderSlotsDemo.vue',
   'gr-sortable-list-basic': 'components/gr-sortable-list/GrSortableListBasicDemo.vue',
   'gr-sortable-list-horizontal': 'components/gr-sortable-list/GrSortableListHorizontalDemo.vue',
   'gr-sortable-list-scroll': 'components/gr-sortable-list/GrSortableListScrollDemo.vue',

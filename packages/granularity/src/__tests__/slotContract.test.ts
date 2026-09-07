@@ -79,6 +79,14 @@ const DOMAIN_SLOTS: Record<string, string[]> = {
   'prev': ['GrCarousel'],
   'next': ['GrCarousel'],
   'handle': ['GrSortableList'],
+  // Деление шкалы слайдера. Не `marker`: у `GrTimeline` это точка события на
+  // оси, а здесь деление с подписью, и имя идёт за пропом `marks`.
+  'mark': ['GrSlider'],
+  // Содержимое ручки слайдера. Не `handle`: у `GrSortableList` это область
+  // захвата **чужой** строки, а здесь сам виджет со значением и `role="slider"`.
+  // `thumb` — устоявшийся термин (`::-webkit-slider-thumb`, APG), и в DOM
+  // компонента он уже есть.
+  'thumb': ['GrSlider'],
   // Места до и после величины, куда потребитель кладёт своё: знак и стрелку
   // (`GrDelta`), скрытое конечное значение для диктора (`GrStatistic`). Не
   // `before`/`after`: те читаются как «до/после всего компонента», а эти два

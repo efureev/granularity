@@ -285,6 +285,57 @@ function setThumb(index: number, value: number, commit: boolean): void {
 const activeThumb = ref<number | null>(null)
 const hoveredThumb = ref<number | null>(null)
 
+defineSlots<{
+  /**
+   * Подпись деления шкалы. Слот наполняет её узел, а не заменяет: позиция,
+   * `aria-hidden` и дублирование значения диктору остаются за компонентом.
+   */
+  mark?: (props: {
+    value: number
+    /** Строка из `marks`; у массива это само значение. */
+    label: string
+    /** Положение деления на дорожке, проценты. */
+    percent: number
+    /** Деление попало в закрашенную часть — по нему красят пройденное. */
+    active: boolean
+  }) => unknown
+  /**
+   * Содержимое бегунка.
+   *
+   * Слот рендерится **внутрь** ручки, а не вместо неё: на самом узле висят
+   * `role="slider"`, `tabindex`, восемь `aria-*` и позиционирование, и отдать
+   * его разметке потребителя значит отдать вместе с ним весь виджетный
+   * контракт. Вид самой ручки меняется токенами `--gr-slider-thumb-*`.
+   */
+  thumb?: (props: {
+    index: number
+    value: number
+    /** Положение бегунка на дорожке, проценты. */
+    percent: number
+    /** Бегунок под курсором или в фокусе — та же величина, что у тултипа. */
+    active: boolean
+    disabled: boolean
+  }) => unknown
+}>()
+
+/**
+ * Попало ли деление в закрашенную часть дорожки.
+ *
+ * Считается тем же способом, что и сама заливка: у диапазона закрашен участок
+ * **между** бегунками, а не от нуля, и деление слева от первого бегунка
+ * пройденным не является.
+ */
+function isMarkActive(value: number): boolean {
+  const position = percent(value)
+  const first = percent(values.value[0])
+
+  if (!props.range)
+    return position <= first
+
+  const second = percent(values.value[1])
+  return position >= Math.min(first, second) && position <= Math.max(first, second)
+}
+
 function valueFromPointer(event: { clientX: number, clientY: number }): number {
   const rect = trackEl.value?.getBoundingClientRect()
   if (!rect)
@@ -467,7 +518,15 @@ function thumbValueText(value: number): string | undefined {
           :style="offsetStyle(mark.value)"
           aria-hidden="true"
         >
-          {{ mark.label }}
+          <slot
+              name="mark"
+              :value="mark.value"
+              :label="mark.label"
+              :percent="percent(mark.value)"
+              :active="isMarkActive(mark.value)"
+          >
+            {{ mark.label }}
+          </slot>
         </span>
       </template>
 
@@ -500,6 +559,17 @@ function thumbValueText(value: number): string | undefined {
         @focus="hoveredThumb = index"
         @blur="hoveredThumb = null"
       >
+        <!-- Тултип остаётся рядом со слотом, а не вытесняется им: значок в
+             ручке не должен стоить потребителю подсказки со значением. -->
+        <slot
+            name="thumb"
+            :index="index"
+            :value="value"
+            :percent="percent(value)"
+            :active="hoveredThumb === index"
+            :disabled="isDisabled"
+        />
+
         <span
           v-if="showTooltipFor(index)"
           data-gr-slider-tooltip

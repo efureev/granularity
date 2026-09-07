@@ -10596,7 +10596,18 @@
         "key": "slots",
         "title": "Slots",
         "origin": "generated",
-        "items": []
+        "items": [
+          {
+            "name": "mark",
+            "description": "Подпись деления шкалы. Слот наполняет её узел, а не заменяет: позиция, `aria-hidden` и дублирование значения диктору остаются за компонентом.",
+            "type": "{ value: number; label: string; percent: number; active: boolean; }"
+          },
+          {
+            "name": "thumb",
+            "description": "Содержимое бегунка. Слот рендерится **внутрь** ручки, а не вместо неё: на самом узле висят `role=\"slider\"`, `tabindex`, восемь `aria-*` и позиционирование, и отдать его разметке потребителя значит отдать вместе с ним весь виджетный контракт. Вид самой ручки меняется токенами `--gr-slider-thumb-*`.",
+            "type": "{ index: number; value: number; percent: number; active: boolean; disabled: boolean; }"
+          }
+        ]
       },
       {
         "key": "events",
