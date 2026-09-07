@@ -111,8 +111,11 @@ describe('GrDelta', () => {
     const wrapper = mount(GrDelta, { props: { value: -15, suffix: '%', locale: 'en-US' } })
     const style = wrapper.attributes('style') ?? ''
 
-    expect(style).toContain('--gr-value-suffix-color: currentColor')
-    expect(style).toContain('--gr-value-suffix-size: 1em')
+    // Перекрытие ссылается на свои хуки, а не задаёт значение: стиль инлайновый,
+    // а инлайн бьёт CSS потребителя — с литералом вернуть приглушение было бы
+    // нечем. Дефолт хука и есть прежнее поведение.
+    expect(style).toContain('--gr-value-suffix-color: var(--gr-delta-suffix-color, currentColor)')
+    expect(style).toContain('--gr-value-suffix-size: var(--gr-delta-suffix-size, 1em)')
   })
 
   it('стрелка стоит перед знаком, а не между знаком и префиксом', () => {
@@ -232,7 +235,8 @@ describe('GrDelta', () => {
     for (const size of [undefined, 'lg'] as const) {
       const wrapper = mount(GrDelta, { props: { value: 5, showArrow: true, size } })
 
-      expect(wrapper.get('[data-gr-delta-arrow]').classes()).toContain('h-[0.875em]')
+      expect(wrapper.get('[data-gr-delta-arrow]').classes())
+        .toContain('h-[var(--gr-delta-arrow-size,0.875em)]')
     }
   })
 
@@ -298,5 +302,37 @@ describe('GrDelta: смысл не только цветом', () => {
     expect(warn).not.toHaveBeenCalled()
 
     warn.mockRestore()
+  })
+})
+
+describe('GrDelta — свои точки настройки', () => {
+  it('отбивка стрелки логическая: в RTL она встаёт с нужной стороны', () => {
+    const wrapper = mount(GrDelta, { props: { value: 5, showArrow: true } })
+
+    // `mr-` поставил бы зазор справа и в RTL, где стрелка стоит слева от числа.
+    const classes = wrapper.get('[data-gr-delta-arrow]').classes()
+    expect(classes).toContain('me-[var(--gr-delta-arrow-gap,0.125rem)]')
+    expect(classes.some(name => name.startsWith('mr-'))).toBe(false)
+  })
+
+  it('размер стрелки приходит хуком с прежним дефолтом', () => {
+    const wrapper = mount(GrDelta, { props: { value: 5, showArrow: true } })
+    const classes = wrapper.get('[data-gr-delta-arrow]').classes()
+
+    expect(classes).toContain('h-[var(--gr-delta-arrow-size,0.875em)]')
+    expect(classes).toContain('w-[var(--gr-delta-arrow-size,0.875em)]')
+  })
+
+  it('приписку можно вернуть к приглушённой, не трогая компонент', () => {
+    const wrapper = mount(GrDelta, {
+      props: { value: -15, suffix: '%', locale: 'en-US' },
+      attrs: { style: '--gr-delta-suffix-color: var(--gr-muted-fg)' },
+    })
+    const style = wrapper.attributes('style') ?? ''
+
+    // Потребительское значение доезжает до `GrValue` через ссылку в перекрытии:
+    // именно ради этого перекрытие и не задаёт цвет литералом.
+    expect(style).toContain('--gr-delta-suffix-color: var(--gr-muted-fg)')
+    expect(style).toContain('--gr-value-suffix-color: var(--gr-delta-suffix-color, currentColor)')
   })
 })

@@ -9,6 +9,30 @@ to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **`GrDelta` has its own customization points** — four `--gr-delta-*` hooks
+  where it previously had none, inheriting its whole appearance from `GrValue`.
+
+  The important one is the suffix. A delta does **not** mute its suffix: "−15 %"
+  is set in the colour and size of the line it stands in, or the percent reads as
+  a caption rather than part of the number. That overrides a `GrValue` default,
+  and the override is applied as an inline style — which beats any CSS the
+  consumer writes. With a literal in there, muting the suffix back was simply
+  impossible; the override now *references* `--gr-delta-suffix-color` and
+  `--gr-delta-suffix-size`, leaving the decision to whoever sets them.
+
+  The arrow gets `--gr-delta-arrow-size` and `--gr-delta-arrow-gap`. The size is
+  a fraction of the value's type size rather than a step of the scale: at `md` a
+  delta has no type size of its own — it is set in the size of its line — and a
+  pixel value would leave the arrow small inside a heading.
+
+### Fixed
+
+- **`GrDelta`'s arrow gap is logical again** — it was `margin-right`, so in RTL
+  the gap sat on the wrong side of the arrow. `GrValue` next to it had used
+  logical properties for exactly this reason. Nothing changes in LTR.
+
+### Added
+
 - **`GrNavbar` can make its title a real heading** — `headingLevel` renders the
   title as `h1`…`h6`. The default stays a `div` on purpose: a logo or a product
   name is not a heading, and an `h1` on the brand would distort the page

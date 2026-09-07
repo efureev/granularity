@@ -24,15 +24,19 @@ export const deltaRootClass = 'inline-flex items-baseline tabular-nums'
  * оказывается мельче окружающих слов.
  *
  * Дефолт `GrValue` рассчитан на плитку, где величина крупная и приписке есть
- * куда уменьшаться. Здесь он переопределяется — ровно теми же токенами, что
- * доступны потребителю.
+ * куда уменьшаться. Здесь он переопределяется.
+ *
+ * **Переопределение ссылается на свои хуки, а не задаёт значение.** Стиль
+ * применяется инлайном, а инлайн бьёт любой CSS потребителя: напиши тут
+ * `currentColor` — и вернуть приглушённый суффикс у дельты стало бы нечем.
+ * Ссылка на `--gr-delta-suffix-*` оставляет решение за тем, кто его задал.
  *
  * `currentColor` и `1em`, а не `inherit`: у пользовательского свойства
  * `inherit` значит «наследовать саму переменную», то есть ничего.
  */
 export const deltaValueStyle: Record<string, string> = {
-  '--gr-value-suffix-color': 'currentColor',
-  '--gr-value-suffix-size': '1em',
+  '--gr-value-suffix-color': 'var(--gr-delta-suffix-color, currentColor)',
+  '--gr-value-suffix-size': 'var(--gr-delta-suffix-size, 1em)',
 }
 
 /** Суффикс — единица измерения, и от числа он отбивается: «−15 %», «120 мс». */
@@ -44,8 +48,11 @@ export const deltaValueStyle: Record<string, string> = {
  * пиксельная лестница оставила бы стрелку 14-пиксельной внутри заголовка.
  * Чуть меньше единицы: стрелка декоративна, и равный вес спорил бы с самим
  * числом.
+ *
+ * Отбивка **логическая** (`me-`), как у приписок `GrValue`: физический
+ * `margin-right` в RTL поставил бы стрелку зазором не с той стороны.
  */
-export const deltaArrowClass = 'mr-0.5 self-center shrink-0 h-[0.875em] w-[0.875em]'
+export const deltaArrowClass = 'me-[var(--gr-delta-arrow-gap,0.125rem)] self-center shrink-0 h-[var(--gr-delta-arrow-size,0.875em)] w-[var(--gr-delta-arrow-size,0.875em)]'
 
 export const deltaToneClass: Record<GrDeltaTone, string> = {
   success: 'text-[var(--gr-success-text)]',
