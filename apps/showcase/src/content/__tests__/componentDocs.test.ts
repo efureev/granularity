@@ -304,7 +304,7 @@ describe('component docs metadata', () => {
     expect(formSectionDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(formSectionDoc.examples.every(example => example.previewKey?.startsWith('gr-form-section'))).toBe(true)
 
-    expect(inputTagDoc.examples).toHaveLength(5)
+    expect(inputTagDoc.examples).toHaveLength(6)
     expect(inputTagDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(inputTagDoc.examples.every(example => example.previewKey?.startsWith('gr-input-tag'))).toBe(true)
   })

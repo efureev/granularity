@@ -65,3 +65,15 @@ export function grInputTagWrapperClass(options: {
 export function grInputTagInputClass(size: GrInputTagSize): string {
   return inputSizeClassBySize[size]
 }
+
+/**
+ * Поле правки тега — внутри чипа, вместо его содержимого.
+ *
+ * Ни фона, ни рамки: их рисует сам чип, и второй набор внутри выглядел бы
+ * полем в поле. А вот кольцо фокуса нужно: без него чип в правке неотличим от
+ * обычного — единственным признаком остаётся каретка, и режим не виден.
+ *
+ * Ширину задаёт нативный `size` по длине черновика: в режиме правки у чипа нет
+ * содержимого, от которого он взял бы ширину.
+ */
+export const tagEditInputClass = 'min-w-[2ch] bg-transparent border-none p-0 text-inherit [font:inherit] rounded-[var(--gr-radius-sm)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]'

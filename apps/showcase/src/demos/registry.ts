@@ -318,6 +318,7 @@ export const demoPathByPreviewKey = {
   'gr-input-tag-addons': 'components/gr-input-tag/GrInputTagAddonsDemo.vue',
   'gr-input-tag-basic-flow': 'components/gr-input-tag/GrInputTagBasicFlowDemo.vue',
   'gr-input-tag-custom-slot': 'components/gr-input-tag/GrInputTagCustomTagDemo.vue',
+  'gr-input-tag-editable': 'components/gr-input-tag/GrInputTagEditableDemo.vue',
   'gr-input-tag-max-state': 'components/gr-input-tag/GrInputTagMaxStateDemo.vue',
   'gr-input-tag-validation': 'components/gr-input-tag/GrInputTagValidationDemo.vue',
   'gr-input-validation-states': 'components/gr-input/GrInputStatesDemo.vue',

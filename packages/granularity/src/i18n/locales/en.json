@@ -237,7 +237,9 @@
     "addedMany": "{count} tags added",
     "removed": "Tag removed: {tag}",
     "cleared": "All tags removed",
-    "limitReached": "Tag limit reached"
+    "limitReached": "Tag limit reached",
+    "editTag": "Edit tag {tag}",
+    "edited": "Tag changed: {tag}"
   },
   "fileUpload": {
     "placeholder": "Drag files here or click to select",

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, ref, useId, watchEffect } from 'vue'
+import { computed, nextTick, ref, useId, watch, watchEffect } from 'vue'
 
 import type { GrBadgeRadius, GrBadgeSize, GrBadgeTone } from '../GrBadge'
 import GrChip from '../GrChip/GrChip.vue'
@@ -15,6 +15,7 @@ import { useGrFormFieldContext } from '../GrFormField/context'
 import { useAnnouncer } from '../../composables/useAnnouncer'
 import { useRovingFocus } from '../../composables/useRovingFocus'
 import { useGrFormControl } from '../../composables/useGrFormControl'
+import { useDismissible } from '../../composables/useDismissible'
 import { useFocusWithin } from '../../composables/internal/useFocusWithin'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 import {
@@ -31,6 +32,7 @@ import {
   grInputTagInputClass,
   grInputTagWrapperClass,
   spinnerClass,
+  tagEditInputClass,
   type GrInputTagSize,
   type GrInputTagState,
 } from './grInputTagStyles'
@@ -65,6 +67,15 @@ export interface GrInputTagProps {
    * сервере). Отклонённый тег не добавляется и уходит в событие `reject`.
    */
   beforeAdd?: (tag: string) => boolean | Promise<boolean>
+  /**
+   * Правка тега на месте: `F2` на чипе или двойной клик по нему открывают
+   * поле, `Enter` подтверждает, `Escape` отменяет.
+   *
+   * Проп, а не поведение по умолчанию: двойной клик по чипу сегодня ничего не
+   * делает, и превращать его во вход в правку у всех потребителей — тихая
+   * смена поведения.
+   */
+  editable?: boolean
   /** Кнопка «снести все теги». Настраивается через `GrConfigProvider`. */
   clearable?: boolean
   /** Фоновая работа: спиннер + `aria-busy`. Асинхронный `beforeAdd` поднимает его сам. */
@@ -102,6 +113,8 @@ export interface GrInputTagEmits {
   (e: 'update:modelValue', value: string[]): void
   (e: 'add', value: string): void
   (e: 'remove', value: string, index: number): void
+  /** Тег изменён на месте: новое значение, его позиция и то, что стояло раньше. */
+  (e: 'edit', value: string, index: number, previous: string): void
   /** Тег не прошёл `beforeAdd`. */
   (e: 'reject', value: string): void
   /** Набор снесён кнопкой «очистить». */
@@ -129,6 +142,7 @@ const props = withDefaults(
     max: undefined,
     addOnBlur: false,
     clearInputOnAdd: true,
+    editable: false,
     beforeAdd: undefined,
     clearable: undefined,
     loading: false,
@@ -427,6 +441,285 @@ function removeAt(index: number): void {
   announce(t('gr.inputTag.removed', 'Tag removed: {tag}', { tag: removed }))
 }
 
+/**
+ * Правка тега на месте.
+ *
+ * Индекс правимого чипа и черновик его значения. Черновик отдельно от модели:
+ * пока пользователь печатает, набор не трогается — иначе `Escape` было бы
+ * нечем отменять.
+ */
+const editingIndex = ref<number | null>(null)
+const editDraft = ref('')
+/** Значение на момент входа в правку: по нему видно, что набор сменили снаружи. */
+const editOriginal = ref('')
+/**
+ * Свой счётчик гонок, отдельный от `validationRun`.
+ *
+ * Общий отменял бы проверку правки при добавлении тега — а к тому моменту
+ * редактор уже закрыт, и набранное восстановить нечем.
+ */
+let editValidationRun = 0
+/**
+ * Сессия закрывается.
+ *
+ * `closeEdit` возвращает фокус **до** размонтирования поля, то есть ждёт тик —
+ * и в это окно приходит `blur` от переезда фокуса. Без флага он успевал
+ * закоммитить то, что пользователь только что отменил.
+ */
+let editClosing = false
+/**
+ * Узел поля правки. Функцией, а не строковым `ref`: поле стоит внутри `v-for`,
+ * и там Vue складывает совпадающие `ref` в массив — `focus()` у массива нет.
+ */
+const editInputEl = ref<HTMLInputElement | null>(null)
+
+function setEditInputRef(el: unknown): void {
+  editInputEl.value = el instanceof HTMLInputElement ? el : null
+}
+
+const canEditTag = computed(() => props.editable && canEdit.value)
+
+/*
+ * Фокусируемый узел у чипа один — кнопка снятия, и `F2` нажимают на ней. Без
+ * `tagClosable` в правку можно попасть только двойным кликом, то есть с
+ * клавиатуры — никак.
+ */
+if (__GR_DEV__) {
+  watchEffect(() => {
+    if (props.editable && !props.tagClosable) {
+      console.warn(
+        '[granularity] GrInputTag: `editable` без `tagClosable` недостижим с клавиатуры — '
+        + '`F2` нажимают на кнопке снятия, а она единственный фокусируемый узел чипа.',
+      )
+    }
+  })
+}
+
+/**
+ * Правка — немодальный слой общего стека, и `Escape` приходит оттуда, а не из
+ * локального обработчика. `overlayStack` слушает `keydown` в capture-фазе на
+ * `window` и гасит событие, когда стек непуст: внутри `GrModal` локальный
+ * обработчик не сработал бы вовсе, а модалка закрылась бы вместе с правкой.
+ */
+const isEditingAny = computed({
+  get: () => editingIndex.value !== null,
+  set: (value) => {
+    if (!value && editingIndex.value !== null)
+      cancelEdit(editingIndex.value)
+  },
+})
+
+useDismissible(isEditingAny, () => {
+  if (editingIndex.value !== null)
+    cancelEdit(editingIndex.value)
+})
+
+function isEditing(index: number): boolean {
+  return editingIndex.value === index
+}
+
+async function startEdit(index: number): Promise<void> {
+  if (!canEditTag.value)
+    return
+
+  const current = props.modelValue[index]
+  if (current === undefined)
+    return
+
+  editingIndex.value = index
+  editDraft.value = current
+  editOriginal.value = current
+
+  await nextTick()
+  editInputEl.value?.focus()
+  editInputEl.value?.select()
+}
+
+/**
+ * Закрыть правку и вернуть фокус на крестик того же чипа.
+ *
+ * Через тик обязательно: ключ чипа зависит от значения тега, поэтому после
+ * коммита Vue пересоздаёт узел — `removeEl` к этому моменту уже другой.
+ */
+async function closeEdit(index: number, restoreFocus: boolean): Promise<void> {
+  editClosing = true
+
+  // Фокус возвращаем **до** размонтирования редактора: иначе `focusout` уйдёт
+  // с `relatedTarget: null`, а `GrFormField` считает это уходом из поля и
+  // гоняет валидацию на каждую правку.
+  if (restoreFocus)
+    await roving.focusKey(index)
+
+  editingIndex.value = null
+  editDraft.value = ''
+  editOriginal.value = ''
+  editClosing = false
+}
+
+/** Фокус ещё в поле правки — значит его и возвращаем. Ушёл сам — не трогаем. */
+function editorHoldsFocus(): boolean {
+  return document.activeElement === editInputEl.value
+}
+
+function cancelEdit(index: number): void {
+  void closeEdit(index, editorHoldsFocus())
+}
+
+/**
+ * Подтверждение правки.
+ *
+ * Проверка дубликатов исключает сам правимый индекс: иначе тег нельзя было бы
+ * подтвердить самим собой. `beforeAdd` назван про добавление, но правило у
+ * тега одно, и второго пропа ради этого не заводится — отказ возвращает
+ * прежнее значение и закрывает правку.
+ */
+async function commitEdit(index: number, options: { fromBlur?: boolean } = {}): Promise<void> {
+  if (editClosing || !canEditTag.value || editingIndex.value !== index)
+    return
+
+  const previous = props.modelValue[index]
+  if (previous === undefined)
+    return
+
+  const restore = editorHoldsFocus()
+  const value = normalizeTag(editDraft.value)
+
+  if (!value) {
+    // Пустое по `Enter` — снятие тега: пустой ввод и в поле не создаёт тега.
+    // Пустое по уходу фокуса — ничего: удаление обязано остаться явным
+    // действием, иначе «стёр текст и отвлёкся» стоит тега.
+    await closeEdit(index, restore)
+    if (!options.fromBlur)
+      removeAt(index)
+    return
+  }
+
+  if (value === previous) {
+    await closeEdit(index, restore)
+    return
+  }
+
+  const duplicate = !props.allowDuplicates
+    && props.modelValue.some((tag, i) => i !== index && tag === value)
+
+  if (duplicate) {
+    await closeEdit(index, restore)
+    announce(t('gr.inputTag.editRejected', 'Tag {tag} was not applied', { tag: value }))
+    return
+  }
+
+  /*
+   * Проверка зовётся напрямую, а не через `filterAllowed`: тот сверяется с
+   * `validationRun`, то есть со счётчиком добавления. Правка ведёт свой —
+   * иначе добавление тега отменяло бы идущую проверку правки, а к тому моменту
+   * редактор закрыт и набранное восстановить нечем.
+   */
+  const run = ++editValidationRun
+  const check = props.beforeAdd
+  validating.value = Boolean(check)
+
+  const ok = check ? await check(value) : true
+
+  if (run === editValidationRun)
+    validating.value = false
+
+  // Сессию сменили, пока шла проверка: своё значение она не дописывает.
+  if (run !== editValidationRun || editingIndex.value !== index)
+    return
+
+  if (!ok) {
+    emit('reject', value)
+    await closeEdit(index, restore)
+    announce(t('gr.inputTag.editRejected', 'Tag {tag} was not applied', { tag: value }))
+    return
+  }
+
+  const next = props.modelValue.slice()
+  next[index] = value
+
+  emit('update:modelValue', next)
+  emit('change', next)
+  emit('edit', value, index, previous)
+  announce(t('gr.inputTag.edited', 'Tag changed: {tag}', { tag: value }))
+
+  await closeEdit(index, restore)
+}
+
+/**
+ * Клик внутри правящегося чипа принадлежит редактору.
+ *
+ * На корне висит `@click="focus"`, и без этого клик, которым ставят каретку в
+ * поле правки, уводил бы фокус в главный ввод — то есть попасть мышью в поле
+ * было бы нельзя.
+ */
+function onTagClick(e: MouseEvent, index: number): void {
+  if (editingIndex.value === index)
+    e.stopPropagation()
+}
+
+/**
+ * Двойной клик по крестику не открывает правку: первый клик уже снял тег, и на
+ * этой позиции стоит другой — правка открылась бы не тому.
+ */
+function onTagDblclick(e: MouseEvent, index: number): void {
+  if (!canEditTag.value)
+    return
+
+  if (e.target instanceof Element && e.target.closest('[data-gr-chip-close]'))
+    return
+
+  e.preventDefault()
+  void startEdit(index)
+}
+
+/**
+ * Набор или доступность сменились снаружи — правка закрывается без коммита.
+ *
+ * Индекс правки к чужому набору не относится: теги могли прийти с сервера,
+ * форму могли сбросить, поле — заблокировать. Дописать туда своё значение
+ * значит переписать не тот тег.
+ */
+watch(
+  [() => props.modelValue, canEditTag],
+  ([tags, allowed]) => {
+    const index = editingIndex.value
+    if (index === null)
+      return
+
+    if (!allowed || tags[index] !== editOriginal.value)
+      void closeEdit(index, false)
+  },
+)
+
+function onEditKeydown(e: KeyboardEvent, index: number): void {
+  if (isComposingEvent(e))
+    return
+
+  if (e.key === 'Enter') {
+    e.preventDefault()
+    void commitEdit(index)
+    return
+  }
+
+  if (e.key === 'Escape') {
+    e.preventDefault()
+    cancelEdit(index)
+  }
+}
+
+/**
+ * Уход фокуса подтверждает, а не отменяет, — и это осознанное расхождение с
+ * `addOnBlur`. Тот решает, становится ли **недонабранное новое** тегом, и там
+ * отбросить безопасно: до этого не было ничего. Правка же начинается с
+ * существующего значения, которое пользователь решил изменить, и тихо вернуть
+ * его набранное — как раз тот исход, который удивит. Отказаться есть чем:
+ * `Escape`.
+ */
+function onEditBlur(index: number): void {
+  if (!editClosing && editingIndex.value === index)
+    void commitEdit(index, { fromBlur: true })
+}
+
 /** Удаление с клавиатуры: фокус переезжает на соседний чип, а не пропадает. */
 async function removeAtFromKeyboard(index: number): Promise<void> {
   removeAt(index)
@@ -491,7 +784,20 @@ function onKeydown(e: KeyboardEvent): void {
 }
 
 function onTagKeydown(e: KeyboardEvent, index: number): void {
+  // Пока чип правится, клавиши принадлежат полю: иначе `Backspace` снёс бы
+  // правящийся тег, а стрелки увезли бы фокус на соседа прямо во время набора.
+  if (editingIndex.value === index)
+    return
+
   if (roving.handleNavigationKeys(e)) {
+    return
+  }
+
+  // `F2`, а не `Enter`: цель кольца — настоящая кнопка снятия, и `Enter` на
+  // ней уже означает «удалить» нативной активацией.
+  if (e.key === 'F2' && canEditTag.value) {
+    e.preventDefault()
+    void startEdit(index)
     return
   }
 
@@ -597,7 +903,7 @@ if (__GR_DEV__) {
     <span v-if="modelValue.length" role="list" class="contents">
       <GrChip
         v-for="(tag, i) in modelValue"
-        :key="`${tag}-${i}`"
+        :key="i"
         :ref="setChipRef(i)"
         role="listitem"
         :tone="tagTone"
@@ -609,12 +915,33 @@ if (__GR_DEV__) {
         :remove-tabindex="roving.tabindexFor(i)"
         data-gr-input-tag-item
         data-testid="gr-input-tag-item"
+        :aria-keyshortcuts="canEditTag ? 'F2' : undefined"
         :data-index="i"
         @remove="removeAt(i)"
         @focusin="roving.setActive(i)"
         @keydown="onTagKeydown($event, i)"
+        @click="onTagClick($event, i)"
+        @dblclick="onTagDblclick($event, i)"
       >
-        <slot name="tag" :tag="tag" :index="i" :remove="() => removeAt(i)">
+        <!--
+          В режиме правки поле встаёт вместо содержимого — в том числе вместо
+          пользовательского `#tag`: слот описывает показ тега, а правка это
+          режим самого компонента.
+        -->
+        <input
+          v-if="isEditing(i)"
+          :ref="setEditInputRef"
+          v-model="editDraft"
+          data-gr-input-tag-edit
+          data-testid="gr-input-tag-edit"
+          :class="tagEditInputClass"
+          :size="Math.max(editDraft.length, 2)"
+          :aria-label="t('gr.inputTag.editTag', 'Edit tag {tag}', { tag })"
+          @keydown.stop="onEditKeydown($event, i)"
+          @blur="onEditBlur(i)"
+        >
+
+        <slot v-else name="tag" :tag="tag" :index="i" :remove="() => removeAt(i)">
           <span class="truncate max-w-[18rem]">{{ tag }}</span>
         </slot>
       </GrChip>

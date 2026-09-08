@@ -238,7 +238,9 @@
     "addedMany": "Etiquetas añadidas: {count}",
     "removed": "Etiqueta eliminada: {tag}",
     "cleared": "Todas las etiquetas eliminadas",
-    "limitReached": "Límite de etiquetas alcanzado"
+    "limitReached": "Límite de etiquetas alcanzado",
+    "editTag": "Editar la etiqueta {tag}",
+    "edited": "Etiqueta cambiada: {tag}"
   },
   "fileUpload": {
     "placeholder": "Arrastra archivos aquí o haz clic para seleccionar",

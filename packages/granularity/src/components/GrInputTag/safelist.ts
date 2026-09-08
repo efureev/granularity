@@ -5,6 +5,7 @@ import {
   inputSizeClassBySize,
   invalidWrapperBorderClass,
   spinnerClass,
+  tagEditInputClass,
   wrapperBaseClass,
   wrapperBorderClassByState,
   wrapperDisabledClass,
@@ -22,6 +23,7 @@ export const grInputTagSafelist = [...new Set([
   ...splitClassTokens(wrapperDisabledClass),
   ...splitClassTokens(clearButtonClass),
   ...splitClassTokens(spinnerClass),
+  ...splitClassTokens(tagEditInputClass),
   // Общий модуль лежит в чанке без адреса — его классы объявляет каждый импортёр.
   ...splitClassTokens(controlStateIconClass),
   ...Object.values(controlStateIconColors).flatMap(splitClassTokens),

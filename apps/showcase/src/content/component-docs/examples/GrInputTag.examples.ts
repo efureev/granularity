@@ -36,4 +36,12 @@ export const grInputTagExamples: ShowcaseComponentExampleDoc[] = [
     status: 'ready',
     previewKey: 'gr-input-tag-custom-slot',
   },
+  {
+    id: 'input-tag-editable',
+    title: 'Правка тега на месте',
+    description: '`editable` открывает правку двойным кликом по тегу или `F2` с клавиатуры: `Enter` сохраняет, `Escape` отменяет, уход фокуса сохраняет. До этого опечатка в длинном теге стоила полного перенабора.',
+    status: 'ready',
+    previewKey: 'gr-input-tag-editable',
+    note: '`F2`, а не `Enter`: цель roving-кольца — настоящая кнопка снятия, и `Enter` на ней уже означает «удалить». Пустое значение по `Enter` снимает тег, а по уходу фокуса — нет: удаление обязано остаться явным действием.',
+  },
 ]

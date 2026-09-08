@@ -6596,6 +6596,13 @@
             "default": "undefined"
           },
           {
+            "name": "editable",
+            "description": "Правка тега на месте: `F2` на чипе или двойной клик по нему открывают поле, `Enter` подтверждает, `Escape` отменяет. Проп, а не поведение по умолчанию: двойной клик по чипу сегодня ничего не делает, и превращать его во вход в правку у всех потребителей — тихая смена поведения.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
             "name": "tagClosable",
             "description": "",
             "type": "boolean | undefined",
@@ -6734,6 +6741,12 @@
             "description": "",
             "type": "[value: string]",
             "signature": "(event: \"reject\", value: string): void"
+          },
+          {
+            "name": "edit",
+            "description": "",
+            "type": "[value: string, index: number, previous: string]",
+            "signature": "(event: \"edit\", value: string, index: number, previous: string): void"
           }
         ]
       },

@@ -9,6 +9,29 @@ to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **`GrInputTag` can edit a tag in place.** `editable` opens an editor on a
+  double click or `F2`; before it a chip either existed or was deleted whole, so
+  a typo in `design-system-tokens-v2` cost a full retype.
+
+  `F2` rather than `Enter`, because the only focusable node in a chip is its
+  remove button and `Enter` there already means "delete" — that is the button's
+  native activation, not something to intercept. The dependency is honest: with
+  `tagClosable: false` there is nothing to focus, so editing cannot be reached
+  from the keyboard at all, and dev says so.
+
+  Leaving the field saves. That is a deliberate departure from `addOnBlur`,
+  which decides whether a half-typed *new* value becomes a tag — there
+  discarding is safe, since nothing existed before. An edit starts from a value
+  the user chose to change, and quietly reverting their typing is the surprising
+  outcome; `Escape` is how you decline. An empty value removes the tag on
+  `Enter` but not on blur: deleting stays an explicit act.
+
+  `beforeAdd` gates edits too — one rule per tag, and a second predicate would
+  drift from the first — with its own race counter, so adding a tag no longer
+  cancels a running edit check. Separators do not apply: one edit is one tag.
+  Inside a modal `Escape` cancels the edit without closing the window, because
+  the edit session registers in the shared overlay stack.
+
 - **`GrInput` can let a meaningful addon be heard.** `#prefix` and `#suffix`
   carried an unconditional `aria-hidden`, so a decorative search icon was
   handled correctly while `https://` on a URL field or `₽` on an amount field

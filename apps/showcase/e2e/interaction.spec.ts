@@ -1354,3 +1354,80 @@ test.describe('GrDataTable: клавиатура по ячейкам', () => {
     expect(await insideCell(), 'Escape не вернул фокус ячейке').toBe('ячейка')
   })
 })
+
+/**
+ * `GrInputTag`: правка тега на месте.
+ *
+ * В jsdom не проверить главное — что `F2` доходит до чипа при настоящем
+ * порядке обхода и что после правки фокус возвращается на ту же кнопку, а не
+ * теряется вместе с пересозданным узлом.
+ */
+test.describe('GrInputTag: правка тега', () => {
+  async function openField(page: import('@playwright/test').Page) {
+    await openShowcasePage(page, componentPath('GrInputTag'))
+
+    const field = page.locator('[data-gr-input-tag]')
+      .filter({ has: page.locator('[data-gr-chip-close]') })
+      .last()
+
+    await field.scrollIntoViewIfNeeded()
+    await expect(field).toBeVisible()
+
+    return field
+  }
+
+  test('F2 открывает правку, Enter сохраняет, фокус возвращается на тот же чип', async ({ page }) => {
+    const field = await openField(page)
+    const firstClose = field.locator('[data-gr-chip-close]').first()
+
+    await firstClose.focus()
+    await page.keyboard.press('F2')
+
+    const editor = field.locator('[data-gr-input-tag-edit]')
+    await expect(editor).toBeVisible()
+
+    await editor.fill('reworked-tag')
+    await page.keyboard.press('Enter')
+
+    await expect(editor).toHaveCount(0)
+    await expect(field.locator('[data-gr-chip-label]').first()).toHaveText('reworked-tag')
+    // Фокус на крестике того же чипа: ключ по значению пересоздал бы узел, и
+    // фокус упал бы на `body`.
+    await expect(firstClose).toBeFocused()
+  })
+
+  test('Escape отменяет правку и возвращает прежнее значение', async ({ page }) => {
+    const field = await openField(page)
+    const label = field.locator('[data-gr-chip-label]').first()
+    const before = await label.innerText()
+
+    await field.locator('[data-gr-chip-close]').first().focus()
+    await page.keyboard.press('F2')
+    await field.locator('[data-gr-input-tag-edit]').fill('что-то другое')
+    await page.keyboard.press('Escape')
+
+    await expect(field.locator('[data-gr-input-tag-edit]')).toHaveCount(0)
+    await expect(label).toHaveText(before)
+  })
+
+  /**
+   * Чип слушает `keydown`, и без гашения `Backspace` из поля правки снёс бы
+   * правящийся тег, а стрелки увезли бы фокус на соседа прямо во время набора.
+   */
+  test('клавиши правки не достаются чипу', async ({ page }) => {
+    const field = await openField(page)
+    const count = await field.locator('[data-gr-chip-close]').count()
+
+    await field.locator('[data-gr-chip-close]').first().focus()
+    await page.keyboard.press('F2')
+
+    const editor = field.locator('[data-gr-input-tag-edit]')
+    await editor.fill('abc')
+    await page.keyboard.press('Backspace')
+    await page.keyboard.press('ArrowLeft')
+
+    await expect(editor).toBeVisible()
+    await expect(editor).toBeFocused()
+    await expect(field.locator('[data-gr-chip-close]')).toHaveCount(count)
+  })
+})

@@ -487,3 +487,291 @@ describe('GrInputTag — признак состояния', () => {
     expect(wrapper.find('[data-gr-input-tag-state]').exists()).toBe(false)
   })
 })
+
+/**
+ * Правка тега на месте. До неё чип либо существовал, либо удалялся целиком:
+ * опечатка в длинном теге стоила полного перенабора.
+ */
+describe('GrInputTag — правка тега', () => {
+  const TAGS = ['vue', 'design-system', 'tokens']
+
+  function mountEditable(props: Record<string, unknown> = {}) {
+    return mount(GrInputTag, {
+      props: { modelValue: TAGS.slice(), editable: true, ...props },
+      attachTo: document.body,
+    })
+  }
+
+  const chips = (w: ReturnType<typeof mountEditable>) => w.findAll('[data-testid="gr-input-tag-item"]')
+  const editField = (w: ReturnType<typeof mountEditable>) => w.find('[data-testid="gr-input-tag-edit"]')
+
+  async function openEdit(w: ReturnType<typeof mountEditable>, index: number) {
+    await chips(w)[index].trigger('keydown', { key: 'F2' })
+    await nextTick()
+    return editField(w)
+  }
+
+  it('без пропа правка не открывается ни клавишей, ни двойным кликом', async () => {
+    const wrapper = mount(GrInputTag, { props: { modelValue: TAGS.slice() } })
+
+    await chips(wrapper)[0].trigger('keydown', { key: 'F2' })
+    await chips(wrapper)[0].trigger('dblclick')
+
+    expect(editField(wrapper).exists()).toBe(false)
+
+    wrapper.unmount()
+  })
+
+  it('F2 открывает поле с текущим значением', async () => {
+    const wrapper = mountEditable()
+
+    const field = await openEdit(wrapper, 1)
+    expect(field.exists()).toBe(true)
+    expect((field.element as HTMLInputElement).value).toBe('design-system')
+
+    wrapper.unmount()
+  })
+
+  it('двойной клик открывает правку', async () => {
+    const wrapper = mountEditable()
+
+    await chips(wrapper)[0].trigger('dblclick')
+    await nextTick()
+
+    expect(editField(wrapper).exists()).toBe(true)
+
+    wrapper.unmount()
+  })
+
+  it('Enter подтверждает: модель, change и edit', async () => {
+    const wrapper = mountEditable()
+
+    const field = await openEdit(wrapper, 1)
+    await field.setValue('design-tokens')
+    await field.trigger('keydown', { key: 'Enter' })
+    await nextTick()
+
+    expect(wrapper.emitted('update:modelValue')?.at(-1)?.[0]).toEqual(['vue', 'design-tokens', 'tokens'])
+    expect(wrapper.emitted('change')?.at(-1)?.[0]).toEqual(['vue', 'design-tokens', 'tokens'])
+    expect(wrapper.emitted('edit')?.at(-1)).toEqual(['design-tokens', 1, 'design-system'])
+    expect(await announced()).toBe('Tag changed: design-tokens')
+
+    wrapper.unmount()
+  })
+
+  it('Escape отменяет и модель не трогает', async () => {
+    const wrapper = mountEditable()
+
+    const field = await openEdit(wrapper, 1)
+    await field.setValue('что-то другое')
+    await field.trigger('keydown', { key: 'Escape' })
+    await nextTick()
+
+    expect(wrapper.emitted('update:modelValue')).toBeUndefined()
+    expect(editField(wrapper).exists()).toBe(false)
+
+    wrapper.unmount()
+  })
+
+  /**
+   * Уход фокуса подтверждает, а не отменяет: правка начинается с существующего
+   * значения, и тихо вернуть набранное — тот исход, который удивит. Отказаться
+   * есть чем — `Escape`.
+   */
+  it('уход фокуса подтверждает правку', async () => {
+    const wrapper = mountEditable()
+
+    const field = await openEdit(wrapper, 0)
+    await field.setValue('vue3')
+    await field.trigger('blur')
+    await nextTick()
+
+    expect(wrapper.emitted('update:modelValue')?.at(-1)?.[0]).toEqual(['vue3', 'design-system', 'tokens'])
+
+    wrapper.unmount()
+  })
+
+  it('пустое значение удаляет тег и эмитит remove, а не edit', async () => {
+    const wrapper = mountEditable()
+
+    const field = await openEdit(wrapper, 1)
+    await field.setValue('   ')
+    await field.trigger('keydown', { key: 'Enter' })
+    await nextTick()
+
+    expect(wrapper.emitted('update:modelValue')?.at(-1)?.[0]).toEqual(['vue', 'tokens'])
+    expect(wrapper.emitted('remove')?.at(-1)).toEqual(['design-system', 1])
+    expect(wrapper.emitted('edit')).toBeUndefined()
+
+    wrapper.unmount()
+  })
+
+  /**
+   * Проверка дубликатов обязана исключать сам правимый индекс: иначе тег
+   * нельзя было бы подтвердить самим собой.
+   */
+  it('тег подтверждается самим собой, но не чужим значением', async () => {
+    const wrapper = mountEditable()
+
+    const same = await openEdit(wrapper, 0)
+    await same.trigger('keydown', { key: 'Enter' })
+    await nextTick()
+    expect(editField(wrapper).exists()).toBe(false)
+    expect(wrapper.emitted('update:modelValue')).toBeUndefined()
+
+    const clash = await openEdit(wrapper, 0)
+    await clash.setValue('tokens')
+    await clash.trigger('keydown', { key: 'Enter' })
+    await nextTick()
+
+    expect(wrapper.emitted('update:modelValue')).toBeUndefined()
+
+    wrapper.unmount()
+  })
+
+  it('достигнутый предел правку не блокирует: набор от неё не растёт', async () => {
+    const wrapper = mountEditable({ max: 3 })
+
+    const field = await openEdit(wrapper, 2)
+    await field.setValue('tokens-v2')
+    await field.trigger('keydown', { key: 'Enter' })
+    await nextTick()
+
+    expect(wrapper.emitted('update:modelValue')?.at(-1)?.[0]).toEqual(['vue', 'design-system', 'tokens-v2'])
+
+    wrapper.unmount()
+  })
+
+  it('readonly и disabled правку не открывают', async () => {
+    for (const lock of [{ readonly: true }, { disabled: true }]) {
+      const wrapper = mountEditable(lock)
+
+      await chips(wrapper)[0].trigger('keydown', { key: 'F2' })
+      await chips(wrapper)[0].trigger('dblclick')
+      await nextTick()
+
+      expect(editField(wrapper).exists()).toBe(false)
+
+      wrapper.unmount()
+    }
+  })
+
+  it('отказ beforeAdd возвращает прежнее значение и эмитит reject', async () => {
+    const wrapper = mountEditable({ beforeAdd: (tag: string) => tag !== 'нельзя' })
+
+    const field = await openEdit(wrapper, 0)
+    await field.setValue('нельзя')
+    await field.trigger('keydown', { key: 'Enter' })
+    await nextTick()
+    await nextTick()
+
+    expect(wrapper.emitted('reject')?.at(-1)).toEqual(['нельзя'])
+    expect(wrapper.emitted('update:modelValue')).toBeUndefined()
+    expect(editField(wrapper).exists()).toBe(false)
+
+    wrapper.unmount()
+  })
+
+  it('в режиме правки показывается поле, а не пользовательский слот', async () => {
+    const wrapper = mount(GrInputTag, {
+      props: { modelValue: TAGS.slice(), editable: true },
+      slots: { tag: '<span data-testid="own-tag">своё</span>' },
+      attachTo: document.body,
+    })
+
+    expect(wrapper.findAll('[data-testid="own-tag"]')).toHaveLength(3)
+
+    await chips(wrapper)[0].trigger('keydown', { key: 'F2' })
+    await nextTick()
+
+    expect(wrapper.findAll('[data-testid="own-tag"]')).toHaveLength(2)
+    expect(editField(wrapper).exists()).toBe(true)
+
+    wrapper.unmount()
+  })
+
+  /**
+   * Клавиши редактора не должны доходить до чипа: на нём висит `onTagKeydown`,
+   * и `Backspace` там значит «удалить тег». Без гашения стирание символа сносило
+   * бы правящийся тег целиком, а стрелки увозили бы фокус на соседа.
+   */
+  it('клавиши редактора не утекают на чип', async () => {
+    const wrapper = mountEditable()
+
+    const field = await openEdit(wrapper, 1)
+    await field.trigger('keydown', { key: 'Backspace' })
+    await nextTick()
+
+    expect(wrapper.emitted('remove')).toBeUndefined()
+    expect(wrapper.emitted('update:modelValue')).toBeUndefined()
+    expect(editField(wrapper).exists()).toBe(true)
+
+    await field.trigger('keydown', { key: 'ArrowLeft' })
+    await nextTick()
+    expect(editField(wrapper).exists()).toBe(true)
+
+    wrapper.unmount()
+  })
+
+  /**
+   * Ключ чипа обязан быть индексом, а не значением: иначе коммит меняет ключ,
+   * Vue пересоздаёт чип, фокус падает на `body` — и `GrFormField` принимает это
+   * за уход из поля и гоняет валидацию на каждую правку.
+   */
+  it('коммит не пересоздаёт чип: узел тот же', async () => {
+    const wrapper = mountEditable()
+    const before = chips(wrapper)[1].element
+
+    const field = await openEdit(wrapper, 1)
+    await field.setValue('design-tokens')
+    await field.trigger('keydown', { key: 'Enter' })
+    await nextTick()
+
+    // Модель обязана вернуться пропом: без этого набор в разметке не менялся
+    // бы вовсе, и проверка была бы зелёной при любом ключе.
+    await wrapper.setProps({ modelValue: wrapper.emitted('update:modelValue')!.at(-1)![0] as string[] })
+    await nextTick()
+
+    // Ключ по значению пересоздал бы чип: крестик под фокусом исчезает, фокус
+    // падает на `body`, и `GrFormField` принимает это за уход из поля —
+    // валидация запускается на каждую правку тега.
+    expect(chips(wrapper)[1].element).toBe(before)
+
+    wrapper.unmount()
+  })
+
+  it('после коммита фокус на крестике того же чипа, и наружу не ушло ни одного blur', async () => {
+    const wrapper = mountEditable()
+
+    const field = await openEdit(wrapper, 1)
+    await field.setValue('design-tokens')
+    await field.trigger('keydown', { key: 'Enter' })
+    await nextTick()
+    await nextTick()
+
+    const closes = wrapper.findAll('[data-gr-chip-close]')
+    expect(document.activeElement).toBe(closes[1].element)
+    expect(wrapper.emitted('blur')).toBeUndefined()
+
+    wrapper.unmount()
+  })
+
+  /**
+   * Крестик на время правки **остаётся**: он цель roving-кольца и точка, куда
+   * возвращается фокус. Спрячь его — и ряд чипов теряет таб-стоп целиком, а
+   * возвращать фокус после правки становится некуда.
+   */
+  it('крестик на время правки остаётся, и таб-стоп в ряду по-прежнему один', async () => {
+    const wrapper = mountEditable()
+
+    expect(wrapper.findAll('[data-gr-chip-close]')).toHaveLength(3)
+
+    await chips(wrapper)[0].trigger('keydown', { key: 'F2' })
+    await nextTick()
+
+    expect(wrapper.findAll('[data-gr-chip-close]')).toHaveLength(3)
+    expect(wrapper.findAll('[data-gr-chip-close][tabindex="0"]')).toHaveLength(1)
+
+    wrapper.unmount()
+  })
+})
