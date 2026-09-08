@@ -172,3 +172,58 @@ export function parseHotkeyCombo(combo: string): ParsedHotkeyCombo | null {
 
   return parsed
 }
+
+/**
+ * Последовательность шагов: `'g i'` — «G, затем I», `'mod+k p'` — «⌘K, затем P».
+ *
+ * Шаги делятся пробелом, аккорд внутри шага — плюсом. Аккорд оказывается
+ * частным случаем из одного шага, поэтому отдельного пути для него нет: `'mod+k'`
+ * разбирается тем же вызовом и даёт массив длины один.
+ *
+ * Сам пробел как клавиша пишется словом `space` и с разделителем не спорит.
+ */
+export function parseHotkeySequence(value: string): ParsedHotkeyCombo[] {
+  const steps: ParsedHotkeyCombo[] = []
+
+  for (const part of value.split(/\s+/)) {
+    const combo = parseHotkeyCombo(part)
+    if (combo)
+      steps.push(combo)
+  }
+
+  return steps
+}
+
+/**
+ * Совпадает ли событие с шагом сочетания.
+ *
+ * Проверки IME-композиции здесь намеренно нет: у потребителей разный момент,
+ * когда её задавать. Директива спрашивает один раз на событие, до перебора всех
+ * своих хоткеев, — зашитая внутрь проверка повторялась бы на каждом.
+ */
+export function matchesHotkeyCombo(
+  event: KeyboardEvent,
+  combo: ParsedHotkeyCombo,
+  apple = isAppleDevice(),
+): boolean {
+  const expectMeta = combo.meta || (combo.mod && apple)
+  const expectCtrl = combo.ctrl || (combo.mod && !apple)
+
+  if (event.metaKey !== expectMeta)
+    return false
+  if (event.ctrlKey !== expectCtrl)
+    return false
+  if (event.altKey !== combo.alt)
+    return false
+  if (!shiftSatisfied(event, combo.key, combo.shift))
+    return false
+
+  /*
+   * Комбинация с модификаторами матчится и по физическому коду: на нелатинской
+   * раскладке `mod+K` приходит как `key: 'л'`, и без кода сочетание мертво.
+   * Одиночная клавиша — печатная, её раскладка и определяет.
+   */
+  return eventMatchesKey(event, combo.key, {
+    codeFallback: expectMeta || expectCtrl || combo.alt,
+  })
+}

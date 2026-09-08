@@ -482,6 +482,10 @@
       "types": "./dist/types/composables/useFloating.d.ts",
       "import": "./dist/composables/useFloating.js"
     },
+    "./composables/useHotkeys": {
+      "types": "./dist/types/composables/useHotkeys.d.ts",
+      "import": "./dist/composables/useHotkeys.js"
+    },
     "./composables/useFocusTrap": {
       "types": "./dist/types/composables/useFocusTrap.d.ts",
       "import": "./dist/composables/useFocusTrap.js"

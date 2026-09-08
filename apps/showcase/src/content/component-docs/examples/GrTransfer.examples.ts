@@ -17,7 +17,7 @@ export const grTransferExamples: ShowcaseComponentExampleDoc[] = [
   },
   {
     id: 'transfer-virtual',
-    title: 'Каталог на две тысячи строк',
+    title: 'Каталог на четыреста строк',
     description: '`virtual` вместе с `max-height` держит в DOM только окно вокруг видимой части панели. Перенос кнопками от этого не страдает — он идёт по модели, а не по разметке; ограничено только перетаскивание указателем, которому и так нечего ловить за краем экрана.',
     status: 'ready',
     previewKey: 'gr-transfer-virtual',

@@ -5,7 +5,7 @@ import { GrTransfer } from '@feugene/granularity'
 
 type Permission = { id: string, label: string }
 
-const catalog: Permission[] = Array.from({ length: 2000 }, (_, index) => ({
+const catalog: Permission[] = Array.from({ length: 400 }, (_, index) => ({
   id: `perm-${index}`,
   label: `Право ${String(index + 1).padStart(4, '0')}`,
 }))
@@ -28,7 +28,7 @@ const granted = ref<string[]>(['perm-3', 'perm-17', 'perm-42'])
     />
 
     <div class="text-xs text-[var(--gr-muted-fg)]">
-      Две тысячи строк в каталоге, а в разметке — окно вокруг видимой части.
+      Четыреста строк в каталоге, а в разметке — окно вокруг видимой части.
       Перенос кнопками идёт по модели, поэтому виртуализация ему не мешает.
     </div>
   </div>

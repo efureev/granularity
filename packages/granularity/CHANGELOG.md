@@ -9,6 +9,32 @@ to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **Hotkey sequences: "G, then I".** A space splits the string into steps, a plus
+  joins keys inside one: `'mod+k'` is a chord, `'g i'` a chain, `'mod+k p'` a
+  chord followed by a key. `v-hotkey` binds it and `GrKbd` draws it from the
+  **same string** — until now `'g+i'` meant a chord to the directive and a chain
+  to the hint, and what separated them was a `variant` prop the directive cannot
+  see.
+
+  A chain is assembled from a buffer of recent presses, which is where its rules
+  come from: a lone modifier is not a step, a pause longer than a second forgets
+  the whole buffer, an intermediate step does not `preventDefault`, and a chain
+  without modifiers does not fire while typing in a field. A single-key hotkey
+  and a chain starting with the same key cannot coexist — the single one wins,
+  and no delay is added to paper over it.
+
+- **A hotkey registry for the application.** `granularityHotkeysPlugin` holds one
+  source of "id → keys + label"; `useHotkeys()` gives `keysOf`, `labelOf`,
+  `register` and `byHotkeyId`, which expands `{ id: handler }` into the map
+  `v-hotkey` expects. `GrKbd` takes `hotkey` and `GrCommandPalette` takes
+  `hotkeyId`.
+
+  A combination written twice — once in the binding, once in the hint — drifts
+  silently: the hint promises one thing and another fires. The reference lives in
+  its own field rather than sharing one with the literal keys: otherwise a typo
+  in an id would quietly become a key name that never occurs. Unknown ids warn in
+  dev.
+
 - **`GrTransfer` virtualises its panels.** `virtual` together with `maxHeight`
   keeps only a window of rows in the DOM — a catalogue of thousands is the case
   transfer exists for. Moving items is unaffected: it goes through the model,
@@ -299,6 +325,12 @@ to [Semantic Versioning](https://semver.org/).
   glyph in the knob should not cost the consumer the value readout.
 
 ### Fixed
+
+- **One matcher instead of two.** `matchesHotkey` in the directive and
+  `matchesCommandHotkey` in the palette were line-for-line equivalent apart from
+  where they checked IME composition. The first pair of copies had already
+  drifted, which is how `esc` and `space` stopped working in the palette; the
+  matcher now lives beside the parser in one place.
 
 - **`GrCommandPalette` now honours `esc` and `space` as its opening hotkey.** The
   combination syntax had two parsers — one in the `v-hotkey` directive, one in

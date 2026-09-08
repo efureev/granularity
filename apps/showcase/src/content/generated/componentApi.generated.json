@@ -2693,6 +2693,13 @@
             "default": "\"mod+k\""
           },
           {
+            "name": "hotkeyId",
+            "description": "Идентификатор записи в реестре (`granularityHotkeysPlugin`) вместо сочетания строкой: подсказка и привязка берутся из одного источника и не могут разойтись. Сильнее `hotkey`.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "maxHeight",
             "description": "Максимальная высота списка, px.",
             "type": "number | undefined",
@@ -6921,7 +6928,7 @@
         "items": [
           {
             "name": "keys",
-            "description": "Сочетание: строкой (`\"mod+shift+K\"`) или набором токенов (`['mod', 'K']`). Токен `mod` — Cmd на macOS, Ctrl на остальных.",
+            "description": "Сочетание: строкой (`\"mod+shift+K\"`) или набором токенов (`['mod', 'K']`). Токен `mod` — Cmd на macOS, Ctrl на остальных. Пробел в строке делит её на шаги: `\"g i\"` рисуется как «G затем I», а `\"mod+k p\"` — как «⌘K затем P». Форма массива остаётся плоским аккордом: что там шаг, а что клавиша, массив не различает.",
             "type": "string | string[] | undefined",
             "required": false,
             "default": "undefined"
@@ -6943,6 +6950,13 @@
           {
             "name": "separator",
             "description": "Разделитель между клавишами. Не задан — авто: в общей плашке символы склеиваются (`⌘K`), а слова разделяются плюсом (`Ctrl+K`); у `split` это плюс, у `sequence` — слово из локали. Пустая строка — только зазор.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "hotkey",
+            "description": "Идентификатор записи в реестре (`granularityHotkeysPlugin`). Сочетание берётся оттуда, поэтому подсказка не может разойтись с привязкой. Сильнее `keys`: если задан и он, побеждает реестр — иначе два источника спорили бы молча.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"

@@ -146,6 +146,8 @@ export { useGrFormControl } from './composables/useGrFormControl'
 export type { GrFormControlProps, GrFormControlState } from './composables/useGrFormControl'
 export { GRANULARITY_THEME_STATE, granularityThemePlugin, initThemeEarly, useTheme } from './composables/useTheme'
 export type { ThemeName, UseThemeOptions } from './composables/useTheme'
+export { GRANULARITY_HOTKEYS_STATE, granularityHotkeysPlugin, useHotkeys } from './composables/useHotkeys'
+export type { GranularityHotkeysPluginOptions, GrHotkeyDefinition, GrHotkeyRegistry } from './composables/useHotkeys'
 export { GRANULARITY_TOAST_STATE, granularityToastPlugin, useToast } from './composables/useToast'
 export type {
   GranularityToastPluginOptions,

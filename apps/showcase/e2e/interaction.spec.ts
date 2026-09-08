@@ -489,6 +489,50 @@ function basicPanelsPreview(page: Page) {
     .first()
 }
 
+test.describe('GrKbd: последовательность клавиш', () => {
+  /**
+   * Цепочка собирается из настоящих событий клавиатуры в их настоящем порядке —
+   * в jsdom это подделка, здесь проверяется связка целиком: одна строка описала
+   * и подсказку, и привязку.
+   */
+  test('срабатывает после всех шагов, а не на первом', async ({ page }) => {
+    await openShowcasePage(page, componentPath('GrKbd'))
+
+    const preview = page.locator('[data-example-preview]').filter({ hasText: 'наберите сочетание' }).first()
+    await preview.scrollIntoViewIfNeeded()
+    await preview.locator('[tabindex="0"]').first().click()
+
+    // Подсказка и привязка — одна и та же строка `g i`.
+    await expect(preview).toContainText('then')
+
+    // Результат читается отдельно: имена цепочек есть и в статическом списке подсказок.
+    const fired = preview.locator('[data-fired]')
+
+    await page.keyboard.press('g')
+    await expect(fired, 'первый шаг ещё не цепочка').toContainText('пока ничего')
+
+    await page.keyboard.press('i')
+    await expect(fired).toContainText('К задачам')
+  })
+
+  /** Цепочки с общим началом обязаны вести каждая к своему. */
+  test('общее начало не путает цепочки', async ({ page }) => {
+    await openShowcasePage(page, componentPath('GrKbd'))
+
+    const preview = page.locator('[data-example-preview]').filter({ hasText: 'наберите сочетание' }).first()
+    await preview.scrollIntoViewIfNeeded()
+    await preview.locator('[tabindex="0"]').first().click()
+
+    const fired = preview.locator('[data-fired]')
+
+    await page.keyboard.press('g')
+    await page.keyboard.press('p')
+
+    await expect(fired).toContainText('К проектам')
+    await expect(fired).not.toContainText('К задачам')
+  })
+})
+
 test.describe('GrTransfer: виртуализация панели', () => {
   /**
    * В jsdom раскладки нет: окно всегда начинается с нуля, и абсолютный индекс
@@ -500,7 +544,7 @@ test.describe('GrTransfer: виртуализация панели', () => {
     await openShowcasePage(page, componentPath('GrTransfer'))
 
     const preview = page.locator('[data-example-preview]')
-      .filter({ hasText: 'Две тысячи строк в каталоге' })
+      .filter({ hasText: 'Четыреста строк в каталоге' })
       .first()
     await preview.scrollIntoViewIfNeeded()
 
@@ -509,9 +553,9 @@ test.describe('GrTransfer: виртуализация панели', () => {
     const options = list.locator('[data-gr-transfer-option]')
     const total = await options.count()
     expect(total, 'весь каталог в разметке — это и есть то, что чинится').toBeGreaterThan(0)
-    expect(total).toBeLessThan(200)
+    expect(total).toBeLessThan(100)
     // Размер набора считается от всей панели, а не от окна.
-    expect(Number(await options.first().getAttribute('aria-setsize'))).toBeGreaterThan(1900)
+    expect(Number(await options.first().getAttribute('aria-setsize'))).toBeGreaterThan(380)
     await expect(options.first()).toHaveAttribute('aria-posinset', '1')
 
     await list.evaluate((node) => {
@@ -521,7 +565,7 @@ test.describe('GrTransfer: виртуализация панели', () => {
       .toBeGreaterThan(1)
 
     // И окно не разрослось: прокрутка меняет содержимое, а не размер.
-    expect(await options.count()).toBeLessThan(200)
+    expect(await options.count()).toBeLessThan(100)
   })
 })
 

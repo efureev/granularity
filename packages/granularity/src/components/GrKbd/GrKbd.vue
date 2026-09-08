@@ -3,7 +3,8 @@ import { computed, onMounted, ref } from 'vue'
 
 import { useGrComponentSize } from '../GrConfigProvider/context'
 import type { GrComponentSize } from '../shared/sizes'
-import { formatHotkeyTokens, isAppleDevice, splitHotkeyCombo } from '../shared/hotkey'
+import { useHotkeys } from '../../composables/useHotkeys'
+import { formatHotkeyTokens, isAppleDevice, splitHotkeySequence } from '../shared/hotkey'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 
 import {
@@ -26,8 +27,19 @@ export interface GrKbdProps {
   /**
    * Сочетание: строкой (`"mod+shift+K"`) или набором токенов
    * (`['mod', 'K']`). Токен `mod` — Cmd на macOS, Ctrl на остальных.
+   *
+   * Пробел в строке делит её на шаги: `"g i"` рисуется как «G затем I», а
+   * `"mod+k p"` — как «⌘K затем P». Форма массива остаётся плоским аккордом:
+   * что там шаг, а что клавиша, массив не различает.
    */
   keys?: string | string[]
+  /**
+   * Идентификатор записи в реестре (`granularityHotkeysPlugin`). Сочетание
+   * берётся оттуда, поэтому подсказка не может разойтись с привязкой. Сильнее
+   * `keys`: если задан и он, побеждает реестр — иначе два источника спорили бы
+   * молча.
+   */
+  hotkey?: string
   /**
    * Разделитель между клавишами. Не задан — авто: в общей плашке символы
    * склеиваются (`⌘K`), а слова разделяются плюсом (`Ctrl+K`); у `split` это
@@ -56,6 +68,7 @@ const props = withDefaults(
     size: undefined,
     variant: 'merged',
     keys: undefined,
+    hotkey: undefined,
     separator: undefined,
     platform: 'auto',
   },
@@ -83,10 +96,48 @@ const isApple = computed(() => {
   return detectedApple.value
 })
 
-const tokens = computed(() => {
-  if (props.keys === undefined)
+const registry = useHotkeys()
+
+/** Сочетание из реестра сильнее пропа: два источника молча спорить не должны. */
+const source = computed<string | string[] | undefined>(() => {
+  if (props.hotkey !== undefined)
+    return registry.keysOf(props.hotkey)
+
+  return props.keys
+})
+
+/**
+ * Шаги сочетания. Аккорд — один шаг, `"g i"` — два. Массив токенов остаётся
+ * одним шагом: делить его не по чему.
+ */
+const steps = computed<string[][]>(() => {
+  const value = source.value
+  if (value === undefined)
     return []
-  return Array.isArray(props.keys) ? props.keys : splitHotkeyCombo(props.keys)
+
+  if (Array.isArray(value))
+    return value.length > 0 ? [value] : []
+
+  return splitHotkeySequence(value)
+})
+
+/**
+ * Токены плоским списком плюс индексы, с которых начинается новый шаг:
+ * `separatorAt` по ним и отличает границу шага от границы клавиш внутри него.
+ * Плоский список — потому что на нём стоит вся отрисовка вложенными `<kbd>`.
+ */
+const tokens = computed(() => steps.value.flat())
+
+const stepStarts = computed(() => {
+  const starts = new Set<number>()
+  let offset = 0
+
+  for (const step of steps.value) {
+    starts.add(offset)
+    offset += step.length
+  }
+
+  return starts
 })
 
 // Сочетание рисуется вложенными `<kbd>` — приём из спецификации HTML, а не
@@ -110,6 +161,10 @@ function separatorAt(index: number): string {
     return ''
   if (props.separator !== undefined)
     return props.separator
+  // Граница шага сильнее вида: структуру задаёт сама строка, и «затем» между
+  // шагами появляется независимо от того, что просили `variant`ом.
+  if (stepStarts.value.has(index))
+    return t('gr.kbd.then', 'then')
   if (props.variant === 'sequence')
     return t('gr.kbd.then', 'then')
   if (props.variant === 'split')

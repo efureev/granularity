@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { codeForChar, eventMatchesKey, isComposingEvent, parseHotkeyCombo, shiftSatisfied } from '../keyboard'
+import { codeForChar, eventMatchesKey, isComposingEvent, parseHotkeyCombo, parseHotkeySequence, shiftSatisfied } from '../keyboard'
 
 function keyEvent(init: KeyboardEventInit & { keyCode?: number } = {}): KeyboardEvent {
   const { keyCode, ...rest } = init
@@ -97,5 +97,34 @@ describe('parseHotkeyCombo', () => {
   it('пустое сочетание — не сочетание', () => {
     expect(parseHotkeyCombo('')).toBeNull()
     expect(parseHotkeyCombo('+')).toBeNull()
+  })
+})
+
+describe('parseHotkeySequence', () => {
+  it('пробел делит строку на шаги, плюс — клавиши внутри шага', () => {
+    expect(parseHotkeySequence('mod+k')).toHaveLength(1)
+
+    const chain = parseHotkeySequence('g i')
+    expect(chain).toHaveLength(2)
+    expect(chain[0]).toMatchObject({ key: 'g', mod: false })
+    expect(chain[1]).toMatchObject({ key: 'i' })
+
+    const mixed = parseHotkeySequence('mod+k p')
+    expect(mixed).toHaveLength(2)
+    expect(mixed[0]).toMatchObject({ key: 'k', mod: true })
+    expect(mixed[1]).toMatchObject({ key: 'p', mod: false })
+  })
+
+  /** Сам пробел пишется словом и с разделителем шагов не спорит. */
+  it('клавиша «пробел» остаётся одним шагом', () => {
+    const steps = parseHotkeySequence('mod+space')
+
+    expect(steps).toHaveLength(1)
+    expect(steps[0]).toMatchObject({ key: ' ', mod: true })
+  })
+
+  it('лишние пробелы шагов не добавляют', () => {
+    expect(parseHotkeySequence('  g   i  ')).toHaveLength(2)
+    expect(parseHotkeySequence('   ')).toHaveLength(0)
   })
 })

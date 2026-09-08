@@ -1,8 +1,9 @@
 import { mount } from '@vue/test-utils'
-import { defineComponent, nextTick } from 'vue'
+import { createApp, defineComponent, nextTick } from 'vue'
 import { describe, expect, it, vi } from 'vitest'
 
 import GrConfigProvider from '../../GrConfigProvider/GrConfigProvider.vue'
+import { granularityHotkeysPlugin, resetHotkeysRegistry } from '../../../composables/useHotkeys'
 import GrKbd from '../GrKbd.vue'
 
 describe('GrKbd', () => {
@@ -242,5 +243,68 @@ describe('GrKbd — словарь клавиш', () => {
     const long = mount(GrKbd, { props: { keys: ['PageUp', 'Delete'], platform: 'other' } })
 
     expect(short.text()).toBe(long.text())
+  })
+})
+
+/**
+ * Раньше строка `"g+i"` означала аккорд для `v-hotkey` и цепочку для `GrKbd`, а
+ * разводил их проп `variant`, которого директива не видит: одна строка, два
+ * смысла. Теперь структуру несёт сама строка.
+ */
+describe('GrKbd — шаги последовательности', () => {
+  it('пробел в строке даёт «затем», плюс — обычный разделитель', () => {
+    const chain = mount(GrKbd, { props: { keys: 'g i', platform: 'other' } })
+    const chord = mount(GrKbd, { props: { keys: 'ctrl+k', platform: 'other' } })
+
+    expect(chain.text()).toContain('then')
+    expect(chord.text()).not.toContain('then')
+    expect(chord.text()).toContain('+')
+  })
+
+  it('шаг с аккордом: внутри плюс, между шагами «затем»', () => {
+    const wrapper = mount(GrKbd, { props: { keys: 'ctrl+k p', platform: 'other' } })
+
+    const text = wrapper.text()
+    expect(text).toContain('+')
+    expect(text).toContain('then')
+    // Порядок: аккорд сначала, «затем» — перед вторым шагом.
+    expect(text.indexOf('+')).toBeLessThan(text.indexOf('then'))
+  })
+
+  /** Старая запись обязана продолжать работать: `variant` остаётся публичным. */
+  it('`variant="sequence"` на строке без пробелов даёт прежнее поведение', () => {
+    const wrapper = mount(GrKbd, { props: { keys: 'g+i', variant: 'sequence', platform: 'other' } })
+
+    expect(wrapper.text()).toContain('then')
+  })
+
+  it('массив токенов остаётся плоским аккордом', () => {
+    const wrapper = mount(GrKbd, { props: { keys: ['ctrl', 'k'], platform: 'other' } })
+
+    expect(wrapper.text()).not.toContain('then')
+  })
+
+  it('свой `separator` сильнее структуры', () => {
+    const wrapper = mount(GrKbd, { props: { keys: 'g i', separator: '·', platform: 'other' } })
+
+    expect(wrapper.text()).toContain('·')
+    expect(wrapper.text()).not.toContain('then')
+  })
+})
+
+describe('GrKbd — сочетание из реестра', () => {
+  it('проп `hotkey` берёт сочетание по id и сильнее `keys`', () => {
+    const app = createApp({ render: () => null })
+    app.use(granularityHotkeysPlugin, { hotkeys: { 'issues.goto': { keys: 'g i' } } })
+
+    const wrapper = app.runWithContext(() => mount(GrKbd, {
+      props: { hotkey: 'issues.goto', keys: 'ctrl+z', platform: 'other' },
+      global: { provide: (app._context as any).provides },
+    }))
+
+    expect(wrapper.text()).toContain('then')
+    expect(wrapper.text()).not.toContain('Ctrl')
+
+    resetHotkeysRegistry()
   })
 })

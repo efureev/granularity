@@ -158,3 +158,118 @@ describe('vHotkey', () => {
     })
   })
 })
+
+/**
+ * Последовательность «G, затем I»: шаги делятся пробелом, аккорд внутри шага —
+ * плюсом. Раньше строка `'g i'` разбиралась как одна клавиша с невозможным
+ * именем и не срабатывала вовсе.
+ */
+describe('v-hotkey: последовательности', () => {
+  it('срабатывает после всех шагов, а не на первом', () => {
+    const handler = vi.fn()
+    const wrapper = mountWithHotkey({ 'g i': handler })
+
+    dispatchKey(window, 'g')
+    expect(handler, 'первый шаг ещё не цепочка').not.toHaveBeenCalled()
+
+    dispatchKey(window, 'i')
+    expect(handler).toHaveBeenCalledTimes(1)
+
+    wrapper.unmount()
+  })
+
+  it('чужая клавиша между шагами сбрасывает набранное', () => {
+    const handler = vi.fn()
+    const wrapper = mountWithHotkey({ 'g i': handler })
+
+    dispatchKey(window, 'g')
+    dispatchKey(window, 'x')
+    dispatchKey(window, 'i')
+
+    expect(handler).not.toHaveBeenCalled()
+    wrapper.unmount()
+  })
+
+  it('обратный порядок не срабатывает', () => {
+    const handler = vi.fn()
+    const wrapper = mountWithHotkey({ 'g i': handler })
+
+    dispatchKey(window, 'i')
+    dispatchKey(window, 'g')
+
+    expect(handler).not.toHaveBeenCalled()
+    wrapper.unmount()
+  })
+
+  it('цепочки с общим началом ведут каждая к своему', () => {
+    const issues = vi.fn()
+    const pulls = vi.fn()
+    const wrapper = mountWithHotkey({ 'g i': issues, 'g p': pulls })
+
+    dispatchKey(window, 'g')
+    dispatchKey(window, 'p')
+
+    expect(pulls).toHaveBeenCalledTimes(1)
+    expect(issues).not.toHaveBeenCalled()
+
+    wrapper.unmount()
+  })
+
+  /**
+   * Сложившаяся цепочка снимается с буфера. Видно это на повторе одной клавиши:
+   * без сброса третье нажатие достроило бы `g g` заново из хвоста предыдущей
+   * цепочки — то есть один лишний `g` давал бы второе срабатывание.
+   */
+  it('сложившаяся цепочка снимается с буфера', () => {
+    const handler = vi.fn()
+    const wrapper = mountWithHotkey({ 'g g': handler })
+
+    dispatchKey(window, 'g')
+    dispatchKey(window, 'g')
+    expect(handler).toHaveBeenCalledTimes(1)
+
+    dispatchKey(window, 'g')
+    expect(handler, 'третий `g` — половина следующей цепочки, а не конец прошлой').toHaveBeenCalledTimes(1)
+
+    dispatchKey(window, 'g')
+    expect(handler).toHaveBeenCalledTimes(2)
+
+    wrapper.unmount()
+  })
+
+  it('шаг с модификатором сверяется целиком', () => {
+    const handler = vi.fn()
+    const wrapper = mountWithHotkey({ 'ctrl+k p': handler })
+
+    dispatchKey(window, 'k')
+    dispatchKey(window, 'p')
+    expect(handler, 'без Ctrl первый шаг не тот').not.toHaveBeenCalled()
+
+    dispatchCombo(window, 'k', { ctrlKey: true })
+    dispatchKey(window, 'p')
+    expect(handler).toHaveBeenCalledTimes(1)
+
+    wrapper.unmount()
+  })
+
+  /**
+   * Набирая текст, пользователь легко напечатает «g i», и увести его со
+   * страницы посреди слова было бы худшим из возможных ответов.
+   */
+  it('в поле ввода цепочка без модификаторов не срабатывает', () => {
+    const handler = vi.fn()
+    const wrapper = mountWithHotkey({ 'g i': handler })
+
+    const input = document.createElement('input')
+    document.body.append(input)
+    input.focus()
+
+    input.dispatchEvent(new KeyboardEvent('keydown', { key: 'g', bubbles: true }))
+    input.dispatchEvent(new KeyboardEvent('keydown', { key: 'i', bubbles: true }))
+
+    expect(handler).not.toHaveBeenCalled()
+
+    input.remove()
+    wrapper.unmount()
+  })
+})

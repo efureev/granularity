@@ -1,6 +1,8 @@
 import type { Directive } from 'vue'
 
-import { eventMatchesKey, isAppleDevice, isComposingEvent, isEditableTarget, parseHotkeyCombo, shiftSatisfied } from '../internal/keyboard'
+import { createHotkeySequenceTracker } from '../internal/hotkeySequence'
+import { isAppleDevice, isComposingEvent, isEditableTarget, matchesHotkeyCombo, parseHotkeySequence } from '../internal/keyboard'
+import type { ParsedHotkeyCombo } from '../internal/keyboard'
 
 export type HotkeyHandler = (event: KeyboardEvent) => void
 
@@ -36,19 +38,19 @@ export type HotkeyBindingValue
 
 type ParsedHotkey = {
   original: string
-  key: string
-  ctrl: boolean
-  meta: boolean
-  /** `mod` — Cmd на macOS, Ctrl на прочих: подсказка и привязка пишутся одинаково. */
-  mod: boolean
-  alt: boolean
-  shift: boolean
+  /**
+   * Шаги сочетания. Аккорд — один шаг, «G, затем I» — два: обе формы идут одним
+   * путём, поэтому у цепочки нет собственной ветки, которую можно забыть.
+   */
+  steps: ParsedHotkeyCombo[]
   entry: HotkeyEntry
 }
 
 type InternalState = {
   enabled: boolean
   hotkeys: ParsedHotkey[]
+  /** Набранное для цепочек: один буфер на элемент, общий для всех его хоткеев. */
+  sequence: ReturnType<typeof createHotkeySequenceTracker>
   listener: (event: KeyboardEvent) => void
   /** Цель, на которой висит слушатель (`window` для 'global', сам `el` для 'element'). */
   target: Window | HTMLElement
@@ -70,36 +72,19 @@ function parseHotkeys(map: HotkeyMap): ParsedHotkey[] {
   const parsed: ParsedHotkey[] = []
 
   for (const [combo, entry] of Object.entries(map)) {
-    const keys = parseHotkeyCombo(combo)
-    if (!keys)
+    const steps = parseHotkeySequence(combo)
+    if (steps.length === 0)
       continue
 
-    parsed.push({ original: combo, ...keys, entry })
+    parsed.push({ original: combo, steps, entry })
   }
 
   return parsed
 }
 
-function matchesHotkey(event: KeyboardEvent, hk: ParsedHotkey): boolean {
-  // Платформа читается в момент события: `navigator` в теле модуля на сервере
-  // либо отсутствует, либо отвечает не за ту машину.
-  const apple = hk.mod ? isAppleDevice() : false
-  const expectMeta = hk.meta || (hk.mod && apple)
-  const expectCtrl = hk.ctrl || (hk.mod && !apple)
-
-  if (expectCtrl !== event.ctrlKey)
-    return false
-  if (expectMeta !== event.metaKey)
-    return false
-  if (hk.alt !== event.altKey)
-    return false
-  if (!shiftSatisfied(event, hk.key, hk.shift))
-    return false
-
-  // По физическому коду матчатся только комбинации с модификаторами: там
-  // клавиша — позиция на клавиатуре, и `Ctrl+K` обязан работать на любой
-  // раскладке. Одиночная клавиша — печатная, её раскладка и определяет.
-  return eventMatchesKey(event, hk.key, { codeFallback: expectCtrl || expectMeta || hk.alt })
+/** Есть ли у сочетания модификаторы: по ним решается перехват ввода и `preventDefault`. */
+function hasModifier(steps: readonly ParsedHotkeyCombo[]): boolean {
+  return steps.some(step => step.ctrl || step.meta || step.mod || step.alt || step.shift)
 }
 
 function resolveEntry(entry: HotkeyEntry) {
@@ -145,6 +130,7 @@ export const vHotkey: Directive<HTMLElement, HotkeyBindingValue> = {
     const state: InternalState = {
       enabled,
       hotkeys: parseHotkeys(handlers),
+      sequence: createHotkeySequenceTracker(),
       listener: (event: KeyboardEvent) => {
         const current = states.get(el)
         if (!current?.enabled)
@@ -155,25 +141,52 @@ export const vHotkey: Directive<HTMLElement, HotkeyBindingValue> = {
         if (isComposingEvent(event))
           return
 
+        /*
+         * Платформа спрашивается один раз на событие, а не на каждый хоткей:
+         * `navigator` в теле модуля на сервере либо отсутствует, либо отвечает не
+         * за ту машину, поэтому вопрос откладывается до события — но повторять
+         * его в цикле незачем.
+         */
+        const apple = isAppleDevice()
+
+        // Нажатие идёт в буфер до перебора: цепочка складывается из событий, а
+        // не из совпадений, и шаг, не подошедший ни одному хоткею, всё равно её часть.
+        current.sequence.push(event, Date.now())
+
         const editable = isEditableTarget(event.target)
 
         for (const hk of current.hotkeys) {
-          if (!matchesHotkey(event, hk))
+          const isChain = hk.steps.length > 1
+          const matched = isChain
+            ? current.sequence.matches(hk.steps, apple)
+            : matchesHotkeyCombo(event, hk.steps[0], apple)
+
+          if (!matched)
             continue
 
           const entry = resolveEntry(hk.entry)
+          const modified = hasModifier(hk.steps)
 
-          // По умолчанию не перехватываем "простые" клавиши во время ввода.
-          const hasModifier = hk.ctrl || hk.meta || hk.mod || hk.alt || hk.shift
-          if (editable && !entry.allowInEditable && !hasModifier && hk.key !== 'Escape') {
+          /*
+           * Простые клавиши во время ввода не перехватываются. Цепочка — тоже
+           * простая: набирая текст, пользователь легко напечатает «g i», и
+           * увести его со страницы посреди слова было бы худшим из возможных
+           * ответов.
+           */
+          const isEscape = !isChain && hk.steps[0].key === 'Escape'
+          if (editable && !entry.allowInEditable && !modified && !isEscape)
             continue
-          }
 
-          const preventDefault = entry.preventDefault ?? (hk.ctrl || hk.meta || hk.mod || hk.alt)
+          const preventDefault = entry.preventDefault ?? modified
           if (preventDefault)
             event.preventDefault()
           if (entry.stopPropagation)
             event.stopPropagation()
+
+          // Сложившаяся цепочка снимается с буфера: иначе следующее нажатие
+          // достроило бы её заново и сработало бы второй раз.
+          if (isChain)
+            current.sequence.reset()
 
           entry.handler(event)
           return
@@ -193,6 +206,9 @@ export const vHotkey: Directive<HTMLElement, HotkeyBindingValue> = {
     const next = normalizeBinding(binding.value)
     state.enabled = next.enabled
     state.hotkeys = parseHotkeys(next.handlers)
+    // Смена карты обнуляет набранное: половина цепочки от прошлого набора
+    // достроилась бы клавишей из нового и сработала бы не тем хоткеем.
+    state.sequence.reset()
 
     // Смена scope на лету — переносим слушатель на новую цель.
     const nextTarget: Window | HTMLElement = next.scope === 'element' ? el : window

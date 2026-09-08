@@ -4,7 +4,7 @@ import { computed, nextTick, onBeforeUnmount, onMounted, ref, useId, watch } fro
 
 import { useVirtualList } from '../../composables/useVirtualList'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
-import { isComposingEvent } from '../../internal/keyboard'
+import { isComposingEvent, parseHotkeySequence } from '../../internal/keyboard'
 import { useComboboxNavigation } from '../../composables/useComboboxNavigation'
 import { iconClass, iconTag } from '../shared/icon'
 import GrKbd from '../GrKbd/GrKbd.vue'
@@ -20,11 +20,11 @@ import {
   type GrCommandFilter,
   type GrCommandItem,
 } from './filtering'
+import { useHotkeys } from '../../composables/useHotkeys'
+import { createHotkeySequenceTracker } from '../../internal/hotkeySequence'
 import {
   formatCommandHotkey,
   isAppleDevice,
-  matchesCommandHotkey,
-  parseCommandHotkey,
 } from '../shared/hotkey'
 import {
   commandEmptyClass,
@@ -73,6 +73,12 @@ export interface GrCommandPaletteProps {
   size?: GrCommandPaletteSize
   /** Глобальное сочетание открытия. `null` — не вешать слушатель. */
   hotkey?: string | null
+  /**
+   * Идентификатор записи в реестре (`granularityHotkeysPlugin`) вместо
+   * сочетания строкой: подсказка и привязка берутся из одного источника и не
+   * могут разойтись. Сильнее `hotkey`.
+   */
+  hotkeyId?: string
   /** Локальная фильтрация по запросу. `false` — фильтрует владелец по событию `search`. */
   filterable?: boolean
   /** Кастомный матчер локальной фильтрации. */
@@ -118,6 +124,7 @@ const props = withDefaults(
     // до того, как компонент заглянет в `GrConfigProvider`.
     size: undefined,
     hotkey: 'mod+k',
+    hotkeyId: undefined,
     filterable: true,
     filter: undefined,
     loading: false,
@@ -430,7 +437,23 @@ watch(
 )
 
 // ————— Глобальное сочетание открытия.
-const parsedHotkey = computed(() => (props.hotkey ? parseCommandHotkey(props.hotkey) : null))
+
+const registry = useHotkeys()
+
+/** Реестр сильнее пропа: два источника сочетания молча спорить не должны. */
+const hotkeyValue = computed(() => (props.hotkeyId !== undefined
+  ? registry.keysOf(props.hotkeyId)
+  : props.hotkey))
+
+/**
+ * Шаги открытия. Аккорд — один шаг, `'g p'` — два: палитра берёт тот же разбор,
+ * что и директива, поэтому цепочка открывает её так же, как и любое другое место.
+ */
+const hotkeySteps = computed(() => (hotkeyValue.value ? parseHotkeySequence(hotkeyValue.value) : []))
+
+const parsedHotkey = computed(() => hotkeySteps.value[0] ?? null)
+
+const sequence = createHotkeySequenceTracker()
 
 // Платформа определяется только после монтирования: на сервере `navigator` нет,
 // и первый рендер обязан совпасть с серверным. Иначе сервер отдаёт `Ctrl`,
@@ -442,9 +465,23 @@ const hotkeyHint = computed(() =>
 )
 
 function onWindowKeydown(event: KeyboardEvent): void {
-  const hotkey = parsedHotkey.value
-  if (!hotkey || !matchesCommandHotkey(event, hotkey, isApple.value))
+  const steps = hotkeySteps.value
+  if (steps.length === 0)
     return
+
+  // Клавиша во время IME-композиции принадлежит композиции, а не сочетанию.
+  if (isComposingEvent(event))
+    return
+
+  sequence.push(event, Date.now())
+
+  if (!sequence.matches(steps, isApple.value))
+    return
+
+  // Сложившаяся цепочка снимается с буфера: иначе следующее нажатие достроило
+  // бы её заново и переключило палитру второй раз.
+  sequence.reset()
+
   event.preventDefault()
   toggle()
 }

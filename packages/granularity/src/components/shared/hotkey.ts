@@ -11,7 +11,7 @@
  * матчер на `window`, с тем же синтаксисом комбинаций плюс токен `mod`.
  */
 
-import { eventMatchesKey, isAppleDevice, isComposingEvent, parseHotkeyCombo, shiftSatisfied } from '../../internal/keyboard'
+import { isAppleDevice, isComposingEvent, matchesHotkeyCombo, parseHotkeyCombo } from '../../internal/keyboard'
 import type { ParsedHotkeyCombo } from '../../internal/keyboard'
 
 import { findKbdToken, type HotkeyKeyView } from './hotkeyTokens'
@@ -33,26 +33,12 @@ export function matchesCommandHotkey(
   apple = isAppleDevice(),
 ): boolean {
   // Клавиша во время IME-композиции принадлежит композиции, а не сочетанию.
+  // Директива спрашивает это раньше, до перебора своих хоткеев; здесь хоткей
+  // один, и место у проверки только тут.
   if (isComposingEvent(event))
     return false
 
-  const expectMeta = hotkey.meta || (hotkey.mod && apple)
-  const expectCtrl = hotkey.ctrl || (hotkey.mod && !apple)
-
-  if (event.metaKey !== expectMeta)
-    return false
-  if (event.ctrlKey !== expectCtrl)
-    return false
-  if (event.altKey !== hotkey.alt)
-    return false
-  if (!shiftSatisfied(event, hotkey.key, hotkey.shift))
-    return false
-
-  // Комбинация с модификаторами матчится и по физическому коду: на нелатинской
-  // раскладке `mod+K` приходит как `key: 'л'`, и без кода сочетание мертво.
-  return eventMatchesKey(event, hotkey.key, {
-    codeFallback: expectMeta || expectCtrl || hotkey.alt,
-  })
+  return matchesHotkeyCombo(event, hotkey, apple)
 }
 
 /** Человекочитаемые клавиши для подсказки в поле ввода (`⌘` / `Ctrl`). */
@@ -93,4 +79,15 @@ export function formatHotkeyTokens(tokens: readonly string[], apple: boolean): H
 /** Комбинация строкой (`mod+shift+K`) — в набор токенов в порядке показа. */
 export function splitHotkeyCombo(combo: string): string[] {
   return combo.split('+').map(part => part.trim()).filter(Boolean)
+}
+
+/**
+ * Последовательность строкой (`g i`, `mod+k p`) — в шаги, каждый набором
+ * токенов. Аккорд даёт один шаг, поэтому отдельного пути для него нет.
+ */
+export function splitHotkeySequence(value: string): string[][] {
+  return value
+    .split(/\s+/)
+    .map(splitHotkeyCombo)
+    .filter(step => step.length > 0)
 }

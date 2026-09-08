@@ -394,6 +394,9 @@ export default defineConfig({
         'composables/useComboboxNavigation': fileURLToPath(
           new URL('./src/composables/useComboboxNavigation.ts', import.meta.url),
         ),
+        'composables/useHotkeys': fileURLToPath(
+          new URL('./src/composables/useHotkeys.ts', import.meta.url),
+        ),
         'composables/useGranularityTranslations': fileURLToPath(
           new URL('./src/composables/useGranularityTranslations.ts', import.meta.url),
         ),
