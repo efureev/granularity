@@ -58,5 +58,21 @@ export const stripedClass = [
 
 export const hoverableClass = `[&>tbody>tr:not([${DETAIL_ROW_ATTR}]):hover]:bg-[${HOVER_TINT}]`
 
+/**
+ * Фон первой ячейки, когда колонка липкая.
+ *
+ * Наследовать фон строки нельзя, хотя это и просится: оттенки полосы и
+ * подсветки **полупрозрачны** (`color-mix(…, transparent)`), и сквозь такую
+ * ячейку уезжающие числа видно насквозь — проверено глазами. Поэтому те же
+ * оттенки собираются заново поверх непрозрачной карточки: визуально это тот же
+ * цвет, но без дыры.
+ */
+const STRIPE_OPAQUE = 'color-mix(in_srgb,var(--gr-muted)_35%,var(--gr-card))'
+const HOVER_OPAQUE = 'color-mix(in_srgb,var(--gr-muted)_45%,var(--gr-card))'
+
+export const stickyColumnStripedClass = `[&>tbody>tr:nth-child(even_of_:not([${DETAIL_ROW_ATTR}]))>*:first-child]:bg-[${STRIPE_OPAQUE}]`
+
+export const stickyColumnHoverableClass = `[&>tbody>tr:not([${DETAIL_ROW_ATTR}]):hover>*:first-child]:bg-[${HOVER_OPAQUE}]`
+
 export const emptyCellClass = 'px-4 py-8 text-center text-[var(--gr-muted-fg)]'
 export const loadingRowCellClass = 'px-4 py-3'

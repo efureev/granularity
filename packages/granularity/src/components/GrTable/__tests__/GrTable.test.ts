@@ -282,3 +282,92 @@ describe('GrTable — императивный API', () => {
     wrapper.unmount()
   })
 })
+
+/**
+ * Липкие шапка и первая колонка.
+ *
+ * В jsdom раскладки нет, поэтому здесь проверяются правила, а не поведение:
+ * что прокрутка их слушается — дело `geometry.spec.ts`. Тестов у `stickyHeader`
+ * не было вовсе, и это та же дыра.
+ */
+describe('GrTable — липкие шапка и колонка', () => {
+  const rows = '<tr><td>Строка</td><td>1</td></tr>'
+
+  function mountTable(props: Record<string, unknown> = {}) {
+    return mount(GrTable, {
+      props,
+      slots: { header: '<tr><th>Название</th><th>Число</th></tr>', default: rows },
+    })
+  }
+
+  it('без пропов ничего не липнет', () => {
+    const wrapper = mountTable()
+
+    expect(wrapper.get('thead').classes()).not.toContain('sticky')
+    expect(wrapper.get('table').attributes('class') ?? '').not.toContain('first-child')
+
+    wrapper.unmount()
+  })
+
+  it('`stickyHeader` прилепляет шапку и оставляет ей непрозрачный фон', () => {
+    const wrapper = mountTable({ stickyHeader: true })
+
+    const thead = wrapper.get('thead').classes()
+    expect(thead).toContain('sticky')
+    expect(thead).toContain('top-0')
+    // Без фона сквозь шапку просвечивали бы уезжающие строки.
+    expect(thead.join(' ')).toContain('bg-[var(--gr-muted)]')
+
+    wrapper.unmount()
+  })
+
+  it('`stickyColumn` липнет к левому краю и только первой ячейкой', () => {
+    const wrapper = mountTable({ stickyColumn: true })
+    const table = wrapper.get('table').attributes('class') ?? ''
+
+    expect(table).toContain('[&_tr>*:first-child]:sticky')
+    expect(table).toContain('[&_tr>*:first-child]:left-0')
+    // Вторая колонка не липнет: правило адресует только первую ячейку строки.
+    expect(table).not.toContain('nth-child(2)')
+
+    wrapper.unmount()
+  })
+
+  it('у липкой ячейки свой непрозрачный фон, и у шапки — свой', () => {
+    const wrapper = mountTable({ stickyColumn: true })
+    const table = wrapper.get('table').attributes('class') ?? ''
+
+    expect(table).toContain('[&>tbody>tr>*:first-child]:bg-[var(--gr-card)]')
+    // Шапке фон задан на `<thead>`, но он скроллится вместе с ней.
+    expect(table).toContain('[&>thead>tr>*:first-child]:bg-[var(--gr-muted)]')
+
+    wrapper.unmount()
+  })
+
+  /**
+   * Наследовать фон строки нельзя, хотя это и просится: оттенки полосы и
+   * подсветки полупрозрачны (`color-mix(…, transparent)`), и сквозь такую
+   * ячейку уезжающие числа видно насквозь. Поэтому те же оттенки собираются
+   * заново **поверх карточки** — визуально тот же цвет, но без дыры.
+   */
+  it('полоса и подсветка в липкой колонке собраны непрозрачными', () => {
+    const wrapper = mountTable({ stickyColumn: true, striped: true, hoverable: true })
+    const table = wrapper.get('table').attributes('class') ?? ''
+
+    expect(table).toContain('nth-child(even_of_:not([data-gr-table-off-grid]))>*:first-child]:bg-[color-mix(in_srgb,var(--gr-muted)_35%,var(--gr-card))]')
+    expect(table).toContain(':hover>*:first-child]:bg-[color-mix(in_srgb,var(--gr-muted)_45%,var(--gr-card))]')
+    // Прозрачного `transparent` в правилах липкой ячейки быть не должно.
+    expect(table).not.toContain('>*:first-child]:bg-[color-mix(in_srgb,var(--gr-muted)_35%,transparent)]')
+
+    wrapper.unmount()
+  })
+
+  it('без полосатости лишних правил у липкой колонки нет', () => {
+    const wrapper = mountTable({ stickyColumn: true })
+    const table = wrapper.get('table').attributes('class') ?? ''
+
+    expect(table).not.toContain('nth-child(even_of_')
+
+    wrapper.unmount()
+  })
+})

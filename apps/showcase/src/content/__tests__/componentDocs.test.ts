@@ -351,7 +351,7 @@ describe('component docs metadata', () => {
     expect(listDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(listDoc.examples.every(example => example.previewKey?.startsWith('gr-list'))).toBe(true)
 
-    expect(tableDoc.examples).toHaveLength(6)
+    expect(tableDoc.examples).toHaveLength(7)
     expect(tableDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(tableDoc.examples.every(example => example.previewKey?.startsWith('gr-table'))).toBe(true)
   })

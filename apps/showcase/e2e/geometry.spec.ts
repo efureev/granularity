@@ -610,3 +610,59 @@ test.describe('раскрытие внутри виртуального спис
     await expect(table.locator('[data-gr-datatable-detail]')).toHaveCount(1)
   })
 })
+
+/**
+ * Липкая первая колонка `GrTable`.
+ *
+ * В jsdom этого нет: там ни прокрутки, ни ширин, ни `position: sticky`. Юнит
+ * гейтит правила, здесь — что они работают: колонка стоит на месте, а под ней
+ * ничего не просвечивает.
+ */
+test.describe('липкая колонка таблицы', () => {
+  test('первая колонка стоит при горизонтальной прокрутке, и под ней непрозрачно', async ({ page }) => {
+    await page.goto(componentPath('GrTable'))
+    await page.locator('#live-examples').waitFor()
+
+    const scroller = page.locator('[data-gr-table-scroll]')
+      .filter({ has: page.locator('table[class*="first-child"]') })
+      .first()
+
+    await scroller.scrollIntoViewIfNeeded()
+    await expect(scroller).toBeVisible()
+
+    const probe = () => scroller.evaluate((node) => {
+      const box = node.getBoundingClientRect()
+      const first = node.querySelector('tbody tr > *:first-child')!
+      const second = node.querySelector('tbody tr > *:nth-child(2)')!
+
+      return {
+        scrollLeft: Math.round(node.scrollLeft),
+        firstLeft: Math.round(first.getBoundingClientRect().left - box.left),
+        secondLeft: Math.round(second.getBoundingClientRect().left - box.left),
+        // Полупрозрачный фон видно по наличию альфы в записи цвета.
+        translucent: [...node.querySelectorAll('tbody tr > *:first-child')]
+          .map(cell => getComputedStyle(cell).backgroundColor)
+          .filter(color => /rgba|\/\s*0?\.\d/.test(color)),
+      }
+    })
+
+    const before = await probe()
+    expect(before.scrollLeft, 'таблица не прокручена — проверять нечего').toBe(0)
+
+    await scroller.evaluate((node) => { node.scrollLeft = 200 })
+    await expect.poll(() => scroller.evaluate(node => node.scrollLeft)).toBeGreaterThan(0)
+
+    const after = await probe()
+
+    // Колонка осталась на месте, а соседняя уехала: это и есть липкость.
+    expect(Math.abs(after.firstLeft - before.firstLeft), 'первая колонка уехала').toBeLessThanOrEqual(1)
+    expect(after.secondLeft, 'вторая колонка не сдвинулась — прокрутки не было').toBeLessThan(before.secondLeft)
+
+    /*
+     * Оттенки полосы и подсветки полупрозрачны, и наследование фона строки
+     * давало сквозь липкую ячейку уезжающие числа. Поэтому альфы у неё быть не
+     * должно ни на одной строке.
+     */
+    expect(after.translucent, 'фон липкой ячейки полупрозрачен — сквозь неё видно').toEqual([])
+  })
+})

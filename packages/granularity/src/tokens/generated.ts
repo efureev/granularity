@@ -3484,6 +3484,13 @@ export const grComponentTokens: GrComponentToken[] = [
     "description": "Цвет содержимого бегунка — один на спиннер загрузки и иконку действия. По состоянию не ветвится: бегунок остаётся var(--gr-card) в любом из них."
   },
   {
+    "owner": "GrTable",
+    "name": "--gr-table-sticky-column-shadow",
+    "kind": "hook",
+    "default": "4px 0 6px -4px rgba(0, 0, 0, 0.25)",
+    "description": "Тень справа у прилипающей первой колонки (`stickyColumn`). Признак того, что под ней уезжает содержимое. Тень, а не рамка: рамка сдвинула бы сетку таблицы."
+  },
+  {
     "owner": "GrTabs",
     "name": "--gr-tabs-scroll-fade",
     "kind": "hook",

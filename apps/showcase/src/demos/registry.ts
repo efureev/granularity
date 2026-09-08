@@ -463,6 +463,7 @@ export const demoPathByPreviewKey = {
   'gr-table-loading-state': 'components/gr-table/GrTableLoadingStateDemo.vue',
   'gr-table-scroll-region': 'components/gr-table/GrTableScrollRegionDemo.vue',
   'gr-table-sizes': 'components/gr-table/GrTableSizesDemo.vue',
+  'gr-table-sticky-column': 'components/gr-table/GrTableStickyColumnDemo.vue',
   'gr-tabs-activation': 'components/gr-tabs/GrTabsActivationDemo.vue',
   'gr-tabs-badge-navigation': 'components/gr-tabs/GrTabsBadgeDemo.vue',
   'gr-tabs-basic-switch': 'components/gr-tabs/GrTabsBasicSwitchDemo.vue',

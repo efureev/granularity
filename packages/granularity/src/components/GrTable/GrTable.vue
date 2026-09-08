@@ -9,6 +9,8 @@ import {
   emptyCellClass,
   hoverableClass,
   loadingRowCellClass,
+  stickyColumnHoverableClass,
+  stickyColumnStripedClass,
   stripedClass,
   tableSizes,
   type GrTableSize,
@@ -73,6 +75,15 @@ export interface GrTableProps {
    */
   stickyHeader?: boolean
   /**
+   * Прилипающая первая колонка: остаётся видимой при горизонтальном скролле.
+   *
+   * Только первая, и это не упрощение: `left` со второй колонки равен сумме
+   * ширин предыдущих, а ячейки принадлежат потребителю — мерить их «тонкому»
+   * контейнеру нечем. Многоколоночное закрепление есть у `GrDataTable`: он
+   * знает свои колонки и меряет смещения сам.
+   */
+  stickyColumn?: boolean
+  /**
    * Полное число строк набора, включая строки заголовка (`aria-rowcount`).
    *
    * Нужен, когда в DOM не весь набор — например, при виртуализации: диктор
@@ -134,6 +145,7 @@ const props = withDefaults(defineProps<GrTableProps>(), {
   rowGroups: false,
   role: 'table',
   stickyHeader: false,
+  stickyColumn: false,
   maxHeight: undefined,
   rowCount: undefined,
   fixedLayout: false,
@@ -173,6 +185,39 @@ const bodyClass = computed(() => [
   props.striped && showRows.value ? stripedClass : '',
   props.hoverable && showRows.value ? hoverableClass : '',
 ].filter(Boolean).join(' '))
+
+/*
+ * Прилипающая первая колонка.
+ *
+ * Липкая ячейка обязана быть непрозрачной, иначе уезжающее просвечивает
+ * насквозь. Наследовать фон строки нельзя, хотя это и просится: оттенки полосы
+ * и подсветки полупрозрачны, и сквозь такую ячейку числа видно. Поэтому фон у
+ * неё свой, а полоса и подсветка собираются заново поверх карточки —
+ * `stickyColumn*Class` в `grTableStyles.ts`.
+ *
+ * Правила позиционирования — литералами здесь, а не в хелпере: литерал `.vue`
+ * уезжает в чанк самого компонента, то есть всегда в области скана UnoCSS.
+ * Тем же путём живёт `stickyHeader`. В хелпер вынесено только то, чему нужны
+ * общие оттенки, — и оно объявлено в safelist.
+ */
+const stickyColumnClass = computed(() => {
+  if (!props.stickyColumn)
+    return ''
+
+  return [
+    '[&_tr>*:first-child]:sticky',
+    '[&_tr>*:first-child]:left-0',
+    '[&_tr>*:first-child]:z-[2]',
+    '[&_tr>*:first-child]:shadow-[var(--gr-table-sticky-column-shadow,4px_0_6px_-4px_rgba(0,0,0,0.25))]',
+    '[&>tbody>tr>*:first-child]:bg-[var(--gr-card)]',
+    '[&>tfoot>tr>*:first-child]:bg-[var(--gr-card)]',
+    // Шапке фон уже задан на `<thead>`, но он скроллится вместе с ней:
+    // липкой ячейке нужен свой.
+    '[&>thead>tr>*:first-child]:bg-[var(--gr-muted)]',
+    props.striped && showRows.value ? stickyColumnStripedClass : '',
+    props.hoverable && showRows.value ? stickyColumnHoverableClass : '',
+  ].filter(Boolean).join(' ')
+})
 
 const scrollStyle = computed(() => {
   // Неполный набор в DOM (`rowCount`) означает виртуализацию, а с ней обязан
@@ -278,7 +323,7 @@ defineSlots<{
     <table
       data-gr-table
       :role="role === 'grid' ? 'grid' : undefined"
-      class="min-w-full" :class="[tableTextClass, bodyClass, fixedLayout ? '[table-layout:fixed]' : '']"
+      class="min-w-full" :class="[tableTextClass, bodyClass, stickyColumnClass, fixedLayout ? '[table-layout:fixed]' : '']"
       :style="tableStyle"
       :aria-label="ariaLabelledby ? undefined : ariaLabel"
       :aria-labelledby="ariaLabelledby"

@@ -9,6 +9,26 @@ to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **`GrTable` takes `stickyColumn`.** The first column now holds its place
+  during horizontal scrolling; a sticky `<thead>` had covered one axis and left
+  the other, so on a wide table you could see the numbers but not whose they
+  were.
+
+  Only the first column, and that is not a simplification: `left` for the second
+  one equals the summed widths of those before it, and the cells belong to the
+  consumer — a thin container has nothing to measure them with. Multi-column
+  pinning stays with `GrDataTable`, which knows its columns. No measurement is
+  needed here at all: the rule is a selector rooted at the `<table>`, the same
+  technique striping already uses in this component.
+
+  The sticky cell's background is opaque, or the scrolling content shows through
+  it. Inheriting the row's background looked like the elegant answer and is
+  wrong: the `striped` and `hoverable` tints are semi-transparent, and the
+  numbers were visible straight through the pinned cell. The same tints are
+  therefore composited over the card colour instead — identical on screen, no
+  hole — so striping and hover keep working in the first column with nothing
+  extra to write.
+
 - **`GrInputTag` can edit a tag in place.** `editable` opens an editor on a
   double click or `F2`; before it a chip either existed or was deleted whole, so
   a typo in `design-system-tokens-v2` cost a full retype.
