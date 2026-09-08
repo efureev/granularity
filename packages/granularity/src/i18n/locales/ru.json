@@ -53,7 +53,8 @@
   "treeSelect": {
     "filterPlaceholder": "Поиск…",
     "empty": "Нет данных",
-    "loading": "Загрузка…"
+    "loading": "Загрузка…",
+    "removeTag": "Удалить {label}"
   },
   "badgeWrap": {
     "count": "{count} новых"

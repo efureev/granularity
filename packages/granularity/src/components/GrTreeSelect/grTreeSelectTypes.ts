@@ -1,6 +1,7 @@
 import type { InputHTMLAttributes } from 'vue'
 import type { GrInputSize } from '../GrInput/GrInput.vue'
 import type { GrTreeFilterNodeMethod, GrTreeKey, GrTreePropsMap } from '../GrTree'
+import type { GrBadgeRadius, GrBadgeSize, GrBadgeTone } from '../GrBadge/grBadgeStyles'
 import type { GrTreeSelectState } from './grTreeSelectStyles'
 
 export type GrTreeSelectModelValue = GrTreeKey | GrTreeKey[] | null
@@ -45,6 +46,26 @@ export interface GrTreeSelectProps<T extends object = any> {
   showCheckbox?: boolean
   /** Отвязать родителей от детей: отметка перестаёт распространяться каскадом. */
   checkStrictly?: boolean
+
+  /**
+   * Чипы выбранных узлов в триггере вместо строки «a, b, c». Работает только
+   * вместе с `multiple`: у одиночного выбора чип был бы плашкой на одно значение.
+   */
+  tags?: boolean
+  /**
+   * Сколько чипов показать до сворачивания остатка в «+N». Без него растёт весь
+   * набор, а высота триггера за ним не идёт — лишние чипы уходят за край.
+   */
+  maxTagCount?: number
+  /**
+   * Вид чипов. Чип — это `GrBadge`: своя плашка на светлой теме почти не
+   * отличалась бы от фона поля. Имена и шкалы те же, что у `GrSelect`, — переходя
+   * с одного компонента на другой, потребитель не переучивается.
+   */
+  tagTone?: GrBadgeTone
+  tagDark?: boolean
+  tagSize?: GrBadgeSize
+  tagRadius?: GrBadgeRadius
   clearable?: boolean
 
   /**

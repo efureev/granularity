@@ -9,6 +9,23 @@ to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **`GrTreeSelect` shows the selection as chips.** `tags` (with `multiple`)
+  replaces the "a, b, c" string with chips whose close button drops a node
+  without opening the panel; `maxTagCount` keeps the row on one line and folds
+  the rest into "+N". Look is tuned by the same `tagTone`/`tagDark`/`tagSize`/
+  `tagRadius` as `GrSelect`, so moving between the two components teaches
+  nothing new.
+
+  The chips sit beside the trigger rather than inside it: `role="combobox"`
+  makes its descendants presentational, and a close button in there would be
+  unreachable from the keyboard (axe: `nested-interactive`). The strip is
+  transparent to the pointer while each chip is not, so clicking between chips
+  opens the panel like any other part of the trigger.
+
+  Under `showCheckbox` a chip is dropped through the tree instead of by
+  filtering the key out: the parent/child cascade is computed by `GrTree`, and
+  going around it could leave a checked parent with no checked children.
+
 - **`GrTree` opens a collapsed branch you hover during a drag.** Aim into the
   middle of a collapsed row, hold for a moment, and it expands. Without that,
   dropping a node inside a collapsed branch at a chosen position was impossible:

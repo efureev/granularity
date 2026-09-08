@@ -53,7 +53,8 @@
   "treeSelect": {
     "filterPlaceholder": "Search…",
     "empty": "No data",
-    "loading": "Loading…"
+    "loading": "Loading…",
+    "removeTag": "Remove {label}"
   },
   "badgeWrap": {
     "count": "{count} new"

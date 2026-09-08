@@ -16,6 +16,13 @@ export const grTreeSelectExamples: ShowcaseComponentExampleDoc[] = [
     previewKey: 'gr-tree-select-path-display',
   },
   {
+    id: 'tree-select-tags',
+    title: 'Чипы выбранных узлов',
+    description: '`tags` показывает выбранное чипами вместо строки «a, b, c»: крестик снимает свой узел, не открывая панель. `max-tag-count` держит ряд в одну строку — остаток сворачивается в «+N». Чипы лежат рядом с триггером, а не внутри: `role="combobox"` делает потомков презентационными, и крестик внутри был бы недостижим с клавиатуры.',
+    status: 'ready',
+    previewKey: 'gr-tree-select-tags',
+  },
+  {
     id: 'tree-select-multiple-filter',
     title: 'Multiple selection with filtering',
     description: 'Показываем наиболее ценный complex-flow: multi-select режим, встроенный filter и `closeOnSelect=false` для пакетного выбора узлов.',

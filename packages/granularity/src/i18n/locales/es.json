@@ -53,7 +53,8 @@
   "treeSelect": {
     "filterPlaceholder": "Buscar…",
     "empty": "Sin datos",
-    "loading": "Cargando…"
+    "loading": "Cargando…",
+    "removeTag": "Quitar {label}"
   },
   "badgeWrap": {
     "count": "{count} nuevos"

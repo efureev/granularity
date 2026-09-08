@@ -14,5 +14,5 @@ export const grTreeSelectConfig = defineGranularComponent(import.meta.url, {
    */
   dynamicTokens: ['gr-z-dropdown', 'gr-z-modal'],
   safelist: grTreeSelectSafelist,
-  dependencies: ['GrInput', 'GrTree'],
+  dependencies: ['GrChip', 'GrInput', 'GrTree'],
 })

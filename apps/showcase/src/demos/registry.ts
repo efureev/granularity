@@ -517,6 +517,7 @@ export const demoPathByPreviewKey = {
   'gr-tree-select-addons': 'components/gr-tree-select/GrTreeSelectAddonsDemo.vue',
   'gr-tree-select-custom-slots': 'components/gr-tree-select/GrTreeSelectCustomSlotsDemo.vue',
   'gr-tree-select-keyboard': 'components/gr-tree-select/GrTreeSelectKeyboardDemo.vue',
+  'gr-tree-select-tags': 'components/gr-tree-select/GrTreeSelectTagsDemo.vue',
   'gr-tree-select-multiple-filter': 'components/gr-tree-select/GrTreeSelectMultipleFilterDemo.vue',
   'gr-tree-select-path-display': 'components/gr-tree-select/GrTreeSelectPathDisplayDemo.vue',
   'gr-value-affixes': 'components/gr-value/GrValueAffixesDemo.vue',

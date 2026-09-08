@@ -334,7 +334,9 @@ function onBlur(e: FocusEvent): void {
         class="ml-auto"
         :class="countClass"
       >
-        <slot name="count" v-bind="countSlotProps">{{ countText }}</slot>
+        <slot name="count" v-bind="countSlotProps">
+          {{ countText }}
+        </slot>
       </div>
     </div>
   </div>

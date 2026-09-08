@@ -20,6 +20,8 @@ import {
   controlStateIconColors,
   controlStateTextKey,
 } from '../shared/controlState'
+import GrChip from '../GrChip/GrChip.vue'
+import { chipSizeForBadgeScale } from '../GrChip/grChipStyles'
 import GrInput from '../GrInput/GrInput.vue'
 import GrTree, {
   type GrTreeInstance,
@@ -68,6 +70,12 @@ const props = withDefaults(
     ariaLabel: undefined,
     state: 'default',
     multiple: false,
+    tags: false,
+    maxTagCount: undefined,
+    tagTone: 'neutral',
+    tagDark: false,
+    tagSize: 'sm',
+    tagRadius: 'round',
     showCheckbox: false,
     checkStrictly: false,
     clearable: false,
@@ -282,6 +290,40 @@ const selectedPathLabels = computed<string[] | undefined>(() => {
   const labels = selectedLabels.value
   return labels.length ? [labels[0]] : undefined
 })
+
+/**
+ * Чипы живут РЯДОМ с триггером, а не внутри него: `role="combobox"` объявляет
+ * потомков презентационными, и крестик внутри был бы недостижим с клавиатуры
+ * (axe: `nested-interactive`). Тот же приём — у `GrSelect`.
+ */
+const showTags = computed(() => props.multiple && props.tags)
+
+/** Полоса чипов рисуется только когда есть что рисовать: пустая съела бы плейсхолдер. */
+const hasTags = computed(() => showTags.value && selectedKeys.value.length > 0)
+
+const visibleTagKeys = computed(() => {
+  const limit = props.maxTagCount
+  if (limit === undefined || limit < 0)
+    return selectedKeys.value
+
+  return selectedKeys.value.slice(0, limit)
+})
+
+const hiddenTagCount = computed(() => selectedKeys.value.length - visibleTagKeys.value.length)
+
+/**
+ * Проп `tagSize` объявлен по шкале бейджа и остаётся публичным контрактом:
+ * ступени чипа сдвинуты, и перевод держит кегль тем же.
+ */
+const chipSize = computed(() => chipSizeForBadgeScale(props.tagSize))
+
+function tagLabel(key: GrTreeKey): string {
+  return labelByKey.value.get(key) ?? String(key)
+}
+
+function tagRemoveLabel(key: GrTreeKey): string {
+  return t('gr.treeSelect.removeTag', 'Remove {label}', { label: tagLabel(key) })
+}
 
 const displayValue = computed(() => {
   const labels = selectedLabels.value
@@ -534,6 +576,24 @@ function onCheckedKeys(keys: GrTreeKey[]): void {
   emitModel([...keys])
 }
 
+/**
+ * Снятие чипа в режиме чекбоксов идёт через дерево, а не через фильтрацию
+ * ключей: каскад по родителям и детям считает `GrTree`, и убрав ключ мимо него,
+ * мы получили бы отмеченного родителя без детей. Дерево смонтировано и при
+ * закрытой панели (она под `v-show`), так что звать его можно всегда.
+ */
+function removeTag(key: GrTreeKey): void {
+  if (isDisabled.value || isReadonly.value)
+    return
+
+  if (checkboxMode.value) {
+    treeRef.value?.setChecked(key, false)
+    return
+  }
+
+  emitModel(selectedKeys.value.filter(k => k !== key))
+}
+
 function onNodeClick(data: T, node: GrTreeNode<T>): void {
   emit('nodeClick', data, node)
 
@@ -629,7 +689,7 @@ const themeAttrs = useGrThemeAttrs()
         :aria-describedby="describedBy"
         :aria-label="ariaLabel"
         class="w-full rounded-[var(--gr-radius-control)] border placeholder:text-[var(--gr-muted-fg)] transition-colors duration-[var(--gr-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]"
-        :class="[className, $slots.value ? 'text-transparent placeholder:text-transparent' : '']"
+        :class="[className, $slots.value || hasTags ? 'text-transparent placeholder:text-transparent' : '']"
         :style="triggerStyle"
         @pointerdown="onTriggerPointerDown"
         @click="toggleDropdown"
@@ -684,6 +744,44 @@ const themeAttrs = useGrThemeAttrs()
         aria-hidden="true"
       >
         <slot name="suffix" />
+      </div>
+
+      <!--
+        Полоса не ловит указатель целиком, а каждый чип — ловит: клик мимо чипа
+        обязан открыть панель, как и клик по любому другому месту триггера.
+      -->
+      <div
+        v-if="hasTags"
+        data-gr-tree-select-tags
+        class="absolute inset-y-0 left-3 right-9 flex flex-wrap items-center gap-1 py-1.5 pointer-events-none"
+        :style="valueOverlayStyle"
+      >
+        <GrChip
+          v-for="key in visibleTagKeys"
+          :key="`tag-${String(key)}`"
+          data-gr-tree-select-tag
+          class="pointer-events-auto"
+          :tone="tagTone"
+          :dark="tagDark"
+          :size="chipSize"
+          :radius="tagRadius"
+          :closable="!isDisabled && !isReadonly"
+          :remove-label="tagRemoveLabel(key)"
+          @remove="removeTag(key)"
+        >
+          <span class="truncate">{{ tagLabel(key) }}</span>
+        </GrChip>
+
+        <GrChip
+          v-if="hiddenTagCount > 0"
+          data-gr-tree-select-tag-rest
+          :tone="tagTone"
+          :dark="tagDark"
+          :size="chipSize"
+          :radius="tagRadius"
+        >
+          +{{ hiddenTagCount }}
+        </GrChip>
       </div>
 
       <div

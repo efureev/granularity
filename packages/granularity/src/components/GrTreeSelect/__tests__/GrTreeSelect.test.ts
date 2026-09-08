@@ -724,3 +724,90 @@ describe('GrTreeSelect — признак состояния', () => {
     expect(wrapper.find('[data-gr-tree-select-state]').exists()).toBe(false)
   })
 })
+
+/**
+ * Чипы живут РЯДОМ с триггером, а не внутри него: `role="combobox"` объявляет
+ * потомков презентационными, и крестик внутри был бы недостижим с клавиатуры
+ * (axe: `nested-interactive`). Тот же приём — у `GrSelect`.
+ */
+describe('GrTreeSelect — чипы в триггере', () => {
+  const DATA = [
+    { id: 1, label: 'Food' },
+    { id: 2, label: 'Travel' },
+    { id: 3, label: 'Home' },
+    { id: 4, label: 'Work' },
+  ]
+
+  function mountTags(props: Partial<GrTreeSelectProps> = {}) {
+    return mount(GrTreeSelect, {
+      props: {
+        modelValue: [1, 2, 3],
+        data: DATA,
+        nodeKey: 'id',
+        multiple: true,
+        tags: true,
+        ...props,
+      } as any,
+    })
+  }
+
+  it('показывает чип на каждый выбранный узел вместо строки «a, b, c»', () => {
+    const wrapper = mountTags()
+
+    const tags = wrapper.findAll('[data-gr-tree-select-tag]')
+    expect(tags.map(tag => tag.text())).toEqual(['Food', 'Travel', 'Home'])
+
+    // Текст самого поля погашен: иначе он проступал бы из-под чипов.
+    expect(wrapper.get('input').classes()).toContain('text-transparent')
+  })
+
+  it('без `tags` остаётся строкой', () => {
+    const wrapper = mountTags({ tags: false })
+
+    expect(wrapper.findAll('[data-gr-tree-select-tag]')).toHaveLength(0)
+    expect(wrapper.get('input').classes()).not.toContain('text-transparent')
+  })
+
+  it('одиночный выбор чипов не получает: плашка на одно значение бессмысленна', () => {
+    const wrapper = mountTags({ multiple: false, modelValue: 1 } as any)
+
+    expect(wrapper.findAll('[data-gr-tree-select-tag]')).toHaveLength(0)
+  })
+
+  it('`maxTagCount` сворачивает остаток в «+N»', () => {
+    const wrapper = mountTags({ maxTagCount: 2 })
+
+    expect(wrapper.findAll('[data-gr-tree-select-tag]').map(tag => tag.text())).toEqual(['Food', 'Travel'])
+    expect(wrapper.get('[data-gr-tree-select-tag-rest]').text()).toBe('+1')
+  })
+
+  it('пустой выбор полосы не рисует — иначе она съела бы плейсхолдер', () => {
+    const wrapper = mountTags({ modelValue: [] } as any)
+
+    expect(wrapper.find('[data-gr-tree-select-tags]').exists()).toBe(false)
+    expect(wrapper.get('input').classes()).not.toContain('text-transparent')
+  })
+
+  it('крестик на чипе убирает свой узел из значения', async () => {
+    const wrapper = mountTags()
+
+    await wrapper.findAll('[data-gr-tree-select-tag]')[1].get('button').trigger('click')
+
+    expect(wrapper.emitted('update:modelValue')?.at(-1)?.[0]).toEqual([1, 3])
+  })
+
+  /** Полоса не ловит указатель целиком: клик мимо чипа обязан открыть панель. */
+  it('полоса чипов прозрачна для указателя, а сами чипы — нет', () => {
+    const wrapper = mountTags()
+
+    expect(wrapper.get('[data-gr-tree-select-tags]').classes()).toContain('pointer-events-none')
+    expect(wrapper.findAll('[data-gr-tree-select-tag]')[0].classes()).toContain('pointer-events-auto')
+  })
+
+  it('readonly и disabled снимают крестики', () => {
+    for (const props of [{ readonly: true }, { disabled: true }]) {
+      const wrapper = mountTags(props as any)
+      expect(wrapper.findAll('[data-gr-tree-select-tag] button')).toHaveLength(0)
+    }
+  })
+})
