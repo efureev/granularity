@@ -168,7 +168,7 @@ describe('component docs metadata', () => {
     expect(numberInputDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(numberInputDoc.examples.every(example => example.previewKey?.startsWith('gr-number-input'))).toBe(true)
 
-    expect(textareaDoc.examples).toHaveLength(7)
+    expect(textareaDoc.examples).toHaveLength(8)
     expect(textareaDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(textareaDoc.examples.every(example => example.previewKey?.startsWith('gr-textarea'))).toBe(true)
 
@@ -241,7 +241,7 @@ describe('component docs metadata', () => {
     expect(promptDialogDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(promptDialogDoc.examples.every(example => example.previewKey?.startsWith('gr-prompt-dialog'))).toBe(true)
 
-    expect(toasterDoc.examples).toHaveLength(7)
+    expect(toasterDoc.examples).toHaveLength(8)
     expect(toasterDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(toasterDoc.examples.every(example => example.previewKey?.startsWith('gr-toaster'))).toBe(true)
 
