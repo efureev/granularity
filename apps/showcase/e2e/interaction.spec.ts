@@ -551,9 +551,18 @@ test.describe('GrTransfer: виртуализация панели', () => {
     const list = preview.locator('[data-gr-transfer-list="source"]')
 
     const options = list.locator('[data-gr-transfer-option]')
-    const total = await options.count()
-    expect(total, 'весь каталог в разметке — это и есть то, что чинится').toBeGreaterThan(0)
-    expect(total).toBeLessThan(100)
+
+    /*
+     * Виртуализация включается ПОСЛЕ замера строк: до него в разметке лежит весь
+     * каталог, и первая строка остаётся первой сколько ни прокручивай. Условие
+     * асинхронное, поэтому его ждут, а не предполагают — на медленной машине
+     * проверка иначе меряет невиртуализованный список и падает не по делу.
+     */
+    await expect.poll(async () => options.count(), {
+      message: 'окно так и не сузилось — виртуализация не включилась',
+    }).toBeLessThan(100)
+
+    expect(await options.count()).toBeGreaterThan(0)
     // Размер набора считается от всей панели, а не от окна.
     expect(Number(await options.first().getAttribute('aria-setsize'))).toBeGreaterThan(380)
     await expect(options.first()).toHaveAttribute('aria-posinset', '1')
