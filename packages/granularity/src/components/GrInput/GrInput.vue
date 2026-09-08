@@ -58,6 +58,18 @@ export interface GrInputProps {
   /** Показывать счётчик символов (`len` или `len/maxlength`). */
   showCount?: boolean
   /**
+   * Аддоны `prefix`/`suffix` несут смысл, а не украшают.
+   *
+   * По умолчанию они скрыты от скринридера: чаще всего там иконка поиска или
+   * глиф, повторяющий подпись поля, и второе прочтение мешает. Но `https://`
+   * или `₽` бывают единственным местом, где сказано, что вводить, — тогда
+   * аддон уезжает в `aria-describedby` поля.
+   *
+   * Декоративную иконку внутри слота помечайте `aria-hidden` сами: проп снимает
+   * скрытие со всей обёртки, а не разбирает её содержимое.
+   */
+  describeAddons?: boolean
+  /**
      * Фоновая работа по полю (проверка занятости логина, автосохранение):
      * спиннер в trailing-области + `aria-busy`. Ввод не блокируется —
      * для этого есть `disabled`/`readonly`.
@@ -141,6 +153,7 @@ const props = withDefaults(
     clearLabel: undefined,
     maxlength: undefined,
     showCount: false,
+    describeAddons: false,
     loading: false,
     passwordToggle: false,
     passwordShowLabel: undefined,
@@ -159,7 +172,7 @@ const props = withDefaults(
 )
 
 const emit = defineEmits<GrInputEmits>()
-defineSlots<{
+const slots = defineSlots<{
   /** Аддон слева от поля: иконка, код валюты, метка. */
   prefix?: () => any
   /** Аддон справа от поля: единица измерения, подсказка. */
@@ -233,8 +246,28 @@ const stateIconClass = computed(() => (signalState.value
   : ''))
 
 const stateTextId = useId()
+const prefixId = useId()
+const suffixId = useId()
+
+/**
+ * Аддоны в описании поля.
+ *
+ * Снять с них `aria-hidden` мало: `<div>` рядом с полем в его доступное имя не
+ * входит, и диктор наткнулся бы на текст только при обходе страницы — то есть
+ * не тогда, когда он нужен. Поэтому значащий аддон уезжает в
+ * `aria-describedby`, а не просто перестаёт быть скрытым.
+ */
+const addonDescribedBy = computed(() => (props.describeAddons
+  ? [slots.prefix ? prefixId : undefined, slots.suffix ? suffixId : undefined]
+  : []))
+
 const describedBy = computed(() =>
-  [field?.describedById.value, props.showCount ? countId : undefined, signalState.value ? stateTextId : undefined]
+  [
+    field?.describedById.value,
+    props.showCount ? countId : undefined,
+    signalState.value ? stateTextId : undefined,
+    ...addonDescribedBy.value,
+  ]
     .filter(Boolean)
     .join(' ') || undefined,
 )
@@ -338,12 +371,13 @@ function togglePassword(): void {
     <div :class="shellClass">
       <div
           v-if="$slots.prefix"
+          :id="prefixId"
           ref="prefixEl"
           data-testid="gr-input-prefix"
           class="absolute inset-y-0 left-0 flex items-center justify-center text-[var(--gr-muted-fg)] pointer-events-none select-none truncate"
           :class="prefixAddonClass"
           :style="prefixStyle"
-          aria-hidden="true"
+          :aria-hidden="describeAddons ? undefined : 'true'"
       >
         <slot name="prefix" />
       </div>
@@ -426,12 +460,13 @@ function togglePassword(): void {
 
       <div
           v-if="$slots.suffix"
+          :id="suffixId"
           ref="suffixEl"
           data-testid="gr-input-suffix"
           class="absolute inset-y-0 right-0 flex items-center justify-center text-[var(--gr-muted-fg)] pointer-events-none select-none truncate"
           :class="[suffixAddonClass, suffixFixed ? '[direction:rtl]' : '']"
           :style="suffixStyle"
-          aria-hidden="true"
+          :aria-hidden="describeAddons ? undefined : 'true'"
       >
         <slot name="suffix" />
       </div>

@@ -9,6 +9,19 @@ to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **`GrInput` can let a meaningful addon be heard.** `#prefix` and `#suffix`
+  carried an unconditional `aria-hidden`, so a decorative search icon was
+  handled correctly while `https://` on a URL field or `₽` on an amount field
+  vanished for a screen reader — and there was no way to fix that from outside,
+  since the attribute sat on the wrapper.
+
+  `describeAddons` does more than drop the attribute: a `<div>` next to the
+  field is not part of its accessible name, so a reader would meet the text only
+  while browsing the page rather than when it is needed. The addon goes into the
+  field's `aria-describedby` instead. A decorative icon inside the slot still
+  needs its own `aria-hidden` — the prop uncovers the wrapper, it does not
+  inspect what is in it.
+
 - **`GrFormFile` lets the user order the set.** `reorderable` gives each row a
   drag handle — for galleries, document pages, an attachment queue, wherever the
   sequence of files means something. It only makes sense with `multiple`.

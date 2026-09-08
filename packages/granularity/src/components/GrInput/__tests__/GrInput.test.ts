@@ -454,3 +454,62 @@ describe('GrInput — признак состояния', () => {
     expect(wrapper.find('[data-gr-input-state]').exists()).toBe(false)
   })
 })
+
+/**
+ * Аддон бывает украшением, а бывает единственным местом, где сказано, что
+ * вводить: `https://` в поле адреса, `₽` при подписи без валюты. Скрытый
+ * литералом, второй случай для диктора исчезал, и снять скрытие снаружи было
+ * нечем — `aria-hidden` стоял на обёртке безусловно.
+ */
+describe('GrInput — значащие аддоны', () => {
+  it('по умолчанию аддоны скрыты: чаще всего там иконка или повтор подписи', () => {
+    const wrapper = mount(GrInput, {
+      props: { modelValue: '' },
+      slots: { prefix: 'https://', suffix: '₽' },
+    })
+
+    expect(wrapper.get('[data-testid="gr-input-prefix"]').attributes('aria-hidden')).toBe('true')
+    expect(wrapper.get('[data-testid="gr-input-suffix"]').attributes('aria-hidden')).toBe('true')
+
+    wrapper.unmount()
+  })
+
+  /**
+   * Снять скрытие мало: `<div>` рядом с полем в его доступное имя не входит, и
+   * диктор наткнулся бы на текст только при обходе страницы — не тогда, когда
+   * он нужен. Поэтому аддон обязан уехать в описание поля.
+   */
+  it('`describeAddons` не только показывает аддоны, но и связывает их с полем', () => {
+    const wrapper = mount(GrInput, {
+      props: { modelValue: '', describeAddons: true },
+      slots: { prefix: 'https://', suffix: '₽' },
+    })
+
+    const prefix = wrapper.get('[data-testid="gr-input-prefix"]')
+    const suffix = wrapper.get('[data-testid="gr-input-suffix"]')
+
+    expect(prefix.attributes('aria-hidden')).toBeUndefined()
+    expect(suffix.attributes('aria-hidden')).toBeUndefined()
+
+    const describedBy = (wrapper.get('input').attributes('aria-describedby') ?? '').split(/\s+/)
+    expect(describedBy).toContain(prefix.attributes('id'))
+    expect(describedBy).toContain(suffix.attributes('id'))
+
+    wrapper.unmount()
+  })
+
+  it('в описание попадает только то, что действительно есть', () => {
+    const wrapper = mount(GrInput, {
+      props: { modelValue: '', describeAddons: true },
+      slots: { suffix: '₽' },
+    })
+
+    const suffixId = wrapper.get('[data-testid="gr-input-suffix"]').attributes('id')
+    const describedBy = (wrapper.get('input').attributes('aria-describedby') ?? '').split(/\s+/)
+
+    expect(wrapper.find('[data-testid="gr-input-prefix"]').exists()).toBe(false)
+    expect(describedBy).toEqual([suffixId])
+
+    wrapper.unmount()
+  })
+})

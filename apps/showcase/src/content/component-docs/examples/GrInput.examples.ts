@@ -28,6 +28,7 @@ export const grInputExamples: ShowcaseComponentExampleDoc[] = [
     description: 'Статичные add-on-слоты (валюта, единицы измерения) внутри поля — общий layout поля при этом не меняется.',
     status: 'ready',
     previewKey: 'gr-input-addons-basic',
+    note: 'Аддоны скрыты от скринридера по умолчанию — чаще всего там лупа или глиф, повторяющий подпись. У денежного поля подпись валюту не называет, поэтому там стоит `describe-addons`: он не просто снимает скрытие, а уводит аддон в `aria-describedby` поля — `<div>` рядом с полем в его доступное имя не входит.',
   },
   {
     id: 'input-addon-slots-fit',

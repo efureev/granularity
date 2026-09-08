@@ -10,7 +10,9 @@ const weight = ref('68')
 <template>
   <div class="grid gap-4 lg:grid-cols-2">
     <GrFormField label="Currency input">
-      <GrInput v-model="amount" placeholder="0.00">
+      <!-- Подпись валюту не называет, значит аддоны значащие: без
+           `describe-addons` они для диктора исчезли бы. -->
+      <GrInput v-model="amount" describe-addons placeholder="0.00">
         <template #prefix>₽</template>
         <template #suffix>RUB</template>
       </GrInput>
