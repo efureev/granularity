@@ -221,6 +221,7 @@ export const demoPathByPreviewKey = {
   'gr-data-table-expand': 'components/gr-data-table/GrDataTableExpandDemo.vue',
   'gr-data-table-column-layout': 'components/gr-data-table/GrDataTableColumnLayoutDemo.vue',
   'gr-data-table-column-pin': 'components/gr-data-table/GrDataTableColumnPinDemo.vue',
+  'gr-data-table-cell-navigation': 'components/gr-data-table/GrDataTableCellNavigationDemo.vue',
   'gr-data-table-column-order': 'components/gr-data-table/GrDataTableColumnOrderDemo.vue',
   'gr-data-table-controlled-sort': 'components/gr-data-table/GrDataTableControlledSortDemo.vue',
   'gr-data-table-custom-cells': 'components/gr-data-table/GrDataTableCustomCellsDemo.vue',

@@ -1732,6 +1732,13 @@
             "default": "undefined"
           },
           {
+            "name": "tabindex",
+            "description": "Остановка `Tab` у самого переключателя. Нужна составным виджетам, которые забирают таб-порядок себе: в сетке `GrDataTable` (`cell-navigation`) `Tab` принадлежит таблице целиком, и чекбокс в ячейке своей остановки держать не должен — до него добираются стрелкой до ячейки и `Enter`. Выключенный переключатель остаётся вне обхода в любом случае.",
+            "type": "number | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "form",
             "description": "",
             "type": "string | undefined",
@@ -3514,6 +3521,13 @@
             "type": "Record<string, GrColumnPin> | undefined",
             "required": false,
             "default": "undefined"
+          },
+          {
+            "name": "cellNavigation",
+            "description": "Клавиатура по ячейкам: паттерн `grid` из WAI-ARIA APG. Вся таблица становится **одной** остановкой `Tab`, внутрь ведут стрелки, а в содержимое ячейки — `Enter` или `F2`. Поэтому проп отдельный, а не поведение по умолчанию: он переставляет таб-порядок у всех, кто таблицу уже поставил.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
           },
           {
             "name": "expandable",
@@ -11632,6 +11646,13 @@
             "type": "number | undefined",
             "required": false,
             "default": "3"
+          },
+          {
+            "name": "role",
+            "description": "Роль таблицы. `grid` — интерактивная сетка с клавиатурой по ячейкам (паттерн WAI-ARIA `grid`): она объявляет диктору, что по таблице ходят стрелками, а не читают её как статичную. Роль ставит тот, кто клавиатуру и реализует, — сама по себе она обещание, которое таблица не выполняет.",
+            "type": "\"grid\" | \"table\" | undefined",
+            "required": false,
+            "default": "\"table\""
           },
           {
             "name": "columnCount",

@@ -19,6 +19,7 @@ vi.mock('~icons/lucide/arrow-down', () => {
   }
 })
 
+import { announced } from '../../../testing'
 import GrDataTable from '../GrDataTable.vue'
 
 type Row = { id: number, name: string, score: number, note: string }
@@ -593,6 +594,25 @@ describe('GrDataTable — строки, слоты и состояния', () =>
 
     await wrapper.setProps({ loading: false, rows: [] })
     expect(wrapper.find('[data-gr-datatable-live]').text()).toBe('No data')
+  })
+
+  /**
+   * `role="grid"` не допускает потомков, кроме строк и групп: любой лишний
+   * узел внутри роняет `aria-required-children` как critical. Поэтому в режиме
+   * сетки региона у таблицы нет, а состояние объявляет общий объявитель.
+   */
+  it('в режиме сетки региона нет, но объявление остаётся', async () => {
+    const wrapper = mount(GrDataTable, {
+      props: { columns, rows, cellNavigation: true },
+      attachTo: document.body,
+    })
+
+    expect(wrapper.find('[data-gr-datatable-live]').exists()).toBe(false)
+
+    await wrapper.setProps({ loading: true })
+    expect(await announced()).toBe('Loading…')
+
+    wrapper.unmount()
   })
 
   it('экспонирует scrollToRow, clearSort и toggleAll', async () => {

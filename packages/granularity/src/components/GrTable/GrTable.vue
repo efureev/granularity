@@ -59,6 +59,15 @@ export interface GrTableProps {
    */
   rowGroups?: boolean
   /**
+   * Роль таблицы. `grid` — интерактивная сетка с клавиатурой по ячейкам
+   * (паттерн WAI-ARIA `grid`): она объявляет диктору, что по таблице ходят
+   * стрелками, а не читают её как статичную.
+   *
+   * Роль ставит тот, кто клавиатуру и реализует, — сама по себе она обещание,
+   * которое таблица не выполняет.
+   */
+  role?: 'table' | 'grid'
+  /**
    * Прилипающий заголовок: `<thead>` остаётся видимым при вертикальном скролле.
    * Осмысленно вместе с `maxHeight` (иначе таблица не скроллится вертикально).
    */
@@ -123,6 +132,7 @@ const props = withDefaults(defineProps<GrTableProps>(), {
   striped: false,
   hoverable: false,
   rowGroups: false,
+  role: 'table',
   stickyHeader: false,
   maxHeight: undefined,
   rowCount: undefined,
@@ -267,6 +277,7 @@ defineSlots<{
   >
     <table
       data-gr-table
+      :role="role === 'grid' ? 'grid' : undefined"
       class="min-w-full" :class="[tableTextClass, bodyClass, fixedLayout ? '[table-layout:fixed]' : '']"
       :style="tableStyle"
       :aria-label="ariaLabelledby ? undefined : ariaLabel"

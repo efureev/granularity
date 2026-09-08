@@ -1269,3 +1269,88 @@ test.describe('GrColorPicker: квадрат насыщенность × све�
     await expect(lightness).not.toBeFocused()
   })
 })
+
+/**
+ * `GrDataTable`: клавиатура по ячейкам (паттерн `grid`).
+ *
+ * В jsdom этого не проверить: там нет ни `Tab`, ни настоящего порядка обхода —
+ * а весь смысл паттерна в том, что таблица занимает **одну** остановку и что
+ * контролы внутри ячеек из обхода выходят. Модель движения гейтится юнит-тестом
+ * (`useDataTableGridNavigation.test.ts`), здесь — то, чего он не видит.
+ */
+test.describe('GrDataTable: клавиатура по ячейкам', () => {
+  async function openGrid(page: import('@playwright/test').Page) {
+    await openShowcasePage(page, componentPath('GrDataTable'))
+
+    const table = page.locator('[data-gr-datatable]').filter({ has: page.locator('table[role="grid"]') }).first()
+    await table.scrollIntoViewIfNeeded()
+    await expect(table).toBeVisible()
+
+    return table
+  }
+
+  test('вся таблица — одна остановка Tab, и она в шапке', async ({ page }) => {
+    const table = await openGrid(page)
+
+    const stops = table.locator('th[tabindex="0"], td[tabindex="0"]')
+    await expect(stops).toHaveCount(1)
+
+    // Контролы внутри ячеек своих остановок не держат: до них добираются
+    // стрелкой до ячейки и `Enter`.
+    const inTabOrder = await table.evaluate(node =>
+      [...node.querySelectorAll<HTMLElement>('button, input, a[href]')].filter(el => el.tabIndex >= 0).length)
+    expect(inTabOrder, 'контрол внутри ячейки остался в обходе Tab').toBe(0)
+  })
+
+  test('стрелки ходят по сетке, Home и End — по краям строки', async ({ page }) => {
+    const table = await openGrid(page)
+
+    const cell = () => table.evaluate(() => {
+      const active = document.activeElement as HTMLElement | null
+      if (!active || !['TD', 'TH'].includes(active.tagName))
+        return null
+      const row = active.closest('tr')!
+      return { tag: active.tagName, column: [...row.children].indexOf(active) }
+    })
+
+    await table.locator('th[tabindex="0"], td[tabindex="0"]').first().focus()
+    expect(await cell()).toEqual({ tag: 'TH', column: 0 })
+
+    await page.keyboard.press('ArrowRight')
+    expect(await cell()).toEqual({ tag: 'TH', column: 1 })
+
+    // Вниз из шапки — в первую строку данных, колонка сохраняется.
+    await page.keyboard.press('ArrowDown')
+    expect(await cell()).toEqual({ tag: 'TD', column: 1 })
+
+    await page.keyboard.press('End')
+    const atEnd = await cell()
+    expect(atEnd!.tag).toBe('TD')
+
+    await page.keyboard.press('Home')
+    expect(await cell()).toEqual({ tag: 'TD', column: 0 })
+  })
+
+  test('Enter входит в содержимое ячейки, Escape возвращает фокус ячейке', async ({ page }) => {
+    const table = await openGrid(page)
+
+    // Первая ячейка строки — служебная, с чекбоксом выбора.
+    await table.locator('th[tabindex="0"], td[tabindex="0"]').first().focus()
+    await page.keyboard.press('ArrowDown')
+
+    const insideCell = () => table.evaluate(() => {
+      const active = document.activeElement as HTMLElement | null
+      if (!active)
+        return 'нет фокуса'
+      return ['TD', 'TH'].includes(active.tagName) ? 'ячейка' : active.tagName
+    })
+
+    expect(await insideCell()).toBe('ячейка')
+
+    await page.keyboard.press('Enter')
+    expect(await insideCell(), 'Enter не отдал фокус содержимому ячейки').not.toBe('ячейка')
+
+    await page.keyboard.press('Escape')
+    expect(await insideCell(), 'Escape не вернул фокус ячейке').toBe('ячейка')
+  })
+})

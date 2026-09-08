@@ -1,6 +1,6 @@
 <script setup lang="ts" generic="TRow extends Record<string, unknown> = Record<string, unknown>">
 import type { Component } from 'vue'
-import { computed, nextTick, onMounted, ref, useId, watchEffect } from 'vue'
+import { computed, nextTick, onMounted, ref, useId, watch, watchEffect } from 'vue'
 
 import GrTable from '../GrTable/GrTable.vue'
 import GrIcon from '../GrIcon/GrIcon.vue'
@@ -21,6 +21,11 @@ import { useDataTableColumnOrder } from './composables/useDataTableColumnOrder'
 import { MIN_COLUMN_WIDTH, useDataTableColumnWidths } from './composables/useDataTableColumnWidths'
 import { SELECT_COLUMN_KEY, useDataTableLayout } from './composables/useDataTableLayout'
 import { useDataTableExpansion } from './composables/useDataTableExpansion'
+import {
+  gridCellKey,
+  HEADER_ROW_INDEX,
+  useDataTableGridNavigation,
+} from './composables/useDataTableGridNavigation'
 import {
   type GrDataTableSize,
   cellPaddings,
@@ -249,6 +254,15 @@ export interface GrDataTableProps<TRow extends Record<string, unknown> = Record<
    */
   pinnedColumns?: Record<string, GrColumnPin>
   /**
+   * Клавиатура по ячейкам: паттерн `grid` из WAI-ARIA APG.
+   *
+   * Вся таблица становится **одной** остановкой `Tab`, внутрь ведут стрелки, а
+   * в содержимое ячейки — `Enter` или `F2`. Поэтому проп отдельный, а не
+   * поведение по умолчанию: он переставляет таб-порядок у всех, кто таблицу
+   * уже поставил.
+   */
+  cellNavigation?: boolean
+  /**
    * Второй ярус строки: колонка с кнопкой раскрытия и блок подробностей под
    * строкой. Содержимое рисует слот `#detail`.
    */
@@ -340,6 +354,7 @@ const props = withDefaults(defineProps<GrDataTableProps<TRow>>(), {
   columnWidths: undefined,
   pinnableColumns: false,
   pinnedColumns: undefined,
+  cellNavigation: false,
   expandable: false,
   expandedKeys: undefined,
   expandableRow: undefined,
@@ -699,6 +714,16 @@ const liveMessage = computed(() => {
   return ''
 })
 
+/**
+ * В режиме сетки регион таблицы не рендерится, и объявлять состояние некому —
+ * берёт на себя общий объявитель. Вне режима ничего не меняется: там регион на
+ * месте, и второе объявление было бы дублем.
+ */
+watch(liveMessage, (next) => {
+  if (props.cellNavigation && next)
+    announce(next)
+})
+
 function cellValue(row: TRow, key: string): unknown {
   return (row as Record<string, unknown>)[key]
 }
@@ -815,6 +840,50 @@ const renderedRows = computed(() => {
   return rows.slice(start, end).map((row, offset) => ({ row, index: start + offset }))
 })
 
+/**
+ * Порядок ячеек в строке: раскрытие, выбор, колонки. Шапка и тело рисуют его
+ * одинаково, поэтому индекс колонки в сетке считается один раз здесь.
+ */
+const serviceColumnCount = computed(() =>
+  (expandColumnVisible.value ? 1 : 0) + (props.selectable ? 1 : 0),
+)
+
+const expandColumnIndex = 0
+const selectColumnIndex = computed(() => (expandColumnVisible.value ? 1 : 0))
+const dataColumnIndex = (index: number): number => serviceColumnCount.value + index
+
+/** Узлы ячеек по ключу сетки. Заполняется `:ref` в разметке. */
+const cellEls = new Map<string, HTMLElement>()
+
+/**
+ * Индексы отрисованных строк. При виртуализации это окно, без неё — весь
+ * набор: сетке нужно то, что действительно есть в разметке.
+ */
+const renderedRowIndexes = computed(() => renderedRows.value.map(item => item.index))
+
+const grid = useDataTableGridNavigation({
+  enabled: () => props.cellNavigation,
+  columns: () => totalColumns.value,
+  renderedRows: () => renderedRowIndexes.value,
+  totalRows: () => sortedRows.value.length,
+  cellEls,
+  scrollToRow: props.virtual ? (index: number) => virtualizer.scrollToIndex(index) : undefined,
+})
+
+function registerCell(row: number, column: number, el: unknown): void {
+  registerEl(cellEls, gridCellKey(row, column), el)
+}
+
+/**
+ * Остановка `Tab` у контролов внутри ячеек.
+ *
+ * При навигации по ячейкам их в таб-порядке быть не должно: `Tab` принадлежит
+ * сетке целиком, а до кнопки добираются стрелкой до ячейки и `Enter`. Иначе
+ * остановок было бы столько же, сколько контролов, — то есть паттерн не
+ * выполнялся бы вовсе.
+ */
+const cellControlTabindex = computed(() => (props.cellNavigation ? -1 : undefined))
+
 const spacerBefore = computed(() => (props.virtual ? virtualizer.offset.value : 0))
 const spacerAfter = computed(() => (props.virtual ? virtualizer.offsetEnd.value : 0))
 
@@ -911,6 +980,8 @@ defineSlots<{
     ref="tableRef"
     row-groups
     data-gr-datatable
+    :role="cellNavigation ? 'grid' : 'table'"
+    @keydown="grid.onKeydown"
   >
     <!-- Caption рендерится всегда (у `GrTable` он `sr-only`): в нём живёт
          постоянный live-регион, иначе объявлять загрузку было бы нечему. -->
@@ -918,7 +989,14 @@ defineSlots<{
       <slot name="caption">
         {{ caption }}
       </slot>
+      <!--
+        В режиме сетки своего региона у таблицы нет: `role="grid"` не допускает
+        потомков, кроме строк и групп, — любой лишний узел внутри роняет
+        `aria-required-children` как critical. Там загрузку и пустоту объявляет
+        общий объявитель пакета (см. `watch` рядом с `liveMessage`).
+      -->
       <span
+        v-if="!cellNavigation"
         :id="`${rootId}-live`"
         data-gr-datatable-live
         role="status"
@@ -932,14 +1010,18 @@ defineSlots<{
              занять обязана, иначе шапка съедет относительно тела. -->
         <th
           v-if="expandColumnVisible"
+          :ref="el => registerCell(HEADER_ROW_INDEX, expandColumnIndex, el)"
           data-gr-datatable-expand-head
           scope="col"
           :class="[expandColumnWidths[resolvedSize], cellClass]"
+          :tabindex="cellNavigation ? grid.tabindexFor(HEADER_ROW_INDEX, expandColumnIndex) : undefined"
+          @focus="grid.setActive(HEADER_ROW_INDEX, expandColumnIndex)"
         />
         <th
           v-if="selectable"
-          :ref="el => registerEl(headerCellEls, SELECT_COLUMN_KEY, el)"
+          :ref="(el) => { registerEl(headerCellEls, SELECT_COLUMN_KEY, el); registerCell(HEADER_ROW_INDEX, selectColumnIndex, el) }"
           class="text-left"
+          :tabindex="cellNavigation ? grid.tabindexFor(HEADER_ROW_INDEX, selectColumnIndex) : undefined"
           :class="[
             selectColumnClass,
             cellClass,
@@ -947,9 +1029,11 @@ defineSlots<{
           ]"
           :style="hasPinnedLeft ? { left: '0px' } : undefined"
           scope="col"
+          @focus="grid.setActive(HEADER_ROW_INDEX, selectColumnIndex)"
         >
           <GrCheckbox
             data-gr-datatable-select-all
+            :tabindex="cellControlTabindex"
             :model-value="allSelected"
             :indeterminate="someSelected"
             :size="checkboxSize"
@@ -961,8 +1045,9 @@ defineSlots<{
         <th
           v-for="(col, colIndex) in orderedColumns"
           :key="col.key"
-          :ref="el => registerEl(headerCellEls, String(col.key), el)"
+          :ref="(el) => { registerEl(headerCellEls, String(col.key), el); registerCell(HEADER_ROW_INDEX, dataColumnIndex(colIndex), el) }"
           class="font-700"
+          :tabindex="cellNavigation ? grid.tabindexFor(HEADER_ROW_INDEX, dataColumnIndex(colIndex)) : undefined"
           :data-column-key="col.key"
           :class="[
             headerTextClass,
@@ -976,6 +1061,7 @@ defineSlots<{
           :style="{ ...columnWidthStyle(widthOf(col)), ...pinnedStyleOf(col) }"
           :aria-sort="ariaSortFor(col)"
           scope="col"
+          @focus="grid.setActive(HEADER_ROW_INDEX, dataColumnIndex(colIndex))"
         >
           <div class="inline-flex items-center" :class="headerGapClass">
             <button
@@ -984,7 +1070,7 @@ defineSlots<{
               type="button"
               data-gr-datatable-column-handle
               :class="[columnHandleClass, columnSort.isActive.value ? columnHandleActiveClass : '']"
-              :tabindex="columnRoving.tabindexFor(String(col.key))"
+              :tabindex="cellNavigation ? -1 : columnRoving.tabindexFor(String(col.key))"
               :aria-label="columnHandleLabel(col)"
               :disabled="loading"
               @pointerdown="columnSort.startFrom(String(col.key))($event)"
@@ -998,6 +1084,7 @@ defineSlots<{
               v-if="col.sortable"
               type="button"
               data-gr-datatable-sort
+              :tabindex="cellControlTabindex"
               class="inline-flex items-center text-[var(--gr-muted-fg)] hover:text-[var(--gr-fg)] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] rounded-[var(--gr-radius-sm)]"
               :class="headerGapClass"
               @click="toggleSort(col)"
@@ -1038,6 +1125,7 @@ defineSlots<{
                 v-bind="triggerProps"
                 type="button"
                 data-gr-datatable-column-menu-trigger
+                :tabindex="cellControlTabindex"
                 :class="columnMenuTriggerClass"
                 :aria-label="columnMenuLabel(col)"
                 :disabled="loading"
@@ -1052,7 +1140,7 @@ defineSlots<{
             v-if="resizableColumns"
             data-gr-datatable-column-resizer
             role="separator"
-            tabindex="0"
+            :tabindex="cellNavigation ? -1 : 0"
             aria-orientation="vertical"
             :class="columnResizerClass"
             :aria-label="resizerLabel(col)"
@@ -1147,9 +1235,12 @@ defineSlots<{
       >
       <td
         v-if="expandColumnVisible"
+        :ref="el => registerCell(index, expandColumnIndex, el)"
         data-gr-datatable-expand-cell
         class="text-left"
         :class="[expandColumnWidths[resolvedSize], cellClass]"
+        :tabindex="cellNavigation ? grid.tabindexFor(index, expandColumnIndex) : undefined"
+        @focus="grid.setActive(index, expandColumnIndex)"
       >
         <!-- `.stop` на кнопке, а не на ячейке: гасить навигационный клик есть
              смысл только там, где стоит контрол. Иначе ячейка строки без
@@ -1158,6 +1249,7 @@ defineSlots<{
           v-if="isRowExpandable(row)"
           type="button"
           data-gr-datatable-expand
+          :tabindex="cellControlTabindex"
           :class="[expandButtonClass, checkboxSize === 'xs' ? 'h-5 w-5' : 'h-6 w-6']"
           :aria-expanded="isRowExpanded(row)"
           :aria-controls="detailRowId(row)"
@@ -1174,6 +1266,7 @@ defineSlots<{
 
       <td
         v-if="selectable"
+        :ref="el => registerCell(index, selectColumnIndex, el)"
         class="text-left"
         :class="[
           selectColumnClass,
@@ -1182,6 +1275,8 @@ defineSlots<{
           hasPinnedLeft && isRowSelected(row) ? rowSelectedClass : '',
         ]"
         :style="hasPinnedLeft ? { left: '0px' } : undefined"
+        :tabindex="cellNavigation ? grid.tabindexFor(index, selectColumnIndex) : undefined"
+        @focus="grid.setActive(index, selectColumnIndex)"
       >
         <!-- `.stop` на самом чекбоксе, а не на ячейке: гасить навигационный
              клик есть смысл только там, где стоит контрол выбора. Иначе
@@ -1189,6 +1284,7 @@ defineSlots<{
         <GrCheckbox
           v-if="isRowSelectable(row)"
           data-gr-datatable-select-row
+          :tabindex="cellControlTabindex"
           :model-value="isRowSelected(row)"
           :size="checkboxSize"
           :aria-label="t('gr.dataTable.selectRow', 'Select row')"
@@ -1199,6 +1295,7 @@ defineSlots<{
       <td
         v-for="(col, colIndex) in orderedColumns"
         :key="col.key"
+        :ref="el => registerCell(index, dataColumnIndex(colIndex), el)"
         :class="[
           cellClass,
           cellAlign(col),
@@ -1206,6 +1303,8 @@ defineSlots<{
           col.pinned && isRowSelected(row) ? rowSelectedClass : '',
         ]"
         :style="{ ...columnWidthStyle(widthOf(col)), ...pinnedStyleOf(col) }"
+        :tabindex="cellNavigation ? grid.tabindexFor(index, dataColumnIndex(colIndex)) : undefined"
+        @focus="grid.setActive(index, dataColumnIndex(colIndex))"
       >
           <slot
             :name="`cell-${col.key}`"

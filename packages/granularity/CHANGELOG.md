@@ -9,6 +9,34 @@ to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **`GrDataTable` takes keyboard navigation over cells.** `cell-navigation`
+  turns on the WAI-ARIA `grid` pattern: the table gets `role="grid"`, becomes a
+  single `Tab` stop, and arrows move between cells. `Home`/`End` go to the ends
+  of the row rather than the table; `Enter` or `F2` step into a cell's contents
+  and `Escape` returns focus to the cell. The header is a row of the grid like
+  any other, and the ring is not closed — below the last row is "no further",
+  not the first.
+
+  It is a prop rather than the default because the grid claims `Tab` for itself,
+  which would rearrange the tab order for everyone who already has the table.
+  Controls inside cells leave the tab sequence when it is on — sort, the reorder
+  and resize handles, the column menu, the checkbox, the expand button — or
+  there would be as many stops as controls and the pattern would not hold.
+
+  It works with `virtual`. The cell set is the rendered window rather than the
+  whole table: ten thousand rows by six columns would be sixty thousand keys
+  rebuilt on every read. A step past the edge of the window scrolls the list and
+  lands the focus on the row that appears.
+
+- **`GrTable` takes `role`.** `grid` marks the table as an interactive grid for
+  a screen reader. The role is set by whoever implements the keyboard — on its
+  own it is a promise the table does not keep.
+
+- **`GrCheckbox` takes `tabindex`.** Its own stop was written as a literal, so a
+  composite widget that claims the tab order — a grid, a toolbar — had no way to
+  take the checkbox out of the sequence from outside. A disabled checkbox stays
+  out of it either way.
+
 - **`GrDataTable` lets the user pin a column.** `pinned` existed but was set in
   code only: the table drew no UI for it, and the page said so, blaming a missing
   `GrMenu`. That premise did not hold — a pin menu is flat, and neither the

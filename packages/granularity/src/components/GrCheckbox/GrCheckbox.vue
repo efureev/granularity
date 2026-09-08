@@ -48,6 +48,17 @@ import {
 export type { GrCheckboxLabelPosition, GrCheckboxSize } from './grCheckboxStyles'
 
 export interface GrCheckboxProps {
+  /**
+   * Остановка `Tab` у самого переключателя.
+   *
+   * Нужна составным виджетам, которые забирают таб-порядок себе: в сетке
+   * `GrDataTable` (`cell-navigation`) `Tab` принадлежит таблице целиком, и
+   * чекбокс в ячейке своей остановки держать не должен — до него добираются
+   * стрелкой до ячейки и `Enter`. Выключенный переключатель остаётся вне
+   * обхода в любом случае.
+   */
+  tabindex?: number
+
   /** Не задан внутри `GrCheckboxGroup` — состояние берётся из группы. */
   modelValue?: boolean
   disabled?: boolean
@@ -89,6 +100,7 @@ const hiddenInputStyle = {
 
 const props = withDefaults(defineProps<GrCheckboxProps>(), {
   modelValue: undefined,
+  tabindex: undefined,
   disabled: undefined,
   name: undefined,
   value: 'on',
@@ -312,7 +324,7 @@ function onClick(e: MouseEvent): void {
       :aria-describedby="describedBy"
       :aria-label="ariaLabel"
       :aria-labelledby="labelledBy"
-      :tabindex="resolvedDisabled ? -1 : 0"
+      :tabindex="resolvedDisabled ? -1 : (tabindex ?? 0)"
       :class="controlClassName"
       @keydown.space.prevent="toggle"
       @focus="emit('focus', $event)"
