@@ -66,10 +66,16 @@ describe('GrTransfer: роли и имена', () => {
     expect(tabindexes.filter(value => value === '0')).toHaveLength(1)
   })
 
-  it('сам список таб-стопа не получает: его строки фокусируемы', () => {
+  /**
+   * Остановка `Tab` — строка, а не список: иначе на одну панель приходилось бы
+   * два таб-стопа. Но принять фокус программно список обязан: при виртуализации
+   * сфокусированная строка уезжает из окна, и без этого фокус упал бы на `body`
+   * вместе с обработчиком клавиш.
+   */
+  it('сам список таб-стопа не получает, но фокус принять умеет', () => {
     const wrapper = mountTransfer()
 
-    expect(listOf(wrapper, 'source').attributes('tabindex')).toBeUndefined()
+    expect(listOf(wrapper, 'source').attributes('tabindex')).toBe('-1')
   })
 
   it('пустая правая панель всё равно рисует список — на нём висят состояния поля', () => {
@@ -388,5 +394,81 @@ describe('GrTransfer: своя шапка не уносит доступное �
 
     expect(id).toBeTruthy()
     expect(wrapper.get(`#${id}`).text()).toBe('Available')
+  })
+})
+
+/**
+ * Виртуализация справочника: в DOM держится окно вокруг вьюпорта, а не весь
+ * каталог. Раскладки в jsdom нет, поэтому виртуализатор считает окно от
+ * объявленной высоты — этого хватает, чтобы проверить сам контракт: сколько
+ * строк в разметке и что они говорят о своём месте в списке.
+ */
+describe('GrTransfer: виртуализация панелей', () => {
+  const many = Array.from({ length: 500 }, (_, i) => ({ id: `k${i}`, label: `Право ${i}` }))
+
+  function mountVirtual(props: Record<string, unknown> = {}) {
+    return mount(GrTransfer, {
+      attachTo: document.body,
+      props: {
+        items: many,
+        modelValue: [],
+        ariaLabel: 'Права',
+        itemKey: 'id',
+        itemLabel: 'label',
+        maxHeight: 300,
+        virtual: true,
+        ...props,
+      },
+    })
+  }
+
+  it('держит в DOM окно, а не весь каталог', () => {
+    const wrapper = mountVirtual()
+
+    const rendered = optionsOf(wrapper, 'source').length
+    expect(rendered).toBeGreaterThan(0)
+    expect(rendered, 'пятьсот строк в разметке — это и есть то, что чинится').toBeLessThan(many.length)
+
+    wrapper.unmount()
+  })
+
+  it('без `virtual` каталог рисуется целиком', () => {
+    const wrapper = mountVirtual({ virtual: false })
+
+    expect(optionsOf(wrapper, 'source')).toHaveLength(many.length)
+
+    wrapper.unmount()
+  })
+
+  /**
+   * Строк в разметке меньше, чем в списке, поэтому размер набора диктору
+   * сообщает атрибут: без него он объявил бы «1 из 12» на пятисотенном
+   * справочнике.
+   *
+   * Парный `aria-posinset` здесь проверить нечем: в jsdom нет раскладки, окно
+   * всегда начинается с нуля, и абсолютный индекс совпадает с оконным — тест
+   * зеленел бы и на неверной реализации. Он живёт в браузерном гейте, где
+   * панель можно прокрутить по-настоящему.
+   */
+  it('строка объявляет размер всего списка, а не окна', () => {
+    const wrapper = mountVirtual()
+    const first = optionsOf(wrapper, 'source')[0]
+
+    expect(first.attributes('aria-setsize')).toBe(String(many.length))
+
+    wrapper.unmount()
+  })
+
+  it('поиск сужает набор, и окно считается уже от него', async () => {
+    const wrapper = mountVirtual()
+
+    await wrapper.findAll('input[type="search"]')[0].setValue('Право 42')
+    await nextTick()
+
+    const options = optionsOf(wrapper, 'source')
+    expect(options.length).toBeGreaterThan(0)
+    expect(options[0].attributes('aria-setsize')).toBe(String(options.length))
+
+    wrapper.unmount()
   })
 })

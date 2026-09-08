@@ -500,6 +500,7 @@ export const demoPathByPreviewKey = {
   'gr-transfer-basic': 'components/gr-transfer/GrTransferBasicDemo.vue',
   'gr-transfer-custom': 'components/gr-transfer/GrTransferCustomDemo.vue',
   'gr-transfer-slots': 'components/gr-transfer/GrTransferSlotsDemo.vue',
+  'gr-transfer-virtual': 'components/gr-transfer/GrTransferVirtualDemo.vue',
   'gr-transfer-ordered': 'components/gr-transfer/GrTransferOrderedDemo.vue',
   'gr-tree-checkboxes': 'components/gr-tree/GrTreeCheckboxesDemo.vue',
   'gr-tree-controlled': 'components/gr-tree/GrTreeControlledDemo.vue',

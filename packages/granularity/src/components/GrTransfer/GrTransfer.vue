@@ -6,6 +6,7 @@ import { usePortalTarget } from '../../composables/usePortalTarget'
 import { useFocusWithin } from '../../composables/internal/useFocusWithin'
 import { useGrFormControl } from '../../composables/useGrFormControl'
 import { useRovingFocus } from '../../composables/useRovingFocus'
+import { useVirtualList } from '../../composables/useVirtualList'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 import GrButton from '../GrButton'
 import GrButtonGroup from '../GrButtonGroup'
@@ -93,6 +94,15 @@ export interface GrTransferProps<T extends Record<string, unknown> = Record<stri
   draggable?: boolean
   /** Высота панелей: обе одинаковы и прокручиваются внутри себя. */
   maxHeight?: number | string
+  /**
+   * Держать в DOM только окно строк вокруг вьюпорта. Нужен `maxHeight`: без
+   * него панель не прокручивается, окна нет и виртуализировать нечего.
+   *
+   * Перенос от этого не страдает — он идёт по модели, а не по разметке. А вот
+   * перетаскивание указателем ограничено отрисованными строками: навести
+   * указатель на то, чего нет на экране, всё равно нечем.
+   */
+  virtual?: boolean
   size?: GrComponentSize
   disabled?: boolean
   readonly?: boolean
@@ -121,6 +131,7 @@ const props = withDefaults(defineProps<GrTransferProps<TItem>>(), {
   sortable: true,
   draggable: undefined,
   maxHeight: undefined,
+  virtual: false,
   size: undefined,
   disabled: false,
   readonly: false,
@@ -467,17 +478,111 @@ function rowsOf(side: GrTransferSide): Map<GrTransferKey, HTMLElement> {
   return side === 'source' ? sourceRows.value : targetRows.value
 }
 
+let isUnmounting = false
+
+onBeforeUnmount(() => {
+  isUnmounting = true
+})
+
+/**
+ * Строка размонтируется — снимаем регистрацию, а если фокус был на ней, уводим
+ * его на сам список.
+ *
+ * При виртуализации это не редкость: колесо мыши уносит сфокусированную строку
+ * из окна, и без перевода фокус упал бы на `body`. Обработчик клавиш висит на
+ * списке, до `body` он не достаёт, и клавиатура панели умерла бы до клика мышью.
+ *
+ * Элемент берётся из карты, а не из аргумента: Vue обнуляет function ref ДО
+ * удаления узла, то есть в момент вызова фокус ещё на строке.
+ */
 function registerRow(side: GrTransferSide, key: GrTransferKey, el: Element | null): void {
   const map = rowsOf(side)
-  if (el instanceof HTMLElement)
+
+  if (el instanceof HTMLElement) {
     map.set(key, el)
-  else map.delete(key)
+    return
+  }
+
+  const previous = map.get(key)
+  const active = typeof document === 'undefined' ? null : document.activeElement
+  const heldFocus = Boolean(previous && active && (previous === active || previous.contains(active)))
+
+  map.delete(key)
+
+  if (heldFocus && !isUnmounting)
+    listEls.value[side]?.focus({ preventScroll: true })
+}
+
+// ————— Виртуализация панелей.
+
+/**
+ * Виртуализатор просит `Ref` на контейнер, а панели хранятся одной картой на обе
+ * стороны. Отдельная ссылка на сторону — дешевле, чем разводить карту на два рефа
+ * и синхронизировать их вручную.
+ */
+const sourceListEl = computed(() => listEls.value.source)
+const targetListEl = computed(() => listEls.value.target)
+
+/** Оценка высоты строки до первого замера: считает сам виртуализатор по образцам. */
+const ROW_ESTIMATE_PX = 36
+
+function makeVirtualizer(side: GrTransferSide) {
+  return useVirtualList({
+    container: side === 'source' ? sourceListEl : targetListEl,
+    count: () => (props.virtual ? visible.value[side].length : 0),
+    // Поиск и перенос меняют состав панели — замеры прошлого набора невалидны.
+    source: () => visible.value[side],
+    itemSize: () => ROW_ESTIMATE_PX,
+    /*
+     * Запасное окно до первого замера — высота панели, а не списка: список
+     * тянется флексом и своей высоты в пропах не имеет. Оценка выходит
+     * завышенной, то есть в первом кадре строк рисуется с запасом — это
+     * безопасная сторона ошибки, и замер её сразу поправляет.
+     */
+    viewportSize: () => (typeof props.maxHeight === 'number' ? props.maxHeight : undefined),
+  })
+}
+
+const sourceVirtualizer = makeVirtualizer('source')
+const targetVirtualizer = makeVirtualizer('target')
+
+function virtualizerOf(side: GrTransferSide) {
+  return side === 'source' ? sourceVirtualizer : targetVirtualizer
+}
+
+/** Строки к отрисовке: при выключенной виртуализации — все. */
+function renderedOf(side: GrTransferSide): TItem[] {
+  if (!props.virtual)
+    return visible.value[side]
+
+  const { start, end } = virtualizerOf(side).range.value
+  return visible.value[side].slice(start, end)
+}
+
+/** Абсолютный индекс строки: `aria-posinset` обязан считать от всего списка. */
+function absoluteIndex(side: GrTransferSide, offsetInWindow: number): number {
+  return props.virtual ? virtualizerOf(side).range.value.start + offsetInWindow : offsetInWindow
+}
+
+/**
+ * Строки вне окна в DOM нет: `elementFor` вернул бы `null`, и фокус остался бы
+ * на месте. Поэтому сперва прокрутка, и только следующим тиком — фокус.
+ */
+function scrollRowIntoView(side: GrTransferSide, key: GrTransferKey): Promise<void> {
+  if (props.virtual) {
+    const index = visibleKeys.value[side].indexOf(key)
+    if (index >= 0)
+      virtualizerOf(side).scrollToIndex(index)
+  }
+
+  return nextTick()
 }
 
 function makeRoving(side: GrTransferSide) {
   return useRovingFocus<GrTransferKey>({
     items: () => visibleKeys.value[side],
     elementFor: key => rowsOf(side).get(key) ?? null,
+    beforeFocus: key => scrollRowIntoView(side, key),
     orientation: () => 'vertical',
     // Кольцо не замкнуто: замкнутое делает `Shift`-диапазоны бессмысленными.
     wrap: () => false,
@@ -801,6 +906,15 @@ const { onFocusIn, onFocusOut } = useFocusWithin(rootEl, {
   leave: event => emit('blur', event),
 })
 
+/**
+ * Скролл-протяжённость виртуализованного списка держат псевдоэлементы
+ * контейнера: распорка приезжает переменными в том же патче, что и сами строки,
+ * и схлопнуться между кадрами ей нечем.
+ */
+function listStyle(side: GrTransferSide): Record<string, string> | undefined {
+  return props.virtual ? virtualizerOf(side).spacerStyle.value : undefined
+}
+
 const panelStyle = computed(() => ({
   maxHeight: props.maxHeight === undefined
     ? 'var(--gr-transfer-panel-max-h, 18rem)'
@@ -979,7 +1093,10 @@ defineExpose({
         :data-overflow="listOverflow[side]"
         role="listbox"
         aria-multiselectable="true"
+        tabindex="-1"
+        :data-gr-virtual="virtual ? '' : undefined"
         :class="transferListBase"
+        :style="listStyle(side)"
         :aria-label="hasHeaderSlot ? titles[side] : undefined"
         :aria-labelledby="hasHeaderSlot
           ? (side === 'target' ? fieldLabelId : undefined)
@@ -995,13 +1112,18 @@ defineExpose({
         @scroll.passive="scheduleOverflow"
       >
         <div
-          v-for="(item, index) in visible[side]"
+          v-for="(item, index) in renderedOf(side)"
           :key="keyOf(item)"
-          :ref="el => registerRow(side, keyOf(item), el as Element | null)"
+          :ref="(el) => {
+            registerRow(side, keyOf(item), el as Element | null)
+            if (virtual) virtualizerOf(side).measure(absoluteIndex(side, index), el as Element | null)
+          }"
           data-gr-transfer-option
           role="option"
           :aria-selected="selections[side].keys.has(keyOf(item)) ? 'true' : 'false'"
           :aria-disabled="disabledOf(item) ? 'true' : undefined"
+          :aria-setsize="visible[side].length"
+          :aria-posinset="absoluteIndex(side, index) + 1"
           :tabindex="rovingOf(side).tabindexFor(keyOf(item))"
           :class="grTransferOptionClass({
             size: resolvedSize,
@@ -1030,7 +1152,7 @@ defineExpose({
             name="item"
             :item="item"
             :side="side"
-            :index="index"
+            :index="absoluteIndex(side, index)"
             :selected="selections[side].keys.has(keyOf(item))"
             :disabled="disabledOf(item)"
           >
@@ -1096,6 +1218,27 @@ defineExpose({
 </template>
 
 <style>
+/*
+ * Распорка виртуализованной панели. Правило повторяется в каждом компоненте с
+ * виртуализацией намеренно: единственный глобальный стиль пакета
+ * (`styles/base.css`) потребитель вправе не подключать, и уехавшее туда правило
+ * молча ломало бы прокрутку. Копии сверяет `src/__tests__/virtualSpacer.test.ts`.
+ */
+[data-gr-virtual]::before,
+[data-gr-virtual]::after {
+    content: '';
+    display: block;
+    flex: none;
+}
+
+[data-gr-virtual]::before {
+    height: var(--gr-virtual-before, 0px);
+}
+
+[data-gr-virtual]::after {
+    height: var(--gr-virtual-after, 0px);
+}
+
 /*
  * Колонка кнопок стоит между панелями, а в DOM идёт после них: так `Tab`
  * проходит левую панель целиком до кнопок, а `order` ставит её на место.

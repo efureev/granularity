@@ -9,6 +9,20 @@ to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **`GrTransfer` virtualises its panels.** `virtual` together with `maxHeight`
+  keeps only a window of rows in the DOM — a catalogue of thousands is the case
+  transfer exists for. Moving items is unaffected: it goes through the model,
+  not the markup, so the buttons still move what is currently off-window. Only
+  pointer dragging is bounded by what is rendered, and a pointer cannot reach an
+  off-screen row anyway.
+
+  Keyboard navigation scrolls the target row into the window before handing it
+  focus — an element outside the window does not exist to focus. And if a
+  focused row is carried off by the mouse wheel, focus moves to the list itself:
+  the key handler lives there, and falling to `body` would kill the panel's
+  keyboard until the next click. `aria-setsize` and `aria-posinset` report the
+  real list, not the window.
+
 - **`GrTreeSelect` shows the selection as chips.** `tags` (with `multiple`)
   replaces the "a, b, c" string with chips whose close button drops a node
   without opening the panel; `maxTagCount` keeps the row on one line and folds

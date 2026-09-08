@@ -489,6 +489,42 @@ function basicPanelsPreview(page: Page) {
     .first()
 }
 
+test.describe('GrTransfer: виртуализация панели', () => {
+  /**
+   * В jsdom раскладки нет: окно всегда начинается с нуля, и абсолютный индекс
+   * совпадает с оконным — юнит зеленел бы и на неверной реализации. Здесь панель
+   * прокручивается по-настоящему, и `aria-posinset` обязан считать от всего
+   * каталога, иначе диктор объявит «первая из двух тысяч» посреди списка.
+   */
+  test('после прокрутки строка объявляет своё место во всём каталоге', async ({ page }) => {
+    await openShowcasePage(page, componentPath('GrTransfer'))
+
+    const preview = page.locator('[data-example-preview]')
+      .filter({ hasText: 'Две тысячи строк в каталоге' })
+      .first()
+    await preview.scrollIntoViewIfNeeded()
+
+    const list = preview.locator('[data-gr-transfer-list="source"]')
+
+    const options = list.locator('[data-gr-transfer-option]')
+    const total = await options.count()
+    expect(total, 'весь каталог в разметке — это и есть то, что чинится').toBeGreaterThan(0)
+    expect(total).toBeLessThan(200)
+    // Размер набора считается от всей панели, а не от окна.
+    expect(Number(await options.first().getAttribute('aria-setsize'))).toBeGreaterThan(1900)
+    await expect(options.first()).toHaveAttribute('aria-posinset', '1')
+
+    await list.evaluate((node) => {
+      node.scrollTop = 4000
+    })
+    await expect.poll(async () => Number(await options.first().getAttribute('aria-posinset')))
+      .toBeGreaterThan(1)
+
+    // И окно не разрослось: прокрутка меняет содержимое, а не размер.
+    expect(await options.count()).toBeLessThan(200)
+  })
+})
+
 test.describe('GrTree: перенос над свёрнутой веткой', () => {
   /**
    * В jsdom этого не проверить: нужны настоящий указатель, попадание по

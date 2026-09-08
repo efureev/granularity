@@ -16,6 +16,13 @@ export const grTransferExamples: ShowcaseComponentExampleDoc[] = [
     previewKey: 'gr-transfer-ordered',
   },
   {
+    id: 'transfer-virtual',
+    title: 'Каталог на две тысячи строк',
+    description: '`virtual` вместе с `max-height` держит в DOM только окно вокруг видимой части панели. Перенос кнопками от этого не страдает — он идёт по модели, а не по разметке; ограничено только перетаскивание указателем, которому и так нечего ловить за краем экрана.',
+    status: 'ready',
+    previewKey: 'gr-transfer-virtual',
+  },
+  {
     id: 'transfer-slots',
     title: 'Своя шапка, кнопки и пустота',
     description: 'Слоты `#header`, `#actions` и `#empty` заменяют части панели целиком: счётчик формулируется словами, пара стрелок уступает место «Взять всех» и «Сброс», а пустая правая панель объясняет, что делать дальше — у каждой стороны пустота значит своё.',

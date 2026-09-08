@@ -171,6 +171,7 @@ describe('контракт распорок виртуального списк�
       'GrDataTable',
       'GrList',
       'GrSelect',
+      'GrTransfer',
       'GrTree',
     ])
   })
