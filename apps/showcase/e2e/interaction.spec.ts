@@ -436,6 +436,32 @@ test.describe('GrSidebar: сворачивание', () => {
 
     await expect(page.locator('[data-gr-sidebar-content][tabindex="0"]').first()).toBeAttached()
   })
+
+  /**
+   * Ради этого подсказку и заводили: нативный `title` показывался только по
+   * наведению указателя, поэтому свёрнутый рейл из одних иконок нельзя было
+   * прочесть с клавиатуры. В jsdom не проверить — там нет ни фокуса по
+   * настоящему, ни всплытия панели.
+   */
+  test('свёрнутый пункт под фокусом показывает подпись', async ({ page }) => {
+    await openShowcasePage(page, componentPath('GrSidebar'))
+
+    const toggle = page.locator('[data-gr-sidebar-toggle]').first()
+    await toggle.waitFor()
+    if (await toggle.getAttribute('aria-expanded') !== 'false')
+      await toggle.click()
+    await expect(toggle).toHaveAttribute('aria-expanded', 'false')
+
+    const item = page.locator('[data-gr-sidebar-item]').first()
+    const label = (await item.getAttribute('aria-label'))!
+    expect(label).not.toBe('')
+
+    // `title` подписи больше не несёт — иначе гейт зеленел бы и на старом поведении.
+    await expect(item).not.toHaveAttribute('title', label)
+
+    await item.focus()
+    await expect(page.getByRole('tooltip').filter({ hasText: label }).first()).toBeVisible()
+  })
 })
 
 test.describe('GrBottomNav: выбор раздела', () => {

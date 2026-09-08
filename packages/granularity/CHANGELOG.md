@@ -9,6 +9,24 @@ to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **`GrSidebar` shows the collapsed label as a tooltip, not a native `title`.**
+  A collapsed rail is icons only, and `title` answers the pointer alone — so
+  a keyboard user could tab through the whole rail without ever learning where
+  they were. The tooltip appears on focus too, follows the panel's side (left
+  panel opens right, right panel opens left), and is themed like everything
+  else.
+
+  `aria-label` stays: it is what gives an icon-only item its name. The tooltip
+  is deliberately not wired as a description — repeating the accessible name
+  verbatim would have a screen reader say "Billing, Billing".
+
+- **`GrTooltip` takes `block` and `describeTrigger`.** `block` stretches both
+  wrappers to the parent's width instead of `inline-flex`, for triggers that
+  must fill their row — a list item, a menu row, a cell; setting it from the
+  outside cannot work, as the class never reaches the inner trigger.
+  `describeTrigger: false` skips `aria-describedby` where the tooltip only
+  repeats the trigger's accessible name.
+
 - **`GrTable` takes `stickyColumn`.** The first column now holds its place
   during horizontal scrolling; a sticky `<thead>` had covered one axis and left
   the other, so on a wide table you could see the numbers but not whose they

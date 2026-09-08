@@ -12448,6 +12448,13 @@
             "default": "undefined"
           },
           {
+            "name": "block",
+            "description": "Обёртка занимает ширину родителя вместо ширины содержимого. Нужно там, где триггер обязан тянуться: пункт списка, строка меню, ячейка. `inline-flex` по умолчанию схлопнул бы такой триггер по содержимому, и подсветка с кольцом фокуса сжались бы вместе с ним.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
             "name": "offsetPx",
             "description": "Зазор между триггером и панелью, px.",
             "type": "number | undefined",
@@ -12481,6 +12488,13 @@
             "type": "string | undefined",
             "required": false,
             "default": "\"var(--gr-muted-fg)\""
+          },
+          {
+            "name": "describeTrigger",
+            "description": "Вешать ли `aria-describedby` на триггер. По умолчанию да. `false` — когда подсказка **дословно повторяет** доступное имя триггера: тогда это не описание, а шум, и диктор произносит подпись дважды. Так устроен свёрнутый `GrSidebarItem`: имя у него уже в `aria-label`.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "true"
           }
         ]
       },

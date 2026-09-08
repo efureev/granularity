@@ -91,7 +91,7 @@ function toggle(): void {
 }
 
 // Даём `GrSidebarItem`'ам знать про свёрнутость.
-provide(GR_SIDEBAR_KEY, { collapsed: collapsedState })
+provide(GR_SIDEBAR_KEY, { collapsed: collapsedState, position: computed(() => props.position) })
 
 const hasTitle = computed(() => Boolean(props.title))
 const hasSubtitle = computed(() => Boolean(props.subtitle))

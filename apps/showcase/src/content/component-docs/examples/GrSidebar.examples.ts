@@ -4,7 +4,7 @@ export const grSidebarExamples: ShowcaseComponentExampleDoc[] = [
   {
     id: 'sidebar-basic-sections',
     title: 'Basic section rail',
-    description: 'Базовый desktop-shell: `GrSidebar` с `v-model:collapsed` и `show-toggle-button`, а навигация собрана из `GrSidebarItem` (иконка, badge, active-состояние). В свёрнутом виде пункты сохраняют иконку, а «Billing» без иконки показывает первую букву.',
+    description: 'Базовый desktop-shell: `GrSidebar` с `v-model:collapsed` и `show-toggle-button`, а навигация собрана из `GrSidebarItem` (иконка, badge, active-состояние). В свёрнутом виде пункты сохраняют иконку, а «Billing» без иконки показывает первую букву; подпись показывает подсказка сбоку — по наведению и по фокусу, так что рейл из одних иконок читается и с клавиатуры.',
     status: 'ready',
     previewKey: 'gr-sidebar-basic-sections',
   },

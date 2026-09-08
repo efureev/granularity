@@ -5,12 +5,15 @@
  * Контракт:
  * - развёрнутая панель — `[иконка] метка [бейдж]`;
  * - свёрнутая панель — только иконка; если иконки нет, показывается ПЕРВАЯ БУКВА
- *   метки (uppercase). В свёрнутом виде метка уходит в `title`/`aria-label` для
- *   доступности и tooltip.
+ *   метки (uppercase). Имя пункту даёт `aria-label`, а подпись показывает
+ *   `GrTooltip`: нативный `title` появлялся только по наведению, то есть с
+ *   клавиатуры свёрнутую панель было не прочесть.
  *
  * Корневой тег: `as` → `<a href>` → `<button>` (в этом порядке).
  */
 import { computed, inject, markRaw, type Component } from 'vue'
+
+import GrTooltip from '../GrTooltip/GrTooltip.vue'
 
 import { grSidebarItemClass, itemBadgeClass, itemLetterClass } from './grSidebarStyles'
 import { GR_SIDEBAR_KEY } from './sidebarContext'
@@ -37,6 +40,27 @@ const props = withDefaults(defineProps<GrSidebarItemProps>(), {
 
 const sidebar = inject(GR_SIDEBAR_KEY, null)
 const collapsed = computed(() => sidebar?.collapsed.value ?? false)
+
+/**
+ * Подсказка уходит **от** панели: у левой — вправо, у правой — влево. Иначе
+ * она легла бы поверх самой панели и закрыла соседние пункты.
+ */
+const tooltipPlacement = computed(() => (sidebar?.position.value === 'right' ? 'left' : 'right'))
+
+/*
+ * Обёртка тултипом появляется только в свёрнутом виде: в развёрнутом подпись
+ * видна текстом, и лишний узел в разметке ни к чему.
+ *
+ * В шаблоне это `v-if`/`v-else`, и комментарию там не место: узел-комментарий
+ * перед корнем делает компонент многокорневым, а у такого не работает проброс
+ * атрибутов и `wrapper.element` указывает не туда.
+ *
+ * `describe-trigger="false"` обязателен — имя пункту уже даёт `aria-label` с
+ * той же подписью, и описание тем же текстом диктор прочитал бы дважды.
+ * `block` — потому что пункт тянется на всю ширину рейла, а обёртка по
+ * умолчанию `inline-flex` схлопнула бы его вместе с подсветкой и кольцом
+ * фокуса.
+ */
 
 const isStringIcon = computed(() => typeof props.icon === 'string')
 const iconComponent = computed(() => (props.icon && typeof props.icon !== 'string' ? markRaw(props.icon as Component) : null))
@@ -67,26 +91,48 @@ const rootClass = computed(() => grSidebarItemClass({
 </script>
 
 <template>
+  <GrTooltip
+    v-if="collapsed"
+    :text="label"
+    :placement="tooltipPlacement"
+    block
+    :describe-trigger="false"
+    data-gr-sidebar-item-tooltip
+  >
+    <component
+      :is="rootTag"
+      data-gr-sidebar-item
+      :type="rootTag === 'button' ? 'button' : undefined"
+      :href="rootHref"
+      :aria-current="active ? 'page' : undefined"
+      :aria-disabled="disabled ? 'true' : undefined"
+      :aria-label="label"
+      :class="rootClass"
+    >
+      <span class="flex h-5 w-5 shrink-0 items-center justify-center">
+        <component :is="iconComponent" v-if="iconComponent" class="h-5 w-5" aria-hidden="true" />
+        <span v-else-if="isStringIcon" :class="icon" class="block h-5 w-5" aria-hidden="true" />
+        <span v-else :class="itemLetterClass" aria-hidden="true">{{ firstLetter }}</span>
+      </span>
+    </component>
+  </GrTooltip>
+
   <component
     :is="rootTag"
+    v-else
     data-gr-sidebar-item
     :type="rootTag === 'button' ? 'button' : undefined"
     :href="rootHref"
     :aria-current="active ? 'page' : undefined"
     :aria-disabled="disabled ? 'true' : undefined"
-    :title="collapsed ? label : undefined"
-    :aria-label="collapsed ? label : undefined"
     :class="rootClass"
   >
     <span class="flex h-5 w-5 shrink-0 items-center justify-center">
       <component :is="iconComponent" v-if="iconComponent" class="h-5 w-5" aria-hidden="true" />
       <span v-else-if="isStringIcon" :class="icon" class="block h-5 w-5" aria-hidden="true" />
-      <span v-else-if="collapsed" :class="itemLetterClass" aria-hidden="true">{{ firstLetter }}</span>
     </span>
 
-    <template v-if="!collapsed">
-      <span class="min-w-0 flex-1 truncate text-left">{{ label }}</span>
-      <span v-if="badge != null" :class="itemBadgeClass">{{ badge }}</span>
-    </template>
+    <span class="min-w-0 flex-1 truncate text-left">{{ label }}</span>
+    <span v-if="badge != null" :class="itemBadgeClass">{{ badge }}</span>
   </component>
 </template>

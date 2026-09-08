@@ -78,12 +78,97 @@ describe('GrSidebar', () => {
     await nextTick()
 
     const items = wrapper.findAll('[data-gr-sidebar-item]')
-    // «Billing» без иконки → первая буква «B», метка уходит в title.
+    // «Billing» без иконки → первая буква «B», имя приходит из `aria-label`.
     expect(items[0].text()).toBe('B')
-    expect(items[0].attributes('title')).toBe('Billing')
-    // «Overview» с иконкой → метка не показывается, но остаётся в title.
+    expect(items[0].attributes('aria-label')).toBe('Billing')
+    // «Overview» с иконкой → метка не показывается, имя остаётся.
     expect(items[1].text()).toBe('')
-    expect(items[1].attributes('title')).toBe('Overview')
+    expect(items[1].attributes('aria-label')).toBe('Overview')
+  })
+})
+
+/**
+ * Подпись свёрнутого пункта.
+ *
+ * Нативный `title` показывался только по наведению: зрячий пользователь
+ * клавиатуры проходил свёрнутую панель табом и не понимал, где он. Теперь
+ * подпись показывает `GrTooltip`, который срабатывает и по фокусу.
+ */
+describe('GrSidebarItem — подсказка в свёрнутом режиме', () => {
+  function mountRail(props: Record<string, unknown> = {}) {
+    return mount(defineComponent({
+      components: { GrSidebar, GrSidebarItem },
+      props: { collapsed: { type: Boolean, default: true }, position: { type: String, default: 'left' } },
+      template: `
+        <GrSidebar :collapsed="collapsed" :position="position" aria-label="Разделы">
+          <GrSidebarItem label="Billing" />
+        </GrSidebar>
+      `,
+    }), { props })
+  }
+
+  it('развёрнутый пункт обёртки не получает вовсе', () => {
+    const wrapper = mountRail({ collapsed: false })
+
+    expect(wrapper.find('[data-gr-sidebar-item-tooltip]').exists()).toBe(false)
+
+    wrapper.unmount()
+  })
+
+  it('свёрнутый получает подсказку, а нативного `title` у него больше нет', () => {
+    const wrapper = mountRail()
+
+    expect(wrapper.find('[data-gr-sidebar-item-tooltip]').exists()).toBe(true)
+
+    const item = wrapper.get('[data-gr-sidebar-item]')
+    expect(item.attributes('title')).toBeUndefined()
+    // Имя остаётся: у пункта с одной иконкой его иначе нет вовсе.
+    expect(item.attributes('aria-label')).toBe('Billing')
+
+    wrapper.unmount()
+  })
+
+  /**
+   * Подсказка дословно повторяет имя пункта. Свяжи её `aria-describedby` — и
+   * диктор произнесёт «Billing, Billing».
+   */
+  it('подсказка не описывает триггер: имя и так то же самое', async () => {
+    const wrapper = mountRail()
+
+    // `aria-describedby` тултип ставит эффектом после монтирования: проверка
+    // без ожидания была бы пустой — атрибута нет ещё ни при каком раскладе.
+    await nextTick()
+    await nextTick()
+
+    expect(wrapper.get('[data-gr-sidebar-item]').attributes('aria-describedby')).toBeUndefined()
+
+    wrapper.unmount()
+  })
+
+  it('подсказка уходит от панели: у левой вправо, у правой влево', () => {
+    const left = mountRail()
+    expect(left.findComponent({ name: 'GrTooltip' }).props('placement')).toBe('right')
+    left.unmount()
+
+    const right = mountRail({ position: 'right' })
+    expect(right.findComponent({ name: 'GrTooltip' }).props('placement')).toBe('left')
+    right.unmount()
+  })
+
+  /**
+   * Пункт тянется на всю ширину рейла. Обёртка `inline-flex` схлопнула бы его
+   * по содержимому — вместе с подсветкой и кольцом фокуса.
+   */
+  it('обёртка не сжимает пункт по содержимому', () => {
+    const wrapper = mountRail()
+
+    const tooltip = wrapper.get('[data-gr-sidebar-item-tooltip]')
+    expect(tooltip.classes()).toContain('w-full')
+    expect(tooltip.classes()).not.toContain('inline-flex')
+    // Внутренний триггер тоже: снаружи до него не дотянуться.
+    expect(wrapper.get('[data-gr-tooltip-trigger]').classes()).toContain('w-full')
+
+    wrapper.unmount()
   })
 })
 describe('GrSidebar — лендмарк и сторона', () => {

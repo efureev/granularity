@@ -48,6 +48,22 @@ export interface GrTooltipProps {
   disabled?: boolean
   /** Управляемая видимость. Без неё компонент ведёт видимость сам. */
   open?: boolean
+  /**
+   * Обёртка занимает ширину родителя вместо ширины содержимого.
+   *
+   * Нужно там, где триггер обязан тянуться: пункт списка, строка меню, ячейка.
+   * `inline-flex` по умолчанию схлопнул бы такой триггер по содержимому, и
+   * подсветка с кольцом фокуса сжались бы вместе с ним.
+   */
+  block?: boolean
+  /**
+   * Вешать ли `aria-describedby` на триггер. По умолчанию да.
+   *
+   * `false` — когда подсказка **дословно повторяет** доступное имя триггера:
+   * тогда это не описание, а шум, и диктор произносит подпись дважды. Так
+   * устроен свёрнутый `GrSidebarItem`: имя у него уже в `aria-label`.
+   */
+  describeTrigger?: boolean
 }
 
 export interface GrTooltipEmits {
@@ -64,6 +80,8 @@ const props = withDefaults(defineProps<GrTooltipProps>(), {
   closeDelay: 0,
   disabled: false,
   open: undefined,
+  block: false,
+  describeTrigger: true,
 })
 
 const emit = defineEmits<GrTooltipEmits>()
@@ -199,7 +217,7 @@ onUpdated(syncSlotFocusable)
 
 watchEffect((onCleanup) => {
   const el = slotFocusableEl.value
-  if (!el)
+  if (!el || !props.describeTrigger)
     return
 
   el.setAttribute('aria-describedby', tooltipId)
@@ -207,14 +225,24 @@ watchEffect((onCleanup) => {
 })
 
 const wrapperTabindex = computed(() => (slotFocusableEl.value ? undefined : 0))
-const wrapperDescribedBy = computed(() => (slotFocusableEl.value ? undefined : tooltipId))
+const wrapperDescribedBy = computed(() => (
+  slotFocusableEl.value || !props.describeTrigger ? undefined : tooltipId
+))
+
+/**
+ * Обе обёртки, а не только внешняя: внутренний триггер тоже `inline-flex`, и
+ * снаружи до него не дотянуться — оставь его как есть, и содержимое всё равно
+ * схлопнется по себе.
+ */
+const layoutClass = computed(() => (props.block ? 'flex w-full' : 'inline-flex'))
 </script>
 
 <template>
   <span
     v-click-outside="dismissOnOutside"
     data-gr-tooltip
-    class="relative inline-flex"
+    class="relative"
+    :class="layoutClass"
   >
     <span
       ref="triggerEl"
@@ -222,7 +250,8 @@ const wrapperDescribedBy = computed(() => (slotFocusableEl.value ? undefined : t
       data-testid="gr-tooltip-trigger"
       :tabindex="wrapperTabindex"
       :aria-describedby="wrapperDescribedBy"
-      class="inline-flex items-center justify-center focus:outline-none"
+      class="items-center justify-center focus:outline-none"
+      :class="layoutClass"
       :style="triggerStyle"
       @mouseenter="show"
       @mouseleave="hide"
