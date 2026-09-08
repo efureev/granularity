@@ -9,6 +9,31 @@ to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **`GrColorPicker` gets a saturation × lightness square and a screen eyedropper.**
+  `view="area"` swaps the two channel sliders for the square every colour picker
+  is expected to have; `eyedropper` adds a button that lifts a colour off the
+  screen. Both are opt-in — the view changes the look of panels already sitting
+  in applications, and that call belongs to the application. Both are also
+  reachable through `GrConfigProvider` defaults.
+
+  The square is accessible, not merely drawn. Inside it are two real
+  `input[type=range]`, one per axis: visually hidden, in tab order, each with its
+  own name and value, with the focus ring on the wrapper via `focus-within`. A
+  screen reader hears two sliders — "Saturation 90 %", "Lightness 66 %" — instead
+  of an unnamed picture. Arrows drive the axes, `Home`/`End` and
+  `PageUp`/`PageDown` act on the focused one, and an arrow across the axis moves
+  focus to the field that changed, or the reader would say nothing about it.
+
+  Its fill is exact rather than approximate: a saturation ramp at 50 % lightness
+  under a white veil above and a black one below. Lightening and darkening in HSL
+  is linear interpolation towards white and black — precisely what an alpha
+  overlay does — so the pixel under the thumb matches the hex to the last digit.
+  A browser test samples that pixel.
+
+  The eyedropper button renders only where the browser has `EyeDropper` (today,
+  Chromium): where it does not, there is no button at all rather than one that
+  does nothing. Declining the picker is not an error and changes nothing.
+
 - **`GrSlider` takes slots for its marks and its thumb** — it had none at all, so
   a two-line mark label, an icon on a division or a value inside the knob meant
   forking the component.

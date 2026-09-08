@@ -1183,3 +1183,95 @@ test.describe('GrOtpInput', () => {
     expect(stillHere, 'Tab остался внутри поля — значит остановок больше одной').toBe(false)
   })
 })
+
+/**
+ * Двумерная область `GrColorPicker`.
+ *
+ * В jsdom её не проверить: обе оси живут скрытыми `input[type=range]`, и весь
+ * смысл устройства — в том, куда уезжает фокус и что при этом видит диктор, а
+ * `sr-only` там не отличим от `display: none`. Плюс сама область без layout не
+ * существует: ручка ставится в процентах от её прямоугольника.
+ */
+test.describe('GrColorPicker: квадрат насыщенность × светлота', () => {
+  async function openArea(page: import('@playwright/test').Page) {
+    await page.goto(componentPath('GrColorPicker'))
+    await page.locator('#live-examples').waitFor()
+
+    const trigger = page.getByLabel('Accent color').first()
+    await trigger.scrollIntoViewIfNeeded()
+    await trigger.click()
+
+    const area = page.locator('[data-gr-color-picker-area]').first()
+    await expect(area).toBeVisible()
+
+    return {
+      area,
+      saturation: area.locator('[data-gr-color-picker-area-axis="saturation"]'),
+      lightness: area.locator('[data-gr-color-picker-area-axis="lightness"]'),
+    }
+  }
+
+  test('обе оси — настоящие слайдеры со своими именами и значениями', async ({ page }) => {
+    const { area, saturation, lightness } = await openArea(page)
+
+    // Роль на обёртке — `group`: виджетная объявила бы поля презентационными,
+    // и диктор потерял бы обе оси разом.
+    await expect(area).toHaveAttribute('role', 'group')
+
+    for (const axis of [saturation, lightness]) {
+      // Скрыты визуально, но не от вспомогательных технологий и не из обхода.
+      await expect(axis).toHaveAttribute('type', 'range')
+      await expect(axis).not.toHaveAttribute('aria-hidden', 'true')
+      await expect(axis).toHaveJSProperty('tabIndex', 0)
+    }
+
+    await expect(saturation).toHaveAttribute('aria-label', 'Saturation')
+    await expect(lightness).toHaveAttribute('aria-label', 'Lightness')
+  })
+
+  test('стрелка поперёк оси меняет соседний канал и уводит фокус к нему', async ({ page }) => {
+    const { saturation, lightness } = await openArea(page)
+
+    await saturation.focus()
+    const before = Number(await lightness.inputValue())
+
+    await page.keyboard.press('ArrowDown')
+
+    // Значение изменилось у светлоты — и фокус уехал туда же: озвучивают
+    // сфокусированное, и без переезда диктор промолчал бы об изменении.
+    expect(Number(await lightness.inputValue())).toBe(before - 1)
+    await expect(lightness).toBeFocused()
+
+    const saturationBefore = Number(await saturation.inputValue())
+    await page.keyboard.press('ArrowRight')
+    expect(Number(await saturation.inputValue())).toBe(saturationBefore + 1)
+    await expect(saturation).toBeFocused()
+  })
+
+  test('крупный шаг и края работают по оси сфокусированного поля', async ({ page }) => {
+    const { saturation, lightness } = await openArea(page)
+
+    await lightness.focus()
+    await page.keyboard.press('Home')
+    await expect(lightness).toHaveValue('0')
+    // Соседняя ось при этом не тронута: `Home` — про диапазон, а их два.
+    expect(Number(await saturation.inputValue())).toBeGreaterThan(0)
+
+    await page.keyboard.press('PageUp')
+    await expect(lightness).toHaveValue('10')
+
+    await page.keyboard.press('End')
+    await expect(lightness).toHaveValue('100')
+  })
+
+  test('вся область — две остановки Tab, как у диапазона с двумя бегунками', async ({ page }) => {
+    const { saturation, lightness } = await openArea(page)
+
+    await saturation.focus()
+    await page.keyboard.press('Tab')
+    await expect(lightness).toBeFocused()
+
+    await page.keyboard.press('Tab')
+    await expect(lightness).not.toBeFocused()
+  })
+})

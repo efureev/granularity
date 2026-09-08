@@ -1,4 +1,4 @@
-import type { GrColorPickerSize } from './grColorPickerStyles'
+import type { GrColorPickerSize, GrColorPickerView } from './grColorPickerStyles'
 
 /**
  * Пропы `GrColorPicker`, настраиваемые глобально через `componentDefaults`.
@@ -8,6 +8,8 @@ import type { GrColorPickerSize } from './grColorPickerStyles'
  */
 export interface GrColorPickerConfigurableProps {
   size: GrColorPickerSize
+  view: GrColorPickerView
+  eyedropper: boolean
 }
 
 declare module '../../composables/useGrComponentConfig' {

@@ -6,27 +6,37 @@
  * Прямой сценарий — настройки темы и брендирования, поэтому модель хранит hex:
  * в такой форме цвет лежит в токенах и его понимает CSS.
  *
- * A11y: каждый канал — отдельный `GrSlider`, то есть настоящий `role="slider"`
- * с полной клавиатурой и `aria-valuetext`. Двумерная область saturation/value
- * не берётся намеренно: это свой виджет со своей клавиатурой по двум осям, и
- * доступность там пришлось бы собирать с нуля.
+ * A11y: у каждого канала настоящий `role="slider"` с полной клавиатурой и
+ * `aria-valuetext`. У двумерной области он тоже настоящий, и даже дважды —
+ * по одному `input[type=range]` на ось (см. `colorArea.ts`).
  */
-import { computed, nextTick, ref, useId, watch } from 'vue'
+import { computed, nextTick, onMounted, ref, useId, watch } from 'vue'
+import IconPipette from '~icons/lucide/pipette'
 
+import { useDragGesture } from '../../composables/useDragGesture'
 import { useGrFormControl } from '../../composables/useGrFormControl'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
-import { useGrComponentSize } from '../GrConfigProvider/context'
+import { useGrComponentProp, useGrComponentSize } from '../GrConfigProvider/context'
 import { useGrFormFieldContext } from '../GrFormField/context'
 import GrInput from '../GrInput/GrInput.vue'
 import GrPopover from '../GrPopover/GrPopover.vue'
 import GrSlider from '../GrSlider/GrSlider.vue'
 
 import { formatHexColor, hslaToCss, normalizeHsla, parseHexColor, type GrHsla } from './color'
+import { colorAreaKeyStep, colorAreaPointAt, colorAreaThumbPosition, type GrColorAreaAxis, type GrColorAreaPoint } from './colorArea'
+import { isEyeDropperSupported, pickScreenColor } from './eyeDropper'
 import {
+  areaInputClass,
+  areaThumbClass,
   checkerClass,
+  eyedropperIconClass,
+  grColorPickerAreaClass,
+  grColorPickerEyedropperClass,
   grColorPickerPanelClass,
   grColorPickerPresetClass,
   grColorPickerTriggerClass,
+  hexFieldClass,
+  hexRowClass,
   presetsGridClass,
   previewClass,
   rowClass,
@@ -37,15 +47,26 @@ import {
   triggerSwatchSizeBySize,
   triggerValueClass,
   type GrColorPickerSize,
+  type GrColorPickerView,
 } from './grColorPickerStyles'
 
-export type { GrColorPickerSize } from './grColorPickerStyles'
+export type { GrColorPickerSize, GrColorPickerView } from './grColorPickerStyles'
 
 export interface GrColorPickerProps {
   /** Цвет в hex: `#RRGGBB`, а при `alpha` — `#RRGGBBAA`. Мусор не роняет компонент. */
   modelValue: string
   /** Четвёртый слайдер и восьмизначная форма hex. */
   alpha?: boolean
+  /**
+   * Как задаются насыщенность и светлота: двумя бегунками или квадратом.
+   * Оттенок и прозрачность остаются бегунками в обоих видах.
+   */
+  view?: GrColorPickerView
+  /**
+   * Кнопка пипетки. Рисуется только там, где браузер даёт `EyeDropper`, —
+   * сегодня это Chromium.
+   */
+  eyedropper?: boolean
   /** Палитра быстрого выбора. Пусто — блок не рендерится. */
   presets?: string[]
   size?: GrColorPickerSize
@@ -73,6 +94,9 @@ export interface GrColorPickerEmits {
 
 const props = withDefaults(defineProps<GrColorPickerProps>(), {
   alpha: false,
+  // Дефолт живёт в резолвере — как у `size`.
+  view: undefined,
+  eyedropper: undefined,
   presets: () => [],
   // Дефолт живёт в резолвере: Vue подставил бы свой раньше, чем компонент
   // заглянет в `GrConfigProvider`.
@@ -92,6 +116,8 @@ const emit = defineEmits<GrColorPickerEmits>()
 const { t } = useGranularityTranslations()
 
 const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrColorPicker' })
+const resolvedView = useGrComponentProp('GrColorPicker', 'view', () => props.view, 'sliders')
+const wantsEyedropper = useGrComponentProp('GrColorPicker', 'eyedropper', () => props.eyedropper, false)
 
 const field = useGrFormFieldContext()
 const fieldId = computed(() => field?.id.value)
@@ -258,12 +284,146 @@ const trackVars = computed<Record<string, string>>(() => {
   const solid = hslaToCss({ h, s, l, a: 1 })
 
   return {
+    // Заливка квадрата: серый → чистый тон при светлоте 50%. Белая и чёрная
+    // вуали поверх неё статичны и живут в `<style>`; вместе они дают **точный**
+    // HSL, а не приблизительный — осветление и затемнение в HSL линейны ровно
+    // так же, как наложение белого и чёрного с альфой.
+    '--gr-color-picker-area-saturation': `linear-gradient(to right, hsl(${Math.round(h)} 0% 50%), hsl(${Math.round(h)} 100% 50%))`,
     '--gr-color-picker-track-hue': 'linear-gradient(to right, hsl(0 100% 50%), hsl(60 100% 50%), hsl(120 100% 50%), hsl(180 100% 50%), hsl(240 100% 50%), hsl(300 100% 50%), hsl(360 100% 50%))',
     '--gr-color-picker-track-saturation': `linear-gradient(to right, hsl(${Math.round(h)} 0% ${Math.round(l)}%), hsl(${Math.round(h)} 100% ${Math.round(l)}%))`,
     '--gr-color-picker-track-lightness': `linear-gradient(to right, hsl(${Math.round(h)} ${Math.round(s)}% 0%), hsl(${Math.round(h)} ${Math.round(s)}% 50%), hsl(${Math.round(h)} ${Math.round(s)}% 100%))`,
     '--gr-color-picker-track-alpha': `linear-gradient(to right, transparent, ${solid})`,
   }
 })
+
+const areaEl = ref<HTMLElement | null>(null)
+const saturationInputEl = ref<HTMLInputElement | null>(null)
+const lightnessInputEl = ref<HTMLInputElement | null>(null)
+
+/** Точка области целыми процентами: поля осей — обычные `input[type=range]`. */
+const areaPoint = computed<GrColorAreaPoint>(() => ({
+  s: Math.round(state.value.s),
+  l: Math.round(state.value.l),
+}))
+
+const areaThumbStyle = computed(() => {
+  const { x, y } = colorAreaThumbPosition(areaPoint.value)
+
+  return {
+    left: `${x}%`,
+    top: `${y}%`,
+    background: hslaToCss({ ...state.value, a: 1 }),
+  }
+})
+
+function applyAreaPoint(point: GrColorAreaPoint): void {
+  commit({ ...state.value, s: point.s, l: point.l })
+}
+
+function areaPointerMove(event: PointerEvent): void {
+  const rect = areaEl.value?.getBoundingClientRect()
+  if (!rect)
+    return
+
+  applyAreaPoint(colorAreaPointAt(event, rect))
+}
+
+/** Цвет до начала жеста: оборванный жест обязан вернуть его на место. */
+let colorBeforeDrag: GrHsla | null = null
+
+const areaDrag = useDragGesture({
+  disabled: () => isLocked.value,
+  onStart: (event) => {
+    colorBeforeDrag = state.value
+    // Нажатие ставит значение сразу: попадание в область — это уже выбор, а не
+    // только взятие ручки. Фокус уходит на ось насыщенности, чтобы жест можно
+    // было продолжить стрелками.
+    areaPointerMove(event)
+    saturationInputEl.value?.focus()
+  },
+  onMove: areaPointerMove,
+  onCancel: () => {
+    if (colorBeforeDrag)
+      commit(colorBeforeDrag)
+    colorBeforeDrag = null
+  },
+  onEnd: () => {
+    colorBeforeDrag = null
+  },
+})
+
+/**
+ * Клавиатура области.
+ *
+ * Стрелка поперёк оси сфокусированного поля уводит фокус на соседнее: значение
+ * поменялось у него, и без переезда диктор промолчал бы о том, что изменилось.
+ */
+function onAreaKeydown(event: KeyboardEvent, axis: GrColorAreaAxis): void {
+  if (isLocked.value)
+    return
+
+  const next = colorAreaKeyStep(event.key, areaPoint.value, axis)
+  if (!next)
+    return
+
+  // Гасим нативный шаг поля: у области своя арифметика по двум осям.
+  event.preventDefault()
+  applyAreaPoint(next.point)
+
+  if (next.axis !== axis)
+    (next.axis === 'saturation' ? saturationInputEl : lightnessInputEl).value?.focus()
+}
+
+/** Изменение поля мимо клавиатуры — например, жестом вспомогательной технологии. */
+function onAreaInput(event: Event, axis: GrColorAreaAxis): void {
+  const value = Number((event.target as HTMLInputElement).value)
+  if (!Number.isFinite(value))
+    return
+
+  applyAreaPoint(axis === 'saturation'
+    ? { ...areaPoint.value, s: value }
+    : { ...areaPoint.value, l: value })
+}
+
+const areaClass = computed(() => grColorPickerAreaClass({
+  size: resolvedSize.value,
+  locked: isLocked.value,
+}))
+
+/**
+ * Поддержка пипетки уточняется после монтирования: `window` в теле `setup`
+ * либо роняет серверный рендер, либо расходится с ним. До этого кнопки нет —
+ * ровно то же, что отдаёт сервер, поэтому гидрация совпадает.
+ */
+const eyedropperSupported = ref(false)
+
+onMounted(() => {
+  eyedropperSupported.value = isEyeDropperSupported()
+})
+
+const showEyedropper = computed(() => wantsEyedropper.value && eyedropperSupported.value)
+const eyedropperClassName = computed(() => grColorPickerEyedropperClass(resolvedSize.value))
+
+/**
+ * Пипетка зовётся прямо из обработчика нажатия: без свежего жеста браузер
+ * отклоняет `open()`. Отказ пользователя — не ошибка и ничего не меняет.
+ */
+async function pickFromScreen(): Promise<void> {
+  if (isLocked.value)
+    return
+
+  const picked = await pickScreenColor()
+  if (!picked)
+    return
+
+  const parsed = parseHexColor(picked)
+  if (!parsed)
+    return
+
+  // С экрана приходит уже смешанный цвет: прозрачности в нём нет, и текущая
+  // остаётся как была.
+  commit({ ...parsed, a: state.value.a })
+}
 </script>
 
 <template>
@@ -319,6 +479,59 @@ const trackVars = computed<Record<string, string>>(() => {
             <span :class="swatchFillClass" :style="{ background: cssColor }" />
           </div>
 
+          <!--
+            Область насыщенность × светлота. Роль на обёртке — `group`, а не
+            виджетная: внутри два настоящих `input[type=range]`, по одному на
+            ось, и роль-виджет объявила бы их презентационными. Поля скрыты
+            визуально, но остаются в таб-порядке — фокус показывает обёртка
+            через `focus-within` (приём `GrFileUpload`).
+          -->
+          <div
+            v-if="resolvedView === 'area'"
+            ref="areaEl"
+            data-gr-color-picker-area
+            role="group"
+            :class="areaClass"
+            :aria-label="t('gr.colorPicker.area', 'Saturation and lightness')"
+            @pointerdown="areaDrag.start"
+          >
+            <input
+              ref="saturationInputEl"
+              data-gr-color-picker-area-axis="saturation"
+              type="range"
+              min="0"
+              max="100"
+              :value="areaPoint.s"
+              :class="areaInputClass"
+              :disabled="isDisabled"
+              :aria-label="t('gr.colorPicker.saturation', 'Saturation')"
+              :aria-valuetext="percent(areaPoint.s)"
+              @keydown="onAreaKeydown($event, 'saturation')"
+              @input="onAreaInput($event, 'saturation')"
+            >
+            <input
+              ref="lightnessInputEl"
+              data-gr-color-picker-area-axis="lightness"
+              type="range"
+              min="0"
+              max="100"
+              :value="areaPoint.l"
+              :class="areaInputClass"
+              :disabled="isDisabled"
+              :aria-label="t('gr.colorPicker.lightness', 'Lightness')"
+              :aria-valuetext="percent(areaPoint.l)"
+              @keydown="onAreaKeydown($event, 'lightness')"
+              @input="onAreaInput($event, 'lightness')"
+            >
+
+            <span
+              data-gr-color-picker-area-thumb
+              aria-hidden="true"
+              :class="areaThumbClass"
+              :style="areaThumbStyle"
+            />
+          </div>
+
           <div data-gr-color-picker-channel="hue" :class="rowClass">
             <span :class="rowLabelClass" aria-hidden="true">H</span>
             <GrSlider
@@ -334,31 +547,33 @@ const trackVars = computed<Record<string, string>>(() => {
             <span :class="rowValueClass">{{ degrees(hue) }}</span>
           </div>
 
-          <div data-gr-color-picker-channel="saturation" :class="rowClass">
-            <span :class="rowLabelClass" aria-hidden="true">S</span>
-            <GrSlider
-              v-model="saturation"
-              :size="resolvedSize"
-              :disabled="isDisabled"
-              :readonly="isReadonly"
-              :format-tooltip="percent"
-              :aria-label="t('gr.colorPicker.saturation', 'Saturation')"
-            />
-            <span :class="rowValueClass">{{ percent(saturation) }}</span>
-          </div>
+          <template v-if="resolvedView === 'sliders'">
+            <div data-gr-color-picker-channel="saturation" :class="rowClass">
+              <span :class="rowLabelClass" aria-hidden="true">S</span>
+              <GrSlider
+                v-model="saturation"
+                :size="resolvedSize"
+                :disabled="isDisabled"
+                :readonly="isReadonly"
+                :format-tooltip="percent"
+                :aria-label="t('gr.colorPicker.saturation', 'Saturation')"
+              />
+              <span :class="rowValueClass">{{ percent(saturation) }}</span>
+            </div>
 
-          <div data-gr-color-picker-channel="lightness" :class="rowClass">
-            <span :class="rowLabelClass" aria-hidden="true">L</span>
-            <GrSlider
-              v-model="lightness"
-              :size="resolvedSize"
-              :disabled="isDisabled"
-              :readonly="isReadonly"
-              :format-tooltip="percent"
-              :aria-label="t('gr.colorPicker.lightness', 'Lightness')"
-            />
-            <span :class="rowValueClass">{{ percent(lightness) }}</span>
-          </div>
+            <div data-gr-color-picker-channel="lightness" :class="rowClass">
+              <span :class="rowLabelClass" aria-hidden="true">L</span>
+              <GrSlider
+                v-model="lightness"
+                :size="resolvedSize"
+                :disabled="isDisabled"
+                :readonly="isReadonly"
+                :format-tooltip="percent"
+                :aria-label="t('gr.colorPicker.lightness', 'Lightness')"
+              />
+              <span :class="rowValueClass">{{ percent(lightness) }}</span>
+            </div>
+          </template>
 
           <div v-if="alpha" data-gr-color-picker-channel="alpha" :class="rowClass">
             <span :class="rowLabelClass" aria-hidden="true">A</span>
@@ -373,16 +588,31 @@ const trackVars = computed<Record<string, string>>(() => {
             <span :class="rowValueClass">{{ percent(opacity) }}</span>
           </div>
 
-          <GrInput
-            v-model="hexDraft"
-            data-gr-color-picker-hex
-            :size="resolvedSize"
-            :disabled="isDisabled"
-            :readonly="isReadonly"
-            :aria-label="t('gr.colorPicker.hexLabel', 'Hex value')"
-            @change="commitHex"
-            @keydown.enter="commitHex"
-          />
+          <div :class="hexRowClass">
+            <GrInput
+              v-model="hexDraft"
+              data-gr-color-picker-hex
+              :class="hexFieldClass"
+              :size="resolvedSize"
+              :disabled="isDisabled"
+              :readonly="isReadonly"
+              :aria-label="t('gr.colorPicker.hexLabel', 'Hex value')"
+              @change="commitHex"
+              @keydown.enter="commitHex"
+            />
+
+            <button
+              v-if="showEyedropper"
+              data-gr-color-picker-eyedropper
+              type="button"
+              :class="eyedropperClassName"
+              :disabled="isLocked"
+              :aria-label="t('gr.colorPicker.eyedropper', 'Pick a colour from the screen')"
+              @click="pickFromScreen"
+            >
+              <IconPipette :class="eyedropperIconClass" aria-hidden="true" />
+            </button>
+          </div>
 
           <div
             v-if="presetList.length"
@@ -460,5 +690,26 @@ const trackVars = computed<Record<string, string>>(() => {
 /* Заливка канала прозрачна: шкалу показывает сама дорожка. */
 [data-gr-color-picker-channel] [data-gr-slider-fill] {
   background-color: transparent;
+}
+
+/*
+ * Заливка области. Три слоя, и порядок важен: белая вуаль сверху, чёрная снизу,
+ * под ними — шкала насыщенности при светлоте 50%.
+ *
+ * Пара вуалей даёт **точный** HSL, а не похожий на него: осветление и
+ * затемнение в HSL — линейная интерполяция к белому и к чёрному, ровно то же,
+ * что делает наложение с альфой. Поэтому цвет под ручкой совпадает с образцом
+ * и с hex до последнего разряда.
+ */
+[data-gr-color-picker-area] {
+  background-image:
+    linear-gradient(
+      to bottom,
+      rgb(255 255 255) 0%,
+      rgb(255 255 255 / 0) 50%,
+      rgb(0 0 0 / 0) 50%,
+      rgb(0 0 0) 100%
+    ),
+    var(--gr-color-picker-area-saturation);
 }
 </style>

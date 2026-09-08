@@ -450,3 +450,84 @@ test.describe('высота списочной панели', () => {
     })
   }
 })
+
+/**
+ * Заливка области `GrColorPicker` — не «похожая», а точная.
+ *
+ * Квадрат собран тремя слоями: шкала насыщенности при светлоте 50% и пара
+ * вуалей, белой сверху и чёрной снизу. Утверждение, ради которого он собран
+ * именно так: осветление и затемнение в HSL — линейная интерполяция к белому и
+ * к чёрному, то есть ровно то, что делает наложение с альфой, и цвет под ручкой
+ * обязан совпадать с hex до последнего разряда.
+ *
+ * Проверить это можно только пикселем: вычисленные стили покажут три градиента
+ * и на неверной формуле тоже.
+ */
+async function pixelAt(
+  page: import('@playwright/test').Page,
+  shot: { toString: (encoding: 'base64') => string },
+  ratio: { x: number, y: number },
+): Promise<[number, number, number]> {
+  return page.evaluate(async ({ base64, x, y }) => {
+    const response = await fetch(`data:image/png;base64,${base64}`)
+    const bitmap = await createImageBitmap(await response.blob())
+    const canvas = new OffscreenCanvas(bitmap.width, bitmap.height)
+    const context = canvas.getContext('2d')!
+    context.drawImage(bitmap, 0, 0)
+
+    // Держимся внутри рамки: у самого края в пробу попала бы она, а не заливка.
+    const px = Math.min(Math.max(Math.round(bitmap.width * x), 3), bitmap.width - 4)
+    const py = Math.min(Math.max(Math.round(bitmap.height * y), 3), bitmap.height - 4)
+
+    const { data } = context.getImageData(px, py, 1, 1)
+    return [data[0], data[1], data[2]] as [number, number, number]
+  }, { base64: shot.toString('base64'), x: ratio.x, y: ratio.y })
+}
+
+test.describe('заливка области выбора цвета', () => {
+  test('пиксель под ручкой совпадает с выбранным цветом', async ({ page }) => {
+    await page.goto(componentPath('GrColorPicker'))
+    await page.locator('#live-examples').waitFor()
+
+    const trigger = page.getByLabel('Accent color').first()
+    await trigger.scrollIntoViewIfNeeded()
+    await trigger.click()
+
+    const area = page.locator('[data-gr-color-picker-area]').first()
+    await expect(area).toBeVisible()
+
+    // Ручка закрывает ровно тот пиксель, который надо померить.
+    await page.addStyleTag({ content: '[data-gr-color-picker-area-thumb] { display: none !important; }' })
+
+    const panel = area.locator('xpath=ancestor::*[@data-gr-color-picker-panel][1]')
+    const hexField = panel.locator('input[data-gr-color-picker-hex]')
+
+    // Несколько точек шкалы: светлая половина, тёмная и насыщенный край.
+    for (const hex of ['#8b5cf6', '#f3d6a1', '#2c1a4d', '#0ea5e9']) {
+      await hexField.fill(hex)
+      await hexField.press('Enter')
+      // Значение вернулось из модели — цвет применён, а не только набран.
+      await expect(hexField).toHaveValue(hex)
+
+      const { s, l } = await area.evaluate(node => ({
+        s: Number(node.querySelector<HTMLInputElement>('[data-gr-color-picker-area-axis="saturation"]')!.value),
+        l: Number(node.querySelector<HTMLInputElement>('[data-gr-color-picker-area-axis="lightness"]')!.value),
+      }))
+
+      // Снимаем саму область: доля от её снимка не зависит ни от прокрутки
+      // страницы, ни от того, в каких координатах считается клип.
+      const [r, g, b] = await pixelAt(page, await area.screenshot(), { x: s / 100, y: (100 - l) / 100 })
+
+      const expected = [
+        Number.parseInt(hex.slice(1, 3), 16),
+        Number.parseInt(hex.slice(3, 5), 16),
+        Number.parseInt(hex.slice(5, 7), 16),
+      ]
+
+      // Допуск в 4 единицы из 255 — на округление позиции ручки до целого
+      // пикселя, а не на приблизительность формулы: она точна.
+      for (const [index, channel] of [r, g, b].entries())
+        expect(Math.abs(channel - expected[index]), `${hex}: канал ${index}`).toBeLessThanOrEqual(4)
+    }
+  })
+})

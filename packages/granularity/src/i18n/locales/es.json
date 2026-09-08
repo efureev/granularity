@@ -356,7 +356,9 @@
     "opacity": "Opacidad",
     "hexLabel": "Valor hex",
     "presetsLabel": "Paleta de colores",
-    "swatchLabel": "Color {color}"
+    "swatchLabel": "Color {color}",
+    "area": "Saturación y luminosidad",
+    "eyedropper": "Tomar un color de la pantalla"
   },
   "collapse": {
     "empty": "Todavía no hay nada"

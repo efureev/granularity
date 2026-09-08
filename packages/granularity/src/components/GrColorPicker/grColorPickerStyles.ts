@@ -52,6 +52,63 @@ export const panelBaseClass = 'grid'
 
 export const previewClass = 'relative h-10 w-full overflow-hidden rounded-[var(--gr-radius-md)] border border-[color-mix(in_srgb,var(--gr-fg)_18%,transparent)]'
 
+/** Вид панели: лестница каналов или квадрат насыщенность × светлота. */
+export const GR_COLOR_PICKER_VIEWS = ['sliders', 'area'] as const
+export type GrColorPickerView = typeof GR_COLOR_PICKER_VIEWS[number]
+
+/**
+ * Высота области. Ширину задаёт панель, поэтому квадрат тут не буквальный:
+ * на узкой ступени доля высоты крупнее, иначе область вырождается в полоску.
+ */
+export const areaHeightBySize: Record<GrColorPickerSize, string> = {
+  xs: 'h-28',
+  sm: 'h-32',
+  md: 'h-36',
+  lg: 'h-44',
+}
+
+/**
+ * Область насыщенности и светлоты.
+ *
+ * Кольцо фокуса живёт на обёртке через `focus-within`: фокус получают скрытые
+ * `input[type=range]` внутри, и своё кольцо у них было бы шириной в пиксель.
+ */
+export const areaBaseClass = 'relative w-full overflow-hidden rounded-[var(--gr-radius-md)] border border-[color-mix(in_srgb,var(--gr-fg)_18%,transparent)] [touch-action:none] focus-within:outline-none focus-within:ring-2 focus-within:ring-[var(--gr-ring)]'
+
+export const areaEnabledClass = 'cursor-crosshair'
+export const areaDisabledClass = 'cursor-not-allowed'
+
+/**
+ * Ручка области.
+ *
+ * Обвода два, светлый и тёмный: ручка лежит поверх произвольного цвета, и
+ * одиночный пропадал бы на своём конце шкалы — белый в углу белого, тёмный в
+ * углу чёрного.
+ *
+ * Оба независимы от темы намеренно: под ручкой не подложка компонента, а
+ * выбираемый цвет, и `--gr-fg` спорил бы с ним, а не с фоном страницы.
+ */
+export const areaThumbClass = 'pointer-events-none absolute h-[var(--gr-color-picker-area-thumb-size,0.875rem)] w-[var(--gr-color-picker-area-thumb-size,0.875rem)] -translate-x-1/2 -translate-y-1/2 rounded-[var(--gr-radius-full)] border-2 border-[var(--gr-color-picker-area-thumb-border,#fff)] shadow-[0_0_0_1px_var(--gr-color-picker-area-thumb-ring,rgba(0,0,0,0.45))]'
+
+/** Оба поля осей: доступны диктору и клавиатуре, но не видны. */
+export const areaInputClass = 'sr-only'
+
+/** Пипетка стоит в одном ряду с полем hex и повторяет его высоту. */
+export const eyedropperClass = 'inline-flex shrink-0 items-center justify-center rounded-[var(--gr-radius-control)] border border-[var(--gr-brd)] bg-[var(--gr-bg)] text-[var(--gr-fg)] transition-colors duration-[var(--gr-duration-fast)] hover:border-[var(--gr-primary)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] disabled:cursor-not-allowed disabled:border-[var(--gr-brd)] disabled:bg-[var(--gr-muted)] disabled:text-[var(--gr-disabled-fg)]'
+
+export const eyedropperSizeBySize: Record<GrColorPickerSize, string> = {
+  xs: 'h-7 w-7',
+  sm: 'h-8 w-8',
+  md: 'h-10 w-10',
+  lg: 'h-11 w-11',
+}
+
+export const eyedropperIconClass = 'h-4 w-4 shrink-0'
+
+/** Поле hex и пипетка стоят рядом: поле тянется, кнопка держит свою ширину. */
+export const hexRowClass = 'flex items-center gap-2'
+export const hexFieldClass = 'min-w-0 flex-1'
+
 export const rowClass = 'grid grid-cols-[1.25rem_minmax(0,1fr)_2.75rem] items-center gap-2'
 export const rowLabelClass = 'text-[var(--gr-muted-fg)]'
 export const rowValueClass = 'text-right text-[var(--gr-muted-fg)] tabular-nums'
@@ -79,4 +136,19 @@ export function grColorPickerPanelClass(size: GrColorPickerSize): string {
 
 export function grColorPickerPresetClass(selected: boolean): string {
   return [presetBaseClass, selected ? presetSelectedClass : ''].filter(Boolean).join(' ')
+}
+
+export function grColorPickerAreaClass(options: {
+  size: GrColorPickerSize
+  locked: boolean
+}): string {
+  return [
+    areaBaseClass,
+    areaHeightBySize[options.size],
+    options.locked ? areaDisabledClass : areaEnabledClass,
+  ].join(' ')
+}
+
+export function grColorPickerEyedropperClass(size: GrColorPickerSize): string {
+  return [eyedropperClass, eyedropperSizeBySize[size]].join(' ')
 }

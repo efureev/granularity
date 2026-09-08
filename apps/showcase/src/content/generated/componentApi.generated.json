@@ -2502,6 +2502,20 @@
             "default": "false"
           },
           {
+            "name": "view",
+            "description": "Как задаются насыщенность и светлота: двумя бегунками или квадратом. Оттенок и прозрачность остаются бегунками в обоих видах.",
+            "type": "\"sliders\" | \"area\" | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "eyedropper",
+            "description": "Кнопка пипетки. Рисуется только там, где браузер даёт `EyeDropper`, — сегодня это Chromium.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "presets",
             "description": "Палитра быстрого выбора. Пусто — блок не рендерится.",
             "type": "string[] | undefined",

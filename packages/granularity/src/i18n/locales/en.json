@@ -354,7 +354,9 @@
     "opacity": "Opacity",
     "hexLabel": "Hex value",
     "presetsLabel": "Color presets",
-    "swatchLabel": "Color {color}"
+    "swatchLabel": "Color {color}",
+    "area": "Saturation and lightness",
+    "eyedropper": "Pick a colour from the screen"
   },
   "collapse": {
     "empty": "Nothing here yet"

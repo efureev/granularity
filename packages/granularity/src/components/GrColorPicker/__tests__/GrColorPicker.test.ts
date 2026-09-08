@@ -1,7 +1,8 @@
 import { mount } from '@vue/test-utils'
 import { nextTick } from 'vue'
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it } from 'vitest'
 
+import { resetGranularityDom } from '../../../testing'
 import GrColorPicker from '../GrColorPicker.vue'
 
 const BLUE = '#3b82f6'
@@ -39,10 +40,24 @@ function sliderOf(channel: string): HTMLElement | null {
   return document.querySelector(`[data-gr-color-picker-channel="${channel}"] [role="slider"]`)
 }
 
+function areaAxis(axis: 'saturation' | 'lightness'): HTMLInputElement | null {
+  return document.querySelector<HTMLInputElement>(`[data-gr-color-picker-area-axis="${axis}"]`)
+}
+
+/** Панель в портале: события шлём настоящему узлу, обёртка его не видит. */
+async function pressOn(axis: 'saturation' | 'lightness', key: string): Promise<void> {
+  areaAxis(axis)!.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true }))
+  await nextTick()
+}
+
 async function open(wrapper: ReturnType<typeof mountPicker>) {
   await wrapper.get('[data-gr-color-picker-trigger]').trigger('click')
   await nextTick()
 }
+
+// Панель уезжает в общий портал, и её узлы переживают `unmount`: без уборки
+// селекторы по документу находят разметку прошлого теста.
+afterEach(resetGranularityDom)
 
 describe('GrColorPicker', () => {
   it('показывает значение и образец текущего цвета', () => {
@@ -289,5 +304,179 @@ describe('GrColorPicker', () => {
     const trigger = wrapper.get('[data-gr-popover-trigger]')
     expect(trigger.classes()).toContain('w-full')
     expect(trigger.classes()).not.toContain('inline-block')
+  })
+
+  describe('вид «область»', () => {
+    it('по умолчанию области нет: вид меняется пропом, а не молча', async () => {
+      const wrapper = mountPicker()
+      await open(wrapper)
+
+      expect(document.querySelector('[data-gr-color-picker-area]')).toBeNull()
+      expect(sliderOf('saturation')).not.toBeNull()
+      expect(sliderOf('lightness')).not.toBeNull()
+
+      wrapper.unmount()
+    })
+
+    it('область заменяет бегунки S и L, но не оттенок', async () => {
+      const wrapper = mountPicker({ view: 'area' })
+      await open(wrapper)
+
+      expect(document.querySelector('[data-gr-color-picker-area]')).not.toBeNull()
+      expect(sliderOf('saturation')).toBeNull()
+      expect(sliderOf('lightness')).toBeNull()
+      expect(sliderOf('hue')).not.toBeNull()
+
+      wrapper.unmount()
+    })
+
+    /**
+     * Главное, ради чего область собрана именно так: у каждой оси настоящий
+     * `input[type=range]` со своим именем и значением. Роль-виджет на обёртке
+     * объявила бы их презентационными, и диктор потерял бы оба.
+     */
+    it('у каждой оси настоящее поле диапазона со своим именем', async () => {
+      const wrapper = mountPicker({ view: 'area' })
+      await open(wrapper)
+
+      const area = document.querySelector('[data-gr-color-picker-area]')!
+      expect(area.getAttribute('role')).toBe('group')
+
+      const s = areaAxis('saturation')!
+      const l = areaAxis('lightness')!
+
+      expect(s.type).toBe('range')
+      expect(l.type).toBe('range')
+      expect(s.getAttribute('aria-label')).toBe('Saturation')
+      expect(l.getAttribute('aria-label')).toBe('Lightness')
+      // В таб-порядке остаются: фокус показывает обёртка через `focus-within`.
+      expect(s.getAttribute('tabindex')).toBeNull()
+      expect(s.getAttribute('aria-hidden')).toBeNull()
+
+      wrapper.unmount()
+    })
+
+    it('модель расходится по осям, а ручка стоит на своём месте', async () => {
+      // hsl(217 91% 60%) — синий из `BLUE`.
+      const wrapper = mountPicker({ view: 'area' })
+      await open(wrapper)
+
+      const s = Number(areaAxis('saturation')!.value)
+      const l = Number(areaAxis('lightness')!.value)
+      expect(s).toBeGreaterThan(80)
+      expect(l).toBeGreaterThan(50)
+
+      const thumb = document.querySelector<HTMLElement>('[data-gr-color-picker-area-thumb]')!
+      expect(thumb.style.left).toBe(`${s}%`)
+      // Светлота инвертирована: белое вверху.
+      expect(thumb.style.top).toBe(`${100 - l}%`)
+      expect(thumb.getAttribute('aria-hidden')).toBe('true')
+
+      wrapper.unmount()
+    })
+
+    it('горизонталь двигает насыщенность, вертикаль — светлоту, и цвет уходит в модель', async () => {
+      const wrapper = mountPicker({ view: 'area' })
+      await open(wrapper)
+
+      const before = Number(areaAxis('saturation')!.value)
+      await pressOn('saturation', 'ArrowLeft')
+
+      expect(Number(areaAxis('saturation')!.value)).toBe(before - 1)
+      expect(wrapper.emitted('update:modelValue')).toBeTruthy()
+
+      const lightnessBefore = Number(areaAxis('lightness')!.value)
+      await pressOn('saturation', 'ArrowUp')
+      expect(Number(areaAxis('lightness')!.value)).toBe(lightnessBefore + 1)
+
+      wrapper.unmount()
+    })
+
+    /**
+     * Стрелка поперёк оси меняет значение соседнего поля. Без переезда фокуса
+     * диктор промолчал бы о том, что изменилось: озвучивает он сфокусированное.
+     */
+    it('стрелка поперёк оси уводит фокус на поле той оси, что изменилась', async () => {
+      const wrapper = mountPicker({ view: 'area' })
+      await open(wrapper)
+
+      areaAxis('saturation')!.focus()
+      await pressOn('saturation', 'ArrowDown')
+      expect(document.activeElement).toBe(areaAxis('lightness'))
+
+      await pressOn('lightness', 'ArrowRight')
+      expect(document.activeElement).toBe(areaAxis('saturation'))
+
+      wrapper.unmount()
+    })
+
+    it('`readonly` показывает область, но значение с клавиатуры не меняет', async () => {
+      const wrapper = mountPicker({ view: 'area', readonly: true })
+      await open(wrapper)
+
+      await pressOn('saturation', 'Home')
+
+      expect(wrapper.emitted('update:modelValue')).toBeUndefined()
+
+      wrapper.unmount()
+    })
+  })
+
+  describe('пипетка', () => {
+    it('без поддержки браузера кнопки нет даже при включённом пропе', async () => {
+      const wrapper = mountPicker({ eyedropper: true })
+      await open(wrapper)
+
+      expect(document.querySelector('[data-gr-color-picker-eyedropper]')).toBeNull()
+
+      wrapper.unmount()
+    })
+
+    it('с поддержкой кнопка появляется только по просьбе', async () => {
+      Object.defineProperty(window, 'EyeDropper', {
+        configurable: true,
+        writable: true,
+        value: class {
+          open = async () => ({ sRGBHex: '#12ab34' })
+        },
+      })
+
+      const plain = mountPicker()
+      await open(plain)
+      expect(document.querySelector('[data-gr-color-picker-eyedropper]')).toBeNull()
+      plain.unmount()
+
+      const wrapper = mountPicker({ eyedropper: true })
+      await open(wrapper)
+      const button = document.querySelector('[data-gr-color-picker-eyedropper]')
+      expect(button).not.toBeNull()
+      expect(button!.getAttribute('aria-label')).toBe('Pick a colour from the screen')
+
+      wrapper.unmount()
+      Reflect.deleteProperty(window, 'EyeDropper')
+    })
+
+    it('взятый с экрана цвет уходит в модель, а прозрачность остаётся своей', async () => {
+      Object.defineProperty(window, 'EyeDropper', {
+        configurable: true,
+        writable: true,
+        value: class {
+          open = async () => ({ sRGBHex: '#12ab34' })
+        },
+      })
+
+      const wrapper = mountPicker({ eyedropper: true, alpha: true, modelValue: '#3b82f680' })
+      await open(wrapper)
+
+      document.querySelector<HTMLElement>('[data-gr-color-picker-eyedropper]')!.click()
+      await nextTick()
+      await nextTick()
+
+      // С экрана приходит уже смешанный цвет: своей прозрачности у него нет.
+      expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual(['#12ab3480'])
+
+      wrapper.unmount()
+      Reflect.deleteProperty(window, 'EyeDropper')
+    })
   })
 })

@@ -358,7 +358,9 @@
     "opacity": "Непрозрачность",
     "hexLabel": "Значение hex",
     "presetsLabel": "Палитра",
-    "swatchLabel": "Цвет {color}"
+    "swatchLabel": "Цвет {color}",
+    "area": "Насыщенность и светлота",
+    "eyedropper": "Взять цвет с экрана"
   },
   "collapse": {
     "empty": "Пока пусто"
