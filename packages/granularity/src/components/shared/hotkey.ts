@@ -11,7 +11,8 @@
  * матчер на `window`, с тем же синтаксисом комбинаций плюс токен `mod`.
  */
 
-import { eventMatchesKey, isAppleDevice, isComposingEvent, shiftSatisfied } from '../../internal/keyboard'
+import { eventMatchesKey, isAppleDevice, isComposingEvent, parseHotkeyCombo, shiftSatisfied } from '../../internal/keyboard'
+import type { ParsedHotkeyCombo } from '../../internal/keyboard'
 
 import { findKbdToken, type HotkeyKeyView } from './hotkeyTokens'
 
@@ -19,46 +20,11 @@ export { isAppleDevice } from '../../internal/keyboard'
 export { findKbdToken, GR_KBD_TOKENS } from './hotkeyTokens'
 export type { GrKbdKeyName, GrKbdTokenGroup, GrKbdTokenSpec, HotkeyKeyView } from './hotkeyTokens'
 
-export type ParsedCommandHotkey = {
-  key: string
-  ctrl: boolean
-  meta: boolean
-  alt: boolean
-  shift: boolean
-  /** `mod` — Cmd на macOS, Ctrl на остальных платформах. */
-  mod: boolean
-}
+/** Разбор сочетания — общий на пакет, см. `internal/keyboard`. */
+export type ParsedCommandHotkey = ParsedHotkeyCombo
 
 export function parseCommandHotkey(combo: string): ParsedCommandHotkey | null {
-  const parts = combo.split('+').map(p => p.trim()).filter(Boolean)
-  const keyToken = parts.at(-1)
-  if (!keyToken)
-    return null
-
-  const parsed: ParsedCommandHotkey = {
-    key: keyToken.length === 1 ? keyToken.toLowerCase() : keyToken,
-    ctrl: false,
-    meta: false,
-    alt: false,
-    shift: false,
-    mod: false,
-  }
-
-  for (const part of parts.slice(0, -1)) {
-    const token = part.toLowerCase()
-    if (token === 'mod')
-      parsed.mod = true
-    else if (token === 'ctrl' || token === 'control')
-      parsed.ctrl = true
-    else if (token === 'meta' || token === 'cmd' || token === 'command' || token === '⌘')
-      parsed.meta = true
-    else if (token === 'alt' || token === 'option')
-      parsed.alt = true
-    else if (token === 'shift')
-      parsed.shift = true
-  }
-
-  return parsed
+  return parseHotkeyCombo(combo)
 }
 
 export function matchesCommandHotkey(

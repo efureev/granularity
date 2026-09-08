@@ -99,3 +99,76 @@ export function shiftSatisfied(event: KeyboardEvent, expectedKey: string, expect
 
   return expectedKey.length === 1 && !/\p{L}/u.test(expectedKey) && event.key === expectedKey
 }
+
+/**
+ * Разбор строки сочетания — один на пакет.
+ *
+ * Синтаксис `mod+shift+k` читают и директива `v-hotkey`, и `GrCommandPalette`
+ * со своим слушателем на `window`. Разборов было два, почти одинаковых, и они
+ * молча разошлись: `esc` и `space` директива приводила к `Escape` и пробелу, а
+ * палитра оставляла как есть — то есть сравнивала `event.key === 'esc'`, что не
+ * бывает истиной никогда, и такой хоткей не срабатывал вовсе.
+ */
+export interface ParsedHotkeyCombo {
+  key: string
+  ctrl: boolean
+  meta: boolean
+  alt: boolean
+  shift: boolean
+  /** `mod` — Cmd на macOS, Ctrl на остальных платформах. */
+  mod: boolean
+}
+
+/**
+ * Имя клавиши в том виде, в каком его даёт `KeyboardEvent.key`.
+ *
+ * Регистр многобуквенных имён сохраняется (`ArrowUp`, `F6`): их сравнивают
+ * посимвольно. Одиночные символы приводятся к нижнему регистру — верхний у них
+ * означает Shift, а он объявляется отдельным токеном.
+ */
+export function normalizeHotkeyToken(token: string): string {
+  const t = token.trim().toLowerCase()
+
+  if (t === 'esc' || t === 'escape')
+    return 'Escape'
+  if (t === 'space')
+    return ' '
+  if (t.length === 1)
+    return t
+
+  return token.trim()
+}
+
+export function parseHotkeyCombo(combo: string): ParsedHotkeyCombo | null {
+  const parts = combo.split('+').map(part => part.trim()).filter(Boolean)
+
+  const keyToken = parts.at(-1)
+  if (!keyToken)
+    return null
+
+  const parsed: ParsedHotkeyCombo = {
+    key: normalizeHotkeyToken(keyToken),
+    ctrl: false,
+    meta: false,
+    alt: false,
+    shift: false,
+    mod: false,
+  }
+
+  for (const part of parts.slice(0, -1)) {
+    const token = part.toLowerCase()
+
+    if (token === 'mod')
+      parsed.mod = true
+    else if (token === 'ctrl' || token === 'control')
+      parsed.ctrl = true
+    else if (token === 'meta' || token === 'cmd' || token === 'command' || token === '⌘')
+      parsed.meta = true
+    else if (token === 'alt' || token === 'option')
+      parsed.alt = true
+    else if (token === 'shift')
+      parsed.shift = true
+  }
+
+  return parsed
+}

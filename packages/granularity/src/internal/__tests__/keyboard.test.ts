@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { codeForChar, eventMatchesKey, isComposingEvent, shiftSatisfied } from '../keyboard'
+import { codeForChar, eventMatchesKey, isComposingEvent, parseHotkeyCombo, shiftSatisfied } from '../keyboard'
 
 function keyEvent(init: KeyboardEventInit & { keyCode?: number } = {}): KeyboardEvent {
   const { keyCode, ...rest } = init
@@ -67,5 +67,35 @@ describe('shiftSatisfied', () => {
 
   it('цифра с Shift даёт другой символ и не проходит', () => {
     expect(shiftSatisfied(keyEvent({ key: '%', shiftKey: true }), '5', false)).toBe(false)
+  })
+})
+
+/**
+ * Разбор один на пакет: его читают и директива `v-hotkey`, и собственный
+ * слушатель `GrCommandPalette`. Два разбора уже расходились молча — гейт держит
+ * то, чтобы имена клавиш выходили в том же виде, в каком их даёт браузер.
+ */
+describe('parseHotkeyCombo', () => {
+  it('имена клавиш приводятся к `KeyboardEvent.key`', () => {
+    expect(parseHotkeyCombo('esc')?.key).toBe('Escape')
+    expect(parseHotkeyCombo('Escape')?.key).toBe('Escape')
+    expect(parseHotkeyCombo('space')?.key).toBe(' ')
+    // Регистр многобуквенных имён сохраняется: их сравнивают посимвольно.
+    expect(parseHotkeyCombo('ArrowUp')?.key).toBe('ArrowUp')
+    // Одиночный символ — в нижний: верхний означал бы Shift, а он отдельным токеном.
+    expect(parseHotkeyCombo('mod+K')?.key).toBe('k')
+  })
+
+  it('модификаторы читаются всеми принятыми написаниями', () => {
+    expect(parseHotkeyCombo('ctrl+alt+shift+p')).toMatchObject({ ctrl: true, alt: true, shift: true, key: 'p' })
+    expect(parseHotkeyCombo('control+option+P')).toMatchObject({ ctrl: true, alt: true, key: 'p' })
+    expect(parseHotkeyCombo('cmd+k')).toMatchObject({ meta: true })
+    expect(parseHotkeyCombo('⌘+k')).toMatchObject({ meta: true })
+    expect(parseHotkeyCombo('mod+k')).toMatchObject({ mod: true, ctrl: false, meta: false })
+  })
+
+  it('пустое сочетание — не сочетание', () => {
+    expect(parseHotkeyCombo('')).toBeNull()
+    expect(parseHotkeyCombo('+')).toBeNull()
   })
 })

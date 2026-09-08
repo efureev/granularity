@@ -1,6 +1,6 @@
 import type { Directive } from 'vue'
 
-import { eventMatchesKey, isAppleDevice, isComposingEvent, isEditableTarget, shiftSatisfied } from '../internal/keyboard'
+import { eventMatchesKey, isAppleDevice, isComposingEvent, isEditableTarget, parseHotkeyCombo, shiftSatisfied } from '../internal/keyboard'
 
 export type HotkeyHandler = (event: KeyboardEvent) => void
 
@@ -66,56 +66,15 @@ function normalizeBinding(value: HotkeyBindingValue | undefined) {
   return { enabled: true, handlers: value as HotkeyMap, scope: 'global' as HotkeyScope }
 }
 
-function normalizeKeyToken(token: string): string {
-  const t = token.trim().toLowerCase()
-  if (t === 'esc')
-    return 'Escape'
-  if (t === 'escape')
-    return 'Escape'
-  if (t === 'space')
-    return ' '
-  if (t.length === 1)
-    return t
-  return token.trim()
-}
-
 function parseHotkeys(map: HotkeyMap): ParsedHotkey[] {
   const parsed: ParsedHotkey[] = []
 
   for (const [combo, entry] of Object.entries(map)) {
-    const parts = combo
-      .split('+')
-      .map(p => p.trim())
-      .filter(Boolean)
-
-    if (!parts.length)
+    const keys = parseHotkeyCombo(combo)
+    if (!keys)
       continue
 
-    let ctrl = false
-    let meta = false
-    let mod = false
-    let alt = false
-    let shift = false
-
-    const keyToken = parts.at(-1)
-    if (!keyToken)
-      continue
-    for (const p of parts.slice(0, -1)) {
-      const t = p.toLowerCase()
-      if (t === 'mod')
-        mod = true
-      else if (t === 'ctrl' || t === 'control')
-        ctrl = true
-      else if (t === 'meta' || t === 'cmd' || t === 'command' || t === '⌘')
-        meta = true
-      else if (t === 'alt' || t === 'option')
-        alt = true
-      else if (t === 'shift')
-        shift = true
-    }
-
-    const key = normalizeKeyToken(keyToken)
-    parsed.push({ original: combo, key, ctrl, meta, mod, alt, shift, entry })
+    parsed.push({ original: combo, ...keys, entry })
   }
 
   return parsed

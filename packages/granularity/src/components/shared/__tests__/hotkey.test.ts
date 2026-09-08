@@ -17,6 +17,16 @@ describe('parseCommandHotkey', () => {
     expect(parseCommandHotkey('mod+k')).toMatchObject({ key: 'k', mod: true, ctrl: false, meta: false })
     expect(parseCommandHotkey('Ctrl+Shift+P')).toMatchObject({ key: 'p', ctrl: true, shift: true })
     expect(parseCommandHotkey('Escape')).toMatchObject({ key: 'Escape', mod: false })
+
+    /*
+     * Разборов было два, почти одинаковых, и они молча разошлись: директива
+     * приводила `esc` и `space` к именам из `KeyboardEvent.key`, а палитра
+     * оставляла как есть — то есть сравнивала `event.key === 'esc'`, чего не
+     * бывает, и такой хоткей не срабатывал вовсе.
+     */
+    expect(parseCommandHotkey('esc')).toMatchObject({ key: 'Escape' })
+    expect(parseCommandHotkey('space')).toMatchObject({ key: ' ' })
+    expect(parseCommandHotkey('mod+space')).toMatchObject({ key: ' ', mod: true })
   })
 
   it('пустая строка не даёт сочетания', () => {

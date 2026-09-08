@@ -286,6 +286,13 @@ to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- **`GrCommandPalette` now honours `esc` and `space` as its opening hotkey.** The
+  combination syntax had two parsers — one in the `v-hotkey` directive, one in
+  the palette — and they had drifted: the directive folded `esc` and `space` into
+  the names a `KeyboardEvent` actually reports, the palette left them as typed.
+  It therefore compared `event.key === 'esc'`, which is never true, and such a
+  hotkey simply never fired. Both now share `parseHotkeyCombo`.
+
 - **`GrFileUpload` no longer accepts `action` and `request` in silence.** Passing
   both is not an error in itself — `request` wins — but nothing said so, and an
   `action` that is quietly ignored behaves exactly like one that was honoured.
