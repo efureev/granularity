@@ -18,6 +18,13 @@ export const grToasterExamples: ShowcaseComponentExampleDoc[] = [
     previewKey: 'gr-toaster-sticky-host',
   },
   {
+    id: 'toaster-stack',
+    title: 'Стопка вместо колонки',
+    description: 'Шесть тостов занимают место одного: `collapse` схлопывает стек в колоду, из-под передней карточки выглядывают края следующих. Наведение или фокус разворачивают её в обычную колонку — теми же двумя сигналами, что ставят таймеры на паузу. `collapse: false` выключает схлопывание.',
+    status: 'ready',
+    previewKey: 'gr-toaster-stack',
+  },
+  {
     id: 'toaster-queue-flow',
     title: 'Queued workflow feedback',
     description: 'Отдельный workflow-сценарий: пушим несколько toast подряд, чтобы проверить stacking и ручные sticky warnings.',

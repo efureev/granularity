@@ -674,3 +674,155 @@ describe('GrToaster — смахивание', () => {
     second.wrapper.unmount()
   })
 })
+
+describe('GrToaster — стопка', () => {
+  afterEach(resetGranularityDom)
+
+  /**
+   * Раскладки в jsdom нет, а стопка считает смещения по высотам тостов. Мокается
+   * именно `offsetHeight`: компонент читает его, а не рект, потому что свёрнутая
+   * карточка уменьшена `scale()` и рект вернул бы её экранный размер.
+   */
+  function mockHeights(nodes: NodeListOf<HTMLElement>, height: number): void {
+    for (const node of nodes)
+      Object.defineProperty(node, 'offsetHeight', { value: height, configurable: true })
+  }
+
+  async function mountWithToasts(count: number, props: Record<string, unknown> = {}) {
+    const wrapper = mount(GrToaster, {
+      attachTo: document.body,
+      props: { maxVisible: 10, ...props },
+      global: { plugins: [granularityToastPlugin] },
+    })
+    const toast = wrapper.vm.$.appContext.app.runWithContext(() => useToast())
+    for (let i = 0; i < count; i++)
+      toast.push({ title: `Тост ${i}`, timeoutMs: 0 })
+    await nextTick()
+
+    // Первый проход даёт узлы, замер — высоты, второй проход — саму раскладку.
+    mockHeights(document.querySelectorAll<HTMLElement>('[data-gr-toast]'), 80)
+    await wrapper.vm.$forceUpdate()
+    await nextTick()
+
+    return { wrapper, toast }
+  }
+
+  function toasts(): HTMLElement[] {
+    return Array.from(document.querySelectorAll<HTMLElement>('[data-gr-toast]'))
+  }
+
+  function container(): HTMLElement {
+    return document.querySelector<HTMLElement>('[data-gr-toaster]')!
+  }
+
+  it('до порога стек остаётся колонкой', async () => {
+    const { wrapper } = await mountWithToasts(3)
+
+    expect(toasts().every(node => node.classList.contains('absolute'))).toBe(false)
+    expect(toasts()[0].style.transform).toBe('')
+
+    wrapper.unmount()
+  })
+
+  it('сверх порога стек схлопывается в стопку', async () => {
+    const { wrapper } = await mountWithToasts(4)
+
+    expect(toasts().every(node => node.classList.contains('absolute'))).toBe(true)
+    // Передняя карточка на месте, следующая уведена на шаг стопки.
+    expect(toasts()[0].style.transform).toContain('* 0)')
+    expect(toasts()[1].style.transform).toContain('--gr-toaster-stack-peek')
+    expect(toasts()[1].style.transform).toContain('* 1)')
+
+    wrapper.unmount()
+  })
+
+  it('`collapse: false` не схлопывает никогда', async () => {
+    const { wrapper } = await mountWithToasts(6, { collapse: false })
+
+    expect(toasts().every(node => node.classList.contains('absolute'))).toBe(false)
+
+    wrapper.unmount()
+  })
+
+  it('порог настраивается числом', async () => {
+    const { wrapper } = await mountWithToasts(4, { collapse: 5 })
+
+    expect(toasts().every(node => node.classList.contains('absolute'))).toBe(false)
+
+    wrapper.unmount()
+  })
+
+  it('наведение разворачивает стопку в колонку, уход возвращает', async () => {
+    const { wrapper } = await mountWithToasts(4)
+
+    container().dispatchEvent(new MouseEvent('mouseenter'))
+    await nextTick()
+
+    // Развёрнуто смещения накопительные: 80 высота + 12 зазор.
+    expect(toasts()[1].style.transform).toBe('translateY(92px)')
+    expect(toasts()[2].style.transform).toBe('translateY(184px)')
+
+    container().dispatchEvent(new MouseEvent('mouseleave'))
+    await nextTick()
+
+    expect(toasts()[1].style.transform).toContain('--gr-toaster-stack-peek')
+
+    wrapper.unmount()
+  })
+
+  /** Кнопка внутри карточки под фокусом обязана быть видна, а не лежать под колодой. */
+  it('фокус внутри стека разворачивает стопку', async () => {
+    const { wrapper } = await mountWithToasts(4)
+
+    container().dispatchEvent(new FocusEvent('focusin', { bubbles: true }))
+    await nextTick()
+
+    expect(toasts()[1].style.transform).toBe('translateY(92px)')
+
+    wrapper.unmount()
+  })
+
+  it('у нижнего угла передняя карточка — последняя', async () => {
+    const { wrapper } = await mountWithToasts(4, { placement: 'bottom-right' })
+
+    const nodes = toasts()
+    // Ближайшая к своему углу карточка не уведена и не уменьшена.
+    expect(nodes[nodes.length - 1].style.transform).toContain('* 0)')
+    // А верхняя лежит в стопке глубже всех — и уходит вверх, а не вниз.
+    expect(nodes[0].style.transform).toContain('* -3)')
+
+    wrapper.unmount()
+  })
+
+  it('карточки глубже видимой части не ловят указатель', async () => {
+    const { wrapper } = await mountWithToasts(5)
+
+    const nodes = toasts()
+    expect(nodes[2].style.opacity).toBe('')
+    expect(nodes[3].style.opacity).toBe('0')
+    expect(nodes[3].style.pointerEvents).toBe('none')
+
+    wrapper.unmount()
+  })
+
+  it('смахивание и стопка живут в одном transform, а не затирают друг друга', async () => {
+    const { wrapper } = await mountWithToasts(4)
+
+    container().dispatchEvent(new MouseEvent('mouseenter'))
+    await nextTick()
+
+    const node = toasts()[1]
+    mockRect(node, { width: 360, height: 80 })
+    press(node, { button: 0, clientX: 10 })
+    move({ clientX: 60 })
+    await nextTick()
+
+    expect(node.style.transform).toContain('translateX(50px)')
+    expect(node.style.transform).toContain('translateY(92px)')
+    // Жест идёт первым: после `scale()` он ехал бы в масштабе карточки.
+    expect(node.style.transform.indexOf('translateX')).toBeLessThan(node.style.transform.indexOf('translateY'))
+
+    release()
+    wrapper.unmount()
+  })
+})

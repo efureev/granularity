@@ -9,6 +9,24 @@ to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **`GrToaster` collapses the stack into a deck.** `maxVisible` caps how many
+  toasts are shown but says nothing about the room they take: raising it to eight
+  handed the app a half-screen column on top of the very interface the
+  notifications were about. The new `collapse` prop (default `3`) says from how
+  many visible toasts the stack folds into a deck — the front card in full, the
+  edges of the ones behind peeking out, the whole stack occupying the space of
+  one. `collapse: false` turns it off.
+
+  A threshold rather than a switch: with two or three toasts a column reads
+  better than a deck, and there is nothing to hide. Hover and focus expand it
+  back — the same two signals that already pause the timers, because reading the
+  stack has to stop the countdown anyway.
+
+  The deck grows away from its corner, and the contents of the cards behind are
+  faded out: a twelve-pixel gap should show card edges, not the tail of a
+  sentence. Steps are themeable through `--gr-toaster-stack-peek` and
+  `--gr-toaster-stack-scale`.
+
 - **`GrTextarea` takes a `#count` slot.** `12 / 60` is not the only way to talk
   about length, and the line counter does not cover that — it is simply a second
   ready-made counter, just as fixed in shape. The slot hands the wording to the

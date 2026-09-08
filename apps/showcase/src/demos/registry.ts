@@ -488,6 +488,7 @@ export const demoPathByPreviewKey = {
   'gr-toaster-builder': 'components/gr-toaster/GrToasterBuilderDemo.vue',
   'gr-toaster-focus-hotkey': 'components/gr-toaster/GrToasterFocusHotkeyDemo.vue',
   'gr-toaster-queue-flow': 'components/gr-toaster/GrToasterQueueDemo.vue',
+  'gr-toaster-stack': 'components/gr-toaster/GrToasterStackDemo.vue',
   'gr-toaster-swipe': 'components/gr-toaster/GrToasterSwipeDemo.vue',
   'gr-toaster-sticky-host': 'components/gr-toaster/GrToasterStickyDemo.vue',
   'gr-tooltip-custom-tone': 'components/gr-tooltip/GrTooltipToneDemo.vue',

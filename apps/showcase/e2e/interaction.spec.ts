@@ -489,6 +489,40 @@ function basicPanelsPreview(page: Page) {
     .first()
 }
 
+test.describe('GrToaster: стопка', () => {
+  /**
+   * Ради этого стопка и делается — занятое место. Проверяется оно, а не классы:
+   * колонка из шести тостов съедала пол-экрана, и мерить надо высоту, а не
+   * признаки раскладки, по которым она получилась.
+   */
+  test('шесть тостов занимают место одного, а по наведению разворачиваются', async ({ page }) => {
+    await openShowcasePage(page, componentPath('GrToaster'))
+    await page.getByRole('button', { name: 'Upload six files' }).click()
+
+    const toaster = page.locator('[data-gr-toaster]')
+    await expect(toaster.locator('[data-gr-toast]')).toHaveCount(6)
+
+    const oneToast = (await toaster.locator('[data-gr-toast]').first().boundingBox())!.height
+    const collapsed = (await toaster.boundingBox())!.height
+    expect(collapsed, 'свёрнутая стопка занимает место одного тоста').toBeLessThan(oneToast * 1.5)
+
+    await toaster.locator('[data-gr-toast]').first().hover()
+    await expect.poll(async () => (await toaster.boundingBox())!.height).toBeGreaterThan(oneToast * 4)
+  })
+
+  /** Из-под передней карточки видны края, но не содержимое: в щель лез обрывок строки. */
+  test('содержимое карточек за передней погашено', async ({ page }) => {
+    await openShowcasePage(page, componentPath('GrToaster'))
+    await page.getByRole('button', { name: 'Upload six files' }).click()
+
+    const behind = page.locator('[data-gr-toaster] [data-gr-toast]').nth(1)
+    await expect(behind.locator('> div').first()).toHaveCSS('opacity', '0')
+
+    await page.locator('[data-gr-toaster] [data-gr-toast]').first().hover()
+    await expect(behind.locator('> div').first()).toHaveCSS('opacity', '1')
+  })
+})
+
 test.describe('GrTabPanels: смена панели', () => {
   /**
    * Длительность берётся из `--gr-duration-fast` (150 мс), и ловить её гонкой

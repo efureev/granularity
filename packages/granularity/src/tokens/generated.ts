@@ -3589,6 +3589,20 @@ export const grComponentTokens: GrComponentToken[] = [
     "description": "Ширина стека тостов. Проп `width` задаёт её же, поэтому одно и то же настраивается и разметкой, и темой."
   },
   {
+    "owner": "GrToaster",
+    "name": "--gr-toaster-stack-peek",
+    "kind": "hook",
+    "default": "12px",
+    "description": "Насколько выглядывает из-под передней карточки каждая следующая в свёрнутой стопке."
+  },
+  {
+    "owner": "GrToaster",
+    "name": "--gr-toaster-stack-scale",
+    "kind": "hook",
+    "default": "0.05",
+    "description": "На сколько уменьшается каждая следующая карточка стопки: глубина читается размером, а не только смещением."
+  },
+  {
     "owner": "GrTransfer",
     "name": "--gr-transfer-panel-max-h",
     "kind": "hook",

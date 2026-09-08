@@ -22,7 +22,7 @@
  *   визуализируется прогресс-баром до закрытия;
  * - `placement` настраивает угол экрана; слой — `--gr-z-toast`.
  */
-import { computed, nextTick, ref, useSlots, watchEffect } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, onUpdated, ref, useSlots, watchEffect } from 'vue'
 
 import { usePortalTarget } from '../../composables/usePortalTarget'
 import type { Component } from 'vue'
@@ -35,7 +35,11 @@ import type { GrToastTone, Toast, ToastAction } from '../../composables/useToast
 import GrButton from '../GrButton'
 import GrIcon from '../GrIcon'
 import {
+  collapsedTransform,
   PLACEMENT_CLASS,
+  STACK_GAP_PX,
+  STACK_PEEK_DEPTH,
+  stackDepth,
   SWIPE_DIRECTION,
   SWIPE_FLY_OUT_PX,
   SWIPE_RESISTANCE,
@@ -96,6 +100,15 @@ export interface GrToasterProps {
    * и `Backspace` на сфокусированном тосте — остаётся и при выключенном жесте.
    */
   swipeDismiss?: boolean
+  /**
+   * Со скольких видимых тостов стек схлопывается в стопку: колонка занимает
+   * место одного тоста, а остальные выглядывают из-под передней. Разворачивается
+   * по наведению и по фокусу. `false` — не схлопывать никогда.
+   *
+   * Порог, а не переключатель: пока тостов мало, колонка читается лучше стопки,
+   * и менять её незачем.
+   */
+  collapse?: number | false
 }
 
 import { useGrThemeAttrs } from '../GrConfigProvider/context'
@@ -108,6 +121,7 @@ const props = withDefaults(defineProps<GrToasterProps>(), {
   width: undefined,
   focusHotkey: 'F6',
   swipeDismiss: true,
+  collapse: 3,
 })
 
 /**
@@ -168,6 +182,113 @@ const focusWithin = ref(false)
 
 // Контейнер стека: по нему ищутся тосты — и для фокуса, и для жеста.
 const containerEl = ref<HTMLElement | null>(null)
+
+// ————— Стопка.
+
+/**
+ * Развёрнуто — по тем же двум флагам, что держат `paused`: рука на стеке или
+ * фокус внутри. Отдельного сигнала не заводим — читать стопку и не остановить
+ * при этом таймеры было бы ловушкой.
+ */
+const expanded = computed(() => hovered.value || focusWithin.value)
+const stacked = computed(() => props.collapse !== false && visibleToasts.value.length > Math.max(1, props.collapse))
+const collapsed = computed(() => stacked.value && !expanded.value)
+
+/**
+ * Высоты тостов: они разные (заголовок, заголовок с текстом, плюс кнопки), а
+ * развёрнутая раскладка складывает их накопительно.
+ *
+ * `offsetHeight`, а не `getBoundingClientRect().height`: свёрнутая карточка
+ * уменьшена `scale()`, и рект вернул бы её экранный размер — стопка мерила бы
+ * саму себя и с каждым замером сжималась.
+ */
+const toastHeights = ref<Record<string, number>>({})
+
+let heightObserver: ResizeObserver | null = null
+
+function measureToasts(): void {
+  const root = containerEl.value
+  if (!root)
+    return
+
+  const next: Record<string, number> = {}
+  for (const node of root.querySelectorAll<HTMLElement>('[data-gr-toast]')) {
+    const id = node.dataset.toastId
+    // В jsdom высота нулевая: раскладка обязана это пережить, поэтому нули не
+    // запоминаются, а потребитель значения падает на запасной путь.
+    if (id && node.offsetHeight > 0)
+      next[id] = node.offsetHeight
+
+    heightObserver?.observe(node)
+  }
+
+  toastHeights.value = next
+}
+
+onMounted(() => {
+  if (typeof ResizeObserver !== 'undefined')
+    heightObserver = new ResizeObserver(() => measureToasts())
+
+  measureToasts()
+})
+
+// Замер до отрисовки кадра: содержимое тоста меняется на месте (`update`,
+// `toast.promise`), и без этого стопка кадр стояла бы по старым высотам.
+onUpdated(measureToasts)
+
+onBeforeUnmount(() => {
+  heightObserver?.disconnect()
+  heightObserver = null
+})
+
+/** Все ли видимые тосты измерены. Пока нет — раскладка остаётся потоком. */
+const measured = computed(() => visibleToasts.value.every(toast => toastHeights.value[toast.id] > 0))
+
+/** Абсолютная раскладка включается только когда есть чем считать смещения. */
+const positioned = computed(() => stacked.value && measured.value)
+
+function expandedOffset(index: number): number {
+  let offset = 0
+  for (let i = 0; i < index; i++)
+    offset += (toastHeights.value[visibleToasts.value[i].id] ?? 0) + STACK_GAP_PX
+
+  return offset
+}
+
+function depthOf(index: number): number {
+  return stackDepth(index, visibleToasts.value.length, props.placement)
+}
+
+/** Высота передней карточки — по ней живёт вся свёрнутая стопка. */
+const frontHeight = computed(() => {
+  const heights = visibleToasts.value.map(toast => toastHeights.value[toast.id] ?? 0)
+  return props.placement.startsWith('top') ? heights[0] : heights[heights.length - 1]
+})
+
+const stackHeight = computed(() => {
+  if (!positioned.value)
+    return undefined
+
+  if (collapsed.value)
+    return `${frontHeight.value}px`
+
+  const heights = visibleToasts.value.map(toast => toastHeights.value[toast.id] ?? 0)
+  return `${heights.reduce((sum, h) => sum + h, 0) + STACK_GAP_PX * (heights.length - 1)}px`
+})
+
+/** Карточка лежит за передней: в свёрнутой стопке от неё виден только край. */
+function isBehind(index: number): boolean {
+  return collapsed.value && positioned.value && depthOf(index) > 0
+}
+
+/**
+ * Содержимое карточек за передней гасится: из-под неё видно 12 пикселей, и в
+ * эту полоску попадали обрывок строки и хвост полосы прогресса. Колода должна
+ * читаться краями карточек, а не мусором в щели.
+ */
+function toastContentStyle(index: number): Record<string, string> | undefined {
+  return isBehind(index) ? { opacity: '0' } : undefined
+}
 
 // ————— Смахивание.
 
@@ -266,18 +387,62 @@ const swipe = useDragGesture({
   onCancel: resetSwipe,
 })
 
-function swipeStyle(toast: Toast): Record<string, string> | undefined {
-  if (swipingId.value !== toast.id)
-    return undefined
+/**
+ * Стиль тоста: смахивание и стопка пишут в один `transform`. Двух инлайновых
+ * трансформов не бывает — второй затирает первый, и жест отменял бы раскладку.
+ */
+function toastStyle(toast: Toast, index: number): Record<string, string> | undefined {
+  const style: Record<string, string> = {}
+  const transforms: string[] = []
 
-  return {
-    transform: `translateX(${swipeOffset.value}px)`,
-    opacity: String(swipeOpacity(swipeOffset.value, swipeThreshold)),
+  if (swipingId.value === toast.id) {
+    // Смахивание идёт первым: трансформы применяются справа налево, и после
+    // `scale()` жест ехал бы в масштабе карточки, а не в пикселях экрана.
+    transforms.push(`translateX(${swipeOffset.value}px)`)
+    style.opacity = String(swipeOpacity(swipeOffset.value, swipeThreshold))
+
     // Переходы группы во время жеста борются с пальцем: тост едет с задержкой
     // и «догоняет» курсор после отпускания. После отпускания запрет снимается —
     // уходящему тосту переход нужен, иначе он не уедет вовсе.
-    ...(swipeReleased.value ? {} : { transition: 'none' }),
+    if (!swipeReleased.value)
+      style.transition = 'none'
   }
+
+  if (positioned.value) {
+    const depth = depthOf(index)
+
+    transforms.push(collapsed.value
+      ? collapsedTransform(depth, props.placement)
+      : `translateY(${expandedOffset(index)}px)`)
+
+    style.zIndex = String(visibleToasts.value.length - depth)
+
+    /*
+     * Уменьшение идёт от того края, которым стопка прижата к углу. По центру
+     * (умолчание) карточка теряет высоту с обеих сторон, и соседи разной высоты
+     * выглядывают на разное расстояние — колода получается рваной.
+     */
+    style.transformOrigin = props.placement.startsWith('top') ? 'top center' : 'bottom center'
+
+    /*
+     * Высота карточек за передней приравнивается к её собственной: иначе более
+     * высокий тост выглядывал бы дальше соседа, и шаг колоды плясал бы вместе с
+     * длиной сообщения.
+     */
+    if (collapsed.value && depth > 0 && frontHeight.value > 0)
+      style.height = `${frontHeight.value}px`
+
+    if (collapsed.value && depth > STACK_PEEK_DEPTH) {
+      style.opacity = '0'
+      // Почти невидимый край иначе ловил бы клики мимо передней карточки.
+      style.pointerEvents = 'none'
+    }
+  }
+
+  if (transforms.length > 0)
+    style.transform = transforms.join(' ')
+
+  return Object.keys(style).length > 0 ? style : undefined
 }
 
 /**
@@ -324,6 +489,41 @@ function metaFor(tone: GrToastTone): ToneMeta {
 }
 
 const containerClass = computed(() => PLACEMENT_CLASS[props.placement])
+
+const listClass = computed(() => (positioned.value
+  ? 'relative transition-[height] duration-[var(--gr-duration-base)] ease-[var(--gr-ease-out)]'
+  : 'grid gap-3'))
+
+const listStyle = computed(() => (stackHeight.value ? { height: stackHeight.value } : undefined))
+
+/**
+ * В стопке карточка вынута из потока, а её место задаёт трансформ — он и
+ * обязан ехать плавно. В обычной колонке переход не нужен: там позицию держит
+ * сама раскладка, а сдвиги отрабатывает `move-class` группы.
+ */
+const toastLayoutClass = computed(() => (positioned.value
+  ? 'absolute inset-x-0 top-0 transition-[transform,opacity] duration-[var(--gr-duration-base)] ease-[var(--gr-ease-out)]'
+  : 'relative'))
+
+/**
+ * В стопке перемещение группы выключается. `TransitionGroup` двигает детей
+ * приёмом FLIP: сам пишет в инлайновый `transform` и по концу перехода
+ * **очищает** его — то есть стирает раскладку стопки. Класс без перехода
+ * трансформа отключает проверку `hasCSSTransform`, и до записи дело не доходит.
+ */
+const moveClass = computed(() => (positioned.value
+  ? 'transition-none'
+  : 'transition-transform duration-[var(--gr-duration-base)] ease-[var(--gr-ease-out)]'))
+
+/**
+ * В стопке появление и уход красятся только прозрачностью: `translate-y-*` из
+ * классов группы спорил бы с инлайновым трансформом раскладки, а инлайновый
+ * сильнее — сдвиг всё равно не сыграл бы.
+ */
+const enterFromClass = computed(() => (positioned.value ? 'opacity-0' : 'opacity-0 translate-y-2'))
+const enterToClass = computed(() => (positioned.value ? 'opacity-100' : 'opacity-100 translate-y-0'))
+const leaveFromClass = computed(() => (positioned.value ? 'opacity-100' : 'opacity-100 translate-y-0'))
+const leaveToClass = computed(() => (positioned.value ? 'opacity-0' : 'opacity-0 translate-y-2'))
 
 const containerStyle = computed(() => {
   if (props.width === undefined)
@@ -379,17 +579,18 @@ defineExpose({ focus })
     >
       <TransitionGroup
           tag="div"
-          class="grid gap-3"
+          :class="listClass"
+          :style="listStyle"
           enter-active-class="transition duration-[var(--gr-duration-base)] ease-[var(--gr-ease-out)]"
-          enter-from-class="opacity-0 translate-y-2"
-          enter-to-class="opacity-100 translate-y-0"
+          :enter-from-class="enterFromClass"
+          :enter-to-class="enterToClass"
           leave-active-class="transition duration-[var(--gr-duration-fast)] ease-[var(--gr-ease-in)] absolute"
-          leave-from-class="opacity-100 translate-y-0"
-          leave-to-class="opacity-0 translate-y-2"
-          move-class="transition-transform duration-[var(--gr-duration-base)] ease-[var(--gr-ease-out)]"
+          :leave-from-class="leaveFromClass"
+          :leave-to-class="leaveToClass"
+          :move-class="moveClass"
       >
         <div
-            v-for="toast in visibleToasts"
+            v-for="(toast, index) in visibleToasts"
             :key="toast.id"
             data-gr-toast
             :data-tone="toast.tone"
@@ -397,13 +598,16 @@ defineExpose({ focus })
             :role="metaFor(toast.tone).role"
             aria-atomic="true"
             tabindex="-1"
-            class="relative overflow-hidden rounded-[var(--gr-radius-lg)] border border-[var(--gr-brd)] bg-[var(--gr-card)] px-4 py-3 shadow-[var(--gr-shadow-2)] focus-visible:outline-none focus-visible:shadow-[var(--gr-shadow-2),0_0_0_2px_var(--gr-ring)]"
-            :class="swipeDismiss ? '[touch-action:pan-y]' : ''"
-            :style="swipeStyle(toast)"
+            class="overflow-hidden rounded-[var(--gr-radius-lg)] border border-[var(--gr-brd)] bg-[var(--gr-card)] px-4 py-3 shadow-[var(--gr-shadow-2)] focus-visible:outline-none focus-visible:shadow-[var(--gr-shadow-2),0_0_0_2px_var(--gr-ring)]"
+            :class="[swipeDismiss ? '[touch-action:pan-y]' : '', toastLayoutClass]"
+            :style="toastStyle(toast, index)"
             @pointerdown="swipe.start"
             @keydown="onToastKeydown($event, toast)"
         >
-          <div class="flex items-start gap-3">
+          <div
+              class="flex items-start gap-3 transition-opacity duration-[var(--gr-duration-base)] ease-[var(--gr-ease-out)]"
+              :style="toastContentStyle(index)"
+          >
             <GrIcon size="md" class="mt-0.5" :style="{ color: metaFor(toast.tone).color }">
               <component :is="metaFor(toast.tone).icon" />
             </GrIcon>
@@ -455,6 +659,7 @@ defineExpose({ focus })
                 backgroundColor: metaFor(toast.tone).color,
                 animationDuration: `${toast.timeoutMs}ms`,
                 animationPlayState: paused ? 'paused' : 'running',
+                ...toastContentStyle(index),
               }"
           />
         </div>
