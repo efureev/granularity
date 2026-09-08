@@ -94,13 +94,37 @@ describe('GrTabPanels', () => {
     expect(panel.attributes('aria-labelledby')).toBe(activeTab.attributes('id'))
   })
 
-  it('без idBase id всё равно уникальны и связаны между собой', () => {
+  /**
+   * `GrTabs` проставляет вкладкам id **только** при явном `idBase`. Значит без
+   * него вкладки с подходящим id не существует, и `aria-labelledby` указывал бы
+   * в пустоту: диктор объявил бы имя панели пустой строкой вместо «имени нет».
+   * Собственный id панель сохраняет — он валиден и годится как якорь.
+   */
+  it('без idBase панель не выдумывает связь с несуществующей вкладкой', () => {
     const wrapper = mountPanels()
 
     const panel = wrapper.get('[role="tabpanel"]')
     expect(panel.attributes('id')).toBeTruthy()
-    expect(panel.attributes('aria-labelledby')).toBeTruthy()
-    expect(panel.attributes('id')).not.toBe(panel.attributes('aria-labelledby'))
+    expect(panel.attributes('aria-labelledby')).toBeUndefined()
+  })
+
+  /**
+   * Классы перехода — литералы в шаблоне, и опечатка в имени фазы не роняет
+   * ничего: анимация просто не сыграет. Поэтому проверяются они, а не факт
+   * движения, которого в jsdom нет.
+   *
+   * Классов ухода нет намеренно: уходящая панель обязана исчезать мгновенно,
+   * иначе на время перехода в контейнере окажутся две и он вырастет вдвое.
+   */
+  it('входящая панель обёрнута переходом, уходящая исчезает мгновенно', () => {
+    const wrapper = mountPanels({ idBase: 'demo' })
+    const stub = wrapper.find('transition-stub')
+
+    expect(stub.exists()).toBe(true)
+    expect(stub.attributes('enterfromclass')).toContain('opacity-0')
+    expect(stub.attributes('enterfromclass')).toContain('translate-y-1')
+    expect(stub.attributes('enteractiveclass')).toContain('duration-[var(--gr-duration-fast)]')
+    expect(stub.attributes('leaveactiveclass')).toBeUndefined()
   })
 
   it('панель вне GrTabPanels не падает и не выдумывает связку', () => {

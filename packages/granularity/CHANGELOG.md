@@ -9,6 +9,13 @@ to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **`GrTabPanels` animates the switch.** The incoming panel fades in over
+  `--gr-duration-fast`, drifting slightly upwards; the outgoing one disappears
+  at once. That asymmetry is deliberate: overlapping the two would stretch the
+  container to the height of both for the length of the transition and jolt the
+  page. Panels under `keepAlive` never leave the DOM, so they keep swapping
+  instantly — `hidden` is `display: none`, which cannot be animated at all.
+
 - **`GrSidebar` shows the collapsed label as a tooltip, not a native `title`.**
   A collapsed rail is icons only, and `title` answers the pointer alone — so
   a keyboard user could tab through the whole rail without ever learning where
@@ -222,6 +229,16 @@ to [Semantic Versioning](https://semver.org/).
   glyph in the knob should not cost the consumer the value readout.
 
 ### Fixed
+
+- **`GrTabPanel` no longer points `aria-labelledby` at a tab that does not
+  exist.** `GrTabs` gives its tabs ids only when an explicit `idBase` is passed,
+  while `GrTabPanels` always generated one of its own — so in the default case,
+  where nobody passes `idBase`, every panel claimed to be labelled by a missing
+  element. A dangling reference is worse than none: a screen reader announces
+  the panel's name as an empty string rather than saying it has none, and the
+  consumer cannot fix that from outside. Without a shared `idBase` the attribute
+  is now omitted; the panel keeps its own id, and the dev warning says what to
+  pass.
 
 - **`GrTable` stripes and hover moved from `<tbody>` to the table.** A rule bound
   to one row group cannot see the alternation between groups, and with

@@ -33,6 +33,14 @@ const isActive = computed(() => (ctx ? ctx.activeValue.value === props.value : t
 const panelId = computed(() => (ctx ? `${ctx.idBase.value}-panel-${props.value}` : undefined))
 const tabId = computed(() => (ctx ? `${ctx.idBase.value}-tab-${props.value}` : undefined))
 
+/**
+ * Без общего `idBase` вкладки с таким id не существует, и `aria-labelledby`
+ * указывал бы в пустоту. Панель без имени — потеря, а ссылка в никуда — ложь:
+ * диктор объявляет её пустой строкой вместо «нет подписи», и починить это
+ * потребитель уже не может.
+ */
+const labelledBy = computed(() => (ctx?.tabsLinked.value ? tabId.value : undefined))
+
 const wasActive = ref(isActive.value)
 watch(isActive, (active) => {
   if (active)
@@ -55,17 +63,33 @@ const shouldRender = computed(() => {
  */
 if (__GR_DEV__) {
   onMounted(() => {
-    if (!tabId.value || !isActive.value)
-      return
-    if (document.getElementById(tabId.value))
+    if (!ctx || !isActive.value)
       return
 
-    console.warn(
-      `[GrTabPanel] Вкладки с id "${tabId.value}" нет в документе: `
-      + '`aria-labelledby` ссылается в пустоту. Передайте один и тот же `idBase` в `GrTabs` и `GrTabPanels`.',
-    )
+    if (!ctx.tabsLinked.value) {
+      console.warn(
+        '[GrTabPanel] Панель не связана с вкладкой: у неё нет доступного имени. '
+        + 'Передайте один и тот же `idBase` в `GrTabs` и `GrTabPanels`.',
+      )
+      return
+    }
+
+    if (tabId.value && !document.getElementById(tabId.value)) {
+      console.warn(
+        `[GrTabPanel] Вкладки с id "${tabId.value}" нет в документе: `
+        + '`aria-labelledby` ссылается в пустоту. Передайте один и тот же `idBase` в `GrTabs` и `GrTabPanels`.',
+      )
+    }
   })
 }
+
+/*
+ * Появление панели — `<Transition>` в шаблоне, и у него есть только фаза входа.
+ * Уходящая панель обязана исчезать мгновенно: две панели одновременно
+ * растянули бы контейнер на высоту обеих, и смена вкладки дёргала бы страницу.
+ * При `keepAlive` перехода не будет вовсе — панель из DOM не уходит, а `hidden`
+ * это `display: none`, который не анимируется в принципе.
+ */
 
 defineSlots<{
   /** Содержимое панели. */
@@ -74,16 +98,22 @@ defineSlots<{
 </script>
 
 <template>
-  <div
-    v-if="shouldRender"
-    :id="panelId"
-    role="tabpanel"
-    data-gr-tab-panel
-    :aria-labelledby="tabId"
-    :hidden="keepAlive && !isActive ? true : undefined"
-    :tabindex="isActive ? 0 : undefined"
-    class="rounded-[var(--gr-radius-md)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]"
+  <Transition
+    enter-active-class="transition ease-[var(--gr-ease-out)] duration-[var(--gr-duration-fast)]"
+    enter-from-class="transform opacity-0 translate-y-1"
+    enter-to-class="transform opacity-100 translate-y-0"
   >
-    <slot />
-  </div>
+    <div
+      v-if="shouldRender"
+      :id="panelId"
+      role="tabpanel"
+      data-gr-tab-panel
+      :aria-labelledby="labelledBy"
+      :hidden="keepAlive && !isActive ? true : undefined"
+      :tabindex="isActive ? 0 : undefined"
+      class="rounded-[var(--gr-radius-md)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]"
+    >
+      <slot />
+    </div>
+  </Transition>
 </template>

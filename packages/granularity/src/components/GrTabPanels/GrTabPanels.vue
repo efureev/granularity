@@ -34,6 +34,7 @@ const resolvedIdBase = computed(() => props.idBase ?? generatedIdBase)
 provide(GR_TAB_PANELS_KEY, {
   activeValue: computed(() => props.modelValue),
   idBase: resolvedIdBase,
+  tabsLinked: computed(() => props.idBase != null),
 })
 
 defineSlots<{

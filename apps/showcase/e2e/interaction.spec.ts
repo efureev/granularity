@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test'
+import { expect, test, type Page } from '@playwright/test'
 
 import { focusedDescription as describeFocus, tabUntil } from '@feugene/granularity-test-kit/e2e'
 
@@ -461,6 +461,77 @@ test.describe('GrSidebar: сворачивание', () => {
 
     await item.focus()
     await expect(page.getByRole('tooltip').filter({ hasText: label }).first()).toBeVisible()
+  })
+})
+
+/**
+ * На странице два демо, и первое — `keepAlive`: там панели из DOM не уходят,
+ * а значит и перехода нет по определению. Отличать их по «нет скрытой панели»
+ * нельзя: у `keepAlive`-демо панели ленивые, и до первого показа скрытой тоже
+ * ни одной. Надёжный признак — `idBase`, он у каждого демо свой.
+ */
+/**
+ * Штатные 150 мс истекают раньше, чем round-trip Playwright донесёт замер.
+ * Замедление вешается **на класс появления**, а не на саму панель: Vue решает,
+ * сколько ждать ухода, по вычисленному `transition-duration` элемента, и общее
+ * правило задержало бы в DOM уходящую панель — ровно то, чего здесь быть не
+ * должно.
+ */
+async function slowDownPanelEnter(page: Page) {
+  await page.addStyleTag({
+    content: '.duration-\\[var\\(--gr-duration-fast\\)\\] { transition-duration: 3s !important; }',
+  })
+}
+
+function basicPanelsPreview(page: Page) {
+  return page.locator('[data-example-preview]')
+    .filter({ has: page.locator('[id^="demo-tabs-panel-"]') })
+    .first()
+}
+
+test.describe('GrTabPanels: смена панели', () => {
+  /**
+   * Длительность берётся из `--gr-duration-fast` (150 мс), и ловить её гонкой
+   * с Playwright бессмысленно. Токен замедляется до двух секунд: измерение
+   * становится детерминированным и заодно доказывает, что переход действительно
+   * управляется токеном, а не зашитым числом.
+   */
+  test('входящая панель проявляется, а не возникает мгновенно', async ({ page }) => {
+    await openShowcasePage(page, componentPath('GrTabPanels'))
+    await slowDownPanelEnter(page)
+
+    const preview = basicPanelsPreview(page)
+    const tab = preview.locator('[role="tab"]').nth(1)
+    // Панель берётся по `aria-controls` вкладки, а не «первая в контейнере»:
+    // первой какое-то время остаётся уходящая, и замер уехал бы на неё.
+    const panelId = await tab.getAttribute('aria-controls')
+    expect(panelId, 'вкладка обязана указывать на панель').toBeTruthy()
+    await tab.click()
+
+    const panel = page.locator(`#${panelId}`)
+    const opacity = await panel.evaluate(node => Number.parseFloat(getComputedStyle(node).opacity))
+    expect(opacity, 'панель обязана быть на середине проявления').toBeLessThan(1)
+
+    // И довести дело до конца: на месте она полностью непрозрачна.
+    await expect(panel).toHaveCSS('opacity', '1', { timeout: 10000 })
+  })
+
+  /**
+   * Уходящая панель обязана исчезать мгновенно: две панели в контейнере
+   * одновременно растянули бы его на высоту обеих.
+   */
+  test('во время перехода в контейнере всё равно одна панель', async ({ page }) => {
+    await openShowcasePage(page, componentPath('GrTabPanels'))
+    await slowDownPanelEnter(page)
+
+    const preview = basicPanelsPreview(page)
+    await preview.locator('[role="tab"]').nth(1).click()
+
+    // Появление растянуто на три секунды — окно проверки широкое, и будь у ухода
+    // своя анимация, вторая панель попалась бы здесь наверняка.
+    const panels = preview.locator('[data-gr-tab-panels] [data-gr-tab-panel]')
+    await expect(panels).toHaveCount(1)
+    expect(await panels.first().evaluate(n => Number.parseFloat(getComputedStyle(n).opacity))).toBeLessThan(1)
   })
 })
 
