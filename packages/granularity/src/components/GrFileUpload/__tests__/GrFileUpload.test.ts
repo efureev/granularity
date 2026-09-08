@@ -1145,3 +1145,38 @@ describe('GrFileUpload — modelValue', () => {
     expect(wrapper.emitted('change')).toHaveLength(1)
   })
 })
+
+/**
+ * Обе ошибки настройки — «куда отправлять не сказано» и «сказано двумя способами
+ * сразу» — по поведению не видны: первая всплывает на первом выборе файла,
+ * вторая не всплывает вовсе. Типом их не выразить: `defineProps` не принимает
+ * discriminated union, и союз не доезжает до места употребления.
+ */
+describe('GrFileUpload — предупреждения о настройке', () => {
+  function warnings(props: Record<string, unknown>): string[] {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const wrapper = mount(GrFileUpload, { props })
+    const calls = warn.mock.calls.map(call => String(call[0]))
+    warn.mockRestore()
+    wrapper.unmount()
+
+    return calls.filter(text => text.includes('[GrFileUpload]'))
+  }
+
+  it('ни `action`, ни `request` — предупреждение', () => {
+    expect(warnings({})).toEqual([
+      expect.stringContaining('не задан ни `action`, ни `request`'),
+    ])
+  })
+
+  it('оба сразу — предупреждение о том, что `action` не участвует', () => {
+    expect(warnings({ action: '/upload', request: () => Promise.resolve({}) })).toEqual([
+      expect.stringContaining('`action` не будет использован'),
+    ])
+  })
+
+  it('одного достаточно — консоль молчит', () => {
+    expect(warnings({ action: '/upload' })).toEqual([])
+    expect(warnings({ request: () => Promise.resolve({}) })).toEqual([])
+  })
+})

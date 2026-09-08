@@ -62,7 +62,8 @@ export type GrFileUploadRequest<TResponse = unknown> = (
  * Пропы `GrFileUpload`.
  *
  * Либо `action` (URL для POST multipart/form-data), либо `request` — кастомный
- * загрузчик (например, через axios). Если переданы оба — приоритет у `request`.
+ * загрузчик (например, через axios). Если переданы оба — приоритет у `request`,
+ * а `action` не используется; в dev-сборке об этом предупреждает консоль.
  *
  * `placeholder` — надпись в дефолтном UI-варианте (без слота default).
  */
@@ -717,16 +718,31 @@ function blur(): void {
   inputRef.value?.blur()
 }
 
-// Ни `action`, ни `request` — загружать некуда, и узнать об этом на первом же
-// выборе файла поздно. Выразить требование типом нельзя: `defineProps` в SFC
-// принимает объектный тип или интерфейс, но не discriminated union.
+/*
+ * Куда отправлять файлы, компонент узнаёт из `action` или `request`, и обе
+ * ошибки — «ни одного» и «оба сразу» — до первого выбора файла ничем себя не
+ * выдают.
+ *
+ * Типом это не выражается, и не по недосмотру: `defineProps` принимает
+ * объектный тип или интерфейс, но не discriminated union. Проверено —
+ * `defineProps<{ action: string } | { request: … }>()` компилируется, а до места
+ * употребления union не доезжает: ключи схлопываются в плоский объект, и
+ * `vue-tsc` молчит и на «оба сразу», и на «ни одного».
+ */
 onMounted(() => {
   if (!__GR_DEV__)
     return
-  if (props.action || props.request)
-    return
 
-  console.warn('[GrFileUpload] не задан ни `action`, ни `request`: отправлять файлы некуда.')
+  if (!props.action && !props.request) {
+    console.warn('[GrFileUpload] не задан ни `action`, ни `request`: отправлять файлы некуда.')
+    return
+  }
+
+  // Приоритет `request` сам по себе не ошибка, но молчаливым быть не должен:
+  // переданный рядом `action` не отменяется и не дополняет — он просто не
+  // участвует, и заметить это по поведению нельзя.
+  if (props.action && props.request)
+    console.warn('[GrFileUpload] заданы и `action`, и `request`: файлы отправит `request`, `action` не будет использован.')
 })
 
 // Хвосты, переживающие размонтирование: незавершённый XHR продолжает качать

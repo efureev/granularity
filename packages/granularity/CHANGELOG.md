@@ -259,6 +259,14 @@ to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- **`GrFileUpload` no longer accepts `action` and `request` in silence.** Passing
+  both is not an error in itself — `request` wins — but nothing said so, and an
+  `action` that is quietly ignored behaves exactly like one that was honoured.
+  Dev builds now warn. The requirement cannot be expressed as a type: Vue's
+  `defineProps` takes an object type or an interface, not a discriminated union —
+  the keys collapse into a flat object and `vue-tsc` passes both "both at once"
+  and "neither".
+
 - **`GrTabPanel` no longer points `aria-labelledby` at a tab that does not
   exist.** `GrTabs` gives its tabs ids only when an explicit `idBase` is passed,
   while `GrTabPanels` always generated one of its own — so in the default case,
