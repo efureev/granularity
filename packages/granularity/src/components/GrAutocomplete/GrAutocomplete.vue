@@ -859,7 +859,7 @@ const themeAttrs = useGrThemeAttrs()
               ref="listboxEl"
               data-gr-autocomplete-listbox
               :data-gr-virtual="virtual ? '' : undefined"
-              class="p-1 overflow-auto"
+              class="p-1 min-h-0 overflow-auto"
               :class="virtual ? 'flex flex-col' : ''"
               :style="listboxStyle"
               role="listbox"
@@ -988,6 +988,7 @@ const themeAttrs = useGrThemeAttrs()
               data-gr-autocomplete-status
               role="status"
               aria-live="polite"
+              class="shrink-0"
               :class="autocompleteStateClass"
             >
               <template v-if="isLoading">

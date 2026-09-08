@@ -39,6 +39,22 @@ to [Semantic Versioning](https://semver.org/).
   have had to centre it themselves. An empty knob is unaffected — it is
   absolutely positioned and sized.
 
+- **`GrSelect`, `GrAutocomplete` and `GrTreeSelect` panels now fit the screen.**
+  Their height came from a fixed `dropdownMaxHeight` (280 / 280 / 320) that knew
+  nothing about the viewport: on a short screen the panel built its full height
+  near the bottom edge and the tail of the list went off-screen — unreachable,
+  since the layer is `fixed` and the page does not scroll it. Neither `flip` nor
+  `shift` can shrink a panel.
+
+  The positioning layer already measures the room left on the side it chose and
+  publishes it as `--gr-floating-available-height`; that measurement is now the
+  panel's ceiling, while `dropdownMaxHeight` stays the list's own. Whichever is
+  smaller wins, so nothing changes where there is room. Inside the panel `min-h-0`
+  hands the shrinking to the list: the search field, the status rows and the
+  "add custom value" row stay put, and there is still exactly one scrollbar.
+  Virtualization needs no telling — `useVirtualList` measures its container with a
+  `ResizeObserver` and prefers that over the declared height.
+
 ### Added
 
 - **`GrDelta` has its own customization points** — four `--gr-delta-*` hooks

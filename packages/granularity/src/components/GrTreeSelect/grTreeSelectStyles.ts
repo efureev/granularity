@@ -1,4 +1,5 @@
 import type { GrControlState } from '../shared/sizes'
+import { overlayListPanelClass } from '../shared/overlayListPanel'
 import { overlayPanelSurfaceClass } from '../shared/overlayPanelSurface'
 
 import type { GrInputSize } from '../GrInput'
@@ -62,7 +63,7 @@ export function grTreeSelectClass(options: {
   ].join(' ')
 }
 
-export const grTreeSelectPanelClass = `${overlayPanelSurfaceClass} overflow-hidden`
+export const grTreeSelectPanelClass = `${overlayPanelSurfaceClass} ${overlayListPanelClass} overflow-hidden`
 
 /**
  * Строка состояния панели: загрузка и «нет данных». По центру и с двойным

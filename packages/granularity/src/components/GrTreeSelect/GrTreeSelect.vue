@@ -741,7 +741,7 @@ const themeAttrs = useGrThemeAttrs()
             дал бы вторую полосу прокрутки на том же списке.
           -->
           <div
-            class="p-1"
+            class="p-1 min-h-0"
             :class="virtual ? '' : 'overflow-auto'"
             :style="virtual ? undefined : { maxHeight: `${dropdownMaxHeight}px` }"
           >

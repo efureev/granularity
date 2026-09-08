@@ -358,3 +358,95 @@ test.describe('ряд вкладок за краем', () => {
     await expect(tablist).toHaveAttribute('data-overflow', 'end')
   })
 })
+
+/**
+ * Потолок списочной панели считается от места, а не от константы.
+ *
+ * `GrSelect`, `GrAutocomplete` и `GrTreeSelect` держали высоту фиксированным
+ * `dropdownMaxHeight` (280/280/320) и о вьюпорте не знали: на коротком экране
+ * панель честно строила свои 280 пикселей и уезжала за нижний край вместе с
+ * концом списка. Слой умеет измерять доступное место и публикует его в
+ * `--gr-floating-available-height`; отсюда потолок панели, а `min-h-0` внутри
+ * отдаёт сжатие списку — прокручивается он, а не панель.
+ *
+ * Дефект геометрический и проявляется только на коротком вьюпорте, поэтому
+ * замер здесь, а не в jsdom.
+ */
+test.describe('высота списочной панели', () => {
+  const cases = [
+    { component: 'GrSelect', label: 'Search a city', list: '[role="listbox"]' },
+    { component: 'GrAutocomplete', label: 'Search a city', list: '[role="listbox"]' },
+    { component: 'GrTreeSelect', label: 'Filter and pick several areas', list: '[role="tree"]' },
+  ] as const
+
+  for (const item of cases) {
+    test(`${item.component}: панель на коротком экране сжимается, а не уезжает за край`, async ({ page }) => {
+      // Короткий экран — единственное условие, при котором дефект виден вовсе:
+      // на обычном места хватает и фиксированному потолку.
+      await page.setViewportSize({ width: 1280, height: 420 })
+      await page.goto(componentPath(item.component))
+      await page.locator('#live-examples').waitFor()
+
+      const trigger = page.getByLabel(item.label).first()
+      await trigger.scrollIntoViewIfNeeded()
+
+      // Триггер по центру экрана: `flip` тут не спасает — мало и сверху, и
+      // снизу, и панели остаётся только сжаться.
+      await trigger.evaluate((el) => {
+        const box = el.getBoundingClientRect()
+        window.scrollBy(0, box.top - (window.innerHeight - box.height) / 2)
+      })
+
+      await trigger.click()
+
+      // Панели всех примеров страницы живут в общем портале, и в DOM их
+      // столько же, сколько демо. Свою находим по `aria-controls` триггера.
+      const listId = await trigger.evaluate(el =>
+        (el.closest('[aria-controls]') ?? el.querySelector('[aria-controls]'))?.getAttribute('aria-controls') ?? null,
+      )
+      if (!listId)
+        throw new Error('у триггера нет `aria-controls` — панель не открылась')
+
+      const list = page.locator(`#${listId}`)
+      await expect(list).toBeVisible()
+
+      const measured = await list.evaluate((node) => {
+        // Потолок несёт поверхность панели — прямой потомок слоя: `data-*` и
+        // координаты стоят на слое, а классы панели на узле внутри него.
+        const surface = node.closest('[data-gr-overlay-root]')!.firstElementChild!
+
+        const isScroller = (el: Element): boolean => {
+          const overflow = getComputedStyle(el).overflowY
+          return (overflow === 'auto' || overflow === 'scroll') && el.scrollHeight > el.clientHeight + 1
+        }
+
+        const box = surface.getBoundingClientRect()
+        return {
+          top: box.top,
+          bottom: box.bottom,
+          viewport: window.innerHeight,
+          available: getComputedStyle(surface).getPropertyValue('--gr-floating-available-height').trim(),
+          maxHeight: getComputedStyle(surface).maxHeight,
+          surfaceScrolls: isScroller(surface),
+          scrollers: [...surface.querySelectorAll('*')].filter(isScroller).length,
+        }
+      })
+
+      // Слой сообщил замер — без него потолок разрешился бы в фолбэк `100vh`.
+      expect(measured.available).toMatch(/^[\d.]+px$/)
+      expect(measured.maxHeight).toBe(measured.available)
+
+      // Замер ниже прежней константы: иначе тест зеленел бы и со статическим
+      // потолком, ничего о нём не сказав.
+      expect(Number.parseFloat(measured.available)).toBeLessThan(280)
+
+      // Панель целиком на экране — то, чего фиксированный потолок не давал.
+      expect(measured.top).toBeGreaterThanOrEqual(-1)
+      expect(measured.bottom).toBeLessThanOrEqual(measured.viewport + 1)
+
+      // Сжимается список, а не панель, и полоса прокрутки при этом одна.
+      expect(measured.surfaceScrolls, 'панель прокручивается сама').toBe(false)
+      expect(measured.scrollers, 'скроллер внутри панели должен быть ровно один').toBe(1)
+    })
+  }
+})

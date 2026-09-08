@@ -1135,7 +1135,7 @@ const themeAttrs = useGrThemeAttrs()
               ref="listboxEl"
               data-gr-select-listbox
               :data-gr-virtual="virtualEnabled ? '' : undefined"
-              class="p-1 overflow-auto"
+              class="p-1 min-h-0 overflow-auto"
               :class="virtualEnabled ? 'flex flex-col' : ''"
               :style="listboxStyle"
               role="listbox"
