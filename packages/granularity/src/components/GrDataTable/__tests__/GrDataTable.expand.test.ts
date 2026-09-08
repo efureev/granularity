@@ -103,14 +103,86 @@ describe('GrDataTable — раскрытие строки', () => {
     expect(detail.attributes('aria-rowindex')).toBeUndefined()
   })
 
-  it('с virtual раскрытие выключено и предупреждает', () => {
+  /**
+   * Строка и её второй ярус обязаны лежать в одной группе строк: замер
+   * виртуализатора висит на группе, и высота подробностей попадает в него
+   * только оттуда. Обернуть две `<tr>` в таблице больше не во что.
+   */
+  it('строка и её второй ярус лежат в одной группе', async () => {
+    const wrapper = mountTable()
+
+    await wrapper.findAll('[data-gr-datatable-expand]')[1].trigger('click')
+
+    const groups = wrapper.findAll('[data-gr-datatable-row-group]')
+    expect(groups).toHaveLength(3)
+
+    // Подробности — в группе своей строки, а не в соседней и не сами по себе.
+    expect(groups[1].find('[data-gr-datatable-detail]').exists()).toBe(true)
+    expect(groups[0].find('[data-gr-datatable-detail]').exists()).toBe(false)
+    expect(groups[2].find('[data-gr-datatable-detail]').exists()).toBe(false)
+  })
+
+  it('с virtual раскрытие работает', async () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
     const wrapper = mountTable({ virtual: true, maxHeight: 200 })
 
-    expect(wrapper.find('[data-gr-datatable-expand]').exists()).toBe(false)
-    expect(warn.mock.calls.flat().join(' ')).toContain('`expandable` вместе с `virtual`')
+    expect(wrapper.findAll('[data-gr-datatable-expand]')).toHaveLength(3)
+
+    await wrapper.findAll('[data-gr-datatable-expand]')[0].trigger('click')
+    expect(wrapper.find('[data-testid="detail"]').exists()).toBe(true)
+
+    // Предупреждения быть не должно: запрета больше нет.
+    expect(warn.mock.calls.flat().join(' ')).not.toContain('`expandable` вместе с `virtual`')
 
     warn.mockRestore()
+  })
+
+  /**
+   * Замер обязан видеть высоту второго яруса. Вернись он с группы на строку —
+   * распорка считала бы её без подробностей, и список поехал бы молча: ни
+   * ошибки, ни падения типов, симптом только в браузере.
+   *
+   * jsdom раскладки не считает, поэтому высоту задаём сами — и задаём её
+   * **группе строк**: на строке подмена не сработает, и распорка останется на
+   * чистой оценке. Это и есть проверка того, что меряется именно группа.
+   */
+  it('при virtual замер видит высоту второго яруса', async () => {
+    const rows = Array.from({ length: 200 }, (_, index) => ({ id: index + 1, name: `Row ${index + 1}` }))
+
+    const original = Object.getOwnPropertyDescriptor(HTMLTableSectionElement.prototype, 'offsetHeight')
+    Object.defineProperty(HTMLTableSectionElement.prototype, 'offsetHeight', {
+      configurable: true,
+      get(this: HTMLElement) {
+        return this.querySelector('[data-gr-datatable-detail]') ? 160 : 40
+      },
+    })
+
+    try {
+      const wrapper = mountTable({ rows, virtual: true, maxHeight: 200 })
+      await nextTick()
+
+      const spacerAfter = () => Number.parseFloat(
+        wrapper.find('[data-gr-datatable-spacer="after"] td').attributes('style')?.match(/height:\s*([\d.]+)px/)?.[1] ?? '0',
+      )
+
+      const before = spacerAfter()
+      expect(before).toBeGreaterThan(0)
+
+      await wrapper.findAll('[data-gr-datatable-expand]')[0].trigger('click')
+      await nextTick()
+
+      // Группа стала выше на высоту подробностей — и ровно на неё выросла
+      // распорка, то есть замер их увидел.
+      expect(spacerAfter() - before).toBeCloseTo(120, 0)
+
+      wrapper.unmount()
+    }
+    finally {
+      if (original)
+        Object.defineProperty(HTMLTableSectionElement.prototype, 'offsetHeight', original)
+      else
+        Reflect.deleteProperty(HTMLTableSectionElement.prototype, 'offsetHeight')
+    }
   })
 })
 

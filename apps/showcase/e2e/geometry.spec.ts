@@ -531,3 +531,82 @@ test.describe('заливка области выбора цвета', () => {
     }
   })
 })
+
+/**
+ * Раскрытая строка внутри виртуального списка.
+ *
+ * В jsdom этой пары не существует: там нет ни раскладки, ни высот, а раскрытие
+ * с виртуализацией держится именно на них. Здесь проверяется то, что видит
+ * пользователь: строка раскрывается, список от этого не дёргается, и раскрытие
+ * переживает прокрутку мимо себя.
+ *
+ * Сам замер (что виртуализатор меряет группу, а не строку) гейтится юнит-тестом
+ * `GrDataTable.expand.test.ts`: он подменяет высоту группы и ловит подмену
+ * цели. В браузере эта разница в тысячах пикселей списка не видна, и проверка
+ * здесь была бы зелёной на сломанной версии.
+ */
+test.describe('раскрытие внутри виртуального списка', () => {
+  test('раскрытая строка не сбивает раскладку ни при раскрытии, ни при прокрутке', async ({ page }) => {
+    await page.goto(componentPath('GrDataTable'))
+    await page.locator('#live-examples').waitFor()
+
+    // Своё демо: на странице несколько таблиц, и только у этой есть и распорка,
+    // и кнопка раскрытия.
+    const table = page.locator('[data-gr-datatable]')
+      .filter({ has: page.locator('[data-gr-datatable-spacer]') })
+      .filter({ has: page.locator('[data-gr-datatable-expand]') })
+      .first()
+
+    await table.scrollIntoViewIfNeeded()
+    await expect(table).toBeVisible()
+
+    const groupHeight = (detail: boolean) => table.evaluate((node, want) => {
+      const group = [...node.querySelectorAll('[data-gr-datatable-row-group]')]
+        .find(el => !!el.querySelector('[data-gr-datatable-detail]') === want)
+      return group ? group.getBoundingClientRect().height : 0
+    }, detail)
+
+    const plain = await groupHeight(false)
+
+    await table.locator('[data-gr-datatable-expand]').first().click()
+
+    // Второй ярус лежит в группе своей строки, а не отдельной строкой рядом:
+    // иначе замер виртуализатора до него не дотянулся бы.
+    const expanded = await groupHeight(true)
+    expect(expanded, 'раскрытая группа не стала выше').toBeGreaterThan(plain)
+    await expect(table.locator('[data-gr-datatable-row-group]').filter({
+      has: page.locator('[data-gr-datatable-detail]'),
+    })).toHaveCount(1)
+
+    /** Первая отрисованная строка при заданном смещении. */
+    const firstRowAt = async (top: number) => {
+      await table.evaluate((node, value) => {
+        node.scrollTop = value
+        node.dispatchEvent(new Event('scroll'))
+      }, top)
+
+      // Замер уточняет высоты и на несколько пикселей подправляет смещение —
+      // это штатная компенсация примитива, чтобы список не дёргался. Допуск
+      // меньше строки, поэтому на проверку соответствия она не влияет.
+      await expect
+        .poll(() => table.evaluate((node, value) => Math.abs(node.scrollTop - value), top))
+        .toBeLessThan(32)
+
+      return table.locator('[data-gr-datatable-row]').first().locator('td').nth(1).innerText()
+    }
+
+    const firstPass = await firstRowAt(6000)
+    // Уезжаем далеко за раскрытые строки и возвращаемся на то же место.
+    await firstRowAt(120000)
+    const secondPass = await firstRowAt(6000)
+
+    // Одно смещение — одна строка. Разойдись они, раскладка «плывёт»: высоты
+    // раскрытых групп не пережили прокрутку мимо них.
+    expect(secondPass, 'то же смещение показало другую строку').toBe(firstPass)
+
+    // И раскрытие путешествие пережило. Смотреть на него надо у себя дома:
+    // вне окна раскрытой строки нет в разметке — на то и виртуализация.
+    await firstRowAt(0)
+    await expect(table.locator('[data-gr-datatable-detail]')).toHaveCount(1)
+  })
+})

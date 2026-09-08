@@ -231,6 +231,7 @@ export const demoPathByPreviewKey = {
   'gr-data-table-sortable-columns': 'components/gr-data-table/GrDataTableSortableColumnsDemo.vue',
   'gr-data-table-summary-row': 'components/gr-data-table/GrDataTableSummaryRowDemo.vue',
   'gr-data-table-virtual': 'components/gr-data-table/GrDataTableVirtualDemo.vue',
+  'gr-data-table-virtual-expand': 'components/gr-data-table/GrDataTableVirtualExpandDemo.vue',
   'gr-delta-basic': 'components/gr-delta/GrDeltaBasicDemo.vue',
   'gr-delta-polarity': 'components/gr-delta/GrDeltaPolarityDemo.vue',
   'gr-delta-type-scale': 'components/gr-delta/GrDeltaTypeScaleDemo.vue',

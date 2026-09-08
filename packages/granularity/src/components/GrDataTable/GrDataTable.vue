@@ -445,7 +445,7 @@ function summaryValue(key: string): unknown {
  * Раскрытие выключено при виртуализации целиком — см. предупреждение ниже.
  * Объявлено здесь, а не рядом с ним: от него зависит `colspan` служебных строк.
  */
-const expandEnabled = computed(() => props.expandable && !props.virtual)
+const expandEnabled = computed(() => props.expandable)
 
 /** Своя колонка с кнопкой: её может не быть, если кнопку ставит потребитель. */
 const expandColumnVisible = computed(() => expandEnabled.value && props.expandColumn)
@@ -644,24 +644,6 @@ function detailRowId(row: TRow): string {
   return `${expandDetailId}-${rowKeyValue(row)}`
 }
 
-/**
- * Раскрытие и виртуализация вместе пока не работают: замер виртуализатора висит
- * на самой строке, и высота второго яруса в него не попадает — распорка
- * разъедется молча. Запрет снимется, когда пара строк переедет в свою группу
- * `<tbody>`; до тех пор лучше предупредить, чем показать прыгающую таблицу.
- */
-if (__GR_DEV__) {
-  watchEffect(() => {
-    if (props.expandable && props.virtual) {
-      console.warn(
-        '[granularity] GrDataTable: `expandable` вместе с `virtual` пока не поддержан — '
-        + 'раскрытие выключено. Замер виртуализатора висит на строке и не видит высоту '
-        + 'подробностей, поэтому распорки разъезжаются.',
-      )
-    }
-  })
-}
-
 // ————— Императивный API.
 const tableRef = ref<InstanceType<typeof GrTable> | null>(null)
 const rootId = useId()
@@ -805,6 +787,7 @@ defineSlots<{
   <GrTable
     v-bind="tableProps"
     ref="tableRef"
+    row-groups
     data-gr-datatable
   >
     <!-- Caption рендерится всегда (у `GrTable` он `sr-only`): в нём живёт
@@ -948,7 +931,7 @@ defineSlots<{
       </tr>
     </template>
 
-    <template v-if="loading">
+    <tbody v-if="loading">
       <tr data-gr-datatable-loading>
         <td :colspan="totalColumns" class="text-center text-[var(--gr-muted-fg)]" :class="placeholderClass">
           <slot name="loading">
@@ -959,8 +942,9 @@ defineSlots<{
           </slot>
         </td>
       </tr>
-    </template>
-    <template v-else-if="isEmpty">
+    </tbody>
+
+    <tbody v-else-if="isEmpty">
       <tr data-gr-datatable-empty>
         <td :colspan="totalColumns" class="text-center text-[var(--gr-muted-fg)]" :class="placeholderClass">
           <slot name="empty">
@@ -968,27 +952,41 @@ defineSlots<{
           </slot>
         </td>
       </tr>
-    </template>
+    </tbody>
+
     <template v-else>
       <!--
         Распорки виртуального списка. У таблицы они строки, а не псевдоэлементы:
         `<tbody>` игнорирует `padding`, а псевдоэлемент внутри группы строк не
         образует строку с управляемой высотой. Форма та же, что у служебных
-        строк загрузки и пустоты.
+        строк загрузки и пустоты, а группа вокруг — потому что тело собрано
+        группами: строка вне группы не встала бы в таблицу вовсе.
       -->
-      <tr
-        v-if="virtual && spacerBefore > 0"
-        aria-hidden="true"
-        data-gr-datatable-spacer="before"
-        data-gr-table-off-grid
-        :style="{ pointerEvents: 'none' }"
-      >
-        <td :colspan="totalColumns" :style="{ height: `${spacerBefore}px`, padding: '0', border: '0' }" />
-      </tr>
+      <tbody v-if="virtual && spacerBefore > 0" data-gr-table-off-grid>
+        <tr
+          aria-hidden="true"
+          data-gr-datatable-spacer="before"
+          data-gr-table-off-grid
+          :style="{ pointerEvents: 'none' }"
+        >
+          <td :colspan="totalColumns" :style="{ height: `${spacerBefore}px`, padding: '0', border: '0' }" />
+        </tr>
+      </tbody>
 
-      <template v-for="{ row, index } in renderedRows" :key="rowKeyValue(row)">
-      <tr
+      <!--
+        Строка и её второй ярус лежат в одной группе, и замер виртуализатора
+        висит на группе, а не на строке: иначе высота подробностей в него не
+        попадает и распорка разъезжается молча. `ResizeObserver` примитива при
+        этом следит за той же группой, поэтому раскрытие и подгрузка деталей
+        уточняют высоту сами, без отдельного уведомления.
+      -->
+      <tbody
+        v-for="{ row, index } in renderedRows"
+        :key="rowKeyValue(row)"
         :ref="(el) => virtual && virtualizer.measure(index, el as Element | null)"
+        data-gr-datatable-row-group
+      >
+      <tr
         class="border-t border-[var(--gr-brd)]"
         :class="[
           isRowSelected(row) ? rowSelectedClass : '',
@@ -1116,17 +1114,18 @@ defineSlots<{
           </div>
         </td>
       </tr>
-      </template>
+      </tbody>
 
-      <tr
-        v-if="virtual && spacerAfter > 0"
-        aria-hidden="true"
-        data-gr-datatable-spacer="after"
-        data-gr-table-off-grid
-        :style="{ pointerEvents: 'none' }"
-      >
-        <td :colspan="totalColumns" :style="{ height: `${spacerAfter}px`, padding: '0', border: '0' }" />
-      </tr>
+      <tbody v-if="virtual && spacerAfter > 0" data-gr-table-off-grid>
+        <tr
+          aria-hidden="true"
+          data-gr-datatable-spacer="after"
+          data-gr-table-off-grid
+          :style="{ pointerEvents: 'none' }"
+        >
+          <td :colspan="totalColumns" :style="{ height: `${spacerAfter}px`, padding: '0', border: '0' }" />
+        </tr>
+      </tbody>
     </template>
 
     <template v-if="$slots.footer || hasSummary" #footer>

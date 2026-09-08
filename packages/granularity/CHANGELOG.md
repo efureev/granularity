@@ -9,6 +9,21 @@ to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **`GrDataTable` expands rows inside a virtual list.** The two were mutually
+  exclusive: with `virtual` the expansion was switched off and said so in dev.
+  The measurement was the reason — the virtualizer sized the row itself, and the
+  second tier is a separate `<tr>` whose height never entered the sum, so the
+  spacers drifted silently.
+
+  A row and its detail tier now live in one row group, and the measurement hangs
+  on the group. There is nothing else to wrap two `<tr>` in — a row group is the
+  only container that exists for them — so the table body is built as one
+  `<tbody>` per row rather than a single one for everything. Several groups are
+  valid HTML and change nothing for a screen reader: the row number comes from
+  `aria-rowindex`, not from the position in the markup. A side benefit: the
+  virtualizer's `ResizeObserver` watches that same group, so expanding a row and
+  loading its details refine the height on their own.
+
 - **`GrTable` takes `rowGroups`.** It hands the body to the consumer whole: the
   default slot goes straight into the table with no `<tbody>` around it. Loading
   and empty states stay with the table and keep their own group.
