@@ -649,7 +649,9 @@ test.describe('липкая колонка таблицы', () => {
     const before = await probe()
     expect(before.scrollLeft, 'таблица не прокручена — проверять нечего').toBe(0)
 
-    await scroller.evaluate((node) => { node.scrollLeft = 200 })
+    await scroller.evaluate((node) => {
+      node.scrollLeft = 200
+    })
     await expect.poll(() => scroller.evaluate(node => node.scrollLeft)).toBeGreaterThan(0)
 
     const after = await probe()
