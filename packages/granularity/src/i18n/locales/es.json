@@ -391,7 +391,8 @@
     "badge": "{count} nuevos"
   },
   "emptyState": {
-    "title": "Todavía no hay nada"
+    "title": "Todavía no hay nada",
+    "searchTitle": "No se ha encontrado nada"
   },
   "sortable": {
     "label": "Lista ordenable",

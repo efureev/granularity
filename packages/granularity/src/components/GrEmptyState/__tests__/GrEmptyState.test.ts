@@ -178,3 +178,35 @@ describe('GrEmptyState — иконка', () => {
     expect(wrapper.find('[data-custom-icon]').exists()).toBe(true)
   })
 })
+
+/**
+ * Значений `kind` два, и это весь корпус: по репозиторию повторяются ровно
+ * «ещё ничего не создано» и «под запросом не нашлось». Разводить их
+ * обязательно — общий заголовок «Пока пусто» под фильтром дезинформирует:
+ * данные есть, просто не совпали.
+ */
+describe('GrEmptyState — вид пустоты', () => {
+  it('по умолчанию говорит про пустоту, а не про поиск', () => {
+    const wrapper = mount(GrEmptyState)
+
+    expect(wrapper.get('[data-gr-empty-state-title]').text()).toBe('Nothing here yet')
+
+    wrapper.unmount()
+  })
+
+  it('`search` меняет заголовок и иконку', () => {
+    const wrapper = mount(GrEmptyState, { props: { kind: 'search' } })
+
+    expect(wrapper.get('[data-gr-empty-state-title]').text()).toBe('Nothing found')
+
+    wrapper.unmount()
+  })
+
+  it('заданный заголовок сильнее вида', () => {
+    const wrapper = mount(GrEmptyState, { props: { kind: 'search', title: 'Своё' } })
+
+    expect(wrapper.get('[data-gr-empty-state-title]').text()).toBe('Своё')
+
+    wrapper.unmount()
+  })
+})

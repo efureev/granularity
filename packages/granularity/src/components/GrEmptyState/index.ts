@@ -5,6 +5,7 @@ export { grEmptyStateConfig } from './config'
 export type { GrEmptyStateConfigurableProps } from './defaults'
 export type {
   GrEmptyStateHeadingLevel,
+  GrEmptyStateKind,
   GrEmptyStateSize,
   GrEmptyStateVariant,
 } from './grEmptyStateStyles'

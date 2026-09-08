@@ -389,7 +389,8 @@
     "badge": "{count} new"
   },
   "emptyState": {
-    "title": "Nothing here yet"
+    "title": "Nothing here yet",
+    "searchTitle": "Nothing found"
   },
   "sortable": {
     "label": "Sortable list",

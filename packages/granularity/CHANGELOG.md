@@ -9,6 +9,18 @@ to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **`GrEmptyState` tells two emptinesses apart.** `kind` picks between "nothing
+  has been created yet" (`empty`, the default) and "nothing matched the query"
+  (`search`), changing the default title and icon. The difference is not
+  cosmetic: under a filter the old single default — "Nothing here yet" —
+  misinforms, because the data is there and simply did not match, and the user's
+  next step is to loosen the query rather than to create something. Every search
+  usage in this repository was already overriding the title by hand.
+
+  There are exactly two values because exactly two recur. A failed load is
+  deliberately not among them — `GrResponseErrorBanner` owns that. No default
+  description is supplied for either: it is always about the specific screen.
+
 - **`GrDataTable` takes keyboard navigation over cells.** `cell-navigation`
   turns on the WAI-ARIA `grid` pattern: the table gets `role="grid"`, becomes a
   single `Tab` stop, and arrows move between cells. `Home`/`End` go to the ends

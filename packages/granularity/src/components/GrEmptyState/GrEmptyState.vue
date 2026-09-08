@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 
 import IconInbox from '~icons/lucide/inbox'
+import IconSearchX from '~icons/lucide/search-x'
 
 import GrIcon from '../GrIcon/GrIcon.vue'
 import { useGrComponentProp, useGrComponentSize } from '../GrConfigProvider/context'
@@ -20,11 +21,13 @@ import {
   titleBySize,
   type GrEmptyStateHeadingLevel,
   type GrEmptyStateSize,
+  type GrEmptyStateKind,
   type GrEmptyStateVariant,
 } from './grEmptyStateStyles'
 
 export type {
   GrEmptyStateHeadingLevel,
+  GrEmptyStateKind,
   GrEmptyStateSize,
   GrEmptyStateVariant,
 } from './grEmptyStateStyles'
@@ -45,6 +48,12 @@ export interface GrEmptyStateProps {
   /** `ghost` снимает рамку и фон: карточка внутри карточки рисует вторую рамку. */
   variant?: GrEmptyStateVariant
   headingLevel?: GrEmptyStateHeadingLevel
+  /**
+   * Что за пустота: ещё ничего не создано (`empty`) или под запросом ничего не
+   * нашлось (`search`). Меняет иконку и заголовок по умолчанию; заданный
+   * `title` сильнее в обоих случаях.
+   */
+  kind?: GrEmptyStateKind
 }
 
 const props = withDefaults(defineProps<GrEmptyStateProps>(), {
@@ -53,6 +62,7 @@ const props = withDefaults(defineProps<GrEmptyStateProps>(), {
   size: undefined,
   variant: undefined,
   headingLevel: undefined,
+  kind: 'empty',
 })
 
 const slots = defineSlots<{
@@ -72,7 +82,11 @@ const resolvedVariant = useGrComponentProp('GrEmptyState', 'variant', () => prop
 const headingLevel = useGrComponentProp('GrEmptyState', 'headingLevel', () => props.headingLevel, 3)
 
 const headingTag = computed(() => `h${headingLevel.value}`)
-const resolvedTitle = computed(() => props.title ?? t('gr.emptyState.title', 'Nothing here yet'))
+const defaultTitle = computed(() => (props.kind === 'search'
+  ? t('gr.emptyState.searchTitle', 'Nothing found')
+  : t('gr.emptyState.title', 'Nothing here yet')))
+
+const resolvedTitle = computed(() => props.title ?? defaultTitle.value)
 const hasDescription = computed(() => Boolean(props.description) || Boolean(slots.description))
 </script>
 
@@ -85,7 +99,8 @@ const hasDescription = computed(() => Boolean(props.description) || Boolean(slot
       <div data-gr-empty-state-icon :class="[iconBoxBaseClass, iconBoxBySize[resolvedSize]]">
         <slot name="icon">
           <GrIcon :size="iconSizeBySize[resolvedSize]">
-            <IconInbox aria-hidden="true" />
+            <IconSearchX v-if="kind === 'search'" aria-hidden="true" />
+            <IconInbox v-else aria-hidden="true" />
           </GrIcon>
         </slot>
       </div>

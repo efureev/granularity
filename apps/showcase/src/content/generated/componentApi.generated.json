@@ -4723,6 +4723,13 @@
             "type": "2 | 3 | 4 | 5 | 6 | undefined",
             "required": false,
             "default": "undefined"
+          },
+          {
+            "name": "kind",
+            "description": "Что за пустота: ещё ничего не создано (`empty`) или под запросом ничего не нашлось (`search`). Меняет иконку и заголовок по умолчанию; заданный `title` сильнее в обоих случаях.",
+            "type": "\"search\" | \"empty\" | undefined",
+            "required": false,
+            "default": "\"empty\""
           }
         ]
       },

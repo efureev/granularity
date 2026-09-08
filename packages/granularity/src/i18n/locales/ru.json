@@ -393,7 +393,8 @@
     "badge": "{count} новых"
   },
   "emptyState": {
-    "title": "Пока пусто"
+    "title": "Пока пусто",
+    "searchTitle": "Ничего не найдено"
   },
   "sortable": {
     "label": "Сортируемый список",

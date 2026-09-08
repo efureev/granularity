@@ -14,6 +14,7 @@ export const grEmptyStateExamples: ShowcaseComponentExampleDoc[] = [
     description: 'Ноль результатов поиска: фильтр сверху, компактный `size="sm"` и действия по сбросу или созданию объекта.',
     status: 'ready',
     previewKey: 'gr-empty-state-search-flow',
+    note: '`kind="search"` меняет заголовок и иконку по умолчанию. Разница не косметическая: под фильтром «Пока пусто» дезинформирует — данные есть, просто не совпали, и следующий шаг у пользователя другой, не «создать», а «ослабить запрос».',
   },
   {
     id: 'empty-state-split-layout',

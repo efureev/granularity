@@ -10,6 +10,17 @@ export type GrEmptyStateVariant = typeof GR_EMPTY_STATE_VARIANTS[number]
  * Уровень заголовка. `h1` намеренно нет: пустое состояние живёт внутри уже
  * существующей структуры страницы, а не задаёт её.
  */
+/**
+ * Что за пустота. Значений два, и это не упрощение, а весь корпус: по репозиторию
+ * повторяются ровно они — «ещё ничего не создано» и «под запросом не нашлось».
+ *
+ * Разводить их обязательно: дефолтный заголовок «Пока пусто» под фильтром
+ * дезинформирует — данные есть, просто не совпали. Ошибка загрузки сюда не
+ * входит намеренно, у неё в пакете свои компоненты (`GrResponseErrorBanner`).
+ */
+export const GR_EMPTY_STATE_KINDS = ['empty', 'search'] as const
+export type GrEmptyStateKind = typeof GR_EMPTY_STATE_KINDS[number]
+
 export const GR_EMPTY_STATE_HEADING_LEVELS = [2, 3, 4, 5, 6] as const
 export type GrEmptyStateHeadingLevel = typeof GR_EMPTY_STATE_HEADING_LEVELS[number]
 
