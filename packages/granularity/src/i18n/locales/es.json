@@ -102,7 +102,14 @@
     "detailRetry": "Reintentar",
     "detailExpanded": "Detalles de la fila mostrados",
     "detailCollapsed": "Detalles de la fila ocultos",
-    "detailReady": "Detalles de la fila cargados"
+    "detailReady": "Detalles de la fila cargados",
+    "columnMenu": "Acciones de la columna {label}",
+    "pinLeft": "Fijar a la izquierda",
+    "pinRight": "Fijar a la derecha",
+    "unpin": "Dejar de fijar",
+    "columnPinnedLeft": "Columna {label} fijada a la izquierda",
+    "columnPinnedRight": "Columna {label} fijada a la derecha",
+    "columnUnpinned": "Columna {label} ya no está fijada"
   },
   "breadcrumbs": {
     "label": "Ruta de navegación",

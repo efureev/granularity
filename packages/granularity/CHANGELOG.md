@@ -9,6 +9,23 @@ to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **`GrDataTable` lets the user pin a column.** `pinned` existed but was set in
+  code only: the table drew no UI for it, and the page said so, blaming a missing
+  `GrMenu`. That premise did not hold — a pin menu is flat, and neither the
+  nested submenus nor the navigation semantics `GrMenu` is about are needed for
+  it. `GrDropdownMenu` already covers the case its own page names first: a menu
+  on a visible "⋯".
+
+  `pinnable-columns` puts that menu in every column header;
+  `v-model:pinned-columns` keeps the choice by column key. The items are
+  `menuitemradio` with `checked` rather than three commands — pinning is a choice
+  among three positions, and in that shape a screen reader announces the current
+  one by itself. `null` in the model means *unpinned*, not "whatever the config
+  says": without the distinction there would be no way to undo a `pinned`
+  declared on the column, since an absent key already means "the config decides".
+  Picking a side also moves the column, because pinned columns stand as a group
+  at their edge.
+
 - **`GrDataTable` expands rows inside a virtual list.** The two were mutually
   exclusive: with `virtual` the expansion was switched off and said so in dev.
   The measurement was the reason — the virtualizer sized the row itself, and the

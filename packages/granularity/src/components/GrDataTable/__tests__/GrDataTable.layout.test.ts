@@ -274,3 +274,142 @@ describe('закреплённые колонки', () => {
     wrapper.unmount()
   })
 })
+
+/**
+ * Панели меню уезжают в общий портал, и в документе их столько же, сколько
+ * колонок: открытую находим по `aria-controls` её триггера.
+ */
+function openColumnMenu(wrapper: ReturnType<typeof mountTable>, key: string) {
+  const trigger = wrapper.get(`thead th[data-column-key="${key}"] [data-gr-datatable-column-menu-trigger]`)
+
+  return async (): Promise<HTMLElement[]> => {
+    await trigger.trigger('click')
+    await nextTick()
+    await nextTick()
+
+    const panelId = trigger.attributes('aria-controls')
+    if (!panelId)
+      throw new Error('у триггера меню нет `aria-controls` — панель не открылась')
+
+    const panel = document.getElementById(panelId)
+    return [...(panel?.querySelectorAll<HTMLElement>('[role="menuitemradio"]') ?? [])]
+  }
+}
+
+describe('GrDataTable — закрепление колонки пользователем', () => {
+  it('без пропа меню в шапке нет: закрепление остаётся объявлением в конфиге', () => {
+    const wrapper = mountTable()
+
+    expect(wrapper.find('[data-gr-datatable-column-menu-trigger]').exists()).toBe(false)
+
+    wrapper.unmount()
+  })
+
+  it('меню есть у каждой колонки и названо ею', () => {
+    const wrapper = mountTable({ pinnableColumns: true })
+
+    const triggers = wrapper.findAll('[data-gr-datatable-column-menu-trigger]')
+    expect(triggers).toHaveLength(columns.length)
+    expect(triggers[0].attributes('aria-label')).toBe('Options for column Name')
+
+    wrapper.unmount()
+  })
+
+  /**
+   * Три состояния закрепления — выбор одного из трёх, а не три команды.
+   * `menuitemradio` с `checked` объявляет текущее положение сам; списком
+   * команд диктор назвал бы только их подписи, и «где колонка сейчас» пришлось
+   * бы угадывать.
+   */
+  it('пункты — переключатели с объявленным текущим положением', async () => {
+    const wrapper = mountTable({ pinnableColumns: true })
+    const items = await openColumnMenu(wrapper, 'name')()
+    expect(items).toHaveLength(3)
+    expect(items.map(item => item.textContent?.trim())).toEqual([
+      'Pin to the left',
+      'Pin to the right',
+      'Unpin',
+    ])
+    // Колонка не закреплена — отмечен третий пункт.
+    expect(items.map(item => item.getAttribute('aria-checked'))).toEqual(['false', 'false', 'true'])
+
+    wrapper.unmount()
+  })
+
+  it('выбор закрепляет колонку, эмитит модель и объявляет результат', async () => {
+    const wrapper = mountTable({ pinnableColumns: true })
+    const items = await openColumnMenu(wrapper, 'score')()
+
+    items[0].click()
+    await nextTick()
+
+    expect(wrapper.emitted('update:pinnedColumns')?.at(-1)).toEqual([{ score: 'left' }])
+    expect(wrapper.emitted('columnPin')?.at(-1)).toEqual([{ key: 'score', pinned: 'left' }])
+    expect(await announced()).toBe('Column Score pinned to the left')
+
+    // Закреплённая колонка уходит своей группой к краю — иначе «слева» не
+    // означало бы «слева».
+    expect(headerKeys(wrapper)).toEqual(['score', 'name', 'note'])
+    expect(wrapper.find('thead th[data-column-key="score"]').classes()).toContain('sticky')
+
+    wrapper.unmount()
+  })
+
+  /**
+   * `null` в модели — не «как в конфиге», а «откреплена». Без различия снять
+   * закрепление, объявленное у колонки, было бы нечем.
+   */
+  it('открепление снимает и то, что объявлено в конфиге колонки', async () => {
+    const wrapper = mountTable({
+      pinnableColumns: true,
+      columns: [
+        { key: 'name', label: 'Name', pinned: 'left' },
+        { key: 'score', label: 'Score' },
+        { key: 'note', label: 'Note' },
+      ],
+    })
+
+    expect(wrapper.find('thead th[data-column-key="name"]').classes()).toContain('sticky')
+
+    const items = await openColumnMenu(wrapper, 'name')()
+    // Отмечен первый пункт: колонка закреплена слева конфигом.
+    expect(items.map(item => item.getAttribute('aria-checked'))).toEqual(['true', 'false', 'false'])
+
+    items[2].click()
+    await nextTick()
+
+    expect(wrapper.emitted('update:pinnedColumns')?.at(-1)).toEqual([{ name: null }])
+    expect(wrapper.find('thead th[data-column-key="name"]').classes()).not.toContain('sticky')
+
+    wrapper.unmount()
+  })
+
+  it('контролируемая модель не подменяется внутренней', async () => {
+    const wrapper = mountTable({ pinnableColumns: true, pinnedColumns: { note: 'right' } })
+
+    expect(headerKeys(wrapper)).toEqual(['name', 'score', 'note'])
+    expect(wrapper.find('thead th[data-column-key="note"]').classes()).toContain('sticky')
+
+    const items = await openColumnMenu(wrapper, 'name')()
+    items[0].click()
+    await nextTick()
+
+    // Проп не менялся — раскладка тоже: решение за потребителем.
+    expect(wrapper.emitted('update:pinnedColumns')?.at(-1)).toEqual([{ note: 'right', name: 'left' }])
+    expect(headerKeys(wrapper)).toEqual(['name', 'score', 'note'])
+
+    wrapper.unmount()
+  })
+
+  it('повторный выбор того же положения ничего не эмитит', async () => {
+    const wrapper = mountTable({ pinnableColumns: true })
+    const items = await openColumnMenu(wrapper, 'name')()
+
+    items[2].click()
+    await nextTick()
+
+    expect(wrapper.emitted('update:pinnedColumns')).toBeUndefined()
+
+    wrapper.unmount()
+  })
+})

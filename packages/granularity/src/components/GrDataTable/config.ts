@@ -4,7 +4,7 @@ import { grDataTableSafelist } from './safelist'
 
 export const grDataTableConfig = defineGranularComponent(import.meta.url, {
   name: 'GrDataTable',
-  dependencies: ['GrTable', 'GrIcon', 'GrCheckbox', 'GrButton', 'GrSkeleton'],
+  dependencies: ['GrTable', 'GrIcon', 'GrCheckbox', 'GrButton', 'GrSkeleton', 'GrDropdownMenu'],
   safelist: grDataTableSafelist,
   // Только светлая: обе роли ссылаются на токены, которые сами меняются с темой.
   tokenDefinitionsRef: {

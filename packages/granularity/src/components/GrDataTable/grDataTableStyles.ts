@@ -40,6 +40,15 @@ export const columnHandleClass = 'inline-flex shrink-0 cursor-grab items-center 
 
 export const columnHandleActiveClass = 'opacity-100'
 
+/**
+ * Кнопка меню колонки. Как и ручка переноса, в покое не видна: три значка в
+ * каждом заголовке — шум, а нужны они по случаю.
+ *
+ * Открытое меню держит кнопку видимой само (`aria-expanded`), иначе она гасла
+ * бы ровно в тот момент, когда указатель уходит с заголовка на её же панель.
+ */
+export const columnMenuTriggerClass = 'absolute end-1 top-1/2 -translate-y-1/2 inline-flex shrink-0 items-center rounded-[var(--gr-radius-sm)] text-[var(--gr-muted-fg)] opacity-0 transition-opacity duration-[var(--gr-duration-fast)] hover:text-[var(--gr-fg)] focus:outline-none focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] group-hover:opacity-100 [&[aria-expanded=true]]:opacity-100 disabled:cursor-not-allowed disabled:text-[var(--gr-disabled-fg)]'
+
 /** Переносимая колонка гасится, чтобы было видно, что она «поднята». */
 export const columnDraggingClass = 'bg-[var(--gr-muted)]'
 

@@ -1,4 +1,5 @@
 <script setup lang="ts" generic="TRow extends Record<string, unknown> = Record<string, unknown>">
+import type { Component } from 'vue'
 import { computed, nextTick, onMounted, ref, useId, watchEffect } from 'vue'
 
 import GrTable from '../GrTable/GrTable.vue'
@@ -6,6 +7,8 @@ import GrIcon from '../GrIcon/GrIcon.vue'
 import GrCheckbox from '../GrCheckbox/GrCheckbox.vue'
 import GrButton from '../GrButton/GrButton.vue'
 import GrSkeleton from '../GrSkeleton/GrSkeleton.vue'
+import GrDropdownMenu from '../GrDropdownMenu/GrDropdownMenu.vue'
+import type { GrDropdownMenuAction, GrDropdownMenuEntry } from '../GrDropdownMenu/menuModel'
 import { useGrComponentSize } from '../GrConfigProvider/context'
 import { useAnnouncer } from '../../composables/useAnnouncer'
 import { useVirtualList } from '../../composables/useVirtualList'
@@ -33,6 +36,7 @@ import {
   expandIconOpenClass,
   columnHandleActiveClass,
   columnHandleClass,
+  columnMenuTriggerClass,
   columnPinnedClass,
   columnResizerClass,
   columnResizerHoverClass,
@@ -55,6 +59,10 @@ import IconGripVertical from '~icons/lucide/grip-vertical'
 import IconLoaderCircle from '~icons/lucide/loader-circle'
 import IconArrowDown from '~icons/lucide/arrow-down'
 import IconChevronRight from '~icons/lucide/chevron-right'
+import IconEllipsisVertical from '~icons/lucide/ellipsis-vertical'
+import IconArrowLeftToLine from '~icons/lucide/arrow-left-to-line'
+import IconArrowRightToLine from '~icons/lucide/arrow-right-to-line'
+import IconPinOff from '~icons/lucide/pin-off'
 
 /**
  * Ключ колонки. Собственные поля строки подсказываются автодополнением, но
@@ -92,8 +100,18 @@ export type GrDataColumn<TRow extends Record<string, unknown> = Record<string, u
    * колонки из группы в группу запрещён, иначе «закреплена слева» перестало бы
    * означать «слева».
    */
-  pinned?: 'left' | 'right'
+  pinned?: GrColumnPinSide
 }
+
+/** Край, к которому липнет колонка. */
+export type GrColumnPinSide = 'left' | 'right'
+
+/**
+ * Закрепление, выбранное пользователем. `null` — не «как в конфиге», а
+ * «откреплена»: без него снять закрепление, объявленное у колонки, было бы
+ * нечем — отсутствие ключа означает «решает конфиг».
+ */
+export type GrColumnPin = GrColumnPinSide | null
 
 /**
  * Значения итоговой строки по ключам колонок.
@@ -218,6 +236,19 @@ export interface GrDataTableProps<TRow extends Record<string, unknown> = Record<
    */
   columnWidths?: Record<string, number>
   /**
+   * Закрепление колонок задаёт пользователь: в шапке появляется меню с
+   * «закрепить слева / справа / открепить».
+   *
+   * Без пропа `pinned` у колонки остаётся тем, чем был, — объявлением в
+   * конфиге, которое меняется только кодом.
+   */
+  pinnableColumns?: boolean
+  /**
+   * Контролируемое закрепление по ключу колонки (`v-model:pinnedColumns`).
+   * Не задано — компонент помнит его сам, начиная с `pinned` у колонок.
+   */
+  pinnedColumns?: Record<string, GrColumnPin>
+  /**
    * Второй ярус строки: колонка с кнопкой раскрытия и блок подробностей под
    * строкой. Содержимое рисует слот `#detail`.
    */
@@ -254,6 +285,8 @@ export interface GrDataTableEmits<TRow extends Record<string, unknown> = Record<
   (e: 'columnReorder', payload: { key: string, from: number, to: number }): void
   (e: 'update:columnWidths', value: Record<string, number>): void
   (e: 'columnResize', payload: { key: string, width: number }): void
+  (e: 'update:pinnedColumns', value: Record<string, GrColumnPin>): void
+  (e: 'columnPin', payload: { key: string, pinned: GrColumnPin }): void
   (e: 'update:expandedKeys', value: Array<string | number>): void
   (e: 'expand', payload: { row: TRow, key: string | number }): void
   (e: 'collapse', payload: { row: TRow, key: string | number }): void
@@ -305,6 +338,8 @@ const props = withDefaults(defineProps<GrDataTableProps<TRow>>(), {
   columnOrder: undefined,
   resizableColumns: false,
   columnWidths: undefined,
+  pinnableColumns: false,
+  pinnedColumns: undefined,
   expandable: false,
   expandedKeys: undefined,
   expandableRow: undefined,
@@ -477,6 +512,31 @@ function registerEl(store: Map<string, HTMLElement>, key: string, el: unknown): 
     store.delete(key)
 }
 
+/**
+ * Закрепление, выбранное пользователем, поверх объявленного в конфиге колонки.
+ *
+ * Отсутствие ключа означает «решает конфиг», а `null` — «откреплена»: без
+ * различия снять закрепление, объявленное у колонки, было бы нечем.
+ */
+const pinnedState = ref<Record<string, GrColumnPin>>({})
+const pinnedOverrides = computed(() => props.pinnedColumns ?? pinnedState.value)
+
+/**
+ * Колонки с уже разрешённым закреплением.
+ *
+ * Дальше по компоненту `col.pinned` читают порядок, раскладка и все три яруса
+ * ячеек. Разрешать выбор пользователя в каждом из этих мест значило бы завести
+ * четыре места, где он может разойтись, — поэтому он разрешается один раз
+ * здесь, а ниже по течению ничего не знает о том, откуда взялось значение.
+ */
+const resolvedColumns = computed<GrDataColumn<TRow>[]>(() => props.columns.map((col) => {
+  const key = String(col.key)
+  if (!(key in pinnedOverrides.value))
+    return col
+
+  return { ...col, pinned: pinnedOverrides.value[key] ?? undefined }
+}))
+
 const {
   orderedColumns,
   columnKeys,
@@ -486,7 +546,7 @@ const {
   columnSort,
   columnRoving,
 } = useDataTableColumnOrder<TRow>({
-  columns: () => props.columns,
+  columns: () => resolvedColumns.value,
   columnOrder: () => props.columnOrder,
   reorderableColumns: () => props.reorderableColumns,
   loading: () => props.loading,
@@ -504,6 +564,68 @@ const {
     }))
   },
 })
+
+/**
+ * Ширина меню колонки.
+ *
+ * Панель ужимается по содержимому, и самой длинной подписи не хватало пяти
+ * пикселей: «Закрепить справа» переносилось на вторую строку. Ширина задана
+ * явно и с запасом — она обязана держать все три локали, а не ту, на которой
+ * её замерили.
+ */
+const COLUMN_MENU_WIDTH = 240
+
+/**
+ * Пункты меню колонки.
+ *
+ * Три состояния закрепления — это выбор одного из трёх, поэтому пункты
+ * `menuitemradio` с `checked`, а не три команды: так диктор называет текущее
+ * положение сам, и «открепить» у незакреплённой колонки видно выключенным, а
+ * не пропадает.
+ */
+function columnMenuItems(col: GrDataColumn<TRow>): GrDropdownMenuEntry[] {
+  const current = col.pinned ?? null
+
+  const item = (pinned: GrColumnPin, label: string, icon: Component): GrDropdownMenuAction => ({
+    key: pinned ?? 'none',
+    label,
+    icon,
+    role: 'menuitemradio',
+    checked: current === pinned,
+  })
+
+  return [
+    item('left', t('gr.dataTable.pinLeft', 'Pin to the left'), IconArrowLeftToLine),
+    item('right', t('gr.dataTable.pinRight', 'Pin to the right'), IconArrowRightToLine),
+    item(null, t('gr.dataTable.unpin', 'Unpin'), IconPinOff),
+  ]
+}
+
+function columnMenuLabel(col: GrDataColumn<TRow>): string {
+  return t('gr.dataTable.columnMenu', 'Options for column {label}', { label: col.label })
+}
+
+function onColumnMenuSelect(col: GrDataColumn<TRow>, item: GrDropdownMenuAction): void {
+  const pinned: GrColumnPin = item.key === 'left' || item.key === 'right' ? item.key : null
+  if ((col.pinned ?? null) === pinned)
+    return
+
+  pinColumn(String(col.key), pinned)
+
+  announce(pinned === 'left'
+    ? t('gr.dataTable.columnPinnedLeft', 'Column {label} pinned to the left', { label: col.label })
+    : pinned === 'right'
+      ? t('gr.dataTable.columnPinnedRight', 'Column {label} pinned to the right', { label: col.label })
+      : t('gr.dataTable.columnUnpinned', 'Column {label} unpinned', { label: col.label }))
+}
+
+function pinColumn(key: string, pinned: GrColumnPin): void {
+  const next = { ...pinnedOverrides.value, [key]: pinned }
+
+  pinnedState.value = next
+  emit('update:pinnedColumns', next)
+  emit('columnPin', { key, pinned })
+}
 
 const {
   columnWidths,
@@ -846,7 +968,7 @@ defineSlots<{
             headerTextClass,
             cellClass,
             cellAlign(col),
-            reorderableColumns || resizableColumns ? 'group relative' : '',
+            reorderableColumns || resizableColumns || pinnableColumns ? 'group relative' : '',
             draggingColumnKey === String(col.key) ? columnDraggingClass : '',
             columnDropClass(colIndex),
             ...pinnedCellClass(col, colIndex),
@@ -901,6 +1023,30 @@ defineSlots<{
               </slot>
             </span>
           </div>
+
+          <GrDropdownMenu
+            v-if="pinnableColumns"
+            data-gr-datatable-column-menu
+            :items="columnMenuItems(col)"
+            placement="bottom-end"
+            :width="COLUMN_MENU_WIDTH"
+            :aria-label="columnMenuLabel(col)"
+            @select="onColumnMenuSelect(col, $event)"
+          >
+            <template #trigger="{ triggerProps }">
+              <button
+                v-bind="triggerProps"
+                type="button"
+                data-gr-datatable-column-menu-trigger
+                :class="columnMenuTriggerClass"
+                :aria-label="columnMenuLabel(col)"
+                :disabled="loading"
+                @click.stop
+              >
+                <IconEllipsisVertical class="block" aria-hidden="true" />
+              </button>
+            </template>
+          </GrDropdownMenu>
 
           <span
             v-if="resizableColumns"

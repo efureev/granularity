@@ -102,7 +102,14 @@
     "detailRetry": "Повторить",
     "detailExpanded": "Подробности строки раскрыты",
     "detailCollapsed": "Подробности строки свёрнуты",
-    "detailReady": "Подробности строки загружены"
+    "detailReady": "Подробности строки загружены",
+    "columnMenu": "Действия с колонкой {label}",
+    "pinLeft": "Закрепить слева",
+    "pinRight": "Закрепить справа",
+    "unpin": "Открепить",
+    "columnPinnedLeft": "Колонка {label} закреплена слева",
+    "columnPinnedRight": "Колонка {label} закреплена справа",
+    "columnUnpinned": "Колонка {label} откреплена"
   },
   "breadcrumbs": {
     "label": "Навигационная цепочка",

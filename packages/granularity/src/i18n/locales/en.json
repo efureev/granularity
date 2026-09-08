@@ -102,7 +102,14 @@
     "detailRetry": "Retry",
     "detailExpanded": "Row details shown",
     "detailCollapsed": "Row details hidden",
-    "detailReady": "Row details loaded"
+    "detailReady": "Row details loaded",
+    "columnMenu": "Options for column {label}",
+    "pinLeft": "Pin to the left",
+    "pinRight": "Pin to the right",
+    "unpin": "Unpin",
+    "columnPinnedLeft": "Column {label} pinned to the left",
+    "columnPinnedRight": "Column {label} pinned to the right",
+    "columnUnpinned": "Column {label} unpinned"
   },
   "breadcrumbs": {
     "label": "Breadcrumb",

@@ -4,6 +4,8 @@ import type GrDataTableComponent from './GrDataTable.vue'
 export { default } from './GrDataTable.vue'
 export { default as GrDataTable } from './GrDataTable.vue'
 export type {
+  GrColumnPin,
+  GrColumnPinSide,
   GrDataColumn,
   GrDataColumnKey,
   GrDataTableProps,

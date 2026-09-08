@@ -3502,6 +3502,20 @@
             "default": "undefined"
           },
           {
+            "name": "pinnableColumns",
+            "description": "Закрепление колонок задаёт пользователь: в шапке появляется меню с «закрепить слева / справа / открепить». Без пропа `pinned` у колонки остаётся тем, чем был, — объявлением в конфиге, которое меняется только кодом.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "pinnedColumns",
+            "description": "Контролируемое закрепление по ключу колонки (`v-model:pinnedColumns`). Не задано — компонент помнит его сам, начиная с `pinned` у колонок.",
+            "type": "Record<string, GrColumnPin> | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "expandable",
             "description": "Второй ярус строки: колонка с кнопкой раскрытия и блок подробностей под строкой. Содержимое рисует слот `#detail`.",
             "type": "boolean | undefined",
@@ -3630,6 +3644,18 @@
             "description": "",
             "type": "[{ key: string; width: number; }]",
             "signature": "(e: \"columnResize\", payload: { key: string; width: number; }): void"
+          },
+          {
+            "name": "update:pinnedColumns",
+            "description": "",
+            "type": "[Record<string, GrColumnPin>]",
+            "signature": "(e: \"update:pinnedColumns\", value: Record<string, GrColumnPin>): void"
+          },
+          {
+            "name": "columnPin",
+            "description": "",
+            "type": "[{ key: string; pinned: GrColumnPin; }]",
+            "signature": "(e: \"columnPin\", payload: { key: string; pinned: GrColumnPin; }): void"
           },
           {
             "name": "update:expandedKeys",

@@ -94,6 +94,14 @@ export const grDataTableExamples: ShowcaseComponentExampleDoc[] = [
     note: 'Ручка ширины — `role="separator"` с паттерном window splitter: стрелки меняют ширину, `Shift` — крупным шагом, `Enter` и двойной клик возвращают колонку к авторазметке.',
   },
   {
+    id: 'data-table-column-pin',
+    title: 'Закрепление колонки пользователем',
+    description: '`pinnable-columns` добавляет в заголовок меню «закрепить слева / справа / открепить», `v-model:pinned-columns` хранит выбор по ключу колонки. Закреплённые колонки стоят своей группой у своего края, поэтому выбор заодно переставляет колонку.',
+    status: 'ready',
+    previewKey: 'gr-data-table-column-pin',
+    note: 'Пункты меню — `menuitemradio` с `checked`, а не три команды: так диктор называет текущее положение колонки сам. `null` в модели означает «откреплена», а не «как в конфиге», — иначе снять закрепление, объявленное у колонки, было бы нечем.',
+  },
+  {
     id: 'data-table-expand',
     title: 'Expandable row with details',
     description: 'Второй ярус строки: подробности из самой строки или подгруженные при раскрытии, с состояниями загрузки и отказа.',
