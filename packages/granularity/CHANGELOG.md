@@ -9,6 +9,10 @@ to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **`GrTable` takes `rowGroups`.** It hands the body to the consumer whole: the
+  default slot goes straight into the table with no `<tbody>` around it. Loading
+  and empty states stay with the table and keep their own group.
+
 - **`GrColorPicker` gets a saturation × lightness square and a screen eyedropper.**
   `view="area"` swaps the two channel sliders for the square every colour picker
   is expected to have; `eyedropper` adds a button that lifts a colour off the
@@ -57,6 +61,12 @@ to [Semantic Versioning](https://semver.org/).
   glyph in the knob should not cost the consumer the value readout.
 
 ### Fixed
+
+- **`GrTable` stripes and hover moved from `<tbody>` to the table.** A rule bound
+  to one row group cannot see the alternation between groups, and with
+  `rowGroups` there is more than one. The zebra selector is now written in two
+  shapes — rows inside a single group, and the groups themselves — and each
+  matches nothing in the other shape, so both live side by side.
 
 - **The slider thumb now centres its contents.** It had no centring at all,
   which nobody noticed while the knob was always empty; with a slot the content

@@ -156,18 +156,55 @@ describe('GrTable — состояния', () => {
     expect(wrapper.find('[data-gr-table-empty]').exists()).toBe(false)
   })
 
-  it('striped и hoverable вешаются на tbody', () => {
+  it('striped и hoverable вешаются на таблицу и знают обе формы тела', () => {
     const wrapper = mount(GrTable, {
       props: { striped: true, hoverable: true },
       slots: { default: '<tr><td>x</td></tr>' },
     })
 
-    const tbody = wrapper.get('tbody')
+    const table = wrapper.get('table').attributes('class') ?? ''
     // Чётность считается мимо служебных строк (`data-gr-table-off-grid`):
     // подробности раскрытой строки и распорки виртуализатора не входят в набор,
     // и обычный `:not()` снаружи чётность бы не перенумеровал.
-    expect(tbody.attributes('class')).toContain('nth-child(even_of_:not([data-gr-table-off-grid]))')
-    expect(tbody.attributes('class')).toContain('tr:not([data-gr-table-off-grid]):hover')
+    expect(table).toContain('tbody>tr:nth-child(even_of_:not([data-gr-table-off-grid]))')
+    // Вторая форма: группа `<tbody>` на строку — так тело собрано у `GrDataTable`.
+    expect(table).toContain('tbody:nth-child(even_of_tbody:not([data-gr-table-off-grid]))')
+    expect(table).toContain('tr:not([data-gr-table-off-grid]):hover')
+
+    // На теле не осталось ни оформления, ни цвета: групп может быть много, и
+    // рисует их потребитель — до его групп ничего из этого не дотянулось бы.
+    expect(wrapper.get('tbody').attributes('class')).toBeUndefined()
+    expect(table, 'цвет текста тоже переехал на таблицу').toContain('text-[var(--gr-fg)]')
+  })
+
+  it('`rowGroups` отдаёт тело потребителю целиком', () => {
+    const wrapper = mount(GrTable, {
+      props: { rowGroups: true },
+      slots: { default: '<tbody data-own><tr><td>x</td></tr></tbody>' },
+    })
+
+    // Своей обёртки нет: она разделила бы пару строк, которую группа и держит.
+    expect(wrapper.findAll('tbody')).toHaveLength(1)
+    expect(wrapper.find('tbody').attributes('data-own')).toBe('')
+  })
+
+  it('загрузка и пустота остаются в своей группе даже при `rowGroups`', () => {
+    const loading = mount(GrTable, {
+      props: { rowGroups: true, loading: true },
+      slots: { default: '<tbody data-own><tr><td>x</td></tr></tbody>' },
+    })
+
+    // Служебные состояния рисует сама таблица, и группа для них своя.
+    expect(loading.find('[data-own]').exists()).toBe(false)
+    expect(loading.findAll('[data-gr-table-loading-row]').length).toBeGreaterThan(0)
+
+    const empty = mount(GrTable, {
+      props: { rowGroups: true, empty: true },
+      slots: { default: '<tbody data-own><tr><td>x</td></tr></tbody>' },
+    })
+
+    expect(empty.find('[data-own]').exists()).toBe(false)
+    expect(empty.find('[data-gr-table-empty]').exists()).toBe(true)
   })
 })
 

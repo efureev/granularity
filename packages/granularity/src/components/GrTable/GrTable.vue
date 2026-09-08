@@ -49,6 +49,16 @@ export interface GrTableProps {
   /** Подсветка строки под курсором. */
   hoverable?: boolean
   /**
+   * Тело собрано группами строк, и рисует их потребитель: слот по умолчанию
+   * встаёт прямо в таблицу, без обёртки в `<tbody>`.
+   *
+   * Нужно там, где пара строк обязана мериться и жить вместе — второй ярус
+   * `GrDataTable` рядом со своей строкой. Обернуть две `<tr>` в таблице больше
+   * не во что: группа строк — единственный контейнер, который для них
+   * существует.
+   */
+  rowGroups?: boolean
+  /**
    * Прилипающий заголовок: `<thead>` остаётся видимым при вертикальном скролле.
    * Осмысленно вместе с `maxHeight` (иначе таблица не скроллится вертикально).
    */
@@ -112,6 +122,7 @@ const props = withDefaults(defineProps<GrTableProps>(), {
   empty: undefined,
   striped: false,
   hoverable: false,
+  rowGroups: false,
   stickyHeader: false,
   maxHeight: undefined,
   rowCount: undefined,
@@ -141,7 +152,13 @@ const showRows = computed(() => !props.loading && !isEmpty.value)
 const loadingRowCount = computed(() => Math.max(1, Math.trunc(props.loadingRows)))
 const serviceColSpan = computed(() => Math.max(1, Math.trunc(props.columnCount)))
 
-const tbodyClass = computed(() => [
+/**
+ * Цвет текста, полосатость и подсветка висят на таблице, а не на теле: групп у
+ * тела может быть много (`rowGroups`), и рисует их потребитель — правило,
+ * привязанное к одной группе, до остальных не дотянулось бы, а цвет и вовсе
+ * не достался бы ни одной.
+ */
+const bodyClass = computed(() => [
   'text-[var(--gr-fg)]',
   props.striped && showRows.value ? stripedClass : '',
   props.hoverable && showRows.value ? hoverableClass : '',
@@ -250,7 +267,7 @@ defineSlots<{
   >
     <table
       data-gr-table
-      class="min-w-full" :class="[tableTextClass, fixedLayout ? '[table-layout:fixed]' : '']"
+      class="min-w-full" :class="[tableTextClass, bodyClass, fixedLayout ? '[table-layout:fixed]' : '']"
       :style="tableStyle"
       :aria-label="ariaLabelledby ? undefined : ariaLabel"
       :aria-labelledby="ariaLabelledby"
@@ -264,26 +281,31 @@ defineSlots<{
       <thead :class="theadClass">
         <slot name="header" />
       </thead>
-      <tbody :class="tbodyClass">
-        <template v-if="loading">
-          <slot name="loading">
-            <tr v-for="row in loadingRowCount" :key="row" data-gr-table-loading-row>
-              <td :colspan="serviceColSpan" :class="loadingRowCellClass">
-                <GrSkeleton />
-              </td>
-            </tr>
-          </slot>
-        </template>
+      <tbody v-if="loading">
+        <slot name="loading">
+          <tr v-for="row in loadingRowCount" :key="row" data-gr-table-loading-row>
+            <td :colspan="serviceColSpan" :class="loadingRowCellClass">
+              <GrSkeleton />
+            </td>
+          </tr>
+        </slot>
+      </tbody>
 
-        <tr v-else-if="isEmpty" data-gr-table-empty>
+      <tbody v-else-if="isEmpty">
+        <tr data-gr-table-empty>
           <td :colspan="serviceColSpan" :class="emptyCellClass">
             <slot name="empty">
               {{ resolvedEmptyText }}
             </slot>
           </td>
         </tr>
+      </tbody>
 
-        <slot v-else />
+      <!-- Группы рисует потребитель: своя обёртка разделила бы пару строк. -->
+      <slot v-else-if="rowGroups" />
+
+      <tbody v-else>
+        <slot />
       </tbody>
       <tfoot v-if="slots.footer" class="text-[var(--gr-fg)]">
         <slot name="footer" />
