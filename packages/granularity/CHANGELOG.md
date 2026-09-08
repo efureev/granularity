@@ -9,6 +9,17 @@ to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **`GrTextarea` takes a `#count` slot.** `12 / 60` is not the only way to talk
+  about length, and the line counter does not cover that — it is simply a second
+  ready-made counter, just as fixed in shape. The slot hands the wording to the
+  consumer and receives `length`, `maxlength` and `remaining`; without a
+  `maxlength` the latter two arrive `undefined` rather than invented. `remaining`
+  is not clamped at zero: `maxlength` only holds back typing, while a value
+  arriving through `v-model` from code steps over the limit, and "-3" is more
+  honest there. Providing the slot is itself a request for a counter, so
+  `show-count` is not needed alongside it; the row position, the styling and the
+  `aria-describedby` link all stay as they were.
+
 - **`GrTabPanels` animates the switch.** The incoming panel fades in over
   `--gr-duration-fast`, drifting slightly upwards; the outgoing one disappears
   at once. That asymmetry is deliberate: overlapping the two would stretch the

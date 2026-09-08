@@ -276,3 +276,60 @@ describe('GrTextarea — признак состояния', () => {
     expect(wrapper.find('[data-gr-textarea-state]').exists()).toBe(false)
   })
 })
+
+describe('GrTextarea — своя формулировка счётчика', () => {
+  it('слот заменяет текст счётчика и получает длину, предел и остаток', () => {
+    const wrapper = mount(GrTextarea, {
+      props: { modelValue: 'abcd', showCount: true, maxlength: 10 },
+      slots: { count: '<span data-own>осталось {{ params.remaining }} из {{ params.maxlength }}, набрано {{ params.length }}</span>' },
+    })
+
+    const count = wrapper.get('[data-gr-textarea-count]')
+    expect(count.text()).toBe('осталось 6 из 10, набрано 4')
+    expect(count.text()).not.toContain('4 / 10')
+  })
+
+  /**
+   * Слот без `show-count` не рисовал бы ничего, и потребитель искал бы опечатку
+   * в имени слота вместо забытого пропа.
+   */
+  it('слот показывает счётчик и без show-count, вместе со связкой по aria', () => {
+    const wrapper = mount(GrTextarea, {
+      props: { modelValue: 'ab' },
+      slots: { count: '<span>своё</span>' },
+    })
+
+    const count = wrapper.get('[data-gr-textarea-count]')
+    expect(count.text()).toBe('своё')
+    expect(wrapper.get('textarea').attributes('aria-describedby')).toContain(count.attributes('id'))
+  })
+
+  it('без maxlength предел и остаток не выдумываются', () => {
+    const wrapper = mount(GrTextarea, {
+      props: { modelValue: 'abc', showCount: true },
+      slots: { count: '<span>{{ params.length }}|{{ params.maxlength ?? "нет" }}|{{ params.remaining ?? "нет" }}</span>' },
+    })
+
+    expect(wrapper.get('[data-gr-textarea-count]').text()).toBe('3|нет|нет')
+  })
+
+  /**
+   * `maxlength` держит только ввод с клавиатуры: значение из кода ограничение
+   * перешагивает, и ноль вместо «-2» скрыл бы ровно тот случай, ради которого
+   * потребитель и берёт свою формулировку.
+   */
+  it('перебор длины даёт отрицательный остаток, а не ноль', () => {
+    const wrapper = mount(GrTextarea, {
+      props: { modelValue: '123456789012', showCount: true, maxlength: 10 },
+      slots: { count: '<span>{{ params.remaining }}</span>' },
+    })
+
+    expect(wrapper.get('[data-gr-textarea-count]').text()).toBe('-2')
+  })
+
+  it('без слота счётчик остаётся прежним', () => {
+    const wrapper = mount(GrTextarea, { props: { modelValue: 'abcd', showCount: true, maxlength: 10 } })
+
+    expect(wrapper.get('[data-gr-textarea-count]').text()).toBe('4 / 10')
+  })
+})

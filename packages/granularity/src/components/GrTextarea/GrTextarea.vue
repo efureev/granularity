@@ -114,6 +114,15 @@ defineOptions({
   inheritAttrs: false,
 })
 
+const slots = defineSlots<{
+  /**
+   * Своя формулировка счётчика символов вместо `12 / 60` — «осталось 48»,
+   * «почти предел» и что угодно ещё. Встроенных счётчиков два, но оба
+   * фиксированы по форме, и вторая готовая формулировка первой не заменяет.
+   */
+  count?: (props: { length: number, maxlength?: number, remaining?: number }) => any
+}>()
+
 const emit = defineEmits<GrTextareaEmits>()
 
 // Fallback из контекста `GrFormField` (id/aria-describedby/invalid/required).
@@ -126,14 +135,32 @@ const countId = useId()
 const lineCountId = useId()
 const stateTextId = useId()
 
+/**
+ * Слот считается за просьбу показать счётчик: заданный `#count` без
+ * `show-count` не рисовал бы ничего, и потребитель искал бы опечатку в имени
+ * слота, а не забытый проп.
+ */
+const hasCharCount = computed(() => props.showCount || Boolean(slots.count))
+
 /** Обёртка нужна любому из счётчиков — и кнопке очистки. */
-const hasCounters = computed(() => props.showCount || props.showLineCount)
+const hasCounters = computed(() => hasCharCount.value || props.showLineCount)
 
 const lineCount = computed(() => props.modelValue.split('\n').length)
 
 const countText = computed(() =>
   props.maxlength !== undefined ? `${props.modelValue.length} / ${props.maxlength}` : String(props.modelValue.length),
 )
+
+/**
+ * `remaining` не зажимается в ноль: `maxlength` держит ввод с клавиатуры, но
+ * значение, пришедшее в `v-model` из кода, ограничение перешагивает — и «-3»
+ * там честнее нуля.
+ */
+const countSlotProps = computed(() => ({
+  length: props.modelValue.length,
+  maxlength: props.maxlength,
+  remaining: props.maxlength === undefined ? undefined : props.maxlength - props.modelValue.length,
+}))
 const {
   disabled: isDisabled,
   invalid: isInvalid,
@@ -154,7 +181,7 @@ const stateIconClass = computed(() => (signalState.value
 const describedBy = computed(() =>
   [
     field?.describedById.value,
-    props.showCount ? countId : undefined,
+    hasCharCount.value ? countId : undefined,
     props.showLineCount ? lineCountId : undefined,
     signalState.value ? stateTextId : undefined,
   ]
@@ -301,13 +328,13 @@ function onBlur(e: FocusEvent): void {
       <!-- Символьный счётчик всегда прижат вправо: без счётчика строк он остаётся
            единственным в ряду, и `justify-between` его туда и отправляет. -->
       <div
-        v-if="showCount"
+        v-if="hasCharCount"
         :id="countId"
         data-gr-textarea-count
         class="ml-auto"
         :class="countClass"
       >
-        {{ countText }}
+        <slot name="count" v-bind="countSlotProps">{{ countText }}</slot>
       </div>
     </div>
   </div>

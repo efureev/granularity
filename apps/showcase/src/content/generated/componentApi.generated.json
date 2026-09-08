@@ -12126,7 +12126,13 @@
         "key": "slots",
         "title": "Slots",
         "origin": "generated",
-        "items": []
+        "items": [
+          {
+            "name": "count",
+            "description": "Своя формулировка счётчика символов вместо `12 / 60` — «осталось 48», «почти предел» и что угодно ещё. Встроенных счётчиков два, но оба фиксированы по форме, и вторая готовая формулировка первой не заменяет.",
+            "type": "{ length: number; maxlength?: number | undefined; remaining?: number | undefined; }"
+          }
+        ]
       },
       {
         "key": "events",

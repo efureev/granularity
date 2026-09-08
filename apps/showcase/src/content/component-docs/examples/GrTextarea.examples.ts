@@ -9,6 +9,13 @@ export const grTextareaExamples: ShowcaseComponentExampleDoc[] = [
     previewKey: 'gr-textarea-line-count',
   },
   {
+    id: 'textarea-count-slot',
+    title: 'Своя формулировка счётчика',
+    description: 'Слот `#count` отдаёт формулировку потребителю: «осталось 12» вместо `108 / 120`, а на перебор — своя подпись цветом. Слот получает `length`, `maxlength` и `remaining`; без `maxlength` предел не выдумывается. Отдельный `show-count` не нужен — заданный слот сам по себе просьба показать счётчик.',
+    status: 'ready',
+    previewKey: 'gr-textarea-count-slot',
+  },
+  {
     id: 'textarea-autosize',
     title: 'Автовысота и счётчик символов',
     description: '`autosize` поверх директивы `v-autosize`, `maxlength` + `showCount` со связкой через `aria-describedby`.',

@@ -91,7 +91,7 @@
 
 Всё остальное — **доменные** роли: они осмысленны только у своего компонента (`option`
 у `GrSelect` и `GrAutocomplete`, `tag` у `GrInputTag`, `symbol` и `text` у `GrRating`,
-`node` и `value` у `GrTreeSelect`). Владелец объявлен явно в гейте
+`node` и `value` у `GrTreeSelect`, `count` у `GrTextarea`). Владелец объявлен явно в гейте
 `src/__tests__/slotContract.test.ts`; чужой компонент то же имя занять не может.
 
 Правило простое: **нет роли — нет слота**. Слот заводится, когда потребителю нужно заменить

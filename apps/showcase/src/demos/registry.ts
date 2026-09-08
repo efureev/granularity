@@ -473,6 +473,7 @@ export const demoPathByPreviewKey = {
   'gr-tabs-sizes': 'components/gr-tabs/GrTabsSizesDemo.vue',
   'gr-textarea-autosize': 'components/gr-textarea/GrTextareaAutosizeDemo.vue',
   'gr-textarea-clearable': 'components/gr-textarea/GrTextareaClearableDemo.vue',
+  'gr-textarea-count-slot': 'components/gr-textarea/GrTextareaCountSlotDemo.vue',
   'gr-textarea-disabled-state': 'components/gr-textarea/GrTextareaDisabledDemo.vue',
   'gr-textarea-line-count': 'components/gr-textarea/GrTextareaLineCountDemo.vue',
   'gr-textarea-rows-layout': 'components/gr-textarea/GrTextareaRowsDemo.vue',
