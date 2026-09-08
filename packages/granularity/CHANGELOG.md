@@ -9,6 +9,16 @@ to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **`GrTree` opens a collapsed branch you hover during a drag.** Aim into the
+  middle of a collapsed row, hold for a moment, and it expands. Without that,
+  dropping a node inside a collapsed branch at a chosen position was impossible:
+  the drag had to be abandoned, the branch expanded by hand, and the whole thing
+  started over.
+
+  Only on "into": aiming above or below a row is not a request to change the
+  layout, and expanding would pull the rows — and the spot being aimed at — out
+  from under the pointer.
+
 - **`GrToaster` collapses the stack into a deck.** `maxVisible` caps how many
   toasts are shown but says nothing about the room they take: raising it to eight
   handed the app a half-screen column on top of the very interface the

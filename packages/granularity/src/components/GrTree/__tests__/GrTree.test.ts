@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { defineComponent, h, nextTick } from 'vue'
 
 import GrTree from '../GrTree.vue'
@@ -1175,5 +1175,99 @@ describe('GrTree — иконки', () => {
     })
 
     expect(wrapper.find('[data-custom-icon]').exists()).toBe(true)
+  })
+})
+
+/**
+ * Свёрнутая ветка под перетаскиваемым узлом раскрывается сама. Без этого
+ * положить узел внутрь неё на нужное место было нельзя вовсе: перенос
+ * приходилось бросать, раскрывать ветку руками и начинать заново.
+ */
+describe('GrTree — раскрытие ветки при переносе', () => {
+  function mountDraggable() {
+    return mount(GrTree<Item>, {
+      props: {
+        data: treeWithNestedFolder(),
+        nodeKey: 'id',
+        props: { children: 'children', label: 'label' },
+        // Раскрыт только корень: «Folder» свёрнут, и его ребёнка в DOM нет.
+        defaultExpandedKeys: [1],
+        draggable: true,
+      },
+      attachTo: document.body,
+    })
+  }
+
+  /** Середина строки — зона «внутрь»; строки по 30px, вторая начинается на 30. */
+  function dragOverFolderMiddle(wrapper: ReturnType<typeof mount>): void {
+    layoutRows(wrapper)
+    press(handleOf(wrapper, 2), { clientY: 65 })
+    move({ clientY: 45 })
+  }
+
+  it('задержка над свёрнутой веткой раскрывает её', async () => {
+    vi.useFakeTimers()
+    const wrapper = mountDraggable()
+
+    expect(wrapper.findAll('[data-gr-tree-node]')).toHaveLength(3)
+
+    dragOverFolderMiddle(wrapper)
+    await nextTick()
+    expect(wrapper.findAll('[data-gr-tree-node]'), 'до истечения задержки ветка закрыта').toHaveLength(3)
+
+    vi.advanceTimersByTime(800)
+    await nextTick()
+
+    expect(wrapper.findAll('[data-gr-tree-node]')).toHaveLength(4)
+    expect(wrapper.text()).toContain('Grandchild')
+
+    release()
+    wrapper.unmount()
+    vi.useRealTimers()
+  })
+
+  it('уход с ветки до истечения задержки её не раскрывает', async () => {
+    vi.useFakeTimers()
+    const wrapper = mountDraggable()
+
+    dragOverFolderMiddle(wrapper)
+    await nextTick()
+
+    // Верхняя треть первой строки — «до неё», а не «внутрь» папки.
+    move({ clientY: 2 })
+    await nextTick()
+
+    vi.advanceTimersByTime(800)
+    await nextTick()
+
+    expect(wrapper.findAll('[data-gr-tree-node]')).toHaveLength(3)
+
+    release()
+    wrapper.unmount()
+    vi.useRealTimers()
+  })
+
+  /**
+   * Целясь в соседа сверху или снизу, пользователь не просил менять раскладку:
+   * раскрытие увело бы строки из-под курсора вместе с точкой, в которую он метил.
+   */
+  it('прицел «до» и «после» ветку не раскрывает', async () => {
+    vi.useFakeTimers()
+    const wrapper = mountDraggable()
+
+    layoutRows(wrapper)
+    press(handleOf(wrapper, 2), { clientY: 65 })
+    // Верхняя треть строки папки — «до неё».
+    move({ clientY: 33 })
+    await nextTick()
+
+    vi.advanceTimersByTime(800)
+    await nextTick()
+
+    expect(wrapper.findAll('[data-gr-tree-node]')).toHaveLength(3)
+
+    release()
+    wrapper.unmount()
+    vi.useRealTimers()
   })
 })

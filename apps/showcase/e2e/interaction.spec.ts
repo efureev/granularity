@@ -489,6 +489,44 @@ function basicPanelsPreview(page: Page) {
     .first()
 }
 
+test.describe('GrTree: перенос над свёрнутой веткой', () => {
+  /**
+   * В jsdom этого не проверить: нужны настоящий указатель, попадание по
+   * прямоугольникам строк и реальный отсчёт. Юниты держат условия, браузер —
+   * что связка целиком работает.
+   */
+  test('задержка над свёрнутой веткой раскрывает её прямо в переносе', async ({ page }) => {
+    await openShowcasePage(page, componentPath('GrTree'))
+
+    const preview = page.locator('[data-example-preview]').filter({ has: page.locator('.gr-tree__drag-handle') }).first()
+    await preview.scrollIntoViewIfNeeded()
+
+    const branch = preview.locator('[data-gr-tree-node]').filter({ hasText: 'Склады' }).first()
+    await branch.locator('.gr-tree__toggle').click()
+    await expect(branch).toHaveAttribute('aria-expanded', 'false')
+
+    const rows = preview.locator('[data-gr-tree-node]')
+    const collapsedCount = await rows.count()
+
+    const target = (await branch.boundingBox())!
+    const handle = (await preview.locator('.gr-tree__drag-handle').first().boundingBox())!
+
+    await page.mouse.move(handle.x + handle.width / 2, handle.y + handle.height / 2)
+    await page.mouse.down()
+    // Середина строки — зона «внутрь»: только она и раскрывает.
+    await page.mouse.move(target.x + target.width / 2, target.y + target.height / 2, { steps: 6 })
+
+    try {
+      await expect(rows, 'сразу по наведению ветка ещё закрыта').toHaveCount(collapsedCount, { timeout: 200 })
+      await expect(branch).toHaveAttribute('aria-expanded', 'true', { timeout: 3000 })
+      expect(await rows.count()).toBeGreaterThan(collapsedCount)
+    }
+    finally {
+      await page.mouse.up()
+    }
+  })
+})
+
 test.describe('GrToaster: стопка', () => {
   /**
    * Ради этого стопка и делается — занятое место. Проверяется оно, а не классы:

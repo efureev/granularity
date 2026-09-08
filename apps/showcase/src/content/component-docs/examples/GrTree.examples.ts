@@ -27,7 +27,7 @@ export const grTreeExamples: ShowcaseComponentExampleDoc[] = [
   {
     id: 'tree-drag-and-slot',
     title: 'Drag-and-drop with custom row slot',
-    description: 'Комбинируем две важные возможности complex-дерева: rearrange drag-and-drop и кастомный рендер строки через default slot.',
+    description: 'Комбинируем две важные возможности complex-дерева: rearrange drag-and-drop и кастомный рендер строки через default slot. Свёрнутая ветка раскрывается сама, если задержать над её серединой перетаскиваемый узел, — иначе положить его внутрь на нужное место было бы нельзя, не бросив перенос.',
     status: 'ready',
     previewKey: 'gr-tree-drag-and-slot',
     note: 'Сценарий особенно важен для real-world деревьев с ownership/status метаданными и операторскими перестановками.',

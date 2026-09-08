@@ -651,6 +651,63 @@ function applyMove(source: GrTreeNode<T>, targetKey: GrTreeKey, type: GrTreeNode
   return true
 }
 
+/**
+ * Свёрнутая ветка под перетаскиваемым узлом раскрывается сама.
+ *
+ * Без этого положить узел внутрь свёрнутой ветки на нужное место было нельзя
+ * вовсе: перенос приходилось бросать, раскрывать ветку руками и начинать
+ * заново — а бросить его нечем, кроме `Escape`.
+ *
+ * Только на «внутрь»: целясь в соседа сверху или снизу, пользователь не просил
+ * менять раскладку, и раскрытие увело бы строки из-под курсора вместе с точкой,
+ * в которую он метил.
+ */
+const DRAG_EXPAND_DELAY_MS = 700
+
+let dragExpandTimer: ReturnType<typeof setTimeout> | null = null
+let dragExpandKey: GrTreeKey | null = null
+
+function cancelDragExpand(): void {
+  if (dragExpandTimer !== null)
+    clearTimeout(dragExpandTimer)
+
+  dragExpandTimer = null
+  dragExpandKey = null
+}
+
+function scheduleDragExpand(target: GrTreeDropTarget | null): void {
+  if (!target || target.type !== 'inner' || !target.allowed) {
+    cancelDragExpand()
+    return
+  }
+
+  // Тот же узел — отсчёт не перезапускается: иначе дрожание руки откладывало бы
+  // раскрытие бесконечно.
+  if (dragExpandKey === target.key)
+    return
+
+  cancelDragExpand()
+
+  const node = treeStore.getNode(target.key)
+  if (!node || treeStore.isLeafNode(node) || treeStore.isExpandedKey(node.key))
+    return
+
+  dragExpandKey = target.key
+  dragExpandTimer = setTimeout(() => {
+    dragExpandTimer = null
+    dragExpandKey = null
+
+    // Уход с ветки и конец переноса снимают отсчёт в `scheduleDragExpand` —
+    // повторять эту проверку здесь незачем. А вот раскрытость перепроверяется:
+    // `toggleExpand` именно переключает, и на раскрытой ветке он бы её закрыл.
+    const fresh = treeStore.getNode(target.key)
+    if (fresh && !treeStore.isExpandedKey(fresh.key))
+      toggleExpand(fresh)
+  }, DRAG_EXPAND_DELAY_MS)
+}
+
+onBeforeUnmount(cancelDragExpand)
+
 const dragSort = useDragSort<GrTreeKey, GrTreeDropTarget>({
   items: () => visibleRows.value.map(row => row.node.key),
   elementFor: key => interactionContext.nodeEls.get(key) ?? null,
@@ -687,6 +744,9 @@ const dragSort = useDragSort<GrTreeKey, GrTreeDropTarget>({
   onUpdate: (sourceKey, target) => {
     interactionContext.draggingNode.value = sourceKey === null ? null : treeStore.getNode(sourceKey) ?? null
     interactionContext.dropTarget.value = target
+
+    // Конец переноса приходит сюда же с `target === null` — отсчёт снимается им.
+    scheduleDragExpand(target)
   },
 })
 
