@@ -3,6 +3,7 @@ import { expect, test } from '@playwright/test'
 import { focusedDescription as describeFocus, tabUntil } from '@feugene/granularity-test-kit/e2e'
 
 import { componentPath } from './components'
+import { openShowcasePage } from './readiness'
 
 /**
  * Поведение, которого в jsdom нет вовсе.
@@ -42,8 +43,7 @@ async function collapsedBreadcrumbs(page: import('@playwright/test').Page) {
 
 test.describe('GrBreadcrumbs: клавиатура', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto(componentPath('GrBreadcrumbs'))
-    await page.locator('#live-examples').waitFor()
+    await openShowcasePage(page, componentPath('GrBreadcrumbs'))
     await page.locator('[data-testid="gr-breadcrumbs-ellipsis"]').first().waitFor()
   })
 
@@ -103,8 +103,7 @@ test.describe('GrBreadcrumbs: схлопывание по ширине', () => {
   }
 
   test('узкий контейнер прячет середину, широкий возвращает её', async ({ page }) => {
-    await page.goto(componentPath('GrBreadcrumbs'))
-    await page.locator('#live-examples').waitFor()
+    await openShowcasePage(page, componentPath('GrBreadcrumbs'))
 
     const breadcrumbs = autoCollapsed(page)
     const items = breadcrumbs.locator('[data-gr-breadcrumbs-item]')
@@ -130,8 +129,7 @@ test.describe('GrBreadcrumbs: схлопывание по ширине', () => {
   })
 
   test('раскрытие «…» не срезает путь и сворачивается обратно при смене ширины', async ({ page }) => {
-    await page.goto(componentPath('GrBreadcrumbs'))
-    await page.locator('#live-examples').waitFor()
+    await openShowcasePage(page, componentPath('GrBreadcrumbs'))
 
     // Ищем по переключателю ширины: класс списка после раскрытия меняется, и
     // фильтр по `.flex-nowrap` перестал бы находить именно то демо, которое проверяем.
@@ -169,8 +167,7 @@ test.describe('GrDropdown: панель с содержимым, а не с ме
    * — пробел. jsdom не даёт ни того, ни другого: там чекбокс не активируется.
    */
   test('до чекбокса в панели доходят стрелки, а переключает его пробел', async ({ page }) => {
-    await page.goto(componentPath('GrDropdown'))
-    await page.locator('#live-examples').waitFor()
+    await openShowcasePage(page, componentPath('GrDropdown'))
 
     await page.getByRole('button', { name: 'Filters' }).focus()
     await page.keyboard.press('Enter')
@@ -205,8 +202,7 @@ test.describe('быстрый поиск витрины', () => {
   const modKey = process.platform === 'darwin' ? 'Meta' : 'Control'
 
   test('⌘K открывает единственную палитру и уводит на выбранную страницу', async ({ page }) => {
-    await page.goto('/components')
-    await page.locator('#live-examples, main').first().waitFor()
+    await openShowcasePage(page, '/components')
 
     await page.keyboard.press(`${modKey}+KeyK`)
 
@@ -226,8 +222,7 @@ test.describe('быстрый поиск витрины', () => {
   })
 
   test('на странице палитры ⌘K не открывает демо-палитры', async ({ page }) => {
-    await page.goto(componentPath('GrCommandPalette'))
-    await page.locator('#live-examples').waitFor()
+    await openShowcasePage(page, componentPath('GrCommandPalette'))
 
     // Демо на странице четыре, и у каждого свой `GrCommandPalette`; хоткей
     // принадлежит поиску витрины, иначе одно нажатие открывало бы сразу несколько.
@@ -285,8 +280,7 @@ async function fieldWith(page: import('@playwright/test').Page, root: string, ch
 
 test.describe('GrInput: trailing-кнопки', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto(componentPath('GrInput'))
-    await page.locator('#live-examples').waitFor()
+    await openShowcasePage(page, componentPath('GrInput'))
     await page.locator('[data-gr-input-clear]').first().waitFor()
   })
 
@@ -340,8 +334,7 @@ test.describe('GrInput: trailing-кнопки', () => {
 
 test.describe('GrTextarea: кнопка очистки', () => {
   test('Enter на крестике очищает поле и возвращает в него фокус', async ({ page }) => {
-    await page.goto(componentPath('GrTextarea'))
-    await page.locator('#live-examples').waitFor()
+    await openShowcasePage(page, componentPath('GrTextarea'))
 
     const demo = await fieldWith(page, '[data-example-preview]', '[data-gr-textarea-clear]')
     const textarea = demo.locator('textarea').first()
@@ -363,8 +356,7 @@ test.describe('GrTextarea: кнопка очистки', () => {
 
 test.describe('GrFileUpload: кнопки строки файла', () => {
   test('поле выбора файла в таб-порядке, а зона сброса — нет', async ({ page }) => {
-    await page.goto(componentPath('GrFileUpload'))
-    await page.locator('#live-examples').waitFor()
+    await openShowcasePage(page, componentPath('GrFileUpload'))
 
     const uploader = page.locator('[data-gr-file-upload]').first()
     await expect(uploader).not.toHaveAttribute('tabindex', '0')
@@ -381,8 +373,7 @@ test.describe('GrFileUpload: кнопки строки файла', () => {
 
 test.describe('GrTable: прокручиваемая область', () => {
   test('область достижима табом, имеет имя и листается стрелками', async ({ page }) => {
-    await page.goto(componentPath('GrTable'))
-    await page.locator('#live-examples').waitFor()
+    await openShowcasePage(page, componentPath('GrTable'))
 
     // Именно демо с `regionLabel`: у остальных таблиц на странице скроллер тоже
     // есть, но роли и имени у него нет — и не должно быть.
@@ -423,8 +414,7 @@ test.describe('GrTable: прокручиваемая область', () => {
 
 test.describe('GrSidebar: сворачивание', () => {
   test('Enter на кнопке сворачивания переключает состояние', async ({ page }) => {
-    await page.goto(componentPath('GrSidebar'))
-    await page.locator('#live-examples').waitFor()
+    await openShowcasePage(page, componentPath('GrSidebar'))
 
     const toggle = page.locator('[data-gr-sidebar-toggle]').first()
     await toggle.waitFor()
@@ -442,8 +432,7 @@ test.describe('GrSidebar: сворачивание', () => {
   })
 
   test('содержимое сайдбара — таб-стоп: прокрутка достижима с клавиатуры', async ({ page }) => {
-    await page.goto(componentPath('GrSidebar'))
-    await page.locator('#live-examples').waitFor()
+    await openShowcasePage(page, componentPath('GrSidebar'))
 
     await expect(page.locator('[data-gr-sidebar-content][tabindex="0"]').first()).toBeAttached()
   })
@@ -451,8 +440,7 @@ test.describe('GrSidebar: сворачивание', () => {
 
 test.describe('GrBottomNav: выбор раздела', () => {
   test('Enter меняет раздел, а выключенный пункт не активируется', async ({ page }) => {
-    await page.goto(componentPath('GrBottomNav'))
-    await page.locator('#live-examples').waitFor()
+    await openShowcasePage(page, componentPath('GrBottomNav'))
 
     const demo = page.locator('[data-example-preview]')
       .filter({ has: page.locator('[data-gr-bottom-nav-item][aria-disabled="true"]') })
@@ -480,8 +468,7 @@ test.describe('GrBottomNav: выбор раздела', () => {
 
 test.describe('GrContextMenu: меню по правому клику', () => {
   test('открывается указателем и с клавиатуры, закрывается Esc', async ({ page }) => {
-    await page.goto(componentPath('GrContextMenu'))
-    await page.locator('#live-examples').waitFor()
+    await openShowcasePage(page, componentPath('GrContextMenu'))
 
     const demo = page.locator('[data-example-preview]')
       .filter({ has: page.locator('[data-gr-tree]') })
@@ -517,8 +504,7 @@ test.describe('GrContextMenu: меню по правому клику', () => {
   })
 
   test('правый клик вне меню закрывает его', async ({ page }) => {
-    await page.goto(componentPath('GrContextMenu'))
-    await page.locator('#live-examples').waitFor()
+    await openShowcasePage(page, componentPath('GrContextMenu'))
 
     const demo = page.locator('[data-example-preview]')
       .filter({ has: page.locator('[data-gr-tree]') })
@@ -540,8 +526,7 @@ test.describe('GrContextMenu: меню по правому клику', () => {
 
 test.describe('GrSteps: проход мастера', () => {
   test('гейт не пускает вперёд, а будущий шаг вне таб-порядка', async ({ page }) => {
-    await page.goto(componentPath('GrSteps'))
-    await page.locator('#live-examples').waitFor()
+    await openShowcasePage(page, componentPath('GrSteps'))
 
     const demo = page.locator('[data-example-preview]')
       .filter({ has: page.locator('[data-gr-step][data-value="contacts"]') })
@@ -575,8 +560,7 @@ test.describe('GrSteps: проход мастера', () => {
 
 test.describe('GrList: кликабельная строка', () => {
   test('Enter и Space на строке вызывают действие', async ({ page }) => {
-    await page.goto(componentPath('GrList'))
-    await page.locator('#live-examples').waitFor()
+    await openShowcasePage(page, componentPath('GrList'))
 
     const demo = page.locator('[data-example-preview]')
       .filter({ has: page.locator('[data-gr-list-item-action]') })
@@ -597,8 +581,7 @@ test.describe('GrList: кликабельная строка', () => {
 
 test.describe('GrTimeline: ось сквозь заголовок группы', () => {
   test('ось не смещается вбок и не рвётся на границе групп', async ({ page }) => {
-    await page.goto(componentPath('GrTimeline'))
-    await page.locator('#live-examples').waitFor()
+    await openShowcasePage(page, componentPath('GrTimeline'))
 
     const grouped = page.locator('[data-example-preview]')
       .filter({ has: page.locator('[data-gr-timeline-group-header]') })
@@ -659,8 +642,7 @@ test.describe('GrTimeline: ось сквозь заголовок группы',
  */
 test.describe('GrCarousel', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto(componentPath('GrCarousel'))
-    await page.locator('#live-examples').waitFor()
+    await openShowcasePage(page, componentPath('GrCarousel'))
   })
 
   test('Tab не заходит в кадры, которых не видно', async ({ page }) => {
@@ -705,8 +687,7 @@ test.describe('GrCarousel', () => {
  */
 test.describe('GrTransfer', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto(componentPath('GrTransfer'))
-    await page.locator('#live-examples').waitFor()
+    await openShowcasePage(page, componentPath('GrTransfer'))
     await page.locator('[data-gr-transfer]').first().waitFor()
   })
 
@@ -796,8 +777,7 @@ test.describe('GrAffix: прилипание', () => {
   }
 
   test.beforeEach(async ({ page }) => {
-    await page.goto(componentPath('GrAffix'))
-    await page.locator('#live-examples').waitFor()
+    await openShowcasePage(page, componentPath('GrAffix'))
     await page.locator('[data-gr-affix]').first().waitFor()
   })
 
@@ -944,8 +924,7 @@ test.describe('GrScrollSpy: подсветка', () => {
   }
 
   test.beforeEach(async ({ page }) => {
-    await page.goto(componentPath('GrScrollSpy'))
-    await page.locator('#live-examples').waitFor()
+    await openShowcasePage(page, componentPath('GrScrollSpy'))
     await page.locator('[data-gr-scroll-spy]').first().waitFor()
   })
 
@@ -1043,15 +1022,26 @@ test.describe('GrScrollSpy: подсветка', () => {
   })
 
   test('заголовок приземляется под липкой шапкой', async ({ page }) => {
+    /*
+     * Проверка про **место** приземления, а не про дорогу к нему, поэтому
+     * дороги здесь нет: под `prefers-reduced-motion` компонент прокручивает
+     * мгновенно (`useScrollSpy.ts`, `behavior: 'auto'`).
+     *
+     * Плавная прокрутка обрывалась под нагрузкой на полпути — замер показывал
+     * 178 → 117 и остановку, — и никакое ожидание этого не лечит: анимация не
+     * «не успела», её отменили. Промежуточную подсветку во время движения
+     * проверяет соседний тест, и там плавность остаётся.
+     */
+    await page.emulateMedia({ reducedMotion: 'reduce' })
+
     const nav = page.locator('[data-gr-scroll-spy]').nth(2)
     await nav.scrollIntoViewIfNeeded()
 
     // Раздел из середины, а не с конца: у последних прокрутка упирается в свой
     // предел, цель зажимается, и приземление честно оказывается ниже линии.
     await nav.getByText('Предмет договора').click()
-    await page.waitForTimeout(800)
 
-    const gap = await page.evaluate(() => {
+    const gap = () => page.evaluate(() => {
       const section = document.getElementById('spy-affix-subject')!
       let scroller = section.parentElement
 
@@ -1060,10 +1050,15 @@ test.describe('GrScrollSpy: подсветка', () => {
 
       const offset = Number.parseFloat(getComputedStyle(scroller!).getPropertyValue('--gr-scroll-spy-offset'))
 
-      return section.getBoundingClientRect().top - (scroller!.getBoundingClientRect().top + offset)
+      return Math.abs(section.getBoundingClientRect().top - (scroller!.getBoundingClientRect().top + offset))
     })
 
-    expect(Math.abs(gap), 'раздел приземлился не на линию активации').toBeLessThanOrEqual(2)
+    // Прокрутка плавная, и пауза фиксированной длины её длительность угадывает:
+    // под нагрузкой она не успевала, и тест падал с расстоянием в сотню
+    // пикселей — на полпути к цели. Ждём приземления, а не времени.
+    await expect
+      .poll(gap, { message: 'раздел приземлился не на линию активации' })
+      .toBeLessThanOrEqual(2)
   })
 })
 
@@ -1074,7 +1069,7 @@ test.describe('GrScrollSpy: подсветка', () => {
  */
 test.describe('GrOtpInput', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto(componentPath('GrOtpInput'))
+    await openShowcasePage(page, componentPath('GrOtpInput'))
     await page.locator('[data-gr-otp-input]').first().waitFor()
   })
 
@@ -1194,8 +1189,7 @@ test.describe('GrOtpInput', () => {
  */
 test.describe('GrColorPicker: квадрат насыщенность × светлота', () => {
   async function openArea(page: import('@playwright/test').Page) {
-    await page.goto(componentPath('GrColorPicker'))
-    await page.locator('#live-examples').waitFor()
+    await openShowcasePage(page, componentPath('GrColorPicker'))
 
     const trigger = page.getByLabel('Accent color').first()
     await trigger.scrollIntoViewIfNeeded()

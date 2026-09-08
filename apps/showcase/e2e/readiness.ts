@@ -34,3 +34,22 @@ export async function waitForSettledPreviews(page: Page): Promise<void> {
     () => document.querySelectorAll('[data-example-preview] .gr-code-editor__line').length,
   )).toBe(0)
 }
+
+/**
+ * Открыть страницу витрины и дождаться её окончательного вида.
+ *
+ * Заголовок секции (`#live-examples`) якорем готовности **не** является: он
+ * приезжает раньше демо, которые грузятся асинхронными компонентами. Тесты,
+ * ждавшие только его, мерили ещё достраивающуюся страницу — под лёгкой
+ * нагрузкой она успевала устояться и всё сходилось, под тяжёлой нет.
+ *
+ * Замер под полным прогоном: на момент ожидания оставалось два пустых превью,
+ * а высота документа за следующие 400 мс вырастала с 5733 до 7075 пикселей.
+ * Отсюда плавающие падения у всего, что зависит от координат и прокрутки, —
+ * `GrAffix`, `GrScrollSpy`, `GrDropdown`.
+ */
+export async function openShowcasePage(page: Page, path: string): Promise<void> {
+  await page.goto(path)
+  await page.locator('#live-examples, main').first().waitFor()
+  await waitForSettledPreviews(page)
+}
