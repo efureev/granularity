@@ -39,6 +39,16 @@ to [Semantic Versioning](https://semver.org/).
   have had to centre it themselves. An empty knob is unaffected — it is
   absolutely positioned and sized.
 
+- **`GrColorPicker` no longer rewrites the colour it was given.** Every commit
+  went through a normaliser that rounded hue, saturation and lightness to whole
+  numbers, and the integer HSL grid is finer than the hex one: eleven of twelve
+  typical brand values came back different — `#10b981` as `#10b77f`. The user had
+  moved nothing; picking a preset or pasting a hex was enough. Worse, a preset
+  stopped matching itself, so its `aria-pressed` went false the moment it was
+  chosen. Whole numbers are what the scales need, and the scales still get them:
+  a slider reads the rounded value of its channel while the stored one stays
+  exact.
+
 - **`GrSelect`, `GrAutocomplete` and `GrTreeSelect` panels now fit the screen.**
   Their height came from a fixed `dropdownMaxHeight` (280 / 280 / 320) that knew
   nothing about the viewport: on a short screen the panel built its full height
