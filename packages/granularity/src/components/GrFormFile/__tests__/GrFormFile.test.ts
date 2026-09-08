@@ -501,3 +501,75 @@ describe('GrFormFile — limit', () => {
     wrapper.unmount()
   })
 })
+
+/**
+ * Порядок набора значим там, где значима последовательность файлов: галерея,
+ * страницы документа, очередь вложений. Механика переноса берётся у
+ * `GrSortableList` — своя копия у неё была бы седьмой в пакете.
+ */
+describe('GrFormFile — порядок набора', () => {
+  const files = () => [
+    new File(['a'], 'a.txt', { type: 'text/plain' }),
+    new File(['b'], 'b.txt', { type: 'text/plain' }),
+    new File(['c'], 'c.txt', { type: 'text/plain' }),
+  ]
+
+  it('без пропа список остаётся обычным — переносить нечем', () => {
+    const wrapper = mount(GrFormFile, { props: { modelValue: files(), multiple: true } })
+
+    expect(wrapper.find('[data-gr-sortable]').exists()).toBe(false)
+    expect(wrapper.findAll('[data-gr-form-file-item]')).toHaveLength(3)
+
+    wrapper.unmount()
+  })
+
+  it('`reorderable` отдаёт строки сортируемому списку, не теряя их содержимого', () => {
+    const wrapper = mount(GrFormFile, {
+      props: { modelValue: files(), multiple: true, reorderable: true },
+    })
+
+    expect(wrapper.find('[data-gr-sortable]').exists()).toBe(true)
+
+    const items = wrapper.findAll('[data-gr-form-file-item]')
+    expect(items).toHaveLength(3)
+    expect(items.map(i => i.get('[data-gr-form-file-item-name]').text())).toEqual(['a.txt', 'b.txt', 'c.txt'])
+    // Удаление из строки никуда не делось: перенос его не вытесняет.
+    expect(wrapper.findAll('[data-gr-form-file-item-remove]')).toHaveLength(3)
+
+    wrapper.unmount()
+  })
+
+  /**
+   * Перестановка — такое же изменение набора, как удаление: без `change`
+   * порядок остался бы только на экране, а форма ушла бы со старым.
+   */
+  it('перестановка отдаёт и модель, и change', async () => {
+    const initial = files()
+    const wrapper = mount(GrFormFile, {
+      props: { modelValue: initial, multiple: true, reorderable: true },
+    })
+
+    const reordered = [initial[1], initial[0], initial[2]]
+    await wrapper.findComponent({ name: 'GrSortableList' }).vm.$emit('update:modelValue', reordered)
+
+    expect(wrapper.emitted('update:modelValue')?.at(-1)?.[0]).toEqual(reordered)
+    expect(wrapper.emitted('change')?.at(-1)?.[0]).toEqual(reordered)
+
+    wrapper.unmount()
+  })
+
+  it('`readonly` и `disabled` перенос запрещают', async () => {
+    for (const lock of [{ readonly: true }, { disabled: true }]) {
+      const initial = files()
+      const wrapper = mount(GrFormFile, {
+        props: { modelValue: initial, multiple: true, reorderable: true, ...lock },
+      })
+
+      await wrapper.findComponent({ name: 'GrSortableList' }).vm.$emit('update:modelValue', [initial[2], initial[0], initial[1]])
+
+      expect(wrapper.emitted('update:modelValue')).toBeUndefined()
+
+      wrapper.unmount()
+    }
+  })
+})

@@ -43,4 +43,12 @@ export const grFormFileExamples: ShowcaseComponentExampleDoc[] = [
     status: 'ready',
     previewKey: 'gr-form-file-server-errors',
   },
+  {
+    id: 'form-file-reorder',
+    title: 'Порядок набора задаёт пользователь',
+    description: '`reorderable` добавляет строке ручку переноса: набор упорядочивается указателем и с клавиатуры. Нужно там, где последовательность файлов что-то значит, — галерея, страницы документа, очередь вложений.',
+    status: 'ready',
+    previewKey: 'gr-form-file-reorder',
+    note: 'Механика переноса берётся у `GrSortableList`, а не пишется заново: клавиатура, автопрокрутка и объявления у него уже есть. Цена — зависимость: его стили приезжают каждому, кто берёт `GrFormFile`.',
+  },
 ]

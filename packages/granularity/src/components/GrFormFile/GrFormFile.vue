@@ -5,6 +5,7 @@ import IconUpload from '~icons/lucide/upload'
 import IconX from '~icons/lucide/x'
 
 import GrButton from '../GrButton/GrButton.vue'
+import GrSortableList from '../GrSortableList/GrSortableList.vue'
 import GrIcon from '../GrIcon/GrIcon.vue'
 import { useGrComponentSize } from '../GrConfigProvider/context'
 import {
@@ -62,6 +63,13 @@ export interface GrFormFileProps {
   size?: GrFormFileSize
   /** Миниатюры для картинок в наборе. Файлы других типов остаются строкой. */
   preview?: boolean
+  /**
+   * Порядок набора задаёт пользователь: у строки появляется ручка переноса.
+   *
+   * Нужно там, где последовательность файлов что-то значит, — галерея,
+   * страницы документа, очередь вложений. Осмысленно только с `multiple`.
+   */
+  reorderable?: boolean
   /** Дополнительная (кастомная) валидация на стороне потребителя. */
   validate?: (files: File[]) => GrFormFileError[] | Promise<GrFormFileError[]>
   /**
@@ -87,6 +95,7 @@ const props = withDefaults(
   {
     multiple: false,
     preview: false,
+    reorderable: false,
     disabled: false,
     readonly: false,
     invalid: false,
@@ -278,6 +287,18 @@ function emitModel(nextFiles: File[]) {
 
   emit('update:modelValue', value)
   emit('change', value)
+}
+
+/**
+ * Перестановка — то же изменение набора, что удаление или добавление, поэтому
+ * идёт тем же путём: валидацию она не запускает (файлы те же), но модель и
+ * `change` обязана отдать, иначе порядок остался бы только на экране.
+ */
+function reorderFiles(nextFiles: File[]): void {
+  if (isLocked.value)
+    return
+
+  emitModel(nextFiles)
 }
 
 async function applyFiles(nextFiles: File[]) {
@@ -507,7 +528,63 @@ watch(
         </span>
       </div>
 
-      <div v-if="multiple && hasFiles" class="flex flex-col" :class="stackClass">
+      <!--
+        При `reorderable` строки набора рисует `GrSortableList`: перенос
+        указателем, клавиатура и объявления у него уже есть, и седьмая копия
+        этой механики пакету не нужна. `ghost` — чтобы не появилась вторая
+        рамка вокруг того же места, `handle-only` — чтобы тянулась ручка, а не
+        строка с кнопкой удаления.
+      -->
+      <GrSortableList
+        v-if="multiple && hasFiles && reorderable"
+        :model-value="files"
+        :item-key="fileKey"
+        :disabled="isLocked"
+        variant="ghost"
+        handle-only
+        data-gr-form-file-list
+        @update:model-value="reorderFiles"
+      >
+        <template #item="{ item: file, index }">
+          <div class="flex flex-1 items-center gap-2" data-gr-form-file-item>
+            <img
+              v-if="previewUrl(file)"
+              data-gr-form-file-preview
+              :src="previewUrl(file)"
+              alt=""
+              :class="previewClass"
+            >
+
+            <span
+              class="text-[var(--gr-muted-fg)] truncate max-w-[240px]"
+              :class="textClass"
+              :title="file.name"
+              data-gr-form-file-item-name
+            >{{ file.name }}</span>
+
+            <span
+              class="text-[var(--gr-muted-fg)] shrink-0"
+              :class="removeTextClass"
+              data-gr-form-file-item-size
+            >{{ formatFileSize(file) }}</span>
+
+            <button
+              v-if="!isReadonly"
+              type="button"
+              class="text-[var(--gr-muted-fg)] hover:text-[var(--gr-fg)]"
+              :class="removeTextClass"
+              data-gr-form-file-item-remove
+              :disabled="isDisabled"
+              :aria-label="t('gr.formFile.removeFile', 'Remove {fileName}', { fileName: file.name })"
+              @click.prevent="removeAt(index)"
+            >
+              {{ resolvedRemoveText }}
+            </button>
+          </div>
+        </template>
+      </GrSortableList>
+
+      <div v-else-if="multiple && hasFiles" class="flex flex-col" :class="stackClass">
         <div
           v-for="(file, index) in files"
           :key="fileKey(file)"

@@ -9,6 +9,21 @@ to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **`GrFormFile` lets the user order the set.** `reorderable` gives each row a
+  drag handle — for galleries, document pages, an attachment queue, wherever the
+  sequence of files means something. It only makes sense with `multiple`.
+
+  The mechanics come from `GrSortableList` rather than being written again:
+  pointer dragging, the keyboard contract, autoscroll and announcements are
+  already there, and a seventh copy of that machinery is exactly what the
+  package does not need. The honest cost is a dependency — its styles now reach
+  everyone who uses `GrFormFile`. The handle is what drags, not the row: the row
+  holds the remove button, and dragging the whole row would cost it its click.
+
+  A reorder emits `update:modelValue` and `change` like a removal does; without
+  the second the new order would live on screen only while the form kept the old
+  one. `readonly` and `disabled` forbid it.
+
 - **`GrEmptyState` tells two emptinesses apart.** `kind` picks between "nothing
   has been created yet" (`empty`, the default) and "nothing matched the query"
   (`search`), changing the default title and icon. The difference is not
