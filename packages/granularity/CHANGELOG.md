@@ -9,6 +9,23 @@ to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **`GrSidebar` can become a modal layer.** `overlay` turns the panel into one —
+  backdrop, `Esc`, focus trap, scroll lock, focus returned to whatever opened it
+  — all from the shared `useModalOverlay` that `GrDrawer` and `GrPopover` already
+  use, rather than a copy of it.
+
+  When to switch is the application's call: the package has no breakpoint system,
+  and asking the environment in `setup` is forbidden — `matchMedia` answers
+  differently on the server and on the first client render, and hydration comes
+  apart.
+
+  The panel's markup is written once for both modes: the layer wrapper is always
+  rendered but collapses to `display: contents` outside overlay mode. Two copies
+  would have drifted in silence. In the layer, `collapsed` is ignored — an
+  icon-wide rail inside a modal is half a screen spent on nothing — and the
+  header button closes instead of collapsing, since there is nothing to collapse
+  and no other way out but `Esc` or the backdrop.
+
 - **`GrSidebar` items nest.** Put items inside an item and it becomes an
   expandable branch: `aria-expanded` on it, the subtree under it, an indent per
   level. Depth is counted from the markup rather than a prop — each item tells

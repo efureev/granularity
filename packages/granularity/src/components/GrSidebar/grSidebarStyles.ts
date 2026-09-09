@@ -108,3 +108,25 @@ export function itemNestIndent(level: number): string | undefined {
 
   return `calc(0.75rem + ${level} * var(--gr-sidebar-nest-indent, 1rem))`
 }
+
+/**
+ * Корень модального слоя. В обычном режиме обёртка остаётся в разметке, но
+ * `display: contents` убирает её из раскладки — так панель и её шапка описаны
+ * один раз на оба режима, а не продублированы.
+ */
+export const layerRootClass = 'fixed inset-0'
+export const layerPassThroughClass = 'contents'
+
+export const layerBackdropClass = 'fixed inset-0 bg-[var(--gr-overlay-bg)]'
+
+/** Панель слоя прижата к своему краю и тянется на всю высоту экрана. */
+export const layerPanelPositions: Record<GrSidebarPosition, string> = {
+  left: 'fixed inset-y-0 left-0 max-w-[85vw]',
+  right: 'fixed inset-y-0 right-0 max-w-[85vw]',
+}
+
+/** Откуда выезжает панель: из-за своего края, а не из глубины экрана. */
+export const layerPanelEnterFrom: Record<GrSidebarPosition, string> = {
+  left: '-translate-x-full',
+  right: 'translate-x-full',
+}

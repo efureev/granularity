@@ -172,26 +172,32 @@ describe('GrSidebarItem — подсказка в свёрнутом режим�
   })
 })
 describe('GrSidebar — лендмарк и сторона', () => {
-  it('корень по умолчанию aside, landmark="navigation" делает его nav', () => {
+  /**
+   * Лендмарк — сама панель, а не корень компонента: корнем стала обёртка слоя,
+   * которая вне режима `overlay` схлопнута в `display: contents` и в раскладке
+   * не участвует.
+   */
+  it('панель по умолчанию aside, landmark="navigation" делает её nav', () => {
     const aside = mount(GrSidebar, { props: { ariaLabel: 'Разделы' } })
-    expect(aside.element.tagName).toBe('ASIDE')
-    expect(aside.attributes('aria-label')).toBe('Разделы')
+    expect(aside.get('[data-gr-sidebar]').element.tagName).toBe('ASIDE')
+    expect(aside.get('[data-gr-sidebar]').attributes('aria-label')).toBe('Разделы')
 
     const nav = mount(GrSidebar, { props: { landmark: 'navigation', ariaLabel: 'Основная навигация' } })
-    expect(nav.element.tagName).toBe('NAV')
-    expect(nav.attributes('aria-label')).toBe('Основная навигация')
+    expect(nav.get('[data-gr-sidebar]').element.tagName).toBe('NAV')
+    expect(nav.get('[data-gr-sidebar]').attributes('aria-label')).toBe('Основная навигация')
   })
 
   it('position меняет сторону границы и направление шеврона', () => {
     const left = mount(GrSidebar, { props: { showToggleButton: true } })
-    expect(left.classes()).toContain('border-r')
+    expect(left.get('[data-gr-sidebar]').classes()).toContain('border-r')
     // Развёрнутая левая панель сворачивается влево.
     expect(left.get('[data-gr-sidebar-toggle]').attributes('data-direction')).toBe('left')
 
     const right = mount(GrSidebar, { props: { showToggleButton: true, position: 'right' } })
-    expect(right.classes()).toContain('border-l')
-    expect(right.classes()).not.toContain('border-r')
-    expect(right.attributes('data-position')).toBe('right')
+    const rightPanel = right.get('[data-gr-sidebar]')
+    expect(rightPanel.classes()).toContain('border-l')
+    expect(rightPanel.classes()).not.toContain('border-r')
+    expect(rightPanel.attributes('data-position')).toBe('right')
     expect(right.get('[data-gr-sidebar-toggle]').attributes('data-direction')).toBe('right')
   })
 
@@ -426,5 +432,124 @@ describe('GrSidebarItem — вложенные пункты', () => {
 
     expect(wrapper.get('[data-gr-sidebar]').attributes('data-collapsed')).toBeUndefined()
     expect(wrapper.get('[data-gr-sidebar-item-children]').text()).toContain('Профиль')
+  })
+})
+
+/**
+ * Мобильный режим: панель как модальный слой поверх страницы. Когда включать —
+ * решает приложение: своей системы брейкпоинтов у пакета нет, а спрашивать среду
+ * в `setup` нельзя, иначе первый клиентский рендер разойдётся с серверным.
+ */
+describe('GrSidebar — модальный слой', () => {
+  function mountSidebar(props: Record<string, unknown> = {}) {
+    return mount(GrSidebar, {
+      attachTo: document.body,
+      props: { ariaLabel: 'Разделы', ...props },
+      slots: { default: '<a href="#a">Обзор</a>' },
+      global: granularityGlobal(),
+    })
+  }
+
+  it('без `overlay` панель остаётся в раскладке потребителя', () => {
+    const wrapper = mountSidebar()
+
+    expect(document.querySelector('[data-gr-sidebar-layer]')).toBeNull()
+    // Панель — в собственном поддереве компонента, а не в портале.
+    expect(wrapper.find('[data-gr-sidebar]').exists()).toBe(true)
+
+    wrapper.unmount()
+  })
+
+  it('`overlay` с открытым состоянием даёт модальный слой с подложкой', async () => {
+    const wrapper = mountSidebar({ overlay: true, open: true })
+    await nextTick()
+
+    const layer = document.querySelector('[data-gr-sidebar-layer]')
+    expect(layer).not.toBeNull()
+    expect(layer?.getAttribute('role')).toBe('dialog')
+    expect(layer?.getAttribute('aria-modal')).toBe('true')
+    expect(document.querySelector('[data-gr-sidebar-backdrop]')).not.toBeNull()
+
+    wrapper.unmount()
+  })
+
+  it('закрытый слой не рисует ни панели, ни подложки', async () => {
+    const wrapper = mountSidebar({ overlay: true, open: false })
+    await nextTick()
+
+    expect(document.querySelector('[data-gr-sidebar-backdrop]')).toBeNull()
+    expect(wrapper.find('[data-gr-sidebar]').exists(), wrapper.html()).toBe(false)
+
+    wrapper.unmount()
+  })
+
+  /**
+   * Телепорт включается только после монтирования — иначе первый клиентский
+   * рендер не совпал бы с серверным. Значит в этом кадре панель не должна
+   * рисоваться вовсе: иначе модальная панель мелькнула бы прямо в потоке
+   * страницы, а потом прыгнула в портал.
+   */
+  it('до монтирования слой не мелькает в потоке страницы', () => {
+    const wrapper = mountSidebar({ overlay: true, open: true })
+
+    expect(wrapper.find('[data-gr-sidebar]').exists(), wrapper.html()).toBe(false)
+
+    wrapper.unmount()
+  })
+
+  /**
+   * Корень слоя растянут на весь экран. Оставь мы его при закрытой панели —
+   * страница получила бы невидимую плёнку, перехватывающую все клики.
+   */
+  it('закрытый слой не накрывает страницу', async () => {
+    const wrapper = mountSidebar({ overlay: true, open: false })
+    await nextTick()
+
+    expect(document.querySelector('[data-gr-sidebar-layer]')).toBeNull()
+    expect(wrapper.html()).not.toContain('fixed inset-0')
+
+    wrapper.unmount()
+  })
+
+  /** Рейл шириной в иконку внутри модального окна — половина экрана под пустоту. */
+  it('в слое свёрнутость игнорируется', async () => {
+    const wrapper = mountSidebar({ overlay: true, open: true, collapsed: true })
+    await nextTick()
+
+    expect(document.querySelector('[data-gr-sidebar]')?.getAttribute('data-collapsed')).toBeNull()
+
+    wrapper.unmount()
+  })
+
+  /** Сворачивать в слое нечего, а закрыть иначе можно только `Esc` или подложкой. */
+  it('кнопка шапки в слое закрывает, а не сворачивает', async () => {
+    const wrapper = mountSidebar({ overlay: true, open: true, showToggleButton: true, title: 'Меню' })
+    await nextTick()
+
+    const toggle = document.querySelector<HTMLElement>('[data-gr-sidebar-toggle]')!
+    toggle.click()
+    await nextTick()
+
+    expect(wrapper.emitted('update:open')?.at(-1)?.[0]).toBe(false)
+    expect(wrapper.emitted('update:collapsed')).toBeUndefined()
+
+    wrapper.unmount()
+  })
+
+  it('атрибуты потребителя садятся на панель, а не на схлопнутую обёртку', () => {
+    const wrapper = mountSidebar({})
+    wrapper.unmount()
+
+    const withClass = mount(GrSidebar, {
+      props: { ariaLabel: 'Разделы' },
+      attrs: { 'class': 'проверка', 'data-own': 'да' },
+      global: granularityGlobal(),
+    })
+
+    const panel = withClass.get('[data-gr-sidebar]')
+    expect(panel.classes()).toContain('проверка')
+    expect(panel.attributes('data-own')).toBe('да')
+
+    withClass.unmount()
   })
 })

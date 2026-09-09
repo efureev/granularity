@@ -10392,6 +10392,13 @@
             "default": "undefined"
           },
           {
+            "name": "open",
+            "description": "Открыт ли слой. Поддерживает `v-model:open`; без `overlay` не значит ничего.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
             "name": "ariaLabel",
             "description": "Имя лендмарка: без него две панели на странице неразличимы.",
             "type": "string | undefined",
@@ -10453,6 +10460,13 @@
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
+          },
+          {
+            "name": "overlay",
+            "description": "Панель как модальный слой поверх страницы: подложка, `Esc`, ловушка фокуса, блокировка прокрутки. Для узкого экрана, где колонке места нет. Когда включать — решает приложение: своей системы брейкпоинтов у пакета нет, а спрашивать среду в `setup` нельзя — первый клиентский рендер разошёлся бы с серверным и сломал гидрацию.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
           }
         ]
       },
@@ -10483,6 +10497,12 @@
         "title": "Events",
         "origin": "generated",
         "items": [
+          {
+            "name": "update:open",
+            "description": "",
+            "type": "[value: boolean]",
+            "signature": "(event: \"update:open\", value: boolean): void"
+          },
           {
             "name": "update:collapsed",
             "description": "",

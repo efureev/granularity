@@ -424,6 +424,7 @@ export const demoPathByPreviewKey = {
   'gr-select-remote-search': 'components/gr-select/GrSelectRemoteSearchDemo.vue',
   'gr-select-virtual': 'components/gr-select/GrSelectVirtualDemo.vue',
   'gr-sidebar-basic-sections': 'components/gr-sidebar/GrSidebarBasicSectionsDemo.vue',
+  'gr-sidebar-overlay': 'components/gr-sidebar/GrSidebarOverlayDemo.vue',
   'gr-sidebar-nested': 'components/gr-sidebar/GrSidebarNestedDemo.vue',
   'gr-sidebar-documentation-nav': 'components/gr-sidebar/GrSidebarDocumentationNavDemo.vue',
   'gr-sidebar-filter-rail': 'components/gr-sidebar/GrSidebarFilterRailDemo.vue',

@@ -534,6 +534,52 @@ test.describe('GrSidebar: вложенные пункты', () => {
   })
 })
 
+test.describe('GrSidebar: модальный слой', () => {
+  function overlayPreview(page: Page) {
+    return page.locator('[data-example-preview]').filter({ hasText: 'панель уехала в модальный слой' }).first()
+  }
+
+  /**
+   * Корень слоя растянут на весь экран, и закрытие обязано убрать его из DOM, а
+   * не только спрятать панель: оставшись, он продолжил бы перехватывать клики по
+   * странице. В jsdom этого не проверить — там переход не доигрывает до
+   * `after-leave`, которым слой и освобождается.
+   */
+  test('Esc закрывает слой, убирает его из DOM и возвращает фокус', async ({ page }) => {
+    await openShowcasePage(page, componentPath('GrSidebar'))
+
+    const preview = overlayPreview(page)
+    await preview.scrollIntoViewIfNeeded()
+
+    const opener = preview.getByRole('button', { name: 'Открыть меню' })
+    await opener.click()
+
+    const layer = page.locator('[data-gr-sidebar-layer]')
+    await expect(layer).toHaveCount(1)
+    await expect(page.locator('[data-gr-sidebar-backdrop]')).toBeVisible()
+
+    await page.keyboard.press('Escape')
+
+    await expect(layer, 'слой обязан уйти из DOM, а не остаться плёнкой').toHaveCount(0)
+    await expect(opener).toBeFocused()
+  })
+
+  test('клик в подложку закрывает слой', async ({ page }) => {
+    await openShowcasePage(page, componentPath('GrSidebar'))
+
+    const preview = overlayPreview(page)
+    await preview.scrollIntoViewIfNeeded()
+    await preview.getByRole('button', { name: 'Открыть меню' }).click()
+
+    const backdrop = page.locator('[data-gr-sidebar-backdrop]')
+    await expect(backdrop).toBeVisible()
+    // Клик у дальнего края — заведомо мимо панели.
+    await backdrop.click({ position: { x: 1200, y: 300 } })
+
+    await expect(page.locator('[data-gr-sidebar-layer]')).toHaveCount(0)
+  })
+})
+
 test.describe('GrKbd: последовательность клавиш', () => {
   /**
    * Цепочка собирается из настоящих событий клавиатуры в их настоящем порядке —
