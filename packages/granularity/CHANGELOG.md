@@ -7,6 +7,8 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.50.0] 2026-09-09
+
 ### Added
 
 - **`GrTransfer` can say the catalogue is still on its way.** The async path was
