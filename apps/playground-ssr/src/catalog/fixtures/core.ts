@@ -89,6 +89,7 @@ import GrSidebarPage from './pages/GrSidebarPage.vue'
 import GrSortableListPage from './pages/GrSortableListPage.vue'
 import GrSplitterPage from './pages/GrSplitterPage.vue'
 import GrTabPanelsPage from './pages/GrTabPanelsPage.vue'
+import GrTabsWithPanelsPage from './pages/GrTabsWithPanelsPage.vue'
 import GrTimelinePage from './pages/GrTimelinePage.vue'
 
 /**
@@ -175,6 +176,7 @@ export const coreFixtures: ComponentFixture[] = [
   { name: 'GrSwitch', about: 'роль и состояние на сервере', render: () => h(GrSwitch, { modelValue: true }) },
   { name: 'GrTabPanels', about: 'связка вкладок и панелей по общему id-base', page: GrTabPanelsPage },
   { name: 'GrTable', about: 'чистая разметка', render: () => h(GrTable, null, { default: () => h('tr', h('td', 'ячейка')) }) },
+  { name: 'GrTabsWithPanels', about: 'общий id-base из useId() переживает гидрацию', page: GrTabsWithPanelsPage },
   { name: 'GrTabs', about: 'id вкладок из useId()', render: () => h(GrTabs, { modelValue: 'a', tabs: [{ value: 'a', label: 'Один' }, { value: 'b', label: 'Два' }] }) },
   { name: 'GrTextarea', about: 'значение приходит содержимым, а не атрибутом', render: () => h(GrTextarea, { modelValue: 'Текст с сервера' }) },
   { name: 'GrTimeline', about: 'контекст ленты доезжает до пунктов на сервере', page: GrTimelinePage },

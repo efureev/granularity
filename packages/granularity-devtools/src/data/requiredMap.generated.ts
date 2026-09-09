@@ -41,6 +41,7 @@ export const GR_REQUIRED_PROPS: Record<string, readonly string[]> = {
   GrSteps: ['modelValue', 'steps'],
   GrTabPanels: ['modelValue'],
   GrTabs: ['modelValue', 'tabs'],
+  GrTabsWithPanels: ['modelValue', 'tabs'],
   GrTextarea: ['modelValue'],
   GrTransfer: ['items', 'modelValue'],
   GrTree: ['data'],
