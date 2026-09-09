@@ -158,6 +158,7 @@ const VISUAL_COMPONENTS = [
   'GrTable',
   'GrDataTable',
   'GrTabs',
+  'GrTabsWithPanels',
   'GrBreadcrumbs',
   'GrPagination',
   'GrList',

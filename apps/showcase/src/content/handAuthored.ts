@@ -6,7 +6,7 @@ import type {
 const componentGroups = {
   actions: ['GrButton', 'GrButtonGroup', 'GrLink'],
   feedback: ['GrAlert', 'GrBadge', 'GrBadgeWrap', 'GrEmptyState', 'GrLoading', 'GrProgressBar', 'GrProgressCircle', 'GrResponseErrorBanner', 'GrSkeleton', 'GrToaster'],
-  navigation: ['GrBottomNav', 'GrBreadcrumbs', 'GrCommandPalette', 'GrNavbar', 'GrPagination', 'GrScrollSpy', 'GrSidebar', 'GrSteps', 'GrTabs', 'GrTabPanels', 'GrTooltip'],
+  navigation: ['GrBottomNav', 'GrBreadcrumbs', 'GrCommandPalette', 'GrNavbar', 'GrPagination', 'GrScrollSpy', 'GrSidebar', 'GrSteps', 'GrTabs', 'GrTabPanels', 'GrTabsWithPanels', 'GrTooltip'],
   overlays: ['GrCollapse', 'GrConfirmDialog', 'GrContextMenu', 'GrDialog', 'GrDrawer', 'GrDropdown', 'GrDropdownMenu', 'GrImageViewer', 'GrModal', 'GrPopover', 'GrPromptDialog'],
   forms: ['GrAutocomplete', 'GrCheckbox', 'GrCheckboxGroup', 'GrColorPicker', 'GrFileUpload', 'GrForm', 'GrFormFile', 'GrFormField', 'GrFormSection', 'GrInput', 'GrNumberInput', 'GrOtpInput', 'GrInputTag', 'GrRadio', 'GrRadioGroup', 'GrRating', 'GrSegmented', 'GrSelect', 'GrSlider', 'GrTransfer', 'GrSwitch', 'GrTextarea', 'GrTreeSelect'],
   data: ['GrAvatar', 'GrCard', 'GrCarousel', 'GrChip', 'GrChipGroup', 'GrFilePreview', 'GrDataTable', 'GrDelta', 'GrDescriptionList', 'GrDivider', 'GrIcon', 'GrJsonViewer', 'GrKbd', 'GrList', 'GrSortableList', 'GrStatistic', 'GrTable', 'GrTimeline', 'GrTree', 'GrTreeSections', 'GrValue'],
@@ -36,6 +36,7 @@ const componentSummaryOverrides = {
   GrDivider: 'Separates content with a line, optionally with a centered label.',
   GrKbd: 'Displays a keyboard key or shortcut in a `<kbd>` element.',
   GrTabPanels: 'Renders tab panels linked to `GrTabs` by ARIA for accessible tabs.',
+  GrTabsWithPanels: 'Pairs a tab row with its panels under one model and one id base.',
   GrCheckbox: 'Lets you toggle independent options and select multiple items.',
   GrCheckboxGroup: 'Collects checkboxes into one multi-select field with a shared model and states.',
   GrCollapse: 'Collapses and expands additional content on demand.',

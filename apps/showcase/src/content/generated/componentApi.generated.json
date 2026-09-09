@@ -12001,6 +12001,127 @@
       }
     ]
   },
+  "GrTabsWithPanels": {
+    "name": "GrTabsWithPanels",
+    "sourcePath": "packages/granularity/src/components/GrTabsWithPanels/GrTabsWithPanels.vue",
+    "sections": [
+      {
+        "key": "props",
+        "title": "Props",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "variant",
+            "description": "Вид ряда: обойма с таблетками или ряд с подчёркиванием.",
+            "type": "\"pills\" | \"line\" | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "closable",
+            "description": "Крестик на вкладках и закрытие по `Delete`/`Backspace`. Точечно снимается `closable: false` у самой вкладки.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "size",
+            "description": "",
+            "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "orientation",
+            "description": "Горизонтальный (по умолчанию) или вертикальный список вкладок.",
+            "type": "GrTabsOrientation | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "activationMode",
+            "description": "`automatic` (по умолчанию) — стрелка сразу переключает вкладку; `manual` — стрелка двигает только фокус, выбор подтверждается `Enter`/`Space`. Второй режим для вкладок с тяжёлой загрузкой: перебор стрелками иначе тянет каждую панель.",
+            "type": "GrTabsActivationMode | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "emptyText",
+            "description": "Текст, когда список вкладок пуст. Слот `#empty` сильнее.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "idBase",
+            "description": "База id для ARIA-связки с `GrTabPanels`. Если задана, каждая вкладка получает `id=\"<idBase>-tab-<value>\"` и `aria-controls=\"<idBase>-panel-<value>\"`. Передайте тот же `idBase` в `GrTabPanels`, чтобы связать `tab`↔`tabpanel`.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "modelValue",
+            "description": "",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "tabs",
+            "description": "",
+            "type": "GrTab[]",
+            "required": true
+          }
+        ]
+      },
+      {
+        "key": "slots",
+        "title": "Slots",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "default",
+            "description": "Панели (`GrTabPanel`).",
+            "type": "any"
+          },
+          {
+            "name": "tab",
+            "description": "Содержимое вкладки целиком — уходит в `GrTabs`.",
+            "type": "{ tab: GrTab; active: boolean; disabled: boolean; }"
+          },
+          {
+            "name": "empty",
+            "description": "Пустой ряд вкладок — уходит в `GrTabs`.",
+            "type": "any"
+          }
+        ]
+      },
+      {
+        "key": "events",
+        "title": "Events",
+        "origin": "generated",
+        "items": [
+          {
+            "name": "close",
+            "description": "",
+            "type": "[value: string]",
+            "signature": "(event: \"close\", value: string): void"
+          },
+          {
+            "name": "update:modelValue",
+            "description": "",
+            "type": "[value: string]",
+            "signature": "(event: \"update:modelValue\", value: string): void"
+          }
+        ]
+      },
+      {
+        "key": "methods",
+        "title": "Methods / Expose",
+        "origin": "generated",
+        "items": []
+      }
+    ]
+  },
   "GrTextarea": {
     "name": "GrTextarea",
     "sourcePath": "packages/granularity/src/components/GrTextarea/GrTextarea.vue",

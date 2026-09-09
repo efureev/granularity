@@ -534,6 +534,43 @@ test.describe('GrSidebar: вложенные пункты', () => {
   })
 })
 
+test.describe('GrTabsWithPanels: пара под одним значением', () => {
+  /**
+   * Ради этого компонент и заведён: `idBase` больше не пишется в двух местах.
+   * В браузере проверяется вся связка целиком — клик по вкладке и живые ссылки
+   * `aria-controls` ↔ `aria-labelledby` между реальными узлами.
+   */
+  test('клик по вкладке меняет панель, а связка остаётся живой', async ({ page }) => {
+    await openShowcasePage(page, componentPath('GrTabsWithPanels'))
+
+    const preview = page.locator('[data-example-preview]').filter({ has: page.locator('[data-gr-tabs-with-panels]') }).first()
+    await preview.scrollIntoViewIfNeeded()
+
+    /*
+     * Панель берётся по `aria-controls` вкладки, а не «единственная в превью»:
+     * на время переключения уходящая и входящая сосуществуют один кадр, и
+     * локатор «просто tabpanel» упирался бы в два узла. Заодно это и есть
+     * проверка связки — ссылка обязана вести к реальному узлу.
+     */
+    const panelOf = async (tab: ReturnType<typeof preview.getByRole>) => {
+      const id = await tab.getAttribute('aria-controls')
+      expect(id, 'вкладка обязана ссылаться на панель').toBeTruthy()
+      return page.locator(`#${id}`)
+    }
+
+    const profile = preview.getByRole('tab', { name: 'Профиль' })
+    await expect(await panelOf(profile)).toContainText('Имя, почта')
+
+    const billing = preview.getByRole('tab', { name: /Оплата/ })
+    await billing.click()
+
+    const billingPanel = await panelOf(billing)
+    await expect(billingPanel).toContainText('Счета и способ оплаты')
+    // Обратная ссылка: ни один из этих id потребитель не задавал.
+    await expect(billingPanel).toHaveAttribute('aria-labelledby', (await billing.getAttribute('id'))!)
+  })
+})
+
 test.describe('GrSidebar: модальный слой', () => {
   function overlayPreview(page: Page) {
     return page.locator('[data-example-preview]').filter({ hasText: 'панель уехала в модальный слой' }).first()

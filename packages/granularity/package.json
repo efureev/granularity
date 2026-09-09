@@ -430,6 +430,10 @@
       "types": "./dist/types/components/GrTabs/index.d.ts",
       "import": "./dist/components/GrTabs/index.js"
     },
+    "./components/GrTabsWithPanels": {
+      "types": "./dist/types/components/GrTabsWithPanels/index.d.ts",
+      "import": "./dist/components/GrTabsWithPanels/index.js"
+    },
     "./components/GrTextarea": {
       "types": "./dist/types/components/GrTextarea/index.d.ts",
       "import": "./dist/components/GrTextarea/index.js"

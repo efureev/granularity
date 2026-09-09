@@ -321,6 +321,9 @@ export default defineConfig({
         'components/GrTabs/index': fileURLToPath(
           new URL('./src/components/GrTabs/index.ts', import.meta.url),
         ),
+        'components/GrTabsWithPanels/index': fileURLToPath(
+          new URL('./src/components/GrTabsWithPanels/index.ts', import.meta.url),
+        ),
         'components/GrTextarea/index': fileURLToPath(
           new URL('./src/components/GrTextarea/index.ts', import.meta.url),
         ),

@@ -88,6 +88,7 @@ import { grSwitchConfig } from '../components/GrSwitch/config'
 import { grTableConfig } from '../components/GrTable/config'
 import { grTabPanelsConfig } from '../components/GrTabPanels/config'
 import { grTabsConfig } from '../components/GrTabs/config'
+import { grTabsWithPanelsConfig } from '../components/GrTabsWithPanels/config'
 import { grTextareaConfig } from '../components/GrTextarea/config'
 import { grTimelineConfig } from '../components/GrTimeline/config'
 import { grToasterConfig } from '../components/GrToaster/config'
@@ -203,6 +204,7 @@ export const granularityComponentConfigs = {
   GrTable: grTableConfig,
   GrTabPanels: grTabPanelsConfig,
   GrTabs: grTabsConfig,
+  GrTabsWithPanels: grTabsWithPanelsConfig,
   GrTextarea: grTextareaConfig,
   GrTimeline: grTimelineConfig,
   GrToaster: grToasterConfig,

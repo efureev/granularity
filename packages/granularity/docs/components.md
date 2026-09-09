@@ -174,6 +174,7 @@ GrSelect>` для них не работает, такой компонент к
 - [`GrTable`](./components/GrTable.md)
 - [`GrTabPanels`](./components/GrTabPanels.md)
 - [`GrTabs`](./components/GrTabs.md)
+- [`GrTabsWithPanels`](./components/GrTabsWithPanels.md)
 - [`GrTextarea`](./components/GrTextarea.md)
 - [`GrTimeline`](./components/GrTimeline.md)
 - [`GrToaster`](./components/GrToaster.md)

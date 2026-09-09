@@ -107,7 +107,8 @@
 | настройка включается немедленно, без «Сохранить» | [`GrSwitch`](../packages/granularity/docs/components/GrSwitch.md) |
 | значение уедет с отправкой формы | [`GrCheckbox`](../packages/granularity/docs/components/GrCheckbox.md) |
 | 2–5 режимов отображения одного и того же | [`GrSegmented`](../packages/granularity/docs/components/GrSegmented.md) |
-| разделы с разным содержимым | [`GrTabs`](../packages/granularity/docs/components/GrTabs.md) + [`GrTabPanels`](../packages/granularity/docs/components/GrTabPanels.md) |
+| разделы с разным содержимым, вкладки и панели рядом | [`GrTabsWithPanels`](../packages/granularity/docs/components/GrTabsWithPanels.md) |
+| то же, но вкладки и панели стоят в разных местах раскладки | [`GrTabs`](../packages/granularity/docs/components/GrTabs.md) + [`GrTabPanels`](../packages/granularity/docs/components/GrTabPanels.md) |
 
 ### Форма как целое
 
@@ -207,7 +208,7 @@
 | боковое меню, сворачиваемое до иконок | [`GrSidebar`](../packages/granularity/docs/components/GrSidebar.md) |
 | нижняя панель разделов на мобильном | [`GrBottomNav`](../packages/granularity/docs/components/GrBottomNav.md) |
 | путь до текущей страницы | [`GrBreadcrumbs`](../packages/granularity/docs/components/GrBreadcrumbs.md) |
-| разделы внутри одной страницы | [`GrTabs`](../packages/granularity/docs/components/GrTabs.md) + [`GrTabPanels`](../packages/granularity/docs/components/GrTabPanels.md) |
+| разделы внутри одной страницы | [`GrTabsWithPanels`](../packages/granularity/docs/components/GrTabsWithPanels.md) |
 | оглавление длинной страницы, подсветка по прокрутке | [`GrScrollSpy`](../packages/granularity/docs/components/GrScrollSpy.md) |
 | этапы процесса по порядку | [`GrSteps`](../packages/granularity/docs/components/GrSteps.md) |
 | страницы длинного списка | [`GrPagination`](../packages/granularity/docs/components/GrPagination.md) |
@@ -517,6 +518,7 @@
 | [`GrTable`](../packages/granularity/docs/components/GrTable.md) | ядро | ячейки оформляет потребитель |
 | [`GrTabPanels`](../packages/granularity/docs/components/GrTabPanels.md) | ядро | к вкладкам нужны панели |
 | [`GrTabs`](../packages/granularity/docs/components/GrTabs.md) | ядро | разделы с разным содержимым |
+| [`GrTabsWithPanels`](../packages/granularity/docs/components/GrTabsWithPanels.md) | ядро | нужны и вкладки, и панели |
 | [`GrTextarea`](../packages/granularity/docs/components/GrTextarea.md) | ядро | текст длиннее строки |
 | [`GrTimeline`](../packages/granularity/docs/components/GrTimeline.md) | ядро | события идут во времени |
 | [`GrTimePicker`](../packages/granularity-chrono/docs/components/GrTimePicker.md) | chrono | время без даты |

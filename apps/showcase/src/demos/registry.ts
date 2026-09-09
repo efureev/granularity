@@ -474,6 +474,8 @@ export const demoPathByPreviewKey = {
   'gr-tabs-overflow': 'components/gr-tabs/GrTabsOverflowDemo.vue',
   'gr-tabs-panel-layout': 'components/gr-tabs/GrTabsPanelLayoutDemo.vue',
   'gr-tabs-sizes': 'components/gr-tabs/GrTabsSizesDemo.vue',
+  'gr-tabs-with-panels-basic': 'components/gr-tabs-with-panels/GrTabsWithPanelsBasicDemo.vue',
+  'gr-tabs-with-panels-vertical': 'components/gr-tabs-with-panels/GrTabsWithPanelsVerticalDemo.vue',
   'gr-textarea-autosize': 'components/gr-textarea/GrTextareaAutosizeDemo.vue',
   'gr-textarea-clearable': 'components/gr-textarea/GrTextareaClearableDemo.vue',
   'gr-textarea-count-slot': 'components/gr-textarea/GrTextareaCountSlotDemo.vue',

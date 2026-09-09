@@ -9,6 +9,26 @@ to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **`GrTabsWithPanels` — a tab row and its panels as one component.** The pair
+  needed the same two values written twice: the active tab and the `idBase` the
+  `tab` ↔ `tabpanel` link is built from. Both drifted in silence, and how real
+  that is has already been measured: `GrTabs` gives its tabs ids only when an
+  explicit `idBase` is passed, so in the ordinary case a panel pointed
+  `aria-labelledby` at an element that did not exist. Here both values belong to
+  one component and cannot be forgotten.
+
+  Row props, the `#tab` and `#empty` slots and the `close` event pass straight
+  through. A prop that was not set arrives at `GrTabs` **absent** rather than
+  carrying the wrapper's value — for `size` and `variant` that matters, since
+  their default lives in the `GrConfigProvider` resolver and a substituted value
+  would override the provider.
+
+  The forwarding surface is held by a gate that reads the prop list from `GrTabs`
+  itself: declaring is not enough, because the wrapper's interface inherits new
+  props automatically while the template would quietly stop passing them on.
+
+  `orientation="vertical"` puts the row beside the panels rather than above them.
+
 - **`GrSidebar` can become a modal layer.** `overlay` turns the panel into one —
   backdrop, `Esc`, focus trap, scroll lock, focus returned to whatever opened it
   — all from the shared `useModalOverlay` that `GrDrawer` and `GrPopover` already

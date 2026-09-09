@@ -107,7 +107,8 @@ const DOMAIN_SLOTS: Record<string, string[]> = {
   'start': ['GrSplitter'],
   'subtitle': ['GrSidebar'],
   'symbol': ['GrRating'],
-  'tab': ['GrTabs'],
+  // Составной компонент пробрасывает слот ряда как есть — имя то же и значит то же.
+  'tab': ['GrTabs', 'GrTabsWithPanels'],
   'tag': ['GrInputTag'],
   'text': ['GrRating'],
   'time': ['GrTimeline'],
