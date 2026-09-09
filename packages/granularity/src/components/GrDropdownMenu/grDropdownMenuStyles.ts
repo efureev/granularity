@@ -45,7 +45,15 @@ export const itemInteractiveClass = 'cursor-pointer hover:bg-[var(--gr-accent)] 
 // AA токены текста. `pointer-events-none` оставлен — он же гасит hover.
 export const itemDisabledClass = 'cursor-not-allowed pointer-events-none bg-[var(--gr-muted)] text-[var(--gr-muted-fg)]'
 
+/**
+ * Раскрытый пункт-подменю подсвечен так же, как наведённый: панель второго
+ * уровня висит рядом, и пункт, из которого она растёт, обязан оставаться
+ * видимой точкой отсчёта, даже когда курсор и фокус уже в ней.
+ */
+export const itemExpandedClass = 'bg-[var(--gr-accent)] text-[var(--gr-accent-fg)]'
+
 export const itemIndicatorClass = 'h-3.5 w-3.5 shrink-0'
+export const subIndicatorClass = 'ml-auto pl-4 h-3.5 w-3.5 box-content shrink-0'
 export const itemShortcutClass = 'ml-auto pl-4 text-[length:var(--gr-text-xs)] leading-[var(--gr-leading-xs)] text-[var(--gr-muted-fg)]'
 
 export const headerClass = 'px-4 py-2 text-[length:var(--gr-text-xs)] leading-[var(--gr-leading-xs)] tracking-wide text-[var(--gr-muted-fg)]'
@@ -77,15 +85,23 @@ export const columnBaseClass = 'px-3 py-2 flex items-center'
 export const dividerClass = 'border-t border-[var(--gr-brd)]'
 export const dividerInsetClass = 'mx-2'
 
+/**
+ * Подсветка раскрытого пункта отдаётся **вместо** цвета варианта, а не поверх
+ * него: два класса цвета в одном атрибуте имеют равную специфичность, и
+ * победителя выбирает порядок правил в сгенерированном CSS, а не разметка.
+ */
 export function grDropdownMenuItemClass(options: {
   align: GrDropdownMenuItemAlign
   variant: GrDropdownMenuItemVariant
   disabled: boolean
+  expanded?: boolean
 }): string {
   return [
     itemBaseClass,
     alignClass[options.align],
-    options.disabled ? itemDisabledClass : itemVariantClass[options.variant],
+    options.disabled
+      ? itemDisabledClass
+      : options.expanded ? itemExpandedClass : itemVariantClass[options.variant],
     options.disabled ? '' : itemInteractiveClass,
   ].filter(Boolean).join(' ')
 }

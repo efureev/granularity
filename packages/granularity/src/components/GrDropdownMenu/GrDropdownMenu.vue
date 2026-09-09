@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { provide, ref, watch } from 'vue'
+
 import GrDropdown from '../GrDropdown/GrDropdown.vue'
 // Типы размещения и ширины — из владельца API, а не переобъявлением: расхождение
 // обнаружилось бы только рантаймом.
@@ -8,6 +10,7 @@ import type { UseFloatingPlacement } from '../../composables/useFloating'
 
 import GrDropdownMenuEntries from './GrDropdownMenuEntries.vue'
 import GrDropdownMenuList from './GrDropdownMenuList.vue'
+import { GR_MENU_CHAIN_KEY } from './menuChain'
 import type { GrDropdownMenuAction, GrDropdownMenuEntry } from './menuModel'
 
 export interface GrDropdownMenuProps {
@@ -61,7 +64,7 @@ export interface GrDropdownMenuEmits {
   (e: 'update:open', value: boolean): void
 }
 
-withDefaults(defineProps<GrDropdownMenuProps>(), {
+const props = withDefaults(defineProps<GrDropdownMenuProps>(), {
   placement: 'bottom-end',
   offset: 8,
   width: '12rem',
@@ -86,6 +89,34 @@ withDefaults(defineProps<GrDropdownMenuProps>(), {
 
 const emit = defineEmits<GrDropdownMenuEmits>()
 
+const dropdownRef = ref<{ close: () => void } | null>(null)
+
+/**
+ * Своя копия состояния панели нужна корню цепочки: подменю обязано закрыться
+ * вместе с меню, а `GrDropdown` держит состояние у себя и наружу отдаёт только
+ * событие.
+ */
+const panelOpen = ref(props.open ?? false)
+
+watch(() => props.open, (value) => {
+  if (value !== undefined)
+    panelOpen.value = value
+})
+
+function onOpenChange(value: boolean): void {
+  panelOpen.value = value
+  emit('update:open', value)
+}
+
+provide(GR_MENU_CHAIN_KEY, {
+  closeRoot: () => dropdownRef.value?.close(),
+  closeOnSelect: () => props.closeOnContentClick,
+  level: 0,
+  open: panelOpen,
+  active: ref(null),
+  travelling: ref(false),
+})
+
 defineSlots<{
   /** Пункты меню. Слот-пропы прокидываются от `GrDropdown` как есть. */
   default?: (props: { close: () => void }) => any
@@ -105,6 +136,7 @@ defineSlots<{
 
 <template>
   <GrDropdown
+    ref="dropdownRef"
     data-gr-dropdown-menu
     :placement="placement"
     :offset="offset"
@@ -117,7 +149,7 @@ defineSlots<{
     :close-on-content-click="closeOnContentClick"
     :content-class="contentClass"
     :open="open"
-    @update:open="emit('update:open', $event)"
+    @update:open="onOpenChange"
   >
     <template #trigger="slotProps">
       <slot name="trigger" v-bind="slotProps" />

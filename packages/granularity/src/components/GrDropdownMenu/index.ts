@@ -1,3 +1,6 @@
+import type { ComponentExposed } from '../shared/instance'
+import type GrDropdownMenuSubComponent from './GrDropdownMenuSub.vue'
+
 export { default } from './GrDropdownMenu.vue'
 export { default as GrDropdownMenu } from './GrDropdownMenu.vue'
 export { default as GrDropdownMenuColumn } from './GrDropdownMenuColumn.vue'
@@ -7,6 +10,7 @@ export { default as GrDropdownMenuGroup } from './GrDropdownMenuGroup.vue'
 export { default as GrDropdownMenuHeader } from './GrDropdownMenuHeader.vue'
 export { default as GrDropdownMenuItem } from './GrDropdownMenuItem.vue'
 export { default as GrDropdownMenuList } from './GrDropdownMenuList.vue'
+export { default as GrDropdownMenuSub } from './GrDropdownMenuSub.vue'
 export { grDropdownMenuConfig } from './config'
 export { grDropdownMenuSafelist } from './safelist'
 export type {
@@ -36,4 +40,6 @@ export type {
   GrDropdownMenuItemVariant,
 } from './GrDropdownMenuItem.vue'
 export type { GrDropdownMenuListProps } from './GrDropdownMenuList.vue'
+export type { GrDropdownMenuSubProps } from './GrDropdownMenuSub.vue'
+export type GrDropdownMenuSubInstance = ComponentExposed<typeof GrDropdownMenuSubComponent>
 export type { GrDropdownMenuEmits } from './GrDropdownMenu.vue'

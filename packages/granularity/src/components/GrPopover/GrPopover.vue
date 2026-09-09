@@ -181,8 +181,6 @@ const rootEl = ref<HTMLElement | null>(null)
 const panelEl = ref<HTMLElement | null>(null)
 const panelId = useId()
 
-const clickOutsideExclude = [() => panelEl.value]
-
 let hoverTimer: ReturnType<typeof setTimeout> | undefined
 
 function open(): void {
@@ -253,7 +251,7 @@ watch(() => props.anchor, () => {
  * Корень слоя и панель здесь один элемент: якорный оверлей уезжает в портал сам,
  * без обёртки.
  */
-const { inertAttr, portalTarget, teleportEnabled, themeAttrs } = useModalOverlay(isOpen, close, {
+const { inertAttr, portalTarget, rootsAbove, teleportEnabled, themeAttrs } = useModalOverlay(isOpen, close, {
   modal: () => props.modal,
   closeOnEscape: () => props.closeOnEsc,
   panel: panelEl,
@@ -261,6 +259,16 @@ const { inertAttr, portalTarget, teleportEnabled, themeAttrs } = useModalOverlay
   teleportTo: () => props.teleportTo,
   initialFocus: () => panelEl.value,
 })
+
+/**
+ * Что для панели «внутри»: она сама и слои, открытые поверх неё.
+ *
+ * Второе — не частный случай. Портал делает слои братьями, поэтому подменю,
+ * селект или второй поповер, открытые изнутри этой панели, лежат в DOM рядом с
+ * ней, а не внутри: клик по ним панель считала бы внешним и закрывалась бы под
+ * курсором, унося с собой тот самый слой, в который кликнули.
+ */
+const clickOutsideExclude = [() => panelEl.value, () => rootsAbove()]
 
 // Фокус переносим после отрисовки панели: до `nextTick` её ещё нет в DOM.
 // В модальном режиме перенос обязателен: фон в `inert`, и фокус, оставленный
@@ -444,7 +452,7 @@ defineSlots<{
           v-show="isOpen"
           :id="panelId"
           ref="panelEl"
-          v-click-outside="{ handler: close, enabled: isOpen && closeOnClickOutside && !hasTrigger }"
+          v-click-outside="{ handler: close, enabled: isOpen && closeOnClickOutside && !hasTrigger, exclude: clickOutsideExclude }"
           v-bind="themeAttrs"
           data-gr-popover-panel
           data-gr-overlay-root

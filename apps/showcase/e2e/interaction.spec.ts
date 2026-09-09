@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 
-import { focusedDescription as describeFocus, tabUntil } from '@feugene/granularity-test-kit/e2e'
+import { expectNoA11yRegressions, focusedDescription as describeFocus, tabUntil } from '@feugene/granularity-test-kit/e2e'
 
 import { componentPath } from './components'
 import { openShowcasePage } from './readiness'
@@ -885,10 +885,12 @@ test.describe('GrContextMenu: меню по правому клику', () => {
       .filter({ has: page.locator('[data-gr-tree]') })
       .first()
     const row = demo.locator('[data-gr-tree-node-key="q1"]').first()
-    // На странице два меню, и обе панели живут в DOM (`v-show`) — различаем по
-    // содержимому, а не по порядку.
+    // На странице несколько меню, и панели у всех живут в DOM (`v-show`).
+    // Различаем по содержимому, а не по порядку: «Переименовать» есть и у демо
+    // с подменю, поэтому отсекаем панели с раскрывателями.
     const panel = page.locator('[data-gr-popover-panel][role="menu"]')
       .filter({ hasText: 'Переименовать' })
+      .filter({ hasNot: page.locator('[data-gr-dropdown-menu-sub-trigger]') })
 
     await row.click({ button: 'right' })
     await expect(panel).toBeVisible()
@@ -920,10 +922,12 @@ test.describe('GrContextMenu: меню по правому клику', () => {
     const demo = page.locator('[data-example-preview]')
       .filter({ has: page.locator('[data-gr-tree]') })
       .first()
-    // На странице два меню, и обе панели живут в DOM (`v-show`) — различаем по
-    // содержимому, а не по порядку.
+    // На странице несколько меню, и панели у всех живут в DOM (`v-show`).
+    // Различаем по содержимому, а не по порядку: «Переименовать» есть и у демо
+    // с подменю, поэтому отсекаем панели с раскрывателями.
     const panel = page.locator('[data-gr-popover-panel][role="menu"]')
       .filter({ hasText: 'Переименовать' })
+      .filter({ hasNot: page.locator('[data-gr-dropdown-menu-sub-trigger]') })
 
     await demo.locator('[data-gr-tree-node-key="q1"]').first().click({ button: 'right' })
     await expect(panel).toBeVisible()
@@ -932,6 +936,119 @@ test.describe('GrContextMenu: меню по правому клику', () => {
     // порождает `click` — без своего слушателя меню осталось бы висеть.
     await page.locator('h1').click({ button: 'right' })
     await expect(panel).toBeHidden()
+  })
+})
+
+test.describe('GrDropdownMenu: вложенные подменю', () => {
+  /**
+   * Уровни меню — самостоятельные слои в портале, и всё интересное в них
+   * происходит там, где jsdom бессилен: геометрия коридора для курсора, реальный
+   * путь мыши по соседним пунктам и настоящий стек слоёв под `Esc`.
+   */
+  function nestedDemo(page: Page) {
+    return page.locator('[data-example-preview]')
+      .filter({ has: page.getByRole('button', { name: 'Document actions' }) })
+      .first()
+  }
+
+  // На странице несколько меню, и панели у всех живут в DOM (`v-show`). Корневую
+  // отличаем по её собственному раскрывателю: «Rename» и «Delete» есть и у соседей.
+  const rootPanel = (page: Page) => page.locator('[data-gr-popover-panel][role="menu"]')
+    .filter({ has: page.locator('[data-gr-dropdown-menu-sub-trigger]', { hasText: 'Export' }) })
+  const exportPanel = (page: Page) => page.locator('[data-gr-popover-panel][role="menu"]').filter({ hasText: 'CSV' })
+  const sharePanel = (page: Page) => page.locator('[data-gr-popover-panel][role="menu"]').filter({ hasText: 'Invite people' })
+  const subTrigger = (page: Page, label: string) =>
+    page.locator('[data-gr-dropdown-menu-sub-trigger]').filter({ hasText: label })
+
+  test('курсор доходит до подменю по диагонали и не теряет его', async ({ page }) => {
+    await openShowcasePage(page, componentPath('GrDropdownMenu'))
+
+    const demo = nestedDemo(page)
+    await demo.getByRole('button', { name: 'Document actions' }).click()
+
+    const trigger = subTrigger(page, 'Export')
+    await trigger.hover()
+    await expect(exportPanel(page)).toBeVisible()
+
+    const from = (await trigger.boundingBox())!
+    const to = (await exportPanel(page).boundingBox())!
+
+    /**
+     * Путь к нижнему пункту подменю идёт наискось от левого края раскрывателя и
+     * проходит по соседним строкам меню. Курсор на нём **останавливается**: без
+     * паузы гейт не доказывал бы ничего — задержка закрытия (160 мс) не успела бы
+     * истечь ни с коридором, ни без него.
+     */
+    const start = { x: from.x + 20, y: from.y + from.height / 2 }
+    const finish = { x: to.x + 20, y: to.y + to.height - 12 }
+    const half = { x: start.x + (finish.x - start.x) * 0.6, y: start.y + (finish.y - start.y) * 0.6 }
+
+    await page.mouse.move(start.x, start.y)
+    await page.mouse.move(half.x, half.y, { steps: 16 })
+    await page.waitForTimeout(200)
+
+    await expect(exportPanel(page), 'подменю закрылось на пути к нему').toBeVisible()
+    await expect(sharePanel(page), 'по дороге раскрылось чужое подменю').toBeHidden()
+
+    await page.mouse.move(finish.x, finish.y, { steps: 8 })
+    await expect(exportPanel(page), 'подменю закрылось у самой цели').toBeVisible()
+  })
+
+  test('стрелки водят по уровням, Esc снимает только верхний', async ({ page }) => {
+    await openShowcasePage(page, componentPath('GrDropdownMenu'))
+
+    const demo = nestedDemo(page)
+    await demo.getByRole('button', { name: 'Document actions' }).focus()
+    await page.keyboard.press('ArrowDown')
+    await page.keyboard.press('ArrowDown')
+    await expect(subTrigger(page, 'Export')).toBeFocused()
+
+    await page.keyboard.press('ArrowRight')
+    await expect(exportPanel(page)).toBeVisible()
+    await expect(exportPanel(page).locator('[role="menuitem"]').first()).toBeFocused()
+
+    await page.keyboard.press('ArrowLeft')
+    await expect(exportPanel(page)).toBeHidden()
+    await expect(rootPanel(page)).toBeVisible()
+    await expect(subTrigger(page, 'Export')).toBeFocused()
+
+    await page.keyboard.press('ArrowRight')
+    await expect(exportPanel(page)).toBeVisible()
+    await page.keyboard.press('Escape')
+    await expect(exportPanel(page), 'Esc унёс не только верхний уровень').toBeHidden()
+    await expect(rootPanel(page)).toBeVisible()
+
+    await page.keyboard.press('Escape')
+    await expect(rootPanel(page)).toBeHidden()
+  })
+
+  test('выбор во втором уровне закрывает всю цепочку', async ({ page }) => {
+    await openShowcasePage(page, componentPath('GrDropdownMenu'))
+
+    const demo = nestedDemo(page)
+    await demo.getByRole('button', { name: 'Document actions' }).click()
+    await subTrigger(page, 'Export').hover()
+    await expect(exportPanel(page)).toBeVisible()
+
+    await exportPanel(page).locator('[role="menuitem"]', { hasText: 'CSV' }).click()
+
+    await expect(exportPanel(page)).toBeHidden()
+    await expect(rootPanel(page), 'корневое меню осталось открытым после выбора').toBeHidden()
+    await expect(demo.getByText('Last action:')).toContainText('CSV')
+  })
+
+  test('раскрытое меню с подменю чисто по axe', async ({ page }) => {
+    // Обёртка триггера `GrPopover` встаёт между `role="menu"` и `role="menuitem"`,
+    // а эта роль делает потомков презентационными: проверяет это axe, а не
+    // рассуждение о том, проходит ли `aria-required-children` через div.
+    await openShowcasePage(page, componentPath('GrDropdownMenu'))
+
+    const demo = nestedDemo(page)
+    await demo.getByRole('button', { name: 'Document actions' }).click()
+    await subTrigger(page, 'Export').hover()
+    await expect(exportPanel(page)).toBeVisible()
+
+    await expectNoA11yRegressions(page, { include: '#gr-portal' })
   })
 })
 

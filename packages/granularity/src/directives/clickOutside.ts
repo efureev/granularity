@@ -2,7 +2,16 @@ import type { Directive } from 'vue'
 
 export type ClickOutsideHandler = (event: MouseEvent | TouchEvent | PointerEvent) => void
 
-export type ClickOutsideExclude = HTMLElement | string | (() => HTMLElement | null | undefined)
+/**
+ * Что считается «внутри» помимо самого элемента.
+ *
+ * Функция вправе вернуть список: слоёв поверх бывает сколько угодно, и их число
+ * меняется на каждое открытие — статичным набором записей это не выражается.
+ */
+export type ClickOutsideExclude
+  = | HTMLElement
+    | string
+    | (() => HTMLElement | null | undefined | Array<HTMLElement | null | undefined>)
 
 export type ClickOutsideBindingValue
   = | ClickOutsideHandler
@@ -70,8 +79,10 @@ function resolveExclude(doc: Document, exclude: ClickOutsideExclude[]): HTMLElem
 
     if (typeof item === 'function') {
       const found = item()
-      if (found instanceof HTMLElement)
-        resolved.push(found)
+      for (const one of Array.isArray(found) ? found : [found]) {
+        if (one instanceof HTMLElement)
+          resolved.push(one)
+      }
       continue
     }
 

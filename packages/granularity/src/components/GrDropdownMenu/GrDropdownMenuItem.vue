@@ -42,6 +42,11 @@ export interface GrDropdownMenuItemProps {
   icon?: Component
   /** Подпись сочетания клавиш справа. Слот `#shortcut` сильнее. */
   shortcut?: string
+  /**
+   * Подменю этого пункта раскрыто. Ставит `GrDropdownMenuSub`: подсветка живёт
+   * на пункте, а состояние — у подменю.
+   */
+  expanded?: boolean
 }
 
 const props = withDefaults(defineProps<GrDropdownMenuItemProps>(), {
@@ -57,6 +62,7 @@ const props = withDefaults(defineProps<GrDropdownMenuItemProps>(), {
   checked: undefined,
   icon: undefined,
   shortcut: undefined,
+  expanded: false,
 })
 
 const attrs = useAttrs()
@@ -86,6 +92,7 @@ const className = computed(() => grDropdownMenuItemClass({
   align: props.align,
   variant: props.variant,
   disabled: props.disabled,
+  expanded: props.expanded,
 }))
 
 /**

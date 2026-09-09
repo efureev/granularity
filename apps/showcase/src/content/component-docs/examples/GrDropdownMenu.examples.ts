@@ -30,6 +30,13 @@ export const grDropdownMenuExamples: ShowcaseComponentExampleDoc[] = [
     previewKey: 'gr-dropdown-menu-edge-lines',
   },
   {
+    id: 'dropdown-menu-nested',
+    title: 'Two levels deep',
+    description: 'Пункт с `children` раскрывает подменю: `select` по нему не приходит, а курсору дан коридор — уход к панели по диагонали её не закрывает и не открывает соседнюю. Стрелка вправо раскрывает, влево — возвращает на раскрыватель.',
+    status: 'ready',
+    previewKey: 'gr-dropdown-menu-nested',
+  },
+  {
     id: 'dropdown-menu-declarative',
     title: 'Menu from a model',
     description: 'Пункты, группы и разделители задаются массивом `items`, а `menuitemcheckbox`/`menuitemradio` дают состояние прямо в меню — композиция подкомпонентов остаётся для нестандартных случаев.',

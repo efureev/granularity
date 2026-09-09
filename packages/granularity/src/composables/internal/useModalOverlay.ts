@@ -93,6 +93,12 @@ export interface ModalOverlay {
   /** Значение атрибута `inert` для корня: слой перестал быть верхним. */
   inertAttr: ComputedRef<true | undefined>
   /**
+   * Корни слоёв, открытых поверх этого. Нужны не только ловушке фокуса: клик в
+   * такой слой для нижнего «снаружи» по DOM, потому что портал делает слои
+   * братьями, — и без этого списка нижний закрылся бы под курсором.
+   */
+  rootsAbove: () => HTMLElement[]
+  /**
    * Высота слоя: базовый токен плюс позиция в стеке.
    *
    * Один токен на все модальные слои означал бы, что порядок отрисовки решает
@@ -187,6 +193,7 @@ export function useModalOverlay(
     isVisible,
     isTopmost,
     inertAttr,
+    rootsAbove: layer.rootsAbove,
     layerZIndex,
     portalTarget,
     teleportEnabled,

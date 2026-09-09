@@ -7,6 +7,52 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- **Second-level menus in `GrDropdownMenu` and `GrContextMenu`.** An entry with
+  non-empty `children` becomes a disclosure: it runs nothing and emits no
+  `select` — it opens the next level. In composition the same thing is
+  `GrDropdownMenuSub`. Depth is unlimited and `children` takes the same entries
+  as the root, so dividers, group headers and further levels all work inside a
+  submenu. The item model is shared between both menus, so the field serves them
+  equally; a `children` alongside `href` or a checkbox/radio role is a dev
+  warning, since an entry cannot be both a link and a disclosure.
+
+  Levels are independent layers rather than nested markup: each panel goes to
+  the portal, so in the DOM they sit beside one another. Everything else follows
+  from that. `Escape` closes the top level only — it is topmost in the overlay
+  stack. Choosing a leaf closes the whole chain, because the root's
+  `closeOnContentClick` only ever sees clicks in its own panel. A click on a
+  disclosure never reaches the parent panel, or the menu would close at the very
+  moment the next level opened. Keyboard: `→`, `Enter` and `Space` open a
+  submenu and land on its first item, `←` closes it and returns to the
+  disclosure, `Tab` closes the menu entirely.
+
+  The pointer gets a corridor. The path from an item to its submenu runs
+  diagonally across neighbouring rows, so while the cursor stays inside the
+  triangle from the exit point to the near edge of the open panel, leaving
+  counts as travelling towards the target: the panel stays and neighbours hold
+  their own submenus back until it is clear the cursor was going elsewhere. The
+  corridor has a mouth at the exit point rather than a bare apex — a zero-width
+  apex made the first pointer event half a pixel away read as "outside", and the
+  corridor tore before it began.
+
+  A level also holds while a level below it is open. The next panel is its
+  sibling in the portal, so a cursor travelling into it *leaves* this one; on its
+  own delay this panel would close and take with it the very panel the cursor was
+  heading for. The close is deferred instead, and happens once the level below is
+  gone — unless by then the cursor has come back.
+
+### Fixed
+
+- **A popover no longer closes on a click into a layer opened above it.** The
+  portal makes layers siblings, so a submenu, a select or a second popover
+  opened from inside a panel lies beside it in the DOM, not within: by DOM
+  containment such a click was "outside", and the lower panel closed under the
+  cursor, taking with it the very layer that was clicked. `v-click-outside` now
+  accepts an `exclude` getter returning a list, and `GrPopover` feeds it the
+  roots of the layers stacked above its own.
+
 ## [v0.50.0] 2026-09-09
 
 ### Added

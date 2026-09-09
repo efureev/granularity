@@ -459,6 +459,40 @@ describe('GrPopover — якорь вместо триггера', () => {
   })
 })
 
+describe('GrPopover — слои поверх', () => {
+  /**
+   * Портал делает слои братьями: панель, открытая изнутри этой, лежит в DOM
+   * рядом с ней, а не внутри. По DOM-родству клик в неё «снаружи», и без
+   * поправки на стек нижняя панель закрывалась бы под курсором, унося с собой
+   * ту, в которую кликнули.
+   */
+  it('клик в панель, открытую поверх, не закрывает нижнюю', async () => {
+    const wrapper = mount(GrPopover, {
+      attachTo: document.body,
+      props: { ariaLabel: 'Внешняя', open: true },
+      slots: {
+        trigger: TRIGGER,
+        content: `
+          <GrPopover aria-label="Внутренняя" :open="true">
+            <template #trigger="{ triggerProps }"><button v-bind="triggerProps">Ещё</button></template>
+            <template #content><button data-deep>Глубже</button></template>
+          </GrPopover>
+        `,
+      },
+      global: { components: { GrPopover } },
+    })
+    await nextTick()
+
+    document.querySelector<HTMLElement>('[data-deep]')
+      ?.dispatchEvent(new MouseEvent('click', { bubbles: true, button: 0 }))
+    await nextTick()
+
+    expect(wrapper.emitted('update:open')).toBeUndefined()
+
+    wrapper.unmount()
+  })
+})
+
 describe('GrPopover — поле панели', () => {
   it('по умолчанию поле есть', async () => {
     mountPopover({ open: true })

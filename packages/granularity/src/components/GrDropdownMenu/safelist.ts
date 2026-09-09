@@ -14,11 +14,13 @@ import {
   headerClass,
   itemBaseClass,
   itemDisabledClass,
+  itemExpandedClass,
   itemIndicatorClass,
   itemInteractiveClass,
   itemShortcutClass,
   itemVariantClass,
   listBaseClass,
+  subIndicatorClass,
   textAlignClass,
 } from './grDropdownMenuStyles'
 
@@ -36,7 +38,9 @@ export const grDropdownMenuSafelist = [...new Set([
   ...splitClassTokens(itemBaseClass),
   ...splitClassTokens(itemInteractiveClass),
   ...splitClassTokens(itemDisabledClass),
+  ...splitClassTokens(itemExpandedClass),
   ...splitClassTokens(itemIndicatorClass),
+  ...splitClassTokens(subIndicatorClass),
   ...splitClassTokens(itemShortcutClass),
   ...splitClassTokens(headerClass),
   ...splitClassTokens(listBaseClass),

@@ -238,6 +238,10 @@
       "types": "./dist/types/components/GrDropdownMenu/index.d.ts",
       "import": "./dist/components/GrDropdownMenu/index.js"
     },
+    "./components/GrDropdownMenuSub": {
+      "types": "./dist/types/components/GrDropdownMenu/index.d.ts",
+      "import": "./dist/components/GrDropdownMenu/index.js"
+    },
     "./components/GrEmptyState": {
       "types": "./dist/types/components/GrEmptyState/index.d.ts",
       "import": "./dist/components/GrEmptyState/index.js"

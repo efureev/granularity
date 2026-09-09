@@ -58,6 +58,27 @@ describe('vClickOutside', () => {
     wrapper.unmount()
   })
 
+  it('геттер exclude вправе вернуть список: слоёв поверх бывает сколько угодно', async () => {
+    // Список, а не набор записей: панели, открытые изнутри этой, лежат в
+    // портале рядом с ней, и их число меняется на каждое открытие.
+    const handler = vi.fn()
+    const first = document.createElement('div')
+    const second = document.createElement('div')
+    document.body.append(first, second)
+
+    const wrapper = mountPanel({ binding: handler })
+    await wrapper.setProps({ binding: { handler, exclude: [() => [first, null, second]] } })
+
+    clickOn(first)
+    clickOn(second)
+    expect(handler).not.toHaveBeenCalled()
+
+    clickOn(outside())
+    expect(handler).toHaveBeenCalledTimes(1)
+
+    wrapper.unmount()
+  })
+
   it('exclude принимает элемент, селектор и геттер', async () => {
     for (const excludeOf of [
       (el: HTMLElement) => el,

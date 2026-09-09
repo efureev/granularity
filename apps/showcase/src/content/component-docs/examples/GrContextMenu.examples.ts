@@ -9,6 +9,13 @@ export const grContextMenuExamples: ShowcaseComponentExampleDoc[] = [
     previewKey: 'gr-context-menu-tree',
   },
   {
+    id: 'context-menu-nested',
+    title: 'Второй уровень',
+    description: 'Модель пунктов общая с `GrDropdownMenu`, поэтому подменю задаётся тем же полем `children`. Выбор во втором уровне закрывает всё меню, а `Esc` — только верхний уровень.',
+    status: 'ready',
+    previewKey: 'gr-context-menu-nested',
+  },
+  {
     id: 'context-menu-area',
     title: 'Меню на области',
     description: 'Когда действия не зависят от того, по чему кликнули, хватает обёртки: она ловит и правый клик, и клавиатурный вызов. `Shift`+правый клик остаётся браузеру.',

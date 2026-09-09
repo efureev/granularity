@@ -349,6 +349,53 @@ describe('GrContextMenu — клавиатура', () => {
   })
 })
 
+describe('GrContextMenu — вложенные подменю', () => {
+  /**
+   * Рендер пунктов у контекстного меню общий с `GrDropdownMenu`, а корень
+   * цепочки — свой: закрывается оно собственным `close()`, и без отдельного
+   * `provide` выбор во втором уровне оставил бы панель висеть.
+   */
+  const nested = [
+    { key: 'open', label: 'Открыть' },
+    { key: 'export', label: 'Экспорт', children: [{ key: 'pdf', label: 'PDF' }] },
+  ]
+
+  function subTrigger(): HTMLElement | null {
+    return document.body.querySelector('[data-gr-dropdown-menu-sub-trigger]')
+  }
+
+  it('пункт с children раскрывает подменю', async () => {
+    mountMenu({ items: nested })
+    rightClick(document.querySelector('[data-row]')!)
+    await settle()
+
+    expect(subTrigger()?.getAttribute('aria-haspopup')).toBe('menu')
+
+    subTrigger()?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+    await nextTick()
+    await nextTick()
+
+    expect(menuItems().map(item => item.textContent?.trim())).toContain('PDF')
+  })
+
+  it('выбор в подменю эмитит select и закрывает контекстное меню', async () => {
+    const wrapper = mountMenu({ items: nested })
+    rightClick(document.querySelector('[data-row]')!)
+    await settle()
+
+    subTrigger()?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+    await nextTick()
+    await nextTick()
+
+    const pdf = menuItems().find(item => item.textContent?.trim() === 'PDF')
+    pdf?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+    await nextTick()
+
+    expect(wrapper.emitted('select')?.at(-1)?.[0]).toMatchObject({ key: 'pdf' })
+    expect(isOpen()).toBe(false)
+  })
+})
+
 describe('GrContextMenu — выбор и разметка', () => {
   it('панель объявлена меню и имеет доступное имя', async () => {
     const wrapper = mountMenu()

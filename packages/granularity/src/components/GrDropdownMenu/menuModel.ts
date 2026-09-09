@@ -40,6 +40,14 @@ export interface GrDropdownMenuAction {
   as?: string | Component
   /** Выравнивание содержимого пункта. */
   align?: GrDropdownMenuItemAlign
+  /**
+   * Пункты второго уровня. Пункт с ними ничего не выполняет — он раскрывает
+   * подменю, поэтому `select` по нему не приходит.
+   *
+   * Тип записи, а не действия: внутри подменю осмысленны и разделители, и
+   * заголовки групп, и следующий уровень.
+   */
+  children?: GrDropdownMenuEntry[]
 }
 
 export interface GrDropdownMenuSeparator {

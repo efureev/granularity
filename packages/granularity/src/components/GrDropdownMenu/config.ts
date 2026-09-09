@@ -4,6 +4,6 @@ import { grDropdownMenuSafelist } from './safelist'
 
 export const grDropdownMenuConfig = defineGranularComponent(import.meta.url, {
   name: 'GrDropdownMenu',
-  dependencies: ['GrDropdown'],
+  dependencies: ['GrDropdown', 'GrPopover'],
   safelist: grDropdownMenuSafelist,
 })

@@ -11,7 +11,7 @@
  * кликом, недоступно с клавиатуры, поэтому обёртка ловит `Shift+F10` и клавишу
  * `ContextMenu` — это условие приёмки, а не удобство.
  */
-import { computed, nextTick, onBeforeUnmount, ref, useSlots, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, provide, ref, useSlots, watch } from 'vue'
 
 import { useControlledOpen } from '../../composables/internal/useControlledOpen'
 import { useMenuItemsFocus } from '../../composables/internal/useMenuItemsFocus'
@@ -19,6 +19,7 @@ import { useGranularityTranslations } from '../../internal/granularityI18n'
 import { isEditableTarget } from '../../internal/keyboard'
 import GrDropdownMenuEntries from '../GrDropdownMenu/GrDropdownMenuEntries.vue'
 import GrDropdownMenuList from '../GrDropdownMenu/GrDropdownMenuList.vue'
+import { GR_MENU_CHAIN_KEY } from '../GrDropdownMenu/menuChain'
 import type { GrDropdownMenuAction, GrDropdownMenuEntry } from '../GrDropdownMenu/menuModel'
 import { isMenuAction, isMenuSection } from '../GrDropdownMenu/menuModel'
 import GrPopover from '../GrPopover/GrPopover.vue'
@@ -154,6 +155,20 @@ const isEmpty = computed(() => {
 const menu = useMenuItemsFocus({
   container: () => listRef.value?.$el ?? null,
   close: () => close(),
+})
+
+/**
+ * Корень цепочки подменю. Провайдится и здесь, и в `GrDropdownMenu`: рендер
+ * пунктов у меню общий, а закрывается каждое своим способом.
+ */
+provide(GR_MENU_CHAIN_KEY, {
+  closeRoot: () => close(),
+  // Панель заводится с `close-on-content-click`, отключить его снаружи нечем.
+  closeOnSelect: () => true,
+  level: 0,
+  open: isOpen,
+  active: ref(null),
+  travelling: ref(false),
 })
 
 function panelOf(): HTMLElement | null {
