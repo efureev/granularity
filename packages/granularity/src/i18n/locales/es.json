@@ -15,7 +15,8 @@
     "moved": "{count} movidos a «{list}»",
     "reordered": "Posición {position} de {count}",
     "reorderFiltered": "El orden no cambia mientras haya búsqueda",
-    "cancelled": "Movimiento cancelado"
+    "cancelled": "Movimiento cancelado",
+    "loading": "Buscando…"
   },
   "carousel": {
     "roledescription": "carrusel",

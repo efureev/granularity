@@ -9,6 +9,23 @@ to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **`GrTransfer` can say the catalogue is still on its way.** The async path was
+  already there — `search` emits the query, the consumer swaps `items` — but
+  nothing said the answer had not arrived yet, so an empty panel claimed
+  "nothing matches" about a search that had not happened. `loading` fills that
+  in, with `loadingText` and a `#loading` slot beside the existing `#empty`.
+
+  It shows in three places, each for its own case: an empty panel says
+  "searching" instead of "nothing found"; a panel that still has rows keeps them
+  — they are real — and signals through the spinner and `aria-busy` on its
+  search field; and the live region announces it, because swapping one empty
+  text for another announces nothing by itself.
+
+  The flag also silences the dev warning about `modelValue` keys missing from
+  `items`: an incomplete catalogue mid-request is normal, and a server-side
+  search that narrows the catalogue would otherwise fire that warning on every
+  keystroke.
+
 - **`GrTabsWithPanels` — a tab row and its panels as one component.** The pair
   needed the same two values written twice: the active tab and the `idBase` the
   `tab` ↔ `tabpanel` link is built from. Both drifted in silence, and how real

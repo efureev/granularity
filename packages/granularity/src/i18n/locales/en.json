@@ -15,7 +15,8 @@
     "moved": "{count} moved to {list}",
     "reordered": "Position {position} of {count}",
     "reorderFiltered": "Reordering is off while a search is active",
-    "cancelled": "Move cancelled"
+    "cancelled": "Move cancelled",
+    "loading": "Loading…"
   },
   "carousel": {
     "roledescription": "carousel",

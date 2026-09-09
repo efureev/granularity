@@ -502,6 +502,7 @@ export const demoPathByPreviewKey = {
   'gr-tooltip-placement': 'components/gr-tooltip/GrTooltipPlacementDemo.vue',
   'gr-tooltip-sizes': 'components/gr-tooltip/GrTooltipSizesDemo.vue',
   'gr-transfer-builder': 'components/gr-transfer/GrTransferBuilderDemo.vue',
+  'gr-transfer-async': 'components/gr-transfer/GrTransferAsyncDemo.vue',
   'gr-transfer-basic': 'components/gr-transfer/GrTransferBasicDemo.vue',
   'gr-transfer-custom': 'components/gr-transfer/GrTransferCustomDemo.vue',
   'gr-transfer-slots': 'components/gr-transfer/GrTransferSlotsDemo.vue',

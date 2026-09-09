@@ -88,6 +88,16 @@ export interface GrTransferProps<T extends Record<string, unknown> = Record<stri
   searchable?: boolean
   /** Свой матчер: встроенный ищет по `itemLabel`, а строка может показывать больше. */
   filter?: (item: T, query: string) => boolean
+  /**
+   * Каталог в пути: пустая панель говорит «ищем», а не «ничего не найдено».
+   *
+   * Проп общий на обе панели, а не свой у каждой: `items` — один каталог, и обе
+   * панели его виды, так что пока он едет, пусты обе. Подгрузку запускает
+   * потребитель по событию `search`, поэтому и флаг держит он.
+   */
+  loading?: boolean
+  /** Текст индикатора. Не задан — из локали (`gr.transfer.loading`). */
+  loadingText?: string
   /** Правую панель можно переставлять. */
   sortable?: boolean
   /** Перетаскивание строк указателем. Усиление поверх кнопок, а не контракт. */
@@ -128,6 +138,8 @@ const props = withDefaults(defineProps<GrTransferProps<TItem>>(), {
   targetTitle: undefined,
   searchable: true,
   filter: undefined,
+  loading: false,
+  loadingText: undefined,
   sortable: true,
   draggable: undefined,
   maxHeight: undefined,
@@ -168,6 +180,8 @@ defineSlots<{
   }) => unknown
   /** Пустая панель. `filtered` — пусто из-за поиска, а не по сути. */
   empty?: (props: { side: GrTransferSide, filtered: boolean }) => unknown
+  /** Панель под загрузкой — вместо текста «ищем». */
+  loading?: (props: { side: GrTransferSide }) => unknown
 }>()
 
 const slots = useSlots()
@@ -278,7 +292,12 @@ if (__GR_DEV__) {
         + 'рисуется первый элемент с таким ключом.',
       )
     }
-    if (value.unresolved.length > 0 && (props.items?.length ?? 0) > 0) {
+    /*
+     * Под загрузкой неполный каталог — норма, а не ошибка потребителя. Без этого
+     * серверный поиск сужает `items`, выбранные ключи оказываются вне сужения, и
+     * предупреждение срабатывает на каждое нажатие клавиши.
+     */
+    if (!props.loading && value.unresolved.length > 0 && (props.items?.length ?? 0) > 0) {
       console.warn(
         `[granularity] GrTransfer: ключи из \`modelValue\` не найдены в \`items\` (${value.unresolved.join(', ')}). `
         + 'Они сохранены в значении, но не показаны: каталог мог ещё не приехать.',
@@ -941,6 +960,8 @@ function emptyText(side: GrTransferSide): string {
     : t('gr.transfer.emptyFiltered', 'Nothing matches the search')
 }
 
+const resolvedLoadingText = computed(() => props.loadingText ?? t('gr.transfer.loading', 'Loading…'))
+
 function isFiltered(side: GrTransferSide): boolean {
   return normalizeOptionQuery(queries.value[side]) !== ''
 }
@@ -1070,6 +1091,7 @@ defineExpose({
           clearable
           :size="resolvedSize"
           :disabled="isDisabled"
+          :loading="loading"
           :placeholder="t('gr.transfer.search', 'Search')"
           :aria-label="`${titles[side]} — ${t('gr.transfer.search', 'Search')}`"
           @update:model-value="(value: string) => onSearch(side, value)"
@@ -1077,8 +1099,12 @@ defineExpose({
         />
       </div>
 
+      <!--
+        Загрузку объявляет живой регион: смена одного пустого текста на другой
+        сама себя не объявляет, и пользователь скринридера получил бы тишину.
+      -->
       <p :class="transferStatusClass" role="status" aria-live="polite">
-        {{ isFiltered(side) ? shownText(side) : '' }}
+        {{ loading ? resolvedLoadingText : (isFiltered(side) ? shownText(side) : '') }}
       </p>
 
       <!--
@@ -1161,8 +1187,20 @@ defineExpose({
         </div>
       </div>
 
-      <!-- Текст пустоты — сосед списка, а не его потомок: потомки роли презентационны. -->
-      <slot v-if="visible[side].length === 0" name="empty" :side="side" :filtered="isFiltered(side)">
+      <!--
+        Текст пустоты и текст загрузки — соседи списка, а не его потомки: потомки
+        роли презентационны.
+
+        Состояния взаимоисключающи: «ничего не найдено» под незакончившимся
+        запросом — утверждение, которого никто не проверял.
+      -->
+      <slot v-if="loading && visible[side].length === 0" name="loading" :side="side">
+        <p data-gr-transfer-loading :class="grTransferEmptyClass(resolvedSize)">
+          {{ resolvedLoadingText }}
+        </p>
+      </slot>
+
+      <slot v-else-if="visible[side].length === 0" name="empty" :side="side" :filtered="isFiltered(side)">
         <p :class="grTransferEmptyClass(resolvedSize)">
           {{ emptyText(side) }}
         </p>

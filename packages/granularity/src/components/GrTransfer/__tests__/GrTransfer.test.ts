@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils'
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { nextTick, ref } from 'vue'
 
 import { resetGranularityDom } from '../../../testing'
@@ -470,5 +470,114 @@ describe('GrTransfer: виртуализация панелей', () => {
     expect(options[0].attributes('aria-setsize')).toBe(String(options.length))
 
     wrapper.unmount()
+  })
+})
+
+/**
+ * Подгрузку каталога запускает потребитель по событию `search`, а флаг держит
+ * он же. Без флага пустая панель во время запроса утверждала, что совпадений
+ * нет, — хотя их ещё не искали.
+ */
+describe('GrTransfer: состояние загрузки', () => {
+  function mountLoading(props: Record<string, unknown> = {}) {
+    return mount(GrTransfer, {
+      attachTo: document.body,
+      props: { items: [], modelValue: [], ariaLabel: 'Права', loading: true, ...props },
+    })
+  }
+
+  it('пустая панель под загрузкой говорит «ищем», а не «ничего не найдено»', () => {
+    const wrapper = mountLoading()
+
+    expect(wrapper.findAll('[data-gr-transfer-loading]').length).toBeGreaterThan(0)
+    expect(wrapper.text()).not.toContain('Nothing here yet')
+
+    wrapper.unmount()
+  })
+
+  it('без загрузки прежние два состояния на месте', () => {
+    const wrapper = mountLoading({ loading: false })
+
+    expect(wrapper.find('[data-gr-transfer-loading]').exists()).toBe(false)
+    expect(wrapper.text()).toContain('Nothing here yet')
+
+    wrapper.unmount()
+  })
+
+  /**
+   * Панель со строками их не теряет: они настоящие, а «ищем» на их месте было бы
+   * подменой данных. Сигнал в этом случае даёт спиннер поля поиска.
+   */
+  it('панель со строками под загрузкой их сохраняет, а пустая — говорит «ищем»', () => {
+    const wrapper = mountLoading({ items: catalog })
+
+    // Слева каталог, справа пусто: состояние считается по панели, а не по компоненту.
+    // Текст ищется в панели, а не в списке: он намеренно сосед `listbox`,
+    // потому что потомки этой роли презентационны.
+    const panel = (side: 'source' | 'target') => wrapper.get(`[data-gr-transfer-panel="${side}"]`)
+
+    expect(optionsOf(wrapper, 'source').length).toBeGreaterThan(0)
+    expect(panel('source').find('[data-gr-transfer-loading]').exists()).toBe(false)
+    expect(panel('target').find('[data-gr-transfer-loading]').exists()).toBe(true)
+
+    wrapper.unmount()
+  })
+
+  it('поле поиска показывает загрузку и объявляет себя занятым', () => {
+    const wrapper = mountLoading({ items: catalog })
+
+    expect(wrapper.find('input[type="search"]').attributes('aria-busy')).toBe('true')
+
+    wrapper.unmount()
+  })
+
+  it('живой регион объявляет загрузку — иначе смена пустого текста беззвучна', () => {
+    const wrapper = mountLoading()
+
+    const status = wrapper.findAll('[role="status"]').map(node => node.text()).join(' ')
+    expect(status).toContain('Loading')
+
+    wrapper.unmount()
+  })
+
+  it('`loadingText` перебивает локаль', () => {
+    const wrapper = mountLoading({ loadingText: 'Спрашиваем сервер' })
+
+    expect(wrapper.get('[data-gr-transfer-loading]').text()).toBe('Спрашиваем сервер')
+
+    wrapper.unmount()
+  })
+
+  it('слот `#loading` сильнее текста и получает сторону', () => {
+    const wrapper = mount(GrTransfer, {
+      attachTo: document.body,
+      props: { items: [], modelValue: [], ariaLabel: 'Права', loading: true },
+      slots: { loading: '<b data-own>{{ params.side }}</b>' },
+    })
+
+    expect(wrapper.findAll('[data-own]').map(node => node.text())).toEqual(['source', 'target'])
+
+    wrapper.unmount()
+  })
+
+  /**
+   * Серверный поиск сужает каталог, и выбранные ключи оказываются вне сужения.
+   * Без гашения предупреждение срабатывало бы на каждое нажатие клавиши.
+   */
+  it('под загрузкой не ругается на ключи вне каталога, а без неё — ругается', async () => {
+    const messages = (props: Record<string, unknown>) => {
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+      const wrapper = mount(GrTransfer, {
+        props: { items: catalog, modelValue: ['нет-такого'], ariaLabel: 'Права', ...props },
+      })
+      const calls = warn.mock.calls.map(call => String(call[0])).filter(text => text.includes('не найдены'))
+      warn.mockRestore()
+      wrapper.unmount()
+
+      return calls
+    }
+
+    expect(messages({ loading: true })).toEqual([])
+    expect(messages({ loading: false }).length).toBeGreaterThan(0)
   })
 })

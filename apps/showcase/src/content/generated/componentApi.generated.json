@@ -12775,6 +12775,20 @@
             "default": "undefined"
           },
           {
+            "name": "loading",
+            "description": "Каталог в пути: пустая панель говорит «ищем», а не «ничего не найдено». Проп общий на обе панели, а не свой у каждой: `items` — один каталог, и обе панели его виды, так что пока он едет, пусты обе. Подгрузку запускает потребитель по событию `search`, поэтому и флаг держит он.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
+            "name": "loadingText",
+            "description": "Текст индикатора. Не задан — из локали (`gr.transfer.loading`).",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "sortable",
             "description": "Правую панель можно переставлять.",
             "type": "boolean | undefined",
@@ -12870,6 +12884,11 @@
             "name": "empty",
             "description": "Пустая панель. `filtered` — пусто из-за поиска, а не по сути.",
             "type": "{ side: GrTransferSide; filtered: boolean; }"
+          },
+          {
+            "name": "loading",
+            "description": "Панель под загрузкой — вместо текста «ищем».",
+            "type": "{ side: GrTransferSide; }"
           }
         ]
       },

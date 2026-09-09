@@ -661,6 +661,31 @@ test.describe('GrKbd: последовательность клавиш', () => 
   })
 })
 
+test.describe('GrTransfer: загрузка справочника', () => {
+  /**
+   * Настоящая последовательность: запрос — «ищем» — ответ. В jsdom её пришлось
+   * бы подделать таймерами, и порядок доставки проверялся бы не тот.
+   */
+  test('пока ответ в пути, панель говорит «ищем», а не «ничего не найдено»', async ({ page }) => {
+    await openShowcasePage(page, componentPath('GrTransfer'))
+
+    const preview = page.locator('[data-example-preview]').filter({ hasText: 'ответ приходит с задержкой' }).first()
+    await preview.scrollIntoViewIfNeeded()
+
+    const search = preview.locator('input[type="search"]').first()
+    // Запрос заведомо без совпадений: иначе «ищем» не отличить от результата.
+    await search.fill('такого сотрудника нет')
+
+    const sourcePanel = preview.locator('[data-gr-transfer-panel="source"]')
+    await expect(sourcePanel.locator('[data-gr-transfer-loading]')).toBeVisible()
+    await expect(search).toHaveAttribute('aria-busy', 'true')
+
+    // Ответ приехал — «ищем» уступает место честному «ничего не найдено».
+    await expect(sourcePanel.locator('[data-gr-transfer-loading]')).toHaveCount(0, { timeout: 5000 })
+    await expect(sourcePanel).toContainText('Nothing matches the search')
+  })
+})
+
 test.describe('GrTransfer: виртуализация панели', () => {
   /**
    * В jsdom раскладки нет: окно всегда начинается с нуля, и абсолютный индекс
