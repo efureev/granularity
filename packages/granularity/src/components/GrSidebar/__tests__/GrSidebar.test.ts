@@ -334,3 +334,97 @@ describe('GrSidebarGroup', () => {
     expect(group.classes()).toContain('border-t')
   })
 })
+
+/**
+ * Вложенные пункты: глубина считается разметкой, а не пропом, который
+ * потребителю пришлось бы держать в синхроне при перестановке ветки.
+ */
+describe('GrSidebarItem — вложенные пункты', () => {
+  function mountNested(props: Record<string, unknown> = {}, itemProps = '') {
+    return mount(defineComponent({
+      components: { GrSidebar, GrSidebarItem },
+      props: { collapsed: { type: Boolean, default: false } },
+      template: `
+        <GrSidebar :collapsed="collapsed">
+          <GrSidebarItem label="Настройки" ${itemProps}>
+            <GrSidebarItem label="Профиль" />
+            <GrSidebarItem label="Безопасность" />
+          </GrSidebarItem>
+          <GrSidebarItem label="Обзор" />
+        </GrSidebar>
+      `,
+    }), { props, global: granularityGlobal() })
+  }
+
+  it('пункт без подпунктов гнездом не оборачивается', () => {
+    const wrapper = mountNested()
+
+    expect(wrapper.findAll('[data-gr-sidebar-item-nest]')).toHaveLength(1)
+  })
+
+  it('свёрнутая ветка не рисует подпункты вовсе', () => {
+    const wrapper = mountNested()
+
+    expect(wrapper.find('[data-gr-sidebar-item-children]').exists()).toBe(false)
+    // Не отрисованное поддерево не ловит `Tab` и не читается диктором.
+    expect(wrapper.text()).not.toContain('Профиль')
+  })
+
+  it('нажатие раскрывает ветку и меняет `aria-expanded`', async () => {
+    const wrapper = mountNested()
+    const parent = wrapper.findAll('[data-gr-sidebar-item]')[0]
+
+    expect(parent.attributes('aria-expanded')).toBe('false')
+
+    await parent.trigger('click')
+
+    expect(parent.attributes('aria-expanded')).toBe('true')
+    expect(wrapper.get('[data-gr-sidebar-item-children]').text()).toContain('Профиль')
+  })
+
+  it('`aria-controls` указывает на само поддерево', async () => {
+    const wrapper = mountNested()
+    const parent = wrapper.findAll('[data-gr-sidebar-item]')[0]
+    await parent.trigger('click')
+
+    expect(parent.attributes('aria-controls')).toBe(wrapper.get('[data-gr-sidebar-item-children]').attributes('id'))
+  })
+
+  it('`default-expanded` открывает ветку сразу', () => {
+    const wrapper = mountNested({}, 'default-expanded')
+
+    expect(wrapper.get('[data-gr-sidebar-item-children]').text()).toContain('Безопасность')
+  })
+
+  it('`v-model:expanded` управляется снаружи', async () => {
+    const wrapper = mountNested({}, ':expanded="false"')
+    const parent = wrapper.findAll('[data-gr-sidebar-item]')[0]
+
+    await parent.trigger('click')
+
+    // Проп сильнее внутреннего состояния: снаружи его никто не поменял.
+    expect(wrapper.find('[data-gr-sidebar-item-children]').exists()).toBe(false)
+    expect(parent.attributes('aria-expanded')).toBe('false')
+  })
+
+  it('подпункт отодвинут отступом уровня, а корневой — нет', async () => {
+    const wrapper = mountNested({}, 'default-expanded')
+    const items = wrapper.findAll('[data-gr-sidebar-item]')
+
+    expect(items[0].attributes('style')).toBeUndefined()
+    expect(items[1].attributes('style')).toContain('padding-inline-start')
+  })
+
+  /** В шестьдесят четыре пикселя подпункты не влезают, а подменю — другая история. */
+  it('в свёрнутом рейле подпунктов нет, а нажатие возвращает панели ширину', async () => {
+    const wrapper = mountNested({ collapsed: true })
+
+    expect(wrapper.find('[data-gr-sidebar-item-children]').exists()).toBe(false)
+
+    await wrapper.findAll('[data-gr-sidebar-item]')[0].trigger('click')
+    await nextTick()
+
+    expect(wrapper.get('[data-gr-sidebar]').attributes('data-collapsed')).toBeUndefined()
+    expect(wrapper.get('[data-gr-sidebar-item-children]').text()).toContain('Профиль')
+  })
+})

@@ -78,3 +78,33 @@ export function grSidebarItemClass(options: {
     options.disabled ? itemDisabledClass : options.active ? itemActiveClass : itemIdleClass,
   ].join(' ')
 }
+
+/**
+ * Гнездо вложенного пункта: сам пункт плюс поддерево под ним. Обёртка нужна
+ * потому, что двух корней у компонента быть не может — при них ломается проброс
+ * атрибутов.
+ */
+export const itemNestClass = 'flex flex-col'
+
+/** Поддерево подпунктов. Отступ уровня задаётся строкам, а не контейнеру. */
+export const itemChildrenClass = 'flex flex-col'
+
+/**
+ * Шеврон раскрытия. Поворотом показывает состояние, но смысла не несёт: его
+ * сообщает `aria-expanded` на самом пункте, поэтому от диктора шеврон скрыт.
+ */
+export const itemChevronClass = 'ml-auto h-4 w-4 shrink-0 text-[var(--gr-muted-fg)] transition-transform duration-[var(--gr-duration-fast)]'
+
+export const itemChevronExpandedClass = 'rotate-90'
+
+/**
+ * Отступ уровня вложенности. Считается от базового `px-3` пункта: своим
+ * `padding` строка отодвигается целиком, вместе с подсветкой и кольцом фокуса,
+ * — сдвинь мы только текст, активный фон уезжал бы под соседний уровень.
+ */
+export function itemNestIndent(level: number): string | undefined {
+  if (level <= 0)
+    return undefined
+
+  return `calc(0.75rem + ${level} * var(--gr-sidebar-nest-indent, 1rem))`
+}

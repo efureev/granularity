@@ -3281,6 +3281,13 @@ export const grComponentTokens: GrComponentToken[] = [
     "description": "Межстрочный интервал подписи пункта."
   },
   {
+    "owner": "GrSidebar",
+    "name": "--gr-sidebar-nest-indent",
+    "kind": "hook",
+    "default": "1rem",
+    "description": "Отступ одного уровня вложенности у подпунктов. Отодвигается вся строка вместе с подсветкой, а не только текст."
+  },
+  {
     "owner": "GrSlider",
     "name": "--gr-slider-fill",
     "kind": "hook",

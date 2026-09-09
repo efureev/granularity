@@ -489,6 +489,51 @@ function basicPanelsPreview(page: Page) {
     .first()
 }
 
+test.describe('GrSidebar: вложенные пункты', () => {
+  function nestedPreview(page: Page) {
+    return page.locator('[data-example-preview]').filter({ hasText: 'глубина' }).first()
+  }
+
+  test('ветка раскрывается нажатием, а её подпункты встают в таб-порядок', async ({ page }) => {
+    await openShowcasePage(page, componentPath('GrSidebar'))
+
+    const preview = nestedPreview(page)
+    await preview.scrollIntoViewIfNeeded()
+
+    const branch = preview.getByRole('button', { name: 'Команда' })
+    await expect(branch).toHaveAttribute('aria-expanded', 'false')
+    await expect(preview.getByRole('button', { name: 'Приглашения' })).toHaveCount(0)
+
+    await branch.click()
+
+    await expect(branch).toHaveAttribute('aria-expanded', 'true')
+    await expect(preview.getByRole('button', { name: 'Приглашения' })).toBeVisible()
+  })
+
+  /**
+   * В шестьдесят четыре пикселя подпункты не влезают, поэтому нажатие на ветку
+   * обязано сперва вернуть панели ширину: иначе это кнопка, от которой ничего не
+   * происходит.
+   */
+  test('в свёрнутом рейле нажатие на ветку возвращает панели ширину', async ({ page }) => {
+    await openShowcasePage(page, componentPath('GrSidebar'))
+
+    const preview = nestedPreview(page)
+    await preview.scrollIntoViewIfNeeded()
+
+    const sidebar = preview.locator('[data-gr-sidebar]')
+    await preview.locator('[data-gr-sidebar-toggle]').click()
+    await expect(sidebar).toHaveAttribute('data-collapsed', 'true')
+    await expect(preview.getByRole('button', { name: 'Счета' })).toHaveCount(0)
+
+    // В рейле у пункта только имя из `aria-label` — подписи там нет.
+    await preview.locator('[data-gr-sidebar-item]').nth(1).click()
+
+    await expect(sidebar).not.toHaveAttribute('data-collapsed', 'true')
+    await expect(preview.getByRole('button', { name: 'Счета' })).toBeVisible()
+  })
+})
+
 test.describe('GrKbd: последовательность клавиш', () => {
   /**
    * Цепочка собирается из настоящих событий клавиатуры в их настоящем порядке —

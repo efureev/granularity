@@ -9,6 +9,13 @@ export const grSidebarExamples: ShowcaseComponentExampleDoc[] = [
     previewKey: 'gr-sidebar-basic-sections',
   },
   {
+    id: 'sidebar-nested',
+    title: 'Вложенные пункты',
+    description: 'Пункт с подпунктами становится раскрывающейся веткой: `aria-expanded` на нём, поддерево под ним, отступ по уровню. Глубина считается разметкой, а не пропом — переставили ветку, и уровни пересчитались сами. В свёрнутом рейле подпунктов нет: в 64 пикселя они не влезают, поэтому нажатие на ветку сперва возвращает панели ширину.',
+    status: 'ready',
+    previewKey: 'gr-sidebar-nested',
+  },
+  {
     id: 'sidebar-documentation-nav',
     title: 'Documentation anchors',
     description: 'Sidebar как rail для doc anchors: кастомные `<button>`-пункты с active-подсветкой через `--gr-sidebar-*` токены и badge-маркером якоря.',

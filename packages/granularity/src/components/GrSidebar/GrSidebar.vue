@@ -90,8 +90,20 @@ function toggle(): void {
   emit('update:collapsed', collapsedState.value)
 }
 
+function expand(): void {
+  if (!collapsedState.value)
+    return
+
+  collapsedState.value = false
+  emit('update:collapsed', false)
+}
+
 // Даём `GrSidebarItem`'ам знать про свёрнутость.
-provide(GR_SIDEBAR_KEY, { collapsed: collapsedState, position: computed(() => props.position) })
+provide(GR_SIDEBAR_KEY, {
+  collapsed: collapsedState,
+  position: computed(() => props.position),
+  expand,
+})
 
 const hasTitle = computed(() => Boolean(props.title))
 const hasSubtitle = computed(() => Boolean(props.subtitle))

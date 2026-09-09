@@ -9,6 +9,26 @@ to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **`GrSidebar` items nest.** Put items inside an item and it becomes an
+  expandable branch: `aria-expanded` on it, the subtree under it, an indent per
+  level. Depth is counted from the markup rather than a prop — each item tells
+  its children their level, so moving a branch renumbers itself. The indent
+  shifts the whole row, not just its label; shifting the text alone would leave
+  the active background under the neighbouring level. Step is themeable through
+  `--gr-sidebar-nest-indent`.
+
+  A branch cannot also be a link: one press cannot both navigate and expand, so
+  children win and `href`/`as` are ignored — with a dev warning, because
+  navigation dropped in silence is indistinguishable from navigation forgotten.
+  A closed subtree is not rendered at all rather than hidden: an invisible branch
+  would still catch `Tab` and still be read out, against its own
+  `aria-expanded="false"`.
+
+  The collapsed rail shows only the top level — sixty-four pixels cannot hold a
+  subtree, and a flyout submenu is a much larger story. Clicking a branch there
+  gives the panel its width back first, so the button does something instead of
+  nothing.
+
 - **Hotkey sequences: "G, then I".** A space splits the string into steps, a plus
   joins keys inside one: `'mod+k'` is a chord, `'g i'` a chain, `'mod+k p'` a
   chord followed by a key. `v-hotkey` binds it and `GrKbd` draws it from the
