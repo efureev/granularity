@@ -309,6 +309,18 @@ function diagramMask(page: import('@playwright/test').Page) {
   return [page.locator('.gr-demo-diagram-canvas')]
 }
 
+/**
+ * Страница с диаграммой получает допуск на текстовый шум.
+ *
+ * Маска снимает пиксели самой диаграммы, но не её влияние на страницу: высота
+ * снимка совпадает, а строки ниже расходятся на пиксель от прогона к прогону —
+ * порядка 7–8 тысяч пикселей из семи с половиной миллионов. Предмет гейта —
+ * цветовые регрессии токенов, а они меняют картинку на порядки больше, так что
+ * допуск их не прячет. Даётся он только страницам с диаграммой: у остальных
+ * держится общий строгий предел в 300 пикселей.
+ */
+const DIAGRAM_DIFF_ALLOWANCE = 12_000
+
 for (const theme of ['light', 'dark'] as const) {
   test.describe(`visual companion (${theme})`, () => {
     for (const name of VISUAL_COMPANIONS) {
@@ -325,8 +337,10 @@ for (const theme of ['light', 'dark'] as const) {
 
         await hideChrome(page)
 
+        const hasDiagrams = await page.locator('.gr-demo-diagram-canvas').count() > 0
         await expect(examples).toHaveScreenshot(`${companionPath(name).replace('/', '-')}-${theme}.png`, {
           mask: diagramMask(page),
+          ...(hasDiagrams ? { maxDiffPixels: DIAGRAM_DIFF_ALLOWANCE } : {}),
         })
       })
     }

@@ -227,14 +227,14 @@ const MermaidBlock = defineComponent({
       }
     }
 
-    let observer: MutationObserver | null = null
+    let themes: MutationObserver | null = null
 
     onMounted(() => {
       void draw()
-      observer = new MutationObserver(() => void draw())
-      observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] })
+      themes = new MutationObserver(() => void draw())
+      themes.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] })
     })
-    onBeforeUnmount(() => observer?.disconnect())
+    onBeforeUnmount(() => themes?.disconnect())
     watch(() => [props.code, props.language, theme.value], () => void draw())
 
     return () => {
@@ -300,9 +300,11 @@ const components = computed(() => (diagrams.value ? { code: MermaidBlock } : {})
 
 <template>
   <div class="grid gap-5">
-    <div class="grid gap-3 rounded-2xl border border-[var(--showcase-brd-strong)] bg-[var(--gr-muted)] p-4">
-      <div class="flex flex-wrap items-center gap-x-6 gap-y-3">
-        <span class="showcase-demo-caption text-[11px]">Рисовать диаграммы</span>
+    <!-- Панель — только органы управления: они обязаны стоять вплотную к тому,
+         чем управляют. Всё, что читают, а не нажимают, живёт под примером. -->
+    <div class="grid gap-2 rounded-2xl border border-[var(--showcase-brd-strong)] bg-[var(--gr-muted)] px-4 py-3">
+      <div class="flex flex-wrap items-center gap-x-5 gap-y-3">
+        <span class="showcase-demo-caption text-[11px]">Диаграммы</span>
         <GrSwitch v-model="diagrams" size="sm">
           mermaid
         </GrSwitch>
@@ -325,92 +327,9 @@ const components = computed(() => (diagrams.value ? { code: MermaidBlock } : {})
       </div>
 
       <p class="showcase-demo-text text-xs">
-<code>mermaid</code> ставит приложение, а не пакет: в
-        <code>@feugene/granularity-editor</code> его нет ни в зависимостях, ни в
-        коде. Шов — проп <code>components.code</code>, тот же, которым подключают
-        подсветку. Выключите тумблер — ограда станет обычным блоком кода, и не
-        загрузится вообще ничего.
+        Выключите тумблер — ограда станет обычным блоком кода, и не загрузится
+        вообще ничего.
       </p>
-
-      <ol class="grid gap-2 rounded-xl border border-[var(--gr-brd)] bg-[var(--gr-card)] p-3.5">
-        <li class="grid gap-1">
-          <span class="showcase-demo-caption text-[11px]">1. Поставить движок в приложении</span>
-          <code class="block font-mono text-xs text-[var(--gr-fg)]">yarn add mermaid</code>
-          <span class="showcase-demo-text text-xs">
-Зависимость приложения, не библиотеки: <code>GrMarkdown</code> весит
-            11.3 КБ gzip, одно только ядро <code>mermaid</code> — 179 КБ.
-          </span>
-        </li>
-
-        <li class="grid gap-1 border-t border-[var(--gr-brd)] pt-2">
-          <span class="showcase-demo-caption text-[11px]">2. Написать рендерер ограды</span>
-          <code class="block font-mono text-xs text-[var(--gr-fg)]">import { GrMarkdownCode } from '@feugene/granularity-editor/components/GrMarkdownCode'</code>
-          <span class="showcase-demo-text text-xs">
-Компонент получает <code>{ code, language, wrap, onCopy }</code>, рисует
-            ограду с языком <code>mermaid</code> и отдаёт все прочие языки
-            <code>GrMarkdownCode</code> — рендереру по умолчанию. Экспорт именованный:
-            по умолчанию из этого подпути приезжает сам <code>GrMarkdown</code>.
-            Весь код — в сниппете под превью.
-          </span>
-        </li>
-
-        <li class="grid gap-1 border-t border-[var(--gr-brd)] pt-2">
-          <span class="showcase-demo-caption text-[11px]">3. Отдать его документу</span>
-          <code class="block font-mono text-xs text-[var(--gr-fg)]">&lt;GrMarkdown :source="md" :components="{ code: MermaidBlock }" /&gt;</code>
-          <span class="showcase-demo-text text-xs">
-Больше ничего: <code>mermaid</code> подключается только здесь, и заменить
-            его на другой движок диаграмм — это правка одного компонента.
-          </span>
-        </li>
-      </ol>
-
-      <p class="showcase-demo-text text-xs">
-Три строки внутри рендерера не косметика. Импорт <code>mermaid</code>
-        только динамический: статический положит движок в общий кусок, и его
-        скачает каждый, кто открыл страницу. <code>layout: 'dagre'</code> отсекает
-        раскладку ELK — по замеру 231 КБ gzip против 661 и 93 мс против 532 на
-        первом flowchart. <code>securityLevel: 'strict'</code> вычищает разметку
-        из подписей: markdown приходит извне.
-      </p>
-
-      <div class="grid gap-2 border-t border-[var(--gr-brd)] pt-3">
-        <span class="showcase-demo-caption text-[11px]">Тема диаграммы</span>
-        <p class="showcase-demo-text text-xs">
-          «Токены», «Акцент» и «Контур» — свои: движку отдаётся
-          <code>theme: 'base'</code> и <code>themeVariables</code>, собранные из
-          токенов дизайн-системы, поэтому диаграмма переключается вместе с темой
-          страницы. <code>neutral</code> и <code>default</code> встроены в
-          <code>mermaid</code> и палитру задают сами — подмешивать к ним токены
-          бессмысленно: <code>themeVariables</code> слушается только
-          <code>base</code>.
-        </p>
-      </div>
-
-      <div class="grid gap-2 border-t border-[var(--gr-brd)] pt-3">
-        <span class="showcase-demo-caption text-[11px]">Нужный тип диаграммы</span>
-        <p class="showcase-demo-text text-xs">
-          Встроенные типы — flowchart, sequence, class, state, pie, gantt, er,
-          journey и прочие — регистрировать не нужно: <code>render()</code> сам
-          подтягивает грамматику того типа, который встретил, при первом показе.
-          Поэтому и цена зависит от вида: sequence добавляет 31 КБ gzip, class —
-          16 КБ, pie — 154 КБ. Чужой тип приходит отдельным пакетом и
-          подключается <code>mermaid.registerExternalDiagrams([…])</code>; иконки
-          для архитектурных диаграмм — <code>registerIconPacks</code> и пакет
-          <code>@iconify-json/*</code>; своя раскладка —
-          <code>registerLayoutLoaders</code>.
-        </p>
-
-        <div class="flex flex-wrap gap-2 pt-0.5">
-          <a
-            v-for="link in docs"
-            :key="link.href"
-            :href="link.href"
-            target="_blank"
-            rel="noreferrer"
-            class="showcase-link-chip inline-flex items-center rounded-full border px-3 py-1 text-xs transition-colors"
-          >{{ link.title }}</a>
-        </div>
-      </div>
     </div>
 
     <div class="overflow-hidden rounded-2xl border border-[var(--showcase-brd-strong)] bg-[var(--gr-card)] shadow-[var(--showcase-shadow-raised)]">
@@ -422,10 +341,180 @@ const components = computed(() => (diagrams.value ? { code: MermaidBlock } : {})
         <GrMarkdown :source="source" id-prefix="mermaid-" :components="components" />
       </div>
     </div>
+
+    <div class="grid gap-3">
+      <div class="grid gap-1">
+        <span class="showcase-demo-caption text-[11px]">Как подключить</span>
+        <p class="showcase-demo-text text-xs">
+          <code>mermaid</code> ставит приложение, а не пакет: в
+          <code>@feugene/granularity-editor</code> его нет ни в зависимостях, ни в коде.
+          Шов — проп <code>components.code</code>, тот же, которым подключают подсветку.
+        </p>
+      </div>
+
+      <ol class="grid gap-px overflow-hidden rounded-xl border border-[var(--gr-brd)] bg-[var(--gr-brd)] sm:grid-cols-3">
+        <li class="grid content-start gap-2 bg-[var(--gr-card)] p-4">
+          <span class="demo-step">1 · Поставить движок</span>
+          <code class="demo-code">yarn add mermaid</code>
+          <p class="demo-note">
+            Зависимость приложения, не библиотеки: <code>GrMarkdown</code> весит 11.3 КБ
+            gzip, одно ядро <code>mermaid</code> — 179 КБ.
+          </p>
+        </li>
+
+        <li class="grid content-start gap-2 bg-[var(--gr-card)] p-4">
+          <span class="demo-step">2 · Написать рендерер</span>
+          <code class="demo-code">import { GrMarkdownCode } from '@feugene/granularity-editor/components/GrMarkdownCode'</code>
+          <p class="demo-note">
+            Получает <code>{ code, language, wrap, onCopy }</code>. Рисует ограду с языком
+            <code>mermaid</code>, прочие языки отдаёт <code>GrMarkdownCode</code>.
+          </p>
+          <p class="demo-warn">Экспорт именованный: по умолчанию отсюда приезжает сам <code>GrMarkdown</code>.</p>
+        </li>
+
+        <li class="grid content-start gap-2 bg-[var(--gr-card)] p-4">
+          <span class="demo-step">3 · Отдать документу</span>
+          <code class="demo-code">&lt;GrMarkdown :components="{ code: MermaidBlock }" /&gt;</code>
+          <p class="demo-note">
+            Больше нигде <code>mermaid</code> не упоминается: замена движка диаграмм —
+            правка одного компонента.
+          </p>
+        </li>
+      </ol>
+    </div>
+
+    <div class="grid gap-3">
+      <span class="showcase-demo-caption text-[11px]">Что ещё знать</span>
+
+      <div class="grid gap-px overflow-hidden rounded-xl border border-[var(--gr-brd)] bg-[var(--gr-brd)] sm:grid-cols-3">
+        <section class="grid content-start gap-2.5 bg-[var(--gr-card)] p-4">
+          <span class="demo-step">Строки конфига</span>
+          <dl class="demo-list">
+            <dt><code>import('mermaid')</code></dt>
+            <dd>только динамический: статический положит движок в общий кусок.</dd>
+
+            <dt><code>layout: 'dagre'</code></dt>
+            <dd>отсекает ELK: 231 КБ gzip против 661, 93 мс против 532.</dd>
+
+            <dt><code>securityLevel: 'strict'</code></dt>
+            <dd>вычищает разметку из подписей: markdown приходит извне.</dd>
+          </dl>
+        </section>
+
+        <section class="grid content-start gap-2.5 bg-[var(--gr-card)] p-4">
+          <span class="demo-step">Темы</span>
+          <dl class="demo-list">
+            <dt>Токены · Акцент · Контур</dt>
+            <dd>свои: <code>theme: 'base'</code> плюс <code>themeVariables</code> из токенов — идут за темой страницы.</dd>
+
+            <dt><code>neutral</code> · <code>default</code></dt>
+            <dd>встроенные в движок, палитру задают сами.</dd>
+          </dl>
+          <p class="demo-warn"><code>themeVariables</code> слушается только темой <code>base</code>.</p>
+        </section>
+
+        <section class="grid content-start gap-2.5 bg-[var(--gr-card)] p-4">
+          <span class="demo-step">Типы диаграмм</span>
+          <dl class="demo-list">
+            <dt>Встроенные</dt>
+            <dd>регистрировать не нужно, <code>render()</code> подтягивает сам. Цена по типу: sequence 31 КБ, class 16 КБ, pie 154 КБ.</dd>
+
+            <dt><code>registerExternalDiagrams</code></dt>
+            <dd>чужой тип, отдельным пакетом.</dd>
+
+            <dt><code>registerIconPacks</code></dt>
+            <dd>иконки, пакеты <code>@iconify-json/*</code>.</dd>
+
+            <dt><code>registerLayoutLoaders</code></dt>
+            <dd>своя раскладка вместо dagre.</dd>
+          </dl>
+        </section>
+      </div>
+
+      <div class="flex flex-wrap gap-2">
+        <a
+          v-for="link in docs"
+          :key="link.href"
+          :href="link.href"
+          target="_blank"
+          rel="noreferrer"
+          class="showcase-link-chip inline-flex items-center rounded-full border px-3 py-1 text-xs transition-colors"
+        >{{ link.title }}</a>
+      </div>
+    </div>
+
   </div>
 </template>
 
 <style scoped>
+/* Заголовок карточки: он держит колонку, поэтому весом отделён от текста. */
+.demo-step {
+  font-size: var(--gr-text-xs);
+  font-weight: var(--gr-font-semibold);
+  color: var(--gr-fg);
+  letter-spacing: 0.01em;
+}
+
+.demo-code {
+  display: block;
+  overflow-wrap: anywhere;
+  border-radius: var(--gr-radius-sm, 6px);
+  background: var(--gr-muted);
+  padding: 0.4rem 0.55rem;
+  font-family: var(--gr-font-mono, ui-monospace, monospace);
+  font-size: 0.72rem;
+  line-height: 1.5;
+  color: var(--gr-fg);
+}
+
+.demo-note,
+.demo-warn {
+  margin: 0;
+  font-size: 0.72rem;
+  line-height: 1.55;
+  color: var(--gr-muted-fg);
+}
+
+/* Оговорка, а не пояснение: её пропускают именно тогда, когда она нужна. */
+.demo-warn {
+  border-inline-start: 2px solid var(--gr-brd-hover);
+  padding-inline-start: 0.6rem;
+  color: var(--gr-fg);
+}
+
+/*
+ * Термин и пояснение отдельными строками.
+ * Одной строкой они сливаются в поток, в котором не видно, что здесь список.
+ */
+.demo-list {
+  display: grid;
+  gap: 0.7rem;
+  margin: 0;
+}
+
+.demo-list dt {
+  font-family: var(--gr-font-mono, ui-monospace, monospace);
+  font-size: 0.72rem;
+  line-height: 1.4;
+  color: var(--gr-fg);
+  overflow-wrap: anywhere;
+}
+
+.demo-list dd {
+  margin: 0.15rem 0 0;
+  font-size: 0.72rem;
+  line-height: 1.55;
+  color: var(--gr-muted-fg);
+}
+
+.demo-note :deep(code),
+.demo-warn :deep(code),
+.demo-list :deep(code) {
+  font-family: var(--gr-font-mono, ui-monospace, monospace);
+  font-size: 0.95em;
+  color: inherit;
+}
+
 .gr-demo-diagram {
   margin: var(--gr-markdown-flow, 1em) 0;
   display: grid;
