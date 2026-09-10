@@ -247,11 +247,52 @@ const components = computed(() => (diagrams.value ? { code: MermaidBlock } : {})
       </div>
 
       <p class="showcase-demo-text text-xs">
-        `mermaid` ставит приложение, а не пакет: в `@feugene/granularity-editor`
-        его нет ни в зависимостях, ни в коде. Шов — проп `components.code`, тот
-        же, которым подключают подсветку. Импорт динамический, поэтому документ
-        без диаграмм за движок не платит; выключите тумблер — ограда станет
-        обычным блоком кода, и ничего не загрузится вовсе.
+<code>mermaid</code> ставит приложение, а не пакет: в
+        <code>@feugene/granularity-editor</code> его нет ни в зависимостях, ни в
+        коде. Шов — проп <code>components.code</code>, тот же, которым подключают
+        подсветку. Выключите тумблер — ограда станет обычным блоком кода, и не
+        загрузится вообще ничего.
+      </p>
+
+      <ol class="grid gap-2 rounded-xl border border-[var(--gr-brd)] bg-[var(--gr-card)] p-3.5">
+        <li class="grid gap-1">
+          <span class="showcase-demo-caption text-[11px]">1. Поставить движок в приложении</span>
+          <code class="block font-mono text-xs text-[var(--gr-fg)]">yarn add mermaid</code>
+          <span class="showcase-demo-text text-xs">
+Зависимость приложения, не библиотеки: <code>GrMarkdown</code> весит
+            11.3 КБ gzip, одно только ядро <code>mermaid</code> — 179 КБ.
+          </span>
+        </li>
+
+        <li class="grid gap-1 border-t border-[var(--gr-brd)] pt-2">
+          <span class="showcase-demo-caption text-[11px]">2. Написать рендерер ограды</span>
+          <code class="block font-mono text-xs text-[var(--gr-fg)]">import { GrMarkdownCode } from '@feugene/granularity-editor/components/GrMarkdownCode'</code>
+          <span class="showcase-demo-text text-xs">
+Компонент получает <code>{ code, language, wrap, onCopy }</code>, рисует
+            ограду с языком <code>mermaid</code> и отдаёт все прочие языки
+            <code>GrMarkdownCode</code> — рендереру по умолчанию. Экспорт именованный:
+            по умолчанию из этого подпути приезжает сам <code>GrMarkdown</code>.
+            Весь код — в сниппете под превью.
+          </span>
+        </li>
+
+        <li class="grid gap-1 border-t border-[var(--gr-brd)] pt-2">
+          <span class="showcase-demo-caption text-[11px]">3. Отдать его документу</span>
+          <code class="block font-mono text-xs text-[var(--gr-fg)]">&lt;GrMarkdown :source="md" :components="{ code: MermaidBlock }" /&gt;</code>
+          <span class="showcase-demo-text text-xs">
+Больше ничего: <code>mermaid</code> подключается только здесь, и заменить
+            его на другой движок диаграмм — это правка одного компонента.
+          </span>
+        </li>
+      </ol>
+
+      <p class="showcase-demo-text text-xs">
+Три строки внутри рендерера не косметика. Импорт <code>mermaid</code>
+        только динамический: статический положит движок в общий кусок, и его
+        скачает каждый, кто открыл страницу. <code>layout: 'dagre'</code> отсекает
+        раскладку ELK — по замеру 231 КБ gzip против 661 и 93 мс против 532 на
+        первом flowchart. <code>securityLevel: 'strict'</code> вычищает разметку
+        из подписей: markdown приходит извне.
       </p>
     </div>
 
