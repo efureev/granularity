@@ -1,6 +1,6 @@
 import type { GrControlShape } from '../shared/controlShape'
 
-import type { GrSegmentedSize, GrSegmentedVariant } from './grSegmentedStyles'
+import type { GrSegmentedItemWidth, GrSegmentedSize, GrSegmentedVariant } from './grSegmentedStyles'
 
 /**
  * Пропы `GrSegmented`, настраиваемые глобально через
@@ -11,6 +11,8 @@ export interface GrSegmentedConfigurableProps {
   size: GrSegmentedSize
   variant: GrSegmentedVariant
   shape: GrControlShape
+  /** Как ряд делит ширину: поровну или по содержимому. */
+  itemWidth: GrSegmentedItemWidth
 }
 
 declare module '../../composables/useGrComponentConfig' {

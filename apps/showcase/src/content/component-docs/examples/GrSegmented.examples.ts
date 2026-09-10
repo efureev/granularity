@@ -31,6 +31,13 @@ export const grSegmentedExamples: ShowcaseComponentExampleDoc[] = [
     note: 'Клавиатура не меняется: у `radiogroup` обе оси стрелок работают в любой ориентации, как требует APG. В вертикали колонка одна, поэтому сегменты одинаковой ширины по построению, а `block` решает лишь, занимать ли ширину контейнера.',
   },
   {
+    id: 'segmented-item-width',
+    title: 'Who gets the slack',
+    description: '`itemWidth="content"` делит ширину по содержимому, а свободное место раскладывает поверх: в шторке на 400px длинная подпись перестаёт резаться многоточием, а короткой не достаётся лишнего. Умолчание прежнее — `equal`.',
+    status: 'ready',
+    previewKey: 'gr-segmented-item-width',
+  },
+  {
     id: 'segmented-shape',
     title: 'Pill or the field shape',
     description: 'Дорожка-пилюля — дефолт сегментов, `shape="box"` даёт то же скругление, что у полей ввода: рядом с селектом пилюля читается гостем из другой системы. Ось независима от размера.',

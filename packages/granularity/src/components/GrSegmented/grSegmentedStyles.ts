@@ -8,7 +8,35 @@ export type GrSegmentedSize = GrComponentSize
 
 /** Направление ряда сегментов. Вертикаль — боковые фильтры. */
 export const GR_SEGMENTED_ORIENTATIONS = ['horizontal', 'vertical'] as const
+
+/**
+ * Как ряд делит ширину между сегментами. Значимо только в горизонтальном ряду с
+ * `block`: без него ширина и так по содержимому, а в вертикали колонка одна.
+ */
+export const GR_SEGMENTED_ITEM_WIDTHS = ['equal', 'content'] as const
 export type GrSegmentedOrientation = typeof GR_SEGMENTED_ORIENTATIONS[number]
+export type GrSegmentedItemWidth = typeof GR_SEGMENTED_ITEM_WIDTHS[number]
+
+/**
+ * Трек грида под один сегмент.
+ *
+ * `content` — это `minmax(min-content, auto)`, и минимум здесь не придирка.
+ * Грид растит треки равными долями до их `max-content`, а остаток делит поверх:
+ * разница между сегментами получается равной разнице их содержимого. Расходятся
+ * минимумы там, где места **не хватает**: с `max-content` трек не сжимается и
+ * ряд вылезает за контейнер, с `min-content` — сжимается, и включается
+ * `truncate` на подписи. Многоточие тут страховка, и терять её нельзя.
+ */
+export function grSegmentedTrack(options: {
+  block: boolean
+  vertical: boolean
+  itemWidth: GrSegmentedItemWidth
+}): string {
+  if (options.vertical || !options.block)
+    return 'minmax(0,max-content)'
+
+  return options.itemWidth === 'content' ? 'minmax(min-content,auto)' : 'minmax(0,1fr)'
+}
 export type GrSegmentedValue = string | number
 export type GrSegmentedOption = {
   value: GrSegmentedValue

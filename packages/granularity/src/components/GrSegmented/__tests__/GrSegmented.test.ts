@@ -221,6 +221,80 @@ describe('GrSegmented', () => {
     expect(group.attributes('style')).toContain('grid-template-columns: minmax(0,1fr) minmax(0,1fr) minmax(0,1fr)')
   })
 
+  it('itemWidth="content" делит ширину по содержимому, а не поровну', async () => {
+    // Равные треки дают шторке на 400px три ячейки по 121px: короткому слову
+    // ширина не нужна, длинная подпись режется многоточием — при том, что места
+    // суммарно хватает.
+    const wrapper = mount(GrSegmented, {
+      props: {
+        modelValue: 'calendar',
+        block: true,
+        itemWidth: 'content',
+        options: [...options],
+      },
+    })
+    await nextTick()
+
+    const style = wrapper.get('[data-gr-segmented]').attributes('style')!
+    expect(style).not.toContain('1fr')
+    expect(style).toContain('grid-template-columns: minmax(min-content,auto) minmax(min-content,auto) minmax(min-content,auto)')
+
+    wrapper.unmount()
+  })
+
+  it('без block режим ширины ничего не меняет', async () => {
+    // Там ширина и так по содержимому — второго правила для того же случая быть
+    // не должно.
+    const plain = mount(GrSegmented, {
+      props: { modelValue: 'calendar', options: [...options] },
+    })
+    const withMode = mount(GrSegmented, {
+      props: { modelValue: 'calendar', itemWidth: 'content', options: [...options] },
+    })
+    await nextTick()
+
+    expect(withMode.get('[data-gr-segmented]').attributes('style'))
+      .toBe(plain.get('[data-gr-segmented]').attributes('style'))
+
+    plain.unmount()
+    withMode.unmount()
+  })
+
+  it('в вертикали режим ширины не значит ничего', async () => {
+    // Колонка одна, сегменты равны по построению.
+    const plain = mount(GrSegmented, {
+      props: { modelValue: 'calendar', block: true, orientation: 'vertical', options: [...options] },
+    })
+    const withMode = mount(GrSegmented, {
+      props: {
+        modelValue: 'calendar',
+        block: true,
+        orientation: 'vertical',
+        itemWidth: 'content',
+        options: [...options],
+      },
+    })
+    await nextTick()
+
+    expect(withMode.get('[data-gr-segmented]').attributes('style'))
+      .toBe(plain.get('[data-gr-segmented]').attributes('style'))
+
+    plain.unmount()
+    withMode.unmount()
+  })
+
+  it('режим ширины приходит из componentDefaults', async () => {
+    const wrapper = mount(GrSegmented, {
+      props: { modelValue: 'calendar', block: true, options: [...options] },
+      global: granularityGlobal({ componentDefaults: { GrSegmented: { itemWidth: 'content' } } }),
+    })
+    await nextTick()
+
+    expect(wrapper.get('[data-gr-segmented]').attributes('style')).toContain('minmax(min-content,auto)')
+
+    wrapper.unmount()
+  })
+
   it('использует дополнительную highlight-тень для pills-индикатора', () => {
     const wrapper = mount(GrSegmented, {
       props: {

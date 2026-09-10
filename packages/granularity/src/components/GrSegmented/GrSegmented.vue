@@ -20,6 +20,8 @@ import {
   grSegmentedItemSpinnerClass,
   grSegmentedRootClass,
   grSegmentedRootStyle,
+  grSegmentedTrack,
+  type GrSegmentedItemWidth,
   type GrSegmentedOption,
   type GrSegmentedOrientation,
   type GrSegmentedSize,
@@ -53,6 +55,16 @@ export interface GrSegmentedProps {
    * построению, он двумерный.
    */
   orientation?: GrSegmentedOrientation
+  /**
+   * Как делится ширина в `block`-ряду: `equal` — поровну, как было всегда;
+   * `content` — по содержимому, свободное место делится поверх него.
+   *
+   * `equal` остаётся умолчанием: с `content` ширина ряда зависела бы от длины
+   * подписей, и перевод интерфейса переставлял бы границы сегментов у всех.
+   * Без `block` и в вертикали проп не значит ничего — там ширина и так по
+   * содержимому, а колонка одна.
+   */
+  itemWidth?: GrSegmentedItemWidth
   /** Длительность анимации индикатора в мс. */
   indicatorDuration?: number
   /** Растягивать сегмент на всю ширину контейнера. */
@@ -83,6 +95,7 @@ const props = withDefaults(
     size: undefined,
     shape: undefined,
     orientation: 'horizontal',
+    itemWidth: undefined,
     indicatorDuration: 300,
     block: false,
     disabled: false,
@@ -99,6 +112,7 @@ const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrSegmen
 const resolvedVariant = useGrComponentProp('GrSegmented', 'variant', () => props.variant, 'pills')
 // Дефолт `pill`, а не общий для пакета `box`: у сегментов пилюля была всегда.
 const resolvedShape = useGrComponentProp('GrSegmented', 'shape', () => props.shape, 'pill')
+const resolvedItemWidth = useGrComponentProp('GrSegmented', 'itemWidth', () => props.itemWidth, 'equal')
 
 const emit = defineEmits<GrSegmentedEmits>()
 defineSlots<{
@@ -163,7 +177,11 @@ const rootClassName = computed(() => grSegmentedRootClass({
  */
 const rootStyle = computed<Record<string, string>>(() => {
   const empty = props.options.length === 0
-  const track = () => props.block && !isVertical.value ? 'minmax(0,1fr)' : 'minmax(0,max-content)'
+  const track = () => grSegmentedTrack({
+    block: props.block,
+    vertical: isVertical.value,
+    itemWidth: resolvedItemWidth.value,
+  })
 
   return {
     ...grSegmentedRootStyle({

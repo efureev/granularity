@@ -7,6 +7,23 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- **`GrSegmented` can divide the row's width by content.** In a `block` row all
+  segments were equal regardless of their labels: in a 400px drawer «All» got
+  121px for a 30px word while «With documents» was cut to an ellipsis — with
+  enough room in total. `itemWidth="content"` sizes segments by their content and
+  spreads the slack on top of that.
+
+  The default stays `equal`, deliberately: with `content` the row's geometry
+  depends on label length, and translating the interface would move every
+  consumer's segment boundaries at once.
+
+  Technically the mode is a `minmax(min-content, auto)` track. `min-content`
+  rather than `max-content` as the floor: where the room honestly is not enough,
+  the track has to shrink and let the label truncate, or the row overflows its
+  container.
+
 ## [v0.51.0] 2026-09-10
 
 ### Added

@@ -418,6 +418,7 @@ export const demoPathByPreviewKey = {
   'gr-segmented-basic-pills': 'components/gr-segmented/GrSegmentedBasicDemo.vue',
   'gr-segmented-button-variant': 'components/gr-segmented/GrSegmentedButtonDemo.vue',
   'gr-segmented-content': 'components/gr-segmented/GrSegmentedContentDemo.vue',
+  'gr-segmented-item-width': 'components/gr-segmented/GrSegmentedItemWidthDemo.vue',
   'gr-segmented-shape': 'components/gr-segmented/GrSegmentedShapeDemo.vue',
   'gr-segmented-states': 'components/gr-segmented/GrSegmentedStatesDemo.vue',
   'gr-segmented-vertical': 'components/gr-segmented/GrSegmentedVerticalDemo.vue',

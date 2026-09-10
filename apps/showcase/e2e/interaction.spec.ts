@@ -1081,6 +1081,58 @@ test.describe('Foundations: линейка высот контролов', () =>
   })
 })
 
+test.describe('GrSegmented: ширина сегмента по содержимому', () => {
+  /**
+   * Треки считает CSS, и в jsdom этого не увидеть вовсе: там нет ни ширин, ни
+   * обрезки. Поэтому режим проверяется замером в браузере — и обе стороны
+   * сразу, иначе «работает» не отличить от «совпало с умолчанием».
+   */
+  function drawerRow(page: Page) {
+    return page.locator('[data-testid="segmented-width-drawer"] [data-gr-segmented]')
+  }
+
+  async function segmentWidths(page: Page): Promise<number[]> {
+    return drawerRow(page).locator('[role="radio"]').evaluateAll(nodes =>
+      nodes.map(node => Math.round(node.getBoundingClientRect().width)))
+  }
+
+  test('content делит по содержимому, equal — поровну', async ({ page }) => {
+    await openShowcasePage(page, componentPath('GrSegmented'))
+
+    const preview = page.locator('[data-example-preview]')
+      .filter({ has: page.locator('[data-testid="segmented-width-drawer"]') })
+      .first()
+
+    // Демо открывается в режиме `content`.
+    const byContent = await segmentWidths(page)
+    expect(new Set(byContent).size, `ширины совпали: ${byContent.join('/')}`).toBeGreaterThan(1)
+
+    // Длинная подпись целиком: места хватает, и трек не обязан её резать.
+    const longLabel = drawerRow(page).locator('[role="radio"]').last().locator('span').first()
+    const overflow = await longLabel.evaluate(node => node.scrollWidth - node.clientWidth)
+    expect(overflow, 'длинная подпись обрезана, хотя места хватает').toBeLessThanOrEqual(1)
+
+    await preview.getByRole('radio', { name: 'equal' }).click()
+    const byEqual = await segmentWidths(page)
+    expect(new Set(byEqual).size, `равные треки дали разные ширины: ${byEqual.join('/')}`).toBe(1)
+  })
+
+  test('островок совпадает с границами выбранного сегмента', async ({ page }) => {
+    // Инвариант: ширина островка — это ширина сегмента из DOM, а не вычисленная
+    // доля. Проверяется в режиме `content`, где сегменты разной ширины.
+    await openShowcasePage(page, componentPath('GrSegmented'))
+
+    const row = drawerRow(page)
+    const active = row.locator('[role="radio"][aria-checked="true"]').first()
+    const indicator = row.locator('[data-gr-segmented-indicator]').first()
+
+    const [activeBox, indicatorBox] = await Promise.all([active.boundingBox(), indicator.boundingBox()])
+
+    expect(Math.abs(indicatorBox!.width - activeBox!.width)).toBeLessThanOrEqual(1)
+    expect(Math.abs(indicatorBox!.x - activeBox!.x)).toBeLessThanOrEqual(1)
+  })
+})
+
 test.describe('GrSteps: проход мастера', () => {
   test('гейт не пускает вперёд, а будущий шаг вне таб-порядка', async ({ page }) => {
     await openShowcasePage(page, componentPath('GrSteps'))

@@ -9933,6 +9933,13 @@
             "default": "\"horizontal\""
           },
           {
+            "name": "itemWidth",
+            "description": "Как делится ширина в `block`-ряду: `equal` — поровну, как было всегда; `content` — по содержимому, свободное место делится поверх него. `equal` остаётся умолчанием: с `content` ширина ряда зависела бы от длины подписей, и перевод интерфейса переставлял бы границы сегментов у всех. Без `block` и в вертикали проп не значит ничего — там ширина и так по содержимому, а колонка одна.",
+            "type": "\"equal\" | \"content\" | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "indicatorDuration",
             "description": "Длительность анимации индикатора в мс.",
             "type": "number | undefined",
