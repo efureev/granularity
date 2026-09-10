@@ -28,7 +28,7 @@ import {
   GrDashboardPalette,
   GrDashboardToolbar,
 } from '@feugene/granularity-dashboard'
-import { GrRichText } from '@feugene/granularity-editor'
+import { GrMarkdown, GrRichText } from '@feugene/granularity-editor'
 import { GrCodeBlock, GrCodeEditor, GrDiff } from '@feugene/granularity-code'
 import { GrSchemaForm } from '@feugene/granularity-forms-schema'
 import { jsonSchemaAdapter, type JsonSchemaDocument } from '@feugene/granularity-forms-schema/json-schema'
@@ -92,6 +92,12 @@ export const dashboardFixtures: ComponentFixture[] = [
 ]
 
 export const editorFixtures: ComponentFixture[] = [
+  // Изоморфен целиком: разбор — чистая функция без DOM, и первый экран
+  // приходит с сервера готовым. Рискованных мест два, и оба здесь на виду:
+  // `id` заголовка обязан считаться из текста (иначе якорь из письма перестанет
+  // работать), а кнопка копирования — появиться только после монтирования,
+  // потому что `navigator` в теле `setup` расходится с сервером.
+  { name: 'GrMarkdown', about: 'разбор — чистая функция: документ печатается целиком, кнопка копирования встаёт после гидрации', render: () => h(GrMarkdown, { source: '## Раздел\n\nАбзац со [ссылкой](/docs) и `кодом`.\n\n- [x] задача\n- [ ] ещё нет\n\n> [!NOTE]\n> Сообщение тоном темы.\n\n| Колонка | Число |\n| --- | ---: |\n| строка | 1 |\n', idPrefix: 'ssr-' }) },
   { name: 'GrRichText', about: 'ProseMirror требует DOM: с сервера приходит только оболочка и тулбар', render: () => h(GrRichText, { modelValue: '<p>Текст</p>' }) },
 ]
 
