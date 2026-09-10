@@ -7,6 +7,55 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.4.0] 2026-09-10
+
+### Added
+
+- `GrMarkdown` renders markdown as a Vue node tree instead of an HTML string. There is no `v-html`
+  and no sanitiser: escaping is Vue's job, so the whole class of markup-injection defects never
+  arises. Raw HTML is either escaped or dropped — a third mode would have required `v-html`.
+- CommonMark and GFM (tables, task lists, strikethrough, autolinks) plus footnotes and GitHub alerts
+  (`> [!NOTE]`). Footnotes ship as a `marked` extension of our own: the alternative was a second
+  runtime dependency for sixty lines.
+- Block-level rendering cache. A block whose source text is unchanged returns the *same* VNode
+  object, so Vue's `patch` short-circuits and leaves its DOM alone. Editing one paragraph of a
+  100 KB document costs one paragraph; inserting a block at the top rebuilds nothing below it,
+  because the cache key comes from the text rather than the position.
+- Long documents drop layout, not DOM: `content-visibility` with an estimated
+  `contain-intrinsic-size` per block. Virtualisation was rejected on purpose — it would have taken
+  find-in-page, anchors into unrendered sections, cross-document selection and printing with it.
+- `streaming` mode re-lexes only the tail, so the cost of one chunk does not grow with what has
+  already been written.
+- Link policy: schemes are checked after entity decoding and insignificant-character stripping, so
+  `&#x6a;avascript:` and a tab inside the scheme are caught where `startsWith` would miss them.
+  A rejected link degrades to plain text rather than to a broken anchor.
+- `createMarkedEngine({ extensions })` accepts `marked` tokenizer extensions, and a token type the
+  package does not know arrives as a `custom` node routed to `components` by the token's name. Only
+  the tokenizer is used — an extension's `renderer` is never called, because the markup is built
+  from Vue nodes and no HTML string exists. This is what makes `marked-katex-extension`,
+  `marked-emoji` and `marked-directive` usable without the package taking a single dependency; a
+  node with no matching component prints its source as text rather than losing it.
+- Task list checkboxes are rendered by the core `GrCheckbox`, GitHub alerts by `GrAlert` and GFM
+  tables by `GrTable` — the component's three declared edges to the core. Checkboxes are `readonly` rather than `disabled`,
+  because a document shows the state of a task instead of forbidding it, so the tick keeps its full
+  colour; alerts carry `live="off"`, because `role="alert"` interrupts a screen reader and a message
+  inside an article has no such right. Everything else stays semantic markup on its own tokens: an
+  edge hands the consumer the donor's entire CSS and safelist, and a document of plain paragraphs
+  should not pay for what it does not contain.
+- `components` swaps the renderer for any node — code, link, image, heading, table. Highlighting is
+  a recipe, not a dependency: `GrCodeBlock` from `@feugene/granularity-code` is passed in by the
+  application, so no edge between companion packages is introduced.
+- `./markdown` subpath exposes the framework-free layer: `parseMarkdown`,
+  `createMarkdownDocument`, `markdownHeadings`, `markdownPlainText` and the `GrMarkdownEngine`
+  contract.
+- i18n keys `grEditor.markdown.*` in all three locales.
+
+### Changed
+
+- `marked` is the package's first runtime dependency. It is `external` in the build, so it reaches
+  the consumer through their own tree; taking `GrRichText` alone does not pull it in. The engine is
+  hidden behind `GrMarkdownEngine` and known by exactly one module, so replacing it costs one file.
+
 ## [v0.3.1] 2026-08-27
 
 ### Fixed

@@ -1,4 +1,5 @@
 // <granularity:components> — блок генерируется `yarn generate:registry`
+export * from './components/GrMarkdown'
 export * from './components/GrRichText'
 // </granularity:components>
 

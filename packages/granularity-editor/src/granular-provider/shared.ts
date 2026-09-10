@@ -8,6 +8,7 @@ import {
   type GranularProvider,
 } from '@feugene/unocss-preset-granular/contract'
 // <granularity:components:imports> — блок генерируется `yarn generate:registry`
+import { grMarkdownConfig } from '../components/GrMarkdown/config'
 import { grRichTextConfig } from '../components/GrRichText/config'
 // </granularity:components:imports>
 
@@ -23,6 +24,7 @@ export const GRANULARITY_EDITOR_PROVIDER_ID = '@feugene/granularity-editor'
  */
 export const granularityEditorComponentConfigs = {
   // <granularity:components:registry> — блок генерируется `yarn generate:registry`
+  GrMarkdown: grMarkdownConfig,
   GrRichText: grRichTextConfig,
   // </granularity:components:registry>
 } satisfies Record<string, GranularComponentDescriptor>

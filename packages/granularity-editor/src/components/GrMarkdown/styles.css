@@ -1,0 +1,456 @@
+/**
+ * Оформление отрендеренного документа.
+ *
+ * Утилитами это не сделать: классы `gr-md-*` рождаются в рендер-функции, и в
+ * файлах, которые сканирует пресет, их нет ни строкой — правило просто не
+ * породилось бы. Тот же случай, что `.ProseMirror` у `GrRichText` и классы
+ * ролей подсветки у `granularity-code`.
+ *
+ * Все значения — токены. Литералов кеглей, радиусов и цветов здесь нет, иначе
+ * документ перестал бы слушаться темы ровно там, где его читают.
+ */
+
+/* --- Блок верхнего уровня: раскладка снимается, DOM остаётся ------------- */
+
+/**
+ * `content-visibility`, а не виртуализация.
+ *
+ * Окно отрисовки убрало бы из DOM всё, чего нет на экране, — вместе с поиском
+ * по странице, переходом по якорю в непоказанный раздел, выделением текста
+ * через весь документ и печатью. Здесь браузер пропускает только раскладку и
+ * отрисовку, а сам текст остаётся на месте.
+ *
+ * `auto` в `contain-intrinsic-size` велит запомнить фактический размер после
+ * первой отрисовки: промах оценки стоит одного кадра, а не всей сессии.
+ */
+.gr-md-block {
+  content-visibility: auto;
+  contain-intrinsic-size: auto var(--gr-markdown-block-size, 3rem);
+}
+
+.gr-md-block + .gr-md-block {
+  margin-top: var(--gr-markdown-flow, 1em);
+}
+
+[data-gr-markdown] {
+  color: var(--gr-fg);
+  overflow-wrap: break-word;
+}
+
+/* Мера строки — текстовым блокам; таблица, код и картинка идут во всю ширину. */
+[data-gr-markdown][data-measure='on'] .gr-md-block > :is(p, ul, ol, blockquote, h1, h2, h3, h4, h5, h6) {
+  max-width: var(--gr-markdown-measure, 68ch);
+}
+
+[data-gr-markdown][data-density='compact'] {
+  --gr-markdown-flow: 0.6em;
+  --gr-markdown-heading-flow: 1em;
+}
+
+/* --- Проза --------------------------------------------------------------- */
+
+[data-gr-markdown] p {
+  margin: 0;
+  text-wrap: pretty;
+}
+
+[data-gr-markdown] :is(h1, h2, h3, h4, h5, h6).gr-md-heading {
+  margin: 0;
+  font-weight: 600;
+  line-height: var(--gr-leading-tight, 1.25);
+  text-wrap: balance;
+  /* Переход по якорю не должен заводить раздел под липкую шапку. */
+  scroll-margin-top: var(--gr-affix-offset, 0px);
+}
+
+.gr-md-block + .gr-md-block > .gr-md-heading {
+  margin-top: calc(var(--gr-markdown-heading-flow, 1.8em) - var(--gr-markdown-flow, 1em));
+}
+
+[data-gr-markdown] h1.gr-md-heading { font-size: 1.75em; }
+[data-gr-markdown] h2.gr-md-heading { font-size: 1.4em; }
+[data-gr-markdown] h3.gr-md-heading { font-size: 1.2em; }
+[data-gr-markdown] h4.gr-md-heading { font-size: 1.05em; }
+[data-gr-markdown] :is(h5, h6).gr-md-heading { font-size: 1em; }
+
+/**
+ * Якорь есть в DOM всегда и лишь показывается: появляющийся по наведению
+ * элемент с клавиатуры недостижим.
+ */
+.gr-md-anchor {
+  display: inline-flex;
+  margin-inline-start: 0.35em;
+  color: var(--gr-muted-fg);
+  opacity: 0;
+  vertical-align: middle;
+  transition: opacity var(--gr-duration-fast) var(--gr-ease-out);
+}
+
+.gr-md-heading:hover .gr-md-anchor,
+.gr-md-anchor:focus-visible {
+  opacity: 1;
+}
+
+.gr-md-anchor:focus-visible {
+  outline: 2px solid var(--gr-ring);
+  outline-offset: 2px;
+  border-radius: var(--gr-radius-sm);
+}
+
+.gr-md-icon {
+  width: 1.15em;
+  height: 1.15em;
+  flex: none;
+}
+
+/**
+ * Обёртка курсора потока. Инлайновая по существу: она встаёт в конец
+ * последнего ряда текста, и любой блочный режим оторвал бы её на свою строку.
+ */
+.gr-md-caret {
+  display: inline;
+  white-space: nowrap;
+}
+
+/* --- Ссылки -------------------------------------------------------------- */
+
+.gr-md-link {
+  color: var(--gr-markdown-link, var(--gr-primary-text));
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.gr-md-link:hover {
+  text-decoration-thickness: 2px;
+}
+
+/**
+ * Внешняя ссылка помечается значком, а не только цветом: цвет уже занят самим
+ * фактом ссылки, и «уводит со страницы» им не выразить.
+ */
+.gr-md-link-external::after {
+  content: '';
+  display: inline-block;
+  width: 0.65em;
+  height: 0.65em;
+  margin-inline-start: 0.25em;
+  background: currentColor;
+  opacity: 0.7;
+  vertical-align: baseline;
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 17 17 7M9 7h8v8'/%3E%3C/svg%3E");
+  mask-repeat: no-repeat;
+  mask-size: contain;
+}
+
+.gr-md-link:focus-visible {
+  outline: 2px solid var(--gr-ring);
+  outline-offset: 2px;
+  border-radius: var(--gr-radius-sm);
+}
+
+/* --- Списки -------------------------------------------------------------- */
+
+/**
+ * Маркеры возвращаются руками: preflight UnoCSS снимает `list-style` со всех
+ * списков, и без этого правила список выглядит абзацами с отступом. Видно
+ * только на странице — в тестах разметка валидна, а маркера нет.
+ */
+.gr-md-list {
+  margin: 0;
+  padding-inline-start: 1.5em;
+  list-style: disc;
+}
+
+ol.gr-md-list {
+  list-style: decimal;
+}
+
+.gr-md-list ul {
+  list-style: circle;
+}
+
+.gr-md-list ul ul {
+  list-style: square;
+}
+
+.gr-md-list ol {
+  list-style: lower-alpha;
+}
+
+.gr-md-list ::marker {
+  color: var(--gr-muted-fg);
+}
+
+.gr-md-list ul,
+.gr-md-list ol {
+  margin-top: 0.35em;
+  padding-inline-start: 1.5em;
+}
+
+/* Свободный список отбивает пункты, тесный — нет. Это и отличает их на вид. */
+.gr-md-list:not(.gr-md-list-tight) > li + li {
+  margin-top: var(--gr-markdown-flow, 1em);
+}
+
+.gr-md-list > li + li {
+  margin-top: 0.25em;
+}
+
+.gr-md-list > li > p + p {
+  margin-top: 0.5em;
+}
+
+.gr-md-task {
+  list-style: none;
+  display: flex;
+  gap: 0.5em;
+  margin-inline-start: -1.5em;
+}
+
+/* Выравнивание по первой строке текста: сам вид чекбокса рисует `GrCheckbox`. */
+.gr-md-task-box {
+  margin-top: 0.15em;
+  flex: none;
+}
+
+/* --- Код ----------------------------------------------------------------- */
+
+.gr-md-code-span {
+  padding: 0.1em 0.35em;
+  border-radius: var(--gr-radius-sm);
+  background: var(--gr-markdown-code-bg, var(--gr-muted));
+  font-family: var(--gr-font-mono, ui-monospace, monospace);
+  font-size: 0.9em;
+  /* Высоту строки код в строке менять не должен: абзац поехал бы рывками. */
+  line-height: inherit;
+}
+
+.gr-md-code {
+  position: relative;
+  border: 1px solid var(--gr-markdown-rule, var(--gr-brd));
+  border-radius: var(--gr-radius-md);
+  background: var(--gr-markdown-pre-bg, var(--gr-muted));
+  overflow: hidden;
+  /* Длинная строка не должна раздувать грид-ячейку и вылезать за родителя. */
+  min-width: 0;
+}
+
+.gr-md-code-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5em;
+  padding: 0.35em 0.6em;
+  border-bottom: 1px solid var(--gr-markdown-rule, var(--gr-brd));
+  min-height: 2em;
+}
+
+.gr-md-code-lang {
+  color: var(--gr-muted-fg);
+  font-family: var(--gr-font-mono, ui-monospace, monospace);
+  font-size: 0.8em;
+  text-transform: lowercase;
+}
+
+.gr-md-code-copy {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25em;
+  border: none;
+  border-radius: var(--gr-radius-sm);
+  background: transparent;
+  color: var(--gr-muted-fg);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity var(--gr-duration-fast) var(--gr-ease-out);
+}
+
+.gr-md-code:hover .gr-md-code-copy,
+.gr-md-code-copy:focus-visible {
+  opacity: 1;
+}
+
+.gr-md-code-copy:hover {
+  color: var(--gr-fg);
+}
+
+.gr-md-code-copy:focus-visible {
+  outline: 2px solid var(--gr-ring);
+  outline-offset: 1px;
+}
+
+.gr-md-pre {
+  margin: 0;
+  padding: 0.75em;
+  overflow-x: auto;
+  min-width: 0;
+  font-family: var(--gr-font-mono, ui-monospace, monospace);
+  font-size: 0.875em;
+  line-height: var(--gr-leading-relaxed, 1.6);
+}
+
+.gr-md-pre-wrap {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.gr-md-pre:focus-visible {
+  outline: 2px solid var(--gr-ring);
+  outline-offset: -2px;
+}
+
+.gr-md-raw-html {
+  margin: 0;
+  padding: 0.75em;
+  border: 1px dashed var(--gr-markdown-rule, var(--gr-brd));
+  border-radius: var(--gr-radius-md);
+  overflow-x: auto;
+  color: var(--gr-muted-fg);
+  font-family: var(--gr-font-mono, ui-monospace, monospace);
+  font-size: 0.875em;
+}
+
+/* --- Цитаты и алерты ----------------------------------------------------- */
+
+.gr-md-quote {
+  margin: 0;
+  padding-inline-start: 1em;
+  border-inline-start: 3px solid var(--gr-markdown-quote-bar, var(--gr-brd));
+  color: var(--gr-muted-fg);
+}
+
+.gr-md-quote > * + * {
+  margin-top: 0.5em;
+}
+
+/* Отбивка блоков внутри сообщения: вид алерта целиком рисует `GrAlert`. */
+.gr-md-alert > * + * {
+  margin-top: 0.5em;
+}
+
+/* --- Таблицы ------------------------------------------------------------- */
+
+/*
+ * Скролл-область, её имя, рамку и достижимость с клавиатуры держит `GrTable`.
+ * Здесь остаются только отступы ячеек и линейки — он объявлен «тонким
+ * контейнером» и отдаёт их потребителю намеренно.
+ */
+.gr-md-table [data-gr-table] {
+  border-collapse: collapse;
+  font-size: 0.95em;
+}
+
+.gr-md-table :is(th, td) {
+  padding: 0.5em 0.75em;
+  border-bottom: 1px solid var(--gr-markdown-rule, var(--gr-brd));
+  text-align: start;
+}
+
+.gr-md-table th {
+  background: var(--gr-markdown-table-header-bg, var(--gr-muted));
+  font-weight: 600;
+}
+
+.gr-md-table tbody tr:last-child :is(th, td) {
+  border-bottom: none;
+}
+
+/* --- Картинки ------------------------------------------------------------ */
+
+.gr-md-image {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--gr-radius-md);
+}
+
+.gr-md-figure {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4em;
+}
+
+.gr-md-figure figcaption {
+  color: var(--gr-muted-fg);
+  font-size: 0.9em;
+}
+
+/* --- Разделитель и сноски ------------------------------------------------ */
+
+.gr-md-hr {
+  margin: 0;
+  border: none;
+  border-top: 1px solid var(--gr-markdown-rule, var(--gr-brd));
+}
+
+.gr-md-footnotes {
+  padding-top: 1em;
+  border-top: 1px solid var(--gr-markdown-rule, var(--gr-brd));
+  font-size: 0.9em;
+}
+
+.gr-md-footnotes-title {
+  margin: 0 0 0.5em;
+  font-size: 1em;
+  font-weight: 600;
+}
+
+.gr-md-footnotes ol {
+  margin: 0;
+  padding-inline-start: 1.5em;
+}
+
+.gr-md-footnotes li + li {
+  margin-top: 0.35em;
+}
+
+.gr-md-fn-ref a,
+.gr-md-fn-back {
+  color: var(--gr-markdown-link, var(--gr-primary-text));
+  text-decoration: none;
+}
+
+.gr-md-fn-back {
+  margin-inline-start: 0.35em;
+}
+
+.gr-md-fn-ref a:focus-visible,
+.gr-md-fn-back:focus-visible {
+  outline: 2px solid var(--gr-ring);
+  outline-offset: 2px;
+}
+
+/* --- Печать и движение ---------------------------------------------------- */
+
+@media print {
+  /* Пропущенная раскладка на бумаге означала бы пустые страницы. */
+  .gr-md-block {
+    content-visibility: visible;
+    contain-intrinsic-size: none;
+  }
+
+  .gr-md-code,
+  .gr-md-table-scroll {
+    break-inside: avoid;
+  }
+
+  .gr-md-anchor,
+  .gr-md-code-copy,
+  .gr-md-link-external::after {
+    display: none;
+  }
+
+  .gr-md-link[href^='http']::after {
+    content: ' (' attr(href) ')';
+    color: var(--gr-muted-fg);
+    font-size: 0.85em;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gr-md-anchor,
+  .gr-md-code-copy {
+    transition: none;
+  }
+}

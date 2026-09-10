@@ -1,4 +1,20 @@
 {
+  "markdown": {
+    "alertCaution": "Precaución",
+    "alertImportant": "Importante",
+    "alertNote": "Nota",
+    "alertTip": "Consejo",
+    "alertWarning": "Advertencia",
+    "anchor": "Enlace a la sección",
+    "codeRegion": "Bloque de código",
+    "copied": "Copiado",
+    "copy": "Copiar código",
+    "copyFailed": "No se pudo copiar",
+    "footnoteBackref": "Volver al texto",
+    "footnotes": "Notas al pie",
+    "tableRegion": "Tabla",
+    "task": "Tarea"
+  },
   "richText": {
     "toolbar": "Formato",
     "bold": "Negrita",

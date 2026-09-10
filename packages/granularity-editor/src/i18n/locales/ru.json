@@ -1,4 +1,20 @@
 {
+  "markdown": {
+    "alertCaution": "Осторожно",
+    "alertImportant": "Важно",
+    "alertNote": "Заметка",
+    "alertTip": "Совет",
+    "alertWarning": "Предупреждение",
+    "anchor": "Ссылка на раздел",
+    "codeRegion": "Блок кода",
+    "copied": "Скопировано",
+    "copy": "Скопировать код",
+    "copyFailed": "Не удалось скопировать",
+    "footnoteBackref": "Вернуться к тексту",
+    "footnotes": "Сноски",
+    "tableRegion": "Таблица",
+    "task": "Задача"
+  },
   "richText": {
     "toolbar": "Форматирование",
     "bold": "Жирный",

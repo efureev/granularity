@@ -26,6 +26,7 @@ export default defineConfig({
       entry: {
         'index': fileURLToPath(new URL('./src/index.ts', import.meta.url)),
         'editor': fileURLToPath(new URL('./src/editor/index.ts', import.meta.url)),
+        'markdown': fileURLToPath(new URL('./src/markdown/index.ts', import.meta.url)),
         'granular-provider': fileURLToPath(
           new URL('./src/granular-provider/index.ts', import.meta.url),
         ),
@@ -42,6 +43,9 @@ export default defineConfig({
           new URL('./src/i18n/all.ts', import.meta.url),
         ),
         // <granularity:components> — блок генерируется `yarn generate:registry`
+        'components/GrMarkdown/index': fileURLToPath(
+          new URL('./src/components/GrMarkdown/index.ts', import.meta.url),
+        ),
         'components/GrRichText/index': fileURLToPath(
           new URL('./src/components/GrRichText/index.ts', import.meta.url),
         ),
@@ -57,6 +61,7 @@ export default defineConfig({
         /^@feugene\/granularity(\/.*)?$/,
         /^@feugene\/unocss-preset-granular(\/.*)?$/,
         /^@feugene\/fint-i18n(\/.*)?$/,
+        'marked',
         /^@tiptap\/.*/,
         /^prosemirror-.*/,
         // Build-time helper deps of the optional `./resolver` entry.

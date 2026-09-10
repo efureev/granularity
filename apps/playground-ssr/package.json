@@ -9,7 +9,7 @@
     "@feugene/granularity-chrono": "^0.10.0",
     "@feugene/granularity-code": "^0.2.0",
     "@feugene/granularity-dashboard": "^0.6.0",
-    "@feugene/granularity-editor": "^0.3.1",
+    "@feugene/granularity-editor": "^0.4.0",
     "@feugene/granularity-forms-schema": "^0.4.0",
     "@feugene/granularity-media": "^0.7.1",
     "@unocss/reset": "^66.8.1",

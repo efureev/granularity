@@ -2,8 +2,8 @@
 
 Ответ на вопрос «какой компонент взять под эту задачу» — по всем пакетам сразу:
 ядро `@feugene/granularity` и спутники `granularity-charts`, `granularity-chrono`,
-`granularity-dashboard`, `granularity-datasource`, `granularity-editor`,
-`granularity-forms-schema` и `granularity-media`.
+`granularity-code`, `granularity-dashboard`, `granularity-datasource`,
+`granularity-editor`, `granularity-forms-schema` и `granularity-media`.
 
 Читается сверху вниз: **Развилки** ставят различающий вопрос и приводят к одному
 компоненту, **Решение — не компонент** ловит задачи, которые компонентом не
@@ -24,6 +24,7 @@
 | строку в одну строку | [`GrInput`](../packages/granularity/docs/components/GrInput.md) |
 | текст в несколько строк | [`GrTextarea`](../packages/granularity/docs/components/GrTextarea.md) |
 | текст с форматированием: абзацы, списки, заголовки | [`GrRichText`](../packages/granularity-editor/docs/components/GrRichText.md) |
+| тот же размеченный текст, но его только **читают** | [`GrMarkdown`](../packages/granularity-editor/docs/components/GrMarkdown.md) |
 | число со ступенями и границами | [`GrNumberInput`](../packages/granularity/docs/components/GrNumberInput.md) |
 | код известной длины: из SMS, из приложения, PIN | [`GrOtpInput`](../packages/granularity/docs/components/GrOtpInput.md) |
 | число перетаскиванием, диапазон «от–до» | [`GrSlider`](../packages/granularity/docs/components/GrSlider.md) |
@@ -270,6 +271,7 @@
 | Что происходит | Компонент |
 | --- | --- |
 | текст или JSON читают целиком и копируют | [`GrCodeBlock`](../packages/granularity-code/docs/components/GrCodeBlock.md) |
+| текст размечен markdown, и разметку надо **истолковать** | [`GrMarkdown`](../packages/granularity-editor/docs/components/GrMarkdown.md) |
 | код **правят**, а не читают | [`GrCodeEditor`](../packages/granularity-code/docs/components/GrCodeEditor.md) |
 | две версии **сравнивают**: что изменилось | [`GrDiff`](../packages/granularity-code/docs/components/GrDiff.md) |
 | по чужому `unknown` ходят: сворачивают узлы, ищут ключ | [`GrJsonViewer`](../packages/granularity/docs/components/GrJsonViewer.md) |
@@ -282,6 +284,11 @@
 **показать, править, сравнить**. Различитель между ними — глагол, и другого не
 нужно. Платит за это только тот, кому нужен редактор: блок и дифф не тянут ни
 одной зависимости, CodeMirror приезжает лишь с `GrCodeEditor`.
+
+Различитель между `GrCodeBlock` и `GrMarkdown` — **что делают с разметкой**: блок
+показывает её буквально, моноширинно и как есть, а `GrMarkdown` её истолковывает
+и печатает документом. Один и тот же README в первом останется решётками и
+звёздочками, во втором станет заголовками и списками.
 
 Различитель между `GrCodeBlock` и `GrJsonViewer` — **читают или ищут**. Ответ на двести строк
 копируют в тикет целиком (`GrCodeBlock`); в ответе на две тысячи узлов ищут одно
@@ -487,6 +494,7 @@
 | [`GrLink`](../packages/granularity/docs/components/GrLink.md) | ядро | нужен переход |
 | [`GrList`](../packages/granularity/docs/components/GrList.md) | ядро | строки однородные |
 | [`GrLoading`](../packages/granularity/docs/components/GrLoading.md) | ядро | контент уже есть и обновляется |
+| [`GrMarkdown`](../packages/granularity-editor/docs/components/GrMarkdown.md) | editor | текст пришёл markdown-строкой и его надо показать оформленным |
 | [`GrModal`](../packages/granularity/docs/components/GrModal.md) | ядро | своя раскладка поверх страницы |
 | [`GrNavbar`](../packages/granularity/docs/components/GrNavbar.md) | ядро | у приложения есть верхняя панель |
 | [`GrNumberInput`](../packages/granularity/docs/components/GrNumberInput.md) | ядро | значение числовое |
@@ -548,9 +556,8 @@
 вложенными пунктами. Второй уровень у всплывающих меню есть у обоих: пункт с
 `children` (или `GrDropdownMenuSub` в композиции) раскрывает подменю.
 
-**Планируется отдельными пакетами.** Просмотр markdown, календарь событий и
-Гант, редактор кода и diff, выгрузка в XLSX и PDF, карта, схема связей,
-продуктовые туры.
+**Планируется отдельными пакетами.** Календарь событий и Гант, выгрузка в XLSX
+и PDF, карта, схема связей, продуктовые туры.
 
 **Не будет.** 3D и география у графиков — это карта, отдельный пакет. Экспорта
 графика в PNG или SVG тоже не будет: DOM компонента у приложения уже есть, и

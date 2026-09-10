@@ -1,4 +1,20 @@
 {
+  "markdown": {
+    "alertCaution": "Caution",
+    "alertImportant": "Important",
+    "alertNote": "Note",
+    "alertTip": "Tip",
+    "alertWarning": "Warning",
+    "anchor": "Link to section",
+    "codeRegion": "Code block",
+    "copied": "Copied",
+    "copy": "Copy code",
+    "copyFailed": "Could not copy",
+    "footnoteBackref": "Back to content",
+    "footnotes": "Footnotes",
+    "tableRegion": "Table",
+    "task": "Task"
+  },
   "richText": {
     "toolbar": "Formatting",
     "bold": "Bold",

@@ -1,7 +1,7 @@
 {
   "name": "@feugene/granularity-editor",
   "description": "Rich-text editing for @feugene/granularity: a TipTap-backed GrRichText field with a design-system toolbar.",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "license": "LicenseRef-Granularity-EUC-1.1",
   "author": {
     "name": "Evgeniy Fureev",
@@ -46,6 +46,14 @@
       "types": "./dist/types/index.d.ts",
       "import": "./dist/index.js"
     },
+    "./components/GrMarkdown": {
+      "types": "./dist/types/components/GrMarkdown/index.d.ts",
+      "import": "./dist/components/GrMarkdown/index.js"
+    },
+    "./components/GrMarkdownCode": {
+      "types": "./dist/types/components/GrMarkdown/index.d.ts",
+      "import": "./dist/components/GrMarkdown/index.js"
+    },
     "./components/GrRichText": {
       "types": "./dist/types/components/GrRichText/index.d.ts",
       "import": "./dist/components/GrRichText/index.js"
@@ -53,6 +61,10 @@
     "./editor": {
       "types": "./dist/types/editor/index.d.ts",
       "import": "./dist/editor.js"
+    },
+    "./markdown": {
+      "types": "./dist/types/markdown/index.d.ts",
+      "import": "./dist/markdown.js"
     },
     "./i18n": {
       "types": "./dist/types/i18n/index.d.ts",
@@ -77,16 +89,16 @@
     "./package.json": "./package.json"
   },
   "peerDependencies": {
+    "@feugene/fint-i18n": ">=0.7.0 <1.0.0",
     "@feugene/granularity": ">=0.38.0 <1.0.0",
     "@feugene/unocss-preset-granular": ">=0.13.0 <1.0.0",
+    "@feugene/unplugin-granularity": ">=0.7.0 <1.0.0",
     "@tiptap/core": "^3.30.0",
     "@tiptap/extensions": "^3.30.0",
     "@tiptap/pm": "^3.30.0",
     "@tiptap/starter-kit": "^3.30.0",
-    "vue": "^3.5.0",
-    "@feugene/fint-i18n": ">=0.7.0 <1.0.0",
-    "@feugene/unplugin-granularity": ">=0.7.0 <1.0.0",
-    "unplugin-vue-components": ">=0.26.0"
+    "unplugin-vue-components": ">=0.26.0",
+    "vue": "^3.5.0"
   },
   "peerDependenciesMeta": {
     "@feugene/fint-i18n": {
@@ -138,5 +150,8 @@
     "vitest": "^4.1.11",
     "vue": "^3.5.42",
     "vue-tsc": "^3.3.11"
+  },
+  "dependencies": {
+    "marked": "^18.0.12"
   }
 }

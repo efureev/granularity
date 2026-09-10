@@ -10,6 +10,7 @@
  */
 export const GRANULARITY_EDITOR_COMPONENTS = [
   // <granularity:components> — блок генерируется `yarn generate:registry`
+  'GrMarkdown',
   'GrRichText',
   // </granularity:components>
 ] as const
