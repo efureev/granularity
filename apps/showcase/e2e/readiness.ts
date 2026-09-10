@@ -33,6 +33,16 @@ export async function waitForSettledPreviews(page: Page): Promise<void> {
   await expect.poll(async () => page.evaluate(
     () => document.querySelectorAll('[data-example-preview] .gr-code-editor__line').length,
   )).toBe(0)
+
+  /*
+   * То же самое у диаграмм: демо `GrMarkdown` тянет `mermaid` динамическим
+   * импортом и до его разрешения держит подпись «Рисуется…». Снимок без этого
+   * ожидания ловил бы либо заглушку, либо диаграмму на середине отрисовки —
+   * причём то одно, то другое, в зависимости от того, прогрет ли чанк.
+   */
+  await expect.poll(async () => page.evaluate(
+    () => document.querySelectorAll('[data-example-preview] .gr-demo-diagram-pending').length,
+  )).toBe(0)
 }
 
 /**

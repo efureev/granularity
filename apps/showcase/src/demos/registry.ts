@@ -56,6 +56,7 @@ export const demoPathByPreviewKey = {
   'extra-editor-markdown-from-editor': 'extra/granularity-editor/GrMarkdownFromEditorDemo.vue',
   'extra-editor-markdown-stream': 'extra/granularity-editor/GrMarkdownStreamDemo.vue',
   'extra-editor-markdown-renderers': 'extra/granularity-editor/GrMarkdownRenderersDemo.vue',
+  'extra-editor-markdown-mermaid': 'extra/granularity-editor/GrMarkdownMermaidDemo.vue',
   'extra-editor-basic': 'extra/granularity-editor/GrRichTextBasicDemo.vue',
   'extra-editor-schema': 'extra/granularity-editor/GrRichTextSchemaDemo.vue',
   'extra-editor-toolbar': 'extra/granularity-editor/GrRichTextToolbarDemo.vue',

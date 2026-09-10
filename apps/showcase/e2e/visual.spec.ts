@@ -295,6 +295,20 @@ for (const theme of ['light', 'dark'] as const) {
   })
 }
 
+/**
+ * Диаграмма из демо `GrMarkdown` закрывается маской.
+ *
+ * Рисует её `mermaid` — чужой рендерер, и попиксельно он невоспроизводим: между
+ * прогонами набегает 600–750 различающихся пикселей при допуске в 300, причём
+ * состояний ровно два, а не разброс. Гейт же существует ради цветовых
+ * регрессий **токенов**, и подписи внутри SVG к ним не относятся. Маской, а не
+ * исключением всей страницы: остальные семь демо `GrMarkdown` под гейтом
+ * остаются, а исключённая страница перестала бы проверять и их.
+ */
+function diagramMask(page: import('@playwright/test').Page) {
+  return [page.locator('.gr-demo-diagram-canvas')]
+}
+
 for (const theme of ['light', 'dark'] as const) {
   test.describe(`visual companion (${theme})`, () => {
     for (const name of VISUAL_COMPANIONS) {
@@ -311,7 +325,9 @@ for (const theme of ['light', 'dark'] as const) {
 
         await hideChrome(page)
 
-        await expect(examples).toHaveScreenshot(`${companionPath(name).replace('/', '-')}-${theme}.png`)
+        await expect(examples).toHaveScreenshot(`${companionPath(name).replace('/', '-')}-${theme}.png`, {
+          mask: diagramMask(page),
+        })
       })
     }
   })
