@@ -1,35 +1,35 @@
 # Вес гранулярных импортов
 
-> Сгенерировано `yarn sizes:docs` по собранному `dist` пакета `@feugene/granularity` 0.50.0.
+> Сгенерировано `yarn sizes:docs` по собранному `dist` пакета `@feugene/granularity` 0.51.0.
 > Править руками бесполезно — правка потеряется на следующей сборке.
 
 Сколько приезжает потребителю, взявшему один подпуть: gzip самого entry и всего, что он тянет
 из `dist`. Общий код лежит в отдельных чанках, поэтому вес самого файла entry ничего не говорит.
 
-**Складывать эти числа нельзя.** Общий чанк посчитан в каждой строке заново, а платится один раз: сумма 5 самых тяжёлых строк даёт 463.1 kB, а вместе они весят 247.8 kB. Вес набора считается объединением — так его и считает `yarn sizes`.
+**Складывать эти числа нельзя.** Общий чанк посчитан в каждой строке заново, а платится один раз: сумма 5 самых тяжёлых строк даёт 471.1 kB, а вместе они весят 250.2 kB. Вес набора считается объединением — так его и считает `yarn sizes`.
 
 Это верхняя граница: бандлер приложения трясёт дерево дальше и минифицирует повторно.
 
 | Компонент | gzip | файлов | от бареля |
 | --- | ---: | ---: | ---: |
 | `GrDataTable` | 115.0 kB | 56 | 17 % |
-| `GrDialogService` | 93.3 kB | 46 | 14 % |
-| `GrTreeSelect` | 89.4 kB | 51 | 13 % |
-| `GrPagination` | 82.7 kB | 49 | 12 % |
-| `GrPromptDialog` | 82.7 kB | 44 | 12 % |
-| `GrSelect` | 74.0 kB | 45 | 11 % |
-| `GrColorPicker` | 73.2 kB | 37 | 11 % |
-| `GrTransfer` | 65.0 kB | 40 | 10 % |
-| `GrJsonViewer` | 63.8 kB | 38 | 10 % |
+| `GrDialogService` | 95.3 kB | 47 | 14 % |
+| `GrTreeSelect` | 91.5 kB | 52 | 14 % |
+| `GrPagination` | 84.8 kB | 50 | 13 % |
+| `GrPromptDialog` | 84.6 kB | 45 | 13 % |
+| `GrSelect` | 76.2 kB | 46 | 11 % |
+| `GrColorPicker` | 75.4 kB | 38 | 11 % |
+| `GrTransfer` | 66.9 kB | 41 | 10 % |
+| `GrJsonViewer` | 65.7 kB | 39 | 10 % |
 | `GrAutocomplete` | 62.8 kB | 39 | 9 % |
 | `GrContextMenu` | 57.5 kB | 27 | 9 % |
-| `GrDropdownMenu` | 56.9 kB | 29 | 9 % |
+| `GrDropdownMenu` | 56.9 kB | 29 | 8 % |
 | `GrConfirmDialog` | 54.6 kB | 29 | 8 % |
 | `GrCommandPalette` | 54.4 kB | 29 | 8 % |
 | `GrSidebar` | 52.9 kB | 32 | 8 % |
 | `GrInputTag` | 47.5 kB | 31 | 7 % |
 | `GrFormFile` | 46.7 kB | 34 | 7 % |
-| `GrImageViewer` | 43.5 kB | 25 | 7 % |
+| `GrImageViewer` | 43.5 kB | 25 | 6 % |
 | `GrTreeSections` | 42.9 kB | 26 | 6 % |
 | `GrDropdown` | 42.7 kB | 23 | 6 % |
 | `GrTree` | 39.3 kB | 24 | 6 % |
@@ -42,21 +42,21 @@
 | `GrCarousel` | 29.7 kB | 19 | 4 % |
 | `GrTooltip` | 27.8 kB | 19 | 4 % |
 | `GrResponseErrorBanner` | 26.5 kB | 15 | 4 % |
+| `GrNumberInput` | 24.6 kB | 22 | 4 % |
 | `GrSortableList` | 24.4 kB | 17 | 4 % |
-| `GrNumberInput` | 22.9 kB | 21 | 3 % |
 | `GrList` | 22.5 kB | 16 | 3 % |
 | `GrBreadcrumbs` | 19.6 kB | 13 | 3 % |
+| `GrInput` | 18.8 kB | 16 | 3 % |
 | `GrCollapse` | 18.8 kB | 14 | 3 % |
 | `GrStatistic` | 18.2 kB | 14 | 3 % |
 | `GrTabsWithPanels` | 18.1 kB | 14 | 3 % |
 | `GrRadioGroup` | 17.3 kB | 14 | 3 % |
-| `GrInput` | 16.9 kB | 15 | 3 % |
-| `GrTabs` | 16.7 kB | 13 | 3 % |
+| `GrTabs` | 16.7 kB | 13 | 2 % |
 | `GrChip` | 16.4 kB | 13 | 2 % |
 | `GrKbd` | 16.2 kB | 10 | 2 % |
+| `GrSegmented` | 15.9 kB | 10 | 2 % |
 | `GrSlider` | 15.8 kB | 13 | 2 % |
 | `GrNavbar` | 15.5 kB | 14 | 2 % |
-| `GrSegmented` | 15.2 kB | 10 | 2 % |
 | `GrSteps` | 14.8 kB | 11 | 2 % |
 | `GrDelta` | 14.6 kB | 11 | 2 % |
 | `GrTextarea` | 14.2 kB | 14 | 2 % |
@@ -79,7 +79,7 @@
 | `GrCheckbox` | 10.2 kB | 10 | 2 % |
 | `GrSplitter` | 10.1 kB | 9 | 2 % |
 | `GrProgressCircle` | 10.1 kB | 9 | 2 % |
-| `GrBadge` | 10.0 kB | 10 | 2 % |
+| `GrBadge` | 10.0 kB | 10 | 1 % |
 | `GrAlert` | 10.0 kB | 10 | 1 % |
 | `GrFormField` | 9.8 kB | 10 | 1 % |
 | `GrBottomNav` | 8.9 kB | 7 | 1 % |
@@ -97,4 +97,4 @@
 | `GrSkeleton` | 1.9 kB | 4 | < 1 % |
 | `GrButtonGroup` | 1.8 kB | 5 | < 1 % |
 
-Весь пакет из корня — 667.1 kB.
+Весь пакет из корня — 671.8 kB.

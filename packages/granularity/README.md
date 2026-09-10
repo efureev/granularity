@@ -91,10 +91,10 @@ from its own chunk, so a granular import already brings everything it needs.
 <!-- entry-sizes:generated:start lang=en -->
 | What you import | gzip | of the barrel |
 | --- | ---: | ---: |
-| the whole package from the root | 667.1 kB | 100 % |
+| the whole package from the root | 671.8 kB | 100 % |
 | the lightest component — `GrButtonGroup` | 1.8 kB | < 1 % |
 | the median component — `GrKbd` | 16.2 kB | 2 % |
-| the 5 heaviest together | 247.8 kB | 37 % |
+| the 5 heaviest together | 250.2 kB | 37 % |
 
 These numbers **do not add up**: shared code is counted again in every row but paid for once, which is why
 the set is shown as a union rather than a sum. They are an upper bound — the gzip of everything a subpath

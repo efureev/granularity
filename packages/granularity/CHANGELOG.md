@@ -7,6 +7,8 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.51.0] 2026-09-10
+
 ### Added
 
 - **`GrPromptDialog` can tell the browser what it is asking for.** The field
