@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, markRaw, useId, useSlots, type Component } from 'vue'
+import { computed, markRaw, useId, useSlots, watch, type Component } from 'vue'
 
 import { useGrComponentProp } from '../GrConfigProvider/context'
 
@@ -28,10 +28,22 @@ export interface GrCardProps {
   padding?: GrCardPadding
   /** `elevated` — рамка, фон и тень; `outlined` — без тени; `ghost` — без рамки. */
   variant?: GrCardVariant
-  /** Свой корневой тег (`RouterLink`, `Link` от Inertia). Сильнее `href`. */
+  /**
+   * Свой корневой тег: компонент-ссылка (`RouterLink`, `Link` от Inertia) или
+   * семантический тег страницы (`section`, `article`, `aside`). Сильнее `href`.
+   * Неинтерактивный тег — только замена `div`: ни подсветки, ни кольца фокуса.
+   */
   as?: string | Component
   /** Карточка-ссылка. */
   href?: string
+  /**
+   * Имя карточки как области страницы: `role="region"` плюс `aria-label`.
+   * Безымянная `<section>` для скринридера — обычный контейнер, и это норма:
+   * именованных областей на страницу нужно немного, иначе их обзор перестаёт
+   * помогать. Интерактивной карточке не даётся — `role="region"` на `<button>`
+   * невалиден.
+   */
+  regionLabel?: string
   /** Карточка-кнопка: интерактивна вся поверхность. */
   clickable?: boolean
   /** Подсветка при наведении без интерактивности. */
@@ -60,6 +72,7 @@ const props = withDefaults(defineProps<GrCardProps>(), {
   variant: undefined,
   as: undefined,
   href: undefined,
+  regionLabel: undefined,
   clickable: false,
   hoverable: false,
   bodyClass: undefined,
@@ -75,8 +88,6 @@ const slots = useSlots()
 const resolvedPadding = useGrComponentProp('GrCard', 'padding', () => props.padding, 'none')
 const resolvedVariant = useGrComponentProp('GrCard', 'variant', () => props.variant, 'elevated')
 
-const isInteractive = computed(() => !!props.as || !!props.href || props.clickable)
-
 const rootTag = computed<string | Component>(() => {
   if (props.as)
     return typeof props.as === 'string' ? props.as : markRaw(props.as)
@@ -86,6 +97,40 @@ const rootTag = computed<string | Component>(() => {
 
   return props.clickable ? 'button' : 'div'
 })
+
+/**
+ * Интерактивность даёт разрешённый тег, а не сам факт `as`: `as="section"` —
+ * замена `div` ради семантики страницы, и карточка обязана остаться такой же
+ * поверхностью. Компонент-ссылка (`RouterLink`, `Link` от Inertia) рендерит
+ * `<a>` сам, но узнать это до рендера нельзя — его считаем интерактивным.
+ */
+const isInteractive = computed(() => {
+  const tag = rootTag.value
+
+  return typeof tag === 'string' ? isFocusableTag(tag) : true
+})
+
+/** Теги, попадающие в таб-порядок сами. `<a>` — только со ссылкой. */
+function isFocusableTag(tag: string): boolean {
+  return tag === 'button' || (tag === 'a' && !!props.href)
+}
+
+if (__GR_DEV__) {
+  watch(
+    () => [props.as, isInteractive.value] as const,
+    ([as, interactive]) => {
+      if (interactive || typeof as !== 'string' || !(props.clickable || props.href))
+        return
+
+      console.warn(
+        `[GrCard] as="${as}" не попадает в таб-порядок: карточка кликается мышью, `
+        + 'но не с клавиатуры. Возьмите тег, умеющий фокус (`button`, `a` со ссылкой), '
+        + 'или компонент роутера — либо снимите `clickable`/`href`.',
+      )
+    },
+    { immediate: true },
+  )
+}
 
 /**
  * Компонент-ссылка (`Link` от Inertia, `RouterLink`) рендерит `<a>` сам, и без
@@ -155,6 +200,30 @@ const hasSections = computed(() => Boolean(
 const rootLabelledBy = computed(() => (isInteractive.value && hasTitle.value ? titleId : undefined))
 const rootDescribedBy = computed(() => (isInteractive.value && hasDescription.value ? descriptionId : undefined))
 
+/**
+ * У интерактивной карточки имя уже есть — заголовок через `aria-labelledby`, и
+ * `aria-label` его бы перебил. Роль области поверх `<button>` вдобавок
+ * невалидна.
+ */
+const rootRegionLabel = computed(() => (isInteractive.value ? undefined : props.regionLabel))
+
+if (__GR_DEV__) {
+  watch(
+    () => [props.regionLabel, isInteractive.value] as const,
+    ([regionLabel, interactive]) => {
+      if (!regionLabel || !interactive)
+        return
+
+      console.warn(
+        '[GrCard] `regionLabel` на интерактивной карточке игнорируется: '
+        + '`role="region"` поверх `<button>`/`<a>` невалиден, а имя ссылке даёт '
+        + 'заголовок. Область страницы — неинтерактивная карточка (`as=\"section\"`).',
+      )
+    },
+    { immediate: true },
+  )
+}
+
 const rootClass = computed(() => grCardRootClass({
   variant: resolvedVariant.value,
   // С секциями отступ принадлежит каждой из них, а не поверхности целиком.
@@ -207,6 +276,8 @@ defineSlots<{
     :type="rootTag === 'button' ? 'button' : undefined"
     :href="rootHref"
     :class="rootClass"
+    :role="rootRegionLabel ? 'region' : undefined"
+    :aria-label="rootRegionLabel"
     :aria-labelledby="rootLabelledBy"
     :aria-describedby="rootDescribedBy"
     @click="onClick"

@@ -179,6 +179,7 @@ export const demoPathByPreviewKey = {
   'gr-card-header-actions': 'components/gr-card/GrCardHeaderActionsDemo.vue',
   'gr-card-kpi-grid': 'components/gr-card/GrCardKpiGridDemo.vue',
   'gr-card-section-heading': 'components/gr-card/GrCardSectionHeadingDemo.vue',
+  'gr-card-semantic-tag': 'components/gr-card/GrCardSemanticTagDemo.vue',
   'gr-card-variants': 'components/gr-card/GrCardVariantsDemo.vue',
   'gr-carousel-builder': 'components/gr-carousel/GrCarouselBuilderDemo.vue',
   'gr-carousel-cards': 'components/gr-carousel/GrCarouselCardsDemo.vue',

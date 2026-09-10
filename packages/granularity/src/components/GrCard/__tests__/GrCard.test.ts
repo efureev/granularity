@@ -371,3 +371,133 @@ describe('GrCard — действия в шапке', () => {
     wrapper.unmount()
   })
 })
+
+/**
+ * Строковый `as` — замена `div`, а не карточка-ссылка. Пока интерактивность
+ * выводилась из самого факта пропа, `as="section"` получал кольцо фокуса,
+ * подсветку под курсором и вместе с `title` — `aria-labelledby`, то есть молча
+ * становился лендмарком.
+ */
+describe('GrCard — семантический тег', () => {
+  it.each(['section', 'article', 'aside'])('as="%s" не делает карточку интерактивной', (tag) => {
+    const wrapper = mount(GrCard, { props: { as: tag }, slots: { default: 'x' } })
+
+    expect(wrapper.classes()).not.toContain('focus-visible:ring-2')
+    expect(wrapper.classes()).not.toContain('cursor-pointer')
+    expect(wrapper.classes()).not.toContain('hover:bg-[var(--gr-muted)]')
+    expect(wrapper.classes()).not.toContain('w-full')
+  })
+
+  // Требование целиком: тег другой, всё остальное — то же самое.
+  it('классы as="section" совпадают с классами дефолтного div', () => {
+    const props = { variant: 'outlined', padding: 'md' } as const
+    const div = mount(GrCard, { props, slots: { default: 'x' } })
+    const section = mount(GrCard, { props: { ...props, as: 'section' }, slots: { default: 'x' } })
+
+    expect(section.element.tagName).toBe('SECTION')
+    expect(section.attributes('class')).toBe(div.attributes('class'))
+  })
+
+  // Безымянная `<section>` для скринридера — обычный контейнер. Имя превратило
+  // бы каждую карточку страницы в лендмарк и разрушило их обзор.
+  it('as="section" с title не получает aria-labelledby', () => {
+    const wrapper = mount(GrCard, {
+      props: { as: 'section', title: 'Продажи', description: 'за август' },
+      slots: { default: 'x' },
+    })
+
+    expect(wrapper.attributes('aria-labelledby')).toBeUndefined()
+    expect(wrapper.attributes('aria-describedby')).toBeUndefined()
+    expect(wrapper.get('[data-gr-card-title]').element.tagName).toBe('H3')
+  })
+
+  // `href` на `<article>` отбрасывается — ссылкой карточка не становится, и
+  // кольцо фокуса было обещанием, которое некому выполнить.
+  it('as="article" с href не интерактивна', () => {
+    const wrapper = mount(GrCard, {
+      props: { as: 'article', href: '/reports/42' },
+      slots: { default: 'x' },
+    })
+
+    expect(wrapper.classes()).not.toContain('focus-visible:ring-2')
+  })
+
+  it('as="a" без href не интерактивна: такая ссылка не фокусируется', () => {
+    const wrapper = mount(GrCard, { props: { as: 'a' }, slots: { default: 'x' } })
+
+    expect(wrapper.classes()).not.toContain('focus-visible:ring-2')
+  })
+
+  it('as="button" интерактивна и без clickable', () => {
+    const wrapper = mount(GrCard, { props: { as: 'button' }, slots: { default: 'x' } })
+
+    expect(wrapper.classes()).toContain('focus-visible:ring-2')
+  })
+
+  // Карточка-ссылка от починки страдать не должна: компонент рендерит `<a>`
+  // сам, и до рендера его тега не видно.
+  it('as-компонент остаётся интерактивным', () => {
+    const wrapper = mount(GrCard, {
+      props: { as: StubLink, href: '/reports/42' },
+      slots: { default: 'x' },
+    })
+
+    expect(wrapper.classes()).toContain('focus-visible:ring-2')
+    expect(wrapper.classes()).toContain('cursor-pointer')
+  })
+
+  // Зеркальная ловушка: кликается мышью, с клавиатуры недостижима.
+  it('clickable с неинтерактивным as предупреждает, но клик эмитит', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+
+    const wrapper = mount(GrCard, {
+      props: { as: 'section', clickable: true },
+      slots: { default: 'x' },
+    })
+    await wrapper.trigger('click')
+
+    expect(wrapper.emitted('click')).toHaveLength(1)
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('таб-порядок'))
+
+    warn.mockRestore()
+  })
+})
+
+/**
+ * Лендмарк — по явной просьбе, а не по наличию заголовка: именованных областей
+ * на страницу нужно немного, иначе их обзор перестаёт помогать.
+ */
+describe('GrCard — regionLabel', () => {
+  it('regionLabel даёт role="region" и имя', () => {
+    const wrapper = mount(GrCard, {
+      props: { as: 'section', regionLabel: 'Продажи за август' },
+      slots: { default: 'x' },
+    })
+
+    expect(wrapper.attributes('role')).toBe('region')
+    expect(wrapper.attributes('aria-label')).toBe('Продажи за август')
+  })
+
+  it('без regionLabel роли нет', () => {
+    const wrapper = mount(GrCard, { props: { as: 'section' }, slots: { default: 'x' } })
+
+    expect(wrapper.attributes('role')).toBeUndefined()
+    expect(wrapper.attributes('aria-label')).toBeUndefined()
+  })
+
+  // `role="region"` на `<button>` невалиден, а `aria-label` перебил бы заголовок.
+  it('на интерактивной карточке regionLabel гасится и предупреждает', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+
+    const wrapper = mount(GrCard, {
+      props: { clickable: true, regionLabel: 'Продажи' },
+      slots: { default: 'x' },
+    })
+
+    expect(wrapper.attributes('role')).toBeUndefined()
+    expect(wrapper.attributes('aria-label')).toBeUndefined()
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('regionLabel'))
+
+    warn.mockRestore()
+  })
+})

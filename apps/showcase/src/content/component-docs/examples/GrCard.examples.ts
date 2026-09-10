@@ -38,6 +38,14 @@ export const grCardExamples: ShowcaseComponentExampleDoc[] = [
     note: 'У кликабельной карточки заголовка не будет: корень там `<button>`, а его контент-модель это phrasing content. Нужен и заголовок, и переход — `hoverable` плюс ссылка в самом заголовке.',
   },
   {
+    id: 'card-semantic-tag',
+    title: 'Семантический тег страницы',
+    description: 'Страница знает свою структуру: `as="section"` (или `article`) меняет только тег — классы, отступы и поведение остаются как у `<div>`. Имя области даётся отдельно, пропом `regionLabel`, потому что страница из десятка карточек-лендмарков теряет смысл.',
+    status: 'ready',
+    previewKey: 'gr-card-semantic-tag',
+    note: 'Интерактивность даёт разрешённый тег, а не сам факт `as`: кольцо фокуса достаётся `<button>`, `<a>` со ссылкой и компоненту роутера. `clickable` вместе с неинтерактивным тегом в dev предупреждает — такая карточка кликается мышью, но недостижима с клавиатуры.',
+  },
+  {
     id: 'card-action-panel',
     title: 'Action panel with badges and CTA group',
     description: 'Документируем composed pattern, где карточка работает контейнером для actions, helper badges и explanatory copy.',

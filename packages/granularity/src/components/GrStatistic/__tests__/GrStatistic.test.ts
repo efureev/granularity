@@ -291,6 +291,25 @@ describe('GrStatistic — переход к деталям', () => {
     expect(wrapper.get('a').attributes('href')).toBe('/orders')
   })
 
+  // Плитка на статической странице бывает `<article>` по семантике страницы —
+  // и тогда она обязана остаться такой же плиткой, что и `<div>`.
+  it('неинтерактивный as не делает плитку интерактивной', () => {
+    const props = { value: 1284 } as const
+    const div = mount(GrStatistic, { props })
+    const article = mount(GrStatistic, { props: { ...props, as: 'article' } })
+
+    const root = article.get('[data-gr-statistic]')
+    expect(root.element.tagName).toBe('ARTICLE')
+    expect(root.classes()).not.toContain('focus-visible:ring-2')
+    expect(root.attributes('class')).toBe(div.get('[data-gr-statistic]').attributes('class'))
+  })
+
+  it('as="article" с href не интерактивна: href туда не уезжает', () => {
+    const wrapper = mount(GrStatistic, { props: { value: 1284, as: 'article', href: '/orders' } })
+
+    expect(wrapper.get('[data-gr-statistic]').classes()).not.toContain('focus-visible:ring-2')
+  })
+
   it('интерактивный корень получает фокус-кольцо и эмитит click', async () => {
     const wrapper = mount(GrStatistic, { props: { value: 1284, clickable: true } })
 

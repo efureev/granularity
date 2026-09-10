@@ -94,7 +94,11 @@ export interface GrStatisticProps {
    * другой жанр, и его число живёт там же, где твин.
    */
   animateDuration?: number
-  /** Свой корневой тег (`RouterLink`, `Link` от Inertia). Сильнее `href`. */
+  /**
+   * Свой корневой тег: компонент-ссылка (`RouterLink`, `Link` от Inertia) или
+   * семантический тег страницы (`section`, `article`). Сильнее `href`.
+   * Неинтерактивный тег — только замена `div`: ни подсветки, ни кольца фокуса.
+   */
   as?: string | Component
   /** Показатель-ссылка: переход к деталям. */
   href?: string
@@ -184,8 +188,6 @@ if (__GR_DEV__) {
 
 const hasTitle = computed(() => Boolean(props.title || slots.title))
 
-const isInteractive = computed(() => Boolean(props.as || props.href || props.clickable))
-
 const rootTag = computed<string | Component>(() => {
   if (props.as)
     return typeof props.as === 'string' ? props.as : markRaw(props.as)
@@ -195,6 +197,40 @@ const rootTag = computed<string | Component>(() => {
 
   return props.clickable ? 'button' : 'div'
 })
+
+/**
+ * Интерактивность даёт разрешённый тег, а не сам факт `as`: `as="article"` —
+ * замена `div` ради семантики страницы, и плитка обязана остаться такой же.
+ * Компонент-ссылка (`RouterLink`, `Link` от Inertia) рендерит `<a>` сам, но
+ * узнать это до рендера нельзя — его считаем интерактивным.
+ */
+const isInteractive = computed(() => {
+  const tag = rootTag.value
+
+  return typeof tag === 'string' ? isFocusableTag(tag) : true
+})
+
+/** Теги, попадающие в таб-порядок сами. `<a>` — только со ссылкой. */
+function isFocusableTag(tag: string): boolean {
+  return tag === 'button' || (tag === 'a' && !!props.href)
+}
+
+if (__GR_DEV__) {
+  watch(
+    () => [props.as, isInteractive.value] as const,
+    ([as, interactive]) => {
+      if (interactive || typeof as !== 'string' || !(props.clickable || props.href))
+        return
+
+      console.warn(
+        `[GrStatistic] as="${as}" не попадает в таб-порядок: плитка кликается мышью, `
+        + 'но не с клавиатуры. Возьмите тег, умеющий фокус (`button`, `a` со ссылкой), '
+        + 'или компонент роутера — либо снимите `clickable`/`href`.',
+      )
+    },
+    { immediate: true },
+  )
+}
 
 /**
  * Компонент-ссылка (`Link` от Inertia, `RouterLink`) рендерит `<a>` сам, и без

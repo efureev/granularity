@@ -7,6 +7,28 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- **`GrCard` and `GrStatistic`: a semantic root tag is now just a tag.** A page
+  whose markup calls for `<section>` or `<article>` could already ask for it via
+  `as`, but the card came back interactive: interactivity was derived from the
+  mere presence of the prop, so `<GrCard as="section">` picked up a focus ring,
+  a hover tint and — together with `title` — `aria-labelledby`, silently turning
+  every such card into a landmark region. Interactivity is now derived from the
+  resolved tag: `<button>`, `<a>` with an `href`, and link components
+  (`RouterLink`, Inertia's `Link`), which render an `<a>` themselves. A
+  non-focusable string tag renders exactly what a `<div>` renders.
+
+  The mirror trap gets a dev warning: `clickable` or `href` combined with a tag
+  that is not in the tab order clicks with the mouse and stays unreachable from
+  the keyboard.
+
+- **`GrCard` prop `regionLabel`** — `role="region"` plus `aria-label`, the same
+  opt-in that `GrTable` and `GrFormSection` already use. An unnamed `<section>`
+  is a plain container to a screen reader, and that is the right default: a page
+  full of named regions makes the landmark list useless. Interactive cards ignore
+  the prop and warn — `role="region"` over a `<button>` is invalid.
+
 ## [v0.52.0] 2026-09-10
 
 ### Added

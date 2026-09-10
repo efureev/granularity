@@ -1313,7 +1313,7 @@
           },
           {
             "name": "as",
-            "description": "Свой корневой тег (`RouterLink`, `Link` от Inertia). Сильнее `href`.",
+            "description": "Свой корневой тег: компонент-ссылка (`RouterLink`, `Link` от Inertia) или семантический тег страницы (`section`, `article`, `aside`). Сильнее `href`. Неинтерактивный тег — только замена `div`: ни подсветки, ни кольца фокуса.",
             "type": "string | Component | undefined",
             "required": false,
             "default": "undefined"
@@ -1329,6 +1329,13 @@
             "name": "padding",
             "description": "Внутренние отступы. По умолчанию `none`: карточка — поверхность, а её содержимое (`GrCollapse`, `GrList`) само знает про свои отступы.",
             "type": "GrCardPadding | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "regionLabel",
+            "description": "Имя карточки как области страницы: `role=\"region\"` плюс `aria-label`. Безымянная `<section>` для скринридера — обычный контейнер, и это норма: именованных областей на страницу нужно немного, иначе их обзор перестаёт помогать. Интерактивной карточке не даётся — `role=\"region\"` на `<button>` невалиден.",
+            "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
@@ -11184,7 +11191,7 @@
           },
           {
             "name": "as",
-            "description": "Свой корневой тег (`RouterLink`, `Link` от Inertia). Сильнее `href`.",
+            "description": "Свой корневой тег: компонент-ссылка (`RouterLink`, `Link` от Inertia) или семантический тег страницы (`section`, `article`). Сильнее `href`. Неинтерактивный тег — только замена `div`: ни подсветки, ни кольца фокуса.",
             "type": "string | Component | undefined",
             "required": false,
             "default": "undefined"
@@ -11723,6 +11730,13 @@
             "default": "false"
           },
           {
+            "name": "regionLabel",
+            "description": "ARIA-label для скролл-контейнера. Включает `role=\"region\"`; сам скролл достижим с клавиатуры всегда, независимо от метки.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "hoverable",
             "description": "Подсветка строки под курсором.",
             "type": "boolean | undefined",
@@ -11760,13 +11774,6 @@
           {
             "name": "caption",
             "description": "Текст caption для screen reader'ов. Рендерится как `<caption class=\"sr-only\">`, если не передан слот `#caption`.",
-            "type": "string | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
-            "name": "regionLabel",
-            "description": "ARIA-label для скролл-контейнера. Включает `role=\"region\"`; сам скролл достижим с клавиатуры всегда, независимо от метки.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
@@ -12566,18 +12573,18 @@
             "default": "\"top-right\""
           },
           {
-            "name": "collapse",
-            "description": "Со скольких видимых тостов стек схлопывается в стопку: колонка занимает место одного тоста, а остальные выглядывают из-под передней. Разворачивается по наведению и по фокусу. `false` — не схлопывать никогда. Порог, а не переключатель: пока тостов мало, колонка читается лучше стопки, и менять её незачем.",
-            "type": "number | false | undefined",
-            "required": false,
-            "default": "3"
-          },
-          {
             "name": "regionLabel",
             "description": "A11y-лейбл контейнера-региона (i18n).",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
+          },
+          {
+            "name": "collapse",
+            "description": "Со скольких видимых тостов стек схлопывается в стопку: колонка занимает место одного тоста, а остальные выглядывают из-под передней. Разворачивается по наведению и по фокусу. `false` — не схлопывать никогда. Порог, а не переключатель: пока тостов мало, колонка читается лучше стопки, и менять её незачем.",
+            "type": "number | false | undefined",
+            "required": false,
+            "default": "3"
           },
           {
             "name": "width",

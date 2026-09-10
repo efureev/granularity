@@ -1,4 +1,4 @@
-import { h } from 'vue'
+import { Fragment, h } from 'vue'
 
 import {
   GrAffix,
@@ -111,7 +111,10 @@ export const coreFixtures: ComponentFixture[] = [
   { name: 'GrBreadcrumbs', about: 'схлопывание середины без замера ширины', render: () => h(GrBreadcrumbs, { items: [{ label: 'Корень', href: '/' }, { label: 'Раздел' }] }) },
   { name: 'GrButton', about: 'чистая разметка', render: () => h(GrButton, null, { default: () => 'Кнопка' }) },
   { name: 'GrButtonGroup', about: 'контекст группы доезжает до кнопок на сервере', render: () => h(GrButtonGroup, { ariaLabel: 'Действия' }, { default: () => [h(GrButton, null, { default: () => 'Один' }), h(GrButton, null, { default: () => 'Два' })] }) },
-  { name: 'GrCard', about: 'чистая разметка', render: () => h(GrCard, null, { default: () => 'Тело карточки' }) },
+  { name: 'GrCard', about: 'чистая разметка; `as` меняет только тег — на статической странице это `<section>`', render: () => h(Fragment, [
+    h(GrCard, { key: 'div' }, { default: () => 'Тело карточки' }),
+    h(GrCard, { key: 'section', as: 'section', regionLabel: 'Область страницы' }, { default: () => 'Тело секции' }),
+  ]) },
   { name: 'GrCarousel', about: 'кадры регистрируются при монтировании: на сервере полоса переключателей пуста', render: () => h(GrCarousel, { ariaLabel: 'Кадры' }, {
     default: () => [1, 2, 3].map(frame => h(GrCarouselSlide, { key: frame, label: `Кадр ${frame}` }, { default: () => `Кадр ${frame}` })),
   }) },
