@@ -313,6 +313,7 @@ const components = computed(() => (diagrams.value ? { code: MermaidBlock } : {})
           v-model="theme"
           size="sm"
           :options="[...THEMES]"
+          :disabled="!diagrams"
           aria-label="Тема диаграммы"
         />
 
