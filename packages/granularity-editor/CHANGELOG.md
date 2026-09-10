@@ -7,6 +7,8 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.4.1] 2026-09-10
+
 ### Fixed
 
 - `GrMarkdown` reported a wrong source offset for any task nested inside another list item or a
