@@ -39,9 +39,9 @@ let diagramId = 0
  * и разборщик цветов внутри `mermaid` падает уже на этой форме. Канва снимает
  * вопрос совсем: пиксель всегда восьмибитный sRGB.
  */
-function tokenColor(probe: HTMLElement, paint: CanvasRenderingContext2D, name: string, fallback: string) {
+function cssColor(probe: HTMLElement, paint: CanvasRenderingContext2D, expression: string, fallback: string) {
   probe.style.color = fallback
-  probe.style.color = `var(${name}, ${fallback})`
+  probe.style.color = expression
 
   paint.fillStyle = '#000000'
   paint.fillStyle = getComputedStyle(probe).color || fallback
@@ -50,6 +50,27 @@ function tokenColor(probe: HTMLElement, paint: CanvasRenderingContext2D, name: s
   const [r, g, b] = paint.getImageData(0, 0, 1, 1).data
   return `#${[r, g, b].map(channel => channel!.toString(16).padStart(2, '0')).join('')}`
 }
+
+/**
+ * Что предлагаем на выбор.
+ *
+ * Первые три — свои: `theme: 'base'` плюс `themeVariables`, собранные из токенов
+ * дизайн-системы. Две последние встроены в движок и палитру задают сами.
+ *
+ * `forest` и `dark` не вошли осознанно: первая уводит в оливковый, чужой всей
+ * системе, вторая рисует чёрные плашки независимо от темы страницы — а тёмную
+ * тему здесь и так закрывают «Токены», они читают текущие значения.
+ */
+const THEMES = [
+  { value: 'tokens', label: 'Токены' },
+  { value: 'accent', label: 'Акцент' },
+  { value: 'outline', label: 'Контур' },
+  { value: 'neutral', label: 'neutral' },
+  { value: 'default', label: 'default' },
+] as const
+type ThemeName = typeof THEMES[number]['value']
+
+const theme = ref<ThemeName>('tokens')
 
 /**
  * Токены дизайн-системы, разложенные в переменные темы `mermaid`.
@@ -64,7 +85,10 @@ function themeVariables() {
   const paint = document.createElement('canvas').getContext('2d', { willReadFrequently: true })!
 
   try {
-    const color = (name: string, fallback: string) => tokenColor(probe, paint, name, fallback)
+    const color = (name: string, fallback: string) => cssColor(probe, paint, `var(${name}, ${fallback})`, fallback)
+    // Мягкий оттенок акцента: сплошной `--gr-primary` даёт нечитаемый текст на плашке.
+    const tint = (name: string, percent: number, fallback: string) =>
+      cssColor(probe, paint, `color-mix(in srgb, var(${name}) ${percent}%, var(--gr-card, #fff))`, fallback)
     const surface = color('--gr-card', '#ffffff')
     const fill = color('--gr-muted', '#f1f5f9')
     const text = color('--gr-fg', '#0f172a')
@@ -81,10 +105,49 @@ function themeVariables() {
       lineColor: color('--gr-brd-hover', '#94a3b8'),
       textColor: text,
       fontSize: '14px',
+      // Не переменные `mermaid`, а сырьё для вариантов ниже.
+      accentFill: tint('--gr-primary', 14, '#eef2ff'),
+      accentLine: tint('--gr-primary', 55, '#a5b4fc'),
+      accentText: color('--gr-primary-text', '#3730a3'),
     }
   }
   finally {
     probe.remove()
+  }
+}
+
+/**
+ * Что отдать движку на выбранную тему.
+ *
+ * `themeVariables` слушается только темой `base` — остальные встроенные темы
+ * задают палитру сами, и подмешивать к ним токены значит получить смесь двух
+ * решений вместо любого из них.
+ */
+function themeConfig() {
+  const vars = themeVariables()
+
+  switch (theme.value) {
+    case 'tokens':
+      return { theme: 'base' as const, themeVariables: vars }
+    case 'accent':
+      return {
+        theme: 'base' as const,
+        themeVariables: {
+          ...vars,
+          mainBkg: vars.accentFill,
+          primaryColor: vars.accentFill,
+          primaryBorderColor: vars.accentLine,
+          primaryTextColor: vars.accentText,
+          lineColor: vars.accentLine,
+        },
+      }
+    case 'outline':
+      return {
+        theme: 'base' as const,
+        themeVariables: { ...vars, mainBkg: vars.background, primaryColor: vars.background, secondaryColor: vars.background, tertiaryColor: vars.background },
+      }
+    default:
+      return { theme: theme.value }
   }
 }
 
@@ -134,8 +197,7 @@ const MermaidBlock = defineComponent({
           // Ключевая строка: без неё `mermaid` тянет раскладку ELK — 440 КБ
           // gzip на первый же flowchart, при том что рисует его dagre.
           layout: 'dagre',
-          theme: 'base',
-          themeVariables: themeVariables(),
+          ...themeConfig(),
         })
 
         // Подписи внутри диаграммы движок меряет сам. Пока шрифт страницы не
@@ -173,7 +235,7 @@ const MermaidBlock = defineComponent({
       observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] })
     })
     onBeforeUnmount(() => observer?.disconnect())
-    watch(() => [props.code, props.language], () => void draw())
+    watch(() => [props.code, props.language, theme.value], () => void draw())
 
     return () => {
       if (props.language !== 'mermaid')
@@ -221,6 +283,15 @@ sequenceDiagram
 \`\`\`
 `
 
+/** Первоисточники: настройка движка и синтаксис типов диаграмм. */
+const docs = [
+  { title: 'Синтаксис всех типов', href: 'https://mermaid.js.org/intro/syntax-reference.html' },
+  { title: 'Конфигурация', href: 'https://mermaid.js.org/config/schema-docs/config.html' },
+  { title: 'Тема и themeVariables', href: 'https://mermaid.js.org/config/theming.html' },
+  { title: 'Раскладки и ELK', href: 'https://mermaid.js.org/config/layouts.html' },
+  { title: 'API render и initialize', href: 'https://mermaid.js.org/config/usage.html' },
+]
+
 const diagrams = ref(true)
 
 /** Выключенный тумблер — рендерера нет, и ограда печатается как код. */
@@ -235,6 +306,13 @@ const components = computed(() => (diagrams.value ? { code: MermaidBlock } : {})
         <GrSwitch v-model="diagrams" size="sm">
           mermaid
         </GrSwitch>
+
+        <GrSegmented
+          v-model="theme"
+          size="sm"
+          :options="[...THEMES]"
+          aria-label="Тема диаграммы"
+        />
 
         <div class="ms-auto flex flex-wrap items-center gap-2">
           <span class="rounded-full border border-[var(--gr-brd)] bg-[var(--gr-card)] px-2.5 py-0.5 font-mono text-xs text-[var(--gr-muted-fg)]">
@@ -294,6 +372,45 @@ const components = computed(() => (diagrams.value ? { code: MermaidBlock } : {})
         первом flowchart. <code>securityLevel: 'strict'</code> вычищает разметку
         из подписей: markdown приходит извне.
       </p>
+
+      <div class="grid gap-2 border-t border-[var(--gr-brd)] pt-3">
+        <span class="showcase-demo-caption text-[11px]">Тема диаграммы</span>
+        <p class="showcase-demo-text text-xs">
+          «Токены», «Акцент» и «Контур» — свои: движку отдаётся
+          <code>theme: 'base'</code> и <code>themeVariables</code>, собранные из
+          токенов дизайн-системы, поэтому диаграмма переключается вместе с темой
+          страницы. <code>neutral</code> и <code>default</code> встроены в
+          <code>mermaid</code> и палитру задают сами — подмешивать к ним токены
+          бессмысленно: <code>themeVariables</code> слушается только
+          <code>base</code>.
+        </p>
+      </div>
+
+      <div class="grid gap-2 border-t border-[var(--gr-brd)] pt-3">
+        <span class="showcase-demo-caption text-[11px]">Нужный тип диаграммы</span>
+        <p class="showcase-demo-text text-xs">
+          Встроенные типы — flowchart, sequence, class, state, pie, gantt, er,
+          journey и прочие — регистрировать не нужно: <code>render()</code> сам
+          подтягивает грамматику того типа, который встретил, при первом показе.
+          Поэтому и цена зависит от вида: sequence добавляет 31 КБ gzip, class —
+          16 КБ, pie — 154 КБ. Чужой тип приходит отдельным пакетом и
+          подключается <code>mermaid.registerExternalDiagrams([…])</code>; иконки
+          для архитектурных диаграмм — <code>registerIconPacks</code> и пакет
+          <code>@iconify-json/*</code>; своя раскладка —
+          <code>registerLayoutLoaders</code>.
+        </p>
+
+        <div class="flex flex-wrap gap-2 pt-0.5">
+          <a
+            v-for="link in docs"
+            :key="link.href"
+            :href="link.href"
+            target="_blank"
+            rel="noreferrer"
+            class="showcase-link-chip inline-flex items-center rounded-full border px-3 py-1 text-xs transition-colors"
+          >{{ link.title }}</a>
+        </div>
+      </div>
     </div>
 
     <div class="overflow-hidden rounded-2xl border border-[var(--showcase-brd-strong)] bg-[var(--gr-card)] shadow-[var(--showcase-shadow-raised)]">
