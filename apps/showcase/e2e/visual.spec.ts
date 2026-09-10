@@ -93,6 +93,14 @@ async function hideChrome(page: import('@playwright/test').Page): Promise<void> 
       .showcase-header { visibility: hidden !important; }
       .showcase-shell { background-image: none !important; }
       :root, [data-theme='dark'] { --preview-surface: var(--gr-bg) !important; }
+
+      /*
+       * \`content-visibility: auto\` велит браузеру не красить то, чего нет на
+       * экране, а снимок берёт элемент целиком — и всё за пределами вьюпорта
+       * попадало в кадр пустым. Эталон при этом стабилен: пустота
+       * воспроизводится трижды подряд и не проверяет ничего.
+       */
+      .gr-md-block { content-visibility: visible !important; }
     `,
   })
 }

@@ -101,7 +101,10 @@ const VISUAL_EXCLUDED_PACKAGES = [
   ...Object.keys(granularityChartsComponentConfigs),
   ...Object.keys(granularityDashboardComponentConfigs),
   // `GrRichText` — курсор в редакторе мигает, и снимок ловил бы его фазу.
-  ...Object.keys(granularityEditorComponentConfigs),
+  // Именем, а не всем пакетом: пакет исключался целиком, и `GrMarkdown` попал
+  // под оговорку про чужой курсор по наследству, а не решением — страница
+  // документа статична и эталону поддаётся.
+  'GrRichText',
   // `useDataSource` — по другой причине: его демо ждёт сервер-заглушку с
   // разными задержками, и на момент снимка таблица бывает и с данными, и в
   // загрузке. Пиксельный эталон у такой страницы измерял бы удачу. Раскладку
