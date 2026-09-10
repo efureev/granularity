@@ -7,6 +7,19 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+
+- `GrMarkdown` reported a wrong source offset for any task nested inside another list item or a
+  blockquote. Offsets inside a block were accumulated from `token.raw` lengths, but `marked` hands
+  back nested lists without their indentation and blockquotes without their `>` markers, so the
+  count drifted by everything stripped from the lines above — on a three-line document the emitted
+  `taskToggle` offset already pointed into the middle of a word in a different item. An application
+  rewriting the source by that number corrupted the document. Items are now located by searching the
+  nearest enclosing text that is still a verbatim slice of the source, which also makes markers
+  inside fenced code and literal `[x]` in prose impossible to mistake for tasks. Where no such
+  anchor exists — a task inside a footnote definition — `taskOffset` is `null` and the checkbox
+  stays non-interactive rather than reporting a number that points at the wrong text.
+
 ## [v0.4.0] 2026-09-10
 
 ### Added

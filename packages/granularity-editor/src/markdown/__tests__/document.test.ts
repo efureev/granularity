@@ -2,8 +2,44 @@ import { describe, expect, it, vi } from 'vitest'
 
 import { createMarkdownDocument, parseMarkdown } from '../document'
 import { markedEngine } from '../engine/marked'
+import type { GrMdBlockNode, GrMdListItem } from '../types'
 
 const keys = (source: string) => parseMarkdown(source).map(block => block.key)
+
+/** Все пункты-задачи дерева в порядке документа. */
+function taskItems(nodes: GrMdBlockNode[], out: GrMdListItem[] = []): GrMdListItem[] {
+  for (const node of nodes) {
+    if (node.type === 'list') {
+      for (const item of node.items) {
+        if (item.checked !== null)
+          out.push(item)
+        taskItems(item.children, out)
+      }
+    }
+    else if (node.type === 'blockquote' || node.type === 'alert') {
+      taskItems(node.children, out)
+    }
+  }
+  return out
+}
+
+/** Первый текст пункта — им проверяется, что офсет указывает на *его* маркер. */
+function leadText(item: GrMdListItem): string {
+  const [first] = item.children
+  if (!first || (first.type !== 'inline' && first.type !== 'paragraph'))
+    return ''
+  const text = first.children.find(child => child.type === 'text')
+  return text?.type === 'text' ? text.value : ''
+}
+
+/** Где маркеры стоят на самом деле — эталон, посчитанный по исходнику. */
+function markerPositions(source: string): number[] {
+  const out: number[] = []
+  const re = /\[[ x]\]/gi
+  for (let m = re.exec(source); m; m = re.exec(source))
+    out.push(m.index)
+  return out
+}
 
 describe('инкрементальный документ', () => {
   it('правка одного абзаца меняет ключ только его блока', () => {
@@ -132,5 +168,89 @@ describe('офсеты блоков', () => {
     expect(todo!.taskOffset).toBe(source.indexOf('[ ]'))
     expect(done!.taskOffset).toBe(source.indexOf('[x]'))
     expect(source.slice(done!.taskOffset!, done!.taskOffset! + 3)).toBe('[x]')
+  })
+
+  it('офсет верен и у вложенной задачи', () => {
+    // `raw` вложенного списка приезжает без отступа, поэтому накопление длин
+    // промахивалось на всё снятое выше и указывало в чужую строку.
+    const source = '- [ ] внешняя\n  - [ ] вложенная\n  - [x] вторая вложенная\n- [x] последняя\n'
+    const found = taskItems(parseMarkdown(source).map(block => block.node))
+
+    expect(found).toHaveLength(4)
+    expect(found.map(item => item.taskOffset)).toEqual(markerPositions(source))
+  })
+
+  it('офсет верен у задачи внутри цитаты', () => {
+    const source = '> - [ ] в цитате\n> - [x] тоже\n'
+    const found = taskItems(parseMarkdown(source).map(block => block.node))
+
+    expect(found).toHaveLength(2)
+    expect(found.map(item => item.taskOffset)).toEqual(markerPositions(source))
+  })
+
+  it('одинаковые пункты не схлопываются в один офсет', () => {
+    const source = '- [ ] дело\n- [ ] дело\n  - [ ] дело\n'
+    const found = taskItems(parseMarkdown(source).map(block => block.node))
+
+    expect(found.map(item => item.taskOffset)).toEqual(markerPositions(source))
+  })
+
+  it('задача без опоры в исходнике офсета не выдумывает', () => {
+    // Сноска разбирается вне основного потока, и куска исходника под ней нет:
+    // честнее отдать `null`, чем число, по которому перепишут не тот текст.
+    const source = 'Текст[^a]\n\n[^a]: - [ ] в сноске\n'
+    const blocks = parseMarkdown(source)
+    const footnotes = blocks.flatMap(block => block.node.type === 'footnotes' ? block.node.items : [])
+    const found = taskItems(footnotes.flatMap(item => item.children))
+
+    expect(found).toHaveLength(1)
+    expect(found[0]!.taskOffset).toBeNull()
+  })
+
+  // Каждый случай — своя причина, по которой наивное накопление длин промахивалось.
+  const TASK_SHAPES: [name: string, source: string][] = [
+    ['три уровня вложенности', '- [ ] a\n  - [ ] b\n    - [x] c\n'],
+    ['нумерованный с вложенным', '1. [ ] раз\n2. [x] два\n   1. [ ] вложенный\n'],
+    ['смешанные маркеры', '* [ ] звёздочка\n  + [x] плюс\n    - [ ] дефис\n'],
+    ['отступ табуляцией', '- [ ] a\n\t- [x] b\n'],
+    ['вложенная цитата', '> > - [ ] дважды\n> > - [x] второй\n'],
+    ['цитата с вложенным списком', '> - [ ] внешний\n>   - [x] вложенный\n'],
+    ['продолжение строки', '- [ ] первая\n  вторая строка\n  - [x] вложенный\n'],
+    ['абзац между пунктами', '- [ ] один\n\n  абзац внутри\n\n  - [x] вложенный\n\n- [ ] два\n'],
+    ['лестница на пять уровней', '- [ ] 1\n  - [ ] 2\n    - [ ] 3\n      - [ ] 4\n        - [x] 5\n'],
+  ]
+
+  it.each(TASK_SHAPES)('офсет указывает на маркер своего пункта: %s', (_name, source) => {
+    const found = taskItems(parseMarkdown(source).map(block => block.node))
+    expect(found.length).toBeGreaterThan(1)
+
+    const offsets = found.map((item) => {
+      expect(item.taskOffset).not.toBeNull()
+      // Маркер — и сразу за ним текст именно этого пункта: одного совпадения
+      // с любым маркером мало, промах как раз попадал в чужую строку.
+      expect(source.slice(item.taskOffset!, item.taskOffset! + 3)).toMatch(/^\[[ x]\]$/i)
+      const lead = leadText(item).split('\n')[0]!.trim()
+      expect(source.slice(item.taskOffset! + 4).trimStart().startsWith(lead)).toBe(true)
+      return item.taskOffset!
+    })
+
+    expect(offsets).toEqual([...offsets].sort((a, b) => a - b))
+    expect(new Set(offsets).size).toBe(offsets.length)
+  })
+
+  it('маркер в блоке кода задачей не считается', () => {
+    const source = '```\n- [ ] не задача\n```\n\n- [x] задача\n'
+    const found = taskItems(parseMarkdown(source).map(block => block.node))
+
+    expect(found).toHaveLength(1)
+    expect(found[0]!.taskOffset).toBe(source.lastIndexOf('[x]'))
+  })
+
+  it('литерал в прозе не сдвигает офсет задачи', () => {
+    const source = 'В тексте [x] буквально.\n\n- [ ] настоящая\n'
+    const found = taskItems(parseMarkdown(source).map(block => block.node))
+
+    expect(found).toHaveLength(1)
+    expect(found[0]!.taskOffset).toBe(source.indexOf('[ ]'))
   })
 })

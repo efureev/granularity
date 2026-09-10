@@ -46,6 +46,85 @@ function customData(token: RawToken): Record<string, unknown> {
 const ALERT_MARKER = /^>[ \t]*\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\][ \t]*(?:\n|$)/i
 const TASK_MARKER = /\[(?: |x)\]/i
 
+/**
+ * Окно поиска — ближайший вверх по дереву `raw`, который ещё является точным
+ * куском исходника, вместе с его абсолютным офсетом.
+ *
+ * Складывать длины `raw` внутри блока нельзя: вложенный список приезжает от
+ * `marked` без отступа, цитата — без `>`, и позиция, посчитанная накоплением,
+ * разъезжается на всё снятое строками выше. Поэтому пункт ищется в окне
+ * поиском, а курсор держит порядок, когда пункты совпадают текстом.
+ */
+interface SourceWindow {
+  readonly raw: string
+  readonly offset: number
+  cursor: number
+}
+
+/** Первая строка пункта — единственная его часть, которая доживает до исходника без изменений. */
+function firstLine(raw: string): string {
+  const nl = raw.indexOf('\n')
+  return nl === -1 ? raw : raw.slice(0, nl + 1)
+}
+
+/**
+ * Снять начальный отступ.
+ *
+ * `marked` разворачивает табуляцию в пробелы, и отступ в `raw` вложенного
+ * пункта не совпадает с исходником посимвольно. Сравнивать поэтому нужно
+ * содержимое строки, а отступ перед ней разрешает `indexOfAtLineStart`.
+ */
+function stripIndent(value: string): string {
+  return value.replace(/^[ \t]+/, '')
+}
+
+/**
+ * Найти подстроку, стоящую в начале своей строки — с точностью до отступа.
+ *
+ * Пункт списка всегда начинается со строки, а совпадение посреди абзаца
+ * означало бы офсет, указывающий в чужой текст.
+ */
+function indexOfAtLineStart(haystack: string, needle: string, from: number): number {
+  for (let at = haystack.indexOf(needle, from); at !== -1; at = haystack.indexOf(needle, at + 1)) {
+    let back = at - 1
+    // Отступ и маркеры цитаты — всё, что вправе стоять перед пунктом на его строке.
+    while (back >= 0 && (haystack[back] === ' ' || haystack[back] === '\t' || haystack[back] === '>'))
+      back--
+    if (back < 0 || haystack[back] === '\n')
+      return at
+  }
+  return -1
+}
+
+interface Located {
+  /** Абсолютный офсет в исходнике либо `-1`, если опоры нет. */
+  offset: number
+  /** Найденный текст — он же годится окном, потому что совпал с исходником. */
+  raw: string
+  /** `raw` нашёлся целиком — значит, внутри него можно искать дальше. */
+  exact: boolean
+}
+
+function locate(win: SourceWindow | null, raw: string): Located {
+  const whole = stripIndent(raw)
+  if (!win)
+    return { offset: -1, raw: whole, exact: false }
+
+  const at = indexOfAtLineStart(win.raw, whole, win.cursor)
+  if (at !== -1) {
+    win.cursor = at + whole.length
+    return { offset: win.offset + at, raw: whole, exact: true }
+  }
+
+  const line = stripIndent(firstLine(raw))
+  const lineAt = line === '' ? -1 : indexOfAtLineStart(win.raw, line, win.cursor)
+  if (lineAt === -1)
+    return { offset: -1, raw: whole, exact: false }
+
+  win.cursor = lineAt + line.length
+  return { offset: win.offset + lineAt, raw: whole, exact: false }
+}
+
 interface Context {
   options: GrMarkdownParseOptions
   slug: (text: string) => string
@@ -182,29 +261,34 @@ function stripAlertMarker(children: GrMdBlockNode[]): GrMdBlockNode[] {
     : [{ type: 'paragraph', children: inlines }, ...children.slice(1)]
 }
 
-function normalizeListItems(token: RawToken, blockOffset: number, ctx: Context): GrMdListItem[] {
-  const listRaw = token.raw
+function normalizeListItems(token: RawToken, ctx: Context, win: SourceWindow | null): GrMdListItem[] {
   const items = (token.items ?? []) as RawToken[]
-  let cursor = 0
 
   return items.map((item) => {
-    const at = listRaw.indexOf(item.raw, cursor)
-    const itemOffset = at === -1 ? -1 : blockOffset + at
-    if (at !== -1)
-      cursor = at + item.raw.length
+    const located = locate(win, item.raw)
+    const itemOffset = located.offset
 
     const checked = typeof item.checked === 'boolean' ? item.checked : null
     let taskOffset: number | null = null
     if (checked !== null && itemOffset !== -1) {
-      const marker = TASK_MARKER.exec(item.raw)
+      // По первой строке без отступа: `itemOffset` указывает на её начало,
+      // и маркер может стоять только на ней.
+      const marker = TASK_MARKER.exec(stripIndent(firstLine(item.raw)))
       if (marker)
         taskOffset = itemOffset + marker.index
     }
 
     // `checkbox` уже выражен полем `checked` — второй раз он не нужен.
     const inner = ((item.tokens ?? []) as RawToken[]).filter(t => t.type !== 'checkbox')
+    // Своим окном пункт становится, только если нашёлся целиком: у пункта с
+    // продолжением строки `raw` тоже без отступа, и опорой он быть не может.
+    // Курсор — за первой строкой: иначе вложенный пункт находит маркер самого
+    // родителя, когда текст у них совпадает.
+    const innerWin = located.exact
+      ? { raw: located.raw, offset: itemOffset, cursor: firstLine(located.raw).length }
+      : win
 
-    return { children: normalizeBlocks(inner, itemOffset, ctx), checked, taskOffset }
+    return { children: normalizeBlocks(inner, ctx, innerWin), checked, taskOffset }
   })
 }
 
@@ -215,7 +299,7 @@ function normalizeTableCells(cells: RawToken[] | undefined, align: (string | nul
   }))
 }
 
-function normalizeBlock(token: RawToken, offset: number, ctx: Context): GrMdBlockNode | null {
+function normalizeBlock(token: RawToken, ctx: Context, win: SourceWindow | null): GrMdBlockNode | null {
   switch (token.type) {
     case 'space':
     case 'def':
@@ -244,7 +328,7 @@ function normalizeBlock(token: RawToken, offset: number, ctx: Context): GrMdBloc
       return { type: 'code', lang: ((token.lang as string) || '').split(/\s+/)[0] || null, text: token.text as string }
 
     case 'blockquote': {
-      const children = normalizeBlocks((token.tokens ?? []) as RawToken[], offset, ctx)
+      const children = normalizeBlocks((token.tokens ?? []) as RawToken[], ctx, win)
       const tone = alertToneOf(token.raw)
       return tone
         ? { type: 'alert', tone, children: stripAlertMarker(children) }
@@ -257,7 +341,7 @@ function normalizeBlock(token: RawToken, offset: number, ctx: Context): GrMdBloc
         ordered: Boolean(token.ordered),
         start: typeof token.start === 'number' ? token.start : 1,
         tight: !token.loose,
-        items: normalizeListItems(token, offset, ctx),
+        items: normalizeListItems(token, ctx, win),
       }
 
     case 'table': {
@@ -287,19 +371,17 @@ function normalizeBlock(token: RawToken, offset: number, ctx: Context): GrMdBloc
         name: token.type,
         raw: token.raw,
         data: customData(token),
-        children: normalizeBlocks((token.tokens ?? []) as RawToken[], offset, ctx),
+        children: normalizeBlocks((token.tokens ?? []) as RawToken[], ctx, win),
       }
   }
 }
 
-function normalizeBlocks(tokens: RawToken[], offset: number, ctx: Context): GrMdBlockNode[] {
+function normalizeBlocks(tokens: RawToken[], ctx: Context, win: SourceWindow | null): GrMdBlockNode[] {
   const out: GrMdBlockNode[] = []
-  let cursor = offset
   for (const token of tokens) {
-    const node = normalizeBlock(token, cursor, ctx)
+    const node = normalizeBlock(token, ctx, win)
     if (node)
       out.push(node)
-    cursor += token.raw?.length ?? 0
   }
   return out
 }
@@ -313,7 +395,8 @@ function collectFootnotes(ctx: Context): GrMdFootnote[] {
     items.push({
       label,
       index: ctx.footnoteIndex.get(label)!,
-      children: normalizeBlocks(tokens, -1, ctx),
+      // Опоры в исходнике у сноски нет: она разбирается вне основного потока.
+      children: normalizeBlocks(tokens, ctx, null),
     })
   }
   return items
@@ -355,7 +438,7 @@ export function createMarkedEngine(options: GrMarkedEngineOptions = {}): GrMarkd
 
       for (const token of tokens) {
         const raw = token.raw ?? ''
-        const node = normalizeBlock(token, offset, ctx)
+        const node = normalizeBlock(token, ctx, { raw, offset, cursor: 0 })
         if (node) {
           blocks.push({
             // `id` заголовка в ключе: он зависит от заголовков выше, и без него
