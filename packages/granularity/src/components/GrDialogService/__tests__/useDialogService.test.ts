@@ -267,6 +267,28 @@ describe('useDialogService — завершение заявки', () => {
     await expect(p2).resolves.toBe(true)
   })
 
+  it('prompt: атрибуты представления доезжают до поля открытого окна', async () => {
+    // Императивным путём окно и открывают в приложениях — расхождение с
+    // декларативным и породило дефект: в компоненте есть, в сервисе нет.
+    const p = dialogService.prompt('Confirm password', {
+      inputType: 'password',
+      autocomplete: 'current-password',
+      name: 'password',
+      autocapitalize: 'off',
+      spellcheck: false,
+    })
+    await flush()
+
+    const input = promptInput()!
+    expect(input.getAttribute('autocomplete')).toBe('current-password')
+    expect(input.getAttribute('name')).toBe('password')
+    expect(input.getAttribute('autocapitalize')).toBe('off')
+    expect(input.getAttribute('spellcheck')).toBe('false')
+
+    p.close()
+    await expect(p).resolves.toBeNull()
+  })
+
   it('setFieldError адресует ошибку полю, чужое поле в prompt не показывается', async () => {
     const p = dialogService.prompt('Enter name', {
       onConfirm: (ctx) => {

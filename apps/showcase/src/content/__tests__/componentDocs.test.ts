@@ -237,7 +237,7 @@ describe('component docs metadata', () => {
     expect(confirmDialogDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(confirmDialogDoc.examples.every(example => example.previewKey?.startsWith('gr-confirm-dialog'))).toBe(true)
 
-    expect(promptDialogDoc.examples).toHaveLength(5)
+    expect(promptDialogDoc.examples).toHaveLength(6)
     expect(promptDialogDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(promptDialogDoc.examples.every(example => example.previewKey?.startsWith('gr-prompt-dialog'))).toBe(true)
 

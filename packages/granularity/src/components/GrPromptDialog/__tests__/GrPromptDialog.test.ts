@@ -259,6 +259,50 @@ describe('GrPromptDialog — ввод', () => {
 
     wrapper.unmount()
   })
+
+  it('атрибуты представления доезжают до однострочного поля', async () => {
+    // Без них менеджер паролей поле не опознаёт, а мобильная клавиатура портит
+    // регистр там, где значение сверяется байт в байт.
+    const wrapper = await mountPrompt(
+      'autocomplete="current-password" name="password" autocapitalize="off" :spellcheck="false"',
+    )
+
+    expect(promptField().attributes('autocomplete')).toBe('current-password')
+    expect(promptField().attributes('name')).toBe('password')
+    expect(promptField().attributes('autocapitalize')).toBe('off')
+    expect(promptField().attributes('spellcheck')).toBe('false')
+
+    wrapper.unmount()
+  })
+
+  it('без пропов атрибутов на поле нет вовсе', async () => {
+    // Умолчание — отсутствие атрибута: ни один существующий вызов не меняет
+    // поведения, и никаких догадок по `inputType` окно не делает.
+    const wrapper = await mountPrompt('input-type="password"')
+
+    expect(promptField().attributes('autocomplete')).toBeUndefined()
+    expect(promptField().attributes('name')).toBeUndefined()
+    expect(promptField().attributes('autocapitalize')).toBeUndefined()
+    expect(promptField().attributes('spellcheck')).toBeUndefined()
+
+    wrapper.unmount()
+  })
+
+  it('в multiline те же атрибуты доезжают до GrTextarea', async () => {
+    // Расхождение между ветками — это второй набор правил там, где у
+    // потребителя один проп.
+    const wrapper = await mountPrompt(
+      'multiline autocomplete="street-address" name="address" autocapitalize="words" :spellcheck="true"',
+    )
+
+    expect(promptField().element.tagName).toBe('TEXTAREA')
+    expect(promptField().attributes('autocomplete')).toBe('street-address')
+    expect(promptField().attributes('name')).toBe('address')
+    expect(promptField().attributes('autocapitalize')).toBe('words')
+    expect(promptField().attributes('spellcheck')).toBe('true')
+
+    wrapper.unmount()
+  })
 })
 
 describe('GrPromptDialog — rules', () => {

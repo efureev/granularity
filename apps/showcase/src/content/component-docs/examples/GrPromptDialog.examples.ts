@@ -31,6 +31,13 @@ export const grPromptDialogExamples: ShowcaseComponentExampleDoc[] = [
     note: 'Императивный prompt и остальные методы (confirm/alert) описаны на странице composable useDialogService.',
   },
   {
+    id: 'prompt-dialog-password',
+    title: 'Password managers and hand-typed secrets',
+    description: 'Окно говорит браузеру, что у человека спрашивают: `autocomplete` и `name` дают менеджеру паролей опознать поле, а пара `autocapitalize="off"` / `spellcheck` бережёт регистр резервного кода. Из `inputType` эти значения не выводятся — у `password` их три разных правильных.',
+    status: 'ready',
+    previewKey: 'gr-prompt-dialog-password',
+  },
+  {
     id: 'prompt-dialog-multiline-rules',
     title: 'Multiline input with shared validation rules',
     description: '`multiline` даёт `GrTextarea` вместо однострочного поля, а `rules` — те же правила, что у `GrForm`: движок валидации в пакете один, а не отдельный у каждого компонента.',

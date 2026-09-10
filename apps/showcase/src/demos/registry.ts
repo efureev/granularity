@@ -391,6 +391,7 @@ export const demoPathByPreviewKey = {
   'gr-progress-circle-upload': 'components/gr-progress-circle/GrProgressCircleUploadDemo.vue',
   'gr-prompt-dialog-multiline-rules': 'components/gr-prompt-dialog/GrPromptDialogMultilineRulesDemo.vue',
   'gr-prompt-dialog-optional-value': 'components/gr-prompt-dialog/GrPromptDialogOptionalValueDemo.vue',
+  'gr-prompt-dialog-password': 'components/gr-prompt-dialog/GrPromptDialogPasswordDemo.vue',
   'gr-prompt-dialog-rename-flow': 'components/gr-prompt-dialog/GrPromptDialogRenameDemo.vue',
   'gr-prompt-dialog-reset-flow': 'components/gr-prompt-dialog/GrPromptDialogResetFlowDemo.vue',
   'gr-prompt-dialog-service-link': 'components/gr-confirm-dialog/GrDialogServiceLinkDemo.vue',

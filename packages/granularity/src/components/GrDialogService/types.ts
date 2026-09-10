@@ -136,6 +136,17 @@ export interface DialogPromptOptions extends DialogBaseOptions {
   /** Ограничение длины; со `showCount` рисуется счётчик. */
   maxlength?: number
   showCount?: boolean
+  /**
+   * Что у человека спрашивают — для браузера и менеджера паролей. Из
+   * `inputType` не выводится: у `password` три разных правильных значения.
+   */
+  autocomplete?: GrPromptDialogProps['autocomplete']
+  /** Имя поля: часть менеджеров паролей без него не сохраняет значение. */
+  name?: GrPromptDialogProps['name']
+  /** Автозаглавная у программной клавиатуры. */
+  autocapitalize?: GrPromptDialogProps['autocapitalize']
+  /** Проверка орфографии. */
+  spellcheck?: GrPromptDialogProps['spellcheck']
   /** Многострочный ввод вместо однострочного. */
   multiline?: boolean
   rows?: number

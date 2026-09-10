@@ -71,6 +71,28 @@ export interface GrPromptDialogProps {
   /** Ограничение длины; со `showCount` рисуется счётчик. */
   maxlength?: number
   showCount?: boolean
+  /**
+   * Что у человека спрашивают — для браузера и менеджера паролей
+   * (`current-password`, `new-password`, `one-time-code`, `off`).
+   *
+   * Из `inputType` не выводится: у одного и того же `password` три разных
+   * правильных значения, и окно не знает, спрашивают у него старый пароль,
+   * новый или одноразовый код. Значение выбирает потребитель.
+   */
+  autocomplete?: string
+  /**
+   * Имя поля. В наборе не за компанию: менеджеры паролей опираются и на него, а
+   * сохранение значения без имени у части из них просто не срабатывает.
+   */
+  name?: string
+  /**
+   * Автозаглавная у программной клавиатуры. Пара к `autocomplete="off"` для
+   * секретов, которые вводят руками: резервный код 2FA сверяется байт в байт, а
+   * клавиатура поднимает первую букву.
+   */
+  autocapitalize?: 'off' | 'none' | 'on' | 'sentences' | 'words' | 'characters'
+  /** Проверка орфографии. Вторая половина той же пары. */
+  spellcheck?: boolean
   /** Многострочный ввод: вместо `GrInput` рисуется `GrTextarea`. */
   multiline?: boolean
   /** Высота многострочного поля в строках. */
@@ -146,6 +168,10 @@ const props = withDefaults(defineProps<GrPromptDialogProps>(), {
   inputmode: undefined,
   maxlength: undefined,
   showCount: false,
+  autocomplete: undefined,
+  name: undefined,
+  autocapitalize: undefined,
+  spellcheck: undefined,
   multiline: false,
   rows: undefined,
   autosize: false,
@@ -373,6 +399,10 @@ defineSlots<{
           :autosize="autosize"
           :maxlength="maxlength"
           :show-count="showCount"
+          :autocomplete="autocomplete"
+          :name="name"
+          :autocapitalize="autocapitalize"
+          :spellcheck="spellcheck"
           :invalid="!!fieldErrorMessage"
           @blur="onBlur"
         />
@@ -386,6 +416,10 @@ defineSlots<{
           :placeholder="placeholder"
           :maxlength="maxlength"
           :show-count="showCount"
+          :autocomplete="autocomplete"
+          :name="name"
+          :autocapitalize="autocapitalize"
+          :spellcheck="spellcheck"
           :invalid="!!fieldErrorMessage"
           @blur="onBlur"
           @keydown.enter="onEnter"

@@ -9,6 +9,27 @@ to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **`GrPromptDialog` can tell the browser what it is asking for.** The field
+  carried no `autocomplete` and no `name`, so password managers did not offer to
+  fill it — and a prompt used to confirm a password had to be typed by hand every
+  time. Four attributes now reach the field in both branches, single-line and
+  multiline: `autocomplete`, `name`, `autocapitalize` and `spellcheck`. The same
+  four are in `DialogPromptOptions`, because the imperative path is how the
+  dialog is actually opened.
+
+  `autocapitalize` and `spellcheck` are the pair that goes with
+  `autocomplete="off"` for secrets typed by hand: a 2FA backup code is compared
+  byte for byte and generated in mixed case, and a mobile keyboard capitalises
+  the first letter.
+
+  The default for all four is the absence of the attribute — no existing call
+  changes behaviour. `autocomplete` is **not** derived from `inputType`: one and
+  the same `password` has three different right answers (`current-password`,
+  `new-password`, `one-time-code`) and the dialog cannot know which.
+
+  A gate now compares the two surfaces: every field of `DialogPromptOptions` has
+  to be forwarded to the dialog. Its absence is what let this defect exist.
+
 - **`shape` — the border shape of a control, an axis next to `size`.** Two
   values, `box` (the control radius scale) and `pill` (fully round), declared
   once in `components/shared/controlShape.ts`. `GrSegmented` keeps its pill as

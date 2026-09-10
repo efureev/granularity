@@ -8769,6 +8769,13 @@
             "default": "undefined"
           },
           {
+            "name": "name",
+            "description": "Имя поля. В наборе не за компанию: менеджеры паролей опираются и на него, а сохранение значения без имени у части из них просто не срабатывает.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "description",
             "description": "",
             "type": "string | undefined",
@@ -8923,6 +8930,13 @@
             "default": "undefined"
           },
           {
+            "name": "autocomplete",
+            "description": "Что у человека спрашивают — для браузера и менеджера паролей (`current-password`, `new-password`, `one-time-code`, `off`). Из `inputType` не выводится: у одного и того же `password` три разных правильных значения, и окно не знает, спрашивают у него старый пароль, новый или одноразовый код. Значение выбирает потребитель.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "inputmode",
             "description": "Программная клавиатура на мобильных.",
             "type": "\"search\" | \"none\" | \"text\" | \"email\" | \"tel\" | \"url\" | \"numeric\" | \"decimal\" | undefined",
@@ -8956,6 +8970,20 @@
             "type": "GrInputType | undefined",
             "required": false,
             "default": "\"text\""
+          },
+          {
+            "name": "autocapitalize",
+            "description": "Автозаглавная у программной клавиатуры. Пара к `autocomplete=\"off\"` для секретов, которые вводят руками: резервный код 2FA сверяется байт в байт, а клавиатура поднимает первую букву.",
+            "type": "\"off\" | \"none\" | \"on\" | \"sentences\" | \"words\" | \"characters\" | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "spellcheck",
+            "description": "Проверка орфографии. Вторая половина той же пары.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "undefined"
           },
           {
             "name": "multiline",
