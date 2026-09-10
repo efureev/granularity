@@ -761,7 +761,7 @@ export async function setupI18n() {
 | `@feugene/granularity-chrono` | 0.10.0 | `GrCalendar`, `GrDatePicker`, `GrDateRangePicker`, `GrDateTimePicker`, `GrDuration`, `GrRelativeTime`, `GrTimePicker` | `grChrono` | `GranularityChronoResolver` |
 | `@feugene/granularity-code` | 0.2.0 | `GrCodeBlock`, `GrCodeEditor`, `GrDiff` | `grCode` | `GranularityCodeResolver` |
 | `@feugene/granularity-dashboard` | 0.6.0 | `GrDashboard`, `GrDashboardItem`, `GrDashboardItemSettings`, `GrDashboardPalette`, `GrDashboardToolbar` | `grDashboard` | `GranularityDashboardResolver` |
-| `@feugene/granularity-editor` | 0.4.0 | `GrMarkdown`, `GrRichText` | `grEditor` | `GranularityEditorResolver` |
+| `@feugene/granularity-editor` | 0.4.1 | `GrMarkdown`, `GrRichText` | `grEditor` | `GranularityEditorResolver` |
 | `@feugene/granularity-forms-schema` | 0.4.0 | `GrSchemaForm` | `grForms` | `GranularityFormsSchemaResolver` |
 | `@feugene/granularity-media` | 0.7.1 | `GrCameraCapture`, `GrCodeScanner`, `GrImageCrop`, `GrVideoPlayer` | `grMedia` | `GranularityMediaResolver` |
 
