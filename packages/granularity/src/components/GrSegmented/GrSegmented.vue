@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, useId, watch, watchEffect } from 'vue'
 
+import type { GrControlShape } from '../shared/controlShape'
 import { useGrComponentProp, useGrComponentSize } from '../GrConfigProvider/context'
 import { useGrFormFieldContext } from '../GrFormField/context'
 import { useGrFormControl } from '../../composables/useGrFormControl'
@@ -42,6 +43,12 @@ export interface GrSegmentedProps {
   variant?: GrSegmentedVariant
   size?: GrSegmentedSize
   /**
+   * Форма рамки. `pill` — дорожка-пилюля, как была всегда; `box` — то же
+   * скругление, что у полей ввода, чтобы сегменты не выглядели в форме гостем
+   * из другой системы.
+   */
+  shape?: GrControlShape
+  /**
    * Направление ряда. Вертикаль — боковые фильтры; индикатор к ней готов по
    * построению, он двумерный.
    */
@@ -74,6 +81,7 @@ const props = withDefaults(
   {
     variant: undefined,
     size: undefined,
+    shape: undefined,
     orientation: 'horizontal',
     indicatorDuration: 300,
     block: false,
@@ -89,6 +97,8 @@ const props = withDefaults(
 // Эффективный размер: локальный проп → `GrConfigProvider` → дефолт компонента.
 const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrSegmented' })
 const resolvedVariant = useGrComponentProp('GrSegmented', 'variant', () => props.variant, 'pills')
+// Дефолт `pill`, а не общий для пакета `box`: у сегментов пилюля была всегда.
+const resolvedShape = useGrComponentProp('GrSegmented', 'shape', () => props.shape, 'pill')
 
 const emit = defineEmits<GrSegmentedEmits>()
 defineSlots<{
@@ -160,6 +170,7 @@ const rootStyle = computed<Record<string, string>>(() => {
       variant: resolvedVariant.value,
       size: resolvedSize.value,
       orientation: props.orientation,
+      shape: resolvedShape.value,
     }),
     gridTemplateColumns: isVertical.value
       ? 'minmax(0,1fr)'

@@ -1,4 +1,5 @@
 import { splitClassTokens } from '../shared/classTokens'
+import { controlPillPaddingXClass, controlShapeRadiusClass } from '../shared/controlShape'
 import { controlStateIconClass, controlStateIconColors } from '../shared/controlState'
 import {
   addonInlinePrefixClass,
@@ -6,6 +7,8 @@ import {
   addonSegmentPrefixClass,
   addonSegmentSuffixClass,
   invalidClass,
+  paddingXClass,
+  shellHeightClass,
   shellBaseClass,
   shellDisabledClass,
   shellEnabledClass,
@@ -16,6 +19,8 @@ import {
 
 export const grInputSafelist = [...new Set([
   ...Object.values(sizes).flatMap(splitClassTokens),
+  ...Object.values(shellHeightClass).flatMap(splitClassTokens),
+  ...Object.values(paddingXClass).flatMap(map => Object.values(map)).flatMap(splitClassTokens),
   ...Object.values(textAlign).flatMap(splitClassTokens),
   ...Object.values(states).flatMap(splitClassTokens),
   ...splitClassTokens(invalidClass),
@@ -27,6 +32,8 @@ export const grInputSafelist = [...new Set([
   ...splitClassTokens(addonInlinePrefixClass),
   ...splitClassTokens(addonInlineSuffixClass),
   // Общий модуль лежит в чанке без адреса — его классы объявляет каждый импортёр.
+  ...Object.values(controlShapeRadiusClass).flatMap(splitClassTokens),
+  ...Object.values(controlPillPaddingXClass).flatMap(splitClassTokens),
   ...splitClassTokens(controlStateIconClass),
   ...Object.values(controlStateIconColors).flatMap(splitClassTokens),
 ])]

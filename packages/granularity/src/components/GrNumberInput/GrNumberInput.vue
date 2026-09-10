@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { InputHTMLAttributes } from 'vue'
 
+import type { GrControlShape } from '../shared/controlShape'
 import { useGrComponentProp, useGrComponentSize } from '../GrConfigProvider/context'
 import { computed, onBeforeUnmount, ref, useId, watchEffect } from 'vue'
 
@@ -14,6 +15,9 @@ import {
   type GrNumberInputSize,
   type GrNumberInputState,
   type GrNumberInputTextAlign,
+  paddingX,
+  shellShapeClass,
+  shellHeightClass,
 } from './grNumberInputStyles'
 import { addStep, bigStep } from './numberInputMath'
 import { useGrFormFieldContext } from '../GrFormField/context'
@@ -48,13 +52,6 @@ const ADDON_PX_BY_SIZE: Record<GrNumberInputSize, number> = {
   lg: 48,
 }
 
-const BASE_PADDING_X_LEN_BY_SIZE: Record<GrNumberInputSize, string> = {
-  xs: '10px',
-  sm: '12px',
-  md: '12px',
-  lg: '16px',
-}
-
 function px(n: number): string {
   return `${n}px`
 }
@@ -84,6 +81,12 @@ export interface GrNumberInputProps {
   name?: string
   id?: string
   size?: GrNumberInputSize
+  /**
+   * Форма рамки. `box` — скругление шкалы контролов; `pill` — пилюля.
+   * Отступ поля и вылет степперов идут за формой: `overflow-hidden` обрезает их
+   * по внешней дуге, но встать вплотную к ней они не должны.
+   */
+  shape?: GrControlShape
 
   textAlign?: GrNumberInputTextAlign
 
@@ -155,6 +158,7 @@ const props = withDefaults(defineProps<GrNumberInputProps>(), {
   name: undefined,
   id: undefined,
   size: undefined,
+  shape: undefined,
 
   textAlign: 'left',
 
@@ -184,6 +188,7 @@ const props = withDefaults(defineProps<GrNumberInputProps>(), {
 
 // Эффективный размер: локальный проп → `GrConfigProvider` → дефолт компонента.
 const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrNumberInput' })
+const resolvedShape = useGrComponentProp('GrNumberInput', 'shape', () => props.shape, 'box')
 
 const resolvedId = computed(() => props.id ?? field?.id.value)
 
@@ -239,7 +244,7 @@ const hasVerticalControls = computed(() => props.controls && props.controlsDirec
 
 const addonPx = computed(() => ADDON_PX_BY_SIZE[resolvedSize.value])
 const addonLen = computed(() => px(addonPx.value))
-const basePaddingXLen = computed(() => BASE_PADDING_X_LEN_BY_SIZE[resolvedSize.value])
+const basePaddingXLen = computed(() => paddingX[resolvedShape.value][resolvedSize.value])
 
 /** Кнопки ± справа: вертикальный стек — одна колонка, горизонтальный — вторая. */
 const rightControlsCount = computed(() =>
@@ -294,6 +299,7 @@ const shellClassName = computed(() => {
 
 const inputClassName = computed(() => {
   return grNumberInputInputClass({
+    shape: resolvedShape.value,
     size: resolvedSize.value,
     textAlign: props.textAlign,
   })
@@ -684,8 +690,8 @@ if (__GR_DEV__) {
 <template>
   <div
     data-gr-number-input
-    class="relative w-full overflow-hidden rounded-[var(--gr-radius-control)] border bg-[var(--gr-bg)] transition-colors duration-[var(--gr-duration-fast)] focus-within:ring-2 focus-within:ring-[var(--gr-ring)]"
-    :class="shellClassName"
+    class="relative w-full overflow-hidden border bg-[var(--gr-bg)] transition-colors duration-[var(--gr-duration-fast)] focus-within:ring-2 focus-within:ring-[var(--gr-ring)]"
+    :class="[shellShapeClass[resolvedShape], shellHeightClass[resolvedSize], shellClassName]"
   >
     <div
       v-if="$slots.prefix"

@@ -1,3 +1,4 @@
+import type { GrControlShape } from '../shared/controlShape'
 import type { GrComponentSize } from '../shared/sizes'
 
 import type { Component } from 'vue'
@@ -63,48 +64,64 @@ export const itemLabelClass = 'truncate'
 export const itemIconClass = 'h-4 w-4 shrink-0'
 export const itemSpinnerClass = 'h-4 w-4 shrink-0 animate-spin'
 export const iconOnlyClass = 'gap-0'
+/**
+ * Размерная карта дорожки.
+ *
+ * Ведущая величина здесь не высота сегмента, а **внешняя высота дорожки**: она
+ * обязана совпадать с высотой поля той же ступени (`GR_CONTROL_HEIGHTS_PX`),
+ * иначе сегмент и селект в одной строке стоят на разной высоте. Отсюда
+ * производные:
+ *
+ *  - `min-height` сегмента = высота контрола − рамка дорожки − её поле с двух
+ *    сторон. Рамка входит в ступень, а не прибавляется к ней: у `GrSelect`
+ *    рамка и высота лежат на одном элементе, и дорожка обязана считать так же;
+ *  - `item-py` подчинён ему же: межстрочный плюс два отступа не должны
+ *    превышать высоту сегмента, иначе содержимое начнёт задавать её вместо
+ *    `min-height`, и дорожка снова станет выше поля.
+ *
+ * Арифметику держит гейт `src/__tests__/controlHeights.test.ts` — комментарий
+ * её только объясняет.
+ */
 const rootSizeStyles: Record<GrSegmentedSize, Record<string, string>> = {
   xs: {
-    '--gr-segmented-radius': '9999px',
     '--gr-segmented-padding': '4px',
     '--gr-segmented-item-px': '10px',
-    '--gr-segmented-item-py': '4px',
+    '--gr-segmented-item-py': '1px',
     '--gr-segmented-font-size': '0.75rem',
     '--gr-segmented-line-height': '1rem',
     '--gr-segmented-font-weight': '600',
-    '--gr-segmented-min-height': '24px',
+    '--gr-segmented-min-height': '18px',
   },
   sm: {
-    '--gr-segmented-radius': '9999px',
     '--gr-segmented-padding': '4px',
     '--gr-segmented-item-px': '12px',
-    '--gr-segmented-item-py': '6px',
+    '--gr-segmented-item-py': '3px',
     '--gr-segmented-font-size': '0.75rem',
     '--gr-segmented-line-height': '1rem',
     '--gr-segmented-font-weight': '600',
-    '--gr-segmented-min-height': '28px',
+    '--gr-segmented-min-height': '22px',
   },
   md: {
-    '--gr-segmented-radius': '9999px',
     '--gr-segmented-padding': '4px',
     '--gr-segmented-item-px': '14px',
-    '--gr-segmented-item-py': '8px',
+    '--gr-segmented-item-py': '5px',
     '--gr-segmented-font-size': '0.875rem',
     '--gr-segmented-line-height': '1.25rem',
     '--gr-segmented-font-weight': '600',
-    '--gr-segmented-min-height': '40px',
+    '--gr-segmented-min-height': '30px',
   },
   lg: {
-    '--gr-segmented-radius': '9999px',
     '--gr-segmented-padding': '4px',
     '--gr-segmented-item-px': '16px',
-    '--gr-segmented-item-py': '10px',
+    '--gr-segmented-item-py': '7px',
     '--gr-segmented-font-size': '0.9375rem',
     '--gr-segmented-line-height': '1.25rem',
     '--gr-segmented-font-weight': '600',
-    '--gr-segmented-min-height': '46px',
+    '--gr-segmented-min-height': '34px',
   },
 }
+
+export { rootSizeStyles }
 const rootVariantStyles: Record<GrSegmentedVariant, Record<string, string>> = {
   pills: {
     '--gr-segmented-track-bg': 'var(--gr-muted)',
@@ -144,25 +161,38 @@ export function grSegmentedRootClass(options: {
   ].filter(Boolean).join(' ')
 }
 /**
- * Радиус дорожки в вертикали — пилюля **одной строки**, а не всей колонки.
- * `9999px` выверен под короткий горизонтальный ряд; на высокой колонке он
- * превращает дорожку в эллипс. Формула повторяет высоту сегмента, поэтому
- * скругление у колонки ровно такое же, как у ряда, и сегменты внутри остаются
- * пилюлями: они считают свой радиус от этого же значения.
+ * Радиус дорожки по форме и ориентации.
+ *
+ * В вертикали пилюля — это пилюля **одной строки**, а не всей колонки: `9999px`
+ * выверен под короткий горизонтальный ряд, на высокой колонке он превращает
+ * дорожку в эллипс. Формула повторяет высоту сегмента, поэтому скругление у
+ * колонки ровно такое же, как у ряда, а сегменты внутри остаются пилюлями —
+ * они считают свой радиус от этого же значения.
+ *
+ * `box` этой развилки не знает: 6 px эллипсом не становятся ни при какой
+ * высоте.
  */
-const verticalRadiusStyle = {
-  '--gr-segmented-radius': 'calc(var(--gr-segmented-min-height) / 2 + var(--gr-segmented-padding))',
+const radiusStyles: Record<GrControlShape, Record<GrSegmentedOrientation, string>> = {
+  pill: {
+    horizontal: '9999px',
+    vertical: 'calc(var(--gr-segmented-min-height) / 2 + var(--gr-segmented-padding))',
+  },
+  box: {
+    horizontal: 'var(--gr-radius-control)',
+    vertical: 'var(--gr-radius-control)',
+  },
 }
 
 export function grSegmentedRootStyle(options: {
   variant: GrSegmentedVariant
   size: GrSegmentedSize
   orientation: GrSegmentedOrientation
+  shape: GrControlShape
 }): Record<string, string> {
   return {
     ...rootSizeStyles[options.size],
     ...rootVariantStyles[options.variant],
-    ...(options.orientation === 'vertical' ? verticalRadiusStyle : {}),
+    '--gr-segmented-radius': radiusStyles[options.shape][options.orientation],
   }
 }
 export function grSegmentedIndicatorClass(variant: GrSegmentedVariant): string {

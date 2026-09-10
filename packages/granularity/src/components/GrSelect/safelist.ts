@@ -1,4 +1,5 @@
 import { flattenTransitionTokens, splitClassTokens } from '../shared/classTokens'
+import { controlPillPaddingXClass, controlShapeRadiusClass } from '../shared/controlShape'
 import { panelPopTransition } from '../shared/overlayTransition'
 import {
   borderClassByState,
@@ -19,6 +20,7 @@ import {
   selectLinkNativeLabelVariantClassByVariant,
   selectLinkSizeClassBySize,
   selectLinkVariantClassByVariant,
+  selectPaddingXClass,
   selectSizeClassBySize,
 } from './grSelectStyles'
 
@@ -29,6 +31,10 @@ export const grSelectSafelist = [...new Set([
   ...Object.values(borderClassByState).flatMap(splitClassTokens),
   ...splitClassTokens(invalidBorderClass),
   ...Object.values(selectSizeClassBySize).flatMap(splitClassTokens),
+  ...Object.values(selectPaddingXClass).flatMap(map => Object.values(map)).flatMap(splitClassTokens),
+  // Общий модуль лежит в чанке без адреса — его классы объявляет каждый импортёр.
+  ...Object.values(controlShapeRadiusClass).flatMap(splitClassTokens),
+  ...Object.values(controlPillPaddingXClass).flatMap(splitClassTokens),
   ...splitClassTokens(defaultBaseClass),
   ...splitClassTokens(linkBaseClass),
   ...splitClassTokens(grSelectLinkNativeOverlayClass),

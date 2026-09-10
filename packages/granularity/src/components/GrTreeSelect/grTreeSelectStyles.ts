@@ -1,3 +1,6 @@
+import type { GrControlShape } from '../shared/controlShape'
+import { controlPillPaddingX, controlPillPaddingXClass, controlShapeRadiusClass } from '../shared/controlShape'
+
 import type { GrControlState } from '../shared/sizes'
 import { overlayListPanelClass } from '../shared/overlayListPanel'
 import { overlayPanelSurfaceClass } from '../shared/overlayPanelSurface'
@@ -7,22 +10,35 @@ import type { GrInputSize } from '../GrInput'
 export type GrTreeSelectState = GrControlState
 
 export const sizeClassBySize: Record<GrInputSize, string> = {
-  xs: 'h-7 px-2.5 text-[length:var(--gr-control-text-xs)] leading-[var(--gr-control-leading-xs)]',
-  sm: 'h-8 px-3 text-[length:var(--gr-control-text-sm)] leading-[var(--gr-control-leading-sm)]',
-  md: 'h-10 px-3 text-[length:var(--gr-control-text-md)] leading-[var(--gr-control-leading-md)]',
-  lg: 'h-11 px-4 text-[length:var(--gr-control-text-lg)] leading-[var(--gr-control-leading-lg)]',
+  xs: 'h-7 text-[length:var(--gr-control-text-xs)] leading-[var(--gr-control-leading-xs)]',
+  sm: 'h-8 text-[length:var(--gr-control-text-sm)] leading-[var(--gr-control-leading-sm)]',
+  md: 'h-10 text-[length:var(--gr-control-text-md)] leading-[var(--gr-control-leading-md)]',
+  lg: 'h-11 text-[length:var(--gr-control-text-lg)] leading-[var(--gr-control-leading-lg)]',
+}
+
+/** Отступ зависит и от размера, и от формы — см. `shared/controlShape.ts`. */
+export const paddingXClass: Record<GrControlShape, Record<GrInputSize, string>> = {
+  box: {
+    xs: 'px-2.5',
+    sm: 'px-3',
+    md: 'px-3',
+    lg: 'px-4',
+  },
+  pill: controlPillPaddingXClass,
 }
 
 /**
- * Горизонтальный отступ из `sizeClassBySize`, но числом: аддоны задают паддинг
- * инлайн-стилем, а он перекрывает класс — значение нужно обеим формам, и
- * расходиться им нельзя.
+ * Тот же отступ числом: аддоны задают паддинг инлайн-стилем, а он перекрывает
+ * класс — значение нужно обеим формам, и расходиться им нельзя.
  */
-export const paddingX: Record<GrInputSize, string> = {
-  xs: '10px',
-  sm: '12px',
-  md: '12px',
-  lg: '16px',
+export const paddingX: Record<GrControlShape, Record<GrInputSize, string>> = {
+  box: {
+    xs: '10px',
+    sm: '12px',
+    md: '12px',
+    lg: '16px',
+  },
+  pill: controlPillPaddingX,
 }
 
 /** Ширина зоны шеврона/крестика справа (`pr-9` в классе триггера). */
@@ -54,9 +70,12 @@ export function grTreeSelectClass(options: {
   state: GrTreeSelectState
   invalid: boolean
   disabled?: boolean
+  shape: GrControlShape
 }): string {
   return [
     sizeClassBySize[options.size],
+    paddingXClass[options.shape][options.size],
+    controlShapeRadiusClass[options.shape],
     'pr-9',
     options.disabled ? shellDisabledClass : shellEnabledClass,
     options.invalid ? invalidBorderClass : borderClassByState[options.state],

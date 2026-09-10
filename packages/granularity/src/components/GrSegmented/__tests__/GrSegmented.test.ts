@@ -2,6 +2,8 @@ import { mount } from '@vue/test-utils'
 import { h, nextTick } from 'vue'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { granularityGlobal } from '../../../testing'
+
 import GrSegmented from '../GrSegmented.vue'
 
 const options = [
@@ -268,10 +270,10 @@ describe('GrSegmented', () => {
 
     expect(smStyle).toContain('--gr-segmented-padding: 4px')
     expect(smStyle).toContain('--gr-segmented-font-size: 0.75rem')
-    expect(smStyle).toContain('--gr-segmented-min-height: 28px')
+    expect(smStyle).toContain('--gr-segmented-min-height: 22px')
     expect(xsStyle).toContain('--gr-segmented-padding: 4px')
     expect(xsStyle).toContain('--gr-segmented-item-px: 10px')
-    expect(xsStyle).toContain('--gr-segmented-min-height: 24px')
+    expect(xsStyle).toContain('--gr-segmented-min-height: 18px')
     expect(mdStyle).toContain('--gr-segmented-padding: 4px')
     expect(lgStyle).toContain('--gr-segmented-padding: 4px')
   })
@@ -462,6 +464,67 @@ describe('GrSegmented — ориентация', () => {
 
     expect(root.classes()).toContain('w-full')
     expect(root.attributes('style')).toContain('grid-template-columns: minmax(0,1fr)')
+  })
+
+  it('без пропа дорожка остаётся пилюлей — это дефолт сегментов, а не пакета', () => {
+    const wrapper = mount(GrSegmented, { props: { modelValue: 'list', options: [...options] } })
+
+    expect(wrapper.get('[data-gr-segmented]').attributes('style')).toContain('--gr-segmented-radius: 9999px')
+  })
+
+  it('shape="box" даёт то же скругление, что у полей ввода', () => {
+    const wrapper = mount(GrSegmented, {
+      props: { modelValue: 'list', options: [...options], shape: 'box' },
+    })
+
+    const style = wrapper.get('[data-gr-segmented]').attributes('style')
+    expect(style).toContain('--gr-segmented-radius: var(--gr-radius-control)')
+    expect(style).not.toContain('9999px')
+  })
+
+  it('в вертикали пилюля считается формулой, а `box` — нет', () => {
+    // `9999px` на высокой колонке превращает дорожку в эллипс, поэтому у пилюли
+    // радиус равен высоте одного сегмента. Шести пикселям такая поправка не
+    // нужна ни при какой высоте.
+    const pill = mount(GrSegmented, {
+      props: { modelValue: 'list', options: [...options], orientation: 'vertical' },
+    })
+    expect(pill.get('[data-gr-segmented]').attributes('style'))
+      .toContain('--gr-segmented-radius: calc(var(--gr-segmented-min-height) / 2 + var(--gr-segmented-padding))')
+
+    const box = mount(GrSegmented, {
+      props: { modelValue: 'list', options: [...options], orientation: 'vertical', shape: 'box' },
+    })
+    expect(box.get('[data-gr-segmented]').attributes('style'))
+      .toContain('--gr-segmented-radius: var(--gr-radius-control)')
+  })
+
+  it('форма приходит и из componentDefaults, а локальный проп её перебивает', () => {
+    const withDefault = mount(GrSegmented, {
+      props: { modelValue: 'list', options: [...options] },
+      global: granularityGlobal({ componentDefaults: { GrSegmented: { shape: 'box' } } }),
+    })
+    expect(withDefault.get('[data-gr-segmented]').attributes('style'))
+      .toContain('--gr-segmented-radius: var(--gr-radius-control)')
+
+    const overridden = mount(GrSegmented, {
+      props: { modelValue: 'list', options: [...options], shape: 'pill' },
+      global: granularityGlobal({ componentDefaults: { GrSegmented: { shape: 'box' } } }),
+    })
+    expect(overridden.get('[data-gr-segmented]').attributes('style'))
+      .toContain('--gr-segmented-radius: 9999px')
+  })
+
+  it('сегмент внутри считает радиус от дорожки в обеих формах', () => {
+    // Радиус сегмента производный (`calc(radius - padding)`), поэтому вторая
+    // форма получается сама — и обязана получаться, а не задаваться отдельно.
+    for (const shape of ['pill', 'box'] as const) {
+      const wrapper = mount(GrSegmented, {
+        props: { modelValue: 'list', options: [...options], shape },
+      })
+      expect(wrapper.findAll('[role="radio"]')[0].classes().join(' '))
+        .toContain('rounded-[calc(var(--gr-segmented-radius)-var(--gr-segmented-padding))]')
+    }
   })
 
   it('пустой список опций не оставляет треков ни в одной ориентации', () => {

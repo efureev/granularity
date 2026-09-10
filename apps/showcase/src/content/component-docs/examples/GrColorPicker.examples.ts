@@ -18,6 +18,13 @@ export const grColorPickerExamples: ShowcaseComponentExampleDoc[] = [
     note: 'Клавиатура у квадрата настоящая: горизонтальные стрелки ведут насыщенность, вертикальные — светлоту, `Home`/`End` и `PageUp`/`PageDown` работают по оси. Диктору обе оси видны отдельными слайдерами со своими именами и значениями — внутри квадрата два `input[type=range]`, скрытых визуально, но не от вспомогательных технологий.',
   },
   {
+    id: 'color-picker-shape',
+    title: 'Border shape',
+    description: 'Образец цвета стоит первым в триггере, и отступ пилюли отодвигает его от дуги. У коробки отступ мельче, чем у полей ввода, — ради этого же образца.',
+    status: 'ready',
+    previewKey: 'gr-color-picker-shape',
+  },
+  {
     id: 'color-picker-form',
     title: 'Inside a form field',
     description: 'Пикер — обычный форм-контрол: читает контекст `GrFormField` (подпись, подсказка, ошибка, `disabled`/`readonly`), участвует в правилах `GrForm` и отдаёт значение в нативную форму скрытым полем по пропу `name`.',

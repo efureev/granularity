@@ -1,3 +1,6 @@
+import type { GrControlShape } from '../shared/controlShape'
+import { controlPillPaddingXClass, controlShapeRadiusClass } from '../shared/controlShape'
+
 import type { GrComponentSize, GrControlState } from '../shared/sizes'
 import { overlayListPanelClass } from '../shared/overlayListPanel'
 import { overlayPanelSurfaceClass } from '../shared/overlayPanelSurface'
@@ -49,7 +52,8 @@ export type GrSelectOptionOrGroup<TValue extends GrSelectValue = string>
     | GrSelectOptionGroup<TValue>
 export type GrSelectModelValue<TValue extends GrSelectValue = string> = TValue | TValue[]
 
-export const defaultBaseClass = 'w-full rounded-[var(--gr-radius-control)] border bg-[var(--gr-bg)] text-[var(--gr-fg)] transition-colors duration-[var(--gr-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]'
+/** Скругление приходит формой, поэтому здесь его нет. */
+export const defaultBaseClass = 'w-full border bg-[var(--gr-bg)] text-[var(--gr-fg)] transition-colors duration-[var(--gr-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]'
 
 /**
  * Цвет рамки по состоянию — та же карта, что у `GrInput` и `GrTextarea`: поля
@@ -71,10 +75,21 @@ export const invalidBorderClass = 'border-[var(--gr-invalid-brd)] focus-visible:
 export const linkBaseClass = 'cursor-pointer inline-block w-auto align-baseline appearance-none bg-transparent border border-transparent px-0 py-0 rounded-[var(--gr-radius-control)] transition-colors duration-[var(--gr-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]'
 
 export const selectSizeClassBySize: Record<GrSelectSize, string> = {
-  xs: 'h-7 px-2.5 text-[length:var(--gr-control-text-xs)] leading-[var(--gr-control-leading-xs)]',
-  sm: 'h-8 px-3 text-[length:var(--gr-control-text-sm)] leading-[var(--gr-control-leading-sm)]',
-  md: 'h-10 px-3 text-[length:var(--gr-control-text-md)] leading-[var(--gr-control-leading-md)]',
-  lg: 'h-11 px-4 text-[length:var(--gr-control-text-lg)] leading-[var(--gr-control-leading-lg)]',
+  xs: 'h-7 text-[length:var(--gr-control-text-xs)] leading-[var(--gr-control-leading-xs)]',
+  sm: 'h-8 text-[length:var(--gr-control-text-sm)] leading-[var(--gr-control-leading-sm)]',
+  md: 'h-10 text-[length:var(--gr-control-text-md)] leading-[var(--gr-control-leading-md)]',
+  lg: 'h-11 text-[length:var(--gr-control-text-lg)] leading-[var(--gr-control-leading-lg)]',
+}
+
+/** Отступ зависит и от размера, и от формы — см. `shared/controlShape.ts`. */
+export const selectPaddingXClass: Record<GrControlShape, Record<GrSelectSize, string>> = {
+  box: {
+    xs: 'px-2.5',
+    sm: 'px-3',
+    md: 'px-3',
+    lg: 'px-4',
+  },
+  pill: controlPillPaddingXClass,
 }
 
 export const selectLinkSizeClassBySize: Record<GrSelectSize, string> = {
@@ -181,6 +196,7 @@ export function grSelectClass(options: {
   underline: GrSelectUnderline
   state?: GrSelectState
   invalid?: boolean
+  shape: GrControlShape
 }): string {
   if (options.view === 'link') {
     return [
@@ -193,6 +209,8 @@ export function grSelectClass(options: {
 
   return [
     selectSizeClassBySize[options.size],
+    selectPaddingXClass[options.shape][options.size],
+    controlShapeRadiusClass[options.shape],
     // `invalid` сильнее `state`: ошибка перекрывает любую другую подсветку.
     options.invalid ? invalidBorderClass : borderClassByState[options.state ?? 'default'],
     // Заблокированный контрол гасится фоном и цветом текста, а не `opacity`:
@@ -210,6 +228,7 @@ export function grSelectNativeClass(options: {
   showNativeChevron: boolean
   state?: GrSelectState
   invalid?: boolean
+  shape: GrControlShape
 }): string {
   return [
     grSelectClass(options),
@@ -228,6 +247,7 @@ export function grSelectTriggerClass(options: {
   underline: GrSelectUnderline
   state?: GrSelectState
   invalid?: boolean
+  shape: GrControlShape
 }): string {
   if (options.optionsView !== 'panel') {
     return grSelectClass(options)

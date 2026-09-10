@@ -64,6 +64,13 @@ export const grSelectExamples: ShowcaseComponentExampleDoc[] = [
     note: 'filterable/loading/tags форсят panel-режим (в нативном `<select>` они невозможны). Поиск и подгрузка комбинируются: пока `loading` — список скрыт, дальше работает клиентская фильтрация.',
   },
   {
+    id: 'select-shape',
+    title: 'Border shape',
+    description: '`shape="pill"` даёт то же скругление, что у `GrSegmented`. Шеврон и кнопка очистки живут у правого края, и отступ идёт за формой — иначе они упирались бы в дугу.',
+    status: 'ready',
+    previewKey: 'gr-select-shape',
+  },
+  {
     id: 'select-virtual',
     title: 'Сгруппированный справочник на 10 000 позиций',
     description: 'С `virtual` в DOM живёт только окно вокруг вьюпорта. Группы при этом сохраняются: если панель прокручена внутрь группы, её обёртка всё равно создаётся и берёт имя через `aria-label` — заголовка в разметке в этот момент нет.',

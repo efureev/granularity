@@ -3235,14 +3235,14 @@ export const grComponentTokens: GrComponentToken[] = [
     "owner": "GrSegmented",
     "name": "--gr-segmented-item-py",
     "kind": "inline",
-    "default": "4px / 6px / 8px / 10px по ступеням `xs…lg`",
+    "default": "2px / 4px / 6px / 8px по ступеням `xs…lg`",
     "description": "Вертикальные поля пункта."
   },
   {
     "owner": "GrSegmented",
     "name": "--gr-segmented-min-height",
     "kind": "inline",
-    "default": "24px / 28px / 40px / 46px по ступеням `xs…lg`",
+    "default": "20px / 24px / 32px / 36px по ступеням `xs…lg`",
     "description": "Минимальная высота дорожки: переключатель обязан вставать в строку с контролами той же ступени."
   },
   {

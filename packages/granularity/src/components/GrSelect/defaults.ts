@@ -1,3 +1,5 @@
+import type { GrControlShape } from '../shared/controlShape'
+
 import type { GrSelectSize, GrSelectUnderline, GrSelectVariant } from './grSelectStyles'
 
 /**
@@ -10,6 +12,8 @@ export interface GrSelectConfigurableProps {
   variant: GrSelectVariant
   underline: GrSelectUnderline
   clearable: boolean
+  /** Форма рамки — см. `components/shared/controlShape.ts`. */
+  shape: GrControlShape
 }
 
 declare module '../../composables/useGrComponentConfig' {

@@ -1,3 +1,5 @@
+import type { GrControlShape } from '../shared/controlShape'
+
 import type { GrSegmentedSize, GrSegmentedVariant } from './grSegmentedStyles'
 
 /**
@@ -8,6 +10,7 @@ import type { GrSegmentedSize, GrSegmentedVariant } from './grSegmentedStyles'
 export interface GrSegmentedConfigurableProps {
   size: GrSegmentedSize
   variant: GrSegmentedVariant
+  shape: GrControlShape
 }
 
 declare module '../../composables/useGrComponentConfig' {

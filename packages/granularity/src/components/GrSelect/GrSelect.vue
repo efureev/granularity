@@ -3,6 +3,7 @@ import { computed, nextTick, ref, useId, useSlots, watch } from 'vue'
 
 import { usePortalTarget } from '../../composables/usePortalTarget'
 
+import type { GrControlShape } from '../shared/controlShape'
 import { useGrComponentProp, useGrComponentSize, useGrThemeAttrs } from '../GrConfigProvider/context'
 
 import type { GrBadgeRadius, GrBadgeSize, GrBadgeTone } from '../GrBadge/grBadgeStyles'
@@ -92,6 +93,11 @@ export interface GrSelectProps<TValue extends GrSelectValue = string> {
   /** Обязательное поле (`aria-required`). */
   required?: boolean
   ariaLabel?: string
+  /**
+   * Форма рамки. `box` — скругление шкалы контролов, как было всегда; `pill` —
+   * пилюля, как у `GrSegmented`. В `view="link"` не участвует: у ссылки рамки нет.
+   */
+  shape?: GrControlShape
   view?: GrSelectView
   size?: GrSelectSize
   /** Placeholder (показывается, когда значение не выбрано). */
@@ -221,6 +227,7 @@ const props = withDefaults(
     required: false,
     ariaLabel: undefined,
     view: 'default',
+    shape: undefined,
     size: undefined,
 
     placeholder: undefined,
@@ -261,6 +268,7 @@ const props = withDefaults(
 
 // Эффективный размер: локальный проп → `GrConfigProvider` → дефолт компонента.
 const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrSelect' })
+const resolvedShape = useGrComponentProp('GrSelect', 'shape', () => props.shape, 'box')
 const resolvedVariant = useGrComponentProp('GrSelect', 'variant', () => props.variant, 'primary')
 const resolvedUnderline = useGrComponentProp('GrSelect', 'underline', () => props.underline, 'auto')
 const resolvedClearable = useGrComponentProp('GrSelect', 'clearable', () => props.clearable, false)
@@ -772,6 +780,7 @@ const nativeClassName = computed(() => {
     showNativeChevron: showNativeChevron.value,
     state: props.state,
     invalid: isInvalid.value,
+    shape: resolvedShape.value,
   })
 })
 
@@ -804,6 +813,7 @@ const triggerClassName = computed(() => {
     underline: resolvedUnderline.value,
     state: props.state,
     invalid: isInvalid.value,
+    shape: resolvedShape.value,
   })
 })
 

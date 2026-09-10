@@ -45,6 +45,13 @@ export const grInputExamples: ShowcaseComponentExampleDoc[] = [
     previewKey: 'gr-input-enhancements',
   },
   {
+    id: 'input-shape',
+    title: 'Border shape',
+    description: '`shape="pill"` даёт то же скругление, что у `GrSegmented`. Форма тянет за собой отступ: в пилюле он не меньше половины высоты, иначе текст заезжает в дугу — видно на всех четырёх ступенях. Аддон-отсек обрезается по внешней дуге, разделитель остаётся прямым.',
+    status: 'ready',
+    previewKey: 'gr-input-shape',
+  },
+  {
     id: 'input-size-and-alignment',
     title: 'Size scale and text alignment',
     description: 'Показываем, что `GrInput` умеет жить и в компактных toolbars, и в крупных form-layout, а выравнивание текста настраивается отдельно от размера.',

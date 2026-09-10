@@ -1,3 +1,5 @@
+import type { GrControlShape } from '../shared/controlShape'
+
 import type { GrNumberInputSize } from './grNumberInputStyles'
 
 /**
@@ -8,6 +10,8 @@ import type { GrNumberInputSize } from './grNumberInputStyles'
 export interface GrNumberInputConfigurableProps {
   size: GrNumberInputSize
   clearable: boolean
+  /** Форма рамки — см. `components/shared/controlShape.ts`. */
+  shape: GrControlShape
 }
 
 declare module '../../composables/useGrComponentConfig' {

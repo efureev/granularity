@@ -1,4 +1,5 @@
 import { flattenTransitionTokens, splitClassTokens } from '../shared/classTokens'
+import { controlPillPaddingXClass, controlShapeRadiusClass } from '../shared/controlShape'
 import { controlStateIconClass, controlStateIconColors } from '../shared/controlState'
 import { panelPopTransition } from '../shared/overlayTransition'
 import {
@@ -9,10 +10,15 @@ import {
   shellDisabledClass,
   shellEnabledClass,
   sizeClassBySize,
+  paddingXClass,
 } from './grTreeSelectStyles'
 
 export const grTreeSelectSafelist = [...new Set([
   ...Object.values(sizeClassBySize).flatMap(splitClassTokens),
+  ...Object.values(paddingXClass).flatMap(map => Object.values(map)).flatMap(splitClassTokens),
+  // Общий модуль лежит в чанке без адреса — его классы объявляет каждый импортёр.
+  ...Object.values(controlShapeRadiusClass).flatMap(splitClassTokens),
+  ...Object.values(controlPillPaddingXClass).flatMap(splitClassTokens),
   ...Object.values(borderClassByState).flatMap(splitClassTokens),
   ...splitClassTokens(invalidBorderClass),
   'pr-9',

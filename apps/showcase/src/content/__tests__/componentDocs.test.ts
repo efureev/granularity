@@ -34,7 +34,7 @@ describe('component docs metadata', () => {
     const selectDoc = getShowcaseComponentDoc(selectEntity!)
     const fileUploadDoc = getShowcaseComponentDoc(fileUploadEntity!)
 
-    expect(selectDoc.examples).toHaveLength(9)
+    expect(selectDoc.examples).toHaveLength(10)
     expect(selectDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(selectDoc.examples.every(example => example.previewKey?.startsWith('gr-select'))).toBe(true)
 
@@ -109,7 +109,7 @@ describe('component docs metadata', () => {
     expect(treeDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(treeDoc.examples.every(example => example.previewKey?.startsWith('gr-tree'))).toBe(true)
 
-    expect(treeSelectDoc.examples).toHaveLength(6)
+    expect(treeSelectDoc.examples).toHaveLength(7)
     expect(treeSelectDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(treeSelectDoc.examples.every(example => example.previewKey?.startsWith('gr-tree-select'))).toBe(true)
   })
@@ -139,7 +139,7 @@ describe('component docs metadata', () => {
 
     const doc = getShowcaseComponentDoc(segmentedEntity!)
 
-    expect(doc.examples).toHaveLength(5)
+    expect(doc.examples).toHaveLength(6)
     expect(doc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(doc.examples.every(example => example.previewKey?.startsWith('gr-segmented'))).toBe(true)
   })
@@ -160,11 +160,11 @@ describe('component docs metadata', () => {
     const textareaDoc = getShowcaseComponentDoc(textareaEntity!)
     const switchDoc = getShowcaseComponentDoc(switchEntity!)
 
-    expect(inputDoc.examples).toHaveLength(7)
+    expect(inputDoc.examples).toHaveLength(8)
     expect(inputDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(inputDoc.examples.every(example => example.previewKey?.startsWith('gr-input'))).toBe(true)
 
-    expect(numberInputDoc.examples).toHaveLength(4)
+    expect(numberInputDoc.examples).toHaveLength(5)
     expect(numberInputDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(numberInputDoc.examples.every(example => example.previewKey?.startsWith('gr-number-input'))).toBe(true)
 

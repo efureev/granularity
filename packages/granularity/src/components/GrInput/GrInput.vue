@@ -10,6 +10,7 @@ import {
 import { computed, ref, useId } from 'vue'
 
 import { useControlAddons } from '../../composables/internal/useControlAddons'
+import type { GrControlShape } from '../shared/controlShape'
 import { useGrComponentProp, useGrComponentSize } from '../GrConfigProvider/context'
 import { useGrFormFieldContext } from '../GrFormField/context'
 import { useGrFormControl } from '../../composables/useGrFormControl'
@@ -48,6 +49,12 @@ export interface GrInputProps {
   name?: string
   id?: string
   size?: GrInputSize
+  /**
+   * Форма рамки. `box` — скругление шкалы контролов, как было всегда; `pill` —
+   * дорожка-пилюля, как у `GrSegmented`. Форма тянет за собой горизонтальный
+   * отступ: в пилюле он не меньше половины высоты, иначе текст заезжает в дугу.
+   */
+  shape?: GrControlShape
 
   /** Показывать кнопку очистки, когда есть значение (и не disabled/readonly). */
   clearable?: boolean
@@ -147,6 +154,7 @@ const props = withDefaults(
     name: undefined,
     id: undefined,
     size: undefined,
+    shape: undefined,
 
     // Настраивается через `GrConfigProvider`; дефолт — в резолвере ниже.
     clearable: undefined,
@@ -185,6 +193,7 @@ const field = useGrFormFieldContext()
 
 // Эффективные значения: локальный проп → `GrConfigProvider` → дефолт компонента.
 const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrInput' })
+const resolvedShape = useGrComponentProp('GrInput', 'shape', () => props.shape, 'box')
 const resolvedClearable = useGrComponentProp('GrInput', 'clearable', () => props.clearable, false)
 
 const resolvedId = computed(() => props.id ?? field?.id.value)
@@ -290,20 +299,23 @@ const {
   // У украшения своей ширины нет — иначе иконка висела бы в пустом отсеке
   // шириной со ступень размера.
   defaultMinWidth: () => (isInlineAddon.value ? '0px' : ADDON_MIN_WIDTH_BY_SIZE[resolvedSize.value]),
-  paddingX: () => paddingX[resolvedSize.value],
+  paddingX: () => paddingX[resolvedShape.value][resolvedSize.value],
   trailingReserve: () => trailingReserve.value,
 })
 
 // Border/ring/disabled — на оболочке (`focus-within`), размеры/выравнивание — на инпуте.
 const shellClass = computed(() => grInputShellClass({
+  size: resolvedSize.value,
   state: props.state,
   invalid: isInvalid.value,
   disabled: isDisabled.value,
+  shape: resolvedShape.value,
 }))
 
 const className = computed(() => grInputFieldClass({
   size: resolvedSize.value,
   align: props.textAlign,
+  shape: resolvedShape.value,
 }))
 
 function onInput(e: Event): void {

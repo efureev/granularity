@@ -1,3 +1,6 @@
+import type { GrControlShape } from '../shared/controlShape'
+import { controlPillPaddingX, controlPillPaddingXClass, controlShapeRadiusClass } from '../shared/controlShape'
+
 /**
  * Классы `GrInput`.
  *
@@ -10,23 +13,58 @@
  */
 
 export const sizes = {
-  xs: 'h-7 px-2.5 text-[length:var(--gr-control-text-xs)] leading-[var(--gr-control-leading-xs)]',
-  sm: 'h-8 px-3 text-[length:var(--gr-control-text-sm)] leading-[var(--gr-control-leading-sm)]',
-  md: 'h-10 px-3 text-[length:var(--gr-control-text-md)] leading-[var(--gr-control-leading-md)]',
-  lg: 'h-11 px-4 text-[length:var(--gr-control-text-lg)] leading-[var(--gr-control-leading-lg)]',
+  xs: 'h-full text-[length:var(--gr-control-text-xs)] leading-[var(--gr-control-leading-xs)]',
+  sm: 'h-full text-[length:var(--gr-control-text-sm)] leading-[var(--gr-control-leading-sm)]',
+  md: 'h-full text-[length:var(--gr-control-text-md)] leading-[var(--gr-control-leading-md)]',
+  lg: 'h-full text-[length:var(--gr-control-text-lg)] leading-[var(--gr-control-leading-lg)]',
 } as const
 
 /**
- * Горизонтальный padding из `sizes`, но числом: аддоны задают паддинги инлайн-
- * стилем, а он перекрывает класс — значение нужно обеим формам, и расходиться
- * им нельзя.
+ * Высота ступени живёт на **оболочке**, а не на самом `input`.
+ *
+ * Оболочка несёт рамку, и держи высоту внутренний элемент — рамка прибавлялась
+ * бы к ступени сверху: поле выходило на 2 px выше `GrSelect`, у которого рамка и
+ * высота на одном элементе. Замерено линейкой на странице Foundations: 30 против
+ * 28 на `xs`. Теперь ступень — это внешняя высота у всех.
  */
-export const paddingX = {
-  xs: '10px',
-  sm: '12px',
-  md: '12px',
-  lg: '16px',
-} as const
+export const shellHeightClass: Record<GrInputSize, string> = {
+  xs: 'h-7',
+  sm: 'h-8',
+  md: 'h-10',
+  lg: 'h-11',
+}
+
+export type GrInputSize = keyof typeof sizes
+
+/**
+ * Горизонтальный отступ отдельно от размера: он зависит ещё и от формы. В
+ * пилюле отступ обязан быть не меньше половины высоты, иначе текст заезжает в
+ * дугу — таблица общая на все поля-коробки.
+ */
+export const paddingXClass: Record<GrControlShape, Record<GrInputSize, string>> = {
+  box: {
+    xs: 'px-2.5',
+    sm: 'px-3',
+    md: 'px-3',
+    lg: 'px-4',
+  },
+  pill: controlPillPaddingXClass,
+}
+
+/**
+ * То же число, но значением: аддоны задают паддинги инлайн-стилем, а он
+ * перекрывает класс — значение нужно обеим формам, и расходиться им нельзя.
+ * Сторожит `controlShape.test.ts`.
+ */
+export const paddingX: Record<GrControlShape, Record<GrInputSize, string>> = {
+  box: {
+    xs: '10px',
+    sm: '12px',
+    md: '12px',
+    lg: '16px',
+  },
+  pill: controlPillPaddingX,
+}
 
 export const textAlign = {
   left: 'text-left',
@@ -50,7 +88,12 @@ export const invalidClass = 'border-[var(--gr-invalid-brd)] focus-within:ring-[v
 
 export type GrInputState = keyof typeof states
 
-export const shellBaseClass = 'relative w-full overflow-hidden rounded-[var(--gr-radius-control)] border transition-colors duration-[var(--gr-duration-fast)] focus-within:ring-2 focus-within:ring-[var(--gr-ring)]'
+/**
+ * Скругление приходит формой и потому не здесь. `overflow-hidden` при этом на
+ * месте: он обрезает отсек аддона и степперы по внешней дуге, и «скруглять
+ * только внешние углы» получается само.
+ */
+export const shellBaseClass = 'relative w-full overflow-hidden border transition-colors duration-[var(--gr-duration-fast)] focus-within:ring-2 focus-within:ring-[var(--gr-ring)]'
 
 export const shellEnabledClass = 'bg-[var(--gr-bg)]'
 
@@ -66,19 +109,28 @@ export function grInputShellClass(options: {
   state: GrInputState
   invalid: boolean
   disabled: boolean
+  shape: GrControlShape
+  size: GrInputSize
 }): string {
   return [
     shellBaseClass,
+    shellHeightClass[options.size],
+    controlShapeRadiusClass[options.shape],
     options.invalid ? invalidClass : states[options.state],
     options.disabled ? shellDisabledClass : shellEnabledClass,
   ].join(' ')
 }
 
 export function grInputFieldClass(options: {
-  size: keyof typeof sizes
+  size: GrInputSize
   align: keyof typeof textAlign
+  shape: GrControlShape
 }): string {
-  return [sizes[options.size], textAlign[options.align]].join(' ')
+  return [
+    sizes[options.size],
+    paddingXClass[options.shape][options.size],
+    textAlign[options.align],
+  ].join(' ')
 }
 
 /**

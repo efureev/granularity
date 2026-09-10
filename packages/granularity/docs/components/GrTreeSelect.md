@@ -4,7 +4,7 @@
 фильтрация, отображение пути до узла.
 
 Само дерево — [`./GrTree.md`](./GrTree.md), клавиатура —
-[`../keyboard.md`](../keyboard.md).
+[`../keyboard.md`](../keyboard.md). Форма рамки (`shape`) — [`../sizes.md`](../sizes.md).
 
 ## Когда брать
 

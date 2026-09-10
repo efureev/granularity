@@ -8,7 +8,7 @@ import { useFloating } from '../../composables/useFloating'
 import { useOverlayLayer } from '../../composables/useOverlayLayer'
 import { useControlAddons } from '../../composables/internal/useControlAddons'
 import { useControlledOpen } from '../../composables/internal/useControlledOpen'
-import { useGrComponentSize, useGrThemeAttrs } from '../GrConfigProvider/context'
+import { useGrComponentProp, useGrComponentSize, useGrThemeAttrs } from '../GrConfigProvider/context'
 import { useGrFormControl } from '../../composables/useGrFormControl'
 import { useFocusWithin } from '../../composables/internal/useFocusWithin'
 import { useGrFormFieldContext } from '../GrFormField/context'
@@ -63,6 +63,7 @@ const props = withDefaults(
     disabled: false,
     placeholder: undefined,
     size: undefined,
+    shape: undefined,
     loading: false,
     invalid: false,
     readonly: false,
@@ -354,10 +355,12 @@ const resolvedFilterPlaceholder = computed(() => {
 })
 
 const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrTreeSelect' })
+const resolvedShape = useGrComponentProp('GrTreeSelect', 'shape', () => props.shape, 'box')
 
 const className = computed(() => {
   return grTreeSelectClass({
     size: resolvedSize.value,
+    shape: resolvedShape.value,
     state: props.state,
     invalid: isInvalid.value,
     disabled: isDisabled.value,
@@ -387,7 +390,7 @@ const {
   fieldPadding: triggerStyle,
 } = useControlAddons(() => props, {
   defaultMinWidth: () => ADDON_MIN_WIDTH_BY_SIZE[resolvedSize.value],
-  paddingX: () => paddingX[resolvedSize.value],
+  paddingX: () => paddingX[resolvedShape.value][resolvedSize.value],
   // Место под крестик и шеврон уже отдано классом `pr-9`, но инлайн-паддинг
   // перекрывает класс целиком — с суффиксом эту зону приходится вернуть числом.
   trailingReserve: () => (slots.suffix ? trailingZoneWidth : '0px'),
@@ -662,7 +665,7 @@ const themeAttrs = useGrThemeAttrs()
         v-if="hasPrefix"
         ref="prefixEl"
         data-gr-tree-select-prefix
-        class="absolute inset-y-px left-px flex items-center justify-center rounded-l-[var(--gr-radius-control)] border-r border-[var(--gr-brd)] px-2 text-[var(--gr-muted-fg)] pointer-events-none select-none truncate"
+        class="absolute inset-y-px left-px flex items-center justify-center border-r border-[var(--gr-brd)] px-2 text-[var(--gr-muted-fg)] pointer-events-none select-none truncate"
         :style="prefixStyle"
         aria-hidden="true"
       >
@@ -688,7 +691,7 @@ const themeAttrs = useGrThemeAttrs()
         :aria-required="isRequired ? 'true' : undefined"
         :aria-describedby="describedBy"
         :aria-label="ariaLabel"
-        class="w-full rounded-[var(--gr-radius-control)] border placeholder:text-[var(--gr-muted-fg)] transition-colors duration-[var(--gr-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]"
+        class="w-full border placeholder:text-[var(--gr-muted-fg)] transition-colors duration-[var(--gr-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]"
         :class="[className, $slots.value || hasTags ? 'text-transparent placeholder:text-transparent' : '']"
         :style="triggerStyle"
         @pointerdown="onTriggerPointerDown"

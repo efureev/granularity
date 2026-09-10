@@ -50,7 +50,7 @@ describe('GrNumberInput', () => {
     })
 
     const input = wrapper.get('input')
-    expect(input.attributes('class')).toContain('h-10')
+    expect(wrapper.get('[data-gr-number-input]').classes()).toContain('h-10')
     expect(input.attributes('class')).toContain('px-3')
     expect(input.attributes('class')).toContain('text-center')
   })

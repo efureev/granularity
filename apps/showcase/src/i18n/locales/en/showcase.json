@@ -421,7 +421,9 @@
       "value": "Color / value",
       "description": "Description",
       "source": "Source"
-    }
+    },
+    "controlSizesTitle": "Control height scale",
+    "controlSizesDescription": "One step, one height: **28 / 32 / 40 / 44 px** for `xs…lg`. A field states it as a utility; `GrSegmented` adds its segment height to the track padding — so the only way to check them is to put them in one row. The dashed rule at the bottom of each row is the height of the step."
   },
   "detailPage": {
     "backTo": "Back to {target}",

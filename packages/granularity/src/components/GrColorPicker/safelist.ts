@@ -1,4 +1,5 @@
 import { splitClassTokens } from '../shared/classTokens'
+import { controlPillPaddingXClass, controlShapeRadiusClass } from '../shared/controlShape'
 import {
   areaBaseClass,
   areaHeightBySize,
@@ -29,6 +30,7 @@ import {
   triggerSizeClassBySize,
   triggerSwatchSizeBySize,
   triggerValueClass,
+  triggerPaddingXClass,
 } from './grColorPickerStyles'
 
 // Классы из вычисляемых мап и литералов `.ts`-хелпера UnoCSS сканом не находит.
@@ -38,6 +40,10 @@ import {
 // `documentedConfig` справедливо на такой записи падает.
 export const grColorPickerSafelist = [...new Set([
   ...Object.values(triggerSizeClassBySize).flatMap(splitClassTokens),
+  ...Object.values(triggerPaddingXClass).flatMap(map => Object.values(map)).flatMap(splitClassTokens),
+  // Общий модуль лежит в чанке без адреса — его классы объявляет каждый импортёр.
+  ...Object.values(controlShapeRadiusClass).flatMap(splitClassTokens),
+  ...Object.values(controlPillPaddingXClass).flatMap(splitClassTokens),
   ...Object.values(triggerSwatchSizeBySize).flatMap(splitClassTokens),
   ...Object.values(panelSizeClassBySize).flatMap(splitClassTokens),
   ...Object.values(areaHeightBySize).flatMap(splitClassTokens),

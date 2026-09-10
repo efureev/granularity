@@ -4,6 +4,8 @@
 H/S/L (плюс альфа), hex-полем и палитрой пресетов. По просьбе — квадрат
 насыщенность × светлота вместо двух бегунков и пипетка экрана.
 
+Форма рамки (`shape`) — [`../sizes.md`](../sizes.md).
+
 ```vue
 <GrFormField label="Цвет бренда">
   <GrColorPicker v-model="brand" :presets="palette" />

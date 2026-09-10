@@ -1,3 +1,5 @@
+import type { GrControlShape } from '../shared/controlShape'
+
 import type { GrColorPickerSize, GrColorPickerView } from './grColorPickerStyles'
 
 /**
@@ -8,6 +10,8 @@ import type { GrColorPickerSize, GrColorPickerView } from './grColorPickerStyles
  */
 export interface GrColorPickerConfigurableProps {
   size: GrColorPickerSize
+  /** Форма рамки — см. `components/shared/controlShape.ts`. */
+  shape: GrControlShape
   view: GrColorPickerView
   eyedropper: boolean
 }

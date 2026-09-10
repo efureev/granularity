@@ -1,3 +1,4 @@
+import type { GrControlShape } from '../shared/controlShape'
 import type { GrComponentSize } from '../GrConfigProvider/context'
 
 /**
@@ -11,6 +12,8 @@ import type { GrComponentSize } from '../GrConfigProvider/context'
 export interface GrInputConfigurableProps {
   size: GrComponentSize
   clearable: boolean
+  /** Форма рамки — см. `components/shared/controlShape.ts`. */
+  shape: GrControlShape
 }
 
 declare module '../../composables/useGrComponentConfig' {

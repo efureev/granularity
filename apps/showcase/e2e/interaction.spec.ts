@@ -1052,6 +1052,35 @@ test.describe('GrDropdownMenu: вложенные подменю', () => {
   })
 })
 
+test.describe('Foundations: линейка высот контролов', () => {
+  /**
+   * Страница показывает линейку глазами, а этот тест делает её проверяемой.
+   *
+   * Высота у контролов выражена по-разному — утилитой у поля, суммой высоты
+   * сегмента и поля дорожки у `GrSegmented`, — и юнит-гейт сверяет только
+   * объявленные числа. Совпадают ли они **после раскладки**, показывает лишь
+   * настоящий браузер: в jsdom высоты нет вовсе.
+   */
+  test('на каждой ступени все контролы одной высоты', async ({ page }) => {
+    await openShowcasePage(page, '/foundations')
+
+    const section = page.locator('#control-sizes')
+    await expect(section).toBeVisible()
+
+    const rows = section.locator('[data-gr-segmented]')
+    const steps = await rows.count()
+    expect(steps, 'ступеней в линейке').toBe(4)
+
+    for (let index = 0; index < steps; index++) {
+      const row = section.locator('.border-dashed').nth(index)
+      const heights = await row.evaluate(node =>
+        [...node.children].map(child => Math.round(child.getBoundingClientRect().height)))
+
+      expect(new Set(heights).size, `ступень ${index}: высоты ${heights.join('/')}`).toBe(1)
+    }
+  })
+})
+
 test.describe('GrSteps: проход мастера', () => {
   test('гейт не пускает вперёд, а будущий шаг вне таб-порядка', async ({ page }) => {
     await openShowcasePage(page, componentPath('GrSteps'))

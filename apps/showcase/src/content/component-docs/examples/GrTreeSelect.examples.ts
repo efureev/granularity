@@ -39,6 +39,13 @@ export const grTreeSelectExamples: ShowcaseComponentExampleDoc[] = [
     note: 'Этот пример помогает увидеть, как `GrTreeSelect` превращается из generic picker в domain-specific selector без форка компонента.',
   },
   {
+    id: 'tree-select-shape',
+    title: 'Border shape',
+    description: 'Приставка прижата к левому краю, и в пилюле её угол повторяет дугу оболочки. Форма — общая ось с остальными полями формы.',
+    status: 'ready',
+    previewKey: 'gr-tree-select-shape',
+  },
+  {
     id: 'tree-select-keyboard',
     title: 'Клавиатура и загрузка справочника',
     description: 'Стрелка с поля открывает панель и уводит в дерево, `Esc` возвращает фокус обратно, а `loading` не даёт спутать «ещё едет» с «ничего нет».',

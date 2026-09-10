@@ -16,6 +16,7 @@ import IconPipette from '~icons/lucide/pipette'
 import { useDragGesture } from '../../composables/useDragGesture'
 import { useGrFormControl } from '../../composables/useGrFormControl'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
+import type { GrControlShape } from '../shared/controlShape'
 import { useGrComponentProp, useGrComponentSize } from '../GrConfigProvider/context'
 import { useGrFormFieldContext } from '../GrFormField/context'
 import GrInput from '../GrInput/GrInput.vue'
@@ -70,6 +71,8 @@ export interface GrColorPickerProps {
   /** Палитра быстрого выбора. Пусто — блок не рендерится. */
   presets?: string[]
   size?: GrColorPickerSize
+  /** Форма рамки. `box` — скругление шкалы контролов; `pill` — пилюля. */
+  shape?: GrControlShape
   /** Контролируемое состояние панели (`v-model:open`). */
   open?: boolean
   /** Сторона, с которой раскрывается панель. */
@@ -101,6 +104,7 @@ const props = withDefaults(defineProps<GrColorPickerProps>(), {
   // Дефолт живёт в резолвере: Vue подставил бы свой раньше, чем компонент
   // заглянет в `GrConfigProvider`.
   size: undefined,
+  shape: undefined,
   open: undefined,
   placement: 'bottom-start',
   name: undefined,
@@ -116,6 +120,7 @@ const emit = defineEmits<GrColorPickerEmits>()
 const { t } = useGranularityTranslations()
 
 const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrColorPicker' })
+const resolvedShape = useGrComponentProp('GrColorPicker', 'shape', () => props.shape, 'box')
 const resolvedView = useGrComponentProp('GrColorPicker', 'view', () => props.view, 'sliders')
 const wantsEyedropper = useGrComponentProp('GrColorPicker', 'eyedropper', () => props.eyedropper, false)
 
@@ -264,6 +269,7 @@ function selectPreset(preset: string): void {
 
 const triggerClass = computed(() => grColorPickerTriggerClass({
   size: resolvedSize.value,
+  shape: resolvedShape.value,
   disabled: isDisabled.value,
   invalid: isInvalid.value,
 }))

@@ -2,8 +2,9 @@ import { mount } from '@vue/test-utils'
 import { nextTick } from 'vue'
 import { describe, expect, it, vi } from 'vitest'
 
+import { granularityGlobal, mockRect } from '../../../testing'
+
 import GrInput from '../GrInput.vue'
-import { mockRect } from '../../../testing'
 
 describe('GrInput', () => {
   it('поддерживает size=xs', () => {
@@ -14,8 +15,11 @@ describe('GrInput', () => {
       },
     })
 
+    // Высота ступени живёт на оболочке: рамка обязана входить в ступень, а не
+    // прибавляться к ней сверху.
+    expect(wrapper.get('[data-gr-input] > div').classes()).toContain('h-7')
+
     const input = wrapper.get('input')
-    expect(input.attributes('class')).toContain('h-7')
     expect(input.attributes('class')).toContain('px-2.5')
     expect(input.attributes('class')).toContain('text-[length:var(--gr-control-text-xs)]')
   })
@@ -28,8 +32,11 @@ describe('GrInput', () => {
       },
     })
 
+    // Высота ступени живёт на оболочке: рамка обязана входить в ступень, а не
+    // прибавляться к ней сверху.
+    expect(wrapper.get('[data-gr-input] > div').classes()).toContain('h-11')
+
     const input = wrapper.get('input')
-    expect(input.attributes('class')).toContain('h-11')
     expect(input.attributes('class')).toContain('px-4')
     expect(input.attributes('class')).toContain('text-[length:var(--gr-control-text-lg)]')
   })
@@ -41,8 +48,11 @@ describe('GrInput', () => {
       },
     })
 
+    // Высота ступени живёт на оболочке: рамка обязана входить в ступень, а не
+    // прибавляться к ней сверху.
+    expect(wrapper.get('[data-gr-input] > div').classes()).toContain('h-10')
+
     const input = wrapper.get('input')
-    expect(input.attributes('class')).toContain('h-10')
     expect(input.attributes('class')).toContain('px-3')
   })
 
@@ -511,5 +521,66 @@ describe('GrInput — значащие аддоны', () => {
     expect(describedBy).toEqual([suffixId])
 
     wrapper.unmount()
+  })
+})
+
+describe('GrInput — форма рамки', () => {
+  const shell = (wrapper: ReturnType<typeof mount>) =>
+    wrapper.get('[data-gr-input] > div')
+
+  it('по умолчанию коробка: скругление шкалы контролов', () => {
+    const wrapper = mount(GrInput, { props: { modelValue: '' } })
+
+    expect(shell(wrapper).classes()).toContain('rounded-[var(--gr-radius-control)]')
+    expect(wrapper.get('input').classes()).toContain('px-3')
+  })
+
+  it('pill даёт пилюлю и отступ не меньше половины высоты', () => {
+    // 12px отступа при дуге в 20px сажали бы текст на скругление — форма обязана
+    // тянуть отступ за собой, иначе пилюля выглядит сломанной.
+    const wrapper = mount(GrInput, { props: { modelValue: '', shape: 'pill' } })
+
+    expect(shell(wrapper).classes()).toContain('rounded-[var(--gr-radius-full)]')
+    expect(wrapper.get('input').classes()).toContain('px-5')
+    expect(wrapper.get('input').classes()).not.toContain('px-3')
+  })
+
+  it('форма приходит из componentDefaults, локальный проп её перебивает', () => {
+    const fromConfig = mount(GrInput, {
+      props: { modelValue: '' },
+      global: granularityGlobal({ componentDefaults: { GrInput: { shape: 'pill' } } }),
+    })
+    expect(shell(fromConfig).classes()).toContain('rounded-[var(--gr-radius-full)]')
+
+    const overridden = mount(GrInput, {
+      props: { modelValue: '', shape: 'box' },
+      global: granularityGlobal({ componentDefaults: { GrInput: { shape: 'pill' } } }),
+    })
+    expect(shell(overridden).classes()).toContain('rounded-[var(--gr-radius-control)]')
+  })
+
+  it('аддон-отсек в пилюле отодвигает поле на увеличенный отступ', () => {
+    // Аддоны задают отступ инлайн-стилем, и он обязан идти из той же таблицы,
+    // что класс: иначе поле с аддоном и без него встают по-разному.
+    const box = mount(GrInput, {
+      props: { modelValue: '' },
+      slots: { prefix: '₽' },
+    })
+    const pill = mount(GrInput, {
+      props: { modelValue: '', shape: 'pill' },
+      slots: { prefix: '₽' },
+    })
+
+    expect(box.get('input').attributes('style')).toContain('12px')
+    expect(pill.get('input').attributes('style')).toContain('20px')
+  })
+
+  it('оболочка обрезает содержимое по дуге в обеих формах', () => {
+    // `overflow-hidden` — то, чем отсек аддона скругляется по внешнему контуру;
+    // без него в пилюле его фон торчал бы прямоугольником из-под дуги.
+    for (const shape of ['box', 'pill'] as const) {
+      const wrapper = mount(GrInput, { props: { modelValue: '', shape } })
+      expect(shell(wrapper).classes()).toContain('overflow-hidden')
+    }
   })
 })

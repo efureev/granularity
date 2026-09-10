@@ -1,3 +1,6 @@
+import type { GrControlShape } from '../shared/controlShape'
+import { controlPillPaddingXClass, controlShapeRadiusClass } from '../shared/controlShape'
+
 import type { GrComponentSize } from '../shared/sizes'
 
 export type GrColorPickerSize = GrComponentSize
@@ -7,10 +10,25 @@ export type GrColorPickerSize = GrComponentSize
  * с `GrInput`, и своя лестница высот выдала бы его из ряда.
  */
 export const triggerSizeClassBySize: Record<GrColorPickerSize, string> = {
-  xs: 'h-7 px-2 gap-1.5 text-[length:var(--gr-control-text-xs)] leading-[var(--gr-control-leading-xs)]',
-  sm: 'h-8 px-2.5 gap-2 text-[length:var(--gr-control-text-sm)] leading-[var(--gr-control-leading-sm)]',
-  md: 'h-10 px-3 gap-2 text-[length:var(--gr-control-text-md)] leading-[var(--gr-control-leading-md)]',
-  lg: 'h-11 px-4 gap-2.5 text-[length:var(--gr-control-text-lg)] leading-[var(--gr-control-leading-lg)]',
+  xs: 'h-7 gap-1.5 text-[length:var(--gr-control-text-xs)] leading-[var(--gr-control-leading-xs)]',
+  sm: 'h-8 gap-2 text-[length:var(--gr-control-text-sm)] leading-[var(--gr-control-leading-sm)]',
+  md: 'h-10 gap-2 text-[length:var(--gr-control-text-md)] leading-[var(--gr-control-leading-md)]',
+  lg: 'h-11 gap-2.5 text-[length:var(--gr-control-text-lg)] leading-[var(--gr-control-leading-lg)]',
+}
+
+/**
+ * Отступ триггера зависит и от размера, и от формы. У коробки он мельче, чем у
+ * полей ввода: слева стоит образец цвета, и лишний отступ отодвигал бы его от
+ * края сильнее, чем нужно.
+ */
+export const triggerPaddingXClass: Record<GrControlShape, Record<GrColorPickerSize, string>> = {
+  box: {
+    xs: 'px-2',
+    sm: 'px-2.5',
+    md: 'px-3',
+    lg: 'px-4',
+  },
+  pill: controlPillPaddingXClass,
 }
 
 /** Образец в триггере: квадрат со стороной чуть меньше высоты поля. */
@@ -28,7 +46,8 @@ export const panelSizeClassBySize: Record<GrColorPickerSize, string> = {
   lg: 'w-72 gap-3 text-[length:var(--gr-control-text-lg)] leading-[var(--gr-control-leading-lg)]',
 }
 
-export const triggerBaseClass = 'inline-flex w-full min-w-0 items-center rounded-[var(--gr-radius-control)] border border-[var(--gr-brd)] bg-[var(--gr-bg)] text-[var(--gr-fg)] transition-colors duration-[var(--gr-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]'
+/** Скругление приходит формой, поэтому здесь его нет. */
+export const triggerBaseClass = 'inline-flex w-full min-w-0 items-center border border-[var(--gr-brd)] bg-[var(--gr-bg)] text-[var(--gr-fg)] transition-colors duration-[var(--gr-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]'
 
 /** Недоступное поле гасится токенами, а не `opacity`: прозрачность роняет контраст подписи. */
 export const triggerDisabledClass = 'cursor-not-allowed border-[var(--gr-brd)] bg-[var(--gr-muted)] text-[var(--gr-disabled-fg)]'
@@ -121,10 +140,13 @@ export function grColorPickerTriggerClass(options: {
   size: GrColorPickerSize
   disabled: boolean
   invalid: boolean
+  shape: GrControlShape
 }): string {
   return [
     triggerBaseClass,
     triggerSizeClassBySize[options.size],
+    triggerPaddingXClass[options.shape][options.size],
+    controlShapeRadiusClass[options.shape],
     options.disabled ? triggerDisabledClass : triggerEnabledClass,
     options.invalid ? triggerInvalidClass : '',
   ].filter(Boolean).join(' ')

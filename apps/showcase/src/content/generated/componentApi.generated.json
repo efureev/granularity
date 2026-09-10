@@ -2502,6 +2502,13 @@
             "default": "undefined"
           },
           {
+            "name": "shape",
+            "description": "Форма рамки. `box` — скругление шкалы контролов; `pill` — пилюля.",
+            "type": "\"box\" | \"pill\" | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "alpha",
             "description": "Четвёртый слайдер и восьмизначная форма hex.",
             "type": "boolean | undefined",
@@ -6276,6 +6283,13 @@
             "default": "false"
           },
           {
+            "name": "shape",
+            "description": "Форма рамки. `box` — скругление шкалы контролов, как было всегда; `pill` — дорожка-пилюля, как у `GrSegmented`. Форма тянет за собой горизонтальный отступ: в пилюле он не меньше половины высоты, иначе текст заезжает в дугу.",
+            "type": "\"box\" | \"pill\" | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "id",
             "description": "",
             "type": "string | undefined",
@@ -7735,6 +7749,13 @@
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
+          },
+          {
+            "name": "shape",
+            "description": "Форма рамки. `box` — скругление шкалы контролов; `pill` — пилюля. Отступ поля и вылет степперов идут за формой: `overflow-hidden` обрезает их по внешней дуге, но встать вплотную к ней они не должны.",
+            "type": "\"box\" | \"pill\" | undefined",
+            "required": false,
+            "default": "undefined"
           },
           {
             "name": "max",
@@ -9863,6 +9884,13 @@
             "default": "undefined"
           },
           {
+            "name": "shape",
+            "description": "Форма рамки. `pill` — дорожка-пилюля, как была всегда; `box` — то же скругление, что у полей ввода, чтобы сегменты не выглядели в форме гостем из другой системы.",
+            "type": "\"box\" | \"pill\" | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "block",
             "description": "Растягивать сегмент на всю ширину контейнера.",
             "type": "boolean | undefined",
@@ -10027,6 +10055,13 @@
             "name": "ariaLabel",
             "description": "",
             "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "shape",
+            "description": "Форма рамки. `box` — скругление шкалы контролов, как было всегда; `pill` — пилюля, как у `GrSegmented`. В `view=\"link\"` не участвует: у ссылки рамки нет.",
+            "type": "\"box\" | \"pill\" | undefined",
             "required": false,
             "default": "undefined"
           },
@@ -13529,6 +13564,13 @@
             "name": "size",
             "description": "",
             "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "shape",
+            "description": "Форма рамки. `box` — скругление шкалы контролов; `pill` — пилюля.",
+            "type": "\"box\" | \"pill\" | undefined",
             "required": false,
             "default": "undefined"
           },

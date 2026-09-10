@@ -9,6 +9,33 @@ to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **`shape` — the border shape of a control, an axis next to `size`.** Two
+  values, `box` (the control radius scale) and `pill` (fully round), declared
+  once in `components/shared/controlShape.ts`. `GrSegmented` keeps its pill as
+  the default and gains `box`, so a segmented row no longer reads as a guest
+  from another system next to a select; `GrInput`, `GrSelect`, `GrNumberInput`,
+  `GrTreeSelect` and `GrColorPicker` default to `box` and gain `pill`. Both are
+  settable per instance and per app through
+  `componentDefaults[Component].shape`.
+
+  The values are named after the shape rather than after whose default they are:
+  a single word would otherwise mean different corners on neighbouring controls.
+
+  **The shape carries the horizontal padding with it**, and that is not cosmetic:
+  a pill on a 40px box draws a 20px arc, and `GrInput`'s 12px padding at `md`
+  would seat the text inside the curve. Pill padding is therefore never less than
+  half the control's height — one table for all of them, since their heights are
+  the same. Addon compartments follow: the shell already clipped them to its
+  outer contour, so only their own clearance had to grow, and the divider between
+  addon and field stays straight.
+
+  Growing fields deliberately have no shape. On `GrTextarea`, on `GrAutocomplete`
+  with chips and on `GrInputTag` the height is not fixed, and an arc of half the
+  height turns a grown box into an ellipse — the same case for which a vertical
+  `GrSegmented` computes its radius instead of taking `9999px`. Checkboxes,
+  radios, the switch and the slider have no shape either: there the round is
+  semantics, not decoration.
+
 - **Second-level menus in `GrDropdownMenu` and `GrContextMenu`.** An entry with
   non-empty `children` becomes a disclosure: it runs nothing and emits no
   `select` — it opens the next level. In composition the same thing is
@@ -44,6 +71,25 @@ to [Semantic Versioning](https://semver.org/).
   gone — unless by then the cursor has come back.
 
 ### Fixed
+
+- **`GrSegmented` now stands at the same height as a field of the same step.**
+  The track was taller than a field by 4, 4, 8 and 10px at `xs…lg` — a different
+  amount at every step — so a segmented control and a select in one row sat on
+  different baselines. The heights were expressed differently (a `h-10` utility
+  on one side, a sum of segment height and track padding on the other) and there
+  was nothing to check them against; the step is now a shared metric,
+  `GR_CONTROL_HEIGHTS_PX`, and the track's outer height derives from it.
+
+  Visually the track is more compact than before at every step; segment labels
+  and icons keep their clearance because the vertical padding derives from the
+  same number.
+
+- **A field's step height now includes its border.** `GrInput` and
+  `GrNumberInput` carried the height utility on the inner element, so the shell's
+  border added 2px on top of the step and they stood taller than `GrSelect`,
+  which keeps border and height on one element. The height moved to the shell and
+  the inner element stretches to fill it. Measured on the new size ruler in
+  Foundations: `30 / 28 / 30 / 30 / 28` at `xs` before, one number after.
 
 - **A popover no longer closes on a click into a layer opened above it.** The
   portal makes layers siblings, so a submenu, a select or a second popover

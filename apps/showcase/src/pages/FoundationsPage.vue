@@ -2,7 +2,8 @@
 import { computed, ref } from 'vue'
 
 import { useFintI18n } from '@feugene/fint-i18n/vue'
-import { GrBadge, GrCard, GrLink, GrSwitch } from '@feugene/granularity'
+import type { GrComponentSize } from '@feugene/granularity'
+import { GR_CONTROL_HEIGHTS_PX, GrBadge, GrCard, GrColorPicker, GrInput, GrLink, GrNumberInput, GrSegmented, GrSelect, GrSwitch } from '@feugene/granularity'
 
 import InlineRichText from '../components/content/InlineRichText.vue'
 import CodeBlock from '../components/doc/CodeBlock.vue'
@@ -103,6 +104,32 @@ const granularitySpecifier = `@feugene${'/granularity'}`
 const granularityVueSpecifier = `${granularitySpecifier}/vue`
 const granularityDirectivesSpecifier = `${granularitySpecifier}/directives`
 const unpluginGranularitySpecifier = `@feugene${'/unplugin-granularity'}`
+/**
+ * Линейка высот: одни и те же контролы на всех четырёх ступенях.
+ *
+ * Страница показывает то, что иначе проверяется только гейтом
+ * (`controlHeights.test.ts`): у поля высота задана утилитой, у `GrSegmented`
+ * складывается из высоты сегмента и поля дорожки — и разъезд между ними виден
+ * лишь тогда, когда они стоят рядом в одной строке.
+ */
+const controlSizeSteps = (Object.keys(GR_CONTROL_HEIGHTS_PX) as GrComponentSize[])
+  .map(size => ({ size, height: GR_CONTROL_HEIGHTS_PX[size] }))
+
+const controlSizeViews = [
+  { value: 'grid', label: 'Grid' },
+  { value: 'list', label: 'List' },
+]
+const controlSizeStatuses = [
+  { value: 'draft', label: 'Draft' },
+  { value: 'published', label: 'Published' },
+]
+
+const controlSizeView = ref('grid')
+const controlSizeStatus = ref('draft')
+const controlSizeText = ref('Quarterly report')
+const controlSizeAmount = ref<number | null>(1240)
+const controlSizeColor = ref('#3b82f6')
+
 const vuePluginCode = `import { createApp } from 'vue'
 import { GrButton, GrInput } from '${granularitySpecifier}'
 import { createGranularity } from '${granularityVueSpecifier}'
@@ -210,6 +237,73 @@ const integrationCodeSamples: Record<string, Array<{ code: string, language: str
                 </p>
               </div>
             </GrCard>
+          </div>
+        </div>
+      </GrCard>
+    </section>
+
+    <section id="control-sizes" class="space-y-6 scroll-mt-28">
+      <GrCard class="showcase-panel rounded-3xl border p-6">
+        <div class="space-y-5">
+          <div class="space-y-2">
+            <h2 class="text-2xl font-semibold">
+              {{ $t('showcase.foundationsPage.controlSizesTitle') }}
+            </h2>
+            <p class="showcase-text-muted text-sm leading-6">
+              <InlineRichText :text="$t('showcase.foundationsPage.controlSizesDescription')" />
+            </p>
+          </div>
+
+          <!--
+            Ступени идут строками, а контролы — колонками: линейка видна только
+            когда соседи стоят на одной горизонтали. Пунктирная линия у нижнего
+            края строки — та самая высота ступени, по которой они выравниваются.
+          -->
+          <div class="grid gap-5">
+            <div v-for="step in controlSizeSteps" :key="step.size" class="space-y-2">
+              <div class="flex items-baseline gap-2">
+                <GrBadge variant="secondary" size="sm">
+                  {{ step.size }}
+                </GrBadge>
+                <span class="showcase-text-muted text-xs">{{ step.height }}px</span>
+              </div>
+
+              <div
+                  class="flex flex-wrap items-center gap-3 border-b border-dashed border-[var(--gr-brd)] pb-5"
+              >
+                <GrSegmented
+                    v-model="controlSizeView"
+                    :options="controlSizeViews"
+                    :size="step.size"
+                    :aria-label="`Layout, size ${step.size}`"
+                />
+                <GrSelect
+                    v-model="controlSizeStatus"
+                    :options="controlSizeStatuses"
+                    :size="step.size"
+                    class="w-40"
+                    :aria-label="`Status, size ${step.size}`"
+                />
+                <GrInput
+                    v-model="controlSizeText"
+                    :size="step.size"
+                    class="w-40"
+                    :aria-label="`Title, size ${step.size}`"
+                />
+                <GrNumberInput
+                    v-model="controlSizeAmount"
+                    :size="step.size"
+                    class="w-32"
+                    :aria-label="`Amount, size ${step.size}`"
+                />
+                <GrColorPicker
+                    v-model="controlSizeColor"
+                    :size="step.size"
+                    class="w-40"
+                    :aria-label="`Colour, size ${step.size}`"
+                />
+              </div>
+            </div>
           </div>
         </div>
       </GrCard>

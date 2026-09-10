@@ -1,3 +1,4 @@
+import type { GrControlShape } from '../shared/controlShape'
 import type { InputHTMLAttributes } from 'vue'
 import type { GrInputSize } from '../GrInput/GrInput.vue'
 import type { GrTreeFilterNodeMethod, GrTreeKey, GrTreePropsMap } from '../GrTree'
@@ -23,6 +24,8 @@ export interface GrTreeSelectProps<T extends object = any> {
 
   placeholder?: string
   size?: GrInputSize
+  /** Форма рамки. `box` — скругление шкалы контролов; `pill` — пилюля. */
+  shape?: GrControlShape
   /**
    * Данные ещё едут. Панель показывает индикатор вместо «Нет данных» — иначе
    * пустой ответ и незагруженный выглядят одинаково.

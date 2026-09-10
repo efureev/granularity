@@ -1,3 +1,6 @@
+import type { GrControlShape } from '../shared/controlShape'
+import { controlPillPaddingX, controlPillPaddingXClass, controlShapeRadiusClass } from '../shared/controlShape'
+
 import type { GrComponentSize, GrControlState } from '../shared/sizes'
 
 export type GrNumberInputState = GrControlState
@@ -10,11 +13,44 @@ export type NumberInputSize = GrNumberInputSize
 export type NumberInputControlsDirection = GrNumberInputControlsDirection
 
 export const sizeClassBySize: Record<GrNumberInputSize, string> = {
-  xs: 'h-7 px-2.5 text-[length:var(--gr-control-text-xs)] leading-[var(--gr-control-leading-xs)]',
-  sm: 'h-8 px-3 text-[length:var(--gr-control-text-sm)] leading-[var(--gr-control-leading-sm)]',
-  md: 'h-10 px-3 text-[length:var(--gr-control-text-md)] leading-[var(--gr-control-leading-md)]',
-  lg: 'h-11 px-4 text-[length:var(--gr-control-text-lg)] leading-[var(--gr-control-leading-lg)]',
+  xs: 'h-full text-[length:var(--gr-control-text-xs)] leading-[var(--gr-control-leading-xs)]',
+  sm: 'h-full text-[length:var(--gr-control-text-sm)] leading-[var(--gr-control-leading-sm)]',
+  md: 'h-full text-[length:var(--gr-control-text-md)] leading-[var(--gr-control-leading-md)]',
+  lg: 'h-full text-[length:var(--gr-control-text-lg)] leading-[var(--gr-control-leading-lg)]',
 }
+
+/** Высота ступени — на оболочке с рамкой, как у `GrInput`. */
+export const shellHeightClass: Record<GrNumberInputSize, string> = {
+  xs: 'h-7',
+  sm: 'h-8',
+  md: 'h-10',
+  lg: 'h-11',
+}
+
+/** Отступ зависит и от размера, и от формы — см. `shared/controlShape.ts`. */
+export const paddingXClass: Record<GrControlShape, Record<GrNumberInputSize, string>> = {
+  box: {
+    xs: 'px-2.5',
+    sm: 'px-3',
+    md: 'px-3',
+    lg: 'px-4',
+  },
+  pill: controlPillPaddingXClass,
+}
+
+/** То же значением: степперы и аддоны задают отступ инлайн-стилем. */
+export const paddingX: Record<GrControlShape, Record<GrNumberInputSize, string>> = {
+  box: {
+    xs: '10px',
+    sm: '12px',
+    md: '12px',
+    lg: '16px',
+  },
+  pill: controlPillPaddingX,
+}
+
+/** Скругление оболочки: `overflow-hidden` обрезает по нему степперы и аддоны. */
+export const shellShapeClass = controlShapeRadiusClass
 
 export const textAlignClassByAlign: Record<GrNumberInputTextAlign, string> = {
   left: 'text-left',
@@ -61,9 +97,14 @@ export function grNumberInputShellClass(options: { disabled: boolean, state: GrN
     .join(' ')
 }
 
-export function grNumberInputInputClass(options: { size: GrNumberInputSize, textAlign: GrNumberInputTextAlign }): string {
+export function grNumberInputInputClass(options: {
+  size: GrNumberInputSize
+  textAlign: GrNumberInputTextAlign
+  shape: GrControlShape
+}): string {
   return [
     sizeClassBySize[options.size],
+    paddingXClass[options.shape][options.size],
     textAlignClassByAlign[options.textAlign],
   ].join(' ')
 }

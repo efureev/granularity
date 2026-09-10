@@ -31,6 +31,13 @@ export const grSegmentedExamples: ShowcaseComponentExampleDoc[] = [
     note: 'Клавиатура не меняется: у `radiogroup` обе оси стрелок работают в любой ориентации, как требует APG. В вертикали колонка одна, поэтому сегменты одинаковой ширины по построению, а `block` решает лишь, занимать ли ширину контейнера.',
   },
   {
+    id: 'segmented-shape',
+    title: 'Pill or the field shape',
+    description: 'Дорожка-пилюля — дефолт сегментов, `shape="box"` даёт то же скругление, что у полей ввода: рядом с селектом пилюля читается гостем из другой системы. Ось независима от размера.',
+    status: 'ready',
+    previewKey: 'gr-segmented-shape',
+  },
+  {
     id: 'segmented-states',
     title: 'Disabled items, block layout and language switcher',
     description: 'Собираем реальные product-like сценарии: language pills, full-width layout и disabled item внутри группы без потери читаемости.',

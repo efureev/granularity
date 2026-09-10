@@ -164,6 +164,12 @@ export type {
 export { GR_TONES } from './components/shared/tones'
 export type { GrTone } from './components/shared/tones'
 
+// Форма рамки контрола — ось, соседняя размеру: прикладной код перебирает её
+// так же, как тона, и типизирует ею свои обёртки над полями.
+export { GR_CONTROL_HEIGHTS_PX } from './components/shared/sizes'
+export { GR_CONTROL_SHAPES } from './components/shared/controlShape'
+export type { GrControlShape } from './components/shared/controlShape'
+
 // Обрезка без подсказки — потеря данных, и правило это одно на всю разметку,
 // а не на компоненты пакета: `truncate` в прикладном коде обрезает точно так же.
 export { titleWhenTruncated } from './components/shared/truncationTitle'

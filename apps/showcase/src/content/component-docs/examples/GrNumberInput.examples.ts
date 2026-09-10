@@ -23,6 +23,13 @@ export const grNumberInputExamples: ShowcaseComponentExampleDoc[] = [
     previewKey: 'gr-number-input-alignment-addons',
   },
   {
+    id: 'number-input-shape',
+    title: 'Border shape',
+    description: 'Кнопки ± прижаты к краю оболочки, и в пилюле их обрезает её дуга: внешний контур даёт `overflow-hidden`, а прямая граница между степпером и полем остаётся прямой.',
+    status: 'ready',
+    previewKey: 'gr-number-input-shape',
+  },
+  {
     id: 'number-input-grouping',
     title: 'Locale-aware thousands grouping',
     description: 'С `useGrouping` поле показывает сгруппированное значение (тысячные разделители через `Intl.NumberFormat`) в состоянии blur и сырое — при фокусе для редактирования. Групповой разделитель берётся из `locale`, а десятичный уважает `decimalSeparator`.',
