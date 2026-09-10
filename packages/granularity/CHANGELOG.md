@@ -7,6 +7,8 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.52.0] 2026-09-10
+
 ### Added
 
 - **`GrSegmented` can divide the row's width by content.** In a `block` row all
