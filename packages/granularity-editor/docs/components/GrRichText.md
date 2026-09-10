@@ -119,6 +119,37 @@
 
 В нативную форму значение уходит **строкой в любом режиме**: скрытое поле не умеет объектов.
 
+## Сохранённое показывается без редактора
+
+Поле нужно, пока текст правят. Показать сохранённое оно — не лучший выбор: ProseMirror требует DOM,
+поэтому на сервере не печатается ничего (см. следующий раздел), а в браузере ради одного абзаца
+поднимается редактируемый документ с плагинами, транзакциями и историей.
+
+Документ TipTap переводится в markdown и отдаётся [`GrMarkdown`](./GrMarkdown.md):
+
+```vue
+<script setup lang="ts">
+import { computed } from 'vue'
+import { markdownFromEditorDocument } from '@feugene/granularity-editor/markdown'
+import GrMarkdown from '@feugene/granularity-editor/components/GrMarkdown'
+
+const { document } = defineProps<{ document: object }>()
+const source = computed(() => markdownFromEditorDocument(document))
+</script>
+
+<template>
+  <GrMarkdown :source="source" />
+</template>
+```
+
+**Потерь на этом пути нет ни у одной из схем.** Сериализатор знает каждый узел и каждую марку,
+которые они способны выдать, — вплоть до переноса строки по `Shift+Enter`; картинку он тоже
+сериализует, хотя ни одна схема её пока не даёт. Заводя своё расширение с новым узлом, ветку в
+сериализаторе придётся завести вместе с ним: молча потеряется именно то, что вы добавили.
+
+Он же годится и для хранения: `output="json"` держит документ TipTap, а `markdownFromEditorDocument`
+кладёт в базу markdown — форму, которую прочтёт и человек, и любой другой инструмент.
+
 ## Содержимое не печатается на сервере
 
 ProseMirror требует DOM, поэтому редактор поднимается после монтирования, а серверная разметка —
