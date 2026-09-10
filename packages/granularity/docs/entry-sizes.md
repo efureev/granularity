@@ -1,6 +1,6 @@
 # Вес гранулярных импортов
 
-> Сгенерировано `yarn sizes:docs` по собранному `dist` пакета `@feugene/granularity` 0.52.0.
+> Сгенерировано `yarn sizes:docs` по собранному `dist` пакета `@feugene/granularity` 0.53.0.
 > Править руками бесполезно — правка потеряется на следующей сборке.
 
 Сколько приезжает потребителю, взявшему один подпуть: gzip самого entry и всего, что он тянет
@@ -28,7 +28,7 @@
 | `GrCommandPalette` | 54.4 kB | 29 | 8 % |
 | `GrSidebar` | 52.9 kB | 32 | 8 % |
 | `GrInputTag` | 47.5 kB | 31 | 7 % |
-| `GrFormFile` | 46.7 kB | 34 | 7 % |
+| `GrFormFile` | 47.4 kB | 34 | 7 % |
 | `GrImageViewer` | 43.5 kB | 25 | 6 % |
 | `GrTreeSections` | 42.9 kB | 26 | 6 % |
 | `GrDropdown` | 42.7 kB | 23 | 6 % |
@@ -42,13 +42,13 @@
 | `GrCarousel` | 29.7 kB | 19 | 4 % |
 | `GrTooltip` | 27.8 kB | 19 | 4 % |
 | `GrResponseErrorBanner` | 26.5 kB | 15 | 4 % |
+| `GrSortableList` | 25.1 kB | 17 | 4 % |
 | `GrNumberInput` | 24.6 kB | 22 | 4 % |
-| `GrSortableList` | 24.4 kB | 17 | 4 % |
-| `GrList` | 22.5 kB | 16 | 3 % |
+| `GrList` | 23.2 kB | 16 | 3 % |
 | `GrBreadcrumbs` | 19.6 kB | 13 | 3 % |
+| `GrCollapse` | 19.5 kB | 14 | 3 % |
 | `GrInput` | 18.8 kB | 16 | 3 % |
-| `GrCollapse` | 18.8 kB | 14 | 3 % |
-| `GrStatistic` | 18.2 kB | 14 | 3 % |
+| `GrStatistic` | 18.7 kB | 14 | 3 % |
 | `GrTabsWithPanels` | 18.1 kB | 14 | 3 % |
 | `GrRadioGroup` | 17.3 kB | 14 | 3 % |
 | `GrTabs` | 16.7 kB | 13 | 2 % |
@@ -82,9 +82,9 @@
 | `GrBadge` | 10.0 kB | 10 | 1 % |
 | `GrAlert` | 10.0 kB | 10 | 1 % |
 | `GrFormField` | 9.8 kB | 10 | 1 % |
+| `GrCard` | 9.0 kB | 5 | 1 % |
 | `GrBottomNav` | 8.9 kB | 7 | 1 % |
 | `GrDescriptionList` | 8.3 kB | 5 | 1 % |
-| `GrCard` | 8.3 kB | 5 | 1 % |
 | `GrConfigProvider` | 7.4 kB | 6 | 1 % |
 | `GrAffix` | 7.3 kB | 4 | 1 % |
 | `GrProgressBar` | 7.2 kB | 8 | 1 % |
@@ -97,4 +97,4 @@
 | `GrSkeleton` | 1.9 kB | 4 | < 1 % |
 | `GrButtonGroup` | 1.8 kB | 5 | < 1 % |
 
-Весь пакет из корня — 672.2 kB.
+Весь пакет из корня — 673.3 kB.

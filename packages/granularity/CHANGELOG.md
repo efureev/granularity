@@ -7,6 +7,8 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.53.0] 2026-09-11
+
 ### Added
 
 - **`GrCard` and `GrStatistic`: a semantic root tag is now just a tag.** A page
