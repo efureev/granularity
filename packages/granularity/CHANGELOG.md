@@ -7,6 +7,33 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+
+- **`GrListItem` and `GrFilePreview`: `as` names a tag, not a behaviour.** The
+  last two components still derived interactivity from the mere presence of the
+  prop, so a row or tile asked to carry a markup tag came back looking like a
+  control — hover tint, pointer cursor and a focus ring promising a keyboard
+  stop that never existed (neither component sets `tabindex`). Interactivity is
+  now derived from the resolved tag, the same rule `GrCard` and `GrStatistic`
+  got in 0.53.0, and the predicate behind it moved to
+  `components/shared/polymorphicRoot.ts` instead of living as four copies.
+
+  `GrListItem` keeps three notions apart, because collapsing them would trade
+  one defect for another: the focus ring follows what the tag can actually do,
+  while the click, the pointer cursor and `data-gr-list-item-action` follow what
+  the consumer asked for. A row with `clickable` on a tag outside the tab order
+  therefore still fires `click` — silently dropping it would break working code
+  instead of fixing styling — but it warns in dev. `disabled` still collapses an
+  interactive tag to `<div>`: `<a href>` has no `disabled`, and not rendering
+  the tag is the only way out of the tab order.
+
+  Also fixed on the way: `GrListItem` bound `href` to interactivity rather than
+  to the tag, so `as="span" href="/x"` produced an invalid `<span href>`.
+
+- A package-wide gate (`src/__tests__/polymorphicRoot.test.ts`) now walks all
+  four components with a polymorphic root, so a fifth one cannot repeat the
+  defect quietly.
+
 ## [v0.53.0] 2026-09-11
 
 ### Added

@@ -2,6 +2,7 @@
 import { computed, markRaw, useId, useSlots, watch, type Component } from 'vue'
 
 import { useGrComponentProp } from '../GrConfigProvider/context'
+import { isFocusableTag } from '../shared/polymorphicRoot'
 
 import {
   headerActionsClass,
@@ -107,13 +108,8 @@ const rootTag = computed<string | Component>(() => {
 const isInteractive = computed(() => {
   const tag = rootTag.value
 
-  return typeof tag === 'string' ? isFocusableTag(tag) : true
+  return typeof tag === 'string' ? isFocusableTag(tag, !!props.href) : true
 })
-
-/** Теги, попадающие в таб-порядок сами. `<a>` — только со ссылкой. */
-function isFocusableTag(tag: string): boolean {
-  return tag === 'button' || (tag === 'a' && !!props.href)
-}
 
 if (__GR_DEV__) {
   watch(

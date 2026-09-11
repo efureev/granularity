@@ -227,6 +227,70 @@ describe('GrFilePreview — интерактивность', () => {
   })
 })
 
+/**
+ * `as` называет тег, а не поведение. Пока интерактивность выводилась из самого
+ * факта пропа, плитка-разметка получала курсор и кольцо фокуса — обещание
+ * клавиатуры, которое некому выполнить: `tabindex` компонент не ставит нигде.
+ */
+describe('GrFilePreview — семантический тег', () => {
+  it.each(['article', 'section', 'figure'])('as="%s" не делает плитку контролом', (tag) => {
+    const wrapper = mount(GrFilePreview, { props: { src: IMAGE, mime: 'image/png', as: tag } })
+
+    expect(wrapper.element.tagName).toBe(tag.toUpperCase())
+    expect(wrapper.classes()).not.toContain('cursor-pointer')
+    expect(wrapper.classes()).not.toContain('focus-visible:ring-2')
+  })
+
+  it('классы as="article" совпадают с классами дефолтного div', () => {
+    const props = { src: IMAGE, mime: 'image/png', ratio: '4:3' } as const
+    const div = mount(GrFilePreview, { props })
+    const article = mount(GrFilePreview, { props: { ...props, as: 'article' } })
+
+    expect(article.attributes('class')).toBe(div.attributes('class'))
+  })
+
+  // `href` на `<article>` отбрасывается, ссылкой плитка не становится — и
+  // родовое имя ей не нужно: `link-name` к `<article>` не применяется.
+  it('as="article" с href не интерактивна и родового имени не получает', () => {
+    const wrapper = mount(GrFilePreview, {
+      props: { mime: 'application/pdf', as: 'article', href: '/files/42.pdf' },
+    })
+
+    expect(wrapper.classes()).not.toContain('cursor-pointer')
+    expect(wrapper.attributes('aria-label')).toBeUndefined()
+  })
+
+  it('as="a" без href не интерактивна: такая ссылка не фокусируется', () => {
+    const wrapper = mount(GrFilePreview, { props: { src: IMAGE, mime: 'image/png', as: 'a' } })
+
+    expect(wrapper.element.tagName).toBe('A')
+    expect(wrapper.classes()).not.toContain('cursor-pointer')
+  })
+
+  // Плитка-ссылка от починки страдать не должна.
+  it('as-компонент остаётся интерактивным', () => {
+    const wrapper = mount(GrFilePreview, {
+      props: { mime: 'application/pdf', name: 'счёт.pdf', as: StubLink, href: '/files/42.pdf' },
+    })
+
+    expect(wrapper.get('[data-gr-file-preview]').classes()).toContain('cursor-pointer')
+  })
+
+  it('clickable с неинтерактивным as предупреждает, но клик эмитит', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+
+    const wrapper = mount(GrFilePreview, {
+      props: { src: IMAGE, mime: 'image/png', name: 'счёт.png', as: 'article', clickable: true },
+    })
+    await wrapper.trigger('click')
+
+    expect(wrapper.emitted('click')).toHaveLength(1)
+    expect(warn.mock.calls.flat().join(' ')).toContain('таб-порядок')
+
+    warn.mockRestore()
+  })
+})
+
 describe('GrFilePreview — размер и загрузка', () => {
   it('ступень задаёт ширину, число — произвольную', () => {
     const step = mount(GrFilePreview, { props: { src: IMAGE, mime: 'image/png', tileSize: 'lg' } })

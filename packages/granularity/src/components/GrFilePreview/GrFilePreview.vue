@@ -3,6 +3,7 @@ import { computed, markRaw, ref, watch, watchEffect, type Component } from 'vue'
 
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 import { useGrComponentProp } from '../GrConfigProvider/context'
+import { isFocusableTag } from '../shared/polymorphicRoot'
 import GrSkeleton from '../GrSkeleton/GrSkeleton.vue'
 
 import IconFile from '~icons/lucide/file'
@@ -62,7 +63,11 @@ export interface GrFilePreviewProps {
   target?: string
   /** Своё значение `rel`. Задано — отменяет автоподстановку. */
   rel?: string
-  /** Свой корневой тег (`RouterLink`, `Link` от Inertia). Сильнее `href`. */
+  /**
+   * Свой корневой тег: компонент-ссылка (`RouterLink`, `Link` от Inertia) или
+   * тег ради разметки страницы (`article`, `figure`). Сильнее `href`.
+   * Неинтерактивный тег — только замена `div`: ни курсора, ни кольца фокуса.
+   */
   as?: string | Component
   /** Плитка кликабельна и эмитит `click` — обычно чтобы открыть просмотрщик. */
   clickable?: boolean
@@ -142,8 +147,6 @@ const iconByKind: Record<GrFileKind, Component> = {
 
 const fallbackIcon = computed(() => iconByKind[kind.value])
 
-const isInteractive = computed(() => Boolean(props.as) || Boolean(props.href) || props.clickable)
-
 const rootTag = computed<string | Component>(() => {
   if (props.as)
     return typeof props.as === 'string' ? props.as : markRaw(props.as)
@@ -166,6 +169,35 @@ const resolvedRel = computed(() => props.rel ?? (props.target === '_blank' ? 'no
  * понимает — там они и гасятся.
  */
 const isAnchorLike = computed(() => typeof rootTag.value !== 'string' || rootTag.value === 'a')
+
+/**
+ * Интерактивность даёт разрешённый тег, а не сам факт `as`: `as="article"` —
+ * замена `div` ради разметки, и плитка обязана остаться картинкой. Компонент-
+ * ссылка (`RouterLink`, `Link` от Inertia) рендерит `<a>` сам, но узнать это до
+ * рендера нельзя — его считаем интерактивным.
+ */
+const isInteractive = computed(() => (
+  typeof rootTag.value === 'string'
+    ? isFocusableTag(rootTag.value, !!props.href)
+    : true
+))
+
+if (__GR_DEV__) {
+  watch(
+    () => [props.as, isInteractive.value] as const,
+    ([as, interactive]) => {
+      if (interactive || typeof as !== 'string' || !(props.clickable || props.href))
+        return
+
+      console.warn(
+        `[granularity] GrFilePreview: as="${as}" не попадает в таб-порядок — плитка кликается `
+        + 'мышью, но не с клавиатуры. Возьмите тег, умеющий фокус (`button`, `a` со ссылкой), '
+        + 'или компонент роутера — либо снимите `clickable`/`href`.',
+      )
+    },
+    { immediate: true },
+  )
+}
 
 const rootHref = computed(() => (isAnchorLike.value ? props.href : undefined))
 const rootTarget = computed(() => (isAnchorLike.value ? props.target : undefined))

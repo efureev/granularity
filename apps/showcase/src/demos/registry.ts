@@ -348,6 +348,7 @@ export const demoPathByPreviewKey = {
   'gr-list-empty-state': 'components/gr-list/GrListEmptyStateDemo.vue',
   'gr-list-navigation': 'components/gr-list/GrListNavigationDemo.vue',
   'gr-list-queue-actions': 'components/gr-list/GrListQueueActionsDemo.vue',
+  'gr-list-semantic-tag': 'components/gr-list/GrListSemanticTagDemo.vue',
   'gr-list-settings': 'components/gr-list/GrListSettingsDemo.vue',
   'gr-list-virtual': 'components/gr-list/GrListVirtualDemo.vue',
   'gr-loading-custom-appearance': 'components/gr-loading/GrLoadingCustomAppearanceDemo.vue',

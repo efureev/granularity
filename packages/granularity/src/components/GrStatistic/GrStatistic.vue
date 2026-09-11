@@ -5,6 +5,7 @@ import { computed, markRaw, onBeforeUnmount, onMounted, ref, useSlots, watch, wa
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 import { deltaTone, type GrDeltaPolarity } from '../GrDelta/deltaTone'
 import { iconClass, iconTag } from '../shared/icon'
+import { isFocusableTag } from '../shared/polymorphicRoot'
 import GrSkeleton from '../GrSkeleton/GrSkeleton.vue'
 import GrValue from '../GrValue'
 
@@ -207,13 +208,8 @@ const rootTag = computed<string | Component>(() => {
 const isInteractive = computed(() => {
   const tag = rootTag.value
 
-  return typeof tag === 'string' ? isFocusableTag(tag) : true
+  return typeof tag === 'string' ? isFocusableTag(tag, !!props.href) : true
 })
-
-/** Теги, попадающие в таб-порядок сами. `<a>` — только со ссылкой. */
-function isFocusableTag(tag: string): boolean {
-  return tag === 'button' || (tag === 'a' && !!props.href)
-}
 
 if (__GR_DEV__) {
   watch(

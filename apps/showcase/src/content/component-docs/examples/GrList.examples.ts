@@ -9,6 +9,14 @@ export const grListExamples: ShowcaseComponentExampleDoc[] = [
     previewKey: 'gr-list-navigation',
   },
   {
+    id: 'list-semantic-tag',
+    title: 'Семантический тег строки',
+    description: 'Разметке страницы нужен свой тег — `as` его даёт и ничего больше не меняет: строка остаётся строкой, а не притворяется контролом. Контролом её делают `href`, `clickable` и компонент роутера.',
+    status: 'ready',
+    previewKey: 'gr-list-semantic-tag',
+    note: 'Действие, повешенное на тег вне таб-порядка, кликается мышью и предупреждает в dev: клавиатура до него не дойдёт (WCAG 2.1.1).',
+  },
+  {
     id: 'list-settings',
     title: 'Settings rows with actions',
     description: 'Базовый data-display сценарий: `GrList` + `GrListItem` собирают preference rows со secondary controls справа.',

@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed, markRaw, useSlots, watch, type Component } from 'vue'
 
+import { isFocusableTag } from '../shared/polymorphicRoot'
+
 import {
   grListItemPaddingClass,
   itemDescriptionClass,
@@ -23,7 +25,11 @@ export interface GrListItemProps {
   density?: GrListItemDensity
   /** Ссылка: строка становится `<a>`. */
   href?: string
-  /** Свой корневой тег строки (`RouterLink`, `Link` от Inertia). Сильнее `href`. */
+  /**
+   * Свой корневой тег строки: компонент-ссылка (`RouterLink`, `Link` от Inertia)
+   * или тег ради разметки. Сильнее `href`. Неинтерактивный тег — только замена
+   * `div`: ни подсветки, ни кольца фокуса.
+   */
   as?: string | Component
   /** Кликабельная строка без ссылки — `<button>` с событием `click`. */
   clickable?: boolean
@@ -54,53 +60,79 @@ const slots = useSlots()
 const hasTitle = computed(() => !!slots.title || !!props.title)
 const hasDescription = computed(() => !!slots.description || !!props.description)
 
-const isInteractive = computed(() => !props.disabled && (!!props.as || !!props.href || props.clickable))
+/** Тег, который заказал потребитель. Интерактивность из него не следует. */
+const requestedTag = computed<string | Component>(() => {
+  if (props.as)
+    return typeof props.as === 'string' ? props.as : markRaw(props.as)
+
+  if (props.href)
+    return 'a'
+
+  return props.clickable ? 'button' : 'div'
+})
+
+/**
+ * Строка попадает в таб-порядок сама. Компонент-ссылка (`RouterLink`, Inertia
+ * `Link`) рендерит `<a>`, но узнать это до рендера нельзя — считаем, что умеет.
+ */
+const isFocusableRow = computed(() => (
+  typeof requestedTag.value === 'string'
+    ? isFocusableTag(requestedTag.value, !!props.href)
+    : true
+))
+
+/**
+ * Потребитель попросил строку-действие. Отсюда клик, курсор и маркер контрола —
+ * но не кольцо фокуса: `clickable` на теге вне таб-порядка остаётся действием
+ * для мыши, и гасить его молча значило бы сломать работающий код.
+ */
+const isAction = computed(() => !props.disabled
+  && (props.clickable || !!props.href || isFocusableRow.value))
+
+/** Действие, до которого можно добраться с клавиатуры. */
+const isInteractive = computed(() => isAction.value && isFocusableRow.value)
 
 /**
  * `role="listitem"` остаётся на обёртке, а строка целиком — вложенный элемент:
  * `<a role="listitem">` потерял бы роль ссылки, а интерактив снаружи разорвал бы
  * связку `list` → `listitem`. Обычная строка идёт по той же схеме, чтобы
  * разметка содержимого была написана один раз, а не по копии на ветку.
+ *
+ * Отключённая строка не может остаться ссылкой или кнопкой: `disabled` у
+ * `<a href>` не существует, и убрать её из таб-порядка можно только тем, что
+ * интерактивный тег не рендерится вовсе. Разметочному схлопываться не от чего.
  */
-const rowTag = computed<string | Component>(() => {
-  if (!isInteractive.value)
-    return 'div'
+const rowTag = computed<string | Component>(() => (
+  props.disabled && isFocusableRow.value ? 'div' : requestedTag.value
+))
 
-  if (props.as)
-    return typeof props.as === 'string' ? props.as : markRaw(props.as)
-
-  return props.href ? 'a' : 'button'
-})
+/** Строковый тег, кроме `a`, атрибут не понимает — там он и гасится. */
+const rowHref = computed(() => (
+  typeof rowTag.value === 'string' && rowTag.value !== 'a' ? undefined : props.href
+))
 
 const rowClass = computed(() => [
   itemLayoutClass,
   grListItemPaddingClass(props.density),
-  isInteractive.value ? `${itemInteractiveClass} ${itemHoverClass}` : '',
-  !isInteractive.value && props.hoverable && !props.disabled ? itemHoverClass : '',
+  isInteractive.value ? itemInteractiveClass : '',
+  isAction.value || (props.hoverable && !props.disabled) ? itemHoverClass : '',
   props.disabled ? itemDisabledClass : '',
 ].filter(Boolean).join(' '))
 
 function onClick(event: MouseEvent): void {
   // `disabled` сюда попадает вместе с обычной строкой: и то и другое —
-  // не-интерактив, а кликов не эмитит ни один.
-  if (!isInteractive.value)
+  // не-действие, а кликов не эмитит ни один.
+  if (!isAction.value)
     return
 
   emit('click', event)
 }
 
-/** Теги, попадающие в таб-порядок сами. `<a>` — только со ссылкой. */
-function isFocusableTag(tag: string): boolean {
-  return tag === 'button' || (tag === 'a' && !!props.href)
-}
-
 if (__GR_DEV__) {
   watch(
-    () => [isInteractive.value, props.as] as const,
-    ([interactive, as]) => {
-      // Компонент из `as` (`RouterLink`, Inertia `Link`) рендерит `<a>`, но узнать
-      // это до рендера нельзя — предупреждаем только по явно названному тегу.
-      if (!interactive || typeof as !== 'string' || isFocusableTag(as))
+    () => [isAction.value, isFocusableRow.value, props.as] as const,
+    ([action, focusable, as]) => {
+      if (!action || focusable || typeof as !== 'string')
         return
 
       console.warn(
@@ -133,9 +165,9 @@ defineSlots<{
   >
     <component
       :is="rowTag"
-      :data-gr-list-item-action="isInteractive ? '' : undefined"
+      :data-gr-list-item-action="isAction ? '' : undefined"
       :type="rowTag === 'button' ? 'button' : undefined"
-      :href="isInteractive ? href : undefined"
+      :href="rowHref"
       :class="rowClass"
       @click="onClick"
     >

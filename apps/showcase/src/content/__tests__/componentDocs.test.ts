@@ -347,7 +347,7 @@ describe('component docs metadata', () => {
     expect(linkDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(linkDoc.examples.every(example => example.previewKey?.startsWith('gr-link'))).toBe(true)
 
-    expect(listDoc.examples).toHaveLength(5)
+    expect(listDoc.examples).toHaveLength(6)
     expect(listDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(listDoc.examples.every(example => example.previewKey?.startsWith('gr-list'))).toBe(true)
 

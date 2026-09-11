@@ -292,6 +292,88 @@ describe('GrListItem — кликабельная строка', () => {
   })
 })
 
+/**
+ * `as` называет тег, а не поведение. Пока интерактивность выводилась из самого
+ * факта пропа, строка-разметка получала кольцо фокуса — обещание клавиатуры,
+ * которое некому выполнить.
+ */
+describe('GrListItem — семантический тег', () => {
+  it('неинтерактивный as меняет только тег', () => {
+    const wrapper = mount(GrListItem, { props: { title: 'Row', as: 'article' } })
+
+    expect(row(wrapper).element.tagName).toBe('ARTICLE')
+    expect(row(wrapper).classes()).not.toContain('focus-visible:ring-2')
+    expect(row(wrapper).classes()).not.toContain('cursor-pointer')
+    expect(row(wrapper).classes()).not.toContain('hover:bg-[var(--gr-muted)]')
+    expect(row(wrapper).classes()).not.toContain('w-full')
+    // Маркер значит «строка — контрол», и разметочный тег им не становится.
+    expect(wrapper.find('[data-gr-list-item-action]').exists()).toBe(false)
+  })
+
+  it('классы строки с as совпадают с классами обычной строки', () => {
+    const plain = mount(GrListItem, { props: { title: 'Row', density: 'compact' } })
+    const semantic = mount(GrListItem, { props: { title: 'Row', density: 'compact', as: 'article' } })
+
+    expect(row(semantic).attributes('class')).toBe(row(plain).attributes('class'))
+  })
+
+  it('неинтерактивная строка с as кликов не эмитит', async () => {
+    const wrapper = mount(GrListItem, { props: { title: 'Row', as: 'article' } })
+
+    await row(wrapper).trigger('click')
+    expect(wrapper.emitted('click')).toBeUndefined()
+  })
+
+  /**
+   * Тут правило уступает: потребитель попросил действие явно, и молча выключить
+   * клик значило бы сломать работающий код вместо починки стилей. Строка
+   * кликается мышью, кольца фокуса не получает и предупреждает в dev.
+   */
+  it('clickable с неинтерактивным as предупреждает, но клик эмитит', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const wrapper = mount(GrListItem, { props: { title: 'Row', as: 'span', clickable: true } })
+    const action = wrapper.get('[data-gr-list-item-action]')
+
+    expect(action.element.tagName).toBe('SPAN')
+    expect(action.classes()).not.toContain('focus-visible:ring-2')
+    // Курсор ложью не является: мышью строка действительно кликается.
+    expect(action.classes()).toContain('cursor-pointer')
+
+    await action.trigger('click')
+    expect(wrapper.emitted('click')).toHaveLength(1)
+    expect(warn.mock.calls.flat().join(' ')).toContain('не попадает в таб-порядок')
+
+    warn.mockRestore()
+  })
+
+  // `<span href>` — невалидная разметка: атрибут понимает только `<a>`.
+  it('href не уезжает на строковый тег, кроме a', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const wrapper = mount(GrListItem, { props: { title: 'Row', as: 'span', href: '/docs' } })
+
+    expect(row(wrapper).attributes('href')).toBeUndefined()
+    expect(row(wrapper).classes()).not.toContain('focus-visible:ring-2')
+
+    warn.mockRestore()
+  })
+
+  it('as="a" без href не интерактивна: такая ссылка не фокусируется', () => {
+    const wrapper = mount(GrListItem, { props: { title: 'Row', as: 'a' } })
+
+    expect(row(wrapper).element.tagName).toBe('A')
+    expect(row(wrapper).classes()).not.toContain('focus-visible:ring-2')
+  })
+
+  // Сегодняшняя гарантия, которую правка обязана сохранить: у `<a href>` нет
+  // `disabled`, и убрать строку из таб-порядка можно только схлопнув тег.
+  it('disabled схлопывает интерактивный as в div', () => {
+    const wrapper = mount(GrListItem, { props: { title: 'Row', as: 'button', disabled: true } })
+
+    expect(row(wrapper).element.tagName).toBe('DIV')
+    expect(wrapper.element.querySelectorAll('a[href], button, [tabindex]')).toHaveLength(0)
+  })
+})
+
 describe('GrList — поверхность и типографика', () => {
   const sizeToken = 'text-[length:var(--gr-text-sm)]'
 
