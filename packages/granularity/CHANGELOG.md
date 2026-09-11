@@ -7,6 +7,8 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v0.53.1] 2026-09-11
+
 ### Fixed
 
 - **`GrListItem` and `GrFilePreview`: `as` names a tag, not a behaviour.** The
