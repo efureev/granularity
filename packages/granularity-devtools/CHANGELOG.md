@@ -7,6 +7,12 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+
+- **Required props of subcomponents are checked too.** The map is generated from the core's `web-types.json`,
+  which used to skip subcomponents; with the core describing them, `GrFormErrorBanner`, `GrUploadErrorBanner`
+  (`error`), `GrSidebarItem` (`label`) and `GrTabPanel` (`value`) join the map.
+
 ## [v0.3.2] 2026-08-31
 
 ### Fixed
