@@ -7,6 +7,18 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+
+- **`web-types.json` describes 105 exported components, not 83.** The generator walked
+  `src/components/GrX/GrX.vue` and so never saw a subcomponent living in its owner's directory:
+  `GrDropdownMenuItem`, `GrDialogHeader`, `GrListItem`, `GrTabPanel` and eighteen more — exactly the parts
+  needed for composition. The list now comes from `package.json#exports`; `GrDialogService` is the only entry
+  left out, being a plugin and a composable rather than a component (`GrDialogServiceHost` is described).
+- **Prop types in `web-types.json` spell out literal unions behind an alias.** A prop typed
+  `GrButtonVariant | undefined` tells an IDE nothing; it now reads
+  `"primary" | "outline" | "secondary" | "ghost" | "ghost-border" | undefined`. Generics, functions and object
+  types keep their written form, which is the more useful hint there.
+
 ## [v0.53.1] 2026-09-11
 
 ### Fixed
