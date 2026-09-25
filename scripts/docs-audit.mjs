@@ -46,13 +46,7 @@ function components() {
     .sort()
 }
 
-/**
- * Публичная поверхность из `dist/web-types.json`: пропы и слоты.
- *
- * Эмитов в этом файле нет — IDE читает их из типов, — поэтому события примера
- * сверяются с пропами `onX` и с `update:*` от `v-model`, а не с отдельным
- * списком.
- */
+/** Публичная поверхность из `dist/web-types.json`: пропы, слоты и события. */
 function surface() {
   if (!existsSync(WEB_TYPES))
     return null
@@ -67,9 +61,7 @@ function surface() {
     byComponent.set(tag.name, {
       props,
       slots: new Set((tag.slots ?? []).map(slot => slot.name)),
-      // `v-model:x` порождает и проп `x`, и эмит `update:x`; отдельного
-      // перечня эмитов web-types не содержит.
-      events: new Set([...props].map(prop => `update:${prop}`)),
+      events: new Set((tag.js?.events ?? []).map(event => event.name)),
     })
   }
 
@@ -84,9 +76,8 @@ function surface() {
  * страницы отношения не имеют. Без этого сужения проверка даёт сотни ложных
  * срабатываний и перестаёт быть гейтом.
  *
- * Слоты и события не проверяются: `web-types.json` не содержит эмитов вовсе,
- * а слот в примере пишется внутри тела компонента, где рядом живут чужие
- * шаблоны. Ловить их эвристикой значило бы вернуть те же ложные срабатывания.
+ * Слоты не проверяются: слот пишется внутри тела компонента, где рядом живут
+ * чужие шаблоны. Ловить их эвристикой значило бы вернуть те же ложные срабатывания.
  */
 function usedInExamples(markdown, component) {
   const props = new Set()
