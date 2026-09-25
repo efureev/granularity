@@ -7,6 +7,15 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- **`dist/component-guides.json`: how to pick a component, outside the repository.** `docs/` is not
+  published, so anything reading the installed package — IDE plugins, the MCP connector — had props but no
+  word on when a component is the right choice. The build now extracts the four places a page is written
+  around (the lead paragraph, «Когда брать», «Когда взять другое», «Границы») into one file, with relative
+  links reduced to their text, since they lead nowhere outside the repo. ~150 kB for all 84 pages against
+  ~770 kB of source markdown. A page missing its lead paragraph or «Когда брать» fails the build.
+
 ### Fixed
 
 - **`web-types.json` describes 105 exported components, not 83.** The generator walked
