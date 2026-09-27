@@ -2,7 +2,7 @@
 import { computed, onBeforeUnmount, provide, ref, watch } from 'vue'
 
 import { useGranularityTranslations } from '../../internal/granularityI18n'
-import { GR_FORM_KEY } from './context'
+import { GR_FORM_KEY } from '../shared/formContext'
 import { cloneModelValue, modelFingerprint } from './modelSnapshot'
 import {
   getByPath,
@@ -15,7 +15,7 @@ import {
   type GrFormRule,
   type GrFormRules,
   type GrFormTrigger,
-} from './validation'
+} from '../shared/formValidation'
 
 export type {
   GrFormFileRule,
@@ -23,7 +23,7 @@ export type {
   GrFormRules,
   GrFormTrigger,
   GrFormValidatorResult,
-} from './validation'
+} from '../shared/formValidation'
 
 /**
  * Публичный GR-примитив «Form» — оркестрация валидации над `GrFormField`.

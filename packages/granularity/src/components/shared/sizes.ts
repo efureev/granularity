@@ -1,7 +1,7 @@
-import type { GrComponentSize } from '../GrConfigProvider/context'
+import type { GrComponentSize } from '../shared/configContext'
 
-export type { GrComponentSize } from '../GrConfigProvider/context'
-export { GR_COMPONENT_SIZES } from '../GrConfigProvider/context'
+export type { GrComponentSize } from '../shared/configContext'
+export { GR_COMPONENT_SIZES } from '../shared/configContext'
 
 /**
  * Каноническая шкала размеров контролов — `GrComponentSize` (`xs|sm|md|lg`).

@@ -1,8 +1,8 @@
-import { defineGranularComponent } from '@feugene/unocss-preset-granular/contract'
+import { defineGranumComponent } from '@feugene/granum/contract'
 
 import { grTooltipSafelist } from './safelist'
 
-export const grTooltipConfig = defineGranularComponent(import.meta.url, {
+export const grTooltipConfig = defineGranumComponent(import.meta.url, {
   name: 'GrTooltip',
   /**
    * Слой панели задаёт `useFloating` → `floatingLayerZIndex`: имя приходит

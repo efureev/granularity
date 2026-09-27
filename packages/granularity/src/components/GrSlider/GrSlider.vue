@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { computed, ref, watchEffect } from 'vue'
 
-import { useGrComponentSize } from '../GrConfigProvider/context'
+import { useGrComponentSize } from '../shared/configContext'
 
-import { useGrFormFieldContext } from '../GrFormField/context'
+import { useGrFormFieldContext } from '../shared/formFieldContext'
 import { bigStep } from '../shared/numericStep'
 import { useDragGesture } from '../../composables/useDragGesture'
 import { useGrFormControl } from '../../composables/useGrFormControl'

@@ -3,8 +3,8 @@ import { computed, markRaw, ref, type Component } from 'vue'
 
 import IconLoader from '~icons/lucide/loader-circle'
 
-import { useGrComponentProp, useGrComponentSize } from '../GrConfigProvider/context'
-import { useGrButtonGroup } from '../GrButtonGroup/context'
+import { useGrComponentProp, useGrComponentSize } from '../shared/configContext'
+import { useGrButtonGroup } from '../shared/buttonGroupContext'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 
 export type { GrButtonSize, GrButtonTone, GrButtonVariant } from './grButtonStyles'

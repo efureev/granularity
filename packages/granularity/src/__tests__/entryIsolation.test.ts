@@ -25,7 +25,7 @@ describe('markupOwners', () => {
   it('чужой `.ts` разметкой не считается — это общая среда пакета', () => {
     expect(markupOwners(JSON.stringify({
       sources: [
-        '../../src/components/GrConfigProvider/context.ts',
+        '../../src/components/GrConfigProvider/zIndexScale.ts',
         '../../src/components/shared/tones.ts',
       ],
     }))).toEqual([])

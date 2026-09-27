@@ -1,6 +1,6 @@
-import { defineGranularComponent } from '@feugene/unocss-preset-granular/contract'
+import { defineGranumComponent } from '@feugene/granum/contract'
 
-export const grConfirmDialogConfig = defineGranularComponent(import.meta.url, {
+export const grConfirmDialogConfig = defineGranumComponent(import.meta.url, {
   name: 'GrConfirmDialog',
   dependencies: ['GrButton', 'GrDialog', 'GrResponseErrorBanner'],
 })

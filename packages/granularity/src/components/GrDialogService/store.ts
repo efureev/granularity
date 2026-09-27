@@ -1,7 +1,7 @@
 import { reactive } from 'vue'
 import type { AppContext, Raw } from 'vue'
 
-import type { GrConfigContext } from '../GrConfigProvider/context'
+import type { GrConfigContext } from '../shared/configContext'
 import type { GranularityI18nLike } from '../../internal/granularityI18n'
 
 import type {

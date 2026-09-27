@@ -6,7 +6,7 @@ import IconMenu from '~icons/lucide/menu'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 import GrButton from '../GrButton/GrButton.vue'
 import GrIcon from '../GrIcon/GrIcon.vue'
-import { type GrComponentSize, useGrComponentSize } from '../GrConfigProvider/context'
+import { type GrComponentSize, useGrComponentSize } from '../shared/configContext'
 
 import {
   grNavbarRootClass,

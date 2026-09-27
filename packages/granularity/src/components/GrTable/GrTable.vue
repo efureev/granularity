@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, useSlots } from 'vue'
 
-import { useGrComponentSize } from '../GrConfigProvider/context'
+import { useGrComponentSize } from '../shared/configContext'
 import GrSkeleton from '../GrSkeleton/GrSkeleton.vue'
 import { hasMeaningfulSlotContent } from '../shared/slotNodes'
 import { useGranularityTranslations } from '../../internal/granularityI18n'

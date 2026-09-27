@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, useId } from 'vue'
 
-import { useGrComponentProp } from '../GrConfigProvider/context'
+import { useGrComponentProp } from '../shared/configContext'
 
 import {
   formSectionActionsClass,

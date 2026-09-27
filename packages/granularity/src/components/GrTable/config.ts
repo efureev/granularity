@@ -1,8 +1,8 @@
-import { defineGranularComponent } from '@feugene/unocss-preset-granular/contract'
+import { defineGranumComponent } from '@feugene/granum/contract'
 
 import { grTableSafelist } from './safelist'
 
-export const grTableConfig = defineGranularComponent(import.meta.url, {
+export const grTableConfig = defineGranumComponent(import.meta.url, {
   name: 'GrTable',
   dependencies: ['GrSkeleton'],
   safelist: grTableSafelist,

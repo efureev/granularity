@@ -5,7 +5,7 @@ import IconInbox from '~icons/lucide/inbox'
 import IconSearchX from '~icons/lucide/search-x'
 
 import GrIcon from '../GrIcon/GrIcon.vue'
-import { useGrComponentProp, useGrComponentSize } from '../GrConfigProvider/context'
+import { useGrComponentProp, useGrComponentSize } from '../shared/configContext'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 
 import {

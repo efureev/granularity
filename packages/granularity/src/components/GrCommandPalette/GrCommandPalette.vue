@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useGrComponentProp } from '../GrConfigProvider/context'
+import { useGrComponentProp } from '../shared/configContext'
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, useId, watch } from 'vue'
 
 import { useVirtualList } from '../../composables/useVirtualList'

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 
-import { useGrComponentSize } from '../GrConfigProvider/context'
+import { useGrComponentSize } from '../shared/configContext'
 import type { GrComponentSize } from '../shared/sizes'
 import { useHotkeys } from '../../composables/useHotkeys'
 import { formatHotkeyTokens, isAppleDevice, splitHotkeySequence } from '../shared/hotkey'

@@ -1,8 +1,8 @@
-import { defineGranularComponent } from '@feugene/unocss-preset-granular/contract'
+import { defineGranumComponent } from '@feugene/granum/contract'
 
 import { grRadioSafelist } from './safelist'
 
-export const grRadioConfig = defineGranularComponent(import.meta.url, {
+export const grRadioConfig = defineGranumComponent(import.meta.url, {
   name: 'GrRadio',
   dependencies: ['GrButton'],
   safelist: grRadioSafelist,

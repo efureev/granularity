@@ -2,7 +2,7 @@
 import { computed, markRaw, ref, watch, watchEffect, type Component } from 'vue'
 
 import { useGranularityTranslations } from '../../internal/granularityI18n'
-import { useGrComponentProp } from '../GrConfigProvider/context'
+import { useGrComponentProp } from '../shared/configContext'
 import { isFocusableTag } from '../shared/polymorphicRoot'
 import GrSkeleton from '../GrSkeleton/GrSkeleton.vue'
 

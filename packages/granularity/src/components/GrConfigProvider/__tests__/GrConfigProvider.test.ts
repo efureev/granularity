@@ -17,7 +17,7 @@ import GrSlider from '../../GrSlider/GrSlider.vue'
 import GrTooltip from '../../GrTooltip/GrTooltip.vue'
 import { GRANULARITY_I18N_KEY } from '../../../i18n/adapter'
 import { useGranularityTranslations } from '../../../internal/granularityI18n'
-import { resetUnsupportedSizeWarnings, useGrComponentProp, useGrComponentSize, useGrConfig } from '../context'
+import { resetUnsupportedSizeWarnings, useGrComponentProp, useGrComponentSize, useGrConfig } from '../../shared/configContext'
 import { resetGrZIndexOwner } from '../zIndexScale'
 
 // Тестовый потребитель конфига: рендерит разрешённый размер и дефолтные пропсы.

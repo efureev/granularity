@@ -1,8 +1,7 @@
 import { readFileSync, readdirSync } from 'node:fs'
 import { basename, relative, resolve } from 'node:path'
 
-import { createGenerator, presetMini } from 'unocss'
-import { presetGranular } from '@feugene/unocss-preset-granular'
+import { miniEngine } from '@feugene/granum-engine-mini'
 import { describe, expect, it } from 'vitest'
 
 import { componentSourceFiles } from './componentGraph'
@@ -184,16 +183,12 @@ describe('safelist-контракт', () => {
    * а не от находки.
    */
   it('классы из `.ts`-хелперов компонента объявлены в его safelist', async () => {
-    // Оракул «это вообще утилита?» — ровно та связка, которую собирает
-    // потребитель: `presetMini` плюс утилиты, которые `presetGranular` добирает
-    // из `@feugene/unocss-mini-extra-rules` (`animate-*`, `divide-*`, `sr-only`…).
-    // На чистом `presetMini` такой токен считался бы «не утилитой», а значит
-    // safelist ему не требовался — и у изолированного потребителя класс молча
-    // не сгенерировался бы. Токен, из которого CSS не делает никто, классом
-    // по-прежнему не считается.
-    const uno = await createGenerator({
-      presets: [presetMini(), presetGranular({ providers: [], components: [] })],
-    })
+    // Оракул «это вообще утилита?» — тот же движок, которым granum собирает
+    // CSS приложения: preset-mini плюс доп-правила (`animate-*`, `divide-*`,
+    // `sr-only`…). На чистом preset-mini такой токен считался бы «не утилитой»,
+    // и у изолированного потребителя класс молча не сгенерировался бы. Токен,
+    // из которого CSS не делает никто, классом по-прежнему не считается.
+    const engine = miniEngine()
     const isUtility = new Map<string, boolean>()
 
     const violations: string[] = []
@@ -214,6 +209,12 @@ describe('safelist-контракт', () => {
             continue
 
           for (const token of literal.split(/\s+/).filter(Boolean)) {
+            // Кусок шаблонной строки классом не является: `${…}` подставляется
+            // в рантайме, и в safelist попадает уже разрешённая форма. Движок
+            // granum получает токены списком, без прохода экстрактором, и такой
+            // кусок для него — синтаксически валидный arbitrary-вариант.
+            if (token.includes('${'))
+              continue
             if (!safelist.has(token))
               candidates.add(token)
           }
@@ -224,7 +225,7 @@ describe('safelist-контракт', () => {
 
       for (const token of candidates) {
         if (!isUtility.has(token)) {
-          const { matched } = await uno.generate(token, { preflights: false })
+          const { matched } = await engine.generate({ classes: new Set([token]) })
           isUtility.set(token, matched.size > 0)
         }
 

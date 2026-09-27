@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, ref, useSlots, watch } from 'vue'
 
-import { useGrComponentProp, useGrComponentSize } from '../GrConfigProvider/context'
+import { useGrComponentProp, useGrComponentSize } from '../shared/configContext'
 
 import {
   descriptionColumnsStyle,

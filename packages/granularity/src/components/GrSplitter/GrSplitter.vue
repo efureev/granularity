@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, useId, watch } from 'vue'
 
-import { useGrComponentProp } from '../GrConfigProvider/context'
+import { useGrComponentProp } from '../shared/configContext'
 import { useDragGesture } from '../../composables/useDragGesture'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 

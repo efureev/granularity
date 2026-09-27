@@ -1,4 +1,4 @@
-import type { GrComponentSize } from '../GrConfigProvider/context'
+import type { GrComponentSize } from '../shared/configContext'
 
 /** Пропы `GrNavbar`, настраиваемые глобально через `componentDefaults`. */
 export interface GrNavbarConfigurableProps {

@@ -4,7 +4,7 @@ import { computed, ref, useAttrs, watch, watchEffect } from 'vue'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 import GrButton from '../GrButton/GrButton.vue'
 import GrSelect from '../GrSelect/GrSelect.vue'
-import { useGrComponentSize } from '../GrConfigProvider/context'
+import { useGrComponentSize } from '../shared/configContext'
 import {
   type GrPaginationSize,
   ellipsisSizes,

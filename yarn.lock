@@ -817,6 +817,16 @@
   resolved "https://registry.yarnpkg.com/@feugene/fint-i18n/-/fint-i18n-0.7.0.tgz#f2a84266f372936d113dd99012135d538a897742"
   integrity sha512-/3mmlOhNVjFyfp1ov8VohUVh6Q8jOqcvrLOGnuKtBYz8pCgG0mmUoCt8gSobetEyxbCQD3waZv42GDNmjH7wXA==
 
+"@feugene/granum-engine-mini@^0.2.0":
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/@feugene/granum-engine-mini/-/granum-engine-mini-0.2.0.tgz#83300e109cd2e29627973c496c0ca56cbd006f99"
+  integrity sha512-mdkoG8b44J0290Eebc9gpvE411kS2FjyBpk2Zm78p0u/PQTY4SBe/+IJVbCmd0Mhn7tuIPXDr56DNhQnJX0Z3w==
+
+"@feugene/granum@^0.2.0":
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/@feugene/granum/-/granum-0.2.0.tgz#bf7026892eb02976dd276543da5cbbee4dc89b3c"
+  integrity sha512-qeMWTtYfr+Ddhz+8ySkiJYxfyK0kQxrgUERJSmo4UjgnM7j6d7Vqp+X78tihjkrAiYhAGQ3JOUc4VjWLOmMJPw==
+
 "@feugene/unocss-mini-extra-rules@^0.8.1":
   version "0.8.1"
   resolved "https://registry.yarnpkg.com/@feugene/unocss-mini-extra-rules/-/unocss-mini-extra-rules-0.8.1.tgz#04cdf74687a05cc897549e405437c09c9eb85462"
@@ -1962,7 +1972,7 @@
     "@typescript-eslint/types" "8.68.0"
     "@typescript-eslint/typescript-estree" "8.68.0"
 
-"@typescript-eslint/utils@^8.58.0", "@typescript-eslint/utils@^8.62.0":
+"@typescript-eslint/utils@^8.58.0":
   version "8.64.0"
   resolved "https://registry.yarnpkg.com/@typescript-eslint/utils/-/utils-8.64.0.tgz#98bb2010cfb754b41985b9c93e6e8b3dcd7bd600"
   integrity sha512-aJUGVB3+U0htrrCjoA8qukw8cm8fNCGAxK/tVoS70k8aeb7DETKeFozRiVFIwEeN9WJLsjaP3ph8I60tY2XZoQ==
@@ -2033,18 +2043,6 @@
   version "66.8.1"
   resolved "https://registry.yarnpkg.com/@unocss/core/-/core-66.8.1.tgz#a47b374bcc8d9fc43e17f7b26ba041eb4be95851"
   integrity sha512-ze/3qTloXZtFn6TXiNjL6ai1vgMvTCXIm8nqTzoU/Dt5d5MRxA86ERfUmgTX70rEBam5l6vnsaEVZO6WnHhdRA==
-
-"@unocss/eslint-plugin@^66.8.1":
-  version "66.8.1"
-  resolved "https://registry.yarnpkg.com/@unocss/eslint-plugin/-/eslint-plugin-66.8.1.tgz#0c901c0c583dadc467c6ca2b73f3e655b0adc6eb"
-  integrity sha512-MC2zoxGq9LRa1Ix3DujBNAkhLXkv3y0R1CuAFvLujvxjuXls4wv29O2NdwNNazuAL8smXDs5LceRZvIijdP7+g==
-  dependencies:
-    "@typescript-eslint/utils" "^8.62.0"
-    "@unocss/config" "66.8.1"
-    "@unocss/core" "66.8.1"
-    "@unocss/rule-utils" "66.8.1"
-    magic-string "^1.2.0"
-    synckit "^0.11.13"
 
 "@unocss/extractor-arbitrary-variants@66.7.5":
   version "66.7.5"
@@ -5954,7 +5952,7 @@ symbol-tree@^3.2.4:
   resolved "https://registry.yarnpkg.com/symbol-tree/-/symbol-tree-3.2.4.tgz#430637d248ba77e078883951fb9aa0eed7c63fa2"
   integrity sha512-9QNk5KwDF+Bvz+PyObkmSYjI5ksVUYtjW7AU22r2NKcfLJcXp96hkDWU3+XndOsUb+AQ9QhfzfCT2O+CNWT5Tw==
 
-synckit@^0.11.12, synckit@^0.11.13:
+synckit@^0.11.12:
   version "0.11.13"
   resolved "https://registry.yarnpkg.com/synckit/-/synckit-0.11.13.tgz#062a5ea57d81befc35892f8254de5c567e97c80a"
   integrity sha512-eNRKgb3z66Yp3D2CixVujOUvXLFUTij/zVnV8KRyvFdQwpz7I5DS8UfRkTeLzb64u+dkzDSdelE24izu+zSSUg==

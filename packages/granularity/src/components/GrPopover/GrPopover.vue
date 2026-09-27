@@ -27,7 +27,7 @@ import { useControlledOpen } from '../../composables/internal/useControlledOpen'
 import { useModalOverlay } from '../../composables/internal/useModalOverlay'
 import { createFloatingAnchor, type GrFloatingAnchorRect, useFloating, type UseFloatingPlacement } from '../../composables/useFloating'
 import { vClickOutside } from '../../directives'
-import { useGrComponentSize } from '../GrConfigProvider/context'
+import { useGrComponentSize } from '../shared/configContext'
 import { panelPopTransition } from '../shared/overlayTransition'
 import {
   type GrPopoverPadding,

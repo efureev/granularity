@@ -3,7 +3,7 @@ import { computed, markRaw, type Component } from 'vue'
 
 import type { GrComponentSize } from '../shared/sizes'
 
-import { useGrComponentSize } from '../GrConfigProvider/context'
+import { useGrComponentSize } from '../shared/configContext'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 
 import {

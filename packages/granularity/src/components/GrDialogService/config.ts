@@ -1,6 +1,6 @@
-import { defineGranularComponent } from '@feugene/unocss-preset-granular/contract'
+import { defineGranumComponent } from '@feugene/granum/contract'
 
-export const grDialogServiceConfig = defineGranularComponent(import.meta.url, {
+export const grDialogServiceConfig = defineGranumComponent(import.meta.url, {
   // Совпадает с именем директории: из него пресет строит scan-glob
   // `dist/components/<name>/**`.
   name: 'GrDialogService',

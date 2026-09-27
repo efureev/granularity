@@ -11,7 +11,7 @@ import {
   toRuleArray,
   type GrFormMessageResolver,
   type GrFormRule,
-} from '../validation'
+} from '../../shared/formValidation'
 
 // Простой резолвер: kind + params, чтобы проверять какое правило сработало.
 const resolve: GrFormMessageResolver = (kind, rule, params) =>

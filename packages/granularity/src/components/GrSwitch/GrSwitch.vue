@@ -2,8 +2,8 @@
 import { computed, ref, watchEffect } from 'vue'
 import IconLoader from '~icons/lucide/loader-circle'
 
-import { useGrComponentSize } from '../GrConfigProvider/context'
-import { useGrFormFieldContext } from '../GrFormField/context'
+import { useGrComponentSize } from '../shared/configContext'
+import { useGrFormFieldContext } from '../shared/formFieldContext'
 import { useGrComponentProp } from '../../composables/useGrComponentConfig'
 import { useGrFormControl } from '../../composables/useGrFormControl'
 import { useGranularityTranslations } from '../../internal/granularityI18n'

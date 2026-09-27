@@ -16,7 +16,7 @@ import { useFilePreviews } from '../../composables/internal/useFilePreviews'
 import { usePerFileUpload } from './usePerFileUpload'
 import { useUploadState } from './useUploadState'
 
-import { useGrComponentSize } from '../GrConfigProvider/context'
+import { useGrComponentSize } from '../shared/configContext'
 import { flattenSlotNodes, meaningfulSlotNodes } from '../shared/slotNodes'
 import {
   type GrFileUploadSize,
@@ -31,7 +31,7 @@ import {
 } from './grFileUploadStyles'
 import { acceptValidator, FileValidationError, runFileValidators } from '../../fileValidation'
 import { GrUploadAbortError, uploadViaXhr } from './uploadViaXhr'
-import { useGrFormFieldContext } from '../GrFormField/context'
+import { useGrFormFieldContext } from '../shared/formFieldContext'
 import { useGrFormControl } from '../../composables/useGrFormControl'
 import { useFocusWithin } from '../../composables/internal/useFocusWithin'
 import { useGranularityTranslations } from '../../internal/granularityI18n'

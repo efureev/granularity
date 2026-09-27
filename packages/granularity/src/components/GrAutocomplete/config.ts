@@ -1,8 +1,8 @@
-import { defineGranularComponent } from '@feugene/unocss-preset-granular/contract'
+import { defineGranumComponent } from '@feugene/granum/contract'
 
 import { grAutocompleteSafelist } from './safelist'
 
-export const grAutocompleteConfig = defineGranularComponent(import.meta.url, {
+export const grAutocompleteConfig = defineGranumComponent(import.meta.url, {
   name: 'GrAutocomplete',
   /**
    * Слой панели задаёт `useFloating` → `floatingLayerZIndex`: имя приходит

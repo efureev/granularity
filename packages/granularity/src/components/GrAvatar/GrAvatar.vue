@@ -2,7 +2,7 @@
 import { computed, inject, ref, watch } from 'vue'
 
 import GrSkeleton from '../GrSkeleton/GrSkeleton.vue'
-import { useGrComponentProp, useGrComponentSize } from '../GrConfigProvider/context'
+import { useGrComponentProp, useGrComponentSize } from '../shared/configContext'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 import type { GrSizeWithPx } from '../shared/sizes'
 

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, watchEffect } from 'vue'
 
-import { useGrComponentProp, useGrComponentSize } from '../GrConfigProvider/context'
+import { useGrComponentProp, useGrComponentSize } from '../shared/configContext'
 import {
   bufferClass,
   grProgressBarFillClass,

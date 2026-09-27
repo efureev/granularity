@@ -7,7 +7,7 @@ import { useGranularityTranslations } from '../../internal/granularityI18n'
 import { useRovingFocus } from '../../composables/useRovingFocus'
 import { iconClass, iconTag } from '../shared/icon'
 import { resolveScrollOverflow, type GrScrollOverflow } from '../shared/scrollOverflow'
-import { useGrComponentProp, useGrComponentSize } from '../GrConfigProvider/context'
+import { useGrComponentProp, useGrComponentSize } from '../shared/configContext'
 import {
   grTabsBadgeClass,
   grTabsCloseClass,

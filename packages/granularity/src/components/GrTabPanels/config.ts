@@ -1,9 +1,9 @@
-import { defineGranularComponent } from '@feugene/unocss-preset-granular/contract'
+import { defineGranumComponent } from '@feugene/granum/contract'
 
 /**
  * Granular-конфиг семейства `GrTabPanels` (контейнер `GrTabPanels` + панель
  * `GrTabPanel`). Companion к `GrTabs` для ARIA-связки `tab`↔`tabpanel`.
  */
-export const grTabPanelsConfig = defineGranularComponent(import.meta.url, {
+export const grTabPanelsConfig = defineGranumComponent(import.meta.url, {
   name: 'GrTabPanels',
 })

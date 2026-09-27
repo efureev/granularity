@@ -1,6 +1,6 @@
 export { default } from './GrFormField.vue'
 export { default as GrFormField } from './GrFormField.vue'
-export { type GrFormFieldContext, useGrFormFieldContext } from './context'
+export { type GrFormFieldContext, useGrFormFieldContext } from '../shared/formFieldContext'
 export { grFormFieldConfig } from './config'
 // Реэкспорт затягивает `defaults.ts` (и его аугментацию реестра) к потребителю.
 export type { GrFormFieldConfigurableProps } from './defaults'

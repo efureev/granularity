@@ -1,8 +1,8 @@
-import { defineGranularComponent } from '@feugene/unocss-preset-granular/contract'
+import { defineGranumComponent } from '@feugene/granum/contract'
 
 import { grStepsSafelist } from './safelist'
 
-export const grStepsConfig = defineGranularComponent(import.meta.url, {
+export const grStepsConfig = defineGranumComponent(import.meta.url, {
   name: 'GrSteps',
   // Компактный вариант рендерит полосу прогресса — это ребро графа.
   dependencies: ['GrProgressBar'],

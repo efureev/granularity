@@ -1,6 +1,6 @@
-import { defineGranularComponent } from '@feugene/unocss-preset-granular/contract'
+import { defineGranumComponent } from '@feugene/granum/contract'
 
-export const grTabsWithPanelsConfig = defineGranularComponent(import.meta.url, {
+export const grTabsWithPanelsConfig = defineGranumComponent(import.meta.url, {
   name: 'GrTabsWithPanels',
   dependencies: ['GrTabPanels', 'GrTabs'],
 })

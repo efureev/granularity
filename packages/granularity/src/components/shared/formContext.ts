@@ -1,6 +1,6 @@
 import { inject, type ComputedRef, type InjectionKey, type Ref } from 'vue'
 
-import type { GrFormTrigger } from './validation'
+import type { GrFormTrigger } from './formValidation'
 
 /**
  * Контекст формы, который `GrForm` предоставляет своим `GrFormField`.

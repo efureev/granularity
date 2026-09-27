@@ -26,9 +26,9 @@ import {
   type GrComponentDefaults,
   type GrComponentSize,
   type GrConfigContext,
-} from './context'
+} from '../shared/configContext'
 
-export type { GrComponentDefaults, GrComponentSize } from './context'
+export type { GrComponentDefaults, GrComponentSize } from '../shared/configContext'
 
 export interface GrConfigProviderProps {
   /** Дефолтный размер контролов для вложенных компонентов. */

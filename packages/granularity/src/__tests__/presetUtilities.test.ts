@@ -1,12 +1,11 @@
-import { createGenerator, presetMini } from 'unocss'
-import { presetGranular } from '@feugene/unocss-preset-granular'
+import { miniEngine } from '@feugene/granum-engine-mini'
 import { describe, expect, it } from 'vitest'
 
 /**
  * Гейт утилит, которых нет в `presetMini`.
  *
  * Пакет не собирает CSS сам: финальные утилиты генерирует приложение через
- * `presetGranular` поверх `presetMini`. Класс, которого нет ни там, ни там,
+ * доп-правила поверх preset-mini. Класс, которого нет ни там, ни там,
  * молча не превращается в CSS — сборка зелёная, типы целы, а увидит это только
  * тот, кто откроет страницу. Так `sr-only` (утилита `presetWind`, не `presetMini`)
  * показывал «скрытые» caption у `GrTable` и a11y-title у `GrDialog` обычным
@@ -49,31 +48,18 @@ const UTILITIES_BEYOND_MINI = [
 
 describe('утилиты сверх presetMini', () => {
   it('генерируются связкой, которую собирает потребитель', async () => {
-    const uno = await createGenerator({
-      presets: [presetMini(), presetGranular({ providers: [], components: [] })],
-    })
-
-    const missing: string[] = []
-
-    for (const utility of UTILITIES_BEYOND_MINI) {
-      const { matched } = await uno.generate(utility, { preflights: false })
-      if (matched.size === 0)
-        missing.push(utility)
-    }
+    const engine = miniEngine()
+    const { unmatched } = await engine.generate({ classes: new Set(UTILITIES_BEYOND_MINI) })
+    const missing = [...unmatched]
 
     expect(missing, `не генерируются: ${missing.join(', ')}`).toEqual([])
   })
 
   it('чистый presetMini их не знает — иначе список бессмыслен', async () => {
-    const mini = await createGenerator({ presets: [presetMini()] })
-
-    const covered: string[] = []
-
-    for (const utility of UTILITIES_BEYOND_MINI) {
-      const { matched } = await mini.generate(utility, { preflights: false })
-      if (matched.size > 0)
-        covered.push(utility)
-    }
+    // Тот же движок без доп-правил — это и есть «чистый presetMini» granum.
+    const mini = miniEngine({ extraRules: false })
+    const { matched } = await mini.generate({ classes: new Set(UTILITIES_BEYOND_MINI) })
+    const covered = [...matched.keys()]
 
     expect(covered, `уже есть в presetMini, из списка можно убрать: ${covered.join(', ')}`).toEqual([])
   })

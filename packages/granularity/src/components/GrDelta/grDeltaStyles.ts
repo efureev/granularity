@@ -1,6 +1,6 @@
 import type { GrComponentSize } from '../shared/sizes'
 
-import type { GrDeltaTone } from './deltaTone'
+import type { GrDeltaTone } from '../shared/deltaTone'
 
 /**
  * Классы `GrDelta`.

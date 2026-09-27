@@ -4,7 +4,7 @@ import { computed, defineComponent, ref } from 'vue'
 import { describe, expect, it, vi } from 'vitest'
 
 import GrCard from '../../GrCard/GrCard.vue'
-import { GR_CONFIG_KEY } from '../../GrConfigProvider/context'
+import { GR_CONFIG_KEY } from '../../shared/configContext'
 
 vi.mock('~icons/lucide/chevron-down', () => {
   return {

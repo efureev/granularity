@@ -8,10 +8,10 @@ import { useFloating } from '../../composables/useFloating'
 import { useOverlayLayer } from '../../composables/useOverlayLayer'
 import { useControlAddons } from '../../composables/internal/useControlAddons'
 import { useControlledOpen } from '../../composables/internal/useControlledOpen'
-import { useGrComponentProp, useGrComponentSize, useGrThemeAttrs } from '../GrConfigProvider/context'
+import { useGrComponentProp, useGrComponentSize, useGrThemeAttrs } from '../shared/configContext'
 import { useGrFormControl } from '../../composables/useGrFormControl'
 import { useFocusWithin } from '../../composables/internal/useFocusWithin'
-import { useGrFormFieldContext } from '../GrFormField/context'
+import { useGrFormFieldContext } from '../shared/formFieldContext'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 import {
   controlSignalState,

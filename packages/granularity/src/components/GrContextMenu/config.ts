@@ -1,6 +1,6 @@
-import { defineGranularComponent } from '@feugene/unocss-preset-granular/contract'
+import { defineGranumComponent } from '@feugene/granum/contract'
 
-export const grContextMenuConfig = defineGranularComponent(import.meta.url, {
+export const grContextMenuConfig = defineGranumComponent(import.meta.url, {
   name: 'GrContextMenu',
   // Хук снятия потолка ширины стоит в шаблоне литералом, но объявлен и здесь:
   // цена ошибки — меню, вылезающее за край панели, а цена строки — ноль.

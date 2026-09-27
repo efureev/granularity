@@ -1,4 +1,4 @@
-import type { GrDeltaPolarity } from '../GrDelta/deltaTone'
+import type { GrDeltaPolarity } from '../shared/deltaTone'
 
 import type { GrStatisticSize } from './grStatisticStyles'
 

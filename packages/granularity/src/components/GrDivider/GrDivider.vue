@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, useSlots } from 'vue'
 
-import { useGrComponentProp } from '../GrConfigProvider/context'
+import { useGrComponentProp } from '../shared/configContext'
 
 /**
  * GrDivider — разделитель контента.

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useGrComponentSize } from '../GrConfigProvider/context'
+import { useGrComponentSize } from '../shared/configContext'
 /**
  * GrLink — GR-примитив ссылки.
  *

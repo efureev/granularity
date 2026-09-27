@@ -1,7 +1,7 @@
 /**
  * Чтение дефолтов `GrConfigProvider` — публичной точкой входа.
  *
- * Сами функции живут в `components/GrConfigProvider/context.ts` и оттуда же
+ * Сами функции живут в `components/shared/configContext.ts` и оттуда же
  * реэкспортируются барrelем компонента. Отдельный субпуть нужен пакетам-
  * компаньонам: импорт из `components/GrConfigProvider` виден `granular doctor`
  * как ребро графа компонентов, и он справедливо требует объявить зависимость.
@@ -16,18 +16,18 @@ export {
   useGrComponentSize,
   useGrConfig,
   useGrThemeAttrs,
-} from '../components/GrConfigProvider/context'
+} from '../components/shared/configContext'
 export type {
   GrConfigContext,
   GrConfigSource,
   GrConfigurableComponent,
   UseGrComponentSizeOptions,
-} from '../components/GrConfigProvider/context'
+} from '../components/shared/configContext'
 
 /**
  * Открытый реестр компонентов, у которых есть настраиваемые через конфиг пропы.
  *
- * Объявление живёт здесь, а не в `GrConfigProvider/context`, потому что это
+ * Объявление живёт здесь, а не в `shared/configContext`, потому что это
  * **точка расширения**: компонент дополняет реестр из своей папки через
  * declaration merging, и то же самое обязан уметь companion-пакет. Дополнять
  * можно только тот модуль, который тип объявляет; через реэкспорт-баррель

@@ -1,6 +1,6 @@
 import type { GrComponentSize } from '../shared/sizes'
 
-import type { GrDeltaPolarity } from './deltaTone'
+import type { GrDeltaPolarity } from '../shared/deltaTone'
 
 /**
  * Пропы `GrDelta`, настраиваемые глобально через

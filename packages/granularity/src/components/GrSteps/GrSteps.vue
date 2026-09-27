@@ -5,7 +5,7 @@ import { computed, watchEffect } from 'vue'
 import IconCheck from '~icons/lucide/check'
 
 import { useGranularityTranslations } from '../../internal/granularityI18n'
-import { useGrComponentProp, useGrComponentSize } from '../GrConfigProvider/context'
+import { useGrComponentProp, useGrComponentSize } from '../shared/configContext'
 import GrProgressBar from '../GrProgressBar/GrProgressBar.vue'
 
 import type { GrStepsOrientation, GrStepsSize, GrStepsVariant } from './grStepsStyles'

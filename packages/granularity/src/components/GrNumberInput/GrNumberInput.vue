@@ -2,7 +2,7 @@
 import type { InputHTMLAttributes } from 'vue'
 
 import type { GrControlShape } from '../shared/controlShape'
-import { useGrComponentProp, useGrComponentSize } from '../GrConfigProvider/context'
+import { useGrComponentProp, useGrComponentSize } from '../shared/configContext'
 import { computed, onBeforeUnmount, ref, useId, watchEffect } from 'vue'
 
 import {
@@ -20,7 +20,7 @@ import {
   shellHeightClass,
 } from './grNumberInputStyles'
 import { addStep, bigStep } from './numberInputMath'
-import { useGrFormFieldContext } from '../GrFormField/context'
+import { useGrFormFieldContext } from '../shared/formFieldContext'
 import { useGrFormControl } from '../../composables/useGrFormControl'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 import GrIcon from '../GrIcon/GrIcon.vue'

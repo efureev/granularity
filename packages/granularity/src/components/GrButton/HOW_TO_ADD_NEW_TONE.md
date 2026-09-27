@@ -47,7 +47,7 @@
      - `borderActive`
 6. Тесты
    - Обнови `packages/granularity/src/components/GrButton/__tests__/GrButton.test.ts`
-   - Обнови `packages/granularity/src/__tests__/presetGranularity.test.ts`
+   - Обнови `packages/granularity/src/__tests__/presetUtilities.test.ts`
 
 ### Почему нужны все эти шаги
 
@@ -148,7 +148,7 @@ const tones = {
 2. Для `primary`, `secondary`, `outline`, `ghost`, `ghost-border` строятся корректные классы.
 3. Новый tone попадает в safelist через `tones`.
 4. `GrButton.test.ts` покрывает новый tone хотя бы на уровне class output / token usage.
-5. `presetGranularity.test.ts` подтверждает, что нужные CSS token'ы реально публикуются.
+5. `presetUtilities.test.ts` подтверждает, что нужные утилиты реально генерируются движком.
 6. Filled variant проходит контраст для текста в обеих темах.
 
 ### Практическое правило

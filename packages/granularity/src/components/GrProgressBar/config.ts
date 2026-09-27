@@ -1,8 +1,8 @@
-import { defineGranularComponent } from '@feugene/unocss-preset-granular/contract'
+import { defineGranumComponent } from '@feugene/granum/contract'
 
 import { grProgressBarSafelist } from './safelist'
 
-export const grProgressBarConfig = defineGranularComponent(import.meta.url, {
+export const grProgressBarConfig = defineGranumComponent(import.meta.url, {
   name: 'GrProgressBar',
   safelist: grProgressBarSafelist,
   tokenDefinitionsRef: {

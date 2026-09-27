@@ -7,7 +7,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { useAnnouncer } from '../../composables/useAnnouncer'
 import { ensurePortalRoot, getPortalRoot } from '../../composables/internal/portalRoot'
-import { useGrComponentProp, useGrComponentSize } from '../../components/GrConfigProvider/context'
+import { useGrComponentProp, useGrComponentSize } from '../../components/shared/configContext'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 import {
   announced,
@@ -215,7 +215,7 @@ describe('публикация точки входа', () => {
     }
 
     expect(packageJson.exports['./testing']).toBeDefined()
-    expect(readFileSync(resolve(packageDir, 'vite.config.ts'), 'utf8')).toContain('./src/testing/index.ts')
+    expect(readFileSync(resolve(packageDir, 'vite.config.ts'), 'utf8')).toContain(`'testing': 'src/testing/index.ts'`)
   })
 
   it('не реэкспортируется из root-barrel: тестовый код не место в бандле приложения', () => {

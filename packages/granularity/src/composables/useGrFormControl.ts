@@ -1,7 +1,7 @@
 import type { ComputedRef } from 'vue'
 import { computed } from 'vue'
 
-import { useGrFormFieldContext } from '../components/GrFormField/context'
+import { useGrFormFieldContext } from '../components/shared/formFieldContext'
 
 /**
  * Общий контракт форм-контрола.

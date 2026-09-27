@@ -1,8 +1,8 @@
-import { defineGranularComponent } from '@feugene/unocss-preset-granular/contract'
+import { defineGranumComponent } from '@feugene/granum/contract'
 
 import { grImageViewerSafelist } from './safelist'
 
-export const grImageViewerConfig = defineGranularComponent(import.meta.url, {
+export const grImageViewerConfig = defineGranumComponent(import.meta.url, {
   name: 'GrImageViewer',
   /**
    * Высоту слоя задаёт `useModalOverlay` → `modalLayerZIndex`: имя приходит

@@ -4,7 +4,7 @@ import type GrFormComponent from './GrForm.vue'
 export { default } from './GrForm.vue'
 export { default as GrForm } from './GrForm.vue'
 export { grFormConfig } from './config'
-export { type GrFormContext, useGrFormContext } from './context'
+export { type GrFormContext, useGrFormContext } from '../shared/formContext'
 export type {
   GrFormFileRule,
   GrFormProps,
@@ -26,6 +26,6 @@ export {
   isEmpty,
   runFieldRules,
   setByPath,
-} from './validation'
+} from '../shared/formValidation'
 export type { GrFormEmits } from './GrForm.vue'
 export type GrFormInstance = ComponentExposed<typeof GrFormComponent>

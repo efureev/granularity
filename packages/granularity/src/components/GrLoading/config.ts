@@ -1,8 +1,8 @@
-import { defineGranularComponent } from '@feugene/unocss-preset-granular/contract'
+import { defineGranumComponent } from '@feugene/granum/contract'
 
 import { grLoadingSafelist } from './safelist'
 
-export const grLoadingConfig = defineGranularComponent(import.meta.url, {
+export const grLoadingConfig = defineGranumComponent(import.meta.url, {
   name: 'GrLoading',
   dependencies: ['GrIcon'],
   safelist: grLoadingSafelist,

@@ -1,7 +1,7 @@
-import { defineGranularComponent } from '@feugene/unocss-preset-granular/contract'
+import { defineGranumComponent } from '@feugene/granum/contract'
 import { grDrawerSafelist } from './safelist'
 
-export const grDrawerConfig = defineGranularComponent(import.meta.url, {
+export const grDrawerConfig = defineGranumComponent(import.meta.url, {
   name: 'GrDrawer',
   /**
    * Высоту слоя задаёт `useModalOverlay` → `modalLayerZIndex`: имя приходит

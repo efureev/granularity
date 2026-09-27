@@ -1,18 +1,17 @@
-// `id`, `theme.*`, `packageBaseUrl` и реестр компонентов провайдера.
+// `id`, `theme.*` и реестр компонентов провайдера.
 //
-// Все `new URL('../styles/...', import.meta.url)` обязаны лежать именно здесь:
-// `shared.ts` в одной директории с `index.ts` / `node.ts`, поэтому
-// относительные пути совпадают. Для браузера безопасно — бандлеры
-// транслируют такие литералы в статические asset-URL.
+// Пути темы — относительно корня раскладки `dist`, а не URL: базу приложение
+// берёт из директории манифеста, который пишет `granumProvider()` (C-16).
+// Исходники лежат зеркально в `src/`, поэтому `styles/tokens.css` собирается
+// из `src/styles/tokens.css` — плагин сборки копирует их сам.
 //
 // `apps/showcase/scripts/generate-component-api.mjs` читает список компонентов
 // из `Object.keys(granularityComponentConfigs)` через vite SSR.
 import {
-  defineGranularProvider,
-  type GranularComponentDescriptor,
-  type GranularProvider,
-  resolvePackageBaseUrl,
-} from '@feugene/unocss-preset-granular/contract'
+  defineGranumProvider,
+  type GranumComponentDescriptor,
+  type GranumProvider,
+} from '@feugene/granum/contract'
 // <granularity:components:imports> — блок генерируется `yarn generate:registry`
 import { grAffixConfig } from '../components/GrAffix/config'
 import { grAlertConfig } from '../components/GrAlert/config'
@@ -103,9 +102,17 @@ import { grValueConfig } from '../components/GrValue/config'
 /** Идентификатор провайдера — совпадает с именем пакета. */
 export const GRANULARITY_PROVIDER_ID = '@feugene/granularity'
 
-// Не заменять на `new URL('..', import.meta.url)`: Vite и rolldown распознают
-// этот литерал и подставляют `data:`-URL, после чего scan-директории пустеют.
-const packageBaseUrl = resolvePackageBaseUrl(import.meta.url)
+/**
+ * Словарь утилит, против которого написаны классы компонентов.
+ *
+ * Пакет опирается не только на `preset-mini`: `sr-only`, `tabular-nums`,
+ * `animate-spin`, `divide-y` и `space-y-*` приходят из дополнительного набора
+ * правил, и без них компоненты рисуются не полностью. Объявленный диалект
+ * превращает это из тихой поломки в громкую: сборка пакета откажется идти на
+ * движке другого словаря, а приложение, взявшее такой движок, получит
+ * `provider-dialect-mismatch` и поимённый список потерянных классов.
+ */
+export const GRANULARITY_ENGINE_DIALECT = 'unocss/preset-mini+granum@66'
 
 /** Встроенные темы пакета. Единственный источник правды о списке тем. */
 export const granularityThemeNames = ['light', 'dark'] as const
@@ -115,11 +122,11 @@ export type GranularityThemeName = (typeof granularityThemeNames)[number]
 export const granularityDefaultThemes: readonly GranularityThemeName[] = ['light']
 
 const theme = {
-  baseCssUrl: new URL('../styles/base.css', import.meta.url).href,
-  tokensCssUrl: new URL('../styles/tokens.css', import.meta.url).href,
+  baseCss: 'styles/base.css',
+  tokensCss: 'styles/tokens.css',
   themes: {
-    light: new URL('../styles/themes/light.css', import.meta.url).href,
-    dark: new URL('../styles/themes/dark.css', import.meta.url).href,
+    light: 'styles/themes/light.css',
+    dark: 'styles/themes/dark.css',
   },
   defaultThemes: granularityDefaultThemes,
 } as const
@@ -220,31 +227,31 @@ export const granularityComponentConfigs = {
 export type GranularityComponentName = keyof typeof granularityComponentConfigs
 
 /** Базовый набор компонентов в порядке реестра. */
-const baseComponents: readonly GranularComponentDescriptor[] = Object.values(
+const baseComponents: readonly GranumComponentDescriptor[] = Object.values(
   granularityComponentConfigs,
 )
 
 /**
- * Собирает granular-provider пакета.
+ * Собирает granum-провайдер пакета.
  *
  * `overrides` — точка расширения для потребителя: дескриптор с именем из
  * базового реестра заменяет его, остальные дописываются в конец.
  */
 export function createGranularityProvider(
-  overrides: readonly GranularComponentDescriptor[] = [],
-): GranularProvider {
+  overrides: readonly GranumComponentDescriptor[] = [],
+): GranumProvider {
   const overrideByName = new Map(
     overrides.map(component => [component.name, component]),
   )
-  const components: GranularComponentDescriptor[] = [
+  const components: GranumComponentDescriptor[] = [
     ...baseComponents.map(component => overrideByName.get(component.name) ?? component),
     ...overrides.filter(component => !baseComponents.some(base => base.name === component.name)),
   ]
 
-  return defineGranularProvider({
+  return defineGranumProvider({
     id: GRANULARITY_PROVIDER_ID,
     contractVersion: 1,
-    packageBaseUrl,
+    engine: { dialect: GRANULARITY_ENGINE_DIALECT },
     components,
     theme,
   })

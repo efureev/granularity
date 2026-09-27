@@ -1,8 +1,8 @@
-import { defineGranularComponent } from '@feugene/unocss-preset-granular/contract'
+import { defineGranumComponent } from '@feugene/granum/contract'
 
 import { grScrollSpySafelist } from './safelist'
 
-export const grScrollSpyConfig = defineGranularComponent(import.meta.url, {
+export const grScrollSpyConfig = defineGranumComponent(import.meta.url, {
   name: 'GrScrollSpy',
   safelist: grScrollSpySafelist,
 })

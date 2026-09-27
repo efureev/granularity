@@ -1,7 +1,7 @@
 import type { ComputedRef, Ref } from 'vue'
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 
-import { useGrThemeAttrs } from '../../components/GrConfigProvider/context'
+import { useGrThemeAttrs } from '../../components/shared/configContext'
 import { modalLayerZIndex } from './overlayStack'
 import { useFocusTrap } from '../useFocusTrap'
 import { useOverlayLayer } from '../useOverlayLayer'

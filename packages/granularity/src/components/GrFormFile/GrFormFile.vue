@@ -7,7 +7,7 @@ import IconX from '~icons/lucide/x'
 import GrButton from '../GrButton/GrButton.vue'
 import GrSortableList from '../GrSortableList/GrSortableList.vue'
 import GrIcon from '../GrIcon/GrIcon.vue'
-import { useGrComponentSize } from '../GrConfigProvider/context'
+import { useGrComponentSize } from '../shared/configContext'
 import {
   type GrFormFileSize,
   buttonSizes,
@@ -20,7 +20,7 @@ import {
   stackGaps,
   textSizes,
 } from './grFormFileStyles'
-import { useGrFormFieldContext } from '../GrFormField/context'
+import { useGrFormFieldContext } from '../shared/formFieldContext'
 import { useGrFormControl } from '../../composables/useGrFormControl'
 import { useFocusWithin } from '../../composables/internal/useFocusWithin'
 import { useFilePreviews } from '../../composables/internal/useFilePreviews'

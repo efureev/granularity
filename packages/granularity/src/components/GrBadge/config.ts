@@ -1,8 +1,8 @@
-import { defineGranularComponent } from '@feugene/unocss-preset-granular/contract'
+import { defineGranumComponent } from '@feugene/granum/contract'
 
 import { grBadgeSafelist } from './safelist'
 
-export const grBadgeConfig = defineGranularComponent(import.meta.url, {
+export const grBadgeConfig = defineGranumComponent(import.meta.url, {
   name: 'GrBadge',
   safelist: grBadgeSafelist,
   tokenDefinitionsRef: {

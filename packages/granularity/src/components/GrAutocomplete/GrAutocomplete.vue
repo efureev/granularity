@@ -3,7 +3,7 @@ import { computed, nextTick, ref, useId, watch } from 'vue'
 
 import { usePortalTarget } from '../../composables/usePortalTarget'
 
-import { useGrComponentProp, useGrComponentSize, useGrThemeAttrs } from '../GrConfigProvider/context'
+import { useGrComponentProp, useGrComponentSize, useGrThemeAttrs } from '../shared/configContext'
 
 import { vClickOutside } from '../../directives'
 import { useFloating } from '../../composables/useFloating'
@@ -15,7 +15,7 @@ import { useAutocompletePanel } from './composables/useAutocompletePanel'
 import { useAutocompleteNavigation } from './composables/useAutocompleteNavigation'
 import { useOptionPanelVirtualization } from '../shared/optionPanel'
 import { isComposingEvent } from '../../internal/keyboard'
-import { useGrFormFieldContext } from '../GrFormField/context'
+import { useGrFormFieldContext } from '../shared/formFieldContext'
 import { useGrFormControl } from '../../composables/useGrFormControl'
 import { useFocusWithin } from '../../composables/internal/useFocusWithin'
 import { useControlledOpen } from '../../composables/internal/useControlledOpen'

@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { computed, ref, type Component } from 'vue'
 
-import { useGrComponentSize } from '../GrConfigProvider/context'
+import { useGrComponentSize } from '../shared/configContext'
 
 import { useGranularityTranslations } from '../../internal/granularityI18n'
-import { useGrFormFieldContext } from '../GrFormField/context'
+import { useGrFormFieldContext } from '../shared/formFieldContext'
 import { useGrFormControl } from '../../composables/useGrFormControl'
 import { iconClass, iconTag } from '../shared/icon'
 

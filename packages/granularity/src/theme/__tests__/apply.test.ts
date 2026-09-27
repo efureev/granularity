@@ -64,8 +64,8 @@ describe('публикация точек входа', () => {
 
     expect(packageJson.exports['./theme']).toBeDefined()
     expect(packageJson.exports['./theme/apply']).toBeDefined()
-    expect(viteConfig).toContain('./src/theme/index.ts')
-    expect(viteConfig).toContain('./src/theme/apply.ts')
+    expect(viteConfig).toContain(`'theme': 'src/theme/index.ts'`)
+    expect(viteConfig).toContain(`'theme-apply': 'src/theme/apply.ts'`)
   })
 
   /** Рантайм-часть не должна тянуть справочник токенов — ради этого она и отдельно. */

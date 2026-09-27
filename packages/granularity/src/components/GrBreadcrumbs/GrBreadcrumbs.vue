@@ -2,7 +2,7 @@
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch, watchEffect } from 'vue'
 
 import GrLink from '../GrLink/GrLink.vue'
-import { useGrComponentProp, useGrComponentSize } from '../GrConfigProvider/context'
+import { useGrComponentProp, useGrComponentSize } from '../shared/configContext'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 import { iconClass, iconTag } from '../shared/icon'
 

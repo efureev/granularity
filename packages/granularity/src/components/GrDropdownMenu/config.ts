@@ -1,8 +1,8 @@
-import { defineGranularComponent } from '@feugene/unocss-preset-granular/contract'
+import { defineGranumComponent } from '@feugene/granum/contract'
 
 import { grDropdownMenuSafelist } from './safelist'
 
-export const grDropdownMenuConfig = defineGranularComponent(import.meta.url, {
+export const grDropdownMenuConfig = defineGranumComponent(import.meta.url, {
   name: 'GrDropdownMenu',
   dependencies: ['GrDropdown', 'GrPopover'],
   safelist: grDropdownMenuSafelist,

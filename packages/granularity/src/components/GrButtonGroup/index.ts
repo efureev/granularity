@@ -1,6 +1,6 @@
 export { default } from './GrButtonGroup.vue'
 export { default as GrButtonGroup } from './GrButtonGroup.vue'
 export { grButtonGroupConfig } from './config'
-export { useGrButtonGroup } from './context'
-export type { GrButtonGroupContext } from './context'
+export { useGrButtonGroup } from '../shared/buttonGroupContext'
+export type { GrButtonGroupContext } from '../shared/buttonGroupContext'
 export type { GrButtonGroupOrientation, GrButtonGroupProps } from './GrButtonGroup.vue'

@@ -4,13 +4,13 @@ import { computed, watchEffect } from 'vue'
 import { formatNumberToParts, splitLeadingSign } from '../../internal/granularityFormat'
 import GrValue from '../GrValue'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
-import { useGrComponentProp, useGrComponentSize } from '../GrConfigProvider/context'
+import { useGrComponentProp, useGrComponentSize } from '../shared/configContext'
 
 import IconMinus from '~icons/lucide/minus'
 import IconTrendingDown from '~icons/lucide/trending-down'
 import IconTrendingUp from '~icons/lucide/trending-up'
 
-import { deltaDirection, deltaTone, type GrDeltaPolarity, type GrDeltaTone } from './deltaTone'
+import { deltaDirection, deltaTone, type GrDeltaPolarity, type GrDeltaTone } from '../shared/deltaTone'
 import {
   deltaArrowClass,
   deltaEmptyClass,
@@ -22,7 +22,7 @@ import {
 
 import type { GrComponentSize } from '../shared/sizes'
 
-export type { GrDeltaPolarity, GrDeltaTone } from './deltaTone'
+export type { GrDeltaPolarity, GrDeltaTone } from '../shared/deltaTone'
 
 /**
  * Величина со знаком и тоном **внутри строки текста**: «Дельта: +$0.004».

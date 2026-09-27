@@ -1,8 +1,8 @@
-import { defineGranularComponent } from '@feugene/unocss-preset-granular/contract'
+import { defineGranumComponent } from '@feugene/granum/contract'
 
 import { grDividerSafelist } from './safelist'
 
-export const grDividerConfig = defineGranularComponent(import.meta.url, {
+export const grDividerConfig = defineGranumComponent(import.meta.url, {
   name: 'GrDivider',
   safelist: grDividerSafelist,
 })

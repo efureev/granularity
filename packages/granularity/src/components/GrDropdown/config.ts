@@ -1,8 +1,8 @@
-import { defineGranularComponent } from '@feugene/unocss-preset-granular/contract'
+import { defineGranumComponent } from '@feugene/granum/contract'
 
 import { grDropdownSafelist } from './safelist'
 
-export const grDropdownConfig = defineGranularComponent(import.meta.url, {
+export const grDropdownConfig = defineGranumComponent(import.meta.url, {
   name: 'GrDropdown',
   safelist: grDropdownSafelist,
   // Панель, слой и портал рисует `GrPopover`: без ребра графа потребитель,

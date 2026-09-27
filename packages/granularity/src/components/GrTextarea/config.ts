@@ -1,8 +1,8 @@
-import { defineGranularComponent } from '@feugene/unocss-preset-granular/contract'
+import { defineGranumComponent } from '@feugene/granum/contract'
 
 import { grTextareaSafelist } from './safelist'
 
-export const grTextareaConfig = defineGranularComponent(import.meta.url, {
+export const grTextareaConfig = defineGranumComponent(import.meta.url, {
   name: 'GrTextarea',
   safelist: grTextareaSafelist,
 })

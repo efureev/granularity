@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, inject, onUnmounted, ref, useId, useSlots } from 'vue'
 
-import { useGrComponentSize } from '../GrConfigProvider/context'
+import { useGrComponentSize } from '../shared/configContext'
 
 import type { GrButtonSize, GrButtonTone, GrButtonVariant } from '../GrButton'
 

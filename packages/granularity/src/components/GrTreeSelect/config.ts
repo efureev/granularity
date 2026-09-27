@@ -1,8 +1,8 @@
-import { defineGranularComponent } from '@feugene/unocss-preset-granular/contract'
+import { defineGranumComponent } from '@feugene/granum/contract'
 
 import { grTreeSelectSafelist } from './safelist'
 
-export const grTreeSelectConfig = defineGranularComponent(import.meta.url, {
+export const grTreeSelectConfig = defineGranumComponent(import.meta.url, {
   name: 'GrTreeSelect',
   /**
    * Слой панели задаёт `useFloating` → `floatingLayerZIndex`: имя приходит

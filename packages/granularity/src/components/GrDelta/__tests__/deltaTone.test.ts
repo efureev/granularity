@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { deltaDirection, deltaTone } from '../deltaTone'
+import { deltaDirection, deltaTone } from '../../shared/deltaTone'
 
 describe('deltaTone', () => {
   it('рост — успех, падение — опасность при positive-good', () => {

@@ -18,6 +18,6 @@ defineEnvGuardGate({
     // Предупреждение живёт в модульной функции, а гард — на стороне
     // единственного вызова (`if (__GR_DEV__) warnUnsupportedSize(…)`), то есть
     // ниже по файлу. Форма осознанная: рядом с вызовом стоит и дедуп.
-    'components/GrConfigProvider/context.ts': 'гард на стороне единственного вызова',
+    'components/shared/configContext.ts': 'гард на стороне единственного вызова',
   },
 })

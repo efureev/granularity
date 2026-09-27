@@ -77,7 +77,6 @@ export default antfu(
 
       'unused-imports/no-unused-imports': 'warn',
 
-      'unocss/order': 'off',
     },
     languageOptions: {
       sourceType: 'module',

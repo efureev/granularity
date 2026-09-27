@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, useAttrs, watchEffect } from 'vue'
 
-import { useGrComponentProp } from '../GrConfigProvider/context'
+import { useGrComponentProp } from '../shared/configContext'
 
 export type { GrBadgeRadius, GrBadgeSize, GrBadgeTone } from './grBadgeStyles'
 

@@ -14,6 +14,6 @@ export {
   // Нужен всем, кто рендерит панель в портал: `data-theme` через телепорт не
   // наследуется, и панель обязана проставить тему себе сама.
   useGrThemeAttrs,
-} from './context'
+} from '../shared/configContext'
 export { grConfigProviderConfig } from './config'
 export type { GrConfigProviderProps } from './GrConfigProvider.vue'

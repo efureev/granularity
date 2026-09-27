@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, markRaw, useId, useSlots, watch, type Component } from 'vue'
 
-import { useGrComponentProp } from '../GrConfigProvider/context'
+import { useGrComponentProp } from '../shared/configContext'
 import { isFocusableTag } from '../shared/polymorphicRoot'
 
 import {

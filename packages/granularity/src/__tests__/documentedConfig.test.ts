@@ -1,11 +1,10 @@
 import { readdirSync, readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 
-import { presetGranular } from '@feugene/unocss-preset-granular'
-import { createGenerator, presetMini } from 'unocss'
-import { describe, expect, it } from 'vitest'
+import { miniEngine } from '@feugene/granum-engine-mini'
 
 import { granularityProvider } from '../granular-provider'
+import { describe, expect, it } from 'vitest'
 
 /**
  * Гейт «класс есть — CSS есть».
@@ -77,27 +76,16 @@ function scannedFragileTokens(): string[] {
 }
 
 describe('документированный конфиг генерирует CSS для всех утилит пакета', () => {
-  // `components: []` — чтобы safelist пресета не подмешивал в вывод посторонние
-  // классы: иначе «CSS непустой» получалось бы всегда, и гейт был бы слепым.
-  // На этом ровно и обжёгся первый замер этого дефекта.
-  const uno = createGenerator({
-    presets: [
-      presetMini(),
-      presetGranular({ providers: [granularityProvider], components: [] }),
-    ],
-  })
+  // Вердикт даёт `unmatched` движка, а не пустота CSS: preflight'ы доп-правил
+  // эмитятся всегда, и проверка «CSS непустой» была бы слепой — ровно на этом
+  // обжёгся первый замер этого дефекта. Заодно весь набор уходит в движок
+  // одним вызовом, а не потокеново.
+  const engine = miniEngine()
 
   async function ungeneratable(tokens: readonly string[]): Promise<string[]> {
-    const generator = await uno
-    const dead: string[] = []
+    const { unmatched } = await engine.generate({ classes: new Set(tokens) })
 
-    for (const token of tokens) {
-      const { css } = await generator.generate(token, { preflights: false })
-      if (css.replace(/\/\*[\s\S]*?\*\//g, '').trim() === '')
-        dead.push(token)
-    }
-
-    return dead
+    return [...unmatched]
   }
 
   function candidates(tokens: readonly string[]): string[] {
@@ -135,14 +123,14 @@ describe('документированный конфиг генерирует C
     ['uppercase', 'text-transform:uppercase'],
     ['divide-[var(--gr-brd)]', 'border-color:var(--gr-brd)'],
   ])('%s даёт CSS, а не пустоту', async (token, declaration) => {
-    const { css } = await (await uno).generate(token, { preflights: false })
+    const { css } = await engine.generate({ classes: new Set([token]) })
 
     expect(css).toContain(declaration)
   })
 
   it('`animate-spin` получает свои @keyframes, а не только правило', async () => {
     // Правило без preflight'а — молчаливый полудефект: класс есть, анимации нет.
-    const { css } = await (await uno).generate('animate-spin')
+    const { css } = await engine.generate({ classes: new Set(['animate-spin']) })
 
     expect(css).toContain('@keyframes granularity-spin')
   })

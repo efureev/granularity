@@ -3,7 +3,7 @@ import type { App, AppContext, InjectionKey } from 'vue'
 
 import { ensurePortalRoot } from '../../composables/internal/portalRoot'
 import GrDialogServiceHost from './GrDialogServiceHost.vue'
-import { useGrConfig } from '../GrConfigProvider/context'
+import { useGrConfig } from '../shared/configContext'
 import { resolveGranularityI18n } from '../../internal/granularityI18n'
 import {
   createDialogServiceState,

@@ -2,7 +2,7 @@
 import { computed, provide, useSlots } from 'vue'
 
 import GrCard from '../GrCard'
-import { useGrComponentProp, useGrComponentSize } from '../GrConfigProvider/context'
+import { useGrComponentProp, useGrComponentSize } from '../shared/configContext'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 import { hasMeaningfulSlotContent } from '../shared/slotNodes'
 import { grCollapseEmptyClass } from './grCollapseStyles'

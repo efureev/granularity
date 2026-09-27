@@ -4,7 +4,7 @@ import { computed, useSlots } from 'vue'
 import IconCheck from '~icons/lucide/check'
 import IconError from '~icons/lucide/x'
 
-import { useGrComponentProp, useGrComponentSize } from '../GrConfigProvider/context'
+import { useGrComponentProp, useGrComponentSize } from '../shared/configContext'
 import { hasMeaningfulSlotContent } from '../shared/slotNodes'
 import { arcGeometry, clampProgress, VIEW_BOX, type GrProgressCircleShape } from './geometry'
 import {

@@ -2,8 +2,8 @@
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, useId, watch, watchEffect } from 'vue'
 
 import type { GrControlShape } from '../shared/controlShape'
-import { useGrComponentProp, useGrComponentSize } from '../GrConfigProvider/context'
-import { useGrFormFieldContext } from '../GrFormField/context'
+import { useGrComponentProp, useGrComponentSize } from '../shared/configContext'
+import { useGrFormFieldContext } from '../shared/formFieldContext'
 import { useGrFormControl } from '../../composables/useGrFormControl'
 import { useRovingFocus } from '../../composables/useRovingFocus'
 import { useFocusWithin } from '../../composables/internal/useFocusWithin'

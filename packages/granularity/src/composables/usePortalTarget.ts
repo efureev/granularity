@@ -1,7 +1,7 @@
 import type { ComputedRef } from 'vue'
 import { computed } from 'vue'
 
-import { useGrConfig } from '../components/GrConfigProvider/context'
+import { useGrConfig } from '../components/shared/configContext'
 import { ensurePortalRoot } from './internal/portalRoot'
 import { useTeleportEnabled } from './internal/useTeleportEnabled'
 

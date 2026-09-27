@@ -111,7 +111,7 @@ export interface GrToasterProps {
   collapse?: number | false
 }
 
-import { useGrThemeAttrs } from '../GrConfigProvider/context'
+import { useGrThemeAttrs } from '../shared/configContext'
 
 const props = withDefaults(defineProps<GrToasterProps>(), {
   placement: 'top-right',

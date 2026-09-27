@@ -16,7 +16,7 @@ import {
 } from './grCommandPaletteStyles'
 
 // Вся вёрстка палитры живёт строковыми литералами в grCommandPaletteStyles.ts —
-// на сборке они уезжают в общий dist-чанк, который granularContent не сканирует.
+// на сборке они уезжают в общий dist-чанк, который экстрактору компонента не виден.
 // Поэтому перечисляем явно (docs/gotchas.md §2).
 export const grCommandPaletteSafelist = [...new Set([
   ...splitClassTokens(commandSearchRowClass),

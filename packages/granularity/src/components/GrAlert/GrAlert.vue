@@ -20,7 +20,7 @@ import type { Component } from 'vue'
 import type { GrTone } from '../shared/tones'
 import type { GrAlertIconKey, GrAlertVariant } from './grAlertStyles'
 
-import { useGrComponentProp } from '../GrConfigProvider/context'
+import { useGrComponentProp } from '../shared/configContext'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 import {
   applyGrAlertOverrides,

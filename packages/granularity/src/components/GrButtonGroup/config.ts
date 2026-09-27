@@ -1,5 +1,5 @@
-import { defineGranularComponent } from '@feugene/unocss-preset-granular/contract'
+import { defineGranumComponent } from '@feugene/granum/contract'
 
-export const grButtonGroupConfig = defineGranularComponent(import.meta.url, {
+export const grButtonGroupConfig = defineGranumComponent(import.meta.url, {
   name: 'GrButtonGroup',
 })

@@ -6,7 +6,7 @@ import GrForm from '../GrForm.vue'
 import GrFormField from '../../GrFormField/GrFormField.vue'
 import GrFormFile from '../../GrFormFile/GrFormFile.vue'
 import GrInput from '../../GrInput/GrInput.vue'
-import type { GrFormRules } from '../validation'
+import type { GrFormRules } from '../../shared/formValidation'
 import type { GrFormInstance } from '..'
 
 // jsdom не реализует layout; глушим scrollIntoView, чтобы scroll-to-error не падал.

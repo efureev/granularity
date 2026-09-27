@@ -1,4 +1,4 @@
-import type { GrComponentSize } from '../GrConfigProvider/context'
+import type { GrComponentSize } from '../shared/configContext'
 
 /** Пропы `GrTable`, настраиваемые глобально через `componentDefaults`. */
 export interface GrTableConfigurableProps {

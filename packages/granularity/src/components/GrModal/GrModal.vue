@@ -23,7 +23,7 @@
  * возврат фокуса), ловушка фокуса, блокировка скролла, портал и присутствие в
  * DOM до конца leave-анимации. Инварианты этой сборки описаны там же.
  */
-import { useGrComponentProp } from '../GrConfigProvider/context'
+import { useGrComponentProp } from '../shared/configContext'
 import { computed, ref, useId, useSlots, watch } from 'vue'
 
 import { useModalOverlay } from '../../composables/internal/useModalOverlay'

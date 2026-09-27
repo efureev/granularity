@@ -2,7 +2,7 @@
 import { computed, provide, useSlots, watch } from 'vue'
 
 import GrSkeleton from '../GrSkeleton/GrSkeleton.vue'
-import { useGrComponentProp } from '../GrConfigProvider/context'
+import { useGrComponentProp } from '../shared/configContext'
 import { hasMeaningfulSlotContent } from '../shared/slotNodes'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 

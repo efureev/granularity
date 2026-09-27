@@ -76,7 +76,7 @@ describe('граф зависимостей компонентов', () => {
       ['тип', 'import type GrButton from \'../GrButton\''],
       ['именованный тип', 'import type { GrButtonProps } from \'../GrButton\''],
       ['контекст соседа', 'import { GR_RADIO_GROUP_CONTEXT } from \'../GrRadio\''],
-      ['композабл соседа', 'import { useGrComponentSize } from \'../GrConfigProvider/context\''],
+      ['композабл соседа', 'import { useGrComponentSize } from \'../shared/configContext\''],
       ['ленивый импорт не-компонента', 'await import(\'../GrButton/context\')'],
       ['закомментированный импорт', '// import GrButton from \'../GrButton\''],
       ['импорт в блочном комментарии', '/* import GrButton from \'../GrButton\' */'],

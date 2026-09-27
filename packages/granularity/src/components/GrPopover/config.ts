@@ -1,8 +1,8 @@
-import { defineGranularComponent } from '@feugene/unocss-preset-granular/contract'
+import { defineGranumComponent } from '@feugene/granum/contract'
 
 import { grPopoverSafelist } from './safelist'
 
-export const grPopoverConfig = defineGranularComponent(import.meta.url, {
+export const grPopoverConfig = defineGranumComponent(import.meta.url, {
   name: 'GrPopover',
   /**
    * Слои задают `useFloating` и `useModalOverlay` через `overlayStack.ts`:

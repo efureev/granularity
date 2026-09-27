@@ -2,7 +2,7 @@ import { defineComponentDefaultsGate } from '@feugene/granularity-test-kit/gates
 
 /**
  * Реестр объявлен в `composables/useGrComponentConfig` — дополнять его можно
- * только там. Через реэкспорт (например `../GrConfigProvider/context`, который
+ * только там. Через реэкспорт (например `../shared/configContext`, который
  * тип лишь пробрасывает) слияние работает, пока аугментация в программе одна:
  * стоит появиться второй, дополняющей объявление напрямую, и первая молча
  * отваливается. Ошибки при этом нет — просто `componentDefaults` перестаёт

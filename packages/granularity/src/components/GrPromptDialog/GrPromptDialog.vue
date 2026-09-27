@@ -13,7 +13,7 @@
  * Проверки сверх `required` описываются пропом `rules` — тем же движком, что и
  * у `GrForm`: третий частный случай валидации в пакете заводить незачем.
  */
-import { useGrComponentProp } from '../GrConfigProvider/context'
+import { useGrComponentProp } from '../shared/configContext'
 import { computed, ref, watch } from 'vue'
 
 import GrButton from '../GrButton/GrButton.vue'
@@ -25,8 +25,8 @@ import GrResponseErrorBanner from '../GrResponseErrorBanner/GrResponseErrorBanne
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 // Именованные импорты чистых функций: разметки не тянут, поэтому в
 // `config.dependencies` не объявляются (см. правило про зависимости).
-import { createGrFormMessageResolver, rulesForTrigger, runFieldRules } from '../GrForm/validation'
-import type { GrFormRule, GrFormTrigger } from '../GrForm/validation'
+import { createGrFormMessageResolver, rulesForTrigger, runFieldRules } from '../shared/formValidation'
+import type { GrFormRule, GrFormTrigger } from '../shared/formValidation'
 import type { GrButtonSize, GrButtonTone, GrButtonVariant } from '../GrButton'
 import type { GrDialogSectionConfig, GrDialogSize } from '../GrDialog'
 

@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, nextTick, provide, ref } from 'vue'
 
-import { useGrComponentSize } from '../GrConfigProvider/context'
-import { useGrFormFieldContext } from '../GrFormField/context'
+import { useGrComponentSize } from '../shared/configContext'
+import { useGrFormFieldContext } from '../shared/formFieldContext'
 import { useGrFormControl } from '../../composables/useGrFormControl'
 import { useRovingFocus } from '../../composables/useRovingFocus'
 import { useFocusWithin } from '../../composables/internal/useFocusWithin'

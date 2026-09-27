@@ -3,7 +3,7 @@ import { computed, ref, useId, watch } from 'vue'
 
 import GrButton from '../GrButton/GrButton.vue'
 import GrIcon from '../GrIcon/GrIcon.vue'
-import { useGrComponentProp } from '../GrConfigProvider/context'
+import { useGrComponentProp } from '../shared/configContext'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 // Модальный слой целиком: стек (Esc верхнему, `inert` нижним модалкам), ловушка
 // фокуса, скролл-лок, портал. Немодальная панель регистрируется в стеке как

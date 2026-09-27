@@ -1,8 +1,8 @@
-import { defineGranularComponent } from '@feugene/unocss-preset-granular/contract'
+import { defineGranumComponent } from '@feugene/granum/contract'
 
 import { grTreeSectionsSafelist } from './safelist'
 
-export const grTreeSectionsConfig = defineGranularComponent(import.meta.url, {
+export const grTreeSectionsConfig = defineGranumComponent(import.meta.url, {
   name: 'GrTreeSections',
   dependencies: ['GrTree'],
   safelist: grTreeSectionsSafelist,

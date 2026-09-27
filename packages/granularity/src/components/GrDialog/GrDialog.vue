@@ -15,7 +15,7 @@
  * - `aria-label` вниз уходит всегда: `GrModal` иначе не отличил бы «заголовок
  *   рисует `GrDialogHeader`» от «имени нет вовсе» и подставил бы обобщённое.
  */
-import { useGrComponentProp } from '../GrConfigProvider/context'
+import { useGrComponentProp } from '../shared/configContext'
 import { computed } from 'vue'
 
 import GrModal from '../GrModal/GrModal.vue'

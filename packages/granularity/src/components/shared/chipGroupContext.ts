@@ -1,6 +1,6 @@
 import type { ComputedRef, InjectionKey } from 'vue'
 
-import type { GrChipRadius, GrChipSize, GrChipTone } from './grChipStyles'
+import type { GrChipRadius, GrChipSize, GrChipTone } from '../GrChip/grChipStyles'
 
 /**
  * Значение чипа в группе.

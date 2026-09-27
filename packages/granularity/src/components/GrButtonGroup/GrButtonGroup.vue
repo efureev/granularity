@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 
 import type { GrButtonSize, GrButtonTone, GrButtonVariant } from '../GrButton/grButtonStyles'
-import { provideGrButtonGroup } from './context'
+import { provideGrButtonGroup } from '../shared/buttonGroupContext'
 
 export type GrButtonGroupOrientation = 'horizontal' | 'vertical'
 

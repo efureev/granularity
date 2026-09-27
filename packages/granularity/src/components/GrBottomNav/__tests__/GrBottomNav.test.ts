@@ -2,7 +2,7 @@ import { mount } from '@vue/test-utils'
 import { computed, defineComponent, h } from 'vue'
 import { describe, expect, it } from 'vitest'
 
-import { GR_CONFIG_KEY } from '../../GrConfigProvider/context'
+import { GR_CONFIG_KEY } from '../../shared/configContext'
 import GrBottomNav from '../GrBottomNav.vue'
 
 const items = [

@@ -1,8 +1,8 @@
-import { defineGranularComponent } from '@feugene/unocss-preset-granular/contract'
+import { defineGranumComponent } from '@feugene/granum/contract'
 
 import { grInputTagSafelist } from './safelist'
 
-export const grInputTagConfig = defineGranularComponent(import.meta.url, {
+export const grInputTagConfig = defineGranumComponent(import.meta.url, {
   name: 'GrInputTag',
   dependencies: ['GrChip', 'GrIcon'],
   safelist: grInputTagSafelist,

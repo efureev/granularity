@@ -8,9 +8,9 @@
  */
 
 import { resolveFileValidationMessage, type FileValidationIssue } from '../../fileValidation'
-import { runFileRule, type GrFormFileRule } from './fileRule'
+import { runFileRule, type GrFormFileRule } from './formFileRule'
 
-export type { GrFormFileRule } from './fileRule'
+export type { GrFormFileRule } from './formFileRule'
 
 export type GrFormTrigger = 'blur' | 'change' | 'submit'
 

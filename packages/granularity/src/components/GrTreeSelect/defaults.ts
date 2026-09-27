@@ -1,6 +1,6 @@
 import type { GrControlShape } from '../shared/controlShape'
 
-import type { GrComponentSize } from '../GrConfigProvider/context'
+import type { GrComponentSize } from '../shared/configContext'
 
 /** Пропы `GrTreeSelect`, настраиваемые глобально через `componentDefaults`. */
 export interface GrTreeSelectConfigurableProps {

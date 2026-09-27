@@ -22,7 +22,7 @@ import { vClickOutside } from '../../directives'
 import GrIcon from '../GrIcon'
 import { useFloating, type UseFloatingPlacement } from '../../composables/useFloating'
 import { useDismissible } from '../../composables/useDismissible'
-import { useGrComponentSize, useGrThemeAttrs } from '../GrConfigProvider/context'
+import { useGrComponentSize, useGrThemeAttrs } from '../shared/configContext'
 import { type GrTooltipSize, panelSizes, panelWidths, triggerIconSizes } from './grTooltipStyles'
 
 import IconInfo from '~icons/lucide/info'

@@ -4,12 +4,12 @@ import { computed, inject, onBeforeUnmount, ref, useAttrs } from 'vue'
 import IconClose from '~icons/lucide/x'
 
 import { useGranularityTranslations } from '../../internal/granularityI18n'
-import { useGrComponentProp, useGrComponentSize } from '../GrConfigProvider/context'
+import { useGrComponentProp, useGrComponentSize } from '../shared/configContext'
 
-import type { GrChipValue } from './grChipGroupContext'
+import type { GrChipValue } from '../shared/chipGroupContext'
 
 import { warnRenamedProp } from '../shared/renamedProp'
-import { GR_CHIP_GROUP_CONTEXT } from './grChipGroupContext'
+import { GR_CHIP_GROUP_CONTEXT } from '../shared/chipGroupContext'
 import type { GrChipRadius, GrChipSize, GrChipTone } from './grChipStyles'
 import {
   chipCloseButtonClass,

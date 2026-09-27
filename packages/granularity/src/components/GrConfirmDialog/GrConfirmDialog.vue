@@ -9,7 +9,7 @@
  * Клик по «Confirm»/«Cancel» эмитит одноимённое событие и закрывает диалог
  * через `update:modelValue`.
  */
-import { useGrComponentProp } from '../GrConfigProvider/context'
+import { useGrComponentProp } from '../shared/configContext'
 import { computed, ref, watch } from 'vue'
 
 import GrButton from '../GrButton/GrButton.vue'

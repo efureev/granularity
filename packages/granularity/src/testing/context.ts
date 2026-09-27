@@ -1,6 +1,6 @@
 import { computed, ref, type Ref } from 'vue'
 
-import { GR_CONFIG_KEY, type GrComponentDefaults, type GrComponentSize, type GrConfigContext } from '../components/GrConfigProvider/context'
+import { GR_CONFIG_KEY, type GrComponentDefaults, type GrComponentSize, type GrConfigContext } from '../components/shared/configContext'
 import { GRANULARITY_I18N_KEY, type GranularityI18nAdapter, type GranularityI18nParams } from '../i18n/adapter'
 
 export interface I18nAdapterOptions {

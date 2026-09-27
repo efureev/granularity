@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, provide, ref, useId, useSlots } from 'vue'
 
-import { useGrComponentProp, useGrComponentSize } from '../GrConfigProvider/context'
-import { useGrFormContext } from '../GrForm/context'
+import { useGrComponentProp, useGrComponentSize } from '../shared/configContext'
+import { useGrFormContext } from '../shared/formContext'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
-import { GR_FORM_FIELD_KEY } from './context'
+import { GR_FORM_FIELD_KEY } from '../shared/formFieldContext'
 import {
   controlColumnClass,
   errorBaseClass,

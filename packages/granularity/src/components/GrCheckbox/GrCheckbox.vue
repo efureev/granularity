@@ -31,7 +31,7 @@ import { computed, inject, onMounted, ref, useId, useSlots, watch } from 'vue'
 import IconCheck from '~icons/lucide/check'
 import IconMinus from '~icons/lucide/minus'
 
-import { useGrComponentSize } from '../GrConfigProvider/context'
+import { useGrComponentSize } from '../shared/configContext'
 import { useGrFormControl } from '../../composables/useGrFormControl'
 
 import { GR_CHECKBOX_GROUP_CONTEXT } from './grCheckboxGroupContext'

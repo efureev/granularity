@@ -6,7 +6,7 @@ import GrInput from '../GrInput/GrInput.vue'
 import GrTree from '../GrTree/GrTree.vue'
 import { useAnnouncer } from '../../composables/useAnnouncer'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
-import { useGrComponentProp, useGrComponentSize } from '../GrConfigProvider/context'
+import { useGrComponentProp, useGrComponentSize } from '../shared/configContext'
 
 import IconCheck from '~icons/lucide/check'
 import IconCopy from '~icons/lucide/copy'

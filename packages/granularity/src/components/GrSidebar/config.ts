@@ -1,8 +1,8 @@
-import { defineGranularComponent } from '@feugene/unocss-preset-granular/contract'
+import { defineGranumComponent } from '@feugene/granum/contract'
 
 import { grSidebarSafelist } from './safelist'
 
-export const grSidebarConfig = defineGranularComponent(import.meta.url, {
+export const grSidebarConfig = defineGranumComponent(import.meta.url, {
   name: 'GrSidebar',
   /**
    * Высоту модального слоя задаёт `useModalOverlay` → `modalLayerZIndex`: имя

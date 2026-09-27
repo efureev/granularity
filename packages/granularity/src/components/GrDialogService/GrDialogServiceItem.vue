@@ -19,7 +19,7 @@ import {
 } from '../GrResponseErrorBanner/parsers'
 import type { ResponseErrorInfo } from '../GrResponseErrorBanner'
 
-import { GR_CONFIG_KEY, type GrComponentDefaults, type GrConfigContext } from '../GrConfigProvider/context'
+import { GR_CONFIG_KEY, type GrComponentDefaults, type GrConfigContext } from '../shared/configContext'
 import { GRANULARITY_I18N_KEY } from '../../i18n/adapter'
 import { resolveGranularityI18n, useGranularityTranslations } from '../../internal/granularityI18n'
 

@@ -2,7 +2,7 @@ import { mount } from '@vue/test-utils'
 import { computed, defineComponent } from 'vue'
 import { describe, expect, it, vi } from 'vitest'
 
-import { GR_CONFIG_KEY } from '../../GrConfigProvider/context'
+import { GR_CONFIG_KEY } from '../../shared/configContext'
 
 vi.mock('~icons/lucide/check', () => {
   return {

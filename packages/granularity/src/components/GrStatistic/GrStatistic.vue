@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { useGrComponentProp, useGrComponentSize } from '../GrConfigProvider/context'
+import { useGrComponentProp, useGrComponentSize } from '../shared/configContext'
 import { computed, markRaw, onBeforeUnmount, onMounted, ref, useSlots, watch, watchEffect, type Component } from 'vue'
 
 import { useGranularityTranslations } from '../../internal/granularityI18n'
-import { deltaTone, type GrDeltaPolarity } from '../GrDelta/deltaTone'
+import { deltaTone, type GrDeltaPolarity } from '../shared/deltaTone'
 import { iconClass, iconTag } from '../shared/icon'
 import { isFocusableTag } from '../shared/polymorphicRoot'
 import GrSkeleton from '../GrSkeleton/GrSkeleton.vue'

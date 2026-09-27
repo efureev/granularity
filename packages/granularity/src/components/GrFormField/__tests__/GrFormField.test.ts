@@ -3,8 +3,8 @@ import { computed, inject, nextTick, ref } from 'vue'
 import { describe, expect, it, vi } from 'vitest'
 
 import GrFormField from '../GrFormField.vue'
-import { GR_FORM_FIELD_KEY } from '../context'
-import { GR_FORM_KEY } from '../../GrForm/context'
+import { GR_FORM_FIELD_KEY } from '../../shared/formFieldContext'
+import { GR_FORM_KEY } from '../../shared/formContext'
 
 describe('granularity/GrFormField (unit)', () => {
   it('показывает label и текст ошибки под контролом', () => {
