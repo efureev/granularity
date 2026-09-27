@@ -62,18 +62,27 @@ const { layout, reset } = useDashboardLayout({
 
 ## Подключение
 
-### UnoCSS
+### CSS
+
+Пакет перечисляется именем, рядом с ядром: `granum` читает
+`dist/granum.manifest.json` каждого через `exports`, а не сканирует
+`node_modules`.
 
 ```ts
-import granularityProvider from '@feugene/granularity/granular-provider/node'
-import dashboardProvider from '@feugene/granularity-dashboard/granular-provider/node'
-import { presetGranularNode } from '@feugene/unocss-preset-granular/node'
+// granum.config.ts
+import { defineGranumConfig } from '@feugene/granum/vite'
+import { windEngine } from '@feugene/granum-engine-wind'
 
-presetGranularNode({
-  providers: [granularityProvider, dashboardProvider],
+export default defineGranumConfig({
+  engine: windEngine(),
+  providers: ['@feugene/granularity', '@feugene/granularity-dashboard'],
   components: ['@feugene/granularity-dashboard:GrDashboard'],
 })
 ```
+
+Классы компонентов написаны против словаря `unocss/preset-wind3+granum@66`.
+Движок другого диалекта заставит `granum` сообщить `provider-dialect-mismatch` и
+перечислить отброшенные классы, а не отрисовать сетку наполовину.
 
 ### Авто-импорт
 

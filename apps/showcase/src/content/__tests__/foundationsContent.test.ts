@@ -12,12 +12,12 @@ import {
 import { grFoundationTokens, grThemeTokens } from '@feugene/granularity/tokens'
 
 describe('showcase foundations content', () => {
-  it('собирает полный foundations coverage для styling, themes, tokens, unocss и localization', () => {
+  it('собирает полный foundations coverage для styling, themes, tokens, granum и localization', () => {
     expect(showcaseFoundationGuides.map(guide => guide.id)).toEqual([
       'styling',
       'themes',
       'tokens',
-      'unocss',
+      'granum',
       'localization',
     ])
     expect(showcaseFoundationGuides.every(guide => guide.narrativeSource.length > 80)).toBe(true)
@@ -26,8 +26,9 @@ describe('showcase foundations content', () => {
 
   it('подключает narrative docs и source layers пакета как источники foundations guidance', () => {
     expect(showcaseFoundationGuides.find(guide => guide.id === 'styling')?.sourcePath).toBe('packages/granularity/docs/styling.md')
-    expect(showcaseFoundationGuides.find(guide => guide.id === 'unocss')?.narrativeSource).toContain('@feugene/unocss-preset-granular/node')
-    expect(showcaseFoundationGuides.find(guide => guide.id === 'unocss')?.narrativeSource).toContain('@feugene/granularity/granular-provider/node')
+    expect(showcaseFoundationGuides.find(guide => guide.id === 'granum')?.sourcePath).toBe('packages/granularity/docs/granum.md')
+    expect(showcaseFoundationGuides.find(guide => guide.id === 'granum')?.narrativeSource).toContain('@feugene/granum/vite')
+    expect(showcaseFoundationGuides.find(guide => guide.id === 'granum')?.narrativeSource).toContain('virtual:granum.css')
     expect(showcaseFoundationGuides.find(guide => guide.id === 'localization')?.narrativeSource).toContain('GRANULARITY_I18N_BLOCK')
     expect(showcaseFoundationGuides.find(guide => guide.id === 'tokens')?.narrativeSource).toContain('--gr-space-4')
   })
@@ -80,22 +81,25 @@ describe('showcase foundations content', () => {
   it('даёт quick-start snippets и обзорные метрики для landing/foundations страниц', () => {
     expect(showcaseQuickStartCards).toHaveLength(5)
     expect(showcaseQuickStartCards.map(card => card.id)).toEqual([
-      'quick-start-preset-basic',
-      'quick-start-preset-components',
-      'quick-start-preset-themes',
-      'quick-start-preset-layer',
-      'quick-start-preset-granular-content',
+      'quick-start-granum-basic',
+      'quick-start-granum-components',
+      'quick-start-granum-themes',
+      'quick-start-granum-prune',
+      'quick-start-granum-guard',
     ])
-    expect(showcaseQuickStartCards.every(card => card.code.includes('presetGranularNode'))).toBe(true)
-    expect(showcaseQuickStartCards.every(card => card.code.includes('@feugene/unocss-preset-granular/node'))).toBe(true)
-    expect(showcaseQuickStartCards.every(card => card.code.includes('@feugene/granularity/granular-provider/node'))).toBe(true)
-    expect(showcaseQuickStartCards.find(card => card.id === 'quick-start-preset-basic')?.code).not.toContain('components:')
-    expect(showcaseQuickStartCards.find(card => card.id === 'quick-start-preset-components')?.code).toContain('names: [\'GrButton\', \'GrCard\']')
-    expect(showcaseQuickStartCards.find(card => card.id === 'quick-start-preset-themes')?.code).toContain('themes: { names: [\'light\', \'dark\'] }')
-    expect(showcaseQuickStartCards.find(card => card.id === 'quick-start-preset-layer')?.code).toContain('layer: \'granular\'')
-    expect(showcaseQuickStartCards.find(card => card.id === 'quick-start-preset-granular-content')?.code).toContain('granularContent(granularOptions)')
-    expect(showcaseInstallationNarrative).toContain('@feugene/unocss-preset-granular/node')
-    expect(showcaseInstallationNarrative).toContain('@feugene/granularity/granular-provider/node')
+    // Все пять шагов — один и тот же конфиг, растущий опциями: движок инстансом
+    // и провайдер именем пакета обязаны стоять в каждом, иначе шаг не рабочий.
+    expect(showcaseQuickStartCards.every(card => card.code.includes('defineGranumConfig'))).toBe(true)
+    expect(showcaseQuickStartCards.every(card => card.code.includes('engine: windEngine()'))).toBe(true)
+    expect(showcaseQuickStartCards.every(card => card.code.includes(`providers: ['@feugene/granularity']`))).toBe(true)
+    expect(showcaseQuickStartCards.every(card => card.code.includes('@feugene/granum-engine-wind'))).toBe(true)
+    expect(showcaseQuickStartCards.find(card => card.id === 'quick-start-granum-basic')?.code).not.toContain('components:')
+    expect(showcaseQuickStartCards.find(card => card.id === 'quick-start-granum-components')?.code).toContain('names: [\'GrButton\', \'GrCard\']')
+    expect(showcaseQuickStartCards.find(card => card.id === 'quick-start-granum-themes')?.code).toContain('themes: { names: [\'light\', \'dark\'] }')
+    expect(showcaseQuickStartCards.find(card => card.id === 'quick-start-granum-prune')?.code).toContain('pruneTokens: { mode: \'on\' }')
+    expect(showcaseQuickStartCards.find(card => card.id === 'quick-start-granum-guard')?.code).toContain('js: { guard: \'error\' }')
+    expect(showcaseInstallationNarrative).toContain('granum(granumConfig)')
+    expect(showcaseInstallationNarrative).toContain('virtual:granum.css')
     expect(showcaseFoundationStats).toHaveLength(3)
     expect(showcaseFoundationsChecklist).toHaveLength(3)
   })

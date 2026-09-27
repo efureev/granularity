@@ -52,6 +52,7 @@
       "import": "./dist/index.js",
       "default": "./dist/index.js"
     },
+    "./granum.manifest.json": "./dist/granum.manifest.json",
     "./components/GrCodeBlock": {
       "types": "./dist/types/components/GrCodeBlock/index.d.ts",
       "import": "./dist/components/GrCodeBlock/index.js"
@@ -98,16 +99,16 @@
     "./package.json": "./package.json"
   },
   "peerDependencies": {
-    "@feugene/granularity": ">=0.41.0 <1.0.0",
-    "@feugene/unocss-preset-granular": ">=0.16.0 <1.0.0",
-    "vue": "^3.5.0",
-    "@feugene/unplugin-granularity": ">=0.7.0 <1.0.0",
-    "unplugin-vue-components": ">=0.26.0",
-    "@feugene/fint-i18n": ">=0.7.0 <1.0.0",
+    "@codemirror/commands": "^6.0.0",
+    "@codemirror/language": "^6.0.0",
     "@codemirror/state": "^6.0.0",
     "@codemirror/view": "^6.0.0",
-    "@codemirror/language": "^6.0.0",
-    "@codemirror/commands": "^6.0.0"
+    "@feugene/fint-i18n": ">=0.7.0 <1.0.0",
+    "@feugene/granularity": ">=0.41.0 <1.0.0",
+    "@feugene/granum": ">=0.3.0 <1.0.0",
+    "@feugene/unplugin-granularity": ">=0.7.0 <1.0.0",
+    "unplugin-vue-components": ">=0.26.0",
+    "vue": "^3.5.0"
   },
   "peerDependenciesMeta": {
     "@feugene/unplugin-granularity": {
@@ -141,7 +142,8 @@
     "@feugene/fint-i18n": "^0.7.0",
     "@feugene/granularity": "^0.53.0",
     "@feugene/granularity-test-kit": "^0.10.0",
-    "@feugene/unocss-preset-granular": "^0.16.0",
+    "@feugene/granum": "^0.3.0",
+    "@feugene/granum-engine-wind": "^0.3.0",
     "@feugene/unplugin-granularity": "^0.7.0",
     "@types/node": "^26.4.0",
     "@vitejs/plugin-vue": "^6.0.8",
@@ -162,7 +164,7 @@
   "scripts": {
     "build": "vite build && vue-tsc -p tsconfig.build.json",
     "dev": "vite build --watch",
-    "doctor": "node ../../scripts/granular-doctor.mjs ./granular.options.mjs",
+    "doctor": "node ../../scripts/granum-doctor.mjs ./granum.config.mjs",
     "sizes": "node ../../scripts/report-entry-sizes.mjs .",
     "sizes:docs": "node ../../scripts/generate-entry-sizes.mjs .",
     "generate:registry": "node scripts/generate-registry.mjs",

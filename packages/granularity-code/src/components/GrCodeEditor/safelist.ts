@@ -1,5 +1,5 @@
 import { splitClassTokens } from '../../internal/classTokens'
-import { codeTokenClass } from '../GrCodeBlock/grCodeBlockStyles'
+import { codeTokenClass } from '../shared/grCodeBlockStyles'
 
 import {
   editorDisabledClass,
@@ -18,9 +18,11 @@ import {
 /**
  * Классы из вычисляемых мап и `.ts`-хелперов — только safelist.
  *
- * `codeTokenClass` объявляется и здесь: общий с блоком модуль в `dist` не
- * принадлежит ни одной директории компонента, а пресет сканирует только
- * `dist/components/<Name>/**`.
+ * `codeTokenClass` объявляется и здесь намеренно. Общий с блоком модуль лежит в
+ * `components/shared/` — вне директории любого компонента, — и в файлы
+ * компонента попадает общим чанком. granum извлекает классы по графу бандла и
+ * такой чанк видит, но safelist остаётся страховкой на случай, когда класс
+ * собирается из вычисляемой мапы и целой строкой в бандле не встречается.
  *
  * `editorHookClass` сюда НЕ идёт: это селектор собственного `<style>`.
  */

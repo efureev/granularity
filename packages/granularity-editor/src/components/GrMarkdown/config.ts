@@ -1,4 +1,4 @@
-import { defineGranularComponent } from '@feugene/unocss-preset-granular/contract'
+import { defineGranumComponent } from '@feugene/granum/contract'
 
 import { grMarkdownSafelist } from './grMarkdownStyles'
 
@@ -23,7 +23,7 @@ import { grMarkdownSafelist } from './grMarkdownStyles'
  * Собственный CSS (`tokens.css`, `styles.css`) в `cssFiles` не объявлен: он
  * импортируется из SFC и уезжает в его чанк через `libInjectCss`.
  */
-export const grMarkdownConfig = defineGranularComponent(import.meta.url, {
+export const grMarkdownConfig = defineGranumComponent(import.meta.url, {
   name: 'GrMarkdown',
   safelist: grMarkdownSafelist,
   dependencies: [

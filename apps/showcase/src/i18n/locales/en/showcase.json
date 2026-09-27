@@ -70,15 +70,15 @@
       "title": "Foundations",
       "shortTitle": "Foundations",
       "eyebrow": "Showcase / Foundations",
-      "description": "Core onboarding docs: installation paths, styling layers, themes, tokens, UnoCSS, and localization. Also covers two additional integration paths: the runtime adapter (createGranularity) and build-time auto-import (unplugin-granularity resolver).",
+      "description": "Core onboarding docs: installation paths, styling layers, themes, tokens, the granum pipeline, and localization. Also covers two additional integration paths: the runtime adapter (createGranularity) and build-time auto-import (unplugin-granularity resolver).",
       "sections": {
         "installation": {
           "title": "Installation paths",
-          "description": "The setup progression for `presetGranular` (the node variant `presetGranularNode`) — the only supported installation method.",
+          "description": "The setup progression for the `@feugene/granum` pipeline — the only supported installation method.",
           "bullets": [
-            "Quick-start snippets right on the foundations page: from a basic config to the advanced `granularContent`.",
+            "Quick-start snippets right on the foundations page: from a basic config to the import guard for components outside the selection.",
             "Narrative guidance is wired in from `packages/granularity/docs/installation.md`.",
-            "One screen shows step by step how to grow the `components`, `themes`, `layer` and `granularContent` options."
+            "One screen shows step by step how to grow the `components`, `themes`, `pruneTokens` and `js.guard` options."
           ]
         },
         "styling": {
@@ -96,13 +96,12 @@
         "tokens": {
           "title": "Tokens"
         },
-        "unocss": {
-          "title": "UnoCSS integration",
-          "description": "Covers the production preset path and the package's i18n contract for the host app.",
+        "granum": {
+          "title": "`granum` integration",
+          "description": "The only supported integration is the `granum()` plugin from `@feugene/granum/vite`.",
           "bullets": [
-            "`presetGranularNode` from `@feugene/unocss-preset-granular/node` is the only supported way to wire it up.",
-            "The localization narrative doc with the package-level i18n entrypoint is wired in.",
-            "Foundations now serves as a real onboarding base rather than a placeholder section."
+            "The plugin reads each provider’s `granum.manifest.json` and serves `virtual:granum.css` — the whole CSS in five cascade layers.",
+            "The utility engine comes from the app (`windEngine()`): granum ships no engine of its own, and the package declares its vocabulary as a dialect."
           ]
         },
         "localization": {
@@ -125,7 +124,7 @@
             "Write `<GrButton />` and `v-hotkey` in a template — the resolver adds the needed imports and pulls in component-level CSS.",
             "Options: `prefix`, `importStyle`, `directives`, `exclude`; directives are resolved through an explicit whitelist.",
             "Recommended for production apps: perfect tree-shaking and no manual `import`s.",
-            "Typical setup: the resolver together with `presetGranularNode` from `@feugene/unocss-preset-granular/node` to auto-import components in templates."
+            "Typical setup: the resolver together with the `granum()` plugin from `@feugene/granum/vite` to auto-import components in templates."
           ]
         },
         "when-to-use": {
@@ -135,7 +134,7 @@
             "`@feugene/unplugin-granularity` is build-time and covers only what actually appears in `<template>`.",
             "`@feugene/granularity/vue` is runtime and covers everything else: directives in `render()`/JSX, i18n/theme via `provide`, the Options API via `globalProperties`.",
             "SSR / tests / environments without `unplugin-vue-components` — only through `createGranularity`.",
-            "Installing the package's CSS part is done exclusively through `presetGranularNode` — see Foundations / Installation paths."
+            "Installing the package’s CSS part is done exclusively through the `granum()` plugin — see Foundations / Installation paths."
           ]
         }
       }

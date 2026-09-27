@@ -9,7 +9,7 @@ import {
   themeVarsByName,
   type ThemeName,
 } from '../../../__tests__/cssContrast'
-import { codeBlockRootClass, codeTokenClass } from '../grCodeBlockStyles'
+import { codeBlockRootClass, codeTokenClass } from '../../shared/grCodeBlockStyles'
 import type { GrCodeRole } from '../../../highlight/tokenizeJson'
 
 /**

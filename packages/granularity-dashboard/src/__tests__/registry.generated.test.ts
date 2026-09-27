@@ -5,8 +5,8 @@ import { granularityDashboardComponentConfigs } from '../granular-provider/share
 
 /**
  * Пропуск любой из точек регистрации не даёт ошибки сборки: молча ломается
- * что-то одно — tree-shaking, subpath-импорт, авто-импорт или скан
- * UnoCSS-классов.
+ * что-то одно — tree-shaking, subpath-импорт, авто-импорт или извлечение
+ * классов granum.
  */
 defineRegistryGate({
   componentConfigs: granularityDashboardComponentConfigs,

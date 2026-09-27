@@ -1,8 +1,8 @@
-import { defineGranularComponent } from '@feugene/unocss-preset-granular/contract'
+import { defineGranumComponent } from '@feugene/granum/contract'
 
 import { grRelativeTimeSafelist } from './safelist'
 
-export const grRelativeTimeConfig = defineGranularComponent(import.meta.url, {
+export const grRelativeTimeConfig = defineGranumComponent(import.meta.url, {
   name: 'GrRelativeTime',
   safelist: grRelativeTimeSafelist,
 })

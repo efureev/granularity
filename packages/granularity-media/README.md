@@ -11,7 +11,7 @@ yarn add @feugene/granularity-media
 ```
 
 Своих зависимостей у пакета нет: кадрирование держится на Canvas и браузерных
-API, а не на библиотеке. Наружу объявлены только peer — ядро, пресет и Vue.
+API, а не на библиотеке. Наружу объявлены только peer — ядро, `granum` и Vue.
 
 ## Быстрый старт
 
@@ -83,14 +83,25 @@ async function save() {
 
 ## Подключение к сборке
 
-Провайдер — рядом с ядром, резолвер — **перед** жадным `GranularityResolver()`:
+Пакет — рядом с ядром, именем: `granum` читает манифест из его `dist`, а не
+сканирует `node_modules`. Резолвер авто-импорта — **перед** жадным
+`GranularityResolver()`.
 
 ```ts
-presetGranularNode({
-  providers: [granularityProvider, granularityMediaProvider],
+// granum.config.ts
+import { defineGranumConfig } from '@feugene/granum/vite'
+import { windEngine } from '@feugene/granum-engine-wind'
+
+export default defineGranumConfig({
+  engine: windEngine(),
+  providers: ['@feugene/granularity', '@feugene/granularity-media'],
   components: ['@feugene/granularity-media:GrImageCrop'],
 })
 ```
+
+Классы компонентов написаны против словаря `unocss/preset-wind3+granum@66`.
+Движок другого диалекта заставит `granum` сообщить `provider-dialect-mismatch` и
+перечислить отброшенные классы, а не отрисовать компоненты наполовину.
 
 Локали подключаются тем же `createFintI18n`, что и словари ядра — блок
 `GR_MEDIA_I18N_BLOCK`.

@@ -14,13 +14,13 @@
         playground / granularity
       </p>
       <h1 class="text-3xl font-semibold leading-tight">
-        Проверка isolated-импорта `GrButton`, `GrModal` и `GrPromptDialog`
+        Нулевая отметка замеров: Vue без `@feugene/granularity`
       </h1>
       <p class="max-w-3xl text-sm leading-6 text-slate-600">
-        В это демо через `presetGranularNode` подключены granular-стили для
-        `GrPromptDialog`.
-        На странице должны быть видны и button states, и корректная работа modal/prompt overlay, и базовые
-        select-сценарии.
+        Ни одного импорта из библиотеки и ни одного CSS-канала: плагина granum в
+        сборке этого стенда нет, поэтому классы разметки остаются без правил и
+        страница выглядит голой. Так и задумано — `dist` здесь показывает цену
+        пустого Vue-приложения, с которой сравнивают остальные playground'ы.
       </p>
     </header>
 

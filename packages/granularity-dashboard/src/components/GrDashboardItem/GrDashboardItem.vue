@@ -12,7 +12,7 @@ import { useGranularityTranslations } from '@feugene/granularity/composables/use
 import DragHandle from '../GrDashboardFrame/shared/DragHandle.vue'
 import ResizeHandle from '../GrDashboardFrame/shared/ResizeHandle.vue'
 import SettingsButton from '../GrDashboardFrame/shared/SettingsButton.vue'
-import { useGrDashboardContext } from '../GrDashboard/context'
+import { useGrDashboardContext } from '../shared/context'
 import type {
   GrDashboardItemOverflow,
   GrDashboardItemPadding,

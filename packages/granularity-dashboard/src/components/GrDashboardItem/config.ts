@@ -1,4 +1,4 @@
-import { defineGranularComponent } from '@feugene/unocss-preset-granular/contract'
+import { defineGranumComponent } from '@feugene/granum/contract'
 
 import { grDashboardItemSafelist } from './safelist'
 
@@ -7,7 +7,7 @@ import { grDashboardItemSafelist } from './safelist'
  * шапка и подвал уже есть в ядре, и своя копия разошлась бы с карточками
  * остального приложения.
  */
-export const grDashboardItemConfig = defineGranularComponent(import.meta.url, {
+export const grDashboardItemConfig = defineGranumComponent(import.meta.url, {
   name: 'GrDashboardItem',
   group: 'GrDashboardFrame',
   safelist: grDashboardItemSafelist,

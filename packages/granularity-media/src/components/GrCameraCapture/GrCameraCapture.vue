@@ -6,10 +6,10 @@ import { useAnnouncer } from '@feugene/granularity/composables/useAnnouncer'
 import { useGrComponentSize } from '@feugene/granularity/composables/useGrComponentConfig'
 import { useGranularityTranslations } from '@feugene/granularity/composables/useGranularityTranslations'
 
-import type { GrCameraStatus } from './cameraState'
+import type { GrCameraStatus } from '../shared/cameraState'
 import { outputSize } from '../../internal/outputSize'
 import { useCameraStream } from '../../internal/useCameraStream'
-import { shouldMirrorPreview } from './cameraState'
+import { shouldMirrorPreview } from '../shared/cameraState'
 import type { GrCameraCaptureSize, GrCameraFacing } from './grCameraCaptureStyles'
 import {
   controlsClass,

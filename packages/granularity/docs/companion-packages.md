@@ -1,11 +1,9 @@
 # Создание пакета-спутника (companion) с нуля
 
-> **Масштаб этого документа — спутники, а они пока на пресете v1.** Ядро
-> (`@feugene/granularity`) переведено на [`@feugene/granum`](./granum.md):
-> entry строит `granumProvider({ provider, engine: miniEngine() })`, а приложение читает
-> `granum.manifest.json` и передаёт свой движок сам.
-> Рецепты ниже (`granularChunkFileNames`, `libInjectCss`, `presetGranularNode`)
-> описывают прежний конвейер и будут переписаны, когда спутники поедут следом.
+> **Конвейер — [`@feugene/granum`](./granum.md).** Пакет на своей сборке отдаёт
+> `granumProvider({ provider, engine: windEngine() })` раскладку `dist` и
+> публикует `granum.manifest.json`; приложение читает манифест и передаёт свой
+> движок само. Ни ядро, ни спутники `dist` друг друга не сканируют.
 
 Этот гайд описывает, как собрать **companion-пакет** экосистемы `@feugene/granularity` — отдельный
 публикуемый пакет с собственными компонентами поверх примитивов дизайн-системы, — и как включить для
@@ -30,6 +28,7 @@ packages/<my-package>/
 ├── tsconfig.json
 ├── tsconfig.build.json
 ├── vite.config.ts
+├── granum.config.mjs            # конфиг для `yarn doctor` по своему манифесту
 ├── .gitignore
 ├── README.md
 ├── CHANGELOG.md
@@ -39,7 +38,7 @@ packages/<my-package>/
     ├── components/
     │   └── GrMyThing/
     │       ├── GrMyThing.vue
-    │       ├── config.ts        # defineGranularComponent
+    │       ├── config.ts        # defineGranumComponent
     │       └── index.ts
     └── granular-provider/
         ├── shared.ts            # фабрика провайдера
@@ -68,6 +67,7 @@ packages/<my-package>/
       "types": "./dist/types/index.d.ts",
       "import": "./dist/index.js"
     },
+    "./granum.manifest.json": "./dist/granum.manifest.json",
     "./components/GrMyThing": {
       "types": "./dist/types/components/GrMyThing/index.d.ts",
       "import": "./dist/components/GrMyThing/index.js"
@@ -84,17 +84,30 @@ packages/<my-package>/
   },
   "peerDependencies": {
     "@feugene/granularity": ">=0.21.0 <1.0.0",
-    "@feugene/unocss-preset-granular": "^0.16.0",
+    "@feugene/granum": ">=0.3.0 <1.0.0",
     "vue": "^3.5.0"
+  },
+  "devDependencies": {
+    "@feugene/granum": "^0.3.0",
+    "@feugene/granum-engine-wind": "^0.3.0"
   },
   "scripts": {
     "build": "vite build && vue-tsc -p tsconfig.build.json",
     "typecheck": "vue-tsc --noEmit -p tsconfig.json",
+    "doctor": "node ../../scripts/granum-doctor.mjs ./granum.config.mjs",
     "sizes": "node ../../scripts/report-entry-sizes.mjs .",
     "sizes:docs": "node ../../scripts/generate-entry-sizes.mjs ."
   }
 }
 ```
+
+`"./granum.manifest.json"` — не косметика: приложение резолвит манифест именно
+этим подпутём, и без экспорта провайдер пакета подключить нельзя. Экспорт ставится
+сразу за `"."`, и этот порядок сверяет гейт реестров.
+
+Движок (`@feugene/granum-engine-wind`) нужен только на сборке — он **dev**, а не
+peer: словарь, против которого написаны классы, пакет объявляет диалектом, а
+инстанс движка приносит приложение.
 
 - `sizes` — отчёт о весе гранулярных импортов (`scripts/report-entry-sizes.mjs`, общий на монорепо).
   Шаг `Entry sizes (gzip)` ставится в сборочную джобу пакета сразу после `Granular doctor` — таблица
@@ -118,8 +131,10 @@ packages/<my-package>/
 `yarn sizes:check` в корне роняет CI, если пакет с компонентными подпутями остался без любого из
 двух скриптов или без маркера в README.
 
-- `@feugene/granularity`, `@feugene/unocss-preset-granular`, `vue` — **peer**-зависимости (одна версия
-  рантайма на всё приложение).
+- `@feugene/granularity`, `@feugene/granum`, `vue` — **peer**-зависимости (одна версия
+  рантайма на всё приложение). Две копии granum в графе особенно вредны: хелперы
+  отпечатка словаря в них разные, отпечатки перестают сравниваться, и приложение
+  молча пересчитывает классы пакета на каждой сборке.
 - Собственные зависимости пакета идут в `dependencies` — их и оплачивает только тот, кто установит
   companion-пакет. У `granularity-chrono` их нет вовсе: своя арифметика дат и `Intl` вместо
   date-библиотеки.
@@ -142,69 +157,87 @@ packages/<my-package>/
 
 ## 3. `vite.config.ts`
 
-Каждый компонент — отдельный lib-entry (tree-shake), SFC-чанки складываются в `components/<Name>/chunks/`
-через `granularChunkFileNames` (чтобы UnoCSS в приложении смог просканировать шаблоны через
-`content.filesystem` пресета). `libInjectCss` инлайнит CSS компонента в его JS-чанк. Всё, что не должно
-попасть в бандл пакета (peers и собственные тяжёлые deps), помечается `external`.
+Раскладку `dist` ведёт плагин `granumProvider()`, а не конфиг: entry на каждый
+компонент и на `index`, SFC-чанки в `components/<Name>/chunks/`, извлечение
+классов и потребляемых токенов по графу бандла, `dist/granum.manifest.json` в
+конце. Руками перечисляются только entry, которых в реестре провайдера нет, —
+слои пакета, резолвер, i18n. `libInjectCss` инлайнит CSS компонента в его
+JS-чанк. Всё, что не должно попасть в бандл (peers и собственные тяжёлые deps),
+помечается `external`.
 
 ```ts
-import { fileURLToPath, URL } from 'node:url'
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
-import { granularChunkFileNames } from '@feugene/unocss-preset-granular/vite'
+import { granumProvider } from '@feugene/granum/build'
+import { windEngine } from '@feugene/granum-engine-wind'
 import { libInjectCss } from 'vite-plugin-lib-inject-css'
 
+import { myProvider } from './src/granular-provider'
+
+/** Entry, которых в реестре провайдера нет: слои пакета и служебные точки входа. */
+const extraEntries: Record<string, string> = {
+  'granular-provider': 'src/granular-provider/index.ts',
+  'granular-provider-node': 'src/granular-provider/node.ts',
+  'resolver': 'src/resolver.ts',
+}
+
 export default defineConfig({
-  plugins: [vue(), libInjectCss()],
+  plugins: [
+    vue(),
+    libInjectCss(),
+    granumProvider({
+      provider: myProvider,
+      engine: windEngine(),
+      entries: extraEntries,
+    }),
+  ],
   build: {
     target: 'esnext',
     cssCodeSplit: true,
     emptyOutDir: true,
-    lib: {
-      entry: {
-        'index': fileURLToPath(new URL('./src/index.ts', import.meta.url)),
-        'components/GrMyThing/index': fileURLToPath(new URL('./src/components/GrMyThing/index.ts', import.meta.url)),
-        'granular-provider': fileURLToPath(new URL('./src/granular-provider/index.ts', import.meta.url)),
-        'granular-provider-node': fileURLToPath(new URL('./src/granular-provider/node.ts', import.meta.url)),
-      },
-      formats: ['es'],
-      fileName: (_f, name) => `${name}.js`,
-    },
     rolldownOptions: {
       external: [
         /^node:/,
         'vue',
         /^@feugene\/granularity(\/.*)?$/,
-        /^@feugene\/unocss-preset-granular(\/.*)?$/,
         // + собственные тяжёлые зависимости пакета, напр.:
         // /^@vuepic\/vue-datepicker(\/.*)?$/, /^date-fns(\/.*)?$/,
       ],
-      output: {
-        chunkFileNames: granularChunkFileNames(),
-        assetFileNames: a => a.name ?? '[name][extname]',
-      },
     },
   },
 })
 ```
 
+`build.lib` в конфиге нет: entry, форматы и имена файлов ставит плагин. Свой
+`lib` рядом с ним — конфликт, и выигравшего в нём не видно по ошибке.
+
+Движок передаётся **инстансом** и только на сборке пакета. Диалект инстанса
+сверяется с тем, что провайдер объявил в `engine.dialect`: расхождение роняет
+сборку, а не пишет в манифест чужой словарь.
+
 ## 4. Компоненты
 
 Компоненты именуются с префиксом `Gr*` и повторяют структуру ядра: `GrMyThing.vue` + `config.ts`
-(`defineGranularComponent`) + `index.ts`. Темизация — через DS-токены (`var(--gr-*)`, `var(--bg)`,
+(`defineGranumComponent`) + `index.ts`. Темизация — через DS-токены (`var(--gr-*)`, `var(--bg)`,
 `var(--primary)` …), чтобы light/dark работали автоматически. Детали — в
 [`ADDING_COMPONENTS.md`](./ADDING_COMPONENTS.md).
 
 ```ts
 // src/components/GrMyThing/config.ts
-import { defineGranularComponent } from '@feugene/unocss-preset-granular/contract'
+import { defineGranumComponent } from '@feugene/granum/contract'
 
-export const grMyThingConfig = defineGranularComponent(import.meta.url, {
+export const grMyThingConfig = defineGranumComponent(import.meta.url, {
   name: 'GrMyThing',
   // Если композит использует примитивы ядра — перечислите их, safelist подтянется:
   // dependencies: [{ provider: '@feugene/granularity', components: ['GrButton', 'GrInput'] }],
 })
 ```
+
+Хелперы, которые делят между собой два компонента пакета, кладите в
+`src/components/shared/` — **не** в директорию одного из них. Импорт из чужой
+директории компонента сборка считает объявленным ребром и требует его в
+`dependencies`, а объявив, заставляет потребителя, выбравшего один компонент,
+оплатить CSS и safelist второго целиком.
 
 ## 5. Локализация компонентов через `@feugene/fint-i18n`
 
@@ -383,60 +416,75 @@ installI18n(app, i18n) // без этого компоненты останут�
 
 ## 6. Granular-provider
 
-Провайдер регистрирует компоненты пакета в едином реестре пресета — так UnoCSS соберёт safelist и
-CSS всех (в т.ч. транзитивных) компонентов. Нужны **два entry**, отличающиеся только тем, какой
-инстанс `granularityProvider` попадает в `dependencies` (browser vs FS-aware node), — чтобы у
-`presetGranularNode` был ровно один инстанс с данным `id`. Общий код — в `shared.ts`:
+Провайдер — реестр компонентов пакета и его паспорт: по нему плагин строит
+раскладку `dist` и пишет манифест, а приложение узнаёт состав пакета и словарь,
+против которого написаны его классы.
+
+Доноры объявляются **строками**, а не инстансами. Инстанс в `dependencies` втянул
+бы ядро в граф объектной формой — то есть заставил бы приложение сканировать его
+`dist` вместо того, чтобы прочитать готовый манифест. Базы раскладки
+(`packageBaseUrl`) у манифестной формы нет вовсе: она равна директории манифеста.
 
 ```ts
 // src/granular-provider/shared.ts
-import { defineGranularProvider, type GranularProvider } from '@feugene/unocss-preset-granular/contract'
+import { defineGranumProvider, type GranumComponentDescriptor, type GranumProvider } from '@feugene/granum/contract'
 import { grMyThingConfig } from '../components/GrMyThing/config'
 
 export const MY_PROVIDER_ID = '@feugene/my-package'
 
-// rolldown заменяет `new URL('..', import.meta.url)` на data:-URL, поэтому корень
-// пакета собираем из `import.meta.url` вручную (два последних сегмента — файл и каталог).
-const packageBaseUrl = `${import.meta.url.slice(
-  0,
-  import.meta.url.lastIndexOf('/', import.meta.url.lastIndexOf('/') - 1) + 1,
-)}`
+/** Словарь утилит, против которого написаны классы компонентов, — тот же, что у ядра. */
+export const MY_ENGINE_DIALECT = 'unocss/preset-wind3+granum@66'
 
-export function createMyProvider(granularityProvider: GranularProvider): GranularProvider {
-  return defineGranularProvider({
+/** Реестр — именованной мапой: по ней гейт сверяет состав с файловой системой. */
+export const myPackageComponentConfigs = {
+  GrMyThing: grMyThingConfig,
+} satisfies Record<string, GranumComponentDescriptor>
+
+export function createMyProvider(): GranumProvider {
+  return defineGranumProvider({
     id: MY_PROVIDER_ID,
     contractVersion: 1,
-    packageBaseUrl,
-    components: [grMyThingConfig],
-    dependencies: [granularityProvider],
+    engine: { dialect: MY_ENGINE_DIALECT },
+    components: Object.values(myPackageComponentConfigs),
+    dependencies: ['@feugene/granularity'],
   })
 }
 ```
 
 ```ts
 // src/granular-provider/index.ts  (browser-entry)
-import { granularityProvider } from '@feugene/granularity/granular-provider'
 import { createMyProvider } from './shared'
 
-export const myProvider = createMyProvider(granularityProvider)
+// Реэкспортом: реестр компонентов — публичная информация о пакете.
+export * from './shared'
+
+export const myProvider = createMyProvider()
 export default myProvider
 ```
 
 ```ts
-// src/granular-provider/node.ts  (node-entry, FS-aware)
-import { granularityProvider } from '@feugene/granularity/granular-provider/node'
-import { createMyProvider } from './shared'
-
-export const myProvider = createMyProvider(granularityProvider)
-export default myProvider
+// src/granular-provider/node.ts  — алиас browser-entry
+export * from './index'
+// `export *` не пробрасывает default.
+export { default } from './index'
 ```
 
-Потребитель подключает провайдер рядом с ядром:
+Два entry остались подпутём совместимости: FS-aware варианта у манифестной формы
+нет, ходить в файловую систему провайдеру больше незачем.
+
+Потребитель подключает провайдер по имени рядом с ядром — читаются манифесты,
+`dist` никто не сканирует:
 
 ```ts
-presetGranularNode({
-  providers: [granularityProvider, myProvider],
-  components: ['@feugene/my-package:GrMyThing'],
+// granum.config.ts приложения
+import { defineGranumConfig } from '@feugene/granum/vite'
+import { windEngine } from '@feugene/granum-engine-wind'
+
+export default defineGranumConfig({
+  engine: windEngine(),
+  providers: ['@feugene/granularity', '@feugene/my-package'],
+  components: [{ provider: '@feugene/my-package', names: ['GrMyThing'] }],
+  appSources: { dirs: ['src'] },
 })
 ```
 
@@ -631,10 +679,11 @@ npx --yes publint@latest --pack npm   # проверка соответстви�
 ## Чеклист
 
 - [ ] `package.json`: `type: module`, `sideEffects: ["**/*.css"]`, пер-компонентные `exports`, peer на ядро.
-- [ ] `vite.config.ts`: entry на каждый компонент, `granularChunkFileNames`, `libInjectCss`, `external` на peers и тяжёлые deps.
-- [ ] Компоненты `Gr*` + `config.ts` (`defineGranularComponent`), темизация через DS-токены.
+- [ ] `vite.config.ts`: `granumProvider({ provider, engine: windEngine(), entries })`, `libInjectCss`, `external` на peers и тяжёлые deps, своего `build.lib` нет.
+- [ ] `granum.manifest.json` в `exports` сразу за `"."`; `granum.config.mjs` + скрипт `doctor`.
+- [ ] Компоненты `Gr*` + `config.ts` (`defineGranumComponent`), общие хелперы в `components/shared/`, темизация через DS-токены.
 - [ ] (Опц., если есть встроенные строки) `src/i18n`: уникальный блок (не `gr`), per-locale loaders, `all.ts` вне barrel; экспорты `./i18n` + `./i18n/all`, `fint-i18n` — optional peer; компоненты читают перевод через резолвер с fallback.
-- [ ] Granular-provider: `shared.ts` + browser/node entry, зарегистрирован в приложении рядом с ядром.
+- [ ] Granular-provider: `shared.ts` с диалектом движка и реестром-мапой, доноры строками, browser/node entry; в приложении подключается по имени пакета.
 - [ ] (Опц.) `./resolver` на `createGranularResolver` (whitelist + `importStyle: false`), optional peers, регистрируется раньше core-резолвера.
 - [ ] Гейты: восемь фабрик из `@feugene/granularity-test-kit/gates` (актуальный список — `REQUIRED_GATES` в `gates/coverage.ts`, его же сверяет `defineGateCoverage`); свои гейты домена — рядом.
 - [ ] Доки: сквозные `model` / `a11y` / `keyboard` / `theming` / `ssr`, страница на каждый компонент в `docs/components/`, индекс `docs/components.md`, компоненты в развилках `docs/COMPONENT-MAP.md`.

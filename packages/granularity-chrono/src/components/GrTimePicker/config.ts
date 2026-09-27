@@ -1,4 +1,4 @@
-import { defineGranularComponent } from '@feugene/unocss-preset-granular/contract'
+import { defineGranumComponent } from '@feugene/granum/contract'
 
 import { grTimePickerSafelist } from './safelist'
 
@@ -8,7 +8,7 @@ import { grTimePickerSafelist } from './safelist'
  * пресет подмешивает safelist и CSS лишь тем компонентам, что попали в
  * селекцию, а `GrPopover` попадает в неё только через этот граф.
  */
-export const grTimePickerConfig = defineGranularComponent(import.meta.url, {
+export const grTimePickerConfig = defineGranumComponent(import.meta.url, {
   name: 'GrTimePicker',
   safelist: grTimePickerSafelist,
   dependencies: [

@@ -10,8 +10,8 @@ import type { GrAffixPlacement } from './affixState'
  * компонента нет: он зависит от приложения. Нужен слой шкалы — приложение
  * ставит `--gr-affix-z: var(--gr-z-navbar)`.
  *
- * `ease-*` обязателен вместе с `duration-*`: без него `presetMini` подставит
- * свою кривую, и движение задавал бы пресет, а не дизайн-система.
+ * `ease-*` обязателен вместе с `duration-*`: без него свою кривую подставит
+ * словарь движка, и движение задавал бы движок, а не дизайн-система.
  */
 export const affixBaseClass = 'z-[var(--gr-affix-z,10)] transition-[box-shadow,background-color] duration-[var(--gr-duration-fast)] ease-[var(--gr-ease-out)]'
 

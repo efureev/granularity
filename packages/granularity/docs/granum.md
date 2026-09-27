@@ -16,7 +16,7 @@
   `virtual:granum/layers/<layer>.css` (один слой), `virtual:granum/components`
   (реэкспорт селекции), `virtual:granum/themes` (манифест тем для рантайма).
 - `defineGranumConfig` — типизированный `granum.config.ts` приложения.
-- `miniEngine()` из `@feugene/granum-engine-mini` — движок утилит. Своей
+- `windEngine()` из `@feugene/granum-engine-wind` — движок утилит. Своей
   реализации движка granum не содержит, поэтому в `devDependencies` приложения
   пакета два: конвейер и движок. Поле `engine` обязательно и принимает
   **инстанс**: строку `'builtin'` и объект опций granum отклоняет
@@ -33,10 +33,10 @@
 ```ts
 // granum.config.ts
 import { defineGranumConfig } from '@feugene/granum/vite'
-import { miniEngine } from '@feugene/granum-engine-mini'
+import { windEngine } from '@feugene/granum-engine-wind'
 
 export default defineGranumConfig({
-  engine: miniEngine(),
+  engine: windEngine(),
   providers: ['@feugene/granularity'],
   appSources: { dirs: ['src'] },
 })
@@ -64,9 +64,8 @@ import 'virtual:granum.css'
 - подмешиваются `tokens.css` и `base.css` пакета и тема `light`
   (`defaultThemes` провайдера);
 - классы разметки приложения извлекаются из `appSources`;
-- правила и варианты приходят от `miniEngine()` — `preset-mini` плюс
-  доп-правила, на которых нарисованы компоненты (опция `extraRules`, включена
-  по умолчанию).
+- правила и варианты приходят от `windEngine()` — `preset-wind3` плюс одно
+  доп-правило (опция `extraRules`, включена по умолчанию).
 
 Готовая связка — в `apps/playground-5`.
 
@@ -76,7 +75,7 @@ import 'virtual:granum.css'
 
 ```ts
 defineGranumConfig({
-  engine: miniEngine(),
+  engine: windEngine(),
   providers: ['@feugene/granularity'],
   components: [
     { provider: '@feugene/granularity', names: ['GrButton'] },
@@ -92,7 +91,7 @@ defineGranumConfig({
 
 ```ts
 defineGranumConfig({
-  engine: miniEngine(),
+  engine: windEngine(),
   providers: ['@feugene/granularity'],
   themes: { names: ['light', 'dark'] },
 })
@@ -106,7 +105,7 @@ defineGranumConfig({
 
 ```ts
 defineGranumConfig({
-  engine: miniEngine(),
+  engine: windEngine(),
   providers: ['@feugene/granularity'],
   components: [{ provider: '@feugene/granularity', names: ['GrButton'] }],
   appSources: { dirs: ['src'] },
@@ -123,7 +122,7 @@ defineGranumConfig({
 
 ```ts
 defineGranumConfig({
-  engine: miniEngine(),
+  engine: windEngine(),
   providers: ['@feugene/granularity'],
   components: [{ provider: '@feugene/granularity', names: ['GrButton'] }],
   js: { guard: 'error' },
@@ -154,15 +153,20 @@ defineGranumConfig({
 
 ## Словарь утилит: диалект и отпечаток
 
-Компоненты пакета пользуются утилитами, которых в `preset-mini` нет вовсе:
-`sr-only`, `tabular-nums`, `animate-spin`, `divide-y`, `space-y-*`,
-`backdrop-*`, `uppercase`. Их привозит дополнительный набор правил
-`miniEngine()` (опция `extraRules`, включена по умолчанию), и без него
+Компоненты пакета нарисованы утилитами словаря `preset-wind3`: `sr-only`,
+`tabular-nums`, `animate-spin`, `divide-y`, `space-y-*`, `backdrop-*`,
+`uppercase`, `border-collapse`, `list-none`, `touch-none`, `scroll-p*`. Движок
+более узкого словаря (например на `preset-mini`) части из них не знает, и тогда
 компоненты рисуются не полностью: «скрытая» подпись таблицы видна обычным
-текстом, спиннер не крутится, у списков нет разделителей.
+текстом, спиннер не крутится, у таблицы графиков двойная рамка.
+
+Сверх словаря `windEngine()` добавляет одно правило — альфу на произвольном
+цвете (`bg-[var(--gr-overlay-bg)]/55`). Без него класс совпадает, но `/55`
+теряется молча, и оверлей перестаёт быть полупрозрачным; именно поэтому
+`extraRules: false` — другой диалект, а не та же сборка с другим выводом.
 
 Поэтому пакет объявляет в манифесте **диалект словаря** —
-`unocss/preset-mini+granum@66`. Диалект — имя словаря классов, а не версия
+`unocss/preset-wind3+granum@66`. Диалект — имя словаря классов, а не версия
 реализации, и решает он ровно один вопрос: грузить ли правила пакета. Рядом
 лежит **отпечаток словаря** (`vocabulary`) — ключ фактического набора имён,
 которые умел сгенерировать движок сборки пакета; он решает другой вопрос:
@@ -185,18 +189,18 @@ defineGranumConfig({
   классу.
 
 Выход из расхождения один из двух: движок того же диалекта либо нужные правила
-своему — `miniEngine({ rules: [...] })`. Смешать два словаря в одной сборке
+своему — `windEngine({ rules: [...] })`. Смешать два словаря в одной сборке
 нельзя: имена пересекаются, а смысл у них разный. Подробности —
 [«Движки и диалекты»][granum-engines] в документации granum.
 
 Со стороны пакета связку держит гейт `src/__tests__/presetUtilities.test.ts`:
-он сверяет тот же список утилит с `miniEngine()` и с ним же без доп-правил.
+он сверяет тот же список утилит с `windEngine()` и с ним же без доп-правил.
 
 ## Иконки классом: правило заводит приложение
 
 Иконки самого пакета в CSS не нуждаются — они вкомпилированы в `dist`.
 Но если вы передаёте иконку **классом** (`icon="i-lucide-user"`), этот класс
-обязан кто-то сгенерировать. `miniEngine()` правил иконок не знает, а поля для
+обязан кто-то сгенерировать. `windEngine()` правил иконок не знает, а поля для
 правил у конфига granum нет и не появится: правила приложения передаются
 **фабрике движка**.
 
@@ -204,7 +208,7 @@ defineGranumConfig({
 
 - передавать иконку Vue-компонентом (`:icon="LucideUser"`) — работает без
   единой настройки;
-- либо завести правило самому — `miniEngine({ rules: [...] })` — либо взять
+- либо завести правило самому — `windEngine({ rules: [...] })` — либо взять
   движок, который умеет иконки. Диалект от `rules` не меняется, меняется
   отпечаток: классы пакета будут пересчитаны, и это норма, а не дефект.
 

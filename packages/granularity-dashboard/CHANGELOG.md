@@ -7,6 +7,49 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+
+- **The utility engine changed: `@feugene/granum-engine-wind` `^0.3.0` instead of
+  `@feugene/granum-engine-mini`.** It vendors `preset-wind3` rather than
+  `preset-mini`, so the vocabulary gained `border-collapse`, `list-none`,
+  `touch-none`, `table-fixed` and `scroll-p*` — utilities that existed neither in
+  `preset-mini` nor in the former extra rules, which is why a class in the markup
+  silently produced no CSS. The package dialect is now
+  `unocss/preset-wind3+granum@66`, and the peer on the core moved to
+  `>=0.3.0 <1.0.0`. A consumer swaps the pair in dev dependencies and replaces
+  `miniEngine()` with `windEngine()` in `granum.config.*`.
+- **`[touch-action:none]` became the `touch-none` utility** in the shared board
+  frame: the arbitrary value was there because the utility was missing from the
+  vocabulary.
+- **The package is built by `@feugene/granum`, not by the `@feugene/unocss-preset-granular` preset.** The
+  `dist` layout and the component entries are driven by the
+  `granumProvider({ provider, engine: miniEngine(), entries })` plugin: it builds them from the provider
+  registry, extracts the classes and the consumed tokens by walking the bundle graph, and writes a
+  machine-generated `granum.manifest.json` next to `dist`. The package's own `build.lib`,
+  `granularChunkFileNames` and hand-written component entries are gone from `vite.config.ts`.
+- **The manifest is exported as `./granum.manifest.json`.** An application resolves it through exactly that
+  subpath — without the export the package's provider cannot be wired up. granum never scans
+  `node_modules`: the component classes are computed when the package is built.
+- **The peer changed: `@feugene/granum` `>=0.2.0 <1.0.0` instead of the preset.** The utility engine comes
+  from the application (`@feugene/granum-engine-mini` sits in the package's dev dependencies), while the
+  package declares a **vocabulary dialect** in the manifest — `unocss/preset-mini+granum@66`, the
+  vocabulary its component classes are written against. An application running an engine of a different
+  vocabulary gets `provider-dialect-mismatch` and every lost class listed by name instead of silently
+  half-drawn components.
+- **The descriptor contract was renamed without a change of meaning.** `defineGranularComponent` →
+  `defineGranumComponent`, `defineGranularProvider` → `defineGranumProvider`, imported from
+  `@feugene/granum/contract`. Donors are declared as **strings**
+  (`dependencies: ['@feugene/granularity']`) rather than instances: an instance would pull the donor into
+  the graph in object form and make the application scan its `dist` instead of reading the manifest.
+  `packageBaseUrl` is gone — the manifest's directory is the base — so `granular-provider/node` is now a
+  plain alias of the browser entry.
+- **`granular.options.mjs` was replaced by `granum.config.mjs`**, and `yarn doctor` runs `granum doctor`
+  against the package's manifests.
+- **`useGrDashboardContext` and `GR_DASHBOARD_KEY` moved from `components/GrDashboard/context.ts` to
+  `components/shared/context.ts`.** Every companion of the board reads them, and an import from another
+  component's directory counts as a declared edge — declaring it would have made a consumer of the toolbar
+  pay for the board's CSS and safelist in full. The public surface is unchanged.
+
 ## [v0.6.0] 2026-08-27
 
 ### Changed

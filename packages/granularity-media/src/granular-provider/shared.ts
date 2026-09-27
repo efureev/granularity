@@ -1,12 +1,12 @@
-// `id`, `packageBaseUrl` и реестр компонентов провайдера.
+// `id` и реестр компонентов провайдера.
 //
 // Списки под маркерами генерируются `yarn generate:registry` — руками внутри
 // них не писать, следующая генерация затрёт.
 import {
-  defineGranularProvider,
-  type GranularComponentDescriptor,
-  type GranularProvider,
-} from '@feugene/unocss-preset-granular/contract'
+  defineGranumProvider,
+  type GranumComponentDescriptor,
+  type GranumProvider,
+} from '@feugene/granum/contract'
 // <granularity:components:imports> — блок генерируется `yarn generate:registry`
 import { grCameraCaptureConfig } from '../components/GrCameraCapture/config'
 import { grCodeScannerConfig } from '../components/GrCodeScanner/config'
@@ -16,6 +16,16 @@ import { grVideoPlayerConfig } from '../components/GrVideoPlayer/config'
 
 /** Идентификатор провайдера — совпадает с именем пакета. */
 export const GRANULARITY_MEDIA_PROVIDER_ID = '@feugene/granularity-media'
+
+/** Донор: компоненты пакета опираются на компоненты ядра. */
+const GRANULARITY_CORE_PROVIDER_ID = '@feugene/granularity'
+
+/**
+ * Словарь утилит, против которого написаны классы компонентов, — тот же, что у
+ * ядра. Сборка сверит объявление с диалектом движка, которым её запустили, и не
+ * даст записать в манифест чужой словарь.
+ */
+export const GRANULARITY_MEDIA_ENGINE_DIALECT = 'unocss/preset-wind3+granum@66'
 
 /**
  * Реестр компонентов пакета — именованной мапой, а не инлайн-массивом.
@@ -30,32 +40,27 @@ export const granularityMediaComponentConfigs = {
   GrImageCrop: grImageCropConfig,
   GrVideoPlayer: grVideoPlayerConfig,
   // </granularity:components:registry>
-} satisfies Record<string, GranularComponentDescriptor>
+} satisfies Record<string, GranumComponentDescriptor>
 
 export type GranularityMediaComponentName = keyof typeof granularityMediaComponentConfigs
 
 /**
- * Собирает granular-provider пакета.
+ * Собирает провайдера пакета.
  *
- * Принимает `granularityProvider` снаружи — в зависимости от entry это будет
- * browser- или node-вариант провайдера `@feugene/granularity`. Это важно,
- * чтобы у пресета был ровно один инстанс с данным `id`.
+ * Донор объявлен строкой, а не инстансом: приложение подключает оба пакета по
+ * имени, и каждый приезжает своим манифестом. Инстанс в `dependencies` втянул
+ * бы ядро в граф объектной формой — то есть заставил бы приложение сканировать
+ * его `dist` вместо того, чтобы прочитать готовый манифест (C-4).
  *
- * `packageBaseUrl` тоже приходит снаружи, из самого entry, и это не церемония:
- * он считается от `import.meta.url`, а этот модуль бандлер волен и вынести в
- * общий чанк, и заинлайнить в entry — то есть положить на разную глубину.
- * Промах на уровень даёт `dist/components/<Name>/`, которых нет, пресет молча
- * пропускает скан, и в CSS остаётся только то, что перечислено в safelist.
+ * База раскладки здесь не нужна вовсе: у манифестной формы она равна директории
+ * манифеста, и считать её от `import.meta.url` больше незачем.
  */
-export function createGranularityMediaProvider(
-  granularityProvider: GranularProvider,
-  packageBaseUrl: string,
-): GranularProvider {
-  return defineGranularProvider({
+export function createGranularityMediaProvider(): GranumProvider {
+  return defineGranumProvider({
     id: GRANULARITY_MEDIA_PROVIDER_ID,
     contractVersion: 1,
-    packageBaseUrl,
+    engine: { dialect: GRANULARITY_MEDIA_ENGINE_DIALECT },
     components: Object.values(granularityMediaComponentConfigs),
-    dependencies: [granularityProvider],
+    dependencies: [GRANULARITY_CORE_PROVIDER_ID],
   })
 }

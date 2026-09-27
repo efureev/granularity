@@ -50,10 +50,10 @@ describe('GrKbd', () => {
     expect(wrapper.classes().some(c => c.startsWith('min-w-'))).toBe(true)
   })
 
-  // `tabular-nums` в `presetMini`, где живёт пакет, отсутствует — её добирает
-  // `@feugene/unocss-mini-extra-rules` (с 0.8.0). Что связка потребителя её
-  // действительно генерирует, стережёт `src/__tests__/presetUtilities.test.ts`:
-  // здесь проверяется только наличие класса в разметке.
+  // `tabular-nums` — утилита словаря `preset-wind3`, который пакет объявляет
+  // диалектом. Что связка потребителя её действительно генерирует, стережёт
+  // `src/__tests__/presetUtilities.test.ts`: здесь проверяется только наличие
+  // класса в разметке.
   it('цифры не пляшут по ширине', () => {
     const wrapper = mount(GrKbd, { slots: { default: '1' } })
 

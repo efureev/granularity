@@ -1,8 +1,8 @@
-import { defineGranularComponent } from '@feugene/unocss-preset-granular/contract'
+import { defineGranumComponent } from '@feugene/granum/contract'
 
 import { grDashboardPaletteSafelist } from './safelist'
 
-export const grDashboardPaletteConfig = defineGranularComponent(import.meta.url, {
+export const grDashboardPaletteConfig = defineGranumComponent(import.meta.url, {
   name: 'GrDashboardPalette',
   group: 'GrDashboardFrame',
   safelist: grDashboardPaletteSafelist,

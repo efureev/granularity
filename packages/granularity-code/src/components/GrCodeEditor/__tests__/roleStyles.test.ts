@@ -3,7 +3,7 @@ import { resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
 
 import { classForRole, LEZER_TAGS_BY_ROLE } from '../../../highlight/fromLezer'
-import { codeTokenClass } from '../../GrCodeBlock/grCodeBlockStyles'
+import { codeTokenClass } from '../../shared/grCodeBlockStyles'
 
 /**
  * Классы ролей для CodeMirror рождаются в рантайме и в файлах не встречаются

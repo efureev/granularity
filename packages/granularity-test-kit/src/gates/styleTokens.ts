@@ -2,11 +2,11 @@ import { describe, expect, it } from 'vitest'
 
 import { offenders, readSources, stripComments, type SourceFile } from '../sources'
 
-/** Утилиты кегля из шкалы `presetMini`: `text-sm` и соседи по лестнице. */
+/** Утилиты кегля из шкалы словаря движка: `text-sm` и соседи по лестнице. */
 export const UNO_TEXT_SCALE = /(?<![\w-])text-(?:xs|sm|base|lg|xl|[2-9]xl)(?![\w-])/g
 
 /**
- * Утилиты радиуса из шкалы `presetMini`, включая направленные (`rounded-l-md`).
+ * Утилиты радиуса из шкалы словаря движка, включая направленные (`rounded-l-md`).
  *
  * Lookbehind и lookahead отсекают то, что утилитой не является: проп
  * `rounded?: string` и его биндинг `:rounded="…"`, чтение того же пропа

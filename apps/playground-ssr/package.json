@@ -16,6 +16,8 @@
     "vue": "^3.5.42"
   },
   "devDependencies": {
+    "@feugene/granum": "^0.3.0",
+    "@feugene/granum-engine-wind": "^0.3.0",
     "@tiptap/core": "^3.30.5",
     "@tiptap/extensions": "^3.30.5",
     "@tiptap/pm": "^3.30.5",
@@ -24,7 +26,6 @@
     "@vue/server-renderer": "^3.5.42",
     "jsdom": "^29.1.1",
     "typescript": "^6.0.3",
-    "unocss": "^66.8.1",
     "vite": "^8.2.2",
     "vitest": "^4.1.11"
   },

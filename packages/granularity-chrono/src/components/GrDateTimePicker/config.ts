@@ -1,4 +1,4 @@
-import { defineGranularComponent } from '@feugene/unocss-preset-granular/contract'
+import { defineGranumComponent } from '@feugene/granum/contract'
 
 import { grDateTimePickerSafelist } from './safelist'
 
@@ -9,7 +9,7 @@ import { grDateTimePickerSafelist } from './safelist'
  * только тем компонентам, что попали в селекцию, и без графа потребитель,
  * выбравший один `GrDateTimePicker`, получил бы панель без стилей.
  */
-export const grDateTimePickerConfig = defineGranularComponent(import.meta.url, {
+export const grDateTimePickerConfig = defineGranumComponent(import.meta.url, {
   name: 'GrDateTimePicker',
   safelist: grDateTimePickerSafelist,
   dependencies: [

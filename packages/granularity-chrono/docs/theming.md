@@ -48,14 +48,16 @@
 
 ## Сборка CSS
 
-Классы пакета попадают в CSS через `presetGranular`: провайдер
-`@feugene/granularity-chrono/granular-provider` отдаёт пресету и safelist, и
-директории для скана. Подключается он рядом с провайдером ядра:
+Классы пакета попадают в CSS через granum: на сборке пакета плагин извлекает их
+по графу бандла и пишет в `dist/granum.manifest.json` вместе с CSS компонентов и
+потребляемыми токенами. Приложение перечисляет пакет по имени рядом с ядром и
+читает готовый манифест, а не сканирует `dist`:
 
 ```ts
-providers: [granularityProvider, granularityChronoProvider]
+providers: ['@feugene/granularity', '@feugene/granularity-chrono']
 ```
 
 Компонент, выбранный потребителем, приносит с собой всё, что рендерит:
 `GrDateTimePicker` — сетку, колонки, поповер и кнопки ядра. Граф объявлен в
-`config.ts` каждого компонента и проверяется `granular doctor --strict`.
+`config.ts` каждого компонента, сборка сверяет его с фактическими импортами
+(`UndeclaredDependencyError`), а замыкание проверяет `granum doctor --strict`.

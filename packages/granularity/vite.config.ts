@@ -4,7 +4,7 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import Icons from 'unplugin-icons/vite'
 import { granumProvider } from '@feugene/granum/build'
-import { miniEngine } from '@feugene/granum-engine-mini'
+import { windEngine } from '@feugene/granum-engine-wind'
 import { granularityProvider } from './src/granular-provider'
 
 /**
@@ -133,7 +133,7 @@ export default defineConfig({
     // и её отпечаток уезжает в манифест как факт о списке.
     granumProvider({
       provider: granularityProvider,
-      engine: miniEngine(),
+      engine: windEngine(),
       entries: extraEntries,
     }),
   ],

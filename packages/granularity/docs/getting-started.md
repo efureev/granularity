@@ -20,7 +20,7 @@
 
 ```bash
 yarn add vue @feugene/granularity @floating-ui/dom @unocss/reset
-yarn add -D vite @vitejs/plugin-vue @feugene/granum @feugene/granum-engine-mini typescript vue-tsc
+yarn add -D vite @vitejs/plugin-vue @feugene/granum @feugene/granum-engine-wind typescript vue-tsc
 ```
 
 `@floating-ui/dom` — обязательная runtime-зависимость: на ней держится
@@ -29,8 +29,8 @@ yarn add -D vite @vitejs/plugin-vue @feugene/granum @feugene/granum-engine-mini 
 
 Движок утилит — вторая build-зависимость, и это не дублирование: granum своей
 реализации движка не содержит, а словарь классов выбирает тот, кто отвечает за
-результат сборки, то есть приложение. `@feugene/granum-engine-mini` —
-реализация по умолчанию (`preset-mini` плюс доп-правила, на которых нарисованы
+результат сборки, то есть приложение. `@feugene/granum-engine-wind` —
+реализация по умолчанию (`preset-wind3` плюс доп-правило, на которых нарисованы
 компоненты пакета); сам `unocss` приложению при этом не нужен вовсе.
 
 В `package.json` приложения обязателен `"type": "module"`, Node — не ниже 22.
@@ -44,10 +44,10 @@ CSS дизайн-системы не импортируется файлами. 
 ```ts
 // granum.config.ts
 import { defineGranumConfig } from '@feugene/granum/vite'
-import { miniEngine } from '@feugene/granum-engine-mini'
+import { windEngine } from '@feugene/granum-engine-wind'
 
 export default defineGranumConfig({
-  engine: miniEngine(),
+  engine: windEngine(),
   providers: ['@feugene/granularity'],
   components: [
     { provider: '@feugene/granularity', names: ['GrButton', 'GrInput'] },
@@ -58,8 +58,8 @@ export default defineGranumConfig({
 ```
 
 `engine` — единственное обязательное поле: реализации движка в granum нет, и
-инстанс передаёт приложение. `miniEngine()` даёт тот же словарь, против
-которого написаны классы компонентов (`unocss/preset-mini+granum@66`); движок
+инстанс передаёт приложение. `windEngine()` даёт тот же словарь, против
+которого написаны классы компонентов (`unocss/preset-wind3+granum@66`); движок
 другого словаря granum назовёт `provider-dialect-mismatch` и перечислит классы,
 которые пришлось выбросить, — см.
 [«Словарь утилит» в `granum.md`](./granum.md#словарь-утилит-диалект-и-отпечаток).
@@ -131,8 +131,8 @@ my-app/
     "vue": "^3.5.40"
   },
   "devDependencies": {
-    "@feugene/granum": "^0.2.0",
-    "@feugene/granum-engine-mini": "^0.2.0",
+    "@feugene/granum": "^0.3.0",
+    "@feugene/granum-engine-wind": "^0.3.0",
     "@vitejs/plugin-vue": "^6.0.8",
     "typescript": "^6.0.2",
     "vite": "^8.2.2",
@@ -722,7 +722,7 @@ export async function setupI18n() {
 
    ```ts
    export default defineGranumConfig({
-     engine: miniEngine(),
+     engine: windEngine(),
      providers: ['@feugene/granularity', '@feugene/granularity-chrono'],
      themes: { names: ['light', 'dark'] },
      appSources: { dirs: ['src'] },
@@ -820,8 +820,8 @@ export default defineConfig({
 |------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | Компоненты бесцветные, разметка «голая»                          | Не импортирован `virtual:granum.css` либо компонент вне селекции — проверьте `granum doctor` и `classes.unmatched` в отчёте                                |
 | Компоненты бесцветные внутри монорепо                            | Пакет не пересобран: `yarn build:granularity`                                                                                                              |
-| Спиннер не крутится, `sr-only`-текст виден                       | Движок другого словаря: `animate-spin`, `sr-only`, `divide-*` привозят доп-правила `miniEngine()` — смотрите `provider-dialect-mismatch` у `granum doctor` |
-| Иконка, переданная классом (`icon="i-lucide-user"`), не рисуется | `miniEngine()` правил иконок не знает: передайте иконку компонентом либо отдайте своё правило фабрике движка. Свои иконки пакета работают всегда           |
+| Спиннер не крутится, `sr-only`-текст виден                       | Движок другого словаря: `animate-spin`, `sr-only`, `divide-*` привозят доп-правила `windEngine()` — смотрите `provider-dialect-mismatch` у `granum doctor` |
+| Иконка, переданная классом (`icon="i-lucide-user"`), не рисуется | `windEngine()` правил иконок не знает: передайте иконку компонентом либо отдайте своё правило фабрике движка. Свои иконки пакета работают всегда           |
 | Интерфейс английский при заданной локали                         | Блок не зарегистрирован, лоадеры не добавлены или забыт `installI18n`                                                                                      |
 | Hydration mismatch на первой же странице                         | Сервер и клиент выбрали разные компоненты, либо в `setup` читается среда — см. [`ssr.md`](./ssr.md)                                                        |
 | Оверлей не работает после гидрации, хотя разметка пришла         | В шаблон не вставлен `ssrContext.teleports` — клиенту не по чему найти целевой контейнер                                                                   |

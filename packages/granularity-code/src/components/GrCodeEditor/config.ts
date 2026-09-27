@@ -1,4 +1,4 @@
-import { defineGranularComponent } from '@feugene/unocss-preset-granular/contract'
+import { defineGranumComponent } from '@feugene/granum/contract'
 
 import { grCodeEditorSafelist } from './safelist'
 
@@ -7,7 +7,7 @@ import { grCodeEditorSafelist } from './safelist'
  * внешняя библиотека, а не компонент дизайн-системы. Общая с блоком карта ролей
  * приходит `.ts`-модулем, и её классы объявлены в собственном safelist.
  */
-export const grCodeEditorConfig = defineGranularComponent(import.meta.url, {
+export const grCodeEditorConfig = defineGranumComponent(import.meta.url, {
   name: 'GrCodeEditor',
   safelist: grCodeEditorSafelist,
 })

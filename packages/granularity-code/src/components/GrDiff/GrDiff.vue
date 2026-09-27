@@ -9,8 +9,8 @@ import type { GrComponentSize } from '@feugene/granularity/components/GrConfigPr
 import { GR_CODE_HIGHLIGHTER_KEY } from '../../highlight/key'
 import { builtInLine } from '../../highlight/builtIn'
 import type { GrCodeLine, GrCodeTokenizer } from '../../highlight/palette'
-import { codeTokenClass } from '../GrCodeBlock/grCodeBlockStyles'
-import { serializeStable } from '../GrCodeBlock/serializeCode'
+import { codeTokenClass } from '../shared/grCodeBlockStyles'
+import { serializeStable } from '../shared/serializeCode'
 import { diffLines, GR_DIFF_DEFAULT_BUDGET, type GrDiffLine } from '../../diff/diffLines'
 import { diffWords, type GrDiffWord } from '../../diff/diffWords'
 import {

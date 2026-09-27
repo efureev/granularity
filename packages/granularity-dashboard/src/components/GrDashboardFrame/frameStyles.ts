@@ -1,9 +1,10 @@
 /**
  * Класс-константы общей рамы.
  *
- * Живут в `.ts`, поэтому на сборке уезжают в общий `dist/chunks/` — вне скана
- * пресета. Каждый компонент-потребитель обязан подмешать `frameSafelist` в свой
- * safelist, иначе рама отрисуется без цветов и фокус-колец.
+ * Живут в `.ts`, поэтому на сборке уезжают в общий `dist/chunks/`. granum
+ * доходит до этого чанка по графу бандла каждого компонента-потребителя, так
+ * что классы рамы извлекаются статически и подмешивать их в safelist больше не
+ * нужно — `frameSafelist` остался как страховка на время чистки safelist-ов.
  */
 
 export const gridClass = 'relative grid w-full'
@@ -33,7 +34,7 @@ const handleBaseClass = [
   'bg-transparent border-0 p-0',
   // Без этого браузер отдаёт вертикальное движение прокрутке, и пальцем сетка
   // неуправляема (`docs/drag-gesture.md`).
-  '[touch-action:none]',
+  'touch-none',
   'select-none',
   'transition-colors duration-[var(--gr-duration-fast)] ease-[var(--gr-ease-out)]',
   'hover:text-[var(--gr-fg)]',
@@ -60,7 +61,7 @@ export const resizeHandleClass = [
   'border-0 border-b-2 border-r-2 border-solid',
   'border-[var(--gr-dashboard-frame-handle-color,var(--gr-muted-fg))]',
   'rounded-br-[var(--gr-dashboard-frame-resize-radius,var(--gr-radius-lg))]',
-  'cursor-nwse-resize [touch-action:none]',
+  'cursor-nwse-resize touch-none',
   'transition-colors duration-[var(--gr-duration-fast)] ease-[var(--gr-ease-out)]',
   'hover:border-[var(--gr-primary)]',
   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]',

@@ -1,77 +1,63 @@
-import { fileURLToPath, URL } from 'node:url'
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
-import { granularAssetFileNames, granularChunkFileNames } from '@feugene/unocss-preset-granular/vite'
+import { granumProvider } from '@feugene/granum/build'
+import { windEngine } from '@feugene/granum-engine-wind'
 import { libInjectCss } from 'vite-plugin-lib-inject-css'
 
-import { GRANULARITY_MEDIA_COMPONENTS } from './src/componentNames'
+import { granularityMediaProvider } from './src/granular-provider'
+
+/**
+ * Entry, которые строит не плагин: резолвер, i18n и служебные точки входа.
+ * Entry компонентов и `index` `granumProvider()` собирает сам из реестра
+ * провайдера — руками их больше не ведут, поэтому сгенерированного блока entry
+ * в этом файле нет.
+ */
+const extraEntries: Record<string, string> = {
+  'granular-provider': 'src/granular-provider/index.ts',
+  'granular-provider-node': 'src/granular-provider/node.ts',
+  'resolver': 'src/resolver.ts',
+  'i18n/index': 'src/i18n/index.ts',
+  'i18n/all': 'src/i18n/all.ts',
+}
 
 /**
  * Build-конфиг пакета `@feugene/granularity-media`.
  *
  * Своих зависимостей у пакета нет: кроп, снимок и разбор кодов держатся на
  * Canvas и браузерных API, а не на библиотеке. Наружу остаются только peers.
+ *
+ * Раскладку `dist` ведёт `granumProvider()`: он строит entry компонентов из
+ * реестра провайдера, извлекает классы и потребляемые токены по графу бандла и
+ * пишет `dist/granum.manifest.json` — по нему приложение собирает CSS, ничего
+ * не сканируя в `node_modules`.
  */
 export default defineConfig({
-  plugins: [vue(), libInjectCss()],
+  plugins: [
+    vue(),
+    libInjectCss(),
+    granumProvider({
+      provider: granularityMediaProvider,
+      engine: windEngine(),
+      entries: extraEntries,
+    }),
+  ],
   build: {
     target: 'esnext',
     minify: 'oxc',
     cssCodeSplit: true,
     reportCompressedSize: true,
     emptyOutDir: true,
-    lib: {
-      entry: {
-        'index': fileURLToPath(new URL('./src/index.ts', import.meta.url)),
-        'granular-provider': fileURLToPath(
-          new URL('./src/granular-provider/index.ts', import.meta.url),
-        ),
-        'granular-provider-node': fileURLToPath(
-          new URL('./src/granular-provider/node.ts', import.meta.url),
-        ),
-        'resolver': fileURLToPath(
-          new URL('./src/resolver.ts', import.meta.url),
-        ),
-        'i18n/index': fileURLToPath(
-          new URL('./src/i18n/index.ts', import.meta.url),
-        ),
-        'i18n/all': fileURLToPath(
-          new URL('./src/i18n/all.ts', import.meta.url),
-        ),
-        // <granularity:components> — блок генерируется `yarn generate:registry`
-        'components/GrCameraCapture/index': fileURLToPath(
-          new URL('./src/components/GrCameraCapture/index.ts', import.meta.url),
-        ),
-        'components/GrCodeScanner/index': fileURLToPath(
-          new URL('./src/components/GrCodeScanner/index.ts', import.meta.url),
-        ),
-        'components/GrImageCrop/index': fileURLToPath(
-          new URL('./src/components/GrImageCrop/index.ts', import.meta.url),
-        ),
-        'components/GrVideoPlayer/index': fileURLToPath(
-          new URL('./src/components/GrVideoPlayer/index.ts', import.meta.url),
-        ),
-        // </granularity:components>
-      },
-      formats: ['es'],
-      fileName: (_format, entryName) => `${entryName}.js`,
-    },
     rolldownOptions: {
       external: [
         /^node:/,
         'vue',
         /^@feugene\/granularity(\/.*)?$/,
-        /^@feugene\/unocss-preset-granular(\/.*)?$/,
         /^@feugene\/fint-i18n(\/.*)?$/,
         // Build-time helper deps of the optional `./resolver` entry.
         '@feugene/unplugin-granularity',
         'unplugin-vue-components',
         /^unplugin-vue-components\/.*/,
       ],
-      output: {
-        chunkFileNames: granularChunkFileNames(),
-        assetFileNames: granularAssetFileNames({ components: GRANULARITY_MEDIA_COMPONENTS }),
-      },
     },
   },
   define: {

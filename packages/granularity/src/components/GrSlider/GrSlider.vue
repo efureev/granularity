@@ -211,13 +211,14 @@ if (__GR_DEV__) {
 
 const values = computed<number[]>(() => draftValues.value ?? modelValues.value)
 
-// `[touch-action:none]` обязателен: без него вертикальный свайп по бегунку
-// уходит в скролл страницы, браузер шлёт `pointercancel`, и слайдер пальцем
-// неуправляем. Утилиты `touch-none` нет ни в `presetMini`, ни в extra-rules —
-// поэтому arbitrary-значение.
+// `touch-none` обязателен: без него вертикальный свайп по бегунку уходит в
+// скролл страницы, браузер шлёт `pointercancel`, и слайдер пальцем неуправляем.
+// Раньше здесь стояло arbitrary-значение `touch-none`, потому что
+// утилиты не было ни в `preset-mini`, ни в доп-правилах; в словаре `preset-wind3`
+// она есть, и `GrImageCrop` пользуется уже ею.
 const trackClass = computed(() => (isVertical.value
-  ? `[touch-action:none] ${sliderTrackWidthBySize[resolvedSize.value]} ${sliderTrackVerticalLengthClass}`
-  : `[touch-action:none] w-full ${sliderTrackHeightBySize[resolvedSize.value]}`))
+  ? `touch-none ${sliderTrackWidthBySize[resolvedSize.value]} ${sliderTrackVerticalLengthClass}`
+  : `touch-none w-full ${sliderTrackHeightBySize[resolvedSize.value]}`))
 
 /** Смещение вдоль дорожки: по горизонтали слева, по вертикали снизу. */
 function offsetStyle(value: number): Record<string, string> {

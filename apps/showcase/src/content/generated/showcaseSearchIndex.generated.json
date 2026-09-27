@@ -13,13 +13,13 @@
   {
     "id": "page:foundations",
     "title": "Foundations",
-    "description": "Базовая onboarding-документация: installation paths, styling layers, themes, tokens, UnoCSS, localization, а также два дополнительных способа интеграции — runtime-адаптер `createGranularity` и build-time авто-импорт `@feugene/unplugin-granularity`.",
+    "description": "Базовая onboarding-документация: installation paths, styling layers, themes, tokens, конвейер `granum`, localization, а также два дополнительных способа интеграции — runtime-адаптер `createGranularity` и build-time авто-импорт `@feugene/unplugin-granularity`.",
     "href": "/foundations",
     "kind": "page",
     "kindLabel": "Page",
     "context": "Foundations",
     "searchableTitle": "foundations",
-    "searchableContent": "foundations foundations foundations базовая onboarding-документация: installation paths, styling layers, themes, tokens, unocss, localization, а также два дополнительных способа интеграции runtime-адаптер `creategranularity` и build-time авто-импорт `@feugene/unplugin-granularity`. foundations foundations installation paths прогрессия подключения `presetgranular` (node-вариант `presetgranularnode`) единственного поддерживаемого способа установки. styling layers разделяет foundation-слои, theme css и component-level styles. themes встроенные `light`/`dark` темы отделены от foundation-токенов. tokens стабильные дизаи н-значения, не дублируемые по темам и компонентам. unocss integration единственныи поддерживаемыи способ интеграции `presetgranularnode`. localization пакет не навязывает i18n-движок: источник правды переводов приложение. vue-плагин `creategranularity` ле гкии runtime-адаптер из `@feugene/granularity/vue`: регистрирует компоненты, директивы, `provide`-ключи и `globalproperties` без потери tree-shaking сам модуль не импортирует ни одного компонента. авто-импорт `@feugene/unplugin-granularity` отдельныи build-time пакет-резолвер для `unplugin-vue-components`: вставляет статические `import`-ы на granular subpath-экспорты пакета прямо в sfc. как выбирать между подходами инструменты ортогональны и типично используются вместе: резолвер закрывает шаблоны, плагин директивы вне шаблонов, `provide` и globals."
+    "searchableContent": "foundations foundations foundations базовая onboarding-документация: installation paths, styling layers, themes, tokens, конвеи ер `granum`, localization, а также два дополнительных способа интеграции runtime-адаптер `creategranularity` и build-time авто-импорт `@feugene/unplugin-granularity`. foundations foundations installation paths прогрессия подключения через конвеи ер `@feugene/granum` единственного поддерживаемого способа установки. styling layers разделяет foundation-слои, theme css и component-level styles. themes встроенные `light`/`dark` темы отделены от foundation-токенов. tokens стабильные дизаи н-значения, не дублируемые по темам и компонентам. интеграция с `granum` единственныи поддерживаемыи способ интеграции плагин `granum()` из `@feugene/granum/vite`. localization пакет не навязывает i18n-движок: источник правды переводов приложение. vue-плагин `creategranularity` ле гкии runtime-адаптер из `@feugene/granularity/vue`: регистрирует компоненты, директивы, `provide`-ключи и `globalproperties` без потери tree-shaking сам модуль не импортирует ни одного компонента. авто-импорт `@feugene/unplugin-granularity` отдельныи build-time пакет-резолвер для `unplugin-vue-components`: вставляет статические `import`-ы на granular subpath-экспорты пакета прямо в sfc. как выбирать между подходами инструменты ортогональны и типично используются вместе: резолвер закрывает шаблоны, плагин директивы вне шаблонов, `provide` и globals."
   },
   {
     "id": "page:components",
@@ -134,13 +134,13 @@
   {
     "id": "page:foundations:section:installation",
     "title": "Foundations / Installation paths",
-    "description": "Прогрессия подключения `presetGranular` (node-вариант `presetGranularNode`) — единственного поддерживаемого способа установки.",
+    "description": "Прогрессия подключения через конвейер `@feugene/granum` — единственного поддерживаемого способа установки.",
     "href": "/foundations#installation",
     "kind": "section",
     "kindLabel": "Section",
     "context": "Foundations",
     "searchableTitle": "foundations installation paths",
-    "searchableContent": "foundations базовая onboarding-документация: installation paths, styling layers, themes, tokens, unocss, localization, а также два дополнительных способа интеграции runtime-адаптер `creategranularity` и build-time авто-импорт `@feugene/unplugin-granularity`. installation installation paths прогрессия подключения `presetgranular` (node-вариант `presetgranularnode`) единственного поддерживаемого способа установки. quick-start snippets прямо в foundations page: от базового конфига до продвинутого `granularcontent`. narrative guidance подключена из `packages/granularity/docs/installation.md`. один экран последовательно показывает, как наращивать опции `components`, `themes`, `layer` и `granularcontent`."
+    "searchableContent": "foundations базовая onboarding-документация: installation paths, styling layers, themes, tokens, конвеи ер `granum`, localization, а также два дополнительных способа интеграции runtime-адаптер `creategranularity` и build-time авто-импорт `@feugene/unplugin-granularity`. installation installation paths прогрессия подключения через конвеи ер `@feugene/granum` единственного поддерживаемого способа установки. quick-start snippets прямо в foundations page: от базового конфига до гарда импорта вне селекции. narrative guidance подключена из `packages/granularity/docs/installation.md`. один экран последовательно показывает, как наращивать опции `components`, `themes`, `prunetokens` и `js.guard`."
   },
   {
     "id": "page:foundations:section:styling",
@@ -151,7 +151,7 @@
     "kindLabel": "Section",
     "context": "Foundations",
     "searchableTitle": "foundations styling layers",
-    "searchableContent": "foundations базовая onboarding-документация: installation paths, styling layers, themes, tokens, unocss, localization, а также два дополнительных способа интеграции runtime-адаптер `creategranularity` и build-time авто-импорт `@feugene/unplugin-granularity`. styling styling layers разделяет foundation-слои, theme css и component-level styles. явное разделение между `tokens`, theme layer и component-level css. подключены реальные excerpts из `styling.md`."
+    "searchableContent": "foundations базовая onboarding-документация: installation paths, styling layers, themes, tokens, конвеи ер `granum`, localization, а также два дополнительных способа интеграции runtime-адаптер `creategranularity` и build-time авто-импорт `@feugene/unplugin-granularity`. styling styling layers разделяет foundation-слои, theme css и component-level styles. явное разделение между `tokens`, theme layer и component-level css. подключены реальные excerpts из `styling.md`."
   },
   {
     "id": "page:foundations:section:themes",
@@ -162,7 +162,7 @@
     "kindLabel": "Section",
     "context": "Foundations",
     "searchableTitle": "foundations themes",
-    "searchableContent": "foundations базовая onboarding-документация: installation paths, styling layers, themes, tokens, unocss, localization, а также два дополнительных способа интеграции runtime-адаптер `creategranularity` и build-time авто-импорт `@feugene/unplugin-granularity`. themes themes встроенные `light`/`dark` темы отделены от foundation-токенов. theme layer задае т semantic-значения (`--gr-bg`, `--gr-primary`, `--gr-brd`) и статусные роли. интерактивныи просмотр текущего theme-реестра прямо на странице."
+    "searchableContent": "foundations базовая onboarding-документация: installation paths, styling layers, themes, tokens, конвеи ер `granum`, localization, а также два дополнительных способа интеграции runtime-адаптер `creategranularity` и build-time авто-импорт `@feugene/unplugin-granularity`. themes themes встроенные `light`/`dark` темы отделены от foundation-токенов. theme layer задае т semantic-значения (`--gr-bg`, `--gr-primary`, `--gr-brd`) и статусные роли. интерактивныи просмотр текущего theme-реестра прямо на странице."
   },
   {
     "id": "page:foundations:section:tokens",
@@ -173,18 +173,18 @@
     "kindLabel": "Section",
     "context": "Foundations",
     "searchableTitle": "foundations tokens",
-    "searchableContent": "foundations базовая onboarding-документация: installation paths, styling layers, themes, tokens, unocss, localization, а также два дополнительных способа интеграции runtime-адаптер `creategranularity` и build-time авто-импорт `@feugene/unplugin-granularity`. tokens tokens стабильные дизаи н-значения, не дублируемые по темам и компонентам. palette scale, typography, spacing, radii, elevation и motion. живе т отдельно от theme layer базовыи контракт переиспользуется."
+    "searchableContent": "foundations базовая onboarding-документация: installation paths, styling layers, themes, tokens, конвеи ер `granum`, localization, а также два дополнительных способа интеграции runtime-адаптер `creategranularity` и build-time авто-импорт `@feugene/unplugin-granularity`. tokens tokens стабильные дизаи н-значения, не дублируемые по темам и компонентам. palette scale, typography, spacing, radii, elevation и motion. живе т отдельно от theme layer базовыи контракт переиспользуется."
   },
   {
-    "id": "page:foundations:section:unocss",
-    "title": "Foundations / UnoCSS integration",
-    "description": "Единственный поддерживаемый способ интеграции — `presetGranularNode`.",
-    "href": "/foundations#unocss",
+    "id": "page:foundations:section:granum",
+    "title": "Foundations / Интеграция с `granum`",
+    "description": "Единственный поддерживаемый способ интеграции — плагин `granum()` из `@feugene/granum/vite`.",
+    "href": "/foundations#granum",
     "kind": "section",
     "kindLabel": "Section",
     "context": "Foundations",
-    "searchableTitle": "foundations unocss integration",
-    "searchableContent": "foundations базовая onboarding-документация: installation paths, styling layers, themes, tokens, unocss, localization, а также два дополнительных способа интеграции runtime-адаптер `creategranularity` и build-time авто-импорт `@feugene/unplugin-granularity`. unocss unocss integration единственныи поддерживаемыи способ интеграции `presetgranularnode`. `presetgranularnode` из `@feugene/unocss-preset-granular/node` подмешивает foundation layers, темы и component css. `granularcontent` настраивает авто-сканирование для subpath imports из `dist/`."
+    "searchableTitle": "foundations интеграция с `granum`",
+    "searchableContent": "foundations базовая onboarding-документация: installation paths, styling layers, themes, tokens, конвеи ер `granum`, localization, а также два дополнительных способа интеграции runtime-адаптер `creategranularity` и build-time авто-импорт `@feugene/unplugin-granularity`. granum интеграция с `granum` единственныи поддерживаемыи способ интеграции плагин `granum()` из `@feugene/granum/vite`. плагин читает `granum.manifest.json` проваи деров и отдае т `virtual:granum.css` весь css в пяти слоях каскада. движок утилит приносит приложение (`windengine()`): своеи реализации granum не содержит, а словарь пакета объявлен диалектом."
   },
   {
     "id": "page:foundations:section:localization",
@@ -195,7 +195,7 @@
     "kindLabel": "Section",
     "context": "Foundations",
     "searchableTitle": "foundations localization",
-    "searchableContent": "foundations базовая onboarding-документация: installation paths, styling layers, themes, tokens, unocss, localization, а также два дополнительных способа интеграции runtime-адаптер `creategranularity` и build-time авто-импорт `@feugene/unplugin-granularity`. localization localization пакет не навязывает i18n-движок: источник правды переводов приложение. компоненты читают переводы из хост-приложения, при отсутствии встроенныи fallback. localization описана как integration contract."
+    "searchableContent": "foundations базовая onboarding-документация: installation paths, styling layers, themes, tokens, конвеи ер `granum`, localization, а также два дополнительных способа интеграции runtime-адаптер `creategranularity` и build-time авто-импорт `@feugene/unplugin-granularity`. localization localization пакет не навязывает i18n-движок: источник правды переводов приложение. компоненты читают переводы из хост-приложения, при отсутствии встроенныи fallback. localization описана как integration contract."
   },
   {
     "id": "page:foundations:section:vue-plugin",
@@ -206,7 +206,7 @@
     "kindLabel": "Section",
     "context": "Foundations",
     "searchableTitle": "foundations vue-плагин `creategranularity`",
-    "searchableContent": "foundations базовая onboarding-документация: installation paths, styling layers, themes, tokens, unocss, localization, а также два дополнительных способа интеграции runtime-адаптер `creategranularity` и build-time авто-импорт `@feugene/unplugin-granularity`. vue-plugin vue-плагин `creategranularity` ле гкии runtime-адаптер из `@feugene/granularity/vue`: регистрирует компоненты, директивы, `provide`-ключи и `globalproperties` без потери tree-shaking сам модуль не импортирует ни одного компонента. `creategranularity({ components, directives, provides, globalproperties })` отдае т стандартныи vue-plugin для `app.use(...)`. поддерживает три формы компонентов: чистыи sfc, объект с `install`, явное `{ name, component }`. основнои сценарии директивы, `provide`, `globalproperties`, ssr/nuxt-плагины и окружения без сборщика. типовые случаи: глобальные директивы (`v-hotkey`, `v-autofocus`), `provide` для i18n/theme, `globalproperties` для options api."
+    "searchableContent": "foundations базовая onboarding-документация: installation paths, styling layers, themes, tokens, конвеи ер `granum`, localization, а также два дополнительных способа интеграции runtime-адаптер `creategranularity` и build-time авто-импорт `@feugene/unplugin-granularity`. vue-plugin vue-плагин `creategranularity` ле гкии runtime-адаптер из `@feugene/granularity/vue`: регистрирует компоненты, директивы, `provide`-ключи и `globalproperties` без потери tree-shaking сам модуль не импортирует ни одного компонента. `creategranularity({ components, directives, provides, globalproperties })` отдае т стандартныи vue-plugin для `app.use(...)`. поддерживает три формы компонентов: чистыи sfc, объект с `install`, явное `{ name, component }`. основнои сценарии директивы, `provide`, `globalproperties`, ssr/nuxt-плагины и окружения без сборщика. типовые случаи: глобальные директивы (`v-hotkey`, `v-autofocus`), `provide` для i18n/theme, `globalproperties` для options api."
   },
   {
     "id": "page:foundations:section:unplugin",
@@ -217,7 +217,7 @@
     "kindLabel": "Section",
     "context": "Foundations",
     "searchableTitle": "foundations авто-импорт `@feugene/unplugin-granularity`",
-    "searchableContent": "foundations базовая onboarding-документация: installation paths, styling layers, themes, tokens, unocss, localization, а также два дополнительных способа интеграции runtime-адаптер `creategranularity` и build-time авто-импорт `@feugene/unplugin-granularity`. unplugin авто-импорт `@feugene/unplugin-granularity` отдельныи build-time пакет-резолвер для `unplugin-vue-components`: вставляет статические `import`-ы на granular subpath-экспорты пакета прямо в sfc. пишете `<grbutton />` и `v-hotkey` в шаблоне резолвер сам добавит нужные импорты и подтянет component-level css. опции: `prefix`, `importstyle`, `directives`, `exclude`; директивы разрешаются по явному whitelist. рекомендуется для prod-приложении : идеальныи tree-shaking и отсутствие ручных `import`-ов. типичныи сценарии : резолвер вместе с `presetgranularnode` из `@feugene/unocss-preset-granular/node` для авто-импорта компонентов в шаблонах."
+    "searchableContent": "foundations базовая onboarding-документация: installation paths, styling layers, themes, tokens, конвеи ер `granum`, localization, а также два дополнительных способа интеграции runtime-адаптер `creategranularity` и build-time авто-импорт `@feugene/unplugin-granularity`. unplugin авто-импорт `@feugene/unplugin-granularity` отдельныи build-time пакет-резолвер для `unplugin-vue-components`: вставляет статические `import`-ы на granular subpath-экспорты пакета прямо в sfc. пишете `<grbutton />` и `v-hotkey` в шаблоне резолвер сам добавит нужные импорты и подтянет component-level css. опции: `prefix`, `importstyle`, `directives`, `exclude`; директивы разрешаются по явному whitelist. рекомендуется для prod-приложении : идеальныи tree-shaking и отсутствие ручных `import`-ов. типичныи сценарии : резолвер вместе с плагином `granum()` из `@feugene/granum/vite` для авто-импорта компонентов в шаблонах."
   },
   {
     "id": "page:foundations:section:when-to-use",
@@ -228,7 +228,7 @@
     "kindLabel": "Section",
     "context": "Foundations",
     "searchableTitle": "foundations как выбирать между подходами",
-    "searchableContent": "foundations базовая onboarding-документация: installation paths, styling layers, themes, tokens, unocss, localization, а также два дополнительных способа интеграции runtime-адаптер `creategranularity` и build-time авто-импорт `@feugene/unplugin-granularity`. when-to-use как выбирать между подходами инструменты ортогональны и типично используются вместе: резолвер закрывает шаблоны, плагин директивы вне шаблонов, `provide` и globals. `@feugene/unplugin-granularity` build-time, охватывает только то, что реально стоит в `<template>`. `@feugene/granularity/vue` runtime, охватывает все остальное: директивы в `render()`/jsx, i18n/theme через `provide`, options api через `globalproperties`. ssr / тесты / окружения без `unplugin-vue-components` только через `creategranularity`. установка css-части пакета делается исключительно через `presetgranularnode` см. раздел foundations / installation paths."
+    "searchableContent": "foundations базовая onboarding-документация: installation paths, styling layers, themes, tokens, конвеи ер `granum`, localization, а также два дополнительных способа интеграции runtime-адаптер `creategranularity` и build-time авто-импорт `@feugene/unplugin-granularity`. when-to-use как выбирать между подходами инструменты ортогональны и типично используются вместе: резолвер закрывает шаблоны, плагин директивы вне шаблонов, `provide` и globals. `@feugene/unplugin-granularity` build-time, охватывает только то, что реально стоит в `<template>`. `@feugene/granularity/vue` runtime, охватывает все остальное: директивы в `render()`/jsx, i18n/theme через `provide`, options api через `globalproperties`. ssr / тесты / окружения без `unplugin-vue-components` только через `creategranularity`. установка css-части пакета делается исключительно через плагин `granum()` см. раздел foundations / installation paths."
   },
   {
     "id": "page:components:section:catalog",

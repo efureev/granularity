@@ -21,7 +21,6 @@ export default antfu(
       'dist/**',
       'node_modules/**',
       'coverage/**',
-      'uno.config.ts',
       // Сгенерирован `yarn generate:tokens` — правится только генератор.
       'src/tokens/generated.ts',
     ],

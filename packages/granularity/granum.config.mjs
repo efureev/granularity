@@ -1,4 +1,4 @@
-import { miniEngine } from '@feugene/granum-engine-mini'
+import { windEngine } from '@feugene/granum-engine-wind'
 
 /**
  * Конфиг для `granum doctor` и прочих команд CLI на самом пакете.
@@ -13,6 +13,6 @@ import { miniEngine } from '@feugene/granum-engine-mini'
  */
 export default {
   providers: ['@feugene/granularity'],
-  engine: miniEngine(),
+  engine: windEngine(),
   components: 'all',
 }

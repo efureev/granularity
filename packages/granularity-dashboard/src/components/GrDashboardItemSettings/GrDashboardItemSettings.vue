@@ -10,7 +10,7 @@ import { useGranularityTranslations } from '@feugene/granularity/composables/use
 
 import type { GrDashboardItemLayout, GrDashboardSpan } from '../../layout'
 import { maxHeightOf, maxWidthOf, minHeightOf, minWidthOf } from '../../layout'
-import { useGrDashboardContext } from '../GrDashboard/context'
+import { useGrDashboardContext } from '../shared/context'
 import type { GrDashboardItemSettingsSize } from './grDashboardItemSettingsStyles'
 import { bodyClass, footerClass, refusalClass, sizeRowClass } from './grDashboardItemSettingsStyles'
 

@@ -363,13 +363,13 @@ await import('./app-styles')
 
 Если тем по-прежнему две, а поменять надо только цвета — тему с тем же именем
 объявляет приложение, и её структурное определение побеждает файл пакета.
-`engine: miniEngine()` здесь и ниже — обязательное поле конфига, а не опция
-темы: движок утилит приезжает отдельным пакетом `@feugene/granum-engine-mini`
+`engine: windEngine()` здесь и ниже — обязательное поле конфига, а не опция
+темы: движок утилит приезжает отдельным пакетом `@feugene/granum-engine-wind`
 и выбирается приложением (см. [`installation.md`](./installation.md)):
 
 ```ts
 defineGranumConfig({
-  engine: miniEngine(),
+  engine: windEngine(),
   providers: ['@feugene/granularity'],
   themes: {
     names: ['light', 'dark'],
@@ -394,7 +394,7 @@ defineGranumConfig({
 
 ```ts
 defineGranumConfig({
-  engine: miniEngine(),
+  engine: windEngine(),
   providers: ['@feugene/granularity'],
   themes: {
     names: ['light', 'dark'],

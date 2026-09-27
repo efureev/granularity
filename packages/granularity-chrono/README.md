@@ -66,7 +66,7 @@ shipped so far is in [`CHANGELOG.md`](./CHANGELOG.md).
 ```bash
 yarn add @feugene/granularity-chrono
 # peers you already have with granularity:
-#   @feugene/granularity  @feugene/unocss-preset-granular  vue
+#   @feugene/granularity  @feugene/granum  vue
 ```
 
 ## Localization
@@ -99,20 +99,29 @@ Need every language at once (demos, e2e) — import the aggregate instead:
 `@feugene/granularity-chrono/i18n/all`. Skip the wiring entirely and the components still work: every
 key has an English fallback compiled into the component.
 
-## UnoCSS granular-provider
+## granum provider
 
-Register the provider alongside granularity so the package's utility classes are
-scanned:
+List the package alongside granularity so its classes, CSS and tokens reach the
+application's CSS:
 
 ```ts
-import { granularityProvider } from '@feugene/granularity/granular-provider/node'
-import { granularityChronoProvider } from '@feugene/granularity-chrono/granular-provider/node'
+// granum.config.ts
+import { defineGranumConfig } from '@feugene/granum/vite'
+import { windEngine } from '@feugene/granum-engine-wind'
 
-presetGranularNode({
-  providers: [granularityProvider, granularityChronoProvider],
+export default defineGranumConfig({
+  engine: windEngine(),
+  providers: ['@feugene/granularity', '@feugene/granularity-chrono'],
   components: ['@feugene/granularity-chrono:GrCalendar'],
+  appSources: { dirs: ['src'] },
 })
 ```
+
+Both packages go in by name, not as imported objects: each one ships its own
+`granum.manifest.json`, and granum reads it instead of scanning the package's
+`dist`. The core arrives as a donor of the selected components anyway — the
+chrono manifest names it — but the application still has to list it to get its
+theme and base layers.
 
 ## Auto-import (unplugin-vue-components)
 
@@ -143,7 +152,7 @@ Requires the optional peers `@feugene/unplugin-granularity` (`>=0.4.0`) and
 
 ## Registries
 
-The component lists in `src/index.ts`, `package.json#exports`, `vite.config.ts`,
+The component lists in `src/index.ts`, `package.json#exports`,
 `src/granular-provider/shared.ts` and `src/componentNames.ts` are **generated**:
 
 ```bash
@@ -153,7 +162,11 @@ yarn generate:registry --check  # report drift, write nothing
 
 Never edit inside a `// <granularity:components>` block — the next run
 overwrites it. The machinery is shared across provider packages and lives in
-`@feugene/unocss-preset-granular/codegen`.
+`@feugene/granum/codegen`.
+
+Component entries are not on that list: `granumProvider()` builds them from the
+same provider registry, so `vite.config.ts` has one fewer place to fall out of
+sync.
 
 **Adding the very first component takes one manual step.** `package.json`
 carries no markers, so the generator replaces the contiguous run of

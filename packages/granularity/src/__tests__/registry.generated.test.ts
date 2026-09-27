@@ -117,7 +117,7 @@ describe('реестры компонентов', () => {
     expect(viteConfig).toContain('provider: granularityProvider')
     // Движок сборки задаётся явно: без него granum не знает, чьим словарём
     // отфильтрован список классов манифеста, и отказывается собирать пакет.
-    expect(viteConfig).toContain('engine: miniEngine()')
+    expect(viteConfig).toContain('engine: windEngine()')
   })
 })
 

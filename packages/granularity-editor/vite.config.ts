@@ -1,10 +1,10 @@
-import { fileURLToPath, URL } from 'node:url'
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
-import { granularAssetFileNames, granularChunkFileNames } from '@feugene/unocss-preset-granular/vite'
+import { granumProvider } from '@feugene/granum/build'
+import { windEngine } from '@feugene/granum-engine-wind'
 import { libInjectCss } from 'vite-plugin-lib-inject-css'
 
-import { GRANULARITY_EDITOR_COMPONENTS } from './src/componentNames'
+import { granularityEditorProvider } from './src/granular-provider'
 
 /**
  * Build-конфиг пакета `@feugene/granularity-editor`.
@@ -13,53 +13,48 @@ import { GRANULARITY_EDITOR_COMPONENTS } from './src/componentNames'
  * зависимостью: ProseMirror обязан быть в приложении в одном экземпляре.
  * Второй даёт два реестра схем, и первое же расширение потребителя падает на
  * чужом документе.
+ *
+ * Раскладку `dist` и entry компонентов ведёт `granumProvider()`: он строит их
+ * из реестра провайдера, извлекает классы и потребляемые токены по графу
+ * бандла и пишет `dist/granum.manifest.json`. Руками их больше не перечисляют,
+ * поэтому сгенерированного блока entry в этом файле нет.
  */
+
+/**
+ * Entry, которые строит не плагин: слои пакета и служебные точки входа. Entry
+ * компонентов и `index` `granumProvider()` собирает сам из реестра провайдера.
+ */
+const extraEntries: Record<string, string> = {
+  'editor': 'src/editor/index.ts',
+  'markdown': 'src/markdown/index.ts',
+  'granular-provider': 'src/granular-provider/index.ts',
+  'granular-provider-node': 'src/granular-provider/node.ts',
+  'resolver': 'src/resolver.ts',
+  'i18n/index': 'src/i18n/index.ts',
+  'i18n/all': 'src/i18n/all.ts',
+}
+
 export default defineConfig({
-  plugins: [vue(), libInjectCss()],
+  plugins: [
+    vue(),
+    libInjectCss(),
+    granumProvider({
+      provider: granularityEditorProvider,
+      engine: windEngine(),
+      entries: extraEntries,
+    }),
+  ],
   build: {
     target: 'esnext',
     minify: 'oxc',
     cssCodeSplit: true,
     reportCompressedSize: true,
     emptyOutDir: true,
-    lib: {
-      entry: {
-        'index': fileURLToPath(new URL('./src/index.ts', import.meta.url)),
-        'editor': fileURLToPath(new URL('./src/editor/index.ts', import.meta.url)),
-        'markdown': fileURLToPath(new URL('./src/markdown/index.ts', import.meta.url)),
-        'granular-provider': fileURLToPath(
-          new URL('./src/granular-provider/index.ts', import.meta.url),
-        ),
-        'granular-provider-node': fileURLToPath(
-          new URL('./src/granular-provider/node.ts', import.meta.url),
-        ),
-        'resolver': fileURLToPath(
-          new URL('./src/resolver.ts', import.meta.url),
-        ),
-        'i18n/index': fileURLToPath(
-          new URL('./src/i18n/index.ts', import.meta.url),
-        ),
-        'i18n/all': fileURLToPath(
-          new URL('./src/i18n/all.ts', import.meta.url),
-        ),
-        // <granularity:components> — блок генерируется `yarn generate:registry`
-        'components/GrMarkdown/index': fileURLToPath(
-          new URL('./src/components/GrMarkdown/index.ts', import.meta.url),
-        ),
-        'components/GrRichText/index': fileURLToPath(
-          new URL('./src/components/GrRichText/index.ts', import.meta.url),
-        ),
-        // </granularity:components>
-      },
-      formats: ['es'],
-      fileName: (_format, entryName) => `${entryName}.js`,
-    },
     rolldownOptions: {
       external: [
         /^node:/,
         'vue',
         /^@feugene\/granularity(\/.*)?$/,
-        /^@feugene\/unocss-preset-granular(\/.*)?$/,
         /^@feugene\/fint-i18n(\/.*)?$/,
         'marked',
         /^@tiptap\/.*/,
@@ -69,10 +64,6 @@ export default defineConfig({
         'unplugin-vue-components',
         /^unplugin-vue-components\/.*/,
       ],
-      output: {
-        chunkFileNames: granularChunkFileNames(),
-        assetFileNames: granularAssetFileNames({ components: GRANULARITY_EDITOR_COMPONENTS }),
-      },
     },
   },
   define: {

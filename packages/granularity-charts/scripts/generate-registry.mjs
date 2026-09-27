@@ -3,9 +3,9 @@ import { fileURLToPath } from 'node:url'
 
 import {
   codegenTargets,
-  GranularCodegenError,
+  GranumCodegenError,
   runRegistryCodegen,
-} from '@feugene/unocss-preset-granular/codegen'
+} from '@feugene/granum/codegen'
 
 /**
  * Генерация реестров компонентов из файловой структуры.
@@ -15,12 +15,14 @@ import {
  *
  *   src/index.ts                     — root-barrel (`export * from './components/GrX'`);
  *   package.json#exports             — subpath `./components/GrX`;
- *   vite.config.ts                   — entry `components/GrX/index`;
+ *   package.json#exports             — экспорт `./granum.manifest.json`;
  *   src/granular-provider/shared.ts  — импорт `grXConfig` + запись в реестр;
  *   src/componentNames.ts            — список имён для резолвера и раскладки чанков.
  *
  * Пропуск любого не даёт ошибки сборки: ломается что-то одно — tree-shaking,
- * subpath-импорт, авто-импорт или скан UnoCSS-классов, — и молча.
+ * subpath-импорт, авто-импорт или доставка манифеста, — и молча. Механика общая
+ * для всех пакетов-провайдеров и живёт в `@feugene/granum/codegen`; здесь только
+ * состав целей.
  *
  * `components/GrChartFrame/` сюда **не попадает намеренно**: у рамы нет ни
  * `index.ts`, ни `config.ts`, она не публичный компонент, а дом общей разметки
@@ -32,9 +34,15 @@ import {
 const packageDir = fileURLToPath(new URL('..', import.meta.url))
 const check = process.argv.includes('--check')
 
+// Метки в файлах исторически именованы по пакету, а не по генератору.
+const NAMESPACE = 'granularity:components'
+const PROVIDER_REGISTRY_FILE = 'src/granular-provider/shared.ts'
+
 const targets = [
   codegenTargets.barrel(),
-  codegenTargets.viteEntries(),
+  // Без `./granum.manifest.json` приложение не найдёт манифест через `exports`,
+  // и сборка провайдера упадёт с `PackageExportsError` (M-6, INV-LAY-2).
+  codegenTargets.manifestExport(),
   // Своя форма subpath-экспорта: декларации этого пакета лежат в
   // `dist/types/` без сегмента `src` — `rootDir` в `tsconfig.build.json`
   // указывает на `src`. Дефолт генератора описывает раскладку ядра, где
@@ -46,7 +54,22 @@ const targets = [
       import: `./dist/components/${component}/index.js`,
     }),
   }),
-  ...codegenTargets.providerRegistry(),
+  // Реестр провайдера — своими метками, а не `providerRegistry()`: у пакета он
+  // именованная карта (`GrX: grXConfig`), а granum рендерит массив дескрипторов.
+  codegenTargets.markedBlock({
+    file: PROVIDER_REGISTRY_FILE,
+    blockId: 'imports',
+    lines: (components, context) => components.map(component => (
+      `import { ${context.configExportName(component)} } from '../components/${context.componentPath(component)}/config'`
+    )),
+  }),
+  codegenTargets.markedBlock({
+    file: PROVIDER_REGISTRY_FILE,
+    blockId: 'registry',
+    lines: (components, context) => components.map(component => (
+      `${component}: ${context.configExportName(component)},`
+    )),
+  }),
   // Своя цель: список имён, который читают резолвер и конфиг сборки.
   codegenTargets.markedBlock({
     file: 'src/componentNames.ts',
@@ -57,7 +80,7 @@ const targets = [
 const registryCount = new Set(targets.map(target => target.file)).size
 
 try {
-  const { components, stale } = await runRegistryCodegen({ packageDir, targets, check })
+  const { components, stale } = await runRegistryCodegen({ packageDir, targets, check, namespace: NAMESPACE })
 
   if (check) {
     if (stale.length > 0) {
@@ -77,7 +100,7 @@ try {
 }
 catch (error) {
   // Оснастка сломалась, а не реестры разошлись — разные поводы, путать не нужно.
-  if (error instanceof GranularCodegenError) {
+  if (error instanceof GranumCodegenError) {
     console.error(`[registry] ${error.reason}: ${error.message}`)
     process.exitCode = 1
   }

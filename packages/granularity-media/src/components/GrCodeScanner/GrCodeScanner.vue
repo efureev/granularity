@@ -7,7 +7,7 @@ import { useGrComponentSize } from '@feugene/granularity/composables/useGrCompon
 import { useGranularityTranslations } from '@feugene/granularity/composables/useGranularityTranslations'
 
 import { useCameraStream } from '../../internal/useCameraStream'
-import type { GrCameraStatus } from '../GrCameraCapture/cameraState'
+import type { GrCameraStatus } from '../shared/cameraState'
 import type { GrCodeDetector, GrCodeResult } from './codeDetection'
 import { createNativeDetector, freshCodes, nativeDetectorSupported } from './codeDetection'
 import type { GrCodeScannerSize } from './grCodeScannerStyles'

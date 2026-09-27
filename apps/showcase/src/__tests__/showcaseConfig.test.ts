@@ -2,9 +2,7 @@ import { existsSync, readFileSync } from 'node:fs'
 import { fileURLToPath, URL } from 'node:url'
 import { describe, expect, it } from 'vitest'
 
-import {
-  showcaseGranularOptions,
-} from '../../uno.config'
+import showcaseGranumConfig from '../../granum.config'
 import {
   showcaseBuildAnalyzeMode,
   showcaseBuildVisualizerConfig,
@@ -51,11 +49,6 @@ const showcaseLayoutEntry = readFileSync(
   'utf8',
 )
 
-const showcaseUnoConfig = readFileSync(
-  fileURLToPath(new URL('../../uno.config.ts', import.meta.url)),
-  'utf8',
-)
-
 describe('showcase bootstrap config', () => {
   it('настраивает базовые app scripts, включая analyze-режим сборки', () => {
     expect(showcasePackageJson).toContain('"dev": "yarn prepare:granularity && yarn generate:api && yarn generate:search && vite"')
@@ -78,9 +71,9 @@ describe('showcase bootstrap config', () => {
     })
   })
 
-  it('подключает reset, uno runtime и раннюю инициализацию темы без legacy-зависимостей', () => {
+  it('подключает reset, CSS granum и раннюю инициализацию темы без legacy-зависимостей', () => {
     expect(showcaseMainEntry).toContain('import \'@unocss/reset/tailwind-compat.css\'')
-    expect(showcaseMainEntry).toContain('import \'virtual:uno.css\'')
+    expect(showcaseMainEntry).toContain('import \'virtual:granum.css\'')
     expect(normalizedShowcaseMainEntry).toContain('import {initThemeEarly} from \'@feugene/granularity\'')
     expect(normalizedShowcaseMainEntry).toContain('import {setupShowcaseI18n} from \'./i18n\'')
     expect(normalizedShowcaseMainEntry).toContain('import {router} from \'./app/router\'')
@@ -125,28 +118,33 @@ describe('showcase bootstrap config', () => {
     expect(showcaseLayoutEntry).not.toContain('@feugene/granularity/components/')
   })
 
-  it('сканирует только исходники showcase и включает пакетный Uno preset через package exports', () => {
-    // Незарегистрированный провайдер — тихий дефект: сборка проходит, а
-    // SFC-чанки его компонентов не сканируются и классы выпадают из CSS.
-    expect(showcaseGranularOptions.providers.map(provider => provider.id)).toEqual([
+  it('подключает восемь провайдеров именами пакетов и выбирает всё', () => {
+    /*
+     * Пропущенный провайдер под пресетом v1 был тихим дефектом: сборка
+     * проходила, а SFC-чанки его компонентов не сканировались, и классы выпадали
+     * из CSS. С granum пропуск громкий: импорт компонента пакета, которого нет в
+     * `providers`, роняет сборку — манифест не найден.
+     *
+     * Порядок в списке значения не имеет (граф разворачивается по манифестам),
+     * поэтому сверяем множество.
+     */
+    expect([...showcaseGranumConfig.providers].sort()).toEqual([
       '@feugene/granularity',
-      '@feugene/granularity-chrono',
       '@feugene/granularity-charts',
-      '@feugene/granularity-dashboard',
-      '@feugene/granularity-forms-schema',
-      '@feugene/granularity-editor',
-      '@feugene/granularity-media',
+      '@feugene/granularity-chrono',
       '@feugene/granularity-code',
+      '@feugene/granularity-dashboard',
+      '@feugene/granularity-editor',
+      '@feugene/granularity-forms-schema',
+      '@feugene/granularity-media',
     ])
-    expect(showcaseGranularOptions.components).toBe('all')
-    expect(showcaseGranularOptions.themes).toEqual({ names: ['light', 'dark'] })
-    expect(showcaseUnoConfig).toContain('from \'@feugene/unocss-preset-granular/node\'')
-    expect(showcaseUnoConfig).toContain('presetGranularNode')
-    expect(showcaseUnoConfig).toContain('import granularityProvider from \'@feugene/granularity/granular-provider/node\'')
-    expect(showcaseUnoConfig).toContain('import chronoProvider from \'@feugene/granularity-chrono/granular-provider/node\'')
-    expect(showcaseUnoConfig).toContain('import chartsProvider from \'@feugene/granularity-charts/granular-provider/node\'')
-    expect(showcaseUnoConfig).toContain('import dashboardProvider from \'@feugene/granularity-dashboard/granular-provider/node\'')
-    expect(showcaseUnoConfig).toContain('import formsSchemaProvider from \'@feugene/granularity-forms-schema/granular-provider/node\'')
-    expect(showcaseUnoConfig).toContain('names: [\'light\', \'dark\']')
+    expect(showcaseGranumConfig.components).toBe('all')
+    expect(showcaseGranumConfig.themes).toEqual({ names: ['light', 'dark'] })
+    expect(showcaseGranumConfig.appSources).toEqual({ dirs: ['src'] })
+
+    // Движок — инстанс с правилом иконок: пресета иконок в granum нет, и
+    // классы `i-lucide-*` витрины держит это правило (см. `granum.icons.ts`).
+    expect(typeof showcaseGranumConfig.engine.generate).toBe('function')
+    expect(showcaseGranumConfig.engine.dialect).toBe('unocss/preset-wind3+granum@66')
   })
 })

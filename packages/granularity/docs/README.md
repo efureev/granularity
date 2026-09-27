@@ -85,7 +85,7 @@
 Поддерживается один проверенный способ — плагин `granum()` из
 [`@feugene/granum`](https://github.com/efureev/granum) и `granum.config.ts` приложения; провайдер
 подключается по имени пакета, манифест плагин находит через `exports`. Движок утилит приложение
-ставит и передаёт само (`engine: miniEngine()` из `@feugene/granum-engine-mini`): своей реализации
+ставит и передаёт само (`engine: windEngine()` из `@feugene/granum-engine-wind`): своей реализации
 движка granum не содержит. Полная инструкция — в
 [`installation.md`](./installation.md), детали конфигурации — в [`granum.md`](./granum.md).
 

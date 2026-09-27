@@ -1,4 +1,4 @@
-import { defineGranularComponent } from '@feugene/unocss-preset-granular/contract'
+import { defineGranumComponent } from '@feugene/granum/contract'
 
 import { CORE_RENDERER_COMPONENTS, FORM_SHELL_COMPONENTS } from '../../renderers/coreComponents'
 
@@ -14,7 +14,7 @@ import { grSchemaFormSafelist } from './safelist'
  * явно, и их компоненты добавляются в селекцию потребителем — это описано в
  * `docs/renderers.md`.
  */
-export const grSchemaFormConfig = defineGranularComponent(import.meta.url, {
+export const grSchemaFormConfig = defineGranumComponent(import.meta.url, {
   name: 'GrSchemaForm',
   safelist: grSchemaFormSafelist,
   dependencies: [

@@ -1,5 +1,5 @@
 import { defineGranumConfig } from '@feugene/granum/vite'
-import { miniEngine } from '@feugene/granum-engine-mini'
+import { windEngine } from '@feugene/granum-engine-wind'
 
 /**
  * Ровно те компоненты, которые импортирует приложение: гранулярность
@@ -21,7 +21,7 @@ export const playgroundConfigComponents = ['GrButton', 'GrInput', 'GrBadge', 'Gr
  * без пересчёта.
  */
 export default defineGranumConfig({
-  engine: miniEngine(),
+  engine: windEngine(),
   providers: ['@feugene/granularity'],
   components: [
     {

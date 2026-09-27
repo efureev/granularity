@@ -9,58 +9,67 @@ to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
-- **Требуется `@feugene/granum` `>=0.2.0 <1.0.0`: движок утилит выбирает приложение.** Реализации
-  движка в ядре granum больше нет — она уехала в отдельный пакет `@feugene/granum-engine-mini`, —
-  поэтому поле `engine` в `granum.config.*` стало обязательным и принимает **инстанс**:
-  `engine: miniEngine()`. Строка `'builtin'` и объект опций отклоняются `InvalidConfigError`, а
-  правила утилит приложения передаются фабрике движка (`miniEngine({ rules: [...] })`), а не
-  конфигу: поля для правил у него нет. У потребителя это значит два build-пакета вместо одного
-  (`yarn add -D @feugene/granum @feugene/granum-engine-mini`), у сборки пакета-провайдера —
-  явный `granumProvider({ provider, engine: miniEngine() })`.
-- **Манифест пакета объявляет словарь утилит: формат 2.** Вместо корневого `engineModule` манифест
-  несёт блок `engine { dialect, vocabulary, name, version?, module }`, и пакет объявляет диалект
-  `unocss/preset-mini+granum@66` — словарь, против которого написаны классы компонентов. Классы
-  `sr-only`, `tabular-nums`, `animate-spin`, `divide-y` и `space-y-*` приходят из доп-правил, без
-  них компоненты рисуются не полностью, и раньше это была тихая поломка. Теперь приложение с
-  движком другого словаря получает `provider-dialect-mismatch` и `provider-classes-dropped` с
-  поимённым списком потерянных классов; при равном диалекте и другом отпечатке словаря классы
-  просто пересчитываются заново. Подробности — в
-  [`docs/granum.md`](./docs/granum.md) и [`docs/installation.md`](./docs/installation.md).
-- **Пакет собирается `@feugene/granum`, а не пресетом `@feugene/unocss-preset-granular`.** Вместо
-  `uno.config.ts` у потребителя — `granum.config.ts` и плагин `granum()`; вместо сканирования
-  `node_modules` — `granum.manifest.json`, который пакет публикует рядом с `dist` и в котором уже
-  посчитаны классы компонентов, потребляемые токены, зависимости, файлы темы и CSS. CSS приложения
-  приезжает одним `virtual:granum.css` с пятью слоями каскада (`tokens`, `base`, `themes`,
-  `components`, `utilities`), так что порядок «утилита приложения перебивает базовый стиль
-  компонента» задан именами слоёв, а не порядком конкатенации. Миграция потребителя — в
-  [`docs/granum.md`](./docs/granum.md) и [`docs/installation.md`](./docs/installation.md).
-- **Контракт дескрипторов переименован без смены смысла.** `defineGranularComponent` →
-  `defineGranumComponent`, `defineGranularProvider` → `defineGranumProvider`, импорт из
-  `@feugene/granum/contract`. `packageBaseUrl` больше не нужен: базой путей служит директория
-  манифеста. Пути темы объявляются относительно корня раскладки (`styles/tokens.css`), а не
-  абсолютными URL.
-- **`libInjectCss` убран из сборки пакета.** CSS компонента доставляет манифест, и вместе с инлайном
-  в JS-чанк он приезжал бы дважды. Ассеты `components/<Name>/styles.css` в `dist` остались и
-  перечислены в манифесте.
-- **Реестров компонентов три, а не четыре.** Entry сборки больше не реестр: `granumProvider()`
-  строит их из реестра провайдера. `yarn generate:registry` ведёт barrel, `package.json#exports`
-  (включая экспорт манифеста) и `src/granular-provider/shared.ts`; гейт живёт в
-  `src/__tests__/registry.generated.test.ts`.
-- **`yarn doctor` — это `granum doctor granum.config.mjs`.** Проверяется собранный манифест, а не
-  исходники; отчёт сборки приложения (`dist/granum-report.json`) появляется у потребителя сам.
-
-### Fixed
-
-- **Общие контексты и хелперы переехали из директорий компонентов в `src/components/shared/`.**
-  `GrConfigProvider/context`, `GrFormField/context`, `GrButtonGroup/context`, `GrForm/context`,
-  `GrForm/validation`, `GrForm/fileRule`, `GrDelta/deltaTone`, `GrChip/grChipGroupContext` лежали
-  внутри чужих компонентов, и импорт ключа инъекции делал соседа зависимостью по графу — 91 ребро на
-  ровном месте. Публичные реэкспорты сохранены: `useGrConfig`, `useGrFormFieldContext`,
-  `useGrButtonGroup`, `useGrFormContext`, `deltaTone` и прочие по-прежнему доступны из своих
-  компонентов.
+- **The utility engine changed: `@feugene/granum-engine-wind` `^0.3.0` instead of
+  `@feugene/granum-engine-mini`.** It vendors `preset-wind3` rather than
+  `preset-mini`, so the vocabulary gained `border-collapse`, `list-none`,
+  `touch-none`, `table-fixed` and `scroll-p*` — utilities that existed neither in
+  `preset-mini` nor in the former extra rules, which is why a class in the markup
+  silently produced no CSS. The package dialect is now
+  `unocss/preset-wind3+granum@66`, and the peer on the core moved to
+  `>=0.3.0 <1.0.0`. A consumer swaps the pair in dev dependencies and replaces
+  `miniEngine()` with `windEngine()` in `granum.config.*`.
+- **`[touch-action:none]` and `[table-layout:fixed]` became the `touch-none` and
+  `table-fixed` utilities.** The arbitrary values were there for exactly one
+  reason — the utilities were missing from the vocabulary; now they are not.
+  Affected: `GrSlider`, `GrSortableList`, `GrColorPicker`, `GrImageViewer`,
+  `GrDataTable`, `GrSplitter`, `GrTable`. Rendering is unchanged; the class names
+  in the markup are not.
+- **The stock engine now knows `motion-safe:` / `motion-reduce:`**, but the
+  accessibility contract still rides on the global `prefers-reduced-motion` block
+  in `base.css`: that block does not depend on the vocabulary, the variant does.
+  The reasoning in `docs/motion.md` was rewritten — the former argument ("the
+  variant produces no CSS at all") no longer holds.
+- **Requires `@feugene/granum` `>=0.2.0 <1.0.0`: the application picks the utility engine.** granum no
+  longer ships an engine of its own — it moved to a separate package, `@feugene/granum-engine-mini` — so
+  `engine` in `granum.config.*` is now required and takes an **instance**: `engine: miniEngine()`. The
+  string `'builtin'` and an options object are rejected with `InvalidConfigError`, and an application's own
+  utility rules go to the engine factory (`miniEngine({ rules: [...] })`), not to the config, which has no
+  field for rules. For a consumer that means two build packages instead of one
+  (`yarn add -D @feugene/granum @feugene/granum-engine-mini`); for a provider package's build, an explicit
+  `granumProvider({ provider, engine: miniEngine() })`.
+- **The package manifest declares its utility vocabulary: format 2.** Instead of a top-level
+  `engineModule`, the manifest carries an `engine { dialect, vocabulary, name, version?, module }` block,
+  and the package declares the dialect `unocss/preset-mini+granum@66` — the vocabulary its component
+  classes are written against. `sr-only`, `tabular-nums`, `animate-spin`, `divide-y` and `space-y-*` come
+  from extra rules, without which components are drawn incompletely, and that used to be a silent
+  breakage. An application running an engine of a different vocabulary now gets
+  `provider-dialect-mismatch` and `provider-classes-dropped` listing every class that was lost by name; on
+  a matching dialect with a different vocabulary fingerprint the classes are simply re-extracted. Details
+  in [`docs/granum.md`](./docs/granum.md) and [`docs/installation.md`](./docs/installation.md).
+- **The package is built by `@feugene/granum`, not by the `@feugene/unocss-preset-granular` preset.**
+  Instead of a consumer's `uno.config.ts` — `granum.config.ts` and the `granum()` plugin; instead of
+  scanning `node_modules` — `granum.manifest.json`, which the package publishes next to `dist` and which
+  already holds the component classes, the tokens they consume, the dependency graph, the theme files and
+  the CSS. An application's CSS arrives as a single `virtual:granum.css` with five cascade layers
+  (`tokens`, `base`, `themes`, `components`, `utilities`), so "an application utility overrides a
+  component's base style" is settled by layer names rather than by concatenation order. The consumer
+  migration is in [`docs/granum.md`](./docs/granum.md) and
+  [`docs/installation.md`](./docs/installation.md).
+- **The descriptor contract was renamed without a change of meaning.** `defineGranularComponent` →
+  `defineGranumComponent`, `defineGranularProvider` → `defineGranumProvider`, imported from
+  `@feugene/granum/contract`. `packageBaseUrl` is gone: the manifest's directory is the path base. Theme
+  paths are declared relative to the layout root (`styles/tokens.css`) rather than as absolute URLs.
+- **`libInjectCss` was dropped from the package build.** The manifest delivers a component's CSS, and
+  together with inlining into the JS chunk it would arrive twice. The `components/<Name>/styles.css`
+  assets stay in `dist` and are listed in the manifest.
+- **Three component registries, not four.** A build entry is no longer a registry: `granumProvider()`
+  builds them from the provider registry. `yarn generate:registry` maintains the barrel,
+  `package.json#exports` (including the manifest export) and `src/granular-provider/shared.ts`; the gate
+  lives in `src/__tests__/registry.generated.test.ts`.
+- **`yarn doctor` is `granum doctor granum.config.mjs`.** It checks the built manifest rather than the
+  sources; an application's build report (`dist/granum-report.json`) appears for the consumer on its own.
 
 ### Added
-
 
 - **`dist/component-guides.json`: how to pick a component, outside the repository.** `docs/` is not
   published, so anything reading the installed package — IDE plugins, the MCP connector — had props but no
@@ -71,6 +80,12 @@ to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- **Shared contexts and helpers moved out of component directories into `src/components/shared/`.**
+  `GrConfigProvider/context`, `GrFormField/context`, `GrButtonGroup/context`, `GrForm/context`,
+  `GrForm/validation`, `GrForm/fileRule`, `GrDelta/deltaTone` and `GrChip/grChipGroupContext` lived inside
+  other components, so importing an injection key made a neighbour a graph dependency — 91 edges for
+  nothing. The public re-exports are kept: `useGrConfig`, `useGrFormFieldContext`, `useGrButtonGroup`,
+  `useGrFormContext`, `deltaTone` and the rest are still available from their own components.
 - **`web-types.json` describes 105 exported components, not 83.** The generator walked
   `src/components/GrX/GrX.vue` and so never saw a subcomponent living in its owner's directory:
   `GrDropdownMenuItem`, `GrDialogHeader`, `GrListItem`, `GrTabPanel` and eighteen more — exactly the parts
@@ -80,6 +95,7 @@ to [Semantic Versioning](https://semver.org/).
   `GrButtonVariant | undefined` tells an IDE nothing; it now reads
   `"primary" | "outline" | "secondary" | "ghost" | "ghost-border" | undefined`. Generics, functions and object
   types keep their written form, which is the more useful hint there.
+
 
 ## [v0.53.1] 2026-09-11
 

@@ -7,7 +7,7 @@
 Monorepo for the [`@feugene/granularity`](./packages/granularity) design system — a Vue 3 package
 with components, styles and granular subpath exports, built and consumed through the
 [`@feugene/granum`](https://github.com/efureev/granum) pipeline (`granum` 0.2 or newer, plus a
-utility engine such as `@feugene/granum-engine-mini` that the application supplies).
+utility engine such as `@feugene/granum-engine-wind` that the application supplies).
 
 ## Contents
 

@@ -1,4 +1,4 @@
-import { defineGranularComponent } from '@feugene/unocss-preset-granular/contract'
+import { defineGranumComponent } from '@feugene/granum/contract'
 
 import { grDateRangePickerSafelist } from './safelist'
 
@@ -12,7 +12,7 @@ import { grDateRangePickerSafelist } from './safelist'
  * `enable-time`: селекция статична, и по ней не видно, каким пропом компонент
  * будет вызван, — а импорт колонок в собранном чанке есть всегда.
  */
-export const grDateRangePickerConfig = defineGranularComponent(import.meta.url, {
+export const grDateRangePickerConfig = defineGranumComponent(import.meta.url, {
   name: 'GrDateRangePicker',
   safelist: grDateRangePickerSafelist,
   dependencies: [

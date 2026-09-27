@@ -221,11 +221,18 @@ function replaceBlock(source, block, file) {
  */
 function checkVersionMentions(rows) {
   const known = new Map(rows.map(row => [row.name, row.version]))
-  const preset = JSON.parse(readFileSync(resolve(ROOT, 'packages/granularity/package.json'), 'utf8'))
-    .devDependencies?.['@feugene/unocss-preset-granular']
 
-  if (preset)
-    known.set('@feugene/unocss-preset-granular', preset.replace(/^[\^~]/, ''))
+  // granum и его движок в этом репозитории не живут, поэтому «текущая версия»
+  // для них — та, что стоит в dev-зависимостях ядра: именно на ней собран dist,
+  // который потребитель увидит.
+  const core = JSON.parse(readFileSync(resolve(ROOT, 'packages/granularity/package.json'), 'utf8'))
+
+  for (const name of ['@feugene/granum', '@feugene/granum-engine-wind']) {
+    const range = core.devDependencies?.[name]
+
+    if (range)
+      known.set(name, range.replace(/^[\^~]/, ''))
+  }
 
   const stale = []
 

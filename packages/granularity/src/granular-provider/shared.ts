@@ -105,14 +105,18 @@ export const GRANULARITY_PROVIDER_ID = '@feugene/granularity'
 /**
  * Словарь утилит, против которого написаны классы компонентов.
  *
- * Пакет опирается не только на `preset-mini`: `sr-only`, `tabular-nums`,
- * `animate-spin`, `divide-y` и `space-y-*` приходят из дополнительного набора
- * правил, и без них компоненты рисуются не полностью. Объявленный диалект
- * превращает это из тихой поломки в громкую: сборка пакета откажется идти на
- * движке другого словаря, а приложение, взявшее такой движок, получит
- * `provider-dialect-mismatch` и поимённый список потерянных классов.
+ * Компоненты нарисованы утилитами словаря `preset-wind3`: `sr-only`,
+ * `tabular-nums`, `animate-spin`, `divide-y`, `space-y-*`, `border-collapse`,
+ * `list-none`, `touch-none`, `table-fixed`. Движок более узкого словаря части из
+ * них не знает, и тогда компоненты рисуются не полностью. Суффикс `+granum`
+ * добавляет к словарю одно правило — альфу на произвольном цвете.
+ *
+ * Объявленный диалект превращает расхождение из тихой поломки в громкую: сборка
+ * пакета откажется идти на движке другого словаря, а приложение, взявшее такой
+ * движок, получит `provider-dialect-mismatch` и поимённый список потерянных
+ * классов.
  */
-export const GRANULARITY_ENGINE_DIALECT = 'unocss/preset-mini+granum@66'
+export const GRANULARITY_ENGINE_DIALECT = 'unocss/preset-wind3+granum@66'
 
 /** Встроенные темы пакета. Единственный источник правды о списке тем. */
 export const granularityThemeNames = ['light', 'dark'] as const

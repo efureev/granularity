@@ -1,12 +1,12 @@
-// `id`, `packageBaseUrl` и реестр компонентов провайдера.
+// `id` и реестр компонентов провайдера.
 //
 // Списки под маркерами генерируются `yarn generate:registry` — руками внутри
 // них не писать, следующая генерация затрёт.
 import {
-  defineGranularProvider,
-  type GranularComponentDescriptor,
-  type GranularProvider,
-} from '@feugene/unocss-preset-granular/contract'
+  defineGranumProvider,
+  type GranumComponentDescriptor,
+  type GranumProvider,
+} from '@feugene/granum/contract'
 // <granularity:components:imports> — блок генерируется `yarn generate:registry`
 import { grDashboardConfig } from '../components/GrDashboard/config'
 import { grDashboardItemConfig } from '../components/GrDashboardItem/config'
@@ -17,6 +17,16 @@ import { grDashboardToolbarConfig } from '../components/GrDashboardToolbar/confi
 
 /** Идентификатор провайдера — совпадает с именем пакета. */
 export const GRANULARITY_DASHBOARD_PROVIDER_ID = '@feugene/granularity-dashboard'
+
+/** Донор: компоненты пакета опираются на компоненты ядра. */
+const GRANULARITY_CORE_PROVIDER_ID = '@feugene/granularity'
+
+/**
+ * Словарь утилит, против которого написаны классы компонентов, — тот же, что у
+ * ядра. Сборка сверит объявление с диалектом движка, которым её запустили, и не
+ * даст записать в манифест чужой словарь.
+ */
+export const GRANULARITY_DASHBOARD_ENGINE_DIALECT = 'unocss/preset-wind3+granum@66'
 
 /**
  * Реестр компонентов пакета — именованной мапой, а не инлайн-массивом: по нему
@@ -31,30 +41,27 @@ export const granularityDashboardComponentConfigs = {
   GrDashboardPalette: grDashboardPaletteConfig,
   GrDashboardToolbar: grDashboardToolbarConfig,
   // </granularity:components:registry>
-} satisfies Record<string, GranularComponentDescriptor>
+} satisfies Record<string, GranumComponentDescriptor>
 
 export type GranularityDashboardComponentName = keyof typeof granularityDashboardComponentConfigs
 
 /**
- * Собирает granular-provider пакета.
+ * Собирает провайдера пакета.
  *
- * Принимает `granularityProvider` снаружи — в зависимости от entry это будет
- * browser- или node-вариант провайдера `@feugene/granularity`: у пресета должен
- * быть ровно один инстанс с данным `id`.
+ * Донор объявлен строкой, а не инстансом: приложение подключает оба пакета по
+ * имени, и каждый приезжает своим манифестом. Инстанс в `dependencies` втянул
+ * бы ядро в граф объектной формой — то есть заставил бы приложение сканировать
+ * его `dist` вместо того, чтобы прочитать готовый манифест (C-4).
  *
- * `packageBaseUrl` тоже приходит снаружи, из самого entry: считать его здесь
- * нельзя, потому что `import.meta.url` этого модуля после сборки указывает в
- * общий чанк, а не в корень `dist`.
+ * База раскладки здесь не нужна вовсе: у манифестной формы она равна директории
+ * манифеста, и считать её от `import.meta.url` больше незачем.
  */
-export function createGranularityDashboardProvider(
-  granularityProvider: GranularProvider,
-  packageBaseUrl: string,
-): GranularProvider {
-  return defineGranularProvider({
+export function createGranularityDashboardProvider(): GranumProvider {
+  return defineGranumProvider({
     id: GRANULARITY_DASHBOARD_PROVIDER_ID,
     contractVersion: 1,
-    packageBaseUrl,
+    engine: { dialect: GRANULARITY_DASHBOARD_ENGINE_DIALECT },
     components: Object.values(granularityDashboardComponentConfigs),
-    dependencies: [granularityProvider],
+    dependencies: [GRANULARITY_CORE_PROVIDER_ID],
   })
 }

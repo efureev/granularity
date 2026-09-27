@@ -92,7 +92,7 @@ export const areaHeightBySize: Record<GrColorPickerSize, string> = {
  * Кольцо фокуса живёт на обёртке через `focus-within`: фокус получают скрытые
  * `input[type=range]` внутри, и своё кольцо у них было бы шириной в пиксель.
  */
-export const areaBaseClass = 'relative w-full overflow-hidden rounded-[var(--gr-radius-md)] border border-[color-mix(in_srgb,var(--gr-fg)_18%,transparent)] [touch-action:none] focus-within:outline-none focus-within:ring-2 focus-within:ring-[var(--gr-ring)]'
+export const areaBaseClass = 'relative w-full overflow-hidden rounded-[var(--gr-radius-md)] border border-[color-mix(in_srgb,var(--gr-fg)_18%,transparent)] touch-none focus-within:outline-none focus-within:ring-2 focus-within:ring-[var(--gr-ring)]'
 
 export const areaEnabledClass = 'cursor-crosshair'
 export const areaDisabledClass = 'cursor-not-allowed'

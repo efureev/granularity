@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { codeBlockRootClass } from '../components/GrCodeBlock/grCodeBlockStyles'
+import { codeBlockRootClass } from '../components/shared/grCodeBlockStyles'
 import { editorRootClass } from '../components/GrCodeEditor/grCodeEditorStyles'
 import { diffRootClass } from '../components/GrDiff/grDiffStyles'
 

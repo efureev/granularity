@@ -42,15 +42,23 @@ optional peer, и его импорт внутри дефолтного набо
 кто пакет не поставил, — bare-specifier резолвится бандлером, а не рантаймом.
 Без chrono дата остаётся текстовым полем с проверкой формата.
 
-**Подключив расширенный набор, допишите его компоненты в селекцию пресета** —
+**Подключив расширенный набор, допишите его компоненты в селекцию `granum`** —
 иначе они приедут без стилей:
 
 ```ts
-presetGranularNode({
-  providers: [granularityProvider, granularityFormsSchemaProvider],
-  components: ['@feugene/granularity-forms-schema:GrSchemaForm', 'GrSlider', 'GrColorPicker'],
+// granum.config.ts
+defineGranumConfig({
+  engine: windEngine(),
+  providers: ['@feugene/granularity', '@feugene/granularity-forms-schema'],
+  components: [
+    '@feugene/granularity-forms-schema:GrSchemaForm',
+    { provider: '@feugene/granularity', names: ['GrSlider', 'GrColorPicker'] },
+  ],
 })
 ```
+
+Короткой формы `'GrSlider'` в селекции нет: имя без провайдера неоднозначно, и
+`granum` требует квалифицированный ключ либо объектную форму.
 
 ## Свой виджет
 

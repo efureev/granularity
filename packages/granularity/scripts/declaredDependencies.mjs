@@ -4,7 +4,7 @@ import { resolve } from 'node:path'
 /**
  * Правило чтения `config.dependencies` — одно на все гейты.
  *
- * Читается текст `config.ts`, а не дескриптор: `defineGranularComponent`
+ * Читается текст `config.ts`, а не дескриптор: `defineGranumComponent`
  * подставляет `dependencies: []` там, где поля не было, и «не объявлено»
  * становится неотличимо от «объявлено пустым».
  *

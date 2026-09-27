@@ -1,30 +1,53 @@
-import { fileURLToPath, URL } from 'node:url'
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
-import { granularAssetFileNames, granularChunkFileNames } from '@feugene/unocss-preset-granular/vite'
+import { granumProvider } from '@feugene/granum/build'
+import { windEngine } from '@feugene/granum-engine-wind'
 import { libInjectCss } from 'vite-plugin-lib-inject-css'
 
-import { GRANULARITY_CHARTS_COMPONENTS } from './src/componentNames'
+import { granularityChartsProvider } from './src/granular-provider'
 
 /**
  * Build-конфиг пакета `@feugene/granularity-charts`.
  *
- * — `vue`, `@feugene/granularity` и `@feugene/unocss-preset-granular`
- *   остаются external (peer-зависимости) — пакет не дублирует их рантайм;
+ * — `vue`, `@feugene/granularity` и `@feugene/granum` остаются external
+ *   (peer-зависимости) — пакет не дублирует их рантайм;
  * — собственных runtime-зависимостей нет: шкалы, деления и раскладка это
  *   обычная арифметика, форматирование даёт `Intl`;
- * — каждый компонент публикуется отдельным `components/<Name>/index` entry
- *   для tree-shake; SFC-чанки складываются в `components/<Name>/chunks/`
- *   через `granularChunkFileNames`, чтобы UnoCSS в приложении сканировал
- *   шаблоны через `content.filesystem` пресета `presetGranularNode`;
  * — арифметика (`chart/`) и композаблы отдаются своими entry: их берут и без
  *   компонентов — например чтобы посчитать деления для своей разметки.
  *
- * Список компонентов берётся из `src/componentNames.ts`, а не дублируется
- * здесь: один генерируемый список на конфиг сборки и резолвер.
+ * Раскладку `dist` и entry компонентов ведёт `granumProvider()`: он строит их
+ * из реестра провайдера, извлекает классы и потребляемые токены по графу
+ * бандла и пишет `dist/granum.manifest.json`. Руками их больше не перечисляют,
+ * поэтому сгенерированного блока entry в этом файле нет.
  */
+
+/**
+ * Entry, которые строит не плагин: слои пакета и служебные точки входа. Entry
+ * компонентов и `index` `granumProvider()` собирает сам из реестра провайдера.
+ */
+const extraEntries: Record<string, string> = {
+  'granular-provider': 'src/granular-provider/index.ts',
+  'granular-provider-node': 'src/granular-provider/node.ts',
+  'resolver': 'src/resolver.ts',
+  'chart/index': 'src/chart/index.ts',
+  'composables/useChartScale': 'src/composables/useChartScale.ts',
+  'composables/useChartTicks': 'src/composables/useChartTicks.ts',
+  'composables/useChartTooltip': 'src/composables/useChartTooltip.ts',
+  'i18n/index': 'src/i18n/index.ts',
+  'i18n/all': 'src/i18n/all.ts',
+}
+
 export default defineConfig({
-  plugins: [vue(), libInjectCss()],
+  plugins: [
+    vue(),
+    libInjectCss(),
+    granumProvider({
+      provider: granularityChartsProvider,
+      engine: windEngine(),
+      entries: extraEntries,
+    }),
+  ],
   // Дословно как в ядре: скобки обязательны, а `typeof process` в выражении быть не
   // должно — оно гасило бы гард в браузере. Разбор — `packages/granularity/vite.config.ts`.
   define: {
@@ -36,78 +59,11 @@ export default defineConfig({
     cssCodeSplit: true,
     reportCompressedSize: true,
     emptyOutDir: true,
-    lib: {
-      entry: {
-        'index': fileURLToPath(new URL('./src/index.ts', import.meta.url)),
-        'granular-provider': fileURLToPath(
-          new URL('./src/granular-provider/index.ts', import.meta.url),
-        ),
-        'granular-provider-node': fileURLToPath(
-          new URL('./src/granular-provider/node.ts', import.meta.url),
-        ),
-        'resolver': fileURLToPath(
-          new URL('./src/resolver.ts', import.meta.url),
-        ),
-        'chart/index': fileURLToPath(
-          new URL('./src/chart/index.ts', import.meta.url),
-        ),
-        'composables/useChartScale': fileURLToPath(
-          new URL('./src/composables/useChartScale.ts', import.meta.url),
-        ),
-        'composables/useChartTicks': fileURLToPath(
-          new URL('./src/composables/useChartTicks.ts', import.meta.url),
-        ),
-        'composables/useChartTooltip': fileURLToPath(
-          new URL('./src/composables/useChartTooltip.ts', import.meta.url),
-        ),
-        'i18n/index': fileURLToPath(
-          new URL('./src/i18n/index.ts', import.meta.url),
-        ),
-        'i18n/all': fileURLToPath(
-          new URL('./src/i18n/all.ts', import.meta.url),
-        ),
-        // <granularity:components> — блок генерируется `yarn generate:registry`
-        'components/GrChartArea/index': fileURLToPath(
-          new URL('./src/components/GrChartArea/index.ts', import.meta.url),
-        ),
-        'components/GrChartBar/index': fileURLToPath(
-          new URL('./src/components/GrChartBar/index.ts', import.meta.url),
-        ),
-        'components/GrChartBullet/index': fileURLToPath(
-          new URL('./src/components/GrChartBullet/index.ts', import.meta.url),
-        ),
-        'components/GrChartFunnel/index': fileURLToPath(
-          new URL('./src/components/GrChartFunnel/index.ts', import.meta.url),
-        ),
-        'components/GrChartHeatmap/index': fileURLToPath(
-          new URL('./src/components/GrChartHeatmap/index.ts', import.meta.url),
-        ),
-        'components/GrChartLine/index': fileURLToPath(
-          new URL('./src/components/GrChartLine/index.ts', import.meta.url),
-        ),
-        'components/GrChartPie/index': fileURLToPath(
-          new URL('./src/components/GrChartPie/index.ts', import.meta.url),
-        ),
-        'components/GrChartRadar/index': fileURLToPath(
-          new URL('./src/components/GrChartRadar/index.ts', import.meta.url),
-        ),
-        'components/GrChartWaterfall/index': fileURLToPath(
-          new URL('./src/components/GrChartWaterfall/index.ts', import.meta.url),
-        ),
-        'components/GrSparkline/index': fileURLToPath(
-          new URL('./src/components/GrSparkline/index.ts', import.meta.url),
-        ),
-        // </granularity:components>
-      },
-      formats: ['es'],
-      fileName: (_format, entryName) => `${entryName}.js`,
-    },
     rolldownOptions: {
       external: [
         /^node:/,
         'vue',
         /^@feugene\/granularity(\/.*)?$/,
-        /^@feugene\/unocss-preset-granular(\/.*)?$/,
         // Тип `LocaleLoaderCollection` стирается на сборке, но правило общее:
         // i18n-слой принадлежит приложению, а не пакету.
         /^@feugene\/fint-i18n(\/.*)?$/,
@@ -116,10 +72,6 @@ export default defineConfig({
         'unplugin-vue-components',
         /^unplugin-vue-components\/.*/,
       ],
-      output: {
-        chunkFileNames: granularChunkFileNames(),
-        assetFileNames: granularAssetFileNames({ components: GRANULARITY_CHARTS_COMPONENTS }),
-      },
     },
   },
 })

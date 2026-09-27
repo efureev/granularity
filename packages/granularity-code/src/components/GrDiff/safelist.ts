@@ -1,5 +1,5 @@
 import { splitClassTokens } from '../../internal/classTokens'
-import { codeTokenClass } from '../GrCodeBlock/grCodeBlockStyles'
+import { codeTokenClass } from '../shared/grCodeBlockStyles'
 
 import {
   diffFontClass,

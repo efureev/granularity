@@ -1210,7 +1210,7 @@ jobs:
   test-showcase:
     # Витрина использует авто-импорт `unplugin-vue-components` через резолверы
     # из @feugene/unplugin-granularity, @feugene/granularity-chrono и
-    # @feugene/granularity-charts, а `uno.config.ts` читает провайдеры тех же
+    # @feugene/granularity-charts, а `granum.config.ts` читает провайдеры тех же
     # пакетов — их dist нужен уже при загрузке vite/vitest-конфига, поэтому
     # скачиваем все четыре.
     if: needs.release-scope.outputs.showcase == 'true'

@@ -24,7 +24,7 @@
   peer-зависимость пакета (устанавливает приложение).
 - [`@feugene/granum`][granum] `≥ 0.2 < 1` — peer-зависимость пакета
   (устанавливает приложение, на build-time).
-- `@feugene/granum-engine-mini` `^0.2` — движок утилит; тоже ставит приложение.
+- `@feugene/granum-engine-wind` `^0.2` — движок утилит; тоже ставит приложение.
   Своей реализации движка в granum нет, и словарь классов выбирает тот, кто
   отвечает за результат сборки, то есть приложение.
 - [`vite`][vite] `^8` — peer-зависимость granum: плагин живёт в сборке
@@ -36,7 +36,7 @@
 
 ```bash
 yarn add vue @feugene/granularity @floating-ui/dom
-yarn add -D @feugene/granum @feugene/granum-engine-mini
+yarn add -D @feugene/granum @feugene/granum-engine-wind
 ```
 
 Почему `@feugene/granularity` стоит в `dependencies`:
@@ -70,10 +70,10 @@ yarn add -D @feugene/granum @feugene/granum-engine-mini
 Почему пакетов два, а не один: granum — это конвейер (резолвер, слои каскада,
 манифесты, отчёт), а реализации движка утилит в нём нет вовсе. Движок решает,
 какой класс во что превращается, — то есть отвечает за результат, — поэтому его
-выбирает приложение и передаёт **инстансом**. `@feugene/granum-engine-mini` —
-реализация по умолчанию: `preset-mini` плюс доп-правила, на которых нарисованы
+выбирает приложение и передаёт **инстансом**. `@feugene/granum-engine-wind` —
+реализация по умолчанию: `preset-wind3` плюс доп-правило, на которых нарисованы
 компоненты пакета. Движок обязан объявлять тот же словарь, что и пакет
-(`unocss/preset-mini+granum@66`), иначе granum скажет
+(`unocss/preset-wind3+granum@66`), иначе granum скажет
 `provider-dialect-mismatch` и перечислит классы, которые пришлось выбросить —
 см. [«Словарь утилит» в `granum.md`](./granum.md#словарь-утилит-диалект-и-отпечаток).
 
@@ -89,10 +89,10 @@ yarn add -D @feugene/granum @feugene/granum-engine-mini
 
 ```ts
 import { defineGranumConfig } from '@feugene/granum/vite'
-import { miniEngine } from '@feugene/granum-engine-mini'
+import { windEngine } from '@feugene/granum-engine-wind'
 
 export default defineGranumConfig({
-  engine: miniEngine(),
+  engine: windEngine(),
   providers: ['@feugene/granularity'],
   appSources: { dirs: ['src'] },
 })
@@ -100,7 +100,7 @@ export default defineGranumConfig({
 
 Что это уже даёт:
 
-- утилиты генерирует `miniEngine()` — `preset-mini` плюс доп-правила пакета;
+- утилиты генерирует `windEngine()` — `preset-wind3` плюс доп-правило пакета;
   `engine` единственное обязательное поле конфига, опустить его нельзя;
 - в сборку подмешиваются `tokens.css`, `base.css` и тема `light` пакета;
 - включены все компоненты, объявленные в провайдере (эквивалент
@@ -115,7 +115,7 @@ export default defineGranumConfig({
 **Свои иконки пакет привозит с собой.** Стрелка селекта, крестик очистки,
 галочка выбранной опции, спиннер, ручка переноса — всё это компилируется в
 `dist` при сборке пакета. Ставить `unplugin-icons` или коллекцию иконок ради
-них не нужно, и от вашего `uno.config.ts` они не зависят.
+них не нужно, и от вашего `granum.config.ts` они не зависят.
 
 **Своя иконка приходит двумя способами.** Пропы `icon` (`GrTabs`,
 `GrBreadcrumbs`, `GrStatistic`, `GrSidebarItem`, `GrBottomNav`,
@@ -137,8 +137,8 @@ import IconUser from '~icons/lucide/user'
 ```
 
 Класс `i-lucide-*` — утилита, и делает её не пакет, а ваша сборка.
-`miniEngine()` правил иконок не знает, а поля для правил у конфига granum нет:
-правила приложения передаются фабрике движка — `miniEngine({ rules: [...] })`.
+`windEngine()` правил иконок не знает, а поля для правил у конфига granum нет:
+правила приложения передаются фабрике движка — `windEngine({ rules: [...] })`.
 
 Поэтому рабочих вариантов два: передавать иконку Vue-компонентом (работает без
 настройки) либо завести правило самому — своё правило фабрике или движок,
@@ -157,7 +157,7 @@ import IconUser from '~icons/lucide/user'
 
 ```ts
 defineGranumConfig({
-  engine: miniEngine(),
+  engine: windEngine(),
   providers: ['@feugene/granularity'],
   components: [
     { provider: '@feugene/granularity', names: ['GrButton'] },
@@ -177,7 +177,7 @@ defineGranumConfig({
 
 ```ts
 defineGranumConfig({
-  engine: miniEngine(),
+  engine: windEngine(),
   providers: ['@feugene/granularity'],
   components: [{ provider: '@feugene/granularity', names: ['GrButton'] }],
   themes: { names: ['light', 'dark'] },
@@ -194,7 +194,7 @@ defineGranumConfig({
 
 ```ts
 defineGranumConfig({
-  engine: miniEngine(),
+  engine: windEngine(),
   providers: ['@feugene/granularity'],
   components: [{ provider: '@feugene/granularity', names: ['GrButton'] }],
   appSources: { dirs: ['src'] },
@@ -206,13 +206,12 @@ defineGranumConfig({
 `dist/granum-report.json`, затем `'on'`. `appSources` при этом обязателен:
 токен, который приложение взяло само, иначе уедет из CSS при зелёной сборке.
 
-### Сканирования `node_modules` больше нет
+### Приложение не сканирует `node_modules`
 
-На пресете v1 приложение должно было объяснить экстрактору, где лежат
-собранные чанки компонентов (`granularContent`, `content.filesystem`) — в granum
-этого канала нет вовсе: классы компонентов и потребляемые ими токены посчитаны
-на сборке пакета и лежат в `granum.manifest.json`. Приложение объявляет только
-свои исходники — `appSources`.
+Объяснять сборке, где лежат собранные чанки компонентов, не нужно: классы
+компонентов и потребляемые ими токены посчитаны на сборке пакета и лежат в
+`granum.manifest.json`. Приложение объявляет только свои исходники —
+`appSources`.
 
 Все доступные опции (`engine`, `components`, `themes`, `appSources`, `css`,
 `js`, `pruneTokens`, `report`) описаны в [`granum.md`](./granum.md) и

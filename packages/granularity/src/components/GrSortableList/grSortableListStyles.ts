@@ -35,11 +35,13 @@ export const emptyClass = 'px-4 py-6 text-center text-[length:var(--gr-text-sm)]
  * правило «один Tab на список» — тот же приём, что у ручки `GrTree`.
  */
 /**
- * `[touch-action:none]` вместо `touch-none`: утилиты нет ни в `presetMini`, ни
- * в extra-rules, класс молча не превратился бы в CSS — и вертикальный свайп по
- * ручке ушёл бы в прокрутку страницы. Тот же приём у дорожки `GrSlider`.
+ * `touch-none` обязателен: без него вертикальный свайп по ручке уходит в
+ * прокрутку страницы. Раньше здесь стояло arbitrary-значение
+ * `touch-none`, потому что утилиты не было ни в `preset-mini`, ни в
+ * доп-правилах; в словаре `preset-wind3` она есть. Тот же класс у дорожки
+ * `GrSlider`.
  */
-export const handleClass = 'flex shrink-0 items-center justify-center rounded-[var(--gr-radius-sm)] text-[var(--gr-sortable-handle-color,var(--gr-muted-fg))] size-[var(--gr-sortable-handle-size,1.5rem)] cursor-grab [touch-action:none] focus:outline-none'
+export const handleClass = 'flex shrink-0 items-center justify-center rounded-[var(--gr-radius-sm)] text-[var(--gr-sortable-handle-color,var(--gr-muted-fg))] size-[var(--gr-sortable-handle-size,1.5rem)] cursor-grab touch-none focus:outline-none'
 
 export const handleDisabledClass = 'cursor-not-allowed text-[var(--gr-muted-fg)]'
 

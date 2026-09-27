@@ -36,7 +36,7 @@ export const placeholderPaddings: Record<GrDataTableSize, string> = {
  * фокусу: постоянная сетка ручек в шапке из десяти колонок читается как рябь,
  * а не как управление.
  */
-export const columnHandleClass = 'inline-flex shrink-0 cursor-grab items-center text-[var(--gr-datatable-drag-handle,var(--gr-muted-fg))] opacity-0 [touch-action:none] transition-opacity duration-[var(--gr-duration-fast)] focus:outline-none focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] rounded-[var(--gr-radius-sm)] group-hover:opacity-100'
+export const columnHandleClass = 'inline-flex shrink-0 cursor-grab items-center text-[var(--gr-datatable-drag-handle,var(--gr-muted-fg))] opacity-0 touch-none transition-opacity duration-[var(--gr-duration-fast)] focus:outline-none focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] rounded-[var(--gr-radius-sm)] group-hover:opacity-100'
 
 export const columnHandleActiveClass = 'opacity-100'
 
@@ -79,7 +79,7 @@ export const summaryRowClass = 'border-t border-[var(--gr-brd)] font-600'
  * Ручка ширины — полоса у правого края заголовка. Видима она узкой линией, а
  * ловится широкой зоной: попасть в двухпиксельную границу мышью тяжело.
  */
-export const columnResizerClass = 'absolute inset-y-0 right-0 z-[1] flex w-3 translate-x-1/2 cursor-col-resize items-stretch justify-center [touch-action:none] focus:outline-none'
+export const columnResizerClass = 'absolute inset-y-0 right-0 z-[1] flex w-3 translate-x-1/2 cursor-col-resize items-stretch justify-center touch-none focus:outline-none'
 
 export const columnResizerLineClass = 'w-[var(--gr-datatable-resizer-width,2px)] bg-transparent transition-colors duration-[var(--gr-duration-fast)]'
 
@@ -179,8 +179,8 @@ export const expandButtonClass = 'inline-flex items-center justify-center rounde
 
 /**
  * Поворот шеврона. Своего `motion-reduce:` здесь нет намеренно: движение пакет
- * гасит одним глобальным блоком в `base.css`, а под `presetMini` этот вариант
- * вдобавок не генерирует CSS вовсе (`docs/motion.md`).
+ * гасит одним глобальным блоком в `base.css`, который от словаря движка не
+ * зависит вовсе (`docs/motion.md`).
  */
 export const expandIconClass = 'h-4 w-4 transition-transform duration-[var(--gr-duration-fast)]'
 

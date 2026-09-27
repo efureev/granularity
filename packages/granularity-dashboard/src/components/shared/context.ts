@@ -1,3 +1,9 @@
+// Контракт доски: что она сообщает виджетам, тулбару и палитре.
+//
+// Лежит в `components/shared/`, а не у `GrDashboard`: контекст читают все
+// спутники доски. Импорт из директории другого компонента granum считает ребром
+// графа компонентов, и объявить его значило бы заставить потребителя,
+// выбравшего один тулбар, оплатить CSS и safelist доски целиком.
 import type { ComputedRef, InjectionKey, Ref } from 'vue'
 import { inject } from 'vue'
 
@@ -11,7 +17,7 @@ import type {
   GrDashboardRect,
   GrDashboardSpan,
 } from '../../layout'
-import type { GrDashboardMode } from './grDashboardStyles'
+import type { GrDashboardMode } from '../GrDashboard/grDashboardStyles'
 
 /**
  * Границы, объявленные самим виджетом.

@@ -1,7 +1,7 @@
 import { readFileSync, readdirSync } from 'node:fs'
 import { basename, relative, resolve } from 'node:path'
 
-import { miniEngine } from '@feugene/granum-engine-mini'
+import { windEngine } from '@feugene/granum-engine-wind'
 import { describe, expect, it } from 'vitest'
 
 import { componentSourceFiles } from './componentGraph'
@@ -184,11 +184,11 @@ describe('safelist-контракт', () => {
    */
   it('классы из `.ts`-хелперов компонента объявлены в его safelist', async () => {
     // Оракул «это вообще утилита?» — тот же движок, которым granum собирает
-    // CSS приложения: preset-mini плюс доп-правила (`animate-*`, `divide-*`,
-    // `sr-only`…). На чистом preset-mini такой токен считался бы «не утилитой»,
-    // и у изолированного потребителя класс молча не сгенерировался бы. Токен,
-    // из которого CSS не делает никто, классом по-прежнему не считается.
-    const engine = miniEngine()
+    // CSS приложения, то есть словарь объявленного диалекта. На движке более
+    // узкого словаря часть таких токенов считалась бы «не утилитой», и у
+    // изолированного потребителя класс молча не сгенерировался бы. Токен, из
+    // которого CSS не делает никто, классом по-прежнему не считается.
+    const engine = windEngine()
     const isUtility = new Map<string, boolean>()
 
     const violations: string[] = []

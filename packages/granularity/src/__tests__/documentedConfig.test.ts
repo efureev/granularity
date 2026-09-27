@@ -1,7 +1,7 @@
 import { readdirSync, readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 
-import { miniEngine } from '@feugene/granum-engine-mini'
+import { windEngine } from '@feugene/granum-engine-wind'
 
 import { granularityProvider } from '../granular-provider'
 import { describe, expect, it } from 'vitest'
@@ -10,22 +10,24 @@ import { describe, expect, it } from 'vitest'
  * Гейт «класс есть — CSS есть».
  *
  * Дефект, ради которого написан: компоненты пользовались `animate-spin`,
- * `divide-y`, `space-y-1`, `backdrop-blur-sm`, а `presetMini` таких правил не
- * знает. Витрина держала недостающие правила в своём `uno.config.ts` и потому
- * выглядела исправной — а у любого потребителя, собравшего конфиг по
+ * `divide-y`, `space-y-1`, `backdrop-blur-sm`, а словарь `preset-mini` таких
+ * правил не знает. Витрина держала недостающие правила у себя в конфиге и
+ * потому выглядела исправной — а у любого потребителя, собравшего конфиг по
  * `docs/installation.md`, эти утилиты не генерировались вовсе: класс в разметке
  * есть, CSS к нему нет. Сборка при этом успешна, тесты зелёные, ошибок нет;
  * увидеть можно было только глазами на живом приложении.
  *
  * Поэтому проверяем не «правило где-то существует», а **документированный
- * конфиг**: ровно `presetMini` + granular-пресет, как в `installation.md`.
+ * движок**: ровно `windEngine()` без своих правил, как в `installation.md`.
  */
 
 const componentsDir = resolve(process.cwd(), 'src/components')
 
 /**
- * Семейства, которых в `presetMini` нет и которые приезжают только из
- * `@feugene/unocss-mini-extra-rules` (пресет подмешивает их с 0.6.1).
+ * Семейства, на которых пакет когда-то обжёгся: их не было в `preset-mini`, и
+ * класс в шаблоне молча не превращался в CSS. Сейчас словарь движка их знает, но
+ * якорь остаётся — движок более узкого словаря вернул бы ту же тихую поломку.
+ *
  * Литералы этих семейств живут в шаблонах, а не в safelist, поэтому их
  * приходится вычитывать из исходников — иначе гейт их не увидит.
  */
@@ -80,7 +82,7 @@ describe('документированный конфиг генерирует C
   // эмитятся всегда, и проверка «CSS непустой» была бы слепой — ровно на этом
   // обжёгся первый замер этого дефекта. Заодно весь набор уходит в движок
   // одним вызовом, а не потокеново.
-  const engine = miniEngine()
+  const engine = windEngine()
 
   async function ungeneratable(tokens: readonly string[]): Promise<string[]> {
     const { unmatched } = await engine.generate({ classes: new Set(tokens) })
@@ -106,7 +108,7 @@ describe('документированный конфиг генерирует C
     expect(dead, `объявлены в safelist, но CSS не дают: ${dead.join(', ')}`).toEqual([])
   }, 30_000)
 
-  it('утилиты вне presetMini, встречающиеся в шаблонах, генерируются', async () => {
+  it('хрупкие семейства, встречающиеся в шаблонах, генерируются', async () => {
     const tokens = candidates(scannedFragileTokens())
     expect(tokens.length).toBeGreaterThan(0)
 
@@ -116,10 +118,9 @@ describe('документированный конфиг генерирует C
   })
 
   it.each([
-    // Оба когда-то были мертвы: `presetMini` не знает ни `text-transform`, ни
-    // цвета для `divide-*`. Правила заведены в `@feugene/unocss-mini-extra-rules`
-    // 0.4.0, пресет подмешивает их с 0.6.2 — держим на них отдельный якорь,
-    // чтобы откат зависимости не прошёл незамеченным.
+    // Оба когда-то были мертвы: `preset-mini` не знал ни `text-transform`, ни
+    // цвета для `divide-*`. В словаре `preset-wind3` они родные — якорь оставлен,
+    // чтобы сужение словаря не прошло незамеченным.
     ['uppercase', 'text-transform:uppercase'],
     ['divide-[var(--gr-brd)]', 'border-color:var(--gr-brd)'],
   ])('%s даёт CSS, а не пустоту', async (token, declaration) => {
@@ -129,9 +130,26 @@ describe('документированный конфиг генерирует C
   })
 
   it('`animate-spin` получает свои @keyframes, а не только правило', async () => {
-    // Правило без preflight'а — молчаливый полудефект: класс есть, анимации нет.
+    // Правило без keyframes — молчаливый полудефект: класс есть, анимации нет.
     const { css } = await engine.generate({ classes: new Set(['animate-spin']) })
 
-    expect(css).toContain('@keyframes granularity-spin')
+    expect(css).toContain('@keyframes spin')
+    expect(css).toContain('.animate-spin{animation:spin 1s linear infinite;}')
+  })
+
+  it('утилиты, которых не знал preset-mini, тоже дают CSS', async () => {
+    // Четыре класса, у которых правила не было ни в preset-mini, ни в прежних
+    // доп-правилах: таблицы графиков рисовались двойной рамкой, палитра доски —
+    // с маркерами списка, кадрирование на тач-устройстве скроллило страницу.
+    // Отсюда переезд движка на preset-wind3; гейт держит его на месте.
+    const { css, unmatched } = await engine.generate({
+      classes: new Set(['border-collapse', 'list-none', 'touch-none', 'scroll-py-1']),
+    })
+
+    expect(unmatched).toEqual([])
+    expect(css).toContain('border-collapse:collapse')
+    expect(css).toContain('list-style-type:none')
+    expect(css).toContain('touch-action:none')
+    expect(css).toContain('scroll-padding-top:0.25rem')
   })
 })

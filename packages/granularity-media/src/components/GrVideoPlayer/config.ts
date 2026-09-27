@@ -1,4 +1,4 @@
-import { defineGranularComponent } from '@feugene/unocss-preset-granular/contract'
+import { defineGranumComponent } from '@feugene/granum/contract'
 
 import { grVideoPlayerSafelist } from './grVideoPlayerStyles'
 
@@ -9,7 +9,7 @@ import { grVideoPlayerSafelist } from './grVideoPlayerStyles'
  * кнопки лежат **на кадре**, где фон заранее неизвестен и меняется каждый
  * кадр. Отсюда собственный класс с белым цветом и полупрозрачной подложкой.
  */
-export const grVideoPlayerConfig = defineGranularComponent(import.meta.url, {
+export const grVideoPlayerConfig = defineGranumComponent(import.meta.url, {
   name: 'GrVideoPlayer',
   safelist: grVideoPlayerSafelist,
 })

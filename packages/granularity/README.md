@@ -70,27 +70,27 @@ it can be removed.
 The supported setup is the `granum` plugin:
 
 ```bash
-yarn add -D @feugene/granum @feugene/granum-engine-mini
+yarn add -D @feugene/granum @feugene/granum-engine-wind
 ```
 
 Two packages, not one: `granum` is the pipeline and ships no utility engine of its own, so the
-application picks the vocabulary and hands over an instance. `@feugene/granum-engine-mini` is the
-default implementation — `preset-mini` plus the extra rules the components are drawn with.
+application picks the vocabulary and hands over an instance. `@feugene/granum-engine-wind` is the
+default implementation — `preset-wind3` plus the extra rule the components are drawn with.
 
 ```ts
 // granum.config.ts
 import { defineGranumConfig } from '@feugene/granum/vite'
-import { miniEngine } from '@feugene/granum-engine-mini'
+import { windEngine } from '@feugene/granum-engine-wind'
 
 export default defineGranumConfig({
-  engine: miniEngine(),
+  engine: windEngine(),
   providers: ['@feugene/granularity'],
   appSources: { dirs: ['src'] },
 })
 ```
 
 The package declares the vocabulary its classes are written against —
-`unocss/preset-mini+granum@66`. An engine with a different dialect makes `granum` report
+`unocss/preset-wind3+granum@66`. An engine with a different dialect makes `granum` report
 `provider-dialect-mismatch` and name every class it had to drop, instead of letting components
 render half-styled. See [`docs/granum.md`](./docs/granum.md).
 

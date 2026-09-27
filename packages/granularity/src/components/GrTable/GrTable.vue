@@ -98,8 +98,9 @@ export interface GrTableProps {
    * Обязателен, если в DOM не весь набор: иначе ширины считаются по
    * отрисованному окну и прыгают на каждой прокрутке.
    *
-   * Класс — arbitrary-значение, а не `table-fixed`: такого правила в
-   * `presetMini` нет, и класс молча не превратился бы в CSS.
+   * Класс — `table-fixed`. Раньше здесь стояло arbitrary-значение
+   * `[table-layout:fixed]`, потому что правила не было в `preset-mini`; в
+   * словаре `preset-wind3` оно есть.
    */
   fixedLayout?: boolean
   /**
@@ -323,7 +324,7 @@ defineSlots<{
     <table
       data-gr-table
       :role="role === 'grid' ? 'grid' : undefined"
-      class="min-w-full" :class="[tableTextClass, bodyClass, stickyColumnClass, fixedLayout ? '[table-layout:fixed]' : '']"
+      class="min-w-full" :class="[tableTextClass, bodyClass, stickyColumnClass, fixedLayout ? 'table-fixed' : '']"
       :style="tableStyle"
       :aria-label="ariaLabelledby ? undefined : ariaLabel"
       :aria-labelledby="ariaLabelledby"

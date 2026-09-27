@@ -20,8 +20,7 @@ export const buttonClass = 'inline-flex items-center justify-center rounded-[var
 
 /**
  * Моноширинные цифры обязательны: без них время скачет на каждой смене
- * секунды. Утилиты нет в `presetMini`, она приезжает из
- * `@feugene/unocss-mini-extra-rules`, который подмешивает `presetGranular`.
+ * секунды. Утилита из словаря `preset-wind3` — часть объявленного диалекта.
  */
 export const timeClass = 'tabular-nums text-white'
 

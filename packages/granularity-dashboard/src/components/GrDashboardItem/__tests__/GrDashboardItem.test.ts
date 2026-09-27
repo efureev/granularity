@@ -6,8 +6,8 @@ import { granularityGlobal, keydown, resetGranularityDom } from '@feugene/granul
 import { stubElementRects } from '@feugene/granularity-test-kit/vue'
 
 import type { GrDashboardResponsiveLayout } from '../../../layout'
-import type { GrDashboardContext } from '../../GrDashboard/context'
-import { useGrDashboardContext } from '../../GrDashboard/context'
+import type { GrDashboardContext } from '../../shared/context'
+import { useGrDashboardContext } from '../../shared/context'
 import GrDashboard from '../../GrDashboard/GrDashboard.vue'
 import GrDashboardItem from '../GrDashboardItem.vue'
 

@@ -76,9 +76,9 @@ describe('playground config', () => {
     expect(typeof engine.generate).toBe('function')
     // Диалект тот же, что объявил пакет: классы берутся из манифеста без
     // пересчёта, и ни один из них не теряется.
-    expect(engine.dialect).toBe('unocss/preset-mini+granum@66')
+    expect(engine.dialect).toBe('unocss/preset-wind3+granum@66')
     expect(engine.vocabulary).toMatch(/^fnv64-[0-9a-f]{16}$/)
-    expect(distPlaygroundGranumConfigSource).toContain(`import { miniEngine } from '@feugene/granum-engine-mini'`)
+    expect(distPlaygroundGranumConfigSource).toContain(`import { windEngine } from '@feugene/granum-engine-wind'`)
   })
 
   it('показывает в main.ts четыре актуальных сценария подключения и активирует granum-сценарий', () => {

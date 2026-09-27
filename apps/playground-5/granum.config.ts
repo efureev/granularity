@@ -1,5 +1,5 @@
 import { defineGranumConfig } from '@feugene/granum/vite'
-import { miniEngine } from '@feugene/granum-engine-mini'
+import { windEngine } from '@feugene/granum-engine-wind'
 
 /** Ровно один компонент: его граф granum развернёт сам по манифесту пакета. */
 export const playground5GranularityComponents = ['GrButton'] as const
@@ -21,7 +21,7 @@ export const playground5GranularityComponents = ['GrButton'] as const
  * часть из них останется без правил.
  */
 export default defineGranumConfig({
-  engine: miniEngine(),
+  engine: windEngine(),
   providers: ['@feugene/granularity'],
   components: [
     {

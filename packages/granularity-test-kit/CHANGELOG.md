@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **The optional peer is `@feugene/granum` `>=0.3.0 <1.0.0`.** The kit's gates do
+  not depend on the engine vocabulary, but the range moved with the others:
+  diverged ranges would leave a consumer with an uninstallable set.
+- **The optional peer changed: `@feugene/granum` `>=0.2.0 <1.0.0` instead of
+  `@feugene/unocss-preset-granular`.** The registry gate learns the parts of a composite component from
+  `@feugene/granum/codegen` (`collectGranumSubcomponents`); it is still imported lazily and only inside
+  `defineRegistryGate`, so the other eight factories work without it.
+- **`defineRegistryGate` checks the granum shape of a package.** Instead of assertions about a generated
+  block of vite entries there are three new ones: component entries are not maintained by hand in
+  `vite.config.ts` (`granumProvider({`, `engine: miniEngine()`, not a single component-entry marker), the
+  manifest is exported as `./granum.manifest.json` right after `"."`, and the provider registry arrives as
+  `componentConfigs`.
+- **`defineComponentTokensGate` also looks into `src/components/shared/`.** Helpers shared by several
+  components live there, and without this their tokens would look declared into the void.
+
 ## [v0.10.0] 2026-08-31
 
 ### Changed

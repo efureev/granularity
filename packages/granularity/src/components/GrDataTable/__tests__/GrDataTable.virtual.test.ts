@@ -156,7 +156,7 @@ describe('GrDataTable — виртуализация', () => {
     const wrapper = mountTable({ virtual: true, maxHeight: 400 })
 
     // Без фиксации ширины считались бы по отрисованному окну и прыгали.
-    expect(wrapper.get('[data-gr-table]').classes()).toContain('[table-layout:fixed]')
+    expect(wrapper.get('[data-gr-table]').classes()).toContain('table-fixed')
 
     const headers = wrapper.findAll('[data-gr-datatable-header] th')
     expect(headers[0].attributes('style')).toContain('width: 240px')
@@ -167,7 +167,7 @@ describe('GrDataTable — виртуализация', () => {
   it('ширина колонки работает и без виртуализации', () => {
     const wrapper = mountTable({ rows: manyRows(3) })
 
-    expect(wrapper.get('[data-gr-table]').classes()).not.toContain('[table-layout:fixed]')
+    expect(wrapper.get('[data-gr-table]').classes()).not.toContain('table-fixed')
     expect(wrapper.findAll('[data-gr-datatable-header] th')[0].attributes('style')).toContain('width: 240px')
     wrapper.unmount()
   })

@@ -29,15 +29,21 @@ import { useChartScale } from '@feugene/granularity-charts/composables/useChartS
 ## Подключение
 
 ```ts
-// uno.config.ts
-import granularityProvider from '@feugene/granularity/granular-provider/node'
-import granularityChartsProvider from '@feugene/granularity-charts/granular-provider/node'
+// granum.config.ts
+import { defineGranumConfig } from '@feugene/granum/vite'
+import { windEngine } from '@feugene/granum-engine-wind'
 
-presetGranularNode({
-  providers: [granularityProvider, granularityChartsProvider],
+export default defineGranumConfig({
+  engine: windEngine(),
+  providers: ['@feugene/granularity', '@feugene/granularity-charts'],
   components: 'all',
+  appSources: { dirs: ['src'] },
 })
 ```
+
+Оба пакета — по имени, а не импортированными объектами: каждый отгружает свой
+`granum.manifest.json`, и granum читает его вместо скана `dist`. Ядро нужно в
+списке и само по себе: от него приезжают токены, база и темы.
 
 ```ts
 // vite.config.ts — авто-импорт

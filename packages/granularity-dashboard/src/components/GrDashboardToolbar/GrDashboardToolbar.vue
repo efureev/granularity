@@ -5,7 +5,7 @@ import GrButton from '@feugene/granularity/components/GrButton'
 import { useGrComponentSize } from '@feugene/granularity/composables/useGrComponentConfig'
 import { useGranularityTranslations } from '@feugene/granularity/composables/useGranularityTranslations'
 
-import { useGrDashboardContext } from '../GrDashboard/context'
+import { useGrDashboardContext } from '../shared/context'
 import type { GrDashboardMode } from '../GrDashboard/grDashboardStyles'
 import type { GrDashboardToolbarSize } from './grDashboardToolbarStyles'
 import { groupClass, spacerClass, toolbarClass } from './grDashboardToolbarStyles'

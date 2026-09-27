@@ -114,7 +114,19 @@ export function collectUnknownTokens(
 /** Зарегистрировано, но в исходниках владельца не встречается. */
 export function collectStaleTokens(registries: readonly TokenRegistry[]): string[] {
   return registries.flatMap((registry) => {
-    const used = new Set(readSources({ dir: registry.sourceDir }).flatMap(({ source }) => [...tokenNamesIn(source)]))
+    /*
+     * Ищем не только в директории владельца, но и в `components/shared/`.
+     *
+     * Общий хелпер, которым пользуются несколько компонентов, обязан лежать вне
+     * `components/<Name>/`: импорт из директории другого компонента granum
+     * считает ребром графа компонентов, и заявить его значит оплатить чужой CSS
+     * и safelist целиком. Токены такой хелпер при этом читает владельческие —
+     * искать их только у владельца значит требовать держать хелпер там, где
+     * ему нельзя.
+     */
+    const shared = resolve(registry.sourceDir, '..', 'shared')
+    const dirs = existsSync(shared) ? [registry.sourceDir, shared] : [registry.sourceDir]
+    const used = new Set(dirs.flatMap(dir => readSources({ dir }).flatMap(({ source }) => [...tokenNamesIn(source)])))
 
     return registry.tokens.filter(token => !used.has(token.name)).map(token => `${token.name} (${registry.path})`)
   })

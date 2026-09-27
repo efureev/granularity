@@ -1,5 +1,5 @@
 import { defineGranumConfig } from '@feugene/granum/vite'
-import { miniEngine } from '@feugene/granum-engine-mini'
+import { windEngine } from '@feugene/granum-engine-wind'
 
 /**
  * Конфиг приложения для granum.
@@ -14,7 +14,7 @@ import { miniEngine } from '@feugene/granum-engine-mini'
  * по списку здесь только маскировала бы пропуски темы.
  */
 export default defineGranumConfig({
-  engine: miniEngine(),
+  engine: windEngine(),
   providers: ['@feugene/granularity'],
   components: 'all',
   themes: { names: ['light', 'dark'] },

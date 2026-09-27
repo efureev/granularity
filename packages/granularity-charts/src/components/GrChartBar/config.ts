@@ -1,16 +1,18 @@
-import { defineGranularComponent } from '@feugene/unocss-preset-granular/contract'
+import { defineGranumComponent } from '@feugene/granum/contract'
 
 import { grChartBarSafelist } from './safelist'
 
 /**
- * `group` тот же, что у остальных графиков: рама у них общая, её чанки уезжают
- * в `dist/groups/GrChartFrame/shared/`, и по этому полю пресет сканирует их
- * дополнительно к `dist/components/GrChartBar/`.
+ * `group` тот же, что у остальных графиков: рама у них общая, и её чанк тоже.
+ * Ребром графа компонентов общий чанк не становится — иначе вынесенный хелпер
+ * превращал бы соседей в зависимости друг друга; в файлы каждого дотянувшегося
+ * компонента он входит, и классы рамы сборка извлекает оттуда сама.
  *
  * `GrEmptyState` и `GrSkeleton` объявлены зависимостями потому, что рама их
- * **рендерит**: без объявления пресет не подмешает их CSS.
+ * **рендерит**: без объявления они не попадут в замыкание селекции, и
+ * приложение не подмешает их CSS.
  */
-export const grChartBarConfig = defineGranularComponent(import.meta.url, {
+export const grChartBarConfig = defineGranumComponent(import.meta.url, {
   name: 'GrChartBar',
   /**
    * Тултип рамы позиционирует `useFloating` ядра: имя слоя уходит туда
@@ -21,7 +23,7 @@ export const grChartBarConfig = defineGranularComponent(import.meta.url, {
    * ВНУТРИ модалки, обязан показать тултип над ней. Токен принадлежит ядру,
    * но читает его рама — поле про потребление, а не про владение. Без него
    * приложение, взявшее только график, теряет его при обрезке токенов:
-   * проверено `granular prune`, `--gr-z-modal` уходил в removed.
+   * проверено `granum prune`, `--gr-z-modal` уходил в removed.
    */
   dynamicTokens: ['gr-z-tooltip', 'gr-z-modal'],
   group: 'GrChartFrame',

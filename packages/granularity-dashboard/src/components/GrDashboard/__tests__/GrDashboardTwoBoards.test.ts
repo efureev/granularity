@@ -7,7 +7,7 @@ import { nextFrame, stubElementRects } from '@feugene/granularity-test-kit/vue'
 
 import type { GrDashboardTransfer } from '../../../composables/useDashboardTransfer'
 import type { GrDashboardResponsiveLayout } from '../../../layout'
-import type { GrDashboardDropEvent } from '../context'
+import type { GrDashboardDropEvent } from '../../shared/context'
 import GrDashboard from '../GrDashboard.vue'
 import GrDashboardItem from '../../GrDashboardItem/GrDashboardItem.vue'
 

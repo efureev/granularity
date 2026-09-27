@@ -1,4 +1,4 @@
-import { defineGranularComponent } from '@feugene/unocss-preset-granular/contract'
+import { defineGranumComponent } from '@feugene/granum/contract'
 
 import { grCodeBlockSafelist } from './safelist'
 
@@ -11,7 +11,7 @@ import { grCodeBlockSafelist } from './safelist'
  * селекции, и без него потребитель, выбравший один `GrCodeBlock`, получил бы
  * кнопку без фона и без фокус-кольца.
  */
-export const grCodeBlockConfig = defineGranularComponent(import.meta.url, {
+export const grCodeBlockConfig = defineGranumComponent(import.meta.url, {
   name: 'GrCodeBlock',
   dependencies: [
     { provider: '@feugene/granularity', components: ['GrButton'] },

@@ -84,20 +84,20 @@ describe('GrChartFrame — рама, а не компонент', () => {
     expect(chartFrameSafelist.length).toBeGreaterThan(10)
   })
 
-  it('шаблоны рамы лежат в `shared/` — иначе группа их не подхватит', () => {
-    // Пресет сканирует `dist/groups/<group>/shared/`, а чанки туда кладёт
-    // `granularChunkFileNames` по умолчанию из раскладки
-    // `src/components/<group>/shared/<File>.vue`. Файл, оставленный на уровень
-    // выше, уедет в общий `dist/chunks/` — и его классы не увидит никто.
+  it('шаблоны рамы лежат в `shared/` — раме принадлежит разметка, а не корень', () => {
+    // Держим раму одним домом: `.vue` рядом с `tokens.json` и хелперами читался
+    // бы как компонент, которым рама не является. Классы из общего чанка granum
+    // находит и так — он входит в файлы каждого дотянувшегося компонента, — но
+    // разъехавшиеся шаблоны стоили бы каждому читателю разбора, чья это рама.
     expect(readdirSync(frameDir).filter(file => file.endsWith('.vue'))).toEqual([])
     expect(readdirSync(resolve(frameDir, 'shared')).filter(file => file.endsWith('.vue')).length)
       .toBeGreaterThan(3)
   })
 
   it('каждый компонент с рамой в шаблоне объявляет её группу', () => {
-    // Без `group` shared-директория не сканируется, и классы из шаблонов рамы
-    // молча выпадают из CSS — при зелёных сборке, тестах и `doctor`. Ищем по
-    // факту импорта рамы, а не по списку: список устаревает молча.
+    // `group` — единственная отметка, по которой видно, что рама у графиков
+    // общая: по ней же выше находятся её потребители. Ищем по факту импорта
+    // рамы, а не по списку: список устаревает молча.
     const renders = Object.keys(granularityChartsComponentConfigs).filter((name) => {
       const sfc = resolve(process.cwd(), `src/components/${name}/${name}.vue`)
 

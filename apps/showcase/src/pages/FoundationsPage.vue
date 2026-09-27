@@ -20,12 +20,12 @@ import IconChevronRight from '~icons/lucide/chevron-right'
 import IconHash from '~icons/lucide/hash'
 
 const i18n = useFintI18n()
-const preferredQuickStartCardId = 'quick-start-preset-themes'
+const preferredQuickStartCardId = 'quick-start-granum-themes'
 const guidesWithoutNarrativeDocs = new Set([
   'styling',
   'themes',
   'tokens',
-  'unocss',
+  'granum',
   'localization',
 ])
 const foundationTokenSectionOrder = [...new Set(showcaseFoundationTokens.map(token => token.section))]

@@ -191,16 +191,16 @@ export const showcasePages: ShowcasePage[] = [
     shortTitle: 'Foundations',
     eyebrow: 'Showcase / Foundations',
     status: 'ready',
-    description: 'Базовая onboarding-документация: installation paths, styling layers, themes, tokens, UnoCSS, localization, а также два дополнительных способа интеграции — runtime-адаптер `createGranularity` и build-time авто-импорт `@feugene/unplugin-granularity`.',
+    description: 'Базовая onboarding-документация: installation paths, styling layers, themes, tokens, конвейер `granum`, localization, а также два дополнительных способа интеграции — runtime-адаптер `createGranularity` и build-time авто-импорт `@feugene/unplugin-granularity`.',
     sections: [
       {
         id: 'installation',
         title: 'Installation paths',
-        description: 'Прогрессия подключения `presetGranular` (node-вариант `presetGranularNode`) — единственного поддерживаемого способа установки.',
+        description: 'Прогрессия подключения через конвейер `@feugene/granum` — единственного поддерживаемого способа установки.',
         bullets: [
-          'Quick-start snippets прямо в foundations page: от базового конфига до продвинутого `granularContent`.',
+          'Quick-start snippets прямо в foundations page: от базового конфига до гарда импорта вне селекции.',
           'Narrative guidance подключена из `packages/granularity/docs/installation.md`.',
-          'Один экран последовательно показывает, как наращивать опции `components`, `themes`, `layer` и `granularContent`.',
+          'Один экран последовательно показывает, как наращивать опции `components`, `themes`, `pruneTokens` и `js.guard`.',
         ],
       },
       {
@@ -231,12 +231,12 @@ export const showcasePages: ShowcasePage[] = [
         ],
       },
       {
-        id: 'unocss',
-        title: 'UnoCSS integration',
-        description: 'Единственный поддерживаемый способ интеграции — `presetGranularNode`.',
+        id: 'granum',
+        title: 'Интеграция с `granum`',
+        description: 'Единственный поддерживаемый способ интеграции — плагин `granum()` из `@feugene/granum/vite`.',
         bullets: [
-          '`presetGranularNode` из `@feugene/unocss-preset-granular/node` подмешивает foundation layers, темы и component CSS.',
-          '`granularContent` настраивает авто-сканирование для subpath imports из `dist/`.',
+          'Плагин читает `granum.manifest.json` провайдеров и отдаёт `virtual:granum.css` — весь CSS в пяти слоях каскада.',
+          'Движок утилит приносит приложение (`windEngine()`): своей реализации granum не содержит, а словарь пакета объявлен диалектом.',
         ],
       },
       {
@@ -267,7 +267,7 @@ export const showcasePages: ShowcasePage[] = [
           'Пишете `<GrButton />` и `v-hotkey` в шаблоне — резолвер сам добавит нужные импорты и подтянет component-level CSS.',
           'Опции: `prefix`, `importStyle`, `directives`, `exclude`; директивы разрешаются по явному whitelist.',
           'Рекомендуется для prod-приложений: идеальный tree-shaking и отсутствие ручных `import`-ов.',
-          'Типичный сценарий: резолвер вместе с `presetGranularNode` из `@feugene/unocss-preset-granular/node` для авто-импорта компонентов в шаблонах.',
+          'Типичный сценарий: резолвер вместе с плагином `granum()` из `@feugene/granum/vite` для авто-импорта компонентов в шаблонах.',
         ],
       },
       {
@@ -278,7 +278,7 @@ export const showcasePages: ShowcasePage[] = [
           '`@feugene/unplugin-granularity` — build-time, охватывает только то, что реально стоит в `<template>`.',
           '`@feugene/granularity/vue` — runtime, охватывает всё остальное: директивы в `render()`/JSX, i18n/theme через `provide`, Options API через `globalProperties`.',
           'SSR / тесты / окружения без `unplugin-vue-components` — только через `createGranularity`.',
-          'Установка CSS-части пакета делается исключительно через `presetGranularNode` — см. раздел Foundations / Installation paths.',
+          'Установка CSS-части пакета делается исключительно через плагин `granum()` — см. раздел Foundations / Installation paths.',
         ],
       },
     ],

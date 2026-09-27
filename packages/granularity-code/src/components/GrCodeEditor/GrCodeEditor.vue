@@ -8,7 +8,7 @@ import type { GrComponentSize } from '@feugene/granularity/components/GrConfigPr
 
 import { clampIssues, minimalChange, type GrCodeIssue } from './editorState'
 import { builtInLineTokenizer, builtInLines } from '../../highlight/builtIn'
-import { codeTokenClass } from '../GrCodeBlock/grCodeBlockStyles'
+import { codeTokenClass } from '../shared/grCodeBlockStyles'
 import {
   editorDisabledClass,
   editorFocusClass,

@@ -4,8 +4,8 @@ import { computed, onBeforeUnmount, ref, shallowRef } from 'vue'
 import { useAnnouncer } from '@feugene/granularity/composables/useAnnouncer'
 import { useGranularityTranslations } from '@feugene/granularity/composables/useGranularityTranslations'
 
-import type { GrCameraStatus } from '../components/GrCameraCapture/cameraState'
-import { cameraStatusFromError, cameraSupported } from '../components/GrCameraCapture/cameraState'
+import type { GrCameraStatus } from '../components/shared/cameraState'
+import { cameraStatusFromError, cameraSupported } from '../components/shared/cameraState'
 
 /**
  * Поток камеры: запрос, состояния отказа, размеры кадра, остановка.

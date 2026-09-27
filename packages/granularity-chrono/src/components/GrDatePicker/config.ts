@@ -1,4 +1,4 @@
-import { defineGranularComponent } from '@feugene/unocss-preset-granular/contract'
+import { defineGranumComponent } from '@feugene/granum/contract'
 
 import { grDatePickerSafelist } from './safelist'
 
@@ -10,7 +10,7 @@ import { grDatePickerSafelist } from './safelist'
  * компонентам, что попали в селекцию, а `GrPopover` попадает в неё только через
  * этот граф.
  */
-export const grDatePickerConfig = defineGranularComponent(import.meta.url, {
+export const grDatePickerConfig = defineGranumComponent(import.meta.url, {
   name: 'GrDatePicker',
   safelist: grDatePickerSafelist,
   dependencies: [

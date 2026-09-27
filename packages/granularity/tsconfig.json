@@ -23,7 +23,6 @@
     "target": 3.3
   },
   "include": [
-    "uno.config.ts",
     "vite.config.ts",
     "vitest.config.ts",
     "vite-env.d.ts",

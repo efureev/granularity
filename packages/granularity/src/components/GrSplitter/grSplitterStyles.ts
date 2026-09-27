@@ -10,4 +10,4 @@ export const rootClass = 'grid h-full w-full'
 export const paneClass = 'min-h-0 min-w-0'
 
 // `touch-none` встроенный движок granum CSS не даёт — только произвольное свойство.
-export const separatorClass = 'relative [touch-action:none] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] focus-visible:ring-inset'
+export const separatorClass = 'relative touch-none focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] focus-visible:ring-inset'

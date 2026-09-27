@@ -48,8 +48,8 @@ import type {
   GrDashboardContext,
   GrDashboardDropEvent,
   GrDashboardItemBounds,
-} from './context'
-import { GR_DASHBOARD_KEY } from './context'
+} from '../shared/context'
+import { GR_DASHBOARD_KEY } from '../shared/context'
 import type { GrDashboardMode } from './grDashboardStyles'
 import { gridStyle } from './grDashboardStyles'
 

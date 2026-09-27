@@ -11,7 +11,7 @@ import {
   codeBlockTextSizes,
   codeBlockWrapClass,
   codeTokenClass,
-} from './grCodeBlockStyles'
+} from '../shared/grCodeBlockStyles'
 
 // Классы из вычисляемых мап (роль токена, размер) UnoCSS сканом не находит —
 // только safelist. Литералы хелпера туда же: на сборке он уезжает в общий чанк.

@@ -1,5 +1,8 @@
+// Весь CSS granum одним модулем: пять каскадных слоёв в фиксированном порядке —
+// токены, база, темы, CSS компонентов селекции и утилиты, включая классы
+// разметки стенда. Импортирует его только клиентский вход: серверу стили не
+// нужны, он отдаёт ссылку на готовый ассет.
 import '@unocss/reset/tailwind-compat.css'
-import 'virtual:uno:granular.css'
-import 'virtual:uno.css'
+import 'virtual:granum.css'
 
 export {}

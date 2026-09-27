@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { cameraStatusFromError, cameraSupported, shouldMirrorPreview } from '../cameraState'
+import { cameraStatusFromError, cameraSupported, shouldMirrorPreview } from './cameraState'
 
 function domError(name: string): Error {
   const error = new Error('camera')

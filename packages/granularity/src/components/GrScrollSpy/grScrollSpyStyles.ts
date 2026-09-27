@@ -6,8 +6,8 @@ export const scrollSpyListClass = 'flex flex-col [list-style:none]'
  * Пункт — ссылка, поэтому `no-underline` и своё фокус-кольцо: `focus:outline-none`
  * снимает системное, `focus-visible:ring-*` возвращает кольцо пакета.
  *
- * `ease-*` обязателен рядом с `duration-*`: без него кривую подставит `presetMini`,
- * то есть движение задавал бы пресет, а не дизайн-система.
+ * `ease-*` обязателен рядом с `duration-*`: без него кривую подставит словарь
+ * движка, то есть движение задавал бы движок, а не дизайн-система.
  */
 export const scrollSpyItemBaseClass = 'block truncate no-underline border-s-2 ps-2 pe-2 py-1 rounded-e-[var(--gr-radius-control)] transition-colors duration-[var(--gr-duration-fast)] ease-[var(--gr-ease-out)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]'
 

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { CIRCULAR_MARKER, UNSERIALIZABLE_MARKER, serializeCode } from '../serializeCode'
+import { CIRCULAR_MARKER, UNSERIALIZABLE_MARKER, serializeCode } from './serializeCode'
 
 describe('serializeCode', () => {
   it('строка проходит как есть, без кавычек', () => {

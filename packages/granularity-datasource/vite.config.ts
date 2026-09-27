@@ -5,8 +5,9 @@ import { defineConfig } from 'vite'
  * Сборка пакета состояния: два entry, ESM, ни одного рантайм-зависимого байта
  * кроме Vue.
  *
- * `granularChunkFileNames` и `libInjectCss` из общего рецепта спутника здесь не
- * нужны: оба про CSS компонентов, а компонентов у пакета нет.
+ * Плагина `granumProvider()` и `libInjectCss` из общего рецепта спутника здесь
+ * нет: оба про компоненты и их CSS, а компонентов у пакета нет — значит, нет и
+ * манифеста.
  */
 export default defineConfig({
   build: {

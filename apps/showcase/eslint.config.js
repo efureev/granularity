@@ -22,7 +22,6 @@ export default antfu(
       'test-results/**',
       'playwright-report/**',
       'e2e/__screenshots__/**',
-      'uno.config.ts',
       // Собираются `generate:api` и `generate:search`; правка руками теряется
       // на следующем прогоне — см. `.claude/rules/showcase-conventions.md`.
       'src/content/generated/**',

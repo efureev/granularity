@@ -85,20 +85,20 @@ export function defineRegistryGate(options: RegistryGateOptions): void {
     let subcomponents: Subcomponents = {}
 
     /**
-     * Пресет подгружается лениво и только здесь.
+     * granum подгружается лениво и только здесь.
      *
      * Статический импорт делал бы его обязательным для **любого** гейта кита:
      * `@feugene/granularity-test-kit/gates` падал бы на резолюции ещё до того,
      * как потребитель решит, какую фабрику звать, — при том что остальные
-     * восьмеро пресета не требуют, а `peerDependenciesMeta` объявляет его
+     * восьмеро granum не требуют, а `peerDependenciesMeta` объявляет его
      * необязательным.
      */
     beforeAll(async () => {
-      const codegen = await import('@feugene/unocss-preset-granular/codegen').catch(() => null)
+      const codegen = await import('@feugene/granum/codegen').catch(() => null)
 
       if (!codegen) {
         throw new Error(
-          'Гейту реестров нужен `@feugene/unocss-preset-granular` (>=0.10.1): по нему он '
+          'Гейту реестров нужен `@feugene/granum` (>=0.2.0): по нему он '
           + 'узнаёт части составных компонентов. Установите пакет или уберите вызов '
           + '`defineRegistryGate`.',
         )
@@ -106,7 +106,7 @@ export function defineRegistryGate(options: RegistryGateOptions): void {
 
       // Список компонентов сужает обход: без него карта зацепила бы `.vue`
       // из директорий, компонентами не являющихся.
-      subcomponents = await codegen.collectGranularSubcomponents({
+      subcomponents = await codegen.collectGranumSubcomponents({
         componentsDir: resolve(pkgDir, 'src/components'),
         prefix: options.prefix,
         components: publicComponents,
@@ -137,14 +137,34 @@ export function defineRegistryGate(options: RegistryGateOptions): void {
         expect(barrel, component).toContain(`export * from './components/${pathOf.get(component) ?? component}'`)
     })
 
-    it('каждый публичный компонент имеет subpath-экспорт и vite-entry', () => {
+    it('каждый публичный компонент имеет subpath-экспорт', () => {
       const pkg = JSON.parse(read('package.json')) as { exports: Record<string, unknown> }
+
+      for (const component of publicComponents)
+        expect(pkg.exports[`./components/${component}`], `${component} в package.json#exports`).toBeDefined()
+    })
+
+    it('entry компонентов не ведут руками: их строит granumProvider из реестра', () => {
+      // Четвёртая точка синхронизации исчезла вместе с пресетом v1: entry
+      // `components/<Name>/index` больше не перечисляют в конфиге сборки, их
+      // строит плагин из того же реестра провайдера (B-4). Если
+      // сгенерированный блок вернётся, вернётся и рассинхрон.
       const viteConfig = read('vite.config.ts')
 
-      for (const component of publicComponents) {
-        expect(pkg.exports[`./components/${component}`], `${component} в package.json#exports`).toBeDefined()
-        expect(viteConfig, `${component} в vite.config.ts`).toContain(`'components/${pathOf.get(component) ?? component}/index'`)
-      }
+      expect(viteConfig).not.toContain('granularity:components>')
+      expect(viteConfig).toContain('granumProvider({')
+      expect(viteConfig).toContain('engine: windEngine()')
+      for (const component of publicComponents)
+        expect(viteConfig, `${component} перечислен руками`).not.toContain(`'components/${pathOf.get(component) ?? component}/index'`)
+    })
+
+    it('манифест пакета экспортирован: без него приложение его не найдёт', () => {
+      const pkg = JSON.parse(read('package.json')) as { exports: Record<string, unknown> }
+
+      // `exports['./granum.manifest.json']` — единственный способ, которым
+      // приложение добирается до манифеста, не вычисляя путей внутрь пакета
+      // (M-6, INV-LAY-2). Без него сборка провайдера падает `PackageExportsError`.
+      expect(pkg.exports['./granum.manifest.json']).toBe('./dist/granum.manifest.json')
     })
 
     it.runIf(options.requireExactExports ?? true)('в реестрах нет компонентов, которых нет на диске', () => {
@@ -173,12 +193,11 @@ export function defineRegistryGate(options: RegistryGateOptions): void {
       }
     })
 
-    it('часть составного компонента не заводит своей entry', () => {
-      // Код части и так лежит в чанке родителя — вторая entry дублировала бы его.
-      const viteConfig = read('vite.config.ts')
-
+    it('часть составного компонента не попадает в реестр провайдера', () => {
+      // Код части и так лежит в чанке родителя. Попади она в реестр — плагин
+      // построил бы ей свою entry и продублировал бы модуль.
       for (const name of Object.keys(subcomponents))
-        expect(viteConfig, name).not.toContain(`'components/${name}/index'`)
+        expect(Object.keys(options.componentConfigs), name).not.toContain(name)
     })
   })
 }

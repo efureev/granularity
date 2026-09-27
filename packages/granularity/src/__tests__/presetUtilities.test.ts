@@ -1,25 +1,23 @@
-import { miniEngine } from '@feugene/granum-engine-mini'
+import { windEngine } from '@feugene/granum-engine-wind'
 import { describe, expect, it } from 'vitest'
 
 /**
- * Гейт утилит, которых нет в `presetMini`.
+ * Гейт утилит, на которые пакет опирается, но CSS для которых не собирает сам.
  *
- * Пакет не собирает CSS сам: финальные утилиты генерирует приложение через
- * доп-правила поверх preset-mini. Класс, которого нет ни там, ни там,
- * молча не превращается в CSS — сборка зелёная, типы целы, а увидит это только
- * тот, кто откроет страницу. Так `sr-only` (утилита `presetWind`, не `presetMini`)
- * показывал «скрытые» caption у `GrTable` и a11y-title у `GrDialog` обычным
- * текстом всем потребителям сразу.
+ * Финальные утилиты генерирует приложение своим движком. Класс, которого движок
+ * не знает, молча не превращается в CSS — сборка зелёная, типы целы, а увидит
+ * это только тот, кто откроет страницу. Так `sr-only` показывал «скрытые»
+ * caption у `GrTable` и a11y-title у `GrDialog` обычным текстом всем
+ * потребителям сразу; так же, пока движок вендорил `preset-mini`, таблицы
+ * графиков рисовались двойной рамкой (`border-collapse`), а палитра доски — с
+ * маркерами списка (`list-none`).
  *
- * Утилиты сверх `presetMini` пресет добирает из `@feugene/unocss-mini-extra-rules`
- * (`includeExtraRules`, по умолчанию включено). Здесь проверяется именно связка,
- * которую собирает потребитель: снятое upstream правило или выключенная опция
- * ломают разметку пакета, и узнать об этом надо тестом, а не глазами.
- *
- * Список — то, чем пакет реально пользуется сверх `presetMini`. Добавляя такую
- * утилиту в компонент, добавляйте её сюда.
+ * Здесь проверяется связка, которую собирает потребитель: снятое upstream
+ * правило или движок более узкого словаря ломают разметку пакета, и узнать об
+ * этом надо тестом, а не глазами. Добавляя в компонент утилиту, которой пакет
+ * раньше не пользовался, добавляйте её сюда.
  */
-const UTILITIES_BEYOND_MINI = [
+const UTILITIES_THE_PACKAGE_RELIES_ON = [
   // a11y: визуально скрытый текст (GrTable, GrDialog, GrDataTable).
   'sr-only',
   'not-sr-only',
@@ -44,23 +42,43 @@ const UTILITIES_BEYOND_MINI = [
   // extra-rules 0.8.0; до неё пакет писал ту же запись arbitrary-значением —
   // `[font-variant-numeric:…]` — в семнадцати местах.
   'tabular-nums',
+  // Рамки таблиц: GrTable, GrDataTable, таблицы granularity-charts, GrCalendar.
+  'border-collapse',
+  // Списки без маркеров: GrDashboardPalette, GrDropdownMenu, GrTree.
+  'list-none',
+  // Кадрирование жестом: GrImageCrop, GrSlider, GrCarousel — без него тач-драг
+  // скроллит страницу вместо перетаскивания.
+  'touch-none',
+  // Прокрутка списка опций к активному элементу: GrTimePicker, GrSelect.
+  'scroll-py-1',
 ] as const
 
-describe('утилиты сверх presetMini', () => {
+describe('утилиты, на которые опирается пакет', () => {
   it('генерируются связкой, которую собирает потребитель', async () => {
-    const engine = miniEngine()
-    const { unmatched } = await engine.generate({ classes: new Set(UTILITIES_BEYOND_MINI) })
+    const engine = windEngine()
+    const { unmatched } = await engine.generate({ classes: new Set(UTILITIES_THE_PACKAGE_RELIES_ON) })
     const missing = [...unmatched]
 
     expect(missing, `не генерируются: ${missing.join(', ')}`).toEqual([])
   })
 
-  it('чистый presetMini их не знает — иначе список бессмыслен', async () => {
-    // Тот же движок без доп-правил — это и есть «чистый presetMini» granum.
-    const mini = miniEngine({ extraRules: false })
-    const { matched } = await mini.generate({ classes: new Set(UTILITIES_BEYOND_MINI) })
-    const covered = [...matched.keys()]
+  /**
+   * Пакет объявляет диалект `unocss/preset-wind3+granum@66`, а не просто wind3, и
+   * `+granum` стоит там ровно из-за одного правила — альфы на произвольном цвете.
+   * Без него класс совпадает, но `/55` теряется молча: `--gr-overlay-bg` теряет
+   * прозрачность, и оверлей GrModal перестаёт быть полупрозрачным.
+   *
+   * Гейт держит связку «объявленный диалект ↔ то, что он обещает»: если правило
+   * уедет из движка, диалект пакета станет ложью, и увидеть это надо здесь.
+   */
+  it('`+granum` в диалекте пакета означает альфу на произвольном цвете', async () => {
+    const token = 'bg-[var(--gr-overlay-bg)]/55'
 
-    expect(covered, `уже есть в presetMini, из списка можно убрать: ${covered.join(', ')}`).toEqual([])
+    const withRule = await windEngine().generate({ classes: new Set([token]) })
+    expect(withRule.css).toContain('color-mix(in srgb, var(--gr-overlay-bg) 55%, transparent)')
+
+    const withoutRule = await windEngine({ extraRules: false }).generate({ classes: new Set([token]) })
+    expect(withoutRule.css).toContain('background-color:var(--gr-overlay-bg);')
+    expect(withoutRule.css).not.toContain('color-mix')
   })
 })

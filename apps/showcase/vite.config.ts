@@ -7,7 +7,9 @@ import { visualizer } from 'rollup-plugin-visualizer'
 import Icons from 'unplugin-icons/vite'
 import VueDevtools from 'vite-plugin-vue-devtools'
 import Components from 'unplugin-vue-components/vite'
-import UnoCSS from 'unocss/vite'
+import { granum } from '@feugene/granum/vite'
+
+import granumConfig from './granum.config'
 
 import { granularityAutoImportResolvers } from './src/app/autoImportResolvers'
 
@@ -84,9 +86,7 @@ export default defineConfig(({ command, mode }) => ({
       compiler: 'vue3',
       autoInstall: false,
     }),
-    UnoCSS({
-      configFile: fileURLToPath(new URL('./uno.config.ts', import.meta.url)),
-    }),
+    granum(granumConfig),
     githubPagesSpaFallback(),
   ],
 }))

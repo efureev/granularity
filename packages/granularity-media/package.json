@@ -47,6 +47,7 @@
       "types": "./dist/types/index.d.ts",
       "import": "./dist/index.js"
     },
+    "./granum.manifest.json": "./dist/granum.manifest.json",
     "./components/GrCameraCapture": {
       "types": "./dist/types/components/GrCameraCapture/index.d.ts",
       "import": "./dist/components/GrCameraCapture/index.js"
@@ -88,7 +89,7 @@
   "peerDependencies": {
     "@feugene/fint-i18n": ">=0.7.0 <1.0.0",
     "@feugene/granularity": ">=0.38.0 <1.0.0",
-    "@feugene/unocss-preset-granular": ">=0.13.0 <1.0.0",
+    "@feugene/granum": ">=0.3.0 <1.0.0",
     "@feugene/unplugin-granularity": ">=0.7.0 <1.0.0",
     "unplugin-vue-components": ">=0.26.0",
     "vue": "^3.5.0"
@@ -107,7 +108,7 @@
   "scripts": {
     "build": "vite build && gr-check-dist-dev-guard && vue-tsc -p tsconfig.build.json",
     "dev": "vite build --watch",
-    "doctor": "node ../../scripts/granular-doctor.mjs ./granular.options.mjs",
+    "doctor": "node ../../scripts/granum-doctor.mjs ./granum.config.mjs",
     "sizes": "node ../../scripts/report-entry-sizes.mjs .",
     "sizes:docs": "node ../../scripts/generate-entry-sizes.mjs .",
     "generate:registry": "node scripts/generate-registry.mjs",
@@ -123,7 +124,8 @@
     "@feugene/fint-i18n": "^0.7.0",
     "@feugene/granularity": "^0.53.0",
     "@feugene/granularity-test-kit": "^0.10.0",
-    "@feugene/unocss-preset-granular": "^0.16.0",
+    "@feugene/granum": "^0.3.0",
+    "@feugene/granum-engine-wind": "^0.3.0",
     "@feugene/unplugin-granularity": "^0.7.0",
     "@types/node": "^26.4.0",
     "@vitejs/plugin-vue": "^6.0.8",

@@ -1,4 +1,4 @@
-import { defineGranularComponent } from '@feugene/unocss-preset-granular/contract'
+import { defineGranumComponent } from '@feugene/granum/contract'
 
 import { grDiffSafelist } from './safelist'
 
@@ -11,7 +11,7 @@ import { grDiffSafelist } from './safelist'
  * блока не рендерит — ребра нет, есть общий `.ts`, и его классы объявлены в
  * собственном safelist.
  */
-export const grDiffConfig = defineGranularComponent(import.meta.url, {
+export const grDiffConfig = defineGranumComponent(import.meta.url, {
   name: 'GrDiff',
   safelist: grDiffSafelist,
 })

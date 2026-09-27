@@ -1,5 +1,5 @@
 import { defineGranumConfig } from '@feugene/granum/vite'
-import { miniEngine } from '@feugene/granum-engine-mini'
+import { windEngine } from '@feugene/granum-engine-wind'
 
 /**
  * Компоненты, чей CSS уезжает в сборку.
@@ -29,14 +29,14 @@ export const playgroundComponents = [
  * каскада выигрывает у любого `@layer`. Порядок импортов на это больше не
  * влияет — раньше влиял, и тема тихо проигрывала базовым токенам пакета.
  *
- * Движок — `miniEngine()`: тот же словарь, что объявил пакет. Пресеты
+ * Движок — `windEngine()`: тот же словарь, что объявил пакет. Пресеты
  * `attributify` и `icons`, а также трансформеры `directives` и `variant-group`
  * из прежнего конфига убраны: ни одной строки разметки, которая ими
  * пользовалась бы, в стенде нет. Иконки приезжают компонентами через
  * `unplugin-icons`, и этот плагин остался на месте.
  */
 export default defineGranumConfig({
-  engine: miniEngine(),
+  engine: windEngine(),
   providers: ['@feugene/granularity'],
   components: [
     { provider: '@feugene/granularity', names: [...playgroundComponents] },

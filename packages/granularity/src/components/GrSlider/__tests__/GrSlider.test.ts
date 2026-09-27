@@ -216,7 +216,7 @@ describe('GrSlider — жест на таче', () => {
     const wrapper = mount(GrSlider, { props: { modelValue: 10 } })
     // Без этого вертикальный свайп по бегунку уходит в скролл страницы, браузер
     // шлёт pointercancel — и слайдер пальцем неуправляем.
-    expect(wrapper.get('[data-gr-slider-track]').classes()).toContain('[touch-action:none]')
+    expect(wrapper.get('[data-gr-slider-track]').classes()).toContain('touch-none')
   })
 
   it('pointercancel обрывает жест: lazy-черновик откатывается без эмита', async () => {

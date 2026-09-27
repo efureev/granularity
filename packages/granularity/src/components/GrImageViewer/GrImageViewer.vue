@@ -722,7 +722,7 @@ defineSlots<{
                   :src="currentUrl"
                   :alt="currentAlt"
                   draggable="false"
-                  class="max-h-full max-w-full select-none object-contain will-change-transform [touch-action:none]"
+                  class="max-h-full max-w-full select-none object-contain will-change-transform touch-none"
                   :class="[imageTransitionClass, imageCursorClass]"
                   :style="imageStyle"
                   @load="onImageLoad"

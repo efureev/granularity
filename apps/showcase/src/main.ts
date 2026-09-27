@@ -4,7 +4,11 @@ import { installGranularityDevtools } from '@feugene/granularity-devtools'
 import { initThemeEarly } from '@feugene/granularity'
 
 import '@unocss/reset/tailwind-compat.css'
-import 'virtual:uno.css'
+// Весь CSS granum одним модулем: пять каскадных слоёв — токены, база, темы, CSS
+// компонентов селекции и утилиты, включая классы разметки витрины.
+import 'virtual:granum.css'
+// Тема витрины — нелейерный CSS: по правилам каскада она выигрывает у любого
+// `@layer`, поэтому порядок относительно granum на результат не влияет.
 import './styles/showcase-theme.css'
 
 import App from './App.vue'

@@ -8,7 +8,7 @@ import { useGrComponentProp, useGrComponentSize } from '@feugene/granularity/com
 
 import { checkIconPaths, copyIconPaths } from './icons'
 
-import { serializeCode } from './serializeCode'
+import { serializeCode } from '../shared/serializeCode'
 import { GR_CODE_HIGHLIGHTER_KEY } from '../../highlight/key'
 import { builtInLines } from '../../highlight/builtIn'
 import type { GrCodeLine, GrCodeTokenizer } from '../../highlight/palette'
@@ -25,7 +25,7 @@ import {
   codeBlockTextSizes,
   codeBlockWrapClass,
   codeTokenClass,
-} from './grCodeBlockStyles'
+} from '../shared/grCodeBlockStyles'
 
 import type { GrComponentSize } from '@feugene/granularity/components/GrConfigProvider'
 

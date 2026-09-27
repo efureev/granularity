@@ -76,8 +76,8 @@ prop» Vue не печатает никогда — панель восстан�
 берут встроенные английские строки — панель говорит об этом вслух.
 
 Статические вопросы — «кто затащил класс в CSS», «кто тянет компонент в сборку»,
-«есть ли конфликт токенов» — решает CLI `granular why-css` / `explain` / `doctor`
-из [`@feugene/unocss-preset-granular`](https://github.com/efureev/unocss-preset-granular).
+«есть ли конфликт токенов» — решает CLI `granum why-css` / `explain` / `doctor`
+из [`@feugene/granum`](https://github.com/efureev/granum).
 
 ## Опции
 
