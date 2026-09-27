@@ -14,7 +14,7 @@
 Добавляйте компонент в `packages/granularity/src/components`, если он должен участвовать в одном или нескольких текущих механизмах пакета:
 
 - экспортироваться из `@feugene/granularity` или через отдельный subpath `@feugene/granularity/components/<ComponentName>`;
-- участвовать в `presetGranularity({ components: [...] })` и общих granular registry;
+- участвовать в селекции `components: [...]` приложения и общих реестрах пакета;
 - если у компонента есть свой CSS, он уезжает в `dist/components/<Name>/styles.css` и
   импортируется чанком компонента — отдельного subpath на него нет;
 - иметь зависимые granular-компоненты, safelist или локальные CSS-файлы, учитываемые preset/node-helper'ами.
@@ -57,7 +57,7 @@ src/components/<ComponentName>/
 
 ### 2. Вынести локальную utility/style-логику при необходимости
 
-Если компонент использует вычисляемые UnoCSS-классы, размеры, варианты или общие style-helper'ы, держите их рядом с компонентом.
+Если компонент использует вычисляемые классы утилит, размеры, варианты или общие style-helper'ы, держите их рядом с компонентом.
 
 Текущие примеры из пакета:
 
@@ -108,11 +108,11 @@ src/components/<ComponentName>/
 Пример для компонента без собственных CSS-файлов:
 
 ```ts
-import { defineGranularComponent } from '@feugene/unocss-preset-granular/contract'
+import { defineGranumComponent } from '@feugene/granum/contract'
 
 import { grButtonSafelist } from './safelist'
 
-export const grButtonConfig = defineGranularComponent(import.meta.url, {
+export const grButtonConfig = defineGranumComponent(import.meta.url, {
   name: 'GrButton',
   safelist: grButtonSafelist,
 })
@@ -121,8 +121,8 @@ export const grButtonConfig = defineGranularComponent(import.meta.url, {
 #### `dynamicTokens` — если имя токена собирается в рантайме
 
 `var()`, собранный из переменной, статический анализ не находит. Приложение с
-включённой обрезкой (`pruneTokens` в пресете) сочтёт токен ненужным и удалит
-его объявление — молча: сборка зелёная, `z-index` разрешается в `unset`,
+включённой обрезкой (`pruneTokens` в конфиге granum) сочтёт токен ненужным и
+удалит его объявление — молча: сборка зелёная, `z-index` разрешается в `unset`,
 панель уезжает под соседний слой.
 
 Так работают оба композабла слоёв (`composables/internal/overlayStack.ts`):
@@ -130,7 +130,7 @@ export const grButtonConfig = defineGranularComponent(import.meta.url, {
 ни разу. Компонент обязан объявить, что он читает:
 
 ```ts
-export const grPopoverConfig = defineGranularComponent(import.meta.url, {
+export const grPopoverConfig = defineGranumComponent(import.meta.url, {
   name: 'GrPopover',
   dynamicTokens: ['gr-z-dropdown', 'gr-z-modal'],
   safelist: grPopoverSafelist,
@@ -154,11 +154,11 @@ export const grPopoverConfig = defineGranularComponent(import.meta.url, {
 Пример для компонента с зависимостями:
 
 ```ts
-import { defineGranularComponent } from '@feugene/unocss-preset-granular/contract'
+import { defineGranumComponent } from '@feugene/granum/contract'
 
 import { grDialogSafelist } from './grDialogStyles'
 
-export const grDialogConfig = defineGranularComponent(import.meta.url, {
+export const grDialogConfig = defineGranumComponent(import.meta.url, {
   name: 'GrDialog',
   dependencies: ['GrButton', 'GrModal'],
   safelist: grDialogSafelist,
@@ -172,21 +172,21 @@ export const grDialogConfig = defineGranularComponent(import.meta.url, {
 весь CSS и safelist донора. Пресет сканирует только директории выбранных
 компонентов, поэтому пропущенная зависимость даёт бесцветный вложенный
 компонент при гранулярной селекции — без единой ошибки сборки. Транзитивное
-объявлять не нужно: граф разворачивает пресет.
+объявлять не нужно: граф разворачивает granum по манифесту.
 
 Проверяют двое: `src/__tests__/componentDependencies.test.ts` (от исходников,
 ловит и лишнее) и `yarn doctor` (от собранного `dist`, видит рёбра через общий
 чанк). Нормативное определение — `docs/SPEC.md` §4.1 в
-`@feugene/unocss-preset-granular`.
+`@feugene/granum`.
 
 Пример для компонента с локальными CSS-файлами:
 
 ```ts
-import { defineGranularComponent } from '@feugene/unocss-preset-granular/contract'
+import { defineGranumComponent } from '@feugene/granum/contract'
 
 import { grIconSafelist } from './safelist'
 
-export const grIconConfig = defineGranularComponent(import.meta.url, {
+export const grIconConfig = defineGranumComponent(import.meta.url, {
   name: 'GrIcon',
   safelist: grIconSafelist,
   cssFiles: ['./tokens.css', './styles.css'],
@@ -210,11 +210,13 @@ export { default as GrIcon } from './GrIcon.vue'
 
 Полный пакетный `styles.css` больше не собирается через `src/styles.css.ts`.
 
-Теперь build прогоняет `presetGranularityNode` по исходникам компонентов и извлекает utility-классы прямо из `*.vue` / `*.ts` файлов внутри `src/components/*`.
+Теперь классы компонента извлекает сборка пакета: плагин granum прогоняет экстрактор движка по собранным чанкам и кладёт результат в манифест.
+
+Движок сборке задаётся явно — `granumProvider({ provider, engine: miniEngine() })` в `vite.config.ts` пакета, — и им же список отфильтрован: токен, для которого у движка правила нет, классом не считается и в манифест не попадает. Отсюда и диалект словаря в манифесте: список классов — факт о конкретной реализации, а не о пакете (см. [`granum.md`](./granum.md#словарь-утилит-диалект-и-отпечаток)).
 
 Практическое правило:
 
-- держите реальные UnoCSS-классы в component source или в локальных helper-файлах рядом с компонентом;
+- держите реальные классы утилит в component source или в локальных helper-файлах рядом с компонентом;
 - если нужны обычные CSS-файлы, перечисляйте их через `cssFiles` в `config.ts`;
 - не добавляйте отдельные `styles.css.ts`-entrypoint'ы ради package bundle.
 
@@ -252,9 +254,10 @@ yarn workspace @feugene/granularity generate:registry
 
 - **Токены темы из CSS.** Если компонент отдаёт структурные токены
   (`GrButton`, `GrProgressBar`), объявите их в `config.ts` через
-  `tokenDefinitionsRef` — это просто ссылка на CSS, файл читает node-слой
-  пресета. Отдельный `config.node.ts` с `tokenDefinitionsFromCssSync` больше
-  не нужен и в клиентский бандл `node:fs` не тянет.
+  `tokenDefinitionsRef` — это просто ссылка на CSS, файл читает сборка пакета и
+  материализует значения в манифест. Отдельный `config.node.ts` с
+  `tokenDefinitionsFromCssSync` больше не нужен и в клиентский бандл `node:fs`
+  не тянет.
 - **Ничего для CSS компонента.** И не нужно: `libInjectCss` вписывает
   `import '../styles.css'` внутрь чанка, так что стиль приезжает вместе с
   компонентом. Отдельного subpath на него пакет не публикует — файл без токенов
@@ -310,7 +313,7 @@ drift` (`yarn sizes:docs --check`) сверяет **состав таблицы 
 ### 4. `package` CSS-exports
 
 Foundation публикуется одним файлом — `@feugene/granularity/styles.css`; utility-классы компонентов
-собирает пресет на стороне приложения.
+собирает движок на стороне приложения.
 
 Оба артефакта собираются из Uno preset, поэтому отдельно править общий source-entrypoint для CSS не нужно.
 
@@ -339,8 +342,8 @@ Foundation публикуется одним файлом — `@feugene/granular
 
 Всё, что живёт в `.ts`-хелперах компонента: и классы из вычисляемых мап
 (`Object.values(map).flatMap(splitClassTokens)`), и обычные строковые литералы.
-Причина в раскладке сборки: пресет сканирует только
-`dist/components/<Name>/**`, а `.ts`-хелпер бандлер выносит в общий
+Причина в раскладке сборки: классы компонента извлекаются только из его
+файлов в `dist/components/<Name>/**`, а `.ts`-хелпер бандлер выносит в общий
 `dist/chunks/`, стоит на модуль сослаться из двух мест (обычно `.vue` и
 `safelist.ts`). Классы из вынесенного хелпера не видит ни скан, ни safelist —
 у потребителя, импортирующего один компонент, он рендерится без цветов, теней и

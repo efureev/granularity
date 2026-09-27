@@ -361,26 +361,31 @@ await import('./app-styles')
 
 ### Перекрасить встроенную тему
 
-Если тем по-прежнему две, а поменять надо только цвета — вот здесь `themeFiles`
-и уместен:
+Если тем по-прежнему две, а поменять надо только цвета — тему с тем же именем
+объявляет приложение, и её структурное определение побеждает файл пакета.
+`engine: miniEngine()` здесь и ниже — обязательное поле конфига, а не опция
+темы: движок утилит приезжает отдельным пакетом `@feugene/granum-engine-mini`
+и выбирается приложением (см. [`installation.md`](./installation.md)):
 
 ```ts
-presetGranularNode({
-  providers: [granularityProvider],
+defineGranumConfig({
+  engine: miniEngine(),
+  providers: ['@feugene/granularity'],
   themes: {
     names: ['light', 'dark'],
-    themeFiles: {
-      // CSS пакета для `dark` не попадёт в сборку — его заменит ваш файл
-      dark: fileURLToPath(new URL('./src/styles/dark-rebrand.css', import.meta.url)),
+    define: {
+      // CSS пакета для `dark` не попадёт в сборку — его заменит ваш файл:
+      // структурное определение темы побеждает файл той же темы, и файл
+      // пакета даже не читается.
+      dark: { tokensRef: new URL('./src/styles/dark-rebrand.css', import.meta.url).href },
     },
   },
 })
 ```
 
-Проверено сборкой: с таким override встроенные значения тёмной темы из бандла
-пропадают целиком, остаётся только ваш файл. Значит он обязан объявлять **все**
-роли — то есть собираться `extendTheme({ name: 'dark', base: 'dark', tokens })`,
-а не писаться руками.
+Замена полная: встроенные значения тёмной темы в бандл не попадают вовсе.
+Значит ваш файл обязан объявлять **все** роли — то есть собираться
+`extendTheme({ name: 'dark', base: 'dark', tokens })`, а не писаться руками.
 
 ### Точечный override без своего файла
 
@@ -388,12 +393,15 @@ presetGranularNode({
 обязательно — короткий путь остаётся коротким:
 
 ```ts
-presetGranularNode({
-  providers: [granularityProvider],
+defineGranumConfig({
+  engine: miniEngine(),
+  providers: ['@feugene/granularity'],
   themes: {
     names: ['light', 'dark'],
+    // Ключи — без префикса `--`: его добавляет генератор, а ключ с `--`
+    // granum отклоняет ошибкой регистрации, а не пишет `----gr-primary`.
     tokenOverrides: {
-      dark: { '--gr-primary': '#4fd1e0' },
+      dark: { 'gr-primary': '#4fd1e0' },
     },
   },
 })

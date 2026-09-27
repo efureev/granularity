@@ -5,7 +5,9 @@
 [![npm](https://img.shields.io/npm/v/@feugene/granularity.svg?logo=npm)](https://www.npmjs.com/package/@feugene/granularity)
 
 Monorepo for the [`@feugene/granularity`](./packages/granularity) design system — a Vue 3 package
-with components, styles, and a UnoCSS preset that supports granular subpath exports.
+with components, styles and granular subpath exports, built and consumed through the
+[`@feugene/granum`](https://github.com/efureev/granum) pipeline (`granum` 0.2 or newer, plus a
+utility engine such as `@feugene/granum-engine-mini` that the application supplies).
 
 ## Contents
 
@@ -13,7 +15,7 @@ The published packages:
 
 <!-- Generated from the workspace by `yarn docs:ecosystem`; `yarn docs:ecosystem:check` gates it. -->
 <!-- ecosystem:generated:start -->
-- [`@feugene/granularity`](./packages/granularity/README.md) `0.53.1` — Granularity design system package with Vue 3 components, consumed via the `@feugene/unocss-preset-granular` preset.
+- [`@feugene/granularity`](./packages/granularity/README.md) `0.53.1` — Granularity design system package with Vue 3 components, consumed via the `@feugene/granum` build pipeline.
 - [`@feugene/granularity-charts`](./packages/granularity-charts/README.md) `0.11.0` — Charts for the @feugene/granularity design system — own SVG, zero dependencies, drawn with theme tokens.
 - [`@feugene/granularity-chrono`](./packages/granularity-chrono/README.md) `0.10.0` — Calendar, date and time components for the @feugene/granularity design system — no third-party date widget, no date library.
 - [`@feugene/granularity-code`](./packages/granularity-code/README.md) `0.2.0` — Code surfaces for @feugene/granularity: view, edit and diff — the viewer and the diff carry no dependencies at all.

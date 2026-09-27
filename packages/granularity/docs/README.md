@@ -1,12 +1,12 @@
 # Документация `@feugene/granularity`
 
-`@feugene/granularity` — пакет дизайн-системы на `Vue 3` с компонентами и интеграцией через
-[`@feugene/unocss-preset-granular`](https://github.com/efureev/unocss-preset-granular).
+`@feugene/granularity` — пакет дизайн-системы на `Vue 3` с компонентами и сборкой через
+[`@feugene/granum`](https://github.com/efureev/granum).
 
 Эта папка — основная документация пакета. `README.md` в корне пакета остаётся короткой точкой входа, а здесь собраны
 подробный сценарий подключения и package-level API.
 
-Репозиторий: <https://github.com/efureev/unocss-preset-granular>
+Репозиторий: <https://github.com/efureev/granularity>
 
 ## С чего начать
 
@@ -14,7 +14,7 @@
 - Если нужен каркас приложения целиком — SPA или SSR: откройте [`getting-started.md`](./getting-started.md).
 - Если приложение уже пишется и хочется не переделывать: откройте [`best-practices.md`](./best-practices.md).
 - Если важно понять устройство слоёв стилей: откройте [`styling.md`](./styling.md).
-- Если приложение уже использует `UnoCSS`: откройте [`unocss.md`](./unocss.md) и [`installation.md`](./installation.md).
+- Если приложение собирается Vite: откройте [`granum.md`](./granum.md) и [`installation.md`](./installation.md).
 - Если нужен единый bootstrap-вход в Vue-приложение: откройте [`vue-plugin.md`](./vue-plugin.md).
 - Если хочется авто-импорта компонентов и директив: откройте [`unplugin.md`](./unplugin.md).
 - Если нужно собрать свой пакет-спутник поверх дизайн-системы: откройте [`companion-packages.md`](./companion-packages.md).
@@ -60,7 +60,7 @@
 - [`overlays.md`](./overlays.md) — контракт оверлеев: портал, стек слоёв, Esc, `inert`, фокус, модальный режим.
 - [`z-index.md`](./z-index.md) — шкала слоёв: кто на каком и как завести новый.
 - [`ssr.md`](./ssr.md) — какие компоненты безопасны при серверном рендере и где нужны оговорки.
-- [`unocss.md`](./unocss.md) — интеграция с `UnoCSS` через `presetGranularNode` из `@feugene/unocss-preset-granular/node`
+- [`granum.md`](./granum.md) — интеграция через плагин `granum()` из `@feugene/granum/vite` и манифест пакета
   и granular-провайдер `@feugene/granularity/granular-provider/node`.
 - [`vue-plugin.md`](./vue-plugin.md) — runtime-адаптер `@feugene/granularity/vue`: `createGranularity`,
   `installGranularity`, `defineInstallable`.
@@ -82,10 +82,12 @@
 
 ## Как подключать
 
-Поддерживается один проверенный способ — тонкая настройка через `UnoCSS` preset
-`presetGranularNode` из [`@feugene/unocss-preset-granular`](https://github.com/efureev/unocss-preset-granular) вместе с
-`granularityProvider` из `@feugene/granularity/granular-provider/node`. Полная инструкция — в
-[`installation.md`](./installation.md), детали конфигурации — в [`unocss.md`](./unocss.md).
+Поддерживается один проверенный способ — плагин `granum()` из
+[`@feugene/granum`](https://github.com/efureev/granum) и `granum.config.ts` приложения; провайдер
+подключается по имени пакета, манифест плагин находит через `exports`. Движок утилит приложение
+ставит и передаёт само (`engine: miniEngine()` из `@feugene/granum-engine-mini`): своей реализации
+движка granum не содержит. Полная инструкция — в
+[`installation.md`](./installation.md), детали конфигурации — в [`granum.md`](./granum.md).
 
 Дополнительно (необязательно):
 
@@ -96,8 +98,10 @@
 
 - `Vue`-компоненты через root barrel и component subpath exports.
 - package-level API для директив и file validation.
-- `UnoCSS` preset `presetGranularNode` (из `@feugene/unocss-preset-granular/node`) + `granularityProvider`
-  (из `@feugene/granularity/granular-provider/node`) — единственный поддерживаемый способ интеграции.
+- `granum.manifest.json` — машинно-порождённый манифест провайдера (формат 2): компоненты, их
+  классы, потребляемые токены, зависимости, файлы темы и CSS, плюс блок `engine` с диалектом и
+  отпечатком словаря, против которого эти классы написаны. Единственный поддерживаемый способ
+  интеграции.
 - внутреннюю инженерную документацию по развитию пакета.
 
 ## Принцип документации

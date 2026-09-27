@@ -215,7 +215,7 @@ const { target, enabled } = usePortalTarget()
 
 **`themes.themeFiles` заменяет тему, а не добавляет.** Список тем — пересечение
 `themes.names` с тем, что объявил провайдер; третью тему через пресет не
-подключить ([`unocss.md`](./unocss.md)).
+подключить ([`granum.md`](./granum.md)).
 
 **Тему собирать из данных, а не писать CSS руками.** `extendTheme` (поверх
 готовой) и `createTheme` (с нуля) из `@feugene/granularity/theme` отдают и

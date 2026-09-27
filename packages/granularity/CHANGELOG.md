@@ -7,7 +7,60 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+
+- **Требуется `@feugene/granum` `>=0.2.0 <1.0.0`: движок утилит выбирает приложение.** Реализации
+  движка в ядре granum больше нет — она уехала в отдельный пакет `@feugene/granum-engine-mini`, —
+  поэтому поле `engine` в `granum.config.*` стало обязательным и принимает **инстанс**:
+  `engine: miniEngine()`. Строка `'builtin'` и объект опций отклоняются `InvalidConfigError`, а
+  правила утилит приложения передаются фабрике движка (`miniEngine({ rules: [...] })`), а не
+  конфигу: поля для правил у него нет. У потребителя это значит два build-пакета вместо одного
+  (`yarn add -D @feugene/granum @feugene/granum-engine-mini`), у сборки пакета-провайдера —
+  явный `granumProvider({ provider, engine: miniEngine() })`.
+- **Манифест пакета объявляет словарь утилит: формат 2.** Вместо корневого `engineModule` манифест
+  несёт блок `engine { dialect, vocabulary, name, version?, module }`, и пакет объявляет диалект
+  `unocss/preset-mini+granum@66` — словарь, против которого написаны классы компонентов. Классы
+  `sr-only`, `tabular-nums`, `animate-spin`, `divide-y` и `space-y-*` приходят из доп-правил, без
+  них компоненты рисуются не полностью, и раньше это была тихая поломка. Теперь приложение с
+  движком другого словаря получает `provider-dialect-mismatch` и `provider-classes-dropped` с
+  поимённым списком потерянных классов; при равном диалекте и другом отпечатке словаря классы
+  просто пересчитываются заново. Подробности — в
+  [`docs/granum.md`](./docs/granum.md) и [`docs/installation.md`](./docs/installation.md).
+- **Пакет собирается `@feugene/granum`, а не пресетом `@feugene/unocss-preset-granular`.** Вместо
+  `uno.config.ts` у потребителя — `granum.config.ts` и плагин `granum()`; вместо сканирования
+  `node_modules` — `granum.manifest.json`, который пакет публикует рядом с `dist` и в котором уже
+  посчитаны классы компонентов, потребляемые токены, зависимости, файлы темы и CSS. CSS приложения
+  приезжает одним `virtual:granum.css` с пятью слоями каскада (`tokens`, `base`, `themes`,
+  `components`, `utilities`), так что порядок «утилита приложения перебивает базовый стиль
+  компонента» задан именами слоёв, а не порядком конкатенации. Миграция потребителя — в
+  [`docs/granum.md`](./docs/granum.md) и [`docs/installation.md`](./docs/installation.md).
+- **Контракт дескрипторов переименован без смены смысла.** `defineGranularComponent` →
+  `defineGranumComponent`, `defineGranularProvider` → `defineGranumProvider`, импорт из
+  `@feugene/granum/contract`. `packageBaseUrl` больше не нужен: базой путей служит директория
+  манифеста. Пути темы объявляются относительно корня раскладки (`styles/tokens.css`), а не
+  абсолютными URL.
+- **`libInjectCss` убран из сборки пакета.** CSS компонента доставляет манифест, и вместе с инлайном
+  в JS-чанк он приезжал бы дважды. Ассеты `components/<Name>/styles.css` в `dist` остались и
+  перечислены в манифесте.
+- **Реестров компонентов три, а не четыре.** Entry сборки больше не реестр: `granumProvider()`
+  строит их из реестра провайдера. `yarn generate:registry` ведёт barrel, `package.json#exports`
+  (включая экспорт манифеста) и `src/granular-provider/shared.ts`; гейт живёт в
+  `src/__tests__/registry.generated.test.ts`.
+- **`yarn doctor` — это `granum doctor granum.config.mjs`.** Проверяется собранный манифест, а не
+  исходники; отчёт сборки приложения (`dist/granum-report.json`) появляется у потребителя сам.
+
+### Fixed
+
+- **Общие контексты и хелперы переехали из директорий компонентов в `src/components/shared/`.**
+  `GrConfigProvider/context`, `GrFormField/context`, `GrButtonGroup/context`, `GrForm/context`,
+  `GrForm/validation`, `GrForm/fileRule`, `GrDelta/deltaTone`, `GrChip/grChipGroupContext` лежали
+  внутри чужих компонентов, и импорт ключа инъекции делал соседа зависимостью по графу — 91 ребро на
+  ровном месте. Публичные реэкспорты сохранены: `useGrConfig`, `useGrFormFieldContext`,
+  `useGrButtonGroup`, `useGrFormContext`, `deltaTone` и прочие по-прежнему доступны из своих
+  компонентов.
+
 ### Added
+
 
 - **`dist/component-guides.json`: how to pick a component, outside the repository.** `docs/` is not
   published, so anything reading the installed package — IDE plugins, the MCP connector — had props but no

@@ -8,7 +8,7 @@
 
 - [`installation.md`](./installation.md) — что и почему ставить в зависимости,
   требования к окружению, иконки;
-- [`unocss.md`](./unocss.md) — все опции `presetGranularNode` и правила про
+- [`granum.md`](./granum.md) — все опции `granum.config.ts` и правила про
   `content`;
 - [`ssr.md`](./ssr.md) — SSR-контракт компонентов: кто что делает на сервере;
 - [`localization.md`](./localization.md) — философия локализации и API пакета.
@@ -20,83 +20,77 @@
 
 ```bash
 yarn add vue @feugene/granularity @floating-ui/dom @unocss/reset
-yarn add -D vite @vitejs/plugin-vue unocss @feugene/unocss-preset-granular typescript vue-tsc
+yarn add -D vite @vitejs/plugin-vue @feugene/granum @feugene/granum-engine-mini typescript vue-tsc
 ```
 
 `@floating-ui/dom` — обязательная runtime-зависимость: на ней держится
 позиционирование всех выпадающих панелей. Обоснование состава — в
 [`installation.md`](./installation.md#установка).
 
-Отдельно ставить `@unocss/preset-mini` не нужно: пакет `unocss` тянет его сам и
-реэкспортирует `presetMini` — именно так он и импортируется в конфиге ниже.
+Движок утилит — вторая build-зависимость, и это не дублирование: granum своей
+реализации движка не содержит, а словарь классов выбирает тот, кто отвечает за
+результат сборки, то есть приложение. `@feugene/granum-engine-mini` —
+реализация по умолчанию (`preset-mini` плюс доп-правила, на которых нарисованы
+компоненты пакета); сам `unocss` приложению при этом не нужен вовсе.
 
 В `package.json` приложения обязателен `"type": "module"`, Node — не ниже 22.
 
 ### Один конфиг, из которого растёт всё остальное
 
-CSS дизайн-системы не импортируется файлами. Его целиком собирает UnoCSS из
-granular-провайдера пакета, а провайдер читает **собранный `dist`**. Отсюда
-единственная точка правды — `uno.config.ts`:
+CSS дизайн-системы не импортируется файлами. Его собирает плагин granum по
+`granum.manifest.json` пакета — файлу, который пакет публикует рядом с `dist`.
+Отсюда единственная точка правды — `granum.config.ts`:
 
 ```ts
-// uno.config.ts
-import { defineConfig, presetMini } from 'unocss'
-import {
-  granularContent,
-  presetGranularNode,
-  type PresetGranularNodeOptions,
-} from '@feugene/unocss-preset-granular/node'
-import granularityProvider from '@feugene/granularity/granular-provider/node'
+// granum.config.ts
+import { defineGranumConfig } from '@feugene/granum/vite'
+import { miniEngine } from '@feugene/granum-engine-mini'
 
-const granularOptions: PresetGranularNodeOptions = {
-  providers: [granularityProvider],
+export default defineGranumConfig({
+  engine: miniEngine(),
+  providers: ['@feugene/granularity'],
   components: [
     { provider: '@feugene/granularity', names: ['GrButton', 'GrInput'] },
   ],
   themes: { names: ['light', 'dark'] },
-  layer: 'granular',
-}
-
-export default defineConfig({
-  // `@unocss/vite` читает `content` только из top-level конфига, не из пресета.
-  content: granularContent(granularOptions),
-  presets: [
-    presetMini(),
-    presetGranularNode(granularOptions),
-  ],
+  appSources: { dirs: ['src'] },
 })
 ```
 
+`engine` — единственное обязательное поле: реализации движка в granum нет, и
+инстанс передаёт приложение. `miniEngine()` даёт тот же словарь, против
+которого написаны классы компонентов (`unocss/preset-mini+granum@66`); движок
+другого словаря granum назовёт `provider-dialect-mismatch` и перечислит классы,
+которые пришлось выбросить, — см.
+[«Словарь утилит» в `granum.md`](./granum.md#словарь-утилит-диалект-и-отпечаток).
+
 `components` можно не указывать вовсе — тогда в CSS попадут все компоненты
-провайдера. Перечисление сужает бандл до нужного набора.
+провайдера. Перечисление сужает бандл до нужного набора; зависимости
+перечисленных компонентов granum добавит сам.
 
 ### CSS-вход приложения
 
-`layer: 'granular'` в опциях выше кладёт preflight-ы пресета в отдельный слой, и у
-слоя появляется собственный виртуальный модуль — `virtual:uno:granular.css`.
-Поэтому импортов три, а не один, и порядок между ними значим:
+Весь CSS granum приезжает одним модулем, а разделение живёт внутри него —
+пятью слоями каскада:
 
 ```ts
 import '@unocss/reset/tailwind-compat.css' // сброс браузерных стилей
-import 'virtual:uno:granular.css' // слой `granular`
-import 'virtual:uno.css' // всё остальное
+import 'virtual:granum.css' // токены, база, темы, CSS компонентов, утилиты
 ```
 
-**Оба виртуальных модуля обязательны.** Слой `granular` — это фундамент:
-`:root { --gr-* }`, `base.css`, темы (`[data-theme=dark]`), покомпонентные
-CSS-переменные. А сами утилитарные классы — и ваши, и те, которыми нарисованы
-шаблоны компонентов пакета, — генерируются в общий `virtual:uno.css`. В собранном
-приложении это видно буквально: утилитарных правил в CSS слоя почти нет, а
-`[data-theme]` не встречается в `uno.css` ни разу. Забыть второй импорт — получить
-компоненты с токенами, но без раскладки.
+Порядок слоёв объявлен первой строкой этого файла, поэтому утилита в разметке
+приложения перебивает базовый стиль компонента, а нелейерный CSS приложения
+перебивает всё. Фундамент (`:root { --gr-* }`, `base.css`, темы
+`[data-theme=dark]`, покомпонентные переменные) и утилитарные классы — и ваши,
+и те, которыми нарисованы шаблоны компонентов пакета, — лежат в одном файле, и
+забыть половину нечего.
 
-Если `layer` не задавать, отдельного модуля слоя нет и всё приезжает одним
-`virtual:uno.css` — так сделано в `apps/showcase`. Оба варианта рабочие; слой
-нужен, когда важен контроль порядка относительно собственного CSS приложения.
+Слои доступны и по отдельности (`virtual:granum/layers/utilities.css`) — но
+тогда порядок слоёв приложение объявляет само: место слоя в каскаде задаётся
+его первым появлением.
 
 > **Внутри этого монорепо.** Приложения резолвят пакет через workspace-симлинк в
-> `packages/granularity/dist`, а `uno.config.ts` исполняется в Node и читает
-> оттуда же. Поэтому после любой правки библиотеки — `yarn build:granularity`,
+> `packages/granularity/dist`, а плагин granum читает оттуда же манифест. Поэтому после любой правки библиотеки — `yarn build:granularity`,
 > иначе приложение соберётся со старыми токенами и без стилей нового компонента.
 > Внешнему потребителю этот шаг не нужен: `yarn add @feugene/granularity`
 > ставит уже собранный пакет.
@@ -108,15 +102,14 @@ my-app/
 ├── index.html
 ├── package.json
 ├── tsconfig.json
-├── uno.config.ts
+├── granum.config.ts
 ├── vite.config.ts
 ├── vite-env.d.ts
 └── src/
     ├── main.ts
     ├── App.vue
     ├── reset.ts
-    ├── granularity.ts
-    └── app-styles.ts
+    └── granularity.ts
 ```
 
 ### `package.json`
@@ -138,11 +131,11 @@ my-app/
     "vue": "^3.5.40"
   },
   "devDependencies": {
-    "@feugene/unocss-preset-granular": "^0.16.0",
+    "@feugene/granum": "^0.2.0",
+    "@feugene/granum-engine-mini": "^0.2.0",
     "@vitejs/plugin-vue": "^6.0.8",
     "typescript": "^6.0.2",
-    "unocss": "^66.7.5",
-    "vite": "^8.1.5",
+    "vite": "^8.2.2",
     "vue-tsc": "^3.3.7"
   }
 }
@@ -168,22 +161,21 @@ my-app/
 ### `vite.config.ts`
 
 ```ts
-import { fileURLToPath, URL } from 'node:url'
-import { defineConfig } from 'vite'
+import { granum } from '@feugene/granum/vite'
 import vue from '@vitejs/plugin-vue'
-import UnoCSS from 'unocss/vite'
+import { defineConfig } from 'vite'
+
+import granumConfig from './granum.config'
 
 export default defineConfig({
   plugins: [
     vue(),
-    UnoCSS({
-      configFile: fileURLToPath(new URL('./uno.config.ts', import.meta.url)),
-    }),
+    granum(granumConfig),
   ],
 })
 ```
 
-### `uno.config.ts`
+### `granum.config.ts`
 
 Дословно как в разделе [«Один конфиг…»](#один-конфиг-из-которого-растёт-всё-остальное).
 
@@ -212,7 +204,7 @@ export default defineConfig({
   },
   "include": [
     "vite.config.ts",
-    "uno.config.ts",
+    "granum.config.ts",
     "vite-env.d.ts",
     "src/**/*.ts",
     "src/**/*.d.ts",
@@ -225,6 +217,9 @@ export default defineConfig({
 ```ts
 // vite-env.d.ts
 /// <reference types="vite/client" />
+
+/** Виртуальный модуль плагина granum. */
+declare module 'virtual:granum.css'
 ```
 
 ### Точка входа
@@ -241,14 +236,7 @@ export {}
 
 ```ts
 // src/granularity.ts
-import 'virtual:uno:granular.css'
-
-export {}
-```
-
-```ts
-// src/app-styles.ts
-import 'virtual:uno.css'
+import 'virtual:granum.css'
 
 export {}
 ```
@@ -262,7 +250,6 @@ import App from './App.vue'
 await Promise.all([
   import('./reset'),
   import('./granularity'),
-  import('./app-styles'),
 ])
 
 createApp(App).mount('#app')
@@ -313,7 +300,7 @@ my-ssr-app/
 ├── package.json
 ├── server.mjs
 ├── tsconfig.json
-├── uno.config.ts
+├── granum.config.ts
 ├── vite.config.ts
 ├── vite-env.d.ts
 └── src/
@@ -324,7 +311,7 @@ my-ssr-app/
     └── App.vue
 ```
 
-`uno.config.ts`, `tsconfig.json`, `vite-env.d.ts` и `src/App.vue` — те же, что в
+`granum.config.ts`, `tsconfig.json`, `vite-env.d.ts` и `src/App.vue` — те же, что в
 SPA: компоненты пакета пишутся одинаково для обоих типов приложения. В
 `vite.config.ts` тоже нет ничего специфичного для SSR: режим задаётся флагами CLI
 и dev-сервером.
@@ -435,8 +422,7 @@ createApp().mount('#app')
 ```ts
 // src/styles.ts
 import '@unocss/reset/tailwind-compat.css'
-import 'virtual:uno:granular.css'
-import 'virtual:uno.css'
+import 'virtual:granum.css'
 
 export {}
 ```
@@ -732,17 +718,15 @@ export async function setupI18n() {
 Спутник подключается всегда одинаково, независимо от того, какой именно:
 
 1. **Зависимость** — `yarn add @feugene/granularity-chrono`.
-2. **Провайдер в `uno.config.ts`** — иначе CSS его компонентов не соберётся:
+2. **Провайдер в `granum.config.ts`** — иначе CSS его компонентов не соберётся:
 
    ```ts
-   import granularityProvider from '@feugene/granularity/granular-provider/node'
-   import chronoProvider from '@feugene/granularity-chrono/granular-provider/node'
-
-   const granularOptions: PresetGranularNodeOptions = {
-     providers: [granularityProvider, chronoProvider],
+   export default defineGranumConfig({
+     engine: miniEngine(),
+     providers: ['@feugene/granularity', '@feugene/granularity-chrono'],
      themes: { names: ['light', 'dark'] },
-     layer: 'granular',
-   }
+     appSources: { dirs: ['src'] },
+   })
    ```
 
 3. **Резолвер** — если пользуетесь авто-импортом (см. ниже).
@@ -777,8 +761,8 @@ export async function setupI18n() {
 компонентов спутники публикуют прикладное API: `./chart` и `useChartScale` у
 charts, `./layout` и `useDashboardLayout` у dashboard, `useChronoNow` у chrono.
 
-Сам пресет `@feugene/unocss-preset-granular` живёт в отдельном репозитории и
-подключается из `devDependencies`: в бандл приложения он не попадает.
+Сам конвейер `@feugene/granum` живёт в отдельном репозитории и подключается из
+`devDependencies`: в бандл приложения он не попадает.
 
 ### Авто-импорт компонентов
 
@@ -832,15 +816,15 @@ export default defineConfig({
 
 ## Приложение не поднялось — что смотреть
 
-| Симптом                                                          | Причина                                                                                                                         |
-|------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------|
-| Компоненты бесцветные, разметка «голая»                          | `granularContent(...)` не развёрнут в top-level `content` — `@unocss/vite` не читает `content` из пресета                       |
-| Компоненты бесцветные внутри монорепо                            | Пакет не пересобран: `yarn build:granularity`                                                                                   |
-| Спиннер не крутится, `sr-only`-текст виден                       | Выключен `includeExtraRules` — утилит `animate-spin`, `sr-only`, `divide-*` нет в `presetMini`, их добирает пресет              |
-| Иконка, переданная классом (`icon="i-lucide-user"`), не рисуется | Нет `presetIcons` и коллекции: этот класс генерирует конфиг приложения, а не пакет. Собственные иконки пакета работают без него |
-| Интерфейс английский при заданной локали                         | Блок не зарегистрирован, лоадеры не добавлены или забыт `installI18n`                                                           |
-| Hydration mismatch на первой же странице                         | Сервер и клиент выбрали разные компоненты, либо в `setup` читается среда — см. [`ssr.md`](./ssr.md)                             |
-| Оверлей не работает после гидрации, хотя разметка пришла         | В шаблон не вставлен `ssrContext.teleports` — клиенту не по чему найти целевой контейнер                                        |
+| Симптом                                                          | Причина                                                                                                                                                    |
+|------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Компоненты бесцветные, разметка «голая»                          | Не импортирован `virtual:granum.css` либо компонент вне селекции — проверьте `granum doctor` и `classes.unmatched` в отчёте                                |
+| Компоненты бесцветные внутри монорепо                            | Пакет не пересобран: `yarn build:granularity`                                                                                                              |
+| Спиннер не крутится, `sr-only`-текст виден                       | Движок другого словаря: `animate-spin`, `sr-only`, `divide-*` привозят доп-правила `miniEngine()` — смотрите `provider-dialect-mismatch` у `granum doctor` |
+| Иконка, переданная классом (`icon="i-lucide-user"`), не рисуется | `miniEngine()` правил иконок не знает: передайте иконку компонентом либо отдайте своё правило фабрике движка. Свои иконки пакета работают всегда           |
+| Интерфейс английский при заданной локали                         | Блок не зарегистрирован, лоадеры не добавлены или забыт `installI18n`                                                                                      |
+| Hydration mismatch на первой же странице                         | Сервер и клиент выбрали разные компоненты, либо в `setup` читается среда — см. [`ssr.md`](./ssr.md)                                                        |
+| Оверлей не работает после гидрации, хотя разметка пришла         | В шаблон не вставлен `ssrContext.teleports` — клиенту не по чему найти целевой контейнер                                                                   |
 
 Что именно попало в CSS и почему, показывает dev-сервер:
 
@@ -851,7 +835,7 @@ curl http://localhost:5173/__uno.css | grep <класс-или-токен>
 ## Ссылки
 
 - [`installation.md`](./installation.md) — зависимости и опции подключения
-- [`unocss.md`](./unocss.md) — пресет и `content`
+- [`granum.md`](./granum.md) — плагин и манифест
 - [`ssr.md`](./ssr.md) — SSR-контракт компонентов
 - [`localization.md`](./localization.md) — локализация
 - [`theming.md`](./theming.md) — своя тема

@@ -1,18 +1,19 @@
 # Установка и подключение
 
 Этот пакет — [`@feugene/granularity`][granularity-repo] —
-дизайн-система на `Vue 3`, построенная поверх [`@feugene/unocss-preset-granular`][preset-granular].
-Единственный поддерживаемый и документированный способ подключения —
-`UnoCSS` preset `presetGranularNode` из [`@feugene/unocss-preset-granular/node`][preset-granular]
-с `granularityProvider` из `@feugene/granularity/granular-provider/node`.
+дизайн-система на `Vue 3`, собранная конвейером [`@feugene/granum`][granum].
+Единственный поддерживаемый и документированный способ подключения — плагин
+`granum()` из [`@feugene/granum/vite`][granum] и `granum.config.ts`
+приложения; провайдер подключается по имени пакета, а его
+`granum.manifest.json` плагин находит через `exports`.
 
 Остальные варианты (прямые CSS-импорты, root import со «всем сразу», подключение
 `styles.css` и т.п.) не поддерживаются и в этой инструкции не описываются.
 
-> Общие принципы установки (обоснование выбора `devDependencies`, требования
-> к окружению, рецепт сборки провайдеров) подробно описаны в документации
-> пресета: [`unocss-preset-granular/docs/ru/installation.md`][preset-installation]
-> и [`unocss-preset-granular/docs/ru/getting-started.md`][preset-getting-started].
+> Общие принципы (контракт провайдера, слои каскада, обрезка токенов,
+> диагностика) описаны в документации granum:
+> [`granum/docs/ru/getting-started.md`][granum-getting-started] и
+> [`granum/docs/ru/usage-in-apps.md`][granum-usage].
 
 ## Требования
 
@@ -21,9 +22,13 @@
 - [`vue`][vue] `^3` — peer-зависимость пакета (устанавливает приложение).
 - [`@floating-ui/dom`][floating-ui] `^1.8` — **обязательная** runtime
   peer-зависимость пакета (устанавливает приложение).
-- [`unocss`][unocss] `≥ 66` и [`@unocss/preset-wind4`][preset-wind4]
-  (или `@unocss/preset-mini`) — peer-зависимости пресета (устанавливает
-  приложение, на build-time).
+- [`@feugene/granum`][granum] `≥ 0.2 < 1` — peer-зависимость пакета
+  (устанавливает приложение, на build-time).
+- `@feugene/granum-engine-mini` `^0.2` — движок утилит; тоже ставит приложение.
+  Своей реализации движка в granum нет, и словарь классов выбирает тот, кто
+  отвечает за результат сборки, то есть приложение.
+- [`vite`][vite] `^8` — peer-зависимость granum: плагин живёт в сборке
+  приложения.
 
 ## Установка
 
@@ -31,7 +36,7 @@
 
 ```bash
 yarn add vue @feugene/granularity @floating-ui/dom
-yarn add -D unocss @feugene/unocss-preset-granular @unocss/preset-mini
+yarn add -D @feugene/granum @feugene/granum-engine-mini
 ```
 
 Почему `@feugene/granularity` стоит в `dependencies`:
@@ -55,45 +60,52 @@ yarn add -D unocss @feugene/unocss-preset-granular @unocss/preset-mini
 `inert` для фона, порядок Esc и возврат фокуса — собственные примитивы пакета
 (`useFocusTrap`, `useOverlayLayer`).
 
-Почему `@feugene/unocss-preset-granular`, `unocss` и `@unocss/preset-mini` / `@unocss/preset-wind4`
-стоят в `devDependencies`:
+Почему `@feugene/granum` стоит в `devDependencies`:
 
-- они выполняются исключительно на build-time (в `uno.config.ts`) и ни одной
-  строкой не попадают в итоговый бандл приложения — подробности в
-  [документации пресета][preset-installation].
+- он выполняется исключительно на build-time (плагин Vite плюс
+  `granum.config.ts`) и ни одной строкой не попадает в итоговый бандл
+  приложения. Единственное исключение — `@feugene/granum/runtime`
+  (переключение тем): если он вам нужен, пакет переезжает в `dependencies`.
 
-Сам `granularityProvider` реэкспортируется пакетом через
-`@feugene/granularity/granular-provider/node` и тоже используется только в
-`uno.config.ts`, поэтому дополнительных зависимостей не требует.
+Почему пакетов два, а не один: granum — это конвейер (резолвер, слои каскада,
+манифесты, отчёт), а реализации движка утилит в нём нет вовсе. Движок решает,
+какой класс во что превращается, — то есть отвечает за результат, — поэтому его
+выбирает приложение и передаёт **инстансом**. `@feugene/granum-engine-mini` —
+реализация по умолчанию: `preset-mini` плюс доп-правила, на которых нарисованы
+компоненты пакета. Движок обязан объявлять тот же словарь, что и пакет
+(`unocss/preset-mini+granum@66`), иначе granum скажет
+`provider-dialect-mismatch` и перечислит классы, которые пришлось выбросить —
+см. [«Словарь утилит» в `granum.md`](./granum.md#словарь-утилит-диалект-и-отпечаток).
 
-## Базовый `uno.config.ts`
+Провайдер приложению импортировать не нужно вовсе: плагин читает
+`granum.manifest.json` пакета через его `exports`, а код пакета ради
+резолюции не исполняет.
 
-Самый минимальный рабочий конфиг — только `presetGranularNode` и сам
-granular-провайдер пакета. Никаких `components`, `themes`, `layer`,
-`granularContent` пока нет:
+## Базовый `granum.config.ts`
+
+Самый минимальный рабочий конфиг — движок, имя пакета в `providers` и
+директории исходников приложения. Никаких `components`, `themes`,
+`pruneTokens` пока нет:
 
 ```ts
-import { defineConfig, presetMini } from 'unocss'
-import { presetGranularNode } from '@feugene/unocss-preset-granular/node'
+import { defineGranumConfig } from '@feugene/granum/vite'
+import { miniEngine } from '@feugene/granum-engine-mini'
 
-import granularityProvider from '@feugene/granularity/granular-provider/node'
-
-export default defineConfig({
-  presets: [
-    presetMini(),
-    presetGranularNode({
-      providers: [granularityProvider],
-    }),
-  ],
+export default defineGranumConfig({
+  engine: miniEngine(),
+  providers: ['@feugene/granularity'],
+  appSources: { dirs: ['src'] },
 })
 ```
 
 Что это уже даёт:
 
-- в сборку подмешиваются `tokens.css` и `base.css` пакета;
-- включены все компоненты, объявленные в granular-провайдере, и их
-  preflight-ы (эквивалент `components: 'all'` по умолчанию);
-- работают rules/variants и safelist провайдера.
+- утилиты генерирует `miniEngine()` — `preset-mini` плюс доп-правила пакета;
+  `engine` единственное обязательное поле конфига, опустить его нельзя;
+- в сборку подмешиваются `tokens.css`, `base.css` и тема `light` пакета;
+- включены все компоненты, объявленные в провайдере (эквивалент
+  `components: 'all'` по умолчанию), их CSS и safelist;
+- классы разметки самого приложения извлекаются из `appSources`.
 
 Дальнейшие секции показывают, как **наращивать** этот базовый пример
 опциями по мере необходимости. Все эти опции — необязательные.
@@ -124,27 +136,18 @@ import IconUser from '~icons/lucide/user'
 </template>
 ```
 
-Класс `i-lucide-*` — это утилита UnoCSS, и делает её не пакет, а ваша сборка.
-Хотите передавать иконки классами — добавьте пресет иконок и коллекцию себе:
+Класс `i-lucide-*` — утилита, и делает её не пакет, а ваша сборка.
+`miniEngine()` правил иконок не знает, а поля для правил у конфига granum нет:
+правила приложения передаются фабрике движка — `miniEngine({ rules: [...] })`.
 
-```bash
-yarn add -D @unocss/preset-icons @iconify-json/lucide
-```
+Поэтому рабочих вариантов два: передавать иконку Vue-компонентом (работает без
+настройки) либо завести правило самому — своё правило фабрике или движок,
+который умеет иконки. Подробнее —
+[«Иконки классом» в `granum.md`](./granum.md).
 
-```ts
-import { presetIcons } from 'unocss'
-
-export default defineConfig({
-  presets: [
-    presetMini(),
-    presetGranularNode({ providers: [granularityProvider] }),
-    presetIcons({ extraProperties: { display: 'inline-block' } }),
-  ],
-})
-```
-
-Без пресета класс останется классом: место под иконку будет, картинки не будет,
-и сборка при этом пройдёт молча. Со стороны пакета границу держит гейт
+Без правила класс останется классом: место под иконку будет, картинки не будет,
+и сборка при этом пройдёт молча — но granum назовёт такой класс в отчёте
+(`classes.unmatched`), а не проглотит. Со стороны пакета границу держит гейт
 `src/__tests__/iconContract.test.ts` — он не даёт собственным иконкам пакета
 снова уехать в классы.
 
@@ -153,105 +156,93 @@ export default defineConfig({
 Чтобы не тянуть в бандл CSS всех компонентов — явно выбираем нужные:
 
 ```ts
-presetGranularNode({
-  providers: [granularityProvider],
+defineGranumConfig({
+  engine: miniEngine(),
+  providers: ['@feugene/granularity'],
   components: [
     { provider: '@feugene/granularity', names: ['GrButton'] },
   ],
+  appSources: { dirs: ['src'] },
 })
 ```
+
+Зависимости компонента дописывать не нужно: селекция замыкается транзитивно по
+графу из манифеста. Импорт компонента вне селекции ловит `js.guard` — по
+умолчанию ошибкой сборки, а не голым рендером.
 
 ### Темы
 
-По умолчанию подключаются все темы провайдера. Ограничим их списком:
+По умолчанию активны темы, объявленные провайдером в `defaultThemes` (у пакета
+это `light`). Возьмём обе:
 
 ```ts
-presetGranularNode({
-  providers: [granularityProvider],
+defineGranumConfig({
+  engine: miniEngine(),
+  providers: ['@feugene/granularity'],
   components: [{ provider: '@feugene/granularity', names: ['GrButton'] }],
   themes: { names: ['light', 'dark'] },
 })
 ```
 
-`themeFiles` позволяет переопределить CSS темы файлом приложения,
-`tokensFile`/`baseFile` — подменить `tokens.css`/`base.css`.
-Подробности — в [документации пресета][preset-getting-started].
+Своя тема приложения задаётся здесь же — `themes.define` с `extends` или
+`tokensRef`; переопределение отдельных значений — `themes.tokenOverrides`.
+Подробности — в [`theming.md`](./theming.md).
 
-### Отдельный layer
+### Обрезка неиспользуемых токенов
 
-По умолчанию preflight-ы пакета идут без явного `layer`. Чтобы
-положить их в собственный слой (и управлять порядком относительно
-`preflights`/`default`) — укажите `layer`:
+Пакет объявляет больше двух сотен токенов, и приложению редко нужны все:
 
 ```ts
-presetGranularNode({
-  providers: [granularityProvider],
+defineGranumConfig({
+  engine: miniEngine(),
+  providers: ['@feugene/granularity'],
   components: [{ provider: '@feugene/granularity', names: ['GrButton'] }],
-  themes: { names: ['light', 'dark'] },
-  layer: 'granular',
+  appSources: { dirs: ['src'] },
+  pruneTokens: { mode: 'on' },
 })
 ```
 
-### Авто-сканирование (`granularContent`)
+Порядок внедрения — `mode: 'report'`, посмотреть план в
+`dist/granum-report.json`, затем `'on'`. `appSources` при этом обязателен:
+токен, который приложение взяло само, иначе уедет из CSS при зелёной сборке.
 
-Когда приложение использует компоненты пакета из уже собранного `dist/`
-(через subpath imports), extractor UnoCSS должен заглянуть в
-директории этих компонентов и `.js`/`.ts` чанки. Для этого есть хелпер
-`granularContent`:
+### Сканирования `node_modules` больше нет
 
-```ts
-import { defineConfig, presetMini } from 'unocss'
-import { granularContent, presetGranularNode } from '@feugene/unocss-preset-granular/node'
-import granularityProvider from '@feugene/granularity/granular-provider/node'
+На пресете v1 приложение должно было объяснить экстрактору, где лежат
+собранные чанки компонентов (`granularContent`, `content.filesystem`) — в granum
+этого канала нет вовсе: классы компонентов и потребляемые ими токены посчитаны
+на сборке пакета и лежат в `granum.manifest.json`. Приложение объявляет только
+свои исходники — `appSources`.
 
-const granularOptions = {
-  providers: [granularityProvider],
-  components: [{ provider: '@feugene/granularity', names: ['GrButton'] }],
-  themes: { names: ['light', 'dark'] },
-  layer: 'granular' as const,
-}
-
-export default defineConfig({
-  presets: [
-    presetMini(),
-    presetGranularNode(granularOptions),
-  ],
-  // ОБЯЗАТЕЛЬНО для авто‑сканирования: `@unocss/vite` читает `content`
-  // только из top-level user-config, не из `preset.content`.
-  content: granularContent(granularOptions),
-})
-```
-
-Если в приложении уже есть свой `content.pipeline.include`, объедините
-его с `granularContent(...).pipeline.include` — пример в
-[`./unocss.md`](./unocss.md).
-
-Все доступные опции пресета (`components`, `themes`, `themeFiles`,
-`tokens`, `baseFile`, `scan`, `layer`) описаны в
-[документации пресета][preset-getting-started].
+Все доступные опции (`engine`, `components`, `themes`, `appSources`, `css`,
+`js`, `pruneTokens`, `report`) описаны в [`granum.md`](./granum.md) и
+[документации granum][granum-usage].
 
 ## Подключение к `Vite`
 
 ```ts
 // vite.config.ts
-import { defineConfig } from 'vite'
+import { granum } from '@feugene/granum/vite'
 import Vue from '@vitejs/plugin-vue'
-import UnoCSS from 'unocss/vite'
+import { defineConfig } from 'vite'
+
+import granumConfig from './granum.config'
 
 export default defineConfig({
   plugins: [
     Vue(),
-    UnoCSS(),
+    granum(granumConfig),
   ],
 })
 ```
 
-В точке входа приложения импортируется виртуальный CSS из `UnoCSS`:
+В точке входа приложения импортируется виртуальный CSS плагина — один модуль
+со всеми пятью слоями каскада:
 
 ```ts
 // main.ts
 import '@unocss/reset/tailwind-compat.css'
-import 'virtual:uno.css'
+import 'virtual:granum.css'
 
 import { createApp } from 'vue'
 import App from './App.vue'
@@ -282,22 +273,20 @@ createApp(App).mount('#app')
 
 ## Ссылки
 
-- Репозиторий пакета: <https://github.com/efureev/unocss-preset-granular>
-- Пресет, на котором построен пакет:
-  [`@feugene/unocss-preset-granular`][preset-granular]
-  ([docs/ru][preset-docs])
-- [`unocss`][unocss] и [`@unocss/preset-wind4`][preset-wind4]
+- Репозиторий пакета: <https://github.com/efureev/granularity>
+- Конвейер, которым собран пакет: [`@feugene/granum`][granum]
+  ([docs/ru][granum-docs])
+- [`vite`][vite]
 - [`vue`][vue]
 - [`@floating-ui/dom`][floating-ui]
 - [`unplugin-vue-components`][unplugin-vue-components]
 
-[granularity-repo]: https://github.com/efureev/unocss-preset-granular
-[preset-granular]: https://github.com/efureev/unocss-preset-granular
-[preset-docs]: ../../../../unocss-preset-granular/docs/ru/README.md
-[preset-installation]: ../../../../unocss-preset-granular/docs/ru/installation.md
-[preset-getting-started]: ../../../../unocss-preset-granular/docs/ru/getting-started.md
-[unocss]: https://github.com/unocss/unocss
-[preset-wind4]: https://github.com/unocss/unocss/tree/main/packages-presets/preset-wind4
+[granularity-repo]: https://github.com/efureev/granularity
+[granum]: https://github.com/efureev/granum
+[granum-docs]: ../../../../granum/docs/ru/README.md
+[granum-getting-started]: ../../../../granum/docs/ru/getting-started.md
+[granum-usage]: ../../../../granum/docs/ru/usage-in-apps.md
+[vite]: https://github.com/vitejs/vite
 [vue]: https://github.com/vuejs/core
 [floating-ui]: https://github.com/floating-ui/floating-ui
 [unplugin-vue-components]: https://github.com/unplugin/unplugin-vue-components

@@ -1,195 +1,233 @@
-# Интеграция с `UnoCSS`
+# Интеграция с `granum`
 
-`@feugene/granularity` интегрируется с [`UnoCSS`][unocss] через пресет
-[`@feugene/unocss-preset-granular`][preset-granular] и granular-провайдер,
-который пакет экспортирует отдельным subpath-ом.
+`@feugene/granularity` подключается к приложению через
+[`@feugene/granum`][granum] — конвейер сборки гранулярных UI-пакетов. Пакет
+собирается его плагином и публикует рядом с `dist` машинно-порождённый
+`granum.manifest.json`; приложение читает манифест и по своей селекции
+собирает CSS.
 
-Базовые понятия (что такое granular-провайдер, как устроены foundation layers,
-темы, safelist) описаны в документации пресета — см.
-[`unocss-preset-granular/docs/ru/*`][preset-docs].
+Базовые понятия (контракт провайдера, слои каскада, темы, safelist, обрезка
+токенов) описаны в документации granum — см. [`docs/ru`][granum-docs].
 
 ## Что именно подключается
 
-- `presetGranularNode` — node-aware preset из
-  `@feugene/unocss-preset-granular/node`; выполняется на build-time
-  в `uno.config.ts`, автоматически подмешивает CSS preflight-ы
-  (`tokens`, `base`, темы, компонентные стили) из файлов пакета.
-- `granularContent` — хелпер из того же subpath-а; возвращает готовые
-  `filesystem` и `pipeline.include` для точного авто-сканирования
-  исходников выбранных компонентов (в т.ч. `.js`/`.ts` чанков в `dist/`).
-- `granularityProvider` — granular-провайдер пакета,
-  реэкспортируется через `@feugene/granularity/granular-provider/node`.
-  Содержит описания компонентов пакета (например, `GrButton`), темы
-  `light`/`dark` и token-определения.
+- `granum()` — плагин приложения из `@feugene/granum/vite`; читает манифесты
+  провайдеров и отдаёт виртуальные модули: `virtual:granum.css` (весь CSS),
+  `virtual:granum/layers/<layer>.css` (один слой), `virtual:granum/components`
+  (реэкспорт селекции), `virtual:granum/themes` (манифест тем для рантайма).
+- `defineGranumConfig` — типизированный `granum.config.ts` приложения.
+- `miniEngine()` из `@feugene/granum-engine-mini` — движок утилит. Своей
+  реализации движка granum не содержит, поэтому в `devDependencies` приложения
+  пакета два: конвейер и движок. Поле `engine` обязательно и принимает
+  **инстанс**: строку `'builtin'` и объект опций granum отклоняет
+  `InvalidConfigError` с путём до поля.
+- `granum.manifest.json` пакета — источник правды о компонентах: классы,
+  потребляемые токены, зависимости, файлы темы и CSS. Лежит в `dist`,
+  экспортируется как `@feugene/granularity/granum.manifest.json`.
+
+Сканирования `node_modules` в granum нет: классы компонентов извлечены на
+сборке пакета и уже лежат в манифесте.
 
 ## Базовый пример
 
-Минимальный рабочий конфиг — только `presetGranularNode` с
-granular-провайдером пакета. Этого достаточно, чтобы `UnoCSS`
-увидел провайдера и подмешал `tokens.css`/`base.css`:
+```ts
+// granum.config.ts
+import { defineGranumConfig } from '@feugene/granum/vite'
+import { miniEngine } from '@feugene/granum-engine-mini'
+
+export default defineGranumConfig({
+  engine: miniEngine(),
+  providers: ['@feugene/granularity'],
+  appSources: { dirs: ['src'] },
+})
+```
 
 ```ts
-import { defineConfig, presetMini } from 'unocss'
-import { presetGranularNode } from '@feugene/unocss-preset-granular/node'
+// vite.config.ts
+import { granum } from '@feugene/granum/vite'
+import vue from '@vitejs/plugin-vue'
+import { defineConfig } from 'vite'
 
-import granularityProvider from '@feugene/granularity/granular-provider/node'
+import granumConfig from './granum.config'
 
-export default defineConfig({
-  presets: [
-    presetMini(),
-    presetGranularNode({
-      providers: [granularityProvider],
-    }),
-  ],
-})
+export default defineConfig({ plugins: [vue(), granum(granumConfig)] })
+```
+
+```ts
+// src/main.ts
+import 'virtual:granum.css'
 ```
 
 По умолчанию при таких опциях:
 
-- подмешивается `tokens.css` пакета и базовый `base.css`;
-- включены все компоненты granular-провайдера и их preflight-ы;
-- работают rules/variants и safelist провайдера.
+- в сборку входят все компоненты провайдера (`components: 'all'`);
+- подмешиваются `tokens.css` и `base.css` пакета и тема `light`
+  (`defaultThemes` провайдера);
+- классы разметки приложения извлекаются из `appSources`;
+- правила и варианты приходят от `miniEngine()` — `preset-mini` плюс
+  доп-правила, на которых нарисованы компоненты (опция `extraRules`, включена
+  по умолчанию).
 
-Готовые связки этого же «корня», но с дополнительными опциями — в
-`apps/showcase` и `apps/playground-5`.
+Готовая связка — в `apps/playground-5`.
 
 ## Наращиваем опции
-
-Все опции ниже — необязательные; добавляйте их по мере необходимости.
 
 ### Сужаем список компонентов
 
 ```ts
-presetGranularNode({
-  providers: [granularityProvider],
+defineGranumConfig({
+  engine: miniEngine(),
+  providers: ['@feugene/granularity'],
   components: [
     { provider: '@feugene/granularity', names: ['GrButton'] },
   ],
+  appSources: { dirs: ['src'] },
 })
 ```
+
+Зависимости компонента granum развернёт сам: селекция замыкается транзитивно
+по графу из манифеста, зависимости встают раньше зависящих.
 
 ### Темы
 
 ```ts
-presetGranularNode({
-  providers: [granularityProvider],
-  components: [{ provider: '@feugene/granularity', names: ['GrButton'] }],
+defineGranumConfig({
+  engine: miniEngine(),
+  providers: ['@feugene/granularity'],
   themes: { names: ['light', 'dark'] },
 })
 ```
 
-### Layer
+Своя тема приложения задаётся в том же месте — `themes.define` с `extends`
+или `tokensRef`; переопределение отдельных токенов — `themes.tokenOverrides`.
+Подробности — [`theming.md`](./theming.md).
+
+### Обрезка неиспользуемых токенов
 
 ```ts
-presetGranularNode({
-  providers: [granularityProvider],
+defineGranumConfig({
+  engine: miniEngine(),
+  providers: ['@feugene/granularity'],
   components: [{ provider: '@feugene/granularity', names: ['GrButton'] }],
-  themes: { names: ['light', 'dark'] },
-  layer: 'granular',
+  appSources: { dirs: ['src'] },
+  pruneTokens: { mode: 'on' },
 })
 ```
 
-### Авто-сканирование через `granularContent`
+Пакет объявляет больше двух сотен токенов, и приложению с одной кнопкой нужна
+их малая часть. Порядок внедрения: `mode: 'report'` → посмотреть план в
+`dist/granum-report.json` → `mode: 'on'`. `appSources` при этом обязателен:
+токен, который приложение взяло само, иначе уедет из CSS при зелёной сборке.
 
-Чтобы extractor увидел классы в собранных чанках компонентов
-(`dist/components/<Name>/...`), разверните `granularContent(...)` в
-top-level `content`:
+### Импорт компонента вне селекции
 
 ```ts
-const granularOptions = {
-  providers: [granularityProvider],
+defineGranumConfig({
+  engine: miniEngine(),
+  providers: ['@feugene/granularity'],
   components: [{ provider: '@feugene/granularity', names: ['GrButton'] }],
-  themes: { names: ['light', 'dark'] },
-  layer: 'granular' as const,
-}
-
-export default defineConfig({
-  presets: [
-    presetMini(),
-    presetGranularNode(granularOptions),
-  ],
-  content: granularContent(granularOptions),
+  js: { guard: 'error' },
 })
 ```
 
-## Полезные опции пресета
+`guard` ловит импорт компонента, которого нет в селекции: его CSS в сборку не
+попал бы, и компонент отрендерился бы голым. Режим `components: 'imports'`
+считает селекцию по импортам и тегам в `appSources` — тогда списка можно не
+вести вовсе.
 
-Детальный список параметров `presetGranularNode` (включая
-`components`, `themes`, `themeFiles`, `tokens`, `baseFile`,
-`scan`, `layer`) и `granularContent` описан в
-[документации пресета][preset-getting-started].
+## Слои каскада вместо порядка конкатенации
 
-Типовые сценарии:
+`virtual:granum.css` начинается с объявления порядка:
 
-- `components: 'all'` — включить все компоненты из granular-registry
-  (поведение по умолчанию).
-- `themes: { names: ['light'] }` — оставить только одну встроенную тему.
-- `themes.themeFiles: { <имя темы>: <путь> }` — **заменить** CSS встроенной темы
-  своим файлом. Это не способ добавить новую тему: список тем — пересечение
-  `themes.names` с тем, что объявил провайдер. Своя, третья тема подключается
-  обычным импортом CSS в приложении — см.
-  [`theming.md`](./theming.md#подключение).
-- `tokens` / `baseFile` — переопределить `tokens.css` и `base.css`
-  пакета своими файлами из приложения.
-
-## Не выключайте `includeExtraRules`
-
-Компоненты пакета пользуются утилитами, которых в `presetMini` нет вовсе:
-`sr-only`, `animate-spin`, `divide-*`, `space-*`, `backdrop-*`, `uppercase`.
-Пресет добирает их из `@feugene/unocss-mini-extra-rules` — это включено по
-умолчанию (`includeExtraRules: true`) и является условием работоспособности, а
-не удобством.
-
-С `includeExtraRules: false` класс остаётся в разметке, CSS не появляется, и
-сборка молча проходит: спиннер не крутится, разделители не рисуются, а
-визуально скрытый текст (caption таблицы, a11y-заголовок диалога) показывается
-пользователю обычным текстом. Со стороны пакета связку держит гейт
-`src/__tests__/presetUtilities.test.ts`.
-
-## Пресет иконок — только под ваши иконки
-
-Иконки самого пакета в CSS не нуждаются: они вкомпилированы в `dist`. Пресет
-иконок нужен ровно тогда, когда вы передаёте иконку **классом**
-(`icon="i-lucide-user"`), — этот класс генерирует ваш конфиг, а не наш.
-Альтернатива без пресета — передать Vue-компонент. Подробности и пример —
-[«Иконки» в `installation.md`](./installation.md#иконки).
-
-## Важно: UnoCSS и `content`
-
-`@unocss/vite` читает `content.filesystem` и `content.pipeline.include`
-**только из top-level `defineConfig`**, а не из `preset.content`.
-Поэтому `granularContent(...)` нужно раскрывать в `content:` своего
-`uno.config.ts`, как показано в базовом примере.
-
-Если в приложении уже есть свой `pipeline.include`, объедините его с
-`granularContent(...).pipeline.include`:
-
-```ts
-const granularContentConfig = granularContent(granularOptions)
-
-export default defineConfig({
-  // ...
-  content: {
-    filesystem: granularContentConfig.filesystem,
-    pipeline: {
-      include: [
-        /apps\/my-app\/src\/.*\.(vue|ts)($|\?)/,
-        ...granularContentConfig.pipeline.include,
-      ],
-    },
-  },
-})
+```css
+@layer granum.tokens, granum.base, granum.themes, granum.components, granum.utilities;
 ```
+
+Отсюда следует то, ради чего слои и заведены: утилита в разметке приложения
+перебивает базовый стиль компонента, а нелейерный CSS приложения перебивает
+всё. Отдельный слой можно загрузить сам по себе —
+`virtual:granum/layers/utilities.css`, — но тогда порядок слоёв нужно объявить
+в приложении самому: первым появлением слоя задаётся его место в каскаде.
+
+`css: { layers: false }` даёт тот же порядок без обёрток `@layer` — для
+приложений с legacy-CSS, который живёт вне слоёв.
+
+## Словарь утилит: диалект и отпечаток
+
+Компоненты пакета пользуются утилитами, которых в `preset-mini` нет вовсе:
+`sr-only`, `tabular-nums`, `animate-spin`, `divide-y`, `space-y-*`,
+`backdrop-*`, `uppercase`. Их привозит дополнительный набор правил
+`miniEngine()` (опция `extraRules`, включена по умолчанию), и без него
+компоненты рисуются не полностью: «скрытая» подпись таблицы видна обычным
+текстом, спиннер не крутится, у списков нет разделителей.
+
+Поэтому пакет объявляет в манифесте **диалект словаря** —
+`unocss/preset-mini+granum@66`. Диалект — имя словаря классов, а не версия
+реализации, и решает он ровно один вопрос: грузить ли правила пакета. Рядом
+лежит **отпечаток словаря** (`vocabulary`) — ключ фактического набора имён,
+которые умел сгенерировать движок сборки пакета; он решает другой вопрос:
+верить списку классов из манифеста или пересчитать его.
+
+Что из этого следует у приложения:
+
+- тот же диалект и тот же отпечаток — быстрый путь, классы берутся из
+  манифеста;
+- тот же диалект, другой отпечаток — так выглядит любое приложение, добавившее
+  своё правило фабрике движка: классы пересчитываются заново по файлам из
+  манифеста, уже с правилами пакета. Само по себе это не предупреждение;
+- **движок другого словаря** — `provider-dialect-mismatch` у доктора. Правила
+  пакета при этом не грузятся (`engine-rules-skipped`), классы пересчитываются
+  без них, и имена, которых чужой словарь не знает, перечисляются
+  **поимённо** в `provider-classes-dropped` и остаются видны в
+  `classes.unmatched` отчёта. Это и есть выгода объявленного диалекта: вместо
+  тихо недорисованных компонентов — список того, что потерялось, и
+  `granum why-css granum.config.ts divide-y` с объяснением по конкретному
+  классу.
+
+Выход из расхождения один из двух: движок того же диалекта либо нужные правила
+своему — `miniEngine({ rules: [...] })`. Смешать два словаря в одной сборке
+нельзя: имена пересекаются, а смысл у них разный. Подробности —
+[«Движки и диалекты»][granum-engines] в документации granum.
+
+Со стороны пакета связку держит гейт `src/__tests__/presetUtilities.test.ts`:
+он сверяет тот же список утилит с `miniEngine()` и с ним же без доп-правил.
+
+## Иконки классом: правило заводит приложение
+
+Иконки самого пакета в CSS не нуждаются — они вкомпилированы в `dist`.
+Но если вы передаёте иконку **классом** (`icon="i-lucide-user"`), этот класс
+обязан кто-то сгенерировать. `miniEngine()` правил иконок не знает, а поля для
+правил у конфига granum нет и не появится: правила приложения передаются
+**фабрике движка**.
+
+Практический выбор:
+
+- передавать иконку Vue-компонентом (`:icon="LucideUser"`) — работает без
+  единой настройки;
+- либо завести правило самому — `miniEngine({ rules: [...] })` — либо взять
+  движок, который умеет иконки. Диалект от `rules` не меняется, меняется
+  отпечаток: классы пакета будут пересчитаны, и это норма, а не дефект.
+
+Подробности и пример — [«Иконки» в `installation.md`](./installation.md#иконки).
+
+## Отчёт сборки
+
+Рядом с бандлом приложения появляется `dist/granum-report.json`: селекция и её
+цепочки, активные темы, классы без правила с источниками, safelist, покрытый
+статикой, план обрезки токенов, токены без объявления и размеры слоёв по
+собранному ассету. Прочитать его глазами — `granum report`, проверить
+конфигурацию без сборки — `granum doctor granum.config.ts`.
 
 ## Ссылки
 
-- [`@feugene/unocss-preset-granular`][preset-granular]
-  ([документация `docs/ru`][preset-docs],
-  [быстрый старт][preset-getting-started])
-- [`unocss`][unocss] и [`@unocss/preset-wind4`][preset-wind4]
+- [`@feugene/granum`][granum] ([документация `docs/ru`][granum-docs],
+  [быстрый старт][granum-getting-started], [CLI][granum-cli],
+  [движки и диалекты][granum-engines])
+- [`theming.md`](./theming.md) — темы и токены пакета
+- [`styling.md`](./styling.md) — сценарии подключения CSS
 
-[preset-granular]: https://github.com/efureev/unocss-preset-granular
-[preset-docs]: ../../../../unocss-preset-granular/docs/ru/README.md
-[preset-getting-started]: ../../../../unocss-preset-granular/docs/ru/getting-started.md
-[unocss]: https://github.com/unocss/unocss
-[preset-wind4]: https://github.com/unocss/unocss/tree/main/packages-presets/preset-wind4
+[granum]: https://github.com/efureev/granum
+[granum-docs]: ../../../../granum/docs/ru/README.md
+[granum-getting-started]: ../../../../granum/docs/ru/getting-started.md
+[granum-cli]: ../../../../granum/docs/ru/cli.md
+[granum-engines]: ../../../../granum/docs/ru/engines-and-dialects.md

@@ -1,5 +1,12 @@
 # Создание пакета-спутника (companion) с нуля
 
+> **Масштаб этого документа — спутники, а они пока на пресете v1.** Ядро
+> (`@feugene/granularity`) переведено на [`@feugene/granum`](./granum.md):
+> entry строит `granumProvider({ provider, engine: miniEngine() })`, а приложение читает
+> `granum.manifest.json` и передаёт свой движок сам.
+> Рецепты ниже (`granularChunkFileNames`, `libInjectCss`, `presetGranularNode`)
+> описывают прежний конвейер и будут переписаны, когда спутники поедут следом.
+
 Этот гайд описывает, как собрать **companion-пакет** экосистемы `@feugene/granularity` — отдельный
 публикуемый пакет с собственными компонентами поверх примитивов дизайн-системы, — и как включить для
 него авто-импорт через [`@feugene/unplugin-granularity`](../../unplugin-granularity/README.md).
