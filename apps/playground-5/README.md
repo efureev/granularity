@@ -1,22 +1,34 @@
 # `apps/playground-5`
 
-Стенд для granular-подключения через `UnoCSS`: CSS генерируется пресетом `@feugene/unocss-preset-granular/node`,
-JS приезжает subpath-импортом. Сценарии подключения CSS описаны в `packages/granularity/docs/styling.md`,
-сам пресет — в `docs/unocss.md`.
+Стенд подключения через **granum**: CSS собирает плагин `@feugene/granum/vite` из
+`granum.manifest.json` пакета, JS приезжает subpath-импортом. Механика пакета —
+в `packages/granularity/docs/unocss.md`, сценарии подключения CSS —
+в `packages/granularity/docs/styling.md`.
 
 ## Что показывает приложение
 
-- JS для `GrButton` остаётся granular за счёт subpath import;
-- reset, CSS слоя `granular` и app CSS грузятся через отдельные ленивые entry (`virtual:uno:granular.css`);
-- `presetGranularNode()` сам подмешивает `tokens`, `base`, встроенную тему `light` и стили выбранного компонента.
+- JS для `GrButton` остаётся гранулярным за счёт subpath-импорта;
+- `granum()` читает манифест пакета и по селекции отдаёт один `virtual:granum.css`:
+  токены, база, тема `light`, CSS выбранного компонента и утилиты — пятью слоями каскада;
+- `node_modules` никто не сканирует: классы компонента и потребляемые токены
+  посчитаны на сборке пакета и лежат в манифесте;
+- классы разметки самого приложения granum извлекает из `appSources`;
+- движок утилит выбирает приложение и передаёт инстансом: granum своей
+  реализации не содержит. Словарь движка совпадает с объявленным у пакета,
+  поэтому классы компонента берутся из манифеста без пересчёта — это видно в
+  `dist/granum-report.json` полем `providers[].classes: "manifest"`.
 
 ## Как работает
 
 ```ts
-import { presetGranularNode } from '@feugene/unocss-preset-granular/node'
+import { defineGranumConfig } from '@feugene/granum/vite'
+import { miniEngine } from '@feugene/granum-engine-mini'
 
-presetGranularNode({
-  components: ['GrButton'],
+export default defineGranumConfig({
+  engine: miniEngine(),
+  providers: ['@feugene/granularity'],
+  components: [{ provider: '@feugene/granularity', names: ['GrButton'] }],
+  appSources: { dirs: ['src'] },
 })
 ```
 
@@ -25,17 +37,34 @@ presetGranularNode({
 - `assets/index-*.js` — код demo-приложения;
 - `assets/vue-*.js` — runtime `vue`;
 - `assets/reset-*.css` — CSS из `@unocss/reset/tailwind-compat.css`;
-- `assets/granularity-*.js` — granular JS-код `GrButton`;
-- `assets/granularity-*.css` — слой `granular` из `presetGranularNode` c foundation + стилями `GrButton`;
-- `assets/app-*.css` или `assets/index-*.css` — оставшийся app CSS из `virtual:uno.css`.
+- `assets/granularity-*.js` — гранулярный JS-код `GrButton`;
+- `assets/granularity-*.css` — весь CSS granum: слои `tokens`, `base`, `themes`,
+  `components`, `utilities`;
+- `dist/granum-report.json` — отчёт сборки: селекция, темы, классы без правила,
+  размеры слоёв по собранному ассету.
+
+Отдельного `app-*.css` больше нет: утилиты разметки приложения лежат в слое
+`utilities` того же файла.
+
+## Замер (production build)
+
+```
+слой          raw     gzip
+tokens       3 878    1 105
+base           558      305
+themes       6 383    1 364
+components       0       20
+utilities   23 926    3 457
+всего       34 770    5 907
+```
+
+Числа берутся из `dist/granum-report.json` — он считается из той же эмиссии,
+что и CSS, а размеры меряются по собранному ассету после минификации.
 
 ## Команды
 
 ```bash
-yarn workspace @feugene/granularity-playground-5 dev
 yarn workspace @feugene/granularity-playground-5 build
-yarn workspace @feugene/granularity-playground-5 test:run   # проверяет обвязку uno/vite-конфигов
+yarn workspace @feugene/granularity-playground-5 dev
+yarn workspace @feugene/granularity-playground-5 test:run
 ```
-
-Стенд собирает CSS из `dist` библиотеки (`granular-provider/node`), поэтому после правок
-пакета — `yarn build:granularity`.

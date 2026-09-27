@@ -30,15 +30,6 @@
       ],
       "@feugene/granularity/granular-provider/node": [
         "../../packages/granularity/src/granular-provider/node.ts"
-      ],
-      "@feugene/unocss-preset-granular": [
-        "../../packages/unocss-preset-granular/src/index.ts"
-      ],
-      "@feugene/unocss-preset-granular/node": [
-        "../../packages/unocss-preset-granular/src/node.ts"
-      ],
-      "@feugene/unocss-preset-granular/contract": [
-        "../../packages/unocss-preset-granular/src/contract/index.ts"
       ]
     }
   },
@@ -49,7 +40,7 @@
     "vite.config.ts",
     "vitest.config.ts",
     "vite-env.d.ts",
-    "uno.config.ts",
+    "granum.config.ts",
     "src/**/*.ts",
     "src/**/*.d.ts",
     "src/**/*.tsx",

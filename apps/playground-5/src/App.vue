@@ -13,20 +13,21 @@ const ready = ref(false)
         playground-5 / способ 5
       </p>
       <h1 class="text-3xl font-semibold leading-tight">
-        `UnoCSS` + `presetGranularNode`
+        `granum` + манифест пакета
       </h1>
       <p class="mt-3 text-sm leading-6 text-slate-600">
-        Стили кнопки и foundation CSS добавляются автоматически через node-only preset пакета.
+        Стили кнопки, токены, база и тема приезжают из `granum.manifest.json` пакета одним
+        `virtual:granum.css` — пятью слоями каскада, без сканирования `node_modules`.
       </p>
     </section>
 
     <section class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
       <div class="flex flex-wrap items-center gap-3">
         <GrButton variant="secondary" tone="success" @click="ready = !ready">
-          {{ ready ? 'Готово' : 'Проверить preset' }}
+          {{ ready ? 'Готово' : 'Проверить granum' }}
         </GrButton>
         <span class="text-sm text-slate-500">
-          Состояние: {{ ready ? 'uno-node подключён' : 'ожидает клика' }}
+          Состояние: {{ ready ? 'плагин granum подключён' : 'ожидает клика' }}
         </span>
       </div>
     </section>
@@ -40,8 +41,8 @@ const ready = ref(false)
           Размеры основных чанков
         </h2>
         <p class="text-sm leading-6 text-slate-600">
-          Ориентир после production build: JS и CSS разложены по отдельным группам `vue`, `granularity`,
-          `reset` и `app`.
+          Замер production-сборки. JS разложен по группам `vue`, `granularity`, `reset` и `app`;
+          весь CSS granum лежит одним ассетом — разделение уехало из файлов в слои каскада.
         </p>
       </div>
 
@@ -53,8 +54,8 @@ const ready = ref(false)
           <div class="mt-3 flex flex-col gap-3">
             <div class="flex flex-col gap-1">
               <span class="text-[11px] uppercase tracking-[0.12em] text-slate-400">JS</span>
-              <p class="text-sm font-semibold text-slate-900">raw ~59.5 kB</p>
-              <p class="text-xs text-slate-500">gzip ~23.6 kB</p>
+              <p class="text-sm font-semibold text-slate-900">raw ~61.2 kB</p>
+              <p class="text-xs text-slate-500">gzip ~24.2 kB</p>
             </div>
             <div class="flex flex-col gap-1">
               <span class="text-[11px] uppercase tracking-[0.12em] text-slate-400">CSS</span>
@@ -71,13 +72,13 @@ const ready = ref(false)
           <div class="mt-3 flex flex-col gap-3">
             <div class="flex flex-col gap-1">
               <span class="text-[11px] uppercase tracking-[0.12em] text-slate-400">JS</span>
-              <p class="text-sm font-semibold text-slate-900">raw ~3.0 kB</p>
-              <p class="text-xs text-slate-500">gzip ~1.3 kB</p>
+              <p class="text-sm font-semibold text-slate-900">raw ~13.0 kB</p>
+              <p class="text-xs text-slate-500">gzip ~3.3 kB</p>
             </div>
             <div class="flex flex-col gap-1">
               <span class="text-[11px] uppercase tracking-[0.12em] text-slate-400">CSS</span>
-              <p class="text-sm font-semibold text-slate-900">raw ~5.1 kB</p>
-              <p class="text-xs text-slate-500">gzip ~1.6 kB</p>
+              <p class="text-sm font-semibold text-slate-900">raw ~34.8 kB</p>
+              <p class="text-xs text-slate-500">gzip ~5.9 kB</p>
             </div>
           </div>
         </article>
@@ -108,12 +109,12 @@ const ready = ref(false)
             <div class="flex flex-col gap-1">
               <span class="text-[11px] uppercase tracking-[0.12em] text-slate-400">JS</span>
               <p class="text-sm font-semibold text-slate-900">raw ~6.9 kB</p>
-              <p class="text-xs text-slate-500">gzip ~2.3 kB</p>
+              <p class="text-xs text-slate-500">gzip ~2.4 kB</p>
             </div>
             <div class="flex flex-col gap-1">
               <span class="text-[11px] uppercase tracking-[0.12em] text-slate-400">CSS</span>
-              <p class="text-sm font-semibold text-slate-900">raw ~5.5 kB</p>
-              <p class="text-xs text-slate-500">gzip ~1.6 kB</p>
+              <p class="text-sm font-semibold text-slate-900">raw ~0 kB</p>
+              <p class="text-xs text-slate-500">gzip ~0 kB</p>
             </div>
           </div>
         </article>

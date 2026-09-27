@@ -4,7 +4,9 @@ import vue from '@vitejs/plugin-vue'
 import { visualizer } from 'rollup-plugin-visualizer'
 import Icons from 'unplugin-icons/vite'
 import VueDevtools from 'vite-plugin-vue-devtools'
-import UnoCSS from 'unocss/vite'
+import { granum } from '@feugene/granum/vite'
+
+import granumConfig from './granum.config'
 
 export const playgroundGranularityEntry = fileURLToPath(new URL('../../packages/granularity/dist/index.js', import.meta.url))
 export const playgroundGranularityDistDir = fileURLToPath(new URL('../../packages/granularity/dist/', import.meta.url))
@@ -54,9 +56,7 @@ export default defineConfig(({ mode }) => ({
       compiler: 'vue3',
       autoInstall: false,
     }),
-    UnoCSS({
-      configFile: fileURLToPath(new URL('./uno.config.ts', import.meta.url)),
-    }),
+    granum(granumConfig),
   ],
   resolve: {
     alias: {

@@ -26,7 +26,7 @@
     "vite.config.ts",
     "vitest.config.ts",
     "vite-env.d.ts",
-    "uno.config.ts",
+    "granum.config.ts",
     "src/**/*.ts",
     "src/**/*.d.ts",
     "src/**/*.tsx",

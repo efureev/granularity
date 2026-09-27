@@ -4,6 +4,15 @@ SSR-стенд к [`packages/granularity/docs/ssr.md`](../../packages/granularit
 живой сервер + тесты, которые проверяют серверный рендер и гидрацию
 воспроизведением, а не чтением исходников.
 
+> **Стенд ждёт переезда пакетов-спутников на granum.**
+>
+> `@feugene/granularity` уже собирается конвейером `@feugene/granum`, а этот стенд
+> подключает вместе с ним пакеты-спутники (`chrono`, `charts`, `dashboard`,
+> `editor`, `forms-schema`, `media`, `code`), которые остались провайдерами
+> пресета v1. Два оркестратора в одной сборке не уживаются: пресет пытается
+> прочитать у пакета раскладку, которой в granum нет, и сборка падает на
+> `tokenDefinitionsRef`. Переводить стенд поодиночке нечего — сначала спутники.
+
 ```bash
 yarn build:granularity                                  # приложения работают с собранным dist
 yarn workspace @feugene/granularity-playground-ssr dev  # http://localhost:5210/

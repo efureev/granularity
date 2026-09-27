@@ -1,4 +1,5 @@
 import { defineGranumConfig } from '@feugene/granum/vite'
+import { miniEngine } from '@feugene/granum-engine-mini'
 
 /** Ровно один компонент: его граф granum развернёт сам по манифесту пакета. */
 export const playground5GranularityComponents = ['GrButton'] as const
@@ -13,8 +14,14 @@ export const playground5GranularityComponents = ['GrButton'] as const
  *
  * `appSources` обязателен: классы разметки самого приложения granum берёт
  * отсюда, а без них утилиты `App.vue` не попали бы в CSS.
+ *
+ * `engine` тоже обязателен и принимает инстанс: движок утилит выбирает
+ * приложение, granum своей реализации не имеет. Словарь обязан совпадать с тем,
+ * который объявил пакет, иначе классы компонентов придётся пересчитывать, а
+ * часть из них останется без правил.
  */
 export default defineGranumConfig({
+  engine: miniEngine(),
   providers: ['@feugene/granularity'],
   components: [
     {

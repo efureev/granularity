@@ -17,15 +17,16 @@ import App from './App.vue'
 // import '@granularity-button-css'
 // import './styles/light-app.css'
 
-// Вариант 4: granular-подключение через `presetGranularNode`.
-// Foundation-слой пакета, utility-стили выбранных компонентов, встроенные темы `light`/`dark`
-// и app theme собираются через `apps/playground/uno.config.ts`.
-
-// Keep UnoCSS only for the playground shell. Package button styles must come from built dist artifacts.
+// Вариант 4: подключение через granum.
+// Токены, база, встроенные темы `light`/`dark`, CSS выбранных компонентов и
+// утилиты разметки приезжают одним виртуальным модулем, пятью каскадными
+// слоями; селекция задана в `apps/playground/granum.config.ts`.
 import '@unocss/reset/tailwind-compat.css'
-import 'virtual:uno.css'
-// После `virtual:uno.css`, иначе базовые токены пакета перебьют тему: они
-// эмитятся последними внутри слоя `granular`.
+import 'virtual:granum.css'
+// Тема стенда — нелейерный CSS, поэтому по правилам каскада она выигрывает у
+// любого слоя granum независимо от порядка импортов. Раньше порядок решал всё:
+// базовые токены пакета эмитились последними внутри одного слоя и перебивали
+// тему, подключённую раньше.
 import './styles/light-app.css'
 
 const app = createApp(App)

@@ -34,7 +34,7 @@ const tagOptions = [
         Проверка isolated-импорта `GrButton`, `GrModal`, `GrSelect` и `GrPromptDialog`
       </h1>
       <p class="max-w-3xl text-sm leading-6 text-slate-600">
-        В это демо через `presetGranularNode` подключены granular-стили для
+        В это демо через granum подключены стили выбранных компонентов:
         `GrButton`, `GrModal`, `GrSelect` и `GrPromptDialog`.
         На странице должны быть видны и button states, и корректная работа modal/prompt overlay, и базовые select-сценарии.
       </p>
@@ -166,7 +166,7 @@ const tagOptions = [
               GrModal в playground
             </h3>
             <p class="text-sm leading-6 text-slate-600">
-              Этот пример помогает быстро проверить, что granular preset подтягивает стили overlay,
+              Этот пример помогает быстро проверить, что granum подтягивает стили overlay,
               панели и анимаций для `GrModal`.
             </p>
           </div>

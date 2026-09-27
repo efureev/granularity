@@ -2,55 +2,28 @@ import { readFileSync } from 'node:fs'
 import { fileURLToPath, URL } from 'node:url'
 import { describe, expect, it } from 'vitest'
 
-import playground5UnoConfigDefault, {
-  playground5GranularityLayer,
-} from '../../uno.config'
+import playground5GranumConfig, {
+  playground5GranularityComponents,
+} from '../../granum.config'
 import {
   playground5GranularityChunkGroup,
   playground5ResetChunkGroup,
   playground5VueChunkGroup,
 } from '../../vite.config'
 
-// `granularContent(options)` возвращает `{ filesystem, pipeline: { include } }`.
-// Раскрываем эту структуру из дефолтного экспорта конфига.
-const playground5Content = (playground5UnoConfigDefault as {
-  content: { filesystem: string[]; pipeline: { include: RegExp[] } }
-}).content
-const playground5ContentIncludes = playground5Content.pipeline.include
-
-// Директория выбранного компонента (`GrButton`) в собранном `dist/`,
-// вычисленная из filesystem-glob'а (реальный абсолютный путь).
-const playground5GrButtonDir = playground5Content.filesystem[0].replace(/\/\*\*.*$/, '')
-const playground5GrButtonFile = `${playground5GrButtonDir}/index.js`
-const playground5GrModalFile = `${playground5GrButtonDir.replace(/GrButton$/, 'GrModal')}/index.js`
-
-const playground5MainEntry = readFileSync(
-  fileURLToPath(new URL('../main.ts', import.meta.url)),
+const read = (relativePath: string): string => readFileSync(
+  fileURLToPath(new URL(relativePath, import.meta.url)),
   'utf8',
 )
 
-const playground5AppEntry = readFileSync(
-  fileURLToPath(new URL('../App.vue', import.meta.url)),
-  'utf8',
-)
+const playground5MainEntry = read('../main.ts')
+const playground5CssEntry = read('../granularity.ts')
+const playground5AppEntry = read('../App.vue')
+const playground5ViteConfig = read('../../vite.config.ts')
+const playground5ViteEnv = read('../../vite-env.d.ts')
 
-const playground5UnoConfig = readFileSync(
-  fileURLToPath(new URL('../../uno.config.ts', import.meta.url)),
-  'utf8',
-)
-
-const playground5ViteEnv = readFileSync(
-  fileURLToPath(new URL('../../vite-env.d.ts', import.meta.url)),
-  'utf8',
-)
-
-const playground5Tsconfig = JSON.parse(readFileSync(
-  fileURLToPath(new URL('../../tsconfig.json', import.meta.url)),
-  'utf8',
-)) as {
-  compilerOptions?: {
-    paths?: Record<string, string[]>
-  }
+const playground5Tsconfig = JSON.parse(read('../../tsconfig.json')) as {
+  compilerOptions?: { paths?: Record<string, string[]> }
 }
 
 describe('playground-5 config', () => {
@@ -62,39 +35,48 @@ describe('playground-5 config', () => {
     expect(playground5GranularityChunkGroup.priority).toBeGreaterThan(playground5ResetChunkGroup.priority)
   })
 
-  it('подключает node-only preset и сканирует только свои исходники', () => {
-    expect(playground5UnoConfig).toContain("from '@feugene/unocss-preset-granular/node'")
-    expect(playground5UnoConfig).toContain('presetGranularNode')
-    expect(playground5UnoConfig).toContain('granularContent')
-    expect(playground5UnoConfig).toContain("import granularityProvider from '@feugene/granularity/granular-provider/node'")
-    expect(playground5UnoConfig).toContain('providers: [granularityProvider]')
-    expect(playground5UnoConfig).toContain('presetGranularNode(granularOptions)')
-    expect(playground5UnoConfig).toContain('granularContent(granularOptions)')
-    expect(playground5UnoConfig).toContain('layer: playground5GranularityLayer')
-    expect(playground5GranularityLayer).toBe('granular')
-    // Шаблоны исходников приложения (`.vue`) подхватываются стандартным фильтром.
-    expect(playground5ContentIncludes.some(re => re.test('/repo/apps/playground-5/src/App.vue'))).toBe(true)
-    // filesystem и таргетированный include нацелены строго на выбранный компонент
-    // (`GrButton`) в `dist/`, не затрагивая невыбранные компоненты и артефакты.
-    expect(
-      playground5Content.filesystem.some(glob => /packages\/granularity\/dist\/components\/GrButton\//.test(glob)),
-    ).toBe(true)
-    expect(playground5ContentIncludes.some(re => re.test(playground5GrButtonFile))).toBe(true)
-    expect(playground5ContentIncludes.some(re => re.test(playground5GrModalFile))).toBe(false)
+  it('подключает провайдера манифестом и выбирает ровно один компонент', () => {
+    // Имя пакета, а не объект провайдера: манифест ищется через `exports`, и
+    // приложению незачем исполнять код пакета ради резолюции.
+    expect(playground5GranumConfig.providers).toEqual(['@feugene/granularity'])
+    expect(playground5GranularityComponents).toEqual(['GrButton'])
+    expect(playground5GranumConfig.components).toEqual([
+      { provider: '@feugene/granularity', names: ['GrButton'] },
+    ])
+    // Без `appSources` классы разметки приложения не попали бы в CSS: granum
+    // берёт их отсюда, а классы компонента — из манифеста.
+    expect(playground5GranumConfig.appSources).toEqual({ dirs: ['src'] })
+  })
+
+  it('CSS приезжает одним виртуальным модулем плагина', () => {
+    expect(playground5ViteConfig).toContain("import { granum } from '@feugene/granum/vite'")
+    expect(playground5ViteConfig).toContain('granum(granumConfig)')
+    expect(playground5CssEntry).toContain(`import 'virtual:granum.css'`)
+    expect(playground5ViteEnv).toContain(`declare module 'virtual:granum.css'`)
+    // Слои каскада внутри одного ассета — отдельной entry под app-CSS больше нет.
     expect(playground5MainEntry).toContain('await Promise.all([')
-    expect(playground5MainEntry).toContain("import('./reset')")
-    expect(playground5MainEntry).toContain("import('./granularity')")
-    expect(playground5MainEntry).toContain("import('./app-styles')")
+    expect(playground5MainEntry).toContain(`import('./reset')`)
+    expect(playground5MainEntry).toContain(`import('./granularity')`)
+    expect(playground5MainEntry).not.toContain('app-styles')
+  })
+
+  it('от пресета v1 в приложении не осталось ни строки', () => {
+    for (const source of [playground5ViteConfig, playground5MainEntry, playground5CssEntry, playground5AppEntry]) {
+      expect(source).not.toContain('unocss-preset-granular')
+      expect(source).not.toContain('virtual:uno')
+    }
+    expect(playground5ViteEnv).toContain('/// <reference types="unplugin-icons/types/vue" />')
   })
 
   it('мапит локальные granularity imports на source-entry для IDE и TS в monorepo', () => {
-    expect(playground5Tsconfig.compilerOptions?.paths).toMatchObject({
+    // Пути пресета убраны вместе с ним; `@feugene/granum` резолвится через
+    // node_modules по `exports`, отдельной карты ему не нужно.
+    expect(playground5Tsconfig.compilerOptions?.paths).toEqual({
       '@feugene/granularity': ['../../packages/granularity/src/index.ts'],
       '@feugene/granularity/components/*': ['../../packages/granularity/src/components/*/index.ts'],
+      '@feugene/granularity/granular-provider': ['../../packages/granularity/src/granular-provider/index.ts'],
       '@feugene/granularity/granular-provider/node': ['../../packages/granularity/src/granular-provider/node.ts'],
-      '@feugene/unocss-preset-granular/node': ['../../packages/unocss-preset-granular/src/node.ts'],
     })
-    expect(playground5ViteEnv).toContain('/// <reference types="unplugin-icons/types/vue" />')
   })
 
   it('показывает на странице примерные размеры bundle', () => {
@@ -103,8 +85,8 @@ describe('playground-5 config', () => {
     expect(playground5AppEntry).toContain('data-bundle-group="granularity"')
     expect(playground5AppEntry).toContain('data-bundle-group="reset"')
     expect(playground5AppEntry).toContain('data-bundle-group="app"')
-    expect(playground5AppEntry).toContain('gzip ~23.6 kB')
-    expect(playground5AppEntry).toContain('gzip ~1.6 kB')
+    expect(playground5AppEntry).toContain('gzip ~24.2 kB')
+    expect(playground5AppEntry).toContain('gzip ~5.9 kB')
     expect(playground5AppEntry).toContain('gzip ~1.0 kB')
   })
 })

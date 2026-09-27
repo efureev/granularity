@@ -23,7 +23,7 @@
   },
   "include": [
     "vite.config.ts",
-    "uno.config.ts",
+    "granum.config.ts",
     "vite-env.d.ts",
     "src/**/*.ts",
     "src/**/*.d.ts",

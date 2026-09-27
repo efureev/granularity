@@ -1,15 +1,15 @@
 import { fileURLToPath, URL } from 'node:url'
-import { defineConfig } from 'vite'
+import { granum } from '@feugene/granum/vite'
 import vue from '@vitejs/plugin-vue'
-import UnoCSS from 'unocss/vite'
+import { defineConfig } from 'vite'
+
+import granumConfig from './granum.config'
 
 export default defineConfig({
   root: fileURLToPath(new URL('./', import.meta.url)),
   base: '/playground-theme/',
   plugins: [
     vue(),
-    UnoCSS({
-      configFile: fileURLToPath(new URL('./uno.config.ts', import.meta.url)),
-    }),
+    granum(granumConfig),
   ],
 })
