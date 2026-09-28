@@ -9,7 +9,21 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
-- **The utility engine changed: `@feugene/granum-engine-wind` `^0.3.0` instead of
+- **`yarn doctor` is `granum doctor --strict`, without a wrapper script.**
+  `scripts/granum-doctor.mjs` existed for two reasons and both are gone. It muted
+  `token-undefined` through the monorepo's token registry — granum 0.4.0 derives
+  the same verdict from the code itself (a use with a fallback, a token the
+  component assigns itself and `dynamicTokens` are not findings), so the registry
+  is unnecessary. And it kept recorded debt from failing the gate — that is now
+  `--allow=<codes>`. Findings across the eight packages went from 861 to 1, and
+  that one is the deliberate `!important` on the drag cursor in `GrTransfer`,
+  recorded through `--allow`.
+- **Safelists in the manifests shrank from 3479 entries to 430** (zero in every
+  companion): granum drops entries that static extraction already covers. Nothing
+  in the sources changed and the CSS is byte-for-byte identical — the safelist
+  there is derived from the component's own class constants, and whether
+  extraction sees a given class is decided by chunking, not by the author.
+- **The utility engine changed: `@feugene/granum-engine-wind` `^0.4.0` instead of
   `@feugene/granum-engine-mini`.** It vendors `preset-wind3` rather than
   `preset-mini`, so the vocabulary gained `border-collapse`, `list-none`,
   `touch-none`, `table-fixed` and `scroll-p*` — utilities that existed neither in

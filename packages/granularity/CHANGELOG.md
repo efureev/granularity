@@ -9,7 +9,30 @@ to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
-- **The utility engine changed: `@feugene/granum-engine-wind` `^0.3.0` instead of
+- **`yarn doctor` is `granum doctor --strict`, without a wrapper script.**
+  `scripts/granum-doctor.mjs` existed for two reasons and both are gone. It muted
+  `token-undefined` through the monorepo's token registry — granum 0.4.0 derives
+  the same verdict from the code itself (a use with a fallback, a token the
+  component assigns itself and `dynamicTokens` are not findings), so the registry
+  is unnecessary. And it kept recorded debt from failing the gate — that is now
+  `--allow=<codes>`. Findings across the eight packages went from 861 to 1, and
+  that one is the deliberate `!important` on the drag cursor in `GrTransfer`,
+  recorded through `--allow`.
+- **Safelists in the manifests shrank from 3479 entries to 430** (zero in every
+  companion): granum drops entries that static extraction already covers. Nothing
+  in the sources changed and the CSS is byte-for-byte identical — the safelist
+  there is derived from the component's own class constants, and whether
+  extraction sees a given class is decided by chunking, not by the author.
+- **Marker classes are no longer emitted into safelists.** `peer` and
+  `group/segmented-item` produce no CSS by design — they are hooks for variants —
+  so a safelist entry for them is dead by definition. `splitClassTokens` filters
+  them out; in the markup they stay where they work. The showcase build now
+  reports zero classes without a rule.
+- **`GrLink` declares its runtime-composed tokens.** The tone colour is read as
+  `var(--gr-${tone}-text)`, and static analysis sees only the `--gr-` prefix;
+  `dynamicTokens` now names the seven tones, so token pruning keeps them and the
+  diagnostic stays quiet.
+- **The utility engine changed: `@feugene/granum-engine-wind` `^0.4.0` instead of
   `@feugene/granum-engine-mini`.** It vendors `preset-wind3` rather than
   `preset-mini`, so the vocabulary gained `border-collapse`, `list-none`,
   `touch-none`, `table-fixed` and `scroll-p*` — utilities that existed neither in

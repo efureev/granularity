@@ -105,7 +105,7 @@
     "@codemirror/view": "^6.0.0",
     "@feugene/fint-i18n": ">=0.7.0 <1.0.0",
     "@feugene/granularity": ">=0.41.0 <1.0.0",
-    "@feugene/granum": ">=0.3.0 <1.0.0",
+    "@feugene/granum": ">=0.4.0 <1.0.0",
     "@feugene/unplugin-granularity": ">=0.7.0 <1.0.0",
     "unplugin-vue-components": ">=0.26.0",
     "vue": "^3.5.0"
@@ -142,8 +142,8 @@
     "@feugene/fint-i18n": "^0.7.0",
     "@feugene/granularity": "^0.53.0",
     "@feugene/granularity-test-kit": "^0.10.0",
-    "@feugene/granum": "^0.3.0",
-    "@feugene/granum-engine-wind": "^0.3.0",
+    "@feugene/granum": "^0.4.0",
+    "@feugene/granum-engine-wind": "^0.4.0",
     "@feugene/unplugin-granularity": "^0.7.0",
     "@types/node": "^26.4.0",
     "@vitejs/plugin-vue": "^6.0.8",
@@ -164,7 +164,7 @@
   "scripts": {
     "build": "vite build && vue-tsc -p tsconfig.build.json",
     "dev": "vite build --watch",
-    "doctor": "node ../../scripts/granum-doctor.mjs ./granum.config.mjs",
+    "doctor": "granum doctor ./granum.config.mjs --strict",
     "sizes": "node ../../scripts/report-entry-sizes.mjs .",
     "sizes:docs": "node ../../scripts/generate-entry-sizes.mjs .",
     "generate:registry": "node scripts/generate-registry.mjs",

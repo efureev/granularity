@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- **The optional peer is `@feugene/granum` `>=0.3.0 <1.0.0`.** The kit's gates do
+- **The optional peer is `@feugene/granum` `>=0.4.0 <1.0.0`.** The kit's gates do
   not depend on the engine vocabulary, but the range moved with the others:
   diverged ranges would leave a consumer with an uninstallable set.
 - **The optional peer changed: `@feugene/granum` `>=0.2.0 <1.0.0` instead of

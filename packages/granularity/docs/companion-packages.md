@@ -84,17 +84,17 @@ packages/<my-package>/
   },
   "peerDependencies": {
     "@feugene/granularity": ">=0.21.0 <1.0.0",
-    "@feugene/granum": ">=0.3.0 <1.0.0",
+    "@feugene/granum": ">=0.4.0 <1.0.0",
     "vue": "^3.5.0"
   },
   "devDependencies": {
-    "@feugene/granum": "^0.3.0",
-    "@feugene/granum-engine-wind": "^0.3.0"
+    "@feugene/granum": "^0.4.0",
+    "@feugene/granum-engine-wind": "^0.4.0"
   },
   "scripts": {
     "build": "vite build && vue-tsc -p tsconfig.build.json",
     "typecheck": "vue-tsc --noEmit -p tsconfig.json",
-    "doctor": "node ../../scripts/granum-doctor.mjs ./granum.config.mjs",
+    "doctor": "granum doctor ./granum.config.mjs --strict",
     "sizes": "node ../../scripts/report-entry-sizes.mjs .",
     "sizes:docs": "node ../../scripts/generate-entry-sizes.mjs ."
   }
@@ -108,6 +108,11 @@ packages/<my-package>/
 Движок (`@feugene/granum-engine-wind`) нужен только на сборке — он **dev**, а не
 peer: словарь, против которого написаны классы, пакет объявляет диалектом, а
 инстанс движка приносит приложение.
+
+`doctor` — прямой вызов CLI, без скрипта-обёртки: свой фильтр вокруг доктора
+неизбежно расходится с самим доктором. Осознанный долг записывается флагом
+(`--allow=important-in-provider-css`) и остаётся напечатанным и посчитанным;
+детали по находке — `--code=<code>` и `--component=<providerId:Name>`.
 
 - `sizes` — отчёт о весе гранулярных импортов (`scripts/report-entry-sizes.mjs`, общий на монорепо).
   Шаг `Entry sizes (gzip)` ставится в сборочную джобу пакета сразу после `Granular doctor` — таблица
@@ -680,7 +685,7 @@ npx --yes publint@latest --pack npm   # проверка соответстви�
 
 - [ ] `package.json`: `type: module`, `sideEffects: ["**/*.css"]`, пер-компонентные `exports`, peer на ядро.
 - [ ] `vite.config.ts`: `granumProvider({ provider, engine: windEngine(), entries })`, `libInjectCss`, `external` на peers и тяжёлые deps, своего `build.lib` нет.
-- [ ] `granum.manifest.json` в `exports` сразу за `"."`; `granum.config.mjs` + скрипт `doctor`.
+- [ ] `granum.manifest.json` в `exports` сразу за `"."`; `granum.config.mjs` + скрипт `doctor` прямым вызовом `granum doctor --strict`.
 - [ ] Компоненты `Gr*` + `config.ts` (`defineGranumComponent`), общие хелперы в `components/shared/`, темизация через DS-токены.
 - [ ] (Опц., если есть встроенные строки) `src/i18n`: уникальный блок (не `gr`), per-locale loaders, `all.ts` вне barrel; экспорты `./i18n` + `./i18n/all`, `fint-i18n` — optional peer; компоненты читают перевод через резолвер с fallback.
 - [ ] Granular-provider: `shared.ts` с диалектом движка и реестром-мапой, доноры строками, browser/node entry; в приложении подключается по имени пакета.
