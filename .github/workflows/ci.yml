@@ -29,17 +29,20 @@ jobs:
   # Что вообще нужно прогонять на этом ref.
   #
   # Тег технического пакета (тест-кит, панель devtools, резолвер авто-импорта,
-  # адаптер данных) витрины не касается: она их не рендерит, а всё нужное для
-  # публикации делает собственная `build`-джоба пакета. Сам коммит к моменту
-  # тега уже прошёл полный конвейер на `main`, поэтому витрина, SSR-стенд и
-  # сборки компонентных спутников здесь были бы повтором на восемь минут.
+  # адаптер данных) компонентных спутников не касается: всё нужное для публикации
+  # делает собственная `build`-джоба пакета. Сам коммит к моменту тега уже прошёл
+  # полный конвейер на `main`, поэтому SSR-стенд и сборки спутников здесь были бы
+  # повтором на восемь минут.
+  #
+  # Флаг назывался `showcase`, пока витрина была в конвейере; теперь он гатит то,
+  # что и гатил по сути: сборки компонентных спутников и SSR-стенд.
   #
   # Список живёт **только здесь** — заводя технический пакет, правьте один
   # `case`, а не условие в дюжине джоб.
   release-scope:
     runs-on: ubuntu-latest
     outputs:
-      showcase: ${{ steps.resolve.outputs.showcase }}
+      components: ${{ steps.resolve.outputs.components }}
       core: ${{ steps.resolve.outputs.core }}
     steps:
       - name: Resolve scope
@@ -47,12 +50,12 @@ jobs:
         run: |
           case "$GITHUB_REF_NAME" in
             granularity-test-kit-v*|granularity-devtools-v*|granularity-datasource-v*|unplugin-granularity-v*)
-              echo 'showcase=false' >> "$GITHUB_OUTPUT"
+              echo 'components=false' >> "$GITHUB_OUTPUT"
               echo 'core=false' >> "$GITHUB_OUTPUT"
-              echo "::notice::Тег технического пакета ($GITHUB_REF_NAME): витрина, SSR-стенд, сборки компонентных спутников и перепроверка ядра пропускаются."
+              echo "::notice::Тег технического пакета ($GITHUB_REF_NAME): SSR-стенд, сборки компонентных спутников и перепроверка ядра пропускаются."
               ;;
             *)
-              echo 'showcase=true' >> "$GITHUB_OUTPUT"
+              echo 'components=true' >> "$GITHUB_OUTPUT"
               echo 'core=true' >> "$GITHUB_OUTPUT"
               ;;
           esac
@@ -376,7 +379,7 @@ jobs:
   # Зависит от сборок пакетов: витрина типизируется против собранного `dist`,
   # как и её тесты.
   build-granularity-editor:
-    if: needs.release-scope.outputs.showcase == 'true'
+    if: needs.release-scope.outputs.components == 'true'
     needs:
       - release-scope
       - quality-granularity
@@ -542,7 +545,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   build-granularity-media:
-    if: needs.release-scope.outputs.showcase == 'true'
+    if: needs.release-scope.outputs.components == 'true'
     needs:
       - release-scope
       - quality-granularity
@@ -631,7 +634,7 @@ jobs:
   # Публикация @feugene/granularity-media в npm по тегу
   # `granularity-media-v<semver>`.
   build-granularity-code:
-    if: needs.release-scope.outputs.showcase == 'true'
+    if: needs.release-scope.outputs.components == 'true'
     needs:
       - release-scope
       - quality-granularity
@@ -875,110 +878,6 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  quality-showcase:
-    if: needs.release-scope.outputs.showcase == 'true'
-    needs:
-      - release-scope
-      - build-granularity
-      - build-unplugin-granularity
-      - build-granularity-chrono
-      - build-granularity-charts
-      - build-granularity-dashboard
-      - build-granularity-forms-schema
-      - build-granularity-datasource
-      - build-granularity-editor
-      - build-granularity-media
-      - build-granularity-code
-      - build-granularity-devtools
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-node@v6
-        with:
-          node-version: 24
-          cache: yarn
-
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile
-
-      # Спеки `e2e/**` импортируют `@feugene/granularity-test-kit/e2e`, а
-      # `tsconfig.json` витрины их типизирует. Без собранного `dist` тест-кита
-      # обе джобы витрины краснеют ещё до первой настоящей проверки.
-      - name: Build test kit
-        run: yarn build:test-kit
-
-      - name: Download granularity dist
-        uses: actions/download-artifact@v8
-        with:
-          name: granularity-dist
-          path: packages/granularity/dist
-
-      - name: Download unplugin-granularity dist
-        uses: actions/download-artifact@v8
-        with:
-          name: unplugin-granularity-dist
-          path: packages/unplugin-granularity/dist
-
-      - name: Download granularity-chrono dist
-        uses: actions/download-artifact@v8
-        with:
-          name: granularity-chrono-dist
-          path: packages/granularity-chrono/dist
-
-      - name: Download granularity-charts dist
-        uses: actions/download-artifact@v8
-        with:
-          name: granularity-charts-dist
-          path: packages/granularity-charts/dist
-
-      - name: Download granularity-dashboard dist
-        uses: actions/download-artifact@v8
-        with:
-          name: granularity-dashboard-dist
-          path: packages/granularity-dashboard/dist
-
-      - name: Download granularity-forms-schema dist
-        uses: actions/download-artifact@v8
-        with:
-          name: granularity-forms-schema-dist
-          path: packages/granularity-forms-schema/dist
-
-      - name: Download granularity-datasource dist
-        uses: actions/download-artifact@v8
-        with:
-          name: granularity-datasource-dist
-          path: packages/granularity-datasource/dist
-
-      - name: Download granularity-editor dist
-        uses: actions/download-artifact@v8
-        with:
-          name: granularity-editor-dist
-          path: packages/granularity-editor/dist
-
-      - name: Download granularity-media dist
-        uses: actions/download-artifact@v8
-        with:
-          name: granularity-media-dist
-          path: packages/granularity-media/dist
-      - name: Download granularity-code dist
-        uses: actions/download-artifact@v8
-        with:
-          name: granularity-code-dist
-          path: packages/granularity-code/dist
-
-      - name: Download granularity-devtools dist
-        uses: actions/download-artifact@v8
-        with:
-          name: granularity-devtools-dist
-          path: packages/granularity-devtools/dist
-
-      - name: Lint showcase
-        run: yarn lint:showcase
-
-      - name: Typecheck showcase
-        if: always()
-        run: yarn typecheck:showcase
-
   docs-granularity:
     if: needs.release-scope.outputs.core == 'true'
     needs:
@@ -1132,7 +1031,7 @@ jobs:
     # Стенд поднимает каждый компонент экосистемы на своей странице, поэтому
     # ему нужен dist всех пакетов, а не только тех, у кого есть тематическая
     # страница.
-    if: needs.release-scope.outputs.showcase == 'true'
+    if: needs.release-scope.outputs.components == 'true'
     needs:
       - release-scope
       - build-granularity
@@ -1207,385 +1106,6 @@ jobs:
       - name: Test SSR playground
         run: yarn test:playground-ssr
 
-  test-showcase:
-    # Витрина использует авто-импорт `unplugin-vue-components` через резолверы
-    # из @feugene/unplugin-granularity, @feugene/granularity-chrono и
-    # @feugene/granularity-charts, а `granum.config.ts` читает провайдеры тех же
-    # пакетов — их dist нужен уже при загрузке vite/vitest-конфига, поэтому
-    # скачиваем все четыре.
-    if: needs.release-scope.outputs.showcase == 'true'
-    needs:
-      - release-scope
-      - build-granularity
-      - build-unplugin-granularity
-      - build-granularity-chrono
-      - build-granularity-charts
-      - build-granularity-dashboard
-      - build-granularity-forms-schema
-      - build-granularity-datasource
-      - build-granularity-editor
-      - build-granularity-media
-      - build-granularity-code
-      - build-granularity-devtools
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-node@v6
-        with:
-          node-version: 24
-          cache: yarn
-
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile
-
-      - name: Download granularity dist
-        uses: actions/download-artifact@v8
-        with:
-          name: granularity-dist
-          path: packages/granularity/dist
-
-      - name: Download unplugin-granularity dist
-        uses: actions/download-artifact@v8
-        with:
-          name: unplugin-granularity-dist
-          path: packages/unplugin-granularity/dist
-
-      - name: Download granularity-chrono dist
-        uses: actions/download-artifact@v8
-        with:
-          name: granularity-chrono-dist
-          path: packages/granularity-chrono/dist
-
-      - name: Download granularity-charts dist
-        uses: actions/download-artifact@v8
-        with:
-          name: granularity-charts-dist
-          path: packages/granularity-charts/dist
-
-      - name: Download granularity-dashboard dist
-        uses: actions/download-artifact@v8
-        with:
-          name: granularity-dashboard-dist
-          path: packages/granularity-dashboard/dist
-
-      - name: Download granularity-forms-schema dist
-        uses: actions/download-artifact@v8
-        with:
-          name: granularity-forms-schema-dist
-          path: packages/granularity-forms-schema/dist
-
-      - name: Download granularity-datasource dist
-        uses: actions/download-artifact@v8
-        with:
-          name: granularity-datasource-dist
-          path: packages/granularity-datasource/dist
-
-      - name: Download granularity-editor dist
-        uses: actions/download-artifact@v8
-        with:
-          name: granularity-editor-dist
-          path: packages/granularity-editor/dist
-
-      - name: Download granularity-media dist
-        uses: actions/download-artifact@v8
-        with:
-          name: granularity-media-dist
-          path: packages/granularity-media/dist
-      - name: Download granularity-code dist
-        uses: actions/download-artifact@v8
-        with:
-          name: granularity-code-dist
-          path: packages/granularity-code/dist
-
-      - name: Download granularity-devtools dist
-        uses: actions/download-artifact@v8
-        with:
-          name: granularity-devtools-dist
-          path: packages/granularity-devtools/dist
-
-      - name: Test showcase
-        run: yarn test:showcase
-
-  # Axe-гейт по всем 59 компонентам витрины. Baseline (`e2e/a11y-baseline.ts`) пуст,
-  # поэтому падает любое новое serious/critical нарушение. Платформонезависим:
-  # axe анализирует дерево доступности, а не рендер.
-  test-a11y:
-    if: needs.release-scope.outputs.showcase == 'true'
-    needs:
-      - release-scope
-      - build-granularity
-      - build-unplugin-granularity
-      - build-granularity-chrono
-      - build-granularity-charts
-      - build-granularity-dashboard
-      - build-granularity-forms-schema
-      - build-granularity-datasource
-      - build-granularity-editor
-      - build-granularity-media
-      - build-granularity-code
-      - build-granularity-devtools
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-node@v6
-        with:
-          node-version: 24
-          cache: yarn
-
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile
-
-      # Спеки `e2e/**` импортируют `@feugene/granularity-test-kit/e2e`, а
-      # `tsconfig.json` витрины их типизирует. Без собранного `dist` тест-кита
-      # обе джобы витрины краснеют ещё до первой настоящей проверки.
-      - name: Build test kit
-        run: yarn build:test-kit
-
-      - name: Download granularity dist
-        uses: actions/download-artifact@v8
-        with:
-          name: granularity-dist
-          path: packages/granularity/dist
-
-      - name: Download unplugin-granularity dist
-        uses: actions/download-artifact@v8
-        with:
-          name: unplugin-granularity-dist
-          path: packages/unplugin-granularity/dist
-
-      - name: Download granularity-chrono dist
-        uses: actions/download-artifact@v8
-        with:
-          name: granularity-chrono-dist
-          path: packages/granularity-chrono/dist
-
-      - name: Download granularity-charts dist
-        uses: actions/download-artifact@v8
-        with:
-          name: granularity-charts-dist
-          path: packages/granularity-charts/dist
-
-      - name: Download granularity-dashboard dist
-        uses: actions/download-artifact@v8
-        with:
-          name: granularity-dashboard-dist
-          path: packages/granularity-dashboard/dist
-
-      - name: Download granularity-forms-schema dist
-        uses: actions/download-artifact@v8
-        with:
-          name: granularity-forms-schema-dist
-          path: packages/granularity-forms-schema/dist
-
-      - name: Download granularity-datasource dist
-        uses: actions/download-artifact@v8
-        with:
-          name: granularity-datasource-dist
-          path: packages/granularity-datasource/dist
-
-      - name: Download granularity-editor dist
-        uses: actions/download-artifact@v8
-        with:
-          name: granularity-editor-dist
-          path: packages/granularity-editor/dist
-
-      - name: Download granularity-media dist
-        uses: actions/download-artifact@v8
-        with:
-          name: granularity-media-dist
-          path: packages/granularity-media/dist
-      - name: Download granularity-code dist
-        uses: actions/download-artifact@v8
-        with:
-          name: granularity-code-dist
-          path: packages/granularity-code/dist
-
-      - name: Download granularity-devtools dist
-        uses: actions/download-artifact@v8
-        with:
-          name: granularity-devtools-dist
-          path: packages/granularity-devtools/dist
-
-      - name: Install Playwright browsers
-        working-directory: apps/showcase
-        run: npx playwright install --with-deps chromium
-
-      - name: A11y gate
-        run: yarn test:a11y
-
-      # Оверлеи в открытом состоянии: axe по открытому окну, ловушка фокуса,
-      # `inert` фона. Обычный a11y-гейт сканирует страницу как есть, то есть
-      # окна на ней всегда закрыты.
-      - name: Overlay gate
-        run: yarn workspace @feugene/granularity-showcase test:overlay
-
-      # То, чего в jsdom нет вовсе: `Tab`, активация кнопки по `Enter` и layout
-      # (`ResizeObserver`). Юнит-тесты проверяют обработчик, но не путь до него.
-      - name: Interaction gate
-        run: yarn workspace @feugene/granularity-showcase test:interaction
-
-      # Геометрия, которую видно только в браузере: где кончается линия, куда
-      # попал её конец относительно скругления панели. В jsdom классов UnoCSS
-      # не существует вовсе, а визуального слоя в CI нет.
-      - name: Geometry gate
-        run: yarn workspace @feugene/granularity-showcase test:geometry
-
-      - name: Upload report
-        if: failure()
-        uses: actions/upload-artifact@v7
-        with:
-          name: a11y-report
-          path: apps/showcase/playwright-report/
-          if-no-files-found: ignore
-
-  build-showcase:
-    if: needs.release-scope.outputs.showcase == 'true'
-    needs:
-      - release-scope
-      - test-showcase
-      - build-granularity-chrono
-      - build-granularity-charts
-      - build-granularity-dashboard
-      - build-granularity-forms-schema
-      - build-granularity-datasource
-      - build-granularity-editor
-      - build-granularity-media
-      - build-granularity-code
-      - build-granularity-devtools
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-node@v6
-        with:
-          node-version: 24
-          cache: yarn
-
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile
-
-      - name: Download granularity dist
-        uses: actions/download-artifact@v8
-        with:
-          name: granularity-dist
-          path: packages/granularity/dist
-
-      - name: Download unplugin-granularity dist
-        uses: actions/download-artifact@v8
-        with:
-          name: unplugin-granularity-dist
-          path: packages/unplugin-granularity/dist
-
-      - name: Download granularity-chrono dist
-        uses: actions/download-artifact@v8
-        with:
-          name: granularity-chrono-dist
-          path: packages/granularity-chrono/dist
-
-      - name: Download granularity-charts dist
-        uses: actions/download-artifact@v8
-        with:
-          name: granularity-charts-dist
-          path: packages/granularity-charts/dist
-
-      - name: Download granularity-dashboard dist
-        uses: actions/download-artifact@v8
-        with:
-          name: granularity-dashboard-dist
-          path: packages/granularity-dashboard/dist
-
-      - name: Download granularity-forms-schema dist
-        uses: actions/download-artifact@v8
-        with:
-          name: granularity-forms-schema-dist
-          path: packages/granularity-forms-schema/dist
-
-      - name: Download granularity-datasource dist
-        uses: actions/download-artifact@v8
-        with:
-          name: granularity-datasource-dist
-          path: packages/granularity-datasource/dist
-
-      - name: Download granularity-editor dist
-        uses: actions/download-artifact@v8
-        with:
-          name: granularity-editor-dist
-          path: packages/granularity-editor/dist
-
-      - name: Download granularity-media dist
-        uses: actions/download-artifact@v8
-        with:
-          name: granularity-media-dist
-          path: packages/granularity-media/dist
-      - name: Download granularity-code dist
-        uses: actions/download-artifact@v8
-        with:
-          name: granularity-code-dist
-          path: packages/granularity-code/dist
-
-      - name: Download granularity-devtools dist
-        uses: actions/download-artifact@v8
-        with:
-          name: granularity-devtools-dist
-          path: packages/granularity-devtools/dist
-
-      - name: Build showcase
-        run: yarn build:showcase
-
-      # Аудит судит по СОБРАННОМУ CSS, а не по резолюции: вырезан ли
-      # невыбранный компонент целиком, доехало ли всё, что обещала селекция,
-      # не осталось ли токенов, до которых не дотянуться. `doctor` у пакетов
-      # смотрит на контракт, а здесь проверяется доставка.
-      - name: Granum audit
-        run: yarn audit:showcase
-
-      - name: Upload showcase
-        uses: actions/upload-artifact@v7
-        with:
-          name: showcase-dist
-          path: apps/showcase/dist/
-
-  deploy-showcase:
-    needs:
-      - build-showcase
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    # Группа принадлежит этой джобе, а не всему workflow: конкурентных вызовов
-    # не терпит только Pages API. Объявленная на уровне workflow, она сажала в
-    # одну очередь все прогоны — веток и всех семи видов тегов, — а в очереди
-    # GitHub держит ровно один ожидающий прогон, и следующий вытесняет его.
-    # Так из шести тегов одного релиза два оказались `cancelled`.
-    concurrency:
-      group: "pages"
-      cancel-in-progress: false
-    permissions:
-      contents: read
-      pages: write
-      id-token: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Download showcase dist
-        uses: actions/download-artifact@v8
-        with:
-          name: showcase-dist
-          path: showcase-dist
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v4
-        with:
-          path: showcase-dist
-
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v5
-
-  # Публикация пакета в npm — первичный реестр.
-  # Релиз не зависит от showcase, чтобы внешние зависимости витрины
-  # (например, @feugene/fint-i18n) не блокировали публикацию @feugene/granularity.
-  publish-npm:
-    needs:
-      - quality-granularity
       - test-granularity
       - build-granularity
     if: startsWith(github.ref, 'refs/tags/v')
@@ -1942,7 +1462,7 @@ jobs:
   # (для vue-tsc нужны его собранные типы) и от @feugene/unplugin-granularity —
   # на его фабрике `createGranularResolver` построен резолвер пакета.
   build-granularity-chrono:
-    if: needs.release-scope.outputs.showcase == 'true'
+    if: needs.release-scope.outputs.components == 'true'
     needs:
       - release-scope
       - quality-granularity
@@ -2113,7 +1633,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   build-granularity-charts:
-    if: needs.release-scope.outputs.showcase == 'true'
+    if: needs.release-scope.outputs.components == 'true'
     needs:
       - release-scope
       - quality-granularity
@@ -2283,7 +1803,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   build-granularity-dashboard:
-    if: needs.release-scope.outputs.showcase == 'true'
+    if: needs.release-scope.outputs.components == 'true'
     needs:
       - release-scope
       - quality-granularity
@@ -2455,7 +1975,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   build-granularity-forms-schema:
-    if: needs.release-scope.outputs.showcase == 'true'
+    if: needs.release-scope.outputs.components == 'true'
     needs:
       - release-scope
       - quality-granularity
