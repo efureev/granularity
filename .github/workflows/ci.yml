@@ -1531,6 +1531,13 @@ jobs:
       - name: Build showcase
         run: yarn build:showcase
 
+      # Аудит судит по СОБРАННОМУ CSS, а не по резолюции: вырезан ли
+      # невыбранный компонент целиком, доехало ли всё, что обещала селекция,
+      # не осталось ли токенов, до которых не дотянуться. `doctor` у пакетов
+      # смотрит на контракт, а здесь проверяется доставка.
+      - name: Granum audit
+        run: yarn audit:showcase
+
       - name: Upload showcase
         uses: actions/upload-artifact@v7
         with:

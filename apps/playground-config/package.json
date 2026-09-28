@@ -9,14 +9,15 @@
     "vue": "^3.5.42"
   },
   "devDependencies": {
-    "@feugene/granum": "^0.4.0",
-    "@feugene/granum-engine-wind": "^0.4.0",
+    "@feugene/granum": "^0.9.0",
+    "@feugene/granum-engine-wind": "^0.9.0",
     "@vitejs/plugin-vue": "^6.0.8",
     "typescript": "^6.0.3",
     "vite": "^8.2.2",
     "vue-tsc": "^3.3.11"
   },
   "scripts": {
+    "audit:dist": "granum audit dist",
     "build": "vite build",
     "dev": "vite",
     "typecheck": "vue-tsc --noEmit -p tsconfig.json && vue-tsc --noEmit -p tsconfig.checks.json"
