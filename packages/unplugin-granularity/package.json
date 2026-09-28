@@ -50,12 +50,12 @@
     "./package.json": "./package.json"
   },
   "peerDependencies": {
-    "@feugene/granularity": ">=0.38.0 <1.0.0",
+    "@feugene/granularity": ">=1.0.0 <2.0.0",
     "unplugin-vue-components": ">=0.26.0"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^9.3.0",
-    "@feugene/granularity": "^0.53.0",
+    "@feugene/granularity": "^1.0.0",
     "@types/node": "^25.9.5",
     "eslint": "^10.9.1",
     "globals": "^16.5.0",

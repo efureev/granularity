@@ -52,12 +52,12 @@
     "@vue/devtools-kit": "^8.2.1"
   },
   "peerDependencies": {
-    "@feugene/granularity": ">=0.38.0 <1.0.0",
+    "@feugene/granularity": ">=1.0.0 <2.0.0",
     "vue": "^3.5.0"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^9.3.0",
-    "@feugene/granularity": "^0.53.0",
+    "@feugene/granularity": "^1.0.0",
     "@types/node": "^26.4.0",
     "eslint": "^10.9.1",
     "globals": "^16.5.0",

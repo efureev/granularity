@@ -5,7 +5,25 @@ All notable changes to the [`@feugene/granularity`](.) package are documented in
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/).
 
-## [Unreleased]
+## [v1.0.0] 2026-09-28
+
+Переезд на `@feugene/granum` 1.0 и первый мажор пакета.
+
+Что означает 1.0 здесь: публичная поверхность — компоненты, их subpath-экспорты,
+токены и реестры — та же, что была в 0.53, и ломать её теперь можно только
+мажором. Сам же переезд ломающий: конвейер сборки CSS сменился целиком, и
+приложению нужно пройти миграцию (см. `docs/ru/migration.md` в granum).
+
+Для потребителя это значит три вещи:
+
+- peer-зависимость уезжает с `@feugene/unocss-preset-granular` на
+  `@feugene/granum` (`>=1.0.0 <2.0.0`); пресет v1 больше не нужен;
+- `uno.config.ts` заменяется на `granum.config.ts`, а движок утилит передаётся
+  инстансом (`windEngine()` из `@feugene/granum-engine-wind`);
+- CSS приезжает пятью каскадными слоями `granum.*`. Это меняет правила спора со
+  стилями приложения: **любой нелейерный CSS бьёт любой `@layer`**, поэтому
+  сброс браузерных стилей нужно импортировать в слой, иначе он перебьёт стили
+  компонентов. Подробности и пример — в руководстве по переезду granum.
 
 ### Changed
 

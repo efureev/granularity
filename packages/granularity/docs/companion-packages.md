@@ -83,7 +83,7 @@ packages/<my-package>/
     "./package.json": "./package.json"
   },
   "peerDependencies": {
-    "@feugene/granularity": ">=0.21.0 <1.0.0",
+    "@feugene/granularity": ">=1.0.0 <2.0.0",
     "@feugene/granum": ">=1.0.0 <2.0.0",
     "vue": "^3.5.0"
   },
