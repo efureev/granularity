@@ -8,7 +8,7 @@
     "vue": "^3.5.42"
   },
   "devDependencies": {
-    "@feugene/granularity-devtools": "^0.3.0",
+    "@feugene/granularity-devtools": "^1.0.0",
     "@feugene/granum": "^1.0.0",
     "@feugene/granum-engine-wind": "^1.0.0",
     "@unocss/reset": "^66.8.1",

@@ -21,12 +21,12 @@ The published packages:
 - [`@feugene/granularity-code`](./packages/granularity-code/README.md) `1.0.0` — Code surfaces for @feugene/granularity: view, edit and diff — the viewer and the diff carry no dependencies at all.
 - [`@feugene/granularity-dashboard`](./packages/granularity-dashboard/README.md) `1.0.0` — Widget grid for the @feugene/granularity design system — drag, resize, breakpoints and layout persistence, zero dependencies.
 - [`@feugene/granularity-datasource`](./packages/granularity-datasource/README.md) `0.1.2` — List state for @feugene/granularity: sorting, filters, paging, URL sync and race-free fetching behind one composable.
-- [`@feugene/granularity-devtools`](./packages/granularity-devtools/README.md) `0.3.2` — Vue DevTools panel for @feugene/granularity — where a prop value came from, the overlay layer stack and design-system warnings.
+- [`@feugene/granularity-devtools`](./packages/granularity-devtools/README.md) `1.0.0` — Vue DevTools panel for @feugene/granularity — where a prop value came from, the overlay layer stack and design-system warnings.
 - [`@feugene/granularity-editor`](./packages/granularity-editor/README.md) `1.0.0` — Rich-text editing for @feugene/granularity: a TipTap-backed GrRichText field with a design-system toolbar.
 - [`@feugene/granularity-forms-schema`](./packages/granularity-forms-schema/README.md) `1.0.0` — Schema-driven forms for the @feugene/granularity design system — zod and JSON Schema into real form fields, zero dependencies.
 - [`@feugene/granularity-media`](./packages/granularity-media/README.md) `1.0.0` — Media components for @feugene/granularity: image cropping, camera capture, code scanning and video playback.
 - [`@feugene/granularity-test-kit`](./packages/granularity-test-kit/README.md) `1.0.0` — Test gates for @feugene/granularity design-system packages — token, registry and defaults contracts as reusable factories.
-- [`@feugene/unplugin-granularity`](./packages/unplugin-granularity/README.md) `0.7.1` — unplugin-vue-components resolver for @feugene/granularity — granular auto-import for components and directives.
+- [`@feugene/unplugin-granularity`](./packages/unplugin-granularity/README.md) `1.0.0` — unplugin-vue-components resolver for @feugene/granularity — granular auto-import for components and directives.
 <!-- ecosystem:generated:end -->
 
 Not published, and living in `apps/`:

@@ -5,7 +5,17 @@ All notable changes to the [`@feugene/granularity-devtools`](.) package are docu
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/).
 
-## [Unreleased]
+## [v1.0.0] 2026-09-28
+
+Привязка к мажору ядра: peer на `@feugene/granularity` стал `>=1.0.0 <2.0.0`.
+
+Прежний диапазон (`>=0.38.0 <1.0.0`) исключал ядро 1.0.0, и после его выкатки
+установка этого пакета рядом с ним давала неудовлетворённый peer: у npm
+предупреждением, у pnpm и yarn berry со строгими настройками — отказом установки.
+
+Собственный API не менялся. Для потребителя на `@feugene/granularity` 0.x это
+всё равно ломающее изменение: новая версия на старое ядро не встанет — оставайтесь
+на предыдущем релизе или обновляйте ядро вместе с ним.
 
 ### Fixed
 
