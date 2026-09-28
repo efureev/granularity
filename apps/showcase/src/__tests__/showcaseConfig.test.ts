@@ -57,16 +57,23 @@ const showcaseLayoutEntry = readFileSync(
 
 describe('showcase bootstrap config', () => {
   it('настраивает базовые app scripts, включая analyze-режим сборки', () => {
-    expect(showcasePackageJson).toContain('"dev": "yarn prepare:granularity && yarn generate:api && yarn generate:search && vite"')
+    expect(showcasePackageJson).toContain('"dev": "yarn prepare:granularity && yarn build:icons && yarn generate:api && yarn generate:search && vite"')
     expect(showcasePackageJson).toContain('"generate:api": "node ./scripts/generate-component-api.mjs"')
     expect(showcasePackageJson).toContain('"generate:search": "node ./scripts/generate-showcase-search-index.mjs"')
     expect(showcasePackageJson).toContain('"generate:search:local": "yarn prepare:granularity && node ./scripts/generate-showcase-search-index.mjs"')
     expect(showcasePackageJson).toContain('"prepare:granularity": "yarn workspace @feugene/granularity build"')
-    expect(showcasePackageJson).toContain('"build": "yarn generate:api && yarn generate:search && vite build && yarn verify:locales"')
+    /*
+     * `build:icons` стоит первым во всём, что читает `granum.config.ts`:
+     * правила иконок приезжают провайдером, и без его манифеста сборка не
+     * найдёт девятый пакет. Джобы a11y и e2e зовут `yarn build` напрямую,
+     * поэтому цепочка живёт здесь, а не в корневом скрипте.
+     */
+    expect(showcasePackageJson).toContain('"build": "yarn build:icons && yarn generate:api && yarn generate:search && vite build && yarn verify:locales"')
+    expect(showcasePackageJson).toContain('"build:icons": "yarn workspace @feugene/granularity-showcase-icons build"')
     // Проверка состава локалей идёт после сборки и в самой сборке: иначе её
     // забудут запустить, а разъехавшийся импорт заметен только по размеру dist.
     expect(showcasePackageJson).toContain('"verify:locales": "node ./checks/verify-locales.mjs"')
-    expect(showcasePackageJson).toContain('"build:analyze": "yarn generate:api && yarn generate:search && vite build --mode analyze"')
+    expect(showcasePackageJson).toContain('"build:analyze": "yarn build:icons && yarn generate:api && yarn generate:search && vite build --mode analyze"')
     expect(showcasePackageJson).toContain('"test:run": "yarn generate:api && yarn generate:search && vitest run --config vitest.config.ts"')
     expect(showcaseBuildAnalyzeMode).toBe('analyze')
     expect(showcaseBuildVisualizerConfig).toEqual({
