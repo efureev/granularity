@@ -3,7 +3,8 @@ import { createApp } from 'vue'
 import { installGranularityDevtools } from '@feugene/granularity-devtools'
 import { initThemeEarly } from '@feugene/granularity'
 
-import '@unocss/reset/tailwind-compat.css'
+// Сброс браузерных стилей в слое `reset`: вне слоёв он бьёт утилиты granum.
+import './styles/reset.css'
 // Весь CSS granum одним модулем: пять каскадных слоёв — токены, база, темы, CSS
 // компонентов селекции и утилиты, включая классы разметки витрины.
 import 'virtual:granum.css'
