@@ -88,8 +88,8 @@ packages/<my-package>/
     "vue": "^3.5.0"
   },
   "devDependencies": {
-    "@feugene/granum": "^0.4.0",
-    "@feugene/granum-engine-wind": "^0.4.0"
+    "@feugene/granum": "^0.9.0",
+    "@feugene/granum-engine-wind": "^0.9.0"
   },
   "scripts": {
     "build": "vite build && vue-tsc -p tsconfig.build.json",
