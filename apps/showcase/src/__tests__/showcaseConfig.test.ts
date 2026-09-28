@@ -18,6 +18,12 @@ const showcaseMainEntry = readFileSync(
   'utf8',
 )
 
+/** Сброс браузерных стилей: проверяется, что он уезжает в слой, а не мимо слоёв. */
+const showcaseResetEntry = readFileSync(
+  fileURLToPath(new URL('../styles/reset.css', import.meta.url)),
+  'utf8',
+)
+
 /**
  * Пробелы внутри `{ … }` схлопываются вместе с переносами: гейт сторожит состав
  * входа, а не его форматирование, и переставший подходить отступ обязан
@@ -72,7 +78,10 @@ describe('showcase bootstrap config', () => {
   })
 
   it('подключает reset, CSS granum и раннюю инициализацию темы без legacy-зависимостей', () => {
-    expect(showcaseMainEntry).toContain('import \'@unocss/reset/tailwind-compat.css\'')
+    // Сброс импортируется через `styles/reset.css`, а тот кладёт его в слой:
+    // нелейерный сброс бьёт утилиты granum и ломает контраст кнопок.
+    expect(showcaseMainEntry).toContain('import \'./styles/reset.css\'')
+    expect(showcaseResetEntry).toContain('@import \'@unocss/reset/tailwind-compat.css\' layer(reset)')
     expect(showcaseMainEntry).toContain('import \'virtual:granum.css\'')
     expect(normalizedShowcaseMainEntry).toContain('import {initThemeEarly} from \'@feugene/granularity\'')
     expect(normalizedShowcaseMainEntry).toContain('import {setupShowcaseI18n} from \'./i18n\'')
@@ -118,7 +127,7 @@ describe('showcase bootstrap config', () => {
     expect(showcaseLayoutEntry).not.toContain('@feugene/granularity/components/')
   })
 
-  it('подключает восемь провайдеров именами пакетов и выбирает всё', () => {
+  it('подключает девять провайдеров именами пакетов и выбирает всё', () => {
     /*
      * Пропущенный провайдер под пресетом v1 был тихим дефектом: сборка
      * проходила, а SFC-чанки его компонентов не сканировались, и классы выпадали
@@ -137,13 +146,18 @@ describe('showcase bootstrap config', () => {
       '@feugene/granularity-editor',
       '@feugene/granularity-forms-schema',
       '@feugene/granularity-media',
+      // Девятый провайдер компонентов не везёт вовсе: только правила иконок,
+      // чтобы движок витрины оставался ванильным и манифестам верили.
+      '@feugene/granularity-showcase-icons',
     ])
     expect(showcaseGranumConfig.components).toBe('all')
     expect(showcaseGranumConfig.themes).toEqual({ names: ['light', 'dark'] })
     expect(showcaseGranumConfig.appSources).toEqual({ dirs: ['src'] })
 
-    // Движок — инстанс с правилом иконок: пресета иконок в granum нет, и
-    // классы `i-lucide-*` витрины держит это правило (см. `granum.icons.ts`).
+    // Движок — ванильный инстанс без своих правил: иконки `i-lucide-*`
+    // приезжают провайдером `@feugene/granularity-showcase-icons`. Правило в
+    // фабрике меняло бы отпечаток словаря и вешало пересчёт классов всех восьми
+    // пакетов на каждую сборку.
     expect(typeof showcaseGranumConfig.engine.generate).toBe('function')
     expect(showcaseGranumConfig.engine.dialect).toBe('unocss/preset-wind3+granum@66')
   })

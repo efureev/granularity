@@ -27,7 +27,6 @@
     "vitest.config.ts",
     "vite-env.d.ts",
     "granum.config.ts",
-    "granum.icons.ts",
     "playwright.config.ts",
     "e2e/**/*.ts",
     "src/**/*.ts",

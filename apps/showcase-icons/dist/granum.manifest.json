@@ -1,0 +1,24 @@
+{
+  "granum": 2,
+  "contractVersion": 1,
+  "id": "@feugene/granularity-showcase-icons",
+  "version": "0.0.0",
+  "generatedBy": "@feugene/granum@1.0.0",
+  "hash": "sha256-4a9c8fa5028d230cfac07c9bb828f2997d042e471fb06c779b8b24d17979c281",
+  "dependencies": [],
+  "theme": {
+    "declares": [],
+    "defaultThemes": [],
+    "themes": {},
+    "tokenDefinitions": {}
+  },
+  "engine": {
+    "dialect": "unocss/preset-wind3+granum@66",
+    "module": "engine.js",
+    "name": "granum-engine-wind",
+    "version": "66.7.5",
+    "vocabulary": "fnv64-c990613aa687df69"
+  },
+  "components": {},
+  "warnings": []
+}

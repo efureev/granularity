@@ -1,0 +1,26 @@
+{
+  "name": "@feugene/granularity-showcase-icons",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "description": "Lucide icon rules as a granum provider: keeps the showcase engine vanilla so package manifests stay trusted.",
+  "exports": {
+    "./engine": {
+      "types": "./dist/types/src/engine.d.ts",
+      "import": "./dist/engine.js"
+    },
+    "./granum.manifest.json": "./dist/granum.manifest.json",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "vite build"
+  },
+  "devDependencies": {
+    "@feugene/granum": "^1.0.0",
+    "@feugene/granum-engine-wind": "^1.0.0",
+    "@iconify-json/lucide": "^1.2.126"
+  }
+}
