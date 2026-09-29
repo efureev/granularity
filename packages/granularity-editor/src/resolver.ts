@@ -13,9 +13,13 @@ export const GRANULARITY_EDITOR_PACKAGE_NAME = '@feugene/granularity-editor'
  *
  * Построен на общей фабрике `createGranularResolver` из
  * `@feugene/unplugin-granularity`. Резолвит компоненты пакета на их
- * гранулярные subpath-экспорты. CSS компонента импортируется его же чанком
- * (`libInjectCss` + `sideEffects: ["**\/*.css"]`), поэтому отдельный
- * `styles.css`-side-effect не нужен (`importStyle: false`).
+ * гранулярные subpath-экспорты. CSS компонента резолвер не подключает
+ * (`importStyle: false`), и это верно по-прежнему, но по другой причине:
+ * его доставляет granum из манифеста пакета, одним листом вместе со всей
+ * библиотекой. Раньше CSS ехал в чанке компонента (`libInjectCss`), и
+ * side-effect был не нужен потому, что стили уже приехали; теперь он не нужен
+ * потому, что приехал бы вторым экземпляром — вне слоёв `granum.*` и сильнее
+ * всей библиотеки.
  *
  * ⚠️ Ставьте этот резолвер **перед** жадным `GranularityResolver()` ядра —
  * иначе core-резолвер (совпадает с любым `Gr*`) перехватит `GrRichText`

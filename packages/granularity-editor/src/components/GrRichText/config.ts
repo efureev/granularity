@@ -8,10 +8,9 @@ import { grRichTextSafelist } from './grRichTextStyles'
  * что попали в селекцию, и без графа потребитель, выбравший один `GrRichText`,
  * получил бы панель без кнопок и всплывающее меню без подложки.
  *
- * Собственный CSS компонента (`tokens.css`, `styles.css`) в `cssFiles` не
- * объявлен: он импортируется из SFC и уезжает в его чанк через `libInjectCss`.
- * `cssFiles` ждал бы отдельных файлов в `dist/components/<Name>/`, которых при
- * инлайне не существует.
+ * Собственный CSS в `cssFiles` не объявлен, и объявлять его не нужно:
+ * `granumProvider()` находит `styles.css` рядом с компонентом сам и пишет его
+ * в манифест — оттуда его и забирает приложение.
  */
 export const grRichTextConfig = defineGranumComponent(import.meta.url, {
   name: 'GrRichText',
