@@ -5,6 +5,30 @@ All notable changes to the [`@feugene/granularity-forms-schema`](.) package are 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/).
 
+## [v1.0.1] 2026-09-29
+
+Гигиена сборки. Артефакт пакета не изменился — проверено побайтно.
+
+### Changed
+
+- **`libInjectCss` убран из конфига сборки.** Плагин вписывал в JS-чанк
+  компонента `import '../styles.css'`; до granum это был единственный канал
+  доставки стилей, а с granum тот же файл приезжает приложению через манифест —
+  и потребитель получал два экземпляра, причём второй **вне слоёв `granum.*`**
+  и потому сильнее всей библиотеки.
+
+  У этого пакета компонентного CSS нет, и плагин стоял вхолостую: сборка с ним
+  и без него совпадает побайтно, числа в `docs/entry-sizes.md` не сдвинулись.
+  Убран до того, как появится первый компонент со стилями — тогда ловушка
+  захлопнулась бы молча.
+
+  Ядро сняло плагин при переезде на granum, `granularity-editor` и
+  `granularity-code` — в 1.0.1, где он уже стрелял. Диагностика
+  `css-double-delivery`, которая обязана была это назвать, не работала вовсе;
+  починена в `@feugene/granum` 1.0.2.
+
+- `vite-plugin-lib-inject-css` убран из devDependencies: больше не импортируется.
+
 ## [v1.0.0] 2026-09-28
 
 Переезд на `@feugene/granum` 1.0 и первый мажор пакета.
