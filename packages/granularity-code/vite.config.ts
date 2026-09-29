@@ -2,7 +2,6 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { granumProvider } from '@feugene/granum/build'
 import { windEngine } from '@feugene/granum-engine-wind'
-import { libInjectCss } from 'vite-plugin-lib-inject-css'
 
 import { granularityCodeProvider } from './src/granular-provider'
 
@@ -42,7 +41,21 @@ const extraEntries: Record<string, string> = {
 export default defineConfig({
   plugins: [
     vue(),
-    libInjectCss(),
+    /*
+     * `libInjectCss` здесь НЕТ, и это не упущение.
+     *
+     * Он вписывал в JS-чанк компонента `import '../styles.css'`, и до granum
+     * это был единственный канал: потребитель получал стили тем, что
+     * импортировал компонент. granum доставляет тот же файл приложению через
+     * манифест (`css: ['components/<Name>/styles.css']`), и вместе выходила
+     * двойная доставка — один и тот же CSS в общем листе и отдельным чанком,
+     * причём второй раз ВНЕ слоёв `granum.*` и потому сильнее всей библиотеки.
+     *
+     * Ядро сняло плагин при переезде на granum; спутники остались на старом
+     * конфиге. Предупреждение `css-double-delivery` (INV-CSS-5) это не поймало:
+     * granum смотрит бандл раньше, чем `libInjectCss` вписывает импорт, —
+     * в `chunk.code` на тот момент его ещё нет.
+     */
     granumProvider({
       provider: granularityCodeProvider,
       engine: windEngine(),

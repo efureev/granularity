@@ -20,8 +20,11 @@ import { grMarkdownSafelist } from './grMarkdownStyles'
  * Ссылку сюда не берут по замеру, а не по вкусу: узел самый частый, и на
  * документе в 300 ссылок инстансы `GrLink` дают ×4.2 ко времени рендера.
  *
- * Собственный CSS (`tokens.css`, `styles.css`) в `cssFiles` не объявлен: он
- * импортируется из SFC и уезжает в его чанк через `libInjectCss`.
+ * Собственный CSS в `cssFiles` не объявлен, и объявлять его не нужно:
+ * `granumProvider()` находит `styles.css` рядом с компонентом сам и пишет его
+ * в манифест — оттуда его и забирает приложение. `tokens.css` в `dist` не
+ * попадает намеренно: он из одних комментариев, hook-токены обязаны остаться
+ * неприсвоенными.
  */
 export const grMarkdownConfig = defineGranumComponent(import.meta.url, {
   name: 'GrMarkdown',

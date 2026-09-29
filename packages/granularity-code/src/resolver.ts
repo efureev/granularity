@@ -9,9 +9,11 @@ export const GRANULARITY_CODE_PACKAGE_NAME = '@feugene/granularity-code'
 /**
  * Резолвер `unplugin-vue-components` для `@feugene/granularity-code`.
  *
- * CSS компонента импортируется его же чанком (`libInjectCss` +
- * `sideEffects: ["**\/*.css"]`), поэтому отдельный side-effect не нужен
- * (`importStyle: false`).
+ * CSS компонента резолвер не подключает (`importStyle: false`), и это верно
+ * по-прежнему, но по другой причине: его доставляет granum из манифеста
+ * пакета. Раньше CSS ехал в чанке компонента (`libInjectCss`), и side-effect
+ * был не нужен потому, что стили уже приехали; теперь он не нужен потому, что
+ * приехал бы вторым экземпляром — вне слоёв `granum.*`.
  *
  * ⚠️ Ставьте этот резолвер **перед** жадным `GranularityResolver()` ядра —
  * иначе core-резолвер (совпадает с любым `Gr*`) перехватит `GrCodeBlock`
