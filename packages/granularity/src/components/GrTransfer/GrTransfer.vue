@@ -28,6 +28,7 @@ import {
   grTransferSearchClass,
   transferActionIconClass,
   transferActionInertClass,
+  transferDragCursorClass,
   transferCounterClass,
   transferGhostClass,
   transferGhostCountClass,
@@ -1157,6 +1158,7 @@ defineExpose({
             disabled: disabledOf(item),
             draggable: resolvedDraggable && !isLocked,
             dragging: isDraggingKey(side, keyOf(item)),
+            dragActive: dragging.session.value !== null,
             arrived: arrived.has(keyOf(item)),
             indicator: indicatorFor(side, keyOf(item)),
           })"
@@ -1233,7 +1235,7 @@ defineExpose({
             data-gr-transfer-to-target
             variant="secondary"
             :aria-disabled="canToTarget ? undefined : 'true'"
-            :class="canToTarget ? '' : transferActionInertClass"
+            :class="dragging.session.value ? transferDragCursorClass : (canToTarget ? '' : transferActionInertClass)"
             :aria-label="t('gr.transfer.toTarget', 'Move to selected')"
             @click="canToTarget && transferSelected('toTarget')"
           >
@@ -1243,7 +1245,7 @@ defineExpose({
             data-gr-transfer-to-source
             variant="secondary"
             :aria-disabled="canToSource ? undefined : 'true'"
-            :class="canToSource ? '' : transferActionInertClass"
+            :class="dragging.session.value ? transferDragCursorClass : (canToSource ? '' : transferActionInertClass)"
             :aria-label="t('gr.transfer.toSource', 'Move back to available')"
             @click="canToSource && transferSelected('toSource')"
           >
@@ -1328,10 +1330,21 @@ defineExpose({
   animation: gr-transfer-arrive var(--gr-duration-slow) var(--gr-ease-out);
 }
 
-/* Пока строка «в руке», курсор обязан это показывать везде, а не только над ней. */
-[data-gr-transfer][data-dragging='true'],
+/*
+ * Пока строка «в руке», курсор показывает это везде. Правилу на корне хватает
+ * наследования — `cursor` наследуемый; потомкам со своим `cursor-*` курсор
+ * жеста приезжает утилитой `transferDragCursorClass`, из их же слоя.
+ *
+ * Здесь было `grabbing !important` на `[data-dragging] *`. В каскадных слоях
+ * `!important` инвертирует их порядок, и важное библиотеки начинало бить
+ * важное приложения: переопределить курсор становилось нечем (ADR-4).
+ */
+[data-gr-transfer][data-dragging='true'] {
+  cursor: grabbing;
+  user-select: none;
+}
+
 [data-gr-transfer][data-dragging='true'] * {
-  cursor: grabbing !important;
   user-select: none;
 }
 

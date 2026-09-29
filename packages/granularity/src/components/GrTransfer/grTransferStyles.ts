@@ -35,6 +35,12 @@ export const transferOptionGrabClass = 'cursor-grab'
 
 export const transferOptionPlainClass = 'cursor-pointer'
 
+/**
+ * Курсор на время жеста. Ставится вместо `cursor-grab`/`cursor-pointer`, а не
+ * поверх: почему не `!important` в CSS компонента — в `<style>` `GrTransfer.vue`.
+ */
+export const transferDragCursorClass = 'cursor-grabbing'
+
 export const transferOptionStates = {
   // Тон, а не заливка: строка остаётся читаемой обычным `--gr-fg`, и контраст
   // не приходится выверять заново. Мягкой подложки под `--gr-primary` в темах
@@ -200,6 +206,8 @@ export interface GrTransferOptionClassOptions {
   dragging: boolean
   arrived: boolean
   indicator: 'before' | 'after' | null
+  /** Жест идёт где угодно в компоненте — не путать с `dragging` этой строки. */
+  dragActive?: boolean
 }
 
 export function grTransferOptionClass(options: GrTransferOptionClassOptions): string {
@@ -207,9 +215,14 @@ export function grTransferOptionClass(options: GrTransferOptionClassOptions): st
     ? transferOptionStates.disabled
     : options.selected ? transferOptionStates.selected : transferOptionStates.idle
 
+  // Одна утилита `cursor-*` на узел: две решались бы порядком правил в листе.
+  const cursor = options.dragActive
+    ? transferDragCursorClass
+    : options.draggable && !options.disabled ? transferOptionGrabClass : transferOptionPlainClass
+
   return [
     transferOptionBase,
-    options.draggable && !options.disabled ? transferOptionGrabClass : transferOptionPlainClass,
+    cursor,
     transferOptionSizes[options.size],
     state,
     options.dragging ? transferOptionDraggingClass : '',
