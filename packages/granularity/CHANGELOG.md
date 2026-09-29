@@ -5,6 +5,24 @@ All notable changes to the [`@feugene/granularity`](.) package are documented in
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/).
 
+## [v1.0.1] 2026-09-29
+
+### Fixed
+
+- **`GrTransfer` больше не держит курсор жеста на `!important`.** Правило
+  `[data-dragging] * { cursor: grabbing !important }` было верным до каскадных
+  слоёв: внутри них `!important` инвертирует порядок слоёв, и важное объявление
+  библиотеки начинает бить важное приложения — переопределить курсор
+  становилось нечем (ADR-4; называл `granum doctor`).
+
+  Курсор корня теперь обычный: `cursor` наследуемый, и потомкам его хватает.
+  Тем, у кого свой `cursor-*` — строкам и кнопкам переноса, — курсор жеста
+  приезжает утилитой `cursor-grabbing`, то есть из того же слоя, что и их
+  собственные утилиты, и побеждает порядком правил, а не весом.
+
+  Поведение не изменилось: страницы `GrTransfer` на портале дизайн-системы
+  совпадают пиксель в пиксель, `granum doctor` портала стал чист.
+
 ## [v1.0.0] 2026-09-28
 
 Переезд на `@feugene/granum` 1.0 и первый мажор пакета.

@@ -1,6 +1,6 @@
 # Вес гранулярных импортов
 
-> Сгенерировано `yarn sizes:docs` по собранному `dist` пакета `@feugene/granularity` 1.0.0.
+> Сгенерировано `yarn sizes:docs` по собранному `dist` пакета `@feugene/granularity` 1.0.1.
 > Править руками бесполезно — правка потеряется на следующей сборке.
 
 Сколько приезжает потребителю, взявшему один подпуть: gzip самого entry и всего, что он тянет
@@ -19,7 +19,7 @@
 | `GrPromptDialog` | 84.7 kB | 45 | 13 % |
 | `GrSelect` | 76.4 kB | 45 | 11 % |
 | `GrColorPicker` | 75.4 kB | 37 | 11 % |
-| `GrTransfer` | 66.4 kB | 39 | 10 % |
+| `GrTransfer` | 66.6 kB | 39 | 10 % |
 | `GrJsonViewer` | 64.5 kB | 38 | 10 % |
 | `GrAutocomplete` | 63.1 kB | 38 | 9 % |
 | `GrContextMenu` | 57.5 kB | 27 | 9 % |
@@ -97,4 +97,4 @@
 | `GrSkeleton` | 1.7 kB | 3 | < 1 % |
 | `GrButtonGroup` | 1.5 kB | 4 | < 1 % |
 
-Весь пакет из корня — 668.9 kB.
+Весь пакет из корня — 669.0 kB.

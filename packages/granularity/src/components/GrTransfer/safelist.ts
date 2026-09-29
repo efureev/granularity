@@ -20,6 +20,7 @@ import {
   transferMarkIconClass,
   transferMarkSizes,
   transferMarkStates,
+  transferDragCursorClass,
   transferOptionBase,
   transferOptionGrabClass,
   transferOptionPlainClass,
@@ -63,6 +64,8 @@ export const grTransferSafelist = [...new Set([
   ...splitClassTokens(transferOptionBase),
   ...splitClassTokens(transferOptionGrabClass),
   ...splitClassTokens(transferOptionPlainClass),
+  // Курсор жеста: ставится условием в шаблоне и в `grTransferOptionClass`.
+  ...splitClassTokens(transferDragCursorClass),
   ...splitClassTokens(transferMarkBase),
   ...splitClassTokens(transferMarkIconClass),
   ...splitClassTokens(transferLabelClass),
