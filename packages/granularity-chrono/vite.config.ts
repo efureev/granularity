@@ -2,7 +2,6 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { granumProvider } from '@feugene/granum/build'
 import { windEngine } from '@feugene/granum-engine-wind'
-import { libInjectCss } from 'vite-plugin-lib-inject-css'
 
 import { granularityChronoProvider } from './src/granular-provider'
 
@@ -37,7 +36,19 @@ const extraEntries: Record<string, string> = {
 export default defineConfig({
   plugins: [
     vue(),
-    libInjectCss(),
+    /*
+     * `libInjectCss` здесь НЕТ, и это не упущение.
+     *
+     * Он вписывал в JS-чанк компонента `import '../styles.css'`, и до granum
+     * это был единственный канал доставки стилей. granum доставляет CSS
+     * компонента приложению через манифест, и вместе вышла бы двойная
+     * доставка — один и тот же файл в общем листе и отдельным чанком, причём
+     * второй раз ВНЕ слоёв `granum.*` и потому сильнее всей библиотеки.
+     *
+     * У этого пакета компонентного CSS сегодня нет, и плагин стоял вхолостую.
+     * Убран до того, как появится первый компонент со стилями: с ним ловушка
+     * захлопнулась бы молча.
+     */
     granumProvider({
       provider: granularityChronoProvider,
       engine: windEngine(),
