@@ -1106,6 +1106,10 @@ jobs:
       - name: Test SSR playground
         run: yarn test:playground-ssr
 
+  # Публикация пакета в npm — первичный реестр.
+  publish-npm:
+    needs:
+      - quality-granularity
       - test-granularity
       - build-granularity
     if: startsWith(github.ref, 'refs/tags/v')
