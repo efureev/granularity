@@ -1,37 +1,6 @@
-import { splitClassTokens } from '../shared/classTokens'
-import {
-  commandEmptyClass,
-  commandFooterClass,
-  commandGroupLabelClass,
-  commandItemActiveClass,
-  commandItemBaseClass,
-  commandItemDescriptionClass,
-  commandItemDisabledClass,
-  commandItemEnabledClass,
-  commandItemMutedDisabledClass,
-  commandItemMutedEnabledClass,
-  commandMatchClass,
-  commandSearchInputClass,
-  commandSearchRowClass,
-} from './grCommandPaletteStyles'
-
-// Вся вёрстка палитры живёт строковыми литералами в grCommandPaletteStyles.ts —
-// на сборке они уезжают в общий dist-чанк, который экстрактору компонента не виден.
-// Поэтому перечисляем явно (docs/gotchas.md §2).
-export const grCommandPaletteSafelist = [...new Set([
-  ...splitClassTokens(commandSearchRowClass),
-  ...splitClassTokens(commandSearchInputClass),
-  ...splitClassTokens(commandGroupLabelClass),
-  ...splitClassTokens(commandItemBaseClass),
-  ...splitClassTokens(commandItemActiveClass),
-  ...splitClassTokens(commandItemDisabledClass),
-  ...splitClassTokens(commandItemEnabledClass),
-  ...splitClassTokens(commandItemMutedEnabledClass),
-  ...splitClassTokens(commandItemMutedDisabledClass),
-  ...splitClassTokens(commandItemDescriptionClass),
-  ...splitClassTokens(commandMatchClass),
-  ...splitClassTokens(commandEmptyClass),
-  ...splitClassTokens(commandFooterClass),
-  // Иконки поля поиска и индикатора загрузки.
-  ...splitClassTokens('animate-spin'),
-])]
+// Составных классов у палитры нет: строка поиска, группы, команды и подвал — целые
+// литералы `grCommandPaletteStyles.ts`, `animate-spin` индикатора загрузки лежит
+// в шаблоне. Класс иконки команды (`i-*`) приходит от потребителя целиком, и
+// правило для него заводит приложение. granum извлекает литералы сам из всех
+// чанков компонента, включая общие, поэтому объявлять здесь нечего.
+export const grCommandPaletteSafelist: string[] = []

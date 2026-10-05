@@ -1,37 +1,9 @@
-import { grBadgeSafelist } from '../GrBadge/safelist'
-import { splitClassTokens } from '../shared/classTokens'
-
-import {
-  chipCloseButtonClass,
-  chipCloseClass,
-  chipDisabledClass,
-  chipIconClass,
-  chipIconSizeClassBySize,
-  chipInteractiveClass,
-  chipLabelClass,
-  chipRootClass,
-  chipSelectedClass,
-  chipSizeClassBySize,
-} from './grChipStyles'
-
-/**
- * Тона и радиусы приходят из `grBadgeStyles.ts`, поэтому их safelist берётся
- * ссылкой, а не копией: копия разошлась бы с оригиналом молча. Ребро
- * `GrChip → GrBadge` объявлено в `config.ts` — без него пресет не подмешает
- * стили бейджа при гранулярной селекции, и чип придёт бесцветным.
- */
-export const grChipSafelist = [...new Set([
-  ...grBadgeSafelist,
-  ...Object.values(chipSizeClassBySize).flatMap(splitClassTokens),
-  ...Object.values(chipIconSizeClassBySize).flatMap(splitClassTokens),
-  ...splitClassTokens(chipRootClass),
-  ...splitClassTokens(chipLabelClass),
-  ...splitClassTokens(chipInteractiveClass),
-  ...splitClassTokens(chipDisabledClass),
-  ...splitClassTokens(chipSelectedClass),
-  ...splitClassTokens(chipCloseClass),
-  ...splitClassTokens(chipCloseButtonClass),
-  ...splitClassTokens(chipIconClass),
-  'h-full',
-  'w-full',
-])]
+// Составных классов у чипа нет. Размеры, корень, интерактив, disabled и крестик
+// лежат литералами в шаблоне и `grChipStyles.ts`, и granum извлекает их из
+// чанков компонента сам, включая общие. Тона и радиусы чип берёт у бейджа
+// (`grChipStyles.ts: grChipClass` → `toneClass`/`radiusClass` из
+// `grBadgeStyles.ts`) — это тоже готовые литералы, но в директории `GrBadge`.
+// Обход granum на чужой директории останавливается: её чанк — ребро графа, и
+// классы приходят с зависимостью `GrBadge` из `config.ts`, которую сборка
+// требует, пока ребро есть. Дублировать их здесь незачем.
+export const grChipSafelist: string[] = []

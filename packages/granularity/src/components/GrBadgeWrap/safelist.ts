@@ -1,18 +1,5 @@
-import { splitClassTokens } from '../shared/classTokens'
-import {
-  countBaseClass,
-  dotBaseClass,
-  dotPlacementClass,
-  placementClass,
-  rootClass,
-  toneClass,
-} from './grBadgeWrapStyles'
-
-export const grBadgeWrapSafelist = [...new Set([
-  ...splitClassTokens(rootClass),
-  ...splitClassTokens(dotBaseClass),
-  ...splitClassTokens(countBaseClass),
-  ...Object.values(placementClass).flatMap(splitClassTokens),
-  ...Object.values(dotPlacementClass).flatMap(splitClassTokens),
-  ...Object.values(toneClass).flatMap(splitClassTokens),
-])]
+// Составных классов у обёртки нет: корень, точка, счётчик, углы и тона лежат
+// целыми литералами в мапах `grBadgeWrapStyles.ts`, шаблон только выбирает из
+// них по ключу. granum извлекает их сам из чанков компонента, включая общие,
+// поэтому объявлять здесь нечего.
+export const grBadgeWrapSafelist: string[] = []

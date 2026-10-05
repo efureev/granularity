@@ -1,33 +1,6 @@
-import { splitClassTokens } from '../shared/classTokens'
-import {
-  breadcrumbsCurrentClass,
-  breadcrumbsEllipsisClass,
-  breadcrumbsItemIconClass,
-  breadcrumbsItemWrapClass,
-  breadcrumbsLabelClass,
-  breadcrumbsLabelHiddenClass,
-  breadcrumbsListClass,
-  breadcrumbsListNowrapClass,
-  breadcrumbsListWrapClass,
-  breadcrumbsRootClass,
-  breadcrumbsSeparatorClass,
-  breadcrumbsSizeClassBySize,
-} from './grBreadcrumbsStyles'
-
-// Всё, что живёт в `grBreadcrumbsStyles.ts`: и мапа размеров, и строковые
-// литералы. Хелпер уезжает в общий `dist/chunks/`, вне области скана
-// компонента — гейт `src/__tests__/safelist.test.ts`.
-export const grBreadcrumbsSafelist = [...new Set([
-  ...Object.values(breadcrumbsSizeClassBySize).flatMap(splitClassTokens),
-  ...splitClassTokens(breadcrumbsRootClass),
-  ...splitClassTokens(breadcrumbsListClass),
-  ...splitClassTokens(breadcrumbsListWrapClass),
-  ...splitClassTokens(breadcrumbsListNowrapClass),
-  ...splitClassTokens(breadcrumbsSeparatorClass),
-  ...splitClassTokens(breadcrumbsCurrentClass),
-  ...splitClassTokens(breadcrumbsItemIconClass),
-  ...splitClassTokens(breadcrumbsItemWrapClass),
-  ...splitClassTokens(breadcrumbsLabelClass),
-  ...splitClassTokens(breadcrumbsLabelHiddenClass),
-  ...splitClassTokens(breadcrumbsEllipsisClass),
-])]
+// Составных классов у пути нет: всё, что он рисует, лежит целыми литералами в
+// шаблоне и в `grBreadcrumbsStyles.ts`, мапа размеров в том числе. granum
+// извлекает их сам из всех чанков компонента, включая общие, поэтому объявлять
+// здесь нечего. Класс иконки-строки приходит от потребителя: правило для него
+// заводит приложение.
+export const grBreadcrumbsSafelist: string[] = []

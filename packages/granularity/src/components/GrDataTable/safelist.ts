@@ -1,67 +1,7 @@
-import { splitClassTokens } from '../shared/classTokens'
-import {
-  cellPaddings,
-  columnDraggingClass,
-  detailCellClass,
-  detailContentClass,
-  detailErrorClass,
-  detailPaddings,
-  detailRowClass,
-  expandButtonClass,
-  expandIconClass,
-  expandIconOpenClass,
-  columnDropAfterClass,
-  columnDropBeforeClass,
-  columnHandleActiveClass,
-  columnHandleClass,
-  columnMenuTriggerClass,
-  columnPinnedClass,
-  columnPinnedLeftEdgeClass,
-  columnPinnedRightEdgeClass,
-  columnResizerClass,
-  columnResizerHoverClass,
-  columnResizerLineActiveClass,
-  columnResizerLineClass,
-  headerGaps,
-  headerTextSizes,
-  placeholderPaddings,
-  rowSelectedClass,
-  selectColumnWidths,
-  spinnerSizes,
-  summaryRowClass,
-} from './grDataTableStyles'
-
-export const grDataTableSafelist = [...new Set([
-  ...Object.values(cellPaddings).flatMap(splitClassTokens),
-  ...Object.values(placeholderPaddings).flatMap(splitClassTokens),
-  ...Object.values(headerTextSizes).flatMap(splitClassTokens),
-  ...Object.values(selectColumnWidths).flatMap(splitClassTokens),
-  ...Object.values(headerGaps).flatMap(splitClassTokens),
-  ...Object.values(spinnerSizes).flatMap(splitClassTokens),
-  ...splitClassTokens(columnHandleClass),
-  ...splitClassTokens(columnMenuTriggerClass),
-  ...splitClassTokens(columnHandleActiveClass),
-  ...splitClassTokens(columnDraggingClass),
-  ...splitClassTokens(columnDropBeforeClass),
-  ...splitClassTokens(columnDropAfterClass),
-  ...splitClassTokens(columnResizerClass),
-  ...splitClassTokens(columnResizerLineClass),
-  ...splitClassTokens(columnResizerLineActiveClass),
-  ...splitClassTokens(columnResizerHoverClass),
-  ...splitClassTokens(columnPinnedClass),
-  ...splitClassTokens(columnPinnedLeftEdgeClass),
-  ...splitClassTokens(columnPinnedRightEdgeClass),
-  ...splitClassTokens(rowSelectedClass),
-  ...splitClassTokens(summaryRowClass),
-  // Второй ярус строки: классы приходят из `.ts`-хелпера, а такие литералы
-  // пресет не видит.
-  ...splitClassTokens(detailRowClass),
-  ...splitClassTokens(detailCellClass),
-  ...splitClassTokens(detailContentClass),
-  ...splitClassTokens(detailErrorClass),
-  ...Object.values(detailPaddings).flatMap(splitClassTokens),
-  ...splitClassTokens(expandButtonClass),
-  ...splitClassTokens(expandIconClass),
-  ...splitClassTokens(expandIconOpenClass),
-  ...splitClassTokens('h-5 w-5 h-6 w-6'),
-])]
+/**
+ * Пуст: составных классов у таблицы нет. Шаблон, мапы размеров и классы
+ * `grDataTableStyles.ts`, которые раздают и композаблы, лежат целыми
+ * литералами, и granum извлекает их из чанков компонента сам, включая общие.
+ * Полоса и подсветка строк собираются в `GrTable` и приходят с его safelist.
+ */
+export const grDataTableSafelist: string[] = []

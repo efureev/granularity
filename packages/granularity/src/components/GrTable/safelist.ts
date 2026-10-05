@@ -1,20 +1,22 @@
 import { splitClassTokens } from '../shared/classTokens'
 import {
-  emptyCellClass,
   hoverableClass,
-  loadingRowCellClass,
   stickyColumnHoverableClass,
   stickyColumnStripedClass,
   stripedClass,
-  tableSizes,
 } from './grTableStyles'
 
+/**
+ * Только полоса и подсветка строк: эти классы склеиваются шаблонной строкой из
+ * атрибута служебной строки и оттенка (`grTableStyles.ts`: `stripedClass`,
+ * `hoverableClass`, `stickyColumnStripedClass`, `stickyColumnHoverableClass`),
+ * и целиком их нет ни в одной строке кода. Остальное — шаблон, мапа кеглей,
+ * классы служебных строк — лежит литералами, и granum извлекает это из чанков
+ * компонента сам, включая общие.
+ */
 export const grTableSafelist = [...new Set([
-  ...Object.values(tableSizes).flatMap(splitClassTokens),
   ...splitClassTokens(stripedClass),
+  ...splitClassTokens(hoverableClass),
   ...splitClassTokens(stickyColumnStripedClass),
   ...splitClassTokens(stickyColumnHoverableClass),
-  ...splitClassTokens(hoverableClass),
-  ...splitClassTokens(emptyCellClass),
-  ...splitClassTokens(loadingRowCellClass),
 ])]

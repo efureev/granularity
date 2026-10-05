@@ -1,20 +1,4 @@
-import { splitClassTokens } from '../shared/classTokens'
-import {
-  iconOffsets,
-  previewBaseClass,
-  previewSizes,
-  removeTextSizes,
-  rowGaps,
-  stackGaps,
-  textSizes,
-} from './grFormFileStyles'
-
-export const grFormFileSafelist = [...new Set([
-  ...Object.values(textSizes).flatMap(splitClassTokens),
-  ...Object.values(removeTextSizes).flatMap(splitClassTokens),
-  ...Object.values(rowGaps).flatMap(splitClassTokens),
-  ...Object.values(stackGaps).flatMap(splitClassTokens),
-  ...Object.values(iconOffsets).flatMap(splitClassTokens),
-  ...Object.values(previewSizes).flatMap(splitClassTokens),
-  ...splitClassTokens(previewBaseClass),
-])]
+// Всё, что рисует компонент, лежит в коде целыми литералами — в шаблоне и мапах
+// `grFormFileStyles.ts`. granum извлекает их из чанков компонента сам, общие
+// включительно, поэтому собранных в рантайме классов здесь нет.
+export const grFormFileSafelist: string[] = []

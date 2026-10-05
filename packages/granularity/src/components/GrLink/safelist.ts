@@ -1,18 +1,5 @@
-import { splitClassTokens } from '../shared/classTokens'
-import {
-  baseRootClass,
-  colorClass,
-  disabledStateClass,
-  focusRingClass,
-  sizeClassBySize,
-  underlineClasses,
-} from './grLinkStyles'
-
-export const grLinkSafelist = [...new Set([
-  ...splitClassTokens(baseRootClass),
-  ...splitClassTokens(focusRingClass),
-  ...Object.values(sizeClassBySize).flatMap(splitClassTokens),
-  ...underlineClasses.flatMap(splitClassTokens),
-  ...splitClassTokens(colorClass),
-  ...splitClassTokens(disabledStateClass),
-])]
+// Составных классов у ссылки нет: размер, подчёркивание и состояние выбираются
+// из `grLinkStyles.ts` целыми литералами, а тон приходит не классом, а
+// CSS-переменными инлайнового стиля (`grLinkColorStyle`). granum извлекает всё
+// это из чанков компонента сам, включая общие.
+export const grLinkSafelist: string[] = []

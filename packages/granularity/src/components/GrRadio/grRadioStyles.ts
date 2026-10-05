@@ -36,8 +36,7 @@ export const grRadioControlInvalidClass = 'border-[var(--gr-danger)] bg-[var(--g
 export const grRadioDotCheckedClass = 'bg-[var(--gr-primary)] opacity-100 scale-100'
 export const grRadioDotUncheckedClass = 'bg-transparent opacity-0 scale-75'
 export const grRadioDotDisabledClass = 'bg-[var(--gr-muted-fg)] opacity-100 scale-100'
-// Базовые классы «точки» внутри radiobox — нестандартный transition. Вынесены сюда,
-// чтобы `safelist` гарантировал их присутствие в сборке даже при tree-shaking шаблона.
+// Базовые классы «точки» внутри radiobox — нестандартный transition.
 export const grRadioDotBaseClass = 'rounded-[var(--gr-radius-full)] transition-[transform,opacity,background-color] duration-[var(--gr-duration-fast)]'
 
 /**

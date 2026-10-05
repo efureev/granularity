@@ -1,48 +1,14 @@
-import { splitClassTokens } from '../shared/classTokens'
-import { grButtonSafelist } from '../GrButton/safelist'
-import {
-  grRadioButtonDisabledCheckedClass,
-  grRadioButtonDisabledClass,
-  grRadioControlCheckedClass,
-  grRadioControlDisabledClass,
-  grRadioControlInvalidClass,
-  grRadioControlUncheckedClass,
-  grRadioControlSizes,
-  grRadioDescriptionSizes,
-  grRadioDotBaseClass,
-  grRadioDotSizes,
-  grRadioDotCheckedClass,
-  grRadioDotDisabledClass,
-  grRadioDotUncheckedClass,
-  grRadioEnabledClass,
-  grRadioLabelCheckedColorClass,
-  grRadioLabelColorClass,
-  grRadioLabelSizes,
-  grRadioRootDisabledClass,
-  grRadioRootReadonlyClass,
-  grRadioRootEnabledClass,
-} from './grRadioStyles'
-
-export const grRadioSafelist = [...new Set([
-  ...grButtonSafelist,
-  ...splitClassTokens(grRadioEnabledClass),
-  ...splitClassTokens(grRadioButtonDisabledClass),
-  ...splitClassTokens(grRadioButtonDisabledCheckedClass),
-  ...splitClassTokens(grRadioRootDisabledClass),
-  ...splitClassTokens(grRadioRootEnabledClass),
-  ...splitClassTokens(grRadioRootReadonlyClass),
-  ...splitClassTokens(grRadioControlCheckedClass),
-  ...splitClassTokens(grRadioControlUncheckedClass),
-  ...splitClassTokens(grRadioControlDisabledClass),
-  ...splitClassTokens(grRadioControlInvalidClass),
-  ...splitClassTokens(grRadioDotCheckedClass),
-  ...splitClassTokens(grRadioDotUncheckedClass),
-  ...splitClassTokens(grRadioDotDisabledClass),
-  ...splitClassTokens(grRadioDotBaseClass),
-  ...Object.values(grRadioControlSizes).flatMap(splitClassTokens),
-  ...Object.values(grRadioDotSizes).flatMap(splitClassTokens),
-  ...Object.values(grRadioLabelSizes).flatMap(splitClassTokens),
-  ...Object.values(grRadioDescriptionSizes).flatMap(splitClassTokens),
-  ...splitClassTokens(grRadioLabelColorClass),
-  ...splitClassTokens(grRadioLabelCheckedColorClass),
-])]
+/**
+ * Пуст: собственных составных классов у переключателя нет. `radiobox` и
+ * отключённая кнопка-радио выбирают классы целыми литералами из
+ * `grRadioStyles.ts` и шаблона — granum извлекает их из чанков компонента сам,
+ * включая общие.
+ *
+ * Вид `button` строит `grRadioStyles.ts: grRadioButtonClass` через
+ * `grButtonClass` из `GrButton/grButtonStyles.ts`: матрицу тон × вариант там
+ * клеит `variantClass`, база и размеры лежат литералами. Модуль живёт в чанке
+ * `GrButton`, обход от входа `GrRadio` на нём останавливается как на ребре, и
+ * все эти классы приезжают зависимостью `GrButton`: литералы её чанка извлекаются
+ * у неё, матрицу объявляет `grButtonSafelist`. Повторять их здесь незачем.
+ */
+export const grRadioSafelist: string[] = []

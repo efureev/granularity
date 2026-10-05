@@ -1,61 +1,6 @@
-import { splitClassTokens } from '../shared/classTokens'
-import {
-  sliderFillBaseClass,
-  sliderFillDisabledClass,
-  sliderFillEnabledClass,
-  sliderFillOrientationClass,
-  sliderMarkLabelClass,
-  sliderMarkLabelDisabledClass,
-  sliderMarkLabelHorizontalClass,
-  sliderMarkLabelVerticalClass,
-  sliderMarkTickBaseClass,
-  sliderMarkTickOrientationClass,
-  sliderPaddingBySize,
-  sliderPaddingVerticalBySize,
-  sliderRailClass,
-  sliderRootBaseClass,
-  sliderRootOrientationClass,
-  sliderThumbBaseClass,
-  sliderThumbDisabledClass,
-  sliderThumbEnabledClass,
-  sliderThumbOrientationClass,
-  sliderThumbSizeBySize,
-  sliderTooltipBaseClass,
-  sliderTooltipOrientationClass,
-  sliderTrackHeightBySize,
-  sliderTrackVerticalLengthClass,
-  sliderTrackWidthBySize,
-} from './grSliderStyles'
-
-// Всё, что живёт в `grSliderStyles.ts`: и вычисляемые мапы, и строковые литералы
-// дорожки, бегунка, тултипа и меток. Хелпер уезжает в общий `dist/chunks/`, вне
-// области скана компонента — гейт `src/__tests__/safelist.test.ts`.
-export const grSliderSafelist = [...new Set([
-  ...Object.values(sliderTrackHeightBySize).flatMap(splitClassTokens),
-  ...Object.values(sliderTrackWidthBySize).flatMap(splitClassTokens),
-  ...Object.values(sliderThumbSizeBySize).flatMap(splitClassTokens),
-  ...Object.values(sliderPaddingBySize).flatMap(splitClassTokens),
-  ...Object.values(sliderPaddingVerticalBySize).flatMap(splitClassTokens),
-  ...Object.values(sliderRootOrientationClass).flatMap(splitClassTokens),
-  ...Object.values(sliderFillOrientationClass).flatMap(splitClassTokens),
-  ...Object.values(sliderThumbOrientationClass).flatMap(splitClassTokens),
-  ...Object.values(sliderTooltipOrientationClass).flatMap(splitClassTokens),
-  ...Object.values(sliderMarkTickOrientationClass).flatMap(splitClassTokens),
-  ...splitClassTokens(sliderRootBaseClass),
-  ...splitClassTokens(sliderRailClass),
-  ...splitClassTokens(sliderFillBaseClass),
-  ...splitClassTokens(sliderFillEnabledClass),
-  ...splitClassTokens(sliderFillDisabledClass),
-  ...splitClassTokens(sliderTrackVerticalLengthClass),
-  ...splitClassTokens(sliderThumbBaseClass),
-  ...splitClassTokens(sliderThumbEnabledClass),
-  ...splitClassTokens(sliderThumbDisabledClass),
-  ...splitClassTokens(sliderTooltipBaseClass),
-  ...splitClassTokens(sliderMarkTickBaseClass),
-  ...splitClassTokens(sliderMarkLabelClass),
-  ...splitClassTokens(sliderMarkLabelHorizontalClass),
-  ...splitClassTokens(sliderMarkLabelVerticalClass),
-  ...splitClassTokens(sliderMarkLabelDisabledClass),
-  // Резерв места под подписи меток и их выравнивание: центр / к левому / к правому краю.
-  ...splitClassTokens('mb-7 mr-10 translate-x-0 -translate-x-1/2 -translate-x-full'),
-])]
+// Всё, что рисует слайдер, лежит в коде целыми литералами: шаблон и карты
+// `grSliderStyles.ts`, включая резерв под подписи меток (`mb-7`/`mr-10`) и их
+// выравнивание (`translate-x-0`/`-translate-x-1/2`/`-translate-x-full`). granum
+// извлекает их сам из чанков компонента, а собранных в рантайме классов у
+// слайдера нет — объявлять нечего.
+export const grSliderSafelist: string[] = []

@@ -1,9 +1,7 @@
 export type GrSortableOrientation = 'horizontal' | 'vertical'
 
 /**
- * Классы `GrSortableList`. Единственный источник правды для шаблона и
- * `safelist.ts`: литерал, живущий только здесь, до скана UnoCSS не доходит —
- * хелпер уезжает в общий чанк `dist/chunks/`.
+ * Классы `GrSortableList`. Единственный источник правды для шаблона.
  */
 
 export const listClass: Record<GrSortableOrientation, string> = {

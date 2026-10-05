@@ -1,32 +1,4 @@
-import { splitClassTokens } from '../shared/classTokens'
-import {
-  contentClass,
-  dividedClass,
-  emptyClass,
-  handleClass,
-  handleDisabledClass,
-  indicatorAfterClass,
-  indicatorBeforeClass,
-  listClass,
-  rowDisabledClass,
-  rowDraggingClass,
-  rowFocusClass,
-  rowGrabbedClass,
-  rowLayoutClass,
-} from './grSortableListStyles'
-
-export const grSortableListSafelist = [...new Set([
-  ...Object.values(listClass).flatMap(splitClassTokens),
-  ...splitClassTokens(rowLayoutClass),
-  ...splitClassTokens(rowFocusClass),
-  ...splitClassTokens(rowDraggingClass),
-  ...splitClassTokens(rowGrabbedClass),
-  ...splitClassTokens(rowDisabledClass),
-  ...splitClassTokens(dividedClass),
-  ...splitClassTokens(emptyClass),
-  ...splitClassTokens(handleClass),
-  ...splitClassTokens(handleDisabledClass),
-  ...splitClassTokens(contentClass),
-  ...splitClassTokens(indicatorBeforeClass),
-  ...splitClassTokens(indicatorAfterClass),
-])]
+// Составных классов у списка нет: всё, что он рисует, лежит целыми литералами
+// в шаблоне и в `grSortableListStyles.ts`. granum извлекает их сам из всех
+// чанков компонента, включая общие, поэтому объявлять здесь нечего.
+export const grSortableListSafelist: string[] = []

@@ -10,7 +10,6 @@ export type GrModalSize = GrOverlaySize
 export type GrModalScrollBehavior = 'outside' | 'inside'
 
 // Корневые утилитарные классы, используемые шаблоном `GrModal.vue`.
-// Они же являются единственным источником истины для safelist.
 export const root = 'fixed inset-0 z-[var(--gr-z-modal)]'
 export const overlay = 'fixed inset-0 z-0 bg-[var(--gr-overlay-bg)]'
 

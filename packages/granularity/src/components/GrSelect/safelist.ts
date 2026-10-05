@@ -1,65 +1,8 @@
-import { flattenTransitionTokens, splitClassTokens } from '../shared/classTokens'
-import { controlPillPaddingXClass, controlShapeRadiusClass } from '../shared/controlShape'
-import { panelPopTransition } from '../shared/overlayTransition'
-import {
-  borderClassByState,
-  defaultBaseClass,
-  grSelectLinkNativeLabelBaseClass,
-  grSelectLinkNativeLabelDisabledClass,
-  grSelectLinkNativeLabelFocusClass,
-  grSelectLinkNativeOverlayClass,
-  grSelectPanelClasses,
-  invalidBorderClass,
-  linkBaseClass,
-  selectOptionActiveClass,
-  selectOptionBaseClass,
-  selectOptionDisabledClass,
-  selectOptionEnabledClass,
-  selectOptionLinkWidthClass,
-  selectOptionWidthClass,
-  selectLinkNativeLabelVariantClassByVariant,
-  selectLinkSizeClassBySize,
-  selectLinkVariantClassByVariant,
-  selectPaddingXClass,
-  selectSizeClassBySize,
-} from './grSelectStyles'
+import { splitClassTokens } from '../shared/classTokens'
+import { selectOptionEnabledClass } from './grSelectStyles'
 
-// Всё, что живёт в `grSelectStyles.ts`: и вычисляемые мапы, и строковые литералы
-// оболочки, link-режима, native-overlay и панели. Хелпер уезжает в общий
-// `dist/chunks/`, вне области скана компонента — гейт `src/__tests__/safelist.test.ts`.
-export const grSelectSafelist = [...new Set([
-  ...Object.values(borderClassByState).flatMap(splitClassTokens),
-  ...splitClassTokens(invalidBorderClass),
-  ...Object.values(selectSizeClassBySize).flatMap(splitClassTokens),
-  ...Object.values(selectPaddingXClass).flatMap(map => Object.values(map)).flatMap(splitClassTokens),
-  // Общий модуль лежит в чанке без адреса — его классы объявляет каждый импортёр.
-  ...Object.values(controlShapeRadiusClass).flatMap(splitClassTokens),
-  ...Object.values(controlPillPaddingXClass).flatMap(splitClassTokens),
-  ...splitClassTokens(defaultBaseClass),
-  ...splitClassTokens(linkBaseClass),
-  ...splitClassTokens(grSelectLinkNativeOverlayClass),
-  ...splitClassTokens(grSelectLinkNativeLabelBaseClass),
-  ...splitClassTokens(grSelectLinkNativeLabelDisabledClass),
-  ...splitClassTokens(grSelectLinkNativeLabelFocusClass),
-  ...splitClassTokens(grSelectPanelClasses),
-  ...Object.values(selectLinkSizeClassBySize).flatMap(splitClassTokens),
-  ...Object.values(selectLinkVariantClassByVariant).flatMap(splitClassTokens),
-  ...Object.values(selectLinkNativeLabelVariantClassByVariant).flatMap(splitClassTokens),
-  ...splitClassTokens('no-underline underline underline-offset-4 hover:underline hover:underline-offset-4 peer-hover:underline peer-hover:underline-offset-4'),
-  ...splitClassTokens('disabled:cursor-not-allowed disabled:text-[var(--gr-muted-fg)] disabled:no-underline'),
-  ...splitClassTokens('disabled:cursor-not-allowed disabled:bg-[var(--gr-muted)] disabled:text-[var(--gr-muted-fg)]'),
-  ...splitClassTokens(selectOptionBaseClass),
-  ...splitClassTokens(selectOptionWidthClass),
-  ...splitClassTokens(selectOptionLinkWidthClass),
-  ...splitClassTokens(selectOptionEnabledClass),
-  ...splitClassTokens(selectOptionActiveClass),
-  ...splitClassTokens(selectOptionDisabledClass),
-  ...splitClassTokens('appearance-none pr-9'),
-  ...splitClassTokens('inline-flex items-center gap-1 text-left'),
-  ...splitClassTokens('flex items-center justify-between text-left'),
-  ...splitClassTokens('block min-w-full w-max whitespace-nowrap'),
-  // Набор перехода панели общий на пять компонентов и живёт безадресным
-  // модулем в `shared/`: в `dist` он лежит в общем чанке, который пресет не
-  // сканирует, поэтому объявить его обязан каждый потребитель.
-  ...flattenTransitionTokens(panelPopTransition),
-])]
+// В рантайме собирается один класс — наведение на опцию панели: `grSelectStyles.ts`
+// клеит его шаблоном `hover:${selectOptionHighlight}`, и целиком он не лежит ни в
+// одной строке кода. Всё остальное — литералы шаблона, `grSelectStyles.ts` и общих
+// модулей `shared/`: granum извлекает их сам из чанков компонента, включая общие.
+export const grSelectSafelist: string[] = splitClassTokens(selectOptionEnabledClass)

@@ -1,56 +1,6 @@
-import { splitClassTokens } from '../shared/classTokens'
-import {
-  contentBase,
-  groupCollapsedClass,
-  groupLabelClass,
-  headerBase,
-  itemActiveClass,
-  itemBadgeClass,
-  itemBase,
-  itemChevronClass,
-  itemChevronExpandedClass,
-  itemChildrenClass,
-  itemCollapsedClass,
-  itemDisabledClass,
-  itemExpandedClass,
-  itemIdleClass,
-  itemLetterClass,
-  itemNestClass,
-  layerBackdropClass,
-  layerPanelEnterFrom,
-  layerPanelPositions,
-  layerPassThroughClass,
-  layerRootClass,
-  rootBase,
-  rootPositions,
-  subtitleClass,
-  titleClass,
-} from './grSidebarStyles'
-
-export const grSidebarSafelist = [...new Set([
-  ...splitClassTokens(rootBase),
-  ...Object.values(rootPositions).flatMap(splitClassTokens),
-  ...splitClassTokens(headerBase),
-  ...splitClassTokens(titleClass),
-  ...splitClassTokens(subtitleClass),
-  ...splitClassTokens(contentBase),
-  ...splitClassTokens(itemBase),
-  ...splitClassTokens(itemCollapsedClass),
-  ...splitClassTokens(itemExpandedClass),
-  ...splitClassTokens(itemDisabledClass),
-  ...splitClassTokens(itemActiveClass),
-  ...splitClassTokens(itemIdleClass),
-  ...splitClassTokens(itemLetterClass),
-  ...splitClassTokens(itemBadgeClass),
-  ...splitClassTokens(itemNestClass),
-  ...splitClassTokens(itemChildrenClass),
-  ...splitClassTokens(itemChevronClass),
-  ...splitClassTokens(itemChevronExpandedClass),
-  ...splitClassTokens(layerRootClass),
-  ...splitClassTokens(layerPassThroughClass),
-  ...splitClassTokens(layerBackdropClass),
-  ...Object.values(layerPanelPositions).flatMap(splitClassTokens),
-  ...Object.values(layerPanelEnterFrom).flatMap(splitClassTokens),
-  ...splitClassTokens(groupLabelClass),
-  ...splitClassTokens(groupCollapsedClass),
-])]
+// Составных классов у панели нет: всё, что рисуют `GrSidebar`, `GrSidebarItem`
+// и `GrSidebarGroup`, лежит целыми литералами в шаблонах и в
+// `grSidebarStyles.ts`, мапы сторон в том числе. granum извлекает их сам из
+// всех чанков компонента, включая общие, поэтому объявлять здесь нечего. Класс
+// иконки-строки приходит от потребителя: правило для него заводит приложение.
+export const grSidebarSafelist: string[] = []

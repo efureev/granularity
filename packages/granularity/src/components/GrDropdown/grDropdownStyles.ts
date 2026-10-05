@@ -1,12 +1,5 @@
-import type { Placement } from '@floating-ui/dom'
-import { overlayOriginClass } from '../shared/overlayOrigin'
-
 /** Ширина панели: число — пиксели, строка — CSS-длина, `auto` — по контенту. */
 export type GrDropdownWidth = number | string
-
-export function grDropdownOriginClass(placement: Placement): string {
-  return overlayOriginClass(placement)
-}
 
 /**
  * Поле вокруг пунктов меню.

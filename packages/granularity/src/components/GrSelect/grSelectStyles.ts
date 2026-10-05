@@ -106,8 +106,9 @@ export const selectLinkSizeClassBySize: Record<GrSelectSize, string> = {
  * `GrLink`. `primary` берётся из `--gr-primary-text` по той же причине: на фоне
  * страницы насыщенный `--gr-primary` под текст не рассчитан.
  *
- * Классы записаны литералами, а не собраны интерполяцией: safelist и скан
- * UnoCSS читают исходник, и вычисленная строка для них не класс.
+ * Классы записаны целыми литералами, а не собраны интерполяцией: экстрактор
+ * находит в коде только целые литералы, а собранный класс пришлось бы
+ * объявлять в safelist.
  */
 export const selectLinkVariantClassByVariant: Record<GrSelectVariant, string> = {
   primary: 'text-[var(--gr-primary-text)] hover:text-[color-mix(in_srgb,var(--gr-primary-text)_92%,var(--gr-fg))] active:text-[color-mix(in_srgb,var(--gr-primary-text)_84%,var(--gr-fg))]',

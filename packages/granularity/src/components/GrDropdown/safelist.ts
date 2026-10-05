@@ -1,18 +1,6 @@
-import { flattenTransitionTokens, splitClassTokens } from '../shared/classTokens'
-import { overlayOriginClassByPlacement } from '../shared/overlayOrigin'
-import { panelPopTransition } from '../shared/overlayTransition'
-import {
-  dropdownContentBaseClass,
-} from './grDropdownStyles'
-
-// И динамические токены (`resolvedPlacement`), и литералы отделки панели:
-// `grDropdownStyles.ts` уезжает в общий `dist/chunks/`, вне области скана
-// компонента — гейт `src/__tests__/safelist.test.ts`.
-export const grDropdownSafelist = [...new Set([
-  ...Object.values(overlayOriginClassByPlacement).flatMap(splitClassTokens),
-  ...splitClassTokens(dropdownContentBaseClass),
-  // Набор перехода панели общий на пять компонентов и живёт безадресным
-  // модулем в `shared/`: в `dist` он лежит в общем чанке, который пресет не
-  // сканирует, поэтому объявить его обязан каждый потребитель.
-  ...flattenTransitionTokens(panelPopTransition),
-])]
+// Составных классов у меню нет. Своё оно рисует одним литералом — полем `p-1`
+// из `grDropdownStyles.ts`. Панель, переход и `origin-*` по стороне раскрытия
+// рисует `GrPopover`: `overlayOriginClass` выбирает класс из карты литералов
+// `shared/overlayOrigin.ts`, а не клеит его из стороны. granum извлекает это из
+// чанков поповера, и к меню оно приходит с зависимостью — объявлять здесь нечего.
+export const grDropdownSafelist: string[] = []

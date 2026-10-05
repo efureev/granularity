@@ -5,6 +5,36 @@ All notable changes to the [`@feugene/granularity`](.) package are documented in
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Changed
+
+- **Safelist компонента — только классы, собранные в рантайме.** Правило «литерал
+  `.ts`-хелпера обязан быть в safelist» осталось от пресета: тот сканировал
+  только `dist/components/<Name>/**` и не видел общий чанк. granum обходит от
+  входа компонента все его чанки, общие тоже, и извлекает целые литералы сам. Из
+  3478 записей ядра сборка вычищала как уже извлечённые больше трёх тысяч.
+
+  Каждый из семидесяти компонентов с safelist'ом изучен по коду. Классы из
+  частей собирают шесть: `GrButton` (тон × вариант), `GrCarousel` (текущая
+  точка по тону), `GrProgressBar` (заливка по тону), `GrTable` (полосы и
+  подсветка строк), `GrSelect` и `GrAutocomplete` (подсветка опции). Их
+  safelist перечисляет эти семейства той же функцией, что строит класс. У
+  остальных `grXSafelist` теперь пуст; `GrRadio`, `GrChip` и `GrDropdown`
+  получают кнопочные, бейджевые и origin-классы с объявленной зависимостью.
+
+  **CSS не изменился.** Манифест сверен с 1.0.2 по селекции каждого компонента
+  вместе с зависимостями: ни один класс не пропал. Ушёл только токен `b` — имя
+  переменной из скомпилированного safelist-модуля, которое экстрактор принимал
+  за утилиту.
+
+  Гейт `src/__tests__/safelist.test.ts` перевёрнут: запись safelist, которая
+  лежит целым литералом в коде компонента, он называет лишней. Проза
+  (`ADDING_COMPONENTS.md`, `motion.md`, `overlays.md`, `sizes.md`,
+  `packaging.md`) и комментарии хелперов переписаны под granum; мёртвые
+  `flattenTransitionTokens`, `grDropdownOriginClass`, `grIconClassTokens`,
+  `grLoadingClassTokens`, `underlineClasses` удалены.
+
 ## [v1.0.2] 2026-10-05
 
 ### Fixed

@@ -1,62 +1,16 @@
 import { splitClassTokens } from '../shared/classTokens'
 import { GR_TONES } from '../shared/tones'
-import {
-  carouselControlAxis,
-  carouselControlBase,
-  carouselControlPositions,
-  carouselControlStates,
-  carouselDotBase,
-  carouselDotStates,
-  carouselIconClass,
-  carouselIndicatorBase,
-  carouselIndicatorsBase,
-  carouselIndicatorsVariants,
-  carouselRootAxis,
-  carouselRootBase,
-  carouselSlideAxis,
-  carouselSlideBase,
-  carouselThumbBase,
-  carouselThumbFallbackClass,
-  carouselThumbImageClass,
-  carouselThumbStates,
-  carouselToggleClass,
-  grCarouselDotActiveClass,
-  grCarouselThumbActiveClass,
-  carouselTrackAxis,
-  carouselTrackBase,
-  carouselViewportAxis,
-  carouselViewportBase,
-  carouselViewportSwipeClass,
-  carouselViewportTouchAction,
-} from './grCarouselStyles'
+import { grCarouselDotActiveClass, grCarouselThumbActiveClass } from './grCarouselStyles'
 
+/**
+ * Только текущий переключатель: его классы склеиваются в рантайме из тона и
+ * скобок `arbitrary()` (`grCarouselStyles.ts`: `grCarouselDotActiveClass` —
+ * заливка, обвод и его отступ; `grCarouselThumbActiveClass` — рамка миниатюры),
+ * и целиком их нет ни в одной строке кода. Тон приходит пропом, поэтому
+ * объявлена вся шкала. Остальное компонент берёт литералами, и granum извлекает
+ * это из его чанков сам, включая общие.
+ */
 export const grCarouselSafelist = [...new Set([
-  // Тон приходит пропом, поэтому в скан попадает не он, а вся шкала.
   ...GR_TONES.flatMap(tone => splitClassTokens(grCarouselDotActiveClass(tone))),
   ...GR_TONES.flatMap(tone => splitClassTokens(grCarouselThumbActiveClass(tone))),
-  ...Object.values(carouselControlPositions).flatMap(positions => Object.values(positions).flatMap(splitClassTokens)),
-  ...Object.values(carouselControlAxis).flatMap(splitClassTokens),
-  ...Object.values(carouselTrackAxis).flatMap(splitClassTokens),
-  ...Object.values(carouselSlideAxis).flatMap(splitClassTokens),
-  ...Object.values(carouselViewportTouchAction).flatMap(splitClassTokens),
-  ...Object.values(carouselRootAxis).flatMap(splitClassTokens),
-  ...Object.values(carouselViewportAxis).flatMap(splitClassTokens),
-  ...Object.values(carouselControlStates).flatMap(splitClassTokens),
-  ...Object.values(carouselIndicatorsVariants).flatMap(splitClassTokens),
-  ...Object.values(carouselDotStates).flatMap(splitClassTokens),
-  ...Object.values(carouselThumbStates).flatMap(splitClassTokens),
-  ...splitClassTokens(carouselRootBase),
-  ...splitClassTokens(carouselViewportBase),
-  ...splitClassTokens(carouselViewportSwipeClass),
-  ...splitClassTokens(carouselTrackBase),
-  ...splitClassTokens(carouselSlideBase),
-  ...splitClassTokens(carouselControlBase),
-  ...splitClassTokens(carouselToggleClass),
-  ...splitClassTokens(carouselIconClass),
-  ...splitClassTokens(carouselIndicatorsBase),
-  ...splitClassTokens(carouselIndicatorBase),
-  ...splitClassTokens(carouselDotBase),
-  ...splitClassTokens(carouselThumbBase),
-  ...splitClassTokens(carouselThumbImageClass),
-  ...splitClassTokens(carouselThumbFallbackClass),
 ])]

@@ -1,7 +1,5 @@
-import { splitClassTokens } from '../shared/classTokens'
-
-import { chipGroupRootClass } from './grChipGroupStyles'
-
-export const grChipGroupSafelist = [...new Set([
-  ...splitClassTokens(chipGroupRootClass),
-])]
+// Составных классов у группы нет: свой класс у неё один — раскладка
+// `chipGroupRootClass` литералом в `grChipGroupStyles.ts`, — а чипы приходят
+// слотом от потребителя. granum извлекает литерал сам из чанков компонента,
+// включая общие, поэтому объявлять здесь нечего.
+export const grChipGroupSafelist: string[] = []

@@ -29,9 +29,10 @@ export const tableSizes: Record<GrTableSize, string> = {
 export const DETAIL_ROW_ATTR = 'data-gr-table-off-grid'
 
 /**
- * Только оттенок, без утилиты вокруг: целый класс отдельным литералом гейт
- * safelist читает как употреблённый в разметке и требует его объявить, хотя
- * сам по себе он нигде не стоит — он всегда хвост варианта.
+ * Только оттенок, без утилиты вокруг: сам по себе он нигде не стоит — он всегда
+ * хвост варианта. Целые классы полосы и подсветки ниже собираются шаблонной
+ * строкой из атрибута служебной строки и оттенка, экстрактор их не видит, и
+ * поэтому они объявлены в `GrTable/safelist.ts`.
  */
 const STRIPE_TINT = 'color-mix(in_srgb,var(--gr-muted)_35%,transparent)'
 const HOVER_TINT = 'color-mix(in_srgb,var(--gr-muted)_45%,transparent)'

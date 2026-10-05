@@ -1,26 +1,6 @@
-import { splitClassTokens } from '../shared/classTokens'
-import {
-  densityPadding,
-  descriptionClass,
-  emptyClass,
-  groupTitleClass,
-  loadingRowClass,
-  markerBaseClass,
-  markerFilledToneClass,
-  markerOutlinedToneClass,
-  timeClass,
-  titleClass,
-} from './grTimelineStyles'
-
-export const grTimelineSafelist = [...new Set([
-  ...Object.values(densityPadding).flatMap(splitClassTokens),
-  ...Object.values(markerFilledToneClass).flatMap(splitClassTokens),
-  ...Object.values(markerOutlinedToneClass).flatMap(splitClassTokens),
-  ...splitClassTokens(markerBaseClass),
-  ...splitClassTokens(timeClass),
-  ...splitClassTokens(titleClass),
-  ...splitClassTokens(descriptionClass),
-  ...splitClassTokens(groupTitleClass),
-  ...splitClassTokens(emptyClass),
-  ...splitClassTokens(loadingRowClass),
-])]
+// Составных классов у ленты нет: плотность, маркеры обоих вариантов по тонам и
+// типографика пункта лежат целыми литералами в `grTimelineStyles.ts`;
+// `grTimelineMarkerClass` склеивает готовые строки, а не части классов.
+// granum извлекает их сам из чанков компонента, включая общие, поэтому
+// объявлять здесь нечего.
+export const grTimelineSafelist: string[] = []

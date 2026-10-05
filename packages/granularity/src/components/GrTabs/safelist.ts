@@ -1,48 +1,6 @@
-import { splitClassTokens } from '../shared/classTokens'
-import {
-  tabBadgeBase,
-  tabBadgeSizes,
-  tabBase,
-  tabCloseBase,
-  tabCloseIconSizes,
-  tabCloseSizes,
-  tabContentClass,
-  tabIconClass,
-  tablistBase,
-  tablistColumnClass,
-  tablistLineSizes,
-  tablistScrollClass,
-  tablistSizes,
-  tablistVariants,
-  tablistVerticalVariants,
-  tabsEmptyBase,
-  tabSizes,
-  tabStateClasses,
-  tabVariantBase,
-} from './grTabsStyles'
-
-export const grTabsSafelist = [...new Set([
-  ...Object.values(tabSizes).flatMap(splitClassTokens),
-  ...Object.values(tabBadgeSizes).flatMap(splitClassTokens),
-  ...Object.values(tabCloseSizes).flatMap(splitClassTokens),
-  ...Object.values(tabCloseIconSizes).flatMap(splitClassTokens),
-  ...Object.values(tablistSizes).flatMap(splitClassTokens),
-  ...Object.values(tablistLineSizes).flatMap(splitClassTokens),
-  ...Object.values(tablistVariants).flatMap(splitClassTokens),
-  ...Object.values(tablistVerticalVariants).flatMap(splitClassTokens),
-  ...Object.values(tabVariantBase).flatMap(splitClassTokens),
-  ...Object.values(tabStateClasses).flatMap(state => [
-    ...splitClassTokens(state.active),
-    ...splitClassTokens(state.idle),
-    ...splitClassTokens(state.disabled),
-  ]),
-  ...splitClassTokens(tablistBase),
-  ...splitClassTokens(tablistScrollClass),
-  ...splitClassTokens(tablistColumnClass),
-  ...splitClassTokens(tabBase),
-  ...splitClassTokens(tabBadgeBase),
-  ...splitClassTokens(tabContentClass),
-  ...splitClassTokens(tabIconClass),
-  ...splitClassTokens(tabCloseBase),
-  ...splitClassTokens(tabsEmptyBase),
-])]
+// Составных классов у вкладок нет: всё, что они рисуют, лежит целыми
+// литералами в шаблоне и в мапах `grTabsStyles.ts` — вариантов `pills`/`line`,
+// их состояний и размеров. granum извлекает их сам из всех чанков компонента,
+// включая общие, поэтому объявлять здесь нечего. Класс иконки-строки приходит
+// от потребителя: правило для него заводит приложение.
+export const grTabsSafelist: string[] = []

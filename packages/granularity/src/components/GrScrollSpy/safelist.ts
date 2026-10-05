@@ -1,19 +1,6 @@
-import { splitClassTokens } from '../shared/classTokens'
-
-import {
-  scrollSpyItemActiveClass,
-  scrollSpyItemAncestorClass,
-  scrollSpyItemBaseClass,
-  scrollSpyItemIdleClass,
-  scrollSpyListClass,
-  scrollSpyRootClass,
-} from './grScrollSpyStyles'
-
-export const grScrollSpySafelist = [...new Set([
-  ...splitClassTokens(scrollSpyRootClass),
-  ...splitClassTokens(scrollSpyListClass),
-  ...splitClassTokens(scrollSpyItemBaseClass),
-  ...splitClassTokens(scrollSpyItemIdleClass),
-  ...splitClassTokens(scrollSpyItemAncestorClass),
-  ...splitClassTokens(scrollSpyItemActiveClass),
-])]
+// Составных классов у оглавления нет: всё, что оно рисует, лежит целыми
+// литералами в шаблоне и в `grScrollSpyStyles.ts`. Отступ и уровень
+// вложенности собираются в рантайме, но это значения инлайнового `style`, а не
+// классы. granum извлекает литералы сам из всех чанков компонента, включая
+// общие, поэтому объявлять здесь нечего.
+export const grScrollSpySafelist: string[] = []

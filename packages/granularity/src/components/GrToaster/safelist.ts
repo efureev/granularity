@@ -1,9 +1,6 @@
-import { splitClassTokens } from '../shared/classTokens'
-import { PLACEMENT_CLASS } from './grToasterStyles'
-
-// В safelist попадают только те классы, которые приходят в шаблон динамически
-// (через `:class`/`PLACEMENT_CLASS`). Литералы из шаблона (`class="..."`)
-// UnoCSS находит статическим сканом и дублировать их здесь не нужно.
-export const grToasterSafelist = [...new Set(
-  Object.values(PLACEMENT_CLASS).flatMap(splitClassTokens),
-)]
+// Составных классов у тостера нет: угол экрана — целые литералы `PLACEMENT_CLASS`
+// в `grToasterStyles.ts`, раскладка стопки и переходы лежат литералами в
+// `GrToaster.vue`. Сдвиг и масштаб стопки собираются в рантайме, но это
+// инлайновый `transform`, а не классы. granum извлекает литералы сам из всех
+// чанков компонента, включая общие, поэтому объявлять здесь нечего.
+export const grToasterSafelist: string[] = []

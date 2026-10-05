@@ -21,8 +21,7 @@ export type GrLinkVariant = 'default' | 'muted'
 export type GrLinkUnderline = 'auto' | 'always' | 'none'
 export type GrLinkSize = GrComponentSize
 
-// Базовые классы корневого элемента (`<a>`/`<span>`). Вынесены сюда,
-// чтобы быть единственным источником истины как для шаблона, так и для safelist.
+// Базовые классы корневого элемента (`<a>`/`<span>`).
 export const baseRootClass = 'inline-flex items-center gap-1 rounded-[var(--gr-radius-control)] transition-colors duration-[var(--gr-duration-fast)]'
 export const focusRingClass = 'focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]'
 
@@ -34,7 +33,7 @@ export const sizeClassBySize: Record<GrLinkSize, string> = {
 }
 
 // Цвет управляется CSS-переменными (как трек в GrSwitch): один набор классов
-// вместо class-эксплозии 8 тонов × 3 состояния. Safelist остаётся крошечным.
+// вместо class-эксплозии 8 тонов × 3 состояния. CSS остаётся крошечным.
 export const colorClass = 'text-[var(--gr-link-color)] visited:text-[var(--gr-link-color)] hover:text-[var(--gr-link-color-hover)] active:text-[var(--gr-link-color-active)]'
 
 type GrLinkToneColors = { base: string, hover: string, active: string }
@@ -102,8 +101,6 @@ export function grLinkColorStyle(options: { tone: GrLinkTone, variant: GrLinkVar
  */
 export const disabledStateClass = 'cursor-not-allowed text-[var(--gr-muted-fg)]'
 
-const UNDERLINE_VALUES: readonly GrLinkUnderline[] = ['auto', 'always', 'none']
-
 function underlineClass(underline: GrLinkUnderline, disabled: boolean): string {
   if (disabled)
     return 'no-underline'
@@ -113,13 +110,6 @@ function underlineClass(underline: GrLinkUnderline, disabled: boolean): string {
     return 'no-underline'
   return 'no-underline hover:underline hover:underline-offset-4'
 }
-
-// Derived from `underlineClass` so that there is a single source of truth:
-// any change/extension of the underline logic is automatically reflected
-// in the safelist without manual updates.
-export const underlineClasses: readonly string[] = [...new Set(
-  UNDERLINE_VALUES.flatMap(u => [underlineClass(u, false), underlineClass(u, true)]),
-)]
 
 export function grLinkClass(options: { size: GrLinkSize, underline: GrLinkUnderline, disabled: boolean }): string {
   return [

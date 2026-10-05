@@ -1,28 +1,6 @@
-import { splitClassTokens } from '../shared/classTokens'
-import {
-  densityPadding,
-  dividedClass,
-  emptyClass,
-  itemDescriptionClass,
-  itemDisabledClass,
-  itemHoverClass,
-  itemInteractiveClass,
-  itemLayoutClass,
-  itemTitleClass,
-  listSurfaceClass,
-  loadingRowClass,
-} from './grListStyles'
-
-export const grListSafelist = [...new Set([
-  ...Object.values(densityPadding).flatMap(splitClassTokens),
-  ...splitClassTokens(listSurfaceClass),
-  ...splitClassTokens(itemLayoutClass),
-  ...splitClassTokens(itemTitleClass),
-  ...splitClassTokens(itemDescriptionClass),
-  ...splitClassTokens(itemInteractiveClass),
-  ...splitClassTokens(itemHoverClass),
-  ...splitClassTokens(itemDisabledClass),
-  ...splitClassTokens(dividedClass),
-  ...splitClassTokens(emptyClass),
-  ...splitClassTokens(loadingRowClass),
-])]
+/**
+ * Пуст: составных классов у списка и его пункта нет. Плотность берётся из мапы
+ * `densityPadding` целым литералом, как и остальные классы `grListStyles.ts`,
+ * и granum извлекает их из чанков компонента сам, включая общие.
+ */
+export const grListSafelist: string[] = []

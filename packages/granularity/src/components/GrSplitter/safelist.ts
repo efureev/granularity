@@ -1,8 +1,4 @@
-import { splitClassTokens } from '../shared/classTokens'
-import { paneClass, rootClass, separatorClass } from './grSplitterStyles'
-
-export const grSplitterSafelist = [...new Set([
-  ...splitClassTokens(rootClass),
-  ...splitClassTokens(paneClass),
-  ...splitClassTokens(separatorClass),
-])]
+// Всё, что рисует компонент, лежит в коде целыми литералами — в
+// `grSplitterStyles.ts`, а геометрия живёт в его `<style>`. granum извлекает
+// литералы из чанков компонента сам, общие включительно.
+export const grSplitterSafelist: string[] = []

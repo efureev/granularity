@@ -1,20 +1,5 @@
-import { splitClassTokens } from '../shared/classTokens'
-import {
-  ellipsisSizes,
-  jumperSizes,
-  labelSizes,
-  pageListGaps,
-  pageBoxSizes,
-  pageSizeSelectWidths,
-  rowGaps,
-} from './grPaginationStyles'
-
-export const grPaginationSafelist = [...new Set([
-  ...Object.values(pageBoxSizes).flatMap(splitClassTokens),
-  ...Object.values(ellipsisSizes).flatMap(splitClassTokens),
-  ...Object.values(labelSizes).flatMap(splitClassTokens),
-  ...Object.values(jumperSizes).flatMap(splitClassTokens),
-  ...Object.values(rowGaps).flatMap(splitClassTokens),
-  ...Object.values(pageListGaps).flatMap(splitClassTokens),
-  ...Object.values(pageSizeSelectWidths).flatMap(splitClassTokens),
-])]
+// Составных классов у пагинации нет: всё, что она рисует, лежит целыми
+// литералами в шаблоне и в мапах размеров `grPaginationStyles.ts`. granum
+// извлекает их сам из всех чанков компонента, включая общие, поэтому объявлять
+// здесь нечего.
+export const grPaginationSafelist: string[] = []

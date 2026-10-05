@@ -1,17 +1,5 @@
-import { splitClassTokens } from '../shared/classTokens'
-
-import {
-  affixBaseClass,
-  affixEdgeClass,
-  affixSentinelClass,
-  affixStickyClass,
-  affixSurfaceClass,
-} from './grAffixStyles'
-
-export const grAffixSafelist = [...new Set([
-  ...splitClassTokens(affixBaseClass),
-  ...splitClassTokens(affixStickyClass),
-  ...Object.values(affixEdgeClass).flatMap(splitClassTokens),
-  ...Object.values(affixSurfaceClass).flatMap(splitClassTokens),
-  ...Object.values(affixSentinelClass).flatMap(splitClassTokens),
-])]
+// Составных классов у аффикса нет: всё, что он рисует, лежит целыми литералами
+// в шаблоне и в мапах краёв `grAffixStyles.ts`. Отступ собирается в рантайме,
+// но это значение инлайновой переменной, а не класс. granum извлекает литералы
+// сам из всех чанков компонента, включая общие, поэтому объявлять здесь нечего.
+export const grAffixSafelist: string[] = []

@@ -1,7 +1,6 @@
 import { readFileSync, readdirSync } from 'node:fs'
 import { basename, relative, resolve } from 'node:path'
 
-import { windEngine } from '@feugene/granum-engine-wind'
 import { describe, expect, it } from 'vitest'
 
 import { componentSourceFiles } from './componentGraph'
@@ -9,36 +8,39 @@ import { componentSourceFiles } from './componentGraph'
 /**
  * Гейт safelist-контракта.
  *
- * Пресет сканирует ровно `<packageBaseUrl>/components/<Name>/**`, а любой
- * `.ts`-хелпер компонента бандлер волен вынести в общий `dist/chunks/` —
- * достаточно, чтобы на модуль сослались из двух мест (например, из `.vue` и
- * из `safelist.ts`). После выноса классы, живущие в нём строковыми литералами,
- * не видит ни скан, ни safelist: у изолированного потребителя компонент
- * рендерится без цветов, теней и фокус-колец, а в витрине дефект маскируется
- * соседями по странице, которые генерируют те же утилиты.
+ * Safelist компонента — только классы, которые собираются в рантайме из частей:
+ * шаблонная строка, конкатенация, `prefix + value`. Целиком их нет ни в одной
+ * строке кода, и экстрактор не увидит их никогда.
  *
- * Поэтому правило сформулировано от исходников, а не от `dist`: класс из
- * `.ts`-хелпера обязан быть в safelist независимо от того, куда его положила
- * текущая раскладка чанков. Гейт от `dist` зеленел бы ровно до следующего
- * изменения чанкинга.
+ * Всё, что лежит в коде целым литералом, granum извлекает сам. `granumProvider`
+ * на сборке пакета обходит от входа компонента все импортированные им чанки,
+ * включая общие `dist/chunks/*`, и прогоняет экстрактор по каждому; останавливается
+ * он только на директории другого компонента — это ребро графа, и её классы
+ * приходят с зависимостью. Раскладка чанков на это не влияет.
  *
- * Литералы из `.vue` под правило не подпадают: шаблон и `<script setup>`
- * компилируются в чанк самого компонента, то есть всегда лежат в области скана.
+ * До granum правило было обратным: пресет сканировал ровно
+ * `components/<Name>/**`, общий чанк не видел, и литералы `.ts`-хелперов
+ * обязаны были дублироваться в safelist. Из 3478 записей ядра сборка вычищала
+ * как уже извлечённые больше трёх тысяч — и часть оставшихся держалась только
+ * потому, что `index.ts` реэкспортирует safelist и экстрактор находил литерал
+ * в самом safelist-модуле.
  *
- * Хелперы из `components/shared/` считаются наравне со своими: адреса у такого
- * модуля нет вовсе — в `dist` он лежит в общем чанке и не принадлежит ни одной
- * директории, которую сканирует пресет. Поэтому его классы обязан объявить
- * **каждый** компонент, который его импортирует. Ни этот гейт до расширения, ни
- * `doctor` этого не ловили: диагностики доктора закрыты списком и классов не
- * касаются вовсе, а `undeclared-dependency` — это ребро в директорию другого
- * компонента, тогда как общий чанк ничьей директорией не является.
+ * Гейт держит новую сторону контракта: запись safelist не должна лежать целым
+ * литералом в коде компонента — его `.vue`, его `.ts`-хелперах и модулях
+ * `components/shared/`, которые он импортирует. Такая запись лишняя: класс
+ * извлечётся и без неё. Обратную сторону — «собранный в рантайме класс объявлен»
+ * — исходник не выдаёт, её держит автор: семейство, которое функция клеит из
+ * частей, объявляется целиком, по всем значениям.
  */
 
 const componentsDir = resolve(process.cwd(), 'src/components')
 const sharedDir = resolve(componentsDir, 'shared')
 
-/** Файлы компонента, которые не являются style-хелперами. */
-const NOT_A_HELPER = /^(?:index|config|safelist|defaults)\.ts$/
+/**
+ * Файлы компонента, литералы которых не считаются кодом компонента: `safelist.ts`
+ * сам и есть объявление, `index.ts` и `config.ts` только его передают.
+ */
+const NOT_COMPONENT_CODE = /^(?:index|config|safelist)\.ts$/
 
 /** `from '../shared/x'`, `from '../../shared/x'` — импорт безадресного хелпера. */
 const SHARED_IMPORT = /import\s+(type\s+)?([^'"]*?)from\s*['"](?:\.\.\/)+shared\/([\w-]+)(?:\.\w+)?['"]/g
@@ -142,16 +144,16 @@ function expandSharedModules(entry: string[]): string[] {
 }
 
 /**
- * Файлы, чьи класс-литералы обязаны быть в safelist компонента: его собственные
- * `.ts`-хелперы плюс безадресные модули из `shared/`.
+ * Код компонента, который видит экстрактор: его `.vue` и `.ts` плюс модули
+ * `shared/`, которые он импортирует.
  *
  * Обход рекурсивный: у `GrSelect` хелперы лежат в `composables/`, у
  * `GrResponseErrorBanner` — в `parsers/`, и плоский `readdirSync` их не видел.
  */
-function helperFiles(component: string): string[] {
+function componentCodeFiles(component: string): string[] {
   const dir = resolve(componentsDir, component)
   const own = componentSourceFiles(dir)
-    .filter(file => file.endsWith('.ts') && !NOT_A_HELPER.test(basename(file)))
+    .filter(file => !NOT_COMPONENT_CODE.test(basename(file)))
 
   const shared = expandSharedModules(
     componentSourceFiles(dir).flatMap(file => parseSharedImports(readFileSync(file, 'utf8'))),
@@ -175,31 +177,16 @@ async function declaredSafelist(component: string): Promise<Set<string>> {
 }
 
 describe('safelist-контракт', () => {
-  /*
-   * Порог поднят намеренно: гейт прогоняет каждого кандидата через реальный
-   * генератор UnoCSS по всем компонентам пакета, и это секунды, а не
-   * миллисекунды. Под параллельной нагрузкой полного набора он перебирал
-   * дефолтные 5 с и падал таймаутом — то есть краснел от собственного роста,
-   * а не от находки.
-   */
-  it('классы из `.ts`-хелперов компонента объявлены в его safelist', async () => {
-    // Оракул «это вообще утилита?» — тот же движок, которым granum собирает
-    // CSS приложения, то есть словарь объявленного диалекта. На движке более
-    // узкого словаря часть таких токенов считалась бы «не утилитой», и у
-    // изолированного потребителя класс молча не сгенерировался бы. Токен, из
-    // которого CSS не делает никто, классом по-прежнему не считается.
-    const engine = windEngine()
-    const isUtility = new Map<string, boolean>()
-
+  it('safelist компонента не дублирует литералы его кода', async () => {
     const violations: string[] = []
 
     for (const component of componentNames()) {
-      const files = helperFiles(component)
-      if (files.length === 0)
+      const safelist = await declaredSafelist(component)
+      if (safelist.size === 0)
         continue
 
-      const safelist = await declaredSafelist(component)
-      const candidates = new Set<string>()
+      const files = componentCodeFiles(component)
+      const literalAt = new Map<string, string>()
 
       for (const file of files) {
         const source = stripComments(readFileSync(file, 'utf8'))
@@ -209,36 +196,23 @@ describe('safelist-контракт', () => {
             continue
 
           for (const token of literal.split(/\s+/).filter(Boolean)) {
-            // Кусок шаблонной строки классом не является: `${…}` подставляется
-            // в рантайме, и в safelist попадает уже разрешённая форма. Движок
-            // granum получает токены списком, без прохода экстрактором, и такой
-            // кусок для него — синтаксически валидный arbitrary-вариант.
+            // Кусок шаблонной строки целым классом не является: `${…}`
+            // подставляется в рантайме, и именно такие классы safelist и несёт.
             if (token.includes('${'))
               continue
-            if (!safelist.has(token))
-              candidates.add(token)
+            if (!literalAt.has(token))
+              literalAt.set(token, relative(componentsDir, file))
           }
         }
       }
 
-      const missing: string[] = []
+      const redundant = [...safelist]
+        .filter(token => literalAt.has(token))
+        .sort()
+        .map(token => `${token} (${literalAt.get(token)})`)
 
-      for (const token of candidates) {
-        if (!isUtility.has(token)) {
-          const { matched } = await engine.generate({ classes: new Set([token]) })
-          isUtility.set(token, matched.size > 0)
-        }
-
-        if (isUtility.get(token))
-          missing.push(token)
-      }
-
-      if (missing.length > 0) {
-        // Путь от `src/components`, иначе общий хелпер в сообщении неотличим
-        // от файла самого компонента.
-        const where = files.map(file => relative(componentsDir, file)).join(', ')
-        violations.push(`${component} [${where}]: ${missing.sort().join(' ')}`)
-      }
+      if (redundant.length > 0)
+        violations.push(`${component}: ${redundant.join(', ')}`)
     }
 
     expect(violations).toEqual([])

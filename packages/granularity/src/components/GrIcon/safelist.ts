@@ -1,6 +1,5 @@
-import { grIconClassTokens } from './grIconStyles'
-
-// Классы тона и вращения живут строковыми литералами в `grIconStyles.ts` —
-// на сборке он уезжает в общий dist-чанк, вне области скана компонента
-// (docs/gotchas.md §2).
-export const grIconSafelist = [...new Set(grIconClassTokens)]
+// Составных классов у иконки нет: тон берётся из мапы `iconToneClass` целым
+// литералом, база и вращение — константы `grIconStyles.ts`, размер задаёт
+// инлайновая переменная. granum извлекает всё это из чанков компонента сам,
+// включая общие.
+export const grIconSafelist: string[] = []

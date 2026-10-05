@@ -7,11 +7,12 @@ import GrRadio from '../GrRadio.vue'
 import { grRadioSafelist } from '../safelist'
 
 describe('GrRadio (radiobox)', () => {
-  it('держит в safelist базовые классы точки, чтобы dot не пропадал в собранных стилях', () => {
-    expect(grRadioSafelist).toContain('h-[6px]')
-    expect(grRadioSafelist).toContain('w-[6px]')
-    expect(grRadioSafelist).toContain('rounded-[var(--gr-radius-full)]')
-    expect(grRadioSafelist).toContain('transition-[transform,opacity,background-color]')
+  it('не держит в safelist классы точки: они литералы, granum извлекает их из чанка сам', () => {
+    // Раньше точка пропадала из собранных стилей, если её классы не дублировались
+    // в safelist: пресет не сканировал общий чанк хелпера. granum обходит все
+    // чанки компонента, и запись была бы лишней — гейт `safelist.test.ts`.
+    expect(grRadioSafelist).not.toContain('h-[6px]')
+    expect(grRadioSafelist).not.toContain('rounded-[var(--gr-radius-full)]')
   })
 
   it('использует primary-цвет для кружочка (dot)', () => {

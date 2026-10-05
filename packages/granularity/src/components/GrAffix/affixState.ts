@@ -36,10 +36,8 @@ export function affixOffsetLength(value: number | string | undefined): string | 
     if (!Number.isFinite(value))
       return undefined
 
-    // Число выносится в переменную, чтобы литерал остался одним токеном:
-    // safelist-гейт разбирает шаблонные строки по пробелам и обломок вроде
-    // `value)}px` принимает за утилиту UnoCSS — которой он, по совпадению, и
-    // оказывается.
+    // Число — длина в пикселях для инлайновой переменной `--gr-affix-offset`, а
+    // не класс: в `class` эта строка не попадает.
     const px = Math.max(0, value)
 
     return `${px}px`

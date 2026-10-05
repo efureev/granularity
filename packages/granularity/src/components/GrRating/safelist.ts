@@ -1,25 +1,7 @@
-import { splitClassTokens } from '../shared/classTokens'
-import {
-  ratingDisabledClass,
-  ratingFillClassByTone,
-  ratingGapBySize,
-  ratingRootBaseClass,
-  ratingSymbolSizeBySize,
-  ratingTextSizeBySize,
-  ratingVoidClass,
-} from './grRatingStyles'
-
-// Всё, что живёт в `grRatingStyles.ts`: и вычисляемые мапы (size/tone), и
-// строковые литералы. Хелпер бандлер волен вынести в общий `dist/chunks/`,
-// который не попадает в область скана компонента — гейт `src/__tests__/safelist.test.ts`.
-export const grRatingSafelist = [...new Set([
-  ...Object.values(ratingSymbolSizeBySize).flatMap(splitClassTokens),
-  ...Object.values(ratingGapBySize).flatMap(splitClassTokens),
-  ...Object.values(ratingTextSizeBySize).flatMap(splitClassTokens),
-  ...Object.values(ratingFillClassByTone).flatMap(splitClassTokens),
-  ...splitClassTokens(ratingVoidClass),
-  ...splitClassTokens(ratingRootBaseClass),
-  ...splitClassTokens(ratingDisabledClass),
-  ...splitClassTokens('cursor-pointer'),
-  ...splitClassTokens('relative block shrink-0 tabular-nums'),
-])]
+// Составных классов у рейтинга нет: размеры символа, зазоры, кегль подписи,
+// тона заливки и состояния лежат целыми литералами в `grRatingStyles.ts` и
+// шаблоне. `ratingSymbolClass` дописывает к литералу готовую строку из мапы, а
+// не часть класса. granum извлекает всё это сам из чанков компонента, включая
+// общие. Класс иконки, заданной строкой, приходит от потребителя: правило для
+// него заводит приложение.
+export const grRatingSafelist: string[] = []

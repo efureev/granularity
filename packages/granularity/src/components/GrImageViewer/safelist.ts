@@ -1,21 +1,6 @@
-import { splitClassTokens } from '../shared/classTokens'
-
-import {
-  badgeClass,
-  chromeButtonClass,
-  emptyStateClass,
-  scrimClass,
-  toolbarButtonClass,
-  toolbarSeparatorClass,
-  toolbarShellClass,
-} from './grImageViewerStyles'
-
-export const grImageViewerSafelist = [...new Set([
-  ...splitClassTokens(scrimClass),
-  ...splitClassTokens(chromeButtonClass),
-  ...splitClassTokens(toolbarButtonClass),
-  ...splitClassTokens(toolbarShellClass),
-  ...splitClassTokens(toolbarSeparatorClass),
-  ...splitClassTokens(badgeClass),
-  ...splitClassTokens(emptyStateClass),
-])]
+// Составных классов у просмотрщика нет: хром — целые литералы
+// `grImageViewerStyles.ts`, переходы и курсор лежат литералами в
+// `GrImageViewer.vue`. Масштаб, сдвиг и поворот изображения — инлайновый
+// `transform` из `useZoomPan`, а не классы. granum извлекает литералы сам из
+// всех чанков компонента, включая общие, поэтому объявлять здесь нечего.
+export const grImageViewerSafelist: string[] = []

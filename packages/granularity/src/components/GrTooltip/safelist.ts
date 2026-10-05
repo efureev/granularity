@@ -1,7 +1,4 @@
-import { splitClassTokens } from '../shared/classTokens'
-import { panelSizes, panelWidths } from './grTooltipStyles'
-
-export const grTooltipSafelist = [...new Set([
-  ...Object.values(panelSizes).flatMap(splitClassTokens),
-  ...Object.values(panelWidths).flatMap(splitClassTokens),
-])]
+// Составных классов у подсказки нет: кегль и ширина панели — целые литералы мап
+// `grTooltipStyles.ts`, поверхность и фейд лежат в шаблоне. granum извлекает их
+// сам из всех чанков компонента, включая общие, поэтому объявлять здесь нечего.
+export const grTooltipSafelist: string[] = []

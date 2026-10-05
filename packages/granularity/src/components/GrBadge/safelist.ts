@@ -1,28 +1,7 @@
-import { splitClassTokens } from '../shared/classTokens'
-import {
-  badgeDotClass,
-  badgeDotCurrentColorClass,
-  badgeDotSizeClassBySize,
-  badgeDotToneClass,
-  badgeIconClass,
-  badgeIconSizeClassBySize,
-  darkToneClassByTone,
-  lightToneClassByTone,
-  semiRadiusClassBySize,
-  sizeClassBySize,
-} from './grBadgeStyles'
-
-export const grBadgeSafelist = [...new Set([
-  ...Object.values(sizeClassBySize).flatMap(splitClassTokens),
-  ...Object.values(badgeIconSizeClassBySize).flatMap(splitClassTokens),
-  ...splitClassTokens(badgeIconClass),
-  ...Object.values(badgeDotSizeClassBySize).flatMap(splitClassTokens),
-  ...splitClassTokens(badgeDotClass),
-  ...splitClassTokens(badgeDotCurrentColorClass),
-  ...Object.values(badgeDotToneClass).flatMap(splitClassTokens),
-  ...Object.values(semiRadiusClassBySize).flatMap(splitClassTokens),
-  'rounded-[var(--gr-radius-none)]',
-  'rounded-[var(--gr-radius-full)]',
-  ...Object.values(lightToneClassByTone).flatMap(splitClassTokens),
-  ...Object.values(darkToneClassByTone).flatMap(splitClassTokens),
-])]
+// Составных классов у бейджа нет: всё, что он рисует, лежит целыми литералами
+// в шаблоне и в мапах `grBadgeStyles.ts` — размеры, радиусы, тона обоих весов,
+// маркер. `grBadgeClass` и `badgeDotClassFor` склеивают готовые строки, а не
+// части классов. granum извлекает их сам из чанков компонента, включая общие.
+// `GrChip` берёт тона и радиусы из тех же мап и получает их классы вместе с
+// зависимостью `GrBadge`, а не через этот список.
+export const grBadgeSafelist: string[] = []

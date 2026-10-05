@@ -28,9 +28,8 @@ export function scrollSpyOffsetLength(value: number | string | undefined): strin
     if (!Number.isFinite(value))
       return undefined
 
-    // Число выносится в переменную, чтобы литерал остался одним токеном: гейт
-    // safelist разбирает шаблонные строки по пробелам и обломок вида `value)}px`
-    // принимает за утилиту UnoCSS — которой он, по совпадению, и оказывается.
+    // Число — длина в пикселях для инлайновой переменной `--gr-scroll-spy-offset`,
+    // а не класс: в `class` эта строка не попадает.
     const px = Math.max(0, value)
 
     return `${px}px`

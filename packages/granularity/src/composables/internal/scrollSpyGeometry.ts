@@ -78,9 +78,8 @@ export function activeSectionId(
 export function scrollSpyRootMargin(offsetPx: number): string {
   const px = Number.isFinite(offsetPx) ? Math.max(0, Math.round(offsetPx)) : 0
   const negative = -px
-  // Число выносится в переменную, чтобы литерал остался одним токеном: гейт
-  // safelist разбирает шаблонные строки по пробелам, а обломок вида `-${px}px`
-  // принимает за утилиту UnoCSS — которой он, по совпадению, и оказывается.
+  // Длины в пикселях для `rootMargin` наблюдателя, а не классы: верх поджимается
+  // на отступ, остальные края нулевые.
   const inset = `${negative}px`
   const zero = '0px'
 

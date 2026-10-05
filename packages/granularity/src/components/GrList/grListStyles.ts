@@ -3,9 +3,9 @@ export type GrListItemDensity = 'compact' | 'regular'
 /**
  * Классы `GrList`/`GrListItem`.
  *
- * Единственный источник правды для шаблонов и safelist: до этого карта
- * плотности жила в SFC, а её копия — строковыми литералами прямо в `config.ts`,
- * и разойтись они могли молча.
+ * Единственный источник правды для шаблонов: до этого карта плотности жила в
+ * SFC, а её копия для safelist — строковыми литералами прямо в `config.ts`, и
+ * разойтись они могли молча.
  */
 
 export const densityPadding: Record<GrListItemDensity, string> = {

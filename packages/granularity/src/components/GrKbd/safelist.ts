@@ -1,22 +1,5 @@
-import { splitClassTokens } from '../shared/classTokens'
-import {
-  comboBaseClass,
-  comboGaps,
-  keyBaseClass,
-  keySizes,
-  mergedGaps,
-  mergedKeyClass,
-  separatorClass,
-  sequenceSeparatorClass,
-} from './grKbdStyles'
-
-export const grKbdSafelist = [...new Set([
-  ...splitClassTokens(keyBaseClass),
-  ...Object.values(keySizes).flatMap(splitClassTokens),
-  ...splitClassTokens(comboBaseClass),
-  ...Object.values(comboGaps).flatMap(splitClassTokens),
-  ...Object.values(mergedGaps).flatMap(splitClassTokens),
-  ...splitClassTokens(mergedKeyClass),
-  ...splitClassTokens(separatorClass),
-  ...splitClassTokens(sequenceSeparatorClass),
-])]
+// Составных классов у клавиши нет: база, размеры и зазоры берутся из мап
+// `grKbdStyles.ts` целыми литералами, шаблонные строки там лишь склеивают
+// готовые классы через пробел. granum извлекает их из чанков компонента сам,
+// включая общие.
+export const grKbdSafelist: string[] = []

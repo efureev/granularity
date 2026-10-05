@@ -1,37 +1,7 @@
-import { splitClassTokens } from '../shared/classTokens'
-
-import {
-  descriptionSingleColumnClass,
-  descriptionDensityClass,
-  descriptionDividedClass,
-  descriptionLabelInlineClass,
-  descriptionLabelStackedClass,
-  descriptionPairFlowClass,
-  descriptionPairInlineClass,
-  descriptionPairStackedClass,
-  descriptionRootClass,
-  descriptionRootFlowClass,
-  descriptionRootGridClass,
-  descriptionSizeClass,
-  descriptionValueClass,
-  descriptionValueToneClass,
-} from './grDescriptionListStyles'
-
-// Классы из вычисляемых мап (тон, размер, колонки) UnoCSS сканом не находит —
-// только safelist. Литералы хелпера туда же: на сборке он уезжает в общий чанк.
-export const grDescriptionListSafelist = [...new Set([
-  ...splitClassTokens(descriptionRootClass),
-  ...splitClassTokens(descriptionRootGridClass),
-  ...splitClassTokens(descriptionRootFlowClass),
-  ...splitClassTokens(descriptionPairInlineClass),
-  ...splitClassTokens(descriptionPairStackedClass),
-  ...splitClassTokens(descriptionPairFlowClass),
-  ...splitClassTokens(descriptionDividedClass),
-  ...splitClassTokens(descriptionLabelInlineClass),
-  ...splitClassTokens(descriptionLabelStackedClass),
-  ...splitClassTokens(descriptionValueClass),
-  ...splitClassTokens(descriptionSingleColumnClass),
-  ...Object.values(descriptionValueToneClass).flatMap(splitClassTokens),
-  ...Object.values(descriptionSizeClass).flatMap(splitClassTokens),
-  ...Object.values(descriptionDensityClass).flatMap(splitClassTokens),
-])]
+/**
+ * Пуст: составных классов у списка нет. Тон, размер и плотность выбираются из
+ * мап `grDescriptionListStyles.ts` целыми литералами, колонки задаются
+ * инлайновым стилем, и granum извлекает всё это из чанков компонента сам,
+ * включая общие.
+ */
+export const grDescriptionListSafelist: string[] = []

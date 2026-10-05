@@ -246,7 +246,7 @@ export const sizes = {
 2. `defaults.ts` с `size` в `GrXConfigurableProps` + аугментация реестра, и реэкспорт типа из `index.ts` — без него
    аугментация не доедет до потребителя.
 3. `useGrComponentSize(() => props.size, { component: 'GrX' })`; `supported`, если компонент умеет не все ступени.
-4. Карты классов — в `grXStyles.ts` и оттуда же в `safelist.ts`: классы из вычисляемых мап экстрактор движка не находит.
+4. Карты классов — в `grXStyles.ts` целыми литералами: granum извлечёт их сам. В `safelist.ts` — только классы, которые компонент собирает в рантайме из частей.
 5. Стенд в `src/__tests__/componentSize.test.ts` — иначе гейт упадёт сам.
 6. Поле-коробка с фиксированной высотой заводит и `shape` — по тому же списку
    шагов, плюс запись в `controlShapeContract.test.ts`.

@@ -1,47 +1,6 @@
-import { splitClassTokens } from '../shared/classTokens'
-
-import {
-  stepsCompactBarClass,
-  stepsCompactCounterClass,
-  stepsCompactLabelClass,
-  stepsCompactRowClass,
-  stepsConnectorClass,
-  stepsConnectorDoneClass,
-  stepsConnectorPendingClass,
-  stepsDescriptionClass,
-  stepsItemClass,
-  stepsItemConnectedClass,
-  stepsLabelClass,
-  stepsLabelClassByStatus,
-  stepsListClass,
-  stepsMarkerClass,
-  stepsMarkerClassByStatus,
-  stepsRootClass,
-  stepsSizeClassBySize,
-  stepsTriggerClass,
-  stepsTriggerClassByOrientation,
-  stepsTriggerEnabledClass,
-} from './grStepsStyles'
-
-export const grStepsSafelist = [...new Set([
-  ...Object.values(stepsSizeClassBySize).flatMap(splitClassTokens),
-  ...Object.values(stepsListClass).flatMap(splitClassTokens),
-  ...Object.values(stepsItemClass).flatMap(splitClassTokens),
-  ...Object.values(stepsItemConnectedClass).flatMap(splitClassTokens),
-  ...Object.values(stepsTriggerClassByOrientation).flatMap(splitClassTokens),
-  ...Object.values(stepsConnectorClass).flatMap(splitClassTokens),
-  ...Object.values(stepsMarkerClassByStatus).flatMap(splitClassTokens),
-  ...Object.values(stepsLabelClassByStatus).flatMap(splitClassTokens),
-  ...splitClassTokens(stepsRootClass),
-  ...splitClassTokens(stepsMarkerClass),
-  ...splitClassTokens(stepsLabelClass),
-  ...splitClassTokens(stepsDescriptionClass),
-  ...splitClassTokens(stepsTriggerClass),
-  ...splitClassTokens(stepsTriggerEnabledClass),
-  ...splitClassTokens(stepsConnectorDoneClass),
-  ...splitClassTokens(stepsConnectorPendingClass),
-  ...splitClassTokens(stepsCompactRowClass),
-  ...splitClassTokens(stepsCompactCounterClass),
-  ...splitClassTokens(stepsCompactLabelClass),
-  ...splitClassTokens(stepsCompactBarClass),
-])]
+// Составных классов у шагов нет: всё, что они рисуют, лежит целыми литералами
+// в шаблоне и в мапах `grStepsStyles.ts` — размеров, ориентаций и статусов.
+// Шаблонные строки там и в `GrSteps.vue` склеивают готовые списки классов
+// через пробел, а не класс из частей. granum извлекает литералы сам из всех
+// чанков компонента, включая общие, поэтому объявлять здесь нечего.
+export const grStepsSafelist: string[] = []

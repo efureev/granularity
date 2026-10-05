@@ -1,3 +1,4 @@
-import { grLoadingClassTokens } from './grLoadingStyles'
-
-export const grLoadingSafelist = [...new Set(grLoadingClassTokens)]
+// Составных классов у оверлея нет: режим, скрим и размытие — целые литералы
+// `grLoadingStyles.ts`, спиннер красит `GrIcon`, который приезжает зависимостью.
+// granum извлекает всё это из чанков компонента сам, включая общие.
+export const grLoadingSafelist: string[] = []

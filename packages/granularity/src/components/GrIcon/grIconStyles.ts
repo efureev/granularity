@@ -1,4 +1,3 @@
-import { splitClassTokens } from '../shared/classTokens'
 import type { GrComponentSize } from '../shared/sizes'
 import type { GrTone } from '../shared/tones'
 
@@ -48,12 +47,3 @@ export const iconSpinClass = 'animate-spin'
 export function grIconToneClass(tone: GrIconTone): string {
   return tone === 'current' ? '' : iconToneClass[tone]
 }
-
-// В safelist идут только утилиты: `gr-icon` CSS не порождает — он лишь селектор
-// собственного стиля компонента, и гейт `documentedConfig` справедливо считает
-// такую запись мёртвой.
-export const grIconClassTokens = [
-  ...splitClassTokens(iconUtilityClass),
-  ...splitClassTokens(iconSpinClass),
-  ...Object.values(iconToneClass).flatMap(splitClassTokens),
-]

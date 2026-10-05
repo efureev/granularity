@@ -1,34 +1,6 @@
-import { splitClassTokens } from '../shared/classTokens'
-import {
-  itemActiveClass,
-  itemBadgeClass,
-  itemBase,
-  itemDisabledClass,
-  itemIconClass,
-  itemIconSizes,
-  itemIdleClass,
-  itemLabelClass,
-  itemTextSizes,
-  listClass,
-  listSizes,
-  rootBase,
-  rootHideAboveClass,
-  rootPositionClass,
-} from './grBottomNavStyles'
-
-export const grBottomNavSafelist = [...new Set([
-  ...splitClassTokens(rootBase),
-  ...splitClassTokens(listClass),
-  ...splitClassTokens(itemBase),
-  ...splitClassTokens(itemActiveClass),
-  ...splitClassTokens(itemIdleClass),
-  ...splitClassTokens(itemDisabledClass),
-  ...splitClassTokens(itemIconClass),
-  ...splitClassTokens(itemLabelClass),
-  ...splitClassTokens(itemBadgeClass),
-  ...Object.values(listSizes).flatMap(splitClassTokens),
-  ...Object.values(itemTextSizes).flatMap(splitClassTokens),
-  ...Object.values(itemIconSizes).flatMap(splitClassTokens),
-  ...Object.values(rootPositionClass).flatMap(splitClassTokens),
-  ...Object.values(rootHideAboveClass).flatMap(splitClassTokens),
-])]
+// Составных классов у панели нет: всё, что она рисует, лежит целыми литералами
+// в шаблоне и в `grBottomNavStyles.ts`, мапы размеров, позиций и `hideAbove`
+// в том числе. granum извлекает их сам из всех чанков компонента, включая
+// общие, поэтому объявлять здесь нечего. Класс иконки-строки приходит от
+// потребителя: правило для него заводит приложение.
+export const grBottomNavSafelist: string[] = []

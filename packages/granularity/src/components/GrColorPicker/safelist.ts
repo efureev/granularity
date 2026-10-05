@@ -1,75 +1,8 @@
-import { splitClassTokens } from '../shared/classTokens'
-import { controlPillPaddingXClass, controlShapeRadiusClass } from '../shared/controlShape'
-import {
-  areaBaseClass,
-  areaHeightBySize,
-  areaDisabledClass,
-  areaEnabledClass,
-  areaInputClass,
-  areaThumbClass,
-  eyedropperClass,
-  eyedropperIconClass,
-  eyedropperSizeBySize,
-  hexFieldClass,
-  hexRowClass,
-  panelBaseClass,
-  panelSizeClassBySize,
-  presetBaseClass,
-  presetSelectedClass,
-  presetsGridClass,
-  previewClass,
-  rowClass,
-  rowLabelClass,
-  rowValueClass,
-  swatchBaseClass,
-  swatchFillClass,
-  triggerBaseClass,
-  triggerDisabledClass,
-  triggerEnabledClass,
-  triggerInvalidClass,
-  triggerSizeClassBySize,
-  triggerSwatchSizeBySize,
-  triggerValueClass,
-  triggerPaddingXClass,
-} from './grColorPickerStyles'
-
-// Классы из вычисляемых мап и литералов `.ts`-хелпера UnoCSS сканом не находит.
+// Всё, что рисует пикер, лежит в коде целыми литералами: шаблон, карты
+// `grColorPickerStyles.ts` и общий `shared/controlShape.ts`. granum извлекает их
+// сам из чанков компонента, включая общие, а собранных в рантайме классов у
+// пикера нет — объявлять нечего.
 //
-// `checkerClass` сюда не входит намеренно: это класс-маркер под собственный
-// `<style>` компонента, а не утилита — CSS из него не генерируется, и гейт
-// `documentedConfig` справедливо на такой записи падает.
-export const grColorPickerSafelist = [...new Set([
-  ...Object.values(triggerSizeClassBySize).flatMap(splitClassTokens),
-  ...Object.values(triggerPaddingXClass).flatMap(map => Object.values(map)).flatMap(splitClassTokens),
-  // Общий модуль лежит в чанке без адреса — его классы объявляет каждый импортёр.
-  ...Object.values(controlShapeRadiusClass).flatMap(splitClassTokens),
-  ...Object.values(controlPillPaddingXClass).flatMap(splitClassTokens),
-  ...Object.values(triggerSwatchSizeBySize).flatMap(splitClassTokens),
-  ...Object.values(panelSizeClassBySize).flatMap(splitClassTokens),
-  ...Object.values(areaHeightBySize).flatMap(splitClassTokens),
-  ...Object.values(eyedropperSizeBySize).flatMap(splitClassTokens),
-  ...splitClassTokens(triggerBaseClass),
-  ...splitClassTokens(triggerDisabledClass),
-  ...splitClassTokens(triggerEnabledClass),
-  ...splitClassTokens(triggerInvalidClass),
-  ...splitClassTokens(triggerValueClass),
-  ...splitClassTokens(swatchBaseClass),
-  ...splitClassTokens(swatchFillClass),
-  ...splitClassTokens(panelBaseClass),
-  ...splitClassTokens(previewClass),
-  ...splitClassTokens(areaBaseClass),
-  ...splitClassTokens(areaEnabledClass),
-  ...splitClassTokens(areaDisabledClass),
-  ...splitClassTokens(areaThumbClass),
-  ...splitClassTokens(areaInputClass),
-  ...splitClassTokens(eyedropperClass),
-  ...splitClassTokens(eyedropperIconClass),
-  ...splitClassTokens(hexRowClass),
-  ...splitClassTokens(hexFieldClass),
-  ...splitClassTokens(rowClass),
-  ...splitClassTokens(rowLabelClass),
-  ...splitClassTokens(rowValueClass),
-  ...splitClassTokens(presetsGridClass),
-  ...splitClassTokens(presetBaseClass),
-  ...splitClassTokens(presetSelectedClass),
-])]
+// `checkerClass` — класс-маркер под собственный `<style>` компонента, а не
+// утилита: CSS из него движок не генерирует, и в safelist ему не место.
+export const grColorPickerSafelist: string[] = []

@@ -1,5 +1,3 @@
-import { splitClassTokens } from '../shared/classTokens'
-
 /**
  * Полноэкранный оверлей сидит на собственном слое шкалы: он блокирует всё
  * приложение целиком, поэтому обязан лечь выше модалки (`--gr-z-modal`), но
@@ -28,9 +26,3 @@ export function grLoadingRootClass(options: {
     .filter(Boolean)
     .join(' ')
 }
-
-export const grLoadingClassTokens = [
-  ...Object.values(rootModeClass).flatMap(splitClassTokens),
-  ...splitClassTokens(rootBackgroundClass),
-  ...splitClassTokens(rootBackdropBlurClass),
-]

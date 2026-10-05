@@ -1,15 +1,6 @@
-import { splitClassTokens } from '../shared/classTokens'
-
-import {
-  treeSectionsCountClass,
-  treeSectionsGroupClass,
-  treeSectionsHeadClass,
-  treeSectionsRootClass,
-} from './grTreeSectionsStyles'
-
-export const grTreeSectionsSafelist = [...new Set([
-  ...splitClassTokens(treeSectionsRootClass),
-  ...splitClassTokens(treeSectionsHeadClass),
-  ...splitClassTokens(treeSectionsCountClass),
-  ...splitClassTokens(treeSectionsGroupClass),
-])]
+/**
+ * Пуст: составных классов у секций нет. Классы `grTreeSectionsStyles.ts` лежат
+ * целыми литералами, и granum извлекает их из чанков компонента сам, включая
+ * общие. Строки рисует `GrTree` — его классы приходят с зависимостью.
+ */
+export const grTreeSectionsSafelist: string[] = []
