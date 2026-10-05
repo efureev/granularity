@@ -223,6 +223,31 @@ describe('GrSteps', () => {
     expect(wrapper.findAll('[data-gr-step-connector]')).toHaveLength(steps.length - 1)
   })
 
+  it('иконка-строка — класс пустого `span`, а не имя тега', () => {
+    // `<component :is="'i-lucide-user'">` Vue рендерит неизвестным элементом
+    // `<i-lucide-user>`: класса нет, правило иконки не срабатывает, на месте
+    // маркера — пустота. Строка уходит в `:class`, как у `GrTabs` и `GrBreadcrumbs`.
+    const wrapper = mountSteps({
+      steps: [{ value: 'account', label: 'Аккаунт', icon: 'i-lucide-user' }, ...steps.slice(1)],
+      modelValue: 'account',
+    })
+
+    const marker = wrapper.findAll('[data-gr-step-marker]')[0]
+    expect(marker.find('i-lucide-user').exists()).toBe(false)
+    const icon = marker.get('span.i-lucide-user')
+    expect(icon.classes()).toContain('h-[60%]')
+  })
+
+  it('иконка-компонент рендерится как компонент', () => {
+    const Glyph = defineComponent({ name: 'Glyph', template: '<svg data-glyph />' })
+    const wrapper = mountSteps({
+      steps: [{ value: 'account', label: 'Аккаунт', icon: Glyph }, ...steps.slice(1)],
+      modelValue: 'account',
+    })
+
+    expect(wrapper.findAll('[data-gr-step-marker]')[0].find('[data-glyph]').exists()).toBe(true)
+  })
+
   it('описание шага рендерится своим узлом', () => {
     const wrapper = mountSteps()
 

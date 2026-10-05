@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import type { Component } from 'vue'
 import { computed, watchEffect } from 'vue'
 
 import IconCheck from '~icons/lucide/check'
 
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 import { useGrComponentProp, useGrComponentSize } from '../shared/configContext'
+import { iconClass, iconTag } from '../shared/icon'
 import GrProgressBar from '../GrProgressBar/GrProgressBar.vue'
 
 import type { GrStepsOrientation, GrStepsSize, GrStepsVariant } from './grStepsStyles'
@@ -178,10 +178,6 @@ function connectorClass(index: number): string {
   return `${stepsConnectorClass[resolvedOrientation.value]} ${done ? stepsConnectorDoneClass : stepsConnectorPendingClass}`
 }
 
-function iconOf(step: GrStep): string | Component | undefined {
-  return step.icon
-}
-
 async function goToIndex(index: number): Promise<boolean> {
   const target = props.steps[index]
   if (!target || target.value === props.modelValue)
@@ -295,7 +291,7 @@ if (__GR_DEV__) {
             :enterable="isEnterable(index)"
           >
             <span data-gr-step-marker :class="grStepsMarkerClass(statusAt(index))" aria-hidden="true">
-              <component :is="iconOf(step)" v-if="step.icon" class="h-[60%] w-[60%]" />
+              <component :is="iconTag(step.icon)" v-if="step.icon" class="h-[60%] w-[60%]" :class="iconClass(step.icon)" />
               <IconCheck v-else-if="statusAt(index) === 'complete'" class="h-[60%] w-[60%]" />
               <template v-else>{{ markerText(index) }}</template>
             </span>
