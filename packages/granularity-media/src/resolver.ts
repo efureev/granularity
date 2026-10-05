@@ -13,9 +13,9 @@ export const GRANULARITY_MEDIA_PACKAGE_NAME = '@feugene/granularity-media'
  *
  * Построен на общей фабрике `createGranularResolver` из
  * `@feugene/unplugin-granularity`. Резолвит компоненты пакета на их
- * гранулярные subpath-экспорты. CSS компонента импортируется его же чанком
- * (`libInjectCss` + `sideEffects: ["**\/*.css"]`), поэтому отдельный
- * `styles.css`-side-effect не нужен (`importStyle: false`).
+ * гранулярные subpath-экспорты. CSS компонента доставляет granum из манифеста
+ * пакета, поэтому отдельный `styles.css`-side-effect не нужен
+ * (`importStyle: false`).
  *
  * ⚠️ Ставьте этот резолвер **перед** жадным `GranularityResolver()` ядра —
  * иначе core-резолвер (совпадает с любым `Gr*`) перехватит `GrImageCrop`

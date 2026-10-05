@@ -64,7 +64,7 @@ async function main() {
 
 main().then(
   () => {
-    // Vite-плагины (`UnoCSS`, `unplugin-icons`, `@vitejs/plugin-vue`, т.п.)
+    // Vite-плагины (`granum()`, `unplugin-icons`, `@vitejs/plugin-vue`, т.п.)
     // оставляют активные handle даже после `server.close()`. Здесь это
     // разовая CLI-утилита — принудительно завершаем процесс, иначе он
     // висит в CI/yarn scripts.

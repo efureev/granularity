@@ -27,8 +27,9 @@ export interface GrTab {
   label: string
   badge?: string
   /**
-   * Иконка слева от подписи: Vue-компонент либо класс иконки вашей UnoCSS-сборки
-   * (`'i-lucide-user'` — тогда нужен ваш `presetIcons`, см. `docs/installation.md`).
+   * Иконка слева от подписи: Vue-компонент либо класс иконки (`'i-lucide-user'` —
+   * правило для класса заводит приложение: фабрике движка или провайдером,
+   * см. `docs/installation.md#иконки`).
    */
   icon?: string | Component
   disabled?: boolean

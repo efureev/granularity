@@ -9415,7 +9415,7 @@
           },
           {
             "name": "icon",
-            "description": "Символ вместо встроенной звезды: Vue-компонент либо класс иконки вашей UnoCSS-сборки (`'i-lucide-heart'` — тогда нужен ваш `presetIcons`, см. `docs/installation.md`).",
+            "description": "Символ вместо встроенной звезды: Vue-компонент либо класс иконки (`'i-lucide-heart'` — правило для класса заводит приложение: фабрике движка или провайдером, см. `docs/installation.md#иконки`).",
             "type": "string | Component | undefined",
             "required": false,
             "default": "undefined"
@@ -11163,7 +11163,7 @@
           },
           {
             "name": "icon",
-            "description": "Иконка слева от блока: Vue-компонент либо класс иконки вашей UnoCSS-сборки (`'i-lucide-users'` — тогда нужен ваш `presetIcons`, см. `docs/installation.md`).",
+            "description": "Иконка слева от блока: Vue-компонент либо класс иконки (`'i-lucide-users'` — правило для класса заводит приложение: фабрике движка или провайдером, см. `docs/installation.md#иконки`).",
             "type": "string | Component | undefined",
             "required": false,
             "default": "undefined"
@@ -13127,7 +13127,7 @@
           },
           {
             "name": "expandIcon",
-            "description": "Иконка свёрнутого узла: Vue-компонент либо класс иконки вашей UnoCSS-сборки (`'i-lucide-plus'` — тогда нужен ваш `presetIcons`, см. `docs/installation.md`). Не задана — встроенная стрелка.",
+            "description": "Иконка свёрнутого узла: Vue-компонент либо класс иконки (`'i-lucide-plus'` — правило для класса заводит приложение: фабрике движка или провайдером, см. `docs/installation.md#иконки`). Не задана — встроенная стрелка.",
             "type": "string | Component | undefined",
             "required": false,
             "default": "undefined"

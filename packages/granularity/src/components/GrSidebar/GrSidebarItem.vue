@@ -31,7 +31,11 @@ import { GR_SIDEBAR_KEY, GR_SIDEBAR_LEVEL_KEY } from './sidebarContext'
 
 export interface GrSidebarItemProps {
   label: string
-  /** Иконка: класс UnoCSS-иконки (`'i-lucide-home'`) или Vue-компонент. */
+  /**
+   * Иконка: Vue-компонент либо класс иконки (`'i-lucide-home'` — правило для
+   * класса заводит приложение: фабрике движка или провайдером, см.
+   * `docs/installation.md#иконки`).
+   */
   icon?: string | Component
   href?: string
   as?: string | Component

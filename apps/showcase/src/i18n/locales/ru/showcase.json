@@ -41,9 +41,9 @@
           "title": "Быстрый старт",
           "description": "Показывает рекомендуемые интеграционные path-ы и реальные кодовые entrypoints пакета.",
           "bullets": [
-            "Quick-start через root API и готовые CSS exports.",
+            "Quick-start через `granum.config.ts`: плагин `granum()` и один `virtual:granum.css` вместо ручных CSS-импортов.",
             "Granular component imports для точечного bundle.",
-            "Production path через `UnoCSS` preset, если приложение уже собирает стили на своей стороне."
+            "Production path: `components`, `themes` и `pruneTokens` сужают CSS до используемого, `js.guard` роняет сборку на импорте вне селекции."
           ]
         },
         "delivery-checklist": {
@@ -306,7 +306,7 @@
           "description": "Глубина графа: сколько шагов от компонента до базового.",
           "bullets": [
             "Граф ациклический и плоский — это следствие правила «объявляем только то, что рендерим».",
-            "Транзитивное пресет разворачивает сам, дублировать его в `dependencies` не нужно."
+            "Транзитивное granum разворачивает сам, дублировать его в `dependencies` не нужно."
           ]
         },
         "focus": {
@@ -398,7 +398,7 @@
     "installationTitle": "Установка",
     "installPackageTitle": "Установить пакет",
     "quickStartTitle": "Карта быстрого старта",
-    "quickStartDescription": "Выберите подходящий сценарий подключения: от простого импорта до `UnoCSS` preset.",
+    "quickStartDescription": "Подключение одно — `granum.config.ts`, и шаги наращивают его от базового конфига до `pruneTokens` и `js.guard`: остановитесь на том, который нужен приложению.",
     "preferredMethod": "Предпочтительный способ",
     "keyPointsTitle": "Что важно понять",
     "recommendationsTitle": "Практические рекомендации",
@@ -579,7 +579,7 @@
     "close": "Закрыть навигацию"
   },
   "overviewPage": {
-    "tagline": "Витрина дизайн-системы для Vue 3: готовые компоненты, понятные слои стилей, granular imports и аккуратная интеграция с `UnoCSS`.",
+    "tagline": "Витрина дизайн-системы для Vue 3: готовые компоненты, понятные слои стилей, granular imports и CSS, который `granum` собирает ровно под выбранные компоненты.",
     "ctaFoundations": "Открыть foundations",
     "ctaComponents": "Каталог компонентов",
     "whyTitle": "Почему Granularity",
@@ -595,7 +595,7 @@
       },
       "2": {
         "title": "Даёт аккуратный контроль над стилями и bundle",
-        "description": "Понятные слои стилей, subpath exports и интеграция с UnoCSS помогают не терять управляемость."
+        "description": "Понятные слои стилей, subpath exports и сборка CSS через granum помогают не терять управляемость."
       },
       "3": {
         "title": "Подходит и для быстрого старта, и для зрелой инфраструктуры",
@@ -603,7 +603,7 @@
       }
     },
     "quickStartTitle": "Быстрый старт",
-    "quickStartSubtitle": "Пять документированных сценариев подключения: от root import до UnoCSS preset-ов.",
+    "quickStartSubtitle": "Пять шагов одного конфига granum: от базового подключения до гарда импорта вне селекции.",
     "foundationsLink": "Foundations",
     "installSummaryTitle": "Коротко об установке",
     "installSummaryText": "Ниже — короткая выдержка из документации, которая помогает быстро выбрать подход к подключению.",

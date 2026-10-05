@@ -107,7 +107,7 @@
     "kindLabel": "Section",
     "context": "Overview",
     "searchableTitle": "overview быстрыи старт",
-    "searchableContent": "overview landing-страница витрины: позиционирование showcase, быстрыи старт по интеграции и карта следующих этапов наполнения. quick-start быстрыи старт показывает рекомендуемые интеграционные path-ы и реальные кодовые entrypoints пакета. quick-start через root api и готовые css exports. granular component imports для точечного bundle. production path через `unocss` preset, если приложение уже собирает стили на своеи стороне."
+    "searchableContent": "overview landing-страница витрины: позиционирование showcase, быстрыи старт по интеграции и карта следующих этапов наполнения. quick-start быстрыи старт показывает рекомендуемые интеграционные path-ы и реальные кодовые entrypoints пакета. quick-start через `granum.config.ts`: плагин `granum()` и один `virtual:granum.css` вместо ручных css-импортов. granular component imports для точечного bundle. production path: `components`, `themes` и `prunetokens` сужают css до используемого, `js.guard` роняет сборку на импорте вне селекции."
   },
   {
     "id": "page:overview:section:delivery-checklist",
@@ -294,7 +294,7 @@
     "kindLabel": "Section",
     "context": "Architecture",
     "searchableTitle": "architecture уровни",
-    "searchableContent": "architecture граф зависимостеи между компонентами: что ни от чего не зависит, на ком держится библиотека и сколько компонентов приедет вместе с выбранным при гранулярнои селекции. levels уровни глубина графа: сколько шагов от компонента до базового. граф ациклическии и плоскии это следствие правила объявляем только то, что рендерим . транзитивное пресет разворачивает сам, дублировать его в `dependencies` не нужно."
+    "searchableContent": "architecture граф зависимостеи между компонентами: что ни от чего не зависит, на ком держится библиотека и сколько компонентов приедет вместе с выбранным при гранулярнои селекции. levels уровни глубина графа: сколько шагов от компонента до базового. граф ациклическии и плоскии это следствие правила объявляем только то, что рендерим . транзитивное granum разворачивает сам, дублировать его в `dependencies` не нужно."
   },
   {
     "id": "page:architecture:section:focus",

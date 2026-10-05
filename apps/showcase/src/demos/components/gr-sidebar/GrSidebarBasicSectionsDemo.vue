@@ -6,7 +6,8 @@ import { GrBadge, GrSidebar, GrSidebarGroup, GrSidebarItem } from '@feugene/gran
 const currentSection = ref('overview')
 const collapsed = ref(false)
 
-// icon — класс UnoCSS-иконки; у «Billing» иконки нет — в свёрнутом виде покажется буква «B».
+// icon — класс иконки: правило для `i-lucide-*` заводит сборка приложения, иначе передавайте
+// Vue-компонент. У «Billing» иконки нет — в свёрнутом виде покажется буква «B».
 const groups = [
   {
     label: 'Workspace',

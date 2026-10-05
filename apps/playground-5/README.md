@@ -2,8 +2,8 @@
 
 Стенд подключения через **granum**: CSS собирает плагин `@feugene/granum/vite` из
 `granum.manifest.json` пакета, JS приезжает subpath-импортом. Механика пакета —
-в `packages/granularity/docs/unocss.md`, сценарии подключения CSS —
-в `packages/granularity/docs/styling.md`.
+в `packages/granularity/docs/granum.md` и `packages/granularity/docs/installation.md`,
+сценарии подключения CSS — в `packages/granularity/docs/styling.md`.
 
 ## Что показывает приложение
 

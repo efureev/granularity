@@ -16,8 +16,8 @@ export const GRANULARITY_DASHBOARD_PACKAGE_NAME = '@feugene/granularity-dashboar
  * ⚠️ Ставьте его **перед** `GranularityResolver()` ядра — точный список должен
  * отработать первым.
  *
- * `importStyle: false` — CSS компонента инлайнится в его JS-чанк
- * (`vite-plugin-lib-inject-css`), отдельного side-effect импорта стилей нет.
+ * `importStyle: false` — CSS компонента доставляет granum из манифеста пакета,
+ * отдельный side-effect импорта стилей не нужен.
  */
 export function GranularityDashboardResolver(): ComponentResolver {
   return createGranularResolver({

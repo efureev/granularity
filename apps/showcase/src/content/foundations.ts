@@ -415,23 +415,23 @@ export const showcaseFoundationGuides: ShowcaseFoundationGuide[] = [
   {
     id: 'styling',
     title: 'Styling layers',
-    summary: 'Разделяет foundation-слои, theme CSS и component-level styles, чтобы приложение могло выбрать свой уровень контроля.',
-    description: 'Стилизация в `granularity` строится вокруг нескольких слоёв: `tokens.css`, `base.css`, theme files и component-level `styles.css`. Foundations page должна объяснять этот контракт раньше, чем пользователь откроет первую компонентную страницу.',
+    summary: 'Разделяет слои CSS — токены, базу, темы, CSS компонентов и утилиты, — чтобы приложение могло выбрать свой уровень контроля.',
+    description: 'Стилизация в `granularity` строится на слоях `granum.tokens`, `granum.base`, `granum.themes`, `granum.components` и `granum.utilities`: granum собирает их в один `virtual:granum.css` по манифестам выбранных компонентов. Без granum остаётся статический `styles.css` — токены, темы, base и preflight, но без утилит и CSS компонентов. Foundations page должна объяснять этот контракт раньше, чем пользователь откроет первую компонентную страницу.',
     narrativeSource: takeLeadingBlock(stylingDocSource),
     sourcePath: 'packages/granularity/docs/styling.md',
     keyPoints: [
       '`tokens.css` хранит шкалы, формулы, типографику и базовые дизайн-токены.',
-      '`base.css` добавляет foundation rules поверх токенов и не зависит от внешних Uno shortcuts.',
-      '`styles.css` не заменяет foundation layers, а только добавляет component-level utility CSS.',
+      '`base.css` добавляет foundation rules поверх токенов и тем: reset и кламп движения по `prefers-reduced-motion`.',
+      'Собственный `styles.css` компонента granum берёт из манифеста в слой `granum.components`: JS-чанк компонента CSS не импортирует.',
     ],
     recommendations: [
-      'Начинайте интеграцию со стандартного порядка импортов: `tokens` → `base` → `theme` → component styles.',
-      'Если хотите минимальный CSS без `UnoCSS`, подключайте `components/<Name>/styles.css` точечно.',
+      'Подключайте CSS одним `virtual:granum.css` через плагин `granum()`, а не ручными импортами слоёв.',
+      'Минимальный CSS даёт селекция granum: `components`, `themes.names` и `pruneTokens`. Подпутей `components/<Name>/styles.css` пакет не публикует — CSS компонента granum берёт из манифеста.',
       'Для кастомной темы оставляйте foundation layers пакета и подменяйте только semantic theme layer.',
     ],
     codeSamples: [
       {
-        title: 'Рекомендуемый порядок импортов',
+        title: 'Без granum: статический лист',
         code: rootImportSnippet,
         language: 'ts',
       },
@@ -580,7 +580,7 @@ export const showcaseOverviewChecklist = [
 ]
 
 export const showcaseFoundationsChecklist = [
-  'Есть единая карта интеграции: быстрый старт, granular imports и UnoCSS preset path.',
+  'Есть единая карта интеграции: быстрый старт на `granum.config.ts`, granular imports и production-селекция компонентов, тем и токенов.',
   'Narrative docs подключены прямо из `packages/granularity/docs/*`, а themes/tokens — из source layers пакета.',
   'Foundations page объясняет различие между `tokens`, `theme` и component-level styles до перехода к detail pages.',
 ]

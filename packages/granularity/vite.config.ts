@@ -9,7 +9,7 @@ import { granularityProvider } from './src/granular-provider'
 
 /**
  * Копирует сырые CSS-токены/темы/preflight (`src/styles/*`) в `dist/styles/`,
- * чтобы потребитель мог подключить тему без UnoCSS-провайдера —
+ * чтобы потребитель мог подключить тему без granum —
  * `import '@feugene/granularity/styles/index.css'` (см. `exports` в package.json).
  */
 function copyStylesPlugin() {

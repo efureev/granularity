@@ -25,7 +25,11 @@ export type { GrBottomNavHideAbove, GrBottomNavPosition } from './grBottomNavSty
 export type GrBottomNavItem = {
   label: string
   value: string
-  /** Иконка: класс UnoCSS-иконки (`'i-lucide-home'`) или Vue-компонент. Декоративна. */
+  /**
+   * Иконка: Vue-компонент либо класс иконки (`'i-lucide-home'` — правило для
+   * класса заводит приложение: фабрике движка или провайдером, см.
+   * `docs/installation.md#иконки`). Декоративна.
+   */
   icon?: string | Component
   /** Счётчик поверх пункта. Число озвучивается словами, строка — как есть. */
   badge?: string | number

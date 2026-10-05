@@ -157,9 +157,9 @@ export const showcasePages: ShowcasePage[] = [
         title: 'Быстрый старт',
         description: 'Показывает рекомендуемые интеграционные path-ы и реальные кодовые entrypoints пакета.',
         bullets: [
-          'Quick-start через root API и готовые CSS exports.',
+          'Quick-start через `granum.config.ts`: плагин `granum()` и один `virtual:granum.css` вместо ручных CSS-импортов.',
           'Granular component imports для точечного bundle.',
-          'Production path через `UnoCSS` preset, если приложение уже собирает стили на своей стороне.',
+          'Production path: `components`, `themes` и `pruneTokens` сужают CSS до используемого, `js.guard` роняет сборку на импорте вне селекции.',
         ],
       },
       {
@@ -358,7 +358,7 @@ export const showcasePages: ShowcasePage[] = [
         description: 'Глубина графа: сколько шагов от компонента до базового.',
         bullets: [
           'Граф ациклический и плоский — это следствие правила «объявляем только то, что рендерим».',
-          'Транзитивное пресет разворачивает сам, дублировать его в `dependencies` не нужно.',
+          'Транзитивное granum разворачивает сам, дублировать его в `dependencies` не нужно.',
         ],
       },
       {

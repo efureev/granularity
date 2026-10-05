@@ -5,6 +5,22 @@ All notable changes to the [`@feugene/granularity`](.) package are documented in
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Fixed
+
+- **Проза и описания пропсов больше не отсылают к пресету UnoCSS.** Пакет с 1.0
+  собирается и потребляется через granum, а подсказки пропа `icon` (`GrTabs`,
+  `GrBreadcrumbs`, `GrStatistic`, `GrSidebarItem`, `GrBottomNav`,
+  `GrCommandPalette`, `GrRating`, `GrTree`, `GrSteps`) всё ещё требовали «ваш
+  `presetIcons`». Теперь они говорят, как есть: правило для класса `i-lucide-*`
+  заводит приложение — фабрике движка или провайдером, иначе иконку передают
+  Vue-компонентом (`docs/installation.md` § «Иконки»).
+
+  Заодно в доках снято утверждение, что CSS компонента едет в его JS-чанке:
+  чанки CSS не импортируют, `styles.css` компонента granum берёт из манифеста.
+  Отладка через `curl …/__uno.css` заменена на `granum why-css`.
+
 ## [v1.0.1] 2026-09-29
 
 ### Fixed

@@ -36,9 +36,11 @@ export interface GranularResolverOptions {
    * Подтягивать ли CSS компонента как side-effect
    * `<packageName>/components/<Name>/styles.css`.
    *
-   * - `true` / `'css'` — пакет публикует покомпонентные style-бандлы (как ядро).
-   * - `false` — пакет инлайнит CSS в JS-чанк (например через `libInjectCss`);
-   *   тогда стиль подтянется вместе с JS-импортом и отдельный side-effect не нужен.
+   * - `true` / `'css'` — пакет раздаёт покомпонентный CSS отдельными файлами и
+   *   объявляет их в `exports`.
+   * - `false` — отдельный side-effect не нужен: пакеты экосистемы таких subpath
+   *   не публикуют, стили компонентов приложению доставляет granum из манифеста
+   *   пакета.
    *
    * @default false
    */
@@ -67,7 +69,7 @@ export interface GranularResolverOptions {
  *
  * @example
  * ```ts
- * // Companion-пакет с whitelist (без CSS side-effect — CSS инлайнится):
+ * // Companion-пакет с whitelist (без CSS side-effect — CSS доставляет granum):
  * createGranularResolver({
  *   packageName: '@feugene/granularity-chrono',
  *   components: ['GrCalendar', 'GrDatePicker', 'GrDateTimePicker', 'GrTimePicker', 'GrDateRangePicker'],
@@ -131,12 +133,11 @@ export interface GranularityResolverOptions {
    * - `true` / `'css'` — в `sideEffects` попадёт `<pkg>/components/<Name>/styles.css`;
    * - `false` — ничего не подгружаем.
    *
-   * **Ядру это не нужно, и по умолчанию выключено.** Свой CSS компонент тянет
-   * сам: `libInjectCss` вписывает `import '../styles.css'` внутрь его чанка, а
-   * у большинства компонентов собственного CSS нет вовсе — их оформление
-   * собирает UnoCSS-пресет. Subpath на такой файл ядро не публикует, поэтому
-   * включённая опция давала `ERR_PACKAGE_PATH_NOT_EXPORTED` на сборке
-   * потребителя — на каждом компоненте, а не только на редком.
+   * **Ядру это не нужно, и по умолчанию выключено.** Чанки ядра CSS не
+   * импортируют: `styles.css` компонента granum берёт из манифеста пакета в
+   * слой `granum.components`. Subpath `components/<Name>/styles.css` ядро не
+   * публикует, поэтому включённая опция дала бы `ERR_PACKAGE_PATH_NOT_EXPORTED`
+   * на сборке потребителя — на каждом компоненте, а не только на редком.
    *
    * Опция остаётся для провайдера, который раздаёт CSS отдельными файлами и
    * объявляет их в `exports`.

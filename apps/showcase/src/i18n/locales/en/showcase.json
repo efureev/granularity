@@ -41,9 +41,9 @@
           "title": "Quick start",
           "description": "Shows the recommended integration paths and the package's real code entrypoints.",
           "bullets": [
-            "Quick start through the root API and ready-made CSS exports.",
+            "Quick start through `granum.config.ts`: the `granum()` plugin and a single `virtual:granum.css` instead of hand-written CSS imports.",
             "Granular component imports for a precise bundle.",
-            "Production path through the `UnoCSS` preset when the app already builds styles on its side."
+            "Production path: `components`, `themes` and `pruneTokens` trim CSS down to what is used, and `js.guard` fails the build on an import outside the selection."
           ]
         },
         "delivery-checklist": {
@@ -306,7 +306,7 @@
           "description": "Graph depth: how many steps separate a component from a base one.",
           "bullets": [
             "The graph is acyclic and flat — a consequence of the rule «declare only what you render».",
-            "Transitive edges are expanded by the preset itself; repeating them in `dependencies` is pointless."
+            "Transitive edges are expanded by granum itself; repeating them in `dependencies` is pointless."
           ]
         },
         "focus": {
@@ -398,7 +398,7 @@
     "installationTitle": "Installation",
     "installPackageTitle": "Install package",
     "quickStartTitle": "Quick-start map",
-    "quickStartDescription": "Choose the integration path that fits your app: from a simple import to an `UnoCSS` preset.",
+    "quickStartDescription": "There is one integration path — `granum.config.ts` — and the steps grow it from the basic config to `pruneTokens` and `js.guard`: stop at the one your app needs.",
     "preferredMethod": "Preferred method",
     "keyPointsTitle": "What matters most",
     "recommendationsTitle": "Practical recommendations",
@@ -579,7 +579,7 @@
     "close": "Close navigation"
   },
   "overviewPage": {
-    "tagline": "A design-system showcase for Vue 3: ready-made components, clear styling layers, granular imports and clean integration with `UnoCSS`.",
+    "tagline": "A design-system showcase for Vue 3: ready-made components, clear styling layers, granular imports and CSS that `granum` builds for exactly the components you pick.",
     "ctaFoundations": "Open foundations",
     "ctaComponents": "Component catalog",
     "whyTitle": "Why Granularity",
@@ -595,7 +595,7 @@
       },
       "2": {
         "title": "Gives neat control over styles and bundle",
-        "description": "Clear styling layers, subpath exports and UnoCSS integration help you keep things manageable."
+        "description": "Clear styling layers, subpath exports and CSS assembled by granum help you keep things manageable."
       },
       "3": {
         "title": "Fits both a quick start and mature infrastructure",
@@ -603,7 +603,7 @@
       }
     },
     "quickStartTitle": "Quick start",
-    "quickStartSubtitle": "Five documented integration scenarios: from a root import to UnoCSS presets.",
+    "quickStartSubtitle": "Five steps of a single granum config: from the basic setup to guarding imports outside the selection.",
     "foundationsLink": "Foundations",
     "installSummaryTitle": "Installation at a glance",
     "installSummaryText": "Below is a short excerpt from the docs that helps you quickly pick an integration approach.",

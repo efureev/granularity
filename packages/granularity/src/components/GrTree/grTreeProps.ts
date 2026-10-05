@@ -100,8 +100,9 @@ export type GrTreeViewProps<T extends object> = {
   maxHeight?: number | string
   highlightCurrent?: boolean
   /**
-   * Иконка свёрнутого узла: Vue-компонент либо класс иконки вашей UnoCSS-сборки
-   * (`'i-lucide-plus'` — тогда нужен ваш `presetIcons`, см. `docs/installation.md`).
+   * Иконка свёрнутого узла: Vue-компонент либо класс иконки (`'i-lucide-plus'` —
+   * правило для класса заводит приложение: фабрике движка или провайдером,
+   * см. `docs/installation.md#иконки`).
    * Не задана — встроенная стрелка.
    */
   expandIcon?: string | Component

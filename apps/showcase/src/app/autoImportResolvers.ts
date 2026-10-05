@@ -25,9 +25,9 @@ import { GranularityMediaResolver } from '@feugene/granularity-media/resolver'
  * core-резолвер перехватил бы `GrCalendar`, `GrChartLine` и остальные и
  * импортировал бы их из несуществующего пути в ядре.
  *
- * `importStyle: false` для ядра — витрина собирает CSS сама через UnoCSS
- * (`granum()` + манифесты пакетов), поэтому per-component
- * `styles.css`-side-effect не нужен (его и нет в dev-dist пакета).
+ * `importStyle: false` для ядра — CSS витрины собирает `granum()` по манифестам
+ * пакетов, а подпутей `components/<Name>/styles.css` ядро не публикует вовсе:
+ * включённая опция сломала бы сборку.
  */
 export function granularityAutoImportResolvers() {
   return [

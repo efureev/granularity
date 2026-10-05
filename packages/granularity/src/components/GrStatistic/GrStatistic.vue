@@ -65,8 +65,9 @@ export interface GrStatisticProps {
   /** Приписка после значения (единица измерения, `%`). */
   suffix?: string
   /**
-   * Иконка слева от блока: Vue-компонент либо класс иконки вашей UnoCSS-сборки
-   * (`'i-lucide-users'` — тогда нужен ваш `presetIcons`, см. `docs/installation.md`).
+   * Иконка слева от блока: Vue-компонент либо класс иконки (`'i-lucide-users'` —
+   * правило для класса заводит приложение: фабрике движка или провайдером,
+   * см. `docs/installation.md#иконки`).
    */
   icon?: string | Component
   size?: GrStatisticSize
