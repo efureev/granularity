@@ -5,7 +5,7 @@ All notable changes to the [`@feugene/granularity`](.) package are documented in
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/).
 
-## [Unreleased]
+## [v1.0.3] 2026-10-06
 
 ### Changed
 
@@ -27,6 +27,10 @@ to [Semantic Versioning](https://semver.org/).
   вместе с зависимостями: ни один класс не пропал. Ушёл только токен `b` — имя
   переменной из скомпилированного safelist-модуля, которое экстрактор принимал
   за утилиту.
+
+  **JS похудел.** Safelist'ы вычислялись при загрузке модуля и лежали в чанках
+  компонентов: весь пакет из корня — 669.0 → 632.9 kB gzip, `GrDataTable` —
+  115.1 → 111.4 kB, `GrInput` — 19.2 → 17.4 kB (`docs/entry-sizes.md`).
 
   Гейт `src/__tests__/safelist.test.ts` перевёрнут: запись safelist, которая
   лежит целым литералом в коде компонента, он называет лишней. Проза
