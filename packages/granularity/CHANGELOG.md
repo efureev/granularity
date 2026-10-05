@@ -5,6 +5,17 @@ All notable changes to the [`@feugene/granularity`](.) package are documented in
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/).
 
+## [v1.0.4] 2026-10-06
+
+### Fixed
+
+- **`GrSteps` рисует иконку-строку.** Шаг с `icon: 'i-lucide-user'` отдавал
+  строку прямо в `<component :is>`, и Vue рендерил неизвестный элемент
+  `<i-lucide-user>`: класса не было, правило иконки не срабатывало, в маркере
+  оставалась пустота. Теперь строка уходит в `:class` пустого `span`, а
+  компонент — в `:is`, через те же `iconTag`/`iconClass`, что у `GrTabs` и
+  `GrBreadcrumbs`. Иконка-компонент рисовалась и раньше.
+
 ## [v1.0.3] 2026-10-06
 
 ### Changed
