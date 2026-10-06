@@ -246,6 +246,22 @@ const showClear = computed(() =>
   resolvedClearable.value && !isDisabled.value && !isReadonly.value && props.modelValue !== '',
 )
 
+/**
+ * Место под кнопку очистки и признак состояния справа: они лежат поверх поля в
+ * его верхнем углу, и без отступа первая строка уходила под «×». Резерв —
+ * пока кнопка **может** появиться, а не только когда видна: иначе первый же
+ * символ переносил бы строку.
+ */
+const fieldEndPadding = computed(() => {
+  const clearSlot = resolvedClearable.value && !isDisabled.value && !isReadonly.value
+  const slots = (clearSlot ? 1 : 0) + (signalState.value ? 1 : 0)
+  if (slots === 0)
+    return undefined
+
+  // Кнопка — 1.5rem у `right-2`, признак — 1rem у `right-10` рядом с ней.
+  return { paddingRight: slots === 2 ? '3.75rem' : '2.25rem' }
+})
+
 function clear(): void {
   emit('update:modelValue', '')
   emit('change', '')
@@ -319,16 +335,25 @@ function onBlur(e: FocusEvent): void {
 
 <template>
   <div
-    v-if="hasCounters"
     data-gr-textarea-wrap
     class="relative"
     :class="aria.ownsWidth() ? '' : 'w-full'"
     v-bind="aria.layoutAttrs()"
   >
+    <!--
+      Одна устойчивая разметка: обёртка есть всегда, а кнопка очистки, признак
+      состояния и счётчики — лишь её соседи по условию. Раньше обёртка
+      появлялась и исчезала вместе с ними, и `<textarea>` пересоздавался: стоило
+      `state` стать `success` или появиться крестику на первом символе, фокус
+      уходил на `<body>`, и следующие нажатия пропадали.
+    -->
+    <!-- `block` — без него под строчным `<textarea>` в блочной обёртке остаётся
+         зазор базовой линии, и поле выходило выше на несколько пикселей. -->
     <textarea
       ref="textareaEl"
       v-autosize="autosize"
-      class="w-full"
+      class="block w-full"
+      :style="fieldEndPadding"
       v-bind="{ ...textareaAttrs, ...aria.fieldAttrs(), ...ariaLinks() }"
       @input="onInput"
       @change="onChange"
@@ -358,7 +383,7 @@ function onBlur(e: FocusEvent): void {
 
     <span v-if="signalState" :id="stateTextId" data-gr-textarea-state-text class="sr-only">{{ stateText }}</span>
 
-    <div :class="countRowClass">
+    <div v-if="hasCounters" :class="countRowClass">
       <div
         v-if="showLineCount"
         :id="lineCountId"
@@ -383,60 +408,4 @@ function onBlur(e: FocusEvent): void {
       </div>
     </div>
   </div>
-
-  <!-- Обёртка появляется под кнопку очистки и под признак состояния: без них
-       поле остаётся корневым элементом — на этом стоит контракт
-       fallthrough-атрибутов. -->
-  <div
-    v-else-if="resolvedClearable || signalState"
-    class="relative"
-    :class="aria.ownsWidth() ? '' : 'w-full'"
-    v-bind="aria.layoutAttrs()"
-  >
-    <textarea
-      ref="textareaEl"
-      v-autosize="autosize"
-      class="w-full"
-      v-bind="{ ...textareaAttrs, ...aria.fieldAttrs(), ...ariaLinks() }"
-      @input="onInput"
-      @change="onChange"
-      @focus="onFocus"
-      @blur="onBlur"
-    />
-
-    <button
-      v-if="showClear"
-      type="button"
-      data-gr-textarea-clear
-      :aria-label="resolvedClearLabel"
-      class="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-[var(--gr-radius-sm)] text-[var(--gr-muted-fg)] transition-colors hover:bg-[var(--gr-muted)] hover:text-[var(--gr-fg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]"
-      @click="clear"
-    >
-      <IconX class="h-4 w-4" aria-hidden="true" />
-    </button>
-
-    <span
-      v-if="signalState"
-      data-gr-textarea-state
-      class="absolute top-2" :class="[stateIconClass, showClear ? 'right-10' : 'right-2']"
-      aria-hidden="true"
-    >
-      <component :is="stateIcon" class="h-4 w-4" />
-    </span>
-
-    <span v-if="signalState" :id="stateTextId" data-gr-textarea-state-text class="sr-only">{{ stateText }}</span>
-  </div>
-
-  <textarea
-    v-else
-    ref="textareaEl"
-    v-autosize="autosize"
-    :class="[aria.ownsWidth() ? '' : 'w-full', aria.layoutAttrs().class]"
-    :style="aria.layoutAttrs().style"
-    v-bind="{ ...textareaAttrs, ...aria.fieldAttrs(), ...ariaLinks() }"
-    @input="onInput"
-    @change="onChange"
-    @focus="onFocus"
-    @blur="onBlur"
-  />
 </template>

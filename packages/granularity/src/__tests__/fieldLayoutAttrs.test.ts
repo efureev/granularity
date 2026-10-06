@@ -37,6 +37,7 @@ interface Case {
 const cases: Case[] = [
   { name: 'GrInput', component: GrInput, props: { modelValue: '' }, root: '[data-gr-input]', field: 'input' },
   { name: 'GrTextarea со счётчиком', component: GrTextarea, props: { modelValue: '', showCount: true }, root: '[data-gr-textarea-wrap]', field: 'textarea' },
+  { name: 'GrTextarea', component: GrTextarea, props: { modelValue: '' }, root: '[data-gr-textarea-wrap]', field: 'textarea' },
   { name: 'GrNumberInput', component: GrNumberInput, props: { modelValue: 1 }, root: '[data-gr-number-input]', field: 'input' },
   { name: 'GrSelect', component: GrSelect, props: { modelValue: null, options: [{ value: 'a', label: 'A' }] }, root: '[data-gr-select]' },
   { name: 'GrInputTag', component: GrInputTag, props: { modelValue: [] }, root: '[data-gr-input-tag]' },
@@ -88,15 +89,17 @@ describe('class и style потребителя — на корне контро
     }
   })
 
-  it('GrTextarea без обёртки: поле — корень, и класс потребителя не стирает свои', () => {
+  it('GrTextarea без счётчика: класс потребителя на обёртке не стирает классы поля', () => {
     const wrapper = mount(GrTextarea, { props: { modelValue: '' }, attrs: { class: 'mt-2', style: 'width: 200px' } })
     const root = wrapper.element as HTMLElement
+    const field = root.querySelector('textarea')!
 
-    expect(root.tagName).toBe('TEXTAREA')
+    expect(root.hasAttribute('data-gr-textarea-wrap')).toBe(true)
     expect(root.classList.contains('mt-2')).toBe(true)
-    expect(root.classList.contains('border')).toBe(true)
     expect(root.style.width).toBe('200px')
     expect(root.classList.contains('w-full')).toBe(false)
+    expect(field.classList.contains('border')).toBe(true)
+    expect(field.classList.contains('mt-2')).toBe(false)
   })
 })
 

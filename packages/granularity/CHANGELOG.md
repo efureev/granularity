@@ -5,6 +5,30 @@ All notable changes to the [`@feugene/granularity`](.) package are documented in
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Changed
+
+- **`GrTextarea` всегда в обёртке.** Раньше без кнопки, признака и счётчиков
+  корнем был сам `<textarea>`. Теперь корень — обёртка `data-gr-textarea-wrap`:
+  `class` и `style` потребителя ложатся на неё, остальные атрибуты (`aria-*`,
+  `data-*`, `spellcheck`) — на `<textarea>`, как у `GrInput`. Селекторы
+  потребителя вида `textarea.my-class` стоит заменить на `.my-class textarea`.
+
+### Fixed
+
+- **`GrTextarea` не теряет фокус посреди набора.** Обёртка появлялась вместе с
+  признаком состояния, кнопкой очистки или счётчиком, и `<textarea>`
+  пересоздавался: на «1100-445» `state` становился `success`, фокус уходил на
+  `<body>`, и «␣Lisboa» не набиралось никуда. Теперь разметка одна и та же,
+  соседи лишь появляются рядом с полем; поле внутри блочное, и высота с ними и
+  без них одинакова (раньше под строчным `<textarea>` оставался зазор базовой
+  линии в 5px).
+- **Первая строка `GrTextarea clearable` не уходит под «×».** Поле держало
+  обычный отступ справа, а кнопка шириной 24px лежала поверх текста. Теперь
+  место под кнопку (и под признак состояния рядом с ней) зарезервировано, пока
+  кнопка может появиться.
+
 ## [v1.0.15] 2026-10-07
 
 ### Added

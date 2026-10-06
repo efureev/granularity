@@ -1,4 +1,5 @@
 import { mount } from '@vue/test-utils'
+import { defineComponent, nextTick } from 'vue'
 import { describe, expect, it } from 'vitest'
 
 import GrTextarea from '../GrTextarea.vue'
@@ -97,31 +98,32 @@ describe('GrTextarea — паритет с GrInput', () => {
     expect(onlyLines.find('[data-gr-textarea-wrap]').exists()).toBe(true)
   })
 
-  it('без showCount поле остаётся корневым элементом', () => {
+  it('обёртка есть всегда, а счётчик без showCount — нет', () => {
     const wrapper = mount(GrTextarea, { props: { modelValue: '' } })
 
-    expect(wrapper.element.tagName).toBe('TEXTAREA')
+    expect(wrapper.element.hasAttribute('data-gr-textarea-wrap')).toBe(true)
+    expect(wrapper.find('textarea').exists()).toBe(true)
     expect(wrapper.find('[data-gr-textarea-count]').exists()).toBe(false)
   })
 
   it('resize управляется пропом', () => {
-    expect(mount(GrTextarea, { props: { modelValue: '' } }).classes()).toContain('resize-y')
-    expect(mount(GrTextarea, { props: { modelValue: '', resize: 'none' } }).classes()).toContain('resize-none')
+    expect(mount(GrTextarea, { props: { modelValue: '' } }).get('textarea').classes()).toContain('resize-y')
+    expect(mount(GrTextarea, { props: { modelValue: '', resize: 'none' } }).get('textarea').classes()).toContain('resize-none')
   })
 
   // Прозрачность разбавляет выверенные на AA токены текста.
   it('disabled гасится токенами, а не прозрачностью', () => {
-    const wrapper = mount(GrTextarea, { props: { modelValue: '', disabled: true } })
+    const field = mount(GrTextarea, { props: { modelValue: '', disabled: true } }).get('textarea')
 
-    expect(wrapper.classes()).toContain('bg-[var(--gr-muted)]')
-    expect(wrapper.classes().some(cls => cls.startsWith('opacity-'))).toBe(false)
+    expect(field.classes()).toContain('bg-[var(--gr-muted)]')
+    expect(field.classes().some(cls => cls.startsWith('opacity-'))).toBe(false)
   })
 
   it('readonly и size доходят до поля', () => {
-    const wrapper = mount(GrTextarea, { props: { modelValue: 'x', readonly: true, size: 'lg' } })
+    const field = mount(GrTextarea, { props: { modelValue: 'x', readonly: true, size: 'lg' } }).get('textarea')
 
-    expect((wrapper.element as HTMLTextAreaElement).readOnly).toBe(true)
-    expect(wrapper.classes()).toContain('text-[length:var(--gr-control-text-lg)]')
+    expect((field.element as HTMLTextAreaElement).readOnly).toBe(true)
+    expect(field.classes()).toContain('text-[length:var(--gr-control-text-lg)]')
   })
 })
 
@@ -263,9 +265,9 @@ describe('GrTextarea — признак состояния', () => {
    * стоит контракт fallthrough-атрибутов. Признак заводит обёртку так же, как
    * её заводит кнопка очистки.
    */
-  it('признак заводит обёртку там, где её иначе нет', () => {
+  it('признак появляется в той же обёртке', () => {
     const bare = mount(GrTextarea, { props: { modelValue: '' } })
-    expect(bare.element.tagName).toBe('TEXTAREA')
+    expect(bare.find('[data-gr-textarea-state]').exists()).toBe(false)
 
     const signalled = mount(GrTextarea, { props: { modelValue: '', state: 'success' } })
     expect(signalled.find('[data-gr-textarea-state]').exists()).toBe(true)
@@ -331,5 +333,106 @@ describe('GrTextarea — своя формулировка счётчика', ()
     const wrapper = mount(GrTextarea, { props: { modelValue: 'abcd', showCount: true, maxlength: 10 } })
 
     expect(wrapper.get('[data-gr-textarea-count]').text()).toBe('4 / 10')
+  })
+})
+
+/**
+ * Обёртка появлялась вместе с признаком, крестиком или счётчиком, и
+ * `<textarea>` пересоздавался: на «1100-445» `state` становился `success`,
+ * фокус уходил на `<body>`, и «␣Lisboa» не набиралось никуда.
+ */
+describe('GrTextarea — поле не пересоздаётся', () => {
+  function typing(props: Record<string, unknown>, decide: (value: string) => Record<string, unknown>) {
+    const Host = defineComponent({
+      components: { GrTextarea },
+      data: () => ({ value: '' }),
+      computed: { extra(): Record<string, unknown> { return decide(this.value) } },
+      template: '<GrTextarea v-model="value" v-bind="{ ...props, ...extra }" />',
+      setup: () => ({ props }),
+    })
+
+    return mount(Host, { attachTo: document.body })
+  }
+
+  async function type(wrapper: ReturnType<typeof mount>, text: string) {
+    const field = wrapper.get('textarea')
+    ;(field.element as HTMLTextAreaElement).value = text
+    await field.trigger('input')
+    await nextTick()
+  }
+
+  it('`state` меняется на лету — тот же узел, фокус и каретка на месте', async () => {
+    const wrapper = typing({}, value => ({ state: /\d{4}-\d{3}/.test(value) ? 'success' : 'default' }))
+    const before = wrapper.get('textarea').element as HTMLTextAreaElement
+    before.focus()
+
+    await type(wrapper, '1100-445')
+    before.setSelectionRange(8, 8)
+
+    const after = wrapper.get('textarea').element as HTMLTextAreaElement
+    expect(wrapper.find('[data-gr-textarea-state]').exists()).toBe(true)
+    expect(after).toBe(before)
+    expect(document.activeElement).toBe(before)
+    expect(after.selectionStart).toBe(8)
+    wrapper.unmount()
+  })
+
+  it('первый символ при `clearable` — крестик появился, фокус остался', async () => {
+    const wrapper = typing({ clearable: true }, () => ({}))
+    const before = wrapper.get('textarea').element as HTMLTextAreaElement
+    before.focus()
+
+    await type(wrapper, 'R')
+
+    expect(wrapper.find('[data-gr-textarea-clear]').exists()).toBe(true)
+    expect(wrapper.get('textarea').element).toBe(before)
+    expect(document.activeElement).toBe(before)
+    wrapper.unmount()
+  })
+
+  it('счётчик включается и выключается — тот же узел', async () => {
+    const wrapper = mount(GrTextarea, { props: { modelValue: 'x' }, attachTo: document.body })
+    const before = wrapper.get('textarea').element
+
+    await wrapper.setProps({ showCount: true, maxlength: 10 })
+    expect(wrapper.find('[data-gr-textarea-count]').exists()).toBe(true)
+    expect(wrapper.get('textarea').element).toBe(before)
+
+    await wrapper.setProps({ showCount: false })
+    expect(wrapper.get('textarea').element).toBe(before)
+    wrapper.unmount()
+  })
+
+  it('поле — блочное: высота не зависит от того, есть ли соседи', () => {
+    for (const props of [{}, { state: 'success' }, { clearable: true, modelValue: 'x' }] as Record<string, unknown>[]) {
+      const wrapper = mount(GrTextarea, { props: { modelValue: '', ...props } })
+      expect(wrapper.get('textarea').classes()).toContain('block')
+      wrapper.unmount()
+    }
+  })
+})
+
+/** Кнопка очистки и признак лежат поверх поля: первая строка не должна уходить под «×». */
+describe('GrTextarea — место под кнопку и признак справа', () => {
+  it.each([
+    ['clearable', { clearable: true }, '2.25rem'],
+    ['признак', { state: 'success' }, '2.25rem'],
+    ['оба', { clearable: true, state: 'success' }, '3.75rem'],
+  ] as [string, Record<string, unknown>, string][])('%s', (_name, props, padding) => {
+    const wrapper = mount(GrTextarea, { props: { modelValue: 'Your invoice INV-0419 was sent today to the billing address', ...props } })
+
+    expect((wrapper.get('textarea').element as HTMLTextAreaElement).style.paddingRight).toBe(padding)
+  })
+
+  it('без кнопки и признака — свой отступ поля', () => {
+    const wrapper = mount(GrTextarea, { props: { modelValue: 'x' } })
+
+    expect((wrapper.get('textarea').element as HTMLTextAreaElement).style.paddingRight).toBe('')
+  })
+
+  it('место держится, пока крестик может появиться, — и на пустом поле', () => {
+    const wrapper = mount(GrTextarea, { props: { modelValue: '', clearable: true } })
+
+    expect((wrapper.get('textarea').element as HTMLTextAreaElement).style.paddingRight).toBe('2.25rem')
   })
 })
