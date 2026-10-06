@@ -747,7 +747,7 @@ floating-компоненты не выходят по построению (v-c
 | `--gr-progress-info-bg` | тема компонента | var(--gr-info) | Заливка полосы тона `info`. |
 | `--gr-progress-slate-bg` | тема компонента | var(--gr-slate) | Заливка полосы тона `slate`. |
 | `--gr-progress-azure-bg` | тема компонента | var(--gr-azure) | Заливка полосы тона `azure`. |
-| `--gr-progress-buffer-bg` | тема компонента | var(--gr-brd) | Слой буфера позади заливки. Тон не наследует: нейтральный слой между треком и заливкой читается у всех восьми тонов. |
+| `--gr-progress-buffer-bg` | тема компонента | color-mix(in srgb, var(--gr-muted-fg) 40%, var(--gr-muted)) | Слой буфера позади заливки. Тон не наследует: нейтральный слой между треком и заливкой читается у всех восьми тонов. |
 | `--gr-progress-indeterminate-bg` | тема компонента | var(--gr-muted-fg) | Заливка неопределённого режима под `prefers-reduced-motion: reduce`, когда бегущая полоса остановлена. |
 | `--gr-progress-indeterminate-duration` | только хук | 1.4s | Период пробега полосы в неопределённом режиме. |
 

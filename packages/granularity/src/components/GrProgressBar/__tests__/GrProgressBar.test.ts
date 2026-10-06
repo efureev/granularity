@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs'
-import { fileURLToPath } from 'node:url'
+import { resolve } from 'node:path'
 import { mount } from '@vue/test-utils'
 import { defineComponent } from 'vue'
 import { describe, expect, it, vi } from 'vitest'
@@ -7,7 +7,7 @@ import { describe, expect, it, vi } from 'vitest'
 import GrConfigProvider from '../../GrConfigProvider/GrConfigProvider.vue'
 import GrProgressBar from '../GrProgressBar.vue'
 import { GR_TONES } from '../../shared/tones'
-import { grProgressBarFillClass, progressIndeterminateReducedClass, trackSizes } from '../grStyle'
+import { bufferClass, grProgressBarFillClass, progressIndeterminateReducedClass, trackSizes } from '../grStyle'
 
 const TRACK = '[data-gr-progress-bar-track]'
 const FILL = '[data-gr-progress-bar-fill]'
@@ -199,6 +199,18 @@ describe('GrProgressBar — буфер', () => {
 
     expect(wrapper.get(BUFFER).attributes('style')).toContain('width: 0%;')
   })
+
+  // `--gr-brd` совпадал с дорожкой `--gr-muted` на тёмной теме (`#334155`) и почти
+  // совпадал на светлой: загруженная часть не читалась вовсе.
+  it('слой видим на дорожке: смесь приглушённого текста с её цветом', () => {
+    const MIX = 'color-mix(in srgb, var(--gr-muted-fg) 40%, var(--gr-muted))'
+    expect(bufferClass).toBe('bg-[var(--gr-progress-buffer-bg,color-mix(in_srgb,var(--gr-muted-fg)_40%,var(--gr-muted)))]')
+
+    for (const theme of ['light', 'dark']) {
+      const css = readFileSync(resolve(__dirname, '../themes', `${theme}.css`), 'utf8')
+      expect(css, theme).toContain(`--gr-progress-buffer-bg: ${MIX};`)
+    }
+  })
 })
 
 describe('GrProgressBar — оформление и размеры', () => {
@@ -280,7 +292,7 @@ describe('GrProgressBar — нейтральный тон', () => {
     expect(grProgressBarFillClass('neutral')).not.toContain('--gr-secondary')
 
     for (const theme of ['light', 'dark']) {
-      const css = readFileSync(fileURLToPath(new URL(`../themes/${theme}.css`, import.meta.url)), 'utf8')
+      const css = readFileSync(resolve(__dirname, '../themes', `${theme}.css`), 'utf8')
       expect(css, theme).toContain('--gr-progress-neutral-bg: var(--gr-muted-fg);')
     }
   })

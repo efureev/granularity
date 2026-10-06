@@ -3081,7 +3081,7 @@ export const grComponentTokens: GrComponentToken[] = [
     "owner": "GrProgressBar",
     "name": "--gr-progress-buffer-bg",
     "kind": "theme",
-    "default": "var(--gr-brd)",
+    "default": "color-mix(in srgb, var(--gr-muted-fg) 40%, var(--gr-muted))",
     "description": "Слой буфера позади заливки. Тон не наследует: нейтральный слой между треком и заливкой читается у всех восьми тонов."
   },
   {

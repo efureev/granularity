@@ -33,7 +33,8 @@ export const valueTextSizes: Record<GrProgressBarSize, string> = {
  * Буфер не наследует тон: `-light`-роли есть не у всех восьми тонов, а
  * нейтральный слой между треком и заливкой читается и без цвета тона.
  */
-export const bufferClass = 'bg-[var(--gr-progress-buffer-bg,var(--gr-brd))]'
+// Не `--gr-brd`: на тёмной теме он совпадает с дорожкой, и загруженное не видно.
+export const bufferClass = 'bg-[var(--gr-progress-buffer-bg,color-mix(in_srgb,var(--gr-muted-fg)_40%,var(--gr-muted)))]'
 
 function withVar(token: string): string {
   return `[${token}]`
