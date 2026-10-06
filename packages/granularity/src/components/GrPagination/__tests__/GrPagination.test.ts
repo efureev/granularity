@@ -389,3 +389,29 @@ describe('GrPagination — рост коробки совпадает с GrButto
       expect(navButtonSizes[size]).toBe(size)
   })
 })
+
+/**
+ * Ряд переносился посреди навигации: «« Prev» на одной строке, страницы и
+ * «Next »» — на другой. Геометрию меряет `apps/showcase/e2e/geometry.spec.ts`.
+ */
+describe('GrPagination — навигация одним кластером', () => {
+  it('первая, назад, страницы, вперёд и последняя — в одном неразрывном кластере', () => {
+    const wrapper = mount(GrPagination, { props: { page: 1, pageSize: 10, total: 137, showTotal: true, showPageSize: true, showJumper: true } })
+    const nav = wrapper.get('[data-gr-pagination-nav]')
+
+    for (const part of ['first', 'prev', 'pages', 'next', 'last'])
+      expect(nav.find(`[data-gr-pagination-${part}]`).exists(), part).toBe(true)
+    expect(nav.classes()).toEqual(expect.arrayContaining(['flex-nowrap', 'min-w-0', 'max-w-full']))
+
+    // Переносится ряд только между группами: кнопки навигации — не его прямые дети.
+    const groups = [...wrapper.element.children].map(child => [...child.attributes].map(attr => attr.name).find(name => name.startsWith('data-gr-pagination')) ?? child.tagName)
+    expect(groups).toContain('data-gr-pagination-nav')
+    expect(groups).not.toContain('data-gr-pagination-prev')
+  })
+
+  it('`compact` живёт в том же кластере', () => {
+    const wrapper = mount(GrPagination, { props: { page: 2, pageSize: 10, total: 137, compact: true } })
+
+    expect(wrapper.get('[data-gr-pagination-nav]').find('[data-gr-pagination-compact]').exists()).toBe(true)
+  })
+})

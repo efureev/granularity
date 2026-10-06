@@ -39,4 +39,11 @@ export const grPaginationExamples: ShowcaseComponentExampleDoc[] = [
     status: 'ready',
     previewKey: 'gr-pagination-sizes',
   },
+  {
+    id: 'pagination-narrow',
+    title: 'Узкий подвал: 560px и 360px',
+    description: 'Ряд переносится только между группами — итог, размер страницы, навигация, переход. Навигация — один неразрывный кластер и на узкой ширине уходит на свою строку целиком. Где не помещается и он, включают `compact`.',
+    status: 'ready',
+    previewKey: 'gr-pagination-narrow',
+  },
 ]

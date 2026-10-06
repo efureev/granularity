@@ -11,6 +11,7 @@ import {
   jumperSizes,
   labelSizes,
   navButtonSizes,
+  navClusterClass,
   pageListGaps,
   pageBoxSizes,
   pageSizeSelectWidths,
@@ -308,6 +309,13 @@ if (__GR_DEV__) {
       />
     </div>
 
+    <!--
+      Навигация — один неразрывный кластер: «назад» не уезжает на другую строку
+      от своих страниц. Переносится ряд только между группами — итог, размер
+      страницы, навигация, переход, — и на узком экране кластер уходит на свою
+      строку целиком. Шире строки он не становится: прокручивается сам.
+    -->
+    <div data-gr-pagination-nav :class="[navClusterClass, pageListClass]">
     <GrButton variant="ghost" :size="navButtonSize" :disabled="disabled || currentPage <= 1" :aria-label="t('gr.pagination.first', 'First page')" data-gr-pagination-first @click="first">
       «
     </GrButton>
@@ -374,6 +382,7 @@ if (__GR_DEV__) {
     <GrButton variant="ghost" :size="navButtonSize" :disabled="disabled || currentPage >= pageCount" :aria-label="t('gr.pagination.last', 'Last page')" data-gr-pagination-last @click="last">
       »
     </GrButton>
+    </div>
 
     <!-- «Перейти к странице»: Enter или blur применяют введённый номер. -->
     <div v-if="showJumper" class="flex items-center gap-2 text-[var(--gr-muted-fg)]" :class="labelClass">

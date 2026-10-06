@@ -381,6 +381,7 @@ export const demoPathByPreviewKey = {
   'gr-pagination-page-size-guard': 'components/gr-pagination/GrPaginationPageSizeDemo.vue',
   'gr-pagination-sizes': 'components/gr-pagination/GrPaginationSizesDemo.vue',
   'gr-pagination-table-composition': 'components/gr-pagination/GrPaginationTableCompositionDemo.vue',
+  'gr-pagination-narrow': 'components/gr-pagination/GrPaginationNarrowDemo.vue',
   'gr-popover-confirm': 'components/gr-popover/GrPopoverConfirmDemo.vue',
   'gr-popover-form': 'components/gr-popover/GrPopoverFormDemo.vue',
   'gr-popover-modal': 'components/gr-popover/GrPopoverModalDemo.vue',

@@ -82,7 +82,7 @@ describe('component docs metadata', () => {
     const tabsDoc = getShowcaseComponentDoc(tabsEntity!)
     const tooltipDoc = getShowcaseComponentDoc(tooltipEntity!)
 
-    expect(paginationDoc.examples).toHaveLength(5)
+    expect(paginationDoc.examples).toHaveLength(6)
     expect(paginationDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(paginationDoc.examples.every(example => example.previewKey?.startsWith('gr-pagination'))).toBe(true)
 

@@ -798,3 +798,35 @@ test.describe('GrNavbar: переполненная зона слева', () => 
     expect(geometry.search.right).toBeLessThanOrEqual(geometry.navbar.right)
   })
 })
+
+/**
+ * Ряд пагинации переносился посреди навигации: «« Prev» на первой строке, а
+ * «1 2 3 … 14 Next »» — на второй. Навигация — один кластер; переносится ряд
+ * только между группами.
+ */
+test.describe('GrPagination: перенос ряда', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto(componentPath('GrPagination'))
+    await page.locator('[data-demo="pagination-560"]').waitFor()
+  })
+
+  for (const width of ['560', '360']) {
+    test(`${width}px: навигация одной строкой и внутри подвала`, async ({ page }) => {
+      const demo = page.locator(`[data-demo="pagination-${width}"]`)
+      const box = await demo.evaluate((root) => {
+        const nav = root.querySelector('[data-gr-pagination-nav]')!
+        const tops = [...nav.children]
+          .filter(child => child.getBoundingClientRect().width > 0 && !child.classList.contains('sr-only'))
+          .map(child => Math.round(child.getBoundingClientRect().top + child.getBoundingClientRect().height / 2))
+        const navRect = nav.getBoundingClientRect()
+        const rootRect = root.getBoundingClientRect()
+
+        return { rows: new Set(tops).size, navRight: navRect.right, navLeft: navRect.left, rootRight: rootRect.right, rootLeft: rootRect.left }
+      })
+
+      expect(box.rows).toBe(1)
+      expect(box.navLeft).toBeGreaterThanOrEqual(box.rootLeft)
+      expect(box.navRight).toBeLessThanOrEqual(box.rootRight)
+    })
+  }
+})
