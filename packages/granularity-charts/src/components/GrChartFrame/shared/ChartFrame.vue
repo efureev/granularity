@@ -9,7 +9,7 @@ import { computed, onScopeDispose, ref, shallowRef, useId, watch } from 'vue'
 import { decimateChartData, decimateSeriesGroup, decimationBudget } from '../../../chart/chartDecimate'
 import type { GrChartNumberFormat } from '../../../chart/chartFormat'
 import { formatNumber, formatTimeSequence, formatTimeValue, formatValue } from '../../../chart/chartFormat'
-import { chartLayout, type Rect, thinTicksToFit, type WrappedLabel, wrapLabel } from '../../../chart/chartLayout'
+import { chartLayout, fitCategoryLabels, type Rect, thinTicksToFit, type WrappedLabel } from '../../../chart/chartLayout'
 import { linePath } from '../../../chart/chartPath'
 import type { ChartData, NormalizedPoint, NormalizedSeries } from '../../../chart/chartModel'
 import type { GrChartReference } from '../../../chart/chartReference'
@@ -474,9 +474,12 @@ const wrappedXLabels = computed<WrappedLabel[] | null>(() => {
   if (props.xLabelFit !== 'wrap' || !showAxes.value || xLabels.value.length === 0)
     return null
 
-  const step = singleLineLayout.value.plot.width / Math.max(1, props.data.positions.length)
+  const area = singleLineLayout.value.plot
+  const step = area.width / Math.max(1, props.data.positions.length)
+  // Крайним подписям в шахматке тесно только до края холста, а не до края области.
+  const edges = { left: area.x + step / 2, right: width.value - (area.x + area.width - step / 2) }
 
-  return xLabels.value.map(tick => wrapLabel(tick.label, fontSizePx.value, step - X_LABEL_GAP))
+  return fitCategoryLabels(xLabels.value.map(tick => tick.label), fontSizePx.value, step, X_LABEL_GAP, edges)
 })
 
 const layout = computed(() => {

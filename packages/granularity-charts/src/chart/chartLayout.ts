@@ -273,6 +273,56 @@ export function wrapLabel(label: string, fontSizePx: number, maxWidth: number): 
   return truncated ? { lines, full: label } : { lines }
 }
 
+/** Короче этого усечённая подпись ничего не называет: «Pr…» — не «Price». */
+const MIN_LABEL_CHARS = 4
+
+function isStub(label: WrappedLabel): boolean {
+  return label.full !== undefined
+    && label.lines.some(line => line.endsWith('…') && line.length - 1 < MIN_LABEL_CHARS)
+}
+
+/** Сколько места у крайних подписей до края холста — от центра деления. */
+export interface LabelEdges {
+  left: number
+  right: number
+}
+
+/**
+ * Подписи категорий, где каждая обязана остаться (шаги моста).
+ *
+ * Сначала перенос на две строки. Если и так от какой-то подписи остаётся огрызок
+ * короче четырёх знаков — шахматка: соседние подписи встают в разные ряды, и
+ * каждой достаётся ширина двух ячеек; крайним — сколько есть до края холста.
+ * Не хватает и этого — подпись держит хотя бы четыре знака: огрызок «C…» не
+ * называет ничего, а полный текст остаётся в `<title>`.
+ */
+export function fitCategoryLabels(
+  labels: readonly string[],
+  fontSizePx: number,
+  step: number,
+  gap: number,
+  edges: LabelEdges = { left: step * 0.75, right: step * 0.75 },
+): WrappedLabel[] {
+  const wrapped = labels.map(label => wrapLabel(label, fontSizePx, step - gap))
+
+  if (!wrapped.some(isStub))
+    return wrapped
+
+  const last = labels.length - 1
+
+  return labels.map((label, index) => {
+    const reachLeft = index === 0 ? edges.left : step
+    const reachRight = index === last ? edges.right : step
+    const fitted = fitLabel(label, fontSizePx, 2 * Math.min(reachLeft, reachRight) - gap)
+    const text = fitted.endsWith('…') && fitted.length - 1 < MIN_LABEL_CHARS && label.length > MIN_LABEL_CHARS
+      ? `${label.slice(0, MIN_LABEL_CHARS).trimEnd()}…`
+      : fitted
+    const lines = index % 2 === 0 ? [text] : ['', text]
+
+    return text === label ? { lines } : { lines, full: label }
+  })
+}
+
 /** Каждая `every`-я позиция из `count`, первая и последняя — всегда. */
 function strided(count: number, every: number): number[] {
   const picked: number[] = []

@@ -3,6 +3,7 @@ import { mount } from '@vue/test-utils'
 import { describe, expect, it } from 'vitest'
 
 import { estimateTextWidth } from '../../../chart/chartLayout'
+import GrChartBar from '../../GrChartBar/GrChartBar.vue'
 import GrChartWaterfall from '../GrChartWaterfall.vue'
 
 function waterfall(props: Record<string, unknown>) {
@@ -92,21 +93,61 @@ describe('GrChartWaterfall: оси', () => {
   it.each([
     [510, pnl.map(step => step.label)],
     [210, ['Start', 'Price', 'Volume', 'Mix', 'FX']],
-  ])('%ipx: каждый шаг назван, подписи не налезают', (width, labels) => {
+    [210, ['Price', 'Volume', 'Mix', 'FX', 'Change']],
+  ])('%ipx: каждый шаг назван, подписи не налезают и не сжимаются в огрызок', (width, labels) => {
     const wrapper = waterfall({ width, steps: labels.map((label, index) => ({ label, value: index === 0 ? 100 : 10 * (index % 2 === 0 ? 1 : -1) })) })
     const ticks = wrapper.findAll('[data-gr-chart-axis="x"] text').map((node) => {
-      const lines = node.findAll('tspan').map(line => line.text())
-      const text = lines.length > 0 ? lines : [node.element.childNodes[0]!.textContent!.trim()]
-      const half = Math.max(...text.map(line => estimateTextWidth(line, 12))) / 2
+      const rows = node.findAll('tspan').map(line => line.text())
+      const lines = rows.length > 0 ? rows : [node.element.childNodes[0]!.textContent!.trim()]
+      const visible = lines.filter(Boolean)
+      const half = Math.max(...visible.map(line => estimateTextWidth(line, 12))) / 2
       const x = Number(node.attributes('x'))
+
+      // Шахматка: подпись во втором ряду начинается с пустой строки.
+      return { text: visible, row: rows.length > 1 && rows[0] === '' ? 1 : 0, left: x - half, right: x + half }
+    })
+
+    expect(ticks).toHaveLength(labels.length)
+    for (const tick of ticks) {
+      for (const line of tick.text) {
+        if (line.endsWith('…'))
+          expect(line.length - 1, line).toBeGreaterThanOrEqual(4)
+      }
+    }
+    ticks.forEach((tick, index) => {
+      const previous = ticks.slice(0, index).reverse().find(other => other.row === tick.row)
+
+      if (previous)
+        expect(tick.left, `${previous.text.join(' ')} / ${tick.text.join(' ')}`).toBeGreaterThanOrEqual(previous.right)
+    })
+    wrapper.unmount()
+  })
+
+  it.each([
+    ['GrChartWaterfall', () => waterfall({
+      width: 210,
+      orientation: 'horizontal',
+      steps: [{ label: 'Opening', value: 1200, kind: 'total' }, { label: 'Received', value: 800 }, { label: 'Closing', value: 2000, kind: 'total' }],
+    })],
+    ['GrChartBar', () => mount(GrChartBar, {
+      props: { width: 210, locale: 'en', orientation: 'horizontal', series: [{ id: 'a', label: 'A', x: ['Opening', 'Received', 'Closing'], y: [1200, 800, 2000] }], yTickFormat: (value: number) => value.toLocaleString('en') },
+      global: granularityGlobal(),
+      attachTo: document.body,
+    })],
+  ])('%s по горизонтали: подписи оси значений на узком холсте не налезают', (_name, render) => {
+    const wrapper = render()
+    const ticks = wrapper.findAll('[data-gr-chart-axis="x"] text').map((node) => {
+      const text = node.element.childNodes[0]!.textContent!.trim()
+      const x = Number(node.attributes('x'))
+      const half = estimateTextWidth(text, 12) / 2
 
       return { text, left: x - half, right: x + half }
     })
 
-    expect(ticks).toHaveLength(labels.length)
+    expect(ticks.length).toBeGreaterThanOrEqual(2)
     ticks.forEach((tick, index) => {
       if (index > 0)
-        expect(tick.left, `${ticks[index - 1]!.text.join(' ')} / ${tick.text.join(' ')}`).toBeGreaterThanOrEqual(ticks[index - 1]!.right)
+        expect(tick.left, `${ticks[index - 1]!.text} / ${tick.text}`).toBeGreaterThanOrEqual(ticks[index - 1]!.right)
     })
     wrapper.unmount()
   })

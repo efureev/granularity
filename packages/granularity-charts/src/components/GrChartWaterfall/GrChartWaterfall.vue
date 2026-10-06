@@ -7,7 +7,7 @@ import { barHitIndex, barPath, barRect, barToward, groupSlots } from '../../char
 import { orientedPoint } from '../../chart/chartOrientation'
 import type { GrChartNumberFormat } from '../../chart/chartFormat'
 import { formatNumber, formatValue } from '../../chart/chartFormat'
-import { estimateTextWidth, type LabelGutters, memoLabelGutters, type Rect } from '../../chart/chartLayout'
+import { estimateTextWidth, type LabelGutters, memoLabelGutters, type Rect, thinTicksToFit } from '../../chart/chartLayout'
 import type { GrChartPoint } from '../../chart/chartModel'
 import { normalizeChartData } from '../../chart/chartModel'
 import { bandScale, type GrChartScale, linearScale } from '../../chart/chartScale'
@@ -709,7 +709,7 @@ defineExpose({
           />
           <ChartAxis
             :plot="geometry.area"
-            :ticks="valueTicks(geometry)"
+            :ticks="thinTicksToFit(valueTicks(geometry), labelFontPx[resolvedSize])"
             orientation="x"
             :font-size-px="labelFontPx[resolvedSize]"
             :size-class="labelSizeClass[resolvedSize]"

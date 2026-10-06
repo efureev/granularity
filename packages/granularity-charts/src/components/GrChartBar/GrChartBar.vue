@@ -9,7 +9,7 @@ import { orientedGrid, orientedPoint } from '../../chart/chartOrientation'
 import type { GrChartNumberFormat } from '../../chart/chartFormat'
 import { formatShare } from '../../chart/chartFormat'
 import type { LabelGutters, Rect } from '../../chart/chartLayout'
-import { estimateTextWidth, memoLabelGutters } from '../../chart/chartLayout'
+import { estimateTextWidth, memoLabelGutters, thinTicksToFit } from '../../chart/chartLayout'
 import type { GrChartSeries, NormalizedSeries } from '../../chart/chartModel'
 import { normalizeChartData, resolveScaleKind } from '../../chart/chartModel'
 import type { GrChartReference, NormalizedReference } from '../../chart/chartReference'
@@ -762,7 +762,7 @@ defineExpose({
         />
         <ChartAxis
           :plot="geometryOf(plot, sx, sy).area"
-          :ticks="valueTicks(geometryOf(plot, sx, sy))"
+          :ticks="thinTicksToFit(valueTicks(geometryOf(plot, sx, sy)), labelFontPx[resolvedSize])"
           orientation="x"
           :font-size-px="labelFontPx[resolvedSize]"
           :size-class="labelSizeClass[resolvedSize]"
