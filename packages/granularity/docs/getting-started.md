@@ -742,12 +742,12 @@ export async function setupI18n() {
 | --- | --- | --- | --- | --- |
 | `@feugene/granularity` | 1.0.9 | ядро, 106 subpath-экспортов `./components/Gr*` | `gr` | `GranularityResolver` (из `@feugene/unplugin-granularity`) |
 | `@feugene/granularity-charts` | 1.0.2 | `GrChartArea`, `GrChartBar`, `GrChartBullet`, `GrChartFunnel`, `GrChartHeatmap`, `GrChartLine`, `GrChartPie`, `GrChartRadar`, `GrChartWaterfall`, `GrSparkline` | `grCharts` | `GranularityChartsResolver` |
-| `@feugene/granularity-chrono` | 1.0.2 | `GrCalendar`, `GrDatePicker`, `GrDateRangePicker`, `GrDateTimePicker`, `GrDuration`, `GrRelativeTime`, `GrTimePicker` | `grChrono` | `GranularityChronoResolver` |
+| `@feugene/granularity-chrono` | 1.0.3 | `GrCalendar`, `GrDatePicker`, `GrDateRangePicker`, `GrDateTimePicker`, `GrDuration`, `GrRelativeTime`, `GrTimePicker` | `grChrono` | `GranularityChronoResolver` |
 | `@feugene/granularity-code` | 1.0.2 | `GrCodeBlock`, `GrCodeEditor`, `GrDiff` | `grCode` | `GranularityCodeResolver` |
 | `@feugene/granularity-dashboard` | 1.0.2 | `GrDashboard`, `GrDashboardItem`, `GrDashboardItemSettings`, `GrDashboardPalette`, `GrDashboardToolbar` | `grDashboard` | `GranularityDashboardResolver` |
 | `@feugene/granularity-editor` | 1.0.2 | `GrMarkdown`, `GrRichText` | `grEditor` | `GranularityEditorResolver` |
 | `@feugene/granularity-forms-schema` | 1.0.2 | `GrSchemaForm` | `grForms` | `GranularityFormsSchemaResolver` |
-| `@feugene/granularity-media` | 1.0.2 | `GrCameraCapture`, `GrCodeScanner`, `GrImageCrop`, `GrVideoPlayer` | `grMedia` | `GranularityMediaResolver` |
+| `@feugene/granularity-media` | 1.0.3 | `GrCameraCapture`, `GrCodeScanner`, `GrImageCrop`, `GrVideoPlayer` | `grMedia` | `GranularityMediaResolver` |
 
 Компонентов не добавляют, но входят в семейство:
 
