@@ -153,7 +153,7 @@ function hasActions(toast: Toast): boolean {
 function onAction(toast: Toast, action: ToastAction): void {
   action.onClick()
   if (action.dismissOnClick !== false)
-    dismiss(toast.id)
+    dismissKeepingFocus(toast)
 }
 
 // SSR-guard: на сервере `document.body` недоступен — отключаем `teleport`.
@@ -454,15 +454,48 @@ function onToastKeydown(event: KeyboardEvent, toast: Toast): void {
     return
 
   event.preventDefault()
+  dismissKeepingFocus(toast)
+}
+
+/**
+ * Откуда пришли в стек — по `focusHotkey` или `focus()`. Туда фокус и
+ * возвращается, когда закрыт последний тост: иначе пользователь, прыгнувший в
+ * стек по F6, оказывался в начале документа.
+ */
+let returnFocusEl: HTMLElement | null = null
+
+/**
+ * Закрыть тост, не уронив фокус на `body`.
+ *
+ * Если фокус был внутри закрываемого тоста — на нём самом, на крестике или на
+ * кнопке действия, — он переходит на следующий тост стека (или на предыдущий),
+ * а когда тостов не осталось — туда, откуда пришли в стек, если тот элемент ещё
+ * в документе.
+ */
+function dismissKeepingFocus(toast: Toast): void {
+  const element = toastElement(toast.id)
+  const active = typeof document === 'undefined' ? null : document.activeElement
+  const hadFocus = Boolean(element && active && element.contains(active))
 
   const index = visibleToasts.value.findIndex(item => item.id === toast.id)
   const next = visibleToasts.value[index + 1] ?? visibleToasts.value[index - 1]
 
   dismiss(toast.id)
 
-  // Фокус не должен упасть на `body`: дальше по стеку есть что читать.
-  if (next)
-    void nextTick(() => toastElement(next.id)?.focus())
+  if (!hadFocus)
+    return
+
+  void nextTick(() => {
+    const nextElement = next ? toastElement(next.id) : null
+    if (nextElement) {
+      nextElement.focus()
+      return
+    }
+
+    if (returnFocusEl?.isConnected)
+      returnFocusEl.focus()
+    returnFocusEl = null
+  })
 }
 
 // Единый источник правды по таймерам: тост тикает, только если он видим И стек не на
@@ -541,6 +574,11 @@ function focus(): boolean {
   const target = containerEl.value?.querySelector<HTMLElement>('[data-gr-toast]')
   if (!target)
     return false
+
+  // Запоминаем, откуда пришли, — но не тост внутри стека: оттуда возвращаться некуда.
+  const active = document.activeElement
+  if (active instanceof HTMLElement && !containerEl.value?.contains(active) && active !== document.body)
+    returnFocusEl = active
 
   target.focus()
   return true
@@ -644,7 +682,7 @@ defineExpose({
                 size="sm"
                 square
                 :aria-label="resolvedDismissLabel"
-                @click="dismiss(toast.id)"
+                @click="dismissKeepingFocus(toast)"
             >
               <GrIcon size="sm">
                 <IconClose />

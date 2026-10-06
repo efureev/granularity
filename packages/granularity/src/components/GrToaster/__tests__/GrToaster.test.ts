@@ -826,3 +826,88 @@ describe('GrToaster — стопка', () => {
     wrapper.unmount()
   })
 })
+
+/**
+ * Закрытый с клавиатуры тост ронял фокус на `<body>`: пришедший в стек по F6
+ * оказывался в начале документа. Теперь фокус идёт на следующий тост, а
+ * когда тостов не осталось — туда, откуда пришли в стек.
+ */
+describe('GrToaster — фокус после закрытия тоста', () => {
+  function pressF6(): void {
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'F6', bubbles: true }))
+  }
+
+  function exportButton(): HTMLButtonElement {
+    const button = document.createElement('button')
+    button.textContent = 'Export to CSV'
+    document.body.append(button)
+    button.focus()
+    return button
+  }
+
+  it('последний тост по `Delete` — фокус возвращается туда, откуда пришли', async () => {
+    const origin = exportButton()
+    useToast().push({ title: 'Exported', timeoutMs: 0 })
+    mount(GrToaster, { attachTo: document.body })
+    await nextTick()
+
+    pressF6()
+    const toastEl = document.body.querySelector<HTMLElement>('[data-gr-toast]')!
+    expect(document.activeElement).toBe(toastEl)
+
+    toastEl.dispatchEvent(new KeyboardEvent('keydown', { key: 'Delete', bubbles: true }))
+    await nextTick()
+    await nextTick()
+
+    expect(document.activeElement).toBe(origin)
+  })
+
+  it('крестик и действие с `dismissOnClick` — фокус на следующий тост, затем домой', async () => {
+    const origin = exportButton()
+    const toast = useToast()
+    toast.push({ title: 'First', timeoutMs: 0, action: { label: 'Undo', onClick: () => {} } })
+    toast.push({ title: 'Second', timeoutMs: 0 })
+    mount(GrToaster, { attachTo: document.body })
+    await nextTick()
+
+    pressF6()
+    const top = document.activeElement as HTMLElement
+    const close = top.querySelector<HTMLElement>('[data-gr-toast-close]') ?? top.querySelector<HTMLElement>('button[aria-label]')
+    close!.focus()
+    close!.click()
+    await nextTick()
+    await nextTick()
+
+    const remaining = document.body.querySelector<HTMLElement>('[data-gr-toast]')!
+    expect(document.activeElement).toBe(remaining)
+
+    const action = remaining.querySelector<HTMLElement>('[data-gr-toast-action]')
+    if (action) {
+      action.focus()
+      action.click()
+    }
+    else {
+      remaining.dispatchEvent(new KeyboardEvent('keydown', { key: 'Delete', bubbles: true }))
+    }
+    await nextTick()
+    await nextTick()
+
+    expect(document.activeElement).toBe(origin)
+  })
+
+  it('элемент, откуда пришли, исчез — фокус не уходит в отсоединённый узел', async () => {
+    const origin = exportButton()
+    useToast().push({ title: 'Exported', timeoutMs: 0 })
+    mount(GrToaster, { attachTo: document.body })
+    await nextTick()
+
+    pressF6()
+    origin.remove()
+    document.body.querySelector<HTMLElement>('[data-gr-toast]')!
+      .dispatchEvent(new KeyboardEvent('keydown', { key: 'Delete', bubbles: true }))
+    await nextTick()
+    await nextTick()
+
+    expect(document.activeElement).not.toBe(origin)
+  })
+})
