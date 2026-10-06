@@ -5283,6 +5283,13 @@
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
+          },
+          {
+            "name": "reserveMessage",
+            "description": "Все поля формы держат место под строку сообщения: ошибки по submit не сдвигают форму, диалог и панель фиксированной высоты. Поле со своим `reserveMessage` решает за себя.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
           }
         ]
       },
@@ -5400,6 +5407,13 @@
             "name": "labelWidth",
             "description": "Ширина колонки подписи при `labelPosition=\"start\"`. Число — пиксели.",
             "type": "string | number | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "reserveMessage",
+            "description": "Держать место под строку сообщения, пока ошибки нет: появление текста не сдвигает форму, диалог и панель фиксированной высоты. Не задан — берётся у `GrForm` (`reserveMessage`), затем из `GrConfigProvider`. Несколько ошибок (`error: string[]`) по-прежнему растут ниже одной строки.",
+            "type": "boolean | undefined",
             "required": false,
             "default": "undefined"
           },
@@ -5540,6 +5554,13 @@
             "default": "undefined"
           },
           {
+            "name": "replace",
+            "description": "Новый выбор в `multiple` **заменяет** набор, а не добавляется к нему — старое поведение. Без него набор растёт, дубликаты (то же имя, размер и время изменения) отбрасываются, а `limit` и валидаторы проверяют набор целиком.",
+            "type": "boolean | undefined",
+            "required": false,
+            "default": "false"
+          },
+          {
             "name": "limit",
             "description": "Максимум файлов в наборе. Лишние не обрезаются молча — набор отбивается ошибкой.",
             "type": "number | undefined",
@@ -5584,6 +5605,13 @@
           {
             "name": "changeText",
             "description": "Подпись кнопки выбора, когда файлы уже есть. По умолчанию — переведённое «Change file».",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
+            "name": "addText",
+            "description": "Подпись кнопки выбора в `multiple`, когда файлы уже есть: новый выбор добавляется к набору. По умолчанию — переведённое «Add files».",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
@@ -6712,7 +6740,7 @@
           },
           {
             "name": "tag",
-            "description": "Свой чип: `remove` снимает значение.",
+            "description": "Содержимое чипа: подпись, значок, счётчик. Сам чип, его тон и кнопка снятия остаются за компонентом; `remove` — для своих действий внутри подписи.",
             "type": "{ tag: string; index: number; remove: () => void; }"
           }
         ]
@@ -6834,7 +6862,7 @@
           },
           {
             "name": "maxHeight",
-            "description": "Высота области просмотра: число — пиксели, строка — как есть.",
+            "description": "Высота области просмотра со своим скроллом — и без `virtual`. Число — пиксели, строка — как есть.",
             "type": "string | number | undefined",
             "required": false,
             "default": "undefined"
@@ -6869,7 +6897,7 @@
           },
           {
             "name": "searchable",
-            "description": "Поле поиска над деревом. Выключено — поиск остаётся на `filter()` из `defineExpose`.",
+            "description": "Панель над деревом: поле поиска и «Развернуть всё / Свернуть всё». По умолчанию **включена** (умолчание меняется через `GrConfigProvider`). `false` убирает панель целиком: поиск остаётся на `filter()`, раскрытие — на `expandAll()`/`collapseAll()` из `defineExpose`.",
             "type": "boolean | undefined",
             "required": false,
             "default": "undefined"
@@ -13113,7 +13141,7 @@
           },
           {
             "name": "maxHeight",
-            "description": "Максимальная высота дерева со своим скроллером. Число — пиксели.",
+            "description": "Максимальная высота дерева со своим скроллером — всегда, не только с `virtual`: тот лишь кладёт поверх окно строк. Число — пиксели.",
             "type": "string | number | undefined",
             "required": false,
             "default": "undefined"
