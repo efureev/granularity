@@ -1,12 +1,12 @@
-import { Annotation, Compartment, EditorState, Prec, RangeSetBuilder, type Extension } from '@codemirror/state'
-import { Decoration, EditorView, ViewPlugin, keymap, lineNumbers as lineNumbersExt, placeholder as placeholderExt, type DecorationSet, type ViewUpdate } from '@codemirror/view'
+import { Annotation, Compartment, EditorState, Prec, RangeSet, RangeSetBuilder, StateEffect, StateField, type Extension } from '@codemirror/state'
+import { Decoration, EditorView, gutter, GutterMarker, ViewPlugin, keymap, lineNumbers as lineNumbersExt, placeholder as placeholderExt, type DecorationSet, type ViewUpdate } from '@codemirror/view'
 import { defaultKeymap, history, historyKeymap, indentWithTab } from '@codemirror/commands'
 import { HighlightStyle, syntaxHighlighting } from '@codemirror/language'
 import { tags } from '@lezer/highlight'
 
 import { classForRole, LEZER_TAGS_BY_ROLE } from '../../highlight/fromLezer'
 import type { GrCodeLine, GrCodeRole } from '../../highlight/palette'
-import type { MinimalChange } from './editorState'
+import type { GrCodeIssue, MinimalChange } from './editorState'
 
 /** Построчный разбор: единица — строка, потому что мост декорирует окно. */
 export type GrCodeLineTokenizer = (text: string) => GrCodeLine
@@ -28,6 +28,7 @@ const languageCompartment = new Compartment()
 const attributesCompartment = new Compartment()
 const keymapCompartment = new Compartment()
 const tokenizerCompartment = new Compartment()
+const issueGutterCompartment = new Compartment()
 
 /**
  * Раскладка клавиш.
@@ -135,6 +136,129 @@ export function tokenizerExtension(tokenize: GrCodeLineTokenizer | null): Extens
   return tokenize ? tokenizerHighlighting(tokenize) : []
 }
 
+// ── Замечания ───────────────────────────────────────────────────────────────
+
+/**
+ * Замечания `validate` в самом тексте: волнистое подчёркивание на диапазоне и
+ * метка в жёлобе на строке. Список под полем остаётся — он связан с полем
+ * через `aria-describedby` и доступен без зрения; подчёркивание и метка
+ * показывают зрячему, **где** именно.
+ *
+ * Замечания приходят эффектом, а не пересозданием состояния: асинхронный
+ * `validate` отвечает позже правки, и курсор с историей терять нельзя.
+ */
+const setIssuesEffect = StateEffect.define<readonly GrCodeIssue[]>()
+
+const SEVERITY_RANK: Record<GrCodeIssue['severity'], number> = { error: 3, warning: 2, info: 1 }
+
+/**
+ * Диапазон, который можно подчеркнуть: пустой расширяется до символа.
+ *
+ * Валидатор указывает на точку («ожидалась запятая»), а декорация нулевой
+ * длины не рисует ничего — замечание было бы только в списке.
+ */
+function markRange(issue: GrCodeIssue, length: number): { from: number, to: number } | null {
+  if (length === 0)
+    return null
+  if (issue.to > issue.from)
+    return { from: issue.from, to: issue.to }
+
+  return issue.from < length ? { from: issue.from, to: issue.from + 1 } : { from: length - 1, to: length }
+}
+
+function issueDecorations(issues: readonly GrCodeIssue[], length: number): DecorationSet {
+  const ranges = issues
+    .map((issue) => {
+      const range = markRange(issue, length)
+
+      return range && Decoration.mark({
+        class: `gr-code-issue gr-code-issue-${issue.severity}`,
+        attributes: { title: issue.message },
+        issue,
+      }).range(range.from, range.to)
+    })
+    .filter((range): range is NonNullable<typeof range> => range !== null)
+
+  return Decoration.set(ranges, true)
+}
+
+const issuesField = StateField.define<DecorationSet>({
+  create: () => Decoration.none,
+  update(decorations, tr) {
+    let next = decorations.map(tr.changes)
+
+    for (const effect of tr.effects) {
+      if (effect.is(setIssuesEffect))
+        next = issueDecorations(effect.value, tr.state.doc.length)
+    }
+
+    return next
+  },
+  provide: field => EditorView.decorations.from(field),
+})
+
+class IssueMarker extends GutterMarker {
+  constructor(readonly severity: GrCodeIssue['severity'], readonly messages: readonly string[]) {
+    super()
+  }
+
+  override eq(other: IssueMarker): boolean {
+    return other.severity === this.severity && other.messages.join('\n') === this.messages.join('\n')
+  }
+
+  override toDOM(): Node {
+    const marker = document.createElement('span')
+
+    marker.className = `gr-code-issue-marker gr-code-issue-marker-${this.severity}`
+    marker.textContent = '●'
+    marker.title = this.messages.join('\n')
+    marker.setAttribute('aria-label', this.messages.join('; '))
+
+    return marker
+  }
+}
+
+/** Пустая метка той же ширины — резерв колонки, пока замечаний нет. */
+const spacerMarker = new IssueMarker('info', [])
+
+function issueMarkers(state: EditorState): RangeSet<GutterMarker> {
+  const byLine = new Map<number, { from: number, severity: GrCodeIssue['severity'], messages: string[] }>()
+  const cursor = state.field(issuesField).iter()
+
+  for (; cursor.value; cursor.next()) {
+    const issue = (cursor.value.spec as { issue: GrCodeIssue }).issue
+    const line = state.doc.lineAt(cursor.from)
+    const entry = byLine.get(line.number) ?? { from: line.from, severity: issue.severity, messages: [] }
+
+    if (SEVERITY_RANK[issue.severity] > SEVERITY_RANK[entry.severity])
+      entry.severity = issue.severity
+
+    entry.messages.push(issue.message)
+    byLine.set(line.number, entry)
+  }
+
+  return RangeSet.of(
+    [...byLine.values()].map(entry => new IssueMarker(entry.severity, entry.messages).range(entry.from)),
+    true,
+  )
+}
+
+/**
+ * Колонка меток. Ставится, когда задан `validate`, и тогда держит ширину и без
+ * замечаний: появись она только с первым замечанием — текст прыгал бы вбок на
+ * каждой смене вердикта.
+ */
+function issueGutter(enabled: boolean): Extension {
+  return enabled
+    ? gutter({ class: 'gr-code-issue-gutter', markers: view => issueMarkers(view.state), initialSpacer: () => spacerMarker })
+    : []
+}
+
+/** Новые замечания — эффектом в живое состояние. */
+export function setIssues(view: unknown, issues: readonly GrCodeIssue[]): void {
+  (view as EditorView).dispatch({ effects: setIssuesEffect.of(issues) })
+}
+
 /** Метка транзакции, рождённой самим редактором. */
 const fromEditor = Annotation.define<boolean>()
 
@@ -195,6 +319,22 @@ const grTheme = EditorView.theme({
     color: 'var(--gr-code-block-line-number, var(--gr-muted-fg))',
     border: 'none',
   },
+  // Волна — вторым признаком к цвету: подчёркивание видно и тому, кто тон не
+  // различает. Цвета — роли текста тонов, как у списка замечаний под полем.
+  '.gr-code-issue': {
+    textDecorationLine: 'underline',
+    textDecorationStyle: 'wavy',
+    textDecorationSkipInk: 'none',
+    textUnderlineOffset: '3px',
+  },
+  '.gr-code-issue-error': { textDecorationColor: 'var(--gr-code-editor-issue-error, var(--gr-invalid-text))' },
+  '.gr-code-issue-warning': { textDecorationColor: 'var(--gr-code-editor-issue-warning, var(--gr-warning-text))' },
+  '.gr-code-issue-info': { textDecorationColor: 'var(--gr-code-editor-issue-info, var(--gr-info-text))' },
+  '.gr-code-issue-gutter .cm-gutterElement': { padding: '0 2px 0 4px' },
+  '.gr-code-issue-marker': { fontSize: '0.75em', lineHeight: 'inherit' },
+  '.gr-code-issue-marker-error': { color: 'var(--gr-code-editor-issue-error, var(--gr-invalid-text))' },
+  '.gr-code-issue-marker-warning': { color: 'var(--gr-code-editor-issue-warning, var(--gr-warning-text))' },
+  '.gr-code-issue-marker-info': { color: 'var(--gr-code-editor-issue-info, var(--gr-info-text))' },
 })
 
 export interface CreateEditorOptions {
@@ -221,6 +361,10 @@ export interface CreateEditorOptions {
    * ставится вовсе.
    */
   tokenizeLine: GrCodeLineTokenizer | null
+  /** Замечания на момент создания; дальше — `setIssues`. */
+  issues: readonly GrCodeIssue[]
+  /** Колонка меток замечаний — когда задан `validate`. */
+  issueGutter: boolean
   onChange: (value: string) => void
   onFocus: (event: FocusEvent) => void
   onBlur: (event: FocusEvent) => void
@@ -256,6 +400,8 @@ export async function createEditor(options: CreateEditorOptions): Promise<Editor
     history(),
     keymapCompartment.of(keymapFor(options.tabIndents)),
     tokenizerCompartment.of(tokenizerExtension(options.tokenizeLine)),
+    issuesField,
+    issueGutterCompartment.of(issueGutter(options.issueGutter)),
     languageCompartment.of(language),
     readonlyCompartment.of(EditorState.readOnly.of(options.readonly)),
     wrapCompartment.of(options.wrap ? EditorView.lineWrapping : []),
@@ -286,10 +432,15 @@ export async function createEditor(options: CreateEditorOptions): Promise<Editor
     ...((options.extensions ?? []) as Extension[]),
   ]
 
-  return new EditorView({
+  const view = new EditorView({
     state: EditorState.create({ doc: options.doc, extensions }),
     parent: options.parent,
   })
+
+  if (options.issues.length > 0)
+    setIssues(view, options.issues)
+
+  return view
 }
 
 export function docOf(view: unknown): string {
@@ -313,6 +464,7 @@ export function reconfigure(
     tabIndents: boolean
     contentAttributes: Record<string, string>
     tokenizeLine: GrCodeLineTokenizer | null
+    issueGutter: boolean
   },
 ): void {
   (view as EditorView).dispatch({
@@ -323,6 +475,7 @@ export function reconfigure(
       attributesCompartment.reconfigure(EditorView.contentAttributes.of(options.contentAttributes)),
       keymapCompartment.reconfigure(keymapFor(options.tabIndents)),
       tokenizerCompartment.reconfigure(tokenizerExtension(options.tokenizeLine)),
+      issueGutterCompartment.reconfigure(issueGutter(options.issueGutter)),
     ],
   })
 }

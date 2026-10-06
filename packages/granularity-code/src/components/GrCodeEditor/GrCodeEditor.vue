@@ -176,6 +176,28 @@ const severityLabel = computed<Record<GrCodeIssue['severity'], string>>(() => ({
   info: t('grCode.editor.severity.info', 'Note'),
 }))
 
+/**
+ * Строка и столбец замечания — по тексту, на который оно пришло.
+ *
+ * В списке без них не понять, к какому подчёркиванию относится строка: «Error:
+ * Unexpected token» на документе в сорок строк ничего не говорит.
+ */
+function positionOf(offset: number): { line: number, column: number } {
+  const before = props.modelValue.slice(0, offset)
+  const lineStart = before.lastIndexOf('\n') + 1
+
+  return { line: before.split('\n').length, column: offset - lineStart + 1 }
+}
+
+const issueItems = computed(() => issues.value.map((issue) => {
+  const { line, column } = positionOf(issue.from)
+
+  return {
+    issue,
+    position: t('grCode.editor.issuePosition', 'Line {line}, column {column}', { line, column }),
+  }
+}))
+
 const describedBy = computed(() => {
   const parts = [control.describedBy.value, issues.value.length > 0 ? issuesId.value : undefined]
 
@@ -284,6 +306,8 @@ async function createView(): Promise<void> {
     wrap: resolvedWrap.value,
     contentAttributes: contentAttributes.value,
     tokenizeLine: tokenizeLine.value,
+    issues: issues.value,
+    issueGutter: Boolean(props.validate),
     onChange: (value) => {
       if (applyingFromProp)
         return
@@ -359,6 +383,7 @@ watch(
     resolvedTabIndents.value,
     contentAttributes.value,
     tokenizeLine.value,
+    Boolean(props.validate),
   ] as const,
   async () => {
     const current = view.value
@@ -375,9 +400,25 @@ watch(
       tabIndents: resolvedTabIndents.value,
       contentAttributes: contentAttributes.value,
       tokenizeLine: tokenizeLine.value,
+      issueGutter: Boolean(props.validate),
     })
   },
 )
+
+/**
+ * Замечания — в живой редактор эффектом: и синхронные, и пришедшие позже
+ * ответом асинхронного `validate`. Подчёркивание и метка обязаны совпадать со
+ * списком под полем, иначе зрячий и незрячий читали бы разные вердикты.
+ */
+watch(issues, async (next) => {
+  const current = view.value
+
+  if (!current)
+    return
+
+  const cm = await import('./codemirror')
+  cm.setIssues(current, next)
+})
 
 // ── Оформление ──────────────────────────────────────────────────────────────
 
@@ -458,8 +499,8 @@ defineExpose({
       остаётся доступной без зрения, а не только цветной волной под текстом.
     -->
     <ul v-if="issues.length > 0" :id="issuesId" :class="editorIssuesClass">
-      <li v-for="(issue, index) in issues" :key="index" :class="editorIssueTone[issue.severity]">
-        {{ severityLabel[issue.severity] }}: {{ issue.message }}
+      <li v-for="(item, index) in issueItems" :key="index" :class="editorIssueTone[item.issue.severity]">
+        {{ item.position }} — {{ severityLabel[item.issue.severity] }}: {{ item.issue.message }}
       </li>
     </ul>
   </div>

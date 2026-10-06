@@ -7,6 +7,7 @@
   "editor": {
     "label": "Code editor",
     "escHint": "Press Escape, then Tab, to leave the editor",
+    "issuePosition": "Line {line}, column {column}",
     "severity": {
       "error": "Error",
       "warning": "Warning",

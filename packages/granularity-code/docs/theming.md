@@ -30,7 +30,8 @@
 `--gr-diff-word-removed`, `--gr-diff-word-added-fg`, `--gr-diff-word-removed-fg`,
 `--gr-diff-gutter`, `--gr-diff-gap-bg`, `--gr-code-editor-selection`,
 `--gr-code-editor-cursor`, `--gr-code-editor-active-line`,
-`--gr-code-editor-placeholder`.
+`--gr-code-editor-placeholder`, `--gr-code-editor-issue-error`,
+`--gr-code-editor-issue-warning`, `--gr-code-editor-issue-info`.
 
 Все — `kind: hook`: значение не присваивается, а подставляется фолбэком
 `var(--gr-x, дефолт)`. Присвой их пакет — фолбэк перестал бы срабатывать.
