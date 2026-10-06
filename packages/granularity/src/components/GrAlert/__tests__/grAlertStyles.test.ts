@@ -16,7 +16,9 @@ describe('grAlertStyles', () => {
 
         for (const [key, value] of Object.entries(colors)) {
           expect(value, `${tone}/${variant}.${key}`).not.toMatch(/#[0-9a-f]{3,8}\b/i)
-          expect(value, `${tone}/${variant}.${key}`).toMatch(/var\(--gr-/)
+          // `transparent` — отсутствие цвета, а не выбор его: фон `outline`.
+          if (value !== 'transparent')
+            expect(value, `${tone}/${variant}.${key}`).toMatch(/var\(--gr-/)
         }
       }
     }
@@ -36,7 +38,9 @@ describe('grAlertStyles', () => {
   it('outline кладёт тон в рамку и иконку, оставляя текст нейтральным', () => {
     const colors = resolveGrAlertColors('danger', 'outline')
 
-    expect(colors.bg).toBe('var(--gr-bg)')
+    // Только рамка: фон страницы внутри карточки читался дырой — тёмной на
+    // тёмной теме, серой плашкой на светлой.
+    expect(colors.bg).toBe('transparent')
     expect(colors.icon).toBe('var(--gr-danger-text)')
     expect(colors.title).toBe('var(--gr-fg)')
     expect(colors.text).toBe('var(--gr-muted-fg)')

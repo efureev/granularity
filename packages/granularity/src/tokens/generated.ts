@@ -1744,7 +1744,7 @@ export const grComponentTokens: GrComponentToken[] = [
     "owner": "GrAlert",
     "name": "--gr-alert-bg",
     "kind": "inline",
-    "default": "подложка тона (`--gr-<tone>-light`)",
+    "default": "подложка тона (`--gr-<tone>-light`); у `outline` — прозрачный",
     "description": "Фон полосы уведомления."
   },
   {

@@ -92,7 +92,10 @@ export function resolveGrAlertColors(tone: GrTone, variant: GrAlertVariant): GrA
 
   if (variant === 'outline') {
     return {
-      bg: 'var(--gr-bg)',
+      // Прозрачный, а не фон страницы: `outline` — только рамка, и сообщение
+      // стоит на той поверхности, где его поставили. `var(--gr-bg)` внутри
+      // карточки читался дырой — тёмной на тёмной теме, серой на светлой.
+      bg: 'transparent',
       border: border(t.accent, 45),
       icon: t.text,
       title: 'var(--gr-fg)',
