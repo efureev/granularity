@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { chartLayout, estimateTextWidth, fitLabel, labelGutters } from '../chartLayout'
+import { chartLayout, estimateTextWidth, fitLabel, labelGutters, placeRowLabels } from '../chartLayout'
 
 const base = {
   width: 600,
@@ -272,5 +272,61 @@ describe('chartLayout: правая ось', () => {
     const dual = chartLayout({ ...base, showYAxisRight: true, yTickLabelsRight: ['40 000'] })
 
     expect(dual.gutters.left).toBe(chartLayout(base).gutters.left)
+  })
+})
+
+describe('placeRowLabels', () => {
+  /** Отрезки, которые подписи занимают на оси, в порядке слева направо. */
+  function boxes(labels: ReturnType<typeof placeRowLabels>): Array<[number, number]> {
+    return labels.map((label) => {
+      const half = estimateTextWidth(label.text, 12) / 2
+
+      return [label.x - half, label.x + half]
+    })
+  }
+
+  function overlapping(spans: Array<[number, number]>): boolean {
+    return spans.some((span, index) => index > 0 && span[0] < spans[index - 1]![1])
+  }
+
+  it('влезающие подписи стоят все и по центру ячеек', () => {
+    const placed = placeRowLabels({ labels: ['M0', 'M1', 'M2'], start: 100, step: 60, bounds: [0, 300], fontSizePx: 12 })
+
+    expect(placed.map(label => label.text)).toEqual(['M0', 'M1', 'M2'])
+    expect(placed.map(label => label.x)).toEqual([130, 190, 250])
+  })
+
+  it('узкие ячейки: подписи не налезают и не выходят за края', () => {
+    const labels = ['Starter', 'Team', 'Business']
+    const placed = placeRowLabels({ labels, start: 110, step: 31, bounds: [4, 205], fontSizePx: 12 })
+    const spans = boxes(placed)
+
+    expect(overlapping(spans)).toBe(false)
+    expect(spans[0]![0]).toBeGreaterThanOrEqual(4)
+    expect(spans.at(-1)![1]).toBeLessThanOrEqual(205)
+    // Прорежено с краёв: первая и последняя колонка подписаны всегда.
+    expect(placed[0]!.index).toBe(0)
+    expect(placed.at(-1)!.index).toBe(2)
+  })
+
+  it('усечение — пока от подписи остаётся хотя бы три знака, и полный текст сохраняется', () => {
+    const labels = ['Январь', 'Февраль', 'Март', 'Апрель']
+    const placed = placeRowLabels({ labels, start: 0, step: 48, bounds: [0, 192], fontSizePx: 12 })
+
+    expect(placed).toHaveLength(4)
+    expect(overlapping(boxes(placed))).toBe(false)
+    expect(placed[1]!.text.endsWith('…')).toBe(true)
+    expect(placed[1]!.full).toBe('Февраль')
+    expect(placed[2]!.full).toBeUndefined()
+  })
+
+  it('длинный ряд прореживается, и подписи не налезают', () => {
+    const labels = Array.from({ length: 60 }, (_, day) => `${day + 1} сен`)
+    const placed = placeRowLabels({ labels, start: 40, step: 9, bounds: [0, 580], fontSizePx: 12 })
+
+    expect(placed.length).toBeLessThan(labels.length)
+    expect(placed[0]!.index).toBe(0)
+    expect(placed.at(-1)!.index).toBe(59)
+    expect(overlapping(boxes(placed))).toBe(false)
   })
 })

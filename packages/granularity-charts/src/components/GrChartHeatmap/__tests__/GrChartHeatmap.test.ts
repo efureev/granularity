@@ -3,6 +3,7 @@ import { mount } from '@vue/test-utils'
 import { describe, expect, it } from 'vitest'
 import { nextTick } from 'vue'
 
+import { estimateTextWidth } from '../../../chart/chartLayout'
 import GrChartHeatmap from '../GrChartHeatmap.vue'
 
 const xLabels = ['M0', 'M1', 'M2', 'M3']
@@ -243,6 +244,50 @@ describe('GrChartHeatmap: подписи строк', () => {
     expect(first!.find('title').text()).toBe(long)
     expect(second!.text()).toBe('Февраль')
     expect(second!.find('title').exists()).toBe(false)
+
+    wrapper.unmount()
+  })
+  it('длинная подпись строки начинается внутри холста', () => {
+    // Колонка подписей считалась по заниженной оценке ширины, и первая буква
+    // «Recurring invoices» срезалась краем `<svg>`.
+    const rows = ['Recurring invoices', 'Payment links', 'Multi-currency', 'API access', 'Audit log']
+    const wrapper = factory({
+      values: rows.map(() => [1, 2, 3]),
+      xLabels: ['Starter', 'Team', 'Business'],
+      yLabels: rows,
+    })
+
+    for (const node of wrapper.findAll('[data-gr-chart-heatmap-row-label]')) {
+      const drawn = node.element.childNodes[0]!.textContent!.trim()
+
+      expect(Number(node.attributes('x')) - estimateTextWidth(drawn, 12)).toBeGreaterThanOrEqual(0)
+    }
+
+    wrapper.unmount()
+  })
+
+  it('подписи колонок не налезают друг на друга в узкой матрице', () => {
+    const width = 213
+    const wrapper = factory({
+      width,
+      values: [[1, 2, 3], [4, 5, 6]],
+      xLabels: ['Starter', 'Team', 'Business'],
+      yLabels: ['Recurring invoices', 'Audit log'],
+    })
+    const spans = wrapper.findAll('[data-gr-chart-heatmap-column-label]').map((node) => {
+      const half = estimateTextWidth(node.element.childNodes[0]!.textContent!.trim(), 12) / 2
+      const x = Number(node.attributes('x'))
+
+      return [x - half, x + half] as const
+    })
+
+    expect(spans.length).toBeGreaterThan(1)
+    spans.forEach((span, index) => {
+      expect(span[0]).toBeGreaterThanOrEqual(0)
+      expect(span[1]).toBeLessThanOrEqual(width)
+      if (index > 0)
+        expect(span[0]).toBeGreaterThanOrEqual(spans[index - 1]![1])
+    })
 
     wrapper.unmount()
   })

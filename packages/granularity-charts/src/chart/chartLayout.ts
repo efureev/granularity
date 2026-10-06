@@ -163,6 +163,92 @@ export function fitLabel(label: string, fontSizePx: number, maxWidth: number): s
   return cut > 0 ? `${label.slice(0, cut).trimEnd()}…` : '…'
 }
 
+export interface PlacedLabel {
+  /** Номер подписи во входном списке. */
+  index: number
+  /** Центр подписи (`text-anchor: middle`). */
+  x: number
+  text: string
+  /** Полный текст, если подпись усечена, — для `<title>`. */
+  full?: string
+}
+
+export interface RowLabelsInput {
+  labels: readonly string[]
+  /** Левый край первой ячейки. */
+  start: number
+  /** Ширина ячейки. */
+  step: number
+  /** Куда подписи могут выходить за ряд ячеек: обычно края области построения. */
+  bounds: readonly [number, number]
+  fontSizePx: number
+}
+
+const ROW_LABEL_GAP = 4
+/** Короче этого усечённая подпись не читается — ряд прореживается. */
+const MIN_VISIBLE_CHARS = 3
+
+/**
+ * Подписи под рядом ячеек равной ширины — без наложения.
+ *
+ * Влезает каждая — стоят все, по центру своих ячеек. Не влезают — сначала
+ * усечение многоточием, пока от подписи остаётся хотя бы три знака; дальше ряд
+ * прореживается через `k`, с первой и последней подписью. Каждой оставшейся
+ * достаётся отрезок до середины пути к соседям, и подпись усекается до него:
+ * наложиться им не на чем по построению. У крайних отрезок доходит до `bounds`,
+ * а подпись сдвигается внутрь, если по центру не помещается.
+ */
+export function placeRowLabels(input: RowLabelsInput): PlacedLabel[] {
+  const { labels, start, step, bounds, fontSizePx } = input
+  const count = labels.length
+
+  if (count === 0 || step <= 0)
+    return []
+
+  const widest = Math.max(...labels.map(label => estimateTextWidth(label, fontSizePx)))
+  const room = step - ROW_LABEL_GAP
+  let every = 1
+
+  if (widest > room) {
+    const readable = labels.every((label) => {
+      const fitted = fitLabel(label, fontSizePx, room)
+
+      return fitted === label || fitted.length - 1 >= Math.min(MIN_VISIBLE_CHARS, label.length)
+    })
+
+    if (!readable)
+      every = Math.max(1, Math.min(count - 1, Math.ceil((widest + ROW_LABEL_GAP) / step)))
+  }
+
+  const shown: number[] = []
+
+  for (let index = 0; index < count; index += every)
+    shown.push(index)
+
+  const last = count - 1
+
+  if (shown.at(-1) !== last) {
+    if (shown.length > 1 && last - shown.at(-1)! < every)
+      shown.pop()
+    shown.push(last)
+  }
+
+  const center = (index: number): number => start + step * (index + 0.5)
+
+  return shown.map((index, position) => {
+    const previous = shown[position - 1]
+    const next = shown[position + 1]
+    const left = previous === undefined ? bounds[0] : (center(previous) + center(index)) / 2 + ROW_LABEL_GAP / 2
+    const right = next === undefined ? bounds[1] : (center(index) + center(next)) / 2 - ROW_LABEL_GAP / 2
+    const label = labels[index]!
+    const text = fitLabel(label, fontSizePx, right - left)
+    const half = estimateTextWidth(text, fontSizePx) / 2
+    const x = Math.min(Math.max(center(index), left + half), right - half)
+
+    return { index, x, text, full: text === label ? undefined : label }
+  })
+}
+
 /**
  * Место под собственные подписи компонента — для тех, кто идёт с `axes: false`.
  *

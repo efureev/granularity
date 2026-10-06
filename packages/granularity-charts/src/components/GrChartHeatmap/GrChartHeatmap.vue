@@ -5,7 +5,7 @@ import { computed, ref } from 'vue'
 
 import type { GrChartNumberFormat } from '../../chart/chartFormat'
 import { formatValue } from '../../chart/chartFormat'
-import { fitLabel, type LabelGutters, labelGutters, type Rect } from '../../chart/chartLayout'
+import { fitLabel, type LabelGutters, labelGutters, placeRowLabels, type Rect } from '../../chart/chartLayout'
 import type { HeatmapCell, HeatmapGrid, HeatmapScaleKind } from '../../chart/chartHeatmap'
 import { heatmapCell, heatmapCells, heatmapColor, heatmapMatrix, heatmapOnDark, heatmapScale } from '../../chart/chartHeatmap'
 import { normalizeChartData } from '../../chart/chartModel'
@@ -327,15 +327,27 @@ function rowLabels(plot: Rect): AxisLabel[] {
   })
 }
 
+/**
+ * Подписи колонок не налезают друг на друга: узкая ячейка получает усечённую
+ * подпись, а слишком узкая — место в прореженном ряду (`placeRowLabels`).
+ * Полное имя колонки остаётся в тултипе и скрытой таблице.
+ */
 function columnLabels(plot: Rect): AxisLabel[] {
   const grid = gridOf(plot)
   const step = columns.value > 0 ? grid.width / columns.value : 0
 
-  return props.xLabels.map((text, x) => ({
-    key: `column-${x}`,
-    x: grid.x + step * x + step / 2,
+  return placeRowLabels({
+    labels: props.xLabels,
+    start: grid.x,
+    step,
+    bounds: [plot.x, plot.x + plot.width],
+    fontSizePx: fontSizePx.value,
+  }).map(label => ({
+    key: `column-${label.index}`,
+    x: label.x,
     y: grid.y + grid.height + fontSizePx.value,
-    text,
+    text: label.text,
+    full: label.full,
     anchor: 'middle' as const,
   }))
 }
@@ -601,6 +613,9 @@ defineExpose({
           :text-anchor="label.anchor"
         >
 {{ label.text }}
+          <title v-if="label.full">
+{{ label.full }}
+</title>
 </text>
       </g>
     </template>
