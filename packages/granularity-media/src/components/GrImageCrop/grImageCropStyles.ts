@@ -1,5 +1,3 @@
-import { splitClassTokens } from '../../internal/classTokens'
-
 export type GrImageCropSize = 'xs' | 'sm' | 'md' | 'lg'
 export type GrImageCropShape = 'rect' | 'circle'
 
@@ -52,15 +50,9 @@ export const sizeEmptyClass = {
   lg: 'min-h-56',
 } as const satisfies Record<GrImageCropSize, string>
 
-export const grImageCropSafelist = [
-  ...splitClassTokens(rootClass),
-  ...splitClassTokens(viewportClass),
-  ...splitClassTokens(imageClass),
-  ...splitClassTokens(imageTransitionClass),
-  ...splitClassTokens(circleMaskClass),
-  ...splitClassTokens(rectGuideClass),
-  ...splitClassTokens(controlsClass),
-  ...splitClassTokens(emptyClass),
-  ...Object.values(sizeTextClass).flatMap(splitClassTokens),
-  ...Object.values(sizeEmptyClass).flatMap(splitClassTokens),
-]
+/**
+ * Safelist пуст: всё, что рисует кадрирование, лежит целыми литералами здесь
+ * и в шаблоне, и granum извлекает это сам — модуль уезжает в общий
+ * `dist/chunks/`, но сборка доходит до него по графу бандла компонента.
+ */
+export const grImageCropSafelist: string[] = []

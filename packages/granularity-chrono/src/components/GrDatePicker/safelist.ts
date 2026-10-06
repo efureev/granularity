@@ -1,13 +1,7 @@
-import { splitClassTokens } from '../../internal/classTokens'
-import { pickerFieldClassTokens } from '../../internal/pickerFieldStyles'
-import { presetRowClassTokens } from '../../internal/presetRowStyles'
-
-/**
- * Классы поля приходят из общего модуля, а он уезжает в `dist/chunks/` —
- * пресет сканирует только `dist/components/<Name>/**`. Своих классов у пикера
- * нет: панель рисует `GrCalendar`, её safelist объявлен там.
- */
-export const grDatePickerSafelist: string[] = [
-  ...pickerFieldClassTokens,
-  ...presetRowClassTokens,
-].flatMap(splitClassTokens)
+// Поле пикера — классы общего `internal/pickerFieldStyles.ts`, ряд готовых
+// периодов — `internal/presetRowStyles.ts`. Всё это целые литералы, и granum
+// извлекает их сам из чанков компонента, общие включительно: до `internal/` он
+// доходит по графу бандла. Перечислять их здесь заставлял UnoCSS-пресет,
+// который общий чанк не сканировал. Панель рисует `GrCalendar`: его классы
+// приходят с зависимостью.
+export const grDatePickerSafelist: string[] = []

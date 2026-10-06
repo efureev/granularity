@@ -7,12 +7,12 @@ import type { GrUiBreakpoint, GrUiColumnCount, GrUiColumns, GrUiSpan } from '../
  * между полями каждый строит своей вёрсткой. Здесь она нужна затем же, зачем
  * весь пакет, — чтобы её не строили руками на каждой форме.
  *
- * Набор классов конечен и перечислен целиком: произвольные числа колонок
- * потребовали бы сотню токенов в safelist ради раскладок, которых никто не
- * строит. Отсюда и кап `GrUiColumnCount` на шести значениях.
+ * Набор классов конечен и перечислен целиком, литералом на значение: такие
+ * классы granum извлекает сам. Произвольное число колонок пришлось бы
+ * собирать в рантайме, а собранный класс экстрактор не видит — его объявляли
+ * бы в safelist по всем значениям, под сотню записей ради раскладок, которых
+ * никто не строит. Отсюда и кап `GrUiColumnCount` на шести значениях.
  */
-const COLUMN_COUNTS: readonly GrUiColumnCount[] = [1, 2, 3, 4, 6, 12]
-
 export const gridColumnsClass: Record<GrUiBreakpoint, Record<GrUiColumnCount, string>> = {
   base: { 1: 'grid-cols-1', 2: 'grid-cols-2', 3: 'grid-cols-3', 4: 'grid-cols-4', 6: 'grid-cols-6', 12: 'grid-cols-12' },
   sm: { 1: 'sm:grid-cols-1', 2: 'sm:grid-cols-2', 3: 'sm:grid-cols-3', 4: 'sm:grid-cols-4', 6: 'sm:grid-cols-6', 12: 'sm:grid-cols-12' },
@@ -77,20 +77,3 @@ export const schemaAdditionalHeaderClass = 'mb-2 flex items-center justify-betwe
 export const schemaAdditionalRowClass = 'flex items-start gap-[var(--gr-schema-form-gap-x,1rem)]'
 export const schemaAdditionalKeyClass = 'w-1/3 min-w-0'
 export const schemaAdditionalValueClass = 'flex-1 min-w-0'
-
-export const ALL_GRID_CLASSES: readonly string[] = [
-  schemaGridClass,
-  schemaRowClass,
-  schemaRowActionsClass,
-  schemaArrayEmptyClass,
-  schemaArrayListClass,
-  schemaSectionsClass,
-  schemaFormErrorsClass,
-  schemaRowLabelClass,
-  schemaAdditionalHeaderClass,
-  schemaAdditionalRowClass,
-  schemaAdditionalKeyClass,
-  schemaAdditionalValueClass,
-  ...Object.values(gridColumnsClass).flatMap(map => COLUMN_COUNTS.map(count => map[count])),
-  ...Object.values(gridSpanClass).flatMap(map => [...COLUMN_COUNTS.map(count => map[count]), map.full]),
-]

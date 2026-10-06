@@ -1,5 +1,3 @@
-import { splitClassTokens } from '../../internal/classTokens'
-
 export type GrRichTextSize = 'xs' | 'sm' | 'md' | 'lg'
 
 /**
@@ -108,24 +106,9 @@ export const fieldFooterClass = 'border-t border-[var(--gr-brd)] px-3 py-2'
 export const iconClass = 'h-[1.15em] w-[1.15em]'
 
 /**
- * Классы из `.ts`-хелпера обязаны быть в safelist: бандлер выносит модуль в
- * общий `dist/chunks/`, а классы извлекаются только из файлов компонента.
- * Симптом пропуска — поле без рамки и фокус-кольца у того, кто импортировал
- * один компонент.
+ * Safelist пуст: все классы поля лежат здесь целыми литералами, и granum
+ * извлекает их сам — модуль уезжает в общий `dist/chunks/`, но сборка доходит
+ * до него по графу бандла компонента. При UnoCSS-пресете, который общий чанк
+ * не сканировал, без списка поле приезжало без рамки и фокус-кольца.
  */
-export const grRichTextSafelist: string[] = [
-  ...Object.values(sizeClasses).flatMap(splitClassTokens),
-  ...splitClassTokens(rootClass),
-  ...splitClassTokens(rootFocusClass),
-  ...splitClassTokens(rootInvalidClass),
-  ...splitClassTokens(rootDisabledClass),
-  ...splitClassTokens(toolbarClass),
-  ...splitClassTokens(toolbarSeparatorClass),
-  ...splitClassTokens(toolbarGroupClass),
-  ...splitClassTokens(bubbleClass),
-  ...splitClassTokens(bubblePanelClass),
-  ...splitClassTokens(contentClass),
-  ...splitClassTokens(fieldHeaderClass),
-  ...splitClassTokens(fieldFooterClass),
-  ...splitClassTokens(iconClass),
-]
+export const grRichTextSafelist: string[] = []

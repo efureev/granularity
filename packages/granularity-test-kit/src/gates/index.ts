@@ -14,6 +14,14 @@ export { defineGateCoverage, type GateCoverageOptions, REQUIRED_GATES } from './
 export { defineLocaleCompletenessGate, type LocaleCompletenessGateOptions } from './localeCompleteness'
 export { defineRegistryGate, type RegistryGateOptions } from './registry'
 export {
+  componentCodeFiles,
+  defineSafelistGate,
+  parseRelativeImports,
+  redundantSafelistEntries,
+  type SafelistComponentConfig,
+  type SafelistGateOptions,
+} from './safelist'
+export {
   defineStyleTokensGate,
   IMPORTANT_UTILITY,
   MS_LITERAL,

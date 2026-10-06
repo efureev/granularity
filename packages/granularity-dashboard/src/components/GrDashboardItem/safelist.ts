@@ -1,40 +1,7 @@
-import { splitClassTokens } from '../../internal/classTokens'
-import { dashboardFrameSafelist } from '../GrDashboardFrame/frameSafelist'
-import {
-  actionsClass,
-  bodyClass,
-  bodySizes,
-  cardBodyClass,
-  cardClass,
-  draggingClass,
-  headerClass,
-  headerSizes,
-  overflowClass,
-  overlayHeaderClass,
-  overlayHeaderHiddenClass,
-  overlayHeaderVisibleClass,
-  overlaySpacerClass,
-  paddingSizes,
-  rootClass,
-  titleClass,
-} from './grDashboardItemStyles'
-
-export const grDashboardItemSafelist = [...new Set([
-  ...dashboardFrameSafelist,
-  ...Object.values(headerSizes).flatMap(splitClassTokens),
-  ...Object.values(bodySizes).flatMap(splitClassTokens),
-  ...Object.values(paddingSizes).flatMap(splitClassTokens),
-  ...Object.values(overflowClass).flatMap(splitClassTokens),
-  ...splitClassTokens(rootClass),
-  ...splitClassTokens(draggingClass),
-  ...splitClassTokens(headerClass),
-  ...splitClassTokens(titleClass),
-  ...splitClassTokens(bodyClass),
-  ...splitClassTokens(cardClass),
-  ...splitClassTokens(cardBodyClass),
-  ...splitClassTokens(actionsClass),
-  ...splitClassTokens(overlayHeaderClass),
-  ...splitClassTokens(overlayHeaderHiddenClass),
-  ...splitClassTokens(overlayHeaderVisibleClass),
-  ...splitClassTokens(overlaySpacerClass),
-])]
+// Всё, что рисует виджет, лежит в коде целыми литералами — в шаблоне, в
+// `grDashboardItemStyles.ts` и в частях рамы: ручках и кнопке настроек из
+// `GrDashboardFrame/shared/` с классами `frameStyles.ts`. granum извлекает их
+// сам из чанков компонента, общие включительно: до рамы он доходит по графу
+// бандла. Список рамы `dashboardFrameSafelist` был нужен UnoCSS-пресету,
+// который общий чанк не сканировал.
+export const grDashboardItemSafelist: string[] = []

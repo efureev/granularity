@@ -7,6 +7,14 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+
+- Гейт `src/__tests__/safelist.test.ts` переехал в test-kit
+  (`defineSafelistGate`) и стал общим для ядра и спутников. Код компонента он
+  теперь обходит по всем относительным импортам, как сборка, а не только по
+  `components/shared/`. Ядро новый обход проходит без правок; артефакт пакета
+  не изменился.
+
 ### Fixed
 
 - **`GrButtonGroup` снова прямой внутри.** Прикреплённая группа срезала

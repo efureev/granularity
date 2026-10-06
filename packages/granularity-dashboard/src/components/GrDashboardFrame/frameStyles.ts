@@ -2,9 +2,8 @@
  * Класс-константы общей рамы.
  *
  * Живут в `.ts`, поэтому на сборке уезжают в общий `dist/chunks/`. granum
- * доходит до этого чанка по графу бандла каждого компонента-потребителя, так
- * что классы рамы извлекаются статически и подмешивать их в safelist больше не
- * нужно — `frameSafelist` остался как страховка на время чистки safelist-ов.
+ * доходит до этого чанка по графу бандла каждого компонента-потребителя и
+ * извлекает классы рамы сам — в safelist их нет.
  */
 
 export const gridClass = 'relative grid w-full'
@@ -113,5 +112,3 @@ export const animatedClass = 'transition-all duration-[var(--gr-duration-base)] 
 export const emptyWrapClass = 'col-span-full'
 
 export const emptyTextClass = 'text-[var(--gr-muted-fg)]'
-
-export const srOnlyClass = 'sr-only'

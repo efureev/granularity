@@ -5,6 +5,24 @@ All notable changes to `@feugene/granularity-test-kit` are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- **`defineSafelistGate`** — гейт safelist-контракта, общий для ядра и
+  спутников. Safelist компонента — только классы, собранные в рантайме из
+  частей; запись, которая лежит в коде компонента целым литералом, гейт
+  называет лишней: granum извлечёт её и так. Код компонента обходится так же,
+  как его обходит сборка: от файлов компонента по относительным импортам —
+  сквозь `shared/`, `internal/` и общие директории группы, — но не в
+  директорию другого компонента. Наружу выставлены и части гейта:
+  `componentCodeFiles`, `parseRelativeImports`, `redundantSafelistEntries`.
+
+### Changed
+
+- `defineSafelistGate` входит в `REQUIRED_GATES`: пакет, который его не
+  подключил, краснеет на `defineGateCoverage`.
+
 ## [v1.0.0] 2026-09-28
 
 Переезд на `@feugene/granum` 1.0 и первый мажор пакета.

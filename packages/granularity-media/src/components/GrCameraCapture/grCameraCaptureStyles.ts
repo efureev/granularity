@@ -1,5 +1,3 @@
-import { splitClassTokens } from '../../internal/classTokens'
-
 export type GrCameraCaptureSize = 'xs' | 'sm' | 'md' | 'lg'
 export type GrCameraFacing = 'user' | 'environment'
 
@@ -33,13 +31,9 @@ export const sizeTextClass = {
   lg: 'text-[length:var(--gr-control-text-lg)] leading-[var(--gr-control-leading-lg)]',
 } as const satisfies Record<GrCameraCaptureSize, string>
 
-export const grCameraCaptureSafelist = [
-  ...splitClassTokens(rootClass),
-  ...splitClassTokens(frameClass),
-  ...splitClassTokens(videoClass),
-  ...splitClassTokens(mirroredClass),
-  ...splitClassTokens(stateLayerClass),
-  ...splitClassTokens(stateTextClass),
-  ...splitClassTokens(controlsClass),
-  ...Object.values(sizeTextClass).flatMap(splitClassTokens),
-]
+/**
+ * Safelist пуст: всё, что рисует камера, лежит целыми литералами здесь и в
+ * шаблоне, и granum извлекает это сам — модуль уезжает в общий `dist/chunks/`,
+ * но сборка доходит до него по графу бандла компонента.
+ */
+export const grCameraCaptureSafelist: string[] = []

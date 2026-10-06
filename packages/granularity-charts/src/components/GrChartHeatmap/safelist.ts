@@ -1,15 +1,8 @@
-import { chartFrameSafelist } from '../GrChartFrame/frameSafelist'
-import { splitClassTokens } from '../../internal/classTokens'
-import { heatmapLegendClass, heatmapLegendLabelClass, heatmapLegendSwatchClass } from './grChartHeatmapLegend'
-
-/**
- * Классы рамы плюс свои: легенда теплокарты — единственная её часть на HTML, а
- * не на SVG, и её классы живут в `.ts`-хелпере, который бандлер уносит в
- * `dist/chunks/`. Пресет туда не заглядывает.
- */
-export const grChartHeatmapSafelist: string[] = [...new Set([
-  ...chartFrameSafelist,
-  ...splitClassTokens(heatmapLegendClass),
-  ...splitClassTokens(heatmapLegendSwatchClass),
-  ...splitClassTokens(heatmapLegendLabelClass),
-])]
+// Всё, что рисует теплокарта, лежит в коде целыми литералами: шаблон
+// компонента, легенда в `grChartHeatmapLegend.ts` и рама — шаблоны
+// `GrChartFrame/shared/` и `chartFrameStyles.ts`. Сами серии красятся
+// атрибутами SVG и классов не порождают. granum извлекает литералы из чанков
+// компонента сам, общие включительно: до рамы он доходит по графу бандла.
+// Список рамы `chartFrameSafelist` был нужен UnoCSS-пресету, который общий чанк
+// не сканировал, — без него цвета приезжали прозрачными.
+export const grChartHeatmapSafelist: string[] = []

@@ -1,34 +1,8 @@
-import { splitClassTokens } from '../../internal/classTokens'
-import { pickerFieldClassTokens } from '../../internal/pickerFieldStyles'
-import { presetRowClassTokens } from '../../internal/presetRowStyles'
-
-import {
-  timeColumnClass,
-  timeColumnLabelClass,
-  timeOptionClass,
-  timeOptionSizes,
-  timePanelClass,
-} from './grTimePickerStyles'
-
-/**
- * Классы из `.ts`-хелперов обязаны быть в safelist: и общий модуль поля, и
- * стили панели уезжают в `dist/chunks/`, а пресет сканирует только
- * `dist/components/<Name>/**`. Симптом пропуска узнаваемый: размеры работают,
- * цвета прозрачные, фокус-кольца нет.
- */
-const optionVariants = (['xs', 'sm', 'md', 'lg'] as const).flatMap(size => [
-  timeOptionClass({ size, selected: false, active: false, disabled: false }),
-  timeOptionClass({ size, selected: true, active: false, disabled: false }),
-  timeOptionClass({ size, selected: false, active: true, disabled: false }),
-  timeOptionClass({ size, selected: false, active: false, disabled: true }),
-])
-
-export const grTimePickerSafelist: string[] = [
-  ...pickerFieldClassTokens.flatMap(splitClassTokens),
-  ...presetRowClassTokens.flatMap(splitClassTokens),
-  ...splitClassTokens(timePanelClass),
-  ...splitClassTokens(timeColumnClass),
-  ...splitClassTokens(timeColumnLabelClass),
-  ...Object.values(timeOptionSizes).flatMap(splitClassTokens),
-  ...optionVariants.flatMap(splitClassTokens),
-]
+// Поле пикера — классы общего `internal/pickerFieldStyles.ts`, ряд готовых
+// периодов — `internal/presetRowStyles.ts`, панель и колонки —
+// `grTimePickerStyles.ts`, где `timeOptionClass` склеивает готовые строки, а не
+// части классов. Всё это целые литералы, и granum извлекает их сам из чанков
+// компонента, общие включительно: до `internal/` он доходит по графу бандла.
+// Перечислять их здесь заставлял UnoCSS-пресет, который общий чанк не
+// сканировал.
+export const grTimePickerSafelist: string[] = []

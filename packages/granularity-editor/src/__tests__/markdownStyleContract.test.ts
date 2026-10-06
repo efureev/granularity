@@ -3,8 +3,6 @@ import { resolve } from 'node:path'
 import process from 'node:process'
 import { describe, expect, it } from 'vitest'
 
-import { grMarkdownSafelist } from '../components/GrMarkdown/grMarkdownStyles'
-
 /**
  * Гейт на механизм, а не на вид.
  *
@@ -36,11 +34,11 @@ describe('контракт стилей GrMarkdown', () => {
     expect(print).toContain('content-visibility: visible')
   })
 
-  it('каждый класс gr-md-*, который рождает рендерер, имеет правило или лежит в safelist', () => {
+  it('каждый класс gr-md-*, который рождает рендерер, имеет правило', () => {
     const produced = new Set([...sources.matchAll(/'(gr-md-[\w-]+)'/g)].map(m => m[1]!))
     const declared = new Set([...styles.matchAll(/\.(gr-md-[\w-]+)/g)].map(m => m[1]!))
 
-    const dead = [...produced].filter(name => !declared.has(name) && !grMarkdownSafelist.includes(name))
+    const dead = [...produced].filter(name => !declared.has(name))
     expect(dead, 'класс без правила мёртв: разметка валидна, тесты зелены, на экране ничего').toEqual([])
   })
 

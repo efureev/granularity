@@ -10,10 +10,8 @@ export type GrPickerSize = GrComponentSize
  * класс-строк дешевле, чем сцепка оболочки пикера с поверхностью пропов чужого
  * поля. Расплата известна — копия может отстать от оригинала.
  *
- * Модуль общий, поэтому уезжает в `dist/chunks/`, куда скан `content.filesystem`
- * не заглядывает: пресет сканирует только `dist/components/<Name>/**`. Каждый
- * пикер обязан перечислить эти классы в своём `safelist.ts` — для того тут и
- * экспортируется `pickerFieldSafelist`.
+ * Модуль общий и уезжает в `dist/chunks/`. granum доходит до него по графу
+ * бандла каждого пикера и извлекает классы сам — в safelist пикеров их нет.
  *
  * Литералов кеглей, радиусов и длительностей здесь нет, как и утилит uno-шкалы
  * (`text-sm`, `rounded-md`): темой они не настраиваются, а выглядят правильно.
@@ -75,20 +73,3 @@ export const clearButtonClass
 export const iconClass = 'h-4 w-4'
 
 export const spinnerClass = 'h-4 w-4 animate-spin text-[var(--gr-muted-fg)]'
-
-/**
- * Классы поля для safelist пикера. Ссылки на сами константы, а не их копии
- * строками: копия расходится с оригиналом молча.
- */
-export const pickerFieldClassTokens: string[] = [
-  fieldBaseClass,
-  fieldEnabledClass,
-  fieldDisabledClass,
-  fieldInvalidClass,
-  ...Object.values(fieldSizes),
-  trailingZoneClass,
-  indicatorClass,
-  clearButtonClass,
-  iconClass,
-  spinnerClass,
-]

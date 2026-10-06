@@ -64,7 +64,7 @@ export interface GrSchemaRenderer {
   codec?: GrSchemaValueCodec
   /** Больше — раньше. Дефолтные записи занимают 0…90. */
   priority?: number
-  /** Что запись рисует — для safelist пакета и доки. */
+  /** Что запись рисует — для зависимостей селекции и доки. */
   components?: string[]
 }
 

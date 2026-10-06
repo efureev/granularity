@@ -1,33 +1,7 @@
-import { splitClassTokens } from '../../internal/classTokens'
-
-import {
-  codeBlockCopyClass,
-  codeBlockGutterClass,
-  codeBlockNowrapClass,
-  codeBlockPaddings,
-  codeBlockRootClass,
-  codeBlockScrollClass,
-  codeBlockSurfaceClass,
-  codeBlockTextSizes,
-  codeBlockWrapClass,
-  codeTokenClass,
-} from '../shared/grCodeBlockStyles'
-
-// Классы из вычисляемых мап (роль токена, размер) UnoCSS сканом не находит —
-// только safelist. Литералы хелпера туда же: на сборке он уезжает в общий чанк.
-//
-// `codeBlockHookClass` и `codeBlockNumberedClass` сюда НЕ идут: это селекторы
-// собственного `<style>` компонента, CSS из них не порождается, и гейт
-// `documentedConfig` справедливо считал бы такую запись мёртвой.
-export const grCodeBlockSafelist = [...new Set([
-  ...splitClassTokens(codeBlockRootClass),
-  ...splitClassTokens(codeBlockSurfaceClass),
-  ...splitClassTokens(codeBlockScrollClass),
-  ...splitClassTokens(codeBlockWrapClass),
-  ...splitClassTokens(codeBlockNowrapClass),
-  ...splitClassTokens(codeBlockCopyClass),
-  ...splitClassTokens(codeBlockGutterClass),
-  ...Object.values(codeBlockPaddings).flatMap(splitClassTokens),
-  ...Object.values(codeBlockTextSizes).flatMap(splitClassTokens),
-  ...Object.values(codeTokenClass).flatMap(splitClassTokens),
-])]
+// Всё, что рисует блок, лежит в коде целыми литералами — в шаблоне, в
+// `shared/grCodeBlockStyles.ts` и в общей поверхности
+// `internal/codeSurface.ts`; роли подсветки — мапа `codeTokenClass`, по
+// литералу на роль. granum извлекает их сам из чанков компонента, общие
+// включительно. Зацепки собственного CSS (`codeBlockHookClass`,
+// `codeBlockNumberedClass`) не утилиты, и safelist им не нужен.
+export const grCodeBlockSafelist: string[] = []

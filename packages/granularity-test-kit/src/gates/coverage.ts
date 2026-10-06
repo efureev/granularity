@@ -17,6 +17,7 @@ export const REQUIRED_GATES = [
   'defineLocaleCompletenessGate',
   'defineEnvGuardGate',
   'defineDynamicTokensGate',
+  'defineSafelistGate',
 ] as const
 
 export interface GateCoverageOptions {

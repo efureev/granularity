@@ -1,5 +1,3 @@
-import { splitClassTokens } from '../../internal/classTokens'
-
 export type GrVideoPlayerSize = 'xs' | 'sm' | 'md' | 'lg'
 
 export const rootClass = 'relative w-full overflow-hidden rounded-[var(--gr-radius-md)] border border-[var(--gr-brd)] bg-black focus-within:ring-2 focus-within:ring-[var(--gr-ring)]'
@@ -39,16 +37,9 @@ export const sizeTextClass = {
   lg: 'text-[length:var(--gr-control-text-lg)] leading-[var(--gr-control-leading-lg)]',
 } as const satisfies Record<GrVideoPlayerSize, string>
 
-export const grVideoPlayerSafelist = [
-  ...splitClassTokens(rootClass),
-  ...splitClassTokens(videoClass),
-  ...splitClassTokens(controlsClass),
-  ...splitClassTokens(rowClass),
-  ...splitClassTokens(buttonClass),
-  ...splitClassTokens(timeClass),
-  ...splitClassTokens(trackClass),
-  ...splitClassTokens(bufferedClass),
-  ...splitClassTokens(playedClass),
-  ...splitClassTokens(stateLayerClass),
-  ...Object.values(sizeTextClass).flatMap(splitClassTokens),
-]
+/**
+ * Safelist пуст: всё, что рисует плеер, лежит целыми литералами здесь и в
+ * шаблоне, и granum извлекает это сам — модуль уезжает в общий `dist/chunks/`,
+ * но сборка доходит до него по графу бандла компонента.
+ */
+export const grVideoPlayerSafelist: string[] = []

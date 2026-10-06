@@ -1,10 +1,5 @@
-import { splitClassTokens } from '../../internal/classTokens'
-import { dashboardFrameSafelist } from '../GrDashboardFrame/frameSafelist'
-import { groupClass, spacerClass, toolbarClass } from './grDashboardToolbarStyles'
-
-export const grDashboardToolbarSafelist = [...new Set([
-  ...dashboardFrameSafelist,
-  ...splitClassTokens(toolbarClass),
-  ...splitClassTokens(groupClass),
-  ...splitClassTokens(spacerClass),
-])]
+// Три класса тулбара лежат литералами в `grDashboardToolbarStyles.ts`, и granum
+// извлекает их сам. Кнопки — `GrButton` ядра, их классы приходят с
+// зависимостью. Раму тулбар не рендерит: её список, подмешанный сюда при
+// UnoCSS-пресете, приносил классы, которыми он не пользуется.
+export const grDashboardToolbarSafelist: string[] = []

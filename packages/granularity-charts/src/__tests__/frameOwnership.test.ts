@@ -2,9 +2,9 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import process from 'node:process'
 
+import { componentCodeFiles } from '@feugene/granularity-test-kit/gates'
 import { describe, expect, it } from 'vitest'
 
-import { chartFrameSafelist } from '../components/GrChartFrame/frameSafelist'
 import { GRANULARITY_CHARTS_COMPONENTS } from '../componentNames'
 import { granularityChartsComponentConfigs } from '../granular-provider/shared'
 
@@ -31,9 +31,9 @@ const frameDir = resolve(process.cwd(), 'src/components/GrChartFrame')
  * Потребители рамы находятся по факту, а не списком.
  *
  * Раньше здесь был захардкожен `GrChartLine`, и проверка стерегла ровно один
- * компонент из пяти: любой следующий мог уехать без `chartFrameSafelist`, и не
- * заметил бы никто — сборка зелёная, тесты зелёные, `doctor` зелёный, а цвета
- * у потребителя прозрачные.
+ * компонент из пяти: любой следующий мог уехать без рамы, и не заметил бы
+ * никто — сборка зелёная, тесты зелёные, `doctor` зелёный, а цвета у
+ * потребителя прозрачные.
  */
 const frameConsumers = Object.entries(granularityChartsComponentConfigs)
   .filter(([name]) => existsSync(resolve(process.cwd(), `src/components/${name}/config.ts`)))
@@ -70,18 +70,19 @@ describe('GrChartFrame — рама, а не компонент', () => {
     expect(frameConsumers.length).toBeGreaterThan(1)
   })
 
-  it.each(frameConsumers)('safelist рамы подмешан в %s', (name) => {
+  it.each(frameConsumers)('классы рамы доходят до %s по графу бандла', (name) => {
     // Классы рамы живут в общем `.ts`-хелпере, который бандлер уносит в
-    // `dist/chunks/`. Пресет сканирует только `dist/components/<Name>/`, и без
-    // этой строки график приезжает к потребителю без цветов — при зелёной
-    // сборке и зелёных тестах.
-    const safelist = readFileSync(resolve(process.cwd(), `src/components/${name}/safelist.ts`), 'utf8')
+    // `dist/chunks/`. granum извлекает их, обходя от входа компонента все его
+    // чанки, — тот же обход здесь по исходникам. При UnoCSS-пресете общий чанк
+    // не сканировался, и рама держалась на `chartFrameSafelist`: без него
+    // график приезжал без цветов при зелёной сборке.
+    const files = componentCodeFiles(
+      resolve(process.cwd(), 'src/components'),
+      name,
+      Object.keys(granularityChartsComponentConfigs),
+    )
 
-    expect(safelist, `${name} не подмешивает chartFrameSafelist`).toContain('chartFrameSafelist')
-  })
-
-  it('safelist рамы не пуст — иначе проверка выше зелена всегда', () => {
-    expect(chartFrameSafelist.length).toBeGreaterThan(10)
+    expect(files, `${name} не дотягивается до классов рамы`).toContain(resolve(frameDir, 'chartFrameStyles.ts'))
   })
 
   it('шаблоны рамы лежат в `shared/` — раме принадлежит разметка, а не корень', () => {

@@ -1,5 +1,3 @@
-import { splitClassTokens } from '../../internal/classTokens'
-
 export type GrCodeScannerSize = 'xs' | 'sm' | 'md' | 'lg'
 
 export const rootClass = 'grid gap-2'
@@ -27,13 +25,9 @@ export const sizeTextClass = {
   lg: 'text-[length:var(--gr-control-text-lg)] leading-[var(--gr-control-leading-lg)]',
 } as const satisfies Record<GrCodeScannerSize, string>
 
-export const grCodeScannerSafelist = [
-  ...splitClassTokens(rootClass),
-  ...splitClassTokens(frameClass),
-  ...splitClassTokens(videoClass),
-  ...splitClassTokens(reticleClass),
-  ...splitClassTokens(stateLayerClass),
-  ...splitClassTokens(stateTextClass),
-  ...splitClassTokens(controlsClass),
-  ...Object.values(sizeTextClass).flatMap(splitClassTokens),
-]
+/**
+ * Safelist пуст: всё, что рисует сканер, лежит целыми литералами здесь и в
+ * шаблоне, и granum извлекает это сам — модуль уезжает в общий `dist/chunks/`,
+ * но сборка доходит до него по графу бандла компонента.
+ */
+export const grCodeScannerSafelist: string[] = []

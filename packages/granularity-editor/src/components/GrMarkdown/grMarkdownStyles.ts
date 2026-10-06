@@ -1,5 +1,3 @@
-import { splitClassTokens } from '../../internal/classTokens'
-
 export type GrMarkdownSize = 'xs' | 'sm' | 'md' | 'lg'
 export type GrMarkdownDensity = 'comfortable' | 'compact'
 
@@ -20,15 +18,13 @@ export const sizeClasses = {
 export const rootClass = 'text-[var(--gr-fg)]'
 
 /**
- * Список остался с тех времён, когда общий `dist/chunks/`, куда уезжает этот
- * модуль, был вне скана: granum доходит до него по графу бандла компонента и
- * показывает записи кодом `safelist-redundant`.
+ * Safelist пуст. Кегль и цвет корня лежат здесь целыми литералами, и granum
+ * извлекает их сам: модуль уезжает в общий `dist/chunks/`, но сборка доходит
+ * до него по графу бандла компонента. Список, который здесь был, пережил
+ * UnoCSS-пресет — тот общий чанк не сканировал.
  *
  * Всё остальное оформление — настоящий CSS в `styles.css`, а не утилиты: оно
  * держится на потомках разметки, собранной рендерером, а утилитой можно
  * пометить только тот узел, который рендер-функция создаёт сама.
  */
-export const grMarkdownSafelist: string[] = [
-  ...Object.values(sizeClasses).flatMap(splitClassTokens),
-  ...splitClassTokens(rootClass),
-]
+export const grMarkdownSafelist: string[] = []

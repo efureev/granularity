@@ -1,11 +1,6 @@
-import { splitClassTokens } from '../../internal/classTokens'
-import { dashboardFrameSafelist } from '../GrDashboardFrame/frameSafelist'
-import { bodyClass, footerClass, refusalClass, sizeRowClass } from './grDashboardItemSettingsStyles'
-
-export const grDashboardItemSettingsSafelist = [...new Set([
-  ...dashboardFrameSafelist,
-  ...splitClassTokens(bodyClass),
-  ...splitClassTokens(sizeRowClass),
-  ...splitClassTokens(refusalClass),
-  ...splitClassTokens(footerClass),
-])]
+// Свои классы диалога настроек лежат литералами в шаблоне и в
+// `grDashboardItemSettingsStyles.ts`, и granum извлекает их сам. Диалог, поле и
+// кнопки — компоненты ядра, их классы приходят с зависимостями. Раму диалог не
+// рендерит: её список, подмешанный сюда при UnoCSS-пресете, приносил классы,
+// которыми он не пользуется.
+export const grDashboardItemSettingsSafelist: string[] = []

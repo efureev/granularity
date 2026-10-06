@@ -9,6 +9,3 @@
  */
 export const presetRowClass
   = 'mt-3 flex flex-wrap items-center gap-1.5 border-t border-[var(--gr-brd)] pt-3'
-
-/** Для safelist потребителей: модуль общий, а значит уезжает в `dist/chunks/`. */
-export const presetRowClassTokens: readonly string[] = [presetRowClass]
