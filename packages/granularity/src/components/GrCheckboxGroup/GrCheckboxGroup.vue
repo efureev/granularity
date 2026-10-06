@@ -33,10 +33,13 @@ export interface GrCheckboxGroupOption {
 }
 
 export interface GrCheckboxGroupProps {
+  /** Отмеченные значения (`v-model`): у каждого чекбокса группы свой `value`. */
   modelValue: string[]
+  /** Варианты, из которых группа строит чекбоксы. Не нужны, если флажки разложены в слоте. */
   options?: GrCheckboxGroupOption[]
   /** Общее имя для нативной формы: значения уйдут как повторяющиеся поля. */
   name?: string
+  /** Выключить всю группу. Складывается с `disabled` у `GrFormField`. */
   disabled?: boolean
   /** Только для чтения: выбор видно, но он не меняется. */
   readonly?: boolean
@@ -44,15 +47,22 @@ export interface GrCheckboxGroupProps {
   invalid?: boolean
   /** Обязательная группа: `aria-required` объявляют сами чекбоксы. */
   required?: boolean
+  /** Раскладка: `vertical` — столбцом, `horizontal` — строкой с переносом. По умолчанию `vertical`. */
   direction?: GrCheckboxGroupDirection
+  /** Ступень размера чекбоксов группы. По умолчанию `md`; берётся из `GrConfigProvider`. */
   size?: GrCheckboxSize
+  /** Доступное имя группы. Не задано — имя берётся из подписи `GrFormField`. */
   ariaLabel?: string
 }
 
 export interface GrCheckboxGroupEmits {
+  /** Новый набор отмеченных значений (`v-model`). */
   (e: 'update:modelValue', value: string[]): void
+  /** Пользователь отметил или снял чекбокс — тот же payload, что у `update:modelValue`. */
   (e: 'change', value: string[]): void
+  /** Фокус вошёл в группу. Переход между её чекбоксами событием не считается. */
   (e: 'focus', event: FocusEvent): void
+  /** Фокус ушёл из группы целиком. */
   (e: 'blur', event: FocusEvent): void
 }
 
@@ -141,7 +151,12 @@ function blur(): void {
   firstCheckbox()?.blur()
 }
 
-defineExpose({ focus, blur })
+defineExpose({
+  /** Поставить фокус на первый доступный чекбокс группы. */
+  focus,
+  /** Снять фокус с первого доступного чекбокса — пара к `focus`. */
+  blur,
+})
 
 provide(GR_CHECKBOX_GROUP_CONTEXT, {
   modelValue: computed(() => props.modelValue),

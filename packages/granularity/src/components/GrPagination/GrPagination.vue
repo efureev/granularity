@@ -35,8 +35,11 @@ import {
 export type GrPaginationPageSizeOption = number | { value: number, label: string }
 
 export interface GrPaginationProps {
+  /** Текущая страница с единицы (`v-model:page`). Вне диапазона рисуется прижатой к краю. */
   page: number
+  /** Элементов на странице (`v-model:pageSize`) — делитель для числа страниц и диапазона. */
   pageSize: number
+  /** Сколько элементов всего, а не страниц: число страниц считается из него и `pageSize`. */
   total: number
   /**
    * Варианты размера страницы. Число — подпись равна значению; пара — своя
@@ -67,11 +70,23 @@ export interface GrPaginationProps {
   ariaLabel?: string
   /** Гасит всю пагинацию: номера, кнопки, селект размера и поле перехода. */
   disabled?: boolean
+  /**
+   * Высота кнопок, поля перехода и селекта по шкале контролов.
+   * Не задан — из `GrConfigProvider`, иначе `md`.
+   */
   size?: GrPaginationSize
 }
 
 export interface GrPaginationEmits {
+  /**
+   * Выбрана страница (`v-model:page`). Приходит и сама, когда `total` или `pageSize`
+   * уменьшились и текущая страница оказалась за последней.
+   */
   (e: 'update:page', value: number): void
+  /**
+   * Выбран размер страницы в селекте (`v-model:pageSize`).
+   * На первую страницу компонент не возвращает.
+   */
   (e: 'update:pageSize', value: number): void
 }
 

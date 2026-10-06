@@ -15,14 +15,31 @@ type NodeKeyProp<T> = keyof T & string
  * Пропсы публичного GR-примитива «TreeSelect».
  */
 export interface GrTreeSelectProps<T extends object = any> {
+  /** Выбранный ключ или `null`; при `multiple` — массив ключей (`v-model`). */
   modelValue: GrTreeSelectModelValue
+  /** Узлы дерева верхнего уровня; дети лежат в поле из `props.children`. */
   data: T[]
+  /** Имена полей узла: детей и подписи. По умолчанию `children` и `label`. */
   props?: GrTreePropsMap
+  /**
+   * Поле-ключ узла — его значения уходят в модель. По умолчанию `id`; без значения ключом
+   * становится позиция узла в дереве.
+   */
   nodeKey?: NodeKeyProp<T> | 'id'
+  /** Ключи узлов, раскрытых в дереве панели с самого начала. */
   defaultExpandedKeys?: GrTreeKey[]
+  /**
+   * Недоступен: панель не открывается, значение не меняется. Складывается по «или» с полем
+   * и формой.
+   */
   disabled?: boolean
 
+  /** Текст триггера, пока ничего не выбрано. */
   placeholder?: string
+  /**
+   * Высота триггера и кегль по шкале контролов; дерево в панели берёт ту же ступень.
+   * По умолчанию `md`.
+   */
   size?: GrInputSize
   /** Форма рамки. `box` — скругление шкалы контролов; `pill` — пилюля. */
   shape?: GrControlShape
@@ -31,6 +48,7 @@ export interface GrTreeSelectProps<T extends object = any> {
    * пустой ответ и незагруженный выглядят одинаково.
    */
   loading?: boolean
+  /** Визуальное и ARIA-состояние ошибки; сильнее `state`. Складывается по «или» с `GrFormField`. */
   invalid?: boolean
   /** Только для чтения: значение видно, но не меняется. */
   readonly?: boolean
@@ -38,8 +56,13 @@ export interface GrTreeSelectProps<T extends object = any> {
   required?: boolean
   /** Доступное имя вне `GrFormField`. */
   ariaLabel?: string
+  /**
+   * Подсветка рамки по решению разработчика. `success` и `warning` добавляют иконку и скрытую
+   * подпись; `invalid` сильнее. По умолчанию `default`.
+   */
   state?: GrTreeSelectState
 
+  /** Множественный выбор: модель — массив ключей, клик по узлу переключает его. */
   multiple?: boolean
   /**
    * Чекбоксы в дереве вместо собственной галочки: отметка родителя каскадом
@@ -66,9 +89,13 @@ export interface GrTreeSelectProps<T extends object = any> {
    * с одного компонента на другой, потребитель не переучивается.
    */
   tagTone?: GrBadgeTone
+  /** Плотная заливка чипов в режиме `tags`. */
   tagDark?: boolean
+  /** Размер чипов по шкале `GrBadge`. По умолчанию `sm`. */
   tagSize?: GrBadgeSize
+  /** Скругление чипов: `square`, `semi` или `round`. По умолчанию `round`. */
   tagRadius?: GrBadgeRadius
+  /** Крестик очистки на месте шеврона, когда что-то выбрано. По умолчанию `false`. */
   clearable?: boolean
 
   /**
@@ -83,12 +110,18 @@ export interface GrTreeSelectProps<T extends object = any> {
   /** Как отображать выбранное значение в single-режиме. */
   valueDisplay?: GrTreeSelectValueDisplay
 
+  /** Поле поиска над деревом; без `filterNodeMethod` узлы ищутся подстрокой в подписи. */
   filterable?: boolean
+  /** Подсказка в поле поиска. По умолчанию — переведённое «Search…». */
   filterPlaceholder?: string
+  /** `inputmode` поля поиска — какую экранную клавиатуру показать на мобильных. */
   filterInputmode?: InputHTMLAttributes['inputmode']
+  /** Своё правило совпадения узла с запросом вместо подстрочного поиска по подписи. */
   filterNodeMethod?: GrTreeFilterNodeMethod<T>
 
+  /** Закрывать панель после выбора узла. По умолчанию — только при одиночном выборе. */
   closeOnSelect?: boolean
+  /** Максимальная высота панели с деревом, px. По умолчанию `320`. */
   dropdownMaxHeight?: number
   /**
    * Виртуализация дерева в панели: в DOM живёт только окно вокруг вьюпорта.
@@ -103,9 +136,14 @@ export interface GrTreeSelectProps<T extends object = any> {
    * (`docs/form-controls.md`).
    */
   prefixMinWidth?: string
+  /** Максимальная ширина префикса: содержимое шире обрезается. */
   prefixMaxWidth?: string
+  /** Минимальная ширина суффикса. По умолчанию — по ступени размера. */
   suffixMinWidth?: string
+  /** Максимальная ширина суффикса: содержимое шире обрезается. */
   suffixMaxWidth?: string
+  /** Жёсткая ширина префикса: `prefixMaxWidth`, иначе `prefixMinWidth`, иначе по ступени размера. */
   prefixFixed?: boolean
+  /** Жёсткая ширина суффикса: `suffixMaxWidth`, иначе `suffixMinWidth`, иначе по ступени размера. */
   suffixFixed?: boolean
 }

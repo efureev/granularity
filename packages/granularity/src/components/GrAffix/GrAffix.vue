@@ -46,6 +46,7 @@ export interface GrAffixProps {
 }
 
 export interface GrAffixEmits {
+  /** Панель прилипла (`true`) или отлипла (`false`); шлётся только при смене состояния. */
   (e: 'stickyChange', stuck: boolean): void
 }
 
@@ -236,7 +237,12 @@ onBeforeUnmount(detach)
 // сторону коробки, и до обновления DOM ссылка вела бы на снятый узел.
 watch(() => [props.placement, props.offset, props.disabled] as const, attach, { flush: 'post' })
 
-defineExpose({ stuck, remeasure })
+defineExpose({
+  /** Прилипла ли панель сейчас — то же состояние, что в слоте и в `data-stuck`. */
+  stuck,
+  /** Перечитать отступ и пересобрать наблюдателя: `vh` после ресайза, смена высоты шапки. */
+  remeasure,
+})
 </script>
 
 <template>

@@ -21,7 +21,12 @@ export type { GrFormSectionHeadingLevel } from './grFormSectionStyles'
  * поэтому заголовок здесь настоящий (`h2`…`h6`), а не жирный текст.
  */
 export interface GrFormSectionProps {
+  /** Заголовок секции — настоящий `h2`…`h6`, по нему обходят форму. Слот `#title` сильнее. */
   title?: string
+  /**
+   * Пояснение под заголовком, связано с секцией через `aria-describedby`. Слот
+   * `#description` сильнее.
+   */
   description?: string
   /** Уровень заголовка под структуру страницы. Не задан — берётся из `GrConfigProvider`, иначе `3`. */
   headingLevel?: GrFormSectionHeadingLevel

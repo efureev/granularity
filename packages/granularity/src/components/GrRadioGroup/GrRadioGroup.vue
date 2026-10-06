@@ -32,9 +32,13 @@ export interface GrRadioGroupOption {
  * Предоставляет дочерним `GrRadio` общий `modelValue`/`disabled`/`size`/`name` через `inject`.
  */
 export interface GrRadioGroupProps {
+  /** Выбранное значение (`v-model`): совпадает с `value` одного из переключателей. */
   modelValue: GrRadioValue
+  /** Варианты, из которых группа строит переключатели. Не нужны, если они разложены в слоте. */
   options?: GrRadioGroupOption[]
+  /** Имя для нативной формы: выбранное значение уходит скрытым полем. Без имени не уходит. */
   name?: string
+  /** Выключить всю группу. Складывается с `disabled` у `GrFormField`. */
   disabled?: boolean
   /** Только для чтения: выбор видно, но он не меняется. */
   readonly?: boolean
@@ -42,20 +46,30 @@ export interface GrRadioGroupProps {
   invalid?: boolean
   /** Обязательное поле (`aria-required`). */
   required?: boolean
+  /**
+   * Вид: `radiobox` — кружки с подписями, `button` — ряд склеенных кнопок. По умолчанию
+   * `radiobox`.
+   */
   variant?: GrRadioGroupVariant
   /**
    * Раскладка варианта `radiobox`. Кнопочный вариант всегда горизонтальный —
    * его собирает `GrButtonGroup`.
    */
   orientation?: GrRadioGroupOrientation
+  /** Ступень размера переключателей. По умолчанию `md`; берётся из `GrConfigProvider`. */
   size?: GrButtonSize
+  /** Доступное имя группы. Не задано — имя берётся из подписи `GrFormField`. */
   ariaLabel?: string
 }
 
 export interface GrRadioGroupEmits {
+  /** Выбрано новое значение (`v-model`) — кликом или стрелкой: стрелка переносит и выбор. */
   (e: 'update:modelValue', value: GrRadioValue): void
+  /** Пользователь сменил выбор — тот же payload, что у `update:modelValue`. */
   (e: 'change', value: GrRadioValue): void
+  /** Фокус вошёл в группу. Переход стрелками между переключателями событием не считается. */
   (e: 'focus', event: FocusEvent): void
+  /** Фокус ушёл из группы целиком. */
   (e: 'blur', event: FocusEvent): void
 }
 
@@ -121,7 +135,12 @@ const { onFocusIn, onFocusOut } = useFocusWithin(rootEl, {
   leave: event => emit('blur', event),
 })
 
-defineExpose({ focus, blur })
+defineExpose({
+  /** Поставить фокус на остановку `Tab` группы — обычно выбранный переключатель, а не первый. */
+  focus,
+  /** Снять фокус с остановки `Tab` группы. */
+  blur,
+})
 
 const entries = ref<GrRadioEntry[]>([])
 

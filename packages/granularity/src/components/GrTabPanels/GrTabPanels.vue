@@ -4,7 +4,12 @@ import { computed, provide, useId } from 'vue'
 import { GR_TAB_PANELS_KEY } from './context'
 
 export interface GrTabPanelsProps {
+  /** `value` видимой панели — та же модель, что у `GrTabs`. */
   modelValue: string
+  /**
+   * Общая база id со `GrTabs`: с ней панели получают `aria-labelledby` на свои вкладки. Без неё
+   * id генерируется, и связи с вкладками нет.
+   */
   idBase?: string
 }
 

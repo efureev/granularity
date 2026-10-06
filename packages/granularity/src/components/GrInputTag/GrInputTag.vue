@@ -48,20 +48,42 @@ const REGEX_SPECIAL_CHAR_RE = /[.*+?^${}()|[\]\\]/g
  * Splits input by configurable `separators`, supports paste, Enter and Backspace editing.
  */
 export interface GrInputTagProps {
+  /** Набор тегов (`v-model`). Компонент его не мутирует — отдаёт новый массив. */
   modelValue: string[]
+  /**
+   * Подсказка в пустом поле — пропадает с первым тегом. Подпись не заменяет:
+   * имя даёт `GrFormField` или `ariaLabel`.
+   */
   placeholder?: string
+  /** Выключить поле: теги не добавляются и не снимаются. Складывается с `GrFormField`. */
   disabled?: boolean
+  /** Только для чтения: теги видно, но ни добавить, ни снять, ни очистить их нельзя. */
   readonly?: boolean
+  /** Ошибка валидации: danger-рамка и `aria-invalid`. Складывается с ошибкой `GrFormField`. */
   invalid?: boolean
   /** Обязательное поле (`aria-required`). Складывается с `required` у `GrFormField`. */
   required?: boolean
+  /**
+   * Подсветка рамки по решению разработчика. `success` и `warning` добавляют иконку
+   * и скрытую подпись; `invalid` сильнее. По умолчанию `default`.
+   */
   state?: GrInputTagState
+  /** Высота и кегль по шкале контролов. По умолчанию `md`; берётся из `GrConfigProvider`. */
   size?: GrInputTagSize
+  /**
+   * Клавиши, которые превращают набранное в тег, — по ним же режется вставка.
+   * `Enter` работает всегда. По умолчанию `[',']`.
+   */
   separators?: string[]
+  /** Разрешить одинаковые теги. По умолчанию повтор молча не добавляется. */
   allowDuplicates?: boolean
+  /** Обрезать пробелы по краям тега. По умолчанию `true`. */
   trim?: boolean
+  /** Предел числа тегов: сверх него теги не добавляются, а скринридер слышит, что предел достигнут. */
   max?: number
+  /** Недонабранный текст становится тегом при уходе фокуса, а не пропадает. По умолчанию `false`. */
   addOnBlur?: boolean
+  /** Очищать поле ввода после добавления тега. По умолчанию `true`. */
   clearInputOnAdd?: boolean
   /**
    * Проверка тега перед добавлением. Может быть асинхронной (проверка на
@@ -81,10 +103,18 @@ export interface GrInputTagProps {
   clearable?: boolean
   /** Фоновая работа: спиннер + `aria-busy`. Асинхронный `beforeAdd` поднимает его сам. */
   loading?: boolean
+  /** Тон чипов-тегов. По умолчанию `neutral`. */
   tagTone?: GrBadgeTone
+  /** Чипы с заливкой тоном вместо мягкой подложки. По умолчанию `false`. */
   tagDark?: boolean
+  /** Кегль чипов по шкале `GrBadge` — та же ступень, что у тегов `GrSelect`. По умолчанию `md`. */
   tagSize?: GrBadgeSize
+  /** Форма чипов: `round`, `semi` или `square`. По умолчанию `round`. */
   tagRadius?: GrBadgeRadius
+  /**
+   * Крестик снятия на каждом чипе. По умолчанию `true`; без него тег снимается
+   * только `Backspace` из пустого поля, а правка (`editable`) недоступна с клавиатуры.
+   */
   tagClosable?: boolean
   /** i18n-friendly aria-label for the per-tag remove button. */
   removeTagLabel?: string
@@ -103,16 +133,27 @@ export interface GrInputTagProps {
    * (`docs/form-controls.md`).
    */
   prefixMinWidth?: string
+  /** Максимальная ширина префикса. */
   prefixMaxWidth?: string
+  /** Минимальная ширина суффикса. По умолчанию — по ступени размера. */
   suffixMinWidth?: string
+  /** Максимальная ширина суффикса. */
   suffixMaxWidth?: string
+  /**
+   * Жёсткая ширина префикса (`prefixMaxWidth` → `prefixMinWidth` → по ступени) —
+   * чтобы аддоны соседних полей встали ровной колонкой.
+   */
   prefixFixed?: boolean
+  /** Жёсткая ширина суффикса — как у `prefixFixed`. */
   suffixFixed?: boolean
 }
 
 export interface GrInputTagEmits {
+  /** Набор тегов изменился (`v-model`): добавление, снятие, правка или очистка. */
   (e: 'update:modelValue', value: string[]): void
+  /** Тег добавлен — по одному событию на тег, в том числе при вставке нескольких сразу. */
   (e: 'add', value: string): void
+  /** Тег снят крестиком или с клавиатуры: значение и позиция, на которой он стоял. */
   (e: 'remove', value: string, index: number): void
   /** Тег изменён на месте: новое значение, его позиция и то, что стояло раньше. */
   (e: 'edit', value: string, index: number, previous: string): void
@@ -122,7 +163,9 @@ export interface GrInputTagEmits {
   (e: 'clear'): void
   /** Набор тегов изменился. */
   (e: 'change', value: string[]): void
+  /** Фокус вошёл в поле. Переходы между вводом и чипами внутри него события не дают. */
   (e: 'focus', event: FocusEvent): void
+  /** Фокус покинул поле целиком — не при переходе на крестик чипа. */
   (e: 'blur', event: FocusEvent): void
 }
 
@@ -859,7 +902,17 @@ const showClearAll = computed(() => resolvedClearable.value && canEdit.value && 
 
 const placeholderText = computed(() => props.modelValue.length > 0 ? undefined : props.placeholder)
 
-defineExpose({ focus, blur, clear: clearAll })
+defineExpose({
+  /** Фокус в поле ввода тега. */
+  focus,
+  /** Снять фокус с поля ввода. */
+  blur,
+  /**
+   * Снять все теги, как кнопкой очистки, и вернуть фокус в поле.
+   * В `disabled` и `readonly` ничего не делает.
+   */
+  clear: clearAll,
+})
 
 if (__GR_DEV__) {
   watchEffect(() => {

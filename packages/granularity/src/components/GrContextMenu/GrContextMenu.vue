@@ -52,18 +52,30 @@ export interface GrContextMenuProps {
   items?: GrDropdownMenuEntry[]
   /** Открыто ли меню. Без пропа компонент ведёт состояние сам. */
   open?: boolean
+  /**
+   * Чем открывается меню: `contextmenu` — правым кликом по области, `manual` — только из кода.
+   * `Shift+F10` и клавиша `ContextMenu` работают в обоих режимах. По умолчанию `contextmenu`.
+   */
   trigger?: GrContextMenuTrigger
+  /** Меню не открывается ничем — ни мышью, ни клавиатурой, ни из кода. */
   disabled?: boolean
+  /** Сторона раскрытия от точки вызова. По умолчанию `bottom-start` — вниз и вправо от курсора. */
   placement?: UseFloatingPlacement
   /** Зазор от якоря. Ноль по умолчанию: меню липнет к курсору. */
   offsetPx?: number
   /** Меню из коротких слов не должно быть шириной в слово. */
   minWidth?: number | string
+  /** Доступное имя панели `role="menu"`. По умолчанию — переведённое «Context menu». */
   ariaLabel?: string
+  /** `id` видимого заголовка, который называет меню, — альтернатива `ariaLabel`. */
   labelledBy?: string
+  /** Точечное переопределение точки монтирования; по умолчанию — общий портал оверлеев. */
   teleportTo?: string | HTMLElement
+  /** Дополнительные классы панели. */
   contentClass?: string
+  /** Дополнительные классы списка пунктов внутри панели. */
   listClass?: string
+  /** Разделители между пунктами. */
   dividers?: boolean
   /**
    * Закрывать при прокрутке страницы. Якорь — точка вьюпорта, и панель осталась
@@ -76,6 +88,7 @@ export interface GrContextMenuProps {
 }
 
 export interface GrContextMenuEmits {
+  /** Меню открылось или закрылось (`v-model:open`). */
   (e: 'update:open', value: boolean): void
   /**
    * Меню собирается открыться у этой цели. Приходит **до** открытия, чтобы
@@ -84,6 +97,7 @@ export interface GrContextMenuEmits {
    * откроется — отдельный способ отменить открытие не нужен.
    */
   (e: 'beforeOpen', context: GrContextMenuOpenContext): void
+  /** Выбран пункт из `items`; пункт с подменю его не шлёт. После выбора меню закрывается. */
   (e: 'select', item: GrDropdownMenuAction): void
 }
 
@@ -364,7 +378,18 @@ onBeforeUnmount(() => {
   stopListening()
 })
 
-defineExpose({ openAt, openAtElement, open, close, toggle })
+defineExpose({
+  /** Открыть у точки курсора (`MouseEvent`) или у произвольного прямоугольника вьюпорта. */
+  openAt,
+  /** Открыть у прямоугольника элемента — клавиатурный путь для внешних композитов. */
+  openAtElement,
+  /** Открыть у последней точки вызова, а без неё — у области меню. */
+  open,
+  /** Закрыть меню из кода; `update:open` придёт с `false`. */
+  close,
+  /** Открыть закрытое меню или закрыть открытое. */
+  toggle,
+})
 
 defineSlots<{
   /** Область, по которой вызывается меню. */

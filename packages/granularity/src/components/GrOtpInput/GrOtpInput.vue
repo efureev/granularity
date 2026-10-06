@@ -42,7 +42,9 @@ export interface GrOtpInputProps {
   masked?: boolean
   /** Знак в пустой ячейке. */
   placeholder?: string
+  /** Размер ячеек и кегль символов. Не задан — из `GrConfigProvider`, иначе `md`. */
   size?: GrOtpInputSize
+  /** Фокус в поле сразу после монтирования — для экрана, где ввод кода и есть всё действие. */
   autofocus?: boolean
   /** `autocomplete="one-time-code"`: код из SMS подставляется на iOS и macOS. */
   oneTimeCode?: boolean
@@ -55,17 +57,26 @@ export interface GrOtpInputProps {
   name?: string
   /** `id` формы, если поле лежит вне неё. */
   form?: string
+  /** Выключить поле: код не вводится и не отправляется с формой. Складывается с `GrFormField`. */
   disabled?: boolean
+  /** Только для чтения: код видно, но не изменить. */
   readonly?: boolean
+  /** Ошибка — например, сервер отверг код: рамка ячеек и `aria-invalid`. Складывается с `GrFormField`. */
   invalid?: boolean
+  /** Обязательное поле (`aria-required`). Складывается с `required` у `GrFormField`. */
   required?: boolean
+  /** Доступное имя вне `GrFormField`: ячейки скрыты от скринридера, читается одно поле поверх них. */
   ariaLabel?: string
 }
 
 export interface GrOtpInputEmits {
+  /** Код изменился (`v-model`) — уже очищенный от недопустимых символов. */
   (e: 'update:modelValue', value: string): void
+  /** Код изменился — то же значение и в тот же момент, что у `update:modelValue`. */
   (e: 'change', value: string): void
+  /** Фокус пришёл в поле. */
   (e: 'focus', event: FocusEvent): void
+  /** Фокус ушёл из поля. */
   (e: 'blur', event: FocusEvent): void
   /** Код набран целиком. Точка автосабмита. */
   (e: 'complete', value: string): void
@@ -258,7 +269,14 @@ function clear(): void {
   focus()
 }
 
-defineExpose({ focus, blur, clear })
+defineExpose({
+  /** Фокус в поле кода. */
+  focus,
+  /** Снять фокус с поля кода. */
+  blur,
+  /** Стереть код и вернуть фокус в первую ячейку — когда сервер отверг код и ждёт новый. */
+  clear,
+})
 
 // Значение пришло снаружи — поле обязано его показать. Санитайз уже прошёл в
 // `value`, поэтому сюда доезжает то же, что видят ячейки.

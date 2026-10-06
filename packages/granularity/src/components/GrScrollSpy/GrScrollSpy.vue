@@ -27,6 +27,7 @@ export interface GrScrollSpyProps {
   offset?: number | string
   /** Скроллпорт: элемент или селектор. Не задан — ищется от первого раздела. */
   scroller?: HTMLElement | string | null
+  /** Имя лендмарка `navigation`. Не задано — берётся из локали. */
   ariaLabel?: string
   /** Обновлять `#hash` адреса при переходе. */
   updateHash?: boolean
@@ -34,11 +35,17 @@ export interface GrScrollSpyProps {
   behavior?: ScrollBehavior
   /** Переносить фокус на раздел, как это делает переход по якорю. */
   focusTarget?: boolean
+  /** Выключить слежение за прокруткой: активный пункт снимается. */
   disabled?: boolean
 }
 
 export interface GrScrollSpyEmits {
+  /** Сменился активный раздел; `null` — линия активации ещё не дошла до первого. */
   (e: 'activeChange', id: string | null): void
+  /**
+   * Пункт выбран кликом: `id` раздела и сам клик. Клик с модификатором и `activate`
+   * из слота его не шлют.
+   */
   (e: 'select', id: string, event: MouseEvent): void
 }
 
@@ -170,8 +177,11 @@ function onItemClick(id: string, event: MouseEvent): void {
 }
 
 defineExpose({
+  /** `id` активного раздела (ref); `null` — линия активации ещё не дошла до первого. */
   active: spy.active,
+  /** Прокрутить к разделу и сразу подсветить его. Адрес и фокус, в отличие от клика, не меняет. */
   scrollTo: spy.scrollTo,
+  /** Перечитать отступ, скроллпорт и положение разделов после смены разметки. */
   refresh: spy.refresh,
 })
 

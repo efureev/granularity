@@ -77,6 +77,7 @@ export interface GrDialogProps {
 }
 
 export interface GrDialogEmits {
+  /** Окно просит открыться или закрыться: Esc, подложка, кнопка в шапке или методы из `ref`. */
   (e: 'update:modelValue', value: boolean): void
   /** Окно открылось и анимация закончилась. */
   (e: 'opened'): void
@@ -107,8 +108,14 @@ const props = withDefaults(defineProps<GrDialogProps>(), {
 const emit = defineEmits<GrDialogEmits>()
 
 const slots = defineSlots<{
+  /** Тело окна; поля задаёт `bodyConfig`. */
   default?: () => any
+  /**
+   * Содержимое шапки вместо видимого заголовка; кнопка закрытия остаётся. Доступное имя окну
+   * тогда даёт скрытый `title`.
+   */
   header?: (props: { title?: string }) => any
+  /** Подвал с действиями окна. Без слота подвала нет. */
   footer?: () => any
 }>()
 
@@ -144,7 +151,14 @@ function toggle(): void {
   emit('update:modelValue', !props.modelValue)
 }
 
-defineExpose({ open, close, toggle })
+defineExpose({
+  /** Попросить родителя открыть окно: шлёт `update:modelValue` с `true`. */
+  open,
+  /** Попросить родителя закрыть окно: шлёт `update:modelValue` с `false`. */
+  close,
+  /** Переключить окно через `update:modelValue`. */
+  toggle,
+})
 </script>
 
 <template>

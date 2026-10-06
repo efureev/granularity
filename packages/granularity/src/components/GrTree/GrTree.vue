@@ -35,11 +35,20 @@ import type {
 } from './grTreeProps'
 
 export interface GrTreeEmits<T extends Record<string, any> = any> {
+  /** Узел выбран кликом или `Enter` и стал текущим. */
   (e: 'nodeClick', data: T, node: GrTreeNode<T>): void
+  /** Узел раскрыт кнопкой, клавиатурой или кликом при `expandOnClickNode`. */
   (e: 'nodeExpand', data: T, node: GrTreeNode<T>): void
+  /** Узел свёрнут — пользователем или `accordion`, когда раскрыли соседа. */
   (e: 'nodeCollapse', data: T, node: GrTreeNode<T>): void
+  /**
+   * Узел перенесён указателем или `Shift` со стрелкой и уже переставлен в `data`. `dropType` —
+   * `prev`, `inner` или `next` относительно `dropNode`.
+   */
   (e: 'nodeDrop', draggingNode: GrTreeNode<T>, dropNode: GrTreeNode<T>, dropType: GrTreeNodeDropType): void
+  /** Контекстное меню строки. Событие — первым аргументом: `preventDefault()` и своё меню. */
   (e: 'nodeContextMenu', evt: MouseEvent, data: T, node: GrTreeNode<T>): void
+  /** Текущий узел сменился кликом или `Enter` (`v-model:current-key`). */
   (e: 'update:currentKey', key: GrTreeKey | undefined): void
   /**
    * Результат фильтрации. Без него потребитель не отличит «данных нет» от
@@ -47,7 +56,12 @@ export interface GrTreeEmits<T extends Record<string, any> = any> {
    * может исправить сам.
    */
   (e: 'filter', info: { value: string, visibleCount: number, matchedCount: number }): void
+  /**
+   * Отмеченные ключи (`v-model:checked-keys`) после отметки пользователем или методом; родители,
+   * отмеченные каскадом, входят тоже.
+   */
   (e: 'update:checkedKeys', keys: GrTreeKey[]): void
+  /** Отметка узла сменилась — `Space`, кликом или `setChecked()`; с итоговыми наборами ключей. */
   (e: 'check', data: T, node: GrTreeNode<T>, info: { checkedKeys: GrTreeKey[], halfCheckedKeys: GrTreeKey[] }): void
 }
 
@@ -102,6 +116,7 @@ const props = withDefaults(defineProps<GrTreeProps<T>>(), {
 const emit = defineEmits<GrTreeEmits<T>>()
 
 defineSlots<{
+  /** Содержимое строки вместо подписи: значок, счётчик, метка. Получает `node` и `data`. */
   default?: (props: { node: GrTreeNode<T>, data: T }) => any
 }>()
 

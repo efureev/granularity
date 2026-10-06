@@ -47,11 +47,15 @@ export type {
 export interface GrSliderProps {
   /** `number` — одиночное значение; `[lo, hi]` — диапазон (при `range=true`). */
   modelValue: GrSliderModelValue
+  /** Нижняя граница шкалы; значение вне границ прижимается к ней. По умолчанию `0`. */
   min?: number
+  /** Верхняя граница шкалы. По умолчанию `100`. */
   max?: number
+  /** Шаг, к которому привязывается значение, — и шаг стрелок с клавиатуры. По умолчанию `1`. */
   step?: number
   /** Диапазон с двумя бегунками; модель — кортеж `[lo, hi]`. */
   range?: boolean
+  /** Недоступен: бегунки не двигаются и не фокусируются. Складывается по «или» с полем и формой. */
   disabled?: boolean
   /** Только для чтения: значение видно, но не меняется. */
   readonly?: boolean
@@ -59,6 +63,7 @@ export interface GrSliderProps {
   invalid?: boolean
   /** Обязательное поле (`aria-required`). */
   required?: boolean
+  /** Толщина дорожки и размер бегунка. По умолчанию `md`; берётся из `GrConfigProvider`. */
   size?: GrSliderSize
   /** Метки делений: `{ [value]: label }` или массив значений. */
   marks?: GrSliderMarks
@@ -74,16 +79,20 @@ export interface GrSliderProps {
    * нажатие клавиши дискретно, придерживать его нечего.
    */
   lazy?: boolean
+  /** Доступное имя вне `GrFormField`. В диапазоне бегунки получают его с пометкой «min»/«max». */
   ariaLabel?: string
   /** Имя для нативной формы: hidden input на значение, при `range` — два с одним именем. */
   name?: string
 }
 
 export interface GrSliderEmits {
+  /** Новое значение для `v-model` — на каждом шаге перетаскивания, при `lazy` только по отпусканию. */
   (e: 'update:modelValue', value: GrSliderModelValue): void
   /** Значение зафиксировано (отпущен бегунок / клавиша). */
   (e: 'change', value: GrSliderModelValue): void
+  /** Фокус вошёл в слайдер. Переход между бегунками диапазона событием не считается. */
   (e: 'focus', event: FocusEvent): void
+  /** Фокус ушёл из слайдера целиком. */
   (e: 'blur', event: FocusEvent): void
 }
 
@@ -157,7 +166,12 @@ function blur(): void {
   thumbEls.value[0]?.blur()
 }
 
-defineExpose({ focus, blur })
+defineExpose({
+  /** Поставить фокус на бегунок; в диапазоне — на нижний. */
+  focus,
+  /** Снять фокус с первого бегунка. */
+  blur,
+})
 
 // Нормализованные границы (гард от max<=min).
 const span = computed(() => (props.max > props.min ? props.max - props.min : 1))

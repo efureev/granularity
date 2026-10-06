@@ -43,6 +43,7 @@ export interface GrNavbarProps {
    * дефолт настраивал бы единственное место вызова.
    */
   headingLevel?: GrNavbarHeadingLevel
+  /** Кнопка-«бургер» слева от заголовка; нажатие приходит событием `menu`. По умолчанию `false`. */
   showMenuButton?: boolean
   /**
    * Ступень кнопки меню — и только её: остальное в шапке принадлежит
@@ -64,6 +65,7 @@ export interface GrNavbarProps {
 }
 
 export interface GrNavbarEmits {
+  /** Нажата кнопка меню — сигнал открыть боковую навигацию. */
   (e: 'menu'): void
 }
 

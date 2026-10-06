@@ -55,7 +55,9 @@ export interface GrResponseErrorBannerProps {
 }
 
 export interface GrResponseErrorBannerEmits {
+  /** Нажата «Повторить» (`canRetry`); приходит текущая ошибка — повторить запрос, что её дал. */
   (e: 'retry', error: ResponseErrorInfo): void
+  /** Нажат крестик (`canDismiss`). Сам баннер не прячется: обнулить `error` — забота экрана. */
   (e: 'dismiss'): void
 }
 

@@ -71,6 +71,10 @@ export interface GrColorPickerProps {
   eyedropper?: boolean
   /** Палитра быстрого выбора. Пусто — блок не рендерится. */
   presets?: string[]
+  /**
+   * Высота триггера и масштаб панели по шкале контролов.
+   * Не задан — из `GrConfigProvider`, иначе `md`.
+   */
   size?: GrColorPickerSize
   /** Форма рамки. `box` — скругление шкалы контролов; `pill` — пилюля. */
   shape?: GrControlShape
@@ -80,19 +84,34 @@ export interface GrColorPickerProps {
   placement?: 'bottom-start' | 'bottom-end' | 'top-start' | 'top-end'
   /** Имя для нативной формы: значение уходит скрытым полем. */
   name?: string
+  /**
+   * Поле недоступно: триггер выключен, панель не открывается.
+   * Включается и `disabled` у `GrFormField`.
+   */
   disabled?: boolean
   /** Только для чтения: цвет видно, панель открывается, но значение не меняется. */
   readonly?: boolean
+  /** Состояние ошибки: рамка цвета ошибки и `aria-invalid`. Включается и ошибкой `GrFormField`. */
   invalid?: boolean
+  /**
+   * Обязательное поле. `aria-required` у кнопки-триггера невалиден, поэтому
+   * обязательность уходит в её описание для скринридера.
+   */
   required?: boolean
+  /** Доступное имя триггера вне `GrFormField` — когда видимой подписи рядом нет. */
   ariaLabel?: string
 }
 
 export interface GrColorPickerEmits {
+  /** Новый цвет в hex — на каждом шаге бегунка, выборе из палитры и валидном вводе в поле hex. */
   (e: 'update:modelValue', value: string): void
+  /** Цвет изменился — тот же hex и в те же моменты, что у `update:modelValue`. */
   (e: 'change', value: string): void
+  /** Панель открылась или закрылась (`v-model:open`). */
   (e: 'update:open', value: boolean): void
+  /** Фокус пришёл на кнопку-триггер. */
   (e: 'focus', event: FocusEvent): void
+  /** Фокус ушёл с кнопки-триггера — в том числе в открытую панель. */
   (e: 'blur', event: FocusEvent): void
 }
 
@@ -168,7 +187,12 @@ function blur(): void {
   triggerEl.value?.blur()
 }
 
-defineExpose({ focus, blur })
+defineExpose({
+  /** Фокус на кнопку-триггер из кода. */
+  focus,
+  /** Снять фокус с кнопки-триггера. */
+  blur,
+})
 
 const FALLBACK: GrHsla = { h: 0, s: 0, l: 0, a: 1 }
 

@@ -51,7 +51,12 @@ export interface GrSplitterProps {
 }
 
 export interface GrSplitterEmits {
+  /**
+   * Новая доля первой панели в процентах — на каждом шаге жеста и клавиатуры. Свёртка модель
+   * не обнуляет: доля остаётся точкой возврата.
+   */
   (e: 'update:modelValue', value: number): void
+  /** Первая панель свёрнута или развёрнута: жестом к краю, `Enter` на разделителе или стрелкой. */
   (e: 'update:collapsed', value: boolean): void
   /** Конец жеста и каждый шаг с клавиатуры: сюда вешают сохранение раскладки. */
   (e: 'change', value: number): void

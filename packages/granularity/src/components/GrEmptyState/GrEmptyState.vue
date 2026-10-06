@@ -43,10 +43,13 @@ export type {
 export interface GrEmptyStateProps {
   /** Заголовок. Не задан — берётся из локали; слот `#title` сильнее обоих. */
   title?: string
+  /** Пояснение под заголовком: почему пусто и что сделать. Слот `#description` сильнее. */
   description?: string
+  /** Масштаб иконки, текста и отступов. По умолчанию `md`; берётся из `GrConfigProvider`. */
   size?: GrEmptyStateSize
   /** `ghost` снимает рамку и фон: карточка внутри карточки рисует вторую рамку. */
   variant?: GrEmptyStateVariant
+  /** Уровень заголовка (`h2`…`h6`) — под структуру страницы. По умолчанию `3`. */
   headingLevel?: GrEmptyStateHeadingLevel
   /**
    * Что за пустота: ещё ничего не создано (`empty`) или под запросом ничего не
@@ -70,6 +73,7 @@ const slots = defineSlots<{
   icon?: () => unknown
   /** Заголовок разметкой: ссылка, выделение, счётчик. */
   title?: () => unknown
+  /** Пояснение разметкой — со ссылкой или выделением; сильнее `description`. */
   description?: () => unknown
   /** Действия под текстом: центрируются. */
   default?: () => unknown

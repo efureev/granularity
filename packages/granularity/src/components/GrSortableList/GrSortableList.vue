@@ -51,8 +51,11 @@ export interface GrSortableListProps<TItem = unknown> {
 }
 
 export interface GrSortableListEmits<TItem = unknown> {
+  /** Новый порядок после переноса — новый массив; исходный не мутируется. */
   (e: 'update:modelValue', value: TItem[]): void
+  /** Строка перенесена с индекса `from` на `to`. Шлётся только по завершении переноса. */
   (e: 'move', from: number, to: number): void
+  /** Перестановка завершена — тот же массив, что ушёл в `update:modelValue`. */
   (e: 'change', value: TItem[]): void
 }
 
@@ -71,8 +74,14 @@ const props = withDefaults(defineProps<GrSortableListProps<T>>(), {
 const emit = defineEmits<GrSortableListEmits<T>>()
 
 defineSlots<{
+  /**
+   * Содержимое строки; без слота выводится сам элемент. `dragging` — строку тянут указателем,
+   * `grabbed` — она взята с клавиатуры.
+   */
   item?: (props: { item: T, index: number, dragging: boolean, grabbed: boolean }) => any
+  /** Значок ручки переноса. Рендерится внутрь кнопки: захват и подпись остаются за компонентом. */
   handle?: (props: { item: T, index: number, disabled: boolean }) => any
+  /** Пустое состояние вместо `emptyText`. */
   empty?: () => any
 }>()
 
@@ -292,6 +301,7 @@ const listStyle = computed(() => (props.maxHeight === undefined
 defineExpose({
   /** Программная перестановка — та же, что делает перенос. */
   move: (from: number, to: number) => applyMove(from, to),
+  /** Перевести фокус на строку по индексу — например, на только что добавленную. */
   focusItem: (index: number) => roving.focusKey(keys.value[index]),
 })
 

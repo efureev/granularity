@@ -38,7 +38,9 @@ export interface GrTab {
 }
 
 export interface GrTabsProps {
+  /** `value` выбранной вкладки (`v-model`). Не совпал ни с одной — `Tab` встаёт на первую доступную. */
   modelValue: string
+  /** Вкладки в порядке вывода: `value`, `label`, по желанию иконка, счётчик и `disabled`. */
   tabs: GrTab[]
   /**
    * База id для ARIA-связки с `GrTabPanels`. Если задана, каждая вкладка
@@ -46,6 +48,7 @@ export interface GrTabsProps {
    * Передайте тот же `idBase` в `GrTabPanels`, чтобы связать `tab`↔`tabpanel`.
    */
   idBase?: string
+  /** Высота вкладок и кегль подписи по шкале контролов. По умолчанию `md`. */
   size?: GrTabsSize
   /** Вид ряда: обойма с таблетками или ряд с подчёркиванием. */
   variant?: GrTabsVariant
@@ -68,6 +71,7 @@ export interface GrTabsProps {
 }
 
 export interface GrTabsEmits {
+  /** Выбрана другая вкладка: кликом, стрелкой или `Enter` в режиме `manual`. */
   (e: 'update:modelValue', value: string): void
   /**
    * Просьба закрыть вкладку. Компонент список не трогает: `tabs` — проп, и

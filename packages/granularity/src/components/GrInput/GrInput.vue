@@ -34,21 +34,34 @@ export interface GrInputProps {
      * напрямую (`showClear`), и `undefined` уронил бы рендер.
      */
   modelValue?: string
+  /** Нативный `type`: меняет клавиатуру и браузерную проверку формата. По умолчанию `text`. */
   type?: 'text' | 'email' | 'password' | 'number' | 'search' | 'tel' | 'url'
+  /** Подсказка в пустом поле. Подпись не заменяет: имя даёт `GrFormField` или `ariaLabel`. */
   placeholder?: string
+  /** Нативный `autocomplete`: чем браузеру заполнять поле — `email`, `one-time-code` и т. п. */
   autocomplete?: string
+  /** Нативный `inputmode`: какую экранную клавиатуру показать, не меняя `type`. */
   inputmode?: InputHTMLAttributes['inputmode']
+  /** Выключить поле: очистка и показ пароля пропадают. Складывается с `GrFormField`. */
   disabled?: boolean
   /** Только для чтения: значение видно и выделяемо, но не редактируется. */
   readonly?: boolean
+  /** Ошибка валидации: danger-рамка и `aria-invalid`. Складывается с ошибкой `GrFormField`. */
   invalid?: boolean
   /** Обязательное поле (`aria-required`). Складывается с `required` у `GrFormField`. */
   required?: boolean
   /** Доступное имя вне `GrFormField`. */
   ariaLabel?: string
+  /**
+   * Подсветка рамки по решению разработчика. `success` и `warning` добавляют иконку
+   * и скрытую подпись; `invalid` сильнее. По умолчанию `default`.
+   */
   state?: 'default' | 'success' | 'warning' | 'danger'
+  /** Нативный `name` — имя поля при отправке формы. */
   name?: string
+  /** `id` поля. Не задан — берётся из `GrFormField`, чтобы подпись нашла поле. */
   id?: string
+  /** Высота и кегль по шкале контролов. По умолчанию `md`; берётся из `GrConfigProvider`. */
   size?: GrInputSize
   /**
    * Форма рамки. `box` — скругление шкалы контролов, как было всегда; `pill` —
@@ -87,13 +100,19 @@ export interface GrInputProps {
   passwordToggle?: boolean
   /** i18n aria-label кнопки показать/скрыть пароль. */
   passwordShowLabel?: string
+  /** i18n aria-label кнопки, которая прячет показанный пароль. Не задан — из локали. */
   passwordHideLabel?: string
 
+  /** Выравнивание текста в поле. По умолчанию `left`. */
   textAlign?: GrInputTextAlign
 
+  /** Минимальная ширина префикса. По умолчанию — по ступени размера, у `inline`-аддона — `0`. */
   prefixMinWidth?: string
+  /** Максимальная ширина префикса: содержимое шире обрезается. */
   prefixMaxWidth?: string
+  /** Минимальная ширина суффикса. По умолчанию — по ступени размера, у `inline`-аддона — `0`. */
   suffixMinWidth?: string
+  /** Максимальная ширина суффикса: содержимое шире обрезается. */
   suffixMaxWidth?: string
   /**
      * Фиксированная ширина у prefix/suffix: аддон получает жёсткую ширину
@@ -102,6 +121,7 @@ export interface GrInputProps {
      * под контент (в пределах min/max), а излишек клипается оболочкой.
      */
   prefixFixed?: boolean
+  /** Жёсткая ширина суффикса — как у `prefixFixed`, только лишнее обрезается слева. */
   suffixFixed?: boolean
   /**
      * Как выглядят аддоны `#prefix`/`#suffix`.
@@ -119,10 +139,13 @@ export interface GrInputProps {
 }
 
 export interface GrInputEmits {
+  /** Новое значение на каждый ввод (`v-model`). Кнопка очистки шлёт пустую строку. */
   (e: 'update:modelValue', value: string): void
   /** Значение зафиксировано нативным `change` — по `blur` или `Enter`. */
   (e: 'change', value: string): void
+  /** Поле получило фокус — нативный `focus` с `<input>`. */
   (e: 'focus', event: FocusEvent): void
+  /** Поле потеряло фокус — нативный `blur` с `<input>`. */
   (e: 'blur', event: FocusEvent): void
   /**
    * Значение стёрто кнопкой очистки. Отдельное событие потому, что по
@@ -227,8 +250,11 @@ function select(): void {
 }
 
 defineExpose({
+  /** Поставить фокус в поле. */
   focus,
+  /** Снять фокус с поля. */
   blur,
+  /** Выделить содержимое поля — чтобы подставленное значение перезаписали вводом. */
   select,
 })
 

@@ -29,25 +29,47 @@ import {
 export interface GrTreeSectionsProps<TData extends object = any> {
   /** Данные обычного дерева. Корни становятся заголовками, их дети — деревьями. */
   data: TData[]
+  /**
+   * Поле с ключом узла. Ключи уникальны на все группы сразу: по ним текущий узел и
+   * отметки ведутся одним набором. По умолчанию `id`.
+   */
   nodeKey?: GrTreeDataProps<TData>['nodeKey']
+  /** Имена полей в данных: `children`, `label`, `isLeaf`. По умолчанию `children` и `label`. */
   props?: GrTreePropsMap
+  /** Размер строк всех групп, как у `GrTree`. Не задан — из `GrConfigProvider`, иначе `md`. */
   size?: GrComponentSize
   /** Уровень заголовка группы под структуру страницы. */
   headingLevel?: 2 | 3 | 4 | 5 | 6
   /** Показывать число узлов первого уровня в группе. */
   showCount?: boolean
+  /** Чекбоксы у узлов: множественный выбор поверх групп. */
   showCheckbox?: boolean
+  /** Не связывать родителей и детей: каждый узел отмечается сам по себе. */
   checkStrictly?: boolean
+  /**
+   * Направляющие уровней: `line` — вертикаль на уровень, `elbow` — ещё и колено к строке.
+   * По умолчанию `line`.
+   */
   branchLine?: boolean | GrTreeBranchLine
+  /** Шаг отступа уровня в пикселях. `0` (по умолчанию) — значение из темы. */
   indent?: number
+  /** Стартовый набор раскрытых узлов во всех группах. Новый массив заменяет раскрытие целиком. */
   defaultExpandedKeys?: GrTreeKey[]
+  /** Текущий узел (`v-model:currentKey`) — один на все группы. */
   currentKey?: GrTreeKey
+  /** Отмеченные ключи всех групп одним списком (`v-model:checkedKeys`). */
   checkedKeys?: GrTreeKey[]
 }
 
 export interface GrTreeSectionsEmits {
+  /** Текущий узел сменился кликом или `Enter` в любой из групп (`v-model:currentKey`). */
   (e: 'update:currentKey', key: GrTreeKey | undefined): void
+  /**
+   * Отметки изменились (`v-model:checkedKeys`): отметки группы сводятся с отметками
+   * остальных групп из `checkedKeys`, родители, отмеченные каскадом, входят тоже.
+   */
   (e: 'update:checkedKeys', keys: GrTreeKey[]): void
+  /** Узел выбран кликом или `Enter` и стал текущим — данные строки и узел, как у `GrTree`. */
   (e: 'nodeClick', data: any, node: GrTreeNode<any>): void
 }
 

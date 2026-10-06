@@ -38,21 +38,34 @@ import {
 import { useControlAria } from '../../composables/internal/useControlAria'
 
 export interface GrTextareaProps {
+  /** Текст поля (`v-model`). */
   modelValue: string
+  /** Подсказка в пустом поле. Подпись не заменяет: имя даёт `GrFormField` или `ariaLabel`. */
   placeholder?: string
+  /** Нативный `autocomplete`: чем браузеру заполнять поле — например, `street-address`. */
   autocomplete?: string
+  /** Выключить поле: значение не редактируется и не уходит в форму. Складывается с `GrFormField`. */
   disabled?: boolean
   /** Только для чтения: значение видно и уходит в форму, но не редактируется. */
   readonly?: boolean
+  /** Ошибка валидации: danger-рамка и `aria-invalid`. Складывается с ошибкой `GrFormField`. */
   invalid?: boolean
   /** Обязательное поле (`aria-required`). Складывается с `required` у `GrFormField`. */
   required?: boolean
   /** Доступное имя вне `GrFormField`. */
   ariaLabel?: string
+  /**
+   * Подсветка рамки по решению разработчика. `success` и `warning` добавляют иконку
+   * и скрытую подпись; `invalid` сильнее. По умолчанию `default`.
+   */
   state?: GrTextareaState
+  /** Нативный `name` — имя поля при отправке формы. */
   name?: string
+  /** `id` поля. Не задан — берётся из `GrFormField`, чтобы подпись нашла поле. */
   id?: string
+  /** Высота в строках; с `autosize` — стартовая и минимальная. По умолчанию `4`. */
   rows?: number
+  /** Кегль и отступы по шкале контролов. По умолчанию `md`; берётся из `GrConfigProvider`. */
   size?: GrTextareaSize
   /** Ограничение длины + основа для счётчика символов. */
   maxlength?: number
@@ -79,12 +92,15 @@ export interface GrTextareaProps {
 }
 
 export interface GrTextareaEmits {
+  /** Текст изменился (`v-model`) — на каждый ввод и при очистке. */
   (e: 'update:modelValue', value: string): void
   /** Значение зафиксировано нативным `change` — по `blur`. */
   (e: 'change', value: string): void
   /** Значение стёрто кнопкой очистки. */
   (e: 'clear'): void
+  /** Фокус пришёл в поле. */
   (e: 'focus', event: FocusEvent): void
+  /** Фокус ушёл из поля. */
   (e: 'blur', event: FocusEvent): void
 }
 
@@ -202,7 +218,12 @@ function blur(): void {
   textareaEl.value?.blur()
 }
 
-defineExpose({ focus, blur })
+defineExpose({
+  /** Фокус в поле из кода. */
+  focus,
+  /** Снять фокус с поля. */
+  blur,
+})
 
 const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrTextarea' })
 const resolvedClearable = useGrComponentProp('GrTextarea', 'clearable', () => props.clearable, false)

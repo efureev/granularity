@@ -29,6 +29,16 @@ to [Semantic Versioning](https://semver.org/).
   найдено» и `#empty` встают по центру резерва. `aria-controls` поля по-прежнему
   указывает на живой список.
 
+### Documentation
+
+- Появились описания у пропов, событий, слотов и методов семидесяти одного
+  компонента, которые в API, подсказках IDE и на портале были пустыми, — от
+  `GrInput`, `GrSelect`, `GrTree` и `GrDataTable` до `GrCarousel`, `GrSteps` и
+  `GrScrollSpy`. Описания событий у компонентов без `generic` в исходнике есть,
+  но vue-component-meta их пока не извлекает. Исправлен устаревший текст слота
+  `default` у `GrConfirmDialog` и `GrPromptDialog`: содержимое заменяет проп
+  `description`, а не `message`.
+
 ## [v1.0.10] 2026-10-06
 
 ### Fixed

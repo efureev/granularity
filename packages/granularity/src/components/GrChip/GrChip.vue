@@ -37,9 +37,22 @@ export interface GrChipProps {
    * «Убрать» на двадцати кнопках подряд не даёт выбрать нужную.
    */
   label?: string
+  /**
+   * Тон чипа — те же цвета, что у `GrBadge`, чтобы в одном ряду они не расходились.
+   * Не задан — из группы и `GrConfigProvider`, иначе `neutral`.
+   */
   tone?: GrChipTone
+  /** Заливка тоном вместо мягкой подложки — для чипа, который обязан выделяться. По умолчанию `false`. */
   dark?: boolean
+  /**
+   * Ступень контрольной шкалы: цель нажатия той же высоты, что у соседних полей.
+   * Не задан — из группы и `GrConfigProvider`, иначе `md`.
+   */
   size?: GrChipSize
+  /**
+   * Форма: `round` — таблетка, `semi` — ярлык, `square` — штамп.
+   * Не задан — из группы и `GrConfigProvider`, иначе `round`.
+   */
   radius?: GrChipRadius
   /** Чип становится переключателем: `aria-pressed`, `Enter`/`Space`. */
   selectable?: boolean
@@ -47,6 +60,7 @@ export interface GrChipProps {
   selected?: boolean
   /** Крестик. Внутри виджета он не кнопка — см. блок про роли ниже. */
   closable?: boolean
+  /** Чип недоступен: не выбирается и не снимается, крестик скрыт. Внутри группы — и от её `disabled`. */
   disabled?: boolean
   /** Доступное имя, когда подпись не объясняет назначения. */
   ariaLabel?: string
@@ -64,7 +78,9 @@ export interface GrChipProps {
 }
 
 export interface GrChipEmits {
+  /** Переключатель вне группы сменил состояние (`v-model:selected`); в группе выбор ведёт она. */
   (e: 'update:selected', value: boolean): void
+  /** Чип просят снять — крестиком или `Delete`/`Backspace`. Удалить его из списка — забота родителя. */
   (e: 'remove'): void
 }
 
@@ -274,7 +290,9 @@ if (group) {
 const removeEl = ref<HTMLButtonElement | null>(null)
 
 defineExpose({
+  /** Фокус на чип из кода. Действует на интерактивный чип: простой чип — `span` без таб-стопа. */
   focus: () => rootEl.value?.focus(),
+  /** Снять фокус с чипа. */
   blur: () => rootEl.value?.blur(),
   /**
    * Кнопка снятия — цель roving-фокуса у родителя. Отдаётся элементом, а не

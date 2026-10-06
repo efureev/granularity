@@ -182,7 +182,12 @@ function blur(): void {
   el?.blur?.()
 }
 
-defineExpose({ focus, blur })
+defineExpose({
+  /** Поставить фокус на кнопку — и когда корень тег, и когда компонент из `as`. */
+  focus,
+  /** Снять фокус с кнопки. */
+  blur,
+})
 
 const className = computed(() => {
   return grButtonClass({

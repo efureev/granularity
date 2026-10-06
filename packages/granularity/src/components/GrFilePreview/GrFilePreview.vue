@@ -52,6 +52,10 @@ export interface GrFilePreviewProps {
    * четыре ступени не укладывается.
    */
   tileSize?: GrSizeWithPx
+  /**
+   * Пропорции плитки: держат место до загрузки, картинка обрезается по ним (`object-cover`).
+   * Не задан — из `GrConfigProvider`, иначе `1:1`.
+   */
   ratio?: GrFilePreviewRatio
   /** Ссылка на оригинал — для не-картинок и для перехода мимо просмотрщика. */
   href?: string
@@ -71,6 +75,10 @@ export interface GrFilePreviewProps {
   as?: string | Component
   /** Плитка кликабельна и эмитит `click` — обычно чтобы открыть просмотрщик. */
   clickable?: boolean
+  /**
+   * Нативный `loading` картинки: `lazy` грузит превью у края вьюпорта, а не все
+   * плитки ленты сразу. Не задан — из `GrConfigProvider`, иначе `lazy`.
+   */
   loading?: 'lazy' | 'eager'
   /**
    * Доступное имя интерактивной плитки. Не задано — имя приходит из содержимого:
@@ -80,6 +88,7 @@ export interface GrFilePreviewProps {
 }
 
 export interface GrFilePreviewEmits {
+  /** Клик по плитке — здесь открывают просмотрщик. С клавиатуры приходит у `clickable` и ссылки. */
   (e: 'click', event: MouseEvent): void
 }
 

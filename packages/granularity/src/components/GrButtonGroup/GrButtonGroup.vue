@@ -9,6 +9,7 @@ export type GrButtonGroupOrientation = 'horizontal' | 'vertical'
 export interface GrButtonGroupProps {
   /** Доступное имя группы: без него кнопки читаются как несвязанные. */
   ariaLabel?: string
+  /** Направление ряда: `vertical` ставит кнопки столбцом. По умолчанию `horizontal`. */
   orientation?: GrButtonGroupOrientation
   /**
    * Склеивать кнопки в один блок. `false` — обычный ряд с зазором: каждая
@@ -17,7 +18,9 @@ export interface GrButtonGroupProps {
   attached?: boolean
   /** Оформление, общее для кнопок группы. Проп самой кнопки сильнее. */
   size?: GrButtonSize
+  /** Вес всех кнопок группы: `primary`, `outline`, `ghost` и т. д. Проп самой кнопки сильнее. */
   variant?: GrButtonVariant
+  /** Тон всех кнопок группы. Проп самой кнопки сильнее. */
   tone?: GrButtonTone
 }
 

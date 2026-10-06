@@ -70,6 +70,10 @@ export interface GrStatisticProps {
    * см. `docs/installation.md#иконки`).
    */
   icon?: string | Component
+  /**
+   * Кегль значения, а с ним заголовка, приписок и строки динамики.
+   * Не задан — из `GrConfigProvider`, иначе `md`.
+   */
   size?: GrStatisticSize
   /** Тон значения; точечно перекрывается `--gr-statistic-value-color`. */
   tone?: GrStatisticTone
@@ -109,6 +113,7 @@ export interface GrStatisticProps {
 }
 
 export interface GrStatisticEmits {
+  /** Клик по плитке — например, чтобы открыть детали. С клавиатуры приходит у `clickable` и ссылки. */
   (e: 'click', event: MouseEvent): void
 }
 

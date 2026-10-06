@@ -19,6 +19,7 @@ import type { GrTab, GrTabsProps } from '../GrTabs/GrTabs.vue'
 export interface GrTabsWithPanelsProps extends GrTabsProps {}
 
 export interface GrTabsWithPanelsEmits {
+  /** Выбрана другая вкладка (`v-model`); панель переключается следом. */
   (e: 'update:modelValue', value: string): void
   /** Просьба закрыть вкладку — всплывает из `GrTabs` как есть. */
   (e: 'close', value: string): void

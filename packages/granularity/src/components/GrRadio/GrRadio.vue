@@ -27,9 +27,6 @@ export type { GrRadioValue } from './grRadioGroupContext'
  * Может работать автономно (через `v-model`) либо внутри `GrRadioGroup`
  * (тогда `modelValue`/`disabled`/`size`/`name`/`invalid` приходят через `inject`).
  *
- * @prop value — значение этого элемента, сравнивается с `modelValue` группы.
- * @prop variant — визуальное представление: `radiobox` (круг+dot) или `button` (стиль `GrButton`).
- *
  * Доступным контролом является сам элемент с `role="radio"`: он держит фокус,
  * `aria-checked` и клавиатуру. Внутрь него ничего интерактивного не вкладывается —
  * `role="radio"` объявляет потомков презентационными, и вложенный native `<input>`
@@ -38,25 +35,43 @@ export type { GrRadioValue } from './grRadioGroupContext'
  * `input[type="hidden"]` — он не фокусируется и не является интерактивным.
  */
 export interface GrRadioProps {
+  /** Значение переключателя: он выбран, когда оно совпадает с `modelValue` или значением группы. */
   value: GrRadioValue
+  /** Выбранное значение (`v-model`) у одиночного переключателя. В группе значение ведёт она. */
   modelValue?: GrRadioValue
+  /** Переключатель недоступен. Не задан — берётся из группы. */
   disabled?: boolean
   /** Визуальное и ARIA-состояние ошибки. Складывается с `invalid` группы. */
   invalid?: boolean
+  /** Имя для нативной формы: выбранный отдаёт значение скрытым полем. Не задано — из группы. */
   name?: string
+  /** Выбор обязателен: `aria-required` на переключателе. */
   required?: boolean
+  /** `form` скрытого поля — когда форма, куда уходит значение, стоит не вокруг переключателя. */
   form?: string
+  /** `id` элемента с ролью `radio` — для ссылок на него извне. */
   id?: string
+  /** Размер по шкале кнопок. Не задан — из группы, затем `GrConfigProvider`, иначе `md`. */
   size?: GrButtonSize
+  /**
+   * Вид: `radiobox` — круг с точкой и подписью, `button` — кнопка в стиле `GrButton`.
+   * По умолчанию `radiobox`.
+   */
   variant?: GrRadioVariant
+  /** Вес невыбранной кнопки в `variant="button"`. По умолчанию `outline`. */
   buttonVariant?: GrButtonVariant
+  /** Тон невыбранной кнопки в `variant="button"`. По умолчанию `neutral`. */
   buttonTone?: GrButtonTone
+  /** Вес выбранной кнопки в `variant="button"`. По умолчанию `primary`. */
   selectedButtonVariant?: GrButtonVariant
+  /** Тон выбранной кнопки в `variant="button"`. По умолчанию `primary`. */
   selectedButtonTone?: GrButtonTone
+  /** Доступное имя, когда подписи в слоте нет — например, у кнопки из одной иконки. */
   ariaLabel?: string
 }
 
 export interface GrRadioEmits {
+  /** Выбран этот переключатель (`v-model`). Только при заданном `modelValue`, иначе выбор у группы. */
   (e: 'update:modelValue', value: GrRadioValue): void
 }
 

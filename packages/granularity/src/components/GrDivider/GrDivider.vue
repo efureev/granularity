@@ -29,8 +29,11 @@ import {
 } from './grDividerStyles'
 
 export interface GrDividerProps {
+  /** Направление линии: между блоками или между элементами в ряду. По умолчанию `horizontal`. */
   orientation?: GrDividerOrientation
+  /** Подпись в разрыве линии: «или», название раздела. Только у горизонтального; даёт и имя. */
   label?: string
+  /** Где стоит подпись на линии: `start`, `center` или `end`. По умолчанию `center`. */
   align?: GrDividerAlign
   /** Начертание линии. Не задано — берётся из `GrConfigProvider`, иначе `solid`. */
   variant?: GrDividerVariant

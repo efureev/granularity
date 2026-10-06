@@ -42,13 +42,19 @@ import IconX from '~icons/lucide/x'
 import { useControlAria } from '../../composables/internal/useControlAria'
 
 export interface GrTreeSelectEmits<T extends Record<string, any> = any> {
+  /** Новое значение для `v-model`: ключ, массив ключей при `multiple` или `null` после очистки. */
   (e: 'update:modelValue', value: GrTreeSelectModelValue): void
+  /** Значение изменилось — тот же payload, что у `update:modelValue`. */
   (e: 'change', value: GrTreeSelectModelValue): void
   /** Панель открылась/закрылась (`v-model:open`). */
   (e: 'update:open', value: boolean): void
+  /** Значение снято крестиком; только при `clearable`. */
   (e: 'clear'): void
+  /** Клик по узлу в панели: его данные и узел дерева. Приходит до смены значения. */
   (e: 'nodeClick', data: T, node: GrTreeNode<T>): void
+  /** Фокус вошёл в контрол. Переход между триггером и панелью событием не считается. */
   (e: 'focus', event: FocusEvent): void
+  /** Фокус ушёл из контрола — из триггера и из панели вместе. */
   (e: 'blur', event: FocusEvent): void
 }
 
@@ -167,7 +173,12 @@ function blur(): void {
   triggerEl.value?.blur()
 }
 
-defineExpose({ focus, blur })
+defineExpose({
+  /** Поставить фокус на триггер; панель при этом открывается. */
+  focus,
+  /** Снять фокус с триггера. */
+  blur,
+})
 const filterInputRef = ref<InstanceType<typeof GrInput> | null>(null)
 const treeRef = ref<GrTreeInstance | null>(null)
 const panelEl = ref<HTMLElement | null>(null)

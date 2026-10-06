@@ -43,15 +43,26 @@ export type GrTreeClassValue = HTMLAttributes['class']
 export type GrTreeNodeClass<T extends object> = GrTreeClassValue | ((row: GrTreeVisibleRow<T>) => GrTreeClassValue)
 
 export type GrTreeDataProps<T extends object> = {
+  /**
+   * Корневые узлы в исходной форме. Дерево их не копирует: перенос и `appendNode` меняют эти
+   * массивы на месте.
+   */
   data: T[]
+  /** Имена полей в данных: `children`, `label`, `isLeaf`. По умолчанию `children` и `label`. */
   props?: GrTreePropsMap
+  /** Поле с уникальным ключом узла: на нём держатся раскрытие, отметки, перенос. По умолчанию `id`. */
   nodeKey?: NodeKeyProp<T> | 'id'
+  /** Стартовый набор раскрытых узлов. Новый массив в пропе заменяет раскрытие целиком. */
   defaultExpandedKeys?: GrTreeKey[]
   /**
    * Раскрывать узлы, как только они появились в данных. Уже свёрнутое руками
    * не раскрывается обратно на каждом обновлении `data`.
    */
   defaultExpandAll?: boolean
+  /**
+   * Своё правило совпадения узла с фильтром; `undefined` из него — правило по умолчанию: подстрока
+   * подписи без учёта регистра. Совпавший узел остаётся видимым вместе с предками.
+   */
   filterNodeMethod?: GrTreeFilterNodeMethod<T>
   /**
    * Значение фильтра. Проп, а не только метод `filter()`: обёртке иначе
@@ -98,6 +109,7 @@ export type GrTreeViewProps<T extends object> = {
   virtual?: boolean
   /** Максимальная высота дерева со своим скроллером. Число — пиксели. */
   maxHeight?: number | string
+  /** Подсвечивать строку текущего узла. По умолчанию `true`. */
   highlightCurrent?: boolean
   /**
    * Иконка свёрнутого узла: Vue-компонент либо класс иконки (`'i-lucide-plus'` —
@@ -108,6 +120,7 @@ export type GrTreeViewProps<T extends object> = {
   expandIcon?: string | Component
   /** Иконка раскрытого узла. Не задана — та же встроенная стрелка, повёрнутая. */
   collapseIcon?: string | Component
+  /** Поворот иконки раскрытого узла на 90°: хватает одной `expandIcon`. По умолчанию `true`. */
   toggleIconRotate?: boolean
   /**
    * Направляющие уровней. `true` — то же, что `'line'`: одна вертикаль на
@@ -116,13 +129,27 @@ export type GrTreeViewProps<T extends object> = {
    * то, какие ветки ещё продолжаются.
    */
   branchLine?: boolean | GrTreeBranchLine
+  /**
+   * Цвет направляющих: CSS-значение или функция от узла. Не задан —
+   * `--gr-tree-branch-line-default-color`, иначе цвет рамки.
+   */
   branchLineColor?: GrTreeBranchLineColor<T>
+  /** Цвет направляющей у ветки текущего узла: значение или функция. Не задан — `branchLineColor`. */
   branchLineActiveColor?: GrTreeBranchLineColor<T>
+  /**
+   * Класс строки узла — значением или функцией от строки (`node`, `isExpanded`, `isLeaf`,
+   * `isMatched`). Перебивает кегль и цвет дерева: так делают ступени по уровням.
+   */
   rowClass?: GrTreeNodeClass<T>
+  /** Класс ручки переноса — значением или функцией от строки. */
   dragHandleClass?: GrTreeNodeClass<T>
+  /** Класс кнопки раскрытия — значением или функцией от строки. */
   toggleClass?: GrTreeNodeClass<T>
+  /** Класс иконки раскрытия — значением или функцией от строки. */
   toggleIconClass?: GrTreeNodeClass<T>
+  /** Класс заглушки на месте кнопки раскрытия у листа — значением или функцией от строки. */
   toggleSpacerClass?: GrTreeNodeClass<T>
+  /** Класс обёртки содержимого строки (подписи или слота) — значением или функцией от строки. */
   contentClass?: GrTreeNodeClass<T>
   /** i18n-метка кнопки "Перетащить" (default: 'Drag'). */
   dragLabel?: string
@@ -137,10 +164,13 @@ export type GrTreeInteractionProps<T extends object> = {
   expandOnClickNode?: boolean
   /** На каждом уровне раскрыт максимум один узел. */
   accordion?: boolean
+  /** Перенос узлов мышью, пальцем и `Shift` со стрелкой. Ограничивают `allowDrag` и `allowDrop`. */
   draggable?: boolean
   /** Иконка ручки переноса: компонент, класс иконки или ничего — тогда встроенная. */
   dragHandleIcon?: string | Component
+  /** Можно ли уронить узел на цель: `prev` — перед ней, `inner` — внутрь, `next` — после. */
   allowDrop?: (draggingNode: GrTreeNode<T>, dropNode: GrTreeNode<T>, type: GrTreeAllowDropType) => boolean
+  /** Можно ли взять узел: `false` выключает его ручку переноса. */
   allowDrag?: (draggingNode: GrTreeNode<T>) => boolean
   /**
    * Когда показывать ручку переноса.
@@ -167,6 +197,7 @@ export type GrTreeSelectionProps = {
   currentKey?: GrTreeKey | null
   /** Отмеченные ключи (`v-model:checked-keys`). */
   checkedKeys?: GrTreeKey[]
+  /** Стартовые отметки, когда `checkedKeys` не ведут снаружи. Читаются один раз, при создании. */
   defaultCheckedKeys?: GrTreeKey[]
   /** Не связывать родителей и детей: каждый узел отмечается сам по себе. */
   checkStrictly?: boolean

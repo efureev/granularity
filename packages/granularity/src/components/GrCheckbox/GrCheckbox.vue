@@ -62,8 +62,11 @@ export interface GrCheckboxProps {
 
   /** Не задан внутри `GrCheckboxGroup` — состояние берётся из группы. */
   modelValue?: boolean
+  /** Недоступен: не переключается и не фокусируется. Складывается по «или» с полем и группой. */
   disabled?: boolean
+  /** Имя скрытого `<input>` в `FormData`. Внутри `GrCheckboxGroup` по умолчанию — имя группы. */
   name?: string
+  /** Значение для формы и ключ в массиве выбранных у `GrCheckboxGroup`. По умолчанию `on`. */
   value?: string
   /** Обязательное поле: объявляется как `aria-required`, нативной проверки нет. */
   required?: boolean
@@ -71,6 +74,7 @@ export interface GrCheckboxProps {
   readonly?: boolean
   /** Визуальное и ARIA-состояние ошибки. */
   invalid?: boolean
+  /** Id формы для скрытого `<input>`, когда чекбокс стоит вне её разметки. */
   form?: string
   /** Пробрасывается на скрытый нативный `<input>`, чтобы работал `<label for="...">`. */
   id?: string
@@ -85,9 +89,16 @@ export interface GrCheckboxProps {
 }
 
 export interface GrCheckboxEmits {
+  /**
+   * Новое состояние для `v-model`. Внутри группы без своего `modelValue` не шлётся —
+   * значение уходит в группу.
+   */
   (e: 'update:modelValue', value: boolean): void
+  /** Пользователь переключил чекбокс; шлётся и внутри `GrCheckboxGroup`. */
   (e: 'change', value: boolean): void
+  /** Фокус пришёл на контрол — в том числе кликом по внешнему `<label for>`. */
   (e: 'focus', event: FocusEvent): void
+  /** Фокус ушёл с контрола. */
   (e: 'blur', event: FocusEvent): void
 }
 
@@ -276,7 +287,12 @@ function blur(): void {
   control.value?.blur()
 }
 
-defineExpose({ focus, blur })
+defineExpose({
+  /** Поставить фокус на контрол — тот же, что получает `Tab`. */
+  focus,
+  /** Снять фокус с контрола. */
+  blur,
+})
 
 // Подпись держится снаружи роли-виджета именно для того, чтобы могла содержать
 // ссылки и кнопки, — поэтому клик по её интерактивному содержимому чекбокс не

@@ -28,28 +28,48 @@ import { chipGroupRootClass } from './grChipGroupStyles'
 export interface GrChipGroupProps {
   /** Одиночный выбор — значение, множественный — массив. */
   modelValue?: GrChipValue | GrChipValue[] | null
+  /**
+   * Множественность выбора: `multiple` — массив значений и роль `listbox`, `single` — одно
+   * значение или `null` и роль `radiogroup`. По умолчанию `multiple`.
+   */
   selection?: GrChipSelection
   /** Имя для нативной формы. Множественный выбор отдаёт по полю на значение. */
   name?: string
+  /** Набор недоступен: чипы не выбираются и не снимаются. Включается и от `GrFormField`. */
   disabled?: boolean
   /** Выбор видно, но он не меняется. */
   readonly?: boolean
+  /** Значение с ошибкой: `aria-invalid` на группе. Включается и от ошибки `GrFormField`. */
   invalid?: boolean
+  /** Выбор обязателен: `aria-required` на группе. Включается и от `GrFormField`. */
   required?: boolean
   /** Крестик у всех чипов набора. Точечно перебивается пропом самого чипа. */
   closable?: boolean
+  /** Ступень шкалы для всех чипов набора; проп чипа сильнее. По умолчанию `md`. */
   size?: GrChipSize
+  /** Тон всех чипов набора; проп чипа сильнее. Не задан — `GrConfigProvider`, иначе `neutral`. */
   tone?: GrChipTone
+  /** Форма всех чипов набора: `round`, `semi` или `square`; проп чипа сильнее. */
   radius?: GrChipRadius
+  /** Заливка тоном вместо мягкой подложки у всех чипов набора; проп чипа сильнее. */
   dark?: boolean
+  /** Доступное имя набора. Внутри `GrFormField` не нужно: группу именует подпись поля. */
   ariaLabel?: string
 }
 
 export interface GrChipGroupEmits {
+  /** Новое значение (`v-model`): массив в `multiple`, значение или `null` в `single`. */
   (e: 'update:modelValue', value: GrChipValue | GrChipValue[] | null): void
+  /** Пользователь изменил выбор кликом или клавишей; приходит вместе с `update:modelValue`. */
   (e: 'change', value: GrChipValue | GrChipValue[] | null): void
+  /**
+   * Чип просят снять — крестиком или `Delete`. Группа его не убирает: значение удаляет из
+   * массива потребитель.
+   */
   (e: 'remove', value: GrChipValue): void
+  /** Фокус вошёл в набор. Переходы между чипами стрелками событием не считаются. */
   (e: 'focus', event: FocusEvent): void
+  /** Фокус ушёл из набора целиком. */
   (e: 'blur', event: FocusEvent): void
 }
 
@@ -210,7 +230,9 @@ provide(GR_CHIP_GROUP_CONTEXT, {
 })
 
 defineExpose({
+  /** Фокус на активный чип — тот, что держит остановку `Tab` набора. */
   focus: () => rovingElement()?.focus(),
+  /** Снять фокус с активного чипа набора. */
   blur: () => rovingElement()?.blur(),
 })
 </script>

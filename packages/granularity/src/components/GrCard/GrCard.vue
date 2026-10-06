@@ -64,6 +64,7 @@ export interface GrCardProps {
 }
 
 export interface GrCardEmits {
+  /** Клик по корню карточки. С клавиатуры приходит только у `clickable` и карточки-ссылки. */
   (e: 'click', event: MouseEvent): void
 }
 

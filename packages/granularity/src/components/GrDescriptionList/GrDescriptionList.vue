@@ -51,6 +51,7 @@ export interface GrDescriptionItem {
  * два разных по роли элемента: термин и его значение.
  */
 export interface GrDescriptionListProps {
+  /** Пары в порядке вывода. `name` пары открывает её слоты `#label-<name>` и `#value-<name>`. */
   items: readonly GrDescriptionItem[]
   /**
    * `inline` — подпись слева колонкой; `stacked` — над значением; `flow` —
@@ -64,6 +65,7 @@ export interface GrDescriptionListProps {
    * В узкой колонке фиксированная подпись выжимает значение в букву на строку.
    */
   stackBelow?: number
+  /** Шаг между парами: `compact` сжимает его для плотных карточек. По умолчанию `regular`. */
   density?: GrDescriptionDensity
   /** Отбивать пары линиями. В `flow` не применяется. */
   divided?: boolean
@@ -71,6 +73,7 @@ export interface GrDescriptionListProps {
   columns?: GrDescriptionColumns
   /** Чем печатать пустое значение. */
   emptyText?: string
+  /** Кегль подписей и значений по шкале контролов. По умолчанию `md`. */
   size?: GrComponentSize
 }
 

@@ -41,7 +41,9 @@ import { GR_SIDEBAR_KEY } from './sidebarContext'
 export type { GrSidebarLandmark, GrSidebarPosition } from './grSidebarStyles'
 
 export interface GrSidebarProps {
+  /** Заголовок шапки — название продукта или раздела. В свёрнутой панели скрыт; слот `#title` сильнее. */
   title?: string
+  /** Приглушённая строка над заголовком — например, рабочее пространство. Слот `#subtitle` сильнее. */
   subtitle?: string
   /** Свёрнутое состояние. Поддерживает `v-model:collapsed`. */
   collapsed?: boolean
@@ -78,7 +80,15 @@ export interface GrSidebarProps {
 }
 
 export interface GrSidebarEmits {
+  /**
+   * Панель свернули или развернули (`v-model:collapsed`): кнопкой в шапке или
+   * нажатием на ветку в свёрнутом рейле, которое возвращает панели ширину.
+   */
   (e: 'update:collapsed', value: boolean): void
+  /**
+   * Слой `overlay` закрыт — `Esc`, подложкой или кнопкой в шапке (`v-model:open`).
+   * Приходит только `false`.
+   */
   (e: 'update:open', value: boolean): void
 }
 

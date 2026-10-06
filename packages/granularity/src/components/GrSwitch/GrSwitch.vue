@@ -42,6 +42,7 @@ export interface GrSwitchProps {
    * заводить `ref` даже там, где переключатель presentational.
    */
   modelValue?: boolean
+  /** Недоступен: не переключается и в форму не уходит. Складывается по «или» с полем и формой. */
   disabled?: boolean
   /** Только для чтения: состояние видно, но не переключается. */
   readonly?: boolean
@@ -49,7 +50,9 @@ export interface GrSwitchProps {
   invalid?: boolean
   /** Обязательное поле (`aria-required`). */
   required?: boolean
+  /** Доступное имя, когда подписи нет ни в слоте, ни у `GrFormField`. */
   ariaLabel?: string
+  /** Размер дорожки и бегунка: `xs`–`lg`. По умолчанию `md`; берётся из `GrConfigProvider`. */
   size?: GrSwitchSize
   /** Сторона подписи относительно дорожки. */
   labelPosition?: GrSwitchLabelPosition
@@ -84,9 +87,13 @@ export interface GrSwitchProps {
 }
 
 export interface GrSwitchEmits {
+  /** Новое состояние для `v-model`. При `disabled`, `readonly` и `loading` не шлётся. */
   (e: 'update:modelValue', value: boolean): void
+  /** Пользователь переключил — тот же payload, что у `update:modelValue`. */
   (e: 'change', value: boolean): void
+  /** Фокус пришёл на переключатель — в том числе кликом по подписи `GrFormField`. */
   (e: 'focus', event: FocusEvent): void
+  /** Фокус ушёл с переключателя. */
   (e: 'blur', event: FocusEvent): void
 }
 
@@ -167,7 +174,12 @@ function blur(): void {
   rootEl.value?.blur()
 }
 
-defineExpose({ focus, blur })
+defineExpose({
+  /** Поставить фокус на переключатель. */
+  focus,
+  /** Снять фокус с переключателя. */
+  blur,
+})
 
 // Эффективный размер: локальный проп → `GrConfigProvider` → дефолт компонента.
 const resolvedSize = useGrComponentSize(() => props.size, {

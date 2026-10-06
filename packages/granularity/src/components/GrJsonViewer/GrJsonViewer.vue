@@ -65,6 +65,7 @@ export interface GrJsonViewerProps {
   maxHeight?: string | number
   /** Имя области для скринридера. Безымянное дерево объявляется просто «дерево». */
   ariaLabel?: string
+  /** Кегль дерева и высота поиска и кнопок панели. Не задан — из `GrConfigProvider`, иначе `md`. */
   size?: GrComponentSize
 }
 
@@ -245,7 +246,17 @@ async function copyNode(node: GrJsonNode): Promise<void> {
   emit('copy', { path: node.path, value: node.value })
 }
 
-defineExpose({ filter, expandAll, collapseAll })
+defineExpose({
+  /**
+   * Отфильтровать дерево по ключу или значению — тем же запросом, что в поле поиска.
+   * Пустая строка снимает фильтр.
+   */
+  filter,
+  /** Раскрыть все ветки. */
+  expandAll,
+  /** Свернуть все ветки, включая корень. */
+  collapseAll,
+})
 </script>
 
 <template>

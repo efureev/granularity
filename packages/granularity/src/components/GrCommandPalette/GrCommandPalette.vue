@@ -72,7 +72,9 @@ export interface GrCommandPaletteProps {
    * наверх в этом порядке и не дублируются ниже.
    */
   recentIds?: string[]
+  /** Подсказка в поле поиска. По умолчанию — строка локали. */
   placeholder?: string
+  /** Ширина окна по шкале панелей `GrModal`. По умолчанию `lg`; берётся из `GrConfigProvider`. */
   size?: GrCommandPaletteSize
   /** Глобальное сочетание открытия. `null` — не вешать слушатель. */
   hotkey?: string | null
@@ -103,11 +105,14 @@ export interface GrCommandPaletteProps {
   virtual?: boolean
   /** Показывать подсказку сочетания в поле ввода. */
   showHotkeyHint?: boolean
+  /** Текст пустой выдачи. Слот `#empty` сильнее; по умолчанию — строка локали. */
   emptyText?: string
+  /** Доступное имя палитры и поля поиска. По умолчанию — строка локали. */
   ariaLabel?: string
 }
 
 export interface GrCommandPaletteEmits {
+  /** Палитра открылась или закрылась (`v-model`): сочетанием, по `Esc` или после выбора команды. */
   (e: 'update:modelValue', value: boolean): void
   /** Команда выбрана (клик или Enter). */
   (e: 'select', item: GrCommandItem): void
@@ -518,7 +523,14 @@ const listStyleWithSpacers = computed(() => {
   }
 })
 
-defineExpose({ open, close, toggle })
+defineExpose({
+  /** Открыть палитру — для кнопки в шапке или пункта меню рядом с сочетанием. */
+  open,
+  /** Закрыть палитру. */
+  close,
+  /** Переключить палитру — то же, что глобальное сочетание. */
+  toggle,
+})
 
 defineSlots<{
   /** Строка списка вместо стандартной. */

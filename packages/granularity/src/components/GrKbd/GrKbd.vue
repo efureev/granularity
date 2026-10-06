@@ -17,6 +17,10 @@ import {
 } from './grKbdStyles'
 
 export interface GrKbdProps {
+  /**
+   * Высота плашки и кегль — под соседний текст или кнопку.
+   * Не задан — из `GrConfigProvider`, иначе `md`.
+   */
   size?: GrKbdSize
   /**
    * `merged` (по умолчанию) — сочетание одной плашкой, как его пишут сами
@@ -46,6 +50,10 @@ export interface GrKbdProps {
    * плюс, у `sequence` — слово из локали. Пустая строка — только зазор.
    */
   separator?: string
+  /**
+   * Чем рисовать `mod` и модификаторы: `apple` — `⌘`, `other` — `Ctrl`. По умолчанию
+   * `auto`: платформа узнаётся после монтирования, а сервер отдаёт не-Apple вид.
+   */
   platform?: GrKbdPlatform
 }
 

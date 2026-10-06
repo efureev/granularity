@@ -53,6 +53,7 @@ export interface GrFormProps<TModel extends object = Record<string, unknown>> {
   validateOnChange?: boolean
   /** Скроллить к первому невалидному полю после `validate()`. */
   scrollToError?: boolean
+  /** Как прокручивать к полю — к первой ошибке и в `scrollToField`. По умолчанию `smooth`. */
   scrollBehavior?: ScrollBehavior
   /**
    * Выключить форму целиком — типично на время отправки. Доезжает до контролов

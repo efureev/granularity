@@ -124,11 +124,11 @@ const props = withDefaults(defineProps<GrToasterProps>(), {
   collapse: 3,
 })
 
-/**
- * Слот `actions` полностью заменяет дефолтные action-кнопки тоста. Получает сам
- * `toast` и `dismiss` — функцию, закрывающую именно этот тост.
- */
 defineSlots<{
+  /**
+   * Кнопки тоста вместо `action`/`actions` из его описания. Получает сам `toast` и `dismiss` —
+   * функцию, закрывающую именно этот тост.
+   */
   actions?: (props: { toast: Toast, dismiss: () => void }) => unknown
 }>()
 
@@ -556,7 +556,10 @@ function onFocusHotkey(event: KeyboardEvent): void {
     event.preventDefault()
 }
 
-defineExpose({ focus })
+defineExpose({
+  /** Фокус на верхний тост, как по `focusHotkey`; `false` — тостов нет. */
+  focus,
+})
 </script>
 
 <template>

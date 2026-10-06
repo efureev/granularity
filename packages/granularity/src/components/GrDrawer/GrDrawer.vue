@@ -68,7 +68,9 @@ export interface GrDrawerProps {
   showCloseButton?: boolean
   /** Паддинги и рамка секций — как у `GrDialog`. */
   headerConfig?: GrDrawerSectionConfig
+  /** Поля тела панели. `bordered` у тела не применяется: своей линии у него нет. */
   bodyConfig?: GrDrawerSectionConfig
+  /** Поля и верхняя линия подвала. Подвал рисуется, только если передан слот `#footer`. */
   footerConfig?: GrDrawerSectionConfig
   /** Элемент, получающий фокус при открытии. По умолчанию — сама панель. */
   initialFocus?: HTMLElement | null
@@ -77,6 +79,7 @@ export interface GrDrawerProps {
 }
 
 export interface GrDrawerEmits {
+  /** Панель закрыта (`v-model`): крестиком, Esc, подложкой или методом `close`. */
   (e: 'update:modelValue', value: boolean): void
   /** Панель выехала и анимация закончилась. */
   (e: 'opened'): void
@@ -112,10 +115,13 @@ const resolvedCloseLabel = computed(() => props.closeLabel ?? t('gr.common.close
 const emit = defineEmits<GrDrawerEmits>()
 
 const slots = defineSlots<{
+  /** Содержимое панели. Тело скроллится, когда не помещается. */
   default?: () => any
+  /** Заголовок вместо пропа `title`. Даёт панели доступное имя и без видимой шапки. */
   title?: () => any
   /** Своя шапка целиком: заголовок, кнопка закрытия и всё, что нужно рядом. */
   header?: (props: { title?: string, close: () => void }) => any
+  /** Подвал панели — обычно кнопки действий. Без слота подвала нет. */
   footer?: () => any
 }>()
 

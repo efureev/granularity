@@ -23,6 +23,7 @@ import {
 } from './grFormFieldStyles'
 
 export interface GrFormFieldProps {
+  /** Подпись поля: `<label for>` контрола и его доступное имя. Слот `#label` сильнее. */
   label?: string
   /**
    * Имя поля в модели `GrForm` (в т.ч. dot-path `address.city`). Когда поле внутри
@@ -64,6 +65,7 @@ export interface GrFormFieldProps {
   labelPosition?: GrFormFieldLabelPosition
   /** Ширина колонки подписи при `labelPosition="start"`. Число — пиксели. */
   labelWidth?: string | number
+  /** Классы на `<label>` поверх встроенных — точечная правка подписи без своего слота. */
   labelClass?: LabelClass
 }
 

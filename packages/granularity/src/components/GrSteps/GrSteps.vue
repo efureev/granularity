@@ -50,9 +50,13 @@ import {
  * Контент шага компонент не рисует: его ставит потребитель обычным `v-if`.
  */
 export interface GrStepsProps {
+  /** `value` текущего шага (`v-model`). */
   modelValue: string
+  /** Шаги мастера по порядку: `value`, подпись, описание, иконка, статус, `disabled`. */
   steps: GrStep[]
+  /** Направление ленты. По умолчанию `horizontal`; берётся из `GrConfigProvider`. */
   orientation?: GrStepsOrientation
+  /** Размер маркеров и кегль подписей. По умолчанию `md`; берётся из `GrConfigProvider`. */
   size?: GrStepsSize
   /** Компактный вид для узкой колонки: подпись текущего шага и полоса прогресса. */
   variant?: GrStepsVariant
@@ -63,6 +67,7 @@ export interface GrStepsProps {
   linear?: boolean
   /** Переход кликом по шагу. Выключен — лента становится только индикатором. */
   clickable?: boolean
+  /** Имя лендмарка `navigation`. Не задано — берётся из локали. */
   ariaLabel?: string
   /**
    * Гейт перехода. Вернул `false` — перехода нет.
@@ -74,7 +79,9 @@ export interface GrStepsProps {
 }
 
 export interface GrStepsEmits {
+  /** Перешли на другой шаг (`v-model`) — кликом или методом, после одобрения `beforeLeave`. */
   (e: 'update:modelValue', value: string): void
+  /** Шаг сменился — тот же payload, что у `update:modelValue`. */
   (e: 'change', value: string): void
 }
 
@@ -216,10 +223,24 @@ async function goTo(value: string): Promise<boolean> {
 }
 
 defineExpose({
+  /**
+   * Перейти на следующий шаг, минуя выключенные; спрашивает `beforeLeave`. `true` —
+   * переход состоялся.
+   */
   next,
+  /**
+   * Вернуться на предыдущий шаг, минуя выключенные; спрашивает `beforeLeave`. `true` —
+   * переход состоялся.
+   */
   back,
+  /**
+   * Перейти на шаг по `value`. Ограничение `linear` не действует, `beforeLeave` —
+   * действует; `true` — переход состоялся.
+   */
   goTo,
+  /** Перед текущим нет доступных шагов — кнопка «Назад» не нужна. */
   isFirst: computed(() => previousEnterableIndex(props.steps, currentIndex.value) === -1),
+  /** После текущего нет доступных шагов — пора показывать «Готово». */
   isLast: computed(() => nextEnterableIndex(props.steps, currentIndex.value) === -1),
 })
 

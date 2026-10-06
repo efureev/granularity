@@ -207,7 +207,14 @@ const panelStyle = computed(() => {
 
 const contentClasses = computed(() => grDropdownContentClass(props.contentClass))
 
-defineExpose({ open, close, toggle })
+defineExpose({
+  /** Открыть панель из кода. При `disabled` ничего не делает. */
+  open,
+  /** Закрыть панель из кода. */
+  close,
+  /** Переключить панель: открытую закрыть, закрытую открыть. */
+  toggle,
+})
 
 defineSlots<{
   /**

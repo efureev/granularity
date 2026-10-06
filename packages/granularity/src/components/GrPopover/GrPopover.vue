@@ -42,9 +42,14 @@ export interface GrPopoverProps {
    * (uncontrolled), с ним — слушайте `update:open`.
    */
   open?: boolean
+  /**
+   * Сторона и выравнивание панели у триггера; при нехватке места она переворачивается.
+   * По умолчанию `bottom-start`.
+   */
   placement?: UseFloatingPlacement
   /** Зазор между триггером и панелью, px. */
   offsetPx?: number
+  /** Поле и кегль панели по шкале контролов. Не задан — из `GrConfigProvider`, иначе `md`. */
   size?: GrPopoverSize
   /** Роль панели. Меняется теми, кто строит поверх примитива своё меню/список. */
   role?: GrPopoverRole
@@ -81,7 +86,15 @@ export interface GrPopoverProps {
   openDelay?: number
   /** Задержка закрытия после ухода курсора, мс. */
   closeDelay?: number
+  /**
+   * Закрывать по `Esc`. Esc закрывает верхний слой стека: поповер в модалке закроет себя, а не её.
+   * По умолчанию `true`.
+   */
   closeOnEsc?: boolean
+  /**
+   * Закрывать по клику вне панели. Слои, открытые из самой панели (подменю, селект),
+   * внешними не считаются. По умолчанию `true`.
+   */
   closeOnClickOutside?: boolean
   /** Закрывать по клику внутри панели — удобно для меню, вредно для формы. */
   closeOnContentClick?: boolean
@@ -96,7 +109,9 @@ export interface GrPopoverProps {
    * оверлеев (`#gr-portal` либо `portalTarget` из `GrConfigProvider`).
    */
   teleportTo?: string | HTMLElement
+  /** Свои классы панели. Поле так не снять — для этого `padding="none"`. */
   contentClass?: string
+  /** Панель не открывается ни кликом, ни наведением; триггер из `triggerProps` получает `disabled`. */
   disabled?: boolean
   /**
    * Якорь-прямоугольник в координатах вьюпорта вместо обёртки слота `#trigger`:
@@ -138,6 +153,7 @@ export interface GrPopoverProps {
 }
 
 export interface GrPopoverEmits {
+  /** Панель открылась или закрылась — триггером, `Esc`, кликом вне или из кода (`v-model:open`). */
   (e: 'update:open', value: boolean): void
 }
 
@@ -399,7 +415,14 @@ const panelClasses = computed(() =>
   grPopoverPanelClass(resolvedSize.value, resolvedPlacement.value, props.contentClass, props.padding),
 )
 
-defineExpose({ open, close, toggle })
+defineExpose({
+  /** Открыть панель из кода. При `disabled` ничего не делает. */
+  open,
+  /** Закрыть панель; фокус возвращается на триггер, если был внутри. */
+  close,
+  /** Открыть закрытую панель или закрыть открытую. */
+  toggle,
+})
 
 defineSlots<{
   /**

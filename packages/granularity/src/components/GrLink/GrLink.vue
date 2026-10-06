@@ -42,17 +42,28 @@ export interface GrLinkProps {
   * рендерится через `<component :is="as">`. Игнорируется при `disabled`.
   */
   as?: string | Component
+  /** Адрес ссылки: без `as` корень становится `<a>`. При `disabled` не выводится. */
   href?: string
+  /** Открыть в новой вкладке: `target="_blank"`, `rel="noopener noreferrer"` и иконка. */
   external?: boolean
+  /** `target` ссылки, сильнее `external`. С `_blank` добавляются защитный `rel` и подсказка. */
   target?: string
+  /** `rel` ссылки. Без него при `target="_blank"` ставится `noopener noreferrer`. */
   rel?: string
+  /** Ссылка недоступна: корень — `<span>` без `href`, вне порядка `Tab`, с `aria-disabled`. */
   disabled?: boolean
+  /** Доступное имя вместо текста; подсказка о новой вкладке дописывается к нему сама. */
   ariaLabel?: string
   /** Семантический цвет ссылки из палитры `GrTone`. */
   tone?: GrLinkTone
   /** Уровень акцента: `default` (окрашен) или `muted` (приглушён, акцент на hover). */
   variant?: GrLinkVariant
+  /**
+   * Подчёркивание: `auto` — при наведении, `always` — всегда, для ссылки посреди текста, `none` —
+   * никогда. По умолчанию `auto`.
+   */
   underline?: GrLinkUnderline
+  /** Кегль ссылки и её иконки. По умолчанию `md`; берётся из `GrConfigProvider`. */
   size?: GrLinkSize
   /**
   * Иконка внешней ссылки. По умолчанию показывается у любой ссылки, которая

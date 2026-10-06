@@ -67,6 +67,7 @@ export interface GrTooltipProps {
 }
 
 export interface GrTooltipEmits {
+  /** Подсказка показана или скрыта (`v-model:open`): курсором, фокусом, тапом или `Esc`. */
   (e: 'update:open', value: boolean): void
 }
 

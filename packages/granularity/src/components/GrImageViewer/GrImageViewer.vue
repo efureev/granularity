@@ -50,6 +50,7 @@ export type GrImageViewerItem = { src: string, alt?: string }
 export type GrImageViewerSource = string | GrImageViewerItem
 
 export interface GrImageViewerProps {
+  /** Открыт ли просмотрщик (`v-model`). Закрывается он сам — крестиком, `Esc` или подложкой. */
   modelValue: boolean
   /**
    * Кадры. Строка — только адрес; объект `{ src, alt }` даёт изображению
@@ -57,13 +58,24 @@ export interface GrImageViewerProps {
    * пользователя, а придумать текст за потребителя компонент не может.
    */
   urlList: GrImageViewerSource[]
+  /**
+   * Кадр, с которого открывается просмотрщик; смена пропа у открытого переключает кадр.
+   * По умолчанию `0`.
+   */
   initialIndex?: number
+  /** Множитель одного шага зума — кнопками и с клавиатуры. По умолчанию `1.2`. */
   zoomRate?: number
+  /** Нижний предел масштаба; `1` — кадр вписан в окно. По умолчанию `0.5`. */
   minScale?: number
+  /** Верхний предел масштаба относительно вписанного кадра. По умолчанию `5`. */
   maxScale?: number
+  /** Закрывать по клику на подложку вокруг кадра. По умолчанию `false`. */
   hideOnClickModal?: boolean
+  /** Закрывать по `Esc`; открытый поверх модалки закрывает себя, а не её. По умолчанию `true`. */
   closeOnPressEscape?: boolean
+  /** Счётчик «3 / 12» в шапке. По умолчанию `false`. */
   showProgress?: boolean
+  /** Масштаб в процентах в шапке; 100% — кадр вписан в окно. По умолчанию `true`. */
   showZoomValue?: boolean
   /** Включает масштабирование колесом мыши / жестом на трекпаде. По умолчанию включено. */
   wheelZoom?: boolean
@@ -106,10 +118,16 @@ export interface GrImageViewerProps {
 }
 
 export interface GrImageViewerEmits {
+  /** Просмотрщик просит закрыться (`v-model`): приходит только с `false`. */
   (e: 'update:modelValue', value: boolean): void
+  /**
+   * Закрыт изнутри — крестиком, `Esc`, подложкой или методом `close`. Внешний сброс модели
+   * его не шлёт.
+   */
   (e: 'close'): void
   /** Показан другой кадр. */
   (e: 'change', newIndex: number): void
+  /** Кадр повёрнут; payload — накопленный угол в градусах с шагом 90, без приведения к 0–360. */
   (e: 'rotate', deg: number): void
   /** Нажата кнопка скачивания. Само скачивание компонент уже запустил. */
   (e: 'download', payload: { src: string, alt: string, index: number }): void
@@ -162,15 +180,23 @@ const resolvedAriaLabel = computed(() => props.ariaLabel ?? t('gr.imageViewer.la
 const emit = defineEmits<GrImageViewerEmits>()
 
 type GrImageViewerToolbarActions = {
+  /** Закрыть просмотрщик, как крестиком: шлёт `update:modelValue` и `close`. */
   close: () => void
+  /** Предыдущий кадр; с первого переходит на последний. */
   prev: () => void
+  /** Следующий кадр; с последнего переходит на первый. */
   next: () => void
+  /** Увеличить в `zoomRate` раз, не выше `maxScale`. */
   zoomIn: () => void
+  /** Уменьшить в `zoomRate` раз, не ниже `minScale`. */
   zoomOut: () => void
   /** Масштаб «один к одному»: реальные 100%, а не номинальные. */
   zoomToNatural: () => void
+  /** Вернуть кадру исходный вид: масштаб, поворот и сдвиг. */
   reset: () => void
+  /** Повернуть на 90° против часовой стрелки. */
   rotateLeft: () => void
+  /** Повернуть на 90° по часовой стрелке. */
   rotateRight: () => void
   /** Скачать текущий кадр — то же, что делает кнопка тулбара. */
   download: () => void

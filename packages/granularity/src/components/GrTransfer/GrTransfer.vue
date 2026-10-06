@@ -79,8 +79,17 @@ export interface GrTransferProps<T extends Record<string, unknown> = Record<stri
   items: T[]
   /** Ключи правой панели **в её порядке**: порядок и есть значение. */
   modelValue: GrTransferKey[]
+  /**
+   * Ключ элемента: имя поля или функция. По умолчанию поле `id`; без ключа выдаётся временный,
+   * и `modelValue` с ним не сойдётся.
+   */
   itemKey?: GrTransferItemKey<T>
+  /** Подпись строки: имя поля или функция. По умолчанию поле `label`; по ней же ищет поиск. */
   itemLabel?: GrTransferItemLabel<T>
+  /**
+   * Запрещённая строка: имя поля или функция. По умолчанию поле `disabled`; такая строка
+   * не отмечается и не переносится.
+   */
   itemDisabled?: GrTransferItemFlag<T>
   /** Имя левой панели. Это доступное имя её `listbox`, а не украшение. */
   sourceTitle?: string
@@ -115,20 +124,35 @@ export interface GrTransferProps<T extends Record<string, unknown> = Record<stri
    * указатель на то, чего нет на экране, всё равно нечем.
    */
   virtual?: boolean
+  /** Кегль строк, шапок, поиска и кнопок по шкале контролов. По умолчанию `md`. */
   size?: GrComponentSize
+  /** Недоступен целиком: ни выбора, ни переноса, ни поиска. Складывается по «или» с полем и формой. */
   disabled?: boolean
+  /** Только для чтения: строки отмечаются, но перенос и перестановка выключены. */
   readonly?: boolean
+  /** Ошибка значения: `aria-invalid` на правой панели. Складывается по «или» с `GrFormField`. */
   invalid?: boolean
+  /** Обязательное поле: `aria-required` на правой панели — значение и есть её состав. */
   required?: boolean
+  /** Доступное имя всей группы; панели называют их заголовки. */
   ariaLabel?: string
 }
 
 export interface GrTransferEmits {
+  /** Новый состав правой панели в её порядке — после переноса или перестановки. */
   (e: 'update:modelValue', value: GrTransferKey[]): void
+  /** Состав изменился — тот же payload, что у `update:modelValue`. */
   (e: 'change', value: GrTransferKey[]): void
+  /**
+   * Строки переехали: их ключи и направление — кнопками, двойным кликом, с клавиатуры или
+   * перетаскиванием. Приходит после `update:modelValue`.
+   */
   (e: 'transfer', keys: GrTransferKey[], direction: GrTransferDirection): void
+  /** Изменился запрос в поиске панели `side` — сигнал подгрузить каталог при удалённом поиске. */
   (e: 'search', query: string, side: GrTransferSide): void
+  /** Фокус вошёл в компонент. Переходы между панелями и кнопками событием не считаются. */
   (e: 'focus', event: FocusEvent): void
+  /** Фокус ушёл из компонента целиком. */
   (e: 'blur', event: FocusEvent): void
 }
 

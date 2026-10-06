@@ -66,9 +66,13 @@ export interface GrNumberInputProps {
    * честно говорит «числа пока нет».
    */
   modelValue: number | null
+  /** Подсказка в пустом поле. Подпись не заменяет: имя даёт `GrFormField` или `ariaLabel`. */
   placeholder?: string
+  /** Нативный `autocomplete`: чем браузеру заполнять поле. */
   autocomplete?: string
+  /** Нативный `inputmode`: какую экранную клавиатуру показать. По умолчанию `decimal`. */
   inputmode?: InputHTMLAttributes['inputmode']
+  /** Выключить поле: ввод, кнопки ± и очистка недоступны. Складывается с `GrFormField`. */
   disabled?: boolean
   /** Быстрый флаг невалидности; эквивалент `state='danger'` + `aria-invalid`. */
   invalid?: boolean
@@ -78,9 +82,16 @@ export interface GrNumberInputProps {
   required?: boolean
   /** Доступное имя вне `GrFormField`. */
   ariaLabel?: string
+  /**
+   * Подсветка рамки по решению разработчика. `success` и `warning` добавляют иконку
+   * и скрытую подпись; `invalid` сильнее. По умолчанию `default`.
+   */
   state?: GrNumberInputState
+  /** Нативный `name` — имя поля при отправке формы. */
   name?: string
+  /** `id` поля. Не задан — берётся из `GrFormField`, чтобы подпись нашла поле. */
   id?: string
+  /** Высота и кегль по шкале контролов. По умолчанию `md`; берётся из `GrConfigProvider`. */
   size?: GrNumberInputSize
   /**
    * Форма рамки. `box` — скругление шкалы контролов; `pill` — пилюля.
@@ -89,12 +100,21 @@ export interface GrNumberInputProps {
    */
   shape?: GrControlShape
 
+  /** Выравнивание числа в поле. По умолчанию `left`. */
   textAlign?: GrNumberInputTextAlign
 
+  /**
+   * Знак дробной части на экране. При вводе принимаются и `.`, и `,`, а в модели
+   * всегда число. По умолчанию `.`.
+   */
   decimalSeparator?: string
+  /** Шаг кнопок ± и стрелок `↑`/`↓`; `PageUp`/`PageDown` шагают крупнее. По умолчанию `1`. */
   step?: number
+  /** Нижняя граница: применяется при коммите ввода, а не на каждом нажатии. `Home` ставит её. */
   min?: number
+  /** Верхняя граница: применяется при коммите ввода, а не на каждом нажатии. `End` ставит её. */
   max?: number
+  /** Сколько знаков после разделителя оставлять при коммите. Не задано — без округления. */
   precision?: number
 
   /** Кнопка очистки значения. */
@@ -114,11 +134,19 @@ export interface GrNumberInputProps {
 
   /** Показывать кнопки +/-. */
   controls?: boolean
+  /**
+   * Раскладка кнопок ±: `vertical` — столбиком справа, `horizontal` — по бокам поля.
+   * По умолчанию `vertical`.
+   */
   controlsDirection?: GrNumberInputControlsDirection
 
+  /** Минимальная ширина префикса. По умолчанию — по ступени размера. */
   prefixMinWidth?: string
+  /** Максимальная ширина префикса: содержимое шире обрезается. */
   prefixMaxWidth?: string
+  /** Минимальная ширина суффикса. По умолчанию — по ступени размера. */
   suffixMinWidth?: string
+  /** Максимальная ширина суффикса: содержимое шире обрезается. */
   suffixMaxWidth?: string
   /**
    * Фиксированная ширина у prefix/suffix: жёсткая ширина (из `*MaxWidth` →
@@ -126,6 +154,7 @@ export interface GrNumberInputProps {
    * suffix — слева). По умолчанию аддоны растягиваются под контент.
    */
   prefixFixed?: boolean
+  /** Жёсткая ширина суффикса — как у `prefixFixed`, только лишнее обрезается слева. */
   suffixFixed?: boolean
 
   /** i18n-friendly aria-label для кнопки "увеличить". */
@@ -135,9 +164,16 @@ export interface GrNumberInputProps {
 }
 
 export interface GrNumberInputEmits {
+  /** Новое значение (`v-model`); `null`, пока набранное не разбирается в число. */
   (e: 'update:modelValue', value: number | null): void
+  /**
+   * Значение зафиксировано: нативный `change`, шаг кнопкой или клавишей, очистка.
+   * Границы и точность к этому моменту уже применены.
+   */
   (e: 'change', value: number | null): void
+  /** Поле получило фокус — нативный `focus` с `<input>`. */
   (e: 'focus', event: FocusEvent): void
+  /** Поле потеряло фокус — нативный `blur` с `<input>`. */
   (e: 'blur', event: FocusEvent): void
   /** Значение стёрто кнопкой очистки. */
   (e: 'clear'): void
@@ -230,7 +266,12 @@ function blur(): void {
   inputEl.value?.blur()
 }
 
-defineExpose({ focus, blur })
+defineExpose({
+  /** Поставить фокус в поле. */
+  focus,
+  /** Снять фокус с поля. */
+  blur,
+})
 
 const { t, locale } = useGranularityTranslations()
 

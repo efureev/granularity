@@ -71,9 +71,11 @@ export type {
  * Пропсы публичного GR-примитива «Select».
  */
 export interface GrSelectProps<TValue extends GrSelectValue = string> {
+  /** Выбранное значение (`v-model`); в `multiple` — массив. */
   modelValue: GrSelectModelValue<TValue>
   /** Список опций. Поддерживает плоский массив опций и группы опций (`{ label, options }`). */
   options?: GrSelectOptionOrGroup<TValue>[]
+  /** Выключить поле целиком. Складывается с `disabled` у `GrFormField`. */
   disabled?: boolean
   /** Только для чтения: значение видно и уходит в форму, но не меняется. */
   readonly?: boolean
@@ -93,13 +95,19 @@ export interface GrSelectProps<TValue extends GrSelectValue = string> {
   valueKey?: string
   /** Обязательное поле (`aria-required`). */
   required?: boolean
+  /** Доступное имя вне `GrFormField`. */
   ariaLabel?: string
   /**
    * Форма рамки. `box` — скругление шкалы контролов, как было всегда; `pill` —
    * пилюля, как у `GrSegmented`. В `view="link"` не участвует: у ссылки рамки нет.
    */
   shape?: GrControlShape
+  /**
+   * Вид триггера: `default` — поле с рамкой, `link` — строчная ссылка без рамки, как
+   * `GrLink`. По умолчанию `default`.
+   */
   view?: GrSelectView
+  /** Высота и кегль по шкале контролов. По умолчанию `md`; берётся из `GrConfigProvider`. */
   size?: GrSelectSize
   /** Placeholder (показывается, когда значение не выбрано). */
   placeholder?: string
@@ -110,8 +118,11 @@ export interface GrSelectProps<TValue extends GrSelectValue = string> {
    * плашка на светлой теме почти не отличалась от фона поля.
    */
   tagTone?: GrBadgeTone
+  /** Плотная заливка чипов в режиме `tags`. Поле `dark` у опции сильнее. */
   tagDark?: boolean
+  /** Размер чипов по шкале `GrBadge`. По умолчанию `sm`. */
   tagSize?: GrBadgeSize
+  /** Скругление чипов: `square`, `semi` или `round`. По умолчанию `round`. */
   tagRadius?: GrBadgeRadius
   /** Как отображать список опций: нативный `<select>` или кастомная панель. */
   optionsView?: GrSelectOptionsView
@@ -193,14 +204,20 @@ export interface GrSelectProps<TValue extends GrSelectValue = string> {
    * нативного `<select>` разметку положить нельзя.
    */
   prefixMinWidth?: string
+  /** Максимальная ширина префикса: содержимое шире обрезается. */
   prefixMaxWidth?: string
+  /** Минимальная ширина суффикса. По умолчанию — по ступени размера. */
   suffixMinWidth?: string
+  /** Максимальная ширина суффикса: содержимое шире обрезается. */
   suffixMaxWidth?: string
+  /** Жёсткая ширина префикса: `prefixMaxWidth`, иначе `prefixMinWidth`, иначе по ступени размера. */
   prefixFixed?: boolean
+  /** Жёсткая ширина суффикса: `suffixMaxWidth`, иначе `suffixMinWidth`, иначе по ступени размера. */
   suffixFixed?: boolean
 }
 
 export interface GrSelectEmits<TValue extends GrSelectValue = string> {
+  /** Новое значение (`v-model`): выбор опции, снятие чипа или очистка. */
   (e: 'update:modelValue', value: GrSelectModelValue<TValue>): void
   /** Значение изменилось — тот же payload, что у `update:modelValue`. */
   (e: 'change', value: GrSelectModelValue<TValue>): void
@@ -210,7 +227,9 @@ export interface GrSelectEmits<TValue extends GrSelectValue = string> {
   (e: 'update:open', value: boolean): void
   /** Текст поиска как контролируемое значение (`v-model:search`). */
   (e: 'update:search', value: string): void
+  /** Фокус вошёл в контрол. Переход между полем и его панелью событием не считается. */
   (e: 'focus', event: FocusEvent): void
+  /** Фокус ушёл из контрола — из поля и из панели вместе. */
   (e: 'blur', event: FocusEvent): void
   /** Пользователь набрал запрос — сигнал сходить за опциями. */
   (e: 'search', value: string): void

@@ -23,25 +23,29 @@ import './defaults'
 
 /**
  * GrCollapse — контейнер секций `GrCollapseItem`.
- *
- * @prop modelValue — открытые секции. В `accordion`-режиме — `string|number|undefined`, иначе — массив значений.
- * @prop accordion — режим, когда одновременно может быть открыта только одна секция.
- * @prop disabled — блокирует взаимодействие со всеми секциями.
- * @prop divided — разделители между секциями.
- * @prop borderless — без обёртки в `GrCard`: аккордеон внутри карточки или сайдбара
- *   иначе получает вторую рамку и вторую тень.
- * @prop beforeChange — async-guard: `false` отменяет переключение.
  */
 export interface GrCollapseProps {
+  /** Открытые секции (`v-model`): в `accordion` — одно значение или `undefined`, иначе массив. */
   modelValue?: GrCollapseModelValue
+  /** Одновременно открыта только одна секция: открытие новой закрывает прежнюю. */
   accordion?: boolean
+  /** Блокирует все секции: заголовки не переключаются. */
   disabled?: boolean
+  /** Разделители между секциями. По умолчанию `true`; глобально — `componentDefaults`. */
   divided?: boolean
+  /**
+   * Без обёртки в `GrCard`: аккордеон внутри карточки или сайдбара иначе получает вторую рамку и
+   * вторую тень. По умолчанию `false`.
+   */
   borderless?: boolean
   /** Уровень заголовков секций (`h2`…`h6`) — под структуру страницы. */
   headingLevel?: GrCollapseHeadingLevel
   /** Сторона шеврона относительно заголовка. */
   expandIconPosition?: GrCollapseIconPosition
+  /**
+   * Async-guard переключения: получает секцию и направление, `false` отменяет. Пока он не
+   * ответил, повторный клик по той же секции игнорируется.
+   */
   beforeChange?: GrCollapseBeforeChange
   /** Размер секций. Не задан — берётся из `GrConfigProvider`, иначе `md`. */
   size?: GrComponentSize
@@ -56,7 +60,9 @@ export interface GrCollapseProps {
 }
 
 export interface GrCollapseEmits {
+  /** Новые открытые секции (`v-model`): значение или `undefined` в `accordion`, иначе массив. */
   (e: 'update:modelValue', value: GrCollapseModelValue): void
+  /** Пользователь открыл или закрыл секцию — уже после `beforeChange`. */
   (e: 'change', value: GrCollapseModelValue): void
 }
 

@@ -24,23 +24,48 @@ import type { ResponseErrorInfo } from '../GrResponseErrorBanner'
 export type GrConfirmDialogFocusAction = 'confirm' | 'cancel' | 'none'
 
 export interface GrConfirmDialogProps {
+  /**
+   * Открыто ли окно (`v-model`). Отмена закрывает его всегда, подтверждение — при
+   * `closeOnConfirm`.
+   */
   modelValue: boolean
+  /** Заголовок окна, он же его доступное имя. Не задан — берётся из локали. */
   title?: string
+  /** Текст вопроса в теле окна. Слот `default` его заменяет. */
   description?: string
+  /**
+   * Закрывать по клику на подложку. По умолчанию `true`; при `persistent` на время
+   * `confirmLoading` выключается.
+   */
   closeOnBackdrop?: boolean
+  /**
+   * Закрывать по Esc. По умолчанию `true`; при `persistent` на время `confirmLoading`
+   * выключается.
+   */
   closeOnEsc?: boolean
+  /** Показывать шапку с заголовком и кнопкой закрытия. По умолчанию `true`. */
   showHeader?: boolean
+  /** Кнопка закрытия в шапке. По умолчанию `true`; при `persistent` тоже остаётся. */
   showCloseButton?: boolean
+  /** Ширина окна по шкале `GrDialog`: от `sm` до `xl`, `full` — во весь экран. По умолчанию `md`. */
   size?: GrDialogSize
+  /** Поля и линия шапки: `paddingX`, `paddingY`, `bordered`. */
   headerConfig?: GrDialogSectionConfig
+  /** Поля и линия подвала с кнопками. */
   footerConfig?: GrDialogSectionConfig
+  /** Поля тела окна. `bordered` у тела не применяется. */
   bodyConfig?: GrDialogSectionConfig
   /** A11y-лейбл кнопки закрытия (i18n). */
   closeLabel?: string
+  /** Размер обеих кнопок подвала. Не задан — кнопки берут размер из `GrConfigProvider`. */
   buttonSize?: GrButtonSize
+  /** Подпись кнопки подтверждения. Не задана — берётся из локали. */
   confirmText?: string
+  /** Подпись кнопки отмены. Не задана — берётся из локали. */
   cancelText?: string
+  /** Вес кнопки подтверждения. По умолчанию `primary`. */
   confirmVariant?: GrButtonVariant
+  /** Тон кнопки подтверждения: `danger` — для необратимого действия. По умолчанию `primary`. */
   confirmTone?: GrButtonTone
   /**
    * Структура ошибки ответа сервера для показа в теле диалога
@@ -76,8 +101,11 @@ export interface GrConfirmDialogProps {
 }
 
 export interface GrConfirmDialogEmits {
+  /** Окно закрыто (`v-model`): кнопкой, крестиком, Esc или кликом по подложке. */
   (e: 'update:modelValue', value: boolean): void
+  /** Нажата кнопка подтверждения. Окно закрывается следом, если не выключен `closeOnConfirm`. */
   (e: 'confirm'): void
+  /** Нажата кнопка отмены. Крестик, Esc и подложка закрывают окно без этого события. */
   (e: 'cancel'): void
 }
 
@@ -177,7 +205,7 @@ function onConfirm(): void {
 }
 
 defineSlots<{
-  /** Содержимое диалога вместо пропа `message`. */
+  /** Содержимое диалога вместо текста из пропа `description`. */
   default?: () => any
   /** Разбор ошибки вместо встроенного баннера. */
   error?: (props: { error: ResponseErrorInfo | null }) => any

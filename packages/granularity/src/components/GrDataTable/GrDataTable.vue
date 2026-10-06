@@ -137,7 +137,12 @@ export type GrDataTableRowKey<TRow extends Record<string, unknown> = Record<stri
 export type GrDataTableSortCycle = 'asc-desc' | 'asc-desc-none'
 
 export interface GrDataTableProps<TRow extends Record<string, unknown> = Record<string, unknown>> {
+  /** Строки набора. Сортирует их компонент, пока не включён `externalSort`; ключ строки — из `rowKey`. */
   rows: TRow[]
+  /**
+   * Колонки: поле строки, заголовок, сортировка, выравнивание, ширина и закрепление.
+   * Порядок массива — исходный порядок колонок в таблице.
+   */
   columns: GrDataColumn<TRow>[]
   /** Ключ строки или функция-резолвер. По умолчанию — поле `'id'`. */
   rowKey?: GrDataTableRowKey<TRow>
@@ -200,9 +205,13 @@ export interface GrDataTableProps<TRow extends Record<string, unknown> = Record<
    */
   size?: GrDataTableSize
   // Прокси к GrTable:
+  /** Подпись таблицы в скрытом `<caption>` — диктор читает её первой. Слот `#caption` сильнее. */
   caption?: string
+  /** Доступное имя `<table>`, когда подписи нет. Игнорируется, если задан `ariaLabelledby`. */
   ariaLabel?: string
+  /** `id` видимого заголовка, который называет таблицу через `aria-labelledby`. */
   ariaLabelledby?: string
+  /** Имя прокручиваемой обёртки: с ним она становится областью `role="region"`. */
   regionLabel?: string
   /** Прилипающий заголовок при вертикальном скролле (нужен `maxHeight`). */
   stickyHeader?: boolean
@@ -291,20 +300,44 @@ export interface GrDataTableProps<TRow extends Record<string, unknown> = Record<
 }
 
 export interface GrDataTableEmits<TRow extends Record<string, unknown> = Record<string, unknown>> {
+  /**
+   * Ключ сортировки сменился кликом по заголовку (`v-model:sortKey`).
+   * Пустая строка — сортировка снята.
+   */
   (e: 'update:sortKey', value: string): void
+  /** Направление сортировки сменилось (`v-model:sortDir`). */
   (e: 'update:sortDir', value: GrDataTableSortDir): void
+  /** Сортировка сменилась — ключ и направление одним событием: удобно перезапросить данные с сервера. */
   (e: 'sortChange', value: { key: string, dir: GrDataTableSortDir }): void
+  /** Выбор строк изменился (`v-model:selected`): ключи выбранных строк, включая скрытые из набора. */
   (e: 'update:selected', value: Array<string | number>): void
+  /** Клик по строке. `index` — позиция в текущем, уже отсортированном порядке. */
   (e: 'rowClick', payload: { row: TRow, index: number, event: MouseEvent }): void
+  /** Пользователь переставил колонку (`v-model:columnOrder`): ключи в новом порядке. */
   (e: 'update:columnOrder', value: string[]): void
+  /** Одна перестановка колонки — откуда и куда; удобно сохранять операцию, а не весь список. */
   (e: 'columnReorder', payload: { key: string, from: number, to: number }): void
+  /** Ширины колонок изменились (`v-model:columnWidths`) — и по ходу протяжки ручки. */
   (e: 'update:columnWidths', value: Record<string, number>): void
+  /**
+   * Ширина колонки задана: на конце жеста и на каждом шаге клавиатуры.
+   * `0` — колонка вернулась к авторазметке.
+   */
   (e: 'columnResize', payload: { key: string, width: number }): void
+  /** Пользователь сменил закрепление колонок (`v-model:pinnedColumns`); `null` — колонка откреплена. */
   (e: 'update:pinnedColumns', value: Record<string, GrColumnPin>): void
+  /** Колонку закрепили у края или открепили (`null`) через меню заголовка. */
   (e: 'columnPin', payload: { key: string, pinned: GrColumnPin }): void
+  /** Набор раскрытых строк изменился (`v-model:expandedKeys`). */
   (e: 'update:expandedKeys', value: Array<string | number>): void
+  /** Строку раскрыли — её второй ярус показан. */
   (e: 'expand', payload: { row: TRow, key: string | number }): void
+  /** Строку свернули. Строки, закрытые `accordion` при раскрытии соседней, события не дают. */
   (e: 'collapse', payload: { row: TRow, key: string | number }): void
+  /**
+   * `loadDetail` отказал; в ярусе — разметка ошибки с кнопкой повтора.
+   * Отменённые запросы сюда не приходят.
+   */
   (e: 'detailLoadError', payload: { row: TRow, key: string | number, error: unknown }): void
 }
 

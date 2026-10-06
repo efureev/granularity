@@ -41,9 +41,13 @@ type IndicatorGeometry = {
  * Пропсы публичного GR-примитива «Segmented».
  */
 export interface GrSegmentedProps {
+  /** Выбранное значение (`v-model`). Стрелки переносят выбор вместе с фокусом. */
   modelValue: GrSegmentedValue
+  /** Сегменты: значение, подпись, иконка, `disabled`, `loading`. Сегменту-иконке нужен `ariaLabel`. */
   options: GrSegmentedOption[]
+  /** Оформление: `button` добавляет тень дорожке и индикатору. По умолчанию `pills`. */
   variant?: GrSegmentedVariant
+  /** Высота и кегль по шкале контролов. По умолчанию `md`; берётся из `GrConfigProvider`. */
   size?: GrSegmentedSize
   /**
    * Форма рамки. `pill` — дорожка-пилюля, как была всегда; `box` — то же
@@ -70,6 +74,7 @@ export interface GrSegmentedProps {
   indicatorDuration?: number
   /** Растягивать сегмент на всю ширину контейнера. */
   block?: boolean
+  /** Ряд недоступен: сегменты не выбираются и не фокусируются. Включается и от `GrFormField`. */
   disabled?: boolean
   /** Только для чтения: выбор видно, но он не меняется. */
   readonly?: boolean
@@ -79,13 +84,18 @@ export interface GrSegmentedProps {
   required?: boolean
   /** Имя скрытого поля, которым выбранное значение уходит в нативную форму. */
   name?: string
+  /** Доступное имя ряда. Внутри `GrFormField` не нужно: ряд именует подпись поля. */
   ariaLabel?: string
 }
 
 export interface GrSegmentedEmits {
+  /** Новое значение (`v-model`): клик, стрелка, `Space` или `Enter` по другому сегменту. */
   (e: 'update:modelValue', value: GrSegmentedValue): void
+  /** Выбор сменился; вместе со значением приходит сама опция — с подписью и прочими полями. */
   (e: 'change', value: GrSegmentedValue, option: GrSegmentedOption): void
+  /** Фокус вошёл в ряд. Переходы между сегментами стрелками событием не считаются. */
   (e: 'focus', event: FocusEvent): void
+  /** Фокус ушёл из ряда целиком. */
   (e: 'blur', event: FocusEvent): void
 }
 
@@ -155,7 +165,12 @@ const { onFocusIn, onFocusOut } = useFocusWithin(rootRef, {
   leave: event => emit('blur', event),
 })
 
-defineExpose({ focus, blur })
+defineExpose({
+  /** Фокус на текущую остановку `Tab` ряда — обычно выбранный сегмент, а не первый. */
+  focus,
+  /** Снять фокус с текущего сегмента ряда. */
+  blur,
+})
 const itemRefs = ref(new Map<string, HTMLElement>())
 const indicatorGeometry = ref<IndicatorGeometry | null>(null)
 const indicatorReady = ref(false)

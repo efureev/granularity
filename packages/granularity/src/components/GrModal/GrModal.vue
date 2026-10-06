@@ -81,6 +81,7 @@ export interface GrModalProps {
 }
 
 export interface GrModalEmits {
+  /** Окно просит открыться или закрыться (`v-model`): Esc, подложка или методы инстанса. */
   (e: 'update:modelValue', value: boolean): void
   /** Окно открылось и анимация закончилась. */
   (e: 'opened'): void
@@ -104,8 +105,11 @@ const props = withDefaults(defineProps<GrModalProps>(), {
 const emit = defineEmits<GrModalEmits>()
 
 defineSlots<{
+  /** Содержимое окна. При `scrollBehavior: 'inside'` скроллится только оно. */
   default?: () => any
+  /** Заголовок окна. Даёт ему доступное имя через `aria-labelledby` — сильнее `ariaLabel`. */
   title?: () => any
+  /** Пояснение к окну, связанное с ним через `aria-describedby`. */
   description?: () => any
   /** Закреплённая шапка: при `inside` остаётся на месте, скроллится только тело. */
   header?: () => any
@@ -313,7 +317,14 @@ watch(
   { immediate: true },
 )
 
-defineExpose({ open, close, toggle })
+defineExpose({
+  /** Открыть окно: шлёт `update:modelValue` с `true` — открывает его родитель. */
+  open,
+  /** Закрыть окно: шлёт `update:modelValue` с `false`. */
+  close,
+  /** Переключить окно: шлёт `update:modelValue` с обратным значением. */
+  toggle,
+})
 </script>
 
 <template>

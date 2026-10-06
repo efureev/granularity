@@ -39,8 +39,14 @@ export type GrFormFileError = FileValidationIssue
  * Все `*Text`/`placeholder` — i18n-friendly, принимают готовые строки локали.
  */
 export interface GrFormFileProps {
+  /** Выбранный файл или `null`; при `multiple` — массив файлов (`v-model`). */
   modelValue: File | File[] | null
+  /** Набор из нескольких файлов: модель — массив, у каждой строки своё удаление. */
   multiple?: boolean
+  /**
+   * Недоступен: выбор, перетаскивание и удаление выключены. Складывается по «или» с
+   * `GrFormField` и формой.
+   */
   disabled?: boolean
   /** Только для чтения: значение видно и уходит в форму, но не редактируется. */
   readonly?: boolean
@@ -52,13 +58,22 @@ export interface GrFormFileProps {
   ariaLabel?: string
   /** W3C `accept` для `<input type="file">` + sugar к `acceptValidator(...)`. */
   accept?: string
+  /**
+   * Проверки набора (`maxFileSize`, `allowedExtensionsValidator` и т. п.) — после `accept` и
+   * `limit`, до `validate`. Отбитый набор в модель не попадает.
+   */
   validators?: FileValidator[]
   /** Максимум файлов в наборе. Лишние не обрезаются молча — набор отбивается ошибкой. */
   limit?: number
+  /** Подпись кнопки выбора, пока набор пуст. По умолчанию — переведённое «Upload file». */
   uploadText?: string
+  /** Подпись кнопки выбора, когда файлы уже есть. По умолчанию — переведённое «Change file». */
   changeText?: string
+  /** Подпись удаления у одиночного файла и у строк набора. По умолчанию — переведённое «Remove». */
   removeText?: string
+  /** Подпись сброса всего набора при `multiple`. По умолчанию — переведённое «Clear all». */
   clearAllText?: string
+  /** Текст у кнопки, пока ничего не выбрано. По умолчанию — переведённое «No files selected». */
   placeholder?: string
   /** Размер кнопок, иконок и подписей. */
   size?: GrFormFileSize
@@ -82,12 +97,20 @@ export interface GrFormFileProps {
 }
 
 export interface GrFormFileEmits {
+  /**
+   * Новый набор для `v-model`: выбор, перетаскивание, удаление, перестановка. Набор, отбитый
+   * валидацией, сюда не приходит.
+   */
   (e: 'update:modelValue', value: File | File[] | null): void
+  /** Набор изменился — тот же payload, что у `update:modelValue`. */
   (e: 'change', value: File | File[] | null): void
+  /** Набор сброшен целиком: «Очистить всё» или удаление единственного файла; модель — следом. */
   (e: 'clear'): void
   /** Результат валидации. Канал один: `validation` дублировал эту же нагрузку. */
   (e: 'update:errors', errors: GrFormFileError[]): void
+  /** Фокус вошёл в поле. Переходы между его кнопками событием не считаются. */
   (e: 'focus', event: FocusEvent): void
+  /** Фокус ушёл из поля целиком. */
   (e: 'blur', event: FocusEvent): void
 }
 
@@ -214,7 +237,12 @@ function blur(): void {
   uploadBtnEl.value?.blur()
 }
 
-defineExpose({ focus, blur })
+defineExpose({
+  /** Поставить фокус на кнопку выбора файла. */
+  focus,
+  /** Снять фокус с кнопки выбора файла. */
+  blur,
+})
 
 const files = computed<File[]>(() => {
   if (props.multiple) {

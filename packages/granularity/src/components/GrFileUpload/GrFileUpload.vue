@@ -77,10 +77,18 @@ export interface GrFileUploadProps<TResponse = unknown> {
    * снаружи.
    */
   modelValue?: File[]
+  /** Адрес для POST `multipart/form-data` встроенным загрузчиком. Нужен, когда нет `request`. */
   action?: string
+  /**
+   * Свой загрузчик (axios, fetch) вместо `action`: получает файлы и `signal`, `extraData`,
+   * `onProgress`. Сильнее `action`.
+   */
   request?: GrFileUploadRequest<TResponse>
+  /** Имя поля файла в `FormData` встроенного загрузчика. По умолчанию `file`. */
   name?: string
+  /** Выбор нескольких файлов за раз; без него `limit` не действует. По умолчанию `false`. */
   multiple?: boolean
+  /** Предел файлов в одном выборе при `multiple`: сверх него — `exceed` и `error`, загрузки нет. */
   limit?: number
   /**
    * Guard перед отправкой. Остаётся пропом, а не эмитом, осознанно: эмит не
@@ -88,6 +96,10 @@ export interface GrFileUploadProps<TResponse = unknown> {
    * Уведомления — `exceed`, `success`, `error`, `progress` — эмиты.
    */
   beforeUpload?: (file: File) => boolean | Promise<unknown>
+  /**
+   * Проверки набора до отправки, после `accept`: размер, тип, число. Нарушения приходят в `error`
+   * одним `FileValidationError`, и загрузка не стартует.
+   */
   validators?: FileValidator[]
   /**
    * W3C `accept` для `<input type="file">` — и sugar к `acceptValidator(...)`.
@@ -101,6 +113,7 @@ export interface GrFileUploadProps<TResponse = unknown> {
   capture?: 'user' | 'environment'
   /** Выбор каталога целиком (`webkitdirectory`). Поддержка — Chromium и Safari. */
   directory?: boolean
+  /** Контрол недоступен: диалог и перетаскивание не работают. Включается и от `GrFormField`. */
   disabled?: boolean
   /** Только для чтения: значение видно и уходит в форму, но не редактируется. */
   readonly?: boolean
@@ -110,9 +123,19 @@ export interface GrFileUploadProps<TResponse = unknown> {
   required?: boolean
   /** Доступное имя вне `GrFormField`. */
   ariaLabel?: string
+  /** Заголовки запроса встроенного загрузчика — например, токен. С `request` не используются. */
   headers?: Record<string, string>
+  /** Слать cookie на другой домен (`xhr.withCredentials`) у встроенного загрузчика. */
   withCredentials?: boolean
+  /**
+   * Список выбранных файлов под зоной: имя, размер, удаление, в `per-file` — статус и повтор.
+   * По умолчанию `false`.
+   */
   showFileList?: boolean
+  /**
+   * Дополнительные поля запроса, посчитанные по набору: ложатся в `FormData` рядом с файлами,
+   * у `request` приходят в `ctx.extraData`. Исключение из колбэка уходит в `error`.
+   */
   uploadExtraData?: (files: File[]) => GrFileUploadExtraData | undefined
   /** i18n: надпись-подсказка в дефолтном UI. */
   placeholder?: string
@@ -149,11 +172,23 @@ export interface GrFileUploadEmits<TResponse = unknown> {
   (e: 'exceed', files: File[], limit: number): void
   /** `file` приходит только в режиме `per-file`: в батче отчитываться нечем. */
   (e: 'success', payload: TResponse, file?: File): void
+  /**
+   * Набор не ушёл или отправка упала: `limit`, валидаторы, `beforeUpload`, сеть, ответ сервера,
+   * отмена. `file` — только в `per-file`.
+   */
   (e: 'error', error: unknown, file?: File): void
+  /** Прогресс отправки в процентах, от `0` до `100`. `file` — только в `per-file`. */
   (e: 'progress', percent: number, info?: GrUploadProgressInfo, file?: File): void
+  /**
+   * Набор отправлен: в `batch` — после успеха, в `per-file` — когда отработала вся очередь.
+   * Не путать с `update:modelValue`.
+   */
   (e: 'change', files: File[]): void
+  /** Сменилась сводная фаза загрузки — `idle`, `uploading`, `success`, `error` — с процентом. */
   (e: 'stateChange', state: GrUploadState): void
+  /** Фокус вошёл в зону. Переходы между полем и кнопками списка событием не считаются. */
   (e: 'focus', event: FocusEvent): void
+  /** Фокус ушёл из зоны целиком. */
   (e: 'blur', event: FocusEvent): void
 }
 

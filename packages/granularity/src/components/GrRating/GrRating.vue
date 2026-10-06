@@ -41,6 +41,7 @@ export interface GrRatingProps {
   modelValue: number
   /** Количество символов шкалы. */
   max?: number
+  /** Размер символов и подписи. Не задан — из `GrConfigProvider`, иначе `md`. */
   size?: GrRatingSize
   /** Тон заливки; точечно перекрывается переменной `--gr-rating-color`. */
   tone?: GrRatingTone
@@ -48,6 +49,7 @@ export interface GrRatingProps {
   allowHalf?: boolean
   /** Только показ: без ввода и фокуса. */
   readonly?: boolean
+  /** Шкала недоступна: остаётся слайдером с `aria-disabled`, но выходит из таб-порядка и не меняется. */
   disabled?: boolean
   /** Визуальное и ARIA-состояние ошибки. */
   invalid?: boolean
@@ -76,12 +78,14 @@ export interface GrRatingProps {
    * `readonly` — в списках и таблицах пять звёзд в каждой строке съедают ширину.
    */
   compact?: boolean
+  /** Доступное имя шкалы: что оценивают — «Качество доставки». По умолчанию — из локали (`Rating`). */
   ariaLabel?: string
   /** Имя для нативной формы: hidden input со значением; `0` — «не выбрано», input не рендерится. */
   name?: string
 }
 
 export interface GrRatingEmits {
+  /** Оценка изменилась (`v-model`); снятая `clearable` оценка приходит как `0`. */
   (e: 'update:modelValue', value: number): void
   /** Оценка зафиксирована (клик / клавиша). */
   (e: 'change', value: number): void
@@ -89,7 +93,9 @@ export interface GrRatingEmits {
   (e: 'hoverChange', value: number | null): void
   /** Оценка снята повторным кликом; только при `clearable`. */
   (e: 'clear'): void
+  /** Фокус пришёл на шкалу. */
   (e: 'focus', event: FocusEvent): void
+  /** Фокус ушёл со шкалы; предпросмотр под курсором при этом сбрасывается. */
   (e: 'blur', event: FocusEvent): void
 }
 
@@ -157,7 +163,12 @@ function blur(): void {
   rootEl.value?.querySelector<HTMLElement>('[data-gr-rating-scale]')?.blur()
 }
 
-defineExpose({ focus, blur })
+defineExpose({
+  /** Фокус на шкалу из кода. В `readonly` шкала — картинка и фокус не принимает. */
+  focus,
+  /** Снять фокус со шкалы. */
+  blur,
+})
 
 /** Ввод возможен: не readonly и не disabled. */
 const interactive = computed(() => !isReadonly.value && !isDisabled.value)

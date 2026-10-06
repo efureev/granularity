@@ -40,29 +40,58 @@ import type { ResponseErrorInfo } from '../GrResponseErrorBanner'
 import type { InputHTMLAttributes } from 'vue'
 
 export interface GrPromptDialogProps {
+  /** Открыто ли окно (`v-model`). Отмена закрывает его всегда, подтверждение — при `closeOnConfirm`. */
   modelValue: boolean
+  /** Значение поля (`v-model:value`). Между открытиями окно его не сбрасывает. */
   value: string
+  /** Заголовок окна, он же его доступное имя. Не задан — берётся из локали. */
   title?: string
+  /** Пояснение над полем. Слот `default` его заменяет. */
   description?: string
+  /** Подпись поля, она же его доступное имя. Не задана — берётся из локали. */
   label?: string
+  /** Подсказка в пустом поле. */
   placeholder?: string
+  /**
+   * Закрывать по клику на подложку. По умолчанию `true`; при `persistent` на время подтверждения
+   * или проверки `rules` выключается.
+   */
   closeOnBackdrop?: boolean
+  /**
+   * Закрывать по Esc. По умолчанию `true`; при `persistent` на время подтверждения или проверки
+   * `rules` выключается.
+   */
   closeOnEsc?: boolean
+  /** Показывать шапку с заголовком и кнопкой закрытия. По умолчанию `true`. */
   showHeader?: boolean
+  /** Кнопка закрытия в шапке. По умолчанию `true`; при `persistent` тоже остаётся. */
   showCloseButton?: boolean
+  /** Ширина окна по шкале `GrDialog`: от `sm` до `xl`, `full` — во весь экран. По умолчанию `md`. */
   size?: GrDialogSize
+  /** Поля и линия шапки: `paddingX`, `paddingY`, `bordered`. */
   headerConfig?: GrDialogSectionConfig
+  /** Поля и линия подвала с кнопками. */
   footerConfig?: GrDialogSectionConfig
+  /** Поля тела окна. `bordered` у тела не применяется. */
   bodyConfig?: GrDialogSectionConfig
   /** A11y-лейбл кнопки закрытия (i18n). */
   closeLabel?: string
+  /** Размер обеих кнопок подвала. Не задан — кнопки берут размер из `GrConfigProvider`. */
   buttonSize?: GrButtonSize
+  /** Подпись кнопки подтверждения. Не задана — берётся из локали. */
   confirmText?: string
+  /** Подпись кнопки отмены. Не задана — берётся из локали. */
   cancelText?: string
   /** Текст ошибки для пустого значения при `required=true` (i18n). */
   requiredErrorText?: string
+  /** Вес кнопки подтверждения. По умолчанию `primary`. */
   confirmVariant?: GrButtonVariant
+  /** Тон кнопки подтверждения: `danger` — для необратимого действия. По умолчанию `primary`. */
   confirmTone?: GrButtonTone
+  /**
+   * Пустое значение не подтверждается; ошибка видна после первого ухода из поля или попытки
+   * подтвердить. По умолчанию `true`.
+   */
   required?: boolean
   /** Тип однострочного поля. В многострочном режиме не применяется. */
   inputType?: GrInputType
@@ -70,6 +99,7 @@ export interface GrPromptDialogProps {
   inputmode?: InputHTMLAttributes['inputmode']
   /** Ограничение длины; со `showCount` рисуется счётчик. */
   maxlength?: number
+  /** Счётчик символов под полем; с `maxlength` — в виде `len/maxlength`. */
   showCount?: boolean
   /**
    * Что у человека спрашивают — для браузера и менеджера паролей
@@ -133,9 +163,16 @@ export interface GrPromptDialogProps {
 }
 
 export interface GrPromptDialogEmits {
+  /** Окно закрыто (`v-model`): кнопкой, крестиком, Esc или кликом по подложке. */
   (e: 'update:modelValue', value: boolean): void
+  /** Значение поля изменилось при вводе (`v-model:value`). */
   (e: 'update:value', value: string): void
+  /**
+   * Значение подтверждено — кнопкой или `Enter` в однострочном поле — и прошло `required` и
+   * `rules`. Окно закрывается следом, если не выключен `closeOnConfirm`.
+   */
   (e: 'confirm', value: string): void
+  /** Нажата кнопка отмены. Крестик, Esc и подложка закрывают окно без этого события. */
   (e: 'cancel'): void
 }
 
@@ -356,7 +393,7 @@ watch(
 )
 
 defineSlots<{
-  /** Содержимое диалога вместо пропа `message`. */
+  /** Содержимое диалога вместо текста из пропа `description`. */
   default?: () => any
   /** Разбор ошибки вместо встроенного баннера. */
   error?: (props: { error: ResponseErrorInfo | null }) => any
