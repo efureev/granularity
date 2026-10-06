@@ -50,6 +50,17 @@ const toneVars: Record<GrProgressBarTone, string> = {
   azure: 'var(--gr-progress-azure-bg,var(--gr-azure))',
 }
 
+/**
+ * Нейтральная заливка бегущей полосы при `prefers-reduced-motion: reduce`.
+ *
+ * Замершая на всю ширину полоса цвета тона читалась бы как «готово». Правило
+ * жило в `<style>` компонента и проигрывало утилите тона: лист компонента
+ * лежит в слое `granum.components`, утилита — в `granum.utilities`, а более
+ * поздний слой побеждает при любой специфичности. Вариант `motion-reduce:`
+ * ставит заливку в тот же слой и после базовых утилит.
+ */
+export const progressIndeterminateReducedClass = 'motion-reduce:bg-[var(--gr-progress-indeterminate-bg,var(--gr-muted-fg))]'
+
 export function grProgressBarFillClass(tone: GrProgressBarTone): string {
   return `bg-${withVar(toneVars[tone])}`
 }

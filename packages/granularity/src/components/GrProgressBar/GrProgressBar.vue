@@ -5,6 +5,7 @@ import { useGrComponentProp, useGrComponentSize } from '../shared/configContext'
 import {
   bufferClass,
   grProgressBarFillClass,
+  progressIndeterminateReducedClass,
   type GrProgressBarSize,
   type GrProgressBarTone,
   rowGaps,
@@ -68,7 +69,10 @@ function clampValue(value: number): number {
 const safe = computed(() => clampValue(props.value))
 const safeBuffer = computed(() => (props.buffer === undefined ? undefined : clampValue(props.buffer)))
 
-const fillClassName = computed(() => grProgressBarFillClass(props.tone))
+const fillClassName = computed(() => [
+  grProgressBarFillClass(props.tone),
+  props.indeterminate ? progressIndeterminateReducedClass : '',
+].filter(Boolean).join(' '))
 
 if (__GR_DEV__) {
   watchEffect(() => {
@@ -151,12 +155,13 @@ const valueLabel = computed(() => valueText.value ?? `${Math.round(safe.value)}%
 
 /* Замерев в исходном кадре, полоса легла бы у левого края и читалась как
    «прогресс 40%». Нейтральная заливка на всю ширину не притворяется ни нулём,
-   ни завершением: она говорит «работа идёт, значение неизвестно». */
+   ни завершением: она говорит «работа идёт, значение неизвестно». Цвет ставит
+   утилита `progressIndeterminateReducedClass`: здесь он проигрывал бы утилите
+   тона из более позднего слоя. */
 @media (prefers-reduced-motion: reduce) {
   [data-gr-progress-bar-indeterminate] [data-gr-progress-bar-fill] {
     width: 100%;
     animation: none;
-    background-color: var(--gr-progress-indeterminate-bg, var(--gr-muted-fg));
   }
 }
 </style>

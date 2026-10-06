@@ -340,7 +340,6 @@ ol.gr-md-list {
  */
 .gr-md-table [data-gr-table] {
   border-collapse: collapse;
-  font-size: 0.95em;
 }
 
 .gr-md-table :is(th, td) {

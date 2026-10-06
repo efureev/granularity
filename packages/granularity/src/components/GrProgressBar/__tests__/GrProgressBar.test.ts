@@ -5,7 +5,7 @@ import { describe, expect, it, vi } from 'vitest'
 import GrConfigProvider from '../../GrConfigProvider/GrConfigProvider.vue'
 import GrProgressBar from '../GrProgressBar.vue'
 import { GR_TONES } from '../../shared/tones'
-import { grProgressBarFillClass, trackSizes } from '../grStyle'
+import { grProgressBarFillClass, progressIndeterminateReducedClass, trackSizes } from '../grStyle'
 
 const TRACK = '[data-gr-progress-bar-track]'
 const FILL = '[data-gr-progress-bar-fill]'
@@ -71,6 +71,17 @@ describe('GrProgressBar — неопределённый режим', () => {
 
     expect(wrapper.get(TRACK).attributes('data-gr-progress-bar-indeterminate')).toBe('')
     expect(wrapper.get(FILL).attributes('style')).toBeUndefined()
+  })
+
+  // Под reduce полоса замирает на всю ширину и должна быть нейтральной: цвет
+  // ставит утилита, правило в листе компонента проиграло бы утилите тона.
+  it('нейтральная заливка под reduce — утилитой только у неопределённой полосы', async () => {
+    const wrapper = mount(GrProgressBar, { props: { value: 40, indeterminate: true, tone: 'success' } })
+
+    expect(wrapper.get(FILL).classes()).toContain(progressIndeterminateReducedClass)
+
+    await wrapper.setProps({ indeterminate: false })
+    expect(wrapper.get(FILL).classes()).not.toContain(progressIndeterminateReducedClass)
   })
 
   it('не показывает ни подписи, ни буфера — показывать нечего', () => {

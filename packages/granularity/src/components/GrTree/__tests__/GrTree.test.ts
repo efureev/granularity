@@ -437,6 +437,40 @@ describe('GrTree', () => {
     expect(childHandle.classes()).toContain('gr-tree__drag-handle--visible')
   })
 
+  // Цвет текущей строки — утилитой по `data-current`: правило в листе
+  // компонента проигрывало цвету из `rowClass` потребителя.
+  it('помечает текущую строку `data-current` и красит её утилитой', async () => {
+    const wrapper = mount(GrTree<Item>, {
+      props: {
+        data: tree(),
+        nodeKey: 'id',
+        props: { children: 'children', label: 'label' },
+        highlightCurrent: true,
+        rowClass: () => 'text-[var(--gr-muted-fg)]',
+      },
+    })
+    const row = () => wrapper.findAll('.gr-tree__row')[0]
+
+    expect(row().attributes('data-current')).toBeUndefined()
+    expect(row().classes()).toContain('data-[current]:text-[var(--gr-tree-row-current-color)]')
+
+    ;(wrapper.vm as any).setCurrentKey(1)
+    await nextTick()
+
+    expect(row().attributes('data-current')).toBe('')
+  })
+
+  it('с `highlightCurrent: false` строка `data-current` не получает', async () => {
+    const wrapper = mount(GrTree<Item>, {
+      props: { data: tree(), nodeKey: 'id', props: { children: 'children', label: 'label' }, highlightCurrent: false },
+    })
+
+    ;(wrapper.vm as any).setCurrentKey(1)
+    await nextTick()
+
+    expect(wrapper.findAll('.gr-tree__row')[0].attributes('data-current')).toBeUndefined()
+  })
+
   it('эмитит `nodeDrop` при переносе указателем', async () => {
     const wrapper = mount(GrTree<Item>, {
       props: {

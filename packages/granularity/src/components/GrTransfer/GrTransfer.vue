@@ -1060,7 +1060,7 @@ defineExpose({
             <button
               type="button"
               data-gr-transfer-move-up
-              :class="grTransferReorderClass(resolvedSize)"
+              :class="grTransferReorderClass(resolvedSize, !canReorder)"
               :aria-disabled="canReorder ? undefined : 'true'"
               :aria-label="t('gr.transfer.moveUp', 'Move earlier')"
               @click="canReorder && moveBlock(-1)"
@@ -1070,7 +1070,7 @@ defineExpose({
             <button
               type="button"
               data-gr-transfer-move-down
-              :class="grTransferReorderClass(resolvedSize)"
+              :class="grTransferReorderClass(resolvedSize, !canReorder)"
               :aria-disabled="canReorder ? undefined : 'true'"
               :aria-label="t('gr.transfer.moveDown', 'Move later')"
               @click="canReorder && moveBlock(1)"
@@ -1362,10 +1362,5 @@ defineExpose({
   color: var(--gr-muted-fg);
   outline: 1px dashed var(--gr-brd);
   outline-offset: -3px;
-}
-
-[data-gr-transfer] button[aria-disabled='true'] {
-  background: var(--gr-muted);
-  color: var(--gr-disabled-fg);
 }
 </style>

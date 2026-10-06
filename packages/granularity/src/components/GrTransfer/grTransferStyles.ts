@@ -126,17 +126,21 @@ export const transferReorderSizes: Record<GrTransferSize, string> = {
 
 export const transferReorderIconClass = 'h-3.5 w-3.5'
 
-export function grTransferReorderClass(size: GrTransferSize): string {
-  return [transferReorderBase, transferReorderSizes[size]].join(' ')
+/** Перестановка, которой некуда двигаться: вид недоступной, фокус остаётся. */
+export const transferReorderInertClass = 'inline-flex shrink-0 items-center justify-center rounded-[var(--gr-radius-sm)] bg-[var(--gr-muted)] text-[var(--gr-disabled-fg)] cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]'
+
+export function grTransferReorderClass(size: GrTransferSize, inert = false): string {
+  return [inert ? transferReorderInertClass : transferReorderBase, transferReorderSizes[size]].join(' ')
 }
 
 export const transferActionIconClass = 'h-4 w-4 shrink-0'
 
 /**
  * Кнопка без пути наружу остаётся в таб-порядке — нативный `disabled` уронил бы
- * фокус в тело документа. Показывает она это правилом в `<style>` компонента, а
- * не утилитой: у `GrButton` свой фон классом той же специфичности, и кто победит,
- * решал бы порядок в сгенерированном CSS, то есть через раз.
+ * фокус в тело документа. Вид недоступной ей даёт сам `GrButton` по
+ * `aria-disabled="true"`: правило в `<style>` компонента проигрывало цветам
+ * варианта — лист компонента живёт в слое `granum.components`, утилиты в более
+ * позднем `granum.utilities`, и тот побеждает при любой специфичности.
  */
 export const transferActionInertClass = 'cursor-not-allowed'
 

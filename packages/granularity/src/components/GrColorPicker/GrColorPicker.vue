@@ -677,6 +677,13 @@ async function pickFromScreen(): Promise<void> {
   border-radius: var(--gr-radius-full);
 }
 
+/* Рельс ползунка лежит поверх дорожки во всю её площадь и закрывал градиент:
+   каналы с самого появления пикера были ровными серыми полосами. Его фон ставит
+   утилита `GrSlider` из хука `--gr-slider-rail` — хук и гасится. */
+[data-gr-color-picker-channel] {
+  --gr-slider-rail: transparent;
+}
+
 [data-gr-color-picker-channel='hue'] [data-gr-slider-track] {
   background-image: var(--gr-color-picker-track-hue);
 }
@@ -693,9 +700,13 @@ async function pickFromScreen(): Promise<void> {
   background-image: var(--gr-color-picker-track-alpha);
 }
 
-/* Заливка канала прозрачна: шкалу показывает сама дорожка. */
+/* Заливки у канала нет: шкалу показывает сама дорожка. Прячется она
+   видимостью, а не `background-color: transparent`: фон заливке ставит утилита
+   `GrSlider` из слоя `granum.utilities`, и этот лист (`granum.components`) ей
+   проигрывал — поверх градиента лежала заливка цвета `primary`. Видимость
+   утилиты не задают, и отключённая заливка прячется тем же правилом. */
 [data-gr-color-picker-channel] [data-gr-slider-fill] {
-  background-color: transparent;
+  visibility: hidden;
 }
 
 /*

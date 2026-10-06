@@ -5,6 +5,17 @@ All notable changes to the [`@feugene/granularity-editor`](.) package are docume
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Fixed
+
+- **Таблица в `GrMarkdown` снова идёт кеглем текста вокруг.** `0.95em`
+  стоял в `styles.css`, а кегль таблице ставит сам `GrTable` утилитой размера.
+  С 1.0.1 лист живёт в слое `granum.components` и утилите из более позднего
+  `granum.utilities` проигрывал: таблица в прозе шла кеглем контрола. Теперь
+  кегль — утилита с вариантом `[&_[data-gr-table]]:` на обёртке, она сильнее
+  одиночного класса размера.
+
 ## [v1.0.1] 2026-09-29
 
 Починка доставки CSS. Публичная поверхность не менялась, обновление безопасное.

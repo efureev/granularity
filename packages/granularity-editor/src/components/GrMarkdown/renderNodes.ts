@@ -301,8 +301,13 @@ function renderNode(node: GrMdBlockNode, ctx: GrMarkdownRenderContext, trailing?
       // `GrTable` объявлен «тонким контейнером»: он владеет скролл-областью,
       // её именем и достижимостью с клавиатуры, а разметку строк отдаёт слотам.
       // Отступы ячеек он оставляет потребителю — они остаются в `styles.css`.
+      // Кегль — утилитой с вариантом на `<table>`: размер ставит ему сам
+      // `GrTable` утилитой, и правило в `styles.css` (слой `granum.components`)
+      // ей проигрывало — таблица в прозе шла кеглем контрола, а не `0.95em`
+      // от текста вокруг. Класс с атрибутом сильнее одиночной утилиты в том же
+      // слое.
       return h(GrTable, {
-        class: 'gr-md-table',
+        class: 'gr-md-table [&_[data-gr-table]]:text-[0.95em]',
         regionLabel: ctx.t('grEditor.markdown.tableRegion', 'Table'),
       }, {
         header: () => h('tr', renderCells(node.header, 'th', ctx)),

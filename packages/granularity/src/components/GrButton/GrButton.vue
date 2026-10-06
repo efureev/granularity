@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, markRaw, ref, type Component } from 'vue'
+import { computed, markRaw, ref, useAttrs, type Component } from 'vue'
 
 import IconLoader from '~icons/lucide/loader-circle'
 
@@ -93,6 +93,15 @@ const blocked = computed(() => props.disabled || props.loading)
 const nativeDisabled = computed(() => (renderAs.value === 'button' && props.disabled) ? true : undefined)
 const ariaDisabled = computed(() => (props.loading || (isLink.value && props.disabled)) ? 'true' : undefined)
 
+// `aria-disabled="true"` снаружи — кнопка, которую потребитель держит в фокусе,
+// но объявляет недоступной (у `GrTransfer` — перенос, которому некуда ехать).
+// Скринридер слышит «недоступна», значит и глаз должен видеть то же: вид
+// отключённой, без нативного `disabled`. Раньше вид подправлял лист потребителя,
+// но он живёт в слое `granum.components` и цветам варианта — утилитам из
+// `granum.utilities` — проигрывал всегда.
+const attrs = useAttrs()
+const looksDisabled = computed(() => props.disabled || attrs['aria-disabled'] === 'true' || attrs['aria-disabled'] === true)
+
 const resolvedTarget = computed(() => props.target ?? (props.external ? '_blank' : undefined))
 const resolvedRel = computed(() => props.rel ?? (resolvedTarget.value === '_blank' ? 'noopener noreferrer' : undefined))
 
@@ -134,7 +143,7 @@ const className = computed(() => {
     tone: resolvedTone.value,
     size: resolvedSize.value,
     square: isSquare.value,
-    disabled: props.disabled,
+    disabled: looksDisabled.value,
     block: props.block,
   })
 })

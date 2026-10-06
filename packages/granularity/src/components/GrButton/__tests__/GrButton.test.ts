@@ -296,6 +296,27 @@ describe('GrButton — отключённое состояние', () => {
     expect(classes.some(cls => cls.includes('opacity-'))).toBe(false)
   })
 
+  // Кнопка, недоступная для скринридера, не может выглядеть доступной. Так
+  // держит перенос без пути `GrTransfer`: в фокусе, но объявлен недоступным.
+  it('`aria-disabled="true"` снаружи даёт вид отключённой, но не нативный `disabled`', () => {
+    const wrapper = mount(GrButton, {
+      props: { variant: 'secondary' },
+      attrs: { 'aria-disabled': 'true' },
+      slots: { default: 'Move' },
+    })
+    const button = wrapper.get('[data-gr-button]')
+
+    expect(button.classes()).toContain('bg-[var(--gr-button-disabled-bg)]')
+    expect(button.classes()).toContain('text-[var(--gr-button-disabled-fg)]')
+    expect((button.element as HTMLButtonElement).disabled).toBe(false)
+  })
+
+  it('`aria-disabled="false"` вид не трогает', () => {
+    const wrapper = mount(GrButton, { attrs: { 'aria-disabled': 'false' }, slots: { default: 'Move' } })
+
+    expect(wrapper.get('[data-gr-button]').classes()).not.toContain('bg-[var(--gr-button-disabled-bg)]')
+  })
+
   /**
    * Токены кнопки — ссылки на общие роли недоступного состояния, те же, что у
    * вкладки, сегмента и бегунка. Разъехаться это может молча: классы в разметке

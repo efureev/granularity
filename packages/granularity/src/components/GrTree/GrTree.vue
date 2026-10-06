@@ -943,7 +943,8 @@ defineExpose<GrTreeInstance<T>>({
     >
       <div
           data-gr-tree-row
-          class="gr-tree__row"
+          class="gr-tree__row data-[current]:text-[var(--gr-tree-row-current-color)]"
+          :data-current="treeProps.highlightCurrent && currentKey === row.node.key ? '' : undefined"
           :class="[
           treeProps.highlightCurrent && currentKey === row.node.key ? 'gr-tree__row--current' : '',
           row.isLeaf ? 'gr-tree__row--leaf' : '',
@@ -1125,7 +1126,8 @@ defineExpose<GrTreeInstance<T>>({
        были бы объявлением, и класс из `rowClass` — при равном весе и более
        раннем подключении — молча проигрывал бы: ступени кегля по уровням у
        оглавления не применялись вовсе. Наследование уступает любому классу
-       потребителя, а модификаторы строки (`--current`) остаются выше. */
+       потребителя. Цвет текущей строки ставит утилита `data-[current]:` на
+       самой строке: класс с атрибутом сильнее одиночного класса из `rowClass`. */
     font-size: var(--gr-tree-font-size);
     color: var(--gr-tree-row-color);
 }
@@ -1252,9 +1254,9 @@ defineExpose<GrTreeInstance<T>>({
     box-shadow: inset 0 0 0 2px var(--gr-primary);
 }
 
-.gr-tree__row--current {
-    color: var(--gr-tree-row-current-color);
-}
+/* Цвет текущей строки — утилитой `data-[current]:` на самой строке, а не здесь:
+   этот лист живёт в слое `granum.components` и проигрывал бы любому цвету из
+   `rowClass` потребителя — утилите из более позднего `granum.utilities`. */
 
 .gr-tree__row--current::before {
     background: var(--gr-tree-row-current-bg);
