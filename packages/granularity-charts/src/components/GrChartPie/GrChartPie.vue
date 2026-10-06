@@ -105,6 +105,11 @@ export interface GrChartPieProps {
   labelMinShare?: number
   showLegend?: boolean
   legendPosition?: 'top' | 'bottom'
+  /**
+   * Панель со значениями под курсором; по умолчанию `true`. `false` прячет только
+   * панель: курсор, активные марки, `update:activeIndex` и `pointHover` работают,
+   * пока график интерактивен.
+   */
   tooltip?: boolean
   /** Курсор — `v-model:activeIndex`. */
   activeIndex?: number | null

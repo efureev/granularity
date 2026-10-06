@@ -88,6 +88,11 @@ export interface GrChartHeatmapProps {
   height?: number
   /** Объявленная ширина: от неё идёт первый рендер, дальше ширина замеряется. */
   width?: number
+  /**
+   * Панель со значениями под курсором; по умолчанию `true`. `false` прячет только
+   * панель: курсор, активные марки, `update:activeIndex` и `pointHover` работают,
+   * пока график интерактивен.
+   */
   tooltip?: boolean
   /** Курсор — `v-model:activeCell`. */
   activeCell?: { x: number, y: number } | null

@@ -65,6 +65,11 @@ export interface GrChartFunnelProps {
   /** Объявленная ширина: от неё идёт первый рендер, дальше ширина замеряется. */
   width?: number
   valueFormat?: GrChartNumberFormat
+  /**
+   * Панель со значениями под курсором; по умолчанию `true`. `false` прячет только
+   * панель: курсор, активные марки, `update:activeIndex` и `pointHover` работают,
+   * пока график интерактивен.
+   */
   tooltip?: boolean
   /** Курсор — `v-model:activeIndex`. */
   activeIndex?: number | null

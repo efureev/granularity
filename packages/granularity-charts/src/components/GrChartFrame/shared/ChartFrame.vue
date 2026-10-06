@@ -111,6 +111,7 @@ export interface ChartFrameProps {
   canvasThreshold?: number
   showLegend?: boolean
   legendPosition?: 'top' | 'bottom'
+  /** Только панель: курсор и `activeIndex` от неё не зависят. */
   tooltip?: boolean
   loading?: boolean
   empty?: boolean
@@ -522,7 +523,10 @@ const tooltipApi = useChartTooltip({
   surface: surfaceEl,
   // Во время протяжки тултип молчит: панель под рукой закрывала бы ровно тот
   // участок, который сейчас выделяют.
-  enabled: () => props.tooltip && props.interactive && !isEmpty.value && !isBrushing(),
+  enabled: () => props.interactive && !isEmpty.value && !isBrushing(),
+  // `tooltip: false` гасит только панель: курсор, активные марки и
+  // `update:activeIndex` нужны и без неё — на них держится пара графиков.
+  panel: () => props.tooltip,
   hitTest: props.hitTest,
   anchor: props.anchorPoint,
 })
@@ -1254,7 +1258,7 @@ watch(tooltipApi.activeIndex, (value) => {
       панель к курсору: у столбцов она садится прямо на верх полосы.
     -->
     <div
-      v-show="tooltipApi.open.value && tooltipApi.active.value"
+      v-show="tooltip && tooltipApi.open.value && tooltipApi.active.value"
       ref="tooltipEl"
       class="pointer-events-none"
       :style="floatingStyle"

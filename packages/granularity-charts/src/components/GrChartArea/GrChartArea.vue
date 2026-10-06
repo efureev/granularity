@@ -100,6 +100,11 @@ export interface GrChartAreaProps {
   showGrid?: 'both' | 'x' | 'y' | 'none'
   showLegend?: boolean | 'auto'
   legendPosition?: 'top' | 'bottom'
+  /**
+   * Панель со значениями под курсором; по умолчанию `true`. `false` прячет только
+   * панель: курсор, активные марки, `update:activeIndex` и `pointHover` работают,
+   * пока график интерактивен.
+   */
   tooltip?: boolean
   /** Скрытые серии по id — `v-model:hiddenSeries`. Скрытая серия из стека выпадает. */
   hiddenSeries?: readonly string[]

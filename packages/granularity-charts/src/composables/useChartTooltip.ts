@@ -64,7 +64,13 @@ export interface UseChartTooltipOptions {
   plot: () => Rect
   /** Элемент, по которому считается координата указателя. */
   surface: Ref<HTMLElement | null>
+  /** Следит ли курсор за указателем. Выключенный не двигается, но курсор снаружи (`setActive`) принимает. */
   enabled?: () => boolean
+  /**
+   * Показывать ли панель. Курсор от неё не зависит: пара графиков на одном
+   * `activeIndex` обходится панелью у одного, а курсор нужен обоим.
+   */
+  panel?: () => boolean
   closeDelayMs?: number
   /**
    * Своё правило попадания: координаты внутри поверхности → индекс позиции,
@@ -213,7 +219,7 @@ export function useChartTooltip(options: UseChartTooltipOptions): UseChartToolti
   function setActive(index: number | null): void {
     cancelClose()
     activeIndex.value = index
-    open.value = index !== null && (options.enabled?.() ?? true)
+    open.value = index !== null && (options.enabled?.() ?? true) && (options.panel?.() ?? true)
   }
 
   function onPointerMove(event: PointerEvent): void {

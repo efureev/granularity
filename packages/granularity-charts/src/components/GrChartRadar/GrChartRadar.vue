@@ -95,6 +95,11 @@ export interface GrChartRadarProps {
   yDomain?: readonly [number | null, number | null]
   showLegend?: boolean | 'auto'
   legendPosition?: 'top' | 'bottom'
+  /**
+   * Панель со значениями под курсором; по умолчанию `true`. `false` прячет только
+   * панель: курсор, активные марки, `update:activeIndex` и `pointHover` работают,
+   * пока график интерактивен.
+   */
   tooltip?: boolean
   /** Скрытые серии по id — `v-model:hiddenSeries`. Оси при этом не исчезают. */
   hiddenSeries?: readonly string[]
