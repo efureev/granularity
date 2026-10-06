@@ -2,6 +2,7 @@ import { mount } from '@vue/test-utils'
 import { defineComponent, nextTick, reactive, ref } from 'vue'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import GrButton from '../../GrButton/GrButton.vue'
 import GrForm from '../GrForm.vue'
 import GrFormField from '../../GrFormField/GrFormField.vue'
 import GrFormFile from '../../GrFormFile/GrFormFile.vue'
@@ -721,6 +722,61 @@ describe('GrForm — среда без `scrollIntoView`', () => {
 
     expect(wrapper.text()).toContain('Обязательно')
 
+    wrapper.unmount()
+  })
+})
+
+/**
+ * Кнопка отправки обычно стоит под полями, а не в `GrFormField`, — и до
+ * `disabled` формы через контекст поля не доходила: «выключенную» форму
+ * отправляли второй раз.
+ */
+describe('GrForm — disabled и кнопки', () => {
+  function stand(disabled: boolean) {
+    const onSubmit = vi.fn()
+    const Harness = defineComponent({
+      components: { GrButton, GrForm, GrFormField, GrInput },
+      setup: () => ({ model: reactive({ name: 'Ada' }), disabled, onSubmit }),
+      template: `
+        <GrForm :model="model" :disabled="disabled" @submit="onSubmit">
+          <GrFormField label="Имя" name="name"><GrInput v-model="model.name" /></GrFormField>
+          <GrButton type="submit" data-submit>Сохранить</GrButton>
+          <GrButton data-cancel>Отмена</GrButton>
+          <GrButton type="reset" data-reset>Сбросить</GrButton>
+        </GrForm>
+      `,
+    })
+
+    return { wrapper: mount(Harness, { attachTo: document.body }), onSubmit }
+  }
+
+  it('кнопка `type="submit"` выключается вместе с формой, остальные — нет', () => {
+    const { wrapper } = stand(true)
+
+    expect(wrapper.get('[data-submit]').attributes('disabled')).toBeDefined()
+    expect(wrapper.get('[data-cancel]').attributes('disabled')).toBeUndefined()
+    expect(wrapper.get('[data-reset]').attributes('disabled')).toBeUndefined()
+    wrapper.unmount()
+  })
+
+  it('выключенная форма не отправляется и событием submit', async () => {
+    const { wrapper, onSubmit } = stand(true)
+
+    await wrapper.get('form').trigger('submit')
+    await new Promise(resolve => setTimeout(resolve, 0))
+
+    expect(onSubmit).not.toHaveBeenCalled()
+    wrapper.unmount()
+  })
+
+  it('включённая — отправляется, кнопка доступна', async () => {
+    const { wrapper, onSubmit } = stand(false)
+
+    expect(wrapper.get('[data-submit]').attributes('disabled')).toBeUndefined()
+    await wrapper.get('form').trigger('submit')
+    await new Promise(resolve => setTimeout(resolve, 0))
+
+    expect(onSubmit).toHaveBeenCalledTimes(1)
     wrapper.unmount()
   })
 })

@@ -408,6 +408,10 @@ provide(GR_FORM_KEY, {
 })
 
 function onSubmit(): void {
+  // Выключенная форма не отправляется и по Enter в поле, и из своей кнопки.
+  if (props.disabled)
+    return
+
   void validate().then((valid) => {
     if (valid) {
       emit('submit', props.model)

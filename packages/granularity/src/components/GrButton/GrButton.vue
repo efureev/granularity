@@ -5,6 +5,7 @@ import IconLoader from '~icons/lucide/loader-circle'
 
 import { useGrComponentProp, useGrComponentSize } from '../shared/configContext'
 import { useGrButtonGroup } from '../shared/buttonGroupContext'
+import { useGrFormContext } from '../shared/formContext'
 import { definedAttrs } from '../shared/polymorphicRoot'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 
@@ -111,14 +112,26 @@ const renderAs = computed<string | Component>(() => {
   return props.href ? 'a' : 'button'
 })
 
-// Неинтерактивно при явном `disabled` ИЛИ во время `loading`.
-const blocked = computed(() => props.disabled || props.loading)
+/**
+ * Кнопка отправки выключенной формы выключена и сама.
+ *
+ * `GrForm disabled` гасит контролы через контекст поля, а кнопка под полями
+ * в `GrFormField` не живёт — и «выключенную» форму можно было отправить ещё
+ * раз. Только `type="submit"`: «Отмена» и «Сбросить» остаются рабочими.
+ */
+const form = useGrFormContext()
+const isDisabled = computed(() => props.disabled || (
+  props.type === 'submit' && !props.as && !props.href && Boolean(form?.disabled?.value)
+))
+
+// Неинтерактивно при `disabled` ИЛИ во время `loading`.
+const blocked = computed(() => isDisabled.value || props.loading)
 
 // Ключевое: `loading` НЕ ставит нативный `disabled` (элемент бы выпал из фокуса и
 // скринридер потерял бы контекст) — вместо этого `aria-disabled` + перехват клика.
 // Нативный `disabled` (только у `<button>`) оставляем лишь для явного `disabled`.
-const nativeDisabled = computed(() => (renderAs.value === 'button' && props.disabled) ? true : undefined)
-const ariaDisabled = computed(() => (props.loading || (isLink.value && props.disabled)) ? 'true' : undefined)
+const nativeDisabled = computed(() => (renderAs.value === 'button' && isDisabled.value) ? true : undefined)
+const ariaDisabled = computed(() => (props.loading || (isLink.value && isDisabled.value)) ? 'true' : undefined)
 
 // `aria-disabled="true"` снаружи — кнопка, которую потребитель держит в фокусе,
 // но объявляет недоступной (у `GrTransfer` — перенос, которому некуда ехать).
@@ -127,13 +140,13 @@ const ariaDisabled = computed(() => (props.loading || (isLink.value && props.dis
 // но он живёт в слое `granum.components` и цветам варианта — утилитам из
 // `granum.utilities` — проигрывал всегда.
 const attrs = useAttrs()
-const looksDisabled = computed(() => props.disabled || attrs['aria-disabled'] === 'true' || attrs['aria-disabled'] === true)
+const looksDisabled = computed(() => isDisabled.value || attrs['aria-disabled'] === 'true' || attrs['aria-disabled'] === true)
 
 const resolvedTarget = computed(() => props.target ?? (props.external ? '_blank' : undefined))
 const resolvedRel = computed(() => props.rel ?? (resolvedTarget.value === '_blank' ? 'noopener noreferrer' : undefined))
 
 const rootAttrs = computed(() => {
-  const liveLink = isLink.value && !props.disabled
+  const liveLink = isLink.value && !isDisabled.value
   const own = definedAttrs({
     'type': renderAs.value === 'button' ? props.type : undefined,
     'disabled': nativeDisabled.value,
@@ -143,13 +156,13 @@ const rootAttrs = computed(() => {
     'aria-busy': props.loading ? 'true' : undefined,
     'aria-disabled': ariaDisabled.value,
     'aria-label': props.ariaLabel,
-    'tabindex': isLink.value && props.disabled ? -1 : undefined,
+    'tabindex': isLink.value && isDisabled.value ? -1 : undefined,
   })
 
   // Выключенная ссылка остаётся без адреса и у компонента-ссылки: `undefined`
   // здесь нарочно ложится поверх `href`, который тот вычислил сам. С адресом
   // средняя кнопка и «открыть в новой вкладке» обошли бы перехват клика.
-  return isLink.value && props.disabled ? { ...own, href: undefined } : own
+  return isLink.value && isDisabled.value ? { ...own, href: undefined } : own
 })
 
 function onClickCapture(e: MouseEvent): void {
