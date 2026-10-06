@@ -295,3 +295,50 @@ describe('GrSplitter', () => {
     expect(localWins.get('[data-gr-splitter]').attributes('data-orientation')).toBe('horizontal')
   })
 })
+
+/**
+ * Свёрнутая панель нулевой ширины рисовала содержимое поверх второй панели, а
+ * её фокусируемые элементы оставались в порядке `Tab` — невидимыми.
+ */
+describe('GrSplitter — свёрнутая панель вне раскладки, дерева и обхода', () => {
+  function withLinks(props: Record<string, unknown>) {
+    return mount(GrSplitter, {
+      props: { collapsible: true, ...props },
+      slots: {
+        start: () => h('a', { 'href': '#billing', 'data-start-link': '' }, 'billing · 6 tables'),
+        end: () => h('textarea', { 'data-editor': '' }),
+      },
+      attachTo: document.body,
+    })
+  }
+
+  it('свёрнутая: inert, скрыта и обрезана; размер помнится', async () => {
+    const wrapper = withLinks({ modelValue: 35 })
+    const start = () => wrapper.get('[data-gr-splitter-pane="start"]')
+
+    const enter = () => wrapper.get('[data-gr-splitter-separator]').trigger('keydown', { key: 'Enter' })
+    await enter()
+
+    expect(start().attributes('inert')).toBeDefined()
+    expect(start().attributes('aria-hidden')).toBe('true')
+    expect(start().classes()).toEqual(expect.arrayContaining(['overflow-hidden', 'invisible']))
+    expect((wrapper.get('[data-start-link]').element as HTMLElement).closest('[inert]')).not.toBeNull()
+
+    await enter()
+
+    expect(start().attributes('inert')).toBeUndefined()
+    expect(start().attributes('aria-hidden')).toBeUndefined()
+    expect(start().classes()).not.toContain('invisible')
+    expect(wrapper.get('[data-gr-splitter-separator]').attributes('aria-valuenow')).toBe('35')
+    wrapper.unmount()
+  })
+
+  it('развёрнутая — без inert и без обрезки', () => {
+    const wrapper = withLinks({ modelValue: 35 })
+    const start = wrapper.get('[data-gr-splitter-pane="start"]')
+
+    expect(start.attributes('inert')).toBeUndefined()
+    expect(start.classes()).not.toContain('overflow-hidden')
+    wrapper.unmount()
+  })
+})

@@ -5,7 +5,7 @@ import { useGrComponentProp } from '../shared/configContext'
 import { useDragGesture } from '../../composables/useDragGesture'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 
-import { paneClass, rootClass, separatorClass } from './grSplitterStyles'
+import { paneClass, paneCollapsedClass, rootClass, separatorClass } from './grSplitterStyles'
 import {
   clampSize,
   shouldCollapse,
@@ -284,7 +284,9 @@ function onDoubleClick(): void {
     <div
       :id="startId"
       data-gr-splitter-pane="start"
-      :class="paneClass"
+      :class="[paneClass, isCollapsed ? paneCollapsedClass : '']"
+      :inert="isCollapsed || undefined"
+      :aria-hidden="isCollapsed ? 'true' : undefined"
     >
       <slot name="start" />
     </div>
