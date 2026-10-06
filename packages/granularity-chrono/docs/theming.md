@@ -17,6 +17,7 @@
 | `--gr-calendar-today-ring` | `var(--gr-primary)` | Обводка сегодняшнего дня |
 | `--gr-calendar-outside-fg` | `var(--gr-muted-fg)` | Дни добора соседних месяцев |
 | `--gr-calendar-range-bg` | `var(--gr-muted)` | Полоса выбранного периода |
+| `--gr-calendar-cell-size` | `1.75rem`…`2.5rem` по `size` | Сторона ячейки дня; для узкой карточки — `min(2.25rem, 12cqi)` |
 | `--gr-time-picker-column-height` | `12rem` | Сколько значений видно в колонке разом |
 | `--gr-time-picker-selected-bg` | `var(--gr-primary)` | Заливка выбранного значения |
 | `--gr-time-picker-selected-fg` | `var(--gr-primary-fg)` | Текст выбранного значения |
@@ -29,6 +30,18 @@
 ```css
 [data-theme='dark'] {
   --gr-calendar-range-bg: color-mix(in srgb, var(--gr-primary) 18%, transparent);
+}
+```
+
+Месяц на `md` занимает около 290px, с номерами недель — 309px: в карточку
+телефона он без хука не помещается. `--gr-calendar-cell-size` уменьшает ячейку
+вместе с панелью пикера; ячейку меньше 24px (WCAG 2.2 «Target Size») делать не
+стоит:
+
+```css
+.phone-card {
+  container-type: inline-size;
+  --gr-calendar-cell-size: max(1.5rem, min(2.25rem, 12cqi));
 }
 ```
 

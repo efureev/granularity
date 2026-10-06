@@ -5,6 +5,16 @@ All notable changes to the [`@feugene/granularity-chrono`](.) package are docume
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Added
+
+- **Хук `--gr-calendar-cell-size` у `GrCalendar` и пикеров дат.** Ячейки дня
+  были фиксированными (`h-9 w-9` на `md`, `h-8 w-8` на `sm`), и месяц — 290px
+  на `md`, 309px с номерами недель — не помещался в карточку телефона без
+  прокрутки. Теперь сторона ячейки — хук с прежним умолчанием по размеру; для
+  узкой карточки, например, `min(2.25rem, 12cqi)`.
+
 ## [v1.0.4] 2026-10-06
 
 ### Changed

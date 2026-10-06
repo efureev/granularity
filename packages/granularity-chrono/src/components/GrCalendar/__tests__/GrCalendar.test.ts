@@ -800,3 +800,23 @@ describe('GrCalendar — режим недели', () => {
     wrapper.unmount()
   })
 })
+
+/**
+ * Ячейки дня были фиксированными (`h-9 w-9` на `md`) без хука: месяц занимал
+ * 290px и в карточку телефона не помещался. Сторона ячейки — хук
+ * `--gr-calendar-cell-size` с прежним умолчанием по размеру.
+ */
+describe('GrCalendar — размер ячейки дня через хук', () => {
+  it.each([
+    ['xs', '1.75rem'],
+    ['sm', '2rem'],
+    ['md', '2.25rem'],
+    ['lg', '2.5rem'],
+  ] as const)('%s: сторона из `--gr-calendar-cell-size`, умолчание %s', (size, fallback) => {
+    const wrapper = mount(GrCalendar, { props: { modelValue: null, size } })
+    const day = wrapper.get('[data-gr-calendar-day]').classes()
+
+    expect(day).toContain(`w-[var(--gr-calendar-cell-size,${fallback})]`)
+    expect(day).toContain(`h-[var(--gr-calendar-cell-size,${fallback})]`)
+  })
+})

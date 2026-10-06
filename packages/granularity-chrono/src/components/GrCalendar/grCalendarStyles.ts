@@ -37,12 +37,18 @@ export const calendarWeekNumberClass
   = 'pr-1 text-right align-middle text-[length:var(--gr-control-text-xs)] leading-[var(--gr-leading-xs)] '
     + 'text-[var(--gr-muted-fg)]'
 
-/** Размер ячейки — не меньше 24 CSS-px по WCAG 2.2 «Target Size (Minimum)». */
+/**
+ * Размер ячейки — не меньше 24 CSS-px по WCAG 2.2 «Target Size (Minimum)».
+ *
+ * Сторона ячейки — хук `--gr-calendar-cell-size` с умолчанием по размеру: месяц
+ * на `md` занимает 290px, и в карточку телефона он без хука не помещался. С ним
+ * потребитель ставит, например, `min(2.25rem, 12cqi)`.
+ */
 export const calendarCellSizes: Record<GrCalendarSize, string> = {
-  xs: 'h-7 w-7 text-[length:var(--gr-control-text-xs)] leading-[var(--gr-control-leading-xs)]',
-  sm: 'h-8 w-8 text-[length:var(--gr-control-text-sm)] leading-[var(--gr-control-leading-sm)]',
-  md: 'h-9 w-9 text-[length:var(--gr-control-text-md)] leading-[var(--gr-control-leading-md)]',
-  lg: 'h-10 w-10 text-[length:var(--gr-control-text-lg)] leading-[var(--gr-control-leading-lg)]',
+  xs: 'h-[var(--gr-calendar-cell-size,1.75rem)] w-[var(--gr-calendar-cell-size,1.75rem)] text-[length:var(--gr-control-text-xs)] leading-[var(--gr-control-leading-xs)]',
+  sm: 'h-[var(--gr-calendar-cell-size,2rem)] w-[var(--gr-calendar-cell-size,2rem)] text-[length:var(--gr-control-text-sm)] leading-[var(--gr-control-leading-sm)]',
+  md: 'h-[var(--gr-calendar-cell-size,2.25rem)] w-[var(--gr-calendar-cell-size,2.25rem)] text-[length:var(--gr-control-text-md)] leading-[var(--gr-control-leading-md)]',
+  lg: 'h-[var(--gr-calendar-cell-size,2.5rem)] w-[var(--gr-calendar-cell-size,2.5rem)] text-[length:var(--gr-control-text-lg)] leading-[var(--gr-control-leading-lg)]',
 }
 
 export const calendarNavSizes: Record<GrCalendarSize, string> = {
