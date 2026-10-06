@@ -42,6 +42,8 @@ export const ocean = extendTheme({
     '--gr-secondary-fg': '#e8f4fa',
     '--gr-brd': '#1c5470',
     '--gr-input': '#1c5470',
+    // Граница переключаемого контрола — 3:1 к фону, карточке и `--gr-muted`.
+    '--gr-control-brd': '#6b9ab3',
     '--gr-ring': '#38bdf8',
     // Подложка модальных слоёв: тон фона темы, а не нейтральный чёрный.
     '--gr-overlay-bg': 'rgb(4 30 43 / 0.6)',
@@ -165,6 +167,7 @@ export const contrast = createTheme({
     // Границы и фокус-кольцо: тонкая светлая линия здесь бесполезна.
     '--gr-brd': '#000000',
     '--gr-input': '#000000',
+    '--gr-control-brd': '#000000',
     '--gr-ring': '#0b3fd4',
     '--gr-overlay-bg': 'rgb(0 0 0 / 0.7)',
 
