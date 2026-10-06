@@ -28,27 +28,44 @@ import {
 import { bufferedPercent, clampTime, formatTime, progressPercent } from './videoTime'
 
 export interface GrVideoPlayerProps {
+  /** Адрес ролика. */
   src?: string | null
   /** Кадр до запуска: без него первые секунды видна чёрная рамка. */
   poster?: string
   /** Соотношение сторон рамки. По умолчанию 16:9 — им снято большинство роликов. */
   aspectRatio?: number
+  /**
+   * Запускать ролик сразу. Браузеры пускают автозапуск только без звука —
+   * вместе с `muted`; отказ приходит событием `error`.
+   */
   autoplay?: boolean
+  /** Играть по кругу: после конца ролик начинается заново. */
   loop?: boolean
   /** Начинать без звука. Для автозапуска обязательно: браузеры блокируют звук. */
   muted?: boolean
   /** Шаг перемотки стрелками, секунды. */
   seekStep?: number
+  /**
+   * Ступень размера: элементы управления и кегль подписей. По умолчанию `md`;
+   * берётся из `GrConfigProvider`.
+   */
   size?: GrVideoPlayerSize
+  /** Плеер недоступен: кнопки выключены, перемотка вне порядка Tab, запуск не срабатывает. */
   disabled?: boolean
+  /** Имя плеера. Не задано — из локали («Video player»). */
   ariaLabel?: string
 }
 
 export interface GrVideoPlayerEmits {
+  /** Воспроизведение пошло. */
   (e: 'play'): void
+  /** Воспроизведение остановлено. */
   (e: 'pause'): void
+  /** Ролик доигран до конца. С `loop` не приходит. */
   (e: 'ended'): void
+  /** Позиция воспроизведения сменилась — текущая секунда. */
   (e: 'timeupdate', current: number): void
+  /** Ролик не загрузился, запуск отклонён браузером или не открылся полный экран. */
   (e: 'error', error: unknown): void
 }
 

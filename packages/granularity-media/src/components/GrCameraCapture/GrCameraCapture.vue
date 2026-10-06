@@ -23,9 +23,13 @@ import {
 } from './grCameraCaptureStyles'
 
 export interface GrCameraCaptureOutput {
+  /** Ширина снимка. Одна — высота считается из пропорций кадра. */
   width?: number
+  /** Высота снимка. Вместе с `width` — габарит, в который кадр вписывается. */
   height?: number
+  /** MIME снимка: `image/jpeg` (по умолчанию), `image/png`, `image/webp`. */
   type?: string
+  /** Качество сжатия от `0` до `1` для JPEG и WebP. По умолчанию `0.92`. */
   quality?: number
 }
 
@@ -51,16 +55,31 @@ export interface GrCameraCaptureProps {
   autoStart?: boolean
   /** Зеркалить превью. По умолчанию — только фронтальную камеру. */
   mirror?: boolean
+  /**
+   * Размер и формат снимка. Одна сторона — вторая считается из пропорций
+   * кадра; обе — габарит, в который кадр вписывается, не искажаясь. Не задан —
+   * снимок в размер кадра камеры, JPEG.
+   */
   output?: GrCameraCaptureOutput
+  /**
+   * Ступень размера: элементы управления и кегль подписей. По умолчанию `md`;
+   * берётся из `GrConfigProvider`.
+   */
   size?: GrCameraCaptureSize
+  /** Камера недоступна: включить её и снять кадр нельзя, кнопки выключены. */
   disabled?: boolean
+  /** Имя группы с превью и кнопками. Не задано — из локали («Camera»). */
   ariaLabel?: string
 }
 
 export interface GrCameraCaptureEmits {
+  /** Снимок готов: кадр целиком, без зеркала превью. */
   (e: 'capture', blob: Blob): void
+  /** Поток камеры пошёл — превью живое. */
   (e: 'start'): void
+  /** Камера выключена. */
   (e: 'stop'): void
+  /** Состояние камеры сменилось — значения `GrCameraStatus`. */
   (e: 'statusChange', status: GrCameraStatus): void
 }
 

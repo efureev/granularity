@@ -5,6 +5,17 @@ All notable changes to `@feugene/granularity-media` are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+
+- Появились описания у пропов, которые в API, подсказках IDE и на портале были
+  пустыми: у `GrCameraCapture` — `output` (и полей `GrCameraCaptureOutput`),
+  `size`, `disabled`, `ariaLabel`; у `GrCodeScanner` — `deviceId`, `size`,
+  `disabled`, `ariaLabel`; у `GrImageCrop` — `shape`, `maxZoom`, `output`, `size`,
+  `disabled`, `ariaLabel`; у `GrVideoPlayer` — `src`, `autoplay`, `loop`, `size`,
+  `disabled`, `ariaLabel`. Описаны и события всех четырёх.
+
 ## [v1.0.2] 2026-10-06
 
 ### Changed

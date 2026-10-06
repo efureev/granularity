@@ -25,6 +25,7 @@ import {
 export interface GrCodeScannerProps {
   /** Какая камера: `environment` — тыловая, ей и сканируют. */
   facing?: 'user' | 'environment'
+  /** Конкретное устройство, если приложение его уже выбрало. */
   deviceId?: string
   /**
    * Включать камеру сразу.
@@ -47,15 +48,25 @@ export interface GrCodeScannerProps {
   interval?: number
   /** Сообщать один и тот же код повторно: приёмка сканирует подряд. */
   continuous?: boolean
+  /**
+   * Ступень размера: элементы управления и кегль подписей. По умолчанию `md`;
+   * берётся из `GrConfigProvider`.
+   */
   size?: GrCodeScannerSize
+  /** Сканер недоступен: камера не включается, кнопки выключены. */
   disabled?: boolean
+  /** Имя группы с превью и кнопками. Не задано — из локали («Code scanner»). */
   ariaLabel?: string
 }
 
 export interface GrCodeScannerEmits {
+  /** Распознаны коды. Без `continuous` — только те, которых не было в прошлом кадре. */
   (e: 'detect', codes: GrCodeResult[]): void
+  /** Поток камеры пошёл — сканирование началось. */
   (e: 'start'): void
+  /** Камера выключена. */
   (e: 'stop'): void
+  /** Состояние камеры сменилось — значения `GrCameraStatus`. */
   (e: 'statusChange', status: GrCameraStatus): void
 }
 
