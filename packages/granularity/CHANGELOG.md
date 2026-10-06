@@ -89,6 +89,9 @@ to [Semantic Versioning](https://semver.org/).
   собственные классы поля. `w-full` корня у этих контролов и у `GrSelect`,
   `GrAutocomplete`, `GrInputTag` — умолчание: со своей шириной (`w-*` или
   `width` в `style`) корень его не ставит.
+- **У `GrInput type="search"` один крестик.** Chromium и Safari рисовали ещё и
+  нативный `::-webkit-search-cancel-button` рядом с кнопкой `clearable`. Теперь
+  нативные украшения поиска спрятаны всегда: кнопка очистки у поля одна.
 
 ## [v1.0.11] 2026-10-06
 

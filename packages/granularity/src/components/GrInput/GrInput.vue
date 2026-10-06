@@ -537,3 +537,16 @@ function togglePassword(): void {
     >{{ liveMessage }}</span>
   </div>
 </template>
+
+<style scoped>
+/*
+ * Свой крестик (`clearable`) — единственная кнопка очистки: Chromium и Safari
+ * рисуют у `type="search"` ещё и нативный, и у поля их становилось два. Без
+ * `clearable` нативный тоже не нужен — он есть не во всех браузерах.
+ */
+input[type='search']::-webkit-search-cancel-button,
+input[type='search']::-webkit-search-decoration {
+  -webkit-appearance: none;
+  appearance: none;
+}
+</style>

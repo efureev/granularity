@@ -2116,3 +2116,48 @@ test.describe('GrDashboard: перенос между дашбордами', () 
     await expectReturned(page, source)
   })
 })
+
+/**
+ * У `type="search"` Chromium и Safari рисуют свой крестик очистки — рядом с
+ * крестиком `clearable` их становилось два. Нативный спрятан всегда.
+ */
+test.describe('GrInput: type="search"', () => {
+  test('нативной кнопки очистки нет — одна кнопка у компонента', async ({ page }) => {
+    await openShowcasePage(page, componentPath('GrInput'))
+    const input = page.locator('[data-gr-input] input[type="search"]').first()
+    await input.fill('button')
+
+    // Стиль псевдоэлемента `getComputedStyle` не отдаёт — ищем правило, которое
+    // до этого поля дотягивается, и смотрим, что оно делает.
+    const appearance = await input.evaluate((element) => {
+      const PSEUDO = '::-webkit-search-cancel-button'
+      const rules: CSSRule[] = []
+      const collect = (list: CSSRuleList) => {
+        for (const rule of Array.from(list)) {
+          rules.push(rule)
+          if ('cssRules' in rule)
+            collect((rule as CSSGroupingRule).cssRules)
+        }
+      }
+      for (const sheet of Array.from(document.styleSheets)) {
+        try {
+          collect(sheet.cssRules)
+        }
+        catch {}
+      }
+
+      for (const rule of rules) {
+        if (!(rule instanceof CSSStyleRule) || !rule.selectorText.includes(PSEUDO))
+          continue
+        const hits = rule.selectorText.split(',')
+          .filter(selector => selector.includes(PSEUDO))
+          .some(selector => element.matches(selector.replace(PSEUDO, '').trim()))
+        if (hits)
+          return rule.style.getPropertyValue('appearance') || rule.style.getPropertyValue('-webkit-appearance')
+      }
+      return null
+    })
+
+    expect(appearance).toBe('none')
+  })
+})
