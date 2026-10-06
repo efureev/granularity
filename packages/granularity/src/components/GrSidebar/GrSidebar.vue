@@ -11,7 +11,7 @@
  *   иначе панель начинается сразу с контента.
  * - Слоты `#title` / `#subtitle` имеют приоритет над одноимёнными пропами.
  */
-import { computed, provide, ref, watch } from 'vue'
+import { computed, provide, ref, useSlots, watch } from 'vue'
 
 import GrButton from '../GrButton/GrButton.vue'
 import GrIcon from '../GrIcon/GrIcon.vue'
@@ -208,17 +208,45 @@ provide(GR_SIDEBAR_KEY, {
   expand,
 })
 
+const slots = useSlots()
+
 const hasTitle = computed(() => Boolean(props.title))
 const hasSubtitle = computed(() => Boolean(props.subtitle))
-const showHeader = computed(() => Boolean(hasTitle.value || hasSubtitle.value || props.showToggleButton))
 
+/**
+ * Шапка есть, когда есть что в ней показать: заголовок или подзаголовок —
+ * пропом **или слотом** — либо кнопка. Раньше учитывались только пропы, и
+ * шапка, заданная одними слотами `#title`/`#subtitle`, не рендерилась вовсе.
+ * Функция, а не `computed`: `$slots` не реактивен.
+ */
+function hasHeading(): boolean {
+  return Boolean(hasTitle.value || hasSubtitle.value || slots.title || slots.subtitle)
+}
+
+function showHeader(): boolean {
+  return hasHeading() || props.showToggleButton
+}
+
+// Ширина и шапка — по `effectiveCollapsed`: в слое свёрнутость игнорируется,
+// и узкий рейл без заголовка внутри модального окна не появляется.
 const asideStyle = computed(() => ({
-  width: collapsedState.value ? props.collapsedWidth : props.width,
+  width: effectiveCollapsed.value ? props.collapsedWidth : props.width,
 }))
 
-const resolvedToggleLabel = computed(() => props.toggleLabel ?? (collapsedState.value
-  ? t('gr.sidebar.expand', 'Expand sidebar')
-  : t('gr.sidebar.collapse', 'Collapse sidebar')))
+/**
+ * Имя кнопки — то, что она делает. В слое кнопка закрывает его (значок ×), и
+ * «Collapse sidebar» скринридер объявлял бы неправду.
+ */
+const resolvedToggleLabel = computed(() => {
+  if (props.toggleLabel)
+    return props.toggleLabel
+  if (props.overlay)
+    return t('gr.sidebar.close', 'Close sidebar')
+
+  return collapsedState.value
+    ? t('gr.sidebar.expand', 'Expand sidebar')
+    : t('gr.sidebar.collapse', 'Collapse sidebar')
+})
 
 const rootTag = computed(() => (props.landmark === 'navigation' ? 'nav' : 'aside'))
 const rootClass = computed(() => grSidebarRootClass(props.position))
@@ -289,12 +317,12 @@ defineSlots<{
           :style="asideStyle"
         >
     <div
-      v-if="showHeader"
+      v-if="showHeader()"
       data-gr-sidebar-header
-      :class="[headerBase, collapsedState ? 'justify-center' : 'justify-between']"
+      :class="[headerBase, effectiveCollapsed ? 'justify-center' : 'justify-between']"
     >
       <div
-        v-if="!collapsedState && (hasTitle || hasSubtitle || $slots.title || $slots.subtitle)"
+        v-if="!effectiveCollapsed && hasHeading()"
         class="min-w-0"
       >
         <div

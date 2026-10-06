@@ -521,6 +521,38 @@ describe('GrSidebar — модальный слой', () => {
     wrapper.unmount()
   })
 
+  /**
+   * Имя кнопки — то, что она делает: в слое она закрывает (значок ×), и
+   * «Collapse sidebar» скринридер объявлял бы неправду.
+   */
+  it('кнопка шапки в слое называется «закрыть», а `toggleLabel` сильнее', async () => {
+    const layer = mountSidebar({ overlay: true, open: true, showToggleButton: true, title: 'Меню' })
+    await nextTick()
+    expect(document.querySelector('[data-gr-sidebar-toggle]')?.getAttribute('aria-label')).toBe('Close sidebar')
+    layer.unmount()
+
+    const own = mountSidebar({ overlay: true, open: true, showToggleButton: true, toggleLabel: 'Скрыть фильтры' })
+    await nextTick()
+    expect(document.querySelector('[data-gr-sidebar-toggle]')?.getAttribute('aria-label')).toBe('Скрыть фильтры')
+    own.unmount()
+
+    const column = mountSidebar({ showToggleButton: true })
+    await nextTick()
+    expect(document.querySelector('[data-gr-sidebar-toggle]')?.getAttribute('aria-label')).toBe('Collapse sidebar')
+    column.unmount()
+  })
+
+  /** В слое свёрнутость игнорируется — и ширина, и шапка. */
+  it('в слое свёрнутая панель держит полную ширину и заголовок', async () => {
+    const wrapper = mountSidebar({ overlay: true, open: true, collapsed: true, title: 'Меню', width: '280px', collapsedWidth: '64px' })
+    await nextTick()
+
+    const panel = document.querySelector<HTMLElement>('[data-gr-sidebar]')!
+    expect(panel.style.width).toBe('280px')
+    expect(document.querySelector('[data-gr-sidebar-title]')?.textContent?.trim()).toBe('Меню')
+    wrapper.unmount()
+  })
+
   /** Сворачивать в слое нечего, а закрыть иначе можно только `Esc` или подложкой. */
   it('кнопка шапки в слое закрывает, а не сворачивает', async () => {
     const wrapper = mountSidebar({ overlay: true, open: true, showToggleButton: true, title: 'Меню' })
@@ -551,5 +583,33 @@ describe('GrSidebar — модальный слой', () => {
     expect(panel.attributes('data-own')).toBe('да')
 
     withClass.unmount()
+  })
+})
+
+/**
+ * Проп обещает «слот `#title` сильнее» — значит, слота одного достаточно.
+ * Шапка решалась только по пропам и без них не рендерилась вовсе.
+ */
+describe('GrSidebar — шапка из одних слотов', () => {
+  it('заголовок и подзаголовок слотами рисуют шапку', () => {
+    const wrapper = mount(GrSidebar, {
+      props: { position: 'right', ariaLabel: 'Report filters' },
+      slots: {
+        title: '<span data-own-title>Filters <b>2</b></span>',
+        subtitle: 'Applied to every chart',
+        default: '<a href="#a">Обзор</a>',
+      },
+      global: granularityGlobal(),
+    })
+
+    expect(wrapper.find('[data-gr-sidebar-header]').exists()).toBe(true)
+    expect(wrapper.find('[data-gr-sidebar-title] [data-own-title]').exists()).toBe(true)
+    expect(wrapper.get('[data-gr-sidebar-subtitle]').text()).toBe('Applied to every chart')
+  })
+
+  it('без заголовка, подзаголовка и кнопки шапки нет', () => {
+    const wrapper = mount(GrSidebar, { props: { ariaLabel: 'Разделы' }, slots: { default: '<a href="#a">Обзор</a>' }, global: granularityGlobal() })
+
+    expect(wrapper.find('[data-gr-sidebar-header]').exists()).toBe(false)
   })
 })

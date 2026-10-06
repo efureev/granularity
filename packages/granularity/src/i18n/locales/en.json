@@ -162,7 +162,8 @@
   },
   "sidebar": {
     "expand": "Expand sidebar",
-    "collapse": "Collapse sidebar"
+    "collapse": "Collapse sidebar",
+    "close": "Close sidebar"
   },
   "splitter": {
     "label": "Resize panels"
