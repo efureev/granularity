@@ -26,7 +26,7 @@ export const rootClosingClass = 'pointer-events-none'
 export const shellBase = 'fixed inset-0'
 
 // Поля вокруг панели. У `full` их нет вовсе: размер означает «во весь экран», а
-// паддинг оболочки вместе с `h-full` панели дал бы окно выше вьюпорта.
+// паддинг оболочки вместе с высотой вьюпорта у панели дал бы окно выше экрана.
 export const shellPaddingBySize: Record<GrModalSize, string> = {
   sm: 'p-4 sm:p-6',
   md: 'p-4 sm:p-6',
@@ -102,8 +102,14 @@ export const panelRadiusBySize: Record<GrModalSize, string> = {
 
 // Для большинства размеров высота не задаётся — `Partial` + фильтрация пустых
 // значений в `getGrModalPanelClass` избавляют от двойных пробелов.
+//
+// У `full` — не `h-full`. Раскладка вокруг панели при `outside` — flex с
+// `min-h-full`, а не с заданной высотой, и процент опереть было не на что:
+// панель занимала всю ширину, но высоту по содержимому, и страница виднелась
+// сверху и снизу. Высота вьюпорта задаётся напрямую; при `inside` её ограничивает
+// `max-h-full` панели, и они совпадают.
 export const panelHeightBySize: Partial<Record<GrModalSize, string>> = {
-  full: 'h-full',
+  full: 'min-h-[100dvh]',
 }
 
 export function getGrModalPanelClass(

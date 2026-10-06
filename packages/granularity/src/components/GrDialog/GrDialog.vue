@@ -31,15 +31,28 @@ import {
 } from './dialogShared'
 
 export interface GrDialogProps {
+  /** Открыто ли окно (`v-model`). Своего состояния у окна нет: открывает и закрывает родитель. */
   modelValue: boolean
+  /** Заголовок окна. Он же даёт окну доступное имя через `aria-labelledby`. */
   title?: string
+  /** Закрывать по клику на подложку — только по клику, начавшемуся на ней. */
   closeOnBackdrop?: boolean
+  /** Закрывать по Esc. Закрывается верхний слой стека. */
   closeOnEsc?: boolean
+  /**
+   * Показывать шапку. Без неё уходят и заголовок, и кнопка закрытия — имя окну
+   * тогда даёт `ariaLabel`.
+   */
   showHeader?: boolean
+  /** Кнопка закрытия в шапке. Без неё окно закрывают Esc, подложка и кнопки подвала. */
   showCloseButton?: boolean
+  /** Ширина окна — шкала `GrModal`: от `sm` до `xl`, `full` — во весь экран. */
   size?: GrDialogSize
+  /** Поля и линия шапки: `paddingX`, `paddingY`, `bordered`. */
   headerConfig?: GrDialogSectionConfig
+  /** Поля и линия подвала. Подвал рисуется, только если передан слот `#footer`. */
   footerConfig?: GrDialogSectionConfig
+  /** Поля тела. `bordered` у тела не применяется: своей верхней линии у него нет. */
   bodyConfig?: GrDialogSectionConfig
   /** A11y-лейбл кнопки закрытия (i18n). */
   closeLabel?: string

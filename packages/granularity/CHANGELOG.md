@@ -5,6 +5,20 @@ All notable changes to the [`@feugene/granularity`](.) package are documented in
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Fixed
+
+- **`size="full"` у `GrModal` и `GrDialog` снова занимает весь экран.** Панель
+  получала `h-full`, а раскладка вокруг неё при `scrollBehavior="outside"` —
+  flex с `min-h-full`, а не с заданной высотой: процент опереть было не на что,
+  и окно растягивалось на всю ширину, но по высоте оставалось по содержимому —
+  страница виднелась сверху и снизу. Теперь у панели высота вьюпорта
+  (`min-h-[100dvh]`).
+- У пропов `GrModal` `modelValue`, `closeOnBackdrop`, `closeOnEsc` и `size` и у
+  десяти пропов `GrDialog` — от `title` до `bodyConfig` — появились описания: в
+  API, подсказках IDE и на портале они были пустыми.
+
 ## [v1.0.6] 2026-10-06
 
 ### Fixed

@@ -278,11 +278,14 @@ describe('granularity/GrModal (unit)', () => {
     const panelClass = q('[data-gr-modal-panel]')!.getAttribute('class')
 
     expect(panelClass).toContain('max-w-none')
-    expect(panelClass).toContain('h-full')
+    // Высота вьюпорта, а не `h-full`: в flex с `min-h-full` процент не на что
+    // опереть, и панель была высотой по содержимому.
+    expect(panelClass).toContain('min-h-[100dvh]')
+    expect(panelClass).not.toMatch(/(^|\s)h-full(\s|$)/)
     expect(panelClass).toContain('rounded-[var(--gr-radius-none)]')
 
-    // Паддинг оболочки при `full` снимается: вместе с `h-full` он дал бы панель
-    // выше вьюпорта и лишний скролл.
+    // Паддинг оболочки при `full` снимается: вместе с высотой вьюпорта он дал бы
+    // панель выше экрана и лишний скролл.
     const shell = document.querySelector('[data-gr-overlay-root]')!.firstElementChild as HTMLElement
     expect(shell.className).not.toContain('p-4')
 

@@ -212,7 +212,7 @@ describe('GrDialog — скролл, фокус и жизненный цикл',
 
     const panelClass = wrapper.find('[data-gr-modal-panel]').attributes('class')
     expect(panelClass).toContain('max-w-none')
-    expect(panelClass).toContain('h-full')
+    expect(panelClass).toContain('min-h-[100dvh]')
 
     wrapper.unmount()
   })
