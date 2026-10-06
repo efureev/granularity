@@ -80,7 +80,7 @@ export const indicatorVariantClassMap: Record<GrSegmentedVariant, string> = {
   button: 'border border-[var(--gr-segmented-indicator-brd)] bg-[var(--gr-segmented-indicator-bg)] shadow-[var(--gr-segmented-indicator-shadow)]',
 }
 export const itemBaseClass
-  = 'group/segmented-item relative z-[1] inline-flex min-h-[var(--gr-segmented-min-height)] min-w-0 items-center justify-center gap-2 rounded-[calc(var(--gr-segmented-radius)-var(--gr-segmented-padding))] px-[var(--gr-segmented-item-px)] py-[var(--gr-segmented-item-py)] text-[length:var(--gr-segmented-font-size)] leading-[var(--gr-segmented-line-height)] font-[var(--gr-segmented-font-weight)] text-[var(--gr-segmented-item-color)] transition-colors duration-[var(--gr-duration-fast)] select-none focus:outline-none focus-visible:shadow-[0_0_0_2px_var(--gr-ring),0_0_0_4px_var(--gr-bg)]'
+  = 'group/segmented-item relative z-[1] inline-flex min-h-[var(--gr-segmented-min-height)] min-w-0 items-center gap-2 rounded-[calc(var(--gr-segmented-radius)-var(--gr-segmented-padding))] px-[var(--gr-segmented-item-px)] py-[var(--gr-segmented-item-py)] text-[length:var(--gr-segmented-font-size)] leading-[var(--gr-segmented-line-height)] font-[var(--gr-segmented-font-weight)] text-[var(--gr-segmented-item-color)] transition-colors duration-[var(--gr-duration-fast)] select-none focus:outline-none focus-visible:shadow-[0_0_0_2px_var(--gr-ring),0_0_0_4px_var(--gr-bg)]'
 export const itemVariantClassMap: Record<GrSegmentedVariant, string> = {
   pills: '',
   button: '',
@@ -243,14 +243,26 @@ export function grSegmentedRootStyle(options: {
 export function grSegmentedIndicatorClass(variant: GrSegmentedVariant): string {
   return [indicatorBaseClass, indicatorVariantClassMap[variant]].join(' ')
 }
+/**
+ * Выравнивание содержимого сегмента. В ряду — по центру: сегмент читается
+ * кнопкой. В колонке — к началу: вертикаль — это боковые фильтры, и по центру
+ * значки подписей разной длины вставали рваной линией, как в меню, а не в списке.
+ */
+export const itemJustifyClassMap: Record<GrSegmentedOrientation, string> = {
+  horizontal: 'justify-center',
+  vertical: 'justify-start',
+}
+
 export function grSegmentedItemClass(options: {
   variant: GrSegmentedVariant
   selected: boolean
   disabled: boolean
   iconOnly: boolean
+  orientation?: GrSegmentedOrientation
 }): string {
   return [
     itemBaseClass,
+    itemJustifyClassMap[options.orientation ?? 'horizontal'],
     itemVariantClassMap[options.variant],
     options.selected ? itemSelectedClass : '',
     options.disabled ? itemDisabledClass : itemEnabledClass,

@@ -805,3 +805,19 @@ describe('GrSegmented — состояние ошибки', () => {
     expect(style).not.toContain('--gr-ring')
   })
 })
+
+describe('GrSegmented — выравнивание содержимого сегмента', () => {
+  it('в ряду — по центру, в колонке — к началу', () => {
+    const row = mount(GrSegmented, { props: { modelValue: 'list', options: [...options] } })
+    const column = mount(GrSegmented, { props: { modelValue: 'list', orientation: 'vertical', options: [...options] } })
+
+    for (const radio of row.findAll('[role="radio"]')) {
+      expect(radio.classes()).toContain('justify-center')
+      expect(radio.classes()).not.toContain('justify-start')
+    }
+    for (const radio of column.findAll('[role="radio"]')) {
+      expect(radio.classes()).toContain('justify-start')
+      expect(radio.classes()).not.toContain('justify-center')
+    }
+  })
+})

@@ -1206,6 +1206,32 @@ test.describe('GrSegmented: состояние ошибки', () => {
   }
 })
 
+/**
+ * Вертикаль — боковые фильтры. По центру подписи разной длины стояли рваной
+ * линией, как в меню; в колонке содержимое сегмента — у начала. Островок при
+ * этом по-прежнему накрывает выбранный сегмент целиком.
+ */
+test.describe('GrSegmented: вертикальный ряд', () => {
+  test('подписи выровнены по началу, островок совпадает с сегментом', async ({ page }) => {
+    await openShowcasePage(page, componentPath('GrSegmented'))
+
+    const column = page.locator('[data-gr-segmented][aria-orientation="vertical"]').filter({ has: page.getByRole('radio', { name: 'Assigned to me' }) })
+    const geometry = await column.evaluate((root) => {
+      const radios = [...root.querySelectorAll<HTMLElement>('[role="radio"]')]
+      const starts = radios.map(radio => radio.querySelector('span')!.getBoundingClientRect().left - radio.getBoundingClientRect().left)
+      const active = root.querySelector('[role="radio"][aria-checked="true"]')!.getBoundingClientRect()
+      const indicator = root.querySelector('[data-gr-segmented-indicator]')!.getBoundingClientRect()
+
+      return { starts, active, indicator }
+    })
+
+    expect(Math.max(...geometry.starts) - Math.min(...geometry.starts), `начала подписей: ${geometry.starts.map(Math.round).join('/')}`).toBeLessThanOrEqual(1)
+    expect(Math.abs(geometry.indicator.width - geometry.active.width)).toBeLessThanOrEqual(1)
+    expect(Math.abs(geometry.indicator.height - geometry.active.height)).toBeLessThanOrEqual(1)
+    expect(Math.abs(geometry.indicator.top - geometry.active.top)).toBeLessThanOrEqual(1)
+  })
+})
+
 test.describe('GrSteps: проход мастера', () => {
   test('гейт не пускает вперёд, а будущий шаг вне таб-порядка', async ({ page }) => {
     await openShowcasePage(page, componentPath('GrSteps'))

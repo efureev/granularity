@@ -568,6 +568,7 @@ if (__GR_DEV__) {
         selected: isOptionSelected(option),
         disabled: resolveOptionDisabled(option),
         iconOnly: isIconOnlyOption(option),
+        orientation,
       })"
       @click="onItemClick(option)"
       @keydown="onKeydown($event, index)"
