@@ -3,6 +3,7 @@ import { mount } from '@vue/test-utils'
 import { describe, expect, it } from 'vitest'
 import { nextTick } from 'vue'
 
+import { estimateTextWidth } from '../../../chart/chartLayout'
 import GrChartFunnel from '../GrChartFunnel.vue'
 
 const stages = [
@@ -142,20 +143,101 @@ describe('GrChartFunnel', () => {
 })
 
 describe('GrChartFunnel: подписи в ступени', () => {
-  it('подпись, которая шире ступени, не рисуется', () => {
-    // Ступень воронки узкая по построению, а вылезшая подпись читается как
-    // чужая: она ложится на фон между соседями.
+  it('подпись, которая шире ступени, стоит рядом с ней, а не поверх фона', () => {
+    // Узкая ступень — то место, где воронка теряет больше всего: подпись там
+    // нужнее всего. Внутри она вылезла бы на фон и читалась как чужая.
     const wrapper = factory({
       stages: [{ label: 'Много', value: 100000 }, { label: 'Мало', value: 40 }],
     })
+    const inside = wrapper.get('[data-gr-chart-funnel-label="0"]')
+    const outside = wrapper.get('[data-gr-chart-funnel-label="1"]')
 
-    expect(wrapper.find('[data-gr-chart-funnel-label="0"]').exists()).toBe(true)
-    expect(wrapper.find('[data-gr-chart-funnel-label="1"]').exists()).toBe(false)
+    expect(inside.attributes('data-outside')).toBeUndefined()
+    expect(outside.attributes('data-outside')).toBe('')
+    expect(outside.text()).toBe('40')
+    expect(outside.attributes('text-anchor')).toBe('start')
   })
 
-  it('на широкой ступени подпись остаётся', () => {
+  it('на широкой ступени подпись остаётся внутри', () => {
     const wrapper = factory({ stages: [{ label: 'Одна', value: 100 }] })
 
-    expect(wrapper.find('[data-gr-chart-funnel-label="0"]').exists()).toBe(true)
+    expect(wrapper.get('[data-gr-chart-funnel-label="0"]').attributes('data-outside')).toBeUndefined()
+  })
+
+  it.each(['vertical', 'horizontal'])('у каждой ступени есть подпись значения (%s)', (orientation) => {
+    const trial = factory({
+      orientation,
+      labels: 'share-first',
+      stages: [
+        { label: 'Visited pricing', value: 12400 },
+        { label: 'Started a trial', value: 3180 },
+        { label: 'Activated', value: 1420 },
+        { label: 'Paid', value: 612 },
+      ],
+    })
+
+    expect(trial.findAll('[data-gr-chart-funnel-label]').map(node => node.text())).toEqual(['100%', '26%', '11%', '5%'])
+  })
+
+  it.each(['vertical', 'horizontal'])('нулевая ступень подписана «0» (%s)', (orientation) => {
+    const referral = factory({
+      orientation,
+      labels: 'value',
+      stages: [
+        { label: 'Invited', value: 940 },
+        { label: 'Opened', value: 1360 },
+        { label: 'Signed up', value: 410 },
+        { label: 'Paid', value: 0 },
+      ],
+    })
+
+    expect(referral.findAll('[data-gr-chart-funnel-label]').map(node => node.text())).toEqual(['940', '1,360', '410', '0'])
+  })
+})
+
+describe('GrChartFunnel: имена ступеней', () => {
+  const stages = [
+    { label: 'Visited pricing', value: 1000 },
+    { label: 'Started a trial', value: 400 },
+    { label: 'Paid', value: 120 },
+  ]
+
+  function names(wrapper: ReturnType<typeof factory>): string[] {
+    return wrapper.findAll('[data-gr-chart-funnel-name]').map(node => node.element.childNodes[0]!.textContent!.trim())
+  }
+
+  it('вертикаль: имена колонкой слева от ступеней', () => {
+    const wrapper = factory({ stages })
+    const firstStage = wrapper.get('[data-gr-chart-funnel-stage="0"]').attributes('d')!
+    const stageLeft = Number(firstStage.split(' ')[1])
+    const name = wrapper.get('[data-gr-chart-funnel-name="0"]')
+
+    expect(names(wrapper)).toEqual(stages.map(stage => stage.label))
+    expect(name.attributes('text-anchor')).toBe('end')
+    expect(Number(name.attributes('x'))).toBeLessThanOrEqual(stageLeft)
+    expect(Number(name.attributes('x')) - estimateTextWidth('Visited pricing', 12)).toBeGreaterThanOrEqual(0)
+  })
+
+  it('горизонталь: имена строкой под ступенями', () => {
+    const wrapper = factory({ stages, orientation: 'horizontal' })
+    const name = wrapper.get('[data-gr-chart-funnel-name="1"]')
+    const label = wrapper.get('[data-gr-chart-funnel-label="1"]')
+
+    expect(names(wrapper)).toEqual(stages.map(stage => stage.label))
+    expect(name.attributes('text-anchor')).toBe('middle')
+    expect(Number(name.attributes('y'))).toBeGreaterThan(Number(label.attributes('y')))
+  })
+
+  it('имя шире потолка кончается многоточием, полное — в title', () => {
+    const long = 'Открыли письмо с приглашением и перешли по ссылке на страницу тарифов'
+    const wrapper = factory({ stages: [{ label: long, value: 10 }, { label: 'Оплатили', value: 2 }], width: 400 })
+    const name = wrapper.get('[data-gr-chart-funnel-name="0"]')
+
+    expect(name.element.childNodes[0]!.textContent!.trim().endsWith('…')).toBe(true)
+    expect(name.find('title').text()).toBe(long)
+  })
+
+  it('без ступеней имён нет', () => {
+    expect(factory({ stages: [] }).findAll('[data-gr-chart-funnel-name]')).toHaveLength(0)
   })
 })

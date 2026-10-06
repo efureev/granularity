@@ -7,7 +7,7 @@ import type { GrChartNumberFormat } from '../../chart/chartFormat'
 import { formatShare, formatValue } from '../../chart/chartFormat'
 import type { FunnelStage, GrChartFunnelStage } from '../../chart/chartFunnel'
 import { funnelPath, funnelStages } from '../../chart/chartFunnel'
-import { estimateTextWidth, type Rect } from '../../chart/chartLayout'
+import { estimateTextWidth, fitLabel, labelGutters, placeRowLabels, type Rect } from '../../chart/chartLayout'
 import { normalizeChartData } from '../../chart/chartModel'
 import { seriesStyle } from '../../chart/chartSeriesStyle'
 import type { ChartTableModel } from '../../chart/chartTable'
@@ -16,6 +16,9 @@ import ChartFrame from '../GrChartFrame/shared/ChartFrame.vue'
 import {
   frameLabelClass,
   frameTooltipClass,
+  labelFill,
+  labelFontPx,
+  labelSizeClass,
   frameTooltipRowClass,
   frameTooltipTitleClass,
   frameTooltipValueClass,
@@ -54,7 +57,11 @@ export interface GrChartFunnelActiveStage {
 
 export interface GrChartFunnelProps {
   stages: readonly GrChartFunnelStage[]
-  /** Что писать у ступени. Доли считаются от разных знаменателей — см. `labels`. */
+  /**
+   * Число у ступени: значение (по умолчанию), доля от первой или от предыдущей
+   * ступени. Не помещается внутри — стоит рядом. `'none'` убирает числа, имена
+   * ступеней остаются.
+   */
   labels?: 'value' | 'share-first' | 'share-prev' | 'none'
   orientation?: 'vertical' | 'horizontal'
   /** Сужающаяся лента или прямоугольники одной ширины. */
@@ -167,13 +174,94 @@ function formatStageShare(share: number | null): string {
   return share === null ? '—' : formatShare(share, resolvedLocale.value)
 }
 
+const nameFont = computed(() => labelFontPx[resolvedSize.value])
+
+/**
+ * Место под имена ступеней.
+ *
+ * Без имён воронку не прочитать: какая полоса что значит, знали только тултип и
+ * скрытая таблица. Вертикаль ставит имена колонкой слева — до 40% ширины, как
+ * категории горизонтальных столбцов, — горизонталь пишет их строкой под
+ * ступенями. Ширина оценивается, а не измеряется: причина в `chartLayout`.
+ */
+function namesOf(plot: Rect) {
+  return labelGutters({
+    leftLabels: isHorizontal.value ? [] : props.stages.map(stage => stage.label),
+    bottomLabels: isHorizontal.value ? props.stages.map(stage => stage.label) : [],
+    fontSizePx: nameFont.value,
+    availableWidth: plot.width,
+  })
+}
+
+/** Область ступеней — область построения без места под имена. */
+function areaOf(plot: Rect): Rect {
+  const names = namesOf(plot)
+
+  return {
+    x: plot.x + names.left,
+    y: plot.y,
+    width: Math.max(0, plot.width - names.left),
+    height: Math.max(0, plot.height - names.bottom),
+  }
+}
+
 /** Геометрия ступеней считается от области построения — она приходит из слота. */
 function stagesOf(plot: Rect): FunnelStage[] {
   return funnelStages(props.stages, {
-    plot,
+    plot: areaOf(plot),
     orientation: resolvedOrientation.value,
     shape: resolvedShape.value,
     gap: resolvedGap.value,
+  })
+}
+
+interface StageName {
+  index: number
+  x: number
+  y: number
+  text: string
+  full?: string
+  anchor: 'end' | 'middle'
+}
+
+const NAME_GAP = 6
+
+function stageNames(plot: Rect): StageName[] {
+  const stages = stagesOf(plot)
+  const area = areaOf(plot)
+
+  if (isHorizontal.value) {
+    const step = stages.length > 0 ? area.width / stages.length : 0
+
+    return placeRowLabels({
+      labels: props.stages.map(stage => stage.label),
+      start: area.x,
+      step,
+      bounds: [plot.x, plot.x + plot.width],
+      fontSizePx: nameFont.value,
+    }).map(label => ({
+      index: label.index,
+      x: label.x,
+      y: area.y + area.height + NAME_GAP + nameFont.value,
+      text: label.text,
+      full: label.full,
+      anchor: 'middle' as const,
+    }))
+  }
+
+  const { labelWidth } = namesOf(plot)
+
+  return stages.map((stage) => {
+    const text = fitLabel(stage.label, nameFont.value, labelWidth)
+
+    return {
+      index: stage.index,
+      x: area.x - NAME_GAP,
+      y: stage.rect.y + stage.rect.height / 2,
+      text,
+      full: text === stage.label ? undefined : stage.label,
+      anchor: 'end' as const,
+    }
   })
 }
 
@@ -202,29 +290,55 @@ function labelFontOf(stage: FunnelStage): number {
   return Math.min(STAGE_LABEL_MAX, Math.max(STAGE_LABEL_MIN, across * STAGE_LABEL_RATIO))
 }
 
+interface StageLabel {
+  index: number
+  x: number
+  y: number
+  text: string
+  font: number
+  fill: string
+  anchor: 'start' | 'middle'
+  baseline: 'central' | 'auto'
+  inside: boolean
+}
+
+const OUTSIDE_GAP = 4
+
 /**
- * Подпись рисуется только там, где помещается.
+ * Подпись значения — внутри ступени, если помещается, иначе рядом с ней.
  *
  * Ступень воронки узкая по построению — последняя тем более, — и подпись, шире
- * неё, вылезает на фон и читается как чужая. Кегль тут не спасает: он считается
- * от толщины ступени, а мешает ей ширина.
+ * неё, вылезла бы на фон и читалась как чужая. Но и пропасть она не может:
+ * узкая ступень — это и есть то место, где воронка теряет больше всего, а
+ * нулевая обещана с подписью. Поэтому снаружи: справа от середины ступени у
+ * вертикали, над ней у горизонтали, цветом подписи рамы, а не цветом поверх
+ * заливки.
  *
- * К оценке добавляется поллитеры с каждой стороны. Не ради воздуха: оценка
- * ширины намеренно грубая (`chartLayout`), в отступе оси её погрешность
- * незаметна, а здесь она решает, видно подпись или нет, — и подпись, влезшая
- * «впритык», по факту задевает край.
+ * К оценке добавляется поллитеры с каждой стороны: подпись, влезшая «впритык»,
+ * по факту задевает край.
  */
-function labelledStages(plot: Rect): FunnelStage[] {
+function stageLabels(plot: Rect): StageLabel[] {
   if (resolvedLabels.value === 'none')
     return []
 
-  return stagesOf(plot).filter((stage) => {
+  return stagesOf(plot).map((stage) => {
     // Подпись стоит в середине ступени, значит и мерить надо ширину там: у
     // трапеции она среднее между входом и выходом, а не узкий конец.
-    const available = isHorizontal.value ? stage.rect.width : (stage.from + stage.to) / 2
+    const middle = (stage.from + stage.to) / 2
+    const available = isHorizontal.value ? stage.rect.width : middle
+    const text = labelTextOf(stage)
     const font = labelFontOf(stage)
+    const centerX = stage.rect.x + stage.rect.width / 2
+    const centerY = stage.rect.y + stage.rect.height / 2
+    const thick = isHorizontal.value ? middle : stage.rect.height
 
-    return estimateTextWidth(labelTextOf(stage), font) + font <= available
+    if (estimateTextWidth(text, font) + font <= available && font <= thick) {
+      return { index: stage.index, x: centerX, y: centerY, text, font, fill: funnelLabelFill, anchor: 'middle', baseline: 'central', inside: true }
+    }
+
+    return isHorizontal.value
+      ? { index: stage.index, x: centerX, y: centerY - middle / 2 - OUTSIDE_GAP, text, font: nameFont.value, fill: labelFill, anchor: 'middle', baseline: 'auto', inside: false }
+      : { index: stage.index, x: centerX + middle / 2 + OUTSIDE_GAP, y: centerY, text, font: nameFont.value, fill: labelFill, anchor: 'start', baseline: 'central', inside: false }
   })
 }
 
@@ -395,18 +509,39 @@ defineExpose({
         />
 
         <text
-          v-for="stage in labelledStages(plot)"
-          :key="`label-${stage.index}`"
+          v-for="label in stageLabels(plot)"
+          :key="`label-${label.index}`"
           :class="frameLabelClass"
-          :data-gr-chart-funnel-label="stage.index"
-          :x="stage.rect.x + stage.rect.width / 2"
-          :y="stage.rect.y + stage.rect.height / 2"
-          :fill="funnelLabelFill"
-          :font-size="labelFontOf(stage)"
-          text-anchor="middle"
-          dominant-baseline="central"
+          :data-gr-chart-funnel-label="label.index"
+          :data-outside="label.inside ? undefined : ''"
+          :x="label.x"
+          :y="label.y"
+          :fill="label.fill"
+          :font-size="label.font"
+          :text-anchor="label.anchor"
+          :dominant-baseline="label.baseline"
         >
-{{ labelTextOf(stage) }}
+{{ label.text }}
+</text>
+      </g>
+
+      <!-- Имена — вне группы ступеней: это подписи оси, а не марки. -->
+      <g data-gr-chart-funnel-names>
+        <text
+          v-for="name in stageNames(plot)"
+          :key="`name-${name.index}`"
+          :class="[frameLabelClass, labelSizeClass[resolvedSize]]"
+          :data-gr-chart-funnel-name="name.index"
+          :x="name.x"
+          :y="name.y"
+          :fill="labelFill"
+          :text-anchor="name.anchor"
+          :dominant-baseline="name.anchor === 'end' ? 'middle' : 'auto'"
+        >
+{{ name.text }}
+          <title v-if="name.full">
+{{ name.full }}
+</title>
 </text>
       </g>
     </template>
