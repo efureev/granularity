@@ -148,6 +148,24 @@
 пропами (`prefixMinWidth`/`prefixMaxWidth`/`prefixFixed` и то же для суффикса).
 Общий контракт контролов — [`form-controls.md`](../form-controls.md#слоты).
 
+## Слот `tag` — содержимое чипа, а не чип
+
+Слот рисует **содержимое** чипа: подпись, значок, счётчик. Сам чип
+(`GrChip`), его тон и кнопка снятия остаются за компонентом — свой чип с
+крестиком внутри слота дал бы чип в чипе и два крестика. `remove` в пропах
+слота — для своих действий внутри подписи, а не для второй кнопки снятия.
+
+```vue
+<template>
+  <GrInputTag v-model="emails">
+    <template #tag="{ tag }">
+      <span class="font-500">{{ tag.split('@')[0] }}</span>
+      <span class="text-[var(--gr-muted-fg)]">@{{ tag.split('@')[1] }}</span>
+    </template>
+  </GrInputTag>
+</template>
+```
+
 ## Нативная форма
 
 Проп `name` рендерит `input[type="hidden"]` на каждый тег — стандартная
