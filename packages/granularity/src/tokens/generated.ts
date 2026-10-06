@@ -1579,7 +1579,7 @@ export const grThemeTokens: GrThemeToken[] = [
     "section": "Data visualization roles",
     "description": "Второй цвет серии для графиков и data-visualization элементов.",
     "values": {
-      "light": "#10b981",
+      "light": "#059669",
       "dark": "#34d399"
     }
   },
@@ -1588,7 +1588,7 @@ export const grThemeTokens: GrThemeToken[] = [
     "section": "Data visualization roles",
     "description": "Третий цвет серии для графиков и data-visualization элементов.",
     "values": {
-      "light": "#f97316",
+      "light": "#ea580c",
       "dark": "#fb923c"
     }
   },
@@ -1597,8 +1597,8 @@ export const grThemeTokens: GrThemeToken[] = [
     "section": "Data visualization roles",
     "description": "Четвёртый цвет серии для графиков и data-visualization элементов.",
     "values": {
-      "light": "#6366f1",
-      "dark": "#818cf8"
+      "light": "#0284c7",
+      "dark": "#38bdf8"
     }
   },
   {
@@ -1606,8 +1606,8 @@ export const grThemeTokens: GrThemeToken[] = [
     "section": "Data visualization roles",
     "description": "Пятый цвет серии для графиков и data-visualization элементов.",
     "values": {
-      "light": "#8b5cf6",
-      "dark": "#a78bfa"
+      "light": "#db2777",
+      "dark": "#f472b6"
     }
   },
   {

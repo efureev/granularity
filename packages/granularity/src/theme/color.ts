@@ -65,7 +65,8 @@ export function contrast(foreground: string | Rgb, background: string | Rgb): nu
   return (lighter + 0.05) / (darker + 0.05)
 }
 
-function toLab(color: string | Rgb): [number, number, number] {
+/** Координаты в CIE Lab. Наружу пакета не уходит: нужна ΔE и гейтам палитры. */
+export function toLab(color: string | Rgb): [number, number, number] {
   const [red, green, blue] = (typeof color === 'string' ? parseHex(color) : color).map((channel) => {
     const normalized = channel / 255
 

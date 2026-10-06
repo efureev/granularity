@@ -430,22 +430,22 @@
         },
         {
           "name": "--gr-chart-2",
-          "value": "#10b981",
+          "value": "#059669",
           "description": "Второй цвет серии для графиков и data-visualization элементов."
         },
         {
           "name": "--gr-chart-3",
-          "value": "#f97316",
+          "value": "#ea580c",
           "description": "Третий цвет серии для графиков и data-visualization элементов."
         },
         {
           "name": "--gr-chart-4",
-          "value": "#6366f1",
+          "value": "#0284c7",
           "description": "Четвёртый цвет серии для графиков и data-visualization элементов."
         },
         {
           "name": "--gr-chart-5",
-          "value": "#8b5cf6",
+          "value": "#db2777",
           "description": "Пятый цвет серии для графиков и data-visualization элементов."
         }
       ]

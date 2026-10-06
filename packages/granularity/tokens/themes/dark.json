@@ -440,12 +440,12 @@
         },
         {
           "name": "--gr-chart-4",
-          "value": "#818cf8",
+          "value": "#38bdf8",
           "description": "Четвёртый цвет серии для графиков и data-visualization элементов."
         },
         {
           "name": "--gr-chart-5",
-          "value": "#a78bfa",
+          "value": "#f472b6",
           "description": "Пятый цвет серии для графиков и data-visualization элементов."
         }
       ]
