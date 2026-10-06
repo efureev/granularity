@@ -573,3 +573,117 @@ describe('GrFormFile — порядок набора', () => {
     }
   })
 })
+
+/**
+ * Выбор в `multiple` раньше заменял набор целиком: три выбранные фотографии и
+ * ещё одна — и первые три пропадали, а `limit` мерил только новый выбор.
+ */
+describe('GrFormFile — выбор добавляется к набору', () => {
+  const pdf = (name: string, size = 1, lastModified = 1) =>
+    new File(['x'.repeat(size)], name, { type: 'application/pdf', lastModified })
+
+  async function pick(wrapper: ReturnType<typeof mount>, files: File[]) {
+    const input = wrapper.get('[data-gr-form-file-input]')
+    setInputFiles(input.element as HTMLInputElement, files)
+    await input.trigger('change')
+    await new Promise(resolve => setTimeout(resolve, 0))
+    await nextTick()
+  }
+
+  function stand(props: Record<string, unknown> = {}) {
+    const model = ref<File[]>([])
+    const Host = defineComponent({
+      components: { GrFormFile },
+      setup: () => ({ model, props }),
+      template: '<GrFormFile v-model="model" multiple v-bind="props" />',
+    })
+
+    return { wrapper: mount(Host, { attachTo: document.body }), model }
+  }
+
+  it('новый выбор дописывается к уже выбранным', async () => {
+    const { wrapper, model } = stand()
+
+    await pick(wrapper, [pdf('a.pdf'), pdf('b.pdf'), pdf('c.pdf')])
+    await pick(wrapper, [pdf('d.pdf')])
+
+    expect(model.value.map(file => file.name)).toEqual(['a.pdf', 'b.pdf', 'c.pdf', 'd.pdf'])
+    wrapper.unmount()
+  })
+
+  it('тот же файл второй раз не добавляется — имя, размер и время изменения', async () => {
+    const { wrapper, model } = stand()
+
+    await pick(wrapper, [pdf('a.pdf', 1, 10)])
+    await pick(wrapper, [pdf('a.pdf', 1, 10), pdf('a.pdf', 2, 10), pdf('a.pdf', 1, 20)])
+
+    expect(model.value.map(file => [file.name, file.size, file.lastModified])).toEqual([
+      ['a.pdf', 1, 10],
+      ['a.pdf', 2, 10],
+      ['a.pdf', 1, 20],
+    ])
+    wrapper.unmount()
+  })
+
+  it('`limit` проверяет набор целиком, и отбитый выбор набор не трогает', async () => {
+    const { wrapper, model } = stand({ limit: 3 })
+
+    await pick(wrapper, [pdf('a.pdf'), pdf('b.pdf')])
+    await pick(wrapper, [pdf('c.pdf'), pdf('d.pdf')])
+
+    expect(model.value.map(file => file.name)).toEqual(['a.pdf', 'b.pdf'])
+    expect(wrapper.get('[data-gr-form-file-errors]').text()).toContain('up to 3 allowed')
+    wrapper.unmount()
+  })
+
+  it('кнопка у непустого набора — «Add files», а не «Change file»', async () => {
+    const { wrapper } = stand()
+
+    expect(wrapper.get('[data-gr-form-file-upload-btn]').text()).toContain('Upload file')
+    await pick(wrapper, [pdf('a.pdf')])
+    expect(wrapper.get('[data-gr-form-file-upload-btn]').text()).toContain('Add files')
+    wrapper.unmount()
+  })
+
+  it('`replace` возвращает замену набора', async () => {
+    const { wrapper, model } = stand({ replace: true })
+
+    await pick(wrapper, [pdf('a.pdf'), pdf('b.pdf')])
+    await pick(wrapper, [pdf('c.pdf')])
+
+    expect(model.value.map(file => file.name)).toEqual(['c.pdf'])
+    expect(wrapper.get('[data-gr-form-file-upload-btn]').text()).toContain('Change file')
+    wrapper.unmount()
+  })
+
+  it('строка набора — во всю ширину: имя усекается, удаление у края', async () => {
+    const { wrapper } = stand()
+
+    await pick(wrapper, [pdf('a-very-long-statement-name-for-october-2026.pdf')])
+
+    const row = wrapper.get('[data-gr-form-file-item]')
+    expect(row.classes()).toEqual(expect.arrayContaining(['flex', 'w-full', 'min-w-0']))
+    expect(row.get('[data-gr-form-file-item-name]').classes()).toEqual(expect.arrayContaining(['min-w-0', 'flex-1', 'truncate']))
+    expect(row.get('[data-gr-form-file-item-name]').classes()).not.toContain('max-w-[240px]')
+    expect(row.get('[data-gr-form-file-item-remove]').classes()).toContain('shrink-0')
+    wrapper.unmount()
+  })
+
+  it('перетаскивание тоже дописывает и проверяет набор целиком', async () => {
+    const { wrapper, model } = stand({ limit: 2 })
+    const drop = async (files: File[]) => {
+      await wrapper.get('[data-gr-form-file]').trigger('drop', { dataTransfer: { files, dropEffect: 'copy' } })
+      await new Promise(resolve => setTimeout(resolve, 0))
+      await nextTick()
+    }
+
+    await drop([pdf('a.pdf')])
+    await drop([pdf('b.pdf')])
+    expect(model.value.map(file => file.name)).toEqual(['a.pdf', 'b.pdf'])
+
+    await drop([pdf('c.pdf')])
+    expect(model.value.map(file => file.name)).toEqual(['a.pdf', 'b.pdf'])
+    expect(wrapper.get('[data-gr-form-file-errors]').text()).toContain('up to 2 allowed')
+    wrapper.unmount()
+  })
+})

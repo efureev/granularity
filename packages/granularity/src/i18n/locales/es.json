@@ -262,6 +262,7 @@
   "formFile": {
     "upload": "Subir archivo",
     "change": "Cambiar archivo",
+    "add": "Añadir archivos",
     "remove": "Eliminar",
     "clearAll": "Limpiar todo",
     "placeholder": "Ningún archivo seleccionado",

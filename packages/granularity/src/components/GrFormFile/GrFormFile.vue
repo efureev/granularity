@@ -26,7 +26,7 @@ import { useFocusWithin } from '../../composables/internal/useFocusWithin'
 import { useFilePreviews } from '../../composables/internal/useFilePreviews'
 import { vDropzone } from '../../directives'
 import { acceptValidator, FileValidationError, maxCountValidator, resolveFileValidationMessage, runFileValidators } from '../../fileValidation'
-import type { FileValidationIssue, FileValidator } from '../../fileValidation'
+import type { FileValidationIssue, FileValidator, FileValidatorSource } from '../../fileValidation'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 import { useControlAria } from '../../composables/internal/useControlAria'
 
@@ -69,6 +69,18 @@ export interface GrFormFileProps {
   uploadText?: string
   /** Подпись кнопки выбора, когда файлы уже есть. По умолчанию — переведённое «Change file». */
   changeText?: string
+  /**
+   * Подпись кнопки выбора в `multiple`, когда файлы уже есть: новый выбор
+   * добавляется к набору. По умолчанию — переведённое «Add files».
+   */
+  addText?: string
+  /**
+   * Новый выбор в `multiple` **заменяет** набор, а не добавляется к нему —
+   * старое поведение. Без него набор растёт, дубликаты (то же имя, размер и
+   * время изменения) отбрасываются, а `limit` и валидаторы проверяют набор
+   * целиком.
+   */
+  replace?: boolean
   /** Подпись удаления у одиночного файла и у строк набора. По умолчанию — переведённое «Remove». */
   removeText?: string
   /** Подпись сброса всего набора при `multiple`. По умолчанию — переведённое «Clear all». */
@@ -132,6 +144,8 @@ const props = withDefaults(
     limit: undefined,
     uploadText: undefined,
     changeText: undefined,
+    addText: undefined,
+    replace: false,
     removeText: undefined,
     clearAllText: undefined,
     placeholder: undefined,
@@ -180,6 +194,9 @@ const {
 const aria = useControlAria()
 const resolvedUploadText = computed(() => props.uploadText ?? t('gr.formFile.upload', 'Upload file'))
 const resolvedChangeText = computed(() => props.changeText ?? t('gr.formFile.change', 'Change file'))
+const resolvedAddText = computed(() => props.addText ?? t('gr.formFile.add', 'Add files'))
+/** Новый выбор добавляется к набору: `multiple` без `replace`. */
+const appends = computed(() => props.multiple && !props.replace)
 const resolvedRemoveText = computed(() => props.removeText ?? t('gr.formFile.remove', 'Remove'))
 const resolvedClearAllText = computed(() => props.clearAllText ?? t('gr.formFile.clearAll', 'Clear all'))
 const resolvedPlaceholder = computed(() => props.placeholder ?? t('gr.formFile.placeholder', 'No files selected'))
@@ -253,6 +270,14 @@ const files = computed<File[]>(() => {
 })
 
 const hasFiles = computed(() => files.value.length > 0)
+
+/** Подпись кнопки выбора: пустой набор — «Upload», в `multiple` — «Add», иначе — «Change». */
+const pickText = computed(() => {
+  if (!hasFiles.value)
+    return resolvedUploadText.value
+
+  return appends.value ? resolvedAddText.value : resolvedChangeText.value
+})
 
 const { fileKey, previewUrl, revokePreview, revokeAllPreviews } = useFilePreviews({
   enabled: () => props.preview,
@@ -335,13 +360,33 @@ function reorderFiles(nextFiles: File[]): void {
   emitModel(nextFiles)
 }
 
-async function applyFiles(nextFiles: File[]) {
+/** Тот же файл, выбранный ещё раз: имя, размер и время изменения совпадают. */
+function sameFile(a: File, b: File): boolean {
+  return a.name === b.name && a.size === b.size && a.lastModified === b.lastModified
+}
+
+/**
+ * Набор после выбора. В `multiple` новый выбор **добавляется**: галерея и
+ * список вложений растут, а не теряют выбранное при каждом диалоге. Повтор уже
+ * выбранного файла отбрасывается.
+ */
+function nextSet(picked: File[]): File[] {
+  if (!appends.value)
+    return picked
+
+  const current = files.value
+  return [...current, ...picked.filter(file => !current.some(kept => sameFile(kept, file)))]
+}
+
+async function applyFiles(nextFiles: File[], source: FileValidatorSource = 'input') {
   const isPromiseLike = (value: unknown): value is PromiseLike<any> => {
     return !!value && typeof (value as any).then === 'function'
   }
 
-  const res = runFileValidators(nextFiles, effectiveValidators.value, {
-    source: 'input',
+  // Валидаторы видят набор целиком: `limit` и суммарный размер — про весь
+  // набор, а не про последний выбор.
+  const res = runFileValidators(nextSet(nextFiles), effectiveValidators.value, {
+    source,
     multiple: props.multiple,
   })
 
@@ -423,13 +468,11 @@ const dropzone = computed(() => {
   return {
     enabled: !isLocked.value,
     multiple: props.multiple,
-    validators: effectiveValidators.value,
+    // Валидаторы — в `applyFiles`, по набору целиком: директива видела бы
+    // только сброшенные файлы, и `limit` пропускал бы набор сверх предела.
+    validators: [],
     onFiles: async (dropped: File[]) => {
-      // `v-dropzone` уже выполнил валидаторы и нормализацию по `multiple`.
-      clearErrors()
-      emitModel(dropped)
-      clearInputValue()
-      await nextTick()
+      await applyFiles(dropped, 'drop')
     },
     onError: (error: unknown) => {
       if (error instanceof FileValidationError) {
@@ -506,7 +549,7 @@ watch(
           <GrIcon :size="iconSize">
             <IconUpload />
           </GrIcon>
-          <span :class="iconOffsetClass">{{ hasFiles ? resolvedChangeText : resolvedUploadText }}</span>
+          <span :class="iconOffsetClass">{{ pickText }}</span>
         </GrButton>
 
         <GrButton
@@ -583,7 +626,7 @@ watch(
         @update:model-value="reorderFiles"
       >
         <template #item="{ item: file, index }">
-          <div class="flex flex-1 items-center gap-2" data-gr-form-file-item>
+          <div class="flex min-w-0 flex-1 items-center gap-2" data-gr-form-file-item>
             <img
               v-if="previewUrl(file)"
               data-gr-form-file-preview
@@ -593,7 +636,7 @@ watch(
             >
 
             <span
-              class="text-[var(--gr-muted-fg)] truncate max-w-[240px]"
+              class="min-w-0 flex-1 truncate text-[var(--gr-muted-fg)]"
               :class="textClass"
               :title="file.name"
               data-gr-form-file-item-name
@@ -608,7 +651,7 @@ watch(
             <button
               v-if="!isReadonly"
               type="button"
-              class="text-[var(--gr-muted-fg)] hover:text-[var(--gr-fg)]"
+              class="shrink-0 text-[var(--gr-muted-fg)] hover:text-[var(--gr-fg)]"
               :class="removeTextClass"
               data-gr-form-file-item-remove
               :disabled="isDisabled"
@@ -625,7 +668,7 @@ watch(
         <div
           v-for="(file, index) in files"
           :key="fileKey(file)"
-          class="flex items-center gap-2"
+          class="flex w-full min-w-0 items-center gap-2"
           data-gr-form-file-item
         >
           <img
@@ -637,7 +680,7 @@ watch(
           >
 
           <span
-            class="text-[var(--gr-muted-fg)] truncate max-w-[240px]"
+            class="min-w-0 flex-1 truncate text-[var(--gr-muted-fg)]"
             :class="textClass"
             :title="file.name"
             data-gr-form-file-item-name
@@ -654,7 +697,7 @@ watch(
           <button
             v-if="!isReadonly"
             type="button"
-            class="text-[var(--gr-muted-fg)] hover:text-[var(--gr-fg)]"
+            class="shrink-0 text-[var(--gr-muted-fg)] hover:text-[var(--gr-fg)]"
             :class="removeTextClass"
             data-gr-form-file-item-remove
             :disabled="isDisabled"

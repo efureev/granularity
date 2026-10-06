@@ -261,6 +261,7 @@
   "formFile": {
     "upload": "Upload file",
     "change": "Change file",
+    "add": "Add files",
     "remove": "Remove",
     "clearAll": "Clear all",
     "placeholder": "No files selected",
