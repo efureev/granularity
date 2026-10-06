@@ -78,4 +78,11 @@ export const grSelectExamples: ShowcaseComponentExampleDoc[] = [
     previewKey: 'gr-select-virtual',
     note: '`aria-setsize`/`aria-posinset` считаются по своему набору: у опции внутри группы это размер группы, а не всего списка. Режим только для `optionsView="panel"` и не сочетается с `view="link"` — там ширина панели равна ширине отрисованной опции.',
   },
+  {
+    id: 'select-tags-wrap',
+    title: 'Chips in a narrow column',
+    description: 'В режиме `tags` чипы переносятся, а поле растёт вместе с их рядами: рамка и кольцо фокуса обходят все чипы. Не меньше обычной строки контрола своего размера — `md`, `sm` с формой `pill`, `xs` с очисткой.',
+    status: 'ready',
+    previewKey: 'gr-select-tags-wrap',
+  },
 ]

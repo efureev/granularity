@@ -830,3 +830,38 @@ test.describe('GrPagination: перенос ряда', () => {
     })
   }
 })
+
+/**
+ * Чипы `GrSelect tags` переносились, а поле оставалось высотой в одну строку:
+ * второй и третий ряд висели под рамкой поверх того, что идёт ниже. Поле
+ * растёт вместе с рядами — на всех размерах и с формой `pill`.
+ */
+test.describe('GrSelect tags: чипы внутри рамки', () => {
+  test('в колонке на 190px каждый чип — внутри рамки поля', async ({ page }) => {
+    await page.goto(componentPath('GrSelect'))
+    const demo = page.locator('[data-demo="select-tags-wrap"]')
+    await demo.waitFor()
+
+    const fields = await demo.locator('[data-gr-select]').evaluateAll(roots => roots.map((root) => {
+      const box = root.querySelector('[data-gr-select-trigger]')!.getBoundingClientRect()
+      const chips = [...root.querySelectorAll('[data-gr-select-tag], [data-gr-select-tag-rest]')].map(chip => chip.getBoundingClientRect())
+      const rows = new Set(chips.map(chip => Math.round(chip.top))).size
+
+      return {
+        label: root.querySelector('[data-gr-select-trigger]')!.getAttribute('aria-label'),
+        rows,
+        outside: chips.filter(chip => chip.top < box.top || chip.bottom > box.bottom || chip.left < box.left || chip.right > box.right).length,
+        rootHeight: root.getBoundingClientRect().height,
+        triggerHeight: box.height,
+      }
+    }))
+
+    expect(fields).toHaveLength(3)
+    for (const field of fields) {
+      expect(field.outside, `${field.label}: чипов за рамкой`).toBe(0)
+      expect(Math.abs(field.rootHeight - field.triggerHeight), `${field.label}: рамка не совпадает с полем`).toBeLessThanOrEqual(1)
+    }
+    // Замер имеет смысл, только если ряды и правда переносятся.
+    expect(fields.some(field => field.rows > 1)).toBe(true)
+  })
+})

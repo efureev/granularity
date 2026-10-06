@@ -387,3 +387,44 @@ describe('GrSelect — резолвенные состояния и typeahead', 
     wrapper.unmount()
   })
 })
+
+/**
+ * Чипы `tags` переносились, а поле держало высоту одной строки: ряды висели
+ * под рамкой. Теперь ряд чипов в потоке задаёт высоту корня, а кнопка с рамкой
+ * лежит под ним во всю эту высоту. Геометрию меряет
+ * `apps/showcase/e2e/geometry.spec.ts`; здесь — раскладка, от которой она зависит.
+ */
+describe('GrSelect — поле с чипами растёт с рядами', () => {
+  const tagOptions = [
+    { value: 'bug', label: 'Bug' },
+    { value: 'billing', label: 'Billing' },
+    { value: 'customer', label: 'Customer report' },
+  ]
+
+  it.each(['xs', 'sm', 'md', 'lg'] as const)('%s: кнопка во всю высоту корня, ряд чипов — не ниже строки контрола', (size) => {
+    const wrapper = mount(GrSelect, {
+      props: { modelValue: ['bug', 'billing', 'customer'], options: tagOptions, optionsView: 'panel', multiple: true, tags: true, size },
+    })
+    const trigger = wrapper.get('[data-gr-select-trigger]').classes()
+    const row = wrapper.get('[data-gr-select-tags]').classes()
+    const minHeight = { xs: 'min-h-7', sm: 'min-h-8', md: 'min-h-10', lg: 'min-h-11' }[size]
+
+    expect(trigger).toEqual(expect.arrayContaining(['absolute', 'inset-0', 'h-full']))
+    expect(trigger.some(name => /^h-\d/.test(name))).toBe(false)
+    expect(row).toContain(minHeight)
+    expect(row).not.toContain('absolute')
+    wrapper.unmount()
+  })
+
+  it('без выбора поле — обычной высоты, кнопка в потоке', () => {
+    const wrapper = mount(GrSelect, {
+      props: { modelValue: [], options: tagOptions, optionsView: 'panel', multiple: true, tags: true },
+    })
+    const trigger = wrapper.get('[data-gr-select-trigger]').classes()
+
+    expect(trigger).toContain('h-10')
+    expect(trigger).not.toContain('absolute')
+    expect(wrapper.find('[data-gr-select-tags]').exists()).toBe(false)
+    wrapper.unmount()
+  })
+})

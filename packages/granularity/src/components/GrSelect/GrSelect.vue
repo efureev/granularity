@@ -35,6 +35,8 @@ import {
   grSelectPanelClasses,
   grSelectTriggerClass,
   linkBaseClass,
+  selectPaddingXClass,
+  selectTagsRowClassBySize,
   type GrSelectState,
   type GrSelectModelValue,
   type GrSelectValue,
@@ -828,6 +830,19 @@ const linkNativeDisplayText = computed(() => {
   return displayText.value || props.placeholder || '\u00A0'
 })
 
+/**
+ * Чипы на месте: ряд чипов в потоке задаёт высоту корня, а кнопка-комбобокс
+ * лежит под ним во всю эту высоту — с рамкой и кольцом фокуса вокруг всех
+ * рядов. Чипы остаются вне кнопки: внутри `role="combobox"` их крестики были бы
+ * недостижимы с клавиатуры.
+ */
+const tagsLayout = computed(() => showTags.value && hasSelection.value)
+const tagsRowClass = computed(() => [
+  selectTagsRowClassBySize[resolvedSize.value],
+  selectPaddingXClass[resolvedShape.value][resolvedSize.value],
+  panelClearVisible.value ? 'pr-16' : 'pr-10',
+])
+
 const triggerClassName = computed(() => {
   return grSelectTriggerClass({
     view: props.view,
@@ -839,6 +854,7 @@ const triggerClassName = computed(() => {
     state: props.state,
     invalid: isInvalid.value,
     shape: resolvedShape.value,
+    grows: tagsLayout.value,
   })
 })
 
@@ -1071,10 +1087,11 @@ const themeAttrs = useGrThemeAttrs()
       клавиатуры (axe: `nested-interactive`).
     -->
     <div
-      v-if="showTags && hasSelection"
+      v-if="tagsLayout"
       data-gr-select-tags
-      class="pointer-events-none absolute inset-y-0 left-0 flex max-w-[calc(100%-4rem)] flex-wrap items-center gap-1 px-3 py-1.5"
-      :style="{ left: hasPrefix ? prefixLen : undefined }"
+      class="pointer-events-none relative z-[1] flex w-full flex-wrap items-center gap-1"
+      :class="tagsRowClass"
+      :style="{ paddingLeft: hasPrefix ? prefixLen : undefined }"
     >
       <GrChip
         v-for="opt in visibleTagOptions"

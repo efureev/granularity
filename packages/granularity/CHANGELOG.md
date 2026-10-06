@@ -5,6 +5,18 @@ All notable changes to the [`@feugene/granularity`](.) package are documented in
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Fixed
+
+- **Чипы `GrSelect tags` больше не висят под рамкой.** Ряд чипов лежал
+  абсолютом поверх поля высотой в одну строку: в колонке на 190px «Billing» и
+  «Customer report» переносились ниже рамки и кольца фокуса — поверх того, что
+  идёт дальше. Теперь ряд чипов в потоке задаёт высоту поля, а кнопка с рамкой
+  лежит под ним во всю эту высоту: поле растёт вместе с рядами, не ниже
+  обычной строки контрола своего размера (`xs`…`lg`, обе формы). Шеврон и
+  кнопка очистки — по центру высоты.
+
 ## [v1.0.14] 2026-10-07
 
 ### Changed

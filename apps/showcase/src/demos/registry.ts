@@ -443,6 +443,7 @@ export const demoPathByPreviewKey = {
   'gr-select-remote-search': 'components/gr-select/GrSelectRemoteSearchDemo.vue',
   'gr-select-shape': 'components/gr-select/GrSelectShapeDemo.vue',
   'gr-select-virtual': 'components/gr-select/GrSelectVirtualDemo.vue',
+  'gr-select-tags-wrap': 'components/gr-select/GrSelectTagsWrapDemo.vue',
   'gr-sidebar-basic-sections': 'components/gr-sidebar/GrSidebarBasicSectionsDemo.vue',
   'gr-sidebar-overlay': 'components/gr-sidebar/GrSidebarOverlayDemo.vue',
   'gr-sidebar-nested': 'components/gr-sidebar/GrSidebarNestedDemo.vue',

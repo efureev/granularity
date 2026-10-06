@@ -81,6 +81,27 @@ export const selectSizeClassBySize: Record<GrSelectSize, string> = {
   lg: 'h-11 text-[length:var(--gr-control-text-lg)] leading-[var(--gr-control-leading-lg)]',
 }
 
+/**
+ * Поле с чипами (`tags`) растёт вместе с их рядами. Кнопка-комбобокс тогда
+ * лежит под чипами во всю высоту корня, а высоту задаёт ряд чипов: не меньше
+ * обычной строки контрола своего размера. С фиксированной `h-*` перенесённые
+ * чипы висели под рамкой — поверх того, что идёт ниже.
+ */
+export const selectGrowSizeClassBySize: Record<GrSelectSize, string> = {
+  xs: 'h-full text-[length:var(--gr-control-text-xs)] leading-[var(--gr-control-leading-xs)]',
+  sm: 'h-full text-[length:var(--gr-control-text-sm)] leading-[var(--gr-control-leading-sm)]',
+  md: 'h-full text-[length:var(--gr-control-text-md)] leading-[var(--gr-control-leading-md)]',
+  lg: 'h-full text-[length:var(--gr-control-text-lg)] leading-[var(--gr-control-leading-lg)]',
+}
+
+/** Ряд чипов: высота не меньше строки контрола и вертикальный отступ от рамки. */
+export const selectTagsRowClassBySize: Record<GrSelectSize, string> = {
+  xs: 'min-h-7 py-0.5',
+  sm: 'min-h-8 py-1',
+  md: 'min-h-10 py-1.5',
+  lg: 'min-h-11 py-1.5',
+}
+
 /** Отступ зависит и от размера, и от формы — см. `shared/controlShape.ts`. */
 export const selectPaddingXClass: Record<GrControlShape, Record<GrSelectSize, string>> = {
   box: {
@@ -198,6 +219,8 @@ export function grSelectClass(options: {
   state?: GrSelectState
   invalid?: boolean
   shape: GrControlShape
+  /** Поле растёт с рядами чипов: высоту задаёт корень, а не размер. */
+  grows?: boolean
 }): string {
   if (options.view === 'link') {
     return [
@@ -209,7 +232,7 @@ export function grSelectClass(options: {
   }
 
   return [
-    selectSizeClassBySize[options.size],
+    (options.grows ? selectGrowSizeClassBySize : selectSizeClassBySize)[options.size],
     selectPaddingXClass[options.shape][options.size],
     controlShapeRadiusClass[options.shape],
     // `invalid` сильнее `state`: ошибка перекрывает любую другую подсветку.
@@ -249,6 +272,7 @@ export function grSelectTriggerClass(options: {
   state?: GrSelectState
   invalid?: boolean
   shape: GrControlShape
+  grows?: boolean
 }): string {
   if (options.optionsView !== 'panel') {
     return grSelectClass(options)
@@ -264,7 +288,8 @@ export function grSelectTriggerClass(options: {
   return [
     grSelectClass(options),
     'flex items-center justify-between text-left',
-  ].join(' ')
+    options.grows ? 'absolute inset-0' : '',
+  ].filter(Boolean).join(' ')
 }
 
 export const grSelectPanelClasses = `${overlayPanelSurfaceClass} ${overlayListPanelClass} overflow-hidden`
