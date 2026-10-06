@@ -258,3 +258,37 @@ describe('GrTooltip — содержимое и управление', () => {
     expect((document.body.querySelector('[role="tooltip"]') as HTMLElement).style.display).toBe('none')
   })
 })
+
+/**
+ * Обёртка вокруг нефокусируемого триггера — таб-стоп, чтобы подсказка была
+ * доступна с клавиатуры. Когда показывать нечего (`disabled`), причины нет:
+ * список, где подсказка включена только у обрезанного имени, давал по
+ * остановке на каждую строку.
+ */
+describe('GrTooltip — без подсказки нет таб-стопа', () => {
+  it('`disabled` снимает tabindex и aria-describedby, включённая — возвращает', async () => {
+    const wrapper = mount(GrTooltip, {
+      props: { text: 'Northwind Traders International', disabled: true },
+      slots: { default: '<span class="truncate">Northwind Traders International</span>' },
+      attachTo: document.body,
+    })
+    const trigger = () => wrapper.get('[data-gr-tooltip-trigger]')
+
+    expect(trigger().attributes('tabindex')).toBeUndefined()
+    expect(trigger().attributes('aria-describedby')).toBeUndefined()
+
+    await wrapper.setProps({ disabled: false })
+    expect(trigger().attributes('tabindex')).toBe('0')
+    expect(trigger().attributes('aria-describedby')).toBeTruthy()
+    wrapper.unmount()
+  })
+
+  it('`block` прижимает триггер к началу строки, а не к центру', () => {
+    const block = mount(GrTooltip, { props: { text: 'Подсказка', block: true }, slots: { default: 'Имя' } })
+    const inline = mount(GrTooltip, { props: { text: 'Подсказка' }, slots: { default: 'Имя' } })
+
+    expect(block.get('[data-gr-tooltip-trigger]').classes()).toContain('justify-start')
+    expect(block.get('[data-gr-tooltip-trigger]').classes()).not.toContain('justify-center')
+    expect(inline.get('[data-gr-tooltip-trigger]').classes()).toContain('justify-center')
+  })
+})

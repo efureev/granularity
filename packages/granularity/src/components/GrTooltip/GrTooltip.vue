@@ -217,18 +217,26 @@ function syncSlotFocusable(): void {
 onMounted(syncSlotFocusable)
 onUpdated(syncSlotFocusable)
 
+/**
+ * Подсказка, которой нечего показать (`disabled` или пустая), не держит ни
+ * таб-стопа, ни описания: причина таб-стопа — «иначе подсказка недоступна с
+ * клавиатуры» — тогда не действует. В списке клиентов, где подсказка включена
+ * только у обрезанного имени, четыре строки давали четыре лишних остановки.
+ */
+const active = computed(() => !props.disabled && hasContent.value)
+
 watchEffect((onCleanup) => {
   const el = slotFocusableEl.value
-  if (!el || !props.describeTrigger)
+  if (!el || !props.describeTrigger || !active.value)
     return
 
   el.setAttribute('aria-describedby', tooltipId)
   onCleanup(() => el.removeAttribute('aria-describedby'))
 })
 
-const wrapperTabindex = computed(() => (slotFocusableEl.value ? undefined : 0))
+const wrapperTabindex = computed(() => (slotFocusableEl.value || !active.value ? undefined : 0))
 const wrapperDescribedBy = computed(() => (
-  slotFocusableEl.value || !props.describeTrigger ? undefined : tooltipId
+  slotFocusableEl.value || !props.describeTrigger || !active.value ? undefined : tooltipId
 ))
 
 /**
@@ -252,8 +260,8 @@ const layoutClass = computed(() => (props.block ? 'flex w-full' : 'inline-flex')
       data-testid="gr-tooltip-trigger"
       :tabindex="wrapperTabindex"
       :aria-describedby="wrapperDescribedBy"
-      class="items-center justify-center focus:outline-none"
-      :class="layoutClass"
+      class="items-center focus:outline-none"
+      :class="[layoutClass, block ? 'justify-start' : 'justify-center']"
       :style="triggerStyle"
       @mouseenter="show"
       @mouseleave="hide"
