@@ -31,6 +31,7 @@
 | `reference-band-opacity` | `0.12` | заливка опорной полосы |
 | `tooltip-bg` / `tooltip-fg` / `tooltip-brd` | `--gr-card` / `--gr-fg` / `--gr-brd` | панель тултипа |
 | `legend-gap` | `0.75rem` | зазор между пунктами легенды |
+| `empty-height` | `height` графика | высота заглушки «нет данных»; выше `height` не поднимается |
 
 ### Линия (`--gr-chart-line-*`)
 

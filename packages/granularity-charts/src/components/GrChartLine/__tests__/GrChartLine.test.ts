@@ -289,20 +289,18 @@ describe('GrChartLine', () => {
     expect(wrapper.find('[data-gr-chart-legend]').exists()).toBe(true)
   })
 
-  // Пустому графику незачем держать площадь построения: две пустые карточки
-  // рядом съедали по 256px каждая ради одной фразы.
-  it('пустое состояние не резервирует высоту графика', () => {
+  // Высоту по состояниям у всех графиков стережёт `GrChartFrame/__tests__/frameHeight.test.ts`;
+  // здесь — что пустой холст при этом не рисуется.
+  it('пустое состояние держит высоту графика, но холста не рисует', () => {
     const empty = factory({ series: [], height: 256 })
     const filled = factory({ height: 256 })
 
     // Прямой потомок — сам холст: иконка заглушки тоже `svg`, но лежит глубже.
     expect(empty.find('[data-gr-chart-plot] > svg').exists()).toBe(false)
     expect(filled.find('[data-gr-chart-plot] > svg').exists()).toBe(true)
-    // Заданная высота остаётся потолком: график, которому явно дали 80px, от
-    // пустоты вырасти не должен.
     expect(filled.find('[data-gr-chart-plot]').attributes('style')).toBe('height: 256px;')
     expect(empty.find('[data-gr-chart-plot]').attributes('style'))
-      .toBe('height: min(256px, var(--gr-chart-frame-empty-height, 8rem));')
+      .toBe('height: min(256px, var(--gr-chart-frame-empty-height, 256px));')
   })
 
   it('скрытая таблица повторяет данные графика', () => {

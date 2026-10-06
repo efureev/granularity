@@ -5,6 +5,20 @@ All notable changes to `@feugene/granularity-charts` are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+
+- **Пустой график держит заданную `height`.** Заглушка «нет данных» сжимала
+  область построения до `min(height, 8rem)`: `GrChartArea` с `:height="260"`
+  занимал с данными 260px, а на периоде без данных — 128px, и карточка вокруг
+  прыгала (скелет загрузки высоту держал). Теперь данные, загрузка и пустота —
+  `series: []` или `empty` — занимают одну `height` у всех графиков на общей
+  раме: `GrChartArea`, `GrChartBar`, `GrChartLine`, `GrChartPie`, `GrChartRadar`,
+  `GrChartFunnel`, `GrChartHeatmap`, `GrChartWaterfall`, `GrChartBullet`. Хук
+  `--gr-chart-frame-empty-height` остался — по умолчанию он равен `height` и
+  сжимает заглушку, если его задать; выше `height` она по-прежнему не растёт.
+
 ## [v1.0.2] 2026-10-06
 
 ### Changed
