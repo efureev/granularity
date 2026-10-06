@@ -30,6 +30,8 @@ export interface GrFormContext {
   validatingFields?: ComputedRef<Set<string>>
   /** Форма выключена целиком: значение видно, но ничего не редактируется. */
   disabled?: ComputedRef<boolean>
+  /** Поля держат место под строку сообщения, пока ошибки нет (`reserveMessage`). */
+  reserveMessage?: ComputedRef<boolean>
   /** Есть ли для поля правила (тогда `GrFormField` берёт ошибку из формы). */
   hasField: (name: string) => boolean
   /**

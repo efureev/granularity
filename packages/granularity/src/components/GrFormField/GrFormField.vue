@@ -7,9 +7,11 @@ import { useGranularityTranslations } from '../../internal/granularityI18n'
 import { GR_FORM_FIELD_KEY } from '../shared/formFieldContext'
 import {
   controlColumnClass,
+  errorReserveClass,
   errorBaseClass,
   errorTexts,
   fieldGaps,
+  labelInlineHeights,
   hintBaseClass,
   hintTexts,
   labelBaseClass,
@@ -67,6 +69,13 @@ export interface GrFormFieldProps {
   labelWidth?: string | number
   /** Классы на `<label>` поверх встроенных — точечная правка подписи без своего слота. */
   labelClass?: LabelClass
+  /**
+   * Держать место под строку сообщения, пока ошибки нет: появление текста не
+   * сдвигает форму, диалог и панель фиксированной высоты. Не задан — берётся у
+   * `GrForm` (`reserveMessage`), затем из `GrConfigProvider`. Несколько ошибок
+   * (`error: string[]`) по-прежнему растут ниже одной строки.
+   */
+  reserveMessage?: boolean
 }
 
 import './defaults'
@@ -89,6 +98,8 @@ const props = withDefaults(
     labelPosition: undefined,
     labelWidth: undefined,
     labelClass: undefined,
+    // `undefined`, а не `false`: иначе булев каст Vue затёр бы значение формы.
+    reserveMessage: undefined,
   },
 )
 
@@ -115,7 +126,7 @@ const labelStyle = computed(() => {
 const labelClassName = computed(() => [
   labelBaseClass,
   labelTexts[resolvedSize.value],
-  isInlineLabel.value ? labelInlineClass : '',
+  isInlineLabel.value ? [labelInlineClass, labelInlineHeights[resolvedSize.value]] : '',
 ])
 const hintClassName = computed(() => [hintBaseClass, hintTexts[resolvedSize.value]])
 const errorClassName = computed(() => [errorBaseClass, errorTexts[resolvedSize.value]])
@@ -169,6 +180,15 @@ const hasHint = computed(() => Boolean(props.hint) || Boolean(slots.hint))
 const hasError = computed(() => resolvedErrors.value.length > 0)
 // Текст можно скрыть, но невалидность поля от этого не исчезает.
 const showsMessage = computed(() => hasError.value && props.showMessage)
+
+/**
+ * Резерв строки сообщения: свой проп сильнее формы, форма — сильнее
+ * `GrConfigProvider`. `showMessage: false` резерв не держит — текста не будет.
+ */
+const configReserve = useGrComponentProp('GrFormField', 'reserveMessage', () => undefined, false)
+const reservesMessage = computed(() => props.showMessage && (
+  props.reserveMessage ?? (form?.reserveMessage?.value || configReserve.value)
+))
 // Пока идёт проверка, показываем её вместо старой ошибки: ошибка относится к
 // прежнему значению, и оставлять её на экране — врать про текущее.
 const showsValidating = computed(() => isValidating.value && props.showMessage)
@@ -300,9 +320,12 @@ defineSlots<{
 
     <!-- Подсказка, контрол и ошибка живут одной колонкой: при подписи сбоку
          они остаются рядом с контролом, а не разъезжаются по строке. -->
+    <!-- При подписи сбоку подсказка — под контролом: над ним она уводила бы
+         подпись от поля, которое та называет. Порядок для AT задаёт
+         `aria-describedby`, а не DOM. -->
     <div data-gr-form-field-control :class="[controlColumnClass, fieldGaps[resolvedSize]]">
       <p
-        v-if="hasHint"
+        v-if="hasHint && !isInlineLabel"
         :id="hintId"
         data-gr-form-field-hint
         :class="hintClassName"
@@ -314,13 +337,26 @@ defineSlots<{
 
       <slot />
 
+      <p
+        v-if="hasHint && isInlineLabel"
+        :id="hintId"
+        data-gr-form-field-hint
+        :class="hintClassName"
+      >
+        <slot name="hint">
+          {{ props.hint }}
+        </slot>
+      </p>
+
       <!-- Пустой контейнер уводится в `sr-only`, чтобы не добавлять пустую
            строку в колонку поля: gap дал бы видимый отступ. -->
       <div
         :id="errorId"
         data-gr-form-field-error
         role="alert"
-        :class="showsMessage || showsValidating ? errorClassName : 'sr-only'"
+        :class="showsMessage || showsValidating || reservesMessage
+          ? [errorClassName, reservesMessage ? errorReserveClass[resolvedSize] : '']
+          : 'sr-only'"
       >
         <span v-if="showsValidating" data-gr-form-field-validating :class="hintClassName">
           {{ validatingText }}

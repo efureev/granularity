@@ -77,6 +77,23 @@ form.value?.setSnapshot()
 контрола и проп поля складываются с ним по «или» — как это уже сделано с
 `readonly`.
 
+## Без сдвигов раскладки
+
+`reserveMessage` у формы держит место под строку сообщения у всех её полей:
+ошибки по submit не сдвигают форму, диалог и панель фиксированной высоты. Поле
+со своим `reserveMessage` решает за себя. Резерв — одна строка; несколько
+ошибок у поля растут ниже. Подробности — [`GrFormField.md`](./GrFormField.md#без-сдвигов-раскладки).
+
+```vue
+<template>
+  <GrForm :model="model" :rules="rules" reserve-message>
+    <GrFormField label="Получатель" name="name">
+      <GrInput v-model="model.name" />
+    </GrFormField>
+  </GrForm>
+</template>
+```
+
 ## Файлы правилом формы
 
 Ограничения файла описываются там же, где остальные правила, — правилом `file`:

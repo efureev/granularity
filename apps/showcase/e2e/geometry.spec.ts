@@ -708,3 +708,52 @@ test.describe('прикреплённая группа кнопок', () => {
     expect(last[2]).toBeGreaterThan(0)
   })
 })
+
+/**
+ * Поле формы без сдвигов раскладки.
+ *
+ * Подпись сбоку стояла по верху строки, а подсказка — над контролом: у строки
+ * с подсказкой подпись висела над полем, у строки без неё — нет, и таблица
+ * подписей была рваной. А ошибка по submit добавляла строку под каждым полем,
+ * и форма в диалоге прыгала. Оба дефекта — геометрия, в jsdom их не увидеть.
+ */
+test.describe('GrFormField: раскладка без сдвигов', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto(componentPath('GrFormField'))
+    await page.locator('[data-demo="start-rows"]').waitFor()
+  })
+
+  test('подпись сбоку стоит на линии своего контрола — с подсказкой, ошибкой и без', async ({ page }) => {
+    const rows = await page.locator('[data-demo="start-rows"] [data-gr-form-field]').evaluateAll(fields =>
+      fields.map((field) => {
+        const label = field.querySelector('label')!.getBoundingClientRect()
+        const control = field.querySelector('[data-gr-form-field-control] > :not([data-gr-form-field-hint]):not([data-gr-form-field-error])')!
+          .getBoundingClientRect()
+
+        return { labelMid: label.top + label.height / 2, controlMid: control.top + control.height / 2 }
+      }))
+
+    expect(rows).toHaveLength(3)
+    for (const row of rows)
+      expect(Math.abs(row.labelMid - row.controlMid)).toBeLessThanOrEqual(1)
+  })
+
+  test('подсказка при подписи сбоку — под контролом', async ({ page }) => {
+    const field = page.locator('[data-demo="start-rows"] [data-gr-form-field]').nth(1)
+    const hint = (await field.locator('[data-gr-form-field-hint]').boundingBox())!
+    const input = (await field.locator('input').boundingBox())!
+
+    expect(hint.y).toBeGreaterThanOrEqual(input.y + input.height)
+  })
+
+  test('`reserveMessage`: ошибки по submit не меняют высоту полей', async ({ page }) => {
+    const form = page.locator('[data-demo="reserved"]')
+    const heights = () => form.locator('[data-gr-form-field]').evaluateAll(fields => fields.map(field => field.getBoundingClientRect().height))
+    const before = await heights()
+
+    await form.getByRole('button', { name: 'Проверить' }).click()
+    await expect(form.locator('[data-gr-form-field-error-item]')).toHaveCount(2)
+
+    expect(await heights()).toEqual(before)
+  })
+})

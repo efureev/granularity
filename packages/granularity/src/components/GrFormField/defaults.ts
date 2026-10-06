@@ -8,6 +8,8 @@ import type { GrFormFieldLabelPosition, GrFormFieldSize } from './grFormFieldSty
 export interface GrFormFieldConfigurableProps {
   size: GrFormFieldSize
   labelPosition: GrFormFieldLabelPosition
+  /** Держать место под строку сообщения — см. проп `reserveMessage`. */
+  reserveMessage: boolean
 }
 
 declare module '../../composables/useGrComponentConfig' {

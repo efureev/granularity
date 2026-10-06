@@ -27,13 +27,35 @@ export const hintTexts: Record<GrFormFieldSize, string> = {
 
 export const errorTexts: Record<GrFormFieldSize, string> = labelTexts
 
+/**
+ * Резерв строки сообщения (`reserveMessage`): пустой контейнер держит высоту
+ * одной строки ошибки, и появление текста не сдвигает форму.
+ */
+export const errorReserveClass: Record<GrFormFieldSize, string> = {
+  xs: 'min-h-[var(--gr-leading-xs)]',
+  sm: 'min-h-[var(--gr-leading-sm)]',
+  md: 'min-h-[var(--gr-leading-sm)]',
+  lg: 'min-h-[var(--gr-leading-base)]',
+}
+
+/**
+ * Подпись сбоку высотой с однострочный контрол того же размера и по центру:
+ * так она стоит на линии текста в поле, а не над ним.
+ */
+export const labelInlineHeights: Record<GrFormFieldSize, string> = {
+  xs: 'min-h-7',
+  sm: 'min-h-8',
+  md: 'min-h-10',
+  lg: 'min-h-11',
+}
+
 /** Сторона подписи относительно контрола — логическая, не физическая (RTL). */
 export const GR_FORM_FIELD_LABEL_POSITIONS = ['top', 'start'] as const
 export type GrFormFieldLabelPosition = typeof GR_FORM_FIELD_LABEL_POSITIONS[number]
 
 export const rootColumnClass = 'flex flex-col'
 export const rootRowClass = 'flex items-start'
-export const labelInlineClass = 'shrink-0'
+export const labelInlineClass = 'shrink-0 flex items-center'
 export const controlColumnClass = 'flex flex-col min-w-0 flex-1'
 
 export const labelBaseClass = 'text-[var(--gr-muted-fg)]'

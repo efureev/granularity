@@ -355,3 +355,89 @@ describe('GrFormField — расположение подписи', () => {
     expect(column.find('input').exists()).toBe(true)
   })
 })
+
+/**
+ * Раскладка без сдвигов. Высоту здесь не измерить — jsdom без layout; её меряет
+ * `apps/showcase/e2e/geometry.spec.ts`. Здесь — то, от чего высота зависит.
+ */
+describe('GrFormField — раскладка без сдвигов', () => {
+  function formContext(reserveMessage: boolean) {
+    return {
+      [GR_FORM_KEY as symbol]: {
+        errors: ref<Record<string, string | undefined>>({}),
+        requiredFields: computed(() => new Set<string>()),
+        hasField: () => false,
+        registerField: () => () => {},
+        reserveMessage: computed(() => reserveMessage),
+      },
+    }
+  }
+
+  const errorBox = (wrapper: ReturnType<typeof mount>) => wrapper.get('[data-gr-form-field-error]')
+
+  it('`reserveMessage`: пустая строка сообщения держит высоту, а с текстом — та же', async () => {
+    const wrapper = mount(GrFormField, { props: { label: 'IBAN', reserveMessage: true }, slots: { default: '<input>' } })
+    const empty = errorBox(wrapper).classes()
+
+    expect(empty).not.toContain('sr-only')
+    expect(empty).toContain('min-h-[var(--gr-leading-sm)]')
+
+    await wrapper.setProps({ error: 'Укажите IBAN' })
+    expect(errorBox(wrapper).classes()).toEqual(empty)
+  })
+
+  it('без `reserveMessage` пустая строка не занимает места, как и раньше', () => {
+    const wrapper = mount(GrFormField, { props: { label: 'IBAN' }, slots: { default: '<input>' } })
+
+    expect(errorBox(wrapper).classes()).toEqual(['sr-only'])
+  })
+
+  it('резерв приходит от формы, а свой проп поля сильнее', () => {
+    const fromForm = mount(GrFormField, {
+      props: { label: 'IBAN' },
+      slots: { default: '<input>' },
+      global: { provide: formContext(true) },
+    })
+    const optedOut = mount(GrFormField, {
+      props: { label: 'IBAN', reserveMessage: false },
+      slots: { default: '<input>' },
+      global: { provide: formContext(true) },
+    })
+
+    expect(errorBox(fromForm).classes()).not.toContain('sr-only')
+    expect(errorBox(optedOut).classes()).toEqual(['sr-only'])
+  })
+
+  it('`showMessage: false` резерв не держит — текста не будет', () => {
+    const wrapper = mount(GrFormField, { props: { label: 'IBAN', reserveMessage: true, showMessage: false }, slots: { default: '<input>' } })
+
+    expect(errorBox(wrapper).classes()).toEqual(['sr-only'])
+  })
+
+  it('при подписи сбоку подсказка — под контролом, и `aria-describedby` прежний', () => {
+    const wrapper = mount(GrFormField, {
+      props: { label: 'Number prefix', hint: 'Next invoice: INV-0419', labelPosition: 'start' },
+      slots: { default: '<input data-control>' },
+    })
+    const column = wrapper.get('[data-gr-form-field-control]').element
+    const order = [...column.children].map(child => child.hasAttribute('data-control') ? 'control' : child.hasAttribute('data-gr-form-field-hint') ? 'hint' : 'error')
+
+    expect(order).toEqual(['control', 'hint', 'error'])
+  })
+
+  it('сверху подсказка остаётся над контролом', () => {
+    const wrapper = mount(GrFormField, {
+      props: { label: 'Number prefix', hint: 'Next invoice: INV-0419' },
+      slots: { default: '<input data-control>' },
+    })
+    const column = wrapper.get('[data-gr-form-field-control]').element
+
+    expect(column.firstElementChild?.hasAttribute('data-gr-form-field-hint')).toBe(true)
+  })
+
+  it('подпись сбоку высотой с однострочный контрол и по центру', () => {
+    const wrapper = mount(GrFormField, { props: { label: 'Terms', labelPosition: 'start', size: 'md' }, slots: { default: '<input>' } })
+
+    expect(wrapper.get('label').classes()).toEqual(expect.arrayContaining(['flex', 'items-center', 'min-h-10']))
+  })
+})

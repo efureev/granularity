@@ -60,6 +60,12 @@ export interface GrFormProps<TModel extends object = Record<string, unknown>> {
    * через контекст поля, поэтому обходить их по одному не нужно.
    */
   disabled?: boolean
+  /**
+   * Все поля формы держат место под строку сообщения: ошибки по submit не
+   * сдвигают форму, диалог и панель фиксированной высоты. Поле со своим
+   * `reserveMessage` решает за себя.
+   */
+  reserveMessage?: boolean
 }
 
 export interface GrFormEmits<TModel extends object = Record<string, unknown>> {
@@ -83,6 +89,7 @@ const props = withDefaults(
     scrollToError: true,
     scrollBehavior: 'smooth',
     disabled: false,
+    reserveMessage: false,
   },
 )
 
@@ -366,6 +373,7 @@ provide(GR_FORM_KEY, {
   requiredFields,
   validatingFields,
   disabled: computed(() => props.disabled),
+  reserveMessage: computed(() => props.reserveMessage),
   hasField: (name: string) => effectiveRules(name).length > 0,
   registerField: (name, getEl, registration) => {
     fieldRegistry.set(name, getEl)

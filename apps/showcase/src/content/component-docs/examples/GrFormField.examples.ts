@@ -45,4 +45,11 @@ export const grFormFieldExamples: ShowcaseComponentExampleDoc[] = [
     status: 'ready',
     previewKey: 'gr-form-field-inline-label',
   },
+  {
+    id: 'form-field-stable-layout',
+    title: 'No layout shift: start labels on the control line, reserved message',
+    description: 'При `labelPosition="start"` подпись стоит на линии своего контрола, а подсказка и ошибка — под ним, поэтому строки с подсказкой и без неё не разъезжаются. `reserveMessage` у `GrForm` держит место под строку ошибки: проверка по submit не сдвигает форму.',
+    status: 'ready',
+    previewKey: 'gr-form-field-stable-layout',
+  },
 ]

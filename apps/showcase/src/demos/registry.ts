@@ -294,6 +294,7 @@ export const demoPathByPreviewKey = {
   'gr-form-field-custom-label': 'components/gr-form-field/GrFormFieldCustomLabelDemo.vue',
   'gr-form-field-error-state': 'components/gr-form-field/GrFormFieldErrorDemo.vue',
   'gr-form-field-inline-label': 'components/gr-form-field/GrFormFieldInlineLabelDemo.vue',
+  'gr-form-field-stable-layout': 'components/gr-form-field/GrFormFieldStableLayoutDemo.vue',
   'gr-form-file-basic-selection': 'components/gr-form-file/GrFormFileBasicSelectionDemo.vue',
   'gr-form-file-custom-validation': 'components/gr-form-file/GrFormFileValidationDemo.vue',
   'gr-form-file-multiple-queue': 'components/gr-form-file/GrFormFileMultipleQueueDemo.vue',
