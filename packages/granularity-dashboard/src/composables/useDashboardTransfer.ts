@@ -95,8 +95,11 @@ export interface UseDashboardTransferReturn {
   adopt: (transfer: GrDashboardTransfer) => void
   /** Следующая точка внешней сессии. Кадр планируется тот же, что и у жеста. */
   moveTo: (at: GrDashboardTransferPoint) => void
-  /** Закончить внешнюю сессию: `true` — уронить на цель, `false` — свернуть. */
-  release: (commit: boolean) => void
+  /**
+   * Закончить внешнюю сессию: `true` — уронить на цель, `false` — свернуть.
+   * Возвращает, лёг ли виджет: источник убирает его у себя только тогда.
+   */
+  release: (commit: boolean) => boolean
   /**
    * Есть ли под точкой готовый принять приёмник.
    *
@@ -195,36 +198,66 @@ function flush(): void {
   activeTarget?.over(current, point.value)
 }
 
+/**
+ * Сессия сбрасывается **до** того, как узнает об этом цель: упади её `leave`,
+ * призрак и слушатель `Esc` всё равно сняты, а не висят на странице навсегда.
+ */
 function reset(): void {
   if (frame !== null) {
     cancelAnimationFrame(frame)
     frame = null
   }
 
-  activeTarget?.leave()
+  const target = activeTarget
+
   activeTarget = null
   pending = null
   transfer.value = null
   stopActive = null
   detachEscape()
+  target?.leave()
 }
 
-function finish(commit: boolean): void {
-  // Отложенный кадр доигрывается, а не отменяется: движение и отпускание могут
-  // прийти внутри одного кадра, и отменённый кадр потерял бы последний сдвиг.
-  if (frame !== null) {
-    cancelAnimationFrame(frame)
-    frame = null
-    flush()
+/**
+ * Конец сессии. Возвращает, лёг ли виджет.
+ *
+ * Приёмник — тот, что под указателем **в момент отпускания**, а не в последнем
+ * кадре: между ними страница могла сдвинуться, и бросок «мимо» уронил бы
+ * виджет в сетку, которой под указателем уже нет, — а источник, спросивший
+ * про цель по точке, решил бы обратное, и виджет оказался бы в обеих сетках.
+ */
+function finish(commit: boolean): boolean {
+  let dropped = false
+
+  try {
+    // Отложенный кадр доигрывается, а не отменяется: движение и отпускание могут
+    // прийти внутри одного кадра, и отменённый кадр потерял бы последний сдвиг.
+    if (frame !== null) {
+      cancelAnimationFrame(frame)
+      frame = null
+      flush()
+    }
+
+    const current = transfer.value
+    const target = current ? targetAt(point.value.x, point.value.y) : null
+
+    if (target !== activeTarget) {
+      activeTarget?.leave()
+      activeTarget = target
+      if (target && current)
+        target.over(current, point.value)
+    }
+
+    if (commit && current && target) {
+      target.drop(current)
+      dropped = true
+    }
+  }
+  finally {
+    reset()
   }
 
-  const current = transfer.value
-  const target = activeTarget
-
-  if (commit && current && target)
-    target.drop(current)
-
-  reset()
+  return dropped
 }
 
 function onMove(event: PointerEvent): void {
@@ -269,11 +302,11 @@ function moveExternal(at: GrDashboardTransferPoint): void {
   frame ??= requestAnimationFrame(flush)
 }
 
-function releaseExternal(commit: boolean): void {
+function releaseExternal(commit: boolean): boolean {
   if (!transfer.value)
-    return
+    return false
 
-  finish(commit)
+  return finish(commit)
 }
 
 export function useDashboardTransfer(): UseDashboardTransferReturn {

@@ -44,6 +44,10 @@ export interface GrDashboardItemProps {
   itemId: string
   /** Имя виджета: заголовок, имя ручек, имя в объявлениях. */
   title?: string
+  /**
+   * Ступень размера: кегль шапки, отступы шапки, тела и подвала. По умолчанию `md`; берётся из
+   * `GrConfigProvider`.
+   */
   size?: GrDashboardItemSize
   /**
    * Отступы содержимого. Не задан — ступень от `size`; `none` отдаёт виджет
@@ -66,6 +70,7 @@ export interface GrDashboardItemProps {
    * интерфейс.
    */
   draggable?: boolean
+  /** Можно ли растягивать этот виджет уголком. Не задан — действует правило сетки. */
   resizable?: boolean
   /** Не двигается сам и не двигается соседями. */
   static?: boolean
@@ -73,9 +78,16 @@ export interface GrDashboardItemProps {
   showSettings?: boolean
   /** Границы размера. Раскладка их может не содержать — знает их виджет. */
   minW?: number
+  /** Наименьшая высота виджета в строках сетки. */
   minH?: number
+  /** Наибольшая ширина виджета в колонках сетки. */
   maxW?: number
+  /** Наибольшая высота виджета в строках сетки; упёршееся содержимое прокручивается. */
   maxH?: number
+  /**
+   * Доступное имя виджета вместо `title`. Без того и другого виджет остаётся обычным блоком, без
+   * роли `group`.
+   */
   ariaLabel?: string
 }
 
@@ -99,12 +111,17 @@ export interface GrDashboardItemEmits {
 const emit = defineEmits<GrDashboardItemEmits>()
 
 defineSlots<{
+  /** Содержимое виджета; при `lazy` у сетки монтируется по попаданию в окно. */
   default?: () => unknown
+  /** Своя шапка вместо заголовка `title`; включает шапку. */
   header?: () => unknown
+  /** Продуктовые кнопки в шапке — видны всегда и включают шапку. */
   actions?: () => unknown
   /** Действия режима редактирования: удалить виджет, открыть настройки. */
   editActions?: () => unknown
+  /** Подвал карточки виджета. */
   footer?: () => unknown
+  /** Заглушка на месте содержимого, пока ленивый виджет не попал в окно. */
   skeleton?: () => unknown
 }>()
 
@@ -158,11 +175,15 @@ const active = computed(() => {
  */
 const style = computed(() => {
   const geometry = active.value
+  // Виджет несут в другую сетку: место за ним держит подложка, а сам он
+  // невидим, пока перенос не решится, — и возвращается сюда же при отмене.
+  const carried = dashboard?.carriedAwayId.value === props.itemId
 
   if (geometry) {
     const { rect, kind } = geometry
 
     return {
+      ...(carried ? { visibility: 'hidden' as const } : {}),
       position: 'absolute' as const,
       left: `${rect.left}px`,
       top: `${rect.top}px`,
@@ -174,16 +195,12 @@ const style = computed(() => {
     }
   }
 
-  // Виджет несут в другую сетку: из раскладки он уже убран, и без этого
-  // элемент потерял бы `grid-area` и всплыл бы в свободной ячейке.
-  if (dashboard?.carriedAwayId.value === props.itemId)
-    return { display: 'none' }
-
   const placed = item.value
   if (!placed)
     return undefined
 
   return {
+    ...(carried ? { visibility: 'hidden' as const } : {}),
     gridColumn: `${placed.x + 1} / span ${placed.w}`,
     gridRow: `${placed.y + 1} / span ${placed.h}`,
   }

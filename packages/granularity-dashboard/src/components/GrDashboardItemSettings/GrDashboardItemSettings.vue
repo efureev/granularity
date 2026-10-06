@@ -23,12 +23,14 @@ export interface GrDashboardItemSettingsProps {
   itemId: string | null
   /** Заголовок окна. Не задан — строка локали. */
   title?: string
+  /** Ширина окна по шкале `GrDialog`. Не задан — из `GrConfigProvider`, иначе `md`. */
   size?: GrDashboardItemSettingsSize
   /** Убрать встроенный редактор размера: у приложения свои поля и только они. */
   hideSize?: boolean
 }
 
 export interface GrDashboardItemSettingsEmits {
+  /** Окно открылось или закрылось (`v-model`). */
   (e: 'update:modelValue', value: boolean): void
   /** Размер уже закоммичен сеткой; приложению остаётся сохранить своё. */
   (e: 'apply', id: string, span: GrDashboardSpan): void

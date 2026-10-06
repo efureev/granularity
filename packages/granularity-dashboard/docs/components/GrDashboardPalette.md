@@ -59,6 +59,29 @@
 Нажатие на саму кнопку переносом не становится: иначе дрогнувшая на пять
 пикселей рука давала бы перенос вместо добавления.
 
+## Своя плитка — слот `#item`
+
+Слот получает `item`, `dragging`, `transferProps` и `add`. `transferProps`
+навешивается на корень плитки — без него свою разметку не перетащить. `add`
+— тот же путь, что у встроенной кнопки: эмит `add` и объявление «добавлено»
+скринридеру, у выключенной плитки — ничего. Своя кнопка «Добавить» обязана звать
+именно его: она остаётся единственным клавиатурным путём.
+
+```vue
+<template>
+  <GrDashboardPalette :items="catalog" @add="place">
+    <template #item="{ item, transferProps, add }">
+      <div v-bind="transferProps" class="flex items-center justify-between gap-2">
+        <span>{{ item.title }}</span>
+        <GrButton size="sm" :disabled="item.disabled" @click="add">
+          Добавить
+        </GrButton>
+      </div>
+    </template>
+  </GrDashboardPalette>
+</template>
+```
+
 ## Границы
 
 **Пальцем плитка не тащится.** Перенос касанием требует `touch-action: none` на

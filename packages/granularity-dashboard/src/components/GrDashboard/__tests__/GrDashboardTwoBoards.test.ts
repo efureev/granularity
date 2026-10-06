@@ -173,11 +173,24 @@ describe('перенос между дашбордами', () => {
     expect(s.transfersOut).toEqual([])
   })
 
-  it('над чужой сеткой виджет уходит из своей раскладки в превью', async () => {
+  /**
+   * Источник держит место за виджетом, пока перенос не решился: уплотнись он
+   * сразу, всё ниже — вместе с приёмником — подъехало бы под указателем, и
+   * бросок пришёлся бы мимо.
+   */
+  it('над чужой сеткой виджет прячется, а его место в своей сетке остаётся', async () => {
     const s = stand()
     await drag(s.root, 'sales', OVER_RIGHT)
 
+    const left = s.root.querySelector('[aria-label="левая"]')!
+    const placeholder = left.querySelector<HTMLElement>('[data-gr-dashboard-placeholder]')
+    const item = left.querySelector<HTMLElement>('[data-item-id="sales"]')!
+
     expect(s.carried()).toBe(true)
+    expect(placeholder?.style.gridColumn).toBe('1 / span 4')
+    expect(placeholder?.style.gridRow).toBe('1 / span 2')
+    expect(item.style.visibility).toBe('hidden')
+    expect(item.style.display).not.toBe('none')
   })
 
   it('успешное отпускание уносит виджет и сообщает об этом', async () => {
@@ -248,6 +261,59 @@ describe('перенос между дашбордами', () => {
     release()
     await nextTick()
 
+    expect(s.leftIds()).toContain('sales')
+  })
+
+  /**
+   * Страница сдвинулась между последним кадром и отпусканием: приёмника под
+   * указателем больше нет. Бросок не засчитывается ни приёмником, ни
+   * источником — раньше они решали это порознь, и виджет мог оказаться в обеих
+   * сетках или ни в одной.
+   */
+  it('приёмник уехал из-под указателя до отпускания — виджет возвращается', async () => {
+    const s = stand()
+    await drag(s.root, 'sales', OVER_RIGHT)
+
+    RIGHT.top = 1000
+    release(OVER_RIGHT)
+    await nextTick()
+    RIGHT.top = 0
+
+    expect(s.carried()).toBe(false)
+    expect(s.drops).toEqual([])
+    expect(s.transfersOut).toEqual([])
+    expect(s.leftIds()).toContain('sales')
+    expect(s.root.querySelector<HTMLElement>('[data-item-id="sales"]')!.style.visibility).not.toBe('hidden')
+  })
+
+  it('`Esc` во время переноса сворачивает его и возвращает виджет', async () => {
+    const s = stand()
+    await drag(s.root, 'sales', OVER_RIGHT)
+
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }))
+    await nextTick()
+
+    expect(s.carried()).toBe(false)
+    expect(s.drops).toEqual([])
+    expect(s.transfersOut).toEqual([])
+    expect(s.leftIds()).toContain('sales')
+    expect(s.root.querySelector<HTMLElement>('[data-item-id="sales"]')!.style.visibility).not.toBe('hidden')
+
+    // Жест снят целиком: отпускание после `Esc` ничего не роняет.
+    release(OVER_RIGHT)
+    await nextTick()
+    expect(s.drops).toEqual([])
+  })
+
+  it('`pointercancel` во время переноса сворачивает его', async () => {
+    const s = stand()
+    await drag(s.root, 'sales', OVER_RIGHT)
+
+    cancelPointer()
+    await nextTick()
+
+    expect(s.carried()).toBe(false)
+    expect(s.drops).toEqual([])
     expect(s.leftIds()).toContain('sales')
   })
 })

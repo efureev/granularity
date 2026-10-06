@@ -2,7 +2,7 @@ import { expect, test, type Page } from '@playwright/test'
 
 import { expectNoA11yRegressions, focusedDescription as describeFocus, tabUntil } from '@feugene/granularity-test-kit/e2e'
 
-import { componentPath } from './components'
+import { companionPath, componentPath } from './components'
 import { openShowcasePage } from './readiness'
 
 /**
@@ -2038,5 +2038,81 @@ test.describe('GrInputTag: правка тега', () => {
     await expect(editor).toBeVisible()
     await expect(editor).toBeFocused()
     await expect(field.locator('[data-gr-chip-close]')).toHaveCount(count)
+  })
+})
+
+/**
+ * Перенос виджета между дашбордами — настоящими событиями указателя.
+ *
+ * Сетки стоят одна под другой (узкое окно), и именно так проявлялся дефект:
+ * источник уплотнялся, как только виджет отрывался, всё ниже подъезжало под
+ * указателем, и бросок приходился мимо приёмника. Источник теперь держит место
+ * за виджетом, пока перенос не решился, а отпускание мимо, `Esc` и обрыв
+ * указателя сворачивают перенос и возвращают виджет.
+ */
+test.describe('GrDashboard: перенос между дашбордами', () => {
+  test.use({ viewport: { width: 640, height: 1000 } })
+
+  async function startCarrying(page: Page) {
+    await openShowcasePage(page, companionPath('GrDashboard'))
+    const source = page.locator('[aria-label="Рабочий дашборд"]')
+    const target = page.locator('[aria-label="Архивный дашборд"]')
+
+    await source.scrollIntoViewIfNeeded()
+    const handle = (await source.locator('[data-gr-dashboard-drag-handle]').first().boundingBox())!
+    const targetBefore = (await target.boundingBox())!
+    const x = handle.x + handle.width / 2
+    let y = handle.y + handle.height / 2
+
+    await page.mouse.move(x, y)
+    await page.mouse.down()
+    for (let step = 0; step < 20; step += 1) {
+      y += (targetBefore.y + 30 - y) / 4
+      await page.mouse.move(x, y)
+    }
+
+    await expect(page.locator('[data-gr-dashboard-transfer-ghost]')).toHaveCount(1)
+
+    return { source, target, targetBefore, x }
+  }
+
+  async function expectReturned(page: Page, source: import('@playwright/test').Locator) {
+    await expect(page.locator('[data-gr-dashboard-transfer-ghost]')).toHaveCount(0)
+    await expect(source.locator('[data-gr-dashboard-item]')).toHaveCount(2)
+    await expect(source.locator('[data-gr-dashboard-item]').first()).toBeVisible()
+  }
+
+  test('приёмник не уезжает из-под указателя, пока виджет несут', async ({ page }) => {
+    const { target, targetBefore } = await startCarrying(page)
+
+    expect((await target.boundingBox())!.y).toBeCloseTo(targetBefore.y, 0)
+    await page.mouse.up()
+  })
+
+  test('отпускание мимо приёмника возвращает виджет на место', async ({ page }) => {
+    const { source, x } = await startCarrying(page)
+    const box = (await source.boundingBox())!
+
+    await page.mouse.move(x, box.y + box.height + 8)
+    await page.mouse.up()
+
+    await expectReturned(page, source)
+  })
+
+  test('`Esc` сворачивает перенос', async ({ page }) => {
+    const { source } = await startCarrying(page)
+
+    await page.keyboard.press('Escape')
+    await expectReturned(page, source)
+
+    await page.mouse.up()
+    await expect(page.locator('[aria-label="Архивный дашборд"] [data-gr-dashboard-item]')).toHaveCount(1)
+  })
+
+  test('обрыв указателя сворачивает перенос', async ({ page }) => {
+    const { source } = await startCarrying(page)
+
+    await page.evaluate(() => window.dispatchEvent(new PointerEvent('pointercancel', { pointerId: 1, bubbles: true })))
+    await expectReturned(page, source)
   })
 })

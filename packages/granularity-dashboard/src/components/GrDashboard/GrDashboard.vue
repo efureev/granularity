@@ -74,8 +74,21 @@ export interface GrDashboardProps {
   gap?: number
   /** `view` — сетка только показывает; `edit` — появляются ручки. */
   mode?: GrDashboardMode
+  /**
+   * Виджеты переносятся за ручку в режиме `edit`; виджет сужает правило своим пропом. Не задан —
+   * из `GrConfigProvider`, иначе `true`.
+   */
   draggable?: boolean
+  /**
+   * Виджеты растягиваются уголком в режиме `edit`; виджет сужает правило своим пропом. Не задан —
+   * из `GrConfigProvider`, иначе `true`.
+   */
   resizable?: boolean
+  /**
+   * Уплотнение после переноса: `vertical` тянет виджеты вверх, `horizontal` — влево, `both` —
+   * в обе стороны, `none` оставляет там, куда положили. Не задан — из `GrConfigProvider`, иначе
+   * `vertical`.
+   */
   compact?: GrDashboardCompaction
   /** Столкновение отменяет перемещение, а не толкает соседей. */
   preventCollision?: boolean
@@ -95,13 +108,27 @@ export interface GrDashboardProps {
    * дашборд принимает виджеты, но своих не отдаёт.
    */
   transferable?: boolean
+  /** Имя группы-сетки. Не задано — из локали («Dashboard»). */
   ariaLabel?: string
 }
 
 export interface GrDashboardEmits {
+  /**
+   * Раскладка изменилась (`v-model:layout`): приходит целиком, с новой записью текущего
+   * брейкпоинта.
+   */
   (e: 'update:layout', value: GrDashboardResponsiveLayout): void
+  /**
+   * Раскладка текущего брейкпоинта изменилась — вместе с самим брейкпоинтом; приходит следом
+   * за `update:layout`.
+   */
   (e: 'layoutChange', value: GrDashboardLayout, breakpoint: GrDashboardBreakpoint): void
+  /** Виджет переехал — указателем или стрелками: прежняя и новая запись раскладки. */
   (e: 'itemMove', id: string, from: GrDashboardItemLayout, to: GrDashboardItemLayout): void
+  /**
+   * Пользователь изменил размер виджета — уголком, стрелками или в окне настроек: прежняя и новая
+   * запись раскладки.
+   */
   (e: 'itemResize', id: string, from: GrDashboardItemLayout, to: GrDashboardItemLayout): void
   /**
    * Виджет с `auto-height` подстроился под содержимое.
@@ -111,6 +138,7 @@ export interface GrDashboardEmits {
    * бы «сохранить изменения?» после загрузки данных в виджет.
    */
   (e: 'itemAutoResize', id: string, from: GrDashboardItemLayout, to: GrDashboardItemLayout): void
+  /** Брейкпоинт сменился по ширине контейнера — новый брейкпоинт и число его колонок. */
   (e: 'breakpointChange', breakpoint: GrDashboardBreakpoint, cols: number): void
   /** Виджет попросил открыть свои настройки: нажата встроенная кнопка-шестерёнка. */
   (e: 'itemSettings', id: string): void
@@ -152,7 +180,9 @@ const props = withDefaults(defineProps<GrDashboardProps>(), {
 const emit = defineEmits<GrDashboardEmits>()
 
 defineSlots<{
+  /** Виджеты `GrDashboardItem` — по одному на запись раскладки. */
   default?: () => unknown
+  /** Что показать, пока в раскладке нет ни одного виджета. */
   empty?: () => unknown
 }>()
 
@@ -449,18 +479,20 @@ function isInsideOwnGrid(x: number, y: number): boolean {
 }
 
 /**
- * Виджет уехал в чужую сетку: из своей он уходит, соседи уплотняются.
+ * Виджет понесли в чужую сетку: своё место он **держит**, пока его не приняли.
  *
- * Превью честно показывает, что останется, — так же, как при обычном переносе.
- * Разметку виджета по-прежнему рисует приложение, поэтому сам элемент прячется
- * по `carriedAwayId`, а не остаётся без `grid-area`.
+ * Уплотнись источник сразу, всё ниже него подъехало бы вверх — вместе с
+ * сеткой-приёмником, прямо под указателем, — и бросок пришёлся бы мимо.
+ * Поэтому раскладка остаётся прежней, на месте виджета стоит подложка, а сам
+ * элемент прячется по `carriedAwayId`. Уплотнение — только после приземления.
  */
 function beginTransferOut(state: NonNullable<typeof dragState.value>, at: GrDashboardTransferPoint): void {
   const payload = transferOf(state.origin)
 
   carriedAway.value = payload
   clearVars(state.id)
-  preview.value = removeItem(baseLayout.value, state.id, moveOptions.value)
+  state.cell = { x: state.origin.x, y: state.origin.y }
+  preview.value = baseLayout.value
   transfer.adopt(payload)
   transfer.moveTo(at)
 }
@@ -541,17 +573,22 @@ function finishGesture(commitResult: boolean): void {
   // он действительно куда-то лёг.
   if (carriedAway.value) {
     const payload = carriedAway.value
-    const landed = commitResult && transfer.hasTargetAt(transfer.point.value)
+    let landed = false
 
-    carriedAway.value = null
-    transfer.release(commitResult)
-
-    clearVars(state.id)
-    dragState.value = null
-    activeGeometry.value = null
-    preview.value = null
-    pendingDx = 0
-    pendingDy = 0
+    // Состояние жеста снимается и тогда, когда приёмник упал на броске: иначе
+    // призрак и спрятанный виджет остались бы на странице навсегда.
+    try {
+      landed = transfer.release(commitResult)
+    }
+    finally {
+      carriedAway.value = null
+      clearVars(state.id)
+      dragState.value = null
+      activeGeometry.value = null
+      preview.value = null
+      pendingDx = 0
+      pendingDy = 0
+    }
 
     if (!landed)
       return
@@ -1103,7 +1140,12 @@ const context: GrDashboardContext = {
 
 provide(GR_DASHBOARD_KEY, context)
 
-defineExpose({ breakpoint, cols })
+defineExpose({
+  /** Текущий брейкпоинт: до первого замера контейнера — `initialBreakpoint`. */
+  breakpoint,
+  /** Число колонок текущего брейкпоинта. */
+  cols,
+})
 
 const placeholderCell = computed(() => {
   const state = dragState.value

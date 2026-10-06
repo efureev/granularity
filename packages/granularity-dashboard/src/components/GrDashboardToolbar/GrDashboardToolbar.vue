@@ -15,15 +15,20 @@ defineOptions({ name: 'GrDashboardToolbar', inheritAttrs: false })
 export interface GrDashboardToolbarProps {
   /** Текущий режим. `v-model:mode`. Не задан — берётся у дашборда, если тулбар внутри него. */
   mode?: GrDashboardMode
+  /** Ступень размера встроенных кнопок. По умолчанию `md`; берётся из `GrConfigProvider`. */
   size?: GrDashboardToolbarSize
   /** Показывать кнопку сброса раскладки. */
   resettable?: boolean
+  /** Встроенные кнопки выключены; кнопки из слотов сюда не относятся. */
   disabled?: boolean
+  /** Имя панели инструментов. Не задано — из локали («Dashboard controls»). */
   ariaLabel?: string
 }
 
 export interface GrDashboardToolbarEmits {
+  /** Нажата кнопка режима (`v-model:mode`): из `view` в `edit` и обратно. */
   (e: 'update:mode', value: GrDashboardMode): void
+  /** Нажата кнопка сброса раскладки; что считать исходной раскладкой, решает приложение. */
   (e: 'reset'): void
 }
 
@@ -38,8 +43,11 @@ const props = withDefaults(defineProps<GrDashboardToolbarProps>(), {
 const emit = defineEmits<GrDashboardToolbarEmits>()
 
 defineSlots<{
+  /** Группа слева, перед растягивающейся серединой. */
   start?: () => unknown
+  /** Середина панели: занимает всё свободное место. */
   default?: () => unknown
+  /** Хвост справа, после кнопок сброса и режима. */
   end?: () => unknown
 }>()
 

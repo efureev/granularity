@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest'
 import { mount } from '@vue/test-utils'
+import { h } from 'vue'
 
 import { announced, granularityGlobal, resetGranularityDom } from '@feugene/granularity/testing'
 
@@ -78,5 +79,28 @@ describe('grDashboardPalette', () => {
 
     expect(wrapper.find('ul').exists()).toBe(false)
     expect(wrapper.text()).toBeTruthy()
+  })
+
+  /**
+   * Своя плитка рисует свою кнопку. Без `add` из слота она звала бы свой
+   * обработчик: эмит `add` не случался, и «добавлено» скринридеру не звучало.
+   */
+  it('слот `#item` отдаёт `add`: эмит и объявление те же, что у встроенной кнопки', async () => {
+    const wrapper = mount(GrDashboardPalette, {
+      props: { items },
+      global: granularityGlobal(),
+      slots: {
+        item: ({ item, add }: { item: GrDashboardPaletteItem, add: () => void }) =>
+          h('button', { 'data-own-add': item.id, 'onClick': add }, item.title),
+      },
+    })
+
+    await wrapper.get('[data-own-add="sales"]').trigger('click')
+
+    expect(wrapper.emitted('add')?.[0]).toEqual([items[0]])
+    expect(await announced()).toContain('Продажи')
+
+    await wrapper.get('[data-own-add="traffic"]').trigger('click')
+    expect(wrapper.emitted('add')).toHaveLength(1)
   })
 })

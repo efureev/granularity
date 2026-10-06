@@ -32,6 +32,10 @@ defineOptions({ name: 'GrDashboardPalette', inheritAttrs: false })
 export interface GrDashboardPaletteProps {
   /** Каталог доступных виджетов. */
   items: GrDashboardPaletteItem[]
+  /**
+   * Ступень размера: кегль плиток и кнопок добавления. По умолчанию `md`; берётся из
+   * `GrConfigProvider`.
+   */
   size?: GrDashboardPaletteSize
   /**
    * Плитку можно перетащить на сетку.
@@ -41,11 +45,14 @@ export interface GrDashboardPaletteProps {
    * брошенное — не слушающая покажет подложку и ничего не сделает.
    */
   draggable?: boolean
+  /** Каталог недоступен: кнопки «Добавить» выключены, плитки не перетаскиваются. */
   disabled?: boolean
+  /** Имя списка плиток. Не задано — из локали («Widget catalog»). */
   ariaLabel?: string
 }
 
 export interface GrDashboardPaletteEmits {
+  /** Нажата кнопка «Добавить»: положить виджет в раскладку — дело приложения. */
   (e: 'add', item: GrDashboardPaletteItem): void
 }
 
@@ -67,9 +74,16 @@ defineSlots<{
     item: GrDashboardPaletteItem
     dragging: boolean
     transferProps: { onPointerdown: (event: PointerEvent) => void }
+    /**
+     * Добавить эту плитку — то же, что встроенная кнопка: эмит `add` и
+     * объявление «добавлено» скринридеру; у выключенной ничего не делает.
+     * Своя кнопка «Добавить» зовёт его — она единственный клавиатурный путь.
+     */
+    add: () => void
   }) => unknown
   /** Что рисуется под курсором во время переноса. */
   ghost?: (props: { item: GrDashboardPaletteItem }) => unknown
+  /** Что показать, когда каталог пуст. */
   empty?: () => unknown
 }>()
 
@@ -153,6 +167,7 @@ function measure(item: GrDashboardPaletteItem): string | undefined {
           :item="item"
           :dragging="carried?.id === item.id"
           :transfer-props="transferPropsFor(item)"
+          :add="() => add(item)"
         >
           <span
             :class="[
