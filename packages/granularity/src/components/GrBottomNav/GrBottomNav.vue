@@ -52,7 +52,12 @@ export type GrBottomNavItem = {
  * подложкой и весом подписи тоже.
  */
 export interface GrBottomNavProps {
+  /** `value` активного пункта (`v-model`): он получает `aria-current="page"` и подсветку. */
   modelValue: string
+  /**
+   * Разделы панели: подпись, `value`, иконка, счётчик, `href` или `to`. Обычно
+   * три–пять ключевых разделов в зоне большого пальца.
+   */
   items: GrBottomNavItem[]
   /** Компонент ссылки для пунктов с `to`: `RouterLink`, `NuxtLink`, `Link` Inertia. */
   as?: string | Component
@@ -70,6 +75,7 @@ export interface GrBottomNavProps {
 }
 
 export interface GrBottomNavEmits {
+  /** Выбран пункт — его `value`. Выключенный пункт событие не шлёт. */
   (e: 'update:modelValue', value: string): void
 }
 

@@ -25,6 +25,10 @@ export type { GrBadgeWrapPlacement, GrBadgeWrapTone } from './grBadgeWrapStyles'
  * поэтому рядом с бейджем идёт визуально скрытая подпись.
  */
 export interface GrBadgeWrapProps {
+  /**
+   * Значение счётчика: число или короткая строка («NEW»). Не задано — счётчика
+   * нет; ноль скрыт, пока не включён `showZero`.
+   */
   value?: string | number
   /** Точка вместо числа: чистая декорация, если не задан `ariaLabel`. */
   dot?: boolean
@@ -32,7 +36,12 @@ export interface GrBadgeWrapProps {
   max?: number
   /** Показывать ли нулевое значение. По умолчанию ноль скрыт. */
   showZero?: boolean
+  /** Цвет метки из шкалы тонов: заливка — роль тона, текст — её `-fg`. По умолчанию `danger`. */
   tone?: GrBadgeWrapTone
+  /**
+   * Угол, в котором висит метка. По умолчанию `top-right`. Сдвиг от угла —
+   * переменные `--gr-badge-wrap-offset-x/-y`.
+   */
   placement?: GrBadgeWrapPlacement
   /** Подпись счётчика для скринридера. Не задана — берётся из локали. */
   ariaLabel?: string

@@ -45,6 +45,7 @@ export interface GrBreadcrumbsProps {
   as?: GrBreadcrumbsLinkComponent
   /** Разделитель между пунктами. Декоративен: диктору не читается. */
   separator?: string
+  /** Кегль пути и его ссылок — шкала общая с `GrLink`. По умолчанию `md`; берётся из `GrConfigProvider`. */
   size?: GrBreadcrumbsSize
   /**
    * С какого числа пунктов схлопывать середину в «…». `0`/не задано — показывать

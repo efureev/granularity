@@ -19,24 +19,50 @@ import {
 } from './grButtonStyles'
 
 export interface GrButtonProps {
+  /**
+   * Вес кнопки: `primary` — заливка тона, `secondary` — мягкая подложка с
+   * рамкой, `outline` — только рамка, `ghost` — только текст, `ghost-border` —
+   * текст, рамка которого проявляется под указателем. По умолчанию `primary`;
+   * глобально — `componentDefaults`.
+   */
   variant?: GrButtonVariant
+  /**
+   * Смысл действия: цвет заливки, рамки и текста. `danger` — для необратимого,
+   * `neutral` — для второстепенного. По умолчанию `primary`; внутри
+   * `GrButtonGroup` — тон группы.
+   */
   tone?: GrButtonTone
+  /** Высота и кегль по шкале контролов. По умолчанию `md`; берётся из группы и `GrConfigProvider`. */
   size?: GrButtonSize
+  /**
+   * Действие выполняется: спиннер на месте префикса, `aria-busy` и перехват
+   * клика. Кнопка при этом остаётся в фокусе — нативный `disabled` не ставится.
+   */
   loading?: boolean
   /** i18n: что именно грузится. `aria-busy` сам по себе часть AT не объявляет. */
   loadingText?: string
+  /**
+   * Действие недоступно: нативный `disabled` у `<button>`, у кнопки-ссылки —
+   * `aria-disabled` и снятый адрес. Цвета — из токенов, без прозрачности.
+   */
   disabled?: boolean
+  /** Равные стороны — кнопка из одной иконки. Без текста ей нужен `ariaLabel`. */
   square?: boolean
   /** Кнопка на всю ширину контейнера. */
   block?: boolean
+  /** Нативный `type` у `<button>`. По умолчанию `button`: кнопка в форме не отправляет её сама. */
   type?: 'button' | 'submit' | 'reset'
+  /** Доступное имя кнопки, когда текста нет: `square` с одной иконкой без него безымянна. */
   ariaLabel?: string
   /** Полиморфизм: кастомный корневой тег/компонент (например, RouterLink). */
   as?: string | Component
   /** Рендерит кнопку как `<a href>` (если не задан `as`). */
   href?: string
+  /** `target` кнопки-ссылки. С `_blank` сам добавляется `rel="noopener noreferrer"`. */
   target?: string
+  /** `rel` кнопки-ссылки. Без него при `target="_blank"` ставится `noopener noreferrer`. */
   rel?: string
+  /** Открывать ссылку в новой вкладке: `target="_blank"` и `rel="noopener noreferrer"`. */
   external?: boolean
 }
 

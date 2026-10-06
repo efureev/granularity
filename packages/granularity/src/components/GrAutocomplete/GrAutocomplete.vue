@@ -71,6 +71,7 @@ export interface GrAutocompleteProps<TValue extends GrAutocompleteValue = string
    * в ответ на событие `search`.
    */
   options?: GrAutocompleteOptionOrGroup<TValue>[]
+  /** Выбор нескольких значений: модель — массив, выбранное стоит в поле чипами. По умолчанию `false`. */
   multiple?: boolean
   /**
    * Вид чипов выбранных значений в режиме `multiple`. Рисует их `GrChip`, но
@@ -79,9 +80,16 @@ export interface GrAutocompleteProps<TValue extends GrAutocompleteValue = string
    * `chipSizeForBadgeScale`.
    */
   tagTone?: GrBadgeTone
+  /** Чипы выбранного залиты тоном, а не стоят на мягкой подложке — для пёстрого фона. */
   tagDark?: boolean
+  /** Кегль чипов по бейджевой шкале. По умолчанию `sm`: чип живёт внутри поля, а не в тексте. */
   tagSize?: GrBadgeSize
+  /** Форма чипов: `round` — таблетка, `semi` — ярлык, `square` — штамп. По умолчанию `round`. */
   tagRadius?: GrBadgeRadius
+  /**
+   * Поле недоступно: панель не открывается, опции не выбираются, чипы не
+   * снимаются. Наследуется от `GrFormField`.
+   */
   disabled?: boolean
   /** Только для чтения: значение видно и уходит в форму, но не редактируется. */
   readonly?: boolean
@@ -89,8 +97,11 @@ export interface GrAutocompleteProps<TValue extends GrAutocompleteValue = string
   invalid?: boolean
   /** Обязательное поле (`aria-required`). */
   required?: boolean
+  /** Высота и кегль поля по шкале контролов. По умолчанию `md`; берётся из `GrConfigProvider`. */
   size?: GrAutocompleteSize
+  /** Подсказка в пустом поле. В `multiple` с выбранными значениями прячется: место занимают чипы. */
   placeholder?: string
+  /** Доступное имя поля, когда видимой подписи нет. Внутри `GrFormField` имя даёт его `label`. */
   ariaLabel?: string
   /** Кнопка очистки выбранного значения/запроса. */
   clearable?: boolean
@@ -136,7 +147,9 @@ export interface GrAutocompleteProps<TValue extends GrAutocompleteValue = string
   virtual?: boolean
   /** i18n-тексты состояний панели / aria. */
   loadingText?: string
+  /** Текст панели, когда по запросу ничего не нашлось. i18n: fallback `gr.autocomplete.noResults`. */
   noResultsText?: string
+  /** Имя кнопки очистки (`aria-label`). i18n: fallback `gr.common.clear`. */
   clearLabel?: string
   /**
    * Контролируемое состояние панели (`v-model:open`). Без пропа панель ведёт
@@ -150,14 +163,26 @@ export interface GrAutocompleteProps<TValue extends GrAutocompleteValue = string
    * (`docs/form-controls.md`).
    */
   prefixMinWidth?: string
+  /** Верхняя граница ширины аддона `prefix`: содержимое шире обрезается. */
   prefixMaxWidth?: string
+  /** Нижняя граница ширины аддона `suffix`. По умолчанию — ширина аддона для ступени размера. */
   suffixMinWidth?: string
+  /** Верхняя граница ширины аддона `suffix`: содержимое шире обрезается. */
   suffixMaxWidth?: string
+  /**
+   * Жёсткая ширина аддона `prefix` (`prefixMaxWidth` → `prefixMinWidth` →
+   * дефолт) — когда аддоны соседних полей обязаны совпасть.
+   */
   prefixFixed?: boolean
+  /**
+   * Жёсткая ширина аддона `suffix` (`suffixMaxWidth` → `suffixMinWidth` →
+   * дефолт) — когда аддоны соседних полей обязаны совпасть.
+   */
   suffixFixed?: boolean
 }
 
 export interface GrAutocompleteEmits<TValue extends GrAutocompleteValue = string> {
+  /** Новое значение (`v-model`): строка или, в `multiple`, массив. */
   (e: 'update:modelValue', value: GrAutocompleteModelValue<TValue>): void
   /** Дебаунснутый поисковый запрос — точка входа для удалённой загрузки опций. */
   (e: 'search', query: string): void
@@ -169,7 +194,9 @@ export interface GrAutocompleteEmits<TValue extends GrAutocompleteValue = string
   (e: 'update:open', value: boolean): void
   /** Значение снято кнопкой очистки; только при `clearable`. */
   (e: 'clear'): void
+  /** Фокус вошёл в контрол. Переход между полем и его панелью событием не считается. */
   (e: 'focus', event: FocusEvent): void
+  /** Фокус ушёл из контрола — из поля и из панели вместе. */
   (e: 'blur', event: FocusEvent): void
 }
 

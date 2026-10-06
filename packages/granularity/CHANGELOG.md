@@ -36,6 +36,14 @@ to [Semantic Versioning](https://semver.org/).
   чертой. Теперь в однострочном режиме голова, разделители и «…» держат свою
   ширину, а ужимается только последний пункт — его подпись обрезается
   многоточием. Ссылка пути тоже обрезает подпись, а не вылезает за край пункта.
+- Появились описания у пропов, которые в API, подсказках IDE и на портале были
+  пустыми: у `GrButton` — `variant`, `tone`, `size`, `loading`, `disabled`,
+  `square`, `type`, `ariaLabel`, `target`, `rel`, `external`; у `GrBadgeWrap` —
+  `value`, `tone`, `placement`; у `GrBottomNav` — `modelValue`, `items`; у
+  `GrBreadcrumbs` — `size`; у `GrAutocomplete` — `multiple`, `tagDark`,
+  `tagSize`, `tagRadius`, `disabled`, `size`, `placeholder`, `ariaLabel`,
+  `noResultsText`, `clearLabel`, ширин аддонов и событий `update:modelValue`,
+  `focus`, `blur`.
 
 ## [v1.0.8] 2026-10-06
 

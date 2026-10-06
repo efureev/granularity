@@ -229,7 +229,7 @@
           },
           {
             "name": "multiple",
-            "description": "",
+            "description": "Выбор нескольких значений: модель — массив, выбранное стоит в поле чипами. По умолчанию `false`.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
@@ -243,28 +243,28 @@
           },
           {
             "name": "tagDark",
-            "description": "",
+            "description": "Чипы выбранного залиты тоном, а не стоят на мягкой подложке — для пёстрого фона.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
           },
           {
             "name": "tagSize",
-            "description": "",
+            "description": "Кегль чипов по бейджевой шкале. По умолчанию `sm`: чип живёт внутри поля, а не в тексте.",
             "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
             "required": false,
             "default": "\"sm\""
           },
           {
             "name": "tagRadius",
-            "description": "",
+            "description": "Форма чипов: `round` — таблетка, `semi` — ярлык, `square` — штамп. По умолчанию `round`.",
             "type": "GrBadgeRadius | undefined",
             "required": false,
             "default": "\"round\""
           },
           {
             "name": "disabled",
-            "description": "",
+            "description": "Поле недоступно: панель не открывается, опции не выбираются, чипы не снимаются. Наследуется от `GrFormField`.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
@@ -292,21 +292,21 @@
           },
           {
             "name": "size",
-            "description": "",
+            "description": "Высота и кегль поля по шкале контролов. По умолчанию `md`; берётся из `GrConfigProvider`.",
             "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "placeholder",
-            "description": "",
+            "description": "Подсказка в пустом поле. В `multiple` с выбранными значениями прячется: место занимают чипы.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "ariaLabel",
-            "description": "",
+            "description": "Доступное имя поля, когда видимой подписи нет. Внутри `GrFormField` имя даёт его `label`.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
@@ -397,14 +397,14 @@
           },
           {
             "name": "noResultsText",
-            "description": "",
+            "description": "Текст панели, когда по запросу ничего не нашлось. i18n: fallback `gr.autocomplete.noResults`.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "clearLabel",
-            "description": "",
+            "description": "Имя кнопки очистки (`aria-label`). i18n: fallback `gr.common.clear`.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
@@ -432,35 +432,35 @@
           },
           {
             "name": "prefixMaxWidth",
-            "description": "",
+            "description": "Верхняя граница ширины аддона `prefix`: содержимое шире обрезается.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "suffixMinWidth",
-            "description": "",
+            "description": "Нижняя граница ширины аддона `suffix`. По умолчанию — ширина аддона для ступени размера.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "suffixMaxWidth",
-            "description": "",
+            "description": "Верхняя граница ширины аддона `suffix`: содержимое шире обрезается.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "prefixFixed",
-            "description": "",
+            "description": "Жёсткая ширина аддона `prefix` (`prefixMaxWidth` → `prefixMinWidth` → дефолт) — когда аддоны соседних полей обязаны совпасть.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
           },
           {
             "name": "suffixFixed",
-            "description": "",
+            "description": "Жёсткая ширина аддона `suffix` (`suffixMaxWidth` → `suffixMinWidth` → дефолт) — когда аддоны соседних полей обязаны совпасть.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
@@ -506,7 +506,7 @@
         "items": [
           {
             "name": "update:modelValue",
-            "description": "",
+            "description": "Новое значение (`v-model`): строка или, в `multiple`, массив.",
             "type": "[GrAutocompleteModelValue<TValue>]",
             "signature": "(e: \"update:modelValue\", value: GrAutocompleteModelValue<TValue>): void"
           },
@@ -542,13 +542,13 @@
           },
           {
             "name": "focus",
-            "description": "",
+            "description": "Фокус вошёл в контрол. Переход между полем и его панелью событием не считается.",
             "type": "[FocusEvent]",
             "signature": "(e: \"focus\", event: FocusEvent): void"
           },
           {
             "name": "blur",
-            "description": "",
+            "description": "Фокус ушёл из контрола — из поля и из панели вместе.",
             "type": "[FocusEvent]",
             "signature": "(e: \"blur\", event: FocusEvent): void"
           }
@@ -743,14 +743,14 @@
         "items": [
           {
             "name": "placement",
-            "description": "",
+            "description": "Угол, в котором висит метка. По умолчанию `top-right`. Сдвиг от угла — переменные `--gr-badge-wrap-offset-x/-y`.",
             "type": "\"top-right\" | \"top-left\" | \"bottom-right\" | \"bottom-left\" | undefined",
             "required": false,
             "default": "\"top-right\""
           },
           {
             "name": "tone",
-            "description": "",
+            "description": "Цвет метки из шкалы тонов: заливка — роль тона, текст — её `-fg`. По умолчанию `danger`.",
             "type": "\"primary\" | \"neutral\" | \"success\" | \"warning\" | \"danger\" | \"info\" | \"slate\" | \"azure\" | undefined",
             "required": false,
             "default": "\"danger\""
@@ -764,7 +764,7 @@
           },
           {
             "name": "value",
-            "description": "",
+            "description": "Значение счётчика: число или короткая строка («NEW»). Не задано — счётчика нет; ноль скрыт, пока не включён `showZero`.",
             "type": "string | number | undefined",
             "required": false,
             "default": "undefined"
@@ -871,13 +871,13 @@
           },
           {
             "name": "modelValue",
-            "description": "",
+            "description": "`value` активного пункта (`v-model`): он получает `aria-current=\"page\"` и подсветку.",
             "type": "string",
             "required": true
           },
           {
             "name": "items",
-            "description": "",
+            "description": "Разделы панели: подпись, `value`, иконка, счётчик, `href` или `to`. Обычно три–пять ключевых разделов в зоне большого пальца.",
             "type": "GrBottomNavItem[]",
             "required": true
           }
@@ -927,7 +927,7 @@
         "items": [
           {
             "name": "size",
-            "description": "",
+            "description": "Кегль пути и его ссылок — шкала общая с `GrLink`. По умолчанию `md`; берётся из `GrConfigProvider`.",
             "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
             "required": false,
             "default": "undefined"
@@ -1057,49 +1057,49 @@
         "items": [
           {
             "name": "disabled",
-            "description": "",
+            "description": "Действие недоступно: нативный `disabled` у `<button>`, у кнопки-ссылки — `aria-disabled` и снятый адрес. Цвета — из токенов, без прозрачности.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
           },
           {
             "name": "type",
-            "description": "",
+            "description": "Нативный `type` у `<button>`. По умолчанию `button`: кнопка в форме не отправляет её сама.",
             "type": "\"button\" | \"submit\" | \"reset\" | undefined",
             "required": false,
             "default": "\"button\""
           },
           {
             "name": "tone",
-            "description": "",
+            "description": "Смысл действия: цвет заливки, рамки и текста. `danger` — для необратимого, `neutral` — для второстепенного. По умолчанию `primary`; внутри `GrButtonGroup` — тон группы.",
             "type": "\"primary\" | \"neutral\" | \"success\" | \"warning\" | \"danger\" | \"info\" | \"slate\" | \"azure\" | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "variant",
-            "description": "",
+            "description": "Вес кнопки: `primary` — заливка тона, `secondary` — мягкая подложка с рамкой, `outline` — только рамка, `ghost` — только текст, `ghost-border` — текст, рамка которого проявляется под указателем. По умолчанию `primary`; глобально — `componentDefaults`.",
             "type": "GrButtonVariant | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "size",
-            "description": "",
+            "description": "Высота и кегль по шкале контролов. По умолчанию `md`; берётся из группы и `GrConfigProvider`.",
             "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "ariaLabel",
-            "description": "",
+            "description": "Доступное имя кнопки, когда текста нет: `square` с одной иконкой без него безымянна.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "loading",
-            "description": "",
+            "description": "Действие выполняется: спиннер на месте префикса, `aria-busy` и перехват клика. Кнопка при этом остаётся в фокусе — нативный `disabled` не ставится.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
@@ -1113,7 +1113,7 @@
           },
           {
             "name": "square",
-            "description": "",
+            "description": "Равные стороны — кнопка из одной иконки. Без текста ей нужен `ariaLabel`.",
             "type": "boolean | undefined",
             "required": false,
             "default": "undefined"
@@ -1141,21 +1141,21 @@
           },
           {
             "name": "target",
-            "description": "",
+            "description": "`target` кнопки-ссылки. С `_blank` сам добавляется `rel=\"noopener noreferrer\"`.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "rel",
-            "description": "",
+            "description": "`rel` кнопки-ссылки. Без него при `target=\"_blank\"` ставится `noopener noreferrer`.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "external",
-            "description": "",
+            "description": "Открывать ссылку в новой вкладке: `target=\"_blank\"` и `rel=\"noopener noreferrer\"`.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
