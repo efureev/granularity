@@ -148,6 +148,16 @@ describe('GrProgressBar — подпись значения', () => {
     expect(wrapper.find(VALUE).exists()).toBe(false)
     expect(wrapper.get(TRACK).attributes('aria-valuetext')).toBe('45 MB')
   })
+
+  // «100%» — три цифры и знак процента, а знак шире цифры: при `4ch` подпись на
+  // ста процентах выходила шире резерва, и трек этой полосы становился короче
+  // соседних — в стопке полос правые края разъезжались.
+  it('резервирует место под «100%», чтобы трек не сжимался на завершении', () => {
+    const wrapper = mount(GrProgressBar, { props: { value: 100, showValue: true } })
+
+    expect(wrapper.get(VALUE).text()).toBe('100%')
+    expect(wrapper.get(VALUE).classes()).toContain('min-w-[5ch]')
+  })
 })
 
 describe('GrProgressBar — буфер', () => {

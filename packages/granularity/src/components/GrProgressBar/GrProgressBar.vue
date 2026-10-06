@@ -124,10 +124,12 @@ const valueLabel = computed(() => valueText.value ?? `${Math.round(safe.value)}%
         :style="indeterminate ? undefined : { width: `${safe}%` }"
       />
     </div>
+    <!-- `5ch`, а не `4ch`: знак процента шире цифры, и «100%» не влезал в резерв —
+         трек завершённой полосы выходил короче соседних. -->
     <span
       v-if="showValue && !indeterminate"
       data-gr-progress-bar-value
-      class="text-[var(--gr-muted-fg)] tabular-nums min-w-[4ch] text-right"
+      class="text-[var(--gr-muted-fg)] tabular-nums min-w-[5ch] text-right"
       :class="valueClassName"
     >{{ valueLabel }}</span>
   </div>
