@@ -15,6 +15,18 @@ export const navbarStickyClass = 'sticky top-0 z-[var(--gr-z-navbar)]'
 export const navbarSideClass = 'flex min-w-0 items-center gap-3'
 
 /**
+ * Зона, которая уступает место (`left`, `center`): не шире остатка и
+ * прокручивается вбок без видимой полосы. Переполненный `left` раньше рисовался
+ * поверх действий справа. Прокрутка, а не обрезка: ссылка за краем остаётся
+ * достижимой — фокус с клавиатуры прокручивает зону к ней. Во всю высоту шапки
+ * (`self-stretch`) — чтобы кольцо фокуса не срезалось сверху и снизу.
+ */
+export const navbarYieldClass = 'self-stretch overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'
+
+/** Действия справа — глобальный интерфейс: не сжимаются никогда. */
+export const navbarActionsClass = 'flex shrink-0 items-center gap-3'
+
+/**
  * Центрировать содержимое относительно панели можно только когда боковые зоны
  * делят остаток поровну: у центра с одним `flex-1` середина считается от
  * остатка, а не от панели, и уезжает вслед за более широким боком.
@@ -22,7 +34,7 @@ export const navbarSideClass = 'flex min-w-0 items-center gap-3'
 export const navbarSideGrowClass = 'flex-1'
 export const navbarRightAlignClass = 'justify-end'
 
-export const navbarCenterClass = 'flex min-w-0 flex-1 items-center justify-center gap-3'
+export const navbarCenterClass = 'flex min-w-0 flex-1 items-center justify-center gap-3 self-stretch overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'
 
 /**
  * Уровни заголовка шапки.

@@ -22,4 +22,11 @@ export const grNavbarExamples: ShowcaseComponentExampleDoc[] = [
     status: 'ready',
     previewKey: 'gr-navbar-title-slot',
   },
+  {
+    id: 'navbar-overflow',
+    title: 'Overfull left zone at 600px',
+    description: 'Разделов в `left` больше, чем помещается: зона уступает место и прокручивается вбок без видимой полосы, а действия справа не сжимаются и не перекрываются.',
+    status: 'ready',
+    previewKey: 'gr-navbar-overflow',
+  },
 ]

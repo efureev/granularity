@@ -10,11 +10,13 @@ import { type GrComponentSize, useGrComponentSize } from '../shared/configContex
 
 import {
   grNavbarRootClass,
+  navbarActionsClass,
   navbarCenterClass,
   navbarRightAlignClass,
   navbarSideClass,
   navbarSideGrowClass,
   navbarTitleClass,
+  navbarYieldClass,
 } from './grNavbarStyles'
 import type { GrNavbarHeadingLevel } from './grNavbarStyles'
 
@@ -110,9 +112,10 @@ const rootClass = computed(() => grNavbarRootClass(props.sticky))
 // вслед за более широким боком. Без неё правая просто прижата к краю.
 const hasCenter = computed(() => Boolean(slots.center))
 
-const sideClass = computed(() => [navbarSideClass, hasCenter.value ? navbarSideGrowClass : ''])
+const sideClass = computed(() => [navbarSideClass, navbarYieldClass, hasCenter.value ? navbarSideGrowClass : ''])
+// Действия справа не сжимаются: при нехватке места уступают `left` и `center`.
 const rightClass = computed(() => [
-  navbarSideClass,
+  navbarActionsClass,
   hasCenter.value ? `${navbarSideGrowClass} ${navbarRightAlignClass}` : 'ml-auto',
 ])
 </script>

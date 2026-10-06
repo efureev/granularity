@@ -757,3 +757,44 @@ test.describe('GrFormField: раскладка без сдвигов', () => {
     expect(await heights()).toEqual(before)
   })
 })
+
+/**
+ * Переполненная зона `left` рисовалась поверх действий справа: «Reports»
+ * ложился на «Search». Действия — глобальный интерфейс и не сжимаются; уступает
+ * `left`, прокручиваясь у своего края.
+ */
+test.describe('GrNavbar: переполненная зона слева', () => {
+  test('не налезает на действия, а действия видны целиком', async ({ page }) => {
+    await page.goto(componentPath('GrNavbar'))
+    const demo = page.locator('[data-demo="navbar-overflow"]')
+    await demo.waitFor()
+    // `elementFromPoint` видит только то, что во вьюпорте.
+    await demo.scrollIntoViewIfNeeded()
+
+    const geometry = await demo.evaluate((root) => {
+      const rect = (selector: string) => root.querySelector(selector)!.getBoundingClientRect()
+      const left = root.querySelector<HTMLElement>('[data-gr-navbar-left]')!
+      const leftRect = left.getBoundingClientRect()
+      // Видимая часть ссылки: зона, которая обрезает переполнение, режет и её.
+      const clipRight = getComputedStyle(left).overflowX === 'visible' ? Number.POSITIVE_INFINITY : leftRect.right
+      const links = [...left.querySelectorAll('nav a')].map(link => Math.min(link.getBoundingClientRect().right, clipRight))
+      const search = rect('[data-demo-search]')
+      const hit = document.elementFromPoint(search.left + 4, search.top + search.height / 2)
+
+      return {
+        visibleLinkRight: Math.max(...links),
+        rightLeft: rect('[data-gr-navbar-right]').left,
+        search,
+        navbar: rect('[data-gr-navbar]'),
+        searchOnTop: Boolean(hit?.closest('[data-demo-search]')),
+        leftScrolls: left.scrollWidth > left.clientWidth,
+      }
+    })
+
+    expect(geometry.visibleLinkRight).toBeLessThanOrEqual(geometry.rightLeft)
+    expect(geometry.leftScrolls).toBe(true)
+    expect(geometry.searchOnTop).toBe(true)
+    expect(geometry.search.left).toBeGreaterThanOrEqual(geometry.rightLeft)
+    expect(geometry.search.right).toBeLessThanOrEqual(geometry.navbar.right)
+  })
+})

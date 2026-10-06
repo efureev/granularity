@@ -367,6 +367,7 @@ export const demoPathByPreviewKey = {
   'gr-navbar-actions-slot': 'components/gr-navbar/GrNavbarActionsDemo.vue',
   'gr-navbar-menu-toggle': 'components/gr-navbar/GrNavbarMenuToggleDemo.vue',
   'gr-navbar-title-slot': 'components/gr-navbar/GrNavbarTitleSlotDemo.vue',
+  'gr-navbar-overflow': 'components/gr-navbar/GrNavbarOverflowDemo.vue',
   'gr-number-input-alignment-addons': 'components/gr-number-input/GrNumberInputAlignmentDemo.vue',
   'gr-number-input-controls': 'components/gr-number-input/GrNumberInputControlsDemo.vue',
   'gr-number-input-decimal-separator': 'components/gr-number-input/GrNumberInputSeparatorDemo.vue',

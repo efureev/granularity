@@ -5,6 +5,16 @@ All notable changes to the [`@feugene/granularity`](.) package are documented in
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Fixed
+
+- **Переполненный `left` у `GrNavbar` больше не налезает на действия.** На
+  600px четыре раздела в `left` рисовались поверх «Search» справа. Теперь
+  действия справа не сжимаются никогда, а `left` и `center` не шире остатка и
+  прокручиваются вбок без видимой полосы: ссылка за краем остаётся достижимой
+  с клавиатуры. Правило описано на странице компонента.
+
 ## [v1.0.12] 2026-10-07
 
 ### Added

@@ -129,3 +129,26 @@ describe('GrNavbar — заголовок, зоны и прилипание', ()
     expect(plain.get('[data-gr-navbar-right]').classes()).toContain('ml-auto')
   })
 })
+
+/**
+ * Переполненный `left` рисовался поверх действий. Геометрию меряет
+ * `apps/showcase/e2e/geometry.spec.ts`; здесь — классы, от которых она зависит.
+ */
+describe('GrNavbar — переполнение зон', () => {
+  it('действия справа не сжимаются, `left` уступает и прокручивается вбок', () => {
+    const wrapper = mount(GrNavbar, { props: { title: 'Ledger' }, slots: { left: '<a href="#">Overview</a>', default: '<button>Search</button>' } })
+    const left = wrapper.get('[data-gr-navbar-left]').classes()
+    const right = wrapper.get('[data-gr-navbar-right]').classes()
+
+    expect(left).toEqual(expect.arrayContaining(['min-w-0', 'overflow-x-auto', 'self-stretch']))
+    expect(right).toContain('shrink-0')
+    expect(right).not.toContain('min-w-0')
+  })
+
+  it('центральная зона тоже уступает, а не налезает', () => {
+    const wrapper = mount(GrNavbar, { slots: { center: '<input>', default: '<button>Search</button>' } })
+
+    expect(wrapper.get('[data-gr-navbar-center]').classes()).toEqual(expect.arrayContaining(['min-w-0', 'overflow-x-auto']))
+    expect(wrapper.get('[data-gr-navbar-right]').classes()).toContain('shrink-0')
+  })
+})

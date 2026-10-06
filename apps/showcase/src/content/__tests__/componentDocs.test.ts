@@ -194,7 +194,7 @@ describe('component docs metadata', () => {
     expect(bottomNavDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(bottomNavDoc.examples.every(example => example.previewKey?.startsWith('gr-bottom-nav'))).toBe(true)
 
-    expect(navbarDoc.examples).toHaveLength(3)
+    expect(navbarDoc.examples).toHaveLength(4)
     expect(navbarDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(navbarDoc.examples.every(example => example.previewKey?.startsWith('gr-navbar'))).toBe(true)
 
