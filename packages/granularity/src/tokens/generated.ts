@@ -3032,7 +3032,7 @@ export const grComponentTokens: GrComponentToken[] = [
     "owner": "GrProgressBar",
     "name": "--gr-progress-neutral-bg",
     "kind": "theme",
-    "default": "var(--gr-secondary)",
+    "default": "var(--gr-muted-fg)",
     "description": "Заливка полосы тона `neutral`."
   },
   {

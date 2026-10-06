@@ -740,7 +740,7 @@ floating-компоненты не выходят по построению (v-c
 | Токен | Откуда | По умолчанию | Назначение |
 | --- | --- | --- | --- |
 | `--gr-progress-bg` | тема компонента | var(--gr-primary) | Заливка полосы прогресса по умолчанию. |
-| `--gr-progress-neutral-bg` | тема компонента | var(--gr-secondary) | Заливка полосы тона `neutral`. |
+| `--gr-progress-neutral-bg` | тема компонента | var(--gr-muted-fg) | Заливка полосы тона `neutral`. |
 | `--gr-progress-success-bg` | тема компонента | var(--gr-success) | Заливка полосы тона `success`. |
 | `--gr-progress-warning-bg` | тема компонента | var(--gr-warning) | Заливка полосы тона `warning`. |
 | `--gr-progress-danger-bg` | тема компонента | var(--gr-danger) | Заливка полосы тона `danger`. |

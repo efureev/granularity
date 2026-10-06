@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest'
 
 import GrConfigProvider from '../../GrConfigProvider/GrConfigProvider.vue'
 import GrProgressCircle from '../GrProgressCircle.vue'
+import { grProgressCircleArcColor } from '../grProgressCircleStyles'
 
 function mountCircle(props: Record<string, unknown> = {}, slots = {}) {
   return mount(GrProgressCircle, { props: { ariaLabel: 'Прогресс', ...props }, slots })
@@ -172,5 +173,13 @@ describe('GrProgressCircle', () => {
       slots: { default: () => h(GrProgressCircle, { value: 40, tone: 'info', ariaLabel: 'П' }) },
     })
     expect(localWins.get('[data-gr-progress-circle]').attributes('data-tone')).toBe('info')
+  })
+})
+
+describe('GrProgressCircle — нейтральный тон', () => {
+  it('дуга не сливается с дорожкой: запасной цвет — `--gr-muted-fg`', () => {
+    // Дорожка — `--gr-muted`; прежний запасной `--gr-secondary` на тёмной теме
+    // с ней совпадал, и нейтральная дуга пропадала целиком.
+    expect(grProgressCircleArcColor('neutral')).toBe('var(--gr-progress-neutral-bg,var(--gr-muted-fg))')
   })
 })

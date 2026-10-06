@@ -1,6 +1,6 @@
 :root {
   --gr-progress-bg: var(--gr-primary);
-  --gr-progress-neutral-bg: var(--gr-secondary);
+  --gr-progress-neutral-bg: var(--gr-muted-fg);
   --gr-progress-success-bg: var(--gr-success);
   --gr-progress-warning-bg: var(--gr-warning);
   --gr-progress-danger-bg: var(--gr-danger);

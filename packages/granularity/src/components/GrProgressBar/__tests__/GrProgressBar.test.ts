@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs'
+import { fileURLToPath } from 'node:url'
 import { mount } from '@vue/test-utils'
 import { defineComponent } from 'vue'
 import { describe, expect, it, vi } from 'vitest'
@@ -255,5 +257,21 @@ describe('GrProgressBar — обязательный проп не доехал'
     expect(warn.mock.calls.flat().join('\n')).toContain('обязательный проп `value`')
 
     warn.mockRestore()
+  })
+})
+
+describe('GrProgressBar — нейтральный тон', () => {
+  // Заливка `--gr-secondary` совпадала с дорожкой `--gr-muted`: на тёмной теме
+  // это один и тот же цвет, и нейтральная полоса (и дуга `GrProgressCircle`)
+  // пропадала целиком. Нейтральная заливка — приглушённый текст, как у
+  // неопределённого прогресса под `reduce`.
+  it('заливка — `--gr-muted-fg`, а не цвет дорожки', () => {
+    expect(grProgressBarFillClass('neutral')).toContain('var(--gr-muted-fg)')
+    expect(grProgressBarFillClass('neutral')).not.toContain('--gr-secondary')
+
+    for (const theme of ['light', 'dark']) {
+      const css = readFileSync(fileURLToPath(new URL(`../themes/${theme}.css`, import.meta.url)), 'utf8')
+      expect(css, theme).toContain('--gr-progress-neutral-bg: var(--gr-muted-fg);')
+    }
   })
 })

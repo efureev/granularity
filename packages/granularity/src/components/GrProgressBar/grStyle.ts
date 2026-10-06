@@ -41,7 +41,8 @@ function withVar(token: string): string {
 
 const toneVars: Record<GrProgressBarTone, string> = {
   primary: 'var(--gr-progress-bg,var(--gr-primary))',
-  neutral: 'var(--gr-progress-neutral-bg,var(--gr-secondary))',
+  // Не `--gr-secondary`: на тёмной теме он совпадает с дорожкой `--gr-muted`.
+  neutral: 'var(--gr-progress-neutral-bg,var(--gr-muted-fg))',
   success: 'var(--gr-progress-success-bg,var(--gr-success))',
   warning: 'var(--gr-progress-warning-bg,var(--gr-warning))',
   danger: 'var(--gr-progress-danger-bg,var(--gr-danger))',
