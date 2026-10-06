@@ -11,5 +11,6 @@ export default defineConfig({
     // поднимается в jsdom, команды идут, разбор по схеме работает.
     environment: 'jsdom',
     include: ['src/**/*.{test,spec}.{ts,tsx}'],
+    setupFiles: ['./src/__tests__/setup.ts'],
   },
 })
