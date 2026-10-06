@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, inject, ref, watch } from 'vue'
+import { computed, inject, nextTick, onMounted, ref, watch } from 'vue'
 
 import GrSkeleton from '../GrSkeleton/GrSkeleton.vue'
 import { useGrComponentProp, useGrComponentSize } from '../shared/configContext'
@@ -194,6 +194,32 @@ function onLoad(kind: 'primary' | 'fallback'): void {
     primaryState.value = 'loaded'
   else fallbackState.value = 'loaded'
 }
+
+/**
+ * Картинка, решившаяся раньше, чем её начали слушать.
+ *
+ * После серверного рендера `<img>` грузится до того, как страница оживает, и
+ * `load` или `error` приходят, когда обработчиков ещё нет. Без этой сверки
+ * аватар навсегда оставался скелетом над готовой картинкой, а битая ссылка не
+ * доходила до `fallbackSrc` и инициалов. `complete` с нулевой шириной — отказ.
+ */
+const imageEl = ref<HTMLImageElement | null>(null)
+
+function syncSettledImage(): void {
+  const image = imageEl.value
+  if (!image?.complete)
+    return
+  const kind = isFallbackActive.value ? 'fallback' : 'primary'
+  if (image.naturalWidth > 0)
+    onLoad(kind)
+  else
+    onError(kind)
+}
+
+onMounted(syncSettledImage)
+watch(activeSrc, () => {
+  void nextTick(syncSettledImage)
+})
 </script>
 
 <template>
@@ -216,6 +242,7 @@ function onLoad(kind: 'primary' | 'fallback'): void {
       <img
         v-if="activeSrc"
         :key="activeSrc"
+        ref="imageEl"
         data-gr-avatar-image
         :src="activeSrc"
         :alt="accessibleName"

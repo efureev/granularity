@@ -1,6 +1,6 @@
-import { mount } from '@vue/test-utils'
-import { defineComponent } from 'vue'
-import { describe, expect, it } from 'vitest'
+import { flushPromises, mount } from '@vue/test-utils'
+import { defineComponent, nextTick } from 'vue'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import GrConfigProvider from '../../GrConfigProvider/GrConfigProvider.vue'
 import GrAvatar from '../GrAvatar.vue'
@@ -93,6 +93,41 @@ describe('GrAvatar — битая и загружающаяся картинка
 
     await wrapper.get('[data-gr-avatar-image]').trigger('load')
     expect(wrapper.find('[data-gr-avatar-skeleton]').exists()).toBe(false)
+  })
+
+  /**
+   * После серверного рендера `<img>` грузится раньше, чем страница оживает, и
+   * `load` или `error` приходят, когда слушать их ещё некому. Аватар оставался
+   * скелетом над уже готовой картинкой, а битая ссылка не доходила до запасной.
+   */
+  describe('картинка решилась раньше, чем компонент смонтирован', () => {
+    function settled(width: number): void {
+      vi.spyOn(HTMLImageElement.prototype, 'complete', 'get').mockReturnValue(true)
+      vi.spyOn(HTMLImageElement.prototype, 'naturalWidth', 'get').mockReturnValue(width)
+    }
+
+    afterEach(() => {
+      vi.restoreAllMocks()
+    })
+
+    it('загруженная — показывается без события `load`', async () => {
+      settled(80)
+      const wrapper = mount(GrAvatar, { props: { src: '/avatar.png', name: 'Ada Lovelace' } })
+      await nextTick()
+
+      expect(wrapper.find('[data-gr-avatar-skeleton]').exists()).toBe(false)
+      expect(wrapper.get('[data-gr-avatar-image]').classes()).not.toContain('invisible')
+    })
+
+    it('битая — уходит на запасную без события `error`', async () => {
+      settled(0)
+      const wrapper = mount(GrAvatar, { props: { src: '/broken.png', fallbackSrc: '/backup.png', name: 'Ada Lovelace' } })
+      // Цепочка: отказ основной → запасная → отказ запасной → инициалы.
+      await flushPromises()
+
+      expect(wrapper.find('[data-gr-avatar-image]').exists()).toBe(false)
+      expect(wrapper.get('[data-gr-avatar-initials]').text()).toBe('AL')
+    })
   })
 })
 
