@@ -67,5 +67,20 @@ export function commandItemClass(options: { active: boolean, disabled: boolean }
     .join(' ')
 }
 
-export const commandEmptyClass = 'px-4 py-10 text-center text-[length:var(--gr-control-text-sm)] leading-[var(--gr-control-leading-sm)] text-[var(--gr-muted-fg)]'
+/**
+ * Область результатов: список и его состояния. Колонка — чтобы строка состояния
+ * растягивалась на зарезервированную высоту и вставала по её центру.
+ */
+export const commandResultsClass = 'flex flex-col min-h-[var(--gr-command-results-min-height,0px)]'
+
+export const commandListClass = 'overflow-y-auto p-2'
+
+/**
+ * Пустой список не занимает места: его отступы были пустой полосой между полем
+ * и «Ничего не найдено». Сам элемент остаётся — на него ссылается
+ * `aria-controls` поля.
+ */
+export const commandListEmptyClass = 'overflow-hidden'
+
+export const commandEmptyClass = 'flex flex-1 flex-col justify-center px-4 py-10 text-center text-[length:var(--gr-control-text-sm)] leading-[var(--gr-control-leading-sm)] text-[var(--gr-muted-fg)]'
 export const commandFooterClass = 'flex items-center gap-3 border-t border-[var(--gr-brd)] px-4 py-2 text-[length:var(--gr-control-text-2xs)] leading-[var(--gr-control-leading-2xs)] text-[var(--gr-muted-fg)]'

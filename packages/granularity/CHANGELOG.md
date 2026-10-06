@@ -5,6 +5,19 @@ All notable changes to the [`@feugene/granularity`](.) package are documented in
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Fixed
+
+- **Пустая выдача `GrCommandPalette` не оставляет пустой полосы.** Пустой
+  `role="listbox"` держал свои отступы, а резерв высоты, поставленный на список
+  (так делал портал, чтобы окно не схлопывалось), уводил «Nothing found» и слот
+  `#empty` под пустой блок в 224px. Теперь пустой список места не занимает, а
+  список и строка состояния лежат в общей области результатов: её высоту
+  резервирует хук `--gr-command-results-min-height`, и загрузка, «ничего не
+  найдено» и `#empty` встают по центру резерва. `aria-controls` поля по-прежнему
+  указывает на живой список.
+
 ## [v1.0.10] 2026-10-06
 
 ### Fixed

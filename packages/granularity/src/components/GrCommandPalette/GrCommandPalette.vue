@@ -28,6 +28,9 @@ import {
 } from '../shared/hotkey'
 import {
   commandEmptyClass,
+  commandListClass,
+  commandListEmptyClass,
+  commandResultsClass,
   commandFooterClass,
   commandGroupLabelClass,
   commandItemClass,
@@ -566,13 +569,20 @@ defineSlots<{
         </span>
       </div>
 
+      <!--
+        Список и его состояния делят одну область. Потребитель, которому нужно,
+        чтобы окно не схлопывалось между «ищем» и «нашлось», резервирует высоту
+        **области** (`--gr-command-results-min-height`), а не списка: тогда
+        «Ничего не найдено» встаёт по центру резерва, а не под пустой полосой.
+      -->
+      <div data-gr-command-palette-results :class="commandResultsClass">
       <div
         :id="listboxId"
         ref="listEl"
         data-gr-command-palette-list
         data-testid="gr-command-palette-list"
         :data-gr-virtual="virtual ? '' : undefined"
-        class="overflow-y-auto p-2"
+        :class="filteredItems.length ? commandListClass : commandListEmptyClass"
         :style="listStyleWithSpacers"
         role="listbox"
         :aria-label="resolvedAriaLabel"
@@ -669,6 +679,7 @@ defineSlots<{
         <slot v-else name="empty" :query="query">
           {{ resolvedEmptyText }}
         </slot>
+      </div>
       </div>
 
       <div v-if="$slots.footer" data-gr-command-palette-footer :class="commandFooterClass">

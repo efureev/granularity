@@ -2702,6 +2702,13 @@ export const grComponentTokens: GrComponentToken[] = [
     "description": "Максимальная высота списка; дальше список скроллится."
   },
   {
+    "owner": "GrCommandPalette",
+    "name": "--gr-command-results-min-height",
+    "kind": "hook",
+    "default": "0px",
+    "description": "Резерв высоты области результатов — чтобы окно не схлопывалось между «ищем» и «нашлось». Состояние «Ничего не найдено» и загрузка встают по центру резерва."
+  },
+  {
     "owner": "GrDataTable",
     "name": "--gr-datatable-drag-handle",
     "kind": "hook",

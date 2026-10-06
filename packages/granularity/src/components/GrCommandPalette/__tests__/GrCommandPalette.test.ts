@@ -369,3 +369,51 @@ describe('GrCommandPalette — иконка команды', () => {
     expect(wrapper.find('[data-custom-icon]').exists()).toBe(true)
   })
 })
+
+describe('GrCommandPalette: пустая выдача', () => {
+  /**
+   * Пустой список держал свои отступы — полосу между полем и «Ничего не
+   * найдено», — а резерв высоты, поставленный потребителем на список, уводил
+   * сообщение под пустой блок. Список схлопывается, а резерв ставится на
+   * область результатов, где сообщение встаёт по центру.
+   */
+  it.each([
+    ['локальный фильтр', { items }, 'zzz'],
+    ['поиск на сервере без результатов', { items: [], filterable: false }, 'zzz'],
+  ])('%s: сообщение — первый блок после поля, пустой список места не занимает', async (_case, props, query) => {
+    const wrapper = await mountPalette(props)
+
+    await wrapper.get('[data-testid="gr-command-palette-input"]').setValue(query)
+    await nextTick()
+
+    const results = wrapper.get('[data-gr-command-palette-results]')
+    const list = wrapper.get('[data-testid="gr-command-palette-list"]')
+    const status = wrapper.get('[data-testid="gr-command-palette-empty"]')
+
+    expect(list.element.children).toHaveLength(0)
+    expect(list.classes()).not.toContain('p-2')
+    // Поле по-прежнему управляет списком: `aria-controls` указывает на живой узел.
+    expect(wrapper.get('[data-testid="gr-command-palette-input"]').attributes('aria-controls')).toBe(list.attributes('id'))
+    // Сообщение — в той же области, что резерв высоты, и растягивается по нему.
+    expect(status.element.parentElement).toBe(results.element)
+    expect(results.classes()).toContain('min-h-[var(--gr-command-results-min-height,0px)]')
+    expect(status.classes()).toEqual(expect.arrayContaining(['flex-1', 'justify-center']))
+    wrapper.unmount()
+  })
+
+  it('загрузка встаёт туда же', async () => {
+    const wrapper = await mountPalette({ items: [], loading: true })
+    const status = wrapper.get('[data-testid="gr-command-palette-empty"]')
+
+    expect(status.element.parentElement).toBe(wrapper.get('[data-gr-command-palette-results]').element)
+    expect(wrapper.get('[data-testid="gr-command-palette-list"]').classes()).not.toContain('p-2')
+    wrapper.unmount()
+  })
+
+  it('с командами список держит отступы', async () => {
+    const wrapper = await mountPalette()
+
+    expect(wrapper.get('[data-testid="gr-command-palette-list"]').classes()).toContain('p-2')
+    wrapper.unmount()
+  })
+})
