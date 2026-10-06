@@ -262,3 +262,29 @@ describe('GrTree — фокус при уходе строки из виртуа
     outside.remove()
   })
 })
+
+/**
+ * `maxHeight` держал высоту только вместе с `virtual`: обычное дерево вырастало
+ * на всю длину, а `GrJsonViewer` с `max-height="18rem"` выходил 454px.
+ */
+describe('GrTree: maxHeight без virtual', () => {
+  it('корень ограничен по высоте и прокручивается сам, все строки в DOM', () => {
+    const wrapper = mount(GrTree, { props: { data: flatTree(50), nodeKey: 'id', maxHeight: '18rem' }, attachTo: document.body })
+    const root = wrapper.get('[data-gr-tree]')
+    const style = root.attributes('style') ?? ''
+
+    expect(style).toContain('max-height: 18rem')
+    expect(style).toContain('overflow: auto')
+    expect(wrapper.findAll('[data-gr-tree-node]')).toHaveLength(50)
+    wrapper.unmount()
+  })
+
+  it('без maxHeight высота не ограничена', () => {
+    const wrapper = mount(GrTree, { props: { data: flatTree(5), nodeKey: 'id' } })
+    const style = wrapper.get('[data-gr-tree]').attributes('style') ?? ''
+
+    expect(style).not.toContain('max-height')
+    expect(style).not.toContain('overflow')
+    wrapper.unmount()
+  })
+})

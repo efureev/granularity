@@ -250,3 +250,23 @@ describe('GrJsonViewer: раскрытие переживает обновлен
     expect(paths(wrapper)).toContain('$.a')
   })
 })
+
+describe('GrJsonViewer: maxHeight без virtual', () => {
+  it('область просмотра ограничена и прокручивается сама', () => {
+    const value = Object.fromEntries(Array.from({ length: 40 }, (_, index) => [`field${index}`, index]))
+    const wrapper = mount(GrJsonViewer, { props: { value, maxHeight: '18rem' } })
+    const style = wrapper.get('[data-gr-tree]').attributes('style') ?? ''
+
+    expect(style).toContain('max-height: 18rem')
+    expect(style).toContain('overflow: auto')
+    wrapper.unmount()
+  })
+
+  it('панель поиска и раскрытия включена по умолчанию, `searchable: false` её убирает', () => {
+    const shown = mount(GrJsonViewer, { props: { value: { a: 1 } } })
+    const hidden = mount(GrJsonViewer, { props: { value: { a: 1 }, searchable: false } })
+
+    expect(shown.find('[data-gr-json-viewer-toolbar]').exists()).toBe(true)
+    expect(hidden.find('[data-gr-json-viewer-toolbar]').exists()).toBe(false)
+  })
+})

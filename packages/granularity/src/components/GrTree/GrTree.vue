@@ -305,14 +305,23 @@ const renderedRows = computed(() => {
  * доступности их нет, а высота приезжает переменными в том же патче, что и сами
  * строки, — схлопнуться между кадрами нечему.
  */
+/**
+ * `maxHeight` ограничивает дерево своим скроллом всегда, а `virtual` кладёт
+ * поверх окно строк. Раньше высота держалась только в виртуальном режиме:
+ * обычное дерево с `maxHeight` вырастало на всю длину.
+ */
 const rootStyle = computed(() => {
+  const bounded = virtualMaxHeight.value === undefined
+    ? {}
+    : { overflow: 'auto', maxHeight: virtualMaxHeight.value }
+
   if (!treeProps.virtual)
-    return sizeStyle.value
+    return { ...sizeStyle.value, ...bounded }
 
   return {
     ...sizeStyle.value,
     overflow: 'auto',
-    maxHeight: virtualMaxHeight.value,
+    ...bounded,
     ...virtualizer.spacerStyle.value,
   }
 })
