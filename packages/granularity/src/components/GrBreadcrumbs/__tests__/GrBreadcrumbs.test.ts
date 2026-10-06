@@ -84,6 +84,26 @@ describe('GrBreadcrumbs — структура и семантика', () => {
     wrapper.unmount()
   })
 
+  // Акцент текущей страницы в начале пути читается как «вы здесь»: выключенный
+  // предок обязан выглядеть как соседи — приглушённым текстом обычного веса.
+  it('выключенный пункт не выглядит текущей страницей', () => {
+    const wrapper = mountPath({
+      items: [{ label: 'Acme', href: '/acme', disabled: true }, { label: 'Проекты', href: '/projects' }, { label: 'Счета' }],
+    })
+    const [disabled, , current] = wrapper.findAll('[data-gr-breadcrumbs-item]')
+
+    expect(disabled.classes()).not.toContain('font-600')
+    expect(disabled.classes()).not.toContain('text-[var(--gr-fg)]')
+    expect(disabled.classes()).toContain('text-[var(--gr-muted-fg)]')
+    expect(disabled.attributes('aria-current')).toBeUndefined()
+
+    expect(current.classes()).toContain('font-600')
+    expect(current.classes()).toContain('text-[var(--gr-fg)]')
+    expect(current.attributes('aria-current')).toBe('page')
+
+    wrapper.unmount()
+  })
+
   it('иконка пункта декоративна', () => {
     const wrapper = mountPath({ items: [{ label: 'Главная', href: '/', icon: 'i-lucide-house' }, { label: 'Тут' }] })
     const icon = wrapper.get('.i-lucide-house')

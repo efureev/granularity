@@ -61,6 +61,14 @@ export const breadcrumbsSeparatorClass = 'select-none text-[var(--gr-muted-fg)]'
 export const breadcrumbsCurrentClass = 'inline-flex items-center gap-1 min-w-0 font-600 text-[var(--gr-fg)]'
 
 /**
+ * Пункт-текст, который не текущая страница: выключенный или без адреса. Цвет и
+ * вес — как у соседних ссылок (`GrLink variant="muted"`), только без ссылки.
+ * Акцент текущей страницы ему не положен: выделенный предок в начале пути
+ * читался бы как «вы здесь».
+ */
+export const breadcrumbsTextClass = 'inline-flex items-center gap-1 min-w-0 text-[var(--gr-muted-fg)]'
+
+/**
  * Обёртка пункта — flex, а не блок с линейным боксом.
  *
  * Базовая линия `inline-flex` берётся от первого flex-элемента: у пункта

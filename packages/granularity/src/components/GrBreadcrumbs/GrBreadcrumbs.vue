@@ -19,6 +19,7 @@ import {
   breadcrumbsRootClass,
   breadcrumbsSeparatorClass,
   breadcrumbsSizeClassBySize,
+  breadcrumbsTextClass,
   type GrBreadcrumbItem,
   type GrBreadcrumbsLinkComponent,
   type GrBreadcrumbsSize,
@@ -417,13 +418,13 @@ if (__GR_DEV__) {
           </GrLink>
 
           <!--
-            Текущая страница и выключенный пункт — не ссылки. `aria-current`
-            остаётся на текущем: именно он отвечает на вопрос «где я».
+            Текущая страница и выключенный пункт — не ссылки. `aria-current` и
+            акцент остаются на текущем: именно он отвечает на вопрос «где я».
           -->
           <span
             v-else
             data-gr-breadcrumbs-item
-            :class="breadcrumbsCurrentClass"
+            :class="isCurrent(entry.index) ? breadcrumbsCurrentClass : breadcrumbsTextClass"
             :aria-label="entry.item.ariaLabel"
             :aria-current="isCurrent(entry.index) ? 'page' : undefined"
             :aria-disabled="entry.item.disabled ? 'true' : undefined"
