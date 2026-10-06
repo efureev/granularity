@@ -215,16 +215,29 @@ const radiusStyles: Record<GrControlShape, Record<GrSegmentedOrientation, string
   },
 }
 
+/**
+ * Вердикт валидации — рамкой дорожки и кольцом фокуса, как у полей ввода и
+ * `GrRadioGroup`: раньше `invalid` ставил только `aria-invalid`, и глазом
+ * ошибка была видна лишь по тексту под полем. Роли — `--gr-invalid-*`: тема
+ * вправе развести подсветку и ошибку по цвету.
+ */
+const rootInvalidStyle: Record<string, string> = {
+  '--gr-segmented-track-brd': 'var(--gr-segmented-invalid-brd, var(--gr-invalid-brd))',
+  '--gr-ring': 'var(--gr-invalid-ring)',
+}
+
 export function grSegmentedRootStyle(options: {
   variant: GrSegmentedVariant
   size: GrSegmentedSize
   orientation: GrSegmentedOrientation
   shape: GrControlShape
+  invalid?: boolean
 }): Record<string, string> {
   return {
     ...rootSizeStyles[options.size],
     ...rootVariantStyles[options.variant],
     '--gr-segmented-radius': radiusStyles[options.shape][options.orientation],
+    ...(options.invalid ? rootInvalidStyle : {}),
   }
 }
 export function grSegmentedIndicatorClass(variant: GrSegmentedVariant): string {

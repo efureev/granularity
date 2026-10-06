@@ -2,7 +2,7 @@
 import { computed, ref } from 'vue'
 
 import type { GrSegmentedOption } from '@feugene/granularity'
-import { GrButton, GrSegmented } from '@feugene/granularity'
+import { GrButton, GrFormField, GrSegmented } from '@feugene/granularity'
 
 const locale = ref<'ru' | 'en'>('ru')
 const status = ref<'draft' | 'review' | 'published'>('review')
@@ -29,6 +29,12 @@ function syncReview() {
   }, 2000)
 }
 
+// Обязательный выбор, который ещё не сделан: ошибка поля доходит до дорожки
+// рамкой и кольцом фокуса, а не только текстом под полем.
+// Пустая строка — «ещё не выбрано»: ни один сегмент ей не соответствует.
+const period = ref<'' | 'month' | 'year'>('')
+const periodError = computed(() => (period.value ? undefined : 'Choose a billing period'))
+
 const statusLabel = computed(() => statusOptions.value.find(option => option.value === status.value)?.label ?? status.value)
 </script>
 
@@ -54,6 +60,16 @@ const statusLabel = computed(() => statusOptions.value.find(option => option.val
           :indicator-duration="500"
           aria-label="Publishing status"
         />
+      </div>
+
+      <div data-demo="segmented-invalid" class="grid gap-3">
+        <GrFormField label="Billing period" :error="periodError" required>
+          <GrSegmented
+            v-model="period"
+            :options="[{ value: 'month', label: 'Monthly' }, { value: 'year', label: 'Yearly' }]"
+            size="sm"
+          />
+        </GrFormField>
       </div>
     </div>
 

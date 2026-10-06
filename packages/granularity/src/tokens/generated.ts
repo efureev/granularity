@@ -3214,6 +3214,13 @@ export const grComponentTokens: GrComponentToken[] = [
   },
   {
     "owner": "GrSegmented",
+    "name": "--gr-segmented-invalid-brd",
+    "kind": "hook",
+    "default": "var(--gr-invalid-brd)",
+    "description": "Рамка дорожки при `invalid` — вердикт валидации."
+  },
+  {
+    "owner": "GrSegmented",
     "name": "--gr-segmented-track-shadow",
     "kind": "inline",
     "default": "none; в варианте `solid` — var(--gr-shadow-1)",

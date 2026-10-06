@@ -1173,6 +1173,39 @@ test.describe('GrSegmented: ширина сегмента по содержим�
   })
 })
 
+/**
+ * `invalid` у `GrSegmented` ставил только `aria-invalid`: дорожка оставалась
+ * серой, и ошибку было видно лишь по тексту под полем. Рамка и кольцо фокуса —
+ * роли `--gr-invalid-*`, в обеих темах.
+ */
+test.describe('GrSegmented: состояние ошибки', () => {
+  for (const theme of ['light', 'dark'] as const) {
+    test(`${theme}: рамка дорожки и кольцо фокуса — цвет ошибки`, async ({ page }) => {
+      await page.emulateMedia({ colorScheme: theme })
+      await openShowcasePage(page, componentPath('GrSegmented'))
+
+      const row = page.locator('[data-demo="segmented-invalid"] [data-gr-segmented]')
+      await expect(row).toHaveAttribute('aria-invalid', 'true')
+
+      const colors = await row.evaluate((root) => {
+        const probe = document.createElement('span')
+        probe.style.color = 'var(--gr-invalid-brd)'
+        root.parentElement!.append(probe)
+        const invalid = getComputedStyle(probe).color
+        probe.remove()
+        return { border: getComputedStyle(root).borderTopColor, invalid }
+      })
+      expect(colors.border).toBe(colors.invalid)
+
+      // Стрелки здесь не годятся: они выбирают, и ошибка уходит вместе с выбором.
+      const first = row.locator('[role="radio"]').first()
+      await first.focus()
+      const ring = await first.evaluate(node => getComputedStyle(node).boxShadow)
+      expect(ring).toContain(colors.invalid)
+    })
+  }
+})
+
 test.describe('GrSteps: проход мастера', () => {
   test('гейт не пускает вперёд, а будущий шаг вне таб-порядка', async ({ page }) => {
     await openShowcasePage(page, componentPath('GrSteps'))

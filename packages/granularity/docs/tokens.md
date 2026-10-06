@@ -786,6 +786,7 @@ floating-компоненты не выходят по построению (v-c
 | --- | --- | --- | --- |
 | `--gr-segmented-track-bg` | инлайн-стиль | var(--gr-muted); в варианте `solid` — var(--gr-card) | Фон дорожки переключателя. |
 | `--gr-segmented-track-brd` | инлайн-стиль | var(--gr-brd) | Цвет рамки дорожки. |
+| `--gr-segmented-invalid-brd` | только хук | var(--gr-invalid-brd) | Рамка дорожки при `invalid` — вердикт валидации. |
 | `--gr-segmented-track-shadow` | инлайн-стиль | none; в варианте `solid` — var(--gr-shadow-1) | Тень дорожки. |
 | `--gr-segmented-indicator-bg` | инлайн-стиль | var(--gr-card); в варианте `primary` — var(--gr-primary) | Заливка бегунка под выбранным пунктом. |
 | `--gr-segmented-indicator-brd` | инлайн-стиль | подмес `--gr-fg` к фону дорожки | Цвет рамки бегунка. |

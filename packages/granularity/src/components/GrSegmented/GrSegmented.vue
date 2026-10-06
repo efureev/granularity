@@ -210,6 +210,7 @@ const rootStyle = computed<Record<string, string>>(() => {
       size: resolvedSize.value,
       orientation: props.orientation,
       shape: resolvedShape.value,
+      invalid: isInvalid.value,
     }),
     gridTemplateColumns: isVertical.value
       ? 'minmax(0,1fr)'

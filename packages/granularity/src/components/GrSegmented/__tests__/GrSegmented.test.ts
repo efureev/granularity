@@ -4,6 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { granularityGlobal } from '../../../testing'
 
+import GrFormField from '../../GrFormField/GrFormField.vue'
 import GrSegmented from '../GrSegmented.vue'
 
 const options = [
@@ -767,5 +768,40 @@ describe('GrSegmented — обрезанная подпись', () => {
     await label.trigger('pointerenter')
 
     expect(label.attributes('title')).toBeUndefined()
+  })
+})
+
+/**
+ * `invalid` ставил только `aria-invalid`: дорожка оставалась серой. Цвет меряет
+ * `apps/showcase/e2e/interaction.spec.ts` в обеих темах; здесь — роли.
+ */
+describe('GrSegmented — состояние ошибки', () => {
+  const INVALID_TRACK = '--gr-segmented-track-brd: var(--gr-segmented-invalid-brd, var(--gr-invalid-brd))'
+  const INVALID_RING = '--gr-ring: var(--gr-invalid-ring)'
+
+  it('`invalid` красит рамку дорожки и кольцо фокуса ролями ошибки', () => {
+    const wrapper = mount(GrSegmented, { props: { modelValue: '', invalid: true, options: [...options] } })
+    const root = wrapper.get('[data-gr-segmented]')
+
+    expect(root.attributes('aria-invalid')).toBe('true')
+    expect(root.attributes('style')).toContain(INVALID_TRACK)
+    expect(root.attributes('style')).toContain(INVALID_RING)
+  })
+
+  it('ошибка `GrFormField` доходит до дорожки так же', () => {
+    const wrapper = mount(GrFormField, {
+      props: { label: 'Период', error: 'Выберите период' },
+      slots: { default: () => h(GrSegmented, { modelValue: '', options: [...options] }) },
+    })
+
+    expect(wrapper.get('[data-gr-segmented]').attributes('style')).toContain(INVALID_TRACK)
+  })
+
+  it('без ошибки рамка обычная', () => {
+    const wrapper = mount(GrSegmented, { props: { modelValue: '', options: [...options] } })
+    const style = wrapper.get('[data-gr-segmented]').attributes('style')!
+
+    expect(style).toContain('--gr-segmented-track-brd: var(--gr-brd)')
+    expect(style).not.toContain('--gr-ring')
   })
 })
