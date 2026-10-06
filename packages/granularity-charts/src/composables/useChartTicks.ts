@@ -13,6 +13,10 @@ export interface ChartTick {
   value: number
   position: number
   label: string
+  /** Подпись, перенесённая на несколько строк; без неё рисуется `label`. */
+  lines?: readonly string[]
+  /** Полный текст усечённой подписи — для `<title>`. */
+  full?: string
 }
 
 export type ChartTickFormat = (value: number, kind: GrChartScaleKind) => string

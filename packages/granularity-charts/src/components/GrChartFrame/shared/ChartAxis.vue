@@ -33,9 +33,20 @@ const props = defineProps<{
 }>()
 
 const TICK_GAP = 6
+/** Межстрочный перенесённой подписи — тот же, что `chartLayout` кладёт в высоту строки. */
+const LINE_HEIGHT = 1.35
 
 function displayLabel(label: string): string {
   return props.maxLabelWidth === undefined ? label : fitLabel(label, props.fontSizePx, props.maxLabelWidth)
+}
+
+/** Перенесённая подпись идёт строками `<tspan>`, обычная — текстом самого `<text>`. */
+function multiLine(tick: ChartTick): readonly string[] {
+  return tick.lines && tick.lines.length > 1 ? tick.lines : []
+}
+
+function singleLine(tick: ChartTick): string {
+  return multiLine(tick).length > 0 ? '' : displayLabel(tick.lines?.[0] ?? tick.label)
 }
 
 /** Правая ось стоит на дальнем краю области, подписи растут от неё вправо. */
@@ -82,9 +93,17 @@ function labelY(tick: ChartTick): number {
       :text-anchor="orientation === 'y' ? (side === 'right' ? 'start' : 'end') : 'middle'"
       :dominant-baseline="orientation === 'y' ? 'middle' : 'auto'"
     >
-      {{ displayLabel(tick.label) }}
-      <title v-if="truncated">
-{{ tick.label }}
+      {{ singleLine(tick) }}
+      <tspan
+        v-for="(row, index) in multiLine(tick)"
+        :key="index"
+        :x="labelX(tick)"
+        :dy="index === 0 ? 0 : fontSizePx * LINE_HEIGHT"
+      >
+{{ row }}
+</tspan>
+      <title v-if="truncated || tick.full">
+{{ tick.full ?? tick.label }}
 </title>
     </text>
   </g>

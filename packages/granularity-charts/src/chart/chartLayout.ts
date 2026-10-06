@@ -32,6 +32,8 @@ export interface ChartLayoutInput {
   /** Подписи правой оси. Место под неё резервируется, только когда она есть. */
   yTickLabelsRight?: readonly string[]
   xTickLabels: readonly string[]
+  /** Сколько строк занимают подписи оси X: перенесённые по словам — две. */
+  xTickLines?: number
   fontSizePx: number
   showYAxis: boolean
   showYAxisRight?: boolean
@@ -237,6 +239,40 @@ export function placeRowLabels(input: RowLabelsInput): PlacedLabel[] {
   })
 }
 
+export interface WrappedLabel {
+  lines: string[]
+  /** Полный текст, если хоть одна строка усечена, — для `<title>`. */
+  full?: string
+}
+
+/**
+ * Подпись в две строки по пробелу, ближайшему к середине по ширине, — для оси,
+ * где каждое деление обязано остаться подписанным (шаги моста). Не помещается
+ * и так — строки кончаются многоточием.
+ */
+export function wrapLabel(label: string, fontSizePx: number, maxWidth: number): WrappedLabel {
+  if (maxWidth <= 0 || estimateTextWidth(label, fontSizePx) <= maxWidth)
+    return { lines: [label] }
+
+  let best: [string, string] | null = null
+  let bestWidth = Number.POSITIVE_INFINITY
+
+  for (let index = label.indexOf(' '); index !== -1; index = label.indexOf(' ', index + 1)) {
+    const pair: [string, string] = [label.slice(0, index), label.slice(index + 1)]
+    const width = Math.max(...pair.map(line => estimateTextWidth(line, fontSizePx)))
+
+    if (width < bestWidth) {
+      best = pair
+      bestWidth = width
+    }
+  }
+
+  const lines = (best ?? [label]).map(line => fitLabel(line, fontSizePx, maxWidth))
+  const truncated = lines.some((line, index) => line !== (best ?? [label])[index])
+
+  return truncated ? { lines, full: label } : { lines }
+}
+
 /** Каждая `every`-я позиция из `count`, первая и последняя — всегда. */
 function strided(count: number, every: number): number[] {
   const picked: number[] = []
@@ -385,7 +421,7 @@ export function chartLayout(input: ChartLayoutInput): ChartLayout {
   }
 
   if (input.showXAxis && input.xTickLabels.length > 0) {
-    bottom += lineHeight + TICK_GAP
+    bottom += lineHeight * Math.max(1, input.xTickLines ?? 1) + TICK_GAP
 
     // Крайние подписи центрируются под своими делениями и вылезли бы за холст
     // ровно наполовину. Потолок тот же, что у оси значений: без него одна

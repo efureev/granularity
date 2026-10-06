@@ -9,7 +9,7 @@ import { computed, onScopeDispose, ref, shallowRef, useId, watch } from 'vue'
 import { decimateChartData, decimateSeriesGroup, decimationBudget } from '../../../chart/chartDecimate'
 import type { GrChartNumberFormat } from '../../../chart/chartFormat'
 import { formatNumber, formatTimeSequence, formatTimeValue, formatValue } from '../../../chart/chartFormat'
-import { chartLayout, type Rect, thinTicksToFit } from '../../../chart/chartLayout'
+import { chartLayout, type Rect, thinTicksToFit, type WrappedLabel, wrapLabel } from '../../../chart/chartLayout'
 import { linePath } from '../../../chart/chartPath'
 import type { ChartData, NormalizedPoint, NormalizedSeries } from '../../../chart/chartModel'
 import type { GrChartReference } from '../../../chart/chartReference'
@@ -139,6 +139,12 @@ export interface ChartFrameProps {
   surfaceAttrs?: Record<string, string | number | undefined>
   /** Желаемое число делений X (по умолчанию 6); у категорий — потолок числа подписей. */
   xTickCount?: number
+  /**
+   * Что делать с подписями X, которые не помещаются: `thin` — показать каждую
+   * `k`-ю; `wrap` — оставить все, перенося на две строки и усекая (шаги моста,
+   * где каждое деление обязано быть названо).
+   */
+  xLabelFit?: 'thin' | 'wrap'
   yTickCount?: number
   xTickFormat?: ChartTickFormat
   yTickFormat?: (value: number) => string
@@ -257,6 +263,7 @@ const props = withDefaults(defineProps<ChartFrameProps>(), {
   surfaceRole: undefined,
   surfaceAttrs: undefined,
   xTickCount: undefined,
+  xLabelFit: 'thin',
   yTickCount: 5,
   xTickFormat: undefined,
   yTickFormat: undefined,
@@ -360,6 +367,8 @@ const hasRightAxis = computed(() => rightTicks.value !== null)
  * досчитываются потом.
  */
 const DEFAULT_X_TICK_COUNT = 6
+/** Зазор между соседними подписями X при переносе. */
+const X_LABEL_GAP = 2
 
 const labelScaleX = computed(() => createScale(props.data.kind, props.data.xDomain, [0, 1]))
 const labelScaleY = computed(() => linearScale(niceYDomain.value, [1, 0]))
@@ -440,7 +449,7 @@ const GHOST_PATH = linePath(
 
 const reserveAxes = computed(() => props.axes && (props.loading || !isEmpty.value))
 
-const layout = computed(() => chartLayout({
+const layoutInput = computed(() => ({
   width: width.value,
   height: props.height,
   yTickLabels: props.loading ? [LOADING_Y_LABEL] : showAxes.value ? yLabels.value.map(tick => tick.label) : [],
@@ -451,6 +460,30 @@ const layout = computed(() => chartLayout({
   showYAxis: reserveAxes.value,
   showXAxis: reserveAxes.value,
 }))
+
+const singleLineLayout = computed(() => chartLayout(layoutInput.value))
+
+/**
+ * Переносы подписей X при `xLabelFit: 'wrap'`.
+ *
+ * Считаются от ширины первого прохода раскладки: перенос меняет только высоту
+ * нижнего поля, ширина области от него не зависит, — поэтому второй проход
+ * круга не замыкает.
+ */
+const wrappedXLabels = computed<WrappedLabel[] | null>(() => {
+  if (props.xLabelFit !== 'wrap' || !showAxes.value || xLabels.value.length === 0)
+    return null
+
+  const step = singleLineLayout.value.plot.width / Math.max(1, props.data.positions.length)
+
+  return xLabels.value.map(tick => wrapLabel(tick.label, fontSizePx.value, step - X_LABEL_GAP))
+})
+
+const layout = computed(() => {
+  const lines = Math.max(1, ...(wrappedXLabels.value ?? []).map(label => label.lines.length))
+
+  return lines > 1 ? chartLayout({ ...layoutInput.value, xTickLines: lines }) : singleLineLayout.value
+})
 
 const plot = computed(() => layout.value.plot)
 
@@ -521,7 +554,14 @@ const xTicks = computed(() => withPosition(xLabels.value, xScale.value))
  * помещаются ли подписи — ширина холста: на узкой карточке лишние пропускаются
  * (`thinTicksToFit`). Сетка остаётся на всех делениях.
  */
-const xAxisTicks = computed(() => thinTicksToFit(xTicks.value, fontSizePx.value))
+const xAxisTicks = computed(() => {
+  const wrapped = wrappedXLabels.value
+
+  if (!wrapped)
+    return thinTicksToFit(xTicks.value, fontSizePx.value)
+
+  return xTicks.value.map((tick, index) => ({ ...tick, lines: wrapped[index]?.lines, full: wrapped[index]?.full }))
+})
 const yTicks = computed(() => withPosition(yLabels.value, yScale.value))
 const yTicksRight = computed(() => (yScaleRight.value === null ? [] : withPosition(yLabelsRight.value, yScaleRight.value)))
 

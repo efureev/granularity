@@ -7,7 +7,7 @@ import { barHitIndex, barPath, barRect, barToward, groupSlots } from '../../char
 import { orientedPoint } from '../../chart/chartOrientation'
 import type { GrChartNumberFormat } from '../../chart/chartFormat'
 import { formatNumber, formatValue } from '../../chart/chartFormat'
-import { type LabelGutters, memoLabelGutters, type Rect } from '../../chart/chartLayout'
+import { estimateTextWidth, type LabelGutters, memoLabelGutters, type Rect } from '../../chart/chartLayout'
 import type { GrChartPoint } from '../../chart/chartModel'
 import { normalizeChartData } from '../../chart/chartModel'
 import { bandScale, type GrChartScale, linearScale } from '../../chart/chartScale'
@@ -257,16 +257,29 @@ const points = computed<GrChartPoint[]>(() => segments.value.map((segment, index
   label: segment.label,
 })))
 
+/**
+ * Ось значений — по накоплениям, а не по шагам.
+ *
+ * Ряд рамы несёт собственные значения шагов (их читают курсор и события), и
+ * дельта −410 на накоплении в 1240 растягивала ось в минус, где ни один
+ * столбец не стоит. Поэтому стороны домена задаются явно — основаниями и
+ * вершинами столбцов вместе с нулём; `yDomain` потребителя сильнее.
+ */
+const valueDomain = computed<readonly [number | null, number | null]>(() => {
+  const [low, high] = model.value.domain
+  const span = high > low
+
+  return [props.yDomain?.[0] ?? (span ? low : null), props.yDomain?.[1] ?? (span ? high : null)]
+})
+
 const data = computed(() => normalizeChartData(
   [{ id: 'waterfall', label: t('grCharts.waterfall.roleDescription', 'waterfall chart'), data: points.value }],
   {
     kind: 'band',
     // Ноль в оси всегда: мост, оторванный от нуля, врёт о величинах.
     includeZero: true,
-    // Ось обязана вместить основания и вершины столбцов, а не значения шагов:
-    // дельта в десять, стоящая на накоплении в тысячу, уходит к тысяче.
     includeYValues: model.value.domain,
-    yDomain: props.yDomain,
+    yDomain: valueDomain.value,
   },
 ))
 
@@ -333,6 +346,19 @@ interface WaterfallGeometry {
  * Домен значений при горизонтали берётся у шкалы рамы: он уже расширен до
  * «красивых» границ, и посчитанный заново разошёлся бы с ней на округлении.
  */
+/**
+ * Половина крайней подписи оси значений при горизонтали.
+ *
+ * Подпись центрируется под своим делением, и последняя половиной ширины ушла бы
+ * за правый край холста («2,00» вместо «2,000»). Рама при горизонтали идёт с
+ * `axes: false` и это место не резервирует — считаем здесь, как у столбцов.
+ */
+function valueLabelOverhang(domain: readonly [number, number]): number {
+  const last = linearTicks(domain, props.yTickCount).values.at(-1)
+
+  return last === undefined ? 0 : estimateTextWidth(formatTick(last), labelFontPx[resolvedSize.value]) / 2
+}
+
 function geometryOf(plot: Rect, xScale: GrChartScale, yScale: GrChartScale): WaterfallGeometry {
   if (!isHorizontal.value)
     return { value: yScale, category: xScale, area: plot }
@@ -341,7 +367,7 @@ function geometryOf(plot: Rect, xScale: GrChartScale, yScale: GrChartScale): Wat
   const area = {
     x: plot.x + gutters.left,
     y: plot.y,
-    width: Math.max(0, plot.width - gutters.left),
+    width: Math.max(0, plot.width - gutters.left - valueLabelOverhang(yScale.domain)),
     height: Math.max(0, plot.height - gutters.bottom),
   }
 
@@ -389,6 +415,26 @@ function slotAt(geometry: WaterfallGeometry) {
   return groupSlots(1, geometry.category.bandwidth)[0] ?? { offset: 0, width: 0 }
 }
 
+/** Лежит ли значение внутри домена оси. */
+function withinDomain(geometry: WaterfallGeometry, value: number): boolean {
+  const [low, high] = geometry.value.domain
+
+  return value >= Math.min(low, high) && value <= Math.max(low, high)
+}
+
+/**
+ * Конец столбца, прижатый к краю домена.
+ *
+ * С `yDomain`, чей низ выше нуля, итоговый столбец от нуля уходил под область
+ * построения — поверх подписей шагов. Прижатый к краю, он обрывается на нём:
+ * обрыв и показывает, что ось начинается не с нуля.
+ */
+function clampToDomain(geometry: WaterfallGeometry, value: number): number {
+  const [low, high] = geometry.value.domain
+
+  return Math.min(Math.max(value, Math.min(low, high)), Math.max(low, high))
+}
+
 function barMarks(geometry: WaterfallGeometry): BarMark[] {
   const slot = slotAt(geometry)
 
@@ -396,9 +442,16 @@ function barMarks(geometry: WaterfallGeometry): BarMark[] {
     if (segment.sign === 0)
       return []
 
+    const start = clampToDomain(geometry, segment.from)
+    const end = clampToDomain(geometry, segment.to)
+
+    // Весь шаг вне оси — рисовать нечего.
+    if (start === end)
+      return []
+
     const center = geometry.category.scale(segment.index)
-    const from = geometry.value.scale(segment.from)
-    const to = geometry.value.scale(segment.to)
+    const from = geometry.value.scale(start)
+    const to = geometry.value.scale(end)
 
     const orientation = isHorizontal.value ? 'horizontal' : 'vertical'
     const rect = barRect(center, slot, from, to, orientation)
@@ -418,7 +471,7 @@ function barMarks(geometry: WaterfallGeometry): BarMark[] {
 function zeroMarks(geometry: WaterfallGeometry): LineMark[] {
   const slot = slotAt(geometry)
 
-  return segments.value.filter(segment => segment.sign === 0).map((segment) => {
+  return segments.value.filter(segment => segment.sign === 0 && withinDomain(geometry, segment.to)).map((segment) => {
     const center = geometry.category.scale(segment.index)
     const level = geometry.value.scale(segment.to)
     const half = slot.width / 2
@@ -444,7 +497,7 @@ function connectorMarks(geometry: WaterfallGeometry): LineMark[] {
   const half = slot.width / 2
 
   return segments.value.flatMap((segment) => {
-    if (segment.connector === null)
+    if (segment.connector === null || !withinDomain(geometry, segment.connector))
       return []
 
     const level = geometry.value.scale(segment.connector)
@@ -617,6 +670,8 @@ defineExpose({
     :aria-description="ariaDescription"
     :role-description="t('grCharts.waterfall.roleDescription', 'waterfall chart')"
     :y-tick-count="yTickCount"
+    :x-tick-count="segments.length"
+    x-label-fit="wrap"
     :x-tick-format="stepTickLabel"
     :y-tick-format="formatTick"
     :value-format="valueFormat"
