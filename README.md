@@ -15,7 +15,7 @@ The published packages:
 
 <!-- Generated from the workspace by `yarn docs:ecosystem`; `yarn docs:ecosystem:check` gates it. -->
 <!-- ecosystem:generated:start -->
-- [`@feugene/granularity`](./packages/granularity/README.md) `1.0.15` — Granularity design system package with Vue 3 components, consumed via the `@feugene/granum` build pipeline.
+- [`@feugene/granularity`](./packages/granularity/README.md) `1.0.16` — Granularity design system package with Vue 3 components, consumed via the `@feugene/granum` build pipeline.
 - [`@feugene/granularity-charts`](./packages/granularity-charts/README.md) `1.0.4` — Charts for the @feugene/granularity design system — own SVG, zero dependencies, drawn with theme tokens.
 - [`@feugene/granularity-chrono`](./packages/granularity-chrono/README.md) `1.0.4` — Calendar, date and time components for the @feugene/granularity design system — no third-party date widget, no date library.
 - [`@feugene/granularity-code`](./packages/granularity-code/README.md) `1.0.3` — Code surfaces for @feugene/granularity: view, edit and diff — the viewer and the diff carry no dependencies at all.
