@@ -138,8 +138,19 @@ export const coreFixtures: ComponentFixture[] = [
   { name: 'GrDropdown', about: 'панель приходит на месте и скрытой', page: GrDropdownPage },
   { name: 'GrDropdownMenu', about: 'панель на месте, пункты меню с ролями', page: GrDropdownMenuPage },
   { name: 'GrEmptyState', about: 'чистая разметка', render: () => h(GrEmptyState, { title: 'Ничего не найдено', description: 'Измените запрос' }) },
-  { name: 'GrFilePreview', about: 'превью без FileReader в setup', render: () => h(GrFilePreview, { name: 'отчёт.pdf', mime: 'application/pdf' }) },
-  { name: 'GrFileUpload', about: 'зона без обращения к DataTransfer на сервере', render: () => h(GrFileUpload) },
+  // Картинка с `src`: в браузере она решается раньше гидрации, и плитка обязана
+  // свериться с элементом, а не ждать `load`, которого уже не будет.
+  { name: 'GrFilePreview', about: 'картинка, загруженная до гидрации', render: () => h(GrFilePreview, { name: 'taxi.png', mime: 'image/png', src: 'data:image/png;base64,iVBORw0KGgo=' }) },
+  // Scoped-слот, читающий пропы при рендере: проба слота с пустым объектом
+  // роняла серверный рендер страницы.
+  {
+    name: 'GrFileUpload',
+    about: 'scoped-слот зоны читает state и files на сервере',
+    render: () => h(GrFileUpload, null, {
+      default: ({ state, files }: { state: { phase: string }, files: File[] }) =>
+        h('span', { 'data-own-zone': '' }, `${state.phase} · ${files.length}`),
+    }),
+  },
   { name: 'GrForm', about: 'контекст формы и связка полей по id', page: GrFormPage },
   { name: 'GrFormField', about: 'auto-id и aria-describedby из useId()', render: () => h(GrFormField, { label: 'Имя', hint: 'Как к вам обращаться' }, { default: () => h(GrInput, { modelValue: '' }) }) },
   { name: 'GrFormFile', about: 'кнопка выбора вместо нативного input', render: () => h(GrFormFile, { modelValue: null }) },

@@ -129,5 +129,5 @@ export const mediaFixtures: ComponentFixture[] = [
   { name: 'GrCameraCapture', about: 'getUserMedia недоступен на сервере: с сервера приходит оболочка', render: () => h(GrCameraCapture, { autoStart: false }) },
   { name: 'GrCodeScanner', about: 'BarcodeDetector недоступен на сервере', render: () => h(GrCodeScanner, { autoStart: false }) },
   { name: 'GrImageCrop', about: 'canvas и Image недоступны на сервере', render: () => h(GrImageCrop, { src: null }) },
-  { name: 'GrVideoPlayer', about: 'элемент video без обращения к его API в setup', render: () => h(GrVideoPlayer, { src: null }) },
+  { name: 'GrVideoPlayer', about: 'метаданные, прочитанные до гидрации', render: () => h(GrVideoPlayer, { src: '/clip.webm' }) },
 ]
