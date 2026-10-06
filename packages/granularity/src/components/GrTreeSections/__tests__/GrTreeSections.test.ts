@@ -46,6 +46,10 @@ describe('GrTreeSections: структура', () => {
     const wrapper = setup({ headingLevel: 2 })
 
     expect(wrapper.findAll('h2')).toHaveLength(2)
+    // Базовый слой страницы (`h2 { margin-block: … }`) не раздвигает группы:
+    // отступы задают `gap` корня и секции.
+    for (const heading of wrapper.findAll('h2'))
+      expect(heading.classes()).toContain('m-0')
   })
 
   it('счётчик показывает число узлов первого уровня группы', () => {

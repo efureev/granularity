@@ -4,7 +4,12 @@ export const treeSectionsRootClass = 'flex flex-col gap-4'
  * Заголовок группы набирается капителью и отделяется линией: он объявляет
  * рубрику, а не узел, и должен читаться иначе, чем строки под ним.
  */
-export const treeSectionsHeadClass = 'flex items-baseline gap-2 pb-1 text-[length:var(--gr-text-xs)] leading-[var(--gr-leading-xs)] uppercase tracking-wider text-[var(--gr-muted-fg)] border-b border-[var(--gr-brd)]'
+/**
+ * `m-0` — заголовок группы бывает настоящим `<h2>`…`<h6>` (`headingLevel`), а
+ * базовый слой страницы обычно даёт заголовкам `margin-block`: с ним группы
+ * раздвигались на десятки пикселей. Отступы задают `gap` корня и секции.
+ */
+export const treeSectionsHeadClass = 'm-0 flex items-baseline gap-2 pb-1 text-[length:var(--gr-text-xs)] leading-[var(--gr-leading-xs)] uppercase tracking-wider text-[var(--gr-muted-fg)] border-b border-[var(--gr-brd)]'
 
 export const treeSectionsCountClass = 'ml-auto text-[var(--gr-muted-fg)] [font-variant-numeric:tabular-nums]'
 
