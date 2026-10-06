@@ -59,31 +59,55 @@ export interface GrSchemaFormProps<T extends Record<string, unknown> = Record<st
   schemaModel?: GrSchemaModel
   /** Явные адаптеры. Без них разбор возможен только из `schemaModel`. */
   adapters?: GrSchemaAdapter[]
+  /**
+   * Настройки разбора чужой схемы адаптером: глубина обхода, обязательность по умолчанию,
+   * префикс аннотаций, полная проверка.
+   */
   parseOptions?: GrSchemaParseOptions
 
   /** Данные формы. Не заданы — собираются из умолчаний схемы. */
   modelValue?: T
 
+  /** Раскладка и вид поверх схемы: секции, колонки, порядок, скрытые поля, виджеты, подписи. */
   uiSchema?: GrUiSchema
   /** Реестр или набор записей поверх дефолтного. */
   renderers?: GrSchemaRendererRegistry | readonly GrSchemaRenderer[]
 
   /** Правила поверх скомпилированных: ключ — инстанс-путь. */
   rules?: GrFormRules
+  /** Настройки компиляции правил из схемы: ярусы, свои форматы, когда идёт полная проверка. */
   validation?: GrSchemaRuleCompilerOptions
 
   /** Ответ сервера: сырой, разобранный или карта `{ путь: сообщения }`. */
   serverErrors?: unknown
 
+  /** Проверять поле при потере фокуса. По умолчанию `true`. */
   validateOnBlur?: boolean
+  /** Проверять поле на каждом изменении значения. По умолчанию `false`. */
   validateOnChange?: boolean
+  /** Прокрутить к первому невалидному полю, когда проверка не прошла. По умолчанию `true`. */
   scrollToError?: boolean
+  /** Все поля формы недоступны. */
   disabled?: boolean
+  /** Все поля формы только для чтения: значения видны, но не правятся. */
   readonly?: boolean
 
+  /**
+   * Колонки сетки полей: число или карта по брейкпоинтам. Не задан — из `uiSchema.layout.columns`,
+   * затем из `GrConfigProvider`, иначе одна.
+   */
   columns?: GrUiColumns
+  /**
+   * Положение подписей полей: `top` — над полем, `start` — слева. Не задан — из `GrConfigProvider`,
+   * иначе `top`.
+   */
   labelPosition?: 'top' | 'start'
+  /** Ширина колонки подписи при `labelPosition="start"`; число — пиксели. */
   labelWidth?: string | number
+  /**
+   * Уровень заголовков секций и вложенных объектов — под место формы на странице. Не задан — из
+   * `GrConfigProvider`, иначе `3`.
+   */
   headingLevel?: 2 | 3 | 4 | 5 | 6
 
   /** Сводка ошибок формы и осиротевших серверных сообщений. */
@@ -91,12 +115,20 @@ export interface GrSchemaFormProps<T extends Record<string, unknown> = Record<st
 }
 
 export interface GrSchemaFormEmits<T extends Record<string, unknown> = Record<string, unknown>> {
+  /** Данные формы изменились (`v-model`): правка поля или строки массива. */
   (e: 'update:modelValue', model: T): void
+  /** Отправка прошла проверку полей и схемы — данные формы. */
   (e: 'submit', model: T): void
+  /** Отправка не прошла проверку: путь поля → первое сообщение об ошибке. */
   (e: 'invalid', errors: Record<string, string>): void
   /** Схема разобрана; `warnings` — то, чего адаптер не понял. */
   (e: 'parsed', model: GrSchemaModel, warnings: GrSchemaWarning[]): void
+  /** Для узла схемы не нашлось рендерера: узел и инстанс-путь; поле остаётся без контрола. */
   (e: 'unresolved', node: GrSchemaNode, name: string): void
+  /**
+   * Строка массива добавлена, удалена или перенесена: путь массива, действие и индекс строки
+   * (у `move` — новый).
+   */
   (e: 'rowChange', path: string, action: 'add' | 'remove' | 'move', index: number): void
 }
 
