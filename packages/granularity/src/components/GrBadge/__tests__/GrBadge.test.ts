@@ -1,5 +1,6 @@
 import { mount } from '@vue/test-utils'
 import { describe, expect, it, vi } from 'vitest'
+import { h } from 'vue'
 
 import GrBadge from '../GrBadge.vue'
 import {
@@ -291,5 +292,17 @@ describe('GrBadge · точка-маркер', () => {
       for (const token of badgeDotSizeClassBySize[size].split(' '))
         expect(classes, size).toContain(token)
     }
+  })
+})
+
+describe('GrBadge — голый атрибут `dot`', () => {
+  // Документация пишет `<GrBadge tone="success" dot>`. В шаблоне это пустая
+  // строка, и флагом она становится, только если `Boolean` в рантайм-типе пропа
+  // стоит раньше `String` — иначе Vue оставляет `''`, и точка молча пропадает.
+  it('рисует точку, как и `:dot="true"`', () => {
+    // Так шаблон и передаёт голый атрибут: пустой строкой.
+    const wrapper = mount(() => h(GrBadge, { tone: 'success', dot: '' } as never, () => 'Paid'))
+
+    expect(wrapper.find('[data-gr-badge-dot]').exists()).toBe(true)
   })
 })

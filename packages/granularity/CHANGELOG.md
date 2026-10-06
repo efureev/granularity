@@ -5,6 +5,19 @@ All notable changes to the [`@feugene/granularity`](.) package are documented in
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Fixed
+
+- **`<GrBadge dot>` снова рисует точку.** Проп был объявлен как
+  `GrBadgeDotTone | boolean`, и рантайм-тип вышел `[String, Boolean]`: в таком
+  порядке Vue оставляет голый атрибут пустой строкой, а не `true`, и точка из
+  примеров документации молча не рисовалась. Работали только `:dot="true"` и
+  имя тона. Теперь `boolean` в объявлении первым. Порядок для всех флагов,
+  которые принимают и строку, держит тест `booleanCasting.test.ts`.
+- У пропов `GrBadge` `tone`, `dark`, `size` и `radius` появились описания: в
+  API, подсказках IDE и на портале они были пустыми.
+
 ## [v1.0.5] 2026-10-06
 
 ### Changed

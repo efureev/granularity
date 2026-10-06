@@ -19,9 +19,25 @@ import {
 } from './grBadgeStyles'
 
 export interface GrBadgeProps {
+  /**
+   * Тон метки: несёт смысл, а не только цвет — «Оплачено» в `success`,
+   * «Просрочено» в `danger`. Не задан — из `GrConfigProvider`, иначе `neutral`.
+   */
   tone?: GrBadgeTone
+  /**
+   * Заливка вместо мягкой подложки: плотный вес для пёстрого фона и для
+   * метки, которая обязана выделяться. Цвета — из слоя `--gr-badge-{tone}-bg`/`-fg`.
+   */
   dark?: boolean
+  /**
+   * Ступень контрольной шкалы `--gr-control-text-*`: бейдж чаще стоит рядом с
+   * кнопками и полями, чем внутри абзаца. Не задан — из `GrConfigProvider`.
+   */
   size?: GrBadgeSize
+  /**
+   * Форма: `round` — таблетка статуса, `semi` — ярлык категории или кода,
+   * `square` — штамп. Не задан — из `GrConfigProvider`, иначе `round`.
+   */
   radius?: GrBadgeRadius
   /**
    * Точка-маркер перед подписью: «● Активен».
@@ -33,7 +49,10 @@ export interface GrBadgeProps {
    * На заливке (`dark`) маркер всегда цвета текста: тон там слился бы с
    * подложкой, взятой из того же слоя.
    */
-  dot?: GrBadgeDotTone | boolean
+  // `boolean` — первым: рантайм-тип пропа идёт в порядке объединения, и при
+  // `[String, Boolean]` Vue оставляет голый атрибут `dot` пустой строкой, а не
+  // `true` — точка из документации молча не рисовалась.
+  dot?: boolean | GrBadgeDotTone
 }
 
 const props = withDefaults(
