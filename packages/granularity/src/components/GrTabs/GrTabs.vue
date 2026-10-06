@@ -15,7 +15,8 @@ import {
   grTabsListClass,
   grTabsTabClass,
   tabCloseIconSizes,
-  tabContentClass,
+  grTabsContentClass,
+  tabLabelVerticalClass,
   tabIconClass,
   type GrTabsOrientation,
   type GrTabsSize,
@@ -133,6 +134,7 @@ function tabClass(tab: GrTab): string {
     size: resolvedSize.value,
     active: tab.value === props.modelValue,
     disabled: Boolean(tab.disabled),
+    orientation: props.orientation,
   })
 }
 
@@ -308,11 +310,24 @@ async function selectByIndex(index: number, focus = false): Promise<void> {
     await focusIndex(index)
 }
 
+/**
+ * Индекс вкладки **под фокусом** — по самому событию, а не по роверному ключу.
+ * Ключ мог отставать от фокуса (программный `focus()`, `manual`, где фокус и
+ * выбор законно расходятся), и `Delete` закрывал выбранную вкладку вместо той,
+ * на которой стоит пользователь.
+ */
+function focusedIndexOf(event: KeyboardEvent): number {
+  const target = event.target instanceof Element ? event.target.closest('[role="tab"]') : null
+  const index = target ? buttonRefs.value.indexOf(target as HTMLButtonElement) : -1
+
+  return index >= 0 ? index : (roving.rovingKey.value ?? 0)
+}
+
 function onKeydown(event: KeyboardEvent): void {
   if (props.tabs.length === 0)
     return
 
-  const currentIndex = roving.rovingKey.value ?? 0
+  const currentIndex = focusedIndexOf(event)
 
   switch (event.key) {
     case 'Enter':
@@ -450,7 +465,7 @@ if (__GR_DEV__) {
       :class="tabClass(tab)"
       @click="onClick($event, tab, index)"
     >
-      <span :class="tabContentClass">
+      <span :class="grTabsContentClass(orientation)">
         <slot
           name="tab"
           :tab="tab"
@@ -463,7 +478,7 @@ if (__GR_DEV__) {
             :class="[tabIconClass, iconClass(tab.icon)]"
             aria-hidden="true"
           />
-          <span>{{ tab.label }}</span>
+          <span :class="orientation === 'vertical' ? tabLabelVerticalClass : undefined">{{ tab.label }}</span>
           <span v-if="tab.badge" :class="badgeClass">
             {{ tab.badge }}
           </span>

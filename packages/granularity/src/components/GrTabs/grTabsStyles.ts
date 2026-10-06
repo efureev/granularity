@@ -98,6 +98,19 @@ export const tabIconClass = 'h-4 w-4 shrink-0'
 export const tabContentClass = 'inline-flex items-center gap-2'
 
 /**
+ * Вертикаль — колонка разделов настроек, а не ряд кнопок. По центру значки
+ * подписей разной длины вставали рваной линией, и колонка читалась меню;
+ * в колонке содержимое вкладки — у начала, подпись занимает остаток, бейдж и
+ * крестик — у конца. Тот же приём, что у вертикального `GrSegmented`.
+ */
+export const tabContentVerticalClass = 'flex w-full items-center gap-2'
+export const tabLabelVerticalClass = 'min-w-0 flex-1 truncate text-start'
+
+export function grTabsContentClass(orientation: GrTabsOrientation): string {
+  return orientation === 'vertical' ? tabContentVerticalClass : tabContentClass
+}
+
+/**
  * Крестик закрытия. Кнопкой он быть не может: `role="tab"` объявляет потомков
  * презентационными, и вложенный интерактив теряется у скринридера (axe:
  * `nested-interactive`). Поэтому это `<span>`, а клик по нему разбирает
@@ -148,6 +161,7 @@ export function grTabsTabClass(options: {
   size: GrTabsSize
   active: boolean
   disabled: boolean
+  orientation?: GrTabsOrientation
 }): string {
   const state = tabStateClasses[options.variant]
 
@@ -155,8 +169,9 @@ export function grTabsTabClass(options: {
     tabBase,
     tabVariantBase[options.variant],
     tabSizes[options.size],
+    options.orientation === 'vertical' ? 'text-start' : '',
     options.disabled ? state.disabled : options.active ? state.active : state.idle,
-  ].join(' ')
+  ].filter(Boolean).join(' ')
 }
 
 export function grTabsBadgeClass(size: GrTabsSize): string {

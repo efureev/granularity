@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest'
 
 import GrConfigProvider from '../../GrConfigProvider/GrConfigProvider.vue'
 import GrTabs from '../GrTabs.vue'
+import type { GrTab } from '../GrTabs.vue'
 
 const tabs = [
   { value: 'overview', label: 'Overview' },
@@ -590,5 +591,80 @@ describe('GrTabs — иконка вкладки', () => {
       props: { modelValue: 'a', tabs: [{ value: 'a', label: 'A', icon: CustomIcon }] },
     })
     expect(byComponent.find('[data-custom-icon]').exists()).toBe(true)
+  })
+})
+
+/**
+ * `Delete` закрывал **выбранную** вкладку, а не ту, что под фокусом, — стоило
+ * им разойтись: в `activation-mode="manual"` это обычное дело.
+ */
+describe('GrTabs — `Delete` закрывает вкладку под фокусом', () => {
+  const mail = [
+    { value: 'readme', label: 'README.md', closable: false },
+    { value: 'paid', label: 'invoice-paid.mjml' },
+    { value: 'failed', label: 'payment-failed.mjml' },
+    { value: 'trial', label: 'trial-ending.mjml' },
+  ]
+
+  function mountMail() {
+    return mount(GrTabs, {
+      props: { modelValue: 'paid', tabs: mail, closable: true, activationMode: 'manual' },
+      attachTo: document.body,
+    })
+  }
+
+  it('стрелкой на соседнюю — `Delete` закрывает её, а не выбранную', async () => {
+    const wrapper = mountMail()
+    const tabs = wrapper.findAll('[role="tab"]')
+
+    ;(tabs[1].element as HTMLElement).focus()
+    await tabs[1].trigger('keydown', { key: 'ArrowRight' })
+    await nextTick()
+    expect(document.activeElement).toBe(tabs[2].element)
+
+    await tabs[2].trigger('keydown', { key: 'Delete' })
+
+    expect(wrapper.emitted('close')?.[0]?.[0]).toBe('failed')
+    expect(wrapper.emitted('update:modelValue')).toBeUndefined()
+    wrapper.unmount()
+  })
+
+  it('фокус поставлен программно — закрывается та вкладка, где он', async () => {
+    const wrapper = mountMail()
+    const tabs = wrapper.findAll('[role="tab"]')
+
+    ;(tabs[3].element as HTMLElement).focus()
+    await tabs[3].trigger('keydown', { key: 'Backspace' })
+
+    expect(wrapper.emitted('close')?.[0]?.[0]).toBe('trial')
+    wrapper.unmount()
+  })
+})
+
+/** Вертикаль — колонка разделов: содержимое у начала, бейдж у конца. */
+describe('GrTabs — вертикальная колонка выровнена к началу', () => {
+  const sections: GrTab[] = [
+    { value: 'profile', label: 'Profile' },
+    { value: 'security', label: 'Security', badge: '1' },
+    { value: 'danger', label: 'Delete account' },
+  ]
+
+  it('в колонке подпись занимает остаток, бейдж у конца', () => {
+    const wrapper = mount(GrTabs, { props: { modelValue: 'profile', tabs: sections, orientation: 'vertical' } })
+    const tab = wrapper.findAll('[role="tab"]')[1]
+
+    expect(tab.classes()).toContain('text-start')
+    const content = tab.element.firstElementChild!
+    expect(content.classList.contains('w-full')).toBe(true)
+    expect(content.firstElementChild!.classList.contains('flex-1')).toBe(true)
+    expect(content.lastElementChild!.textContent?.trim()).toBe('1')
+  })
+
+  it('в ряду — как прежде, по центру', () => {
+    const wrapper = mount(GrTabs, { props: { modelValue: 'profile', tabs: sections } })
+    const tab = wrapper.findAll('[role="tab"]')[1]
+
+    expect(tab.classes()).not.toContain('text-start')
+    expect(tab.element.firstElementChild!.classList.contains('inline-flex')).toBe(true)
   })
 })
