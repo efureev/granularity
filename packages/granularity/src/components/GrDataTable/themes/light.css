@@ -4,7 +4,10 @@
  * Тёмного файла нет по той же причине, что у палитры `GrAvatar`: обе роли
  * переключаются вместе с темой сами, и второй файл дублировал бы первый.
  */
-:root {
+:root,
+[data-theme],
+.light,
+.dark {
   --gr-datatable-detail-bg: color-mix(in srgb, var(--gr-muted) 45%, transparent);
   --gr-datatable-detail-accent: var(--gr-primary);
 }

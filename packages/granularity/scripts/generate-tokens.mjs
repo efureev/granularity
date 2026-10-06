@@ -132,6 +132,9 @@ function renderGroup(group, indent) {
   return lines
 }
 
+/** Где пересчитываются производные: корень и любой остров темы. */
+const DERIVED_SELECTORS = [':root', '[data-theme]', '.light', '.dark']
+
 function renderTokensCss({ foundation, derived }) {
   const lines = [GENERATED_BANNER_CSS, ':root {']
 
@@ -142,8 +145,19 @@ function renderTokensCss({ foundation, derived }) {
     lines.push(...renderGroup(group, '  '))
   }
 
-  for (const group of derived.groups) {
-    lines.push('', `  /* ${group.title} */`)
+  lines.push('}', '')
+
+  // Формулы — и на каждом элементе, объявляющем тему, а не только на `:root`.
+  // Значение `var()` в кастомном свойстве подставляется там, где свойство
+  // объявлено, и наследуется уже готовым: остров `data-theme` внутри страницы
+  // другой темы получил бы hover-цвета, посчитанные от ролей страницы.
+  lines.push(`${DERIVED_SELECTORS.join(',\n')} {`)
+
+  for (const [index, group] of derived.groups.entries()) {
+    if (index > 0)
+      lines.push('')
+
+    lines.push(`  /* ${group.title} */`)
 
     for (const token of group.tokens)
       lines.push(`  ${token.name}: color-mix(in srgb, var(${token.base}) ${token.amount}%, var(${token.mixWith}));`)
@@ -162,6 +176,10 @@ function renderThemeCss(theme, derived) {
     lines.push(...renderNote(theme.note, ''))
 
   lines.push(`${selector} {`)
+
+  // Нативные контролы и полосы прокрутки острова следуют его теме, а не странице.
+  if (theme.colorScheme)
+    lines.push(`  color-scheme: ${theme.colorScheme};`, '')
 
   for (const [index, group] of theme.groups.entries()) {
     if (index > 0)

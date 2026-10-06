@@ -2,7 +2,16 @@
  * СГЕНЕРИРОВАНО `yarn generate:tokens` из `tokens/*.json` — правки здесь потеряются.
  * Менять значения и комментарии нужно в JSON, затем перегенерировать.
  */
-:root {
+/*
+ * Светлая тема. Кроме `:root` — атрибут `[data-theme='light']` и класс `.light`:
+ * остров `GrConfigProvider theme="light"` внутри тёмной страницы объявляет роли на
+ * себе и перекрывает унаследованные тёмные.
+ */
+:root,
+[data-theme='light'],
+.light {
+  color-scheme: light;
+
   /* Surface roles */
   --gr-bg: #f8fafc;
   --gr-fg: #0f172a;
@@ -174,7 +183,9 @@
 }
 
 @supports not (color: color-mix(in srgb, #000 50%, #fff)) {
-  :root {
+  :root,
+  [data-theme='light'],
+  .light {
     /* Action role fallbacks */
     --gr-primary-hover: #4a42d6;
     --gr-primary-active: #453ec7;

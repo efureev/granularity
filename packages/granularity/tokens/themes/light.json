@@ -1,8 +1,12 @@
 {
   "name": "light",
   "selectors": [
-    ":root"
+    ":root",
+    "[data-theme='light']",
+    ".light"
   ],
+  "colorScheme": "light",
+  "note": "Светлая тема. Кроме `:root` — атрибут `[data-theme='light']` и класс `.light`:\nостров `GrConfigProvider theme=\"light\"` внутри тёмной страницы объявляет роли на\nсебе и перекрывает унаследованные тёмные.",
   "groups": [
     {
       "title": "Surface roles",

@@ -4,7 +4,9 @@
  * одинаковые в обеих темах — токены нужны не для смены на тёмную, а чтобы
  * потребитель мог перекрасить хром под свой продукт.
  */
-:root {
+:root,
+[data-theme='light'],
+.light {
   --gr-image-viewer-scrim: rgb(0 0 0 / 0.6);
   --gr-image-viewer-chrome-bg: rgb(0 0 0 / 0.35);
   --gr-image-viewer-chrome-bg-hover: rgb(0 0 0 / 0.55);

@@ -1,4 +1,6 @@
-:root {
+:root,
+[data-theme='light'],
+.light {
   --gr-badge-neutral-bg: var(--gr-fg);
   --gr-badge-neutral-fg: var(--gr-bg);
   --gr-badge-primary-bg: var(--gr-primary-solid);

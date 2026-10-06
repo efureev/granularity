@@ -1,4 +1,6 @@
-:root {
+:root,
+[data-theme='light'],
+.light {
   --gr-progress-bg: var(--gr-primary);
   --gr-progress-neutral-bg: var(--gr-muted-fg);
   --gr-progress-success-bg: var(--gr-success);

@@ -9,6 +9,8 @@
  */
 [data-theme='dark'],
 .dark {
+  color-scheme: dark;
+
   /* Surface roles */
   --gr-bg: #0f172a;
   --gr-fg: #f8fafc;

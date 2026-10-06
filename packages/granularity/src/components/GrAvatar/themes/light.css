@@ -14,7 +14,10 @@
  * у него нет `-light` (мягкая подложка бренда называется `--gr-accent`).
  * Приложение вправе переназначить любой слот, не трогая компонент.
  */
-:root {
+:root,
+[data-theme],
+.light,
+.dark {
   --gr-avatar-1-bg: var(--gr-info-light);
   --gr-avatar-1-fg: var(--gr-info-text);
 

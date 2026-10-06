@@ -4,6 +4,7 @@
     "[data-theme='dark']",
     ".dark"
   ],
+  "colorScheme": "dark",
   "note": "Тёмная тема. Канон — атрибут `[data-theme='dark']` на `<html>` (его ставит\n`useTheme`/`initThemeEarly`). Селектор `.dark` оставлен для интеропа с\nclass-стратегией Tailwind/UnoCSS: приложение может уже переключать тему им.",
   "groups": [
     {

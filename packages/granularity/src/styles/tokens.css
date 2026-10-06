@@ -180,7 +180,12 @@
   --gr-z-modal: 1100;
   --gr-z-loading: 1150;
   --gr-z-toast: 1200;
+}
 
+:root,
+[data-theme],
+.light,
+.dark {
   /* Derived interaction formulas: action roles */
   --gr-primary-hover: color-mix(in srgb, var(--gr-primary) 92%, var(--gr-fg));
   --gr-primary-active: color-mix(in srgb, var(--gr-primary) 84%, var(--gr-fg));

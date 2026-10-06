@@ -9,7 +9,9 @@
  * Soft-заливка остаётся формулой: она выводится из тона подмесом к фону, и
  * своего значения ей не нужно.
  */
-:root {
+:root,
+[data-theme='light'],
+.light {
   --gr-button-primary-bg: var(--gr-primary-solid);
   --gr-button-primary-bg-hover: var(--gr-primary-solid-hover);
   --gr-button-primary-bg-active: var(--gr-primary-solid-active);
