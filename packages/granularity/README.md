@@ -111,10 +111,10 @@ utility classes, so components render with their own CSS but without layout.
 <!-- entry-sizes:generated:start lang=en -->
 | What you import | gzip | of the barrel |
 | --- | ---: | ---: |
-| the whole package from the root | 632.9 kB | 100 % |
+| the whole package from the root | 633.6 kB | 100 % |
 | the lightest component — `GrButtonGroup` | 1.5 kB | < 1 % |
 | the median component — `GrKbd` | 15.0 kB | 2 % |
-| the 5 heaviest together | 241.5 kB | 38 % |
+| the 5 heaviest together | 241.6 kB | 38 % |
 
 These numbers **do not add up**: shared code is counted again in every row but paid for once, which is why
 the set is shown as a union rather than a sum. They are an upper bound — the gzip of everything a subpath
@@ -132,16 +132,16 @@ on this one — the core stays lean, and you install only what you reach for.
 <!-- ecosystem:generated:start -->
 | Package | Version | What it adds |
 | --- | --- | --- |
-| [`@feugene/granularity-charts`](../granularity-charts) | 1.0.1 | Charts — own SVG, zero dependencies, drawn with theme tokens. |
-| [`@feugene/granularity-chrono`](../granularity-chrono) | 1.0.1 | Calendar, date and time components — no third-party date widget, no date library. |
-| [`@feugene/granularity-code`](../granularity-code) | 1.0.1 | Code surfaces: view, edit and diff — the viewer and the diff carry no dependencies at all. |
-| [`@feugene/granularity-dashboard`](../granularity-dashboard) | 1.0.1 | Widget grid — drag, resize, breakpoints and layout persistence, zero dependencies. |
+| [`@feugene/granularity-charts`](../granularity-charts) | 1.0.2 | Charts — own SVG, zero dependencies, drawn with theme tokens. |
+| [`@feugene/granularity-chrono`](../granularity-chrono) | 1.0.2 | Calendar, date and time components — no third-party date widget, no date library. |
+| [`@feugene/granularity-code`](../granularity-code) | 1.0.2 | Code surfaces: view, edit and diff — the viewer and the diff carry no dependencies at all. |
+| [`@feugene/granularity-dashboard`](../granularity-dashboard) | 1.0.2 | Widget grid — drag, resize, breakpoints and layout persistence, zero dependencies. |
 | [`@feugene/granularity-datasource`](../granularity-datasource) | 0.1.2 | List state: sorting, filters, paging, URL sync and race-free fetching behind one composable. |
 | [`@feugene/granularity-devtools`](../granularity-devtools) | 1.0.0 | Vue DevTools panel — where a prop value came from, the overlay layer stack and design-system warnings. |
-| [`@feugene/granularity-editor`](../granularity-editor) | 1.0.1 | Rich-text editing: a TipTap-backed GrRichText field with a design-system toolbar. |
-| [`@feugene/granularity-forms-schema`](../granularity-forms-schema) | 1.0.1 | Schema-driven forms — zod and JSON Schema into real form fields, zero dependencies. |
-| [`@feugene/granularity-media`](../granularity-media) | 1.0.1 | Media components: image cropping, camera capture, code scanning and video playback. |
-| [`@feugene/granularity-test-kit`](../granularity-test-kit) | 1.0.0 | Test gates for @feugene/granularity design-system packages — token, registry and defaults contracts as reusable factories. |
+| [`@feugene/granularity-editor`](../granularity-editor) | 1.0.2 | Rich-text editing: a TipTap-backed GrRichText field with a design-system toolbar. |
+| [`@feugene/granularity-forms-schema`](../granularity-forms-schema) | 1.0.2 | Schema-driven forms — zod and JSON Schema into real form fields, zero dependencies. |
+| [`@feugene/granularity-media`](../granularity-media) | 1.0.2 | Media components: image cropping, camera capture, code scanning and video playback. |
+| [`@feugene/granularity-test-kit`](../granularity-test-kit) | 1.1.0 | Test gates for @feugene/granularity design-system packages — token, registry and defaults contracts as reusable factories. |
 | [`@feugene/unplugin-granularity`](../unplugin-granularity) | 1.0.0 | unplugin-vue-components resolver — granular auto-import for components and directives. |
 <!-- ecosystem:generated:end -->
 

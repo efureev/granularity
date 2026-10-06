@@ -17,10 +17,10 @@ package pulls in no date library and no third-party widget.
 <!-- entry-sizes:generated:start lang=en -->
 | What you import | gzip | of the barrel |
 | --- | ---: | ---: |
-| the whole package from the root | 43.6 kB | 100 % |
-| the lightest component — `GrDuration` | 3.2 kB | 7 % |
-| the median component — `GrTimePicker` | 14.5 kB | 33 % |
-| the 5 heaviest together | 35.4 kB | 81 % |
+| the whole package from the root | 41.6 kB | 100 % |
+| the lightest component — `GrDuration` | 3.0 kB | 7 % |
+| the median component — `GrTimePicker` | 13.8 kB | 33 % |
+| the 5 heaviest together | 33.6 kB | 81 % |
 
 These numbers **do not add up**: shared code is counted again in every row but paid for once, which is why
 the set is shown as a union rather than a sum. They are an upper bound — the gzip of everything a subpath

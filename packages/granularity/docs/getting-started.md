@@ -740,20 +740,20 @@ export async function setupI18n() {
 <!-- ecosystem:generated:start -->
 | Пакет | Версия | Компоненты | Блок i18n | Резолвер |
 | --- | --- | --- | --- | --- |
-| `@feugene/granularity` | 1.0.4 | ядро, 106 subpath-экспортов `./components/Gr*` | `gr` | `GranularityResolver` (из `@feugene/unplugin-granularity`) |
-| `@feugene/granularity-charts` | 1.0.1 | `GrChartArea`, `GrChartBar`, `GrChartBullet`, `GrChartFunnel`, `GrChartHeatmap`, `GrChartLine`, `GrChartPie`, `GrChartRadar`, `GrChartWaterfall`, `GrSparkline` | `grCharts` | `GranularityChartsResolver` |
-| `@feugene/granularity-chrono` | 1.0.1 | `GrCalendar`, `GrDatePicker`, `GrDateRangePicker`, `GrDateTimePicker`, `GrDuration`, `GrRelativeTime`, `GrTimePicker` | `grChrono` | `GranularityChronoResolver` |
-| `@feugene/granularity-code` | 1.0.1 | `GrCodeBlock`, `GrCodeEditor`, `GrDiff` | `grCode` | `GranularityCodeResolver` |
-| `@feugene/granularity-dashboard` | 1.0.1 | `GrDashboard`, `GrDashboardItem`, `GrDashboardItemSettings`, `GrDashboardPalette`, `GrDashboardToolbar` | `grDashboard` | `GranularityDashboardResolver` |
-| `@feugene/granularity-editor` | 1.0.1 | `GrMarkdown`, `GrRichText` | `grEditor` | `GranularityEditorResolver` |
-| `@feugene/granularity-forms-schema` | 1.0.1 | `GrSchemaForm` | `grForms` | `GranularityFormsSchemaResolver` |
-| `@feugene/granularity-media` | 1.0.1 | `GrCameraCapture`, `GrCodeScanner`, `GrImageCrop`, `GrVideoPlayer` | `grMedia` | `GranularityMediaResolver` |
+| `@feugene/granularity` | 1.0.5 | ядро, 106 subpath-экспортов `./components/Gr*` | `gr` | `GranularityResolver` (из `@feugene/unplugin-granularity`) |
+| `@feugene/granularity-charts` | 1.0.2 | `GrChartArea`, `GrChartBar`, `GrChartBullet`, `GrChartFunnel`, `GrChartHeatmap`, `GrChartLine`, `GrChartPie`, `GrChartRadar`, `GrChartWaterfall`, `GrSparkline` | `grCharts` | `GranularityChartsResolver` |
+| `@feugene/granularity-chrono` | 1.0.2 | `GrCalendar`, `GrDatePicker`, `GrDateRangePicker`, `GrDateTimePicker`, `GrDuration`, `GrRelativeTime`, `GrTimePicker` | `grChrono` | `GranularityChronoResolver` |
+| `@feugene/granularity-code` | 1.0.2 | `GrCodeBlock`, `GrCodeEditor`, `GrDiff` | `grCode` | `GranularityCodeResolver` |
+| `@feugene/granularity-dashboard` | 1.0.2 | `GrDashboard`, `GrDashboardItem`, `GrDashboardItemSettings`, `GrDashboardPalette`, `GrDashboardToolbar` | `grDashboard` | `GranularityDashboardResolver` |
+| `@feugene/granularity-editor` | 1.0.2 | `GrMarkdown`, `GrRichText` | `grEditor` | `GranularityEditorResolver` |
+| `@feugene/granularity-forms-schema` | 1.0.2 | `GrSchemaForm` | `grForms` | `GranularityFormsSchemaResolver` |
+| `@feugene/granularity-media` | 1.0.2 | `GrCameraCapture`, `GrCodeScanner`, `GrImageCrop`, `GrVideoPlayer` | `grMedia` | `GranularityMediaResolver` |
 
 Компонентов не добавляют, но входят в семейство:
 
 - [`@feugene/granularity-datasource`](../../granularity-datasource) `0.1.2`
 - [`@feugene/granularity-devtools`](../../granularity-devtools) `1.0.0`
-- [`@feugene/granularity-test-kit`](../../granularity-test-kit) `1.0.0`
+- [`@feugene/granularity-test-kit`](../../granularity-test-kit) `1.1.0`
 - [`@feugene/unplugin-granularity`](../../unplugin-granularity) `1.0.0`
 <!-- ecosystem:generated:end -->
 

@@ -1,7 +1,7 @@
 {
   "name": "@feugene/granularity-code",
   "description": "Code surfaces for @feugene/granularity: view, edit and diff — the viewer and the diff carry no dependencies at all.",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "license": "LicenseRef-Granularity-EUC-1.1",
   "author": {
     "name": "Evgeniy Fureev",
@@ -141,7 +141,7 @@
     "@codemirror/view": "^6.36.0",
     "@feugene/fint-i18n": "^0.7.0",
     "@feugene/granularity": "^1.0.0",
-    "@feugene/granularity-test-kit": "^1.0.0",
+    "@feugene/granularity-test-kit": "^1.1.0",
     "@feugene/granum": "^1.0.0",
     "@feugene/granum-engine-wind": "^1.0.0",
     "@feugene/unplugin-granularity": "^1.0.0",

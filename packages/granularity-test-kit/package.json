@@ -1,7 +1,7 @@
 {
   "name": "@feugene/granularity-test-kit",
   "description": "Test gates for @feugene/granularity design-system packages — token, registry and defaults contracts as reusable factories.",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "license": "LicenseRef-Granularity-EUC-1.1",
   "author": {
     "name": "Evgeniy Fureev",

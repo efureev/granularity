@@ -1,7 +1,7 @@
 {
   "name": "@feugene/granularity-media",
   "description": "Media components for @feugene/granularity: image cropping, camera capture, code scanning and video playback.",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "license": "LicenseRef-Granularity-EUC-1.1",
   "author": {
     "name": "Evgeniy Fureev",
@@ -123,7 +123,7 @@
     "@antfu/eslint-config": "^9.3.0",
     "@feugene/fint-i18n": "^0.7.0",
     "@feugene/granularity": "^1.0.0",
-    "@feugene/granularity-test-kit": "^1.0.0",
+    "@feugene/granularity-test-kit": "^1.1.0",
     "@feugene/granum": "^1.0.0",
     "@feugene/granum-engine-wind": "^1.0.0",
     "@feugene/unplugin-granularity": "^1.0.0",
