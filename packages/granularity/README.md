@@ -111,10 +111,10 @@ utility classes, so components render with their own CSS but without layout.
 <!-- entry-sizes:generated:start lang=en -->
 | What you import | gzip | of the barrel |
 | --- | ---: | ---: |
-| the whole package from the root | 642.4 kB | 100 % |
+| the whole package from the root | 646.8 kB | 100 % |
 | the lightest component — `GrButtonGroup` | 1.5 kB | < 1 % |
-| the median component — `GrSlider` | 15.5 kB | 2 % |
-| the 5 heaviest together | 246.0 kB | 38 % |
+| the median component — `GrSlider` | 15.9 kB | 2 % |
+| the 5 heaviest together | 248.2 kB | 38 % |
 
 These numbers **do not add up**: shared code is counted again in every row but paid for once, which is why
 the set is shown as a union rather than a sum. They are an upper bound — the gzip of everything a subpath
@@ -140,7 +140,7 @@ on this one — the core stays lean, and you install only what you reach for.
 | [`@feugene/granularity-devtools`](../granularity-devtools) | 1.0.0 | Vue DevTools panel — where a prop value came from, the overlay layer stack and design-system warnings. |
 | [`@feugene/granularity-editor`](../granularity-editor) | 1.0.3 | Rich-text editing: a TipTap-backed GrRichText field with a design-system toolbar. |
 | [`@feugene/granularity-forms-schema`](../granularity-forms-schema) | 1.0.3 | Schema-driven forms — zod and JSON Schema into real form fields, zero dependencies. |
-| [`@feugene/granularity-media`](../granularity-media) | 1.0.4 | Media components: image cropping, camera capture, code scanning and video playback. |
+| [`@feugene/granularity-media`](../granularity-media) | 1.0.5 | Media components: image cropping, camera capture, code scanning and video playback. |
 | [`@feugene/granularity-test-kit`](../granularity-test-kit) | 1.1.0 | Test gates for @feugene/granularity design-system packages — token, registry and defaults contracts as reusable factories. |
 | [`@feugene/unplugin-granularity`](../unplugin-granularity) | 1.0.0 | unplugin-vue-components resolver — granular auto-import for components and directives. |
 <!-- ecosystem:generated:end -->
