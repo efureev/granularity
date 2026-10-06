@@ -115,8 +115,19 @@ const camera = useCameraStream({
 
 const { frameRatio, isLive, message: cameraMessage, start, status, stop } = camera
 
+/**
+ * Есть ли нативный `BarcodeDetector` — проверяется **после монтирования**.
+ *
+ * На сервере его нет никогда: решение в рендере давало сервером «не умеет
+ * читать коды» без кнопки, а браузером — «камера выключена» с кнопкой, и
+ * гидрация расходилась на каждой странице со сканером. До проверки первый
+ * рендер одинаков везде — нейтральное состояние покоя; тот же приём у
+ * `GrCodeBlock` с буфером обмена.
+ */
+const nativeSupported = ref<boolean | null>(null)
+
 /** Разбирать кадр нечем: ни нативного API, ни детектора от приложения. */
-const undetectable = computed(() => !props.detector && !nativeDetectorSupported())
+const undetectable = computed(() => !props.detector && nativeSupported.value === false)
 
 const stateMessage = computed(() => {
   if (undetectable.value) {
@@ -206,6 +217,8 @@ function stopScanning(): void {
 }
 
 onMounted(() => {
+  nativeSupported.value = nativeDetectorSupported()
+
   if (props.autoStart)
     void start()
 })
@@ -238,8 +251,9 @@ defineExpose({ start, stop: stopAll, status })
           {{ stateMessage }}
         </p>
 
+        <!-- Слот `#controls` владеет действиями: своя кнопка здесь стала бы второй «Начать». -->
         <GrButton
-          v-if="!undetectable && status !== 'starting' && status !== 'insecure' && status !== 'missing'"
+          v-if="!$slots.controls && !undetectable && status !== 'starting' && status !== 'insecure' && status !== 'missing'"
           :size="resolvedSize"
           :disabled="disabled"
           @click="start"

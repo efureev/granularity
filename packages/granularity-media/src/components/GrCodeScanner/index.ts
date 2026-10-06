@@ -1,5 +1,6 @@
 export { default } from './GrCodeScanner.vue'
 export { default as GrCodeScanner } from './GrCodeScanner.vue'
+export type { GrCameraStatus } from '../shared/cameraState'
 export type { GrCodeDetector, GrCodeResult } from './codeDetection'
 export { createNativeDetector, freshCodes, nativeDetectorSupported } from './codeDetection'
 export { grCodeScannerConfig } from './config'

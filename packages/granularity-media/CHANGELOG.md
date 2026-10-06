@@ -5,6 +5,21 @@ All notable changes to `@feugene/granularity-media` are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+
+- **Гидрация `GrCodeScanner` без расхождений.** Решение «нативного
+  `BarcodeDetector` нет» принималось в рендере: сервер писал «This browser cannot
+  read codes» без кнопки, Chrome — «The camera is off.» с кнопкой «Start
+  scanning», и гидрация расходилась на каждой странице со сканером, а до неё
+  мелькало ложное сообщение. Теперь поддержка проверяется после монтирования:
+  первый рендер везде — нейтральное состояние покоя.
+- **Со слотом `#controls` в рамке нет второй кнопки «Start scanning».** Слот
+  владеет действиями; в рамке остаётся только текст состояния.
+- **`GrCameraStatus` экспортируется из входа `GrCodeScanner`.** Слот `#controls`
+  отдаёт `status: GrCameraStatus`, а тип был только у входа `GrCameraCapture`.
+
 ## [v1.0.3] 2026-10-06
 
 ### Fixed
