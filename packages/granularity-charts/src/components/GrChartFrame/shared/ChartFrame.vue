@@ -571,6 +571,10 @@ const { floatingStyle } = useFloating(anchorEl, tooltipEl, tooltipApi.open, {
   placement: 'top',
   offsetPx: 12,
   zIndexVar: '--gr-z-tooltip',
+  // Курсор бывает поставлен программно — парой на `v-model:activeIndex`, — и
+  // тогда якорь легко уезжает прокруткой: подсказка не должна висеть поверх
+  // чужого содержимого у края вьюпорта.
+  hideWhenDetached: true,
 })
 
 const activeSeriesIndex = ref(0)
