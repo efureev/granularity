@@ -48,3 +48,29 @@
 Круг ничего не сортирует и не группирует. Хвост в «Прочее» собирает потребитель,
 потому что только он знает, что «Прочее» обязано стоять последним, а не попасть
 в середину по величине.
+
+## Своё число в середине бублика
+
+По умолчанию в дырке стоит итог — сумма долей по `valueFormat` и подпись
+`totalLabel`. Слот `#center` заменяет его своим содержимым. Оно рисуется
+**внутри холста**, поэтому это SVG, а не HTML, и ставится от координат,
+которые слот отдаёт: `cx`/`cy` — центр бублика, `innerRadius` — радиус дырки,
+`valueFont`/`labelFont` — кегли содержимого по умолчанию, подобранные от её
+размера.
+
+```vue
+<GrChartPie :data="deliveries" variant="donut">
+  <template #center="{ cx, cy, valueFont, labelFont }">
+    <text :x="cx" :y="cy - labelFont / 2" text-anchor="middle" dominant-baseline="middle" :font-size="valueFont" font-weight="600">
+      92%
+    </text>
+    <text :x="cx" :y="cy + valueFont * 0.55" text-anchor="middle" dominant-baseline="middle" :font-size="labelFont">
+      on time
+    </text>
+  </template>
+</GrChartPie>
+```
+
+Шире диаметра дырки (`2 × innerRadius`) содержимое ляжет на кольцо. Итог
+слоту тоже приходит — `total` числом и `formattedTotal` строкой по
+`valueFormat`.

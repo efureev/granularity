@@ -1,7 +1,7 @@
 import { announced, granularityGlobal, i18nAdapter, keydown, mockRect, pointer } from '@feugene/granularity/testing'
 import { mount } from '@vue/test-utils'
 import { describe, expect, it } from 'vitest'
-import { nextTick } from 'vue'
+import { h, nextTick } from 'vue'
 
 import GrChartPie from '../GrChartPie.vue'
 
@@ -261,6 +261,37 @@ describe('GrChartPie', () => {
   it('бублик показывает итог в середине, круг — нет', () => {
     expect(factory({ variant: 'donut' }).find('[data-gr-chart-pie-center]').text()).toContain('100')
     expect(factory().find('[data-gr-chart-pie-center]').exists()).toBe(false)
+  })
+
+  it('слот `#center` получает геометрию середины: своё содержимое встаёт по центру', () => {
+    // Без `cx`/`cy` своё SVG ложилось в начало координат холста, а не в дырку.
+    let scope: Record<string, unknown> | undefined
+    const wrapper = factory({ variant: 'donut' })
+    const own = mount(GrChartPie, {
+      props: { data, variant: 'donut', valueFormat: { precision: 2 } },
+      global: granularityGlobal(),
+      slots: {
+        center: (props: Record<string, unknown>) => {
+          scope = props
+          return h('text', { 'data-own-center': '', 'x': props.cx, 'y': props.cy }, '92%')
+        },
+      },
+    })
+    const defaultValue = wrapper.get('[data-gr-chart-pie-center] text')
+
+    expect(scope).toBeDefined()
+    expect(scope!.cx).toBe(Number(defaultValue.attributes('x')))
+    expect(scope!.cx).toBe(CENTER.x)
+    expect(scope!.cy).toBe(CENTER.y)
+    expect(scope!.innerRadius).toBeGreaterThan(0)
+    expect(scope!.innerRadius).toBeLessThan(120)
+    expect(typeof scope!.valueFont).toBe('number')
+    expect(typeof scope!.labelFont).toBe('number')
+    // Итог форматируется по `valueFormat`, как и подписи долей.
+    expect(scope!.formattedTotal).toBe('100.00')
+    expect(own.get('[data-own-center]').attributes('x')).toBe(String(CENTER.x))
+
+    own.unmount()
   })
 
   it('подписи снаружи кольца и только у заметных долей', () => {

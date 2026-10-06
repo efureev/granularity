@@ -175,8 +175,24 @@ const props = withDefaults(defineProps<GrChartPieProps>(), {
 const emit = defineEmits<GrChartPieEmits>()
 
 defineSlots<{
-  /** Середина бублика. Содержимое — SVG: оно рисуется внутри холста. */
-  center?: (props: { total: number, formattedTotal: string }) => unknown
+  /**
+   * Середина бублика. Содержимое — SVG в координатах холста: ставьте его от
+   * `cx`/`cy` и держите внутри `innerRadius`.
+   */
+  center?: (props: {
+    total: number
+    /** Итог, отформатированный по `valueFormat`. */
+    formattedTotal: string
+    /** Центр бублика в координатах холста. */
+    cx: number
+    cy: number
+    /** Радиус дырки: содержимое шире её диаметра ляжет на кольцо. */
+    innerRadius: number
+    /** Кегль итога у содержимого по умолчанию — от размера дырки. */
+    valueFont: number
+    /** Кегль подписи под итогом. */
+    labelFont: number
+  }) => unknown
   tooltip?: (props: {
     active: GrChartActivePoint
     slice: GrChartPieActiveSlice | null
@@ -498,6 +514,7 @@ function labelMarks(plot: Rect): LabelMark[] {
 interface CenterMark {
   cx: number
   cy: number
+  innerRadius: number
   valueFont: number
   labelFont: number
 }
@@ -512,6 +529,7 @@ function centerMarks(plot: Rect): CenterMark[] {
   return [{
     cx: geometry.cx,
     cy: geometry.cy,
+    innerRadius: geometry.inner,
     // Кегль от дырки, а не от размера компонента: иначе итог либо теряется в
     // большом бублике, либо не влезает в маленький.
     valueFont: clamp(geometry.inner * TOTAL_VALUE_RATIO, 12, 32),
@@ -639,7 +657,16 @@ defineExpose({
         </template>
 
         <g v-for="center in centerMarks(plot)" :key="center.valueFont" data-gr-chart-pie-center>
-          <slot name="center" :total="total" :formatted-total="formattedTotal">
+          <slot
+            name="center"
+            :total="total"
+            :formatted-total="formattedTotal"
+            :cx="center.cx"
+            :cy="center.cy"
+            :inner-radius="center.innerRadius"
+            :value-font="center.valueFont"
+            :label-font="center.labelFont"
+          >
             <text
               :x="center.cx"
               :y="center.cy - center.labelFont * 0.5"
