@@ -1117,6 +1117,46 @@ test.describe('GrSegmented: ширина сегмента по содержим�
     expect(new Set(byEqual).size, `равные треки дали разные ширины: ${byEqual.join('/')}`).toBe(1)
   })
 
+  /**
+   * Подпись однострочная, и у неё `min-content` равен `max-content`: трек
+   * `minmax(min-content, auto)` не сжимался, и в колонке на 200px ряд вылезал
+   * за край (три трека на 360px внутри 198px). Теперь короткая подпись целиком,
+   * длинные делят остаток и режутся многоточием, а ряд не шире колонки.
+   */
+  test('content в узкой колонке сжимает треки и не вылезает за край', async ({ page }) => {
+    await openShowcasePage(page, componentPath('GrSegmented'))
+
+    const row = page.locator('[data-testid="segmented-width-narrow"] [data-gr-segmented]')
+    const geometry = await row.evaluate((root) => {
+      const column = root.parentElement!.getBoundingClientRect()
+      const box = root.getBoundingClientRect()
+      const labels = [...root.querySelectorAll('[role="radio"]')].map((radio) => {
+        const label = radio.querySelector('span')!
+        return { truncated: label.scrollWidth - label.clientWidth > 1, title: (radio as HTMLElement).title || label.title }
+      })
+
+      return { scroll: root.scrollWidth, client: root.clientWidth, right: box.right, columnRight: column.right, labels }
+    })
+
+    expect(geometry.scroll, `${geometry.scroll} > ${geometry.client}`).toBeLessThanOrEqual(geometry.client)
+    expect(geometry.right).toBeLessThanOrEqual(geometry.columnRight)
+    expect(geometry.labels[0].truncated, 'короткая подпись обрезана').toBe(false)
+    expect(geometry.labels.slice(1).some(label => label.truncated), 'длинным подписям хватило места — замер ничего не проверяет').toBe(true)
+  })
+
+  test('content при достатке места: разница сегментов — разница содержимого', async ({ page }) => {
+    await openShowcasePage(page, componentPath('GrSegmented'))
+
+    const slack = await drawerRow(page).locator('[role="radio"]').evaluateAll(nodes =>
+      nodes.map((node) => {
+        const label = node.querySelector('span')!
+        return node.getBoundingClientRect().width - label.scrollWidth
+      }))
+
+    // Остаток делится поверх содержимого поровну.
+    expect(Math.max(...slack) - Math.min(...slack), `запас: ${slack.map(Math.round).join('/')}`).toBeLessThanOrEqual(2)
+  })
+
   test('островок совпадает с границами выбранного сегмента', async ({ page }) => {
     // Инвариант: ширина островка — это ширина сегмента из DOM, а не вычисленная
     // доля. Проверяется в режиме `content`, где сегменты разной ширины.

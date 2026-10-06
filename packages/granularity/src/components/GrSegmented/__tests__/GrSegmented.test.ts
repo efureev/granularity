@@ -237,7 +237,11 @@ describe('GrSegmented', () => {
 
     const style = wrapper.get('[data-gr-segmented]').attributes('style')!
     expect(style).not.toContain('1fr')
-    expect(style).toContain('grid-template-columns: minmax(min-content,auto) minmax(min-content,auto) minmax(min-content,auto)')
+    // Минимум трека — ноль: у однострочной подписи `min-content` равен
+    // `max-content`, и трек с таким минимумом не сжимался — ряд вылезал за
+    // контейнер. Само сжатие меряет `apps/showcase/e2e/interaction.spec.ts`.
+    expect(style).toContain('grid-template-columns: minmax(0,auto) minmax(0,auto) minmax(0,auto)')
+    expect(style).not.toContain('min-content')
 
     wrapper.unmount()
   })
@@ -290,7 +294,7 @@ describe('GrSegmented', () => {
     })
     await nextTick()
 
-    expect(wrapper.get('[data-gr-segmented]').attributes('style')).toContain('minmax(min-content,auto)')
+    expect(wrapper.get('[data-gr-segmented]').attributes('style')).toContain('minmax(0,auto)')
 
     wrapper.unmount()
   })

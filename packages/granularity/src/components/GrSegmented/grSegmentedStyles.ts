@@ -20,12 +20,16 @@ export type GrSegmentedItemWidth = typeof GR_SEGMENTED_ITEM_WIDTHS[number]
 /**
  * Трек грида под один сегмент.
  *
- * `content` — это `minmax(min-content, auto)`, и минимум здесь не придирка.
- * Грид растит треки равными долями до их `max-content`, а остаток делит поверх:
- * разница между сегментами получается равной разнице их содержимого. Расходятся
- * минимумы там, где места **не хватает**: с `max-content` трек не сжимается и
- * ряд вылезает за контейнер, с `min-content` — сжимается, и включается
- * `truncate` на подписи. Многоточие тут страховка, и терять её нельзя.
+ * `content` — это `minmax(0, auto)`. Максимум `auto` — это `max-content` с
+ * растяжением: грид растит треки равными долями до их `max-content`, а остаток
+ * делит поверх, и разница между сегментами равна разнице их содержимого.
+ *
+ * Минимум — ноль, а не `min-content`, и это не придирка. Подпись однострочная
+ * (`truncate`), и у неё `min-content` равен `max-content`: трек с минимумом
+ * `min-content` не сжимался вовсе, и там, где места не хватает, ряд вылезал за
+ * контейнер. С нулём треки при нехватке места растут равными долями от нуля:
+ * короткие подписи получают свою ширину целиком, длинные делят остаток и
+ * уходят в многоточие. Шире контейнера ряд не становится.
  */
 export function grSegmentedTrack(options: {
   block: boolean
@@ -35,7 +39,7 @@ export function grSegmentedTrack(options: {
   if (options.vertical || !options.block)
     return 'minmax(0,max-content)'
 
-  return options.itemWidth === 'content' ? 'minmax(min-content,auto)' : 'minmax(0,1fr)'
+  return options.itemWidth === 'content' ? 'minmax(0,auto)' : 'minmax(0,1fr)'
 }
 export type GrSegmentedValue = string | number
 export type GrSegmentedOption = {

@@ -5,6 +5,20 @@ All notable changes to the [`@feugene/granularity`](.) package are documented in
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Fixed
+
+- **`GrSegmented block item-width="content"` не шире контейнера.** Трек был
+  `minmax(min-content, auto)`, а у однострочной подписи (`truncate`)
+  `min-content` равен `max-content` — трек не сжимался вовсе. В колонке на
+  198px три сегмента («All 6», «Needs my review 3», «Failing checks 2») давали
+  треки на 360px, и ряд выталкивал за край карточку вокруг себя. Теперь трек —
+  `minmax(0, auto)`: пока места хватает, раскладка прежняя (ширина по
+  содержимому, остаток поровну поверх), а когда не хватает — короткие подписи
+  остаются целиком, длинные делят остаток и уходят в многоточие с полным
+  текстом в `title`. `equal` и вертикаль не меняются.
+
 ## [v1.0.13] 2026-10-07
 
 ### Fixed
