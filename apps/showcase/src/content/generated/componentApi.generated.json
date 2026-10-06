@@ -10382,7 +10382,7 @@
         "items": [
           {
             "name": "default",
-            "description": "Собственные `<option>` для нативного режима.",
+            "description": "Собственные `<option>` (и `<optgroup>`) для нативного режима. Выбор у них ставит компонент по `v-model` — так же, как у опций из `options`: свой `:selected` писать не нужно, и сервер отдаёт уже выбранную опцию.",
             "type": "any"
           },
           {
@@ -11453,8 +11453,13 @@
         "items": [
           {
             "name": "step",
-            "description": "Своя разметка пункта. Корневой тег, `aria-current` и клик остаются за компонентом — иначе доступность шага пришлось бы собирать заново.",
-            "type": "{ step: GrStep; index: number; status: GrStepStatus; enterable: boolean; }"
+            "description": "Своя разметка пункта **целиком**: маркер, подпись и состояние словом. Корневой тег, `aria-current` и клик остаются за компонентом. Слот обязан сам вывести `stateText` (визуально скрытым): иначе пройденный шаг и шаг с ошибкой звучат одинаково — цвет маркера диктору недоступен. Класс маркера по статусу — `markerClass`. Нужно только дополнить подпись — бери `#label`.",
+            "type": "{ step: GrStep; index: number; status: GrStepStatus; enterable: boolean; markerClass: string; stateText: string; }"
+          },
+          {
+            "name": "label",
+            "description": "Только текстовый блок шага: подпись, описание, своё рядом с ними — оценка времени, бейдж. Маркер и визуально скрытое состояние остаются за компонентом.",
+            "type": "{ step: GrStep; index: number; status: GrStepStatus; }"
           }
         ]
       },
