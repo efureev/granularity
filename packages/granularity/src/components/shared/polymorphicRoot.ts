@@ -17,3 +17,28 @@
 export function isFocusableTag(tag: string, hasHref: boolean): boolean {
   return tag === 'button' || (tag === 'a' && hasHref)
 }
+
+/**
+ * Атрибуты полиморфного корня без ключей со значением `undefined`.
+ *
+ * Компонент-ссылка из `as` получает всё, что не его проп, в `$attrs`, и там
+ * `undefined` — значение, а не «атрибута нет». При fallthrough `mergeProps`
+ * кладёт его поверх атрибутов, которые ссылка ставит своему `<a>` сама:
+ * `href: undefined` затирает адрес, вычисленный роутером, и ссылка остаётся
+ * без `href` — вне порядка Tab, без «открыть в новой вкладке». Переставить
+ * привязки не поможет: объект в `v-bind` с `undefined` внутри делает то же.
+ *
+ * Нативному тегу фильтр ничего не меняет — у него `undefined` и так значит
+ * «не ставить», — поэтому корень собирается через него, не разбирая, тег это
+ * или компонент.
+ */
+export function definedAttrs(attrs: Record<string, unknown>): Record<string, unknown> {
+  const result: Record<string, unknown> = {}
+
+  for (const key in attrs) {
+    if (attrs[key] !== undefined)
+      result[key] = attrs[key]
+  }
+
+  return result
+}

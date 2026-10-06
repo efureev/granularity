@@ -14,6 +14,7 @@
 import { computed, inject, markRaw, provide, ref, useId, watch, type Component } from 'vue'
 
 import GrTooltip from '../GrTooltip/GrTooltip.vue'
+import { definedAttrs } from '../shared/polymorphicRoot'
 
 import IconChevronRight from '~icons/lucide/chevron-right'
 
@@ -183,6 +184,20 @@ const rootHref = computed(() => (
   typeof rootTag.value === 'string' && rootTag.value !== 'a' ? undefined : props.href
 ))
 
+const rootAttrs = computed(() => definedAttrs({
+  'type': rootTag.value === 'button' ? 'button' : undefined,
+  'href': rootHref.value,
+  'aria-current': props.active ? 'page' : undefined,
+  'aria-disabled': props.disabled ? 'true' : undefined,
+}))
+
+/** В рейле пункт — иконка: имя ему даёт подпись, а ветка объявляет себя свёрнутой. */
+const collapsedAttrs = computed(() => definedAttrs({
+  ...rootAttrs.value,
+  'aria-label': props.label,
+  'aria-expanded': hasChildren.value ? 'false' : undefined,
+}))
+
 const rootClass = computed(() => grSidebarItemClass({
   collapsed: collapsed.value,
   disabled: props.disabled,
@@ -221,12 +236,7 @@ const showChildren = computed(() => hasChildren.value && isExpanded.value)
     <component
       :is="rootTag"
       data-gr-sidebar-item
-      :type="rootTag === 'button' ? 'button' : undefined"
-      :href="rootHref"
-      :aria-current="active ? 'page' : undefined"
-      :aria-disabled="disabled ? 'true' : undefined"
-      :aria-label="label"
-      :aria-expanded="hasChildren ? 'false' : undefined"
+      v-bind="collapsedAttrs"
       :class="rootClass"
       @click="onCollapsedActivate"
     >
@@ -274,10 +284,7 @@ const showChildren = computed(() => hasChildren.value && isExpanded.value)
     :is="rootTag"
     v-else
     data-gr-sidebar-item
-    :type="rootTag === 'button' ? 'button' : undefined"
-    :href="rootHref"
-    :aria-current="active ? 'page' : undefined"
-    :aria-disabled="disabled ? 'true' : undefined"
+    v-bind="rootAttrs"
     :class="rootClass"
     :style="rootStyle"
   >

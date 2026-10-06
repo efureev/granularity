@@ -5,6 +5,7 @@ import IconLoader from '~icons/lucide/loader-circle'
 
 import { useGrComponentProp, useGrComponentSize } from '../shared/configContext'
 import { useGrButtonGroup } from '../shared/buttonGroupContext'
+import { definedAttrs } from '../shared/polymorphicRoot'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 
 export type { GrButtonSize, GrButtonTone, GrButtonVariant } from './grButtonStyles'
@@ -105,6 +106,26 @@ const looksDisabled = computed(() => props.disabled || attrs['aria-disabled'] ==
 const resolvedTarget = computed(() => props.target ?? (props.external ? '_blank' : undefined))
 const resolvedRel = computed(() => props.rel ?? (resolvedTarget.value === '_blank' ? 'noopener noreferrer' : undefined))
 
+const rootAttrs = computed(() => {
+  const liveLink = isLink.value && !props.disabled
+  const own = definedAttrs({
+    'type': renderAs.value === 'button' ? props.type : undefined,
+    'disabled': nativeDisabled.value,
+    'href': liveLink ? props.href : undefined,
+    'target': liveLink ? resolvedTarget.value : undefined,
+    'rel': liveLink ? resolvedRel.value : undefined,
+    'aria-busy': props.loading ? 'true' : undefined,
+    'aria-disabled': ariaDisabled.value,
+    'aria-label': props.ariaLabel,
+    'tabindex': isLink.value && props.disabled ? -1 : undefined,
+  })
+
+  // Выключенная ссылка остаётся без адреса и у компонента-ссылки: `undefined`
+  // здесь нарочно ложится поверх `href`, который тот вычислил сам. С адресом
+  // средняя кнопка и «открыть в новой вкладке» обошли бы перехват клика.
+  return isLink.value && props.disabled ? { ...own, href: undefined } : own
+})
+
 function onClickCapture(e: MouseEvent): void {
   // Блокируем и дефолт (submit/навигация), и внешние обработчики (в т.ч. по Enter/Space),
   // сохраняя фокус на элементе.
@@ -165,15 +186,7 @@ defineSlots<{
     data-gr-button
     :data-gr-variant="resolvedVariant"
     :data-gr-tone="resolvedTone"
-    :type="renderAs === 'button' ? props.type : undefined"
-    :disabled="nativeDisabled"
-    :href="isLink && !props.disabled ? props.href : undefined"
-    :target="isLink && !props.disabled ? resolvedTarget : undefined"
-    :rel="isLink && !props.disabled ? resolvedRel : undefined"
-    :aria-busy="props.loading ? 'true' : undefined"
-    :aria-disabled="ariaDisabled"
-    :aria-label="props.ariaLabel"
-    :tabindex="isLink && props.disabled ? -1 : undefined"
+    v-bind="rootAttrs"
     :class="[grButtonBaseClass, className, blocked ? 'cursor-not-allowed' : '']"
     @click.capture="onClickCapture"
   >

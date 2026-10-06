@@ -23,6 +23,7 @@ import { computed, markRaw, useAttrs, type Component } from 'vue'
 import GrIcon from '../GrIcon/GrIcon.vue'
 import IconExternal from '~icons/lucide/external-link'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
+import { definedAttrs } from '../shared/polymorphicRoot'
 
 import {
   baseRootClass,
@@ -163,6 +164,21 @@ const rootClass = computed(() => {
     : `${baseRootClass} ${focusRingClass} ${variantClass}`
 })
 
+/**
+ * Функция, а не `computed`: `attrs` нереактивны, и вычисление от них
+ * запомнило бы первый рендер. Шаблон зовёт её на каждом.
+ */
+function rootAttrs(): Record<string, unknown> {
+  return definedAttrs({
+    ...attrs,
+    'href': isInteractive.value ? props.href : undefined,
+    'target': isInteractive.value ? resolvedTarget.value : undefined,
+    'rel': isInteractive.value ? resolvedRel.value : undefined,
+    'aria-label': resolvedAriaLabel.value,
+    'aria-disabled': props.disabled ? 'true' : undefined,
+  })
+}
+
 // Цвет (tone × variant) прокидываем через CSS-переменные, чтобы не плодить классы.
 const colorStyle = computed(() => grLinkColorStyle({
   tone: props.tone,
@@ -179,12 +195,7 @@ defineSlots<{
 <template>
   <component
     :is="renderAs"
-    v-bind="attrs"
-    :href="isInteractive ? href : undefined"
-    :target="isInteractive ? resolvedTarget : undefined"
-    :rel="isInteractive ? resolvedRel : undefined"
-    :aria-label="resolvedAriaLabel"
-    :aria-disabled="disabled ? 'true' : undefined"
+    v-bind="rootAttrs()"
     :class="rootClass"
     :style="colorStyle"
   >

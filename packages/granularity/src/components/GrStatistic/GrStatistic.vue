@@ -5,7 +5,7 @@ import { computed, markRaw, onBeforeUnmount, onMounted, ref, useSlots, watch, wa
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 import { deltaTone, type GrDeltaPolarity } from '../shared/deltaTone'
 import { iconClass, iconTag } from '../shared/icon'
-import { isFocusableTag } from '../shared/polymorphicRoot'
+import { definedAttrs, isFocusableTag } from '../shared/polymorphicRoot'
 import GrSkeleton from '../GrSkeleton/GrSkeleton.vue'
 import GrValue from '../GrValue'
 
@@ -238,6 +238,11 @@ const rootHref = computed(() => (
   typeof rootTag.value === 'string' && rootTag.value !== 'a' ? undefined : props.href
 ))
 
+const rootAttrs = computed(() => definedAttrs({
+  type: rootTag.value === 'button' ? 'button' : undefined,
+  href: rootHref.value,
+}))
+
 const rootClass = computed(() => statisticRootClass({ interactive: isInteractive.value }))
 
 function toNumber(value: number | string): number | null {
@@ -389,8 +394,7 @@ defineSlots<{
   <component
     :is="rootTag"
     data-gr-statistic
-    :type="rootTag === 'button' ? 'button' : undefined"
-    :href="rootHref"
+    v-bind="rootAttrs"
     :class="rootClass"
     @click="emit('click', $event)"
   >

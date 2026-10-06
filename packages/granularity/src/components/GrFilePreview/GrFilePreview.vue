@@ -3,7 +3,7 @@ import { computed, markRaw, ref, watch, watchEffect, type Component } from 'vue'
 
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 import { useGrComponentProp } from '../shared/configContext'
-import { isFocusableTag } from '../shared/polymorphicRoot'
+import { definedAttrs, isFocusableTag } from '../shared/polymorphicRoot'
 import GrSkeleton from '../GrSkeleton/GrSkeleton.vue'
 
 import IconFile from '~icons/lucide/file'
@@ -239,6 +239,14 @@ const resolvedAriaLabel = computed(() => {
   return t('gr.filePreview.label', 'File')
 })
 
+const rootAttrs = computed(() => definedAttrs({
+  'type': rootTag.value === 'button' ? 'button' : undefined,
+  'href': rootHref.value,
+  'target': rootTarget.value,
+  'rel': rootRel.value,
+  'aria-label': resolvedAriaLabel.value,
+}))
+
 if (__GR_DEV__) {
   watchEffect(() => {
     if (isInteractive.value && !props.ariaLabel && !props.name) {
@@ -260,13 +268,9 @@ function onClick(event: MouseEvent): void {
     :is="rootTag"
     data-gr-file-preview
     :data-kind="kind"
-    :type="rootTag === 'button' ? 'button' : undefined"
-    :href="rootHref"
-    :target="rootTarget"
-    :rel="rootRel"
+    v-bind="rootAttrs"
     :class="rootClass"
     :style="rootStyle"
-    :aria-label="resolvedAriaLabel"
     @click="onClick"
   >
     <GrSkeleton

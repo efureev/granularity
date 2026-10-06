@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, markRaw, useSlots, watch, type Component } from 'vue'
 
-import { isFocusableTag } from '../shared/polymorphicRoot'
+import { definedAttrs, isFocusableTag } from '../shared/polymorphicRoot'
 
 import {
   grListItemPaddingClass,
@@ -31,6 +31,11 @@ export interface GrListItemProps {
    * `div`: ни подсветки, ни кольца фокуса.
    */
   as?: string | Component
+  /**
+   * Цель роутерной ссылки: уезжает в компонент из `as`. Пропом, а не атрибутом:
+   * атрибуты достаются обёртке с ролью `listitem`, до строки они не доходят.
+   */
+  to?: unknown
   /** Кликабельная строка без ссылки — `<button>` с событием `click`. */
   clickable?: boolean
   /** Подсветка при наведении без интерактивности. */
@@ -111,6 +116,13 @@ const rowHref = computed(() => (
   typeof rowTag.value === 'string' && rowTag.value !== 'a' ? undefined : props.href
 ))
 
+const rowAttrs = computed(() => definedAttrs({
+  'data-gr-list-item-action': isAction.value ? '' : undefined,
+  'type': rowTag.value === 'button' ? 'button' : undefined,
+  'href': rowHref.value,
+  'to': typeof rowTag.value === 'string' ? undefined : props.to,
+}))
+
 const rowClass = computed(() => [
   itemLayoutClass,
   grListItemPaddingClass(props.density),
@@ -165,9 +177,7 @@ defineSlots<{
   >
     <component
       :is="rowTag"
-      :data-gr-list-item-action="isAction ? '' : undefined"
-      :type="rowTag === 'button' ? 'button' : undefined"
-      :href="rowHref"
+      v-bind="rowAttrs"
       :class="rowClass"
       @click="onClick"
     >

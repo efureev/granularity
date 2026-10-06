@@ -4,6 +4,8 @@ import type { Component } from 'vue'
 
 import IconCheck from '~icons/lucide/check'
 
+import { definedAttrs } from '../shared/polymorphicRoot'
+
 import {
   grDropdownMenuItemClass,
   itemIndicatorClass,
@@ -106,6 +108,24 @@ const className = computed(() => grDropdownMenuItemClass({
  */
 const resolvedTabindex = computed(() => (attrs.tabindex as number | string | undefined) ?? -1)
 
+/** Функция, а не `computed`: в ней `attrs`, а они нереактивны. */
+function rootAttrs(): Record<string, unknown> {
+  const own = definedAttrs({
+    ...attrs,
+    'type': isNativeButton.value ? (attrs.type ?? 'button') : undefined,
+    'href': resolvedHref.value,
+    'target': resolvedHref.value ? resolvedTarget.value : undefined,
+    'rel': resolvedHref.value ? resolvedRel.value : undefined,
+    'aria-disabled': props.disabled ? 'true' : undefined,
+    'aria-checked': isCheckable.value ? (props.checked ? 'true' : 'false') : undefined,
+    'tabindex': resolvedTabindex.value,
+  })
+
+  // У выключенного пункта адреса нет и тогда, когда его вычисляет компонент-ссылка:
+  // `undefined` здесь нарочно ложится поверх его собственного `href`.
+  return props.disabled ? { ...own, href: undefined } : own
+}
+
 function onClickCapture(e: MouseEvent): void {
   if (!props.disabled)
     return
@@ -130,17 +150,10 @@ defineSlots<{
 <template>
   <component
     :is="renderAs"
-    v-bind="attrs"
+    v-bind="rootAttrs()"
     data-gr-dropdown-menu-item
     :role="role"
     :class="className"
-    :type="isNativeButton ? (attrs.type as any) ?? 'button' : undefined"
-    :href="resolvedHref"
-    :target="resolvedHref ? resolvedTarget : undefined"
-    :rel="resolvedHref ? resolvedRel : undefined"
-    :aria-disabled="disabled ? 'true' : undefined"
-    :aria-checked="isCheckable ? (checked ? 'true' : 'false') : undefined"
-    :tabindex="resolvedTabindex"
     @click.capture="onClickCapture"
   >
     <span

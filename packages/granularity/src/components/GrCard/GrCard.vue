@@ -2,7 +2,7 @@
 import { computed, markRaw, useId, useSlots, watch, type Component } from 'vue'
 
 import { useGrComponentProp } from '../shared/configContext'
-import { isFocusableTag } from '../shared/polymorphicRoot'
+import { definedAttrs, isFocusableTag } from '../shared/polymorphicRoot'
 
 import {
   headerActionsClass,
@@ -220,6 +220,15 @@ if (__GR_DEV__) {
   )
 }
 
+const rootAttrs = computed(() => definedAttrs({
+  'type': rootTag.value === 'button' ? 'button' : undefined,
+  'href': rootHref.value,
+  'role': rootRegionLabel.value ? 'region' : undefined,
+  'aria-label': rootRegionLabel.value,
+  'aria-labelledby': rootLabelledBy.value,
+  'aria-describedby': rootDescribedBy.value,
+}))
+
 const rootClass = computed(() => grCardRootClass({
   variant: resolvedVariant.value,
   // С секциями отступ принадлежит каждой из них, а не поверхности целиком.
@@ -269,13 +278,8 @@ defineSlots<{
   <component
     :is="rootTag"
     data-gr-card
-    :type="rootTag === 'button' ? 'button' : undefined"
-    :href="rootHref"
+    v-bind="rootAttrs"
     :class="rootClass"
-    :role="rootRegionLabel ? 'region' : undefined"
-    :aria-label="rootRegionLabel"
-    :aria-labelledby="rootLabelledBy"
-    :aria-describedby="rootDescribedBy"
     @click="onClick"
   >
     <template v-if="hasSections">

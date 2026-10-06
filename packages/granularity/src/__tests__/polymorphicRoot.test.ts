@@ -1,10 +1,18 @@
-import { mount } from '@vue/test-utils'
+import { mount, type VueWrapper } from '@vue/test-utils'
+import { defineComponent, h, markRaw } from 'vue'
 import { describe, expect, it, vi } from 'vitest'
 
+import GrBottomNav from '../components/GrBottomNav/GrBottomNav.vue'
+import GrBreadcrumbs from '../components/GrBreadcrumbs/GrBreadcrumbs.vue'
+import GrButton from '../components/GrButton/GrButton.vue'
 import GrCard from '../components/GrCard/GrCard.vue'
+import GrDropdownMenuItem from '../components/GrDropdownMenu/GrDropdownMenuItem.vue'
 import GrFilePreview from '../components/GrFilePreview/GrFilePreview.vue'
+import GrLink from '../components/GrLink/GrLink.vue'
 import GrListItem from '../components/GrList/GrListItem.vue'
+import GrSidebarItem from '../components/GrSidebar/GrSidebarItem.vue'
 import GrStatistic from '../components/GrStatistic/GrStatistic.vue'
+import { definedAttrs } from '../components/shared/polymorphicRoot'
 
 /**
  * Гейт контракта полиморфного корня.
@@ -78,5 +86,79 @@ describe('контракт полиморфного корня: as называ�
     expect(warn.mock.calls.flat().join(' ')).toContain('таб-порядок')
 
     warn.mockRestore()
+  })
+})
+
+/**
+ * Компонент-ссылка из `as` (`RouterLink`, `NuxtLink`, `Link` от Inertia) сам
+ * вычисляет `href` своему `<a>`. Всё, что корень привязал со значением
+ * `undefined`, доезжает до него в `$attrs` и при fallthrough ложится поверх:
+ * `href: undefined` оставлял ссылку без адреса — вне порядка Tab, без «открыть
+ * в новой вкладке».
+ *
+ * Заглушка устроена как `RouterLink`: `to` — проп, `href` — её собственный.
+ */
+const RouterLinkStub = markRaw(defineComponent({
+  name: 'RouterLinkStub',
+  props: { to: { type: String, required: true } },
+  setup: (props, { slots }) => () => h('a', { href: `#${props.to}` }, slots.default?.()),
+}))
+
+const TO = '/reports'
+const asLink = { as: RouterLinkStub }
+
+const LINK_CASES: { name: string, render: () => VueWrapper }[] = [
+  { name: 'GrButton', render: () => mount(GrButton, { props: asLink, attrs: { to: TO }, slots: { default: 'Отчёты' } }) },
+  { name: 'GrLink', render: () => mount(GrLink, { props: asLink, attrs: { to: TO }, slots: { default: 'Отчёты' } }) },
+  { name: 'GrCard', render: () => mount(GrCard, { props: asLink, attrs: { to: TO }, slots: { default: 'Отчёты' } }) },
+  { name: 'GrStatistic', render: () => mount(GrStatistic, { props: { ...asLink, value: 1284 }, attrs: { to: TO } }) },
+  {
+    name: 'GrFilePreview',
+    render: () => mount(GrFilePreview, {
+      props: { ...asLink, mime: 'application/pdf', name: 'счёт.pdf' },
+      attrs: { to: TO },
+    }),
+  },
+  { name: 'GrListItem', render: () => mount(GrListItem, { props: { ...asLink, title: 'Отчёты', to: TO } }) },
+  { name: 'GrSidebarItem', render: () => mount(GrSidebarItem, { props: { ...asLink, label: 'Отчёты' }, attrs: { to: TO } }) },
+  {
+    name: 'GrDropdownMenuItem',
+    render: () => mount(GrDropdownMenuItem, { props: asLink, attrs: { to: TO }, slots: { default: 'Отчёты' } }),
+  },
+  {
+    name: 'GrBottomNav',
+    render: () => mount(GrBottomNav, {
+      props: { ...asLink, modelValue: 'home', items: [{ value: 'reports', label: 'Отчёты', to: TO }] },
+    }),
+  },
+  {
+    name: 'GrBreadcrumbs',
+    render: () => mount(GrBreadcrumbs, {
+      props: { ...asLink, items: [{ label: 'Отчёты', to: TO }, { label: 'Квартал' }] },
+    }),
+  },
+]
+
+describe('компонент-ссылка из as сохраняет свой href', () => {
+  it.each(LINK_CASES)('$name: href ставит сама ссылка, type к ней не приходит', ({ render }) => {
+    const link = render().get('a')
+
+    expect(link.attributes('href')).toBe(`#${TO}`)
+    expect(link.attributes('type')).toBeUndefined()
+  })
+
+  // Обратная сторона: выключенная ссылка адреса не получает и от компонента —
+  // с ним средняя кнопка обошла бы любой перехват клика.
+  it('выключенные GrButton и GrDropdownMenuItem остаются без адреса', () => {
+    const button = mount(GrButton, { props: { ...asLink, disabled: true }, attrs: { to: TO } })
+    const item = mount(GrDropdownMenuItem, { props: { ...asLink, disabled: true }, attrs: { to: TO } })
+
+    expect(button.get('a').attributes('href')).toBeUndefined()
+    expect(item.get('a').attributes('href')).toBeUndefined()
+  })
+
+  it('definedAttrs выбрасывает только undefined', () => {
+    expect(definedAttrs({ 'href': undefined, 'type': 'button', 'aria-label': '', 'rel': null }))
+      .toEqual({ 'type': 'button', 'aria-label': '', 'rel': null })
   })
 })

@@ -5,6 +5,26 @@ All notable changes to the [`@feugene/granularity`](.) package are documented in
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Fixed
+
+- **Компонент-ссылка из `as` сохраняет свой `href`.** `RouterLink`, `NuxtLink`
+  или `Link` от Inertia, поданные в `as`, получали от корня `href`, `type`,
+  `target`, `rel` и `aria-*` со значением `undefined` — в `$attrs`, а не как
+  «атрибута нет». При fallthrough такое значение ложится поверх атрибутов, которые
+  ссылка ставит своему `<a>` сама, и `href`, вычисленный роутером, затирался:
+  пункт с `to` рендерился `<a>` без адреса — вне порядка Tab, без «открыть в
+  новой вкладке» и без предзагрузки. Касалось `GrButton`, `GrLink` (а через него
+  `GrBreadcrumbs`), `GrCard`, `GrStatistic`, `GrFilePreview`, `GrListItem`,
+  `GrSidebarItem`, `GrDropdownMenuItem` и `GrBottomNav`. Теперь корень собирает
+  атрибуты без ключей со значением `undefined`. Выключенные `GrButton` и
+  `GrDropdownMenuItem` по-прежнему остаются без адреса и у компонента-ссылки.
+- **`GrListItem` принимает `to`.** Пример из документации
+  `<GrListItem :as="RouterLink" :to="…" />` не работал: атрибуты достаются обёртке
+  с ролью `listitem`, и `to` до ссылки не доезжал. Теперь это проп, и он уходит в
+  компонент из `as`.
+
 ## [v1.0.8] 2026-10-06
 
 ### Fixed

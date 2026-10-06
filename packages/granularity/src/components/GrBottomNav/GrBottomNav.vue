@@ -4,6 +4,7 @@ import { computed, markRaw, type Component } from 'vue'
 import type { GrComponentSize } from '../shared/sizes'
 
 import { useGrComponentSize } from '../shared/configContext'
+import { definedAttrs } from '../shared/polymorphicRoot'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 
 import {
@@ -118,6 +119,20 @@ function itemTag(item: GrBottomNavItem): string | Component {
   return item.href ? 'a' : 'button'
 }
 
+/** Атрибуты пункта. Через фильтр — потому что пункт бывает и компонентом-ссылкой. */
+function itemAttrs(item: GrBottomNavItem): Record<string, unknown> {
+  const tag = itemTag(item)
+
+  return definedAttrs({
+    'type': tag === 'button' ? 'button' : undefined,
+    'href': tag === 'a' ? item.href : undefined,
+    'to': item.to !== undefined && linkComponent.value ? item.to : undefined,
+    'aria-current': item.value === props.modelValue ? 'page' : undefined,
+    'aria-disabled': item.disabled ? 'true' : undefined,
+    'aria-label': item.ariaLabel,
+  })
+}
+
 /**
  * Счётчик рисуется декоративно, а рядом идёт скрытая подпись: голое «3» без
  * единицы измерения диктору ничего не сообщает.
@@ -148,12 +163,7 @@ function select(item: GrBottomNavItem): void {
         v-for="item in items"
         :key="item.value"
         data-gr-bottom-nav-item
-        :type="itemTag(item) === 'button' ? 'button' : undefined"
-        :href="itemTag(item) === 'a' ? item.href : undefined"
-        :to="item.to !== undefined && linkComponent ? item.to : undefined"
-        :aria-current="item.value === modelValue ? 'page' : undefined"
-        :aria-disabled="item.disabled ? 'true' : undefined"
-        :aria-label="item.ariaLabel"
+        v-bind="itemAttrs(item)"
         :class="grBottomNavItemClass({ active: item.value === modelValue, disabled: item.disabled ?? false, size: resolvedSize })"
         @click="select(item)"
       >
