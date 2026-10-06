@@ -239,7 +239,18 @@ onBeforeUnmount(() => {
   videoEl.value?.pause()
 })
 
-defineExpose({ play: toggle, seekTo, toggleMuted, current, duration })
+defineExpose({
+  /** Запустить ролик или поставить на паузу, если он играет; отказ браузера приходит `error`. */
+  play: toggle,
+  /** Перемотать на позицию в секундах, прижатую к границам ролика. */
+  seekTo,
+  /** Включить или выключить звук. */
+  toggleMuted,
+  /** Текущая позиция воспроизведения в секундах. */
+  current,
+  /** Длительность ролика в секундах: `0` до загрузки метаданных, `NaN` у потоковой записи. */
+  duration,
+})
 </script>
 
 <template>

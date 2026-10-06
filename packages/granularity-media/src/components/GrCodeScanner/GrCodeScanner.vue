@@ -230,7 +230,17 @@ function stopAll(): void {
   stop()
 }
 
-defineExpose({ start, stop: stopAll, status })
+defineExpose({
+  /**
+   * Запросить разрешение, включить камеру и начать разбор кадров. При `disabled`, во время запроса
+   * и на живом потоке ничего не делает; отказ оседает в `status`.
+   */
+  start,
+  /** Остановить разбор кадров и выключить камеру; состояние возвращается в `idle`. */
+  stop: stopAll,
+  /** Текущее состояние камеры (`GrCameraStatus`): `idle`, `starting`, `live` или причина отказа. */
+  status,
+})
 </script>
 
 <template>

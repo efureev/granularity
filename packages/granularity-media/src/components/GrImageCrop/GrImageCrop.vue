@@ -414,7 +414,17 @@ async function toBlob(): Promise<Blob | null> {
   }
 }
 
-defineExpose({ crop: toBlob, reset, rect: currentRect })
+defineExpose({
+  /**
+   * Вырезать текущий кадр в `Blob` по `output` (по умолчанию PNG в пикселях исходника). Вернёт
+   * `null` без картинки или при запрете холста — тогда же придёт `error`.
+   */
+  crop: toBlob,
+  /** Вернуть кадр к центру и увеличение к единице. */
+  reset,
+  /** Текущая область кадра в пикселях исходника: `sx`, `sy`, `sw`, `sh` для `drawImage`. */
+  rect: currentRect,
+})
 </script>
 
 <template>

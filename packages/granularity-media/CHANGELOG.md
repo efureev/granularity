@@ -20,6 +20,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **`GrCameraStatus` экспортируется из входа `GrCodeScanner`.** Слот `#controls`
   отдаёт `status: GrCameraStatus`, а тип был только у входа `GrCameraCapture`.
 
+### Documentation
+
+- Появились описания у методов `GrCameraCapture`, `GrCodeScanner`,
+  `GrImageCrop` и `GrVideoPlayer`, которые в API и на портале были пустыми.
+
 ## [v1.0.3] 2026-10-06
 
 ### Fixed
