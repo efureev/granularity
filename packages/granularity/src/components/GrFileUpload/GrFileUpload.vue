@@ -2,6 +2,7 @@
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, Text, useSlots, watch, type VNode } from 'vue'
 
 import IconArrowUp from '~icons/lucide/arrow-up'
+import IconStop from '~icons/lucide/circle-stop'
 import IconClose from '~icons/lucide/x'
 
 import GrIcon from '../GrIcon/GrIcon.vue'
@@ -36,6 +37,7 @@ import { useGrFormControl } from '../../composables/useGrFormControl'
 import { useFocusWithin } from '../../composables/internal/useFocusWithin'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 import { useControlAria } from '../../composables/internal/useControlAria'
+import { titleWhenTruncated } from '../shared/truncationTitle'
 
 export type GrFileUploadMode = 'batch' | 'per-file'
 
@@ -917,7 +919,7 @@ defineExpose({
         </GrIcon>
       </div>
 
-      <div class="min-w-0">
+      <div class="min-w-0 flex-1">
         <div data-gr-file-upload-label class="font-700" :class="labelClass">
           <slot name="label">
             <slot v-bind="defaultSlotProps">
@@ -931,12 +933,17 @@ defineExpose({
         </div>
         <div v-else class="mt-1 text-[var(--gr-muted-fg)]" :class="hintClass" />
 
-        <ul v-if="showFileList && lastFiles.length" data-gr-file-upload-list class="mt-3 space-y-1">
+        <!--
+          Строка списка — во всю ширину колонки: имя слева и усекается, статус и
+          кнопки — у общего правого края. Иначе крестики шли сразу за текстом,
+          и столбец действий был рваным на строках разной длины.
+        -->
+        <ul v-if="showFileList && lastFiles.length" data-gr-file-upload-list class="mt-3 w-full space-y-1 text-start">
           <li
             v-for="file in lastFiles"
             :key="fileKey(file)"
             data-gr-file-upload-item
-            class="flex items-center gap-2"
+            class="flex w-full min-w-0 items-center gap-2"
             :class="hintClass"
           >
             <img
@@ -946,55 +953,61 @@ defineExpose({
               alt=""
               class="h-8 w-8 shrink-0 rounded-[var(--gr-radius-sm)] object-cover border border-[var(--gr-brd)]"
             >
-            <span class="font-600">{{ file.name }}</span>
-            <span class="text-[var(--gr-muted-fg)]"> · {{ Math.ceil(file.size / 1024) }} KB</span>
+            <span data-gr-file-upload-item-text class="flex min-w-0 flex-1 items-baseline gap-1">
+              <span class="min-w-0 truncate font-600" @pointerenter="titleWhenTruncated">{{ file.name }}</span>
+              <span class="shrink-0 whitespace-nowrap text-[var(--gr-muted-fg)]">· {{ Math.ceil(file.size / 1024) }} KB</span>
+            </span>
 
-            <template v-if="entryFor(file)">
-              <span
-                data-gr-file-upload-status
-                :data-status="entryFor(file)!.status"
-                class="text-[var(--gr-muted-fg)]"
-              >· {{ statusTextByStatus[entryFor(file)!.status] }}<template
-                v-if="entryFor(file)!.status === 'uploading'"
-              >&nbsp;{{ Math.round(entryFor(file)!.percent) }}%</template></span>
+            <span data-gr-file-upload-item-actions class="ml-auto flex shrink-0 items-center gap-2">
+              <template v-if="entryFor(file)">
+                <span
+                  data-gr-file-upload-status
+                  :data-status="entryFor(file)!.status"
+                  class="whitespace-nowrap text-[var(--gr-muted-fg)]"
+                >{{ statusTextByStatus[entryFor(file)!.status] }}<template
+                  v-if="entryFor(file)!.status === 'uploading'"
+                >&nbsp;{{ Math.round(entryFor(file)!.percent) }}%</template></span>
+
+                <!-- Пока файл едет, у строки одна кнопка — «остановить», со своим
+                     значком: два одинаковых крестика рядом не различить. -->
+                <button
+                  v-if="entryFor(file)!.status === 'uploading'"
+                  data-gr-file-upload-abort-file
+                  type="button"
+                  class="text-[var(--gr-muted-fg)] hover:text-[var(--gr-fg)] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] rounded-[var(--gr-radius-sm)]"
+                  :aria-label="t('gr.fileUpload.abortFile', 'Cancel upload of {fileName}', { fileName: file.name })"
+                  @click.stop="abortFile(file)"
+                >
+                  <GrIcon :size="iconGlyphSize">
+                    <IconStop />
+                  </GrIcon>
+                </button>
+
+                <button
+                  v-else-if="entryFor(file)!.status === 'error' && !isDisabled && !isReadonly"
+                  data-gr-file-upload-retry-file
+                  type="button"
+                  class="whitespace-nowrap text-[var(--gr-danger-text)] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] rounded-[var(--gr-radius-sm)] underline"
+                  :aria-label="t('gr.fileUpload.retryFile', 'Retry {fileName}', { fileName: file.name })"
+                  @click.stop="retryFile(file)"
+                >
+                  {{ t('gr.fileUpload.retry', 'Retry upload') }}
+                </button>
+              </template>
 
               <button
-                v-if="entryFor(file)!.status === 'uploading'"
-                data-gr-file-upload-abort-file
+                v-if="!isDisabled && !isReadonly && entryFor(file)?.status !== 'uploading'"
+                data-gr-file-upload-remove
                 type="button"
-                class="ml-auto text-[var(--gr-muted-fg)] hover:text-[var(--gr-fg)] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] rounded-[var(--gr-radius-sm)]"
-                :aria-label="t('gr.fileUpload.abortFile', 'Cancel upload of {fileName}', { fileName: file.name })"
-                @click.stop="abortFile(file)"
+                class="text-[var(--gr-muted-fg)] hover:text-[var(--gr-danger-text)] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] rounded-[var(--gr-radius-sm)]"
+                :aria-label="t('gr.fileUpload.remove', 'Remove {fileName}', { fileName: file.name })"
+                @click.stop="removeFile(file)"
               >
                 <GrIcon :size="iconGlyphSize">
                   <IconClose />
                 </GrIcon>
               </button>
-
-              <button
-                v-else-if="entryFor(file)!.status === 'error' && !isDisabled && !isReadonly"
-                data-gr-file-upload-retry-file
-                type="button"
-                class="ml-auto text-[var(--gr-danger-text)] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] rounded-[var(--gr-radius-sm)] underline"
-                :aria-label="t('gr.fileUpload.retryFile', 'Retry {fileName}', { fileName: file.name })"
-                @click.stop="retryFile(file)"
-              >
-                {{ t('gr.fileUpload.retry', 'Retry upload') }}
-              </button>
-            </template>
-
-            <button
-              v-if="!isDisabled && !isReadonly"
-              data-gr-file-upload-remove
-              type="button"
-              class="ml-auto text-[var(--gr-muted-fg)] hover:text-[var(--gr-danger-text)] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] rounded-[var(--gr-radius-sm)]"
-              :aria-label="t('gr.fileUpload.remove', 'Remove {fileName}', { fileName: file.name })"
-              @click.stop="removeFile(file)"
-            >
-              <GrIcon :size="iconGlyphSize">
-                <IconClose />
-              </GrIcon>
-            </button>
+            </span>
           </li>
         </ul>
 

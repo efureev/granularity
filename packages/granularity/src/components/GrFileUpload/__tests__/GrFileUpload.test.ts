@@ -878,6 +878,38 @@ describe('GrFileUpload — пофайловая загрузка', () => {
     expect(controllers[1].aborted).toBe(false)
   })
 
+  /**
+   * Два одинаковых крестика рядом — «остановить» и «убрать» — не различить.
+   * Пока файл едет, у строки одна кнопка, со своим значком; а действия стоят
+   * у общего правого края, не сразу за текстом разной длины.
+   */
+  it('у едущего файла одна кнопка — остановить, и действия прижаты к краю строки', async () => {
+    const request = vi.fn(() => new Promise(() => {}))
+    const wrapper = mount(GrFileUpload, {
+      props: { request, multiple: true, uploadMode: 'per-file', showFileList: true, concurrency: 1 },
+    })
+
+    await dropFiles(wrapper, [png('a-very-long-statement-name-for-october-2026.png'), png('b.png')])
+    await flushPromises()
+
+    const [uploading, pending] = wrapper.findAll('[data-gr-file-upload-item]')
+    expect(uploading.get('[data-gr-file-upload-status]').attributes('data-status')).toBe('uploading')
+    expect(uploading.findAll('button')).toHaveLength(1)
+    expect(uploading.find('[data-gr-file-upload-abort-file]').exists()).toBe(true)
+    expect(uploading.find('[data-gr-file-upload-remove]').exists()).toBe(false)
+    expect(uploading.get('[data-gr-file-upload-abort-file] svg').html()).not.toBe(pending.get('[data-gr-file-upload-remove] svg').html())
+
+    // Ожидающий файл убирается, как и раньше.
+    expect(pending.find('[data-gr-file-upload-remove]').exists()).toBe(true)
+
+    for (const row of [uploading, pending]) {
+      expect(row.classes()).toEqual(expect.arrayContaining(['flex', 'w-full', 'min-w-0']))
+      expect(row.get('[data-gr-file-upload-item-text]').classes()).toEqual(expect.arrayContaining(['min-w-0', 'flex-1']))
+      expect(row.get('[data-gr-file-upload-item-text] > span').classes()).toContain('truncate')
+      expect(row.get('[data-gr-file-upload-item-actions]').classes()).toEqual(expect.arrayContaining(['ml-auto', 'shrink-0']))
+    }
+  })
+
   it('батчевый режим статусов по файлам не заводит', async () => {
     const request = vi.fn().mockResolvedValue({ ok: true })
     const wrapper = mount(GrFileUpload, {
