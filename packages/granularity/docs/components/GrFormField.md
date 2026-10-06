@@ -65,8 +65,14 @@
 объявляется, а в поле — объявляется вместе с подсказкой поля:
 
 ```vue
-<GrCheckbox v-model="consent" aria-describedby="consent-terms-note">Согласен</GrCheckbox>
-<p id="consent-terms-note">Условия можно отозвать в профиле.</p>
+<template>
+  <GrCheckbox v-model="consent" aria-describedby="consent-terms-note">
+    Согласен
+  </GrCheckbox>
+  <p id="consent-terms-note">
+    Условия можно отозвать в профиле.
+  </p>
+</template>
 ```
 
 ## Обязательность объявляет контрол, и роль решает чем
