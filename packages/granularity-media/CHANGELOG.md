@@ -5,6 +5,17 @@ All notable changes to `@feugene/granularity-media` are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+
+- **`GrVideoPlayer` после гидрации знает длительность и сбой.** Серверный HTML
+  уже несёт `<video>` с `src`: браузер читает метаданные — или ломается — раньше,
+  чем плеер вешает слушатели в `onMounted`, и `loadedmetadata`/`error` терялись.
+  Плеер оставался без длительности, а битый источник — без слоя ошибки. Теперь
+  после монтирования плеер сверяется с элементом: `readyState` и `error` помнят
+  то, что события уже сказали.
+
 ## [v1.0.4] 2026-10-06
 
 ### Fixed

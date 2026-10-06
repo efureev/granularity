@@ -224,6 +224,29 @@ function bindVideo(): void {
     failed.value = true
     emit('error', event)
   })
+
+  syncSettledVideo(video)
+}
+
+/**
+ * Видео, решившееся раньше, чем его начали слушать.
+ *
+ * После серверного рендера `<video>` читает метаданные — или ломается — до
+ * гидрации, и `loadedmetadata`/`error` приходят без слушателей: плеер оставался
+ * без длительности, а битый источник — без слоя ошибки. Сверка с самим
+ * элементом: `readyState` и `error` помнят то, что события уже сказали.
+ */
+function syncSettledVideo(video: HTMLVideoElement): void {
+  if (video.error) {
+    failed.value = true
+    emit('error', video.error)
+    return
+  }
+
+  if (video.readyState >= HTMLMediaElement.HAVE_METADATA) {
+    duration.value = video.duration
+    current.value = video.currentTime
+  }
 }
 
 onMounted(() => {

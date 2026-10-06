@@ -133,3 +133,35 @@ describe('GrVideoPlayer', () => {
     expect(play).not.toHaveBeenCalled()
   })
 })
+
+/**
+ * После серверного рендера `<video>` читает метаданные или ломается до
+ * гидрации: `loadedmetadata` и `error` приходят без слушателей. Плеер обязан
+ * свериться с самим элементом.
+ */
+describe('GrVideoPlayer: видео решилось раньше, чем плеер смонтировали', () => {
+  it('метаданные уже есть — длительность видна без события', async () => {
+    const readyState = vi.spyOn(HTMLMediaElement.prototype, 'readyState', 'get').mockReturnValue(HTMLMediaElement.HAVE_METADATA)
+    const wrapper = mount(GrVideoPlayer, { props: { src: '/clip.webm' } })
+    await nextTick()
+
+    expect(wrapper.get('[role="slider"]').attributes('aria-valuemax')).toBe(String(DURATION))
+    readyState.mockRestore()
+  })
+
+  it('источник уже сломан — слой ошибки и эмит без события', async () => {
+    const error = { code: 4, message: 'MEDIA_ERR_SRC_NOT_SUPPORTED' } as MediaError
+    // В jsdom у медиа-элемента нет `error` вовсе — свойство заводится на время теста.
+    Object.defineProperty(HTMLMediaElement.prototype, 'error', { configurable: true, get: () => error })
+    try {
+      const wrapper = mount(GrVideoPlayer, { props: { src: '/purged.webm' } })
+      await nextTick()
+
+      expect(wrapper.emitted('error')?.[0]).toEqual([error])
+      expect(wrapper.text()).toContain('The video could not be played.')
+    }
+    finally {
+      Reflect.deleteProperty(HTMLMediaElement.prototype, 'error')
+    }
+  })
+})
