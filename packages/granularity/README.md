@@ -111,7 +111,7 @@ utility classes, so components render with their own CSS but without layout.
 <!-- entry-sizes:generated:start lang=en -->
 | What you import | gzip | of the barrel |
 | --- | ---: | ---: |
-| the whole package from the root | 634.4 kB | 100 % |
+| the whole package from the root | 634.7 kB | 100 % |
 | the lightest component — `GrButtonGroup` | 1.5 kB | < 1 % |
 | the median component — `GrTabs` | 15.1 kB | 2 % |
 | the 5 heaviest together | 242.0 kB | 38 % |
