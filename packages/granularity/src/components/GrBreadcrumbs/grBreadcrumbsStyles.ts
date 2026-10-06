@@ -78,6 +78,17 @@ export const breadcrumbsTextClass = 'inline-flex items-center gap-1 min-w-0 text
  */
 export const breadcrumbsItemWrapClass = 'flex items-center min-w-0'
 
+/**
+ * В одной строке (`autoCollapse`) ужимается только последний пункт: его подпись
+ * обрезается многоточием. Голова, разделители и «…» держат свою ширину — когда
+ * не влезает даже «голова, …, текущая», браузер иначе ужал бы всех поровну, и
+ * ссылка головы вылезла бы из своего пункта на зазор перед разделителем.
+ */
+export const breadcrumbsNoShrinkClass = 'shrink-0'
+
+/** Ссылка ужимается вместе с пунктом: подпись обрезается, а не вылезает за край. */
+export const breadcrumbsLinkClass = 'min-w-0'
+
 export const breadcrumbsItemIconClass = 'inline-block h-4 w-4 shrink-0'
 
 export const breadcrumbsLabelClass = 'truncate'

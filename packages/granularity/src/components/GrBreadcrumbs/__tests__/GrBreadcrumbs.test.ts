@@ -462,6 +462,48 @@ describe('GrBreadcrumbs — схлопывание по ширине', () => {
     wrapper.unmount()
   })
 
+  /**
+   * Когда даже «голова, …, текущая» не влезает, браузер ужимал бы все пункты
+   * поровну. Ссылка головы сама не обрезается и вылезала из своего пункта на
+   * зазор перед разделителем — «granularity/ +4 / GrBreadcru…». Ужимается только
+   * последний пункт, и его подпись обрезается многоточием.
+   */
+  it('в одной строке ужимается только последний пункт', async () => {
+    const wrapper = await mountAuto(10)
+    const wraps = wrapper.findAll('[data-gr-breadcrumbs-item-wrap]')
+    const tail = wraps[wraps.length - 1]
+
+    expect(wraps[0].classes()).toContain('shrink-0')
+    expect(wrapper.get('[data-gr-breadcrumbs-ellipsis-item]').classes()).toContain('shrink-0')
+    for (const separator of wrapper.findAll('[data-gr-breadcrumbs-separator]'))
+      expect(separator.classes()).toContain('shrink-0')
+
+    expect(tail.classes()).not.toContain('shrink-0')
+    expect(tail.classes()).toContain('min-w-0')
+
+    wrapper.unmount()
+  })
+
+  // Перенос строки сам решает нехватку места — держать ширину там незачем.
+  it('с переносом пункты ширину не держат', () => {
+    const wrapper = mount(GrBreadcrumbs, { props: { items: LONG }, attachTo: document.body })
+
+    for (const wrap of wrapper.findAll('[data-gr-breadcrumbs-item-wrap]'))
+      expect(wrap.classes()).not.toContain('shrink-0')
+
+    wrapper.unmount()
+  })
+
+  // Ссылка в ужатом пункте обрезает подпись, а не вылезает за его край.
+  it('ссылка пути ужимается вместе со своим пунктом', () => {
+    const wrapper = mountPath()
+
+    for (const link of wrapper.findAll('a[data-gr-breadcrumbs-item]'))
+      expect(link.classes()).toContain('min-w-0')
+
+    wrapper.unmount()
+  })
+
   it('однострочный режим включается только вместе с пропом', async () => {
     const auto = await mountAuto(600)
     expect(auto.get('[data-gr-breadcrumbs-list]').classes()).toContain('flex-nowrap')

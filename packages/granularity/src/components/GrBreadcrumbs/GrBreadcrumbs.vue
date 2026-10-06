@@ -13,9 +13,11 @@ import {
   breadcrumbsItemWrapClass,
   breadcrumbsLabelClass,
   breadcrumbsLabelHiddenClass,
+  breadcrumbsLinkClass,
   breadcrumbsListClass,
   breadcrumbsListNowrapClass,
   breadcrumbsListWrapClass,
+  breadcrumbsNoShrinkClass,
   breadcrumbsRootClass,
   breadcrumbsSeparatorClass,
   breadcrumbsSizeClassBySize,
@@ -177,6 +179,15 @@ const entries = computed(() => resolveBreadcrumbsLayout({
 }))
 
 const resolvedCurrentIndex = computed(() => props.currentIndex ?? lastIndex.value)
+
+const singleLine = computed(() => props.autoCollapse && !expanded.value)
+
+/** В одной строке ширину держит всё, кроме последнего пункта. */
+const noShrinkClass = computed(() => (singleLine.value ? breadcrumbsNoShrinkClass : undefined))
+
+function itemNoShrink(position: number): string | undefined {
+  return position < entries.value.length - 1 ? noShrinkClass.value : undefined
+}
 
 function isCurrent(index: number): boolean {
   return index === resolvedCurrentIndex.value
@@ -360,7 +371,7 @@ if (__GR_DEV__) {
     <ol
       ref="listEl"
       data-gr-breadcrumbs-list
-      :class="[breadcrumbsListClass, autoCollapse && !expanded ? breadcrumbsListNowrapClass : breadcrumbsListWrapClass]"
+      :class="[breadcrumbsListClass, singleLine ? breadcrumbsListNowrapClass : breadcrumbsListWrapClass]"
     >
       <template v-for="(entry, position) in entries" :key="entry.kind === 'item' ? `item-${entry.index}` : 'ellipsis'">
         <!--
@@ -370,7 +381,7 @@ if (__GR_DEV__) {
         <li
           v-if="position > 0"
           data-gr-breadcrumbs-separator
-          :class="breadcrumbsSeparatorClass"
+          :class="[breadcrumbsSeparatorClass, noShrinkClass]"
           aria-hidden="true"
         >
           <slot name="separator">
@@ -378,7 +389,7 @@ if (__GR_DEV__) {
           </slot>
         </li>
 
-        <li v-if="entry.kind === 'ellipsis'" data-gr-breadcrumbs-ellipsis-item class="min-w-0">
+        <li v-if="entry.kind === 'ellipsis'" data-gr-breadcrumbs-ellipsis-item class="min-w-0" :class="noShrinkClass">
           <slot name="ellipsis" :hidden-count="entry.hiddenCount" :expand="expand">
             <button
               type="button"
@@ -393,11 +404,12 @@ if (__GR_DEV__) {
           </slot>
         </li>
 
-        <li v-else data-gr-breadcrumbs-item-wrap :class="breadcrumbsItemWrapClass">
+        <li v-else data-gr-breadcrumbs-item-wrap :class="[breadcrumbsItemWrapClass, itemNoShrink(position)]">
           <GrLink
             v-if="isLink(entry.item, entry.index)"
             :key="`link-${entry.index}`"
             data-gr-breadcrumbs-item
+            :class="breadcrumbsLinkClass"
             :as="as"
             :href="entry.item.href"
             :to="entry.item.to"
