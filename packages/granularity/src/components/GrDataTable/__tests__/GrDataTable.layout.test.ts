@@ -273,6 +273,34 @@ describe('закреплённые колонки', () => {
 
     wrapper.unmount()
   })
+
+  it('заголовок закреплённой колонки липнет и при ручках ширины и переноса', () => {
+    // `relative` для ручек стоял рядом со `sticky`, побеждал его в листе, и
+    // шапка закреплённой колонки уезжала с прокруткой, а ячейки оставались.
+    const wrapper = mountTable({ columns: pinnedColumns, resizableColumns: true, reorderableColumns: true, selectable: true })
+    const pinned = wrapper.get('thead th[data-column-key="name"]')
+    const free = wrapper.get('thead th[data-column-key="score"]')
+
+    expect(pinned.classes()).toContain('sticky')
+    expect(pinned.classes()).not.toContain('relative')
+    expect(free.classes()).toContain('relative')
+
+    wrapper.unmount()
+  })
+
+  it('заголовок закреплённой колонки — на тоне шапки, ячейка — на карточке', () => {
+    const wrapper = mountTable({ columns: pinnedColumns, selectable: true })
+    const headerCells = [wrapper.findAll('thead th')[0], wrapper.get('thead th[data-column-key="name"]')]
+    const bodyCell = wrapper.findAll('tbody tr')[0].findAll('td')[1]
+
+    for (const cell of headerCells) {
+      expect(cell.classes()).toContain('bg-[var(--gr-muted)]')
+      expect(cell.classes()).not.toContain('bg-[var(--gr-card)]')
+    }
+    expect(bodyCell.classes()).toContain('bg-[var(--gr-card)]')
+
+    wrapper.unmount()
+  })
 })
 
 /**

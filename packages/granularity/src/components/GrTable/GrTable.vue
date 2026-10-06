@@ -111,6 +111,9 @@ export interface GrTableProps {
    * пропорционально — то есть заданные ширины молча ужимаются, а
    * горизонтальной прокрутки, на которой держатся закреплённые колонки, не
    * возникает вовсе.
+   *
+   * Это нижняя граница, а не ширина: в контейнере шире суммы колонок таблица
+   * по-прежнему занимает его целиком.
    */
   tableMinWidth?: string | number
   /**
@@ -248,7 +251,10 @@ const tableStyle = computed(() => {
 
   const value = typeof props.tableMinWidth === 'number' ? `${props.tableMinWidth}px` : props.tableMinWidth
 
-  return { minWidth: value }
+  // `max()`, а не голое значение: инлайновый `min-width` перебивает `min-w-full`,
+  // и при колонках уже контейнера таблица стояла узкой полосой в широкой рамке —
+  // шапка обрывалась на последней колонке, справа оставалось пустое поле.
+  return { minWidth: `max(100%, ${value})` }
 })
 
 const scrollEl = ref<HTMLElement | null>(null)

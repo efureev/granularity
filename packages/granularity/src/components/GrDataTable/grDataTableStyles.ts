@@ -94,6 +94,13 @@ export const columnResizerHoverClass = 'hover:bg-[var(--gr-datatable-resizer,var
  */
 export const columnPinnedClass = 'sticky z-[2] bg-[var(--gr-card)]'
 
+/**
+ * То же для ячейки шапки: фон — тон шапки, а не карточка. Шапке он задан на
+ * `<thead>`, но уезжает вместе с ней, и липкой ячейке нужен свой; карточный
+ * выбивался из шапки белым пятном над закреплённой колонкой.
+ */
+export const columnPinnedHeadClass = 'sticky z-[2] bg-[var(--gr-muted)]'
+
 /** Граница группы закреплённых колонок — тень, а не рамка: рамка сдвигает сетку. */
 export const columnPinnedLeftEdgeClass = 'shadow-[var(--gr-datatable-pinned-shadow,4px_0_6px_-4px_rgba(0,0,0,0.25))]'
 

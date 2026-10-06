@@ -120,6 +120,16 @@ describe('GrTable', () => {
       expect(wrapper.find('table').classes(), size).toContain(className)
     }
   })
+
+  it('tableMinWidth не делает таблицу уже контейнера', () => {
+    // Голое `min-width: 632px` перебивало `min-w-full`: при колонках уже
+    // контейнера таблица стояла узкой полосой в широкой рамке.
+    const numeric = mount(GrTable, { props: { tableMinWidth: 632 }, slots: { default: '<tr><td>x</td></tr>' } })
+    expect(numeric.get('table').attributes('style')).toContain('min-width: max(100%, 632px)')
+
+    const text = mount(GrTable, { props: { tableMinWidth: '40rem' }, slots: { default: '<tr><td>x</td></tr>' } })
+    expect(text.get('table').attributes('style')).toContain('min-width: max(100%, 40rem)')
+  })
 })
 
 describe('GrTable — состояния', () => {

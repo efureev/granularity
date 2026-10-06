@@ -43,6 +43,7 @@ import {
   columnHandleClass,
   columnMenuTriggerClass,
   columnPinnedClass,
+  columnPinnedHeadClass,
   columnResizerClass,
   columnResizerHoverClass,
   columnResizerLineActiveClass,
@@ -1025,7 +1026,7 @@ defineSlots<{
           :class="[
             selectColumnClass,
             cellClass,
-            hasPinnedLeft ? columnPinnedClass : '',
+            hasPinnedLeft ? columnPinnedHeadClass : '',
           ]"
           :style="hasPinnedLeft ? { left: '0px' } : undefined"
           scope="col"
@@ -1053,10 +1054,13 @@ defineSlots<{
             headerTextClass,
             cellClass,
             cellAlign(col),
-            reorderableColumns || resizableColumns || pinnableColumns ? 'group relative' : '',
+            // Опора для ручек — `relative`, но у закреплённой колонки её уже
+            // даёт `sticky`; вдвоём они спорили, и `relative` побеждал в листе:
+            // шапка уезжала с прокруткой, а ячейки под ней оставались.
+            reorderableColumns || resizableColumns || pinnableColumns ? (col.pinned ? 'group' : 'group relative') : '',
             draggingColumnKey === String(col.key) ? columnDraggingClass : '',
             columnDropClass(colIndex),
-            ...pinnedCellClass(col, colIndex),
+            ...pinnedCellClass(col, colIndex, true),
           ]"
           :style="{ ...columnWidthStyle(widthOf(col)), ...pinnedStyleOf(col) }"
           :aria-sort="ariaSortFor(col)"
