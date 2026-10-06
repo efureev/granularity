@@ -132,7 +132,7 @@ on this one — the core stays lean, and you install only what you reach for.
 <!-- ecosystem:generated:start -->
 | Package | Version | What it adds |
 | --- | --- | --- |
-| [`@feugene/granularity-charts`](../granularity-charts) | 1.0.2 | Charts — own SVG, zero dependencies, drawn with theme tokens. |
+| [`@feugene/granularity-charts`](../granularity-charts) | 1.0.3 | Charts — own SVG, zero dependencies, drawn with theme tokens. |
 | [`@feugene/granularity-chrono`](../granularity-chrono) | 1.0.3 | Calendar, date and time components — no third-party date widget, no date library. |
 | [`@feugene/granularity-code`](../granularity-code) | 1.0.2 | Code surfaces: view, edit and diff — the viewer and the diff carry no dependencies at all. |
 | [`@feugene/granularity-dashboard`](../granularity-dashboard) | 1.0.2 | Widget grid — drag, resize, breakpoints and layout persistence, zero dependencies. |
