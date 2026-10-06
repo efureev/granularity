@@ -80,23 +80,35 @@ export interface GrRichTextProps {
    * выделения, оба или ничего.
    */
   toolbar?: boolean | 'bubble' | 'both'
+  /**
+   * Ступень размера: кегль поля и кнопки тулбара. По умолчанию `md`; берётся из
+   * `GrConfigProvider`.
+   */
   size?: GrRichTextSize
   /** Собственный `id` области ввода. Не задан — берётся из `GrFormField`. */
   id?: string
   /** Имя для нативной формы: значение уходит скрытым полем. */
   name?: string
+  /** Поле недоступно: текст не правится, кнопки тулбара выключены. Наследуется от `GrFormField`. */
   disabled?: boolean
   /** Значение видно и уходит в форму, но не редактируется. */
   readonly?: boolean
+  /** Визуальное и ARIA-состояние ошибки (`aria-invalid`). Наследуется от `GrFormField`. */
   invalid?: boolean
+  /** Обязательное поле (`aria-required`). Наследуется от `GrFormField`. */
   required?: boolean
+  /** Доступное имя поля; перекрывает подпись `GrFormField`. */
   ariaLabel?: string
 }
 
 export interface GrRichTextEmits {
+  /** Значение изменилось (`v-model`) — в форме из `output`. */
   (e: 'update:modelValue', value: string | Record<string, unknown>): void
+  /** Значение изменилось; приходит вместе с `update:modelValue` на каждой правке. */
   (e: 'change', value: string | Record<string, unknown>): void
+  /** Фокус вошёл в область ввода. */
   (e: 'focus'): void
+  /** Фокус ушёл из области ввода. */
   (e: 'blur'): void
 }
 
@@ -453,7 +465,9 @@ defineSlots<{
 defineExpose({
   /** Инстанс TipTap: своя команда, своё расширение, свой плагин. */
   editor: computed(() => editor.value),
+  /** Поставить курсор в поле. До монтирования редактора ничего не делает. */
   focus: () => editor.value?.commands.focus(),
+  /** Убрать фокус из поля. */
   blur: () => editor.value?.commands.blur(),
 })
 

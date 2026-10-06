@@ -44,6 +44,7 @@ import { renderTopBlock } from './renderNodes'
  */
 
 export interface GrMarkdownProps {
+  /** Исходный markdown. По умолчанию пустая строка — тогда рисуется слот `empty`. */
   source?: string
   /** `gfm` — таблицы, задачи, зачёркивание; `commonmark` — без них; `minimal` — ещё и без картинок. */
   preset?: 'gfm' | 'commonmark' | 'minimal'
@@ -59,9 +60,19 @@ export interface GrMarkdownProps {
   measure?: boolean
   /** Плотность: `comfortable` — статья, `compact` — комментарий. */
   density?: GrMarkdownDensity
+  /**
+   * Ступень размера: кегль и межстрочный текста. По умолчанию `md`; берётся из
+   * `GrConfigProvider`.
+   */
   size?: GrMarkdownSize
+  /** `target` внешних ссылок, например `_blank`. По умолчанию не задаётся. */
   linkTarget?: string | null
+  /** `rel` внешних ссылок. По умолчанию `nofollow noopener noreferrer`. */
   linkRel?: string
+  /**
+   * Схемы, допустимые в адресах ссылок и картинок; ссылка с другой схемой становится текстом.
+   * По умолчанию `http`, `https`, `mailto`, `tel`.
+   */
   allowedProtocols?: readonly string[]
   /** Чекбоксы задач кликабельны и эмитят `taskToggle` с офсетом в исходнике. */
   interactiveTasks?: boolean
@@ -71,16 +82,25 @@ export interface GrMarkdownProps {
   streaming?: boolean
   /** Подмена рендерера узла: `{ code, link, image, heading, table }`. */
   components?: GrMarkdownRenderers
+  /**
+   * Движок разбора. По умолчанию встроенный на `marked`; свой синтаксис добавляет
+   * `createMarkedEngine({ extensions })`.
+   */
   engine?: GrMarkdownEngine
   /** Имя области. Не задан — ориентиром документ не объявляется. */
   ariaLabel?: string
 }
 
 export interface GrMarkdownEmits {
+  /** Источник разобран: оглавление и число блоков верхнего уровня. */
   (e: 'parsed', headings: GrMdHeading[], blocks: number): void
+  /** Клик по ссылке, до перехода: `preventDefault` оставляет навигацию приложению. */
   (e: 'linkClick', event: MouseEvent, href: string | null): void
+  /** Чекбокс задачи переключён (`interactiveTasks`): офсет задачи в исходнике и новое состояние. */
   (e: 'taskToggle', offset: number, checked: boolean): void
+  /** Код скопирован кнопкой у блока; `language` — язык блока или `null`. */
   (e: 'copy', language: string | null): void
+  /** Движок разбора бросил исключение; документ показан пустым. */
   (e: 'error', error: unknown): void
 }
 
@@ -230,8 +250,11 @@ function scrollToHeading(id: string): void {
 }
 
 defineExpose({
+  /** Оглавление документа: `id`, уровень и текст каждого заголовка. */
   headings,
+  /** Прокрутить к заголовку по `id` с `idPrefix`; плавно, если не просили меньше движения. */
   scrollToHeading,
+  /** Текст документа без разметки — для поиска, превью и доступного имени. */
   plainText: () => markdownPlainText(blocks.value),
 })
 </script>
