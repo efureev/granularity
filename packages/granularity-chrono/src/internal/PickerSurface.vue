@@ -16,6 +16,12 @@ import type { GrPickerSize } from './pickerFieldStyles'
  * открытие только программное (иначе клик по полю обрабатывался бы дважды),
  * без автофокуса на саму панель (фокус уводит пикер — в сетку или в колонку) и
  * без закрытия по клику внутри.
+ *
+ * Обёртка поля — `block`, как у `GrSelect` и `GrAutocomplete`: поле пикера
+ * занимает ширину колонки, куда его поставили. `inline-block` обжимал поле по
+ * его собственной ширине (около 209px у `md`), и ни `width` на компоненте, ни
+ * ячейка формы растянуть его не могли — диапазон со временем обрезался на
+ * середине.
  */
 export interface PickerSurfaceProps {
   /** Панель рисуется на месте: ни поля, ни поповера. */
@@ -58,6 +64,7 @@ defineSlots<{
     :disabled="disabled"
     :teleport-to="teleportTo"
     :aria-label="panelLabel"
+    block
     :close-on-content-click="false"
     trigger="manual"
     :auto-focus="false"

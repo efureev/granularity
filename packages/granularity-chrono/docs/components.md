@@ -19,6 +19,15 @@ import { GrDatePicker } from '@feugene/granularity-chrono/components/GrDatePicke
 
 Выбор между пакетами — карта `docs/COMPONENT-MAP.md` в корне репозитория.
 
+## Поле пикера занимает ширину колонки
+
+Поля `GrDatePicker`, `GrDateRangePicker`, `GrDateTimePicker` и `GrTimePicker`
+ведут себя как `GrInput` и `GrSelect`: растягиваются на ширину того, куда их
+поставили, — колонки `GrFormField`, ячейки сетки. Узкое поле — ширина на самом
+компоненте (`class="w-48"`, `style="width: 12rem"`). В строке `flex` без ширины
+поле, как и любое блочное, сжимается по содержимому: дайте ему `flex-1` или
+ширину, иначе период со временем не поместится целиком.
+
 ## Сквозное — не на странице компонента
 
 | Тема | Документ |
