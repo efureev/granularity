@@ -54,6 +54,11 @@ export interface SelectNavigation<TValue extends GrSelectValue> {
   onOptionHover: (panelIndex: number) => void
   onComboKeydown: (event: KeyboardEvent) => void
   initActiveIndex: () => void
+  /**
+   * Привести активную опцию в окно: прокрутить виртуальный список к ней и
+   * довести `scrollIntoView`. Зовётся при открытии панели.
+   */
+  revealActive: () => Promise<void>
   resetActive: () => void
 }
 
@@ -227,6 +232,11 @@ export function useSelectNavigation<TValue extends GrSelectValue>(
     onOptionHover,
     onComboKeydown,
     initActiveIndex,
+    revealActive: async () => {
+      const item = activeItem.value
+      if (item)
+        await scrollActiveIntoView(item)
+    },
     resetActive,
   }
 }

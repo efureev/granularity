@@ -717,6 +717,7 @@ const {
   onOptionHover,
   onComboKeydown,
   initActiveIndex,
+  revealActive,
   resetActive,
 } = useSelectNavigation<TValue>({
   panelItems,
@@ -762,6 +763,13 @@ watch(
     }
 
     initActiveIndex()
+
+    // Выбранная опция — в окне сразу при открытии. С `virtual` она иначе жила
+    // за пределами отрисованного окна: список стоял в начале, а
+    // `aria-activedescendant` указывал на элемент, которого нет в DOM.
+    await nextTick()
+    if (open.value)
+      await revealActive()
 
     if (showSearchInput.value) {
       await nextTick()

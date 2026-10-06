@@ -170,6 +170,29 @@ describe('GrSelect — виртуализация', () => {
     wrapper.unmount()
   })
 
+  /**
+   * Выбор у конца длинного сгруппированного списка. Раньше панель открывалась
+   * в начале списка, а `aria-activedescendant` указывал на опцию вне окна —
+   * элемента, которого нет в DOM.
+   */
+  it.each([
+    ['без поиска', {}, '[data-gr-select-trigger]'],
+    ['с поиском', { filterable: true }, '[data-gr-select-search]'],
+  ])('%s: при открытии выбранная опция в окне, и активная ссылка на неё жива', async (_name, extra, owner) => {
+    const wrapper = await openVirtual({ options: groupedOptions(), modelValue: 'g10-opt-87', ...extra })
+    await nextTick()
+    await nextTick()
+
+    const activeId = document.querySelector(owner)?.getAttribute('aria-activedescendant')
+    expect(activeId).toBeTruthy()
+
+    const active = document.getElementById(activeId!)
+    expect(active, 'активная опция вне окна').not.toBeNull()
+    expect(active!.textContent).toContain('Group 10 option 87')
+    expect(options().some(option => option.textContent?.includes('Group 1 option 1'))).toBe(false)
+    wrapper.unmount()
+  })
+
   it('прокрутка сдвигает окно', async () => {
     const wrapper = await openVirtual()
     const box = listbox()
