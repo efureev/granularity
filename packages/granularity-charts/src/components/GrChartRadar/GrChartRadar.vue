@@ -86,14 +86,28 @@ export interface GrChartRadarProps {
   shape?: 'polygon' | 'circle'
   /** Угол первой оси в градусах от двенадцати часов, по часовой. */
   startAngle?: number
+  /**
+   * Заливать многоугольник серии; по умолчанию `true`. Без заливки остаётся контур — удобнее, когда
+   * серий много.
+   */
   fill?: boolean
+  /** Маркеры вершин: `auto` (по умолчанию), `always` или `never`. */
   showPoints?: 'auto' | 'always' | 'never'
+  /**
+   * Высота холста в пикселях; по умолчанию 280. Данные, загрузка и пустое состояние занимают её
+   * одинаково.
+   */
   height?: number
   /** Объявленная ширина: от неё идёт первый рендер, дальше ширина замеряется. */
   width?: number
   /** Границы оси значений при `shared`. Ноль в домене остаётся всегда. */
   yDomain?: readonly [number | null, number | null]
+  /**
+   * Легенда серий: `auto` (по умолчанию) — когда серий больше одной; `true` и `false` — всегда и
+   * никогда.
+   */
   showLegend?: boolean | 'auto'
+  /** Где стоит легенда: `bottom` (по умолчанию) или `top`. */
   legendPosition?: 'top' | 'bottom'
   /**
    * Панель со значениями под курсором; по умолчанию `true`. `false` прячет только
@@ -105,16 +119,42 @@ export interface GrChartRadarProps {
   hiddenSeries?: readonly string[]
   /** Курсор — `v-model:activeIndex`. Индекс оси. */
   activeIndex?: number | null
+  /**
+   * Загрузка: на месте области построения — скелет той же высоты, место под оси уже
+   * зарезервировано.
+   */
   loading?: boolean
+  /** Пустое состояние явно. Не задано — график пуст, когда рисовать нечего. */
   empty?: boolean
+  /** Текст заглушки пустого графика. Не задан — «Нет данных» из переводов пакета. */
   emptyText?: string
+  /**
+   * Таблица данных: `hidden` (по умолчанию) — только для скринридера, `visible` — под графиком,
+   * `off` — без неё.
+   */
   dataTable?: 'hidden' | 'visible' | 'off'
   /** `false` — график становится картинкой: без фокуса, тултипа и клавиатуры. */
   interactive?: boolean
+  /**
+   * Кегль имён осей, колец и легенды по контрольной шкале ядра;
+   * по умолчанию — размер из `GrConfigProvider`.
+   */
   size?: GrChartSize
+  /**
+   * Формат значений в тултипе, скрытой таблице и объявлениях: знаки после запятой и разделители.
+   */
   valueFormat?: GrChartNumberFormat
+  /** BCP-47 локаль чисел и дат. Не задана — язык переводов приложения, иначе `en`. */
   locale?: string
+  /**
+   * Доступное имя графика. Не задано — сводка, которую собирает компонент: тип графика и объём
+   * данных.
+   */
   ariaLabel?: string
+  /**
+   * Описание для скринридера — вывод, ради которого график показан; дополняет сводку, а не заменяет
+   * её.
+   */
   ariaDescription?: string
   /**
    * Потолок строк скрытой таблицы данных.
@@ -129,10 +169,18 @@ export interface GrChartRadarProps {
 }
 
 export interface GrChartRadarEmits {
+  /**
+   * Легенда просит скрыть или показать серию — новый список id; применяет его потребитель
+   * (`v-model:hiddenSeries`).
+   */
   (e: 'update:hiddenSeries', value: string[]): void
+  /** Курсор сдвинулся: индекс позиции или `null` — для `v-model:activeIndex`. */
   (e: 'update:activeIndex', value: number | null): void
+  /** Щелчок или Enter по активной позиции — со значениями всех видимых серий в ней. */
   (e: 'pointClick', value: GrChartActivePoint): void
+  /** Курсор пришёл на позицию или ушёл с графика (`null`). */
   (e: 'pointHover', value: GrChartActivePoint | null): void
+  /** Нажат пункт легенды: какая серия и в какое состояние просится. */
   (e: 'legendToggle', value: { seriesId: string, hidden: boolean }): void
 }
 
@@ -170,9 +218,16 @@ const props = withDefaults(defineProps<GrChartRadarProps>(), {
 const emit = defineEmits<GrChartRadarEmits>()
 
 defineSlots<{
+  /**
+   * Своё содержимое панели тултипа вместо стандартного; данные активной позиции — в параметрах
+   * слота.
+   */
   tooltip?: (props: { active: GrChartActivePoint, formatValue: (value: number | null) => string }) => unknown
+  /** Своя легенда вместо стандартной. У пустого графика не рисуется. */
   legend?: (props: { series: readonly NormalizedSeries[], toggle: (id: string) => void }) => unknown
+  /** Своя заглушка пустого графика вместо «Нет данных»; занимает ту же `height`. */
   empty?: () => unknown
+  /** Заголовок над графиком, внутри его корня — выше легенды, стоящей сверху. */
   header?: () => unknown
 }>()
 

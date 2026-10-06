@@ -91,9 +91,14 @@ export interface GrChartPieActiveSlice {
 export interface GrChartPieProps {
   /** Доли либо голый ряд чисел — тогда подписью становится порядковый номер. */
   data: readonly GrChartPieSlice[] | readonly (number | null)[]
+  /** Форма: `pie` (по умолчанию) — круг, `donut` — кольцо с итогом в середине (слот `#center`). */
   variant?: 'pie' | 'donut'
   /** Радиус дырки бублика долей внешнего радиуса. */
   donutRatio?: number
+  /**
+   * Высота холста в пикселях; по умолчанию 256. Данные, загрузка и пустое состояние занимают её
+   * одинаково.
+   */
   height?: number
   /** Объявленная ширина: от неё идёт первый рендер, дальше ширина замеряется. */
   width?: number
@@ -103,7 +108,9 @@ export interface GrChartPieProps {
   labels?: 'none' | 'share' | 'value'
   /** Наименьшая доля, которую подписывают: на трёх процентах подпись перекроет соседнюю. */
   labelMinShare?: number
+  /** Легенда долей со значениями и процентами; по умолчанию `true`. */
   showLegend?: boolean
+  /** Где стоит легенда: `bottom` (по умолчанию) или `top`. */
   legendPosition?: 'top' | 'bottom'
   /**
    * Панель со значениями под курсором; по умолчанию `true`. `false` прячет только
@@ -113,18 +120,44 @@ export interface GrChartPieProps {
   tooltip?: boolean
   /** Курсор — `v-model:activeIndex`. */
   activeIndex?: number | null
+  /**
+   * Загрузка: на месте области построения — скелет той же высоты, место под оси уже
+   * зарезервировано.
+   */
   loading?: boolean
+  /** Пустое состояние явно. Не задано — график пуст, когда рисовать нечего. */
   empty?: boolean
+  /** Текст заглушки пустого графика. Не задан — «Нет данных» из переводов пакета. */
   emptyText?: string
+  /**
+   * Таблица данных: `hidden` (по умолчанию) — только для скринридера, `visible` — под графиком,
+   * `off` — без неё.
+   */
   dataTable?: 'hidden' | 'visible' | 'off'
   /** `false` — график становится картинкой: без фокуса, тултипа и клавиатуры. */
   interactive?: boolean
+  /**
+   * Кегль подписей долей и легенды по контрольной шкале ядра;
+   * по умолчанию — размер из `GrConfigProvider`.
+   */
   size?: GrChartSize
+  /**
+   * Формат значений в тултипе, скрытой таблице и объявлениях: знаки после запятой и разделители.
+   */
   valueFormat?: GrChartNumberFormat
+  /** BCP-47 локаль чисел и дат. Не задана — язык переводов приложения, иначе `en`. */
   locale?: string
   /** Подпись под итогом в середине бублика. */
   totalLabel?: string
+  /**
+   * Доступное имя графика. Не задано — сводка, которую собирает компонент: тип графика и объём
+   * данных.
+   */
   ariaLabel?: string
+  /**
+   * Описание для скринридера — вывод, ради которого график показан; дополняет сводку, а не заменяет
+   * её.
+   */
   ariaDescription?: string
   /**
    * Потолок строк скрытой таблицы данных.
@@ -139,8 +172,11 @@ export interface GrChartPieProps {
 }
 
 export interface GrChartPieEmits {
+  /** Курсор сдвинулся: индекс доли или `null` — для `v-model:activeIndex`. */
   (e: 'update:activeIndex', value: number | null): void
+  /** Щелчок или Enter по доле — с её значением и процентом. */
   (e: 'sliceClick', value: GrChartPieActiveSlice): void
+  /** Курсор пришёл на долю или ушёл с графика (`null`). */
   (e: 'sliceHover', value: GrChartPieActiveSlice | null): void
 }
 
@@ -193,13 +229,20 @@ defineSlots<{
     /** Кегль подписи под итогом. */
     labelFont: number
   }) => unknown
+  /**
+   * Своё содержимое панели тултипа вместо стандартного; данные активной позиции — в параметрах
+   * слота.
+   */
   tooltip?: (props: {
     active: GrChartActivePoint
     slice: GrChartPieActiveSlice | null
     formatValue: (value: number | null) => string
   }) => unknown
+  /** Своя легенда вместо стандартной. У пустого графика не рисуется. */
   legend?: (props: { slices: readonly PieEntry[], formatValue: (value: number | null) => string }) => unknown
+  /** Своя заглушка пустого графика вместо «Нет данных»; занимает ту же `height`. */
   empty?: () => unknown
+  /** Заголовок над графиком, внутри его корня — выше легенды, стоящей сверху. */
   header?: () => unknown
 }>()
 

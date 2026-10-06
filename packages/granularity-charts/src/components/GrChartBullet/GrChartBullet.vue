@@ -57,17 +57,26 @@ export interface GrChartBulletProps {
   ranges?: readonly number[]
   /** Верх шкалы. Не задан — максимум из величины, цели и границ с запасом. */
   max?: number
+  /** Низ шкалы; по умолчанию 0. Полоса bullet без нуля искажает длину — величину читают по ней. */
   min?: number
   /** Цвета полос от «хорошо» к «плохо». Длина на единицу больше `ranges`. */
   rangeColors?: readonly string[]
   /** Тон самой полосы значения. */
   color?: string
+  /** Направление дорожки: `horizontal` (по умолчанию) или `vertical`. */
   orientation?: 'horizontal' | 'vertical'
   /** Имя метрики: заголовок строки в таблице и в тултипе. */
   label?: string
+  /**
+   * Высота холста в пикселях; по умолчанию 48. Данные, загрузка и пустое состояние занимают её
+   * одинаково.
+   */
   height?: number
   /** Объявленная ширина: от неё идёт первый рендер, дальше ширина замеряется. */
   width?: number
+  /**
+   * Формат значений в тултипе, скрытой таблице и объявлениях: знаки после запятой и разделители.
+   */
   valueFormat?: GrChartNumberFormat
   /**
    * Панель со значениями под курсором; по умолчанию `true`. `false` прячет только
@@ -75,15 +84,32 @@ export interface GrChartBulletProps {
    * пока график интерактивен.
    */
   tooltip?: boolean
+  /**
+   * Загрузка: на месте области построения — скелет той же высоты, место под оси уже
+   * зарезервировано.
+   */
   loading?: boolean
+  /** Пустое состояние явно. Не задано — график пуст, когда рисовать нечего. */
   empty?: boolean
+  /** Текст заглушки пустого графика. Не задан — «Нет данных» из переводов пакета. */
   emptyText?: string
+  /**
+   * Таблица данных: `hidden` (по умолчанию) — только для скринридера, `visible` — под графиком,
+   * `off` — без неё.
+   */
   dataTable?: 'hidden' | 'visible' | 'off'
   /** `false` — график становится картинкой: без фокуса, тултипа и клавиатуры. */
   interactive?: boolean
+  /** Кегль подписей по контрольной шкале ядра; по умолчанию — размер из `GrConfigProvider`. */
   size?: GrChartSize
+  /** BCP-47 локаль чисел и дат. Не задана — язык переводов приложения, иначе `en`. */
   locale?: string
+  /** Доступное имя графика. Не задано — сводка из `label`, величины и цели. */
   ariaLabel?: string
+  /**
+   * Описание для скринридера — вывод, ради которого график показан; дополняет сводку, а не заменяет
+   * её.
+   */
   ariaDescription?: string
   /**
    * Потолок строк скрытой таблицы данных.
@@ -98,6 +124,7 @@ export interface GrChartBulletProps {
 }
 
 export interface GrChartBulletEmits {
+  /** Щелчок или Enter по графику; в событии — сама величина. */
   (e: 'valueClick', value: number | null): void
 }
 
@@ -131,8 +158,14 @@ const props = withDefaults(defineProps<GrChartBulletProps>(), {
 const emit = defineEmits<GrChartBulletEmits>()
 
 defineSlots<{
+  /**
+   * Своё содержимое панели тултипа вместо стандартного; данные активной позиции — в параметрах
+   * слота.
+   */
   tooltip?: (props: { active: GrChartActivePoint, formatValue: (value: number | null) => string }) => unknown
+  /** Своя заглушка пустого графика вместо «Нет данных»; занимает ту же `height`. */
   empty?: () => unknown
+  /** Заголовок над графиком, внутри его корня — выше легенды, стоящей сверху. */
   header?: () => unknown
 }>()
 

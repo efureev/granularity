@@ -59,10 +59,16 @@ export interface GrChartAreaProps {
   stacked?: boolean | '100%'
   /** Заливка. `auto` — градиент у наложения, плотная у стека. */
   fill?: 'auto' | 'gradient' | 'solid'
+  /**
+   * Высота холста в пикселях; по умолчанию 256. Данные, загрузка и пустое состояние занимают её
+   * одинаково.
+   */
   height?: number
   /** Объявленная ширина: от неё идёт первый рендер, дальше ширина замеряется. */
   width?: number
+  /** Границы оси значений `[min, max]`; `null` на месте границы — она берётся по данным. */
   yDomain?: readonly [number | null, number | null]
+  /** Дотянуть ось значений до нуля; по умолчанию нет — ось облегает данные. */
   includeZero?: boolean
   /**
    * Опорные линии и полосы: порог, план, коридор допустимого.
@@ -87,18 +93,53 @@ export interface GrChartAreaProps {
    * должно быть решением автора графика, а не побочным эффектом поля в данных.
    */
   dualAxis?: boolean
+  /**
+   * Границы правой оси значений при `dualAxis`; `null` на месте границы — она берётся по данным.
+   */
   yDomainRight?: readonly [number | null, number | null]
+  /** Подпись деления правой оси. Не задана — число по локали. */
   yTickFormatRight?: (value: number) => string
+  /** Формат значений серий правой оси в тултипе, скрытой таблице и объявлениях. */
   valueFormatRight?: GrChartNumberFormat
+  /**
+   * Желаемое число делений оси X; по умолчанию 6. У категорий — потолок числа подписей (не задан —
+   * 12). Подписи, которые не помещаются по ширине, прореживаются.
+   */
   xTickCount?: number
+  /**
+   * Желаемое число делений оси значений; по умолчанию 5. Шаг остаётся «круглым», поэтому делений
+   * бывает на одно меньше.
+   */
   yTickCount?: number
+  /**
+   * Подпись деления оси X: `(value, kind) => string`. Не задана — категория, дата или число по
+   * локали.
+   */
   xTickFormat?: ChartTickFormat
+  /**
+   * Подпись деления оси значений, например `value => value + '%'`. Место под ось считается по
+   * отформатированной подписи.
+   */
   yTickFormat?: (value: number) => string
+  /**
+   * Формат значений в тултипе, скрытой таблице и объявлениях: знаки после запятой и разделители.
+   */
   valueFormat?: GrChartNumberFormat
+  /**
+   * Форма линии между точками: `linear` (по умолчанию), `smooth` или `step`. Сглаживание не
+   * выдумывает значений между замерами.
+   */
   curve?: GrChartCurve
+  /** Маркеры точек: `auto` (по умолчанию) — только на нечастом ряде, `always` или `never`. */
   showPoints?: 'auto' | 'always' | 'never'
+  /** Линии сетки: `y` (по умолчанию) — по делениям значений, `x`, `both` или `none`. */
   showGrid?: 'both' | 'x' | 'y' | 'none'
+  /**
+   * Легенда серий: `auto` (по умолчанию) — когда серий больше одной; `true` и `false` — всегда и
+   * никогда.
+   */
   showLegend?: boolean | 'auto'
+  /** Где стоит легенда: `bottom` (по умолчанию) или `top`. */
   legendPosition?: 'top' | 'bottom'
   /**
    * Панель со значениями под курсором; по умолчанию `true`. `false` прячет только
@@ -110,15 +151,38 @@ export interface GrChartAreaProps {
   hiddenSeries?: readonly string[]
   /** Курсор — `v-model:activeIndex`. Синхронизирует пару графиков. */
   activeIndex?: number | null
+  /**
+   * Загрузка: на месте области построения — скелет той же высоты, место под оси уже
+   * зарезервировано.
+   */
   loading?: boolean
+  /** Пустое состояние явно. Не задано — график пуст, когда рисовать нечего. */
   empty?: boolean
+  /** Текст заглушки пустого графика. Не задан — «Нет данных» из переводов пакета. */
   emptyText?: string
+  /**
+   * Таблица данных: `hidden` (по умолчанию) — только для скринридера, `visible` — под графиком,
+   * `off` — без неё.
+   */
   dataTable?: 'hidden' | 'visible' | 'off'
   /** `false` — график становится картинкой: без фокуса, тултипа и клавиатуры. */
   interactive?: boolean
+  /**
+   * Кегль подписей осей и легенды по контрольной шкале ядра; по умолчанию — размер из
+   * `GrConfigProvider`.
+   */
   size?: GrChartSize
+  /** BCP-47 локаль чисел и дат. Не задана — язык переводов приложения, иначе `en`. */
   locale?: string
+  /**
+   * Доступное имя графика. Не задано — сводка, которую собирает компонент: тип графика и объём
+   * данных.
+   */
   ariaLabel?: string
+  /**
+   * Описание для скринридера — вывод, ради которого график показан; дополняет сводку, а не заменяет
+   * её.
+   */
   ariaDescription?: string
   /**
    * Когда прореживать ряд для рисунка (LTTB).
@@ -168,11 +232,20 @@ export interface GrChartAreaProps {
 }
 
 export interface GrChartAreaEmits {
+  /**
+   * Легенда просит скрыть или показать серию — новый список id; применяет его потребитель
+   * (`v-model:hiddenSeries`).
+   */
   (e: 'update:hiddenSeries', value: string[]): void
+  /** Курсор сдвинулся: индекс позиции или `null` — для `v-model:activeIndex`. */
   (e: 'update:activeIndex', value: number | null): void
+  /** Жест приближения сменил видимое окно — для `v-model:xWindow`. */
   (e: 'update:xWindow', value: GrChartXWindow | null): void
+  /** Щелчок или Enter по активной позиции — со значениями всех видимых серий в ней. */
   (e: 'pointClick', value: GrChartActivePoint): void
+  /** Курсор пришёл на позицию или ушёл с графика (`null`). */
   (e: 'pointHover', value: GrChartActivePoint | null): void
+  /** Нажат пункт легенды: какая серия и в какое состояние просится. */
   (e: 'legendToggle', value: { seriesId: string, hidden: boolean }): void
 }
 
@@ -225,9 +298,16 @@ const props = withDefaults(defineProps<GrChartAreaProps>(), {
 const emit = defineEmits<GrChartAreaEmits>()
 
 defineSlots<{
+  /**
+   * Своё содержимое панели тултипа вместо стандартного; данные активной позиции — в параметрах
+   * слота.
+   */
   tooltip?: (props: { active: GrChartActivePoint, formatValue: (value: number | null) => string }) => unknown
+  /** Своя легенда вместо стандартной. У пустого графика не рисуется. */
   legend?: (props: { series: readonly NormalizedSeries[], toggle: (id: string) => void }) => unknown
+  /** Своя заглушка пустого графика вместо «Нет данных»; занимает ту же `height`. */
   empty?: () => unknown
+  /** Заголовок над графиком, внутри его корня — выше легенды, стоящей сверху. */
   header?: () => unknown
 }>()
 

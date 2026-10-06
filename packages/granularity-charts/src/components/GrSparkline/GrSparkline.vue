@@ -34,12 +34,15 @@ import {
 export interface GrSparklineProps {
   /** Голый ряд чисел либо точки. `null` — пропуск, линия рвётся. */
   data: readonly (number | null)[] | readonly GrChartPoint[]
+  /** Вид: `line` (по умолчанию) или `area` — линия с заливкой под ней. */
   variant?: 'line' | 'area'
   /** Цвет линии. Не задан — токен `--gr-sparkline-color`. */
   color?: string
   /** Автоматическая текстовая сводка для скринридера. */
   summary?: boolean
+  /** Формат чисел в текстовой сводке для скринридера: знаки после запятой и разделители. */
   valueFormat?: GrChartNumberFormat
+  /** BCP-47 локаль чисел сводки. Не задана — язык переводов приложения, иначе `en`. */
   locale?: string
   /** Своё имя вместо сводки. */
   ariaLabel?: string

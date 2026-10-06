@@ -64,20 +64,48 @@ export interface GrChartWaterfallActiveStep {
 }
 
 export interface GrChartWaterfallProps {
+  /**
+   * Шаги моста: `{ label, value, kind?, color? }`. `kind: 'total'` — абсолютное значение: столбец
+   * от нуля, накопление сбрасывается на него.
+   */
   steps: readonly GrChartWaterfallStep[]
   /** Начальное накопление. */
   baseline?: number
   /** Дорисовать итоговый столбец справа. Строка задаёт его подпись. */
   showTotal?: boolean | string
+  /**
+   * Соединители между столбцами — показывают, что следующий шаг начинается там, где кончился
+   * прошлый; по умолчанию `true`.
+   */
   showConnectors?: boolean
+  /** Скругление столбцов в пикселях. */
   barRadius?: number
+  /**
+   * Направление: `vertical` (по умолчанию) или `horizontal` — длинные имена шагов читаются строкой.
+   */
   orientation?: 'vertical' | 'horizontal'
+  /**
+   * Высота холста в пикселях; по умолчанию 256. Данные, загрузка и пустое состояние занимают её
+   * одинаково.
+   */
   height?: number
   /** Объявленная ширина: от неё идёт первый рендер, дальше ширина замеряется. */
   width?: number
+  /** Границы оси значений `[min, max]`; `null` на месте границы — она берётся по данным. */
   yDomain?: readonly [number | null, number | null]
+  /**
+   * Желаемое число делений оси значений; по умолчанию 5. Шаг остаётся «круглым», поэтому делений
+   * бывает на одно меньше.
+   */
   yTickCount?: number
+  /**
+   * Подпись деления оси значений, например `value => value + '%'`. Место под ось считается по
+   * отформатированной подписи.
+   */
   yTickFormat?: (value: number) => string
+  /**
+   * Формат значений в тултипе, скрытой таблице и объявлениях: знаки после запятой и разделители.
+   */
   valueFormat?: GrChartNumberFormat
   /** Какая сетка нужна. Оси названы по данным: при горизонтали они меняются местами сами. */
   showGrid?: 'both' | 'x' | 'y' | 'none'
@@ -89,15 +117,38 @@ export interface GrChartWaterfallProps {
   tooltip?: boolean
   /** Курсор — `v-model:activeIndex`. */
   activeIndex?: number | null
+  /**
+   * Загрузка: на месте области построения — скелет той же высоты, место под оси уже
+   * зарезервировано.
+   */
   loading?: boolean
+  /** Пустое состояние явно. Не задано — график пуст, когда рисовать нечего. */
   empty?: boolean
+  /** Текст заглушки пустого графика. Не задан — «Нет данных» из переводов пакета. */
   emptyText?: string
+  /**
+   * Таблица данных: `hidden` (по умолчанию) — только для скринридера, `visible` — под графиком,
+   * `off` — без неё.
+   */
   dataTable?: 'hidden' | 'visible' | 'off'
   /** `false` — график становится картинкой: без фокуса, тултипа и клавиатуры. */
   interactive?: boolean
+  /**
+   * Кегль подписей осей и легенды по контрольной шкале ядра; по умолчанию — размер из
+   * `GrConfigProvider`.
+   */
   size?: GrChartSize
+  /** BCP-47 локаль чисел и дат. Не задана — язык переводов приложения, иначе `en`. */
   locale?: string
+  /**
+   * Доступное имя графика. Не задано — сводка, которую собирает компонент: тип графика и объём
+   * данных.
+   */
   ariaLabel?: string
+  /**
+   * Описание для скринридера — вывод, ради которого график показан; дополняет сводку, а не заменяет
+   * её.
+   */
   ariaDescription?: string
   /**
    * Потолок строк скрытой таблицы данных.
@@ -112,8 +163,11 @@ export interface GrChartWaterfallProps {
 }
 
 export interface GrChartWaterfallEmits {
+  /** Курсор сдвинулся: индекс шага или `null` — для `v-model:activeIndex`. */
   (e: 'update:activeIndex', value: number | null): void
+  /** Щелчок или Enter по шагу — с его приростом и накоплением. */
   (e: 'stepClick', value: GrChartWaterfallActiveStep): void
+  /** Курсор пришёл на шаг или ушёл с графика (`null`). */
   (e: 'stepHover', value: GrChartWaterfallActiveStep | null): void
 }
 
@@ -149,12 +203,18 @@ const props = withDefaults(defineProps<GrChartWaterfallProps>(), {
 const emit = defineEmits<GrChartWaterfallEmits>()
 
 defineSlots<{
+  /**
+   * Своё содержимое панели тултипа вместо стандартного; данные активной позиции — в параметрах
+   * слота.
+   */
   tooltip?: (props: {
     active: GrChartActivePoint
     step: GrChartWaterfallActiveStep | null
     formatValue: (value: number | null) => string
   }) => unknown
+  /** Своя заглушка пустого графика вместо «Нет данных»; занимает ту же `height`. */
   empty?: () => unknown
+  /** Заголовок над графиком, внутри его корня — выше легенды, стоящей сверху. */
   header?: () => unknown
 }>()
 

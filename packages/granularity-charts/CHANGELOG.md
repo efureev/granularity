@@ -88,6 +88,17 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   сторону. Теперь курсор, активные марки, вертикаль и события работают, пока
   график интерактивен; картинкой его делает только `interactive: false`.
   Поведение описано в JSDoc пропа `tooltip` у всех графиков.
+- Появились описания у пропов, событий и слотов всех графиков, которые в API,
+  подсказках IDE и на портале были пустыми: у общих пропов (`height`,
+  `yDomain`, `includeZero`, `yDomainRight`, `yTickFormatRight`,
+  `valueFormatRight`, `xTickCount`, `yTickCount`, `xTickFormat`, `yTickFormat`,
+  `valueFormat`, `curve`, `showPoints`, `showGrid`, `showLegend`,
+  `legendPosition`, `tooltip`, `loading`, `empty`, `emptyText`, `dataTable`,
+  `size`, `locale`, `ariaLabel`, `ariaDescription`) и у своих — `min` и
+  `orientation` буллета, `stages` воронки, `xLabels`, `yLabels` и цветов шкалы
+  теплокарты, `variant` круга и спарклайна, `fill` радара, `steps`,
+  `showConnectors` и `barRadius` моста; у событий `update:*`, `*Click`,
+  `*Hover`, `legendToggle` и слотов `tooltip`, `legend`, `empty`, `header`.
 
 ## [v1.0.2] 2026-10-06
 

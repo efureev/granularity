@@ -56,6 +56,10 @@ export interface GrChartFunnelActiveStage {
 }
 
 export interface GrChartFunnelProps {
+  /**
+   * Ступени по порядку: `{ label, value, color? }`. Ширина ступени пропорциональна значению, а не
+   * порядку.
+   */
   stages: readonly GrChartFunnelStage[]
   /**
    * Число у ступени: значение (по умолчанию), доля от первой или от предыдущей
@@ -63,14 +67,25 @@ export interface GrChartFunnelProps {
    * ступеней остаются.
    */
   labels?: 'value' | 'share-first' | 'share-prev' | 'none'
+  /**
+   * Направление: `vertical` (по умолчанию) — ступени сверху вниз, имена слева; `horizontal` — слева
+   * направо, имена под ступенями.
+   */
   orientation?: 'vertical' | 'horizontal'
   /** Сужающаяся лента или прямоугольники одной ширины. */
   shape?: 'trapezoid' | 'bar'
   /** Зазор между ступенями в пикселях. */
   gap?: number
+  /**
+   * Высота холста в пикселях; по умолчанию 256. Данные, загрузка и пустое состояние занимают её
+   * одинаково.
+   */
   height?: number
   /** Объявленная ширина: от неё идёт первый рендер, дальше ширина замеряется. */
   width?: number
+  /**
+   * Формат значений в тултипе, скрытой таблице и объявлениях: знаки после запятой и разделители.
+   */
   valueFormat?: GrChartNumberFormat
   /**
    * Панель со значениями под курсором; по умолчанию `true`. `false` прячет только
@@ -80,15 +95,38 @@ export interface GrChartFunnelProps {
   tooltip?: boolean
   /** Курсор — `v-model:activeIndex`. */
   activeIndex?: number | null
+  /**
+   * Загрузка: на месте области построения — скелет той же высоты, место под оси уже
+   * зарезервировано.
+   */
   loading?: boolean
+  /** Пустое состояние явно. Не задано — график пуст, когда рисовать нечего. */
   empty?: boolean
+  /** Текст заглушки пустого графика. Не задан — «Нет данных» из переводов пакета. */
   emptyText?: string
+  /**
+   * Таблица данных: `hidden` (по умолчанию) — только для скринридера, `visible` — под графиком,
+   * `off` — без неё.
+   */
   dataTable?: 'hidden' | 'visible' | 'off'
   /** `false` — график становится картинкой: без фокуса, тултипа и клавиатуры. */
   interactive?: boolean
+  /**
+   * Кегль имён ступеней и подписей снаружи по контрольной шкале ядра; по умолчанию — размер из
+   * `GrConfigProvider`.
+   */
   size?: GrChartSize
+  /** BCP-47 локаль чисел и дат. Не задана — язык переводов приложения, иначе `en`. */
   locale?: string
+  /**
+   * Доступное имя графика. Не задано — сводка, которую собирает компонент: тип графика и объём
+   * данных.
+   */
   ariaLabel?: string
+  /**
+   * Описание для скринридера — вывод, ради которого график показан; дополняет сводку, а не заменяет
+   * её.
+   */
   ariaDescription?: string
   /**
    * Потолок строк скрытой таблицы данных.
@@ -103,8 +141,11 @@ export interface GrChartFunnelProps {
 }
 
 export interface GrChartFunnelEmits {
+  /** Курсор сдвинулся: индекс ступени или `null` — для `v-model:activeIndex`. */
   (e: 'update:activeIndex', value: number | null): void
+  /** Щелчок или Enter по ступени — с её значением и обеими долями. */
   (e: 'stageClick', value: GrChartFunnelActiveStage): void
+  /** Курсор пришёл на ступень или ушёл с графика (`null`). */
   (e: 'stageHover', value: GrChartFunnelActiveStage | null): void
 }
 
@@ -135,8 +176,14 @@ const props = withDefaults(defineProps<GrChartFunnelProps>(), {
 const emit = defineEmits<GrChartFunnelEmits>()
 
 defineSlots<{
+  /**
+   * Своё содержимое панели тултипа вместо стандартного; данные активной позиции — в параметрах
+   * слота.
+   */
   tooltip?: (props: { active: GrChartActivePoint, stage: GrChartFunnelActiveStage | null }) => unknown
+  /** Своя заглушка пустого графика вместо «Нет данных»; занимает ту же `height`. */
   empty?: () => unknown
+  /** Заголовок над графиком, внутри его корня — выше легенды, стоящей сверху. */
   header?: () => unknown
 }>()
 

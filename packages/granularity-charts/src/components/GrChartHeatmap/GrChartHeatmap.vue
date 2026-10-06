@@ -66,7 +66,12 @@ export interface GrChartHeatmapCell {
 export interface GrChartHeatmapProps {
   /** Значения построчно: `values[y][x]`. `null` — ячейки нет, а не «ноль». */
   values: readonly (readonly (number | null)[])[]
+  /**
+   * Подписи колонок — по одной на колонку `values`. Не помещаются в ячейку — усекаются или
+   * прореживаются.
+   */
   xLabels: readonly string[]
+  /** Подписи строк — по одной на строку `values`. Колонка под них — до 40% ширины. */
   yLabels: readonly string[]
   /** Границы шкалы. Не заданы — считаются по данным. */
   domain?: readonly [number, number]
@@ -74,17 +79,30 @@ export interface GrChartHeatmapProps {
   scale?: HeatmapScaleKind
   /** Середина расходящейся шкалы. */
   midpoint?: number
+  /** Цвет нижнего края расходящейся шкалы; по умолчанию `--gr-danger`. */
   lowColor?: string
+  /**
+   * Цвет верхнего края шкалы; у последовательной — единственный цвет. По умолчанию `--gr-chart-1`.
+   */
   highColor?: string
+  /** Цвет середины расходящейся шкалы; по умолчанию `--gr-muted`. */
   midColor?: string
   /** Число ступеней шкалы. `0` — непрерывная. */
   steps?: number
   /** Зазор между ячейками в пикселях. */
   cellGap?: number
+  /** Полоса шкалы с границами домена; по умолчанию `true` — без неё цвет нечем прочитать. */
   showLegend?: boolean
   /** Значения в ячейках. `'auto'` — только если они помещаются. */
   showValues?: boolean | 'auto'
+  /**
+   * Формат значений в тултипе, скрытой таблице и объявлениях: знаки после запятой и разделители.
+   */
   valueFormat?: GrChartNumberFormat
+  /**
+   * Высота холста в пикселях; по умолчанию 256. Данные, загрузка и пустое состояние занимают её
+   * одинаково.
+   */
   height?: number
   /** Объявленная ширина: от неё идёт первый рендер, дальше ширина замеряется. */
   width?: number
@@ -96,15 +114,38 @@ export interface GrChartHeatmapProps {
   tooltip?: boolean
   /** Курсор — `v-model:activeCell`. */
   activeCell?: { x: number, y: number } | null
+  /**
+   * Загрузка: на месте области построения — скелет той же высоты, место под оси уже
+   * зарезервировано.
+   */
   loading?: boolean
+  /** Пустое состояние явно. Не задано — график пуст, когда рисовать нечего. */
   empty?: boolean
+  /** Текст заглушки пустого графика. Не задан — «Нет данных» из переводов пакета. */
   emptyText?: string
+  /**
+   * Таблица данных: `hidden` (по умолчанию) — только для скринридера, `visible` — под графиком,
+   * `off` — без неё.
+   */
   dataTable?: 'hidden' | 'visible' | 'off'
   /** `false` — график становится картинкой: без фокуса, тултипа и клавиатуры. */
   interactive?: boolean
+  /**
+   * Кегль подписей строк, колонок и ячеек по контрольной шкале ядра; по умолчанию — размер из
+   * `GrConfigProvider`.
+   */
   size?: GrChartSize
+  /** BCP-47 локаль чисел и дат. Не задана — язык переводов приложения, иначе `en`. */
   locale?: string
+  /**
+   * Доступное имя графика. Не задано — сводка, которую собирает компонент: тип графика и объём
+   * данных.
+   */
   ariaLabel?: string
+  /**
+   * Описание для скринридера — вывод, ради которого график показан; дополняет сводку, а не заменяет
+   * её.
+   */
   ariaDescription?: string
   /**
    * Потолок строк скрытой таблицы данных.
@@ -119,8 +160,11 @@ export interface GrChartHeatmapProps {
 }
 
 export interface GrChartHeatmapEmits {
+  /** Курсор сдвинулся: ячейка `{ x, y }` или `null` — для `v-model:activeCell`. */
   (e: 'update:activeCell', value: { x: number, y: number } | null): void
+  /** Щелчок или Enter по ячейке — с её значением и подписями строки и колонки. */
   (e: 'cellClick', value: GrChartHeatmapCell): void
+  /** Курсор пришёл на ячейку или ушёл с графика (`null`). */
   (e: 'cellHover', value: GrChartHeatmapCell | null): void
 }
 
@@ -157,9 +201,16 @@ const props = withDefaults(defineProps<GrChartHeatmapProps>(), {
 const emit = defineEmits<GrChartHeatmapEmits>()
 
 defineSlots<{
+  /**
+   * Своё содержимое панели тултипа вместо стандартного; данные активной позиции — в параметрах
+   * слота.
+   */
   tooltip?: (props: { active: GrChartActivePoint, cell: GrChartHeatmapCell | null }) => unknown
+  /** Своя легенда вместо стандартной. У пустого графика не рисуется. */
   legend?: (props: { thresholds: readonly number[], colorAt: (fraction: number) => string }) => unknown
+  /** Своя заглушка пустого графика вместо «Нет данных»; занимает ту же `height`. */
   empty?: () => unknown
+  /** Заголовок над графиком, внутри его корня — выше легенды, стоящей сверху. */
   header?: () => unknown
 }>()
 
