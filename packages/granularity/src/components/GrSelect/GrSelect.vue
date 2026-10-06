@@ -1,5 +1,5 @@
 <script setup lang="ts" generic="TValue extends GrSelectValue = string">
-import { computed, nextTick, ref, useId, useSlots, watch } from 'vue'
+import { cloneVNode, computed, Fragment, h, nextTick, ref, useId, useSlots, watch, type VNode } from 'vue'
 
 import { usePortalTarget } from '../../composables/usePortalTarget'
 
@@ -319,7 +319,11 @@ const rootClass = computed(() => props.view === 'link' ? 'relative inline-block 
 
 const emit = defineEmits<GrSelectEmits<TValue>>()
 defineSlots<{
-  /** Собственные `<option>` для нативного режима. */
+  /**
+   * Собственные `<option>` (и `<optgroup>`) для нативного режима. Выбор у них
+   * ставит компонент по `v-model` — так же, как у опций из `options`: свой
+   * `:selected` писать не нужно, и сервер отдаёт уже выбранную опцию.
+   */
   default?: () => any
   /** Аддон слева в панельном триггере (в нативном режиме недоступен). */
   prefix?: () => any
@@ -390,6 +394,39 @@ const {
   valueKey: () => props.valueKey,
   placeholder: () => props.placeholder,
 })
+
+const slots = useSlots()
+
+/**
+ * Опции из слота — с выбором по `v-model`.
+ *
+ * Свои опции компонент отмечает `:selected` сам, а опциям из слота не ставил
+ * ничего: при `country = ''` браузер показывал первую доступную опцию, и
+ * программная смена модели на экран не доходила. Здесь узлы слота клонируются
+ * с `selected` по модели — тем же путём, что у опций из `options`, поэтому и
+ * серверный HTML несёт выбранную опцию.
+ */
+function markSlotSelection(nodes: VNode[]): VNode[] {
+  return nodes.map((node) => {
+    if (node.type === 'option') {
+      const raw = node.props?.value ?? (typeof node.children === 'string' ? node.children.trim() : undefined)
+      if (raw === undefined)
+        return node
+      const key = String(raw)
+      const selected = key === '' ? !props.multiple && modelSingle.value === '' : isSelected(fromDomValue(key))
+      return cloneVNode(node, { selected })
+    }
+
+    if ((node.type === 'optgroup' || node.type === Fragment) && Array.isArray(node.children))
+      return h(node.type as string, node.props, markSlotSelection(node.children as VNode[]))
+
+    return node
+  })
+}
+
+function NativeSlotOptions(): VNode[] {
+  return markSlotSelection(slots.default?.() ?? [])
+}
 
 const ADDON_MIN_WIDTH_BY_SIZE: Record<GrSelectSize, string> = {
   xs: '2rem',
@@ -660,8 +697,6 @@ const {
 })
 
 if (__GR_DEV__) {
-  const slots = useSlots()
-
   watch(
     () => [Boolean(slots.prefix || slots.suffix), effectiveOptionsView.value] as const,
     ([hasAddon, view]) => {
@@ -946,7 +981,8 @@ const themeAttrs = useGrThemeAttrs()
         {{ placeholder || t('gr.select.clearOption', 'None') }}
       </option>
 
-      <slot>
+      <NativeSlotOptions v-if="$slots.default" />
+      <template v-else>
         <option v-if="nativeCustomOptionVisible" :value="keyOf(modelSingle)" :selected="!multiple">
           {{ modelSingle }}
         </option>
@@ -971,7 +1007,7 @@ const themeAttrs = useGrThemeAttrs()
             {{ item.label }}
           </option>
         </template>
-      </slot>
+      </template>
     </select>
 
     <span

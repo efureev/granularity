@@ -165,6 +165,31 @@ native-режиме имя уходит на сам `<select>`, в panel-реж�
 сериализуются hidden-инпутами (ключ — `valueKey`/`keyOf`, по одному на
 значение при `multiple`).
 
+## Свои `<option>` в нативном режиме
+
+Дефолтный слот принимает собственные `<option>` и `<optgroup>` — например,
+недоступную подсказку первой строкой. Выбор у них ставит компонент по
+`v-model`, как у опций из `options`: свой `:selected` писать не нужно, и сервер
+отдаёт уже выбранную опцию.
+
+```vue
+<template>
+  <GrSelect v-model="country" name="country">
+    <option value="" disabled>
+      Choose a country
+    </option>
+    <optgroup label="Next working day">
+      <option value="ie">
+        Ireland
+      </option>
+    </optgroup>
+  </GrSelect>
+</template>
+```
+
+Раньше опции из слота не получали ничего: при `country = ''` браузер показывал
+первую доступную опцию, а программная смена модели на экран не доходила.
+
 ## Значения-объекты
 
 ```vue
