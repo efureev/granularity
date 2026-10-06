@@ -42,10 +42,32 @@ export type { GrAlertVariant } from './grAlertStyles'
 export type GrAlertLive = 'auto' | 'assertive' | 'polite' | 'off'
 
 export interface GrAlertProps {
+  /**
+   * Смысл сообщения: цвет подложки и рамки, глиф иконки и — при `live="auto"` —
+   * роль для скринридера. `warning` и `danger` перебивают речь, остальные ждут
+   * паузы. По умолчанию `info`; глобально — `componentDefaults`.
+   */
   tone?: GrAlertTone
+  /**
+   * Вес: `soft` — тонированная подложка, `outline` — только рамка тона для
+   * спокойных пояснений рядом с другими сообщениями. По умолчанию `soft`.
+   */
   variant?: GrAlertVariant
+  /**
+   * Короткий факт первой строкой: «Карта истекает через 12 дней». Подробности —
+   * в тексте под ним; без заголовка сообщение — одна строка текста.
+   */
   title?: string
+  /**
+   * Кнопка закрытия. Сама она сообщение не прячет: эмитит `close` и
+   * `update:visible` — прятать ли, решает экран (см. `visible`).
+   */
   closable?: boolean
+  /**
+   * Как сообщение объявляется скринридеру: `auto` — по тону, `assertive` —
+   * `role="alert"`, `polite` — `role="status"`, `off` — без роли, когда оно уже
+   * объявлено иначе. По умолчанию `auto`.
+   */
   live?: GrAlertLive
   /**
    * Показывать ли иконку тона. Своя иконка — слотом `#icon`; проп нужен для
@@ -62,12 +84,19 @@ export interface GrAlertProps {
    * например, спрашивает по нему подтверждение.
    */
   visible?: boolean
+  /**
+   * Подложка вместо тона — цвет бренда или партнёра. Раскладка, иконка и
+   * закрытие остаются прежними. Переменная `--gr-alert-bg` делает то же из CSS.
+   */
   backgroundColor?: string
+  /** Цвет текста, заголовка и иконки вместо тона (`--gr-alert-*` в `tokens.md`). */
   textColor?: string
+  /** Цвет рамки вместо тона; у `outline` это главный цвет сообщения. */
   borderColor?: string
 }
 
 export interface GrAlertEmits {
+  /** Нажата кнопка закрытия. Эмитится всегда, с `v-model:visible` и без него. */
   (e: 'close'): void
   /** Пользователь закрыл сообщение (`v-model:visible`). */
   (e: 'update:visible', value: boolean): void
@@ -93,8 +122,11 @@ const props = withDefaults(defineProps<GrAlertProps>(), {
   title: undefined,
   closable: undefined,
   live: undefined,
-  icon: undefined,
-  visible: undefined,
+  // Не `undefined`: эти два пропа в `componentDefaults` не входят, и различать
+  // «не задан» и «задан» незачем. С `true` API и подсказки IDE говорят правду —
+  // иконка и сообщение видны, пока их не выключили.
+  icon: true,
+  visible: true,
   backgroundColor: undefined,
   textColor: undefined,
   borderColor: undefined,

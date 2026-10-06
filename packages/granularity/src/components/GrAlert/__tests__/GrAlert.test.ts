@@ -243,6 +243,14 @@ describe('GrAlert', () => {
       expect(wrapper.find('[data-gr-alert]').exists()).toBe(true)
     })
 
+    it('без пропов иконка и сообщение видны, и умолчания говорят то же', () => {
+      const wrapper = mount(GrAlert, { slots: { default: 'Body' } })
+
+      expect(wrapper.find('[data-gr-alert-icon]').exists()).toBe(true)
+      expect(wrapper.props('icon')).toBe(true)
+      expect(wrapper.props('visible')).toBe(true)
+    })
+
     it('`visible: false` не рендерит сообщение', () => {
       const wrapper = mount(GrAlert, { props: { visible: false }, slots: { default: 'Body' } })
 
