@@ -10,6 +10,7 @@ import type { GrBadgeRadius, GrBadgeSize, GrBadgeTone } from '../GrBadge/grBadge
 import GrChip from '../GrChip/GrChip.vue'
 import { chipSizeForBadgeScale } from '../GrChip/grChipStyles'
 import GrInput from '../GrInput/GrInput.vue'
+import { FieldContextBoundary } from '../shared/FieldContextBoundary'
 import { vClickOutside } from '../../directives'
 import { useFloating } from '../../composables/useFloating'
 import { useDismissible } from '../../composables/useDismissible'
@@ -1199,22 +1200,25 @@ const themeAttrs = useGrThemeAttrs()
         >
           <div :class="panelClasses">
             <div v-if="showSearchInput" class="p-2 border-b border-[var(--gr-brd)]">
-              <GrInput
-                ref="customInputRef"
-                v-model="customValue"
-                data-testid="gr-select-custom-input"
-                data-gr-select-search
-                type="text"
-                role="combobox"
-                aria-haspopup="listbox"
-                :aria-expanded="open ? 'true' : 'false'"
-                :aria-controls="listboxIdIfRendered"
-                :aria-activedescendant="searchActiveDescendant"
-                :placeholder="resolvedSearchPlaceholder"
-                :loading="loading"
-                size="sm"
-                @keydown="onComboKeydown"
-              />
+              <FieldContextBoundary>
+                <GrInput
+                  ref="customInputRef"
+                  v-model="customValue"
+                  data-testid="gr-select-custom-input"
+                  data-gr-select-search
+                  type="text"
+                  role="combobox"
+                  aria-haspopup="listbox"
+                  :aria-expanded="open ? 'true' : 'false'"
+                  :aria-controls="listboxIdIfRendered"
+                  :aria-activedescendant="searchActiveDescendant"
+                  :placeholder="resolvedSearchPlaceholder"
+                  :aria-label="resolvedSearchPlaceholder"
+                  :loading="loading"
+                  size="sm"
+                  @keydown="onComboKeydown"
+                />
+              </FieldContextBoundary>
             </div>
 
             <!-- Состояние загрузки: вместо списка — индикатор. -->

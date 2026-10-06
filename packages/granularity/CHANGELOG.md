@@ -5,6 +5,31 @@ All notable changes to the [`@feugene/granularity`](.) package are documented in
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Fixed
+
+- **Поиск в панели `GrTreeSelect` не забирает контекст `GrFormField`.** Внутри
+  поля с `required` и ошибкой поиск получал id контрола — тот же, что у
+  триггера (дубль в DOM навсегда: поиск живёт в DOM и при закрытой панели), —
+  а с ним подсказку и ошибку в `aria-describedby`, `aria-required` и
+  `aria-invalid`: скринридер объявлял поиск «обязательным, с ошибкой». Теперь
+  вспомогательные поля внутри контролов стоят за границей контекста поля и
+  называются сами: поиск `GrTreeSelect` и `GrSelect`, поиск `GrTransfer`, hex у
+  `GrColorPicker`.
+- **Подсказка поиска видна.** `GrInput` гасил placeholder на фокусе, а панель
+  `GrTreeSelect` уводит фокус в поиск сразу — «Search…» не был виден ни разу.
+  У `type="search"` placeholder теперь остаётся, пока поле пустое; у прочих
+  полей — как прежде.
+- **Строки дерева в панели `GrTreeSelect` — на шаге контрола.** На `md` дерево
+  наследовало кегль страницы, и строки в панели были 16px против 14px у поля.
+  Теперь панель набирается кеглем контрола своего размера.
+- **Заголовок группы `GrTreeSections` без внешних отступов.** С
+  `headingLevel` он — настоящий `<h2>`…`<h6>`, и базовый слой страницы
+  (`h2 { margin-block: 2.5rem 1rem }`) раздвигал группы: секция на 147px при
+  заголовке в 21px. Теперь у заголовка `m-0`, отступы задают `gap` корня и
+  секции.
+
 ## [v1.0.16] 2026-10-07
 
 ### Changed

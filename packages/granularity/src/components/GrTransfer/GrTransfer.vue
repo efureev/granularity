@@ -13,6 +13,7 @@ import GrButtonGroup from '../GrButtonGroup'
 import GrCheckbox from '../GrCheckbox'
 import { useGrComponentProp, useGrComponentSize } from '../shared/configContext'
 import GrInput from '../GrInput'
+import { FieldContextBoundary } from '../shared/FieldContextBoundary'
 import { matchesQueryParts, normalizeOptionQuery } from '../shared/optionFilter'
 import type { GrScrollOverflow } from '../shared/scrollOverflow'
 import { resolveScrollOverflow } from '../shared/scrollOverflow'
@@ -1128,18 +1129,20 @@ defineExpose({
         :ref="el => { searchEls[side] = el as HTMLElement | null }"
         :class="grTransferSearchClass(resolvedSize)"
       >
-        <GrInput
-          :model-value="queries[side]"
-          type="search"
-          clearable
-          :size="resolvedSize"
-          :disabled="isDisabled"
-          :loading="loading"
-          :placeholder="t('gr.transfer.search', 'Search')"
-          :aria-label="`${titles[side]} — ${t('gr.transfer.search', 'Search')}`"
-          @update:model-value="(value: string) => onSearch(side, value)"
-          @keydown="(event: KeyboardEvent) => onSearchKeydown(side, event)"
-        />
+        <FieldContextBoundary>
+          <GrInput
+            :model-value="queries[side]"
+            type="search"
+            clearable
+            :size="resolvedSize"
+            :disabled="isDisabled"
+            :loading="loading"
+            :placeholder="t('gr.transfer.search', 'Search')"
+            :aria-label="`${titles[side]} — ${t('gr.transfer.search', 'Search')}`"
+            @update:model-value="(value: string) => onSearch(side, value)"
+            @keydown="(event: KeyboardEvent) => onSearchKeydown(side, event)"
+          />
+        </FieldContextBoundary>
       </div>
 
       <!--

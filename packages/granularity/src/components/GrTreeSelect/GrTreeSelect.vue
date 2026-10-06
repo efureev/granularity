@@ -23,6 +23,7 @@ import {
 import GrChip from '../GrChip/GrChip.vue'
 import { chipSizeForBadgeScale } from '../GrChip/grChipStyles'
 import GrInput from '../GrInput/GrInput.vue'
+import { FieldContextBoundary } from '../shared/FieldContextBoundary'
 import GrTree, {
   type GrTreeInstance,
   type GrTreeKey,
@@ -372,6 +373,13 @@ const resolvedFilterPlaceholder = computed(() => {
 })
 
 const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrTreeSelect' })
+
+const panelTextClass = computed(() => ({
+  xs: 'text-[length:var(--gr-control-text-xs)] leading-[var(--gr-control-leading-xs)]',
+  sm: 'text-[length:var(--gr-control-text-sm)] leading-[var(--gr-control-leading-sm)]',
+  md: 'text-[length:var(--gr-control-text-md)] leading-[var(--gr-control-leading-md)]',
+  lg: 'text-[length:var(--gr-control-text-lg)] leading-[var(--gr-control-leading-lg)]',
+})[resolvedSize.value])
 const resolvedShape = useGrComponentProp('GrTreeSelect', 'shape', () => props.shape, 'box')
 
 const className = computed(() => {
@@ -842,18 +850,24 @@ const themeAttrs = useGrThemeAttrs()
           @keydown="onPanelKeydown"
         >
           <div :class="panelClasses">
+          <!-- Поиск — вспомогательное поле панели, а не контрол поля формы: без
+               границы он забирал контекст `GrFormField` — id триггера (дубль в
+               DOM), подсказку, ошибку, `aria-required` и `aria-invalid`. -->
           <div v-if="filterable" class="p-2 border-b border-[var(--gr-brd)]">
-            <GrInput
-              ref="filterInputRef"
-              v-model="filterValue"
-              data-testid="gr-tree-select-filter"
-              data-gr-tree-select-filter
-              type="search"
-              :inputmode="filterInputmode"
-              :placeholder="resolvedFilterPlaceholder"
-              size="sm"
-              @keydown="onFilterKeydown"
-            />
+            <FieldContextBoundary>
+              <GrInput
+                ref="filterInputRef"
+                v-model="filterValue"
+                data-testid="gr-tree-select-filter"
+                data-gr-tree-select-filter
+                type="search"
+                :inputmode="filterInputmode"
+                :placeholder="resolvedFilterPlaceholder"
+                :aria-label="resolvedFilterPlaceholder"
+                size="sm"
+                @keydown="onFilterKeydown"
+              />
+            </FieldContextBoundary>
           </div>
 
           <!--
@@ -861,9 +875,11 @@ const themeAttrs = useGrThemeAttrs()
             высота нужна ему, чтобы посчитать окно, а вложенный скроллер поверх
             дал бы вторую полосу прокрутки на том же списке.
           -->
+          <!-- Строки дерева — на шаге контрола, как триггер: на `md` дерево
+               наследует кегль, и в панели он был 16px против 14px у поля. -->
           <div
             class="p-1 min-h-0"
-            :class="virtual ? '' : 'overflow-auto'"
+            :class="[virtual ? '' : 'overflow-auto', panelTextClass]"
             :style="virtual ? undefined : { maxHeight: `${dropdownMaxHeight}px` }"
           >
             <div

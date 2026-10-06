@@ -20,6 +20,7 @@ import type { GrControlShape } from '../shared/controlShape'
 import { useGrComponentProp, useGrComponentSize } from '../shared/configContext'
 import { useGrFormFieldContext } from '../shared/formFieldContext'
 import GrInput from '../GrInput/GrInput.vue'
+import { FieldContextBoundary } from '../shared/FieldContextBoundary'
 import GrPopover from '../GrPopover/GrPopover.vue'
 import GrSlider from '../GrSlider/GrSlider.vue'
 
@@ -627,17 +628,19 @@ async function pickFromScreen(): Promise<void> {
           </div>
 
           <div :class="hexRowClass">
-            <GrInput
-              v-model="hexDraft"
-              data-gr-color-picker-hex
-              :class="hexFieldClass"
-              :size="resolvedSize"
-              :disabled="isDisabled"
-              :readonly="isReadonly"
-              :aria-label="t('gr.colorPicker.hexLabel', 'Hex value')"
-              @change="commitHex"
-              @keydown.enter="commitHex"
-            />
+            <FieldContextBoundary>
+              <GrInput
+                v-model="hexDraft"
+                data-gr-color-picker-hex
+                :class="hexFieldClass"
+                :size="resolvedSize"
+                :disabled="isDisabled"
+                :readonly="isReadonly"
+                :aria-label="t('gr.colorPicker.hexLabel', 'Hex value')"
+                @change="commitHex"
+                @keydown.enter="commitHex"
+              />
+            </FieldContextBoundary>
 
             <button
               v-if="showEyedropper"
