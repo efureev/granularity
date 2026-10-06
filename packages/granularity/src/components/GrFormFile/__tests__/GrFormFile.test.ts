@@ -496,7 +496,7 @@ describe('GrFormFile — limit', () => {
 
     // Значение не изменилось, а ошибка объявлена — как у любого другого правила.
     expect(wrapper.emitted('update:modelValue')).toBeFalsy()
-    expect(wrapper.get('[data-gr-form-file-errors]').text()).toContain('maxCount=2')
+    expect(wrapper.get('[data-gr-form-file-errors]').text()).toContain('up to 2 allowed')
 
     wrapper.unmount()
   })

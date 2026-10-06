@@ -25,6 +25,19 @@ to [Semantic Versioning](https://semver.org/).
   `TypeError`, а серверный рендер страницы отдавал 500. Теперь проба идёт с
   настоящими пропами слота. Других проб с пустыми пропами в пакетах нет: прочие
   компоненты пробуют только слоты без пропов.
+- **Ошибки валидации файлов написаны для человека.** Пользователь видел в поле
+  формы `File "statement-oct.pdf" does not match accept=".csv,.ofx"`, размеры в
+  байтах и `maxBytes=…`. Теперь во всех трёх локалях: «statement-oct.pdf is not
+  an allowed file type», «report.pdf is larger than 10 MB», «Too many files: up
+  to 6 allowed», «The files together exceed 50 MB». Ключи и параметры прежние, к
+  байтам добавлены размеры словами — `maxSize`, `fileSize`, `totalSize`
+  (единицы — ключи `gr.fileSize.*`, число — по локали: «1,5 МБ»). Английский
+  `message` валидаторов переписан так же. `resolveFileValidationMessage`
+  принимает третьим аргументом локаль; наружу вышел `formatFileSize`.
+- **`GrFileUpload` отдаёт в `@error` переведённый текст.** `message` его
+  `FileValidationError` — тот же перевод `gr.fileValidation.*`, что и в форме, а
+  превышение `limit` стало `FileValidationError` с `code: 'maxCount'` вместо
+  голого `Error('Too many files selected, limit=…')`.
 
 ## [v1.0.11] 2026-10-06
 

@@ -78,7 +78,10 @@ const DEFAULT_MESSAGES: Record<GrFormRuleFailure, string> = {
  * `runFieldRules` публичен, но без резолвера бесполезен — любой, кто хочет
  * прогнать те же правила вне формы, обязан был написать свой.
  */
-export function createGrFormMessageResolver(t: GrFormMessageTranslate): GrFormMessageResolver {
+export function createGrFormMessageResolver(
+  t: GrFormMessageTranslate,
+  locale?: () => string | undefined,
+): GrFormMessageResolver {
   return (kind, rule, params) => {
     if (rule.message)
       return rule.message
@@ -89,7 +92,7 @@ export function createGrFormMessageResolver(t: GrFormMessageTranslate): GrFormMe
     // вида `file` без issue: сюда движок не приходит, но резолвер публичный.
     const issue = params.issue as FileValidationIssue | undefined
     if (kind === 'file' && issue)
-      return resolveFileValidationMessage(issue, t)
+      return resolveFileValidationMessage(issue, t, locale?.())
 
     return t(`gr.form.${kind}`, DEFAULT_MESSAGES[kind], params)
   }

@@ -14,6 +14,7 @@ vi.mock('~icons/lucide/arrow-up', () => {
 import GrFormField from '../../GrFormField/GrFormField.vue'
 import GrFileUpload from '../GrFileUpload.vue'
 import { maxFileSize } from '../maxFileSize'
+import { FileValidationError } from '../../../fileValidation'
 
 function flushPromises() {
   return new Promise(resolve => setTimeout(resolve, 0))
@@ -218,6 +219,24 @@ describe('GrFileUpload', () => {
 
     expect(request).not.toHaveBeenCalled()
     expect(wrapper.emitted('error')).toBeTruthy()
+
+    // Текст ошибки уходит в поле формы — он для человека, а не `limit=1`.
+    const [error] = wrapper.emitted('error')![0] as [FileValidationError]
+    expect(error).toBeInstanceOf(FileValidationError)
+    expect(error.code).toBe('maxCount')
+    expect(error.message).toBe('Too many files: up to 1 allowed')
+  })
+
+  it('ошибка валидации несёт человеческий текст, а не `accept="…"`', async () => {
+    const wrapper = mount(GrFileUpload, { props: { request: vi.fn(), accept: '.csv,.ofx' } })
+
+    await wrapper.get('[data-gr-file-upload]').trigger('drop', {
+      dataTransfer: { files: [new File(['%PDF'], 'statement-oct.pdf', { type: 'application/pdf' })] },
+    })
+    await flushPromises()
+
+    const [error] = wrapper.emitted('error')![0] as [FileValidationError]
+    expect(error.message).toBe('statement-oct.pdf is not an allowed file type')
   })
 
   it('beforeUpload=false отменяет загрузку до старта', async () => {
@@ -1179,6 +1198,7 @@ describe('GrFileUpload — предупреждения о настройке', 
     expect(warnings({ action: '/upload' })).toEqual([])
     expect(warnings({ request: () => Promise.resolve({}) })).toEqual([])
   })
+
   /**
    * Проба слота шла с пустым объектом вместо пропов: `#default="{ state }"` с
    * `state.phase` бросал `TypeError` на первом же рендере.

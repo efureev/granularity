@@ -16,7 +16,7 @@ export function acceptValidator(accept: string | undefined): FileValidator {
       issues.push({
         fileName: file.name,
         code: 'accept',
-        message: `File "${file.name}" does not match accept="${accept}"`,
+        message: `${file.name} is not an allowed file type`,
         i18nParams: { fileName: file.name, accept },
       })
     }

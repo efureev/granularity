@@ -19,7 +19,7 @@ export function maxCountValidator(maxCount: number | undefined): FileValidator {
 
     const issue: FileValidationIssue = {
       code: 'maxCount',
-      message: `Too many files selected (${files.length}), maxCount=${limit}`,
+      message: `Too many files: up to ${limit} allowed`,
       i18nParams: { count: files.length, maxCount: limit },
       meta: { count: files.length, maxCount: limit },
     }

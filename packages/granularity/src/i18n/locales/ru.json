@@ -332,13 +332,19 @@
     "label": "Файл"
   },
   "fileValidation": {
-    "accept": "Файл «{fileName}» не подходит под accept=\"{accept}\"",
-    "extension": "У файла «{fileName}» недопустимое расширение «.{extension}»",
-    "mimeType": "У файла «{fileName}» недопустимый тип «{mimeType}»",
-    "mimeTypeFallback": "У файла «{fileName}» неопределённый тип «{mimeType}»",
-    "maxFileSize": "Файл «{fileName}» слишком большой ({size} байт), максимум {maxBytes}",
-    "maxCount": "Выбрано слишком много файлов ({count}), максимум — {maxCount}",
-    "maxTotalSize": "Суммарный размер файлов слишком большой ({total} байт), максимум {maxBytes}"
+    "accept": "Файлы такого типа не принимаются: {fileName}",
+    "extension": "Файлы .{extension} не принимаются: {fileName}",
+    "mimeType": "Файлы такого типа не принимаются: {fileName}",
+    "mimeTypeFallback": "Не удалось определить тип файла {fileName}",
+    "maxFileSize": "Файл {fileName} больше {maxSize}",
+    "maxCount": "Слишком много файлов: можно не больше {maxCount}",
+    "maxTotalSize": "Файлы вместе больше {maxSize}"
+  },
+  "fileSize": {
+    "b": "{value} Б",
+    "kb": "{value} КБ",
+    "mb": "{value} МБ",
+    "gb": "{value} ГБ"
   },
   "kbd": {
     "command": "Command",

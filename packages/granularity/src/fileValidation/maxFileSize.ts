@@ -1,3 +1,4 @@
+import { formatFileSize } from './formatFileSize'
 import type { FileValidationIssue, FileValidator } from './types'
 
 export interface MaxFileSizeOptions {
@@ -40,7 +41,7 @@ export function maxFileSize(options: MaxFileSizeOptions): FileValidator {
       issues.push({
         fileName: file.name,
         code: 'maxFileSize',
-        message: `File "${file.name}" is too large (${file.size} bytes), maxBytes=${maxBytes}`,
+        message: `${file.name} is larger than ${formatFileSize(maxBytes)}`,
         i18nParams: { fileName: file.name, size: file.size, maxBytes },
         meta: { maxBytes },
       })

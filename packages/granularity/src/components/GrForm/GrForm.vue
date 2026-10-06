@@ -88,7 +88,7 @@ const props = withDefaults(
 
 const emit = defineEmits<GrFormEmits<TModel>>()
 
-const { t } = useGranularityTranslations()
+const { t, locale } = useGranularityTranslations()
 
 /**
  * Модель наружу дженерик, а адресация полей внутри работает по строковому пути.
@@ -150,7 +150,7 @@ function effectiveRules(name: string): GrFormRule[] {
 
 // Дефолтные i18n-сообщения (перекрываются `rule.message`) — общие с любым
 // потребителем движка правил, не только с формой.
-const resolveMessage = createGrFormMessageResolver(t)
+const resolveMessage = createGrFormMessageResolver(t, () => locale.value)
 
 // ————— Валидация.
 // Счётчик поколений на имя поля: перекрывающиеся асинхронные прогоны пишут

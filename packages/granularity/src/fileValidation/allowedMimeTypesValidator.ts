@@ -35,7 +35,7 @@ export function allowedMimeTypesValidator(
           issues.push({
             fileName: file.name,
             code: 'mimeType',
-            message: `File "${file.name}" has fallback mime type "${fileType}"`,
+            message: `The type of ${file.name} could not be determined`,
             // Тот же `code`, что и у запрещённого типа ниже — ветка обработчика
             // одна, — но формулировка другая, поэтому ключ задан явно.
             i18nKey: fileValidationI18nKey('mimeTypeFallback'),
@@ -50,7 +50,7 @@ export function allowedMimeTypesValidator(
         issues.push({
           fileName: file.name,
           code: 'mimeType',
-          message: `File "${file.name}" has disallowed mime type "${fileType}"`,
+          message: `${file.name} is not an allowed file type`,
           i18nParams: { fileName: file.name, mimeType: fileType },
         })
       }

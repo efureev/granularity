@@ -31,7 +31,7 @@ export function allowedExtensionsValidator(exts: string[]): FileValidator {
         issues.push({
           fileName: file.name,
           code: 'extension',
-          message: `File "${file.name}" has disallowed extension ".${ext}"`,
+          message: `${file.name} is not an allowed file type (.${ext})`,
           i18nParams: { fileName: file.name, extension: ext },
         })
       }

@@ -328,13 +328,19 @@
     "label": "File"
   },
   "fileValidation": {
-    "accept": "File \"{fileName}\" does not match accept=\"{accept}\"",
-    "extension": "File \"{fileName}\" has disallowed extension \".{extension}\"",
-    "mimeType": "File \"{fileName}\" has disallowed mime type \"{mimeType}\"",
-    "mimeTypeFallback": "File \"{fileName}\" has fallback mime type \"{mimeType}\"",
-    "maxFileSize": "File \"{fileName}\" is too large ({size} bytes), maxBytes={maxBytes}",
-    "maxCount": "Too many files selected ({count}), maxCount={maxCount}",
-    "maxTotalSize": "Total files size is too large ({total} bytes), maxTotalSizeBytes={maxBytes}"
+    "accept": "{fileName} is not an allowed file type",
+    "extension": "{fileName} is not an allowed file type (.{extension})",
+    "mimeType": "{fileName} is not an allowed file type",
+    "mimeTypeFallback": "The type of {fileName} could not be determined",
+    "maxFileSize": "{fileName} is larger than {maxSize}",
+    "maxCount": "Too many files: up to {maxCount} allowed",
+    "maxTotalSize": "The files together exceed {maxSize}"
+  },
+  "fileSize": {
+    "b": "{value} B",
+    "kb": "{value} KB",
+    "mb": "{value} MB",
+    "gb": "{value} GB"
   },
   "kbd": {
     "command": "Command",

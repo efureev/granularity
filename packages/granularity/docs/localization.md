@@ -173,14 +173,23 @@ fallback как есть: одной формой и без форматиров
 а строку собирает UI:
 
 ```ts
-import { resolveFileValidationMessage } from '@feugene/granularity'
+import { resolveFileValidationMessage } from '@feugene/granularity/fileValidation'
 
-const { t } = useGranularityTranslations()
-const text = resolveFileValidationMessage(issue, t)
+const { t, locale } = useGranularityTranslations()
+const text = resolveFileValidationMessage(issue, t, locale.value)
 ```
 
-Числа уходят в перевод как есть — размеры в байтах приходят параметрами, и
-отформатировать их может словарь приложения.
+Текст пишется для человека: «report.pdf is larger than 10 MB», а не
+`maxBytes=10485760`. Размеры приходят в перевод дважды — байтами под прежними
+именами (`size`, `maxBytes`, `total`) и словами (`fileSize`, `maxSize`,
+`totalSize`): `10 MB`, `1,5 МБ`. Единицы — ключи `gr.fileSize.{b,kb,mb,gb}`,
+число — `Intl.NumberFormat` переданной локали (без неё — `en`, чтобы сервер и
+клиент совпали). Отдельно форматтер доступен как `formatFileSize(bytes, { t, locale })`.
+
+`GrFileUpload` кладёт тот же переведённый текст в `message` своей
+`FileValidationError` — его можно отдать `GrFormField` прямо из `@error`. Сюда же
+приходит и превышение `limit`: это `FileValidationError` с `code: 'maxCount'`, а не
+голый `Error` с `limit=…`.
 
 Ключ выводится из `code` — `gr.fileValidation.<code>`, — поэтому новый
 встроенный валидатор переводится заведением одной строки в локали.

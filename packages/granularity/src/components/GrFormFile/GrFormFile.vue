@@ -159,7 +159,7 @@ defineSlots<{
   error?: (props: { errors: GrFormFileError[] }) => any
 }>()
 
-const { t } = useGranularityTranslations()
+const { t, locale } = useGranularityTranslations()
 
 // Контекст `GrFormField`. Виджет здесь — кнопка выбора файла, а не нативный
 // `<input type="file">`: он `aria-hidden` и вне таб-порядка, id на нём увёл бы
@@ -407,7 +407,7 @@ function formatFileSize(file: File): string {
 }
 
 function issueMessage(issue: GrFormFileError): string {
-  const text = resolveFileValidationMessage(issue, t)
+  const text = resolveFileValidationMessage(issue, t, locale.value)
 
   // Префикс с именем файла нужен только тем сообщениям, которые сами его не
   // называют, — то есть валидаторам потребителя. Встроенные передают `fileName`

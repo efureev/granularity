@@ -1,3 +1,4 @@
+import { formatFileSize } from './formatFileSize'
 import type { FileValidationIssue, FileValidationIssueCode } from './types'
 
 /**
@@ -29,11 +30,35 @@ export function fileValidationI18nKey(code: FileValidationIssueCode): string {
 export function resolveFileValidationMessage(
   issue: FileValidationIssue,
   t: (key: string, fallback: string, params?: Record<string, unknown>) => string,
+  locale?: string,
 ): string {
   const key = issue.i18nKey ?? fileValidationI18nKey(issue.code)
 
-  // Числа уходят в перевод как есть. Форматировать их — работа переводчика
-  // приложения: у него есть локаль и свои правила, а вторая реализация `Intl`
-  // внутри UI-библиотеки однажды разошлась бы с ней в мелочах.
-  return t(key, issue.message, issue.i18nParams)
+  return t(key, issue.message, withReadableSizes(issue.i18nParams, t, locale))
+}
+
+/**
+ * К байтам добавляются те же размеры словами: `maxSize`, `fileSize`, `totalSize`.
+ *
+ * Сообщение видит пользователь, а `10485760 bytes` — язык разработчика. Байты
+ * при этом остаются в параметрах под прежними именами: на них опираются
+ * переводы приложений, написанные раньше.
+ */
+function withReadableSizes(
+  params: Record<string, unknown> | undefined,
+  t: (key: string, fallback: string, params?: Record<string, unknown>) => string,
+  locale: string | undefined,
+): Record<string, unknown> | undefined {
+  if (!params)
+    return params
+
+  const readable = (value: unknown): string | undefined =>
+    typeof value === 'number' && Number.isFinite(value) ? formatFileSize(value, { t, locale }) : undefined
+
+  return {
+    ...params,
+    maxSize: readable(params.maxBytes),
+    fileSize: readable(params.size),
+    totalSize: readable(params.total),
+  }
 }

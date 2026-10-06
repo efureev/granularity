@@ -7,7 +7,7 @@ import IconClose from '~icons/lucide/x'
 import GrIcon from '../GrIcon/GrIcon.vue'
 import GrProgressBar from '../GrProgressBar/GrProgressBar.vue'
 import type { GrProgressBarTone } from '../GrProgressBar/grStyle'
-import type { FileValidator, FileValidatorSource } from '../../fileValidation'
+import type { FileValidator, FileValidatorSource, FileValidationIssue } from '../../fileValidation'
 import type { GrUploadProgressInfo } from './uploadViaXhr'
 import type { GrUploadState } from './uploadState'
 import { summarizeFileEntries, type GrFileUploadEntry } from './fileEntry'
@@ -29,7 +29,7 @@ import {
   progressTextSizes,
   zoneGaps,
 } from './grFileUploadStyles'
-import { acceptValidator, FileValidationError, runFileValidators } from '../../fileValidation'
+import { acceptValidator, FileValidationError, maxCountValidator, resolveFileValidationMessage, runFileValidators } from '../../fileValidation'
 import { GrUploadAbortError, uploadViaXhr } from './uploadViaXhr'
 import { useGrFormFieldContext } from '../shared/formFieldContext'
 import { useGrFormControl } from '../../composables/useGrFormControl'
@@ -277,7 +277,7 @@ defineSlots<{
 
 const slots = useSlots()
 
-const { t } = useGranularityTranslations()
+const { t, locale } = useGranularityTranslations()
 
 // Контекст `GrFormField`: доступным контролом служит сам нативный
 // `<input type="file">` — он и остаётся целью `<label for>`.
@@ -539,6 +539,20 @@ function effectiveValidators(): FileValidator[] {
  */
 let runCounter = 0
 
+/**
+ * Ошибка валидации с текстом на языке интерфейса.
+ *
+ * `message` ошибки — то, что потребитель кладёт в `GrFormField` прямо из
+ * `@error`, поэтому он переведён тем же ключом `gr.fileValidation.*`, что и
+ * сообщения формы. Разбор по `issues` и `code` остаётся прежним.
+ */
+function validationError(issues: FileValidationIssue[], valid: File[]): FileValidationError {
+  const first = issues[0]
+  const message = first ? resolveFileValidationMessage(first, t, locale.value) : undefined
+
+  return new FileValidationError(issues, valid, message)
+}
+
 async function handleFiles(files: File[], source: FileValidatorSource = 'input') {
   if (isLocked.value)
     return
@@ -552,7 +566,10 @@ async function handleFiles(files: File[], source: FileValidatorSource = 'input')
   const normalizedLimit = normalizeLimit(props.limit)
   if (props.multiple && normalizedLimit && files.length > normalizedLimit) {
     emit('exceed', files, normalizedLimit)
-    emit('error', new Error(`Too many files selected, limit=${normalizedLimit}`))
+    // Та же ошибка, что у валидатора `maxCount`: текст уходит пользователю в
+    // поле формы, и «limit=6» в нём — язык разработчика, а не человека.
+    const issues = await maxCountValidator(normalizedLimit)({ files, context: { source, multiple: props.multiple } })
+    emit('error', validationError(issues, []))
     return
   }
 
@@ -565,7 +582,7 @@ async function handleFiles(files: File[], source: FileValidatorSource = 'input')
     return
 
   if (issues.length > 0) {
-    emit('error', new FileValidationError(issues, valid))
+    emit('error', validationError(issues, valid))
     return
   }
 

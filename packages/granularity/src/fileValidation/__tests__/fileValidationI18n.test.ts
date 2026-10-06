@@ -1,11 +1,15 @@
 import { describe, expect, it } from 'vitest'
 
 import en from '../../i18n/locales/en.json'
+import es from '../../i18n/locales/es.json'
+import ru from '../../i18n/locales/ru.json'
 import {
   acceptValidator,
   allowedExtensionsValidator,
   allowedMimeTypesValidator,
   fileValidationI18nKey,
+  formatFileSize,
+  maxCountValidator,
   maxFileSize,
   maxTotalSizeBytesValidator,
   resolveFileValidationMessage,
@@ -107,5 +111,75 @@ describe('resolveFileValidationMessage', () => {
     const custom: FileValidationIssue = { code: 'my-rule', message: 'Своё правило нарушено' }
 
     expect(resolveFileValidationMessage(custom, translator({}))).toBe('Своё правило нарушено')
+  })
+})
+
+/** Плоский словарь `gr.*` из JSON локали — как его видит `t`. */
+function flatten(block: Record<string, unknown>, prefix = 'gr'): Record<string, string> {
+  return Object.fromEntries(Object.entries(block).flatMap(([key, value]) =>
+    typeof value === 'string'
+      ? [[`${prefix}.${key}`, value]]
+      : Object.entries(flatten(value as Record<string, unknown>, `${prefix}.${key}`))))
+}
+
+/**
+ * Текст ошибки видит пользователь: на сайте поле формы показывало
+ * «File "statement-oct.pdf" does not match accept=".csv,.ofx"». Ни
+ * `accept="…"`, ни `maxBytes=…`, ни размера в байтах в сообщении быть не должно
+ * — ни в одной локали, ни в английском `message` валидатора.
+ */
+describe('сообщения написаны для человека', () => {
+  const MB = 1024 * 1024
+
+  async function allIssues(): Promise<FileValidationIssue[]> {
+    return [
+      ...await run(acceptValidator('.csv,.ofx'), [file('statement-oct.pdf')]),
+      ...await run(allowedExtensionsValidator(['csv']), [file('statement-oct.pdf')]),
+      ...await run(allowedMimeTypesValidator(['text/csv']), [file('photo.png')]),
+      ...await run(allowedMimeTypesValidator(['text/csv'], { allowFallbackByExtension: false }), [file('a.bin', 1, '')]),
+      ...await run(maxFileSize({ mb: 10 }), [file('report.pdf', 10 * MB + 1)]),
+      ...await run(maxCountValidator(6), Array.from({ length: 7 }, (_, index) => file(`${index}.png`))),
+      ...await run(maxTotalSizeBytesValidator(50 * MB), [file('a.pdf', 30 * MB), file('b.pdf', 30 * MB)]),
+    ]
+  }
+
+  function expectHuman(text: string): void {
+    expect(text).not.toMatch(/=/)
+    expect(text, 'размер в байтах').not.toMatch(/\d{4,}/)
+    expect(text).not.toMatch(/\bbytes?\b|байт/)
+    expect(text).not.toMatch(/\{\w+\}/)
+  }
+
+  it.each([['en', en], ['ru', ru], ['es', es]] as const)('%s', async (_locale, messages) => {
+    const t = translator(flatten(messages))
+
+    for (const issue of await allIssues())
+      expectHuman(resolveFileValidationMessage(issue, t, _locale))
+  })
+
+  it('английский `message` валидатора — тоже', async () => {
+    for (const issue of await allIssues())
+      expectHuman(issue.message)
+  })
+
+  it('пределы называются в KB и MB, а не в байтах', async () => {
+    const t = translator(flatten(en))
+    const [big] = await run(maxFileSize({ mb: 10 }), [file('report.pdf', 10 * MB + 1)])
+    const [total] = await run(maxTotalSizeBytesValidator(50 * MB), [file('a.pdf', 30 * MB), file('b.pdf', 30 * MB)])
+    const [many] = await run(maxCountValidator(6), Array.from({ length: 7 }, (_, index) => file(`${index}.png`)))
+
+    expect(resolveFileValidationMessage(big, t)).toBe('report.pdf is larger than 10 MB')
+    expect(resolveFileValidationMessage(total, t)).toBe('The files together exceed 50 MB')
+    expect(resolveFileValidationMessage(many, t)).toBe('Too many files: up to 6 allowed')
+  })
+
+  it('размер округляется и пишется числом своей локали', () => {
+    const t = translator(flatten(ru))
+
+    expect(formatFileSize(512)).toBe('512 B')
+    expect(formatFileSize(500 * 1024)).toBe('500 KB')
+    expect(formatFileSize(1.5 * MB)).toBe('1.5 MB')
+    expect(formatFileSize(12.4 * MB)).toBe('12 MB')
+    expect(formatFileSize(1.5 * MB, { t, locale: 'ru' })).toBe('1,5 МБ')
   })
 })
