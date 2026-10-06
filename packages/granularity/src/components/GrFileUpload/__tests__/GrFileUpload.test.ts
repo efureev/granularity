@@ -1179,4 +1179,18 @@ describe('GrFileUpload — предупреждения о настройке', 
     expect(warnings({ action: '/upload' })).toEqual([])
     expect(warnings({ request: () => Promise.resolve({}) })).toEqual([])
   })
+  /**
+   * Проба слота шла с пустым объектом вместо пропов: `#default="{ state }"` с
+   * `state.phase` бросал `TypeError` на первом же рендере.
+   */
+  it('scoped-слот, читающий `state` и `files`, получает настоящие пропы', () => {
+    const wrapper = mount(GrFileUpload, {
+      slots: {
+        default: ({ state, files }: { state: { phase: string }, files: File[] }) =>
+          h('span', { 'data-own-zone': '' }, `${state.phase} · ${files.length}`),
+      },
+    })
+
+    expect(wrapper.get('[data-own-zone]').text()).toBe('idle · 0')
+  })
 })

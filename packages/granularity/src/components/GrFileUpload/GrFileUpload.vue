@@ -312,14 +312,6 @@ function slotIsTextOnly(nodes: VNode[]): boolean {
   return true
 }
 
-const defaultSlotNodes = computed(() => {
-  return slots.default ? flattenSlotNodes(slots.default({} as any)) : []
-})
-
-const hasCustomUi = computed(() => {
-  return !!slots.default && !slotIsTextOnly(defaultSlotNodes.value)
-})
-
 const inputRef = ref<HTMLInputElement | null>(null)
 const rootEl = ref<HTMLElement | null>(null)
 
@@ -406,7 +398,7 @@ const { retryFile, abortFile } = perFile
 
 const dropZone = useDropZone({
   locked: () => isLocked.value,
-  inactive: () => hasCustomUi.value,
+  inactive: () => isCustomUi(),
   onDrop: files => void handleFiles(files, 'drop'),
 })
 const isOver = dropZone.isOver
@@ -428,6 +420,26 @@ const defaultSlotProps = computed(() => ({
   retryFile,
   abortFile,
 }))
+
+/**
+ * Проба слота — с настоящими пропами.
+ *
+ * Пустой объект ронял любой scoped-слот, читающий пропы при рендере:
+ * `#default="{ state }"` с `state.phase` бросал `TypeError`, и серверный
+ * рендер отдавал 500.
+ */
+const defaultSlotNodes = computed(() => {
+  return slots.default ? flattenSlotNodes(slots.default(defaultSlotProps.value)) : []
+})
+
+const hasCustomUi = computed(() => {
+  return !!slots.default && !slotIsTextOnly(defaultSlotNodes.value)
+})
+
+/** Своя зона вместо стандартной: она и сбрасывает файлы, если хочет. */
+function isCustomUi(): boolean {
+  return hasCustomUi.value
+}
 
 const zoneClass = computed(() => grFileUploadZoneClass({
   size: resolvedSize.value,
