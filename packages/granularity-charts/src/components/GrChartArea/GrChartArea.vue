@@ -192,7 +192,7 @@ const props = withDefaults(defineProps<GrChartAreaProps>(), {
   yDomainRight: undefined,
   yTickFormatRight: undefined,
   valueFormatRight: undefined,
-  xTickCount: 6,
+  xTickCount: undefined,
   yTickCount: 5,
   xTickFormat: undefined,
   yTickFormat: undefined,

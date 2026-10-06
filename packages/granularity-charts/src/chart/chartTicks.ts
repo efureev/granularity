@@ -156,7 +156,11 @@ const TIME_LADDER: { unit: GrTimeTickUnit, step: number, approxMs: number }[] = 
   { unit: 'day', step: 2, approxMs: 1728e5 },
   { unit: 'week', step: 1, approxMs: 6048e5 },
   { unit: 'month', step: 1, approxMs: 2.6298e9 },
+  { unit: 'month', step: 2, approxMs: 5.2596e9 },
   { unit: 'month', step: 3, approxMs: 7.8894e9 },
+  // Без полугода малый `count` на годе без месяца прыгал с квартала сразу на
+  // год — и оставлял одно деление.
+  { unit: 'month', step: 6, approxMs: 1.57788e10 },
   { unit: 'year', step: 1, approxMs: 3.1557e10 },
 ]
 
@@ -178,24 +182,39 @@ export function timeTicks(domain: readonly [number, number], count: number): Tim
 
   const desired = Math.max(2, Math.floor(count))
   const span = to - from
-  const chosen = TIME_LADDER.find(entry => span / entry.approxMs <= desired - 1)
-    ?? TIME_LADDER[TIME_LADDER.length - 1]!
 
+  // Ступень выбирается по настоящему числу делений, а не по оценке «длина
+  // через шаг»: выравнивание по границе месяца или квартала съедает кусок
+  // диапазона, и оценка браковала ступень, которая на деле давала ровно
+  // `count` делений. Грубая оценка отсекает только заведомо мелкие ступени.
+  for (const entry of TIME_LADDER) {
+    if (entry.unit === 'year' || span / entry.approxMs > desired)
+      continue
+
+    const values = stepTicks(from, to, entry.unit, entry.step)
+
+    if (values.length <= desired)
+      return { values, unit: entry.unit, step: entry.step }
+  }
+
+  const year = TIME_LADDER[TIME_LADDER.length - 1]!
   // Годовой шаг растягивается сам: на диапазоне в век годовых делений было бы
   // сто, а лестница выше уже кончилась.
-  const step = chosen.unit === 'year'
-    ? Math.max(1, niceNumber(span / chosen.approxMs / (desired - 1), true))
-    : chosen.step
+  const step = Math.max(1, niceNumber(span / year.approxMs / (desired - 1), true))
 
+  return { values: stepTicks(from, to, 'year', step), unit: 'year', step }
+}
+
+function stepTicks(from: number, to: number, unit: GrTimeTickUnit, step: number): number[] {
   const values: number[] = []
-  let cursor = alignUp(new Date(from), chosen.unit, step)
+  let cursor = alignUp(new Date(from), unit, step)
 
   while (cursor.getTime() <= to && values.length < MAX_TICKS) {
     values.push(cursor.getTime())
-    cursor = addUnit(cursor, chosen.unit, step)
+    cursor = addUnit(cursor, unit, step)
   }
 
-  return { values, unit: chosen.unit, step }
+  return values
 }
 
 function alignUp(date: Date, unit: GrTimeTickUnit, step: number): Date {

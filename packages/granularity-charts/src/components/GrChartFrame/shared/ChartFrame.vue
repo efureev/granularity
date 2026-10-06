@@ -9,7 +9,7 @@ import { computed, onScopeDispose, ref, shallowRef, useId, watch } from 'vue'
 import { decimateChartData, decimateSeriesGroup, decimationBudget } from '../../../chart/chartDecimate'
 import type { GrChartNumberFormat } from '../../../chart/chartFormat'
 import { formatNumber, formatTimeSequence, formatTimeValue, formatValue } from '../../../chart/chartFormat'
-import { chartLayout, type Rect } from '../../../chart/chartLayout'
+import { chartLayout, type Rect, thinTicksToFit } from '../../../chart/chartLayout'
 import { linePath } from '../../../chart/chartPath'
 import type { ChartData, NormalizedPoint, NormalizedSeries } from '../../../chart/chartModel'
 import type { GrChartReference } from '../../../chart/chartReference'
@@ -137,6 +137,7 @@ export interface ChartFrameProps {
   surfaceRole?: string
   /** Атрибуты оверлея сверх имени: `aria-valuenow` и соседи у `meter`. */
   surfaceAttrs?: Record<string, string | number | undefined>
+  /** Желаемое число делений X (по умолчанию 6); у категорий — потолок числа подписей. */
   xTickCount?: number
   yTickCount?: number
   xTickFormat?: ChartTickFormat
@@ -255,7 +256,7 @@ const props = withDefaults(defineProps<ChartFrameProps>(), {
   roleDescription: undefined,
   surfaceRole: undefined,
   surfaceAttrs: undefined,
-  xTickCount: 6,
+  xTickCount: undefined,
   yTickCount: 5,
   xTickFormat: undefined,
   yTickFormat: undefined,
@@ -358,12 +359,16 @@ const hasRightAxis = computed(() => rightTicks.value !== null)
  * поэтому один проход форматирования делается заранее, а координаты
  * досчитываются потом.
  */
+const DEFAULT_X_TICK_COUNT = 6
+
 const labelScaleX = computed(() => createScale(props.data.kind, props.data.xDomain, [0, 1]))
 const labelScaleY = computed(() => linearScale(niceYDomain.value, [1, 0]))
 
 const xLabels = useChartTicks({
   scale: () => labelScaleX.value,
-  count: () => props.xTickCount,
+  count: () => props.xTickCount ?? DEFAULT_X_TICK_COUNT,
+  // У категорий `xTickCount` — потолок числа подписей; не задан — свой потолок шкалы.
+  maxLabels: () => props.xTickCount,
   categories: () => props.data.categories,
   locale: () => resolvedLocale.value,
   format: () => props.xTickFormat,
@@ -511,6 +516,12 @@ function withPosition(ticks: readonly ChartTick[], scale: GrChartScale): ChartTi
 }
 
 const xTicks = computed(() => withPosition(xLabels.value, xScale.value))
+/**
+ * Подписи оси X, которые встают без наложения. Число делений выбирает шкала, а
+ * помещаются ли подписи — ширина холста: на узкой карточке лишние пропускаются
+ * (`thinTicksToFit`). Сетка остаётся на всех делениях.
+ */
+const xAxisTicks = computed(() => thinTicksToFit(xTicks.value, fontSizePx.value))
 const yTicks = computed(() => withPosition(yLabels.value, yScale.value))
 const yTicksRight = computed(() => (yScaleRight.value === null ? [] : withPosition(yLabelsRight.value, yScaleRight.value)))
 
@@ -1114,7 +1125,7 @@ watch(tooltipApi.activeIndex, (value) => {
           />
           <ChartAxis
             :plot="plot"
-            :ticks="xTicks"
+            :ticks="xAxisTicks"
             orientation="x"
             :font-size-px="fontSizePx"
             :size-class="labelSizeClass[size]"

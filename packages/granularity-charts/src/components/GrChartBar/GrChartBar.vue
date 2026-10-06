@@ -166,7 +166,7 @@ const props = withDefaults(defineProps<GrChartBarProps>(), {
   yDomainRight: undefined,
   yTickFormatRight: undefined,
   valueFormatRight: undefined,
-  xTickCount: 6,
+  xTickCount: undefined,
   yTickCount: 5,
   xTickFormat: undefined,
   yTickFormat: undefined,

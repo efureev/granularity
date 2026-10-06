@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { chartLayout, estimateTextWidth, fitLabel, labelGutters, placeRowLabels } from '../chartLayout'
+import { chartLayout, estimateTextWidth, fitLabel, labelGutters, placeRowLabels, thinTicksToFit } from '../chartLayout'
 
 const base = {
   width: 600,
@@ -328,5 +328,44 @@ describe('placeRowLabels', () => {
     expect(placed[0]!.index).toBe(0)
     expect(placed.at(-1)!.index).toBe(59)
     expect(overlapping(boxes(placed))).toBe(false)
+  })
+})
+
+describe('thinTicksToFit', () => {
+  function ticksAt(labels: readonly string[], width: number) {
+    const step = width / labels.length
+
+    return labels.map((label, index) => ({ value: index, position: step * (index + 0.5), label }))
+  }
+
+  function intersecting(ticks: ReturnType<typeof ticksAt>): boolean {
+    return ticks.some((tick, index) => {
+      const previous = ticks[index - 1]
+
+      return previous !== undefined
+        && previous.position + estimateTextWidth(previous.label, 12) / 2 > tick.position - estimateTextWidth(tick.label, 12) / 2
+    })
+  }
+
+  it('помещающиеся подписи остаются все', () => {
+    const ticks = ticksAt(['Q1', 'Q2', 'Q3', 'Q4'], 600)
+
+    expect(thinTicksToFit(ticks, 12)).toEqual(ticks)
+  })
+
+  it('двадцать пять получасов на 250px прореживаются без наложения, с краями', () => {
+    const labels = Array.from({ length: 25 }, (_, index) => `${String(Math.floor(index / 2)).padStart(2, '0')}:${index % 2 === 0 ? '00' : '30'}`)
+    const thinned = thinTicksToFit(ticksAt(labels, 250), 12)
+
+    expect(intersecting(thinned)).toBe(false)
+    expect(thinned.length).toBeGreaterThan(1)
+    expect(thinned[0]!.label).toBe('00:00')
+    expect(thinned.at(-1)!.label).toBe('12:00')
+  })
+
+  it('не помещаются даже крайние — остаётся первая', () => {
+    const thinned = thinTicksToFit(ticksAt(['Очень длинная подпись', 'Ещё одна длинная подпись'], 60), 12)
+
+    expect(thinned.map(tick => tick.label)).toEqual(['Очень длинная подпись'])
   })
 })

@@ -220,19 +220,7 @@ export function placeRowLabels(input: RowLabelsInput): PlacedLabel[] {
       every = Math.max(1, Math.min(count - 1, Math.ceil((widest + ROW_LABEL_GAP) / step)))
   }
 
-  const shown: number[] = []
-
-  for (let index = 0; index < count; index += every)
-    shown.push(index)
-
-  const last = count - 1
-
-  if (shown.at(-1) !== last) {
-    if (shown.length > 1 && last - shown.at(-1)! < every)
-      shown.pop()
-    shown.push(last)
-  }
-
+  const shown = strided(count, every)
   const center = (index: number): number => start + step * (index + 0.5)
 
   return shown.map((index, position) => {
@@ -247,6 +235,62 @@ export function placeRowLabels(input: RowLabelsInput): PlacedLabel[] {
 
     return { index, x, text, full: text === label ? undefined : label }
   })
+}
+
+/** Каждая `every`-я позиция из `count`, первая и последняя — всегда. */
+function strided(count: number, every: number): number[] {
+  const picked: number[] = []
+
+  for (let index = 0; index < count; index += every)
+    picked.push(index)
+
+  const last = count - 1
+
+  // Последняя ближе шага к предыдущей выбранной — та уступает ей место: иначе
+  // две подписи у края встали бы впритык.
+  if (picked.at(-1) !== last) {
+    if (picked.length > 1 && last - picked.at(-1)! < every)
+      picked.pop()
+    picked.push(last)
+  }
+
+  return picked
+}
+
+/**
+ * Подписи горизонтальной оси, которые встают без наложения.
+ *
+ * Деления выбирает шкала, а помещаются ли их подписи — решает ширина холста:
+ * двадцать пять получасов на карточке в 250px сливались в «00:0030:0001:00…».
+ * Берётся каждое `k`-е деление с первым и последним — наименьшее `k`, при
+ * котором соседние подписи (по оценке ширины, центрированные на делении)
+ * расходятся хотя бы на зазор. Не расходятся даже крайние — остаётся первая.
+ */
+export function thinTicksToFit<T extends { position: number, label: string }>(
+  ticks: readonly T[],
+  fontSizePx: number,
+): T[] {
+  const count = ticks.length
+
+  if (count < 2)
+    return [...ticks]
+
+  const half = ticks.map(tick => estimateTextWidth(tick.label, fontSizePx) / 2)
+  const fits = (picked: readonly number[]): boolean => picked.every((index, position) => {
+    const previous = picked[position - 1]
+
+    return previous === undefined
+      || ticks[previous]!.position + half[previous]! + ROW_LABEL_GAP <= ticks[index]!.position - half[index]!
+  })
+
+  for (let every = 1; every < count; every++) {
+    const picked = strided(count, every)
+
+    if (fits(picked))
+      return picked.map(index => ticks[index]!)
+  }
+
+  return [ticks[0]!]
 }
 
 /**

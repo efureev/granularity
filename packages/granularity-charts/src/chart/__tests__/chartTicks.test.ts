@@ -122,6 +122,26 @@ describe('timeTicks', () => {
   it('перевёрнутый домен не вешает генерацию', () => {
     expect(timeTicks([Date.UTC(2026, 5, 1), Date.UTC(2026, 0, 1)], 5).values).toEqual([])
   })
+
+  it('малый count на одиннадцати месяцах не схлопывается в одно деление', () => {
+    // Лестница прыгала с квартала сразу на год, и от оси оставалось «Dec»:
+    // первое января в местной зоне.
+    const domain = [new Date(2025, 10, 1).getTime(), new Date(2026, 9, 1).getTime()] as const
+
+    expect(timeTicks(domain, 4).values.length).toBeGreaterThanOrEqual(3)
+    expect(timeTicks(domain, 4).values.length).toBeLessThanOrEqual(4)
+    expect(timeTicks(domain, 2).values.length).toBe(2)
+    expect(timeTicks(domain, 2).unit).toBe('month')
+  })
+
+  it('число делений не больше count', () => {
+    for (const count of [2, 3, 4, 5, 6, 8]) {
+      const { values } = timeTicks([new Date(2025, 10, 1).getTime(), new Date(2026, 9, 1).getTime()], count)
+
+      expect(values.length, `count ${count}`).toBeLessThanOrEqual(count)
+      expect(values.length, `count ${count}`).toBeGreaterThanOrEqual(2)
+    }
+  })
 })
 
 describe('bandTicks', () => {
