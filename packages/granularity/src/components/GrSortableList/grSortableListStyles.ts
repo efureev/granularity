@@ -22,7 +22,16 @@ export const rowDraggingClass = 'bg-[var(--gr-sortable-row-bg-active,var(--gr-mu
 /** Взятая с клавиатуры строка обязана отличаться от просто сфокусированной. */
 export const rowGrabbedClass = 'bg-[var(--gr-sortable-row-bg-active,var(--gr-muted))] ring-2 ring-[var(--gr-ring)] ring-inset'
 
-export const rowDisabledClass = 'cursor-not-allowed bg-[var(--gr-muted)] text-[var(--gr-muted-fg)]'
+export const rowDisabledClass = 'cursor-not-allowed text-[var(--gr-muted-fg)]'
+
+/**
+ * Подложка недоступного списка — на самом списке, а не на строках. В
+ * горизонтальной раскладке строки шириной по содержимому, и подложка на них
+ * очерчивала только занятое место: поверхность «сжималась» с 552px до 400px,
+ * когда переключатель выключал список. Недоступность меняет вид и
+ * поведение, а не размер коробки.
+ */
+export const listDisabledClass = 'rounded-[inherit] bg-[var(--gr-muted)]'
 
 export const dividedClass = 'divide-y divide-[var(--gr-brd)]'
 

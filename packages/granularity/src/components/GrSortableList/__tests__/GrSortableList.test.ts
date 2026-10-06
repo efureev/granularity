@@ -277,3 +277,24 @@ describe('императивный API', () => {
     wrapper.unmount()
   })
 })
+
+/**
+ * В горизонтальной раскладке подложка недоступного списка лежала на строках —
+ * а они шириной по содержимому, и тонированная поверхность «сжималась» с
+ * ширины контейнера до ширины строк. Подложка теперь на самом списке.
+ */
+describe('GrSortableList — недоступный список не меняет коробку', () => {
+  it.each(['horizontal', 'vertical'] as const)('%s: подложка на списке, а не на строках', async (orientation) => {
+    const wrapper = mountList({ orientation, divided: false, variant: 'ghost' })
+    const list = () => wrapper.get('[data-gr-sortable]')
+    const enabledClasses = list().classes().filter(name => !name.startsWith('bg-') && name !== 'rounded-[inherit]')
+
+    await wrapper.setProps({ disabled: true })
+
+    expect(list().classes()).toContain('bg-[var(--gr-muted)]')
+    for (const row of wrapper.findAll('[data-gr-sortable-item]'))
+      expect(row.classes().some(name => name.startsWith('bg-'))).toBe(false)
+    // Раскладочные классы те же: меняется вид, а не размер.
+    expect(list().classes().filter(name => !name.startsWith('bg-') && name !== 'rounded-[inherit]')).toEqual(enabledClasses)
+  })
+})

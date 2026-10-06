@@ -18,6 +18,7 @@ import {
   indicatorAfterClass,
   indicatorBeforeClass,
   listClass,
+  listDisabledClass,
   rowDisabledClass,
   rowDraggingClass,
   rowFocusClass,
@@ -324,7 +325,7 @@ if (__GR_DEV__) {
       data-gr-sortable
       :aria-label="resolvedLabel"
       :aria-disabled="disabled ? 'true' : undefined"
-      :class="[listClass[orientation], divided ? dividedClass : '']"
+      :class="[listClass[orientation], divided ? dividedClass : '', disabled ? listDisabledClass : '']"
       :style="listStyle"
       @focusout="onFocusout"
     >
