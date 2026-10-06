@@ -40,6 +40,10 @@ import TimeColumns from './TimeColumns.vue'
  * `v-model:open`.
  */
 export interface GrTimePickerProps<T = Date | null> {
+  /**
+   * Время (`v-model`) — `Date`, у которого значимо время суток. Тип задаёт
+   * `valueAdapter`; `null` — ничего не выбрано.
+   */
   modelValue?: T
   /**
    * Как значение уходит наружу и приходит обратно: имя готового адаптера
@@ -54,6 +58,7 @@ export interface GrTimePickerProps<T = Date | null> {
   minuteStep?: number
   /** Шаг колонки секунд в секундах. */
   secondStep?: number
+  /** Колонка секунд в панели и секунды в поле. По умолчанию выключена. */
   enableSeconds?: boolean
   /** 12-часовой вид. Не задан — из локали через `Intl`. */
   use12Hours?: boolean
@@ -64,6 +69,7 @@ export interface GrTimePickerProps<T = Date | null> {
   today?: Date
   /** Вид значения в поле — опциями `Intl`, а не строкой-паттерном. */
   format?: Intl.DateTimeFormatOptions
+  /** Подсказка в пустом поле. */
   placeholder?: string
   /**
    * Время можно набрать руками: `9:30`, `09:30:45`, `3:30 PM`. Маски здесь нет
@@ -72,6 +78,10 @@ export interface GrTimePickerProps<T = Date | null> {
   editable?: boolean
   /** Разобранный текст уходит наружу на уходе фокуса, а не только по `Enter`. */
   applyOnBlur?: boolean
+  /**
+   * Кнопка очистки в поле: снимает значение и шлёт `clear`. Не задан — из
+   * `GrConfigProvider`, иначе `false`.
+   */
   clearable?: boolean
   /** Контролируемое состояние панели (`v-model:open`). */
   open?: boolean
@@ -81,8 +91,14 @@ export interface GrTimePickerProps<T = Date | null> {
    * который говорит кортежами.
    */
   inline?: boolean
+  /**
+   * Сторона поля, у которой раскрывается панель. Не задан — из `GrConfigProvider`,
+   * иначе `bottom-start`.
+   */
   placement?: UseFloatingPlacement
+  /** Точечное переопределение точки монтирования панели. */
   teleportTo?: string | HTMLElement
+  /** Высота и кегль поля по шкале контролов. По умолчанию `md`; берётся из `GrConfigProvider`. */
   size?: GrTimePickerSize
   /** Локаль показа. Не задана — из адаптера i18n приложения. */
   locale?: string
@@ -90,21 +106,32 @@ export interface GrTimePickerProps<T = Date | null> {
   id?: string
   /** Имя для нативной формы: сериализованное значение уходит скрытым полем. */
   name?: string
+  /** Поле недоступно: панель не открывается, значение не меняется. Наследуется от `GrFormField`. */
   disabled?: boolean
   /** Значение видно, панель открывается, но выбор не меняется. */
   readonly?: boolean
+  /** Визуальное и ARIA-состояние ошибки (`aria-invalid`). Наследуется от `GrFormField`. */
   invalid?: boolean
+  /** Обязательное поле (`aria-required`). Наследуется от `GrFormField`. */
   required?: boolean
+  /** Фоновая работа: спиннер в поле и `aria-busy`. */
   loading?: boolean
+  /** Доступное имя поля, когда видимой подписи нет. Внутри `GrFormField` имя даёт его `label`. */
   ariaLabel?: string
 }
 
 export interface GrTimePickerEmits<T = Date | null> {
+  /** Новое значение (`v-model`); `null` — значение снято. */
   (e: 'update:modelValue', value: T | null): void
+  /** Значение зафиксировано: выбором в панели, вводом или очисткой. */
   (e: 'change', value: T | null): void
+  /** Панель открылась или закрылась (`v-model:open`). */
   (e: 'update:open', value: boolean): void
+  /** Значение снято кнопкой очистки; только при `clearable`. */
   (e: 'clear'): void
+  /** Фокус вошёл в поле. */
   (e: 'focus', event: FocusEvent): void
+  /** Фокус ушёл из поля. */
   (e: 'blur', event: FocusEvent): void
 }
 

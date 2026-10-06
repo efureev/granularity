@@ -73,7 +73,9 @@ export interface GrDatePickerProps<T = Date | null> {
    * тип задавала строка, и вывести его из типов было невозможно.
    */
   valueAdapter?: GrChronoAdapterName | GrChronoAdapter<T>
+  /** Самая ранняя дата, которую можно выбрать. Дни раньше неё в панели видны, но выключены. */
   min?: Date
+  /** Самая поздняя дата, которую можно выбрать. Дни позже неё в панели видны, но выключены. */
   max?: Date
   /** Запрещённые даты: список или предикат. */
   disabledDates?: readonly Date[] | ((date: Date) => boolean)
@@ -90,6 +92,10 @@ export interface GrDatePickerProps<T = Date | null> {
   presets?: readonly GrDatePreset[]
   /** Первый день недели по ISO (1 — понедельник). Не задан — из локали. */
   weekStart?: IsoWeekday
+  /**
+   * Колонка номеров недель по ISO 8601 в панели. Не задан — как у `GrCalendar` в
+   * `GrConfigProvider`, иначе `false`.
+   */
   showWeekNumbers?: boolean
   /** Что считать сегодняшним днём. Задаётся ради воспроизводимых тестов и снимков. */
   today?: Date
@@ -101,6 +107,10 @@ export interface GrDatePickerProps<T = Date | null> {
    * локали.
    */
   format?: Intl.DateTimeFormatOptions
+  /**
+   * Подсказка в пустом поле. Не задана, а поле редактируемое (`editable`) —
+   * показывается порядок частей даты из локали.
+   */
   placeholder?: string
   /**
    * Дату можно набрать руками. Порядок частей и разделитель берутся из локали,
@@ -113,6 +123,10 @@ export interface GrDatePickerProps<T = Date | null> {
   editable?: boolean
   /** Разобранный текст уходит наружу на уходе фокуса, а не только по `Enter`. */
   applyOnBlur?: boolean
+  /**
+   * Кнопка очистки в поле: снимает значение и шлёт `clear`. Не задан — из
+   * `GrConfigProvider`, иначе `false`.
+   */
   clearable?: boolean
   /** Контролируемое состояние панели (`v-model:open`). */
   open?: boolean
@@ -122,29 +136,45 @@ export interface GrDatePickerProps<T = Date | null> {
    * который говорит кортежами.
    */
   inline?: boolean
+  /**
+   * Сторона поля, у которой раскрывается панель. Не задан — из `GrConfigProvider`,
+   * иначе `bottom-start`.
+   */
   placement?: UseFloatingPlacement
   /** Точечное переопределение точки монтирования панели. */
   teleportTo?: string | HTMLElement
+  /** Высота и кегль поля по шкале контролов. По умолчанию `md`; берётся из `GrConfigProvider`. */
   size?: GrDatePickerSize
   /** Собственный `id` поля. Не задан — берётся из `GrFormField`. */
   id?: string
   /** Имя для нативной формы: сериализованное значение уходит скрытым полем. */
   name?: string
+  /** Поле недоступно: панель не открывается, значение не меняется. Наследуется от `GrFormField`. */
   disabled?: boolean
   /** Значение видно, панель открывается, но выбор не меняется. */
   readonly?: boolean
+  /** Визуальное и ARIA-состояние ошибки (`aria-invalid`). Наследуется от `GrFormField`. */
   invalid?: boolean
+  /** Обязательное поле (`aria-required`). Наследуется от `GrFormField`. */
   required?: boolean
+  /** Фоновая работа: спиннер в поле и `aria-busy`. */
   loading?: boolean
+  /** Доступное имя поля, когда видимой подписи нет. Внутри `GrFormField` имя даёт его `label`. */
   ariaLabel?: string
 }
 
 export interface GrDatePickerEmits<T = Date | null> {
+  /** Новое значение (`v-model`); `null` — значение снято. */
   (e: 'update:modelValue', value: T | readonly T[] | null): void
+  /** Значение зафиксировано: выбором в панели, вводом или очисткой. */
   (e: 'change', value: T | readonly T[] | null): void
+  /** Панель открылась или закрылась (`v-model:open`). */
   (e: 'update:open', value: boolean): void
+  /** Значение снято кнопкой очистки; только при `clearable`. */
   (e: 'clear'): void
+  /** Фокус вошёл в поле. */
   (e: 'focus', event: FocusEvent): void
+  /** Фокус ушёл из поля. */
   (e: 'blur', event: FocusEvent): void
 }
 

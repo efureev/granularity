@@ -68,7 +68,15 @@ export interface GrCalendarProps {
   modelValue?: PlainDate | null
   /** Показываемый месяц. Без него календарь ведёт его сам, отталкиваясь от выбора. */
   viewDate?: PlainDate
+  /**
+   * Самая ранняя дата, которую можно выбрать. Дни раньше неё видны, но
+   * выключены, а листать за её месяц нельзя.
+   */
   min?: PlainDate
+  /**
+   * Самая поздняя дата, которую можно выбрать. Дни позже неё видны, но
+   * выключены, а листать за её месяц нельзя.
+   */
   max?: PlainDate
   /** Запрещённые даты: список или предикат. Список нормализуется в `Set` один раз. */
   disabledDates?: DisabledDatesInput
@@ -77,13 +85,29 @@ export interface GrCalendarProps {
    * через `Intl`.
    */
   weekStart?: IsoWeekday
+  /**
+   * Колонка номеров недель по ISO 8601 слева от сетки. Не задан — из
+   * `GrConfigProvider`, иначе `false`.
+   */
   showWeekNumbers?: boolean
   /** Что считать сегодняшним днём. Задаётся ради воспроизводимых тестов и снимков. */
   today?: PlainDate
   /** Локаль показа. Не задана — из адаптера i18n приложения. */
   locale?: string
+  /**
+   * Ступень размера: ячейки, кегль и стрелки листания. По умолчанию `md`; берётся
+   * из `GrConfigProvider`.
+   */
   size?: GrCalendarSize
+  /**
+   * Календарь недоступен: выбор и листание выключены, сетка объявлена
+   * `aria-disabled`.
+   */
   disabled?: boolean
+  /**
+   * Выбор зафиксирован: выбранная дата видна и читается диктором, но не
+   * меняется, листание тоже стоит. Сетка объявлена `aria-readonly`.
+   */
   readonly?: boolean
   /** Доступное имя сетки, когда рядом нет подписи. */
   ariaLabel?: string
@@ -113,8 +137,11 @@ export interface GrCalendarProps {
 }
 
 export interface GrCalendarEmits {
+  /** Выбрана дата (`v-model`). В режимах периода — первое число месяца, квартала или года. */
   (e: 'update:modelValue', value: PlainDate): void
+  /** Показываемый период сменился (`v-model:viewDate`). */
   (e: 'update:viewDate', value: PlainDate): void
+  /** Пользователь выбрал дату — кликом, клавиатурой или из подвала. */
   (e: 'change', value: PlainDate): void
   /** Показываемый период сменился — листанием, клавиатурой или выбором. */
   (e: 'periodChange', value: PlainDate): void

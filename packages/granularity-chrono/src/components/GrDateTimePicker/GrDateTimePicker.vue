@@ -55,6 +55,7 @@ import {
  * подтверждать там нечего.
  */
 export interface GrDateTimePickerProps<T = Date | null> {
+  /** Дата со временем (`v-model`). Тип задаёт `valueAdapter`; `null` — ничего не выбрано. */
   modelValue?: T
   /**
    * Как значение уходит наружу и приходит обратно: имя готового адаптера
@@ -67,10 +68,18 @@ export interface GrDateTimePickerProps<T = Date | null> {
   max?: Date
   /** Запрещённые даты: список или предикат. */
   disabledDates?: readonly Date[] | ((date: Date) => boolean)
+  /** Первый день недели по ISO (1 — понедельник). Не задан — из локали. */
   weekStart?: IsoWeekday
+  /**
+   * Колонка номеров недель по ISO 8601 в панели. Не задан — как у `GrCalendar` в
+   * `GrConfigProvider`, иначе `false`.
+   */
   showWeekNumbers?: boolean
+  /** Шаг колонки минут в минутах. По умолчанию `1`. */
   minuteStep?: number
+  /** Шаг колонки секунд в секундах. По умолчанию `1`; осмыслен с `enableSeconds`. */
   secondStep?: number
+  /** Колонка секунд в панели и секунды в поле. По умолчанию выключена. */
   enableSeconds?: boolean
   /** 12-часовой вид колонок. Не задан — из локали через `Intl`. */
   use12Hours?: boolean
@@ -83,6 +92,10 @@ export interface GrDateTimePickerProps<T = Date | null> {
   today?: Date
   /** Вид значения в поле — опциями `Intl`, а не строкой-паттерном. */
   format?: Intl.DateTimeFormatOptions
+  /**
+   * Подсказка в пустом поле. Не задана, а поле редактируемое (`editable`) —
+   * показывается порядок частей даты из локали.
+   */
   placeholder?: string
   /**
    * Значение можно набрать руками. Разбор идёт от `Intl`: порядок частей и
@@ -91,6 +104,10 @@ export interface GrDateTimePickerProps<T = Date | null> {
   editable?: boolean
   /** Набранное фиксируется на уходе фокуса, а не только по `Enter`. */
   applyOnBlur?: boolean
+  /**
+   * Кнопка очистки в поле: снимает значение и шлёт `clear`. Не задан — из
+   * `GrConfigProvider`, иначе `false`.
+   */
   clearable?: boolean
   /** Контролируемое состояние панели (`v-model:open`). */
   open?: boolean
@@ -100,8 +117,14 @@ export interface GrDateTimePickerProps<T = Date | null> {
    * который говорит кортежами.
    */
   inline?: boolean
+  /**
+   * Сторона поля, у которой раскрывается панель. Не задан — из `GrConfigProvider`,
+   * иначе `bottom-start`.
+   */
   placement?: UseFloatingPlacement
+  /** Точечное переопределение точки монтирования панели. */
   teleportTo?: string | HTMLElement
+  /** Высота и кегль поля по шкале контролов. По умолчанию `md`; берётся из `GrConfigProvider`. */
   size?: GrDateTimePickerSize
   /** Локаль показа. Не задана — из адаптера i18n приложения. */
   locale?: string
@@ -109,21 +132,32 @@ export interface GrDateTimePickerProps<T = Date | null> {
   id?: string
   /** Имя для нативной формы: сериализованное значение уходит скрытым полем. */
   name?: string
+  /** Поле недоступно: панель не открывается, значение не меняется. Наследуется от `GrFormField`. */
   disabled?: boolean
   /** Значение видно, панель открывается, но выбор не меняется. */
   readonly?: boolean
+  /** Визуальное и ARIA-состояние ошибки (`aria-invalid`). Наследуется от `GrFormField`. */
   invalid?: boolean
+  /** Обязательное поле (`aria-required`). Наследуется от `GrFormField`. */
   required?: boolean
+  /** Фоновая работа: спиннер в поле и `aria-busy`. */
   loading?: boolean
+  /** Доступное имя поля, когда видимой подписи нет. Внутри `GrFormField` имя даёт его `label`. */
   ariaLabel?: string
 }
 
 export interface GrDateTimePickerEmits<T = Date | null> {
+  /** Новое значение (`v-model`); `null` — значение снято. */
   (e: 'update:modelValue', value: T | null): void
+  /** Значение зафиксировано: выбором в панели, вводом или очисткой. */
   (e: 'change', value: T | null): void
+  /** Панель открылась или закрылась (`v-model:open`). */
   (e: 'update:open', value: boolean): void
+  /** Значение снято кнопкой очистки; только при `clearable`. */
   (e: 'clear'): void
+  /** Фокус вошёл в поле. */
   (e: 'focus', event: FocusEvent): void
+  /** Фокус ушёл из поля. */
   (e: 'blur', event: FocusEvent): void
 }
 

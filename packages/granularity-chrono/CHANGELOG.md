@@ -5,6 +5,20 @@ All notable changes to the [`@feugene/granularity-chrono`](.) package are docume
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Fixed
+
+- Появились описания у пропов, которые в API, подсказках IDE и на портале были
+  пустыми: у `GrCalendar` — `min`, `max`, `showWeekNumbers`, `size`, `disabled`,
+  `readonly`; у `GrDatePicker`, `GrDateRangePicker`, `GrDateTimePicker` и
+  `GrTimePicker` — границы дат, номера недель, первый день недели, шаги колонок
+  времени, `placeholder`, `clearable`, `placement`, `teleportTo`, `size`,
+  `disabled`, `invalid`, `required`, `loading`, `ariaLabel`, `modelValue`
+  пикеров даты со временем и времени, а также их события.
+- Описание `minRange` у `GrDateRangePicker` стояло над соседним пропом
+  `enableTime` и до `minRange` не доходило.
+
 ## [v1.0.2] 2026-10-06
 
 ### Changed
