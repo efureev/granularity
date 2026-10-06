@@ -181,4 +181,22 @@ describe('GrChip', () => {
     expect(icon.element.compareDocumentPosition(wrapper.get('[data-gr-chip-label]').element))
       .toBe(Node.DOCUMENT_POSITION_FOLLOWING)
   })
+
+  it('чип из одного значка — без пустой подписи, значок по центру', () => {
+    // Пустой узел подписи всё равно занимал зазор `gap` после значка, и тот
+    // стоял левее середины чипа.
+    const wrapper = mount(GrChip, {
+      props: { ariaLabel: 'Starred', selectable: true },
+      slots: { icon: '<i data-icon />' },
+    })
+
+    expect(wrapper.find('[data-gr-chip-icon]').exists()).toBe(true)
+    expect(wrapper.find('[data-gr-chip-label]').exists()).toBe(false)
+  })
+
+  it('подпись из слота остаётся, даже без пропа `label`', () => {
+    const wrapper = mount(GrChip, { slots: { default: 'Overdue' } })
+
+    expect(wrapper.get('[data-gr-chip-label]').text()).toBe('Overdue')
+  })
 })

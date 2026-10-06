@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { VNode } from 'vue'
 import { computed, inject, onBeforeUnmount, ref, useAttrs } from 'vue'
 
 import IconClose from '~icons/lucide/x'
@@ -9,6 +10,7 @@ import { useGrComponentProp, useGrComponentSize } from '../shared/configContext'
 import type { GrChipValue } from '../shared/chipGroupContext'
 
 import { warnRenamedProp } from '../shared/renamedProp'
+import { hasMeaningfulSlotContent } from '../shared/slotNodes'
 import { GR_CHIP_GROUP_CONTEXT } from '../shared/chipGroupContext'
 import type { GrChipRadius, GrChipSize, GrChipTone } from './grChipStyles'
 import {
@@ -91,12 +93,19 @@ const emit = defineEmits<GrChipEmits>()
 // рисуется дефолтным тоном.
 warnRenamedProp('GrChip', useAttrs(), { variant: 'tone' })
 
-defineSlots<{
+const slots = defineSlots<{
   /** Подпись чипа. Внутри выбираемого чипа — только фразовое содержимое. */
   default?: () => unknown
   /** Иконка перед подписью. */
   icon?: () => unknown
 }>()
+
+/**
+ * Подпись есть, если её дали пропом или слот что-то рисует. Чип из одного
+ * значка (`aria-label` вместо подписи) пустого узла не получает: тот занимал
+ * зазор `gap` после значка, и значок стоял левее середины.
+ */
+const hasLabel = computed(() => Boolean(props.label) || hasMeaningfulSlotContent((slots.default?.() ?? []) as VNode[]))
 
 const { t } = useGranularityTranslations()
 
@@ -300,7 +309,7 @@ defineExpose({
       <slot name="icon" />
     </span>
 
-    <span data-gr-chip-label :class="chipLabelClass">
+    <span v-if="hasLabel" data-gr-chip-label :class="chipLabelClass">
       <slot>{{ label }}</slot>
     </span>
 
