@@ -274,3 +274,46 @@ describe('GrSteps', () => {
     expect(fromProp.get('[data-gr-steps]').attributes('data-orientation')).toBe('horizontal')
   })
 })
+
+/**
+ * Единственный слот `#step` заменял всё внутри пункта — маркер и состояние
+ * словом вместе с подписью: дописать «1 min» рядом с подписью значило потерять
+ * маркер, а шаг с ошибкой начинал звучать как пройденный.
+ */
+describe('GrSteps — слот `#label` дополняет подпись, не трогая маркер', () => {
+  const broken: GrStep[] = [{ ...steps[0], status: 'error' }, { ...steps[1], status: 'complete' }, ...steps.slice(2)]
+
+  it('маркер и состояние словом остаются, своё — рядом с подписью', () => {
+    const wrapper = mount(GrSteps, {
+      props: { modelValue: 'payment', steps: broken, orientation: 'vertical' },
+      slots: { label: `<template #label="{ step }"><span data-own-label>{{ step.label }}</span> <small data-estimate>1 min</small></template>` },
+      attachTo: document.body,
+    })
+    const first = wrapper.findAll('[data-gr-step-trigger]')[0]
+
+    expect(wrapper.findAll('[data-gr-step-marker]')).toHaveLength(broken.length)
+    expect(first.find('[data-own-label]').text()).toBe('Корзина')
+    expect(first.find('[data-estimate]').exists()).toBe(true)
+    expect(first.get('[data-gr-step-state]').text()).toContain('has errors')
+    expect(wrapper.findAll('[data-gr-step-trigger]')[1].get('[data-gr-step-state]').text()).toMatch(/complete/i)
+    wrapper.unmount()
+  })
+
+  it('`#step` получает класс маркера и состояние словом', () => {
+    const seen: { markerClass: string, stateText: string }[] = []
+    const wrapper = mount(GrSteps, {
+      props: { modelValue: 'payment', steps: broken },
+      slots: {
+        step: (props: { markerClass: string, stateText: string }) => {
+          seen.push({ markerClass: props.markerClass, stateText: props.stateText })
+          return 'шаг'
+        },
+      },
+    })
+
+    expect(seen[0].markerClass).toBeTruthy()
+    expect(seen[0].stateText).toContain('has errors')
+    expect(seen.at(-1)!.stateText).toBe('')
+    wrapper.unmount()
+  })
+})

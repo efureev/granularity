@@ -101,10 +101,28 @@ const emit = defineEmits<GrStepsEmits>()
 
 defineSlots<{
   /**
-   * Своя разметка пункта. Корневой тег, `aria-current` и клик остаются за
-   * компонентом — иначе доступность шага пришлось бы собирать заново.
+   * Своя разметка пункта **целиком**: маркер, подпись и состояние словом.
+   * Корневой тег, `aria-current` и клик остаются за компонентом. Слот обязан
+   * сам вывести `stateText` (визуально скрытым): иначе пройденный шаг и шаг с
+   * ошибкой звучат одинаково — цвет маркера диктору недоступен. Класс маркера
+   * по статусу — `markerClass`. Нужно только дополнить подпись — бери `#label`.
    */
-  step?: (props: { step: GrStep, index: number, status: GrStepStatus, enterable: boolean }) => unknown
+  step?: (props: {
+    step: GrStep
+    index: number
+    status: GrStepStatus
+    enterable: boolean
+    /** Классы маркера для этого статуса — те же, что у встроенного. */
+    markerClass: string
+    /** Состояние словом («ошибка», «пройден») или пустая строка. */
+    stateText: string
+  }) => unknown
+  /**
+   * Только текстовый блок шага: подпись, описание, своё рядом с ними — оценка
+   * времени, бейдж. Маркер и визуально скрытое состояние остаются за
+   * компонентом.
+   */
+  label?: (props: { step: GrStep, index: number, status: GrStepStatus }) => unknown
 }>()
 
 const { t } = useGranularityTranslations()
@@ -310,6 +328,8 @@ if (__GR_DEV__) {
             :index="index"
             :status="statusAt(index)"
             :enterable="isEnterable(index)"
+            :marker-class="grStepsMarkerClass(statusAt(index))"
+            :state-text="stateText(statusAt(index))"
           >
             <span data-gr-step-marker :class="grStepsMarkerClass(statusAt(index))" aria-hidden="true">
               <component :is="iconTag(step.icon)" v-if="step.icon" class="h-[60%] w-[60%]" :class="iconClass(step.icon)" />
@@ -318,15 +338,20 @@ if (__GR_DEV__) {
             </span>
 
             <span class="block min-w-0">
-              <span data-gr-step-label :class="grStepsLabelClass(statusAt(index))">{{ step.label }}</span>
               <!--
                 Состояние шага словом: пройденный и шаг с ошибкой иначе звучат
-                одинаково — цвет маркера диктору недоступен.
+                одинаково — цвет маркера диктору недоступен. Сразу за подписью,
+                а со слотом `#label` — за его содержимым: дополнить подпись
+                можно, потерять состояние — нет.
               -->
-              <span v-if="stateText(statusAt(index))" class="sr-only"> — {{ stateText(statusAt(index)) }}</span>
-              <span v-if="step.description" data-gr-step-description :class="stepsDescriptionClass">
-                {{ step.description }}
-              </span>
+              <slot name="label" :step="step" :index="index" :status="statusAt(index)">
+                <span data-gr-step-label :class="grStepsLabelClass(statusAt(index))">{{ step.label }}</span>
+                <span v-if="stateText(statusAt(index))" data-gr-step-state class="sr-only"> — {{ stateText(statusAt(index)) }}</span>
+                <span v-if="step.description" data-gr-step-description :class="stepsDescriptionClass">
+                  {{ step.description }}
+                </span>
+              </slot>
+              <span v-if="$slots.label && stateText(statusAt(index))" data-gr-step-state class="sr-only"> — {{ stateText(statusAt(index)) }}</span>
             </span>
           </slot>
         </component>
