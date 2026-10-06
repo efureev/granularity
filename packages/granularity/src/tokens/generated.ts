@@ -2031,14 +2031,14 @@ export const grComponentTokens: GrComponentToken[] = [
     "owner": "GrBadgeWrap",
     "name": "--gr-badge-wrap-offset-x",
     "kind": "hook",
-    "default": "-0.5rem (для `dot` — -0.25rem)",
+    "default": "-0.5rem (для `dot` — 0)",
     "description": "Горизонтальный сдвиг метки относительно угла обёртки."
   },
   {
     "owner": "GrBadgeWrap",
     "name": "--gr-badge-wrap-offset-y",
     "kind": "hook",
-    "default": "-0.5rem (для `dot` — -0.25rem)",
+    "default": "-0.5rem (для `dot` — 0)",
     "description": "Вертикальный сдвиг метки относительно угла обёртки."
   },
   {

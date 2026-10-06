@@ -5,6 +5,18 @@ All notable changes to the [`@feugene/granularity`](.) package are documented in
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Fixed
+
+- **Точка `GrBadgeWrap` стоит на углу контрола, а не висит рядом.** Сдвиг точки
+  по умолчанию был `-0.25rem` — половина её размера, — и её центр приходился
+  ровно на угол рамки обёртки. У скруглённых кнопок, квадратных и круглых
+  аватаров этот угол пуст: точка отрывалась от контрола на 2–4 пикселя. Теперь
+  сдвиг точки по умолчанию `0`, и она садится на дугу скругления или на край
+  круга, как статусная точка `GrAvatar`. Хуки `--gr-badge-wrap-offset-x/-y`
+  работают как прежде; счётчик остался на `-0.5rem`.
+
 ## [v1.0.7] 2026-10-06
 
 ### Fixed

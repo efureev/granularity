@@ -121,6 +121,20 @@ describe('GrBadgeWrap — тон и положение', () => {
     expect(badge.classes()).toContain('bottom-[var(--gr-badge-wrap-offset-y,-0.5rem)]')
   })
 
+  it('точка по умолчанию стоит на углу контрола, смещение — из тех же переменных', () => {
+    // Центр точки на углу рамки повис бы в воздухе: у скруглённой кнопки и круглого
+    // аватара этот угол пуст. Нулевой сдвиг сажает точку на дугу скругления.
+    const topRight = mount(GrBadgeWrap, { props: { dot: true } })
+    const dot = topRight.get('[data-gr-badge-wrap-dot]')
+    expect(dot.classes()).toContain('top-[var(--gr-badge-wrap-offset-y,0px)]')
+    expect(dot.classes()).toContain('right-[var(--gr-badge-wrap-offset-x,0px)]')
+
+    const bottomLeft = mount(GrBadgeWrap, { props: { dot: true, placement: 'bottom-left' } })
+    const corner = bottomLeft.get('[data-gr-badge-wrap-dot]')
+    expect(corner.classes()).toContain('bottom-[var(--gr-badge-wrap-offset-y,0px)]')
+    expect(corner.classes()).toContain('left-[var(--gr-badge-wrap-offset-x,0px)]')
+  })
+
   it('formatBadgeValue — чистая функция', () => {
     expect(formatBadgeValue(5)).toBe('5')
     expect(formatBadgeValue(120, 99)).toBe('99+')

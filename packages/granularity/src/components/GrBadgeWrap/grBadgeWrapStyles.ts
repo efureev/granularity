@@ -19,12 +19,19 @@ export const placementClass: Record<GrBadgeWrapPlacement, string> = {
   'bottom-left': 'bottom-[var(--gr-badge-wrap-offset-y,-0.5rem)] left-[var(--gr-badge-wrap-offset-x,-0.5rem)]',
 }
 
-/** У точки смещение меньше: она вдвое мельче счётчика. */
+/**
+ * Точка по умолчанию не выходит за рамку обёртки: её край совпадает с краем
+ * рамки, центр отстоит на 4px от обеих сторон угла. Сам угол рамки у контролов
+ * пакета пуст — кнопки, аватары и поля скруглены, — и точка с центром на нём
+ * висела бы в воздухе рядом с контролом. С нулевым сдвигом она садится на дугу
+ * скругления или на край круга, как статусная точка `GrAvatar`. Счётчику это не
+ * нужно: он крупнее и перекрывает скругление.
+ */
 export const dotPlacementClass: Record<GrBadgeWrapPlacement, string> = {
-  'top-right': 'top-[var(--gr-badge-wrap-offset-y,-0.25rem)] right-[var(--gr-badge-wrap-offset-x,-0.25rem)]',
-  'top-left': 'top-[var(--gr-badge-wrap-offset-y,-0.25rem)] left-[var(--gr-badge-wrap-offset-x,-0.25rem)]',
-  'bottom-right': 'bottom-[var(--gr-badge-wrap-offset-y,-0.25rem)] right-[var(--gr-badge-wrap-offset-x,-0.25rem)]',
-  'bottom-left': 'bottom-[var(--gr-badge-wrap-offset-y,-0.25rem)] left-[var(--gr-badge-wrap-offset-x,-0.25rem)]',
+  'top-right': 'top-[var(--gr-badge-wrap-offset-y,0px)] right-[var(--gr-badge-wrap-offset-x,0px)]',
+  'top-left': 'top-[var(--gr-badge-wrap-offset-y,0px)] left-[var(--gr-badge-wrap-offset-x,0px)]',
+  'bottom-right': 'bottom-[var(--gr-badge-wrap-offset-y,0px)] right-[var(--gr-badge-wrap-offset-x,0px)]',
+  'bottom-left': 'bottom-[var(--gr-badge-wrap-offset-y,0px)] left-[var(--gr-badge-wrap-offset-x,0px)]',
 }
 
 export const dotBaseClass = 'absolute h-2 w-2 rounded-[var(--gr-radius-full)]'
