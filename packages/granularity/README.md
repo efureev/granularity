@@ -111,10 +111,10 @@ utility classes, so components render with their own CSS but without layout.
 <!-- entry-sizes:generated:start lang=en -->
 | What you import | gzip | of the barrel |
 | --- | ---: | ---: |
-| the whole package from the root | 636.2 kB | 100 % |
+| the whole package from the root | 639.7 kB | 100 % |
 | the lightest component — `GrButtonGroup` | 1.5 kB | < 1 % |
-| the median component — `GrSegmented` | 15.1 kB | 2 % |
-| the 5 heaviest together | 243.5 kB | 38 % |
+| the median component — `GrSlider` | 15.5 kB | 2 % |
+| the 5 heaviest together | 245.3 kB | 38 % |
 
 These numbers **do not add up**: shared code is counted again in every row but paid for once, which is why
 the set is shown as a union rather than a sum. They are an upper bound — the gzip of everything a subpath
