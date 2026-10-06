@@ -12,33 +12,98 @@ export const CIRCULAR_MARKER = '[Circular]'
 /** Что печатается, когда сериализовать не удалось вовсе. */
 export const UNSERIALIZABLE_MARKER = '[Unserializable]'
 
+/** Признак значения, которое не удалось прочитать: на верхнем уровне печатается без кавычек. */
+const FAILED = Symbol('unserializable')
+
 /**
- * Замена значений, на которых штатный `JSON.stringify` спотыкается.
+ * Дерево, которое `JSON.stringify` пройдёт без исключений, — собранное своим
+ * обходом, значение за значением.
  *
- * Маркером помечается **повторная ссылка**, а не только настоящий цикл: объект,
- * положенный в дерево дважды, тоже её получит. Отличить одно от другого можно
- * лишь стеком предков, а `replacer` его не отдаёт — узнать, что обход вышел из
- * ветки, изнутри нечем. Размен осознанный: показать `[Circular]` там, где данные
- * просто переиспользуют объект, — неточность; зациклиться на настоящем цикле —
- * зависшая вкладка.
+ * Штатный `stringify` зовёт `toJSON` **до** `replacer`, поэтому один враждебный
+ * `toJSON` (или геттер, который бросает) обрывал весь вызов: вместо данных со
+ * сбоем в одном поле показывался единственный `[Unserializable]`, а циклы и
+ * `BigInt` так и не доходили до обработки. Здесь `toJSON` и чтение каждого поля
+ * идут в своём `try`, и маркер получает только упавшее значение — соседи,
+ * `[Circular]` и `BigInt` остаются.
+ *
+ * Маркером `[Circular]` помечается **повторная ссылка**, а не только настоящий
+ * цикл: объект, положенный в дерево дважды, тоже его получит. Стек предков
+ * отличил бы одно от другого, но обход по стеку разворачивает каждую общую
+ * ветку заново — на «ромбе» из общих ссылок это экспонента. Показать
+ * `[Circular]` там, где данные переиспользуют объект, — неточность; зависнуть —
+ * хуже.
  */
-function createSafeReplacer(): (key: string, value: unknown) => unknown {
-  const seen = new WeakSet<object>()
+function toSafe(value: unknown, key: string, seen: WeakSet<object>): unknown {
+  let current = value
 
-  return function safeReplacer(_key: string, value: unknown): unknown {
-    // `BigInt` не имеет представления в JSON, и `stringify` на нём бросает.
-    if (typeof value === 'bigint')
-      return `${value}n`
+  try {
+    const toJSON = (current as { toJSON?: unknown } | null | undefined)?.toJSON
 
-    if (typeof value !== 'object' || value === null)
-      return value
-
-    if (seen.has(value))
-      return CIRCULAR_MARKER
-
-    seen.add(value)
-    return value
+    if (typeof current === 'object' && current !== null && typeof toJSON === 'function')
+      current = (toJSON as (key: string) => unknown).call(current, key)
   }
+  catch {
+    return FAILED
+  }
+
+  // `BigInt` не имеет представления в JSON, и `stringify` на нём бросает.
+  if (typeof current === 'bigint')
+    return `${current}n`
+
+  if (typeof current !== 'object' || current === null)
+    return current
+
+  // Обёртки примитивов `stringify` разворачивает сам — как и он, берём значение.
+  const tag = Object.prototype.toString.call(current)
+
+  if (tag === '[object Number]' || tag === '[object String]' || tag === '[object Boolean]')
+    return (current as { valueOf: () => unknown }).valueOf()
+
+  if (seen.has(current))
+    return CIRCULAR_MARKER
+
+  seen.add(current)
+
+  try {
+    if (Array.isArray(current)) {
+      const items: unknown[] = []
+
+      for (let index = 0; index < current.length; index += 1)
+        items.push(read(current, index, seen))
+
+      return items
+    }
+
+    const entries: Record<string, unknown> = {}
+
+    for (const name of Object.keys(current))
+      entries[name] = read(current as Record<string, unknown>, name, seen)
+
+    return entries
+  }
+  catch {
+    // Упал перебор ключей (`Proxy` с враждебным `ownKeys`) — маркер у всего объекта.
+    return FAILED
+  }
+}
+
+/** Поле, прочитанное в своём `try`: геттер, который бросает, портит только себя. */
+function read(container: Record<string | number, unknown> | unknown[], name: string | number, seen: WeakSet<object>): unknown {
+  let item: unknown
+
+  try {
+    item = (container as Record<string | number, unknown>)[name]
+  }
+  catch {
+    return FAILED
+  }
+
+  return toSafe(item, String(name), seen)
+}
+
+/** Сбойное значение → маркер-строка внутри дерева. */
+function markFailures(_key: string, value: unknown): unknown {
+  return value === FAILED ? UNSERIALIZABLE_MARKER : value
 }
 
 /**
@@ -46,7 +111,8 @@ function createSafeReplacer(): (key: string, value: unknown) => unknown {
  *
  * Строка проходит как есть: это уже готовый текст, и оборачивать его в кавычки
  * значило бы показать не то, что пришло. `undefined` даёт пустую строку —
- * показывать нечего. Всё остальное сериализуется с отступом.
+ * показывать нечего. Всё остальное сериализуется с отступом; что не удалось
+ * прочитать, заменяется маркером **на месте этого значения**.
  */
 export function serializeCode(value: unknown, indent = 2): string {
   if (typeof value === 'string')
@@ -55,10 +121,14 @@ export function serializeCode(value: unknown, indent = 2): string {
     return ''
 
   try {
-    const serialized = JSON.stringify(value, createSafeReplacer(), indent)
+    const safe = toSafe(value, '', new WeakSet())
+
+    if (safe === FAILED)
+      return UNSERIALIZABLE_MARKER
+
     // `stringify` отдаёт `undefined` на функции и символе — печатать «undefined»
     // строкой было бы враньём про содержимое.
-    return serialized ?? ''
+    return JSON.stringify(safe, markFailures, indent) ?? ''
   }
   catch {
     return UNSERIALIZABLE_MARKER
@@ -84,11 +154,18 @@ export function serializeStable(value: unknown, indent = 2): string {
     return ''
 
   try {
-    const keys = new Set<string>()
-    JSON.stringify(value, createSafeReplacer(), indent)
-    collectKeys(value, keys, new WeakSet())
+    const safe = toSafe(value, '', new WeakSet())
 
-    const serialized = JSON.stringify(value, [...keys].sort(), indent)
+    if (safe === FAILED)
+      return UNSERIALIZABLE_MARKER
+
+    const keys = new Set<string>()
+    collectKeys(safe, keys, new WeakSet())
+
+    // Маркеры сбоев проставляются до сортировки: список ключей `replacer`
+    // заменяет, а не дополняет.
+    const marked: unknown = JSON.parse(JSON.stringify(safe, markFailures) ?? 'null')
+    const serialized = JSON.stringify(marked, [...keys].sort(), indent)
 
     return serialized ?? ''
   }

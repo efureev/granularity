@@ -5,6 +5,19 @@ All notable changes to the [`@feugene/granularity-code`](.) package are document
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Fixed
+
+- **Сбой сериализации `GrCodeBlock` портит только своё значение.** Штатный
+  `JSON.stringify` зовёт `toJSON` раньше `replacer`, и один враждебный `toJSON`
+  обрывал весь вызов: объект с ошибкой, релизом, `BigInt`-идентификатором,
+  циклическим запросом и полем `customer`, чей `toJSON` бросает, печатался одной
+  строкой `[Unserializable]`. Теперь значение обходится своим кодом, `toJSON` и
+  чтение каждого поля идут в своём `try`, и маркер `"[Unserializable]"` встаёт
+  только на место упавшего значения — соседи, `[Circular]` и `BigInt` с `n`
+  остаются. Так же для геттеров, которые бросают, и для `GrDiff` (`serializeStable`).
+
 ## [v1.0.2] 2026-10-06
 
 ### Changed
