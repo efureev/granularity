@@ -317,6 +317,7 @@ function onKeydown(event: KeyboardEvent): void {
     ref="rootEl"
     data-gr-rating
     class="inline-flex items-center gap-2"
+    :style="isInvalid && !disabled ? { '--gr-rating-void-color': 'var(--gr-invalid-brd)' } : undefined"
     v-bind="aria.rootAttrs()"
   >
     <!-- Нативная форма: роль-виджет не labelable и в submit не попадает. -->

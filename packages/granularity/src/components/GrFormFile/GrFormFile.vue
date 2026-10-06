@@ -535,7 +535,8 @@ watch(
         <GrButton
           :id="fieldId"
           ref="uploadBtnEl"
-          variant="secondary"
+          :variant="showsInvalid && !isDisabled ? 'outline' : 'secondary'"
+          :tone="showsInvalid && !isDisabled ? 'danger' : undefined"
           :size="buttonSize"
           data-gr-form-file-upload-btn
           :aria-describedby="aria.describedBy(describedByIds)"

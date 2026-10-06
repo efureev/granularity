@@ -1063,7 +1063,7 @@ defineExpose({
       :ref="el => { panelEls[side] = el as HTMLElement | null }"
       :data-gr-transfer-panel="side"
       :class="grTransferPanelClass(dragging.spot.value?.side === side)"
-      :style="panelStyle"
+      :style="[panelStyle, side === 'target' && isInvalid && !isDisabled && dragging.spot.value?.side !== side ? { borderColor: 'var(--gr-invalid-brd)' } : undefined]"
     >
       <slot
         name="header"

@@ -231,15 +231,19 @@ const trackStyle = computed(() => {
 
   return {
     '--gr-switch-track-bg': backgroundColor,
+    // Вердикт валидации — рамкой дорожки ролью ошибки, как у полей ввода:
+    // раньше `invalid` ставил только `aria-invalid`.
     '--gr-switch-track-brd': isDisabled.value
       ? 'var(--gr-disabled-brd)'
-      : customBackgroundColor
-        ? backgroundColor
-        : isChecked
-          ? 'var(--gr-primary)'
+      : isInvalid.value
+        ? 'var(--gr-invalid-brd)'
+        : customBackgroundColor
+          ? backgroundColor
+          : isChecked
+            ? 'var(--gr-primary)'
           // Выключенная дорожка светлая, как поверхность вокруг: видна она
           // только рамкой, и рамке нужна роль с 3:1 к фону.
-          : 'var(--gr-control-brd)',
+            : 'var(--gr-control-brd)',
     'backgroundColor': 'var(--gr-switch-track-bg)',
   }
 })

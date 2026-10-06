@@ -73,7 +73,7 @@ export const progressBarSizes: Record<GrFileUploadSize, GrComponentSize> = {
   lg: 'lg',
 }
 
-export const zoneBaseClass = 'relative w-full rounded-[var(--gr-radius-lg)] border border-dashed border-[var(--gr-brd)] outline-none transition'
+export const zoneBaseClass = 'relative w-full rounded-[var(--gr-radius-lg)] border border-dashed outline-none transition'
 
 /**
  * Недоступная зона гасится фоном, а не `opacity`: прозрачность разбавляет
@@ -92,20 +92,30 @@ export const zoneIdleClass = 'bg-[var(--gr-card)] cursor-pointer hover:bg-[var(-
 /** Файл над зоной: подсветка появляется только там, где drop реально примут. */
 export const zoneOverClass = 'border-[var(--gr-ring)] bg-[var(--gr-muted)]'
 
+/*
+ * Цвет рамки — один класс на состояние: два `border-[…]` на узле решаются
+ * порядком утилит в листе. Сброс поверх (`over`) сильнее ошибки — это ответ на
+ * жест, — ошибка сильнее обычной рамки: раньше `invalid` её не красил вовсе.
+ */
+export const zoneBorderIdleClass = 'border-[var(--gr-brd)]'
+export const zoneBorderInvalidClass = 'border-[var(--gr-invalid-brd)]'
+
 export function grFileUploadZoneClass(options: {
   size: GrFileUploadSize
   disabled: boolean
   readonly: boolean
   over: boolean
+  invalid?: boolean
 }): string {
   const state = options.disabled
     ? zoneDisabledClass
     : options.readonly ? zoneReadonlyClass : zoneIdleClass
+  const over = options.over && !options.disabled && !options.readonly
 
   return [
     zoneBaseClass,
     zonePaddings[options.size],
     state,
-    options.over && !options.disabled && !options.readonly ? zoneOverClass : '',
+    over ? zoneOverClass : options.invalid && !options.disabled ? zoneBorderInvalidClass : zoneBorderIdleClass,
   ].filter(Boolean).join(' ')
 }

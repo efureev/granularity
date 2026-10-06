@@ -188,6 +188,18 @@ const rootClass = computed(() => grChipClass({
   disabled: isDisabled.value,
 }))
 
+/**
+ * Группа с ошибкой — рамка невыбранных чипов ролью ошибки, как у полей ввода.
+ * Раньше `invalid` группы доходил только до `aria-invalid`. Стилем, а не
+ * классом: тон чипа сам задаёт цвет рамки, и два `border-[…]` решал бы порядок
+ * утилит в листе.
+ */
+const invalidStyle = computed(() => (
+  inGroup.value && group!.invalid?.value && !isSelected.value && !isDisabled.value
+    ? { borderColor: 'var(--gr-invalid-brd)' }
+    : undefined
+))
+
 const iconSizeClass = computed(() => chipIconSizeClassBySize[resolvedSize.value])
 
 const removeTitle = computed(() => {
@@ -310,6 +322,7 @@ defineExpose({
     data-gr-chip
     :type="isInteractive ? 'button' : undefined"
     :class="rootClass"
+    :style="invalidStyle"
     :role="chipRole"
     :data-value="value"
     :aria-label="ariaLabel"

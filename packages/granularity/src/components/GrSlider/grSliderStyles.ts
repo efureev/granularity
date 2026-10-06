@@ -82,9 +82,33 @@ export const sliderFillOrientationClass: Record<GrSliderOrientation, string> = {
  */
 export const sliderFillDisabledClass = 'bg-[var(--gr-disabled-fg)]'
 export const sliderFillEnabledClass = 'bg-[var(--gr-slider-fill,var(--gr-primary))]'
+/**
+ * Вердикт валидации — ролью ошибки, как рамка у полей ввода: раньше `invalid`
+ * ставил только `aria-invalid`, и заливка оставалась цвета акцента.
+ */
+export const sliderFillInvalidClass = 'bg-[var(--gr-invalid-brd)]'
 
-export function sliderFillClass(disabled: boolean): string {
-  return [sliderFillBaseClass, disabled ? sliderFillDisabledClass : sliderFillEnabledClass].join(' ')
+/** Состояние слайдера для оформления: недоступность сильнее ошибки. */
+export type GrSliderTone = 'enabled' | 'invalid' | 'disabled'
+
+export function sliderTone(options: { disabled: boolean, invalid: boolean }): GrSliderTone {
+  if (options.disabled)
+    return 'disabled'
+
+  return options.invalid ? 'invalid' : 'enabled'
+}
+
+const sliderFillToneClass: Record<GrSliderTone, string> = {
+  enabled: sliderFillEnabledClass,
+  invalid: sliderFillInvalidClass,
+  disabled: sliderFillDisabledClass,
+}
+
+export function sliderFillClass(tone: GrSliderTone | boolean): string {
+  // Булев аргумент — прежняя сигнатура: `true` — недоступен.
+  const resolved = typeof tone === 'boolean' ? (tone ? 'disabled' : 'enabled') : tone
+
+  return [sliderFillBaseClass, sliderFillToneClass[resolved]].join(' ')
 }
 
 // Окантовка бегунка: цветной border (по умолчанию = fill) + тонкая контрастная
@@ -95,7 +119,7 @@ export function sliderFillClass(disabled: boolean): string {
  * бы каждому потребителю. Пустой ручке объявление ничего не меняет: она
  * позиционирована абсолютно и имеет заданный размер.
  */
-export const sliderThumbBaseClass = 'absolute inline-flex items-center justify-center overflow-visible rounded-[var(--gr-radius-full)] border-2 border-[var(--gr-slider-thumb-border,var(--gr-slider-fill,var(--gr-primary)))] bg-[var(--gr-slider-thumb-bg,var(--gr-bg))] ring-1 ring-[color-mix(in_srgb,var(--gr-fg)_22%,transparent)] shadow-[var(--gr-shadow-1)] transition-[box-shadow,transform] duration-[var(--gr-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--gr-bg)]'
+export const sliderThumbBaseClass = 'absolute inline-flex items-center justify-center overflow-visible rounded-[var(--gr-radius-full)] border-2 ring-1 ring-[color-mix(in_srgb,var(--gr-fg)_22%,transparent)] shadow-[var(--gr-shadow-1)] transition-[box-shadow,transform] duration-[var(--gr-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--gr-bg)]'
 
 /** Бегунок центрируется поперёк дорожки, а вдоль неё его ведёт inline-стиль. */
 export const sliderThumbOrientationClass: Record<GrSliderOrientation, string> = {
@@ -103,23 +127,42 @@ export const sliderThumbOrientationClass: Record<GrSliderOrientation, string> = 
   vertical: 'left-1/2 -translate-x-1/2 translate-y-1/2',
 }
 
+/*
+ * Цвет рамки, фона и кольца фокуса — только в классе состояния, не в базовом:
+ * два `border-[…]` на одном узле решаются порядком утилит в листе, и
+ * недоступный бегунок оставался с рамкой акцента.
+ */
 export const sliderThumbDisabledClass = 'cursor-not-allowed border-[var(--gr-disabled-fg)] bg-[var(--gr-disabled-bg)]'
-export const sliderThumbEnabledClass = 'cursor-grab active:cursor-grabbing hover:scale-110'
+export const sliderThumbEnabledClass = 'cursor-grab active:cursor-grabbing hover:scale-110 border-[var(--gr-slider-thumb-border,var(--gr-slider-fill,var(--gr-primary)))] bg-[var(--gr-slider-thumb-bg,var(--gr-bg))] focus-visible:ring-[var(--gr-ring)]'
+export const sliderThumbInvalidClass = 'cursor-grab active:cursor-grabbing hover:scale-110 border-[var(--gr-invalid-brd)] bg-[var(--gr-slider-thumb-bg,var(--gr-bg))] focus-visible:ring-[var(--gr-invalid-ring)]'
+
+const sliderThumbToneClass: Record<GrSliderTone, string> = {
+  enabled: sliderThumbEnabledClass,
+  invalid: sliderThumbInvalidClass,
+  disabled: sliderThumbDisabledClass,
+}
 
 export function sliderThumbClass(options: {
   size: GrSliderSize
   disabled: boolean
+  invalid?: boolean
   orientation?: GrSliderOrientation
 }): string {
   return [
     sliderThumbBaseClass,
     sliderThumbOrientationClass[options.orientation ?? 'horizontal'],
     sliderThumbSizeBySize[options.size],
-    options.disabled ? sliderThumbDisabledClass : sliderThumbEnabledClass,
+    sliderThumbToneClass[sliderTone({ disabled: options.disabled, invalid: options.invalid ?? false })],
   ].join(' ')
 }
 
-export const sliderTooltipBaseClass = 'pointer-events-none absolute whitespace-nowrap rounded-[var(--gr-radius-control)] bg-[var(--gr-fg)] px-1.5 py-0.5 text-[length:var(--gr-text-2xs)] font-medium leading-tight text-[var(--gr-bg)] shadow-[var(--gr-shadow-2)]'
+export const sliderTooltipBaseClass = 'pointer-events-none absolute whitespace-nowrap rounded-[var(--gr-radius-control)] px-1.5 py-0.5 text-[length:var(--gr-text-2xs)] font-medium leading-tight shadow-[var(--gr-shadow-2)]'
+
+/** Недоступный слайдер гасит и подсказку: тёмная плашка над серым бегунком спорила бы с ним. */
+export const sliderTooltipToneClass = {
+  enabled: 'bg-[var(--gr-fg)] text-[var(--gr-bg)]',
+  disabled: 'bg-[var(--gr-disabled-bg)] text-[var(--gr-disabled-fg)] ring-1 ring-[var(--gr-brd)]',
+} as const
 
 /** В вертикали подсказка уходит вбок: над бегунком она легла бы на дорожку. */
 export const sliderTooltipOrientationClass: Record<GrSliderOrientation, string> = {
@@ -127,8 +170,12 @@ export const sliderTooltipOrientationClass: Record<GrSliderOrientation, string> 
   vertical: 'right-full top-1/2 mr-2 -translate-y-1/2',
 }
 
-export function sliderTooltipClass(orientation: GrSliderOrientation = 'horizontal'): string {
-  return [sliderTooltipBaseClass, sliderTooltipOrientationClass[orientation]].join(' ')
+export function sliderTooltipClass(orientation: GrSliderOrientation = 'horizontal', disabled = false): string {
+  return [
+    sliderTooltipBaseClass,
+    sliderTooltipOrientationClass[orientation],
+    sliderTooltipToneClass[disabled ? 'disabled' : 'enabled'],
+  ].join(' ')
 }
 
 export const sliderMarkTickBaseClass = 'absolute h-1.5 w-1.5 rounded-[var(--gr-radius-full)] bg-[var(--gr-bg)] ring-1 ring-[var(--gr-brd)]'

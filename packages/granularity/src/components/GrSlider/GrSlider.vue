@@ -18,6 +18,7 @@ import {
   sliderRailClass,
   sliderRootClass,
   sliderThumbClass,
+  sliderTone,
   sliderTooltipClass,
   sliderTrackHeightBySize,
   sliderTrackVerticalLengthClass,
@@ -502,7 +503,8 @@ function thumbValueText(value: number): string | undefined {
     @focusout="onFocusOut"
   >
     <!-- Нативная форма: роль-виджет не labelable и в submit не попадает.
-         Сериализуется модель (snapped), а не черновик жеста. -->
+         Сериализуется модель (snapped), а не черновик жеста. Недоступный
+         слайдер значение не отправляет — как нативный `disabled` контрол. -->
     <template v-if="name">
       <input
         v-for="(value, index) in modelValues"
@@ -510,6 +512,7 @@ function thumbValueText(value: number): string | undefined {
         type="hidden"
         :name="name"
         :value="String(value)"
+        :disabled="isDisabled"
       >
     </template>
     <div
@@ -522,7 +525,7 @@ function thumbValueText(value: number): string | undefined {
       <div :class="sliderRailClass" />
       <div
         data-gr-slider-fill
-        :class="[sliderFillClass(isDisabled), sliderFillOrientationClass[orientation]]"
+        :class="[sliderFillClass(sliderTone({ disabled: isDisabled, invalid: isInvalid })), sliderFillOrientationClass[orientation]]"
         :style="fillStyle"
       />
 
@@ -562,7 +565,7 @@ function thumbValueText(value: number): string | undefined {
         :ref="(el) => { if (el) thumbEls[index] = el as HTMLElement }"
         data-gr-slider-thumb
         :data-testid="`gr-slider-thumb-${index}`"
-        :class="sliderThumbClass({ size: resolvedSize, disabled: isDisabled, orientation })"
+        :class="sliderThumbClass({ size: resolvedSize, disabled: isDisabled, invalid: isInvalid, orientation })"
         :style="offsetStyle(value)"
         role="slider"
         :tabindex="isDisabled ? -1 : 0"
@@ -599,7 +602,7 @@ function thumbValueText(value: number): string | undefined {
         <span
           v-if="showTooltipFor(index)"
           data-gr-slider-tooltip
-          :class="sliderTooltipClass(orientation)"
+          :class="sliderTooltipClass(orientation, isDisabled)"
         >
           {{ tooltipText(value) }}
         </span>

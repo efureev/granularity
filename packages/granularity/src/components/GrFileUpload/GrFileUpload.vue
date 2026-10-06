@@ -448,6 +448,7 @@ const zoneClass = computed(() => grFileUploadZoneClass({
   disabled: isDisabled.value,
   readonly: isReadonly.value,
   over: isOver.value,
+  invalid: isInvalid.value,
 }))
 
 const hiddenInputStyle = {
