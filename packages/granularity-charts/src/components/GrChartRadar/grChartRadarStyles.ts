@@ -44,14 +44,6 @@ export const RADAR_HIT_DEAD_ZONE = 8
 /** Зазор между внешним кольцом и именем оси, в кеглях подписи. */
 export const AXIS_LABEL_GAP_EM = 0.8
 
-/**
- * Место, которое имена осей забирают у радиуса.
- *
- * Считается по числу знаков: замерить текст нечем — `getBBox` в jsdom нет, а в
- * браузере он форсирует reflow (докблок `chart/chartLayout.ts`).
- */
-export const AXIS_LABEL_CHAR_EM = 0.55
-
 /** Кегль подписей паутины — на ступень мельче подписи оси: они не заголовки. */
 export const radarLabelFontPx: Record<GrChartSize, number> = {
   xs: 9,

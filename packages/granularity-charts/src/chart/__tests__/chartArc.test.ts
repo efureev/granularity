@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { angleOfPoint, arcCentroid, arcPath, pieSlices, polarPoint, sliceAtPoint } from '../chartArc'
+import { angleOfPoint, arcCentroid, arcPath, pieSlices, polarPoint, sliceAtPoint, svgCoord } from '../chartArc'
 
 const TAU = Math.PI * 2
 
@@ -100,8 +100,9 @@ describe('arcCentroid', () => {
     const centroid = arcCentroid(0, 0, 40, 20, 0, Math.PI / 2)
     const distance = Math.hypot(centroid.x, centroid.y)
 
-    expect(distance).toBeCloseTo(30, 9)
-    expect(angleOfPoint(0, 0, centroid.x, centroid.y)).toBeCloseTo(Math.PI / 4, 9)
+    // Точка округлена до сотых (`svgCoord`): расстояние и угол — с той же точностью.
+    expect(distance).toBeCloseTo(30, 2)
+    expect(angleOfPoint(0, 0, centroid.x, centroid.y)).toBeCloseTo(Math.PI / 4, 3)
   })
 })
 
@@ -130,5 +131,17 @@ describe('sliceAtPoint', () => {
 
     expect(sliceAtPoint(shifted, 0, 0, 40, 0, 0, -30)).toBe(0)
     expect(sliceAtPoint(shifted, 0, 0, 40, 0, 30, 0)).toBe(0)
+  })
+})
+
+describe('svgCoord', () => {
+  it('тригонометрия даёт одну и ту же строку при расхождении в последнем знаке', () => {
+    // Сервер и браузер расходились в последнем знаке синуса — и гидрация падала.
+    expect(String(svgCoord(229.37383539249433))).toBe(String(svgCoord(229.37383539249436)))
+    expect(String(polarPoint(100, 100, 50, 1.2345).x).split('.')[1]?.length ?? 0).toBeLessThanOrEqual(2)
+  })
+
+  it('минус ноль печатается нулём', () => {
+    expect(Object.is(svgCoord(-0.001), 0)).toBe(true)
   })
 })

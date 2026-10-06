@@ -87,6 +87,7 @@
     "summary": "Radar chart, {axes} axes, {series} series",
     "keyboardHint": "Use arrow keys to browse axes",
     "axisWithMax": "{axis} · {max}",
+    "axisCeiling": "max {max}",
     "point": "{axis}. {series}: {value} of {max}",
     "columnAxis": "Axis",
     "columnMax": "Axis maximum"

@@ -62,17 +62,29 @@ export function pieSlices(
   })
 }
 
+/**
+ * Координата для атрибута SVG — с двумя знаками.
+ *
+ * Не ради краткости разметки: `Math.sin` и `Math.cos` на сервере и в браузере
+ * расходятся в последнем знаке, и полное число давало расхождение гидрации
+ * (`229.37383539249433` против `…436`). Всё, что выведено из тригонометрии,
+ * проходит здесь — дальше арифметика детерминирована.
+ */
+export function svgCoord(value: number): number {
+  const snapped = Math.round(value * 100) / 100
+
+  return snapped === 0 ? 0 : snapped
+}
+
 /** Точка на окружности: ноль — вверху, угол растёт по часовой стрелке. */
 export function polarPoint(cx: number, cy: number, radius: number, angle: number): Point {
   return {
-    x: cx + radius * Math.sin(angle),
-    y: cy - radius * Math.cos(angle),
+    x: svgCoord(cx + radius * Math.sin(angle)),
+    y: svgCoord(cy - radius * Math.cos(angle)),
   }
 }
 
-function round(value: number): number {
-  return Math.round(value * 100) / 100
-}
+const round = svgCoord
 
 function arcSegment(cx: number, cy: number, radius: number, from: number, to: number, sweep: 0 | 1): string {
   const end = polarPoint(cx, cy, radius, to)

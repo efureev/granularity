@@ -3,7 +3,7 @@ import { useGrComponentProp, useGrComponentSize } from '@feugene/granularity/com
 import { useGranularityTranslations } from '@feugene/granularity/composables/useGranularityTranslations'
 import { computed, ref, useId } from 'vue'
 
-import { arcCentroid, arcPath, type PieSlice, pieSlices, polarPoint, sliceAtPoint } from '../../chart/chartArc'
+import { arcCentroid, arcPath, type PieSlice, pieSlices, polarPoint, sliceAtPoint, svgCoord } from '../../chart/chartArc'
 import type { GrChartNumberFormat } from '../../chart/chartFormat'
 import { formatShare, formatValue } from '../../chart/chartFormat'
 import type { Rect } from '../../chart/chartLayout'
@@ -388,8 +388,8 @@ function geometryOf(plot: Rect): PieGeometry {
   )
 
   return {
-    cx: plot.x + plot.width / 2,
-    cy: plot.y + plot.height / 2,
+    cx: svgCoord(plot.x + plot.width / 2),
+    cy: svgCoord(plot.y + plot.height / 2),
     outer,
     inner: resolvedVariant.value === 'donut' ? outer * resolvedDonutRatio.value : 0,
   }
@@ -560,6 +560,9 @@ interface CenterMark {
   innerRadius: number
   valueFont: number
   labelFont: number
+  /** Строки содержимого по умолчанию: итог над центром, подпись под ним. */
+  valueY: number
+  labelY: number
 }
 
 /** Список из нуля или одной метки: шаблону негде объявить локальную переменную. */
@@ -568,15 +571,19 @@ function centerMarks(plot: Rect): CenterMark[] {
     return []
 
   const geometry = geometryOf(plot)
+  // Кегль от дырки, а не от размера компонента: иначе итог либо теряется в
+  // большом бублике, либо не влезает в маленький.
+  const valueFont = svgCoord(clamp(geometry.inner * TOTAL_VALUE_RATIO, 12, 32))
+  const labelFont = svgCoord(clamp(geometry.inner * TOTAL_LABEL_RATIO, 9, 14))
 
   return [{
     cx: geometry.cx,
     cy: geometry.cy,
-    innerRadius: geometry.inner,
-    // Кегль от дырки, а не от размера компонента: иначе итог либо теряется в
-    // большом бублике, либо не влезает в маленький.
-    valueFont: clamp(geometry.inner * TOTAL_VALUE_RATIO, 12, 32),
-    labelFont: clamp(geometry.inner * TOTAL_LABEL_RATIO, 9, 14),
+    innerRadius: svgCoord(geometry.inner),
+    valueFont,
+    labelFont,
+    valueY: svgCoord(geometry.cy - labelFont * 0.5),
+    labelY: svgCoord(geometry.cy + valueFont * 0.55),
   }]
 }
 
@@ -712,7 +719,7 @@ defineExpose({
           >
             <text
               :x="center.cx"
-              :y="center.cy - center.labelFont * 0.5"
+              :y="center.valueY"
               :fill="pieTotalFill"
               :font-size="center.valueFont"
               font-weight="600"
@@ -723,7 +730,7 @@ defineExpose({
 </text>
             <text
               :x="center.cx"
-              :y="center.cy + center.valueFont * 0.55"
+              :y="center.labelY"
               :fill="pieTotalLabelFill"
               :font-size="center.labelFont"
               text-anchor="middle"

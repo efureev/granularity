@@ -3,7 +3,7 @@ import { useGrComponentProp, useGrComponentSize } from '@feugene/granularity/com
 import { useGranularityTranslations } from '@feugene/granularity/composables/useGranularityTranslations'
 import { computed, ref } from 'vue'
 
-import { type Point, polarPoint } from '../../chart/chartArc'
+import { type Point, polarPoint, svgCoord } from '../../chart/chartArc'
 import type { GrChartNumberFormat } from '../../chart/chartFormat'
 import { formatValue } from '../../chart/chartFormat'
 import type { Rect } from '../../chart/chartLayout'
@@ -16,7 +16,8 @@ import {
   perAxisMaxima,
   radarAreaPath,
   radarAxisAngles,
-  radarLabelAnchor,
+  type RadarAxisLabel,
+  radarLayout,
   radarLinePath,
   radarRingPath,
   radarSegments,
@@ -36,7 +37,6 @@ import {
   markerSizes,
 } from '../GrChartFrame/chartFrameStyles'
 import {
-  AXIS_LABEL_CHAR_EM,
   AXIS_LABEL_GAP_EM,
   RADAR_HIT_DEAD_ZONE,
   RADAR_INSET,
@@ -317,29 +317,67 @@ function fractionOf(value: number, axisIndex: number): number {
 
 const labelFontSize = computed(() => radarLabelFontPx[resolvedSize.value])
 
-const axisLabels = computed(() => chartData.value.categories.map((name, index) => (
-  perAxis.value
-    ? t('grCharts.radar.axisWithMax', '{axis} · {max}', { axis: name, max: formatPointValue(axisMaxima.value[index] ?? null) })
-    : name
-)))
+/**
+ * Подписи осей. При нормировке на ось потолок оси идёт второй, мелкой строкой:
+ * в одну строку «Заказы в день · 200» удваивал ширину подписи, и паутина
+ * отдавала ей радиус. Целиком, одной строкой, он остаётся в `<title>`.
+ */
+const axisLabelInputs = computed(() => chartData.value.categories.map((name, index) => {
+  if (!perAxis.value)
+    return { name, full: name }
+
+  const max = formatPointValue(axisMaxima.value[index] ?? null)
+
+  return {
+    name,
+    note: t('grCharts.radar.axisCeiling', 'max {max}', { max }),
+    full: t('grCharts.radar.axisWithMax', '{axis} · {max}', { axis: name, max }),
+  }
+}))
+
+const noteFontSize = computed(() => Math.max(8, labelFontSize.value - 2))
 
 interface RadarGeometry {
   cx: number
   cy: number
   radius: number
+  labels: RadarAxisLabel[]
 }
 
-function geometryOf(plot: Rect): RadarGeometry {
-  const font = labelFontSize.value
-  const longest = axisLabels.value.reduce((max, label) => Math.max(max, label.length), 0)
-  const gutterX = font * (AXIS_LABEL_GAP_EM + AXIS_LABEL_CHAR_EM * longest)
-  const gutterY = font * 2
+let lastGeometry: { plot: Rect, inputs: unknown, angles: unknown, font: number, value: RadarGeometry } | null = null
 
-  return {
-    cx: plot.x + plot.width / 2,
-    cy: plot.y + plot.height / 2,
-    radius: Math.max(0, Math.min(plot.width - gutterX * 2, plot.height - gutterY * 2) / 2 - RADAR_INSET),
+/**
+ * Раскладка паутины — один расчёт на область построения: её спрашивает каждая
+ * вершина, марка и спица.
+ */
+function geometryOf(plot: Rect): RadarGeometry {
+  const inputs = axisLabelInputs.value
+  const font = labelFontSize.value
+
+  if (
+    lastGeometry
+    && lastGeometry.inputs === inputs
+    && lastGeometry.angles === angles.value
+    && lastGeometry.font === font
+    && lastGeometry.plot.x === plot.x && lastGeometry.plot.y === plot.y
+    && lastGeometry.plot.width === plot.width && lastGeometry.plot.height === plot.height
+  ) {
+    return lastGeometry.value
   }
+
+  const value = radarLayout({
+    plot,
+    angles: angles.value,
+    labels: inputs,
+    fontSizePx: font,
+    noteFontSizePx: noteFontSize.value,
+    gap: font * AXIS_LABEL_GAP_EM,
+    inset: RADAR_INSET,
+  })
+
+  lastGeometry = { plot: { ...plot }, inputs, angles: angles.value, font, value }
+
+  return value
 }
 
 function vertexOf(series: NormalizedSeries, axisIndex: number, geometry: RadarGeometry): Point | null {
@@ -430,23 +468,32 @@ interface RadarRing {
 
 function ringsOf(plot: Rect): RadarRing[] {
   const geometry = geometryOf(plot)
+  const count = Math.max(1, angles.value.length)
+  const step = (Math.PI * 2) / count
+  // Подпись кольца стоит на биссектрисе между первой и второй спицей, а не на
+  // первой: там она попадала в одну колонку с именем верхней оси и на внешнем
+  // кольце налезала на него. У многоугольника биссектриса упирается в середину
+  // ребра — оно ближе к центру, чем вершина.
+  const bisector = (angles.value[0] ?? 0) + step / 2
+  const toEdge = resolvedShape.value === 'circle' || count < 3 ? 1 : Math.cos(step / 2)
+  const offset = labelFontSize.value * 0.3
 
-  // Подпись кольца отходит вправо от верхней спицы: по центру она встала бы в
-  // одну колонку с именем верхней оси, и на плотной паутине они наезжают.
-  const offset = labelFontSize.value * 0.4
+  const ring = (radius: number, label: string, key: number): RadarRing => {
+    const at = polarPoint(geometry.cx, geometry.cy, radius * toEdge, bisector)
 
-  const ring = (radius: number, label: string, key: number): RadarRing => ({
-    key,
-    radius,
-    path: radarRingPath(geometry.cx, geometry.cy, radius, angles.value),
-    label,
-    labelX: geometry.cx + offset,
-    labelY: geometry.cy - radius,
-  })
+    return {
+      key,
+      radius,
+      path: radarRingPath(geometry.cx, geometry.cy, radius, angles.value),
+      label,
+      labelX: svgCoord(at.x + offset),
+      labelY: at.y,
+    }
+  }
 
   // При нормировке на ось единственного верного числа для кольца не существует:
   // у каждой оси свой максимум. Кольца становятся равными долями, а максимумы
-  // уезжают в имена осей.
+  // уезжают в подписи осей.
   if (perAxis.value) {
     return Array.from({ length: resolvedRings.value }, (_, index) => (
       ring((geometry.radius * (index + 1)) / resolvedRings.value, '', index)
@@ -467,29 +514,27 @@ interface RadarSpoke {
   x: number
   y: number
   active: boolean
-  label: string
-  labelX: number
-  labelY: number
-  anchor: 'start' | 'middle' | 'end'
+  label: RadarAxisLabel
+  /** Полная подпись, если хоть одна строка усечена или потолок оси ушёл во вторую строку. */
+  title: string | undefined
 }
 
 function spokesOf(plot: Rect, cursor: number | null): RadarSpoke[] {
   const geometry = geometryOf(plot)
-  const gap = labelFontSize.value * AXIS_LABEL_GAP_EM
 
   return angles.value.map((angle, index) => {
     const end = polarPoint(geometry.cx, geometry.cy, geometry.radius, angle)
-    const label = polarPoint(geometry.cx, geometry.cy, geometry.radius + gap, angle)
+    const label = geometry.labels[index] ?? { x: end.x, anchor: 'middle' as const, lines: [] }
+    const input = axisLabelInputs.value[index]
+    const truncated = label.lines.some(line => line.full !== undefined)
 
     return {
       key: index,
       x: end.x,
       y: end.y,
       active: index === cursor,
-      label: axisLabels.value[index] ?? '',
-      labelX: label.x,
-      labelY: label.y,
-      anchor: radarLabelAnchor(angle),
+      label,
+      title: truncated || perAxis.value ? input?.full : undefined,
     }
   })
 }
@@ -725,32 +770,43 @@ defineExpose({
           stroke-width="1.5"
         />
 
-        <text
-          v-for="ring in ringsOf(plot)"
-          :key="`ring-label-${ring.key}`"
-          :x="plot.x + plot.width / 2"
-          :y="ring.labelY"
-          :fill="labelFill"
-          :font-size="labelFontSize"
-          text-anchor="middle"
-          dominant-baseline="middle"
-        >
+        <template v-for="ring in ringsOf(plot)" :key="`ring-label-${ring.key}`">
+          <text
+            v-if="ring.label"
+            data-gr-chart-radar-ring-label
+            :x="ring.labelX"
+            :y="ring.labelY"
+            :fill="labelFill"
+            :font-size="labelFontSize"
+            text-anchor="start"
+            dominant-baseline="middle"
+          >
 {{ ring.label }}
 </text>
+        </template>
 
         <text
           v-for="spoke in spokesOf(plot, cursor)"
           :key="`axis-label-${spoke.key}`"
           :data-gr-chart-radar-label="spoke.key"
-          :x="spoke.labelX"
-          :y="spoke.labelY"
+          :x="spoke.label.x"
           :fill="spoke.active ? radarActiveLabelFill : labelFill"
-          :font-size="labelFontSize"
-          :text-anchor="spoke.anchor"
-          dominant-baseline="middle"
+          :text-anchor="spoke.label.anchor"
         >
-{{ spoke.label }}
-</text>
+          <tspan
+            v-for="(line, index) in spoke.label.lines"
+            :key="index"
+            :x="spoke.label.x"
+            :y="line.y"
+            :font-size="line.fontSizePx"
+            dominant-baseline="middle"
+          >
+{{ line.text }}
+</tspan>
+          <title v-if="spoke.title">
+{{ spoke.title }}
+</title>
+        </text>
       </g>
     </template>
 

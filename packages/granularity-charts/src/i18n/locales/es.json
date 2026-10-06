@@ -87,6 +87,7 @@
     "summary": "Gráfico radial, {axes} ejes, {series} series",
     "keyboardHint": "Usa las flechas para recorrer los ejes",
     "axisWithMax": "{axis} · {max}",
+    "axisCeiling": "máx. {max}",
     "point": "{axis}. {series}: {value} de {max}",
     "columnAxis": "Eje",
     "columnMax": "Máximo del eje"
