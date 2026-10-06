@@ -7,7 +7,7 @@ import { barHitIndex, barPath, barRect, barToward, groupSlots } from '../../char
 import { orientedPoint } from '../../chart/chartOrientation'
 import type { GrChartNumberFormat } from '../../chart/chartFormat'
 import { formatNumber, formatValue } from '../../chart/chartFormat'
-import { type LabelGutters, labelGutters, type Rect } from '../../chart/chartLayout'
+import { type LabelGutters, memoLabelGutters, type Rect } from '../../chart/chartLayout'
 import type { GrChartPoint } from '../../chart/chartModel'
 import { normalizeChartData } from '../../chart/chartModel'
 import { bandScale, type GrChartScale, linearScale } from '../../chart/chartScale'
@@ -285,6 +285,8 @@ function stepTickLabel(index: number): string {
   return segments.value[index]?.label ?? String(index)
 }
 
+const measureGutters = memoLabelGutters()
+
 /**
  * Место под собственные подписи при горизонтали.
  *
@@ -296,7 +298,7 @@ function stepTickLabel(index: number): string {
  */
 function guttersOf(plot: Rect): LabelGutters {
   return isHorizontal.value
-    ? labelGutters({
+    ? measureGutters({
         leftLabels: segments.value.map(segment => segment.label),
         bottomLabels: ['0'],
         fontSizePx: labelFontPx[resolvedSize.value],

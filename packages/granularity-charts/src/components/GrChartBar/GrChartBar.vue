@@ -9,7 +9,7 @@ import { orientedGrid, orientedPoint } from '../../chart/chartOrientation'
 import type { GrChartNumberFormat } from '../../chart/chartFormat'
 import { formatShare } from '../../chart/chartFormat'
 import type { LabelGutters, Rect } from '../../chart/chartLayout'
-import { estimateTextWidth, labelGutters } from '../../chart/chartLayout'
+import { estimateTextWidth, memoLabelGutters } from '../../chart/chartLayout'
 import type { GrChartSeries, NormalizedSeries } from '../../chart/chartModel'
 import { normalizeChartData, resolveScaleKind } from '../../chart/chartModel'
 import type { GrChartReference, NormalizedReference } from '../../chart/chartReference'
@@ -354,6 +354,8 @@ function categoryTickLabel(position: number, index?: number): string {
   return props.xTickFormat ? String(props.xTickFormat(position, data.value.kind)) : String(position)
 }
 
+const measureGutters = memoLabelGutters()
+
 /**
  * Место под собственные подписи при горизонтали.
  *
@@ -366,7 +368,7 @@ function categoryTickLabel(position: number, index?: number): string {
  */
 function guttersOf(plot: Rect): LabelGutters {
   return isHorizontal.value
-    ? labelGutters({
+    ? measureGutters({
         leftLabels: categoryLabels.value,
         bottomLabels: ['0'],
         fontSizePx: labelFontPx[resolvedSize.value],

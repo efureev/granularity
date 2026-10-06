@@ -7,7 +7,7 @@ import type { GrChartNumberFormat } from '../../chart/chartFormat'
 import { formatShare, formatValue } from '../../chart/chartFormat'
 import type { FunnelStage, GrChartFunnelStage } from '../../chart/chartFunnel'
 import { funnelPath, funnelStages } from '../../chart/chartFunnel'
-import { estimateTextWidth, fitLabel, labelGutters, placeRowLabels, type Rect } from '../../chart/chartLayout'
+import { estimateTextWidth, fitLabel, memoLabelGutters, placeRowLabels, type Rect } from '../../chart/chartLayout'
 import { normalizeChartData } from '../../chart/chartModel'
 import { seriesStyle } from '../../chart/chartSeriesStyle'
 import type { ChartTableModel } from '../../chart/chartTable'
@@ -223,6 +223,8 @@ function formatStageShare(share: number | null): string {
 
 const nameFont = computed(() => labelFontPx[resolvedSize.value])
 
+const measureGutters = memoLabelGutters()
+
 /**
  * Место под имена ступеней.
  *
@@ -232,7 +234,7 @@ const nameFont = computed(() => labelFontPx[resolvedSize.value])
  * ступенями. Ширина оценивается, а не измеряется: причина в `chartLayout`.
  */
 function namesOf(plot: Rect) {
-  return labelGutters({
+  return measureGutters({
     leftLabels: isHorizontal.value ? [] : props.stages.map(stage => stage.label),
     bottomLabels: isHorizontal.value ? props.stages.map(stage => stage.label) : [],
     fontSizePx: nameFont.value,

@@ -318,6 +318,45 @@ export function labelGutters(input: LabelGuttersInput): LabelGutters {
   }
 }
 
+function sameLabels(first: readonly string[] | undefined, second: readonly string[] | undefined): boolean {
+  if (first === second)
+    return true
+  if (!first || !second || first.length !== second.length)
+    return false
+
+  return first.every((label, index) => label === second[index])
+}
+
+/**
+ * `labelGutters` с памятью на последний вход.
+ *
+ * Гуттер зависит от ширины области, поэтому считается от неё, а не раз на
+ * компонент, — и спрашивают его на каждую марку: у теплокарты в восемьсот
+ * строк это были бы тысячи проходов по восьмистам подписям за один рендер.
+ */
+export function memoLabelGutters(): (input: LabelGuttersInput) => LabelGutters {
+  let lastInput: LabelGuttersInput | null = null
+  let lastResult: LabelGutters | null = null
+
+  return (input) => {
+    if (
+      lastInput && lastResult
+      && lastInput.fontSizePx === input.fontSizePx
+      && lastInput.availableWidth === input.availableWidth
+      && lastInput.maxLabelWidth === input.maxLabelWidth
+      && sameLabels(lastInput.leftLabels, input.leftLabels)
+      && sameLabels(lastInput.bottomLabels, input.bottomLabels)
+    ) {
+      return lastResult
+    }
+
+    lastInput = input
+    lastResult = labelGutters(input)
+
+    return lastResult
+  }
+}
+
 export function chartLayout(input: ChartLayoutInput): ChartLayout {
   const padding = { ...DEFAULT_PADDING, ...input.padding }
   const maxAxisWidth = input.maxAxisWidth ?? DEFAULT_MAX_AXIS_WIDTH

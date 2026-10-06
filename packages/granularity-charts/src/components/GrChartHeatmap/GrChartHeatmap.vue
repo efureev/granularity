@@ -5,7 +5,7 @@ import { computed, ref } from 'vue'
 
 import type { GrChartNumberFormat } from '../../chart/chartFormat'
 import { formatValue } from '../../chart/chartFormat'
-import { fitLabel, type LabelGutters, labelGutters, placeRowLabels, type Rect } from '../../chart/chartLayout'
+import { fitLabel, type LabelGutters, memoLabelGutters, placeRowLabels, type Rect } from '../../chart/chartLayout'
 import type { HeatmapCell, HeatmapGrid, HeatmapScaleKind } from '../../chart/chartHeatmap'
 import { heatmapCell, heatmapCells, heatmapColor, heatmapMatrix, heatmapOnDark, heatmapScale } from '../../chart/chartHeatmap'
 import { normalizeChartData } from '../../chart/chartModel'
@@ -278,6 +278,8 @@ const activeRow = computed(() => props.activeCell?.y ?? innerRow.value)
 
 const fontSizePx = computed(() => labelFontPx[resolvedSize.value])
 
+const measureGutters = memoLabelGutters()
+
 /**
  * Место под подписи строк и колонок.
  *
@@ -287,7 +289,7 @@ const fontSizePx = computed(() => labelFontPx[resolvedSize.value])
  * Потолок подписи строки — доля ширины области, поэтому и считается от неё.
  */
 function guttersOf(plot: Rect): LabelGutters {
-  return labelGutters({
+  return measureGutters({
     leftLabels: props.yLabels,
     bottomLabels: props.xLabels,
     fontSizePx: fontSizePx.value,
