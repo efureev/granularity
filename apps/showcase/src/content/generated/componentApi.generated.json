@@ -86,35 +86,35 @@
         "items": [
           {
             "name": "tone",
-            "description": "",
+            "description": "Смысл сообщения: цвет подложки и рамки, глиф иконки и — при `live=\"auto\"` — роль для скринридера. `warning` и `danger` перебивают речь, остальные ждут паузы. По умолчанию `info`; глобально — `componentDefaults`.",
             "type": "\"primary\" | \"neutral\" | \"success\" | \"warning\" | \"danger\" | \"info\" | \"slate\" | \"azure\" | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "variant",
-            "description": "",
+            "description": "Вес: `soft` — тонированная подложка, `outline` — только рамка тона для спокойных пояснений рядом с другими сообщениями. По умолчанию `soft`.",
             "type": "\"soft\" | \"outline\" | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "title",
-            "description": "",
+            "description": "Короткий факт первой строкой: «Карта истекает через 12 дней». Подробности — в тексте под ним; без заголовка сообщение — одна строка текста.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "closable",
-            "description": "",
+            "description": "Кнопка закрытия. Сама она сообщение не прячет: эмитит `close` и `update:visible` — прятать ли, решает экран (см. `visible`).",
             "type": "boolean | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "live",
-            "description": "",
+            "description": "Как сообщение объявляется скринридеру: `auto` — по тону, `assertive` — `role=\"alert\"`, `polite` — `role=\"status\"`, `off` — без роли, когда оно уже объявлено иначе. По умолчанию `auto`.",
             "type": "GrAlertLive | undefined",
             "required": false,
             "default": "undefined"
@@ -124,32 +124,32 @@
             "description": "Показывать ли иконку тона. Своя иконка — слотом `#icon`; проп нужен для случая «иконка мешает»: узкая колонка, плотный список, сообщение в форме.",
             "type": "boolean | undefined",
             "required": false,
-            "default": "undefined"
+            "default": "true"
           },
           {
             "name": "visible",
             "description": "Видимость сообщения — **только контролируемая**: без пропа алерт виден всегда, и закрытие остаётся заботой потребителя (`@close`). С `v-model:visible` компонент прячет себя сам. Собственного состояния у пропа нет намеренно. Оно превратило бы кнопку закрытия в необратимое действие у всех, кто уже живёт на `@close` и, например, спрашивает по нему подтверждение.",
             "type": "boolean | undefined",
             "required": false,
-            "default": "undefined"
+            "default": "true"
           },
           {
             "name": "backgroundColor",
-            "description": "",
+            "description": "Подложка вместо тона — цвет бренда или партнёра. Раскладка, иконка и закрытие остаются прежними. Переменная `--gr-alert-bg` делает то же из CSS.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "textColor",
-            "description": "",
+            "description": "Цвет текста, заголовка и иконки вместо тона (`--gr-alert-*` в `tokens.md`).",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "borderColor",
-            "description": "",
+            "description": "Цвет рамки вместо тона; у `outline` это главный цвет сообщения.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
@@ -666,28 +666,28 @@
         "items": [
           {
             "name": "tone",
-            "description": "",
+            "description": "Тон метки: несёт смысл, а не только цвет — «Оплачено» в `success`, «Просрочено» в `danger`. Не задан — из `GrConfigProvider`, иначе `neutral`.",
             "type": "\"primary\" | \"neutral\" | \"success\" | \"warning\" | \"danger\" | \"info\" | \"slate\" | \"azure\" | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "size",
-            "description": "",
+            "description": "Ступень контрольной шкалы `--gr-control-text-*`: бейдж чаще стоит рядом с кнопками и полями, чем внутри абзаца. Не задан — из `GrConfigProvider`.",
             "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "dark",
-            "description": "",
+            "description": "Заливка вместо мягкой подложки: плотный вес для пёстрого фона и для метки, которая обязана выделяться. Цвета — из слоя `--gr-badge-{tone}-bg`/`-fg`.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
           },
           {
             "name": "radius",
-            "description": "",
+            "description": "Форма: `round` — таблетка статуса, `semi` — ярлык категории или кода, `square` — штамп. Не задан — из `GrConfigProvider`, иначе `round`.",
             "type": "GrBadgeRadius | undefined",
             "required": false,
             "default": "undefined"
@@ -3936,14 +3936,14 @@
         "items": [
           {
             "name": "title",
-            "description": "",
+            "description": "Заголовок окна. Он же даёт окну доступное имя через `aria-labelledby`.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "size",
-            "description": "",
+            "description": "Ширина окна — шкала `GrModal`: от `sm` до `xl`, `full` — во весь экран.",
             "type": "\"sm\" | \"md\" | \"lg\" | \"xl\" | \"full\" | undefined",
             "required": false,
             "default": "undefined"
@@ -3957,49 +3957,49 @@
           },
           {
             "name": "closeOnBackdrop",
-            "description": "",
+            "description": "Закрывать по клику на подложку — только по клику, начавшемуся на ней.",
             "type": "boolean | undefined",
             "required": false,
             "default": "true"
           },
           {
             "name": "closeOnEsc",
-            "description": "",
+            "description": "Закрывать по Esc. Закрывается верхний слой стека.",
             "type": "boolean | undefined",
             "required": false,
             "default": "true"
           },
           {
             "name": "showHeader",
-            "description": "",
+            "description": "Показывать шапку. Без неё уходят и заголовок, и кнопка закрытия — имя окну тогда даёт `ariaLabel`.",
             "type": "boolean | undefined",
             "required": false,
             "default": "true"
           },
           {
             "name": "showCloseButton",
-            "description": "",
+            "description": "Кнопка закрытия в шапке. Без неё окно закрывают Esc, подложка и кнопки подвала.",
             "type": "boolean | undefined",
             "required": false,
             "default": "true"
           },
           {
             "name": "headerConfig",
-            "description": "",
+            "description": "Поля и линия шапки: `paddingX`, `paddingY`, `bordered`.",
             "type": "GrDialogSectionConfig | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "footerConfig",
-            "description": "",
+            "description": "Поля и линия подвала. Подвал рисуется, только если передан слот `#footer`.",
             "type": "GrDialogSectionConfig | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "bodyConfig",
-            "description": "",
+            "description": "Поля тела. `bordered` у тела не применяется: своей верхней линии у него нет.",
             "type": "GrDialogSectionConfig | undefined",
             "required": false,
             "default": "undefined"
@@ -4027,7 +4027,7 @@
           },
           {
             "name": "modelValue",
-            "description": "",
+            "description": "Открыто ли окно (`v-model`). Своего состояния у окна нет: открывает и закрывает родитель.",
             "type": "boolean",
             "required": true
           }
@@ -7406,7 +7406,7 @@
         "items": [
           {
             "name": "size",
-            "description": "",
+            "description": "Ширина панели: от `sm` до `xl` меняет только максимальную ширину, `full` — весь вьюпорт, без полей и скруглений.",
             "type": "\"sm\" | \"md\" | \"lg\" | \"xl\" | \"full\" | undefined",
             "required": false,
             "default": "undefined"
@@ -7420,14 +7420,14 @@
           },
           {
             "name": "closeOnBackdrop",
-            "description": "",
+            "description": "Закрывать по клику на подложку. Считается только клик, начавшийся на ней: выделение текста, отпущенное за краем панели, окно не закрывает.",
             "type": "boolean | undefined",
             "required": false,
             "default": "true"
           },
           {
             "name": "closeOnEsc",
-            "description": "",
+            "description": "Закрывать по Esc. Закрывается верхний слой стека, а не тот, что ниже по документу.",
             "type": "boolean | undefined",
             "required": false,
             "default": "true"
@@ -7448,7 +7448,7 @@
           },
           {
             "name": "modelValue",
-            "description": "",
+            "description": "Открыто ли окно (`v-model`). Своего состояния у окна нет: открывает и закрывает родитель.",
             "type": "boolean",
             "required": true
           }
@@ -11843,7 +11843,7 @@
           },
           {
             "name": "tableMinWidth",
-            "description": "Минимальная ширина самой таблицы (число — пиксели). Нужна при `fixedLayout`: с фиксированной раскладкой и шириной `auto` браузер вписывает таблицу в контейнер и делит место между колонками пропорционально — то есть заданные ширины молча ужимаются, а горизонтальной прокрутки, на которой держатся закреплённые колонки, не возникает вовсе.",
+            "description": "Минимальная ширина самой таблицы (число — пиксели). Нужна при `fixedLayout`: с фиксированной раскладкой и шириной `auto` браузер вписывает таблицу в контейнер и делит место между колонками пропорционально — то есть заданные ширины молча ужимаются, а горизонтальной прокрутки, на которой держатся закреплённые колонки, не возникает вовсе. Это нижняя граница, а не ширина: в контейнере шире суммы колонок таблица по-прежнему занимает его целиком.",
             "type": "string | number | undefined",
             "required": false,
             "default": "undefined"
