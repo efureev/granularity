@@ -24,6 +24,7 @@ vi.mock('@floating-ui/dom', () => ({
   shift: vi.fn(() => ({})),
   offset: vi.fn(() => ({})),
   size: vi.fn(() => ({})),
+  hide: vi.fn(() => ({ name: 'hide' })),
 }))
 
 function mountHarness() {
@@ -431,5 +432,96 @@ describe('useFloating — доступное место по вертикали'
     const floating = applyWith(240)
     expect(floating.style.width).toBe('')
     expect(floating.style.minWidth).toBe('')
+  })
+})
+
+describe('useFloating — якорь уехал из вида', () => {
+  function mountDetachable(hideWhenDetached: boolean) {
+    const open = ref(false)
+    const style = ref<Record<string, unknown>>({})
+
+    const wrapper = mount(defineComponent({
+      setup() {
+        const reference = ref<HTMLElement | null>(null)
+        const floating = ref<HTMLElement | null>(null)
+        const { floatingStyle, update } = useFloating(reference, floating, open, { hideWhenDetached })
+
+        watchEffect(() => {
+          style.value = floatingStyle.value as Record<string, unknown>
+        })
+
+        return { reference, floating, update }
+      },
+      template: '<div><button ref="reference" /><div ref="floating" /></div>',
+    }), { attachTo: document.body })
+
+    return { wrapper, open, style }
+  }
+
+  async function settle() {
+    for (let i = 0; i < 4; i += 1) await nextTick()
+  }
+
+  function positionWith(referenceHidden: boolean) {
+    vi.mocked(computePosition).mockResolvedValueOnce({
+      x: 40,
+      y: 60,
+      placement: 'top',
+      strategy: 'fixed',
+      middlewareData: { hide: { referenceHidden } },
+    })
+  }
+
+  it('до первого расчёта позиции панель спрятана, а не стоит в углу вьюпорта', () => {
+    const { wrapper, style } = mountDetachable(true)
+
+    expect(style.value.visibility).toBe('hidden')
+    wrapper.unmount()
+  })
+
+  it('якорь вне вьюпорта — панель спрятана; вернулся — видна у якоря', async () => {
+    // Подсказка курсора графика, поставленная программно: якорь уехал
+    // прокруткой, а `shift` прижимал панель к краю — поверх чужого содержимого.
+    const { wrapper, open, style } = mountDetachable(true)
+
+    positionWith(true)
+    open.value = true
+    await settle()
+    expect(style.value.visibility).toBe('hidden')
+
+    positionWith(false)
+    ;(wrapper.vm as unknown as { update: () => void }).update()
+    await settle()
+    expect(style.value.visibility).toBeUndefined()
+    expect(style.value.left).toBe('40px')
+    expect(style.value.top).toBe('60px')
+
+    wrapper.unmount()
+  })
+
+  it('закрытая панель снова прячется до следующего расчёта', async () => {
+    const { wrapper, open, style } = mountDetachable(true)
+
+    positionWith(false)
+    open.value = true
+    await settle()
+    expect(style.value.visibility).toBeUndefined()
+
+    open.value = false
+    await settle()
+    expect(style.value.visibility).toBe('hidden')
+
+    wrapper.unmount()
+  })
+
+  it('без опции поведение прежнее: панель не прячется', async () => {
+    const { wrapper, open, style } = mountDetachable(false)
+
+    positionWith(true)
+    open.value = true
+    await settle()
+
+    expect(style.value.visibility).toBeUndefined()
+    wrapper.unmount()
   })
 })

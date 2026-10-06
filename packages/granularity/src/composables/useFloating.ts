@@ -1,6 +1,6 @@
 import type { CSSProperties, Ref } from 'vue'
 import type { Middleware, Placement, VirtualElement } from '@floating-ui/dom'
-import { autoUpdate, computePosition, flip, offset as offsetMiddleware, shift, size as sizeMiddleware } from '@floating-ui/dom'
+import { autoUpdate, computePosition, flip, hide, offset as offsetMiddleware, shift, size as sizeMiddleware } from '@floating-ui/dom'
 import { nextTick, onBeforeUnmount, ref, watch } from 'vue'
 
 import { floatingLayerZIndex } from './internal/overlayStack'
@@ -126,6 +126,17 @@ export interface UseFloatingOptions {
    * окном высоту задаёт стек слоёв (см. {@link floatingZIndex}).
    */
   zIndexVar?: string
+  /**
+   * Прятать панель (`visibility: hidden`), пока якорь вне вьюпорта или обрезан
+   * прокручиваемым предком, и до первого расчёта позиции. По умолчанию нет.
+   *
+   * Без этого `shift` прижимает панель к краю вьюпорта, и подсказка, чей якорь
+   * уехал прокруткой, висит поверх чужого содержимого; до первого расчёта она
+   * стоит в левом верхнем углу. Включают **неинтерактивные** панели — подсказки.
+   * Панели с полями ввода не включают: спрятанный элемент теряет фокус, и
+   * прокрутка страницы сбрасывала бы набор посреди слова.
+   */
+  hideWhenDetached?: boolean
 }
 
 export interface UseFloatingReturn {
@@ -171,6 +182,7 @@ export function useFloating(
     position: 'fixed',
     top: '0px',
     left: '0px',
+    ...(options.hideWhenDetached ? { visibility: 'hidden' as const } : {}),
   })
   function resolveRequestedPlacement(): Placement {
     return typeof options.placement === 'function' ? options.placement() : options.placement ?? 'bottom-start'
@@ -228,7 +240,11 @@ export function useFloating(
       }),
     )
 
-    const { x, y, placement } = await computePosition(reference, floating, {
+    // Последним: проверяет якорь уже после сдвигов панели.
+    if (options.hideWhenDetached)
+      middleware.push(hide({ strategy: 'referenceHidden' }))
+
+    const { x, y, placement, middlewareData } = await computePosition(reference, floating, {
       placement: resolveRequestedPlacement(),
       strategy: 'fixed',
       middleware,
@@ -240,12 +256,17 @@ export function useFloating(
       left: `${roundByDpr(floating, x)}px`,
       top: `${roundByDpr(floating, y)}px`,
       zIndex: floatingLayerZIndex(options.zIndexVar ?? '--gr-z-dropdown'),
+      ...(options.hideWhenDetached && middlewareData.hide?.referenceHidden ? { visibility: 'hidden' as const } : {}),
     }
   }
 
   function stop(): void {
     stopAutoUpdate?.()
     stopAutoUpdate = null
+
+    // Следующее открытие начнётся с прежней позиции — до пересчёта она чужая.
+    if (options.hideWhenDetached)
+      floatingStyle.value = { ...floatingStyle.value, visibility: 'hidden' }
   }
 
   function start(): void {

@@ -142,6 +142,7 @@ const { floatingStyle } = useFloating(triggerEl, panelEl, open, {
   // так проп остаётся живым, а не замирает на моменте setup.
   get offsetPx() { return props.offsetPx },
   zIndexVar: '--gr-z-tooltip',
+  hideWhenDetached: true,
 })
 
 let delayTimer: ReturnType<typeof setTimeout> | undefined
