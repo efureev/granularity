@@ -63,12 +63,12 @@
         "items": [
           {
             "name": "stuck",
-            "description": "",
+            "description": "Прилипла ли панель сейчас — то же состояние, что в слоте и в `data-stuck`.",
             "type": "boolean"
           },
           {
             "name": "remeasure",
-            "description": "",
+            "description": "Перечитать отступ и пересобрать наблюдателя: `vh` после ресайза, смена высоты шапки.",
             "type": "() => void"
           }
         ]
@@ -587,7 +587,7 @@
           },
           {
             "name": "src",
-            "description": "",
+            "description": "Адрес фото. Пока грузится — скелет; не загрузился — `fallbackSrc`, затем инициалы.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
@@ -601,14 +601,14 @@
           },
           {
             "name": "alt",
-            "description": "",
+            "description": "Доступное имя аватара; сильнее `name`, когда подпись для диктора должна быть другой.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "shape",
-            "description": "",
+            "description": "Круг или квадрат со скруглением. По умолчанию `circle`; группа задаёт форму всему ряду.",
             "type": "GrAvatarShape | undefined",
             "required": false,
             "default": "undefined"
@@ -1197,12 +1197,12 @@
         "items": [
           {
             "name": "focus",
-            "description": "",
+            "description": "Поставить фокус на кнопку — и когда корень тег, и когда компонент из `as`.",
             "type": "() => void"
           },
           {
             "name": "blur",
-            "description": "",
+            "description": "Снять фокус с кнопки.",
             "type": "() => void"
           }
         ]
@@ -1220,14 +1220,14 @@
         "items": [
           {
             "name": "tone",
-            "description": "",
+            "description": "Тон всех кнопок группы. Проп самой кнопки сильнее.",
             "type": "\"primary\" | \"neutral\" | \"success\" | \"warning\" | \"danger\" | \"info\" | \"slate\" | \"azure\" | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "variant",
-            "description": "",
+            "description": "Вес всех кнопок группы: `primary`, `outline`, `ghost` и т. д. Проп самой кнопки сильнее.",
             "type": "GrButtonVariant | undefined",
             "required": false,
             "default": "undefined"
@@ -1248,7 +1248,7 @@
           },
           {
             "name": "orientation",
-            "description": "",
+            "description": "Направление ряда: `vertical` ставит кнопки столбцом. По умолчанию `horizontal`.",
             "type": "GrButtonGroupOrientation | undefined",
             "required": false,
             "default": "\"horizontal\""
@@ -1540,28 +1540,28 @@
           },
           {
             "name": "prevLabel",
-            "description": "",
+            "description": "Доступное имя стрелки «назад»: у кнопки только иконка. По умолчанию — строка локали.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "nextLabel",
-            "description": "",
+            "description": "Доступное имя стрелки «вперёд»: у кнопки только иконка. По умолчанию — строка локали.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "playLabel",
-            "description": "",
+            "description": "Имя тумблера показа, пока лента стоит. По умолчанию — строка локали.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "pauseLabel",
-            "description": "",
+            "description": "Имя тумблера показа, пока кадры листаются сами. По умолчанию — строка локали.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
@@ -1632,27 +1632,27 @@
           },
           {
             "name": "next",
-            "description": "",
+            "description": "Следующий кадр. Останавливает показ; без `loop` на последнем кадре ничего не делает.",
             "type": "() => void"
           },
           {
             "name": "prev",
-            "description": "",
+            "description": "Предыдущий кадр. Останавливает показ; без `loop` на первом кадре ничего не делает.",
             "type": "() => void"
           },
           {
             "name": "goTo",
-            "description": "",
+            "description": "Перейти к кадру по индексу; индекс за пределами ленты прижимается к краю. Останавливает показ.",
             "type": "(index: number) => void"
           },
           {
             "name": "play",
-            "description": "",
+            "description": "Запустить показ — так же, как тумблером.",
             "type": "() => void"
           },
           {
             "name": "pause",
-            "description": "",
+            "description": "Остановить показ и объявить остановку скринридеру.",
             "type": "() => void"
           }
         ]
@@ -1670,7 +1670,7 @@
         "items": [
           {
             "name": "disabled",
-            "description": "",
+            "description": "Недоступен: не переключается и не фокусируется. Складывается по «или» с полем и группой.",
             "type": "boolean | undefined",
             "required": false,
             "default": "undefined"
@@ -1719,14 +1719,14 @@
           },
           {
             "name": "name",
-            "description": "",
+            "description": "Имя скрытого `<input>` в `FormData`. Внутри `GrCheckboxGroup` по умолчанию — имя группы.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "value",
-            "description": "",
+            "description": "Значение для формы и ключ в массиве выбранных у `GrCheckboxGroup`. По умолчанию `on`.",
             "type": "string | undefined",
             "required": false,
             "default": "\"on\""
@@ -1747,7 +1747,7 @@
           },
           {
             "name": "form",
-            "description": "",
+            "description": "Id формы для скрытого `<input>`, когда чекбокс стоит вне её разметки.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
@@ -1818,12 +1818,12 @@
         "items": [
           {
             "name": "focus",
-            "description": "",
+            "description": "Поставить фокус на контрол — тот же, что получает `Tab`.",
             "type": "() => void"
           },
           {
             "name": "blur",
-            "description": "",
+            "description": "Снять фокус с контрола.",
             "type": "() => void"
           }
         ]
@@ -1841,14 +1841,14 @@
         "items": [
           {
             "name": "disabled",
-            "description": "",
+            "description": "Выключить всю группу. Складывается с `disabled` у `GrFormField`.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
           },
           {
             "name": "options",
-            "description": "",
+            "description": "Варианты, из которых группа строит чекбоксы. Не нужны, если флажки разложены в слоте.",
             "type": "GrCheckboxGroupOption[] | undefined",
             "required": false,
             "default": "undefined"
@@ -1876,14 +1876,14 @@
           },
           {
             "name": "size",
-            "description": "",
+            "description": "Ступень размера чекбоксов группы. По умолчанию `md`; берётся из `GrConfigProvider`.",
             "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "ariaLabel",
-            "description": "",
+            "description": "Доступное имя группы. Не задано — имя берётся из подписи `GrFormField`.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
@@ -1897,14 +1897,14 @@
           },
           {
             "name": "direction",
-            "description": "",
+            "description": "Раскладка: `vertical` — столбцом, `horizontal` — строкой с переносом. По умолчанию `vertical`.",
             "type": "GrCheckboxGroupDirection | undefined",
             "required": false,
             "default": "\"vertical\""
           },
           {
             "name": "modelValue",
-            "description": "",
+            "description": "Отмеченные значения (`v-model`): у каждого чекбокса группы свой `value`.",
             "type": "string[]",
             "required": true
           }
@@ -1960,12 +1960,12 @@
         "items": [
           {
             "name": "focus",
-            "description": "",
+            "description": "Поставить фокус на первый доступный чекбокс группы.",
             "type": "() => void"
           },
           {
             "name": "blur",
-            "description": "",
+            "description": "Снять фокус с первого доступного чекбокса — пара к `focus`.",
             "type": "() => void"
           }
         ]
@@ -1983,14 +1983,14 @@
         "items": [
           {
             "name": "disabled",
-            "description": "",
+            "description": "Чип недоступен: не выбирается и не снимается, крестик скрыт. Внутри группы — и от её `disabled`.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
           },
           {
             "name": "tone",
-            "description": "",
+            "description": "Тон чипа — те же цвета, что у `GrBadge`, чтобы в одном ряду они не расходились. Не задан — из группы и `GrConfigProvider`, иначе `neutral`.",
             "type": "\"primary\" | \"neutral\" | \"success\" | \"warning\" | \"danger\" | \"info\" | \"slate\" | \"azure\" | undefined",
             "required": false,
             "default": "undefined"
@@ -2004,7 +2004,7 @@
           },
           {
             "name": "size",
-            "description": "",
+            "description": "Ступень контрольной шкалы: цель нажатия той же высоты, что у соседних полей. Не задан — из группы и `GrConfigProvider`, иначе `md`.",
             "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
             "required": false,
             "default": "undefined"
@@ -2025,14 +2025,14 @@
           },
           {
             "name": "dark",
-            "description": "",
+            "description": "Заливка тоном вместо мягкой подложки — для чипа, который обязан выделяться. По умолчанию `false`.",
             "type": "boolean | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "radius",
-            "description": "",
+            "description": "Форма: `round` — таблетка, `semi` — ярлык, `square` — штамп. Не задан — из группы и `GrConfigProvider`, иначе `round`.",
             "type": "GrBadgeRadius | undefined",
             "required": false,
             "default": "undefined"
@@ -2117,12 +2117,12 @@
         "items": [
           {
             "name": "focus",
-            "description": "",
+            "description": "Фокус на чип из кода. Действует на интерактивный чип: простой чип — `span` без таб-стопа.",
             "type": "() => void | undefined"
           },
           {
             "name": "blur",
-            "description": "",
+            "description": "Снять фокус с чипа.",
             "type": "() => void | undefined"
           },
           {
@@ -2145,14 +2145,14 @@
         "items": [
           {
             "name": "disabled",
-            "description": "",
+            "description": "Набор недоступен: чипы не выбираются и не снимаются. Включается и от `GrFormField`.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
           },
           {
             "name": "tone",
-            "description": "",
+            "description": "Тон всех чипов набора; проп чипа сильнее. Не задан — `GrConfigProvider`, иначе `neutral`.",
             "type": "\"primary\" | \"neutral\" | \"success\" | \"warning\" | \"danger\" | \"info\" | \"slate\" | \"azure\" | undefined",
             "required": false,
             "default": "undefined"
@@ -2180,28 +2180,28 @@
           },
           {
             "name": "invalid",
-            "description": "",
+            "description": "Значение с ошибкой: `aria-invalid` на группе. Включается и от ошибки `GrFormField`.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
           },
           {
             "name": "required",
-            "description": "",
+            "description": "Выбор обязателен: `aria-required` на группе. Включается и от `GrFormField`.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
           },
           {
             "name": "size",
-            "description": "",
+            "description": "Ступень шкалы для всех чипов набора; проп чипа сильнее. По умолчанию `md`.",
             "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "ariaLabel",
-            "description": "",
+            "description": "Доступное имя набора. Внутри `GrFormField` не нужно: группу именует подпись поля.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
@@ -2215,21 +2215,21 @@
           },
           {
             "name": "dark",
-            "description": "",
+            "description": "Заливка тоном вместо мягкой подложки у всех чипов набора; проп чипа сильнее.",
             "type": "boolean | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "radius",
-            "description": "",
+            "description": "Форма всех чипов набора: `round`, `semi` или `square`; проп чипа сильнее.",
             "type": "GrBadgeRadius | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "selection",
-            "description": "",
+            "description": "Множественность выбора: `multiple` — массив значений и роль `listbox`, `single` — одно значение или `null` и роль `radiogroup`. По умолчанию `multiple`.",
             "type": "GrChipSelection | undefined",
             "required": false,
             "default": "\"multiple\""
@@ -2292,12 +2292,12 @@
         "items": [
           {
             "name": "focus",
-            "description": "",
+            "description": "Фокус на активный чип — тот, что держит остановку `Tab` набора.",
             "type": "() => void | undefined"
           },
           {
             "name": "blur",
-            "description": "",
+            "description": "Снять фокус с активного чипа набора.",
             "type": "() => void | undefined"
           }
         ]
@@ -2315,14 +2315,14 @@
         "items": [
           {
             "name": "disabled",
-            "description": "",
+            "description": "Блокирует все секции: заголовки не переключаются.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
           },
           {
             "name": "modelValue",
-            "description": "",
+            "description": "Открытые секции (`v-model`): в `accordion` — одно значение или `undefined`, иначе массив.",
             "type": "GrCollapseValue | GrCollapseValue[] | undefined",
             "required": false,
             "default": "undefined"
@@ -2343,21 +2343,21 @@
           },
           {
             "name": "accordion",
-            "description": "",
+            "description": "Одновременно открыта только одна секция: открытие новой закрывает прежнюю.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
           },
           {
             "name": "divided",
-            "description": "",
+            "description": "Разделители между секциями. По умолчанию `true`; глобально — `componentDefaults`.",
             "type": "boolean | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "borderless",
-            "description": "",
+            "description": "Без обёртки в `GrCard`: аккордеон внутри карточки или сайдбара иначе получает вторую рамку и вторую тень. По умолчанию `false`.",
             "type": "boolean | undefined",
             "required": false,
             "default": "undefined"
@@ -2371,7 +2371,7 @@
           },
           {
             "name": "beforeChange",
-            "description": "",
+            "description": "Async-guard переключения: получает секцию и направление, `false` отменяет. Пока он не ответил, повторный клик по той же секции игнорируется.",
             "type": "GrCollapseBeforeChange | undefined",
             "required": false,
             "default": "undefined"
@@ -2454,7 +2454,7 @@
           },
           {
             "name": "disabled",
-            "description": "",
+            "description": "Поле недоступно: триггер выключен, панель не открывается. Включается и `disabled` у `GrFormField`.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
@@ -2475,28 +2475,28 @@
           },
           {
             "name": "invalid",
-            "description": "",
+            "description": "Состояние ошибки: рамка цвета ошибки и `aria-invalid`. Включается и ошибкой `GrFormField`.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
           },
           {
             "name": "required",
-            "description": "",
+            "description": "Обязательное поле. `aria-required` у кнопки-триггера невалиден, поэтому обязательность уходит в её описание для скринридера.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
           },
           {
             "name": "size",
-            "description": "",
+            "description": "Высота триггера и масштаб панели по шкале контролов. Не задан — из `GrConfigProvider`, иначе `md`.",
             "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "ariaLabel",
-            "description": "",
+            "description": "Доступное имя триггера вне `GrFormField` — когда видимой подписи рядом нет.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
@@ -2601,12 +2601,12 @@
         "items": [
           {
             "name": "focus",
-            "description": "",
+            "description": "Фокус на кнопку-триггер из кода.",
             "type": "() => void"
           },
           {
             "name": "blur",
-            "description": "",
+            "description": "Снять фокус с кнопки-триггера.",
             "type": "() => void"
           }
         ]
@@ -2631,21 +2631,21 @@
           },
           {
             "name": "size",
-            "description": "",
+            "description": "Ширина окна по шкале панелей `GrModal`. По умолчанию `lg`; берётся из `GrConfigProvider`.",
             "type": "\"sm\" | \"md\" | \"lg\" | \"xl\" | \"full\" | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "placeholder",
-            "description": "",
+            "description": "Подсказка в поле поиска. По умолчанию — строка локали.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "ariaLabel",
-            "description": "",
+            "description": "Доступное имя палитры и поля поиска. По умолчанию — строка локали.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
@@ -2687,7 +2687,7 @@
           },
           {
             "name": "emptyText",
-            "description": "",
+            "description": "Текст пустой выдачи. Слот `#empty` сильнее; по умолчанию — строка локали.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
@@ -2789,17 +2789,17 @@
         "items": [
           {
             "name": "open",
-            "description": "",
+            "description": "Открыть палитру — для кнопки в шапке или пункта меню рядом с сочетанием.",
             "type": "() => void"
           },
           {
             "name": "close",
-            "description": "",
+            "description": "Закрыть палитру.",
             "type": "() => void"
           },
           {
             "name": "toggle",
-            "description": "",
+            "description": "Переключить палитру — то же, что глобальное сочетание.",
             "type": "() => void"
           }
         ]
@@ -2910,70 +2910,70 @@
         "items": [
           {
             "name": "title",
-            "description": "",
+            "description": "Заголовок окна, он же его доступное имя. Не задан — берётся из локали.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "size",
-            "description": "",
+            "description": "Ширина окна по шкале `GrDialog`: от `sm` до `xl`, `full` — во весь экран. По умолчанию `md`.",
             "type": "\"sm\" | \"md\" | \"lg\" | \"xl\" | \"full\" | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "description",
-            "description": "",
+            "description": "Текст вопроса в теле окна. Слот `default` его заменяет.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "closeOnBackdrop",
-            "description": "",
+            "description": "Закрывать по клику на подложку. По умолчанию `true`; при `persistent` на время `confirmLoading` выключается.",
             "type": "boolean | undefined",
             "required": false,
             "default": "true"
           },
           {
             "name": "closeOnEsc",
-            "description": "",
+            "description": "Закрывать по Esc. По умолчанию `true`; при `persistent` на время `confirmLoading` выключается.",
             "type": "boolean | undefined",
             "required": false,
             "default": "true"
           },
           {
             "name": "showHeader",
-            "description": "",
+            "description": "Показывать шапку с заголовком и кнопкой закрытия. По умолчанию `true`.",
             "type": "boolean | undefined",
             "required": false,
             "default": "true"
           },
           {
             "name": "showCloseButton",
-            "description": "",
+            "description": "Кнопка закрытия в шапке. По умолчанию `true`; при `persistent` тоже остаётся.",
             "type": "boolean | undefined",
             "required": false,
             "default": "true"
           },
           {
             "name": "headerConfig",
-            "description": "",
+            "description": "Поля и линия шапки: `paddingX`, `paddingY`, `bordered`.",
             "type": "GrDialogSectionConfig | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "footerConfig",
-            "description": "",
+            "description": "Поля и линия подвала с кнопками.",
             "type": "GrDialogSectionConfig | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "bodyConfig",
-            "description": "",
+            "description": "Поля тела окна. `bordered` у тела не применяется.",
             "type": "GrDialogSectionConfig | undefined",
             "required": false,
             "default": "undefined"
@@ -2987,35 +2987,35 @@
           },
           {
             "name": "buttonSize",
-            "description": "",
+            "description": "Размер обеих кнопок подвала. Не задан — кнопки берут размер из `GrConfigProvider`.",
             "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "confirmText",
-            "description": "",
+            "description": "Подпись кнопки подтверждения. Не задана — берётся из локали.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "cancelText",
-            "description": "",
+            "description": "Подпись кнопки отмены. Не задана — берётся из локали.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "confirmVariant",
-            "description": "",
+            "description": "Вес кнопки подтверждения. По умолчанию `primary`.",
             "type": "GrButtonVariant | undefined",
             "required": false,
             "default": "\"primary\""
           },
           {
             "name": "confirmTone",
-            "description": "",
+            "description": "Тон кнопки подтверждения: `danger` — для необратимого действия. По умолчанию `primary`.",
             "type": "\"primary\" | \"neutral\" | \"success\" | \"warning\" | \"danger\" | \"info\" | \"slate\" | \"azure\" | undefined",
             "required": false,
             "default": "\"primary\""
@@ -3064,7 +3064,7 @@
           },
           {
             "name": "modelValue",
-            "description": "",
+            "description": "Открыто ли окно (`v-model`). Отмена закрывает его всегда, подтверждение — при `closeOnConfirm`.",
             "type": "boolean",
             "required": true
           }
@@ -3077,7 +3077,7 @@
         "items": [
           {
             "name": "default",
-            "description": "Содержимое диалога вместо пропа `message`.",
+            "description": "Содержимое диалога вместо текста из пропа `description`.",
             "type": "any"
           },
           {
@@ -3136,14 +3136,14 @@
         "items": [
           {
             "name": "placement",
-            "description": "",
+            "description": "Сторона раскрытия от точки вызова. По умолчанию `bottom-start` — вниз и вправо от курсора.",
             "type": "Placement | undefined",
             "required": false,
             "default": "\"bottom-start\""
           },
           {
             "name": "disabled",
-            "description": "",
+            "description": "Меню не открывается ничем — ни мышью, ни клавиатурой, ни из кода.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
@@ -3157,7 +3157,7 @@
           },
           {
             "name": "ariaLabel",
-            "description": "",
+            "description": "Доступное имя панели `role=\"menu\"`. По умолчанию — переведённое «Context menu».",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
@@ -3171,7 +3171,7 @@
           },
           {
             "name": "trigger",
-            "description": "",
+            "description": "Чем открывается меню: `contextmenu` — правым кликом по области, `manual` — только из кода. `Shift+F10` и клавиша `ContextMenu` работают в обоих режимах. По умолчанию `contextmenu`.",
             "type": "GrContextMenuTrigger | undefined",
             "required": false,
             "default": "\"contextmenu\""
@@ -3192,35 +3192,35 @@
           },
           {
             "name": "labelledBy",
-            "description": "",
+            "description": "`id` видимого заголовка, который называет меню, — альтернатива `ariaLabel`.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "teleportTo",
-            "description": "",
+            "description": "Точечное переопределение точки монтирования; по умолчанию — общий портал оверлеев.",
             "type": "string | HTMLElement | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "contentClass",
-            "description": "",
+            "description": "Дополнительные классы панели.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "listClass",
-            "description": "",
+            "description": "Дополнительные классы списка пунктов внутри панели.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "dividers",
-            "description": "",
+            "description": "Разделители между пунктами.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
@@ -3290,22 +3290,22 @@
         "items": [
           {
             "name": "openAt",
-            "description": "",
+            "description": "Открыть у точки курсора (`MouseEvent`) или у произвольного прямоугольника вьюпорта.",
             "type": "(at: MouseEvent | GrFloatingAnchorRect) => void"
           },
           {
             "name": "openAtElement",
-            "description": "",
+            "description": "Открыть у прямоугольника элемента — клавиатурный путь для внешних композитов.",
             "type": "(element: Element) => void"
           },
           {
             "name": "close",
-            "description": "",
+            "description": "Закрыть меню из кода; `update:open` придёт с `false`.",
             "type": "() => void"
           },
           {
             "name": "toggle",
-            "description": "",
+            "description": "Открыть закрытое меню или закрыть открытое.",
             "type": "() => void"
           }
         ]
@@ -3323,13 +3323,13 @@
         "items": [
           {
             "name": "rows",
-            "description": "",
+            "description": "Строки набора. Сортирует их компонент, пока не включён `externalSort`; ключ строки — из `rowKey`.",
             "type": "TRow[]",
             "required": true
           },
           {
             "name": "columns",
-            "description": "",
+            "description": "Колонки: поле строки, заголовок, сортировка, выравнивание, ширина и закрепление. Порядок массива — исходный порядок колонок в таблице.",
             "type": "GrDataColumn<TRow>[]",
             "required": true
           },
@@ -3454,28 +3454,28 @@
           },
           {
             "name": "caption",
-            "description": "",
+            "description": "Подпись таблицы в скрытом `<caption>` — диктор читает её первой. Слот `#caption` сильнее.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "ariaLabel",
-            "description": "",
+            "description": "Доступное имя `<table>`, когда подписи нет. Игнорируется, если задан `ariaLabelledby`.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "ariaLabelledby",
-            "description": "",
+            "description": "`id` видимого заголовка, который называет таблицу через `aria-labelledby`.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "regionLabel",
-            "description": "",
+            "description": "Имя прокручиваемой обёртки: с ним она становится областью `role=\"region\"`.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
@@ -3628,91 +3628,91 @@
         "items": [
           {
             "name": "update:sortKey",
-            "description": "",
+            "description": "Ключ сортировки сменился кликом по заголовку (`v-model:sortKey`). Пустая строка — сортировка снята.",
             "type": "[string]",
             "signature": "(e: \"update:sortKey\", value: string): void"
           },
           {
             "name": "update:sortDir",
-            "description": "",
+            "description": "Направление сортировки сменилось (`v-model:sortDir`).",
             "type": "[GrDataTableSortDir]",
             "signature": "(e: \"update:sortDir\", value: GrDataTableSortDir): void"
           },
           {
             "name": "sortChange",
-            "description": "",
+            "description": "Сортировка сменилась — ключ и направление одним событием: удобно перезапросить данные с сервера.",
             "type": "[{ key: string; dir: GrDataTableSortDir; }]",
             "signature": "(e: \"sortChange\", value: { key: string; dir: GrDataTableSortDir; }): void"
           },
           {
             "name": "update:selected",
-            "description": "",
+            "description": "Выбор строк изменился (`v-model:selected`): ключи выбранных строк, включая скрытые из набора.",
             "type": "[(string | number)[]]",
             "signature": "(e: \"update:selected\", value: (string | number)[]): void"
           },
           {
             "name": "rowClick",
-            "description": "",
+            "description": "Клик по строке. `index` — позиция в текущем, уже отсортированном порядке.",
             "type": "[{ row: TRow; index: number; event: MouseEvent; }]",
             "signature": "(e: \"rowClick\", payload: { row: TRow; index: number; event: MouseEvent; }): void"
           },
           {
             "name": "update:columnOrder",
-            "description": "",
+            "description": "Пользователь переставил колонку (`v-model:columnOrder`): ключи в новом порядке.",
             "type": "[string[]]",
             "signature": "(e: \"update:columnOrder\", value: string[]): void"
           },
           {
             "name": "columnReorder",
-            "description": "",
+            "description": "Одна перестановка колонки — откуда и куда; удобно сохранять операцию, а не весь список.",
             "type": "[{ key: string; from: number; to: number; }]",
             "signature": "(e: \"columnReorder\", payload: { key: string; from: number; to: number; }): void"
           },
           {
             "name": "update:columnWidths",
-            "description": "",
+            "description": "Ширины колонок изменились (`v-model:columnWidths`) — и по ходу протяжки ручки.",
             "type": "[Record<string, number>]",
             "signature": "(e: \"update:columnWidths\", value: Record<string, number>): void"
           },
           {
             "name": "columnResize",
-            "description": "",
+            "description": "Ширина колонки задана: на конце жеста и на каждом шаге клавиатуры. `0` — колонка вернулась к авторазметке.",
             "type": "[{ key: string; width: number; }]",
             "signature": "(e: \"columnResize\", payload: { key: string; width: number; }): void"
           },
           {
             "name": "update:pinnedColumns",
-            "description": "",
+            "description": "Пользователь сменил закрепление колонок (`v-model:pinnedColumns`); `null` — колонка откреплена.",
             "type": "[Record<string, GrColumnPin>]",
             "signature": "(e: \"update:pinnedColumns\", value: Record<string, GrColumnPin>): void"
           },
           {
             "name": "columnPin",
-            "description": "",
+            "description": "Колонку закрепили у края или открепили (`null`) через меню заголовка.",
             "type": "[{ key: string; pinned: GrColumnPin; }]",
             "signature": "(e: \"columnPin\", payload: { key: string; pinned: GrColumnPin; }): void"
           },
           {
             "name": "update:expandedKeys",
-            "description": "",
+            "description": "Набор раскрытых строк изменился (`v-model:expandedKeys`).",
             "type": "[(string | number)[]]",
             "signature": "(e: \"update:expandedKeys\", value: (string | number)[]): void"
           },
           {
             "name": "expand",
-            "description": "",
+            "description": "Строку раскрыли — её второй ярус показан.",
             "type": "[{ row: TRow; key: string | number; }]",
             "signature": "(e: \"expand\", payload: { row: TRow; key: string | number; }): void"
           },
           {
             "name": "collapse",
-            "description": "",
+            "description": "Строку свернули. Строки, закрытые `accordion` при раскрытии соседней, события не дают.",
             "type": "[{ row: TRow; key: string | number; }]",
             "signature": "(e: \"collapse\", payload: { row: TRow; key: string | number; }): void"
           },
           {
             "name": "detailLoadError",
-            "description": "",
+            "description": "`loadDetail` отказал; в ярусе — разметка ошибки с кнопкой повтора. Отменённые запросы сюда не приходят.",
             "type": "[{ row: TRow; key: string | number; error: unknown; }]",
             "signature": "(e: \"detailLoadError\", payload: { row: TRow; key: string | number; error: unknown; }): void"
           }
@@ -3737,7 +3737,7 @@
         "items": [
           {
             "name": "size",
-            "description": "",
+            "description": "Кегль по шкале контролов. По умолчанию `md` — кегль окружающей строки; `xs`, `sm`, `lg` нужны, когда величина стоит в ряду с контролами.",
             "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
             "required": false,
             "default": "undefined"
@@ -3837,7 +3837,7 @@
         "items": [
           {
             "name": "size",
-            "description": "",
+            "description": "Кегль подписей и значений по шкале контролов. По умолчанию `md`.",
             "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
             "required": false,
             "default": "undefined"
@@ -3886,14 +3886,14 @@
           },
           {
             "name": "density",
-            "description": "",
+            "description": "Шаг между парами: `compact` сжимает его для плотных карточек. По умолчанию `regular`.",
             "type": "GrDescriptionDensity | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "items",
-            "description": "",
+            "description": "Пары в порядке вывода. `name` пары открывает её слоты `#label-<name>` и `#value-<name>`.",
             "type": "readonly GrDescriptionItem[]",
             "required": true
           }
@@ -4040,17 +4040,17 @@
         "items": [
           {
             "name": "default",
-            "description": "",
+            "description": "Тело окна; поля задаёт `bodyConfig`.",
             "type": "any"
           },
           {
             "name": "header",
-            "description": "",
+            "description": "Содержимое шапки вместо видимого заголовка; кнопка закрытия остаётся. Доступное имя окну тогда даёт скрытый `title`.",
             "type": "{ title?: string | undefined; }"
           },
           {
             "name": "footer",
-            "description": "",
+            "description": "Подвал с действиями окна. Без слота подвала нет.",
             "type": "any"
           }
         ]
@@ -4087,17 +4087,17 @@
         "items": [
           {
             "name": "open",
-            "description": "",
+            "description": "Попросить родителя открыть окно: шлёт `update:modelValue` с `true`.",
             "type": "() => void"
           },
           {
             "name": "close",
-            "description": "",
+            "description": "Попросить родителя закрыть окно: шлёт `update:modelValue` с `false`.",
             "type": "() => void"
           },
           {
             "name": "toggle",
-            "description": "",
+            "description": "Переключить окно через `update:modelValue`.",
             "type": "() => void"
           }
         ]
@@ -4136,21 +4136,21 @@
           },
           {
             "name": "orientation",
-            "description": "",
+            "description": "Направление линии: между блоками или между элементами в ряду. По умолчанию `horizontal`.",
             "type": "GrDividerOrientation | undefined",
             "required": false,
             "default": "\"horizontal\""
           },
           {
             "name": "label",
-            "description": "",
+            "description": "Подпись в разрыве линии: «или», название раздела. Только у горизонтального; даёт и имя.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "align",
-            "description": "",
+            "description": "Где стоит подпись на линии: `start`, `center` или `end`. По умолчанию `center`.",
             "type": "GrDividerAlign | undefined",
             "required": false,
             "default": "\"center\""
@@ -4257,14 +4257,14 @@
           },
           {
             "name": "footerConfig",
-            "description": "",
+            "description": "Поля и верхняя линия подвала. Подвал рисуется, только если передан слот `#footer`.",
             "type": "GrDrawerSectionConfig | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "bodyConfig",
-            "description": "",
+            "description": "Поля тела панели. `bordered` у тела не применяется: своей линии у него нет.",
             "type": "GrDrawerSectionConfig | undefined",
             "required": false,
             "default": "undefined"
@@ -4333,12 +4333,12 @@
         "items": [
           {
             "name": "default",
-            "description": "",
+            "description": "Содержимое панели. Тело скроллится, когда не помещается.",
             "type": "any"
           },
           {
             "name": "title",
-            "description": "",
+            "description": "Заголовок вместо пропа `title`. Даёт панели доступное имя и без видимой шапки.",
             "type": "any"
           },
           {
@@ -4348,7 +4348,7 @@
           },
           {
             "name": "footer",
-            "description": "",
+            "description": "Подвал панели — обычно кнопки действий. Без слота подвала нет.",
             "type": "any"
           }
         ]
@@ -4522,12 +4522,12 @@
         "items": [
           {
             "name": "close",
-            "description": "",
+            "description": "Закрыть панель из кода.",
             "type": "() => void"
           },
           {
             "name": "toggle",
-            "description": "",
+            "description": "Переключить панель: открытую закрыть, закрытую открыть.",
             "type": "() => void"
           }
         ]
@@ -4726,21 +4726,21 @@
           },
           {
             "name": "size",
-            "description": "",
+            "description": "Масштаб иконки, текста и отступов. По умолчанию `md`; берётся из `GrConfigProvider`.",
             "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "description",
-            "description": "",
+            "description": "Пояснение под заголовком: почему пусто и что сделать. Слот `#description` сильнее.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "headingLevel",
-            "description": "",
+            "description": "Уровень заголовка (`h2`…`h6`) — под структуру страницы. По умолчанию `3`.",
             "type": "2 | 3 | 4 | 5 | 6 | undefined",
             "required": false,
             "default": "undefined"
@@ -4771,7 +4771,7 @@
           },
           {
             "name": "description",
-            "description": "",
+            "description": "Пояснение разметкой — со ссылкой или выделением; сильнее `description`.",
             "type": "any"
           },
           {
@@ -4813,7 +4813,7 @@
           },
           {
             "name": "loading",
-            "description": "",
+            "description": "Нативный `loading` картинки: `lazy` грузит превью у края вьюпорта, а не все плитки ленты сразу. Не задан — из `GrConfigProvider`, иначе `lazy`.",
             "type": "\"lazy\" | \"eager\" | undefined",
             "required": false,
             "default": "undefined"
@@ -4883,7 +4883,7 @@
           },
           {
             "name": "ratio",
-            "description": "",
+            "description": "Пропорции плитки: держат место до загрузки, картинка обрезается по ним (`object-cover`). Не задан — из `GrConfigProvider`, иначе `1:1`.",
             "type": "GrFilePreviewRatio | undefined",
             "required": false,
             "default": "undefined"
@@ -4935,35 +4935,35 @@
           },
           {
             "name": "action",
-            "description": "",
+            "description": "Адрес для POST `multipart/form-data` встроенным загрузчиком. Нужен, когда нет `request`.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "request",
-            "description": "",
+            "description": "Свой загрузчик (axios, fetch) вместо `action`: получает файлы и `signal`, `extraData`, `onProgress`. Сильнее `action`.",
             "type": "GrFileUploadRequest<TResponse> | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "name",
-            "description": "",
+            "description": "Имя поля файла в `FormData` встроенного загрузчика. По умолчанию `file`.",
             "type": "string | undefined",
             "required": false,
             "default": "\"file\""
           },
           {
             "name": "multiple",
-            "description": "",
+            "description": "Выбор нескольких файлов за раз; без него `limit` не действует. По умолчанию `false`.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
           },
           {
             "name": "limit",
-            "description": "",
+            "description": "Предел файлов в одном выборе при `multiple`: сверх него — `exceed` и `error`, загрузки нет.",
             "type": "number | undefined",
             "required": false,
             "default": "undefined"
@@ -4977,7 +4977,7 @@
           },
           {
             "name": "validators",
-            "description": "",
+            "description": "Проверки набора до отправки, после `accept`: размер, тип, число. Нарушения приходят в `error` одним `FileValidationError`, и загрузка не стартует.",
             "type": "FileValidator[] | undefined",
             "required": false,
             "default": "undefined"
@@ -5005,7 +5005,7 @@
           },
           {
             "name": "disabled",
-            "description": "",
+            "description": "Контрол недоступен: диалог и перетаскивание не работают. Включается и от `GrFormField`.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
@@ -5040,28 +5040,28 @@
           },
           {
             "name": "headers",
-            "description": "",
+            "description": "Заголовки запроса встроенного загрузчика — например, токен. С `request` не используются.",
             "type": "Record<string, string> | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "withCredentials",
-            "description": "",
+            "description": "Слать cookie на другой домен (`xhr.withCredentials`) у встроенного загрузчика.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
           },
           {
             "name": "showFileList",
-            "description": "",
+            "description": "Список выбранных файлов под зоной: имя, размер, удаление, в `per-file` — статус и повтор. По умолчанию `false`.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
           },
           {
             "name": "uploadExtraData",
-            "description": "",
+            "description": "Дополнительные поля запроса, посчитанные по набору: ложатся в `FormData` рядом с файлами, у `request` приходят в `ctx.extraData`. Исключение из колбэка уходит в `error`.",
             "type": "((files: File[]) => GrFileUploadExtraData | undefined) | undefined",
             "required": false,
             "default": "undefined"
@@ -5183,37 +5183,37 @@
           },
           {
             "name": "error",
-            "description": "",
+            "description": "Набор не ушёл или отправка упала: `limit`, валидаторы, `beforeUpload`, сеть, ответ сервера, отмена. `file` — только в `per-file`.",
             "type": "[unknown, File | undefined]",
             "signature": "(e: \"error\", error: unknown, file?: File | undefined): void"
           },
           {
             "name": "progress",
-            "description": "",
+            "description": "Прогресс отправки в процентах, от `0` до `100`. `file` — только в `per-file`.",
             "type": "[number, GrUploadProgressInfo | undefined, File | undefined]",
             "signature": "(e: \"progress\", percent: number, info?: GrUploadProgressInfo | undefined, file?: File | undefined): void"
           },
           {
             "name": "change",
-            "description": "",
+            "description": "Набор отправлен: в `batch` — после успеха, в `per-file` — когда отработала вся очередь. Не путать с `update:modelValue`.",
             "type": "[File[]]",
             "signature": "(e: \"change\", files: File[]): void"
           },
           {
             "name": "stateChange",
-            "description": "",
+            "description": "Сменилась сводная фаза загрузки — `idle`, `uploading`, `success`, `error` — с процентом.",
             "type": "[GrUploadState]",
             "signature": "(e: \"stateChange\", state: GrUploadState): void"
           },
           {
             "name": "focus",
-            "description": "",
+            "description": "Фокус вошёл в зону. Переходы между полем и кнопками списка событием не считаются.",
             "type": "[FocusEvent]",
             "signature": "(e: \"focus\", event: FocusEvent): void"
           },
           {
             "name": "blur",
-            "description": "",
+            "description": "Фокус ушёл из зоны целиком.",
             "type": "[FocusEvent]",
             "signature": "(e: \"blur\", event: FocusEvent): void"
           }
@@ -5272,7 +5272,7 @@
           },
           {
             "name": "scrollBehavior",
-            "description": "",
+            "description": "Как прокручивать к полю — к первой ошибке и в `scrollToField`. По умолчанию `smooth`.",
             "type": "ScrollBehavior | undefined",
             "required": false,
             "default": "\"smooth\""
@@ -5377,7 +5377,7 @@
           },
           {
             "name": "label",
-            "description": "",
+            "description": "Подпись поля: `<label for>` контрола и его доступное имя. Слот `#label` сильнее.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
@@ -5426,7 +5426,7 @@
           },
           {
             "name": "labelClass",
-            "description": "",
+            "description": "Классы на `<label>` поверх встроенных — точечная правка подписи без своего слота.",
             "type": "LabelClass | undefined",
             "required": false,
             "default": "undefined"
@@ -5485,14 +5485,14 @@
         "items": [
           {
             "name": "disabled",
-            "description": "",
+            "description": "Недоступен: выбор, перетаскивание и удаление выключены. Складывается по «или» с `GrFormField` и формой.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
           },
           {
             "name": "multiple",
-            "description": "",
+            "description": "Набор из нескольких файлов: модель — массив, у каждой строки своё удаление.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
@@ -5527,7 +5527,7 @@
           },
           {
             "name": "placeholder",
-            "description": "",
+            "description": "Текст у кнопки, пока ничего не выбрано. По умолчанию — переведённое «No files selected».",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
@@ -5548,7 +5548,7 @@
           },
           {
             "name": "validators",
-            "description": "",
+            "description": "Проверки набора (`maxFileSize`, `allowedExtensionsValidator` и т. п.) — после `accept` и `limit`, до `validate`. Отбитый набор в модель не попадает.",
             "type": "FileValidator[] | undefined",
             "required": false,
             "default": "undefined"
@@ -5576,28 +5576,28 @@
           },
           {
             "name": "uploadText",
-            "description": "",
+            "description": "Подпись кнопки выбора, пока набор пуст. По умолчанию — переведённое «Upload file».",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "changeText",
-            "description": "",
+            "description": "Подпись кнопки выбора, когда файлы уже есть. По умолчанию — переведённое «Change file».",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "removeText",
-            "description": "",
+            "description": "Подпись удаления у одиночного файла и у строк набора. По умолчанию — переведённое «Remove».",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "clearAllText",
-            "description": "",
+            "description": "Подпись сброса всего набора при `multiple`. По умолчанию — переведённое «Clear all».",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
@@ -5618,7 +5618,7 @@
           },
           {
             "name": "modelValue",
-            "description": "",
+            "description": "Выбранный файл или `null`; при `multiple` — массив файлов (`v-model`).",
             "type": "File | File[] | null",
             "required": true
           }
@@ -5686,12 +5686,12 @@
         "items": [
           {
             "name": "focus",
-            "description": "",
+            "description": "Поставить фокус на кнопку выбора файла.",
             "type": "() => void"
           },
           {
             "name": "blur",
-            "description": "",
+            "description": "Снять фокус с кнопки выбора файла.",
             "type": "() => void"
           }
         ]
@@ -5709,14 +5709,14 @@
         "items": [
           {
             "name": "title",
-            "description": "",
+            "description": "Заголовок секции — настоящий `h2`…`h6`, по нему обходят форму. Слот `#title` сильнее.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "description",
-            "description": "",
+            "description": "Пояснение под заголовком, связано с секцией через `aria-describedby`. Слот `#description` сильнее.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
@@ -5889,56 +5889,56 @@
           },
           {
             "name": "showProgress",
-            "description": "",
+            "description": "Счётчик «3 / 12» в шапке. По умолчанию `false`.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
           },
           {
             "name": "initialIndex",
-            "description": "",
+            "description": "Кадр, с которого открывается просмотрщик; смена пропа у открытого переключает кадр. По умолчанию `0`.",
             "type": "number | undefined",
             "required": false,
             "default": "0"
           },
           {
             "name": "zoomRate",
-            "description": "",
+            "description": "Множитель одного шага зума — кнопками и с клавиатуры. По умолчанию `1.2`.",
             "type": "number | undefined",
             "required": false,
             "default": "1.2"
           },
           {
             "name": "minScale",
-            "description": "",
+            "description": "Нижний предел масштаба; `1` — кадр вписан в окно. По умолчанию `0.5`.",
             "type": "number | undefined",
             "required": false,
             "default": "0.5"
           },
           {
             "name": "maxScale",
-            "description": "",
+            "description": "Верхний предел масштаба относительно вписанного кадра. По умолчанию `5`.",
             "type": "number | undefined",
             "required": false,
             "default": "5"
           },
           {
             "name": "hideOnClickModal",
-            "description": "",
+            "description": "Закрывать по клику на подложку вокруг кадра. По умолчанию `false`.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
           },
           {
             "name": "closeOnPressEscape",
-            "description": "",
+            "description": "Закрывать по `Esc`; открытый поверх модалки закрывает себя, а не её. По умолчанию `true`.",
             "type": "boolean | undefined",
             "required": false,
             "default": "true"
           },
           {
             "name": "showZoomValue",
-            "description": "",
+            "description": "Масштаб в процентах в шапке; 100% — кадр вписан в окно. По умолчанию `true`.",
             "type": "boolean | undefined",
             "required": false,
             "default": "true"
@@ -6022,7 +6022,7 @@
           },
           {
             "name": "modelValue",
-            "description": "",
+            "description": "Открыт ли просмотрщик (`v-model`). Закрывается он сам — крестиком, `Esc` или подложкой.",
             "type": "boolean",
             "required": true
           },
@@ -6095,27 +6095,27 @@
         "items": [
           {
             "name": "close",
-            "description": "",
+            "description": "Закрыть просмотрщик, как крестиком: шлёт `update:modelValue` и `close`.",
             "type": "() => void"
           },
           {
             "name": "prev",
-            "description": "",
+            "description": "Предыдущий кадр; с первого переходит на последний.",
             "type": "() => void"
           },
           {
             "name": "next",
-            "description": "",
+            "description": "Следующий кадр; с последнего переходит на первый.",
             "type": "() => void"
           },
           {
             "name": "zoomIn",
-            "description": "",
+            "description": "Увеличить в `zoomRate` раз, не выше `maxScale`.",
             "type": "() => void"
           },
           {
             "name": "zoomOut",
-            "description": "",
+            "description": "Уменьшить в `zoomRate` раз, не ниже `minScale`.",
             "type": "() => void"
           },
           {
@@ -6125,17 +6125,17 @@
           },
           {
             "name": "reset",
-            "description": "",
+            "description": "Вернуть кадру исходный вид: масштаб, поворот и сдвиг.",
             "type": "() => void"
           },
           {
             "name": "rotateLeft",
-            "description": "",
+            "description": "Повернуть на 90° против часовой стрелки.",
             "type": "() => void"
           },
           {
             "name": "rotateRight",
-            "description": "",
+            "description": "Повернуть на 90° по часовой стрелке.",
             "type": "() => void"
           },
           {
@@ -6158,14 +6158,14 @@
         "items": [
           {
             "name": "disabled",
-            "description": "",
+            "description": "Выключить поле: очистка и показ пароля пропадают. Складывается с `GrFormField`.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
           },
           {
             "name": "type",
-            "description": "",
+            "description": "Нативный `type`: меняет клавиатуру и браузерную проверку формата. По умолчанию `text`.",
             "type": "\"number\" | \"search\" | \"text\" | \"email\" | \"password\" | \"tel\" | \"url\" | undefined",
             "required": false,
             "default": "\"text\""
@@ -6186,7 +6186,7 @@
           },
           {
             "name": "invalid",
-            "description": "",
+            "description": "Ошибка валидации: danger-рамка и `aria-invalid`. Складывается с ошибкой `GrFormField`.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
@@ -6200,14 +6200,14 @@
           },
           {
             "name": "size",
-            "description": "",
+            "description": "Высота и кегль по шкале контролов. По умолчанию `md`; берётся из `GrConfigProvider`.",
             "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "placeholder",
-            "description": "",
+            "description": "Подсказка в пустом поле. Подпись не заменяет: имя даёт `GrFormField` или `ariaLabel`.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
@@ -6242,35 +6242,35 @@
           },
           {
             "name": "name",
-            "description": "",
+            "description": "Нативный `name` — имя поля при отправке формы.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "prefixMinWidth",
-            "description": "",
+            "description": "Минимальная ширина префикса. По умолчанию — по ступени размера, у `inline`-аддона — `0`.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "prefixMaxWidth",
-            "description": "",
+            "description": "Максимальная ширина префикса: содержимое шире обрезается.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "suffixMinWidth",
-            "description": "",
+            "description": "Минимальная ширина суффикса. По умолчанию — по ступени размера, у `inline`-аддона — `0`.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "suffixMaxWidth",
-            "description": "",
+            "description": "Максимальная ширина суффикса: содержимое шире обрезается.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
@@ -6284,7 +6284,7 @@
           },
           {
             "name": "suffixFixed",
-            "description": "",
+            "description": "Жёсткая ширина суффикса — как у `prefixFixed`, только лишнее обрезается слева.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
@@ -6298,28 +6298,28 @@
           },
           {
             "name": "id",
-            "description": "",
+            "description": "`id` поля. Не задан — берётся из `GrFormField`, чтобы подпись нашла поле.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "state",
-            "description": "",
+            "description": "Подсветка рамки по решению разработчика. `success` и `warning` добавляют иконку и скрытую подпись; `invalid` сильнее. По умолчанию `default`.",
             "type": "\"default\" | \"success\" | \"warning\" | \"danger\" | undefined",
             "required": false,
             "default": "\"default\""
           },
           {
             "name": "autocomplete",
-            "description": "",
+            "description": "Нативный `autocomplete`: чем браузеру заполнять поле — `email`, `one-time-code` и т. п.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "inputmode",
-            "description": "",
+            "description": "Нативный `inputmode`: какую экранную клавиатуру показать, не меняя `type`.",
             "type": "\"search\" | \"none\" | \"text\" | \"email\" | \"tel\" | \"url\" | \"numeric\" | \"decimal\" | undefined",
             "required": false,
             "default": "undefined"
@@ -6361,14 +6361,14 @@
           },
           {
             "name": "passwordHideLabel",
-            "description": "",
+            "description": "i18n aria-label кнопки, которая прячет показанный пароль. Не задан — из локали.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "textAlign",
-            "description": "",
+            "description": "Выравнивание текста в поле. По умолчанию `left`.",
             "type": "GrInputTextAlign | undefined",
             "required": false,
             "default": "\"left\""
@@ -6443,17 +6443,17 @@
         "items": [
           {
             "name": "focus",
-            "description": "",
+            "description": "Поставить фокус в поле.",
             "type": "() => void"
           },
           {
             "name": "blur",
-            "description": "",
+            "description": "Снять фокус с поля.",
             "type": "() => void"
           },
           {
             "name": "select",
-            "description": "",
+            "description": "Выделить содержимое поля — чтобы подставленное значение перезаписали вводом.",
             "type": "() => void"
           }
         ]
@@ -6471,49 +6471,49 @@
         "items": [
           {
             "name": "disabled",
-            "description": "",
+            "description": "Выключить поле: теги не добавляются и не снимаются. Складывается с `GrFormField`.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
           },
           {
             "name": "tagTone",
-            "description": "",
+            "description": "Тон чипов-тегов. По умолчанию `neutral`.",
             "type": "\"primary\" | \"neutral\" | \"success\" | \"warning\" | \"danger\" | \"info\" | \"slate\" | \"azure\" | undefined",
             "required": false,
             "default": "\"neutral\""
           },
           {
             "name": "tagDark",
-            "description": "",
+            "description": "Чипы с заливкой тоном вместо мягкой подложки. По умолчанию `false`.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
           },
           {
             "name": "tagSize",
-            "description": "",
+            "description": "Кегль чипов по шкале `GrBadge` — та же ступень, что у тегов `GrSelect`. По умолчанию `md`.",
             "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
             "required": false,
             "default": "\"md\""
           },
           {
             "name": "tagRadius",
-            "description": "",
+            "description": "Форма чипов: `round`, `semi` или `square`. По умолчанию `round`.",
             "type": "GrBadgeRadius | undefined",
             "required": false,
             "default": "\"round\""
           },
           {
             "name": "readonly",
-            "description": "",
+            "description": "Только для чтения: теги видно, но ни добавить, ни снять, ни очистить их нельзя.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
           },
           {
             "name": "invalid",
-            "description": "",
+            "description": "Ошибка валидации: danger-рамка и `aria-invalid`. Складывается с ошибкой `GrFormField`.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
@@ -6527,14 +6527,14 @@
           },
           {
             "name": "size",
-            "description": "",
+            "description": "Высота и кегль по шкале контролов. По умолчанию `md`; берётся из `GrConfigProvider`.",
             "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "placeholder",
-            "description": "",
+            "description": "Подсказка в пустом поле — пропадает с первым тегом. Подпись не заменяет: имя даёт `GrFormField` или `ariaLabel`.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
@@ -6569,49 +6569,49 @@
           },
           {
             "name": "max",
-            "description": "",
+            "description": "Предел числа тегов: сверх него теги не добавляются, а скринридер слышит, что предел достигнут.",
             "type": "number | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "trim",
-            "description": "",
+            "description": "Обрезать пробелы по краям тега. По умолчанию `true`.",
             "type": "boolean | undefined",
             "required": false,
             "default": "true"
           },
           {
             "name": "state",
-            "description": "",
+            "description": "Подсветка рамки по решению разработчика. `success` и `warning` добавляют иконку и скрытую подпись; `invalid` сильнее. По умолчанию `default`.",
             "type": "\"default\" | \"success\" | \"warning\" | \"danger\" | undefined",
             "required": false,
             "default": "\"default\""
           },
           {
             "name": "separators",
-            "description": "",
+            "description": "Клавиши, которые превращают набранное в тег, — по ним же режется вставка. `Enter` работает всегда. По умолчанию `[',']`.",
             "type": "string[] | undefined",
             "required": false,
             "default": "[\",\"]"
           },
           {
             "name": "allowDuplicates",
-            "description": "",
+            "description": "Разрешить одинаковые теги. По умолчанию повтор молча не добавляется.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
           },
           {
             "name": "addOnBlur",
-            "description": "",
+            "description": "Недонабранный текст становится тегом при уходе фокуса, а не пропадает. По умолчанию `false`.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
           },
           {
             "name": "clearInputOnAdd",
-            "description": "",
+            "description": "Очищать поле ввода после добавления тега. По умолчанию `true`.",
             "type": "boolean | undefined",
             "required": false,
             "default": "true"
@@ -6632,7 +6632,7 @@
           },
           {
             "name": "tagClosable",
-            "description": "",
+            "description": "Крестик снятия на каждом чипе. По умолчанию `true`; без него тег снимается только `Backspace` из пустого поля, а правка (`editable`) недоступна с клавиатуры.",
             "type": "boolean | undefined",
             "required": false,
             "default": "true"
@@ -6653,7 +6653,7 @@
           },
           {
             "name": "modelValue",
-            "description": "",
+            "description": "Набор тегов (`v-model`). Компонент его не мутирует — отдаёт новый массив.",
             "type": "string[]",
             "required": true
           },
@@ -6665,31 +6665,31 @@
           },
           {
             "name": "prefixMaxWidth",
-            "description": "",
+            "description": "Максимальная ширина префикса.",
             "type": "string | undefined",
             "required": false
           },
           {
             "name": "suffixMinWidth",
-            "description": "",
+            "description": "Минимальная ширина суффикса. По умолчанию — по ступени размера.",
             "type": "string | undefined",
             "required": false
           },
           {
             "name": "suffixMaxWidth",
-            "description": "",
+            "description": "Максимальная ширина суффикса.",
             "type": "string | undefined",
             "required": false
           },
           {
             "name": "prefixFixed",
-            "description": "",
+            "description": "Жёсткая ширина префикса (`prefixMaxWidth` → `prefixMinWidth` → по ступени) — чтобы аддоны соседних полей встали ровной колонкой.",
             "type": "boolean | undefined",
             "required": false
           },
           {
             "name": "suffixFixed",
-            "description": "",
+            "description": "Жёсткая ширина суффикса — как у `prefixFixed`.",
             "type": "boolean | undefined",
             "required": false
           }
@@ -6785,17 +6785,17 @@
         "items": [
           {
             "name": "focus",
-            "description": "",
+            "description": "Фокус в поле ввода тега.",
             "type": "() => void"
           },
           {
             "name": "blur",
-            "description": "",
+            "description": "Снять фокус с поля ввода.",
             "type": "() => void"
           },
           {
             "name": "clear",
-            "description": "",
+            "description": "Снять все теги, как кнопкой очистки, и вернуть фокус в поле. В `disabled` и `readonly` ничего не делает.",
             "type": "() => void"
           }
         ]
@@ -6813,7 +6813,7 @@
         "items": [
           {
             "name": "size",
-            "description": "",
+            "description": "Кегль дерева и высота поиска и кнопок панели. Не задан — из `GrConfigProvider`, иначе `md`.",
             "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
             "required": false,
             "default": "undefined"
@@ -6921,17 +6921,17 @@
         "items": [
           {
             "name": "filter",
-            "description": "",
+            "description": "Отфильтровать дерево по ключу или значению — тем же запросом, что в поле поиска. Пустая строка снимает фильтр.",
             "type": "(value: string) => void"
           },
           {
             "name": "expandAll",
-            "description": "",
+            "description": "Раскрыть все ветки.",
             "type": "() => void"
           },
           {
             "name": "collapseAll",
-            "description": "",
+            "description": "Свернуть все ветки, включая корень.",
             "type": "() => void"
           }
         ]
@@ -6963,7 +6963,7 @@
           },
           {
             "name": "size",
-            "description": "",
+            "description": "Высота плашки и кегль — под соседний текст или кнопку. Не задан — из `GrConfigProvider`, иначе `md`.",
             "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
             "required": false,
             "default": "undefined"
@@ -6984,7 +6984,7 @@
           },
           {
             "name": "platform",
-            "description": "",
+            "description": "Чем рисовать `mod` и модификаторы: `apple` — `⌘`, `other` — `Ctrl`. По умолчанию `auto`: платформа узнаётся после монтирования, а сервер отдаёт не-Apple вид.",
             "type": "GrKbdPlatform | undefined",
             "required": false,
             "default": "\"auto\""
@@ -7028,7 +7028,7 @@
         "items": [
           {
             "name": "disabled",
-            "description": "",
+            "description": "Ссылка недоступна: корень — `<span>` без `href`, вне порядка `Tab`, с `aria-disabled`.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
@@ -7049,14 +7049,14 @@
           },
           {
             "name": "size",
-            "description": "",
+            "description": "Кегль ссылки и её иконки. По умолчанию `md`; берётся из `GrConfigProvider`.",
             "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "ariaLabel",
-            "description": "",
+            "description": "Доступное имя вместо текста; подсказка о новой вкладке дописывается к нему сама.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
@@ -7070,35 +7070,35 @@
           },
           {
             "name": "href",
-            "description": "",
+            "description": "Адрес ссылки: без `as` корень становится `<a>`. При `disabled` не выводится.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "target",
-            "description": "",
+            "description": "`target` ссылки, сильнее `external`. С `_blank` добавляются защитный `rel` и подсказка.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "rel",
-            "description": "",
+            "description": "`rel` ссылки. Без него при `target=\"_blank\"` ставится `noopener noreferrer`.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "external",
-            "description": "",
+            "description": "Открыть в новой вкладке: `target=\"_blank\"`, `rel=\"noopener noreferrer\"` и иконка.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
           },
           {
             "name": "underline",
-            "description": "",
+            "description": "Подчёркивание: `auto` — при наведении, `always` — всегда, для ссылки посреди текста, `none` — никогда. По умолчанию `auto`.",
             "type": "GrLinkUnderline | undefined",
             "required": false,
             "default": "\"auto\""
@@ -7461,17 +7461,17 @@
         "items": [
           {
             "name": "default",
-            "description": "",
+            "description": "Содержимое окна. При `scrollBehavior: 'inside'` скроллится только оно.",
             "type": "any"
           },
           {
             "name": "title",
-            "description": "",
+            "description": "Заголовок окна. Даёт ему доступное имя через `aria-labelledby` — сильнее `ariaLabel`.",
             "type": "any"
           },
           {
             "name": "description",
-            "description": "",
+            "description": "Пояснение к окну, связанное с ним через `aria-describedby`.",
             "type": "any"
           },
           {
@@ -7518,17 +7518,17 @@
         "items": [
           {
             "name": "open",
-            "description": "",
+            "description": "Открыть окно: шлёт `update:modelValue` с `true` — открывает его родитель.",
             "type": "() => void"
           },
           {
             "name": "close",
-            "description": "",
+            "description": "Закрыть окно: шлёт `update:modelValue` с `false`.",
             "type": "() => void"
           },
           {
             "name": "toggle",
-            "description": "",
+            "description": "Переключить окно: шлёт `update:modelValue` с обратным значением.",
             "type": "() => void"
           }
         ]
@@ -7567,7 +7567,7 @@
           },
           {
             "name": "showMenuButton",
-            "description": "",
+            "description": "Кнопка-«бургер» слева от заголовка; нажатие приходит событием `menu`. По умолчанию `false`.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
@@ -7647,7 +7647,7 @@
         "items": [
           {
             "name": "disabled",
-            "description": "",
+            "description": "Выключить поле: ввод, кнопки ± и очистка недоступны. Складывается с `GrFormField`.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
@@ -7675,14 +7675,14 @@
           },
           {
             "name": "size",
-            "description": "",
+            "description": "Высота и кегль по шкале контролов. По умолчанию `md`; берётся из `GrConfigProvider`.",
             "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "placeholder",
-            "description": "",
+            "description": "Подсказка в пустом поле. Подпись не заменяет: имя даёт `GrFormField` или `ariaLabel`.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
@@ -7710,35 +7710,35 @@
           },
           {
             "name": "name",
-            "description": "",
+            "description": "Нативный `name` — имя поля при отправке формы.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "prefixMinWidth",
-            "description": "",
+            "description": "Минимальная ширина префикса. По умолчанию — по ступени размера.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "prefixMaxWidth",
-            "description": "",
+            "description": "Максимальная ширина префикса: содержимое шире обрезается.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "suffixMinWidth",
-            "description": "",
+            "description": "Минимальная ширина суффикса. По умолчанию — по ступени размера.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "suffixMaxWidth",
-            "description": "",
+            "description": "Максимальная ширина суффикса: содержимое шире обрезается.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
@@ -7752,7 +7752,7 @@
           },
           {
             "name": "suffixFixed",
-            "description": "",
+            "description": "Жёсткая ширина суффикса — как у `prefixFixed`, только лишнее обрезается слева.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
@@ -7766,14 +7766,14 @@
           },
           {
             "name": "max",
-            "description": "",
+            "description": "Верхняя граница: применяется при коммите ввода, а не на каждом нажатии. `End` ставит её.",
             "type": "number | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "id",
-            "description": "",
+            "description": "`id` поля. Не задан — берётся из `GrFormField`, чтобы подпись нашла поле.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
@@ -7787,56 +7787,56 @@
           },
           {
             "name": "precision",
-            "description": "",
+            "description": "Сколько знаков после разделителя оставлять при коммите. Не задано — без округления.",
             "type": "number | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "state",
-            "description": "",
+            "description": "Подсветка рамки по решению разработчика. `success` и `warning` добавляют иконку и скрытую подпись; `invalid` сильнее. По умолчанию `default`.",
             "type": "\"default\" | \"success\" | \"warning\" | \"danger\" | undefined",
             "required": false,
             "default": "\"default\""
           },
           {
             "name": "autocomplete",
-            "description": "",
+            "description": "Нативный `autocomplete`: чем браузеру заполнять поле.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "inputmode",
-            "description": "",
+            "description": "Нативный `inputmode`: какую экранную клавиатуру показать. По умолчанию `decimal`.",
             "type": "\"search\" | \"none\" | \"text\" | \"email\" | \"tel\" | \"url\" | \"numeric\" | \"decimal\" | undefined",
             "required": false,
             "default": "\"decimal\""
           },
           {
             "name": "textAlign",
-            "description": "",
+            "description": "Выравнивание числа в поле. По умолчанию `left`.",
             "type": "GrNumberInputTextAlign | undefined",
             "required": false,
             "default": "\"left\""
           },
           {
             "name": "decimalSeparator",
-            "description": "",
+            "description": "Знак дробной части на экране. При вводе принимаются и `.`, и `,`, а в модели всегда число. По умолчанию `.`.",
             "type": "string | undefined",
             "required": false,
             "default": "\".\""
           },
           {
             "name": "step",
-            "description": "",
+            "description": "Шаг кнопок ± и стрелок `↑`/`↓`; `PageUp`/`PageDown` шагают крупнее. По умолчанию `1`.",
             "type": "number | undefined",
             "required": false,
             "default": "1"
           },
           {
             "name": "min",
-            "description": "",
+            "description": "Нижняя граница: применяется при коммите ввода, а не на каждом нажатии. `Home` ставит её.",
             "type": "number | undefined",
             "required": false,
             "default": "undefined"
@@ -7857,7 +7857,7 @@
           },
           {
             "name": "controlsDirection",
-            "description": "",
+            "description": "Раскладка кнопок ±: `vertical` — столбиком справа, `horizontal` — по бокам поля. По умолчанию `vertical`.",
             "type": "GrNumberInputControlsDirection | undefined",
             "required": false,
             "default": "\"vertical\""
@@ -7945,12 +7945,12 @@
         "items": [
           {
             "name": "focus",
-            "description": "",
+            "description": "Поставить фокус в поле.",
             "type": "() => void"
           },
           {
             "name": "blur",
-            "description": "",
+            "description": "Снять фокус с поля.",
             "type": "() => void"
           }
         ]
@@ -7968,7 +7968,7 @@
         "items": [
           {
             "name": "disabled",
-            "description": "",
+            "description": "Выключить поле: код не вводится и не отправляется с формой. Складывается с `GrFormField`.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
@@ -7996,28 +7996,28 @@
           },
           {
             "name": "readonly",
-            "description": "",
+            "description": "Только для чтения: код видно, но не изменить.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
           },
           {
             "name": "invalid",
-            "description": "",
+            "description": "Ошибка — например, сервер отверг код: рамка ячеек и `aria-invalid`. Складывается с `GrFormField`.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
           },
           {
             "name": "required",
-            "description": "",
+            "description": "Обязательное поле (`aria-required`). Складывается с `required` у `GrFormField`.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
           },
           {
             "name": "size",
-            "description": "",
+            "description": "Размер ячеек и кегль символов. Не задан — из `GrConfigProvider`, иначе `md`.",
             "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
             "required": false,
             "default": "undefined"
@@ -8031,7 +8031,7 @@
           },
           {
             "name": "ariaLabel",
-            "description": "",
+            "description": "Доступное имя вне `GrFormField`: ячейки скрыты от скринридера, читается одно поле поверх них.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
@@ -8073,7 +8073,7 @@
           },
           {
             "name": "autofocus",
-            "description": "",
+            "description": "Фокус в поле сразу после монтирования — для экрана, где ввод кода и есть всё действие.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
@@ -8155,17 +8155,17 @@
         "items": [
           {
             "name": "focus",
-            "description": "",
+            "description": "Фокус в поле кода.",
             "type": "() => void"
           },
           {
             "name": "blur",
-            "description": "",
+            "description": "Снять фокус с поля кода.",
             "type": "() => void"
           },
           {
             "name": "clear",
-            "description": "",
+            "description": "Стереть код и вернуть фокус в первую ячейку — когда сервер отверг код и ждёт новый.",
             "type": "() => void"
           }
         ]
@@ -8190,7 +8190,7 @@
           },
           {
             "name": "size",
-            "description": "",
+            "description": "Высота кнопок, поля перехода и селекта по шкале контролов. Не задан — из `GrConfigProvider`, иначе `md`.",
             "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
             "required": false,
             "default": "undefined"
@@ -8260,19 +8260,19 @@
           },
           {
             "name": "page",
-            "description": "",
+            "description": "Текущая страница с единицы (`v-model:page`). Вне диапазона рисуется прижатой к краю.",
             "type": "number",
             "required": true
           },
           {
             "name": "pageSize",
-            "description": "",
+            "description": "Элементов на странице (`v-model:pageSize`) — делитель для числа страниц и диапазона.",
             "type": "number",
             "required": true
           },
           {
             "name": "total",
-            "description": "",
+            "description": "Сколько элементов всего, а не страниц: число страниц считается из него и `pageSize`.",
             "type": "number",
             "required": true
           }
@@ -8328,14 +8328,14 @@
         "items": [
           {
             "name": "placement",
-            "description": "",
+            "description": "Сторона и выравнивание панели у триггера; при нехватке места она переворачивается. По умолчанию `bottom-start`.",
             "type": "Placement | undefined",
             "required": false,
             "default": "\"bottom-start\""
           },
           {
             "name": "disabled",
-            "description": "",
+            "description": "Панель не открывается ни кликом, ни наведением; триггер из `triggerProps` получает `disabled`.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
@@ -8349,7 +8349,7 @@
           },
           {
             "name": "size",
-            "description": "",
+            "description": "Поле и кегль панели по шкале контролов. Не задан — из `GrConfigProvider`, иначе `md`.",
             "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
             "required": false,
             "default": "undefined"
@@ -8384,7 +8384,7 @@
           },
           {
             "name": "closeOnEsc",
-            "description": "",
+            "description": "Закрывать по `Esc`. Esc закрывает верхний слой стека: поповер в модалке закроет себя, а не её. По умолчанию `true`.",
             "type": "boolean | undefined",
             "required": false,
             "default": "true"
@@ -8419,7 +8419,7 @@
           },
           {
             "name": "contentClass",
-            "description": "",
+            "description": "Свои классы панели. Поле так не снять — для этого `padding=\"none\"`.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
@@ -8461,7 +8461,7 @@
           },
           {
             "name": "closeOnClickOutside",
-            "description": "",
+            "description": "Закрывать по клику вне панели. Слои, открытые из самой панели (подменю, селект), внешними не считаются. По умолчанию `true`.",
             "type": "boolean | undefined",
             "required": false,
             "default": "true"
@@ -8519,12 +8519,12 @@
         "items": [
           {
             "name": "close",
-            "description": "",
+            "description": "Закрыть панель; фокус возвращается на триггер, если был внутри.",
             "type": "() => void"
           },
           {
             "name": "toggle",
-            "description": "",
+            "description": "Открыть закрытую панель или закрыть открытую.",
             "type": "() => void"
           }
         ]
@@ -8749,28 +8749,28 @@
         "items": [
           {
             "name": "title",
-            "description": "",
+            "description": "Заголовок окна, он же его доступное имя. Не задан — берётся из локали.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "required",
-            "description": "",
+            "description": "Пустое значение не подтверждается; ошибка видна после первого ухода из поля или попытки подтвердить. По умолчанию `true`.",
             "type": "boolean | undefined",
             "required": false,
             "default": "true"
           },
           {
             "name": "size",
-            "description": "",
+            "description": "Ширина окна по шкале `GrDialog`: от `sm` до `xl`, `full` — во весь экран. По умолчанию `md`.",
             "type": "\"sm\" | \"md\" | \"lg\" | \"xl\" | \"full\" | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "placeholder",
-            "description": "",
+            "description": "Подсказка в пустом поле.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
@@ -8784,63 +8784,63 @@
           },
           {
             "name": "description",
-            "description": "",
+            "description": "Пояснение над полем. Слот `default` его заменяет.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "label",
-            "description": "",
+            "description": "Подпись поля, она же его доступное имя. Не задана — берётся из локали.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "closeOnBackdrop",
-            "description": "",
+            "description": "Закрывать по клику на подложку. По умолчанию `true`; при `persistent` на время подтверждения или проверки `rules` выключается.",
             "type": "boolean | undefined",
             "required": false,
             "default": "true"
           },
           {
             "name": "closeOnEsc",
-            "description": "",
+            "description": "Закрывать по Esc. По умолчанию `true`; при `persistent` на время подтверждения или проверки `rules` выключается.",
             "type": "boolean | undefined",
             "required": false,
             "default": "true"
           },
           {
             "name": "showHeader",
-            "description": "",
+            "description": "Показывать шапку с заголовком и кнопкой закрытия. По умолчанию `true`.",
             "type": "boolean | undefined",
             "required": false,
             "default": "true"
           },
           {
             "name": "showCloseButton",
-            "description": "",
+            "description": "Кнопка закрытия в шапке. По умолчанию `true`; при `persistent` тоже остаётся.",
             "type": "boolean | undefined",
             "required": false,
             "default": "true"
           },
           {
             "name": "headerConfig",
-            "description": "",
+            "description": "Поля и линия шапки: `paddingX`, `paddingY`, `bordered`.",
             "type": "GrDialogSectionConfig | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "footerConfig",
-            "description": "",
+            "description": "Поля и линия подвала с кнопками.",
             "type": "GrDialogSectionConfig | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "bodyConfig",
-            "description": "",
+            "description": "Поля тела окна. `bordered` у тела не применяется.",
             "type": "GrDialogSectionConfig | undefined",
             "required": false,
             "default": "undefined"
@@ -8854,35 +8854,35 @@
           },
           {
             "name": "buttonSize",
-            "description": "",
+            "description": "Размер обеих кнопок подвала. Не задан — кнопки берут размер из `GrConfigProvider`.",
             "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "confirmText",
-            "description": "",
+            "description": "Подпись кнопки подтверждения. Не задана — берётся из локали.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "cancelText",
-            "description": "",
+            "description": "Подпись кнопки отмены. Не задана — берётся из локали.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "confirmVariant",
-            "description": "",
+            "description": "Вес кнопки подтверждения. По умолчанию `primary`.",
             "type": "GrButtonVariant | undefined",
             "required": false,
             "default": "\"primary\""
           },
           {
             "name": "confirmTone",
-            "description": "",
+            "description": "Тон кнопки подтверждения: `danger` — для необратимого действия. По умолчанию `primary`.",
             "type": "\"primary\" | \"neutral\" | \"success\" | \"warning\" | \"danger\" | \"info\" | \"slate\" | \"azure\" | undefined",
             "required": false,
             "default": "\"primary\""
@@ -8959,7 +8959,7 @@
           },
           {
             "name": "showCount",
-            "description": "",
+            "description": "Счётчик символов под полем; с `maxlength` — в виде `len/maxlength`.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
@@ -9015,13 +9015,13 @@
           },
           {
             "name": "modelValue",
-            "description": "",
+            "description": "Открыто ли окно (`v-model`). Отмена закрывает его всегда, подтверждение — при `closeOnConfirm`.",
             "type": "boolean",
             "required": true
           },
           {
             "name": "value",
-            "description": "",
+            "description": "Значение поля (`v-model:value`). Между открытиями окно его не сбрасывает.",
             "type": "string",
             "required": true
           }
@@ -9034,7 +9034,7 @@
         "items": [
           {
             "name": "default",
-            "description": "Содержимое диалога вместо пропа `message`.",
+            "description": "Содержимое диалога вместо текста из пропа `description`.",
             "type": "any"
           },
           {
@@ -9099,21 +9099,21 @@
         "items": [
           {
             "name": "disabled",
-            "description": "",
+            "description": "Переключатель недоступен. Не задан — берётся из группы.",
             "type": "boolean | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "variant",
-            "description": "",
+            "description": "Вид: `radiobox` — круг с точкой и подписью, `button` — кнопка в стиле `GrButton`. По умолчанию `radiobox`.",
             "type": "GrRadioVariant | undefined",
             "required": false,
             "default": "\"radiobox\""
           },
           {
             "name": "modelValue",
-            "description": "",
+            "description": "Выбранное значение (`v-model`) у одиночного переключателя. В группе значение ведёт она.",
             "type": "GrRadioValue | undefined",
             "required": false,
             "default": "undefined"
@@ -9127,77 +9127,77 @@
           },
           {
             "name": "required",
-            "description": "",
+            "description": "Выбор обязателен: `aria-required` на переключателе.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
           },
           {
             "name": "size",
-            "description": "",
+            "description": "Размер по шкале кнопок. Не задан — из группы, затем `GrConfigProvider`, иначе `md`.",
             "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "ariaLabel",
-            "description": "",
+            "description": "Доступное имя, когда подписи в слоте нет — например, у кнопки из одной иконки.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "name",
-            "description": "",
+            "description": "Имя для нативной формы: выбранный отдаёт значение скрытым полем. Не задано — из группы.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "id",
-            "description": "",
+            "description": "`id` элемента с ролью `radio` — для ссылок на него извне.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "form",
-            "description": "",
+            "description": "`form` скрытого поля — когда форма, куда уходит значение, стоит не вокруг переключателя.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "buttonVariant",
-            "description": "",
+            "description": "Вес невыбранной кнопки в `variant=\"button\"`. По умолчанию `outline`.",
             "type": "GrButtonVariant | undefined",
             "required": false,
             "default": "\"outline\""
           },
           {
             "name": "buttonTone",
-            "description": "",
+            "description": "Тон невыбранной кнопки в `variant=\"button\"`. По умолчанию `neutral`.",
             "type": "\"primary\" | \"neutral\" | \"success\" | \"warning\" | \"danger\" | \"info\" | \"slate\" | \"azure\" | undefined",
             "required": false,
             "default": "\"neutral\""
           },
           {
             "name": "selectedButtonVariant",
-            "description": "",
+            "description": "Вес выбранной кнопки в `variant=\"button\"`. По умолчанию `primary`.",
             "type": "GrButtonVariant | undefined",
             "required": false,
             "default": "\"primary\""
           },
           {
             "name": "selectedButtonTone",
-            "description": "",
+            "description": "Тон выбранной кнопки в `variant=\"button\"`. По умолчанию `primary`.",
             "type": "\"primary\" | \"neutral\" | \"success\" | \"warning\" | \"danger\" | \"info\" | \"slate\" | \"azure\" | undefined",
             "required": false,
             "default": "\"primary\""
           },
           {
             "name": "value",
-            "description": "",
+            "description": "Значение переключателя: он выбран, когда оно совпадает с `modelValue` или значением группы.",
             "type": "GrRadioValue",
             "required": true
           }
@@ -9252,21 +9252,21 @@
         "items": [
           {
             "name": "disabled",
-            "description": "",
+            "description": "Выключить всю группу. Складывается с `disabled` у `GrFormField`.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
           },
           {
             "name": "variant",
-            "description": "",
+            "description": "Вид: `radiobox` — кружки с подписями, `button` — ряд склеенных кнопок. По умолчанию `radiobox`.",
             "type": "GrRadioGroupVariant | undefined",
             "required": false,
             "default": "\"radiobox\""
           },
           {
             "name": "options",
-            "description": "",
+            "description": "Варианты, из которых группа строит переключатели. Не нужны, если они разложены в слоте.",
             "type": "GrRadioGroupOption[] | undefined",
             "required": false,
             "default": "undefined"
@@ -9294,21 +9294,21 @@
           },
           {
             "name": "size",
-            "description": "",
+            "description": "Ступень размера переключателей. По умолчанию `md`; берётся из `GrConfigProvider`.",
             "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "ariaLabel",
-            "description": "",
+            "description": "Доступное имя группы. Не задано — имя берётся из подписи `GrFormField`.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "name",
-            "description": "",
+            "description": "Имя для нативной формы: выбранное значение уходит скрытым полем. Без имени не уходит.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
@@ -9322,7 +9322,7 @@
           },
           {
             "name": "modelValue",
-            "description": "",
+            "description": "Выбранное значение (`v-model`): совпадает с `value` одного из переключателей.",
             "type": "GrRadioValue",
             "required": true
           }
@@ -9378,12 +9378,12 @@
         "items": [
           {
             "name": "focus",
-            "description": "",
+            "description": "Поставить фокус на остановку `Tab` группы — обычно выбранный переключатель, а не первый.",
             "type": "() => void"
           },
           {
             "name": "blur",
-            "description": "",
+            "description": "Снять фокус с остановки `Tab` группы.",
             "type": "() => void"
           }
         ]
@@ -9401,7 +9401,7 @@
         "items": [
           {
             "name": "disabled",
-            "description": "",
+            "description": "Шкала недоступна: остаётся слайдером с `aria-disabled`, но выходит из таб-порядка и не меняется.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
@@ -9443,14 +9443,14 @@
           },
           {
             "name": "size",
-            "description": "",
+            "description": "Размер символов и подписи. Не задан — из `GrConfigProvider`, иначе `md`.",
             "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "ariaLabel",
-            "description": "",
+            "description": "Доступное имя шкалы: что оценивают — «Качество доставки». По умолчанию — из локали (`Rating`).",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
@@ -9586,12 +9586,12 @@
         "items": [
           {
             "name": "focus",
-            "description": "",
+            "description": "Фокус на шкалу из кода. В `readonly` шкала — картинка и фокус не принимает.",
             "type": "() => void"
           },
           {
             "name": "blur",
-            "description": "",
+            "description": "Снять фокус со шкалы.",
             "type": "() => void"
           }
         ]
@@ -9750,14 +9750,14 @@
           },
           {
             "name": "disabled",
-            "description": "",
+            "description": "Выключить слежение за прокруткой: активный пункт снимается.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
           },
           {
             "name": "ariaLabel",
-            "description": "",
+            "description": "Имя лендмарка `navigation`. Не задано — берётся из локали.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
@@ -9836,17 +9836,17 @@
         "items": [
           {
             "name": "active",
-            "description": "",
+            "description": "`id` активного раздела (ref); `null` — линия активации ещё не дошла до первого.",
             "type": "string | null"
           },
           {
             "name": "scrollTo",
-            "description": "",
+            "description": "Прокрутить к разделу и сразу подсветить его. Адрес и фокус, в отличие от клика, не меняет.",
             "type": "(id: string, options?: { behavior?: ScrollBehavior | undefined; } | undefined) => void"
           },
           {
             "name": "refresh",
-            "description": "",
+            "description": "Перечитать отступ, скроллпорт и положение разделов после смены разметки.",
             "type": "() => void"
           }
         ]
@@ -9864,14 +9864,14 @@
         "items": [
           {
             "name": "disabled",
-            "description": "",
+            "description": "Ряд недоступен: сегменты не выбираются и не фокусируются. Включается и от `GrFormField`.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
           },
           {
             "name": "variant",
-            "description": "",
+            "description": "Оформление: `button` добавляет тень дорожке и индикатору. По умолчанию `pills`.",
             "type": "GrSegmentedVariant | undefined",
             "required": false,
             "default": "undefined"
@@ -9899,14 +9899,14 @@
           },
           {
             "name": "size",
-            "description": "",
+            "description": "Высота и кегль по шкале контролов. По умолчанию `md`; берётся из `GrConfigProvider`.",
             "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "ariaLabel",
-            "description": "",
+            "description": "Доступное имя ряда. Внутри `GrFormField` не нужно: ряд именует подпись поля.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
@@ -9955,13 +9955,13 @@
           },
           {
             "name": "modelValue",
-            "description": "",
+            "description": "Выбранное значение (`v-model`). Стрелки переносят выбор вместе с фокусом.",
             "type": "GrSegmentedValue",
             "required": true
           },
           {
             "name": "options",
-            "description": "",
+            "description": "Сегменты: значение, подпись, иконка, `disabled`, `loading`. Сегменту-иконке нужен `ariaLabel`.",
             "type": "GrSegmentedOption[]",
             "required": true
           }
@@ -10017,12 +10017,12 @@
         "items": [
           {
             "name": "focus",
-            "description": "",
+            "description": "Фокус на текущую остановку `Tab` ряда — обычно выбранный сегмент, а не первый.",
             "type": "() => void"
           },
           {
             "name": "blur",
-            "description": "",
+            "description": "Снять фокус с текущего сегмента ряда.",
             "type": "() => void"
           }
         ]
@@ -10040,7 +10040,7 @@
         "items": [
           {
             "name": "modelValue",
-            "description": "",
+            "description": "Выбранное значение (`v-model`); в `multiple` — массив.",
             "type": "GrSelectModelValue<TValue>",
             "required": true
           },
@@ -10053,7 +10053,7 @@
           },
           {
             "name": "disabled",
-            "description": "",
+            "description": "Выключить поле целиком. Складывается с `disabled` у `GrFormField`.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
@@ -10095,7 +10095,7 @@
           },
           {
             "name": "ariaLabel",
-            "description": "",
+            "description": "Доступное имя вне `GrFormField`.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
@@ -10109,14 +10109,14 @@
           },
           {
             "name": "view",
-            "description": "",
+            "description": "Вид триггера: `default` — поле с рамкой, `link` — строчная ссылка без рамки, как `GrLink`. По умолчанию `default`.",
             "type": "GrSelectView | undefined",
             "required": false,
             "default": "\"default\""
           },
           {
             "name": "size",
-            "description": "",
+            "description": "Высота и кегль по шкале контролов. По умолчанию `md`; берётся из `GrConfigProvider`.",
             "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
             "required": false,
             "default": "undefined"
@@ -10144,21 +10144,21 @@
           },
           {
             "name": "tagDark",
-            "description": "",
+            "description": "Плотная заливка чипов в режиме `tags`. Поле `dark` у опции сильнее.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
           },
           {
             "name": "tagSize",
-            "description": "",
+            "description": "Размер чипов по шкале `GrBadge`. По умолчанию `sm`.",
             "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
             "required": false,
             "default": "\"sm\""
           },
           {
             "name": "tagRadius",
-            "description": "",
+            "description": "Скругление чипов: `square`, `semi` или `round`. По умолчанию `round`.",
             "type": "GrBadgeRadius | undefined",
             "required": false,
             "default": "\"round\""
@@ -10312,35 +10312,35 @@
           },
           {
             "name": "prefixMaxWidth",
-            "description": "",
+            "description": "Максимальная ширина префикса: содержимое шире обрезается.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "suffixMinWidth",
-            "description": "",
+            "description": "Минимальная ширина суффикса. По умолчанию — по ступени размера.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "suffixMaxWidth",
-            "description": "",
+            "description": "Максимальная ширина суффикса: содержимое шире обрезается.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "prefixFixed",
-            "description": "",
+            "description": "Жёсткая ширина префикса: `prefixMaxWidth`, иначе `prefixMinWidth`, иначе по ступени размера.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
           },
           {
             "name": "suffixFixed",
-            "description": "",
+            "description": "Жёсткая ширина суффикса: `suffixMaxWidth`, иначе `suffixMinWidth`, иначе по ступени размера.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
@@ -10396,7 +10396,7 @@
         "items": [
           {
             "name": "update:modelValue",
-            "description": "",
+            "description": "Новое значение (`v-model`): выбор опции, снятие чипа или очистка.",
             "type": "[GrSelectModelValue<TValue>]",
             "signature": "(e: \"update:modelValue\", value: GrSelectModelValue<TValue>): void"
           },
@@ -10426,13 +10426,13 @@
           },
           {
             "name": "focus",
-            "description": "",
+            "description": "Фокус вошёл в контрол. Переход между полем и его панелью событием не считается.",
             "type": "[FocusEvent]",
             "signature": "(e: \"focus\", event: FocusEvent): void"
           },
           {
             "name": "blur",
-            "description": "",
+            "description": "Фокус ушёл из контрола — из поля и из панели вместе.",
             "type": "[FocusEvent]",
             "signature": "(e: \"blur\", event: FocusEvent): void"
           },
@@ -10463,7 +10463,7 @@
         "items": [
           {
             "name": "title",
-            "description": "",
+            "description": "Заголовок шапки — название продукта или раздела. В свёрнутой панели скрыт; слот `#title` сильнее.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
@@ -10505,7 +10505,7 @@
           },
           {
             "name": "subtitle",
-            "description": "",
+            "description": "Приглушённая строка над заголовком — например, рабочее пространство. Слот `#subtitle` сильнее.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
@@ -10621,14 +10621,14 @@
           },
           {
             "name": "width",
-            "description": "",
+            "description": "Ширина, CSS-длина. По умолчанию `100%`, у круга — `2.5rem`; без неё последняя из нескольких текстовых строк короче остальных.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "height",
-            "description": "",
+            "description": "Высота, CSS-длина. По умолчанию `12px`, у круга — равна ширине.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
@@ -10673,7 +10673,7 @@
         "items": [
           {
             "name": "disabled",
-            "description": "",
+            "description": "Недоступен: бегунки не двигаются и не фокусируются. Складывается по «или» с полем и формой.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
@@ -10701,14 +10701,14 @@
           },
           {
             "name": "size",
-            "description": "",
+            "description": "Толщина дорожки и размер бегунка. По умолчанию `md`; берётся из `GrConfigProvider`.",
             "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "ariaLabel",
-            "description": "",
+            "description": "Доступное имя вне `GrFormField`. В диапазоне бегунки получают его с пометкой «min»/«max».",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
@@ -10722,7 +10722,7 @@
           },
           {
             "name": "max",
-            "description": "",
+            "description": "Верхняя граница шкалы. По умолчанию `100`.",
             "type": "number | undefined",
             "required": false,
             "default": "100"
@@ -10743,14 +10743,14 @@
           },
           {
             "name": "step",
-            "description": "",
+            "description": "Шаг, к которому привязывается значение, — и шаг стрелок с клавиатуры. По умолчанию `1`.",
             "type": "number | undefined",
             "required": false,
             "default": "1"
           },
           {
             "name": "min",
-            "description": "",
+            "description": "Нижняя граница шкалы; значение вне границ прижимается к ней. По умолчанию `0`.",
             "type": "number | undefined",
             "required": false,
             "default": "0"
@@ -10846,12 +10846,12 @@
         "items": [
           {
             "name": "focus",
-            "description": "",
+            "description": "Поставить фокус на бегунок; в диапазоне — на нижний.",
             "type": "() => void"
           },
           {
             "name": "blur",
-            "description": "",
+            "description": "Снять фокус с первого бегунка.",
             "type": "() => void"
           }
         ]
@@ -10945,17 +10945,17 @@
         "items": [
           {
             "name": "item",
-            "description": "",
+            "description": "Содержимое строки; без слота выводится сам элемент. `dragging` — строку тянут указателем, `grabbed` — она взята с клавиатуры.",
             "type": "{ item: T; index: number; dragging: boolean; grabbed: boolean; }"
           },
           {
             "name": "handle",
-            "description": "",
+            "description": "Значок ручки переноса. Рендерится внутрь кнопки: захват и подпись остаются за компонентом.",
             "type": "{ item: T; index: number; disabled: boolean; }"
           },
           {
             "name": "empty",
-            "description": "",
+            "description": "Пустое состояние вместо `emptyText`.",
             "type": "any"
           }
         ]
@@ -10967,19 +10967,19 @@
         "items": [
           {
             "name": "update:modelValue",
-            "description": "",
+            "description": "Новый порядок после переноса — новый массив; исходный не мутируется.",
             "type": "[T[]]",
             "signature": "(e: \"update:modelValue\", value: T[]): void"
           },
           {
             "name": "move",
-            "description": "",
+            "description": "Строка перенесена с индекса `from` на `to`. Шлётся только по завершении переноса.",
             "type": "[number, number]",
             "signature": "(e: \"move\", from: number, to: number): void"
           },
           {
             "name": "change",
-            "description": "",
+            "description": "Перестановка завершена — тот же массив, что ушёл в `update:modelValue`.",
             "type": "[T[]]",
             "signature": "(e: \"change\", value: T[]): void"
           }
@@ -11170,7 +11170,7 @@
           },
           {
             "name": "size",
-            "description": "",
+            "description": "Кегль значения, а с ним заголовка, приписок и строки динамики. Не задан — из `GrConfigProvider`, иначе `md`.",
             "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
             "required": false,
             "default": "undefined"
@@ -11364,21 +11364,21 @@
           },
           {
             "name": "size",
-            "description": "",
+            "description": "Размер маркеров и кегль подписей. По умолчанию `md`; берётся из `GrConfigProvider`.",
             "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "ariaLabel",
-            "description": "",
+            "description": "Имя лендмарка `navigation`. Не задано — берётся из локали.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "orientation",
-            "description": "",
+            "description": "Направление ленты. По умолчанию `horizontal`; берётся из `GrConfigProvider`.",
             "type": "GrStepsOrientation | undefined",
             "required": false,
             "default": "undefined"
@@ -11406,13 +11406,13 @@
           },
           {
             "name": "modelValue",
-            "description": "",
+            "description": "`value` текущего шага (`v-model`).",
             "type": "string",
             "required": true
           },
           {
             "name": "steps",
-            "description": "",
+            "description": "Шаги мастера по порядку: `value`, подпись, описание, иконка, статус, `disabled`.",
             "type": "GrStep[]",
             "required": true
           }
@@ -11456,27 +11456,27 @@
         "items": [
           {
             "name": "next",
-            "description": "",
+            "description": "Перейти на следующий шаг, минуя выключенные; спрашивает `beforeLeave`. `true` — переход состоялся.",
             "type": "() => Promise<boolean>"
           },
           {
             "name": "back",
-            "description": "",
+            "description": "Вернуться на предыдущий шаг, минуя выключенные; спрашивает `beforeLeave`. `true` — переход состоялся.",
             "type": "() => Promise<boolean>"
           },
           {
             "name": "goTo",
-            "description": "",
+            "description": "Перейти на шаг по `value`. Ограничение `linear` не действует, `beforeLeave` — действует; `true` — переход состоялся.",
             "type": "(value: string) => Promise<boolean>"
           },
           {
             "name": "isFirst",
-            "description": "",
+            "description": "Перед текущим нет доступных шагов — кнопка «Назад» не нужна.",
             "type": "boolean"
           },
           {
             "name": "isLast",
-            "description": "",
+            "description": "После текущего нет доступных шагов — пора показывать «Готово».",
             "type": "boolean"
           }
         ]
@@ -11494,7 +11494,7 @@
         "items": [
           {
             "name": "disabled",
-            "description": "",
+            "description": "Недоступен: не переключается и в форму не уходит. Складывается по «или» с полем и формой.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
@@ -11529,14 +11529,14 @@
           },
           {
             "name": "size",
-            "description": "",
+            "description": "Размер дорожки и бегунка: `xs`–`lg`. По умолчанию `md`; берётся из `GrConfigProvider`.",
             "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "ariaLabel",
-            "description": "",
+            "description": "Доступное имя, когда подписи нет ни в слоте, ни у `GrFormField`.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
@@ -11687,12 +11687,12 @@
         "items": [
           {
             "name": "focus",
-            "description": "",
+            "description": "Поставить фокус на переключатель.",
             "type": "() => void"
           },
           {
             "name": "blur",
-            "description": "",
+            "description": "Снять фокус с переключателя.",
             "type": "() => void"
           }
         ]
@@ -11923,14 +11923,14 @@
         "items": [
           {
             "name": "idBase",
-            "description": "",
+            "description": "Общая база id со `GrTabs`: с ней панели получают `aria-labelledby` на свои вкладки. Без неё id генерируется, и связи с вкладками нет.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "modelValue",
-            "description": "",
+            "description": "`value` видимой панели — та же модель, что у `GrTabs`.",
             "type": "string",
             "required": true
           }
@@ -11987,7 +11987,7 @@
           },
           {
             "name": "size",
-            "description": "",
+            "description": "Высота вкладок и кегль подписи по шкале контролов. По умолчанию `md`.",
             "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
             "required": false,
             "default": "undefined"
@@ -12022,13 +12022,13 @@
           },
           {
             "name": "modelValue",
-            "description": "",
+            "description": "`value` выбранной вкладки (`v-model`). Не совпал ни с одной — `Tab` встаёт на первую доступную.",
             "type": "string",
             "required": true
           },
           {
             "name": "tabs",
-            "description": "",
+            "description": "Вкладки в порядке вывода: `value`, `label`, по желанию иконка, счётчик и `disabled`.",
             "type": "GrTab[]",
             "required": true
           }
@@ -12103,7 +12103,7 @@
           },
           {
             "name": "size",
-            "description": "",
+            "description": "Высота вкладок и кегль подписи по шкале контролов. По умолчанию `md`.",
             "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
             "required": false,
             "default": "undefined"
@@ -12138,13 +12138,13 @@
           },
           {
             "name": "modelValue",
-            "description": "",
+            "description": "`value` выбранной вкладки (`v-model`). Не совпал ни с одной — `Tab` встаёт на первую доступную.",
             "type": "string",
             "required": true
           },
           {
             "name": "tabs",
-            "description": "",
+            "description": "Вкладки в порядке вывода: `value`, `label`, по желанию иконка, счётчик и `disabled`.",
             "type": "GrTab[]",
             "required": true
           }
@@ -12210,7 +12210,7 @@
         "items": [
           {
             "name": "disabled",
-            "description": "",
+            "description": "Выключить поле: значение не редактируется и не уходит в форму. Складывается с `GrFormField`.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
@@ -12224,7 +12224,7 @@
           },
           {
             "name": "invalid",
-            "description": "",
+            "description": "Ошибка валидации: danger-рамка и `aria-invalid`. Складывается с ошибкой `GrFormField`.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
@@ -12238,14 +12238,14 @@
           },
           {
             "name": "size",
-            "description": "",
+            "description": "Кегль и отступы по шкале контролов. По умолчанию `md`; берётся из `GrConfigProvider`.",
             "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "placeholder",
-            "description": "",
+            "description": "Подсказка в пустом поле. Подпись не заменяет: имя даёт `GrFormField` или `ariaLabel`.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
@@ -12273,35 +12273,35 @@
           },
           {
             "name": "name",
-            "description": "",
+            "description": "Нативный `name` — имя поля при отправке формы.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "id",
-            "description": "",
+            "description": "`id` поля. Не задан — берётся из `GrFormField`, чтобы подпись нашла поле.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "rows",
-            "description": "",
+            "description": "Высота в строках; с `autosize` — стартовая и минимальная. По умолчанию `4`.",
             "type": "number | undefined",
             "required": false,
             "default": "4"
           },
           {
             "name": "state",
-            "description": "",
+            "description": "Подсветка рамки по решению разработчика. `success` и `warning` добавляют иконку и скрытую подпись; `invalid` сильнее. По умолчанию `default`.",
             "type": "\"default\" | \"success\" | \"warning\" | \"danger\" | undefined",
             "required": false,
             "default": "\"default\""
           },
           {
             "name": "autocomplete",
-            "description": "",
+            "description": "Нативный `autocomplete`: чем браузеру заполнять поле — например, `street-address`.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
@@ -12336,7 +12336,7 @@
           },
           {
             "name": "modelValue",
-            "description": "",
+            "description": "Текст поля (`v-model`).",
             "type": "string",
             "required": true
           },
@@ -12410,12 +12410,12 @@
         "items": [
           {
             "name": "focus",
-            "description": "",
+            "description": "Фокус в поле из кода.",
             "type": "() => void"
           },
           {
             "name": "blur",
-            "description": "",
+            "description": "Снять фокус с поля.",
             "type": "() => void"
           }
         ]
@@ -12630,7 +12630,7 @@
         "items": [
           {
             "name": "actions",
-            "description": "",
+            "description": "Кнопки тоста вместо `action`/`actions` из его описания. Получает сам `toast` и `dismiss` — функцию, закрывающую именно этот тост.",
             "type": "{ toast: Toast; dismiss: () => void; }"
           }
         ]
@@ -12648,7 +12648,7 @@
         "items": [
           {
             "name": "focus",
-            "description": "",
+            "description": "Фокус на верхний тост, как по `focusHotkey`; `false` — тостов нет.",
             "type": "() => boolean"
           }
         ]
@@ -12804,21 +12804,21 @@
           },
           {
             "name": "itemKey",
-            "description": "",
+            "description": "Ключ элемента: имя поля или функция. По умолчанию поле `id`; без ключа выдаётся временный, и `modelValue` с ним не сойдётся.",
             "type": "GrTransferItemKey<TItem> | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "itemLabel",
-            "description": "",
+            "description": "Подпись строки: имя поля или функция. По умолчанию поле `label`; по ней же ищет поиск.",
             "type": "GrTransferItemLabel<TItem> | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "itemDisabled",
-            "description": "",
+            "description": "Запрещённая строка: имя поля или функция. По умолчанию поле `disabled`; такая строка не отмечается и не переносится.",
             "type": "GrTransferItemFlag<TItem> | undefined",
             "required": false,
             "default": "undefined"
@@ -12895,42 +12895,42 @@
           },
           {
             "name": "size",
-            "description": "",
+            "description": "Кегль строк, шапок, поиска и кнопок по шкале контролов. По умолчанию `md`.",
             "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "disabled",
-            "description": "",
+            "description": "Недоступен целиком: ни выбора, ни переноса, ни поиска. Складывается по «или» с полем и формой.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
           },
           {
             "name": "readonly",
-            "description": "",
+            "description": "Только для чтения: строки отмечаются, но перенос и перестановка выключены.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
           },
           {
             "name": "invalid",
-            "description": "",
+            "description": "Ошибка значения: `aria-invalid` на правой панели. Складывается по «или» с `GrFormField`.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
           },
           {
             "name": "required",
-            "description": "",
+            "description": "Обязательное поле: `aria-required` на правой панели — значение и есть её состав.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
           },
           {
             "name": "ariaLabel",
-            "description": "",
+            "description": "Доступное имя всей группы; панели называют их заголовки.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
@@ -12976,37 +12976,37 @@
         "items": [
           {
             "name": "update:modelValue",
-            "description": "",
+            "description": "Новый состав правой панели в её порядке — после переноса или перестановки.",
             "type": "[GrTransferKey[]]",
             "signature": "(e: \"update:modelValue\", value: GrTransferKey[]): void"
           },
           {
             "name": "change",
-            "description": "",
+            "description": "Состав изменился — тот же payload, что у `update:modelValue`.",
             "type": "[GrTransferKey[]]",
             "signature": "(e: \"change\", value: GrTransferKey[]): void"
           },
           {
             "name": "transfer",
-            "description": "",
+            "description": "Строки переехали: их ключи и направление — кнопками, двойным кликом, с клавиатуры или перетаскиванием. Приходит после `update:modelValue`.",
             "type": "[GrTransferKey[], GrTransferDirection]",
             "signature": "(e: \"transfer\", keys: GrTransferKey[], direction: GrTransferDirection): void"
           },
           {
             "name": "search",
-            "description": "",
+            "description": "Изменился запрос в поиске панели `side` — сигнал подгрузить каталог при удалённом поиске.",
             "type": "[string, GrTransferSide]",
             "signature": "(e: \"search\", query: string, side: GrTransferSide): void"
           },
           {
             "name": "focus",
-            "description": "",
+            "description": "Фокус вошёл в компонент. Переходы между панелями и кнопками событием не считаются.",
             "type": "[FocusEvent]",
             "signature": "(e: \"focus\", event: FocusEvent): void"
           },
           {
             "name": "blur",
-            "description": "",
+            "description": "Фокус ушёл из компонента целиком.",
             "type": "[FocusEvent]",
             "signature": "(e: \"blur\", event: FocusEvent): void"
           }
@@ -13031,27 +13031,27 @@
         "items": [
           {
             "name": "data",
-            "description": "",
+            "description": "Корневые узлы в исходной форме. Дерево их не копирует: перенос и `appendNode` меняют эти массивы на месте.",
             "type": "T[]",
             "required": true
           },
           {
             "name": "props",
-            "description": "",
+            "description": "Имена полей в данных: `children`, `label`, `isLeaf`. По умолчанию `children` и `label`.",
             "type": "GrTreePropsMap | undefined",
             "required": false,
             "default": "{\n    children: \"children\",\n    label: \"label\",\n}"
           },
           {
             "name": "nodeKey",
-            "description": "",
+            "description": "Поле с уникальным ключом узла: на нём держатся раскрытие, отметки, перенос. По умолчанию `id`.",
             "type": "\"id\" | Extract<keyof T, string> | undefined",
             "required": false,
             "default": "\"id\" as any"
           },
           {
             "name": "defaultExpandedKeys",
-            "description": "",
+            "description": "Стартовый набор раскрытых узлов. Новый массив в пропе заменяет раскрытие целиком.",
             "type": "GrTreeKey[] | undefined",
             "required": false,
             "default": "[]"
@@ -13065,7 +13065,7 @@
           },
           {
             "name": "filterNodeMethod",
-            "description": "",
+            "description": "Своё правило совпадения узла с фильтром; `undefined` из него — правило по умолчанию: подстрока подписи без учёта регистра. Совпавший узел остаётся видимым вместе с предками.",
             "type": "GrTreeFilterNodeMethod<T> | undefined",
             "required": false
           },
@@ -13120,7 +13120,7 @@
           },
           {
             "name": "highlightCurrent",
-            "description": "",
+            "description": "Подсвечивать строку текущего узла. По умолчанию `true`.",
             "type": "boolean | undefined",
             "required": false,
             "default": "true"
@@ -13141,7 +13141,7 @@
           },
           {
             "name": "toggleIconRotate",
-            "description": "",
+            "description": "Поворот иконки раскрытого узла на 90°: хватает одной `expandIcon`. По умолчанию `true`.",
             "type": "boolean | undefined",
             "required": false,
             "default": "true"
@@ -13155,56 +13155,56 @@
           },
           {
             "name": "branchLineColor",
-            "description": "",
+            "description": "Цвет направляющих: CSS-значение или функция от узла. Не задан — `--gr-tree-branch-line-default-color`, иначе цвет рамки.",
             "type": "GrTreeBranchLineColor<T> | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "branchLineActiveColor",
-            "description": "",
+            "description": "Цвет направляющей у ветки текущего узла: значение или функция. Не задан — `branchLineColor`.",
             "type": "GrTreeBranchLineColor<T> | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "rowClass",
-            "description": "",
+            "description": "Класс строки узла — значением или функцией от строки (`node`, `isExpanded`, `isLeaf`, `isMatched`). Перебивает кегль и цвет дерева: так делают ступени по уровням.",
             "type": "GrTreeNodeClass<T>",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "dragHandleClass",
-            "description": "",
+            "description": "Класс ручки переноса — значением или функцией от строки.",
             "type": "GrTreeNodeClass<T>",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "toggleClass",
-            "description": "",
+            "description": "Класс кнопки раскрытия — значением или функцией от строки.",
             "type": "GrTreeNodeClass<T>",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "toggleIconClass",
-            "description": "",
+            "description": "Класс иконки раскрытия — значением или функцией от строки.",
             "type": "GrTreeNodeClass<T>",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "toggleSpacerClass",
-            "description": "",
+            "description": "Класс заглушки на месте кнопки раскрытия у листа — значением или функцией от строки.",
             "type": "GrTreeNodeClass<T>",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "contentClass",
-            "description": "",
+            "description": "Класс обёртки содержимого строки (подписи или слота) — значением или функцией от строки.",
             "type": "GrTreeNodeClass<T>",
             "required": false,
             "default": "undefined"
@@ -13253,7 +13253,7 @@
           },
           {
             "name": "defaultCheckedKeys",
-            "description": "",
+            "description": "Стартовые отметки, когда `checkedKeys` не ведут снаружи. Читаются один раз, при создании.",
             "type": "GrTreeKey[] | undefined",
             "required": false,
             "default": "[]"
@@ -13281,7 +13281,7 @@
           },
           {
             "name": "draggable",
-            "description": "",
+            "description": "Перенос узлов мышью, пальцем и `Shift` со стрелкой. Ограничивают `allowDrag` и `allowDrop`.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
@@ -13295,13 +13295,13 @@
           },
           {
             "name": "allowDrop",
-            "description": "",
+            "description": "Можно ли уронить узел на цель: `prev` — перед ней, `inner` — внутрь, `next` — после.",
             "type": "((draggingNode: GrTreeNode<T>, dropNode: GrTreeNode<T>, type: GrTreeNodeDropType) => boolean) | undefined",
             "required": false
           },
           {
             "name": "allowDrag",
-            "description": "",
+            "description": "Можно ли взять узел: `false` выключает его ручку переноса.",
             "type": "((draggingNode: GrTreeNode<T>) => boolean) | undefined",
             "required": false
           },
@@ -13321,7 +13321,7 @@
         "items": [
           {
             "name": "default",
-            "description": "",
+            "description": "Содержимое строки вместо подписи: значок, счётчик, метка. Получает `node` и `data`.",
             "type": "{ node: GrTreeNode<T>; data: T; }"
           }
         ]
@@ -13333,37 +13333,37 @@
         "items": [
           {
             "name": "nodeClick",
-            "description": "",
+            "description": "Узел выбран кликом или `Enter` и стал текущим.",
             "type": "[T, GrTreeNode<T>]",
             "signature": "(e: \"nodeClick\", data: T, node: GrTreeNode<T>): void"
           },
           {
             "name": "nodeExpand",
-            "description": "",
+            "description": "Узел раскрыт кнопкой, клавиатурой или кликом при `expandOnClickNode`.",
             "type": "[T, GrTreeNode<T>]",
             "signature": "(e: \"nodeExpand\", data: T, node: GrTreeNode<T>): void"
           },
           {
             "name": "nodeCollapse",
-            "description": "",
+            "description": "Узел свёрнут — пользователем или `accordion`, когда раскрыли соседа.",
             "type": "[T, GrTreeNode<T>]",
             "signature": "(e: \"nodeCollapse\", data: T, node: GrTreeNode<T>): void"
           },
           {
             "name": "nodeDrop",
-            "description": "",
+            "description": "Узел перенесён указателем или `Shift` со стрелкой и уже переставлен в `data`. `dropType` — `prev`, `inner` или `next` относительно `dropNode`.",
             "type": "[GrTreeNode<T>, GrTreeNode<T>, GrTreeNodeDropType]",
             "signature": "(e: \"nodeDrop\", draggingNode: GrTreeNode<T>, dropNode: GrTreeNode<T>, dropType: GrTreeNodeDropType): void"
           },
           {
             "name": "nodeContextMenu",
-            "description": "",
+            "description": "Контекстное меню строки. Событие — первым аргументом: `preventDefault()` и своё меню.",
             "type": "[MouseEvent, T, GrTreeNode<T>]",
             "signature": "(e: \"nodeContextMenu\", evt: MouseEvent, data: T, node: GrTreeNode<T>): void"
           },
           {
             "name": "update:currentKey",
-            "description": "",
+            "description": "Текущий узел сменился кликом или `Enter` (`v-model:current-key`).",
             "type": "[GrTreeKey | undefined]",
             "signature": "(e: \"update:currentKey\", key: GrTreeKey | undefined): void"
           },
@@ -13375,13 +13375,13 @@
           },
           {
             "name": "update:checkedKeys",
-            "description": "",
+            "description": "Отмеченные ключи (`v-model:checked-keys`) после отметки пользователем или методом; родители, отмеченные каскадом, входят тоже.",
             "type": "[GrTreeKey[]]",
             "signature": "(e: \"update:checkedKeys\", keys: GrTreeKey[]): void"
           },
           {
             "name": "check",
-            "description": "",
+            "description": "Отметка узла сменилась — `Space`, кликом или `setChecked()`; с итоговыми наборами ключей.",
             "type": "[T, GrTreeNode<T>, { checkedKeys: GrTreeKey[]; halfCheckedKeys: GrTreeKey[]; }]",
             "signature": "(e: \"check\", data: T, node: GrTreeNode<T>, info: { checkedKeys: GrTreeKey[]; halfCheckedKeys: GrTreeKey[]; }): void"
           }
@@ -13412,21 +13412,21 @@
           },
           {
             "name": "nodeKey",
-            "description": "",
+            "description": "Поле с ключом узла. Ключи уникальны на все группы сразу: по ним текущий узел и отметки ведутся одним набором. По умолчанию `id`.",
             "type": "\"id\" | Extract<keyof T, string> | undefined",
             "required": false,
             "default": "\"id\" as never"
           },
           {
             "name": "props",
-            "description": "",
+            "description": "Имена полей в данных: `children`, `label`, `isLeaf`. По умолчанию `children` и `label`.",
             "type": "GrTreePropsMap | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "size",
-            "description": "",
+            "description": "Размер строк всех групп, как у `GrTree`. Не задан — из `GrConfigProvider`, иначе `md`.",
             "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
             "required": false,
             "default": "undefined"
@@ -13447,49 +13447,49 @@
           },
           {
             "name": "showCheckbox",
-            "description": "",
+            "description": "Чекбоксы у узлов: множественный выбор поверх групп.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
           },
           {
             "name": "checkStrictly",
-            "description": "",
+            "description": "Не связывать родителей и детей: каждый узел отмечается сам по себе.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
           },
           {
             "name": "branchLine",
-            "description": "",
+            "description": "Направляющие уровней: `line` — вертикаль на уровень, `elbow` — ещё и колено к строке. По умолчанию `line`.",
             "type": "boolean | GrTreeBranchLine | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "indent",
-            "description": "",
+            "description": "Шаг отступа уровня в пикселях. `0` (по умолчанию) — значение из темы.",
             "type": "number | undefined",
             "required": false,
             "default": "0"
           },
           {
             "name": "defaultExpandedKeys",
-            "description": "",
+            "description": "Стартовый набор раскрытых узлов во всех группах. Новый массив заменяет раскрытие целиком.",
             "type": "GrTreeKey[] | undefined",
             "required": false,
             "default": "[]"
           },
           {
             "name": "currentKey",
-            "description": "",
+            "description": "Текущий узел (`v-model:currentKey`) — один на все группы.",
             "type": "GrTreeKey | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "checkedKeys",
-            "description": "",
+            "description": "Отмеченные ключи всех групп одним списком (`v-model:checkedKeys`).",
             "type": "GrTreeKey[] | undefined",
             "required": false,
             "default": "undefined"
@@ -13520,19 +13520,19 @@
         "items": [
           {
             "name": "update:currentKey",
-            "description": "",
+            "description": "Текущий узел сменился кликом или `Enter` в любой из групп (`v-model:currentKey`).",
             "type": "[GrTreeKey | undefined]",
             "signature": "(e: \"update:currentKey\", key: GrTreeKey | undefined): void"
           },
           {
             "name": "update:checkedKeys",
-            "description": "",
+            "description": "Отметки изменились (`v-model:checkedKeys`): отметки группы сводятся с отметками остальных групп из `checkedKeys`, родители, отмеченные каскадом, входят тоже.",
             "type": "[GrTreeKey[]]",
             "signature": "(e: \"update:checkedKeys\", keys: GrTreeKey[]): void"
           },
           {
             "name": "nodeClick",
-            "description": "",
+            "description": "Узел выбран кликом или `Enter` и стал текущим — данные строки и узел, как у `GrTree`.",
             "type": "[any, GrTreeNode<any>]",
             "signature": "(e: \"nodeClick\", data: any, node: GrTreeNode<any>): void"
           }
@@ -13557,54 +13557,54 @@
         "items": [
           {
             "name": "modelValue",
-            "description": "",
+            "description": "Выбранный ключ или `null`; при `multiple` — массив ключей (`v-model`).",
             "type": "GrTreeSelectModelValue",
             "required": true
           },
           {
             "name": "data",
-            "description": "",
+            "description": "Узлы дерева верхнего уровня; дети лежат в поле из `props.children`.",
             "type": "T[]",
             "required": true
           },
           {
             "name": "props",
-            "description": "",
+            "description": "Имена полей узла: детей и подписи. По умолчанию `children` и `label`.",
             "type": "GrTreePropsMap | undefined",
             "required": false,
             "default": "{\n    children: \"children\",\n    label: \"label\",\n}"
           },
           {
             "name": "nodeKey",
-            "description": "",
+            "description": "Поле-ключ узла — его значения уходят в модель. По умолчанию `id`; без значения ключом становится позиция узла в дереве.",
             "type": "\"id\" | NodeKeyProp<T> | undefined",
             "required": false,
             "default": "\"id\" as any"
           },
           {
             "name": "defaultExpandedKeys",
-            "description": "",
+            "description": "Ключи узлов, раскрытых в дереве панели с самого начала.",
             "type": "GrTreeKey[] | undefined",
             "required": false,
             "default": "[]"
           },
           {
             "name": "disabled",
-            "description": "",
+            "description": "Недоступен: панель не открывается, значение не меняется. Складывается по «или» с полем и формой.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
           },
           {
             "name": "placeholder",
-            "description": "",
+            "description": "Текст триггера, пока ничего не выбрано.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "size",
-            "description": "",
+            "description": "Высота триггера и кегль по шкале контролов; дерево в панели берёт ту же ступень. По умолчанию `md`.",
             "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
             "required": false,
             "default": "undefined"
@@ -13625,7 +13625,7 @@
           },
           {
             "name": "invalid",
-            "description": "",
+            "description": "Визуальное и ARIA-состояние ошибки; сильнее `state`. Складывается по «или» с `GrFormField`.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
@@ -13653,14 +13653,14 @@
           },
           {
             "name": "state",
-            "description": "",
+            "description": "Подсветка рамки по решению разработчика. `success` и `warning` добавляют иконку и скрытую подпись; `invalid` сильнее. По умолчанию `default`.",
             "type": "\"default\" | \"success\" | \"warning\" | \"danger\" | undefined",
             "required": false,
             "default": "\"default\""
           },
           {
             "name": "multiple",
-            "description": "",
+            "description": "Множественный выбор: модель — массив ключей, клик по узлу переключает его.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
@@ -13702,28 +13702,28 @@
           },
           {
             "name": "tagDark",
-            "description": "",
+            "description": "Плотная заливка чипов в режиме `tags`.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
           },
           {
             "name": "tagSize",
-            "description": "",
+            "description": "Размер чипов по шкале `GrBadge`. По умолчанию `sm`.",
             "type": "\"xs\" | \"sm\" | \"md\" | \"lg\" | undefined",
             "required": false,
             "default": "\"sm\""
           },
           {
             "name": "tagRadius",
-            "description": "",
+            "description": "Скругление чипов: `square`, `semi` или `round`. По умолчанию `round`.",
             "type": "GrBadgeRadius | undefined",
             "required": false,
             "default": "\"round\""
           },
           {
             "name": "clearable",
-            "description": "",
+            "description": "Крестик очистки на месте шеврона, когда что-то выбрано. По умолчанию `false`.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
@@ -13751,42 +13751,42 @@
           },
           {
             "name": "filterable",
-            "description": "",
+            "description": "Поле поиска над деревом; без `filterNodeMethod` узлы ищутся подстрокой в подписи.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
           },
           {
             "name": "filterPlaceholder",
-            "description": "",
+            "description": "Подсказка в поле поиска. По умолчанию — переведённое «Search…».",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "filterInputmode",
-            "description": "",
+            "description": "`inputmode` поля поиска — какую экранную клавиатуру показать на мобильных.",
             "type": "\"search\" | \"none\" | \"text\" | \"email\" | \"tel\" | \"url\" | \"numeric\" | \"decimal\" | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "filterNodeMethod",
-            "description": "",
+            "description": "Своё правило совпадения узла с запросом вместо подстрочного поиска по подписи.",
             "type": "GrTreeFilterNodeMethod<T> | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "closeOnSelect",
-            "description": "",
+            "description": "Закрывать панель после выбора узла. По умолчанию — только при одиночном выборе.",
             "type": "boolean | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "dropdownMaxHeight",
-            "description": "",
+            "description": "Максимальная высота панели с деревом, px. По умолчанию `320`.",
             "type": "number | undefined",
             "required": false,
             "default": "320"
@@ -13807,35 +13807,35 @@
           },
           {
             "name": "prefixMaxWidth",
-            "description": "",
+            "description": "Максимальная ширина префикса: содержимое шире обрезается.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "suffixMinWidth",
-            "description": "",
+            "description": "Минимальная ширина суффикса. По умолчанию — по ступени размера.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "suffixMaxWidth",
-            "description": "",
+            "description": "Максимальная ширина суффикса: содержимое шире обрезается.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "prefixFixed",
-            "description": "",
+            "description": "Жёсткая ширина префикса: `prefixMaxWidth`, иначе `prefixMinWidth`, иначе по ступени размера.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
           },
           {
             "name": "suffixFixed",
-            "description": "",
+            "description": "Жёсткая ширина суффикса: `suffixMaxWidth`, иначе `suffixMinWidth`, иначе по ступени размера.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
@@ -13886,13 +13886,13 @@
         "items": [
           {
             "name": "update:modelValue",
-            "description": "",
+            "description": "Новое значение для `v-model`: ключ, массив ключей при `multiple` или `null` после очистки.",
             "type": "[GrTreeSelectModelValue]",
             "signature": "(e: \"update:modelValue\", value: GrTreeSelectModelValue): void"
           },
           {
             "name": "change",
-            "description": "",
+            "description": "Значение изменилось — тот же payload, что у `update:modelValue`.",
             "type": "[GrTreeSelectModelValue]",
             "signature": "(e: \"change\", value: GrTreeSelectModelValue): void"
           },
@@ -13904,25 +13904,25 @@
           },
           {
             "name": "clear",
-            "description": "",
+            "description": "Значение снято крестиком; только при `clearable`.",
             "type": "[]",
             "signature": "(e: \"clear\"): void"
           },
           {
             "name": "nodeClick",
-            "description": "",
+            "description": "Клик по узлу в панели: его данные и узел дерева. Приходит до смены значения.",
             "type": "[T, GrTreeNode<T>]",
             "signature": "(e: \"nodeClick\", data: T, node: GrTreeNode<T>): void"
           },
           {
             "name": "focus",
-            "description": "",
+            "description": "Фокус вошёл в контрол. Переход между триггером и панелью событием не считается.",
             "type": "[FocusEvent]",
             "signature": "(e: \"focus\", event: FocusEvent): void"
           },
           {
             "name": "blur",
-            "description": "",
+            "description": "Фокус ушёл из контрола — из триггера и из панели вместе.",
             "type": "[FocusEvent]",
             "signature": "(e: \"blur\", event: FocusEvent): void"
           }
