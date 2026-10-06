@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, markRaw, ref, watch, watchEffect, type Component } from 'vue'
+import { computed, markRaw, nextTick, onMounted, ref, watch, watchEffect, type Component } from 'vue'
 
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 import { useGrComponentProp } from '../shared/configContext'
@@ -130,9 +130,32 @@ type ImageState = 'loading' | 'loaded' | 'error'
 
 const imageState = ref<ImageState>('loading')
 
+/**
+ * Картинка, решившаяся раньше, чем её начали слушать.
+ *
+ * После серверного рендера `<img>` грузится до того, как страница оживает:
+ * data-URI и картинка из кэша успевают и `load`, и `error` до гидрации, когда
+ * обработчиков ещё нет. Без этой сверки плитка навсегда оставалась скелетом
+ * над готовой картинкой, а битое превью не доходило до заглушки. Сверка — с
+ * самим элементом: `complete` с ненулевой шириной — готово, с нулевой — отказ.
+ * Та же сверка у `GrAvatar`.
+ */
+const imageEl = ref<HTMLImageElement | null>(null)
+
+function syncSettledImage(): void {
+  const image = imageEl.value
+  if (!image?.complete || imageState.value !== 'loading')
+    return
+  imageState.value = image.naturalWidth > 0 ? 'loaded' : 'error'
+}
+
+onMounted(syncSettledImage)
+
 // Новая ссылка не должна наследовать ни ошибку прошлой, ни её готовность.
+// Элемент по `:key` создаётся заново, поэтому сверка — после его рендера.
 watch(() => props.src, () => {
   imageState.value = 'loading'
+  void nextTick(syncSettledImage)
 })
 
 const showImage = computed(() => (
@@ -299,6 +322,7 @@ function onClick(event: MouseEvent): void {
     <img
       v-if="showImage"
       :key="src ?? ''"
+      ref="imageEl"
       data-gr-file-preview-image
       :src="src ?? undefined"
       :alt="alt"

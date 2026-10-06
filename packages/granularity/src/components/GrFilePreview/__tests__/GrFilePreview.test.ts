@@ -1,6 +1,6 @@
 import { mount } from '@vue/test-utils'
 import { defineComponent, h, markRaw, nextTick } from 'vue'
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 // `vi.mock` поднимается компилятором в начало файла, поэтому пути пишутся
 // литералами: в цикле замыкание до подъёма не доживает.
@@ -413,5 +413,64 @@ describe('GrFilePreview: интерактивная плитка всегда н
     expect(warn.mock.calls.map(call => String(call[0])).join('\n')).toContain('GrFilePreview')
 
     warn.mockRestore()
+  })
+})
+
+/**
+ * После серверного рендера `<img>` успевает загрузиться (или сорваться) до
+ * гидрации, и `load`/`error` приходят без слушателей. Плитка обязана свериться
+ * с самим элементом, а не ждать события, которого уже не будет.
+ */
+describe('grFilePreview: картинка решилась раньше, чем плитку смонтировали', () => {
+  function settled(width: number): void {
+    vi.spyOn(HTMLImageElement.prototype, 'complete', 'get').mockReturnValue(true)
+    vi.spyOn(HTMLImageElement.prototype, 'naturalWidth', 'get').mockReturnValue(width)
+  }
+
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
+  it('загруженная — показывается без события `load`', async () => {
+    settled(113)
+    const wrapper = mount(GrFilePreview, { props: { name: 'taxi.jpg', mime: 'image/jpeg', src: 'data:image/svg+xml,<svg/>' } })
+    await nextTick()
+
+    expect(wrapper.find('[data-gr-file-preview-skeleton]').exists()).toBe(false)
+    expect(wrapper.get('[data-gr-file-preview-image]').classes()).not.toContain('invisible')
+  })
+
+  it('сорвавшаяся — уходит в заглушку без события `error`', async () => {
+    settled(0)
+    const wrapper = mount(GrFilePreview, { props: { name: 'scan.png', mime: 'image/png', src: 'data:image/png;base64,purged' } })
+    await nextTick()
+
+    expect(wrapper.find('[data-gr-file-preview-skeleton]').exists()).toBe(false)
+    expect(wrapper.find('[data-gr-file-preview-image]').exists()).toBe(false)
+    expect(wrapper.find('[data-gr-file-preview-fallback]').exists()).toBe(true)
+  })
+
+  it('новая ссылка из кэша сверяется заново — элемент пересоздан по `key`', async () => {
+    const wrapper = mount(GrFilePreview, { props: { name: 'a.png', mime: 'image/png', src: '/a.png' } })
+    await nextTick()
+    expect(wrapper.find('[data-gr-file-preview-skeleton]').exists()).toBe(true)
+
+    settled(64)
+    await wrapper.setProps({ src: '/b.png' })
+    // Сверка — после рендера нового элемента, её итог — ещё одним рендером.
+    await nextTick()
+    await nextTick()
+
+    expect(wrapper.find('[data-gr-file-preview-skeleton]').exists()).toBe(false)
+  })
+
+  it('незагруженная ждёт события, как и раньше', async () => {
+    const wrapper = mount(GrFilePreview, { props: { name: 'a.png', mime: 'image/png', src: '/slow.png' } })
+    await nextTick()
+
+    expect(wrapper.find('[data-gr-file-preview-skeleton]').exists()).toBe(true)
+
+    await wrapper.get('[data-gr-file-preview-image]').trigger('load')
+    expect(wrapper.find('[data-gr-file-preview-skeleton]').exists()).toBe(false)
   })
 })

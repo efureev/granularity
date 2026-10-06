@@ -5,6 +5,20 @@ All notable changes to the [`@feugene/granularity`](.) package are documented in
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Fixed
+
+- **`GrFilePreview` не застревает на скелете после гидрации.** Серверный HTML
+  уже несёт `<img>`: data-URI или картинка из кэша грузится раньше, чем Vue
+  вешает `@load`, и `imageState` навсегда оставался `loading` — скелет над
+  готовой картинкой. Так же терялся `@error`: битое превью не доходило до
+  заглушки. Теперь после монтирования и на каждой смене `src` плитка сверяется
+  с самим элементом: `complete` с ненулевой `naturalWidth` — готово, с нулевой —
+  отказ. Обработчики событий остались для поздних загрузок. Та же сверка уже
+  была у `GrAvatar`; `GrImageViewer` метрики кэшированной картинки читает при
+  открытии, `GrCarousel` загрузку не слушает.
+
 ## [v1.0.11] 2026-10-06
 
 ### Fixed
