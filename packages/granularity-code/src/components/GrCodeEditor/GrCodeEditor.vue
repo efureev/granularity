@@ -50,10 +50,16 @@ export type GrCodeEditorLanguage
  * правки — `GrCodeBlock`, сравнение — `GrDiff`.
  */
 export interface GrCodeEditorProps {
+  /** Текст в редакторе (`v-model`). По умолчанию пустая строка. */
   modelValue?: string
+  /**
+   * Язык: строка — имя для встроенного разбора (`json`, `text`), объект или массив — грамматика
+   * CodeMirror, функция — её ленивая загрузка. По умолчанию `text`.
+   */
   language?: GrCodeEditorLanguage
   /** Сырые расширения CodeMirror — escape hatch для всего, чего нет в пропах. */
   extensions?: readonly unknown[]
+  /** Подсказка в пустом редакторе. */
   placeholder?: string
   /**
    * Замечания к коду: подчёркивание в месте и метка в жёлобе.
@@ -71,23 +77,42 @@ export interface GrCodeEditorProps {
    * Включён — освободить фокус можно `Esc`, и об этом сказано под полем.
    */
   tabIndents?: boolean
+  /** Номера строк в жёлобе. Не задан — из `GrConfigProvider`, иначе `true`. */
   lineNumbers?: boolean
+  /**
+   * Переносить длинные строки вместо горизонтальной прокрутки. Не задан — из `GrConfigProvider`,
+   * иначе `false`.
+   */
   wrap?: boolean
+  /** Наибольшая высота поля: строка CSS или число в пикселях. */
   maxHeight?: string | number
+  /** Ступень размера: кегль кода. По умолчанию `md`; берётся из `GrConfigProvider`. */
   size?: GrComponentSize
+  /** Собственный `id` редактора. Не задан — берётся из `GrFormField`, иначе генерируется. */
   id?: string
+  /** Редактор недоступен: текст не правится, поле приглушено. Наследуется от `GrFormField`. */
   disabled?: boolean
+  /** Текст виден и выделяется, но не правится. Наследуется от `GrFormField`. */
   readonly?: boolean
+  /** Визуальное и ARIA-состояние ошибки (`aria-invalid`). Наследуется от `GrFormField`. */
   invalid?: boolean
+  /** Обязательное поле (`aria-required`). Наследуется от `GrFormField`. */
   required?: boolean
+  /**
+   * Доступное имя редактора; перекрывает подпись `GrFormField`. Без того и другого — из локали
+   * («Code editor»).
+   */
   ariaLabel?: string
 }
 
 export interface GrCodeEditorEmits {
+  /** Текст изменился (`v-model`) — на каждой правке в редакторе. */
   (e: 'update:modelValue', value: string): void
   /** Правка завершена — на потере фокуса. Для форм, где сохранять на букву не надо. */
   (e: 'change', value: string): void
+  /** Фокус вошёл в редактор. */
   (e: 'focus', event: FocusEvent): void
+  /** Фокус ушёл из редактора; следом приходит `change`. */
   (e: 'blur', event: FocusEvent): void
 }
 
@@ -461,7 +486,9 @@ async function blur(): Promise<void> {
 }
 
 defineExpose({
+  /** Поставить курсор в редактор. Пока CodeMirror не смонтирован, ничего не делает. */
   focus,
+  /** Убрать фокус из редактора. */
   blur,
   /**
    * Живой `EditorView` — **escape hatch без контракта**. Всё, чего пакет не

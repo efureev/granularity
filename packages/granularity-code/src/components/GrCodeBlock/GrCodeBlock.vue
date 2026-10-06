@@ -51,6 +51,10 @@ export type GrCodeBlockLanguage = 'json' | 'text' | (string & {})
 export interface GrCodeBlockProps {
   /** Строка или значение: объект сериализуется с отступом. */
   code: unknown
+  /**
+   * Язык подсветки: `json` и `text` разбираются встроенно, остальные — подключённой подсветкой.
+   * По умолчанию `json`.
+   */
   language?: GrCodeBlockLanguage
   /**
    * Подсветка для языков сверх встроенных. Не задана — берётся из
@@ -63,9 +67,17 @@ export interface GrCodeBlockProps {
   copyable?: boolean
   /** Переносить длинные строки вместо горизонтальной прокрутки. */
   wrap?: boolean
+  /**
+   * Номера строк в колонке слева; в выделение и буфер они не попадают. Не задан — из
+   * `GrConfigProvider`, иначе `false`.
+   */
   lineNumbers?: boolean
   /** Имя области прокрутки. Безымянную скринридер объявляет просто «регион». */
   ariaLabel?: string
+  /**
+   * Ступень размера: кегль кода и внутренние отступы. По умолчанию `md`; берётся из
+   * `GrConfigProvider`.
+   */
   size?: GrComponentSize
 }
 

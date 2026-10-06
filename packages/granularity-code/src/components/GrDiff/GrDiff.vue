@@ -69,6 +69,10 @@ export interface GrDiffProps {
   after?: unknown
   /** Готовый дифф. Сильнее `before`/`after`: считать заново нечего. */
   hunks?: GrDiffHunk[]
+  /**
+   * Раскладка: `unified` — одна колонка со знаками `+`/`−`, `split` — «было» и «стало» рядом.
+   * Не задан — из `GrConfigProvider`, иначе `unified`.
+   */
   mode?: GrDiffMode
   /**
    * Язык подсветки строк. Тот же словарь, что у блока.
@@ -77,6 +81,10 @@ export interface GrDiffProps {
    * сериализуем мы сами и точно знаем, что получилось.
    */
   language?: string
+  /**
+   * Подсветка для языков сверх встроенных. Не задана — берётся из
+   * `provide`/`inject` приложения (`GR_CODE_HIGHLIGHTER_KEY`).
+   */
   highlighter?: GrCodeTokenizer
   /** Неизменных строк вокруг изменения. `0` — только изменения, `Infinity` — всё. */
   context?: number
@@ -84,9 +92,16 @@ export interface GrDiffProps {
   expandStep?: number
   /** Предел работы алгоритма. За ним разбор огрубляется, а не вешает вкладку. */
   budget?: number
+  /** Номера строк обеих сторон в жёлобе. Не задан — из `GrConfigProvider`, иначе `true`. */
   lineNumbers?: boolean
+  /**
+   * Переносить длинные строки вместо горизонтальной прокрутки. Не задан — из `GrConfigProvider`,
+   * иначе `false`.
+   */
   wrap?: boolean
+  /** Высота, после которой включается вертикальный скролл; число — в пикселях. */
   maxHeight?: string | number
+  /** Ступень размера: кегль и отступы строк. По умолчанию `md`; берётся из `GrConfigProvider`. */
   size?: GrComponentSize
   /** Имя области сравнения. Безымянную скринридер объявляет просто «регион». */
   ariaLabel?: string
