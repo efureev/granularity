@@ -34,7 +34,10 @@ export const controlSizes: Record<GrCheckboxSize, string> = {
 }
 
 export const controlCheckedClass = 'border-[var(--gr-primary)] bg-[var(--gr-primary)]'
-export const controlUncheckedClass = 'border-[var(--gr-brd)] bg-[var(--gr-bg)]'
+// Рамка — единственное, по чему виден невыбранный контрол: роль с 3:1 к фону
+// (`--gr-control-brd`), а не разделитель `--gr-brd`. Только для чтения — тоже она:
+// значение там передаёт состояние, а 1.4.11 освобождает лишь недоступный контрол.
+export const controlUncheckedClass = 'border-[var(--gr-control-brd)] bg-[var(--gr-bg)]'
 export const controlInvalidCheckedClass = 'border-[var(--gr-danger)] bg-[var(--gr-danger)]'
 export const controlInvalidUncheckedClass = 'border-[var(--gr-danger)] bg-[var(--gr-bg)]'
 

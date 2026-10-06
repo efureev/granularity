@@ -29,7 +29,8 @@ export const grRadioRootEnabledClass = 'cursor-pointer'
 export const grRadioRootReadonlyClass = 'cursor-default'
 
 export const grRadioControlCheckedClass = 'border-[var(--gr-primary)] bg-[color-mix(in_srgb,var(--gr-primary)_10%,var(--gr-bg))]'
-export const grRadioControlUncheckedClass = 'border-[var(--gr-brd)] bg-[var(--gr-bg)]'
+/** Рамка невыбранного радио — `--gr-control-brd` с 3:1 к фону: другого признака у него нет. */
+export const grRadioControlUncheckedClass = 'border-[var(--gr-control-brd)] bg-[var(--gr-bg)]'
 export const grRadioControlDisabledClass = 'border-[var(--gr-brd)] bg-[var(--gr-muted)]'
 export const grRadioControlInvalidClass = 'border-[var(--gr-danger)] bg-[var(--gr-bg)]'
 

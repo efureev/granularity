@@ -222,7 +222,9 @@ const trackStyle = computed(() => {
         ? backgroundColor
         : isChecked
           ? 'var(--gr-primary)'
-          : 'var(--gr-brd)',
+          // Выключенная дорожка светлая, как поверхность вокруг: видна она
+          // только рамкой, и рамке нужна роль с 3:1 к фону.
+          : 'var(--gr-control-brd)',
     'backgroundColor': 'var(--gr-switch-track-bg)',
   }
 })

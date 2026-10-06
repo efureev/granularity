@@ -990,6 +990,15 @@ export const grThemeTokens: GrThemeToken[] = [
     }
   },
   {
+    "name": "--gr-control-brd",
+    "section": "Surface roles",
+    "description": "Граница переключаемого контрола в покое — коробки чекбокса, кружка радио, дорожки выключенного переключателя. Держит 3:1 к странице, карточке и `--gr-muted` (WCAG 1.4.11): у такого контрола граница — единственное, по чему его видно.",
+    "values": {
+      "light": "#64748b",
+      "dark": "#94a3b8"
+    }
+  },
+  {
     "name": "--gr-ring",
     "section": "Surface roles",
     "description": "Цвет focus-ring и акцентного outline для интерактивных компонентов.",
@@ -3494,7 +3503,7 @@ export const grComponentTokens: GrComponentToken[] = [
     "owner": "GrSwitch",
     "name": "--gr-switch-track-brd",
     "kind": "inline",
-    "default": "var(--gr-primary) / var(--gr-brd) / var(--gr-disabled-brd)",
+    "default": "var(--gr-primary) / var(--gr-control-brd) / var(--gr-disabled-brd)",
     "description": "Цвет рамки дорожки переключателя."
   },
   {
