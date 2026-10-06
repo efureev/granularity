@@ -7,7 +7,7 @@ import { barHitIndex, barPath, barRect, barToward, groupSlots } from '../../char
 import { orientedPoint } from '../../chart/chartOrientation'
 import type { GrChartNumberFormat } from '../../chart/chartFormat'
 import { formatNumber, formatValue } from '../../chart/chartFormat'
-import { labelGutters, type Rect } from '../../chart/chartLayout'
+import { type LabelGutters, labelGutters, type Rect } from '../../chart/chartLayout'
 import type { GrChartPoint } from '../../chart/chartModel'
 import { normalizeChartData } from '../../chart/chartModel'
 import { bandScale, type GrChartScale, linearScale } from '../../chart/chartScale'
@@ -226,14 +226,19 @@ function stepTickLabel(index: number): string {
  * Рама туда идёт с `axes: false`: её ось значений вертикальна по построению, а
  * здесь она внизу. Содержимое нижних подписей на высоту гуттера не влияет —
  * важно лишь то, что строка текста под областью есть.
+ *
+ * Считается от области построения: потолок подписи шага — доля её ширины.
  */
-const gutters = computed(() => (isHorizontal.value
-  ? labelGutters({
-      leftLabels: segments.value.map(segment => segment.label),
-      bottomLabels: ['0'],
-      fontSizePx: labelFontPx[resolvedSize.value],
-    })
-  : { left: 0, bottom: 0, labelWidth: 0, truncated: false }))
+function guttersOf(plot: Rect): LabelGutters {
+  return isHorizontal.value
+    ? labelGutters({
+        leftLabels: segments.value.map(segment => segment.label),
+        bottomLabels: ['0'],
+        fontSizePx: labelFontPx[resolvedSize.value],
+        availableWidth: plot.width,
+      })
+    : { left: 0, bottom: 0, labelWidth: 0, truncated: false }
+}
 
 /** `showGrid` называет оси по данным; при горизонтали стороны меняются местами. */
 const horizontalGrid = computed<'both' | 'x' | 'y' | 'none'>(() => {
@@ -265,11 +270,12 @@ function geometryOf(plot: Rect, xScale: GrChartScale, yScale: GrChartScale): Wat
   if (!isHorizontal.value)
     return { value: yScale, category: xScale, area: plot }
 
+  const gutters = guttersOf(plot)
   const area = {
-    x: plot.x + gutters.value.left,
+    x: plot.x + gutters.left,
     y: plot.y,
-    width: Math.max(0, plot.width - gutters.value.left),
-    height: Math.max(0, plot.height - gutters.value.bottom),
+    width: Math.max(0, plot.width - gutters.left),
+    height: Math.max(0, plot.height - gutters.bottom),
   }
 
   return {
@@ -575,8 +581,8 @@ defineExpose({
             orientation="y"
             :font-size-px="labelFontPx[resolvedSize]"
             :size-class="labelSizeClass[resolvedSize]"
-            :truncated="gutters.truncated"
-            :max-label-width="gutters.labelWidth"
+            :truncated="guttersOf(plot).truncated"
+            :max-label-width="guttersOf(plot).labelWidth"
             :label="t('grCharts.chart.axisY', 'Y axis')"
           />
           <ChartAxis

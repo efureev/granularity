@@ -230,3 +230,20 @@ describe('потолок строк таблицы', () => {
     expect(wrapper.findAll('[data-gr-chart-table] tbody tr')).toHaveLength(2)
   })
 })
+
+describe('GrChartHeatmap: подписи строк', () => {
+  it('строка шире потолка кончается многоточием, полный текст — в title', () => {
+    // Без усечения подпись уезжала за край холста и срезалась без признака обрезки.
+    const long = 'Клиенты, пришедшие по партнёрской программе в январе прошлого года'
+    const wrapper = factory({ values: [[100, 62], [100, 58]], xLabels: ['M0', 'M1'], yLabels: [long, 'Февраль'] })
+    const [first, second] = wrapper.findAll('[data-gr-chart-heatmap-row-label]')
+    const drawn = first!.element.childNodes[0]!.textContent!.trim()
+
+    expect(drawn.endsWith('…')).toBe(true)
+    expect(first!.find('title').text()).toBe(long)
+    expect(second!.text()).toBe('Февраль')
+    expect(second!.find('title').exists()).toBe(false)
+
+    wrapper.unmount()
+  })
+})

@@ -287,3 +287,26 @@ describe('приближение по абсциссе', () => {
     expect(wrapper.findAll('[data-gr-chart-area-fill]')).toHaveLength(2)
   })
 })
+
+describe('GrChartArea: отступ оси значений', () => {
+  it('подпись «100%» помещается в холст целиком', () => {
+    // Подпись прижата к оси (`text-anchor: end`) и растёт к краю холста: что
+    // отступ недодал, срезается краем `<svg>`, и «100%» читалась как «l00%».
+    // 2.65 em — ширина «100%» в Inter, самом широком шрифте стека `--gr-font-ui`.
+    const wrapper = factory({
+      width: 550,
+      height: 240,
+      yDomain: [0, 100],
+      yTickCount: 5,
+      yTickFormat: (value: number) => `${value}%`,
+    })
+    const axis = wrapper.get('[data-gr-chart-axis="y"]')
+    const labels = axis.findAll('text').map(node => node.text())
+    const anchorX = Number(axis.findAll('text')[0]!.attributes('x'))
+
+    expect(labels).toContain('100%')
+    expect(anchorX).toBeGreaterThanOrEqual(2.65 * 12)
+
+    wrapper.unmount()
+  })
+})

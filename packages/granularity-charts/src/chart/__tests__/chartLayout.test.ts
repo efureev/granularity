@@ -12,7 +12,48 @@ const base = {
   showXAxis: true,
 }
 
+/**
+ * Настоящая ширина строк в долях кегля: максимум по шрифтам стека `--gr-font-ui` —
+ * Inter 4, системному шрифту macOS и Arial/Helvetica, — замер `measureText` в
+ * Chromium. Оценка обязана быть не уже: недооценка срезает начало подписи
+ * оси краем холста, и «100%» читается как «l00%».
+ */
+const MEASURED_EM: Record<string, number> = {
+  '100%': 2.65,
+  '−20%': 2.851,
+  '+12%': 2.66,
+  '100.0%': 3.519,
+  '1 000': 2.581,
+  '1 234 567': 4.622,
+  '4444': 2.584,
+  '1.5M': 2.223,
+  '12k': 1.612,
+  '€1,200': 3.247,
+  '$1,200': 3.208,
+  '1 200 ₽': 3.542,
+  '250 ms': 3.519,
+  '1.2 s': 2.168,
+  '12:00': 2.566,
+  'Jan 2026': 4.475,
+  'Wed': 2.13,
+  'W12': 2.056,
+  'WWW': 3.005,
+  'MMM': 2.71,
+  'Mississippi': 5.208,
+  'ЖЩШЮ': 3.904,
+  'Санкт-Петербург': 8.523,
+  'Зарегистрировались': 10.309,
+  'Customer changed their mind': 14.011,
+  'Colour differs from the photo': 13.706,
+  'Delivered after the promised date': 15.758,
+  'Доставили позже обещанного срока': 18.093,
+}
+
 describe('estimateTextWidth', () => {
+  it.each(Object.entries(MEASURED_EM))('«%s» не уже, чем в шрифтах стека', (text, em) => {
+    expect(estimateTextWidth(text, 100)).toBeGreaterThanOrEqual(em * 100)
+  })
+
   it('растёт с длиной строки и кеглем', () => {
     expect(estimateTextWidth('1234', 12)).toBeGreaterThan(estimateTextWidth('12', 12))
     expect(estimateTextWidth('1234', 24)).toBeGreaterThan(estimateTextWidth('1234', 12))
@@ -44,7 +85,7 @@ describe('chartLayout', () => {
     const long = chartLayout({ ...base, yTickLabels: ['1 234 567 890 123'], maxAxisWidth: 40 })
 
     expect(long.truncated).toBe(true)
-    expect(long.gutters.left).toBeLessThanOrEqual(4 + 40 + 6)
+    expect(long.gutters.left).toBeLessThanOrEqual(4 + 40 + 6 + 2)
   })
 
   it('короткие подписи усечения не дают', () => {
@@ -72,6 +113,24 @@ describe('chartLayout', () => {
 
     expect(withLegend.plot.y).toBe(chartLayout(base).plot.y)
     expect(withLegend.gutters.bottom).toBeGreaterThan(chartLayout(base).gutters.bottom)
+  })
+
+  it('отступ оси значений вмещает самую широкую отформатированную подпись', () => {
+    // Подпись прижата к области построения (`text-anchor: end`) и растёт к краю
+    // холста: всё, что отступ недодал, срезается краем `<svg>`.
+    const labels = ['0%', '20%', '40%', '60%', '80%', '100%']
+    const layout = chartLayout({ ...base, yTickLabels: labels })
+    const room = layout.gutters.left - 6
+
+    expect(room).toBeGreaterThanOrEqual(estimateTextWidth('100%', 12))
+    expect(room).toBeGreaterThanOrEqual(MEASURED_EM['100%']! * 12)
+    expect(layout.truncated).toBe(false)
+  })
+
+  it('правая ось вмещает свою самую широкую подпись так же', () => {
+    const layout = chartLayout({ ...base, showYAxisRight: true, yTickLabelsRight: ['250 ms', '1 250 ms'] })
+
+    expect(layout.gutters.right - 6).toBeGreaterThanOrEqual(estimateTextWidth('1 250 ms', 12))
   })
 
   it('крайняя подпись оси X резервирует половину своей ширины', () => {
@@ -153,8 +212,33 @@ describe('labelGutters', () => {
   it('подпись выше потолка усекается и помечается', () => {
     const gutters = labelGutters({ leftLabels: ['A'.repeat(200)], fontSizePx: 12, maxLabelWidth: 40 })
 
-    expect(gutters.left).toBe(46)
+    expect(gutters.left).toBe(48)
     expect(gutters.truncated).toBe(true)
+  })
+
+  it('потолок подписи — доля доступной ширины, а не 96px на любом холсте', () => {
+    const label = 'Delivered after the promised date'
+    const wide = labelGutters({ leftLabels: [label], fontSizePx: 12, availableWidth: 540 })
+
+    expect(wide.truncated).toBe(false)
+    expect(wide.labelWidth).toBe(estimateTextWidth(label, 12))
+    expect(labelGutters({ leftLabels: [label], fontSizePx: 12 }).truncated).toBe(true)
+  })
+
+  it('колонка подписей растёт с длиной подписи до 40% ширины и дальше усекается', () => {
+    const availableWidth = 540
+    const widths = ['Брак', 'Не подошёл размер', 'Доставили позже срока', 'Не подошёл размер, курьер не позвонил вовремя']
+      .map(label => labelGutters({ leftLabels: [label], fontSizePx: 12, availableWidth }))
+
+    expect(widths[1]!.labelWidth).toBeGreaterThan(widths[0]!.labelWidth)
+    expect(widths[2]!.labelWidth).toBeGreaterThan(widths[1]!.labelWidth)
+    expect(widths[3]!.labelWidth).toBe(availableWidth * 0.4)
+    expect(widths[3]!.truncated).toBe(true)
+    expect(widths.slice(0, 3).every(gutters => !gutters.truncated)).toBe(true)
+  })
+
+  it('на узком холсте потолок не опускается ниже 96px', () => {
+    expect(labelGutters({ leftLabels: ['A'.repeat(200)], fontSizePx: 12, availableWidth: 120 }).labelWidth).toBe(96)
   })
 })
 

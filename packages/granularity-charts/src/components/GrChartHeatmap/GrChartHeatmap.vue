@@ -5,7 +5,7 @@ import { computed, ref } from 'vue'
 
 import type { GrChartNumberFormat } from '../../chart/chartFormat'
 import { formatValue } from '../../chart/chartFormat'
-import { labelGutters, type Rect } from '../../chart/chartLayout'
+import { fitLabel, type LabelGutters, labelGutters, type Rect } from '../../chart/chartLayout'
 import type { HeatmapCell, HeatmapGrid, HeatmapScaleKind } from '../../chart/chartHeatmap'
 import { heatmapCell, heatmapCells, heatmapColor, heatmapMatrix, heatmapOnDark, heatmapScale } from '../../chart/chartHeatmap'
 import { normalizeChartData } from '../../chart/chartModel'
@@ -228,19 +228,25 @@ const fontSizePx = computed(() => labelFontPx[resolvedSize.value])
  * Рама идёт с `axes: false`: её ось значений числовая по построению, а здесь обе
  * оси категориальные. Гуттер поэтому считается внутри области построения и
  * ужимает сетку — тот же приём, что у круга под выносными подписями.
+ * Потолок подписи строки — доля ширины области, поэтому и считается от неё.
  */
-const gutters = computed(() => labelGutters({
-  leftLabels: props.yLabels,
-  bottomLabels: props.xLabels,
-  fontSizePx: fontSizePx.value,
-}))
+function guttersOf(plot: Rect): LabelGutters {
+  return labelGutters({
+    leftLabels: props.yLabels,
+    bottomLabels: props.xLabels,
+    fontSizePx: fontSizePx.value,
+    availableWidth: plot.width,
+  })
+}
 
 function gridOf(plot: Rect): Rect {
+  const gutters = guttersOf(plot)
+
   return {
-    x: plot.x + gutters.value.left,
+    x: plot.x + gutters.left,
     y: plot.y,
-    width: Math.max(0, plot.width - gutters.value.left),
-    height: Math.max(0, plot.height - gutters.value.bottom),
+    width: Math.max(0, plot.width - gutters.left),
+    height: Math.max(0, plot.height - gutters.bottom),
   }
 }
 
@@ -291,20 +297,29 @@ interface AxisLabel {
   x: number
   y: number
   text: string
+  /** Полный текст усечённой подписи — для `<title>`. */
+  full?: string
   anchor: 'start' | 'middle' | 'end'
 }
 
 function rowLabels(plot: Rect): AxisLabel[] {
   const grid = gridOf(plot)
+  const { labelWidth, truncated } = guttersOf(plot)
   const step = rows.value > 0 ? grid.height / rows.value : 0
 
-  return props.yLabels.map((text, y) => ({
-    key: `row-${y}`,
-    x: grid.x - DEFAULT_HEATMAP_GAP * 2,
-    y: grid.y + step * y + step / 2,
-    text,
-    anchor: 'end' as const,
-  }))
+  return props.yLabels.map((label, y) => {
+    // Выше потолка подпись уехала бы за край холста и срезалась без признака обрезки.
+    const text = fitLabel(label, fontSizePx.value, labelWidth)
+
+    return {
+      key: `row-${y}`,
+      x: grid.x - DEFAULT_HEATMAP_GAP * 2,
+      y: grid.y + step * y + step / 2,
+      text,
+      full: truncated && text !== label ? label : undefined,
+      anchor: 'end' as const,
+    }
+  })
 }
 
 function columnLabels(plot: Rect): AxisLabel[] {
@@ -565,6 +580,9 @@ defineExpose({
           dominant-baseline="middle"
         >
 {{ label.text }}
+          <title v-if="label.full">
+{{ label.full }}
+</title>
 </text>
 
         <text

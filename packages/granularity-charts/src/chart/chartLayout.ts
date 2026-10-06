@@ -10,6 +10,11 @@
  * Цена известна: очень длинная подпись не влезает в потолок и усекается
  * (`truncated`). Это не «до настоящего замера» — возврат к замеру вернёт и
  * прыжок, и расхождение гидрации.
+ *
+ * Ошибаться оценка обязана **вверх**. Подпись оси рисуется от края области
+ * построения к краю холста, и недооценка срезает её начало краем `<svg>` —
+ * «100%» читается как «l00%», без всякого признака обрезки. Переоценка стоит
+ * пары пикселей отступа.
  */
 
 export interface Rect {
@@ -45,13 +50,30 @@ export interface ChartLayout {
 }
 
 const TICK_GAP = 6
+/** Запас поверх оценки: кегль после хинтинга и масштаба страницы бывает чуть крупнее заявленного. */
+const LABEL_SAFETY = 2
 const LEGEND_GAP = 8
 const DEFAULT_MAX_AXIS_WIDTH = 96
+/**
+ * Доля ширины, которую подписи категорий могут забрать у марок. Неподвижный
+ * потолок в 96px резал «Доставили позже обещанного срока» до «Доставили по…» и
+ * на графике в полэкрана, где места под подпись было вдоволь.
+ */
+const MAX_LABEL_SHARE = 0.4
 const LINE_HEIGHT_RATIO = 1.35
 const DEFAULT_PADDING = { top: 8, right: 8, bottom: 4, left: 4 } as const
 
-const NARROW = new Set([...'.,:;\'`|!ift1'])
-const WIDE = new Set([...'ABCDEFGHKLMNOPQRSTUVXYZmw@%'])
+/**
+ * Классы ширины, в долях кегля. Каждый — **потолок** класса по шрифтам стека
+ * `--gr-font-ui` (Inter, системный, Arial/Helvetica), замеренным в Chromium;
+ * гейт — `chartLayout.test.ts`. Цифры — отдельный класс, а не средний: у Inter
+ * они шире строчных, а «1» в моноширинных цифрах Arial не уже нуля.
+ */
+const THIN = new Set([...'.,:;\'`|!ijlI'])
+const SEMI = new Set([...'ftr-()[]{}/\\"'])
+const FIGURE = new Set([...'0123456789$£¥₽+−±=<>#~^*'])
+const WIDE = new Set([...'w€мжшщюфыД'])
+const WIDEST = new Set([...'mMW%@…ЖШЩЮЫФМ'])
 
 /**
  * Пробел любого вида — узкий, и проверяется он классом, а не перечислением.
@@ -65,24 +87,36 @@ const WIDE = new Set([...'ABCDEFGHKLMNOPQRSTUVXYZmw@%'])
  */
 const SPACE = /\s/u
 
+function charUnits(char: string): number {
+  if (THIN.has(char) || SPACE.test(char))
+    return 0.3
+  if (WIDEST.has(char))
+    return 1.02
+  if (WIDE.has(char))
+    return 0.86
+  if (SEMI.has(char))
+    return 0.42
+  if (FIGURE.has(char))
+    return 0.66
+  // Заглавная — по регистру, а не перечислением: так же для кириллицы.
+  if (char !== char.toLowerCase())
+    return 0.76
+
+  return 0.6
+}
+
 /**
  * Ширина строки без DOM.
  *
- * Три класса символов вместо таблицы метрик: точность до полусимвола здесь
+ * Классы символов вместо таблицы метрик: точность до полусимвола здесь
  * лишняя — результат идёт в отступ оси, где её никто не заметит, а таблица
  * метрик расходилась бы с реальным шрифтом потребителя ровно так же.
  */
 export function estimateTextWidth(text: string, fontSizePx: number): number {
   let units = 0
 
-  for (const char of text) {
-    if (NARROW.has(char) || SPACE.test(char))
-      units += 0.32
-    else if (WIDE.has(char))
-      units += 0.68
-    else
-      units += 0.55
-  }
+  for (const char of text)
+    units += charUnits(char)
 
   return units * fontSizePx
 }
@@ -93,7 +127,10 @@ export interface LabelGuttersInput {
   /** Подписи под областью: колонки матрицы, деления значений при горизонтали. */
   bottomLabels?: readonly string[]
   fontSizePx: number
+  /** Явный потолок ширины подписи. Без него потолок — доля `availableWidth`. */
   maxLabelWidth?: number
+  /** Ширина, которую делят подписи и марки: потолок подписи — её доля, но не меньше 96px. */
+  availableWidth?: number
 }
 
 export interface LabelGutters {
@@ -138,12 +175,13 @@ export function fitLabel(label: string, fontSizePx: number, maxWidth: number): s
  * Ширина по-прежнему оценивается, а не измеряется: причина в докблоке модуля.
  */
 export function labelGutters(input: LabelGuttersInput): LabelGutters {
-  const maxLabelWidth = input.maxLabelWidth ?? DEFAULT_MAX_AXIS_WIDTH
+  const maxLabelWidth = input.maxLabelWidth
+    ?? Math.max(DEFAULT_MAX_AXIS_WIDTH, (input.availableWidth ?? 0) * MAX_LABEL_SHARE)
   const widest = Math.max(0, ...(input.leftLabels ?? []).map(label => estimateTextWidth(label, input.fontSizePx)))
   const capped = Math.min(widest, maxLabelWidth)
 
   return {
-    left: widest > 0 ? capped + TICK_GAP : 0,
+    left: widest > 0 ? capped + TICK_GAP + LABEL_SAFETY : 0,
     bottom: (input.bottomLabels?.length ?? 0) > 0 ? input.fontSizePx * LINE_HEIGHT_RATIO + TICK_GAP : 0,
     labelWidth: widest > 0 ? capped : 0,
     truncated: widest > capped,
@@ -166,7 +204,7 @@ export function chartLayout(input: ChartLayoutInput): ChartLayout {
     const capped = Math.min(widest, maxAxisWidth)
 
     truncated = widest > capped
-    left += capped + TICK_GAP
+    left += capped + TICK_GAP + LABEL_SAFETY
   }
 
   if (input.showYAxisRight && (input.yTickLabelsRight?.length ?? 0) > 0) {
@@ -174,7 +212,7 @@ export function chartLayout(input: ChartLayoutInput): ChartLayout {
     const capped = Math.min(widest, maxAxisWidth)
 
     truncated ||= widest > capped
-    right += capped + TICK_GAP
+    right += capped + TICK_GAP + LABEL_SAFETY
   }
 
   if (input.showXAxis && input.xTickLabels.length > 0) {

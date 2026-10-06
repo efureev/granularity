@@ -341,6 +341,36 @@ describe('GrChartBar — горизонталь', () => {
     wrapper.unmount()
   })
 
+  it('длинные имена категорий читаются целиком, пока колонка не дошла до 40% ширины', () => {
+    // Горизонталь берут ради длинных имён: неподвижный потолок в 96px резал
+    // их до «Ordered by mis…» даже там, где полосам хватало места с избытком.
+    const reasons = [
+      'Ordered by mistake',
+      'Arrived damaged in transit',
+      'Customer changed their mind',
+      'Colour differs from the photo',
+      'Missing parts or screws',
+      'Delivered after the promised date',
+    ]
+    const width = 550
+    const wrapper = factory({
+      orientation: 'horizontal',
+      width,
+      series: [{ id: 'returns', label: 'Returns', x: reasons, y: [42, 31, 27, 18, 12, 9] }],
+    })
+    const labels = wrapper.findAll('[data-gr-chart-axis="y"] text')
+    const drawn = labels.map(node => node.element.childNodes[0]!.textContent!.trim())
+    const plotX = Number(wrapper.find('[data-gr-chart-axis="y"] line').attributes('x1'))
+
+    expect(drawn).toEqual(reasons)
+    expect(labels.every(node => !node.find('title').exists())).toBe(true)
+    // Колонка подписей — от края холста до оси категорий.
+    expect(plotX).toBeGreaterThan(Math.max(...reasons.map(reason => estimateTextWidth(reason, 12))))
+    expect(plotX).toBeLessThanOrEqual(width * 0.4 + 4 + 6 + 2)
+
+    wrapper.unmount()
+  })
+
   it('все полосы начинаются от общего нуля слева', () => {
     const wrapper = factory({ orientation: 'horizontal' })
     const starts = bars(wrapper).map(bar => startX(bar.attributes('d')!))

@@ -8,7 +8,7 @@ import type { ChartOrientation } from '../../chart/chartOrientation'
 import { orientedGrid, orientedPoint } from '../../chart/chartOrientation'
 import type { GrChartNumberFormat } from '../../chart/chartFormat'
 import { formatShare } from '../../chart/chartFormat'
-import type { Rect } from '../../chart/chartLayout'
+import type { LabelGutters, Rect } from '../../chart/chartLayout'
 import { estimateTextWidth, labelGutters } from '../../chart/chartLayout'
 import type { GrChartSeries, NormalizedSeries } from '../../chart/chartModel'
 import { normalizeChartData, resolveScaleKind } from '../../chart/chartModel'
@@ -282,14 +282,20 @@ function categoryTickLabel(position: number, index?: number): string {
  * Рама идёт с `axes: false`: её ось значений вертикальна по построению, а здесь
  * она внизу. Содержимое нижних подписей на высоту гуттера не влияет — важно
  * лишь то, что строка текста под областью есть.
+ *
+ * Считается от области построения, а не раз на компонент: потолок подписи
+ * категории — доля её ширины. Горизонталь и берут ради длинных имён категорий.
  */
-const gutters = computed(() => (isHorizontal.value
-  ? labelGutters({
-      leftLabels: categoryLabels.value,
-      bottomLabels: ['0'],
-      fontSizePx: labelFontPx[resolvedSize.value],
-    })
-  : { left: 0, bottom: 0, labelWidth: 0, truncated: false }))
+function guttersOf(plot: Rect): LabelGutters {
+  return isHorizontal.value
+    ? labelGutters({
+        leftLabels: categoryLabels.value,
+        bottomLabels: ['0'],
+        fontSizePx: labelFontPx[resolvedSize.value],
+        availableWidth: plot.width,
+      })
+    : { left: 0, bottom: 0, labelWidth: 0, truncated: false }
+}
 
 interface BarGeometry {
   /** Шкала значений: у вертикали это ось рамы, у горизонтали — своя. */
@@ -331,11 +337,12 @@ function geometryOf(plot: Rect, xScale: GrChartScale, yScale: GrChartScale): Bar
   if (!isHorizontal.value)
     return { value: yScale, category: xScale, area: plot }
 
+  const gutters = guttersOf(plot)
   const area = {
-    x: plot.x + gutters.value.left,
+    x: plot.x + gutters.left,
     y: plot.y,
-    width: Math.max(0, plot.width - gutters.value.left - valueLabelOverhang(yScale.domain)),
-    height: Math.max(0, plot.height - gutters.value.bottom),
+    width: Math.max(0, plot.width - gutters.left - valueLabelOverhang(yScale.domain)),
+    height: Math.max(0, plot.height - gutters.bottom),
   }
 
   return {
@@ -669,8 +676,8 @@ defineExpose({
           orientation="y"
           :font-size-px="labelFontPx[resolvedSize]"
           :size-class="labelSizeClass[resolvedSize]"
-          :truncated="gutters.truncated"
-          :max-label-width="gutters.labelWidth"
+          :truncated="guttersOf(plot).truncated"
+          :max-label-width="guttersOf(plot).labelWidth"
           :label="t('grCharts.chart.axisY', 'Y axis')"
         />
         <ChartAxis
