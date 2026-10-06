@@ -5,6 +5,25 @@ All notable changes to the [`@feugene/granularity`](.) package are documented in
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Fixed
+
+- **`GrButtonGroup` снова прямой внутри.** Прикреплённая группа срезала
+  внутренние углы звеньев из своего `<style>` (`border-*-radius: 0`), а радиус
+  кнопке ставит утилита. С переезда на granum CSS компонента живёт в слое
+  `granum.components`, утилита — в `granum.utilities`, и более поздний слой
+  побеждает при любой специфичности: с 1.0.0 группа выглядела рядом отдельных
+  скруглённых кнопок.
+
+  Теперь `GrButton` читает радиус каждого угла из своей переменной
+  (`--gr-button-radius-ss`, `-se`, `-ee`, `-es`, по умолчанию —
+  `--gr-button-radius`), а группа гасит переменные, а не радиусы. Утилиты
+  переменных не задают, спорить слоям не о чем. Углы логические — RTL группа
+  отражает сама. Проверяет замер в браузере
+  (`apps/showcase/e2e/geometry.spec.ts`): у первой кнопки скруглено только
+  начало, у средних — ничего, у последней — только конец.
+
 ## [v1.0.4] 2026-10-06
 
 ### Fixed

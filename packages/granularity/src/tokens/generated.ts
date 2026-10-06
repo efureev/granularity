@@ -2050,6 +2050,34 @@ export const grComponentTokens: GrComponentToken[] = [
   },
   {
     "owner": "GrButton",
+    "name": "--gr-button-radius-ss",
+    "kind": "hook",
+    "default": "var(--gr-button-radius)",
+    "description": "Скругление одного угла (начало блока, начало строки). Прикреплённая `GrButtonGroup` гасит им внутренние углы звеньев."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-radius-se",
+    "kind": "hook",
+    "default": "var(--gr-button-radius)",
+    "description": "Скругление одного угла (начало блока, конец строки). Прикреплённая `GrButtonGroup` гасит им внутренние углы звеньев."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-radius-ee",
+    "kind": "hook",
+    "default": "var(--gr-button-radius)",
+    "description": "Скругление одного угла (конец блока, конец строки). Прикреплённая `GrButtonGroup` гасит им внутренние углы звеньев."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-radius-es",
+    "kind": "hook",
+    "default": "var(--gr-button-radius)",
+    "description": "Скругление одного угла (конец блока, начало строки). Прикреплённая `GrButtonGroup` гасит им внутренние углы звеньев."
+  },
+  {
+    "owner": "GrButton",
     "name": "--gr-button-square-size",
     "kind": "hook",
     "default": "высота кнопки текущей ступени",

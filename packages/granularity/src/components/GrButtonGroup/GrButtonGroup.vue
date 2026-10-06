@@ -69,13 +69,21 @@ defineSlots<{
  * Края считаются от соседства звеньев, а не от `:first-child`/`:last-child`:
  * ведущий край гасится у звена, перед которым уже было звено, ведомый — у
  * звена, за которым звено ещё будет.
+ *
+ * Гасится он переменной, а не `border-*-radius`. Этот лист живёт в слое
+ * `granum.components`, а радиус кнопке ставит утилита из `granum.utilities` —
+ * более поздний слой побеждает при любой специфичности, и правило
+ * «внутренний угол — 0» молча проигрывало: группа выглядела рядом отдельных
+ * кнопок. Утилита кнопки читает радиус каждого угла из своей переменной
+ * (`--gr-button-radius-ss` … `-ee`), а переменные утилиты не задают — спорить
+ * слоям не о чем. Углы логические, поэтому RTL отражает группу сам.
  */
 [data-gr-button-group] {
     --gr-button-group-radius: var(--gr-button-radius, 0.375rem);
 }
 
 [data-gr-button-group][data-attached] [data-gr-button] {
-    border-radius: var(--gr-button-group-radius);
+    --gr-button-radius: var(--gr-button-group-radius);
     position: relative;
 }
 
@@ -94,14 +102,14 @@ defineSlots<{
 
 [data-gr-button-group][data-attached][data-orientation='horizontal'] > :is([data-gr-button], :has([data-gr-button])) ~ [data-gr-button],
 [data-gr-button-group][data-attached][data-orientation='horizontal'] > :is([data-gr-button], :has([data-gr-button])) ~ :has([data-gr-button]) [data-gr-button] {
-    border-start-start-radius: 0;
-    border-end-start-radius: 0;
+    --gr-button-radius-ss: 0;
+    --gr-button-radius-es: 0;
 }
 
 [data-gr-button-group][data-attached][data-orientation='horizontal'] > [data-gr-button]:has(~ :is([data-gr-button], :has([data-gr-button]))),
 [data-gr-button-group][data-attached][data-orientation='horizontal'] > :has([data-gr-button]):has(~ :is([data-gr-button], :has([data-gr-button]))) [data-gr-button] {
-    border-start-end-radius: 0;
-    border-end-end-radius: 0;
+    --gr-button-radius-se: 0;
+    --gr-button-radius-ee: 0;
 }
 
 /* ————— Вертикальная группа: та же логика, другая ось. */
@@ -112,13 +120,13 @@ defineSlots<{
 
 [data-gr-button-group][data-attached][data-orientation='vertical'] > :is([data-gr-button], :has([data-gr-button])) ~ [data-gr-button],
 [data-gr-button-group][data-attached][data-orientation='vertical'] > :is([data-gr-button], :has([data-gr-button])) ~ :has([data-gr-button]) [data-gr-button] {
-    border-start-start-radius: 0;
-    border-start-end-radius: 0;
+    --gr-button-radius-ss: 0;
+    --gr-button-radius-se: 0;
 }
 
 [data-gr-button-group][data-attached][data-orientation='vertical'] > [data-gr-button]:has(~ :is([data-gr-button], :has([data-gr-button]))),
 [data-gr-button-group][data-attached][data-orientation='vertical'] > :has([data-gr-button]):has(~ :is([data-gr-button], :has([data-gr-button]))) [data-gr-button] {
-    border-end-start-radius: 0;
-    border-end-end-radius: 0;
+    --gr-button-radius-es: 0;
+    --gr-button-radius-ee: 0;
 }
 </style>

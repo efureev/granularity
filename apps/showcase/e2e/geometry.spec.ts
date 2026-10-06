@@ -668,3 +668,43 @@ test.describe('липкая колонка таблицы', () => {
     expect(after.translucent, 'фон липкой ячейки полупрозрачен — сквозь неё видно').toEqual([])
   })
 })
+
+/**
+ * Прикреплённая группа кнопок: скруглены только внешние углы.
+ *
+ * Внутренние углы срезает `<style>` группы, а радиус кнопке ставит утилита. В
+ * granum CSS компонента живёт в слое `granum.components`, утилита — в
+ * `granum.utilities`, и более поздний слой побеждает при любой специфичности:
+ * правило группы «внутренний угол — 0» молча проигрывало, и группа выглядела
+ * рядом отдельных кнопок. jsdom каскадных слоёв не знает — замер здесь.
+ */
+test.describe('прикреплённая группа кнопок', () => {
+  test('скруглены только внешние углы', async ({ page }) => {
+    await page.goto(componentPath('GrButtonGroup'))
+    await page.locator('[data-gr-button-group][data-attached][data-orientation="horizontal"]').first().waitFor()
+    const radii = await page.evaluate(() => {
+      const group = document.querySelector('[data-gr-button-group][data-attached][data-orientation="horizontal"]')
+      if (!group)
+        throw new Error('прикреплённая горизонтальная группа не найдена')
+      return [...group.querySelectorAll('[data-gr-button]')].map((button) => {
+        const style = getComputedStyle(button)
+        // Порядок логических углов: start-start, start-end, end-end, end-start.
+        return [style.borderStartStartRadius, style.borderStartEndRadius, style.borderEndEndRadius, style.borderEndStartRadius]
+          .map(value => Number.parseFloat(value))
+      })
+    })
+
+    expect(radii.length).toBeGreaterThanOrEqual(3)
+    const [first, ...rest] = radii
+    const last = rest.pop()!
+
+    expect(first[0]).toBeGreaterThan(0)
+    expect(first[3]).toBeGreaterThan(0)
+    expect([first[1], first[2]]).toEqual([0, 0])
+    for (const middle of rest)
+      expect(middle).toEqual([0, 0, 0, 0])
+    expect([last[0], last[3]]).toEqual([0, 0])
+    expect(last[1]).toBeGreaterThan(0)
+    expect(last[2]).toBeGreaterThan(0)
+  })
+})
