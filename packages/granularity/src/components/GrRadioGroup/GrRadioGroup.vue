@@ -12,6 +12,7 @@ import GrButtonGroup from '../GrButtonGroup/GrButtonGroup.vue'
 import GrRadio from '../GrRadio/GrRadio.vue'
 import { GR_RADIO_GROUP_CONTEXT } from '../GrRadio/grRadioGroupContext'
 import type { GrRadioEntry, GrRadioValue } from '../GrRadio/grRadioGroupContext'
+import { useControlAria } from '../../composables/internal/useControlAria'
 
 export type GrRadioGroupVariant = 'radiobox' | 'button'
 export type GrRadioGroupOrientation = 'vertical' | 'horizontal'
@@ -58,6 +59,9 @@ export interface GrRadioGroupEmits {
   (e: 'blur', event: FocusEvent): void
 }
 
+// Связи потребителя (`aria-describedby` и соседи) уходят на элемент с ролью, а не на корень.
+defineOptions({ inheritAttrs: false })
+
 const props = withDefaults(defineProps<GrRadioGroupProps>(), {
   options: undefined,
   name: undefined,
@@ -87,6 +91,8 @@ const {
   required: isRequired,
   readonly: isReadonly,
 } = useGrFormControl(() => props)
+
+const aria = useControlAria()
 const labelledBy = computed(() => (props.ariaLabel ? undefined : field?.labelId.value))
 
 const emit = defineEmits<GrRadioGroupEmits>()
@@ -192,12 +198,14 @@ provide(GR_RADIO_GROUP_CONTEXT, {
     data-gr-radio-group
     role="radiogroup"
     :aria-label="ariaLabel"
-    :aria-labelledby="labelledBy"
-    :aria-describedby="describedBy"
+    :aria-labelledby="aria.labelledBy(labelledBy)"
+    :aria-describedby="aria.describedBy(describedBy)"
+    :aria-errormessage="aria.errorMessage()"
     :aria-invalid="isInvalid ? 'true' : undefined"
     :aria-required="isRequired ? 'true' : undefined"
     :aria-readonly="isReadonly ? 'true' : undefined"
     :aria-disabled="isDisabled ? 'true' : undefined"
+    v-bind="aria.rootAttrs()"
     @focusin="onFocusIn"
     @focusout="onFocusOut"
   >

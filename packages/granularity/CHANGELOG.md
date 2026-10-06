@@ -17,6 +17,17 @@ to [Semantic Versioning](https://semver.org/).
   нейтрального счётчика `GrBadgeWrap`: не меньше 3:1 к фону страницы, карточки и
   к неактивным точкам в обеих темах. Хук `--gr-carousel-dot-active` перебивает
   тон, как прежде.
+- **`aria-describedby` потребителя доходит до контрола.** Атрибуты, поставленные
+  на контрол, попадали не туда: у `GrCheckbox`, `GrRadio`, `GrSlider`,
+  `GrRating`, `GrSelect`, `GrAutocomplete`, `GrTreeSelect`, `GrInputTag`,
+  `GrOtpInput`, `GrColorPicker`, `GrFormFile`, `GrFileUpload`, `GrTransfer` — на
+  обёртку-`div`, где ничего не значат (`<GrCheckbox aria-describedby="consent-note">`
+  оставлял `span[role="checkbox"]` без описания); у групп, `GrSegmented`,
+  `GrSwitch`, `GrInput`, `GrTextarea`, `GrNumberInput` атрибут потребителя и
+  описание `GrFormField` затирали друг друга. Теперь `aria-describedby`,
+  `aria-labelledby` и `aria-errormessage` потребителя уходят на элемент с ролью
+  или на поле ввода и складываются с id подсказки и ошибки поля через пробел,
+  без повторов. Гейт — `consumerAria.test.ts` по реестру форм-контролов.
 - **Невыбранные чекбокс и радио и выключенный переключатель видны на фоне.**
   Их граница рисовалась разделителем `--gr-brd` (`#e2e8f0`): на белой карточке
   это 1.2:1, и в матрице настроек пустые коробки пропадали, хотя граница здесь —

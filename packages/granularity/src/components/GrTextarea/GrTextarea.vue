@@ -35,6 +35,7 @@ import {
   controlStateIconColors,
   controlStateTextKey,
 } from '../shared/controlState'
+import { useControlAria } from '../../composables/internal/useControlAria'
 
 export interface GrTextareaProps {
   modelValue: string
@@ -168,6 +169,8 @@ const {
   readonly: isReadonly,
 } = useGrFormControl(() => props)
 
+const aria = useControlAria()
+
 /**
  * Небуквенный признак состояния: иконка для глаз, скрытая подпись для
  * скринридера. Разбор — `shared/controlState`.
@@ -266,6 +269,18 @@ function onInput(e: Event): void {
   emit('update:modelValue', (e.target as HTMLTextAreaElement).value)
 }
 
+/**
+ * Связи потребителя складываются с описанием поля, а не затирают его: `$attrs`
+ * шли поверх `textareaAttrs`, и `aria-describedby` потребителя убирал подсказку.
+ */
+function ariaLinks(): Record<string, string | undefined> {
+  return {
+    'aria-describedby': aria.describedBy(describedBy.value),
+    'aria-labelledby': aria.labelledBy(),
+    'aria-errormessage': aria.errorMessage(),
+  }
+}
+
 // Объявленный emit уходит из `$attrs`, поэтому нативные события переизлучаем
 // руками — иначе `@change`/`@focus`/`@blur` у потребителя перестали бы работать.
 function onChange(e: Event): void {
@@ -286,7 +301,7 @@ function onBlur(e: FocusEvent): void {
     <textarea
       ref="textareaEl"
       v-autosize="autosize"
-      v-bind="{ ...textareaAttrs, ...$attrs }"
+      v-bind="{ ...textareaAttrs, ...aria.rootAttrs(), ...ariaLinks() }"
       @input="onInput"
       @change="onChange"
       @focus="onFocus"
@@ -348,7 +363,7 @@ function onBlur(e: FocusEvent): void {
     <textarea
       ref="textareaEl"
       v-autosize="autosize"
-      v-bind="{ ...textareaAttrs, ...$attrs }"
+      v-bind="{ ...textareaAttrs, ...aria.rootAttrs(), ...ariaLinks() }"
       @input="onInput"
       @change="onChange"
       @focus="onFocus"
@@ -382,7 +397,7 @@ function onBlur(e: FocusEvent): void {
     v-else
     ref="textareaEl"
     v-autosize="autosize"
-    v-bind="{ ...textareaAttrs, ...$attrs }"
+    v-bind="{ ...textareaAttrs, ...aria.rootAttrs(), ...ariaLinks() }"
     @input="onInput"
     @change="onChange"
     @focus="onFocus"

@@ -44,6 +44,7 @@ import {
   type GrCheckboxLabelPosition,
   type GrCheckboxSize,
 } from './grCheckboxStyles'
+import { useControlAria } from '../../composables/internal/useControlAria'
 
 export type { GrCheckboxLabelPosition, GrCheckboxSize } from './grCheckboxStyles'
 
@@ -98,6 +99,9 @@ const hiddenInputStyle = {
   pointerEvents: 'none',
 } as const
 
+// Связи потребителя (`aria-describedby` и соседи) уходят с обёртки на `role="checkbox"`.
+defineOptions({ inheritAttrs: false })
+
 const props = withDefaults(defineProps<GrCheckboxProps>(), {
   modelValue: undefined,
   tabindex: undefined,
@@ -139,6 +143,8 @@ const checked = computed(() => {
 })
 
 const resolvedName = computed(() => props.name ?? group?.name.value)
+
+const aria = useControlAria()
 
 // Контекст `GrFormField`. Id поля вешается на `span[role="checkbox"]` — именно он
 // виджет и держит фокус; на скрытом `aria-hidden`-инпуте он был бы бесполезен
@@ -292,6 +298,7 @@ function onClick(e: MouseEvent): void {
 
 <template>
   <div
+    v-bind="aria.rootAttrs()"
     data-gr-checkbox
     :class="rootClassName"
     @click="onClick"
@@ -321,9 +328,10 @@ function onClick(e: MouseEvent): void {
       :aria-required="isRequired ? 'true' : undefined"
       :aria-readonly="isReadonly ? 'true' : undefined"
       :aria-invalid="isInvalid ? 'true' : undefined"
-      :aria-describedby="describedBy"
+      :aria-describedby="aria.describedBy(describedBy)"
+      :aria-errormessage="aria.errorMessage()"
       :aria-label="ariaLabel"
-      :aria-labelledby="labelledBy"
+      :aria-labelledby="aria.labelledBy(labelledBy)"
       :tabindex="resolvedDisabled ? -1 : (tabindex ?? 0)"
       :class="controlClassName"
       @keydown.space.prevent="toggle"

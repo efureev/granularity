@@ -17,6 +17,7 @@ import {
   type GrRatingSize,
   type GrRatingTone,
 } from './grRatingStyles'
+import { useControlAria } from '../../composables/internal/useControlAria'
 
 export type {
   GrRatingSize,
@@ -92,6 +93,9 @@ export interface GrRatingEmits {
   (e: 'blur', event: FocusEvent): void
 }
 
+// Связи потребителя (`aria-describedby` и соседи) уходят на элемент с ролью, а не на корень.
+defineOptions({ inheritAttrs: false })
+
 const props = withDefaults(
   defineProps<GrRatingProps>(),
   {
@@ -139,6 +143,8 @@ const {
   required: isRequired,
   readonly: isReadonly,
 } = useGrFormControl(() => props)
+
+const aria = useControlAria()
 const describedBy = computed(() => field?.describedById.value)
 
 const rootEl = ref<HTMLElement | null>(null)
@@ -300,6 +306,7 @@ function onKeydown(event: KeyboardEvent): void {
     ref="rootEl"
     data-gr-rating
     class="inline-flex items-center gap-2"
+    v-bind="aria.rootAttrs()"
   >
     <!-- Нативная форма: роль-виджет не labelable и в submit не попадает. -->
     <input
@@ -323,7 +330,9 @@ function onKeydown(event: KeyboardEvent): void {
       :aria-orientation="asSlider ? 'horizontal' : undefined"
       :aria-disabled="asSlider && disabled ? 'true' : undefined"
       :aria-invalid="asSlider && isInvalid ? 'true' : undefined"
-      :aria-describedby="asSlider ? describedBy : undefined"
+      :aria-describedby="aria.describedBy(asSlider ? describedBy : undefined)"
+      :aria-labelledby="aria.labelledBy()"
+      :aria-errormessage="asSlider ? aria.errorMessage() : undefined"
       :aria-required="asSlider && isRequired ? 'true' : undefined"
       :aria-readonly="asSlider && isReadonly ? 'true' : undefined"
       @keydown="onKeydown"

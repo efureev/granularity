@@ -68,6 +68,7 @@ import IconArrowLeft from '~icons/lucide/arrow-left'
 import IconArrowRight from '~icons/lucide/arrow-right'
 import IconChevronLeft from '~icons/lucide/chevron-left'
 import IconChevronRight from '~icons/lucide/chevron-right'
+import { useControlAria } from '../../composables/internal/useControlAria'
 
 export type GrTransferItemKey<T> = string | ((item: T) => GrTransferKey)
 export type GrTransferItemLabel<T> = string | ((item: T) => string)
@@ -130,6 +131,9 @@ export interface GrTransferEmits {
   (e: 'focus', event: FocusEvent): void
   (e: 'blur', event: FocusEvent): void
 }
+
+// Связи потребителя (`aria-describedby` и соседи) уходят на элемент с ролью, а не на корень.
+defineOptions({ inheritAttrs: false })
 
 const props = withDefaults(defineProps<GrTransferProps<TItem>>(), {
   itemKey: undefined,
@@ -213,10 +217,23 @@ const {
   describedBy,
 } = useGrFormControl(() => props)
 
+const aria = useControlAria()
+
 const rootEl = ref<HTMLElement | null>(null)
 const uid = useId()
 const sourceTitleId = `${uid}-source-title`
 const targetTitleId = `${uid}-target-title`
+
+/** Подпись списка: заголовок стороны и, у правой, подпись поля. */
+function listLabelledBy(side: 'source' | 'target'): string | undefined {
+  if (hasHeaderSlot.value)
+    return side === 'target' ? fieldLabelId.value : undefined
+
+  if (side === 'target' && fieldLabelId.value)
+    return `${fieldLabelId.value} ${targetTitleId}`
+
+  return side === 'source' ? sourceTitleId : targetTitleId
+}
 const sourceListId = `${uid}-source-list`
 const targetListId = `${uid}-target-list`
 
@@ -1012,6 +1029,7 @@ defineExpose({
     :class="transferRootBase"
     :aria-label="ariaLabel"
     :aria-disabled="isDisabled ? 'true' : undefined"
+    v-bind="aria.rootAttrs()"
     @focusin="onFocusIn"
     @focusout="onFocusOut"
   >
@@ -1125,12 +1143,9 @@ defineExpose({
         :class="transferListBase"
         :style="listStyle(side)"
         :aria-label="hasHeaderSlot ? titles[side] : undefined"
-        :aria-labelledby="hasHeaderSlot
-          ? (side === 'target' ? fieldLabelId : undefined)
-          : (side === 'target' && fieldLabelId
-            ? `${fieldLabelId} ${targetTitleId}`
-            : (side === 'source' ? sourceTitleId : targetTitleId))"
-        :aria-describedby="side === 'target' ? describedBy : undefined"
+        :aria-labelledby="side === 'target' ? aria.labelledBy(listLabelledBy(side)) : listLabelledBy(side)"
+        :aria-describedby="side === 'target' ? aria.describedBy(describedBy) : undefined"
+        :aria-errormessage="aria.errorMessage()"
         :aria-invalid="side === 'target' && isInvalid ? 'true' : undefined"
         :aria-required="side === 'target' && isRequired ? 'true' : undefined"
         :aria-readonly="side === 'target' && isReadonly ? 'true' : undefined"

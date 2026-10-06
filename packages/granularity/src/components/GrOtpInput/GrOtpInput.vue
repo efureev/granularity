@@ -22,6 +22,7 @@ import {
   sanitizeOtpValue,
   type GrOtpInputType,
 } from './otpValue'
+import { useControlAria } from '../../composables/internal/useControlAria'
 
 export type { GrOtpInputSize } from './grOtpInputStyles'
 export type { GrOtpInputType } from './otpValue'
@@ -69,6 +70,9 @@ export interface GrOtpInputEmits {
   /** Код набран целиком. Точка автосабмита. */
   (e: 'complete', value: string): void
 }
+
+// Связи потребителя (`aria-describedby` и соседи) уходят на элемент с ролью, а не на корень.
+defineOptions({ inheritAttrs: false })
 
 const props = withDefaults(
   defineProps<GrOtpInputProps>(),
@@ -119,6 +123,8 @@ const {
   id: fieldId,
   describedBy,
 } = useGrFormControl(() => props)
+
+const aria = useControlAria()
 
 const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrOtpInput' })
 const resolvedLength = useGrComponentProp('GrOtpInput', 'length', () => props.length, 6)
@@ -367,6 +373,7 @@ if (__GR_DEV__) {
       data-testid="gr-otp-input"
       data-gr-otp-input
       :class="rootClass"
+    v-bind="aria.rootAttrs()"
   >
     <template v-for="(char, index) in characters" :key="index">
       <span
@@ -418,7 +425,9 @@ if (__GR_DEV__) {
         :readonly="isReadonly"
         :required="isRequired"
         :aria-label="ariaLabel"
-        :aria-describedby="describedBy"
+        :aria-describedby="aria.describedBy(describedBy)"
+        :aria-errormessage="aria.errorMessage()"
+        :aria-labelledby="aria.labelledBy()"
         :aria-invalid="isInvalid ? 'true' : undefined"
         :aria-required="isRequired ? 'true' : undefined"
         :inputmode="OTP_TYPE_INPUT_MODES[type]"

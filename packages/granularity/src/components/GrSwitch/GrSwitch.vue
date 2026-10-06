@@ -24,6 +24,7 @@ import {
   type GrSwitchSize,
   type GrSwitchStateTextSize,
 } from './grSwitchStyles'
+import { useControlAria } from '../../composables/internal/useControlAria'
 
 export type {
   GrSwitchLabelPosition,
@@ -151,6 +152,8 @@ const {
   required: isRequired,
   readonly: isReadonly,
 } = useGrFormControl(() => props)
+
+const aria = useControlAria()
 
 const { t } = useGranularityTranslations()
 
@@ -316,13 +319,15 @@ function toggle(): void {
   <button
       :id="fieldId"
       ref="rootEl"
-      v-bind="$attrs"
+      v-bind="aria.rootAttrs()"
       type="button"
       role="switch"
       data-gr-switch
       :aria-checked="modelValue ? 'true' : 'false'"
       :aria-label="ariaLabel"
-      :aria-describedby="describedBy"
+      :aria-describedby="aria.describedBy(describedBy)"
+      :aria-labelledby="aria.labelledBy()"
+      :aria-errormessage="aria.errorMessage()"
       :aria-invalid="isInvalid ? 'true' : undefined"
       :aria-required="isRequired ? 'true' : undefined"
       :aria-readonly="isReadonly ? 'true' : undefined"

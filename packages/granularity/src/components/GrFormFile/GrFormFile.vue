@@ -28,6 +28,7 @@ import { vDropzone } from '../../directives'
 import { acceptValidator, FileValidationError, maxCountValidator, resolveFileValidationMessage, runFileValidators } from '../../fileValidation'
 import type { FileValidationIssue, FileValidator } from '../../fileValidation'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
+import { useControlAria } from '../../composables/internal/useControlAria'
 
 export type GrFormFileError = FileValidationIssue
 
@@ -90,6 +91,9 @@ export interface GrFormFileEmits {
   (e: 'blur', event: FocusEvent): void
 }
 
+// Связи потребителя (`aria-describedby` и соседи) уходят на элемент с ролью, а не на корень.
+defineOptions({ inheritAttrs: false })
+
 const props = withDefaults(
   defineProps<GrFormFileProps>(),
   {
@@ -149,6 +153,8 @@ const {
   // перетаскиванием, ни удалением.
   locked: isLocked,
 } = useGrFormControl(() => props)
+
+const aria = useControlAria()
 const resolvedUploadText = computed(() => props.uploadText ?? t('gr.formFile.upload', 'Upload file'))
 const resolvedChangeText = computed(() => props.changeText ?? t('gr.formFile.change', 'Change file'))
 const resolvedRemoveText = computed(() => props.removeText ?? t('gr.formFile.remove', 'Remove'))
@@ -434,6 +440,7 @@ watch(
     data-gr-form-file
     class="rounded-[var(--gr-radius-md)]"
     :class="isDisabled ? 'cursor-not-allowed' : ''"
+    v-bind="aria.rootAttrs()"
     @focusin="onFocusIn"
     @focusout="onFocusOut"
   >
@@ -460,7 +467,9 @@ watch(
           variant="secondary"
           :size="buttonSize"
           data-gr-form-file-upload-btn
-          :aria-describedby="describedByIds"
+          :aria-describedby="aria.describedBy(describedByIds)"
+          :aria-errormessage="aria.errorMessage()"
+          :aria-labelledby="aria.labelledBy()"
           :aria-invalid="showsInvalid ? 'true' : undefined"
           :aria-label="ariaLabel"
           :disabled="isDisabled"

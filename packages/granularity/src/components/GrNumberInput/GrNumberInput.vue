@@ -40,6 +40,7 @@ import {
   controlStateIconColors,
   controlStateTextKey,
 } from '../shared/controlState'
+import { useControlAria } from '../../composables/internal/useControlAria'
 
 defineOptions({
   inheritAttrs: false,
@@ -198,6 +199,8 @@ const {
   required: isRequired,
   readonly: isReadonly,
 } = useGrFormControl(() => props)
+
+const aria = useControlAria()
 
 const emit = defineEmits<GrNumberInputEmits>()
 defineSlots<{
@@ -708,7 +711,7 @@ if (__GR_DEV__) {
     <input
       :id="resolvedId"
       ref="inputEl"
-      v-bind="$attrs"
+      v-bind="aria.rootAttrs()"
       :name="name"
       type="text"
       :inputmode="inputmode"
@@ -722,7 +725,9 @@ if (__GR_DEV__) {
       :aria-valuemax="max"
       :aria-valuetext="ariaValueText"
       :aria-invalid="isInvalid ? 'true' : undefined"
-      :aria-describedby="describedBy"
+      :aria-describedby="aria.describedBy(describedBy)"
+      :aria-labelledby="aria.labelledBy()"
+      :aria-errormessage="aria.errorMessage()"
       :aria-required="isRequired ? 'true' : undefined"
       :aria-readonly="isReadonly ? 'true' : undefined"
       :aria-label="ariaLabel"

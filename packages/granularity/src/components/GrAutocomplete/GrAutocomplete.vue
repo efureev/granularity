@@ -43,6 +43,7 @@ import IconCheck from '~icons/lucide/check'
 import IconChevronDown from '~icons/lucide/chevron-down'
 import IconLoaderCircle from '~icons/lucide/loader-circle'
 import IconX from '~icons/lucide/x'
+import { useControlAria } from '../../composables/internal/useControlAria'
 
 export type {
   GrAutocompleteModelValue,
@@ -200,6 +201,9 @@ export interface GrAutocompleteEmits<TValue extends GrAutocompleteValue = string
   (e: 'blur', event: FocusEvent): void
 }
 
+// Связи потребителя (`aria-describedby` и соседи) уходят на элемент с ролью, а не на корень.
+defineOptions({ inheritAttrs: false })
+
 const props = withDefaults(
   defineProps<GrAutocompleteProps<TValue>>(),
   {
@@ -303,6 +307,8 @@ const {
   readonly: isReadonly,
 } = useGrFormControl(() => props)
 const describedBy = computed(() => field?.describedById.value)
+
+const aria = useControlAria()
 
 // Read-only запирает контрол так же, как disabled: значение видно, но панель не
 // открывается, опции не выбираются и чипы не удаляются. Без этого `readonly`
@@ -738,7 +744,8 @@ const themeAttrs = useGrThemeAttrs()
     v-click-outside="{ handler: closeDropdown, enabled: open, exclude: clickOutsideExclude }"
     data-gr-autocomplete
     class="relative w-full"
-     @focusin="onFocusIn"
+     v-bind="aria.rootAttrs()"
+    @focusin="onFocusIn"
     @focusout="onFocusOut"
   >
     <div
@@ -791,7 +798,9 @@ const themeAttrs = useGrThemeAttrs()
         :placeholder="hasSelection && multiple ? undefined : placeholder"
         :aria-label="ariaLabel"
         :aria-invalid="isInvalid ? 'true' : undefined"
-        :aria-describedby="describedBy"
+        :aria-describedby="aria.describedBy(describedBy)"
+        :aria-errormessage="aria.errorMessage()"
+        :aria-labelledby="aria.labelledBy()"
         :aria-required="isRequired ? 'true' : undefined"
         :aria-readonly="isReadonly ? 'true' : undefined"
         :readonly="isReadonly"

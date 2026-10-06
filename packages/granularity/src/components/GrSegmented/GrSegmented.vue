@@ -28,6 +28,7 @@ import {
   type GrSegmentedValue,
   type GrSegmentedVariant,
 } from './grSegmentedStyles'
+import { useControlAria } from '../../composables/internal/useControlAria'
 
 type IndicatorGeometry = {
   width: number
@@ -88,6 +89,9 @@ export interface GrSegmentedEmits {
   (e: 'blur', event: FocusEvent): void
 }
 
+// Связи потребителя (`aria-describedby` и соседи) уходят на элемент с ролью, а не на корень.
+defineOptions({ inheritAttrs: false })
+
 const props = withDefaults(
   defineProps<GrSegmentedProps>(),
   {
@@ -139,6 +143,8 @@ const {
   required: isRequired,
   readonly: isReadonly,
 } = useGrFormControl(() => props)
+
+const aria = useControlAria()
 
 const rootRef = ref<HTMLElement | null>(null)
 
@@ -494,14 +500,16 @@ if (__GR_DEV__) {
     role="radiogroup"
     :aria-orientation="orientation"
     :aria-label="ariaLabel"
-    :aria-labelledby="labelledBy"
-    :aria-describedby="describedBy"
+    :aria-labelledby="aria.labelledBy(labelledBy)"
+    :aria-describedby="aria.describedBy(describedBy)"
+    :aria-errormessage="aria.errorMessage()"
     :aria-invalid="isInvalid ? 'true' : undefined"
     :aria-required="isRequired ? 'true' : undefined"
     :aria-readonly="isReadonly ? 'true' : undefined"
     :aria-disabled="isDisabled ? 'true' : undefined"
     :class="rootClassName"
     :style="rootStyle"
+    v-bind="aria.rootAttrs()"
     @focusin="onFocusIn"
     @focusout="onFocusOut"
   >

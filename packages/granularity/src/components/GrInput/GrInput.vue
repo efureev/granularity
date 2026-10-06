@@ -25,6 +25,7 @@ import IconCheckCircle from '~icons/lucide/check-circle'
 import IconAlertTriangle from '~icons/lucide/alert-triangle'
 import IconEye from '~icons/lucide/eye'
 import IconEyeOff from '~icons/lucide/eye-off'
+import { useControlAria } from '../../composables/internal/useControlAria'
 
 export interface GrInputProps {
   /**
@@ -207,6 +208,8 @@ const {
   required: isRequired,
   readonly: isReadonly,
 } = useGrFormControl(() => props)
+
+const aria = useControlAria()
 
 const inputEl = ref<HTMLInputElement | null>(null)
 
@@ -397,7 +400,7 @@ function togglePassword(): void {
       <input
           :id="resolvedId"
           ref="inputEl"
-          v-bind="$attrs"
+          v-bind="aria.rootAttrs()"
           :name="props.name"
           :type="resolvedType"
           :inputmode="props.inputmode"
@@ -408,7 +411,9 @@ function togglePassword(): void {
           :maxlength="props.maxlength"
           :value="props.modelValue"
           :aria-invalid="isInvalid ? 'true' : undefined"
-          :aria-describedby="describedBy"
+          :aria-describedby="aria.describedBy(describedBy)"
+          :aria-labelledby="aria.labelledBy()"
+          :aria-errormessage="aria.errorMessage()"
           :aria-required="isRequired ? 'true' : undefined"
           :aria-readonly="isReadonly ? 'true' : undefined"
           :aria-label="ariaLabel"

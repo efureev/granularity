@@ -36,6 +36,7 @@ import {
   type GrInputTagSize,
   type GrInputTagState,
 } from './grInputTagStyles'
+import { useControlAria } from '../../composables/internal/useControlAria'
 
 export type { GrInputTagSize, GrInputTagState } from './grInputTagStyles'
 
@@ -125,6 +126,9 @@ export interface GrInputTagEmits {
   (e: 'blur', event: FocusEvent): void
 }
 
+// Связи потребителя (`aria-describedby` и соседи) уходят на элемент с ролью, а не на корень.
+defineOptions({ inheritAttrs: false })
+
 const props = withDefaults(
   defineProps<GrInputTagProps>(),
   {
@@ -178,6 +182,8 @@ const {
   required: isRequired,
   readonly: isReadonly,
 } = useGrFormControl(() => props)
+
+const aria = useControlAria()
 
 // Эффективные значения: локальный проп → `GrConfigProvider` → дефолт компонента.
 /** Ширина аддона по умолчанию — та же лестница, что у `GrInput`. */
@@ -872,6 +878,7 @@ if (__GR_DEV__) {
     data-gr-input-tag
     data-testid="gr-input-tag"
     :class="wrapperClassName"
+    v-bind="aria.rootAttrs()"
     @click="focus"
     @focusin="onFocusIn"
     @focusout="onFocusOut"
@@ -957,7 +964,9 @@ if (__GR_DEV__) {
       :readonly="isReadonly"
       :placeholder="placeholderText"
       :aria-label="ariaLabel"
-      :aria-describedby="describedBy"
+      :aria-describedby="aria.describedBy(describedBy)"
+      :aria-errormessage="aria.errorMessage()"
+      :aria-labelledby="aria.labelledBy()"
       :aria-required="isRequired ? 'true' : undefined"
       :aria-readonly="isReadonly ? 'true' : undefined"
       :aria-invalid="isInvalid ? 'true' : undefined"

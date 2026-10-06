@@ -35,6 +35,7 @@ import { useGrFormFieldContext } from '../shared/formFieldContext'
 import { useGrFormControl } from '../../composables/useGrFormControl'
 import { useFocusWithin } from '../../composables/internal/useFocusWithin'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
+import { useControlAria } from '../../composables/internal/useControlAria'
 
 export type GrFileUploadMode = 'batch' | 'per-file'
 
@@ -156,6 +157,9 @@ export interface GrFileUploadEmits<TResponse = unknown> {
   (e: 'blur', event: FocusEvent): void
 }
 
+// Связи потребителя (`aria-describedby` и соседи) уходят на элемент с ролью, а не на корень.
+defineOptions({ inheritAttrs: false })
+
 const props = withDefaults(
   defineProps<GrFileUploadProps<TResponse>>(),
   {
@@ -254,6 +258,8 @@ const {
   // `readonly` виден и уходит в форму, но поменять его нельзя.
   locked: isLocked,
 } = useGrFormControl(() => props)
+
+const aria = useControlAria()
 const resolvedPlaceholder = computed(() => props.placeholder ?? t('gr.fileUpload.placeholder', 'Drag files here or click to select'))
 const resolvedProgressLabel = computed(() => props.progressLabel ?? t('gr.fileUpload.progress', 'Upload progress'))
 
@@ -789,6 +795,7 @@ defineExpose({
     ref="rootEl"
     data-gr-file-upload
     :class="hasCustomUi ? 'inline-block' : zoneClass"
+    v-bind="aria.rootAttrs()"
     @click="onRootClick"
     @focusin="onFocusIn"
     @focusout="onFocusOut"
@@ -809,7 +816,9 @@ defineExpose({
       :tabindex="hasCustomUi || isDisabled ? -1 : 0"
       :aria-hidden="hasCustomUi ? 'true' : undefined"
       :aria-label="ariaLabel ?? (hasCustomUi ? undefined : resolvedPlaceholder)"
-      :aria-describedby="describedBy"
+      :aria-describedby="aria.describedBy(describedBy)"
+      :aria-errormessage="aria.errorMessage()"
+      :aria-labelledby="aria.labelledBy()"
       :aria-invalid="isInvalid ? 'true' : undefined"
       :aria-required="isRequired ? 'true' : undefined"
       :aria-readonly="isReadonly ? 'true' : undefined"

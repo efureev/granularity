@@ -39,6 +39,7 @@ import IconCheckCircle from '~icons/lucide/check-circle'
 import IconAlertTriangle from '~icons/lucide/alert-triangle'
 import IconLoaderCircle from '~icons/lucide/loader-circle'
 import IconX from '~icons/lucide/x'
+import { useControlAria } from '../../composables/internal/useControlAria'
 
 export interface GrTreeSelectEmits<T extends Record<string, any> = any> {
   (e: 'update:modelValue', value: GrTreeSelectModelValue): void
@@ -50,6 +51,9 @@ export interface GrTreeSelectEmits<T extends Record<string, any> = any> {
   (e: 'focus', event: FocusEvent): void
   (e: 'blur', event: FocusEvent): void
 }
+
+// Связи потребителя (`aria-describedby` и соседи) уходят на элемент с ролью, а не на корень.
+defineOptions({ inheritAttrs: false })
 
 const props = withDefaults(
   defineProps<GrTreeSelectProps<T>>(),
@@ -132,6 +136,8 @@ const {
   required: isRequired,
   readonly: isReadonly,
 } = useGrFormControl(() => props)
+
+const aria = useControlAria()
 
 /**
  * Небуквенный признак состояния: иконка для глаз, скрытая подпись для
@@ -647,7 +653,8 @@ const themeAttrs = useGrThemeAttrs()
     v-click-outside="{ handler: onClickOutside, enabled: open, exclude: clickOutsideExclude }"
     data-gr-tree-select
     class="relative"
-     @focusin="onFocusIn"
+     v-bind="aria.rootAttrs()"
+    @focusin="onFocusIn"
     @focusout="onFocusOut"
   >
     <!-- Нативная форма: hidden на каждый выбранный ключ. -->
@@ -689,7 +696,9 @@ const themeAttrs = useGrThemeAttrs()
         :aria-controls="open && hasTree ? treeId : undefined"
         :aria-invalid="isInvalid ? 'true' : undefined"
         :aria-required="isRequired ? 'true' : undefined"
-        :aria-describedby="describedBy"
+        :aria-describedby="aria.describedBy(describedBy)"
+        :aria-errormessage="aria.errorMessage()"
+        :aria-labelledby="aria.labelledBy()"
         :aria-label="ariaLabel"
         class="w-full border placeholder:text-[var(--gr-muted-fg)] transition-colors duration-[var(--gr-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]"
         :class="[className, $slots.value || hasTags ? 'text-transparent placeholder:text-transparent' : '']"

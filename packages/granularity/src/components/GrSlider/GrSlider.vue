@@ -27,6 +27,7 @@ import {
   type GrSliderOrientation,
   type GrSliderSize,
 } from './grSliderStyles'
+import { useControlAria } from '../../composables/internal/useControlAria'
 
 export type {
   GrSliderMarks,
@@ -86,6 +87,9 @@ export interface GrSliderEmits {
   (e: 'blur', event: FocusEvent): void
 }
 
+// Связи потребителя (`aria-describedby` и соседи) уходят на элемент с ролью, а не на корень.
+defineOptions({ inheritAttrs: false })
+
 const props = withDefaults(
   defineProps<GrSliderProps>(),
   {
@@ -129,6 +133,8 @@ const {
   required: isRequired,
   readonly: isReadonly,
 } = useGrFormControl(() => props)
+
+const aria = useControlAria()
 const describedBy = computed(() => field?.describedById.value)
 
 const trackEl = ref<HTMLElement | null>(null)
@@ -475,6 +481,7 @@ function thumbValueText(value: number): string | undefined {
     data-gr-slider
     :data-orientation="orientation"
     :class="sliderRootClass({ size: resolvedSize, disabled: isDisabled, hasMarks: normalizedMarks.length > 0, orientation })"
+    v-bind="aria.rootAttrs()"
     @focusin="onFocusIn"
     @focusout="onFocusOut"
   >
@@ -551,7 +558,9 @@ function thumbValueText(value: number): string | undefined {
         :aria-label="thumbAriaLabel(index)"
         :aria-disabled="isDisabled ? 'true' : undefined"
         :aria-invalid="isInvalid ? 'true' : undefined"
-        :aria-describedby="index === 0 ? describedBy : undefined"
+        :aria-describedby="index === 0 ? aria.describedBy(describedBy) : undefined"
+        :aria-labelledby="index === 0 ? aria.labelledBy() : undefined"
+        :aria-errormessage="index === 0 ? aria.errorMessage() : undefined"
         :aria-required="isRequired && index === 0 ? 'true' : undefined"
         :aria-readonly="isReadonly ? 'true' : undefined"
         @keydown="onThumbKeydown($event, index)"

@@ -17,6 +17,7 @@ import {
   type GrRadioVariant,
 } from './grRadioStyles'
 import { GR_RADIO_GROUP_CONTEXT, type GrRadioValue } from './grRadioGroupContext'
+import { useControlAria } from '../../composables/internal/useControlAria'
 
 export type { GrRadioValue } from './grRadioGroupContext'
 
@@ -59,6 +60,9 @@ export interface GrRadioEmits {
   (e: 'update:modelValue', value: GrRadioValue): void
 }
 
+// Связи потребителя (`aria-describedby` и соседи) уходят на элемент с ролью, а не на корень.
+defineOptions({ inheritAttrs: false })
+
 const props = withDefaults(defineProps<GrRadioProps>(), {
   modelValue: undefined,
   disabled: undefined,
@@ -96,6 +100,8 @@ const resolvedDisabled = computed(() => {
 })
 
 const resolvedReadonly = computed(() => group?.readonly.value ?? false)
+
+const aria = useControlAria()
 
 // «Или», а не `??`: ошибку может объявить и группа, и сам переключатель.
 const resolvedInvalid = computed(() => props.invalid || (group?.invalid.value ?? false))
@@ -224,9 +230,13 @@ defineSlots<{
     :aria-disabled="resolvedDisabled ? 'true' : undefined"
     :aria-invalid="resolvedInvalid ? 'true' : undefined"
     :aria-required="required ? 'true' : undefined"
+    :aria-describedby="aria.describedBy()"
+    :aria-labelledby="aria.labelledBy()"
+    :aria-errormessage="aria.errorMessage()"
     :data-value="domValue"
     :tabindex="rovingTabindex"
     :class="buttonClassName"
+    v-bind="aria.rootAttrs()"
     @click="onButtonClick"
     @keydown.space.prevent="onButtonClick"
     @keydown.enter.prevent="onButtonClick"
@@ -254,11 +264,14 @@ defineSlots<{
     :aria-disabled="resolvedDisabled ? 'true' : undefined"
     :aria-invalid="resolvedInvalid ? 'true' : undefined"
     :aria-required="required ? 'true' : undefined"
-    :aria-describedby="hasDescription ? descriptionId : undefined"
+    :aria-describedby="aria.describedBy(hasDescription ? descriptionId : undefined)"
+    :aria-labelledby="aria.labelledBy()"
+    :aria-errormessage="aria.errorMessage()"
     :data-value="domValue"
     :tabindex="rovingTabindex"
     class="inline-flex items-start gap-2 select-none focus-visible:outline-none focus-visible:rounded-[var(--gr-radius-md)] focus-visible:shadow-[0_0_0_2px_var(--gr-ring),0_0_0_4px_var(--gr-bg)]"
     :class="rootClassName"
+    v-bind="aria.rootAttrs()"
     @click="onButtonClick"
     @keydown.space.prevent="onButtonClick"
     @keydown.enter.prevent="onButtonClick"

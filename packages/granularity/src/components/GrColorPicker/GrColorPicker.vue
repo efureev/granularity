@@ -50,6 +50,7 @@ import {
   type GrColorPickerSize,
   type GrColorPickerView,
 } from './grColorPickerStyles'
+import { useControlAria } from '../../composables/internal/useControlAria'
 
 export type { GrColorPickerSize, GrColorPickerView } from './grColorPickerStyles'
 
@@ -95,6 +96,9 @@ export interface GrColorPickerEmits {
   (e: 'blur', event: FocusEvent): void
 }
 
+// Связи потребителя (`aria-describedby` и соседи) уходят на элемент с ролью, а не на корень.
+defineOptions({ inheritAttrs: false })
+
 const props = withDefaults(defineProps<GrColorPickerProps>(), {
   alpha: false,
   // Дефолт живёт в резолвере — как у `size`.
@@ -134,6 +138,8 @@ const {
   // «Ввод не принимается» — `disabled` или `readonly`: значение видно, но не меняется.
   locked: isLocked,
 } = useGrFormControl(() => props)
+
+const aria = useControlAria()
 
 /**
  * `aria-required` и `aria-readonly` роль `button` не поддерживает — axe роняет
@@ -433,7 +439,7 @@ async function pickFromScreen(): Promise<void> {
 </script>
 
 <template>
-  <div data-gr-color-picker>
+  <div data-gr-color-picker v-bind="aria.rootAttrs()">
     <!-- Значение для нативной формы уходит скрытым полем: интерактивного
          контрола внутри виджета быть не должно. -->
     <input v-if="name" type="hidden" :name="name" :value="hexValue">
@@ -458,7 +464,9 @@ async function pickFromScreen(): Promise<void> {
           type="button"
           :class="triggerClass"
           :aria-label="ariaLabel"
-          :aria-describedby="describedBy"
+          :aria-describedby="aria.describedBy(describedBy)"
+          :aria-errormessage="aria.errorMessage()"
+          :aria-labelledby="aria.labelledBy()"
           :aria-invalid="isInvalid ? 'true' : undefined"
           @focus="emit('focus', $event)"
           @blur="emit('blur', $event)"

@@ -22,6 +22,7 @@ import { useFocusWithin } from '../../composables/internal/useFocusWithin'
 import GrCheckbox from '../GrCheckbox/GrCheckbox.vue'
 import { GR_CHECKBOX_GROUP_CONTEXT } from '../GrCheckbox/grCheckboxGroupContext'
 import type { GrCheckboxSize } from '../GrCheckbox/grCheckboxStyles'
+import { useControlAria } from '../../composables/internal/useControlAria'
 
 export type GrCheckboxGroupDirection = 'vertical' | 'horizontal'
 
@@ -54,6 +55,9 @@ export interface GrCheckboxGroupEmits {
   (e: 'focus', event: FocusEvent): void
   (e: 'blur', event: FocusEvent): void
 }
+
+// Связи потребителя (`aria-describedby` и соседи) уходят на элемент с ролью, а не на корень.
+defineOptions({ inheritAttrs: false })
 
 const props = withDefaults(defineProps<GrCheckboxGroupProps>(), {
   options: undefined,
@@ -88,6 +92,8 @@ const {
   required: isRequired,
   readonly: isReadonly,
 } = useGrFormControl(() => props)
+
+const aria = useControlAria()
 
 const labelledBy = computed(() => (props.ariaLabel ? undefined : fieldLabelId.value))
 
@@ -157,10 +163,12 @@ provide(GR_CHECKBOX_GROUP_CONTEXT, {
     role="group"
     :class="layoutClass"
     :aria-label="ariaLabel"
-    :aria-labelledby="labelledBy"
-    :aria-describedby="describedBy"
+    :aria-labelledby="aria.labelledBy(labelledBy)"
+    :aria-describedby="aria.describedBy(describedBy)"
+    :aria-errormessage="aria.errorMessage()"
     :aria-invalid="isInvalid ? 'true' : undefined"
     :aria-disabled="isDisabled ? 'true' : undefined"
+    v-bind="aria.rootAttrs()"
     @focusin="onFocusIn"
     @focusout="onFocusOut"
   >
