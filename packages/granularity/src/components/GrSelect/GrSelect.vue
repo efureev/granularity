@@ -313,7 +313,7 @@ const resolvedSearchPlaceholder = computed(() =>
 
 const baseClassName = computed(() => props.view === 'link' ? linkBaseClass : defaultBaseClass)
 
-const rootClass = computed(() => props.view === 'link' ? 'relative inline-block align-baseline' : 'relative w-full')
+const rootClass = computed(() => props.view === 'link' ? 'relative inline-block align-baseline' : 'relative')
 
 const emit = defineEmits<GrSelectEmits<TValue>>()
 defineSlots<{
@@ -891,7 +891,7 @@ const themeAttrs = useGrThemeAttrs()
   <div
     v-if="effectiveOptionsView === 'native'"
     data-gr-select
-    :class="rootClass"
+    :class="[rootClass, view === 'link' || aria.ownsWidth() ? '' : 'w-full']"
      v-bind="aria.rootAttrs()"
     @focusin="onFocusIn"
     @focusout="onFocusOut"
@@ -971,7 +971,7 @@ const themeAttrs = useGrThemeAttrs()
     ref="rootEl"
     v-click-outside="{ handler: closeDropdown, enabled: open, exclude: clickOutsideExclude }"
     data-gr-select
-    :class="rootClass"
+    :class="[rootClass, view === 'link' || aria.ownsWidth() ? '' : 'w-full']"
     v-bind="aria.rootAttrs()"
   >
     <!-- Нативная форма: панельный режим сериализуется hidden-инпутами по keyOf. -->

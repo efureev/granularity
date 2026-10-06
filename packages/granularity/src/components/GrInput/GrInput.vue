@@ -408,7 +408,9 @@ function togglePassword(): void {
 </script>
 
 <template>
-  <div data-gr-input class="w-full">
+  <div data-gr-input :class="aria.ownsWidth() ? '' : 'w-full'" v-bind="aria.layoutAttrs()">
+    <!-- `class` и `style` потребителя — на корне: он держит рамку и ширину.
+         На нативное поле уходит остальное — там `aria-*` и `data-*` что-то значат. -->
     <div :class="shellClass">
       <div
           v-if="$slots.prefix"
@@ -426,7 +428,7 @@ function togglePassword(): void {
       <input
           :id="resolvedId"
           ref="inputEl"
-          v-bind="aria.rootAttrs()"
+          v-bind="aria.fieldAttrs()"
           :name="props.name"
           :type="resolvedType"
           :inputmode="props.inputmode"

@@ -930,7 +930,7 @@ if (__GR_DEV__) {
     ref="rootEl"
     data-gr-input-tag
     data-testid="gr-input-tag"
-    :class="wrapperClassName"
+    :class="[wrapperClassName, aria.ownsWidth() ? '' : 'w-full']"
     v-bind="aria.rootAttrs()"
     @click="focus"
     @focusin="onFocusIn"

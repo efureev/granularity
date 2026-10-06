@@ -734,8 +734,9 @@ if (__GR_DEV__) {
 <template>
   <div
     data-gr-number-input
-    class="relative w-full overflow-hidden border bg-[var(--gr-bg)] transition-colors duration-[var(--gr-duration-fast)] focus-within:ring-2 focus-within:ring-[var(--gr-ring)]"
-    :class="[shellShapeClass[resolvedShape], shellHeightClass[resolvedSize], shellClassName]"
+    v-bind="aria.layoutAttrs()"
+    class="relative overflow-hidden border bg-[var(--gr-bg)] transition-colors duration-[var(--gr-duration-fast)] focus-within:ring-2 focus-within:ring-[var(--gr-ring)]"
+    :class="[aria.ownsWidth() ? '' : 'w-full', shellShapeClass[resolvedShape], shellHeightClass[resolvedSize], shellClassName]"
   >
     <div
       v-if="$slots.prefix"
@@ -752,7 +753,7 @@ if (__GR_DEV__) {
     <input
       :id="resolvedId"
       ref="inputEl"
-      v-bind="aria.rootAttrs()"
+      v-bind="aria.fieldAttrs()"
       :name="name"
       type="text"
       :inputmode="inputmode"

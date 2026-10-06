@@ -743,8 +743,9 @@ const themeAttrs = useGrThemeAttrs()
     ref="rootEl"
     v-click-outside="{ handler: closeDropdown, enabled: open, exclude: clickOutsideExclude }"
     data-gr-autocomplete
-    class="relative w-full"
-     v-bind="aria.rootAttrs()"
+    class="relative"
+    :class="aria.ownsWidth() ? '' : 'w-full'"
+    v-bind="aria.rootAttrs()"
     @focusin="onFocusIn"
     @focusout="onFocusOut"
   >

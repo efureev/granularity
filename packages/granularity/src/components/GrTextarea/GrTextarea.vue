@@ -253,7 +253,7 @@ function clear(): void {
   focus()
 }
 
-const baseClass = 'w-full rounded-[var(--gr-radius-control)] border text-[var(--gr-fg)] placeholder:text-[var(--gr-muted-fg)] transition-colors duration-[var(--gr-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] disabled:cursor-not-allowed'
+const baseClass = 'rounded-[var(--gr-radius-control)] border text-[var(--gr-fg)] placeholder:text-[var(--gr-muted-fg)] transition-colors duration-[var(--gr-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] disabled:cursor-not-allowed'
 
 const className = computed(() => [
   sizes[resolvedSize.value],
@@ -318,11 +318,18 @@ function onBlur(e: FocusEvent): void {
 </script>
 
 <template>
-  <div v-if="hasCounters" data-gr-textarea-wrap class="relative w-full">
+  <div
+    v-if="hasCounters"
+    data-gr-textarea-wrap
+    class="relative"
+    :class="aria.ownsWidth() ? '' : 'w-full'"
+    v-bind="aria.layoutAttrs()"
+  >
     <textarea
       ref="textareaEl"
       v-autosize="autosize"
-      v-bind="{ ...textareaAttrs, ...aria.rootAttrs(), ...ariaLinks() }"
+      class="w-full"
+      v-bind="{ ...textareaAttrs, ...aria.fieldAttrs(), ...ariaLinks() }"
       @input="onInput"
       @change="onChange"
       @focus="onFocus"
@@ -380,11 +387,17 @@ function onBlur(e: FocusEvent): void {
   <!-- Обёртка появляется под кнопку очистки и под признак состояния: без них
        поле остаётся корневым элементом — на этом стоит контракт
        fallthrough-атрибутов. -->
-  <div v-else-if="resolvedClearable || signalState" class="relative w-full">
+  <div
+    v-else-if="resolvedClearable || signalState"
+    class="relative"
+    :class="aria.ownsWidth() ? '' : 'w-full'"
+    v-bind="aria.layoutAttrs()"
+  >
     <textarea
       ref="textareaEl"
       v-autosize="autosize"
-      v-bind="{ ...textareaAttrs, ...aria.rootAttrs(), ...ariaLinks() }"
+      class="w-full"
+      v-bind="{ ...textareaAttrs, ...aria.fieldAttrs(), ...ariaLinks() }"
       @input="onInput"
       @change="onChange"
       @focus="onFocus"
@@ -418,7 +431,9 @@ function onBlur(e: FocusEvent): void {
     v-else
     ref="textareaEl"
     v-autosize="autosize"
-    v-bind="{ ...textareaAttrs, ...aria.rootAttrs(), ...ariaLinks() }"
+    :class="[aria.ownsWidth() ? '' : 'w-full', aria.layoutAttrs().class]"
+    :style="aria.layoutAttrs().style"
+    v-bind="{ ...textareaAttrs, ...aria.fieldAttrs(), ...ariaLinks() }"
     @input="onInput"
     @change="onChange"
     @focus="onFocus"

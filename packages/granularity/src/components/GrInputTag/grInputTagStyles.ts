@@ -33,7 +33,7 @@ export const wrapperBorderClassByState: Record<GrInputTagState, string> = {
  */
 export const invalidWrapperBorderClass = 'border-[var(--gr-invalid-brd)] focus-within:ring-[var(--gr-invalid-ring)]'
 
-export const wrapperBaseClass = 'w-full flex flex-wrap items-center rounded-[var(--gr-radius-control)] border text-[var(--gr-fg)] transition-colors duration-[var(--gr-duration-fast)] focus-within:ring-2 focus-within:ring-[var(--gr-ring)]'
+export const wrapperBaseClass = 'flex flex-wrap items-center rounded-[var(--gr-radius-control)] border text-[var(--gr-fg)] transition-colors duration-[var(--gr-duration-fast)] focus-within:ring-2 focus-within:ring-[var(--gr-ring)]'
 
 export const wrapperEnabledClass = 'bg-[var(--gr-bg)] cursor-text'
 
