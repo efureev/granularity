@@ -5,6 +5,19 @@ All notable changes to the [`@feugene/granularity`](.) package are documented in
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Fixed
+
+- **Текущая точка `GrCarousel tone="neutral"` снова видна.** Тон `neutral` красил
+  текущую точку, её обвод и рамку текущей миниатюры в `--gr-secondary` — серый
+  поверхности, тот же, что у неактивных точек (`--gr-brd`): текущий кадр
+  переставал читаться, а обвод на подложке почти пропадал (1.41:1 на карточке
+  светлой темы). Теперь у `neutral` цвет основного текста, `--gr-fg`, как у
+  нейтрального счётчика `GrBadgeWrap`: не меньше 3:1 к фону страницы, карточки и
+  к неактивным точкам в обеих темах. Хук `--gr-carousel-dot-active` перебивает
+  тон, как прежде.
+
 ## [v1.0.9] 2026-10-06
 
 ### Fixed

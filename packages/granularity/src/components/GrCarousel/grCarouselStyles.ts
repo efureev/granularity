@@ -13,7 +13,8 @@ export type GrCarouselIndicators = typeof GR_CAROUSEL_INDICATORS[number]
  */
 const dotToneVars: Record<GrTone, string> = {
   primary: 'var(--gr-carousel-dot-active,var(--gr-primary))',
-  neutral: 'var(--gr-carousel-dot-active,var(--gr-secondary))',
+  // Не `--gr-secondary`: это цвет неактивных точек, и текущая пропадала бы среди них.
+  neutral: 'var(--gr-carousel-dot-active,var(--gr-fg))',
   success: 'var(--gr-carousel-dot-active,var(--gr-success))',
   warning: 'var(--gr-carousel-dot-active,var(--gr-warning))',
   danger: 'var(--gr-carousel-dot-active,var(--gr-danger))',
