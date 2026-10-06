@@ -148,8 +148,27 @@ export const sliderMarkLabelClass = 'absolute whitespace-nowrap text-[length:var
 export const sliderMarkLabelDisabledClass = 'text-[var(--gr-disabled-fg)]'
 
 /** Вертикальные подписи уходят вправо от дорожки: под ней им места нет. */
-export const sliderMarkLabelVerticalClass = 'left-full ml-2.5 translate-y-1/2'
-export const sliderMarkLabelHorizontalClass = 'top-full mt-2.5'
+export const sliderMarkLabelVerticalClass = 'left-full ml-[var(--gr-slider-mark-offset)] translate-y-1/2'
+export const sliderMarkLabelHorizontalClass = 'top-full mt-[var(--gr-slider-mark-offset)]'
+
+/** Диаметр бегунка и толщина дорожки по умолчанию — те же, что в классах выше. */
+const defaultThumbSize: Record<GrSliderSize, string> = { xs: '0.75rem', sm: '0.875rem', md: '1rem', lg: '1.25rem' }
+const defaultTrackSize: Record<GrSliderSize, string> = { xs: '0.1875rem', sm: '0.25rem', md: '0.375rem', lg: '0.5rem' }
+
+/**
+ * Отступ подписей меток от дорожки — от **бегунка**, а не на глаз.
+ *
+ * Отступ был постоянным (`0.625rem`), и крупный бегунок — `--gr-slider-thumb-size`
+ * вместе со слотом `#thumb`, путь из документации для «совсем другой ручки», —
+ * ложился на подписи: в значении 21 бегунок на 36px закрывал «21°». Теперь
+ * отступ — выступ бегунка за дорожку плюс зазор, но не меньше прежнего: на
+ * штатных размерах подписи стоят там же, где стояли.
+ */
+export function sliderMarkOffsetStyle(size: GrSliderSize): Record<string, string> {
+  return {
+    '--gr-slider-mark-offset': `max(0.625rem, calc((var(--gr-slider-thumb-size, ${defaultThumbSize[size]}) - var(--gr-slider-track-height, ${defaultTrackSize[size]})) / 2 + 0.25rem))`,
+  }
+}
 
 // Выравнивание подписи по позиции: центр для внутренних меток, а крайние (0% и
 // 100%) прижимаем внутрь, чтобы они не вылезали за края дорожки и не обрезались.
@@ -195,8 +214,12 @@ export function sliderRootClass(options: {
     sliderRootBaseClass,
     sliderRootOrientationClass[orientation],
     vertical ? sliderPaddingVerticalBySize[options.size] : sliderPaddingBySize[options.size],
-    // Резервируем место под подписи меток, чтобы они не наезжали на соседний контент.
-    options.hasMarks ? (vertical ? 'mr-10' : 'mb-7') : '',
+    // Резервируем место под подписи меток, чтобы они не наезжали на соседний
+    // контент. Растёт вместе с отступом подписей: на штатных размерах это те же
+    // `1.75rem` снизу и `2.5rem` справа.
+    options.hasMarks
+      ? (vertical ? 'mr-[calc(var(--gr-slider-mark-offset)+1.875rem)]' : 'mb-[calc(var(--gr-slider-mark-offset)+1.125rem)]')
+      : '',
   ]
     .filter(Boolean)
     .join(' ')

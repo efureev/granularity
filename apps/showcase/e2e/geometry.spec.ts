@@ -865,3 +865,40 @@ test.describe('GrSelect tags: чипы внутри рамки', () => {
     expect(fields.some(field => field.rows > 1)).toBe(true)
   })
 })
+
+/**
+ * Подписи делений отступали от дорожки на постоянные 0.625rem, и крупная ручка
+ * (`--gr-slider-thumb-size` + слот `#thumb`) ложилась на них: на значении 21
+ * бегунок на 36px закрывал «21°». Отступ теперь считается от бегунка.
+ */
+test.describe('GrSlider: подписи делений и крупная ручка', () => {
+  test('ручка на 36px не закрывает подписи — ни в колонке, ни в ряду', async ({ page }) => {
+    await page.goto(componentPath('GrSlider'))
+    const demo = page.locator('[data-demo="slider-big-thumb"]')
+    await demo.waitFor()
+
+    const sliders = await demo.locator('[data-gr-slider]').evaluateAll(roots => roots.map((root) => {
+      const thumb = root.querySelector('[role="slider"]')!.getBoundingClientRect()
+      const labels = [...root.querySelectorAll('[data-gr-slider-mark-label]')].map(label => label.getBoundingClientRect())
+      const overlaps = labels.filter(label =>
+        label.left < thumb.right && label.right > thumb.left && label.top < thumb.bottom && label.bottom > thumb.top)
+      const rootBox = root.getBoundingClientRect()
+      const style = getComputedStyle(root)
+      const reserveEnd = root.getAttribute('data-orientation') === 'vertical'
+        ? rootBox.right + Number.parseFloat(style.marginRight)
+        : rootBox.bottom + Number.parseFloat(style.marginBottom)
+      const labelsEnd = root.getAttribute('data-orientation') === 'vertical'
+        ? Math.max(...labels.map(label => label.right))
+        : Math.max(...labels.map(label => label.bottom))
+
+      return { thumb: thumb.width, overlaps: overlaps.length, labelsInsideReserve: labelsEnd <= reserveEnd + 0.5 }
+    }))
+
+    expect(sliders).toHaveLength(2)
+    for (const slider of sliders) {
+      expect(slider.thumb).toBeCloseTo(36, 0)
+      expect(slider.overlaps).toBe(0)
+      expect(slider.labelsInsideReserve).toBe(true)
+    }
+  })
+})

@@ -7,6 +7,12 @@ import { GrCard, GrSlider } from '@feugene/granularity'
 
 const temperature = ref(22)
 const budget = ref<[number, number]>([30, 70])
+
+// Термостат с ручкой на 36px: подписи делений отступают от бегунка, а не от
+// дорожки, — ручка не закрывает «21°», даже стоя прямо на делении.
+const setpoint = ref(21)
+const setpointRow = ref(21)
+const thermostatMarks = { 16: '16°', 21: '21°', 28: '28°' }
 </script>
 
 <template>
@@ -49,6 +55,50 @@ const budget = ref<[number, number]>([30, 70])
         собирается связкой «токены + слот». <code>role="slider"</code>,
         клавиатура и восемь <code>aria-*</code> при этом остаются за
         компонентом.
+      </div>
+    </GrCard>
+
+    <GrCard data-demo="slider-big-thumb" class="grid gap-4 p-4">
+      <div class="text-sm font-semibold text-[var(--gr-fg)]">
+        Ручка на 36px стоит прямо на делении
+      </div>
+
+      <div class="flex flex-wrap items-start gap-10">
+        <GrSlider
+            v-model="setpoint"
+            orientation="vertical"
+            :min="16"
+            :max="28"
+            :step="0.5"
+            :marks="thermostatMarks"
+            aria-label="Термостат"
+            style="--gr-slider-thumb-size: 2.25rem"
+        >
+          <template #thumb="{ value }">
+            <span class="text-[length:var(--gr-control-text-2xs)] leading-none font-semibold text-[var(--gr-fg)]">{{ value }}°</span>
+          </template>
+        </GrSlider>
+
+        <div class="min-w-[240px] flex-1">
+          <GrSlider
+              v-model="setpointRow"
+              :min="16"
+              :max="28"
+              :step="0.5"
+              :marks="thermostatMarks"
+              aria-label="Термостат в ряд"
+              style="--gr-slider-thumb-size: 2.25rem"
+          >
+            <template #thumb="{ value }">
+              <span class="text-[length:var(--gr-control-text-2xs)] leading-none font-semibold text-[var(--gr-fg)]">{{ value }}°</span>
+            </template>
+          </GrSlider>
+        </div>
+      </div>
+
+      <div class="text-sm text-[var(--gr-muted-fg)]">
+        Подписи делений отступают от края бегунка, а не от дорожки: чем крупнее
+        ручка, тем дальше подписи и тем больше места под ними оставляет слайдер.
       </div>
     </GrCard>
 

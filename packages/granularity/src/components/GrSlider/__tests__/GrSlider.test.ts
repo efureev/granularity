@@ -340,3 +340,25 @@ describe('GrSlider — обязательный проп не доехал', () 
     warn.mockRestore()
   })
 })
+
+/**
+ * Подписи меток отступали от дорожки на постоянные 0.625rem, и крупная ручка
+ * их закрывала. Геометрию меряет `apps/showcase/e2e/geometry.spec.ts`; здесь —
+ * что отступ считается от `--gr-slider-thumb-size`.
+ */
+describe('GrSlider — отступ подписей меток от бегунка', () => {
+  it.each([
+    ['md', 'horizontal', '1rem', '0.375rem', 'mt-[var(--gr-slider-mark-offset)]'],
+    ['lg', 'vertical', '1.25rem', '0.5rem', 'ml-[var(--gr-slider-mark-offset)]'],
+  ] as const)('%s, %s: отступ от выступа ручки, место под подписями растёт вместе с ним', (size, orientation, thumb, track, labelClass) => {
+    const wrapper = mount(GrSlider, {
+      props: { modelValue: 21, min: 16, max: 28, size, orientation, marks: { 16: '16°', 21: '21°', 28: '28°' }, ariaLabel: 'Термостат' },
+      global: granularityGlobal(),
+    })
+    const root = wrapper.get('[data-gr-slider]')
+
+    expect(root.attributes('style')).toContain(`--gr-slider-mark-offset: max(0.625rem, calc((var(--gr-slider-thumb-size, ${thumb}) - var(--gr-slider-track-height, ${track})) / 2 + 0.25rem))`)
+    expect(wrapper.get('[data-gr-slider-mark-label]').classes()).toContain(labelClass)
+    expect(root.classes().some(name => name.includes('var(--gr-slider-mark-offset)'))).toBe(true)
+  })
+})

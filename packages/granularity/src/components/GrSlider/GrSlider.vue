@@ -13,6 +13,7 @@ import { useGranularityTranslations } from '../../internal/granularityI18n'
 import {
   sliderFillClass,
   sliderMarkLabelClassFor,
+  sliderMarkOffsetStyle,
   sliderMarkTickClass,
   sliderRailClass,
   sliderRootClass,
@@ -495,6 +496,7 @@ function thumbValueText(value: number): string | undefined {
     data-gr-slider
     :data-orientation="orientation"
     :class="sliderRootClass({ size: resolvedSize, disabled: isDisabled, hasMarks: normalizedMarks.length > 0, orientation })"
+    :style="sliderMarkOffsetStyle(resolvedSize)"
     v-bind="aria.rootAttrs()"
     @focusin="onFocusIn"
     @focusout="onFocusOut"

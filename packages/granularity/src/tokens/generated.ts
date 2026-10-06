@@ -3340,6 +3340,13 @@ export const grComponentTokens: GrComponentToken[] = [
   },
   {
     "owner": "GrSlider",
+    "name": "--gr-slider-mark-offset",
+    "kind": "inline",
+    "default": "выступ бегунка за дорожку + 0.25rem, не меньше 0.625rem",
+    "description": "Отступ подписей меток от дорожки. Считается от `--gr-slider-thumb-size`: крупная ручка не закрывает подписи."
+  },
+  {
+    "owner": "GrSlider",
     "name": "--gr-slider-fill",
     "kind": "hook",
     "default": "var(--gr-primary)",
