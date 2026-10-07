@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 
-import { componentPath } from './components'
+import { companionPath, componentPath } from './components'
 
 /**
  * Правило во всю ширину и скруглённая панель.
@@ -900,5 +900,25 @@ test.describe('GrSlider: подписи делений и крупная руч�
       expect(slider.overlaps).toBe(0)
       expect(slider.labelsInsideReserve).toBe(true)
     }
+  })
+})
+
+/**
+ * На телефоне «Reset layout», «Edit layout» и свои действия панели дашборда
+ * вылезали за край: группа действий не переносилась. Каждая панель на
+ * странице — не шире своей колонки.
+ */
+test.describe('GrDashboardToolbar: узкая колонка', () => {
+  test.use({ viewport: { width: 390, height: 900 } })
+
+  test('панель переносит действия, а не вылезает за край', async ({ page }) => {
+    await page.goto(companionPath('GrDashboardToolbar'))
+    const toolbars = page.locator('[data-gr-dashboard-toolbar]')
+    await toolbars.first().waitFor()
+
+    const overflow = await toolbars.evaluateAll(nodes => nodes.map(node => node.scrollWidth - node.clientWidth))
+    expect(overflow.length).toBeGreaterThan(0)
+    for (const extra of overflow)
+      expect(extra).toBeLessThanOrEqual(1)
   })
 })

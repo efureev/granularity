@@ -58,3 +58,23 @@ describe('grDashboardToolbar', () => {
     expect(() => toolbar({ mode: 'edit' })).not.toThrow()
   })
 })
+
+/**
+ * На телефоне действия справа вылезали за край: группа — один элемент ряда и
+ * сама не переносилась. Ширину меряет `apps/showcase/e2e/geometry.spec.ts`;
+ * здесь — что группы переносятся внутри себя.
+ */
+describe('GrDashboardToolbar — группы переносятся', () => {
+  it('и начальная, и конечная группа — `flex-wrap`', () => {
+    const wrapper = mount(GrDashboardToolbar, {
+      props: { mode: 'edit' },
+      slots: { start: '<span>Sales overview</span>', end: '<button>Share</button>' },
+      global: granularityGlobal(),
+    })
+    const groups = wrapper.findAll('span.flex')
+
+    expect(groups.length).toBeGreaterThanOrEqual(2)
+    for (const group of groups)
+      expect(group.classes()).toContain('flex-wrap')
+  })
+})
