@@ -111,7 +111,7 @@ utility classes, so components render with their own CSS but without layout.
 <!-- entry-sizes:generated:start lang=en -->
 | What you import | gzip | of the barrel |
 | --- | ---: | ---: |
-| the whole package from the root | 653.6 kB | 100 % |
+| the whole package from the root | 653.9 kB | 100 % |
 | the lightest component — `GrButtonGroup` | 1.5 kB | < 1 % |
 | the median component — `GrNavbar` | 16.7 kB | 3 % |
 | the 5 heaviest together | 250.8 kB | 38 % |
@@ -133,9 +133,9 @@ on this one — the core stays lean, and you install only what you reach for.
 | Package | Version | What it adds |
 | --- | --- | --- |
 | [`@feugene/granularity-charts`](../granularity-charts) | 1.0.4 | Charts — own SVG, zero dependencies, drawn with theme tokens. |
-| [`@feugene/granularity-chrono`](../granularity-chrono) | 1.0.4 | Calendar, date and time components — no third-party date widget, no date library. |
+| [`@feugene/granularity-chrono`](../granularity-chrono) | 1.0.5 | Calendar, date and time components — no third-party date widget, no date library. |
 | [`@feugene/granularity-code`](../granularity-code) | 1.0.3 | Code surfaces: view, edit and diff — the viewer and the diff carry no dependencies at all. |
-| [`@feugene/granularity-dashboard`](../granularity-dashboard) | 1.0.3 | Widget grid — drag, resize, breakpoints and layout persistence, zero dependencies. |
+| [`@feugene/granularity-dashboard`](../granularity-dashboard) | 1.0.4 | Widget grid — drag, resize, breakpoints and layout persistence, zero dependencies. |
 | [`@feugene/granularity-datasource`](../granularity-datasource) | 0.1.2 | List state: sorting, filters, paging, URL sync and race-free fetching behind one composable. |
 | [`@feugene/granularity-devtools`](../granularity-devtools) | 1.0.0 | Vue DevTools panel — where a prop value came from, the overlay layer stack and design-system warnings. |
 | [`@feugene/granularity-editor`](../granularity-editor) | 1.0.3 | Rich-text editing: a TipTap-backed GrRichText field with a design-system toolbar. |

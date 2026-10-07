@@ -17,7 +17,7 @@ package pulls in no date library and no third-party widget.
 <!-- entry-sizes:generated:start lang=en -->
 | What you import | gzip | of the barrel |
 | --- | ---: | ---: |
-| the whole package from the root | 41.6 kB | 100 % |
+| the whole package from the root | 41.7 kB | 100 % |
 | the lightest component — `GrDuration` | 3.0 kB | 7 % |
 | the median component — `GrTimePicker` | 13.8 kB | 33 % |
 | the 5 heaviest together | 33.6 kB | 81 % |

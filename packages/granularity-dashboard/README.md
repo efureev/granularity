@@ -114,7 +114,7 @@ i18n.registerBlocks([GRANULARITY_I18N_BLOCK, GR_DASHBOARD_I18N_BLOCK])
 | Что берут | gzip | от бареля |
 | --- | ---: | ---: |
 | весь пакет из корня | 25.7 kB | 100 % |
-| самый лёгкий компонент — `GrDashboardToolbar` | 1.7 kB | 6 % |
+| самый лёгкий компонент — `GrDashboardToolbar` | 1.7 kB | 7 % |
 | медианный компонент — `GrDashboardItemSettings` | 5.2 kB | 20 % |
 | 5 самых тяжёлых вместе | 22.3 kB | 87 % |
 

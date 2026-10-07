@@ -1,6 +1,6 @@
 # Вес гранулярных импортов
 
-> Сгенерировано `yarn sizes:docs` по собранному `dist` пакета `@feugene/granularity-dashboard` 1.0.3.
+> Сгенерировано `yarn sizes:docs` по собранному `dist` пакета `@feugene/granularity-dashboard` 1.0.4.
 > Править руками бесполезно — правка потеряется на следующей сборке.
 
 Сколько приезжает потребителю, взявшему один подпуть: gzip самого entry и всего, что он тянет
@@ -16,6 +16,6 @@
 | `GrDashboardItem` | 5.6 kB | 5 | 22 % |
 | `GrDashboardItemSettings` | 5.2 kB | 5 | 20 % |
 | `GrDashboardPalette` | 5.1 kB | 6 | 20 % |
-| `GrDashboardToolbar` | 1.7 kB | 4 | 6 % |
+| `GrDashboardToolbar` | 1.7 kB | 4 | 7 % |
 
 Весь пакет из корня — 25.7 kB.
