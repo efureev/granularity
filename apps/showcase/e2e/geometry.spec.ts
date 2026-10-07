@@ -922,3 +922,26 @@ test.describe('GrDashboardToolbar: узкая колонка', () => {
       expect(extra).toBeLessThanOrEqual(1)
   })
 })
+
+/**
+ * В узкой панели (232px) несжимаемый ключ глубокого узла забирал всю строку, и
+ * значение обрезалось до нуля: у `amount_paid` не было видно ничего. У значения
+ * теперь остаётся минимум ширины.
+ */
+test.describe('GrJsonViewer: узкая панель', () => {
+  test('на 232px каждое значение видно хотя бы частью', async ({ page }) => {
+    await page.goto(componentPath('GrJsonViewer'))
+    const viewer = page.locator('[data-gr-json-viewer]').first()
+    await viewer.waitFor()
+    await viewer.evaluate((node) => {
+      (node as HTMLElement).style.width = '232px'
+    })
+    await viewer.getByRole('button', { name: /expand all|развернуть/i }).first().click().catch(() => {})
+
+    const widths = await viewer.locator('[data-gr-json-viewer-value]').evaluateAll(nodes =>
+      nodes.filter(node => (node.textContent ?? '').trim() !== '').map(node => node.getBoundingClientRect().width))
+
+    expect(widths.length).toBeGreaterThan(0)
+    expect(Math.min(...widths)).toBeGreaterThan(12)
+  })
+})

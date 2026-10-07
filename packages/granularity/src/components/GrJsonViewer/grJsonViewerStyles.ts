@@ -26,7 +26,14 @@ export const jsonViewerRowClass = 'relative flex min-w-0 items-center gap-1 font
 /** Область узла не даёт значению растянуть строку шире панели. */
 export const jsonViewerContentClass = 'min-w-0'
 
-export const jsonViewerKeyClass = 'shrink-0 text-[var(--gr-json-viewer-key,var(--gr-primary-text))]'
+/**
+ * Ключ уступает ширину вместе со значением. Несжимаемый ключ в узкой панели
+ * (232px, глубокий узел) забирал всю строку, и значение обрезалось до нуля —
+ * у `amount_paid` не было видно ничего. Теперь сжимаются обе части, ключ —
+ * охотнее (`shrink-[3]`), а у значения остаётся минимум в 5 знаков. Минимума у
+ * ключа нет нарочно: `min-width` раздвигал бы короткие ключи вроде `$` и `id`.
+ */
+export const jsonViewerKeyClass = 'min-w-0 shrink-[3] truncate text-[var(--gr-json-viewer-key,var(--gr-primary-text))]'
 
 export const jsonViewerPunctuationClass = 'shrink-0 text-[var(--gr-json-viewer-punctuation,var(--gr-fg))]'
 
@@ -34,7 +41,7 @@ export const jsonViewerPunctuationClass = 'shrink-0 text-[var(--gr-json-viewer-p
  * Значение обрезается по ширине строки, а не переносится: перенос превратил бы
  * дерево в простыню и сломал бы оценку высоты строки у виртуализации.
  */
-export const jsonViewerValueClass = 'min-w-0 truncate'
+export const jsonViewerValueClass = 'min-w-[5ch] truncate'
 
 /** Счётчик у свёрнутой ветки и служебные подписи — тише значения. */
 export const jsonViewerMutedClass = 'shrink-0 text-[var(--gr-json-viewer-muted,var(--gr-muted-fg))]'

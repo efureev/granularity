@@ -5,6 +5,16 @@ All notable changes to the [`@feugene/granularity`](.) package are documented in
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Fixed
+
+- **Значения `GrJsonViewer` в узкой панели не пропадают.** Ключ не сжимался и
+  в глубоком узле на 232px забирал всю строку: значение обрезалось до нуля, и у
+  `amount_paid` не было видно ничего. Теперь ключ и значение сжимаются вместе
+  (ключ — охотнее), а у значения остаётся минимум в 5 знаков; остальное уходит
+  в многоточие.
+
 ## [v1.0.17] 2026-10-07
 
 ### Fixed
