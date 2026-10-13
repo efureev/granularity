@@ -619,6 +619,38 @@ describe('GrRichText — пузырьковый тулбар', () => {
     }
   })
 
+  /**
+   * Сторона выбиралась по видимой части, в которую входит и своя прокрутка
+   * поля: верхняя кромка `.ProseMirror` съедала место над первой строкой, и
+   * пузырёк уходил вниз — на следующую строку, которую читают, — при целой
+   * странице места над ним.
+   */
+  it('выделение у верхнего края прокручиваемого поля открывает пузырёк над собой', async () => {
+    const wrapper = mountEditor({ modelValue: '<p>текст</p>', toolbar: 'bubble' })
+
+    try {
+      await ready(wrapper)
+      // Поле посреди экрана, область ввода — со своей прокруткой: 400…528.
+      const content = area(wrapper)
+      content.style.overflowY = 'auto'
+      content.getBoundingClientRect = () => ({ top: 400, bottom: 528, left: 0, right: 600, width: 600, height: 128, x: 0, y: 400, toJSON: () => ({}) })
+      await selectAllWithBubble(wrapper)
+      const side = () => wrapper.findComponent(GrPopover).props('placement')
+
+      // Первая строка: 409…421, над ней в поле 9px, на странице — все 409.
+      await scrollSelectionTo(wrapper, 409)
+      expect(bubblePanel()?.style.display).not.toBe('none')
+      expect(side()).toBe('top')
+
+      // Выделение ушло за верхний край поля — пузырька нет.
+      await scrollSelectionTo(wrapper, 380)
+      expect(bubblePanel()?.style.display).toBe('none')
+    }
+    finally {
+      wrapper.unmount()
+    }
+  })
+
   it('закрытый Esc пузырёк прокрутка не возвращает', async () => {
     const wrapper = mountEditor({ modelValue: '<p>текст</p>', toolbar: 'bubble' })
     await ready(wrapper)

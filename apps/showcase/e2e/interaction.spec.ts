@@ -2339,6 +2339,54 @@ test.describe('GrRichText: пузырёк при прокрутке', () => {
   })
 
   /**
+   * Сторона пузырька выбиралась по видимой части с прокруткой самого поля:
+   * у ответа в тикете с min = max = 8rem `.ProseMirror` прокручивается, его
+   * верхняя кромка съедала место над первой строкой, и пузырёк уходил вниз —
+   * на строку, которую читают, — при целой странице места над ним.
+   */
+  test('выделение у верхнего края прокручиваемого поля открывает пузырёк над ним', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 800 })
+    await openShowcasePage(page, companionPath('GrRichText'))
+    await page.evaluate(() => document.documentElement.style.setProperty('scroll-padding-top', '80px'))
+    const field = page.getByRole('textbox', { name: 'Все кнопки' })
+    await field.evaluate((node) => {
+      const root = node.closest('[data-gr-rich-text]') as HTMLElement
+      root.style.setProperty('--gr-rich-text-min-height', '8rem')
+      root.style.setProperty('--gr-rich-text-max-height', '8rem')
+      node.scrollIntoView({ block: 'center', behavior: 'instant' })
+    })
+    expect(await field.evaluate(node => getComputedStyle(node).overflowY)).toBe('auto')
+
+    const bubble = page.locator('[data-gr-rich-text-bubble]')
+    const expectAbove = async (line: number) => {
+      await expect(bubble).toBeVisible()
+      const selection = await page.evaluate(() => window.getSelection()!.getRangeAt(0).getBoundingClientRect().top)
+      const bottom = await settled(async () => {
+        const box = (await bubble.boundingBox())!
+        return box.y + box.height
+      })
+      expect(bottom, `строка ${line}: пузырёк над выделением`).toBeLessThanOrEqual(selection)
+    }
+
+    // Строка 1: слово от начала.
+    await field.locator('p').first().click({ position: { x: 2, y: 4 } })
+    for (let i = 0; i < 4; i += 1)
+      await page.keyboard.press('Shift+ArrowRight')
+    await expectAbove(1)
+
+    // Строка 2: дописанная, слово с конца. Курсор в конец строки — щелчком у
+    // её правого края: `End` в Chrome на macOS прокручивает страницу.
+    const first = field.locator('p').first()
+    const width = (await first.boundingBox())!.width
+    await first.click({ position: { x: width - 2, y: 4 } })
+    await page.keyboard.press('Enter')
+    await page.keyboard.type('Вторая строка ответа')
+    for (let i = 0; i < 6; i += 1)
+      await page.keyboard.press('Shift+ArrowLeft')
+    await expectAbove(2)
+  })
+
+  /**
    * Липкую шапку сайт объявляет `scroll-padding` страницы. Видимая часть его не
    * учитывала: выделение под шапкой держало пузырёк поверх навигации сайта, а
    * у самой её кромки пузырёк вставал над выделением — то есть на шапку.

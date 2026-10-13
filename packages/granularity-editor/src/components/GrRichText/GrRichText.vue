@@ -141,6 +141,7 @@ const fallbackId = useId()
 const inputId = computed(() => props.id ?? field.id.value ?? fallbackId)
 
 const hostEl = ref<HTMLElement | null>(null)
+const rootEl = ref<HTMLElement | null>(null)
 /** `shallowRef`: у документа ProseMirror своя реактивность, чужая ему вредна. */
 const editor = shallowRef<Editor | null>(null)
 /** Счётчик правок — им перерисовывается тулбар: сам редактор не реактивен. */
@@ -466,13 +467,14 @@ function clipBy(area: VisibleArea, box: VisibleArea, style: CSSStyleDeclaration)
 
 /**
  * Видимая часть элемента: вьюпорт, урезанный каждым предком, который обрезает
- * содержимое (`overflow` не `visible`), — сам элемент включительно.
+ * содержимое (`overflow` не `visible`), — сам элемент включительно. Без
+ * элемента — вьюпорт за вычетом `scroll-padding` страницы.
  *
  * Каждая область прокрутки, страница тоже, урезается своим `scroll-padding`:
  * так сайты объявляют липкую шапку (`html { scroll-padding-top: 80px }`), и
  * выделение под ней пользователь не видит, хотя оно во вьюпорте.
  */
-function visibleArea(element: Element): VisibleArea {
+function visibleArea(element: Element | null): VisibleArea {
   const viewport = { top: 0, left: 0, right: window.innerWidth, bottom: window.innerHeight }
   const area = { ...viewport }
   const page = document.scrollingElement ?? document.documentElement
@@ -498,7 +500,7 @@ function visibleArea(element: Element): VisibleArea {
   return area
 }
 
-/** Сторона пузырька: над выделением, а если над ним в видимой части места нет — под ним. */
+/** Сторона пузырька: над выделением, а если над ним на странице места нет — под ним. */
 const bubblePlacement = ref<'top' | 'bottom'>('top')
 const bubbleEl = ref<HTMLElement | null>(null)
 
@@ -514,12 +516,19 @@ const BUBBLE_HEIGHT_FALLBACK_PX = 40
  * Координаты вьюпорта устаревают с любой прокруткой, поэтому, пока пузырёк
  * включён, якорь пересчитывается на `scroll` и `resize`.
  *
- * Пузырёк держится за край выделения: над ним — за верхний, под ним — за
- * нижний. Край, ушедший за видимую часть (за край поля, страницы или под
- * липкую шапку), держать нельзя: тогда пузырёк переходит к другому краю, а
- * когда не видно обоих — прячется, а не висит над чужим содержимым. Места над
- * выделением внутри видимой части не хватает — пузырёк встаёт под ним, а не
- * наезжает на шапку.
+ * Здесь два разных вопроса и две разные области.
+ *
+ * - **Показывать ли.** Пузырёк держится за край выделения: над ним — за
+ *   верхний, под ним — за нижний. Край, ушедший за видимую часть — за край
+ *   поля, страницы или под липкую шапку, — держать нельзя: тогда пузырёк
+ *   переходит к другому краю, а когда не видно обоих, прячется. Видимая часть
+ *   урезана всеми обрезающими предками, поле включительно.
+ * - **С какой стороны.** Пузырёк — поповер в верхнем слое, и предки поля его
+ *   не обрезают: место для него — страница вне поля, за вычетом её липкой
+ *   шапки. Своя прокрутка поля (`.ProseMirror` с `overflow-y: auto`) и его
+ *   рамка в счёт не идут — пузырёк вправе лечь на тулбар и поле над первой
+ *   строкой. Иначе выделение у верхнего края поля всегда переворачивало бы его
+ *   вниз, на следующую строку, которую как раз читают.
  */
 function placeBubble(): void {
   const instance = editor.value
@@ -536,6 +545,7 @@ function placeBubble(): void {
     const top = Math.min(start.top, end.top)
     const bottom = Math.max(start.bottom, end.bottom)
     const area = visibleArea(instance.view.dom)
+    const page = visibleArea(rootEl.value?.parentElement ?? null)
 
     const across = right > area.left && left < area.right
     const topVisible = across && top >= area.top && top < area.bottom
@@ -547,13 +557,11 @@ function placeBubble(): void {
     }
 
     const needed = (bubbleEl.value?.offsetHeight || BUBBLE_HEIGHT_FALLBACK_PX) + BUBBLE_GAP_PX
-    const roomAbove = top - area.top
-    const roomBelow = area.bottom - bottom
-    const fitsAbove = topVisible && roomAbove >= needed
+    const roomAbove = top - page.top
+    const roomBelow = page.bottom - bottom
+    const aboveWins = roomAbove >= needed || (roomAbove >= roomBelow && roomBelow < needed)
 
-    bubblePlacement.value = fitsAbove || !bottomVisible || (topVisible && roomAbove >= roomBelow && roomBelow < needed)
-      ? 'top'
-      : 'bottom'
+    bubblePlacement.value = topVisible && (!bottomVisible || aboveWins) ? 'top' : 'bottom'
     bubbleRect.value = { x: left, y: top, width: Math.max(right - left, 1), height: Math.max(bottom - top, 1) }
   }
   catch {
@@ -628,7 +636,7 @@ const rootClasses = computed(() => [
 </script>
 
 <template>
-  <div data-gr-rich-text :class="rootClasses">
+  <div ref="rootEl" data-gr-rich-text :class="rootClasses">
     <!-- Форме уходит разметка строкой: скрытое поле не умеет объектов. -->
     <input v-if="name" type="hidden" :name="name" :value="formValue">
 

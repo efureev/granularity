@@ -5,6 +5,18 @@ All notable changes to the [`@feugene/granularity-editor`](.) package are docume
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Fixed
+
+- **Пузырёк `GrRichText` у верхнего края поля снова над выделением.** С 1.0.5 сторона выбиралась по
+  видимой части, в которую входила и своя прокрутка поля: у поля с `--gr-rich-text-max-height`
+  верхняя кромка `.ProseMirror` съедала место над первой строкой, и пузырёк уходил вниз — на
+  следующую строку, которую читают, — при целой странице места над ним. Теперь видимость выделения
+  по-прежнему решают все обрезающие предки, поле включительно, а место для пузырька — страница вне
+  поля за вычетом её `scroll-padding`. Вниз пузырёк уходит, только когда над выделением нет места
+  на странице, например у липкой шапки.
+
 ## [v1.0.5] 2026-10-13
 
 ### Fixed
