@@ -2260,3 +2260,22 @@ test.describe('GrInput: type="search"', () => {
     expect(appearance).toBe('none')
   })
 })
+
+/**
+ * Чекбоксы задач `GrMarkdown` назывались одним словом «Task»: диктор читал
+ * «Task, checkbox, checked» на каждом пункте, и задачи было не различить. Имя
+ * чекбокса — текст его пункта, в режиме чтения он остаётся только для чтения.
+ */
+test.describe('GrMarkdown: имена задач', () => {
+  test('каждый чекбокс задачи назван текстом своего пункта', async ({ page }) => {
+    await openShowcasePage(page, companionPath('GrMarkdown'))
+    const notes = page.getByRole('region', { name: 'Заметки о релизе' })
+    const boxes = notes.getByRole('checkbox')
+
+    await expect(boxes).toHaveCount(3)
+    await expect(boxes.nth(0)).toHaveAccessibleName('дерево вместо строки HTML')
+    await expect(boxes.nth(1)).toHaveAccessibleName('кэш по блокам')
+    await expect(boxes.nth(2)).toHaveAccessibleName('мост в редактор')
+    await expect(notes.getByRole('checkbox', { name: 'мост в редактор' })).toHaveAttribute('aria-readonly', 'true')
+  })
+})

@@ -278,8 +278,14 @@ function normalizeListItems(token: RawToken, ctx: Context, win: SourceWindow | n
         taskOffset = itemOffset + marker.index
     }
 
-    // `checkbox` уже выражен полем `checked` — второй раз он не нужен.
-    const inner = ((item.tokens ?? []) as RawToken[]).filter(t => t.type !== 'checkbox')
+    // `checkbox` уже выражен полем `checked` — второй раз он не нужен. У
+    // тесного пункта он лежит среди блоков, у свободного — первым инлайном его
+    // абзаца, и там без фильтра печатался бы текстом `[ ] `.
+    const inner = ((item.tokens ?? []) as RawToken[])
+      .filter(t => t.type !== 'checkbox')
+      .map((t, index) => index === 0 && t.type === 'paragraph' && Array.isArray(t.tokens)
+        ? { ...t, tokens: (t.tokens as RawToken[]).filter(inline => inline.type !== 'checkbox') }
+        : t)
     // Своим окном пункт становится, только если нашёлся целиком: у пункта с
     // продолжением строки `raw` тоже без отступа, и опорой он быть не может.
     // Курсор — за первой строкой: иначе вложенный пункт находит маркер самого

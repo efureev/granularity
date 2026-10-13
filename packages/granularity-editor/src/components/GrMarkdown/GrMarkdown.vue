@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { VNodeChild } from 'vue'
-import { computed, h, shallowRef, useSlots, watch } from 'vue'
+import { computed, h, shallowRef, useId, useSlots, watch } from 'vue'
 
 // Документ рисует рендер-функция, поэтому у компонента есть настоящий CSS.
 // Импорт здесь, а не `cssFiles` в конфиге: он держит файл в графе модулей,
@@ -27,7 +27,7 @@ import { GrMarkdownBody } from './body'
 import type { GrMarkdownDensity, GrMarkdownSize } from './grMarkdownStyles'
 import { rootClass, sizeClasses } from './grMarkdownStyles'
 import type { GrMarkdownRenderContext, GrMarkdownRenderers } from './renderNodes'
-import { renderTopBlock } from './renderNodes'
+import { containsTask, renderTopBlock } from './renderNodes'
 
 /**
  * GrMarkdown — показать markdown.
@@ -173,6 +173,8 @@ watch(
   { immediate: true },
 )
 
+const taskIdBase = `${useId()}-`
+
 const renderContext = computed<GrMarkdownRenderContext>(() => ({
   t,
   components: props.components ?? {},
@@ -182,6 +184,7 @@ const renderContext = computed<GrMarkdownRenderContext>(() => ({
   linkRel: props.linkRel,
   interactiveTasks: props.interactiveTasks,
   idPrefix: props.idPrefix,
+  taskIdBase,
   wrapCode: props.wrapCode,
   onLinkClick: (event, href) => emit('linkClick', event, href),
   onTaskToggle: (offset, checked) => emit('taskToggle', offset, checked),
@@ -193,16 +196,37 @@ const renderContext = computed<GrMarkdownRenderContext>(() => ({
  *
  * Сбрасывается целиком при смене контекста рендера: иначе на экране остался бы
  * прошлый вариант — старый сдвиг заголовков, старая политика ссылок.
+ *
+ * Запись помнит и офсет блока в исходнике. Ключ считается от текста, и блок с
+ * задачами, сдвинутый правкой выше, узнаётся как тот же — а его чекбоксы
+ * эмитят офсет маркера, запечатанный в обработчике при отрисовке. Такой блок
+ * при `interactiveTasks` перерисовывается, иначе переключение задачи
+ * переписало бы в исходнике чужие символы.
  */
-const cache = new Map<string, VNodeChild>()
+interface CachedBlock {
+  node: VNodeChild
+  offset: number
+}
+
+const cache = new Map<string, CachedBlock>()
 watch(renderContext, () => cache.clear())
+
+function cachedNode(block: GrMdBlock, key: string, interactiveTasks: boolean): VNodeChild | undefined {
+  const entry = cache.get(key)
+  if (!entry)
+    return undefined
+  if (entry.offset !== block.offset && interactiveTasks && containsTask(block.node))
+    return undefined
+
+  return entry.node
+}
 
 const slots = useSlots()
 
 const rendered = computed<VNodeChild[]>(() => {
   const ctx = renderContext.value
   const occurrences = new Map<string, number>()
-  const fresh = new Map<string, VNodeChild>()
+  const fresh = new Map<string, CachedBlock>()
   const last = blocks.value.length - 1
 
   const nodes = blocks.value.map((block, index) => {
@@ -223,13 +247,13 @@ const rendered = computed<VNodeChild[]>(() => {
     if (caret)
       return renderTopBlock(block, ctx, key, caret)
 
-    const node = cache.get(key) ?? renderTopBlock(block, ctx, key)
-    fresh.set(key, node)
+    const node = cachedNode(block, key, ctx.interactiveTasks) ?? renderTopBlock(block, ctx, key)
+    fresh.set(key, { node, offset: block.offset })
     return node
   })
 
   cache.clear()
-  for (const [key, node] of fresh) cache.set(key, node)
+  for (const [key, entry] of fresh) cache.set(key, entry)
 
   return nodes
 })

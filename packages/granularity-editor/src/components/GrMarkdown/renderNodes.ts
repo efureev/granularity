@@ -49,6 +49,13 @@ export interface GrMarkdownRenderContext {
   linkRel: string
   interactiveTasks: boolean
   idPrefix: string
+  /**
+   * Основа `id` подписей задач — своя у каждого экземпляра (`useId()`): два
+   * документа с одинаковым списком задач на странице не делят идентификаторы.
+   */
+  taskIdBase?: string
+  /** Следующий `id` подписи задачи. Заводит `renderTopBlock` — счёт идёт в пределах блока. */
+  taskLabelId?: () => string
   wrapCode: boolean
   onLinkClick: (event: MouseEvent, href: string | null) => void
   onTaskToggle: (offset: number, checked: boolean) => void
@@ -173,33 +180,53 @@ function renderInline(nodes: GrMdInline[], ctx: GrMarkdownRenderContext): VNodeC
  * `readonly`, а не `disabled`: документ показывает состояние задачи, а не
  * запрещает её. Выключенный чекбокс браузер и дизайн-система гасят приглушённым
  * тоном — здесь гасить нечего, отметка видна в полном цвете.
+ *
+ * Имя чекбокса — текст его пункта, через `aria-labelledby` на первый блок
+ * пункта. Общее «Task» у всех диктор читал бы одинаково, и задачи было бы не
+ * различить. Ссылается только первый блок: вложенный список задач — чужие
+ * пункты со своими именами, и в имя родителя он не входит.
  */
-function renderListItem(item: GrMdListItem, ctx: GrMarkdownRenderContext): VNodeChild {
-  const children = renderBlocks(item.children, ctx)
+function renderListItem(item: GrMdListItem, ctx: GrMarkdownRenderContext, trailing?: VNodeChild): VNodeChild {
+  const children = renderBlocks(item.children, ctx, trailing)
   if (item.checked === null)
     return h('li', children)
 
   const editable = ctx.interactiveTasks && item.taskOffset !== null
+  const [lead, ...rest] = children
+  // Пустой первый блок назвать нечем — тогда общее «Task», а не пустое имя.
+  const named = lead !== undefined && !(Array.isArray(lead) && lead.length === 0)
+  const labelId = named ? ctx.taskLabelId?.() : undefined
 
   const box = h(GrCheckbox, {
     'class': 'gr-md-task-box',
     'modelValue': item.checked,
     'readonly': !editable,
-    'ariaLabel': ctx.t('grEditor.markdown.task', 'Task'),
+    ...(labelId
+      ? { 'aria-labelledby': labelId }
+      : { ariaLabel: ctx.t('grEditor.markdown.task', 'Task') }),
     'onUpdate:modelValue': (next: boolean) => {
       if (item.taskOffset !== null)
         ctx.onTaskToggle(item.taskOffset, next)
     },
   })
 
-  return h('li', { class: 'gr-md-task' }, [box, h('span', children)])
+  const content = labelId ? [h('span', { id: labelId }, [lead]), ...rest] : children
+
+  return h('li', { class: 'gr-md-task' }, [box, h('span', content)])
 }
 
-function renderCells(cells: GrMdTableCell[], tag: 'th' | 'td', ctx: GrMarkdownRenderContext): VNodeChild[] {
-  return cells.map(cell => h(
+function renderCells(
+  cells: GrMdTableCell[],
+  tag: 'th' | 'td',
+  ctx: GrMarkdownRenderContext,
+  trailing?: VNodeChild,
+): VNodeChild[] {
+  const last = cells.length - 1
+
+  return cells.map((cell, index) => h(
     tag,
     { style: cell.align ? { textAlign: cell.align } : undefined },
-    renderInline(cell.children, ctx),
+    withTrailing(renderInline(cell.children, ctx), index === last ? trailing : undefined),
   ))
 }
 
@@ -227,6 +254,11 @@ function withTrailing(children: VNodeChild[], trailing?: VNodeChild): VNodeChild
  * `trailing` — курсор потока. Он обязан встать **внутрь** последнего
  * инлайнового ряда, а не рядом с блоком: отдельной строкой под текстом он
  * читается как опечатка, а не как «здесь продолжается набор».
+ *
+ * Поэтому он спускается в хвост составного блока — в последний пункт списка,
+ * последнюю ячейку таблицы, последний блок цитаты и алерта: поток чаще всего и
+ * дописывает именно их. Блок кода и подменённые рендереры курсор не принимают —
+ * у них своя разметка, и вставлять в неё чужой узел нельзя.
  */
 function renderNode(node: GrMdBlockNode, ctx: GrMarkdownRenderContext, trailing?: VNodeChild): VNodeChild {
   switch (node.type) {
@@ -269,7 +301,7 @@ function renderNode(node: GrMdBlockNode, ctx: GrMarkdownRenderContext, trailing?
     }
 
     case 'blockquote':
-      return h('blockquote', { class: 'gr-md-quote' }, renderBlocks(node.children, ctx))
+      return h('blockquote', { class: 'gr-md-quote' }, renderBlocks(node.children, ctx, trailing))
 
     case 'alert': {
       const [key, fallback] = ALERT_LABEL_KEY[node.tone]
@@ -284,15 +316,17 @@ function renderNode(node: GrMdBlockNode, ctx: GrMarkdownRenderContext, trailing?
         tone: ALERT_TONE[node.tone],
         live: 'off',
         title: ctx.t(key, fallback),
-      }, () => renderBlocks(node.children, ctx))
+      }, () => renderBlocks(node.children, ctx, trailing))
     }
 
-    case 'list':
+    case 'list': {
+      const last = node.items.length - 1
       return h(
         node.ordered ? 'ol' : 'ul',
         { class: ['gr-md-list', node.tight ? 'gr-md-list-tight' : null], start: node.ordered && node.start !== 1 ? node.start : undefined },
-        node.items.map(item => renderListItem(item, ctx)),
+        node.items.map((item, index) => renderListItem(item, ctx, index === last ? trailing : undefined)),
       )
+    }
 
     case 'table': {
       if (ctx.components.table)
@@ -310,8 +344,11 @@ function renderNode(node: GrMdBlockNode, ctx: GrMarkdownRenderContext, trailing?
         class: 'gr-md-table [&_[data-gr-table]]:text-[0.95em]',
         regionLabel: ctx.t('grEditor.markdown.tableRegion', 'Table'),
       }, {
-        header: () => h('tr', renderCells(node.header, 'th', ctx)),
-        default: () => node.rows.map(row => h('tr', renderCells(row, 'td', ctx))),
+        header: () => h('tr', renderCells(node.header, 'th', ctx, node.rows.length === 0 ? trailing : undefined)),
+        default: () => node.rows.map((row, index) => h(
+          'tr',
+          renderCells(row, 'td', ctx, index === node.rows.length - 1 ? trailing : undefined),
+        )),
       })
     }
 
@@ -336,8 +373,32 @@ function renderNode(node: GrMdBlockNode, ctx: GrMarkdownRenderContext, trailing?
   }
 }
 
-export function renderBlocks(nodes: GrMdBlockNode[], ctx: GrMarkdownRenderContext): VNodeChild[] {
-  return nodes.map(node => renderNode(node, ctx))
+/** Есть ли в блоке задача — на любой глубине списков, цитат и алертов. */
+export function containsTask(node: GrMdBlockNode): boolean {
+  switch (node.type) {
+    case 'list':
+      return node.items.some(item => item.checked !== null || item.children.some(containsTask))
+    case 'blockquote':
+    case 'alert':
+      return node.children.some(containsTask)
+    case 'footnotes':
+      return node.items.some(item => item.children.some(containsTask))
+    case 'heading':
+    case 'paragraph':
+    case 'inline':
+    case 'code':
+    case 'table':
+    case 'hr':
+    case 'html':
+    case 'custom':
+      return false
+  }
+}
+
+export function renderBlocks(nodes: GrMdBlockNode[], ctx: GrMarkdownRenderContext, trailing?: VNodeChild): VNodeChild[] {
+  const last = nodes.length - 1
+
+  return nodes.map((node, index) => renderNode(node, ctx, index === last ? trailing : undefined))
 }
 
 /**
@@ -358,6 +419,15 @@ export function renderTopBlock(
   key: string,
   trailing?: VNodeChild,
 ): VNodeChild {
+  // Счёт подписей задач — в пределах блока: ключ блока уже различает блоки, а
+  // номер внутри него от соседей не зависит. Поэтому `id` у блока из кэша и у
+  // такого же, отрисованного заново, совпадают.
+  let tasks = 0
+  const blockCtx: GrMarkdownRenderContext = {
+    ...ctx,
+    taskLabelId: () => `${ctx.taskIdBase ?? ''}task-${key}-${tasks++}`,
+  }
+
   return h(
     'div',
     {
@@ -366,6 +436,6 @@ export function renderTopBlock(
       'style': { '--gr-markdown-block-size': estimateBlockSize(block.node) },
       'data-gr-markdown-block': key,
     },
-    [renderNode(block.node, ctx, trailing)],
+    [renderNode(block.node, blockCtx, trailing)],
   )
 }

@@ -1,8 +1,10 @@
 import { mount } from '@vue/test-utils'
 import { describe, expect, it, vi } from 'vitest'
+import type { ComponentInternalInstance, VNode } from 'vue'
 import { defineComponent, h, nextTick } from 'vue'
 
 import { createMarkedEngine, markedEngine } from '../../../markdown/engine/marked'
+import { GrMarkdownBody } from '../body'
 import GrMarkdown from '../GrMarkdown.vue'
 
 const mountMd = (props: Record<string, unknown>) => mount(GrMarkdown, { props })
@@ -148,6 +150,77 @@ describe('GrMarkdown: алерты, сноски, задачи', () => {
     expect(box.attributes('aria-disabled')).toBeUndefined()
   })
 
+  /**
+   * Имя виджета так, как его считает браузер для этих двух путей: ссылки
+   * `aria-labelledby` сильнее `aria-label`. Ссылка ищется в документе — висячая
+   * дала бы пустое имя, и тест обязан это увидеть.
+   */
+  function accessibleName(box: Element): string {
+    const ids = box.getAttribute('aria-labelledby')
+    if (ids) {
+      return ids.split(/\s+/)
+        .map(id => box.ownerDocument.getElementById(id)?.textContent ?? '')
+        .join(' ')
+        .trim()
+    }
+
+    return box.getAttribute('aria-label') ?? ''
+  }
+
+  function taskNames(wrapper: { element: Element }): string[] {
+    return [...wrapper.element.querySelectorAll('[role="checkbox"]')].map(accessibleName)
+  }
+
+  it.each([false, true])('имя чекбокса задачи — текст её пункта (interactiveTasks = %s)', (interactiveTasks) => {
+    const wrapper = mount(GrMarkdown, {
+      props: { source: '- [x] Renewal call booked\n- [ ] Credit note approved\n', interactiveTasks },
+      attachTo: document.body,
+    })
+
+    // Общее «Task» у всех диктор читал бы одинаково, и задачи было бы не различить.
+    expect(taskNames(wrapper)).toEqual(['Renewal call booked', 'Credit note approved'])
+    for (const box of wrapper.findAll('[role="checkbox"]'))
+      expect(box.attributes('aria-readonly')).toBe(interactiveTasks ? undefined : 'true')
+  })
+
+  it('в имя задачи идёт её собственный текст, а не вложенные пункты', () => {
+    const wrapper = mount(GrMarkdown, {
+      props: { source: '- [ ] Подготовить **договор**\n  - [x] Реквизиты\n\n- [ ] Отправить\n' },
+      attachTo: document.body,
+    })
+
+    expect(taskNames(wrapper)).toEqual(['Подготовить договор', 'Реквизиты', 'Отправить'])
+  })
+
+  it('свободный список задач не печатает маркер текстом', () => {
+    // У свободного пункта marked кладёт `checkbox` первым инлайном абзаца, а не
+    // среди блоков пункта: без фильтра рядом с чекбоксом стояло бы «[ ] Отправить».
+    const wrapper = mount(GrMarkdown, { props: { source: '- [ ] Подписать\n\n- [x] Отправить\n' }, attachTo: document.body })
+
+    expect(wrapper.text()).not.toContain('[')
+    expect(taskNames(wrapper)).toEqual(['Подписать', 'Отправить'])
+  })
+
+  it('два одинаковых документа на странице не делят идентификаторы подписей', () => {
+    const source = '- [ ] Одна и та же задача\n'
+    const Page = defineComponent({
+      setup: () => () => h('div', [h(GrMarkdown, { source }), h(GrMarkdown, { source })]),
+    })
+    const wrapper = mount(Page, { attachTo: document.body })
+
+    const ids = wrapper.findAll('[role="checkbox"]').map(box => box.attributes('aria-labelledby'))
+    expect(ids).toHaveLength(2)
+    expect(ids[0]).not.toBe(ids[1])
+    expect(taskNames(wrapper)).toEqual(['Одна и та же задача', 'Одна и та же задача'])
+  })
+
+  it('задача без текста называется общим словом, а не пустым именем', () => {
+    const wrapper = mount(GrMarkdown, { props: { source: '- [ ] \n- [ ]\n' }, attachTo: document.body })
+
+    for (const name of taskNames(wrapper))
+      expect(name).not.toBe('')
+  })
+
   it('interactiveTasks эмитит офсет маркера в исходнике, а не номер пункта', async () => {
     const source = 'Вступление.\n\n- обычный пункт\n\n* [ ] дело\n'
     const wrapper = mountMd({ source, interactiveTasks: true })
@@ -157,6 +230,54 @@ describe('GrMarkdown: алерты, сноски, задачи', () => {
     const [offset, checked] = wrapper.emitted('taskToggle')![0] as [number, boolean]
     expect(source.slice(offset, offset + 3)).toBe('[ ]')
     expect(checked).toBe(true)
+  })
+})
+
+describe('GrMarkdown: задачи после правки выше', () => {
+  it('блок с задачами, сдвинутый правкой выше, эмитит офсет маркера в новом исходнике', async () => {
+    const wrapper = mountMd({ source: 'Вступление.\n\n- [ ] дело\n', interactiveTasks: true })
+    const next = 'Вступление, теперь длиннее.\n\n- [ ] дело\n'
+    await wrapper.setProps({ source: next })
+
+    await wrapper.find('[role="checkbox"]').trigger('click')
+
+    // Блок списка тот же по тексту и пришёл бы из кэша с офсетом прежнего
+    // исходника: переключение переписало бы « те» вместо «[ ]».
+    const [offset] = wrapper.emitted('taskToggle')![0] as [number, boolean]
+    expect(next.slice(offset, offset + 3)).toBe('[ ]')
+  })
+
+  /** VNode блоков в том виде, в каком их отдаёт кэш, — до того, как Vue их клонирует. */
+  function blockVNodes(wrapper: ReturnType<typeof mountMd>): unknown[] {
+    const find = (vnode: VNode): VNode | undefined => {
+      if (vnode.type === GrMarkdownBody)
+        return vnode
+      return Array.isArray(vnode.children)
+        ? (vnode.children as VNode[]).map(child => find(child)).find(Boolean)
+        : undefined
+    }
+    const instance = (wrapper.vm as unknown as { $: ComponentInternalInstance }).$
+    const body = find(instance.subTree)
+
+    return body!.props!.nodes as unknown[]
+  }
+
+  it.each([
+    [true, 'перерисовывается'],
+    [false, 'берётся из кэша'],
+  ])('interactiveTasks = %s: сдвинутый блок с задачами %s, блок без задач — из кэша', async (interactiveTasks) => {
+    const tail = 'Абзац без задач.\n\n- [ ] дело\n'
+    const wrapper = mountMd({ source: `Вступление.\n\n${tail}`, interactiveTasks })
+    const before = blockVNodes(wrapper)
+
+    await wrapper.setProps({ source: `Вступление, теперь длиннее.\n\n${tail}` })
+    const after = blockVNodes(wrapper)
+
+    expect(after[1]).toBe(before[1])
+    if (interactiveTasks)
+      expect(after[2]).not.toBe(before[2])
+    else
+      expect(after[2]).toBe(before[2])
   })
 })
 
@@ -172,6 +293,20 @@ describe('GrMarkdown: стриминг', () => {
     const paragraphs = (wrapper.element as HTMLElement).querySelectorAll('p')
     expect(paragraphs[1]?.querySelector('.caret')).not.toBeNull()
     expect(paragraphs[0]?.querySelector('.caret')).toBeNull()
+  })
+
+  it.each([
+    ['пункт нумерованного списка', '1. one\n2. tw', 'li:last-child'],
+    ['пункт задачи', '- [x] one\n- [ ] tw', 'li:last-child'],
+    ['вложенный пункт', '- one\n  - tw', 'li li'],
+    ['ячейка таблицы', '| a | b |\n| - | - |\n| 1 | 2', 'tbody tr:last-child td:last-child'],
+    ['цитата', '> цит', 'blockquote'],
+  ])('курсор встаёт в хвост, когда поток дописывает %s', (_, source, selector) => {
+    const wrapper = mount(GrMarkdown, { props: { source, streaming: true }, slots: { caret } })
+    const tail = [...(wrapper.element as HTMLElement).querySelectorAll(selector)].at(-1)
+
+    expect(wrapper.findAll('.gr-md-caret')).toHaveLength(1)
+    expect(tail?.querySelector('.gr-md-caret')).not.toBeNull()
   })
 
   it('без streaming курсора нет вовсе', () => {
