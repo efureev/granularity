@@ -13,7 +13,7 @@ export type GrTimePickerSize = GrPickerSize
 export const timePanelClass = 'flex gap-1'
 
 export const timeColumnClass
-  = 'max-h-[var(--gr-time-picker-column-height,12rem)] w-14 overflow-y-auto '
+  = 'relative max-h-[var(--gr-time-picker-column-height,12rem)] w-14 overflow-y-auto '
     + 'scroll-py-1 rounded-[var(--gr-radius-control)] '
     + 'focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]'
 

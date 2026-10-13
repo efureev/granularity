@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, useId, watch } from 'vue'
+import { computed, onMounted, ref, useId, watch } from 'vue'
 
 import { useAnnouncer } from '@feugene/granularity/composables/useAnnouncer'
 import { useComboboxNavigation } from '@feugene/granularity/composables/useComboboxNavigation'
@@ -10,6 +10,7 @@ import type { PlainTime } from '../../chrono/plainTime'
 import { plainTime } from '../../chrono/plainTime'
 import type { TimeColumn, TimeOption, TimeUnit } from '../../chrono/timeColumns'
 import { applyTimeUnit, buildTimeColumns } from '../../chrono/timeColumns'
+import { scrollOptionIntoList } from '../../internal/scrollColumn'
 
 import type { GrTimePickerSize } from './grTimePickerStyles'
 import {
@@ -97,6 +98,29 @@ function optionDomId(option: TimeOption): string {
   return `${panelId}-${option.key}`
 }
 
+/** Прокрутка — оформление: колонки или опции нет в DOM — двигать нечего. */
+function scrollColumnTo(unit: TimeUnit, option: TimeOption | undefined, block: 'center' | 'nearest'): void {
+  const list = columnEls.value.get(unit)
+  const element = option ? optionEls.value.get(option.key) : undefined
+  if (list && element)
+    scrollOptionIntoList(list, element, block)
+}
+
+/**
+ * Куда встать в колонке без выбора: на первое доступное значение. С `min` в
+ * 11:30 часы с нуля начинаются запрещёнными, и курсор с прокруткой на 00
+ * показывали бы шесть строк, из которых выбрать нечего.
+ */
+function startIndex(unit: TimeUnit): number {
+  const column = columnOf(unit)
+  if (!column)
+    return 0
+  if (column.selectedIndex >= 0)
+    return column.selectedIndex
+
+  return Math.max(column.options.findIndex(option => !option.disabled), 0)
+}
+
 /**
  * Навигация каждой колонки — свой экземпляр примитива: их число зависит от
  * пропов, а композаблы создаются один раз в `setup`, поэтому все четыре
@@ -111,11 +135,8 @@ function createNavigation(unit: TimeUnit) {
     items: () => columnOf(unit)?.options ?? [],
     open: () => props.open,
     idOf: option => optionDomId(option),
-    initialIndex: () => Math.max(columnOf(unit)?.selectedIndex ?? -1, 0),
-    scrollTo: (option) => {
-      // В jsdom метода нет, и это не повод падать: прокрутка — оформление.
-      optionEls.value.get(option.key)?.scrollIntoView?.({ block: 'nearest' })
-    },
+    initialIndex: () => startIndex(unit),
+    scrollTo: option => scrollColumnTo(unit, option, 'nearest'),
   })
 }
 
@@ -136,12 +157,29 @@ const shown: Record<TimeUnit, number> = { hour: -1, minute: -1, second: -1, peri
  *
  * Не в `focus()`: в `inline` панель никто не открывает и фокус в неё не уводит,
  * а `aria-activedescendant` обязан существовать всё равно — иначе клавиатура
- * для скринридера молчит.
+ * для скринридера молчит. Курсор ставится сразу, ещё в `setup`: он не требует
+ * DOM и попадает в серверную разметку.
  */
 watch(() => props.open, (open) => {
   if (open)
     initNavigation()
 }, { immediate: true })
+
+/**
+ * Прокрутка к курсору — после отрисовки. Первая — в `onMounted`, а не в
+ * `immediate` наблюдателе: тот с колбэком выполняется сразу, в `setup`, когда
+ * опций в DOM ещё нет, а в `inline` `open` с тех пор не меняется — колонки так
+ * и остались бы на нуле.
+ */
+onMounted(() => {
+  if (props.open)
+    revealAll()
+})
+
+watch(() => props.open, (open) => {
+  if (open)
+    revealAll()
+}, { flush: 'post' })
 
 /**
  * Показать выбранное значение колонки — **по центру**, а не у ближнего края.
@@ -153,24 +191,25 @@ watch(() => props.open, (open) => {
  */
 function revealSelected(unit: TimeUnit): void {
   const column = columnOf(unit)
-  const option = column?.options[column.selectedIndex]
-  if (!option)
-    return
-
-  // В jsdom метода нет, и это не повод падать: прокрутка — оформление.
-  optionEls.value.get(option.key)?.scrollIntoView?.({ block: 'center' })
+  scrollColumnTo(unit, column?.options[startIndex(unit)], 'center')
 }
 
 function initNavigation(): void {
   for (const unit of UNITS) {
     const nav = navigation[unit]
     nav.init()
-    // `init` только ставит курсор, прокрутку он не трогает — а колонка на 24
-    // значения открывается на нуле, и выбранные 09:30 остаются за кадром.
     nav.setActive(nav.activeIndex.value)
-    revealSelected(unit)
     shown[unit] = columnOf(unit)?.selectedIndex ?? -1
   }
+}
+
+/**
+ * `init` только ставит курсор, прокрутку он не трогает — а колонка на 24
+ * значения открывается на нуле, и выбранные 09:30 остаются за кадром.
+ */
+function revealAll(): void {
+  for (const unit of UNITS)
+    revealSelected(unit)
 }
 
 /**
@@ -252,6 +291,7 @@ function columnLabel(unit: TimeUnit): string {
 /** Поставить курсор на выбранные значения и увести фокус в первую колонку. */
 function focus(): void {
   initNavigation()
+  revealAll()
   columnEls.value.get('hour')?.focus()
 }
 

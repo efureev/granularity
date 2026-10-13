@@ -110,6 +110,7 @@ export const demoPathByPreviewKey = {
   'extra-chrono-relative-scale': 'extra/granularity-chrono/GrRelativeTimeScaleDemo.vue',
   'extra-chrono-time-basic': 'extra/granularity-chrono/GrTimePickerBasicDemo.vue',
   'extra-chrono-time-footer': 'extra/granularity-chrono/GrTimePickerFooterDemo.vue',
+  'extra-chrono-time-inline': 'extra/granularity-chrono/GrTimePickerInlineDemo.vue',
   'extra-chrono-time-twelve': 'extra/granularity-chrono/GrTimePickerTwelveHourDemo.vue',
   'extra-forms-schema-adapters': 'extra/granularity-forms-schema/GrSchemaFormAdaptersDemo.vue',
   'extra-forms-schema-additional': 'extra/granularity-forms-schema/GrSchemaFormAdditionalDemo.vue',

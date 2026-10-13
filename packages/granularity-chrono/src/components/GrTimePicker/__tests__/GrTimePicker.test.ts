@@ -38,6 +38,66 @@ function panelExists(): boolean {
   return document.querySelector('[data-gr-time-picker-panel]') !== null
 }
 
+const ROW = 32
+const VIEW = 192
+
+/**
+ * Геометрия колонок для jsdom: опция 32px, видимая часть колонки — 192px.
+ * Раскладки в jsdom нет, а прокрутка колонки считается от `offsetTop` и высот.
+ */
+function stubColumnGeometry(): () => void {
+  const isOption = (node: HTMLElement) => node.hasAttribute('data-gr-time-picker-option')
+  const isColumn = (node: HTMLElement) => node.getAttribute('role') === 'listbox' && node.hasAttribute('data-unit')
+  const getters: Record<string, (this: HTMLElement) => number> = {
+    offsetTop() {
+      return isOption(this) ? [...this.parentElement!.children].indexOf(this) * ROW : 0
+    },
+    offsetHeight() {
+      return isOption(this) ? ROW : 0
+    },
+    clientHeight() {
+      return isColumn(this) ? VIEW : 0
+    },
+    scrollHeight() {
+      return isColumn(this) ? this.children.length * ROW : 0
+    },
+  }
+  const saved = Object.keys(getters).map(key => [key, Object.getOwnPropertyDescriptor(HTMLElement.prototype, key)] as const)
+
+  for (const [key, get] of Object.entries(getters))
+    Object.defineProperty(HTMLElement.prototype, key, { configurable: true, get })
+
+  return () => {
+    for (const [key, descriptor] of saved) {
+      if (descriptor)
+        Object.defineProperty(HTMLElement.prototype, key, descriptor)
+      else Reflect.deleteProperty(HTMLElement.prototype, key)
+    }
+  }
+}
+
+function columnEl(unit: string): HTMLElement {
+  return queryOne(`[role="listbox"][data-unit="${unit}"]`)
+}
+
+/**
+ * Какая опция колонки видна целиком и ближе всего к центру (`selected`) либо
+ * какая под курсором и видна ли она (`active`).
+ */
+function revealed(unit: string, which: 'selected' | 'active' = 'selected'): string | null {
+  const list = columnEl(unit)
+  const top = list.scrollTop
+  const options = [...list.querySelectorAll<HTMLElement>('[data-gr-time-picker-option]')]
+  const target = which === 'selected'
+    ? options.find(option => option.getAttribute('aria-selected') === 'true')
+    : options.find(option => option.id === list.getAttribute('aria-activedescendant'))
+  if (!target)
+    return null
+
+  const visible = target.offsetTop >= top && target.offsetTop + ROW <= top + VIEW
+  return visible ? target.getAttribute('data-key') : null
+}
+
 function column(unit: string) {
   return query(`[data-unit="${unit}"]`)
 }
@@ -282,23 +342,17 @@ describe('GrTimePicker — клавиатура', () => {
     wrapper.unmount()
   })
 
-  it('колонка прокручивается к выбранному значению', async () => {
+  it('колонка прокручивается к выбранному значению — сама, а не через scrollIntoView', async () => {
     // Иначе панель на 24 значения открывается на нуле, и выбранные 09:30
     // остаются за кадром — курсор на них есть, а видно их нет.
-    // jsdom метода не знает вовсе — заводим заглушку и следим за вызовами.
-    // Убирается она удалением, а не возвратом прежнего значения: прежнего нет.
-    Element.prototype.scrollIntoView = () => {}
-    const spy = vi.spyOn(Element.prototype, 'scrollIntoView')
-
+    const restore = stubColumnGeometry()
     const wrapper = mountPicker({ modelValue: at(9, 30) })
     await openPicker(wrapper)
 
-    const scrolled = spy.mock.instances.map(element => (element as Element).getAttribute('data-key'))
-    expect(scrolled).toContain('hour-9')
-    expect(scrolled).toContain('minute-30')
+    expect(revealed('hour')).toBe('hour-9')
+    expect(revealed('minute')).toBe('minute-30')
 
-    spy.mockRestore()
-    Reflect.deleteProperty(Element.prototype, 'scrollIntoView')
+    restore()
     wrapper.unmount()
   })
 
@@ -492,6 +546,63 @@ describe('GrTimePicker — форма', () => {
 })
 
 describe('GrTimePicker — inline', () => {
+  /**
+   * Начальная прокрутка шла в `watch` с `immediate` — в `setup`, когда опций в
+   * DOM ещё нет, и ничего не двигала; а `open` в `inline` больше не меняется.
+   * Часы с выбранными 14 стояли на 00–05.
+   */
+  it('после монтирования колонки показывают выбранное время', async () => {
+    const restore = stubColumnGeometry()
+    const wrapper = mountPicker({ inline: true, modelValue: at(14, 30), min: at(11, 30), max: at(17, 30), minuteStep: 30 })
+    for (let i = 0; i < 4; i += 1) await nextTick()
+
+    expect(columnEl('hour').scrollTop).toBeGreaterThan(0)
+    expect(revealed('hour')).toBe('hour-14')
+    expect(revealed('minute')).toBe('minute-30')
+
+    restore()
+    wrapper.unmount()
+  })
+
+  /**
+   * `scrollIntoView` двигает все прокручиваемые предки вплоть до окна: инлайн-
+   * пикер ниже по странице на загрузке утаскивал бы к себе всю страницу.
+   */
+  it('монтирование и стрелки прокручивают только колонку, не страницу', async () => {
+    const restore = stubColumnGeometry()
+    Element.prototype.scrollIntoView = () => {}
+    const intoView = vi.spyOn(Element.prototype, 'scrollIntoView')
+    const scrollTo = vi.spyOn(window, 'scrollTo').mockImplementation(() => {})
+
+    const wrapper = mountPicker({ inline: true, modelValue: at(9, 30) })
+    for (let i = 0; i < 4; i += 1) await nextTick()
+    for (let i = 0; i < 8; i += 1)
+      await press('hour', 'ArrowDown')
+
+    expect(intoView).not.toHaveBeenCalled()
+    expect(scrollTo).not.toHaveBeenCalled()
+    // Курсор на 17 ушёл за нижний край — колонка дошла до него ближним краем.
+    expect(revealed('hour', 'active')).toBe('hour-17')
+
+    intoView.mockRestore()
+    scrollTo.mockRestore()
+    Reflect.deleteProperty(Element.prototype, 'scrollIntoView')
+    restore()
+    wrapper.unmount()
+  })
+
+  it('без значения с min колонка показывает первое доступное', async () => {
+    const restore = stubColumnGeometry()
+    const wrapper = mountPicker({ inline: true, modelValue: null, min: at(11, 30), max: at(17, 30), minuteStep: 30 })
+    for (let i = 0; i < 4; i += 1) await nextTick()
+
+    expect(revealed('hour', 'active')).toBe('hour-11')
+    expect(activeKey('hour')).toBe('hour-11')
+
+    restore()
+    wrapper.unmount()
+  })
+
   it('колонки на месте, поля нет, фокус не забирается', async () => {
     const before = document.activeElement
     const wrapper = mountPicker({ inline: true, modelValue: at(9, 30) })

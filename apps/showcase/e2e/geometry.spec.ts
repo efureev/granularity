@@ -990,3 +990,37 @@ test.describe('GrImageCrop: рамка до и после картинки', () 
     await expect(demo.locator('[data-demo-cover-size]')).toHaveText('1200 × 900')
   })
 })
+
+/**
+ * Колонки инлайн-`GrTimePicker` прокручивались к выбранному в `setup`, когда
+ * опций ещё нет в DOM, а `open` в `inline` больше не меняется: часы с выбранными
+ * 14 стояли на 00–05. Прокрутка обязана двигать только колонку — не страницу,
+ * ниже первого экрана которой стоит пикер.
+ */
+test.describe('GrTimePicker inline: колонки у выбранного значения', () => {
+  test('после загрузки часы стоят на выбранном, а страница не прыгает к пикеру', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 720 })
+    await page.goto(companionPath('GrTimePicker'))
+    const demo = page.locator('[data-demo="time-picker-inline"]')
+    await demo.waitFor()
+    await expect(demo.locator('[data-demo-slot]')).toHaveText('14:30')
+
+    expect(await page.evaluate(() => window.scrollY)).toBe(0)
+
+    for (const [unit, value] of [['hour', '14'], ['minute', '30']] as const) {
+      const list = demo.locator(`[role="listbox"][data-unit="${unit}"]`)
+      const selected = list.locator('[aria-selected="true"]')
+      await expect(selected).toHaveText(value)
+
+      const inside = await list.evaluate((node) => {
+        const option = node.querySelector('[aria-selected="true"]') as HTMLElement
+        const box = node.getBoundingClientRect()
+        const rect = option.getBoundingClientRect()
+        return rect.top >= box.top - 0.5 && rect.bottom <= box.bottom + 0.5
+      })
+      expect(inside, `${unit}: выбранное значение в видимой части колонки`).toBe(true)
+    }
+
+    expect(await demo.locator('[role="listbox"][data-unit="hour"]').evaluate(node => node.scrollTop)).toBeGreaterThan(0)
+  })
+})
