@@ -1,6 +1,6 @@
 import { markedEngine } from './engine/marked'
 import { markdownHeadings } from './headings'
-import type { GrMarkdownEngine, GrMarkdownParseOptions, GrMdBlock, GrMdHeading } from './types'
+import type { GrMarkdownEngine, GrMarkdownParseOptions, GrMdBlock, GrMdBlockNode, GrMdHeading } from './types'
 
 export interface GrMarkdownDocumentOptions extends GrMarkdownParseOptions {
   engine?: GrMarkdownEngine
@@ -38,6 +38,38 @@ export function createMarkdownDocument(options: GrMarkdownDocumentOptions = {}):
   let source = ''
   let blocks: GrMdBlock[] = []
 
+  /**
+   * Офсеты задач хвоста считаны от начала хвоста, а `taskToggle` обещает офсет
+   * в исходнике целиком: без сдвига переключение задачи из потока указывало бы
+   * на чужие символы.
+   */
+  function shiftTaskOffsets(node: GrMdBlockNode, delta: number): GrMdBlockNode {
+    switch (node.type) {
+      case 'list':
+        return {
+          ...node,
+          items: node.items.map(item => ({
+            ...item,
+            taskOffset: item.taskOffset === null ? null : item.taskOffset + delta,
+            children: item.children.map(child => shiftTaskOffsets(child, delta)),
+          })),
+        }
+      case 'blockquote':
+      case 'alert':
+      case 'custom':
+        return { ...node, children: node.children.map(child => shiftTaskOffsets(child, delta)) }
+      case 'heading':
+      case 'paragraph':
+      case 'inline':
+      case 'code':
+      case 'table':
+      case 'hr':
+      case 'html':
+      case 'footnotes':
+        return node
+    }
+  }
+
   function full(next: string): GrMdBlock[] {
     return engine.lex(next, parseOptions)
   }
@@ -67,7 +99,12 @@ export function createMarkdownDocument(options: GrMarkdownDocumentOptions = {}):
 
     return [
       ...head,
-      ...parsed.map(block => ({ ...block, offset: block.offset + from, end: block.end + from })),
+      ...parsed.map(block => ({
+        ...block,
+        offset: block.offset + from,
+        end: block.end + from,
+        node: shiftTaskOffsets(block.node, from),
+      })),
     ]
   }
 

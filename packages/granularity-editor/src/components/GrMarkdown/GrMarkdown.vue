@@ -241,7 +241,8 @@ const rendered = computed<VNodeChild[]>(() => {
     // он и так пересобирается на каждом куске, а кэш вернул бы его с курсором
     // уже после остановки потока.
     const caret = props.streaming && index === last && slots.caret
-      ? h('span', { class: 'gr-md-caret' }, slots.caret())
+      // Курсор декоративный: в чтение абзаца и в имя задачи он не входит.
+      ? h('span', { 'class': 'gr-md-caret', 'aria-hidden': 'true' }, slots.caret())
       : undefined
 
     if (caret)

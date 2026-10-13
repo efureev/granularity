@@ -24,7 +24,8 @@ function inlineText(nodes: GrMdInline[]): string {
   return out
 }
 
-function blockText(node: GrMdBlockNode): string {
+/** Текст одного блока — то, что из него попадёт в доступное имя. */
+export function blockText(node: GrMdBlockNode): string {
   switch (node.type) {
     case 'heading':
     case 'paragraph':

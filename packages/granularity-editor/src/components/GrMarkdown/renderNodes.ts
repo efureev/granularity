@@ -4,6 +4,7 @@ import GrTable from '@feugene/granularity/components/GrTable'
 import type { Component, VNode, VNodeChild } from 'vue'
 import { h } from 'vue'
 
+import { blockText } from '../../markdown/plainText'
 import type {
   GrMdBlock,
   GrMdBlockNode,
@@ -193,8 +194,10 @@ function renderListItem(item: GrMdListItem, ctx: GrMarkdownRenderContext, traili
 
   const editable = ctx.interactiveTasks && item.taskOffset !== null
   const [lead, ...rest] = children
-  // Пустой первый блок назвать нечем — тогда общее «Task», а не пустое имя.
-  const named = lead !== undefined && !(Array.isArray(lead) && lead.length === 0)
+  // Первый блок без текста назвать нечем — пустой инлайн, картинка без
+  // подписи, — тогда общее «Task», а не пустое имя.
+  const leadNode = item.children[0]
+  const named = leadNode !== undefined && blockText(leadNode).trim() !== ''
   const labelId = named ? ctx.taskLabelId?.() : undefined
 
   const box = h(GrCheckbox, {

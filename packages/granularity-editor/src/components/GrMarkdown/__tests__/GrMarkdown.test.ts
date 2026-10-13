@@ -12,6 +12,38 @@ function blocksOf(wrapper: { element: Element }) {
   return [...(wrapper.element as HTMLElement).querySelectorAll('[data-gr-markdown-block]')]
 }
 
+/** Текст узла так, как его берёт имя: без `aria-hidden`-поддеревьев, картинка — своим `alt`. */
+function nameText(node: Node): string {
+  if (node.nodeType === Node.TEXT_NODE)
+    return node.textContent ?? ''
+  if (!(node instanceof Element) || node.getAttribute('aria-hidden') === 'true')
+    return ''
+  if (node.tagName === 'IMG')
+    return node.getAttribute('alt') ?? ''
+
+  return [...node.childNodes].map(nameText).join('')
+}
+
+/**
+ * Имя виджета так, как его считает браузер для этих двух путей: ссылки
+ * `aria-labelledby` сильнее `aria-label`. Ссылка ищется в документе — висячая
+ * дала бы пустое имя, и тест обязан это увидеть.
+ */
+function accessibleNameIn(box: Element): string {
+  const ids = box.getAttribute('aria-labelledby')
+  if (ids) {
+    return ids.split(/\s+/)
+      .map((id) => {
+        const target = box.ownerDocument.getElementById(id)
+        return target ? nameText(target) : ''
+      })
+      .join(' ')
+      .trim()
+  }
+
+  return box.getAttribute('aria-label') ?? ''
+}
+
 describe('GrMarkdown: разметка', () => {
   it('рисует основные узлы', () => {
     const html = mountMd({ source: '# Заголовок\n\nАбзац.\n\n- пункт\n\n| a |\n| - |\n| 1 |\n\n---\n' }).html()
@@ -150,25 +182,8 @@ describe('GrMarkdown: алерты, сноски, задачи', () => {
     expect(box.attributes('aria-disabled')).toBeUndefined()
   })
 
-  /**
-   * Имя виджета так, как его считает браузер для этих двух путей: ссылки
-   * `aria-labelledby` сильнее `aria-label`. Ссылка ищется в документе — висячая
-   * дала бы пустое имя, и тест обязан это увидеть.
-   */
-  function accessibleName(box: Element): string {
-    const ids = box.getAttribute('aria-labelledby')
-    if (ids) {
-      return ids.split(/\s+/)
-        .map(id => box.ownerDocument.getElementById(id)?.textContent ?? '')
-        .join(' ')
-        .trim()
-    }
-
-    return box.getAttribute('aria-label') ?? ''
-  }
-
   function taskNames(wrapper: { element: Element }): string[] {
-    return [...wrapper.element.querySelectorAll('[role="checkbox"]')].map(accessibleName)
+    return [...wrapper.element.querySelectorAll('[role="checkbox"]')].map(accessibleNameIn)
   }
 
   it.each([false, true])('имя чекбокса задачи — текст её пункта (interactiveTasks = %s)', (interactiveTasks) => {
@@ -214,11 +229,14 @@ describe('GrMarkdown: алерты, сноски, задачи', () => {
     expect(taskNames(wrapper)).toEqual(['Одна и та же задача', 'Одна и та же задача'])
   })
 
-  it('задача без текста называется общим словом, а не пустым именем', () => {
-    const wrapper = mount(GrMarkdown, { props: { source: '- [ ] \n- [ ]\n' }, attachTo: document.body })
+  it.each([
+    ['пустой инлайн, снятый политикой html', '- [ ] <b></b>\n'],
+    ['картинка без подписи', '- [ ] ![](https://example.com/x.png)\n'],
+  ])('задача без текста (%s) называется общим словом, а не пустым именем', (_, source) => {
+    const wrapper = mount(GrMarkdown, { props: { source, html: 'strip' }, attachTo: document.body })
 
-    for (const name of taskNames(wrapper))
-      expect(name).not.toBe('')
+    expect(wrapper.findAll('[role="checkbox"]')).toHaveLength(1)
+    expect(taskNames(wrapper)).toEqual(['Task'])
   })
 
   it('interactiveTasks эмитит офсет маркера в исходнике, а не номер пункта', async () => {
@@ -278,6 +296,36 @@ describe('GrMarkdown: задачи после правки выше', () => {
       expect(after[2]).not.toBe(before[2])
     else
       expect(after[2]).toBe(before[2])
+  })
+})
+
+describe('GrMarkdown: задачи в потоке', () => {
+  /**
+   * Хвост разбирается отдельно, и офсеты его задач считаются от начала хвоста:
+   * блоку сдвигались только границы, а `taskOffset` пунктов оставался
+   * относительным, и переключение задачи указывало на чужие символы.
+   */
+  it('задача из хвоста потока эмитит офсет маркера в полном исходнике', async () => {
+    const start = 'Intro.\n\nSecond para.\n\n- [ ] a'
+    const wrapper = mountMd({ source: start, streaming: true, interactiveTasks: true })
+    const full = `${start}\n- [ ] b`
+    await wrapper.setProps({ source: full })
+
+    await wrapper.findAll('[role="checkbox"]')[1]!.trigger('click')
+
+    const [offset] = wrapper.emitted('taskToggle')![0] as [number, boolean]
+    expect(offset).toBe(full.lastIndexOf('[ ]'))
+  })
+
+  it('курсор потока в имя задачи не входит', () => {
+    const wrapper = mount(GrMarkdown, {
+      props: { source: '- [ ] one\n- [ ] tw', streaming: true },
+      slots: { caret: () => h('span', '|') },
+      attachTo: document.body,
+    })
+
+    expect(wrapper.find('.gr-md-caret').attributes('aria-hidden')).toBe('true')
+    expect(wrapper.findAll('[role="checkbox"]').map(box => accessibleNameIn(box.element))).toEqual(['one', 'tw'])
   })
 })
 
