@@ -80,6 +80,7 @@
     "customValuePlaceholder": "Add value…",
     "addOption": "Add \"{value}\"",
     "clearOption": "None",
+    "placeholder": "Select…",
     "searchPlaceholder": "Search…",
     "loading": "Loading…",
     "noResults": "No results",

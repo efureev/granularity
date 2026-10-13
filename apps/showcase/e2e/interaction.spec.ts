@@ -2382,3 +2382,32 @@ test.describe('GrRichText: пузырёк при прокрутке', () => {
     await expect(field).toBeFocused()
   })
 })
+
+/**
+ * Одиночный нативный `GrSelect` без `clearable` с пустой моделью показывал
+ * первую опцию: пустой опции не было, и браузер выбирал первую сам. Поле
+ * говорило «Alpha workspace», `select.value` уходил в форму мимо модели.
+ */
+test.describe('GrSelect: пустой нативный выбор', () => {
+  test('показывает подсказку, а не первую опцию, и в форму уходит пусто', async ({ page }) => {
+    await openShowcasePage(page, componentPath('GrSelect'))
+    const select = page.locator('select[aria-label="Pick workspace"]').first()
+    await select.waitFor()
+
+    const state = await select.evaluate((node: HTMLSelectElement) => ({
+      index: node.selectedIndex,
+      value: node.value,
+      shown: node.options[node.selectedIndex]?.text.trim(),
+      placeholder: { disabled: node.options[0]?.disabled, hidden: node.options[0]?.hidden },
+      chosen: [...node.options].filter((option, index) => option.selected && index > 0).length,
+    }))
+
+    expect(state).toEqual({
+      index: 0,
+      value: '',
+      shown: 'Pick workspace',
+      placeholder: { disabled: true, hidden: true },
+      chosen: 0,
+    })
+  })
+})

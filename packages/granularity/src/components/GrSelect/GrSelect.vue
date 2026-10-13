@@ -831,6 +831,25 @@ const nativeClearOptionVisible = computed(() => {
   return !flatOptions.value.some(o => isEmptySelectValue(o.value))
 })
 
+/**
+ * Опция-подсказка одиночного нативного выбора без `clearable`, пока модель пуста.
+ *
+ * Без неё и без выбранной опции браузер ставит первую сам: поле показывало
+ * «Germany» при пустом значении, а `select.value` уходил в форму «DE» мимо
+ * модели. Подсказку не выбрать обратно (`disabled`) и нет в списке (`hidden`);
+ * с `clearable` её роль играет опция очистки, а опция с пустым значением в
+ * `options` и есть «ничего не выбрано».
+ */
+const nativePlaceholderVisible = computed(() => {
+  if (effectiveOptionsView.value !== 'native' || props.multiple)
+    return false
+  if (nativeClearOptionVisible.value || modelSingle.value !== '')
+    return false
+  if (!props.options)
+    return true
+  return !flatOptions.value.some(o => isEmptySelectValue(o.value))
+})
+
 const panelClearVisible = computed(() => {
   if (!resolvedClearable.value)
     return false
@@ -980,6 +999,9 @@ const themeAttrs = useGrThemeAttrs()
     >
       <option v-if="nativeClearOptionVisible" value="" :selected="!multiple && modelSingle === ''">
         {{ placeholder || t('gr.select.clearOption', 'None') }}
+      </option>
+      <option v-else-if="nativePlaceholderVisible" value="" disabled hidden selected data-gr-select-placeholder>
+        {{ placeholder || t('gr.select.placeholder', 'Select…') }}
       </option>
 
       <NativeSlotOptions v-if="$slots.default" />

@@ -143,6 +143,82 @@ describe('GrSelect', () => {
     expect(optionValues[0]).toBe('')
   })
 
+  describe('native без clearable с пустой моделью', () => {
+    const countries = [
+      { value: 'DE', label: 'Germany' },
+      { value: 'FR', label: 'France' },
+    ]
+
+    function shown(select: HTMLSelectElement): string | undefined {
+      return select.options[select.selectedIndex]?.text.trim()
+    }
+
+    /**
+     * Пустую опцию поле рисовало только с `clearable`: без неё и без выбранной
+     * опции браузер сам ставил первую — поле показывало «Germany» при пустом
+     * значении, а `select.value` уходил в форму «DE» мимо модели.
+     */
+    it.each([undefined, null, ''])('модель %s показывает подсказку, а не первую опцию', async (empty) => {
+      const wrapper = mount(GrSelect, {
+        // Пустое значение приходит от нетипизированного потребителя — формы из
+        // схемы отдают `undefined` у необязательного поля без умолчания.
+        props: { modelValue: empty as unknown as string, ariaLabel: 'Country', placeholder: 'Choose a country', options: countries },
+        attachTo: document.body,
+      })
+      const select = wrapper.get('select').element
+      const placeholder = select.options[0]
+
+      expect(select.selectedIndex).toBe(0)
+      expect(placeholder.value).toBe('')
+      expect(placeholder.disabled).toBe(true)
+      expect(placeholder.hidden).toBe(true)
+      expect(shown(select)).toBe('Choose a country')
+      expect([...select.options].filter(option => option.selected && option !== placeholder)).toEqual([])
+      expect(select.value).toBe('')
+
+      await nextTick()
+      expect(wrapper.emitted('update:modelValue')).toBeUndefined()
+      wrapper.unmount()
+    })
+
+    it('без placeholder подсказка берёт строку из словаря', () => {
+      const wrapper = mount(GrSelect, { props: { modelValue: undefined as unknown as string, ariaLabel: 'Country', options: countries } })
+
+      expect(shown(wrapper.get('select').element)).toBe('Select…')
+    })
+
+    it('выбор пользователя приходит в модель, а подсказку выбрать обратно нельзя', async () => {
+      const wrapper = mount(GrSelect, {
+        props: { modelValue: undefined as unknown as string, ariaLabel: 'Country', options: countries },
+        attachTo: document.body,
+      })
+      await wrapper.get('select').setValue('FR')
+
+      expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual(['FR'])
+      await wrapper.setProps({ modelValue: 'FR' })
+      // Значение есть — подсказки нет: вернуть «ничего» нельзя без `clearable`.
+      expect(wrapper.findAll('option').map(option => option.attributes('value'))).toEqual(['DE', 'FR'])
+      wrapper.unmount()
+    })
+
+    it('с clearable остаётся прежняя опция очистки, а не подсказка', () => {
+      const wrapper = mount(GrSelect, { props: { modelValue: undefined as unknown as string, clearable: true, ariaLabel: 'Country', options: countries } })
+      const first = wrapper.get('select').element.querySelector('option')!
+
+      expect(first.disabled).toBe(false)
+      expect(first.hidden).toBe(false)
+      expect(first.textContent?.trim()).toBe('None')
+    })
+
+    it('опция с пустым значением в списке сама и есть «ничего не выбрано»', () => {
+      const wrapper = mount(GrSelect, {
+        props: { modelValue: '', ariaLabel: 'Country', options: [{ value: '', label: 'Any country' }, ...countries] },
+      })
+
+      expect(wrapper.findAll('option').map(option => option.text())).toEqual(['Any country', 'Germany', 'France'])
+    })
+  })
+
   it('в native-режиме с clearable и multiple не добавляет пустой option', () => {
     const wrapper = mount(GrSelect, {
       props: {

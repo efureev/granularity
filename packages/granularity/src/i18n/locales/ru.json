@@ -80,6 +80,7 @@
     "customValuePlaceholder": "Добавить значение…",
     "addOption": "Добавить «{value}»",
     "clearOption": "Не выбрано",
+    "placeholder": "Выберите…",
     "searchPlaceholder": "Поиск…",
     "loading": "Загрузка…",
     "noResults": "Ничего не найдено",

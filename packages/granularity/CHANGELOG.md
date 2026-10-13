@@ -5,6 +5,23 @@ All notable changes to the [`@feugene/granularity`](.) package are documented in
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Fixed
+
+- **Пустой нативный `GrSelect` без `clearable` не показывает первую опцию.** Пустую опцию поле
+  рисовало только с `clearable`; без неё и без выбранной опции браузер ставил первую сам — поле
+  показывало «Germany» при пустой модели, `select.value` уходил в форму «DE», а форма из схемы
+  писала «This field is required» прямо под «Germany». Теперь пустая модель одиночного нативного
+  выбора показывает опцию-подсказку `<option value="" disabled hidden selected>` с текстом
+  `placeholder` или переведённым «Select…»; выбрать её обратно нельзя, а с `clearable` остаётся
+  прежняя опция очистки.
+
+### Added
+
+- **Строка `gr.select.placeholder`** — подсказка пустого нативного выбора: «Select…», «Выберите…»,
+  «Seleccione…».
+
 ## [v1.0.19] 2026-10-13
 
 ### Fixed

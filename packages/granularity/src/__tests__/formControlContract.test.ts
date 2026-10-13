@@ -111,7 +111,10 @@ describe('контракт форм-контрола', () => {
         await nextTick()
 
         // Значение readonly-контрола по-прежнему уходит в форму и читается AT.
-        expect(wrapper.html().includes('disabled=""'), 'readonly не должен выключать контрол').toBe(false)
+        // `disabled` у `<option>` — недоступность пункта (подсказка нативного
+        // выбора), а не выключенный контрол.
+        const disabled = wrapper.findAll('[disabled]').filter(node => node.element.tagName !== 'OPTION')
+        expect(disabled.map(node => node.element.tagName), 'readonly не должен выключать контрол').toEqual([])
       })
 
       it('наследует readonly от GrFormField', async () => {

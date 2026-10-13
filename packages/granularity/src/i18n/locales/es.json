@@ -80,6 +80,7 @@
     "customValuePlaceholder": "Añadir valor…",
     "addOption": "Añadir «{value}»",
     "clearOption": "Ninguno",
+    "placeholder": "Seleccione…",
     "searchPlaceholder": "Buscar…",
     "loading": "Cargando…",
     "noResults": "Sin resultados",
