@@ -72,6 +72,40 @@ describe('GrRelativeTime — текст и разметка', () => {
     wrapper.unmount()
   })
 
+  it.each([
+    ['2026-10-07', 'tomorrow'],
+    ['2026-10-06', 'today'],
+    ['2026-10-05', 'yesterday'],
+    ['2026-10-13', 'next week'],
+  ])('дата без времени — календарный разрыв: %s утром 6 октября — %s', (value, expected) => {
+    // Полночь 7 октября — через 15 часов, а 5 октября было 33 часа назад:
+    // прошедшим временем это «in 15 hours» и «yesterday» лишь по случайности.
+    const wrapper = mountMark({ value, valueAdapter: 'isoDate', base: new Date(2026, 9, 6, 9, 0), numeric: 'auto' })
+
+    expect(wrapper.text()).toBe(expected)
+    wrapper.unmount()
+  })
+
+  it('свой адаптер без времени объявляет это флагом и тоже считается календарём', () => {
+    const dayNumber = {
+      dateOnly: true,
+      parse: (raw: number) => new Date(2026, 9, raw),
+      serialize: (date: Date) => date.getDate(),
+    }
+    const wrapper = mountMark({ value: 7, valueAdapter: dayNumber, base: new Date(2026, 9, 6, 21, 30) })
+
+    expect(wrapper.text()).toBe('tomorrow')
+    wrapper.unmount()
+  })
+
+  it('машинная форма даты без времени — сама дата, а не момент в UTC', () => {
+    // Локальная полночь в UTC для восточных зон — это вечер предыдущего дня.
+    const wrapper = mountMark({ value: '2026-08-11', valueAdapter: 'isoDate' })
+
+    expect(wrapper.attributes('datetime')).toBe('2026-08-11')
+    wrapper.unmount()
+  })
+
   it('неразобранное значение не рисует ни текста, ни момента', () => {
     const wrapper = mountMark({ value: 'не дата', valueAdapter: 'isoDate' })
 
@@ -204,6 +238,51 @@ describe('GrRelativeTime — живое обновление', () => {
     // Секундный тикер осиротел и снят: подписка переехала на минутный.
     expect(chronoTickerIntervals()).toEqual([30_000])
     wrapper.unmount()
+  })
+
+  /**
+   * Общие часы обновляются тактом: на секундах — раз в пять секунд. Значение,
+   * пришедшее между тактами, новее последнего тика, и сравнение с ним делало
+   * «только что» будущим: «in 4 sec.», а через такт — «3 sec. ago».
+   */
+  it('значение, сменившееся между тактами, сравнивается со свежими часами', async () => {
+    const wrapper = mountLive({ value: new Date(), width: 'short' })
+    await nextTick()
+    expect(chronoTickerIntervals()).toEqual([5000])
+
+    vi.advanceTimersByTime(4000)
+    await wrapper.setProps({ value: new Date() })
+
+    expect(wrapper.text()).toBe('now')
+    wrapper.unmount()
+  })
+
+  it('метка, смонтированная между тактами общего таймера, не уходит в будущее', async () => {
+    const first = mountLive({ value: new Date() })
+    await nextTick()
+
+    vi.advanceTimersByTime(4000)
+    const second = mountLive({ value: new Date(), numeric: 'always' })
+    await nextTick()
+
+    expect(second.text()).toBe('0 seconds ago')
+    first.unmount()
+    second.unmount()
+  })
+
+  it('будущее меньше такта у живой метки — «сейчас»: часы сравнения отстают на такт', async () => {
+    // Сервер с часами, убежавшими на пару секунд, — обычное дело.
+    const ahead = mountLive({ value: new Date(Date.now() + 2000) })
+    const far = mountLive({ value: new Date(Date.now() + 20_000) })
+    const fixed = mountMark({ value: new Date(NOW.getTime() + 2000) })
+
+    expect(ahead.text()).toBe('now')
+    expect(far.text()).toBe('in 20 seconds')
+    // С `base` часы не отстают: две секунды вперёд — это будущее.
+    expect(fixed.text()).toBe('in 2 seconds')
+    ahead.unmount()
+    far.unmount()
+    fixed.unmount()
   })
 
   it('live=false не заводит таймера вовсе', async () => {

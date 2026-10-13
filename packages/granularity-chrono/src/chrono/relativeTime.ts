@@ -19,6 +19,11 @@ import { differenceInDays, differenceInMonths } from './plainDate'
  *
  * Иначе месяц считался бы как 30 суток и врал на каждом феврале, а сутки на
  * дне перевода часов (23 или 25 часов) давали бы «2 дня назад» вместо «вчера».
+ *
+ * Значение без времени (`dateOnly`) — календарная дата, а не момент: его
+ * «полночь» — условность разбора, и прошедшим временем дата завтрашнего дня
+ * утром оказалась бы «через 15 часов». Такое значение меряется только
+ * календарём, от дня `from`.
  */
 
 export type RelativeUnit = 'second' | 'minute' | 'hour' | 'day' | 'week' | 'month' | 'year'
@@ -40,15 +45,42 @@ function toward(value: number): number {
 }
 
 /**
+ * Нулевой разрыв — «сейчас», и знак у него прошлый. `Intl` различает знак нуля:
+ * `+0` печатается «in 0 sec.», `−0` — «0 sec. ago», а при `numeric: 'auto'` оба
+ * дают «now». Только что случившееся будущим не бывает.
+ */
+function nowLeaning(amount: RelativeAmount): RelativeAmount {
+  return amount.value === 0 ? { value: -0, unit: amount.unit } : amount
+}
+
+export interface SelectRelativeAmountOptions {
+  /**
+   * `to` — календарная дата без времени: разрыв меряется днями календаря от
+   * дня `from`, а не прошедшим временем.
+   */
+  dateOnly?: boolean
+  /**
+   * Будущее ближе стольких миллисекунд — тоже «сейчас». Нужен, когда `from`
+   * отстаёт от настоящих часов (такт общего таймера) или источник значения
+   * спешит: только что случившееся иначе читалось бы как «через 3 секунды».
+   */
+  nowWithin?: number
+}
+
+/**
  * Разрыв между `from` и `to` в самой крупной единице, которая набралась хотя
  * бы раз. `to` в будущем — значение положительно.
  */
-export function selectRelativeAmount(from: Date, to: Date): RelativeAmount {
-  const elapsed = to.getTime() - from.getTime()
+export function selectRelativeAmount(from: Date, to: Date, options: SelectRelativeAmountOptions = {}): RelativeAmount {
+  if (options.dateOnly)
+    return nowLeaning(calendarAmount(toPlainDate(from), toPlainDate(to)))
+
+  const raw = to.getTime() - from.getTime()
+  const elapsed = raw > 0 && raw < (options.nowWithin ?? 0) ? 0 : raw
   const magnitude = Math.abs(elapsed)
 
   if (magnitude < MS_IN_MINUTE)
-    return { value: toward(elapsed / MS_IN_SECOND), unit: 'second' }
+    return nowLeaning({ value: toward(elapsed / MS_IN_SECOND), unit: 'second' })
   if (magnitude < MS_IN_HOUR)
     return { value: toward(elapsed / MS_IN_MINUTE), unit: 'minute' }
   if (magnitude < MS_IN_DAY)

@@ -92,7 +92,7 @@ export {
 
 // Относительное время: «3 минуты назад». Единица выбирается здесь, строку
 // строит `Intl.RelativeTimeFormat`.
-export type { FormatRelativeTimeOptions, RelativeAmount, RelativeUnit } from './chrono/relativeTime'
+export type { FormatRelativeTimeOptions, RelativeAmount, RelativeUnit, SelectRelativeAmountOptions } from './chrono/relativeTime'
 export {
   formatRelativeTime,
   resetRelativeTimeCache,

@@ -5,6 +5,28 @@ All notable changes to the [`@feugene/granularity-chrono`](.) package are docume
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Fixed
+
+- **Живой `GrRelativeTime` не называет только что случившееся будущим.** «Сейчас» бралось из
+  последнего тика общего таймера, а он на секундах отстаёт до пяти секунд: значение, выставленное
+  между тактами, показывалось «in 1 sec.», а через такт — «3 sec. ago». Теперь при смене значения
+  (и при монтировании) часы перечитываются, будущее ближе секундного такта у живой метки — «сейчас»,
+  а нулевой разрыв печатается «now» или «0 sec. ago» при `numeric="always"`, но не «in 0 sec.».
+- **Дата без времени у `GrRelativeTime` меряется календарём.** `value="2026-10-07"` с
+  `valueAdapter="isoDate"` утром 6 октября читалось «in 15 hours», вчерашняя дата — «9 hours ago»:
+  разрыв до суток считался прошедшим временем до условной полуночи. Теперь такое значение
+  сравнивается по календарным дням — «tomorrow», «today», «yesterday», дальше недели и месяцы, — а
+  `datetime` у `<time>` получает саму дату, а не момент в UTC.
+
+### Added
+
+- **Флаг `dateOnly` у `GrChronoAdapter`.** Адаптер объявляет, что его значение — день без времени;
+  у `isoDateAdapter` он включён. Свой адаптер дат включает его так же.
+- **Опции `selectRelativeAmount`: `dateOnly` и `nowWithin`.** Первая меряет разрыв календарём, вторая
+  задаёт допуск, в пределах которого будущее считается «сейчас». Тип — `SelectRelativeAmountOptions`.
+
 ## [v1.0.5] 2026-10-07
 
 ### Added

@@ -68,6 +68,12 @@ export interface GrChronoAdapter<T> {
   /** Из значения потребителя в `Date`. Невалидное — `null`, а не исключение. */
   parse: (raw: T) => Date | null
   serialize: (date: Date) => T
+  /**
+   * Значение — календарная дата без времени: `parse` отдаёт условную локальную
+   * полночь. Тогда `GrRelativeTime` меряет разрыв днями календаря («завтра»), а
+   * не часами до этой полуночи («через 15 часов»).
+   */
+  dateOnly?: boolean
 }
 
 function pad(value: number, length = 2): string {
@@ -82,6 +88,7 @@ export const dateAdapter: GrChronoAdapter<Date | null> = {
 
 /** `2026-08-12` — календарная дата без времени и без зоны. */
 export const isoDateAdapter: GrChronoAdapter<string | null> = {
+  dateOnly: true,
   parse: (raw) => {
     if (typeof raw !== 'string')
       return null

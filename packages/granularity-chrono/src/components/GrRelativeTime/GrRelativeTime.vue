@@ -8,7 +8,7 @@ import type { NameWidth } from '../../chrono/chronoFormat'
 import { formatPlainDate } from '../../chrono/chronoFormat'
 import type { GrChronoAdapter, GrChronoAdapterName } from '../../chrono/chronoModel'
 import { resolveChronoAdapter, toPlainDate } from '../../chrono/chronoModel'
-import { differenceInDays } from '../../chrono/plainDate'
+import { differenceInDays, plainDateKey } from '../../chrono/plainDate'
 import type { RelativeUnit } from '../../chrono/relativeTime'
 import { formatRelativeTime, selectRelativeAmount } from '../../chrono/relativeTime'
 import { useChronoNow } from '../../composables/useChronoNow'
@@ -85,11 +85,14 @@ const resolvedNumeric = useGrComponentProp('GrRelativeTime', 'numeric', () => pr
 const resolvedCutoff = useGrComponentProp('GrRelativeTime', 'cutoff', () => props.cutoff, 0)
 const resolvedLive = useGrComponentProp('GrRelativeTime', 'live', () => props.live, true)
 
+const adapter = computed(() => resolveChronoAdapter<TValue>(props.valueAdapter))
 const parsed = computed(() => (
   props.value === undefined || props.value === null
     ? null
-    : resolveChronoAdapter<TValue>(props.valueAdapter).parse(props.value)
+    : adapter.value.parse(props.value)
 ))
+/** Значение — календарная дата: его полночь условна, и мерить его часами нельзя. */
+const dateOnly = computed(() => adapter.value.dateOnly === true)
 
 /**
  * Такт — от единицы, а не пропом.
@@ -126,19 +129,41 @@ const tick = shallowRef(TICK_BY_UNIT.second)
 const clock = useChronoNow(() => (props.base || !resolvedLive.value ? 0 : tick.value))
 
 /**
- * Момент отсчёта для нежившей метки. Снимается один раз на экземпляр: иначе
- * `computed` пересчитывал бы «сейчас» на каждый чужой рендер.
+ * Часы, прочитанные при монтировании и при каждой смене значения.
+ *
+ * Не на каждый рендер: иначе `computed` пересчитывал бы «сейчас» на каждый
+ * чужой рендер. Но и не один раз на экземпляр: общий тикер обновляется тактом —
+ * на секундах раз в пять секунд, — и значение, пришедшее между тактами, новее
+ * его последнего тика. Сравнение с тиком делало бы только что случившееся
+ * будущим: «in 4 sec.», а через такт — «3 sec. ago».
  */
-const staticNow = new Date()
+const readAt = shallowRef(new Date())
+watch(() => parsed.value?.getTime(), () => {
+  readAt.value = new Date()
+}, { flush: 'sync' })
 
 const now = computed(() => {
   if (props.base)
     return props.base
+  if (!resolvedLive.value)
+    return readAt.value
 
-  return resolvedLive.value ? clock.value : staticNow
+  return clock.value.getTime() >= readAt.value.getTime() ? clock.value : readAt.value
 })
 
-const amount = computed(() => (parsed.value ? selectRelativeAmount(now.value, parsed.value) : null))
+/**
+ * Будущее ближе секундного такта у живой метки — «сейчас». Часы сравнения
+ * отстают от настоящих на долю такта, а источник значения нередко спешит на
+ * пару секунд; «через 2 секунды» о только что случившемся — неправда. С `base`
+ * часы не отстают, и допуска нет.
+ */
+const nowWithin = computed(() => (props.base || !resolvedLive.value ? 0 : TICK_BY_UNIT.second))
+
+const amount = computed(() => (
+  parsed.value
+    ? selectRelativeAmount(now.value, parsed.value, { dateOnly: dateOnly.value, nowWithin: nowWithin.value })
+    : null
+))
 
 watch(() => amount.value?.unit, (unit) => {
   tick.value = TICK_BY_UNIT[unit ?? 'second']
@@ -169,8 +194,17 @@ const text = computed(() => {
   })
 })
 
-/** Машинная форма для `<time>`: момент на мировой линии, то есть UTC. */
-const datetime = computed(() => parsed.value?.toISOString() ?? '')
+/**
+ * Машинная форма для `<time>`: момент на мировой линии, то есть UTC. Дата без
+ * времени остаётся датой — её условная локальная полночь в UTC восточнее
+ * Гринвича приходится на вечер предыдущего дня.
+ */
+const datetime = computed(() => {
+  if (!parsed.value)
+    return ''
+
+  return dateOnly.value ? plainDateKey(toPlainDate(parsed.value)) : parsed.value.toISOString()
+})
 
 /**
  * Показ выведен из часов — значит серверный рендер и клиентский разойдутся:
