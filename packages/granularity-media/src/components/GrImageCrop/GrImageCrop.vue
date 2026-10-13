@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vue'
 
 import GrSlider from '@feugene/granularity/components/GrSlider'
 import { useDragGesture } from '@feugene/granularity/composables/useDragGesture'
@@ -8,7 +8,7 @@ import { useGranularityTranslations } from '@feugene/granularity/composables/use
 
 import type { GrCropOffset, GrCropRect } from './cropGeometry'
 import { outputSize } from '../../internal/outputSize'
-import { clampOffset, cropRect, viewportFor } from './cropGeometry'
+import { clampOffset, coverScale, cropRect, frameFor, frameRatio, viewportFor } from './cropGeometry'
 import type { GrImageCropShape, GrImageCropSize } from './grImageCropStyles'
 import {
   circleMaskClass,
@@ -18,7 +18,6 @@ import {
   imageTransitionClass,
   rectGuideClass,
   rootClass,
-  sizeEmptyClass,
   sizeTextClass,
   viewportClass,
 } from './grImageCropStyles'
@@ -120,20 +119,25 @@ const viewportSize = ref({ width: 0, height: 0 })
 const offset = ref<GrCropOffset>({ x: 0, y: 0 })
 const objectUrl = ref<string | null>(null)
 
+const ratio = computed(() => frameRatio(props.aspectRatio))
+
 /**
- * Окно измеряется, а не вычисляется.
- *
- * Высота, посчитанная как `ширина / aspectRatio`, расходится с настоящей: её
- * задаёт CSS (`aspect-ratio` плюс рамка), и при `box-sizing: border-box`
- * расхождение систематическое. Кадр от такой высоты вырезался **не тот**, что
- * пользователь видел в рамке. До первого измерения остаётся расчёт — иначе
- * геометрия вырождена.
+ * Окно измеряется, а не вычисляется: масштаб картинки на экране задаёт то, что
+ * CSS действительно отвёл под рамку. До первого измерения остаётся расчёт —
+ * иначе геометрия вырождена.
  */
 const viewport = computed(() => (
   viewportSize.value.height > 0
     ? viewportSize.value
-    : viewportFor(viewportSize.value.width, props.aspectRatio)
+    : viewportFor(viewportSize.value.width, ratio.value)
 ))
+/**
+ * Рамка кадра — окно, доведённое до точного соотношения (`frameFor`). От неё, а
+ * не от окна, считаются и масштаб, и пределы сдвига, и вырезаемая область:
+ * иначе доля пикселя, на которую содержимое окна расходится с `aspectRatio`,
+ * доезжала бы до файла лишней строкой.
+ */
+const frame = computed(() => frameFor(viewport.value, ratio.value))
 const hasImage = computed(() => image.value !== null && naturalSize.value.width > 0)
 /**
  * Своё увеличение — как `useControlledOpen` у оверлеев ядра: проп перекрывает
@@ -147,11 +151,8 @@ const currentZoom = computed(() => Math.min(
 ))
 
 const imageStyle = computed(() => {
-  const scale = viewport.value.width > 0 && naturalSize.value.width > 0
-    ? Math.max(
-      viewport.value.width / naturalSize.value.width,
-      viewport.value.height / naturalSize.value.height,
-    ) * currentZoom.value
+  const scale = frame.value.width > 0 && naturalSize.value.width > 0
+    ? coverScale(naturalSize.value, frame.value) * currentZoom.value
     : 1
 
   return {
@@ -162,7 +163,7 @@ const imageStyle = computed(() => {
 })
 
 function currentRect(): GrCropRect {
-  return cropRect(naturalSize.value, viewport.value, currentZoom.value, offset.value)
+  return cropRect(naturalSize.value, frame.value, currentZoom.value, offset.value)
 }
 
 function announceChange(): void {
@@ -177,7 +178,7 @@ function moveBy(dx: number, dy: number): void {
   offset.value = clampOffset(
     { x: offset.value.x + dx, y: offset.value.y + dy },
     naturalSize.value,
-    viewport.value,
+    frame.value,
     currentZoom.value,
   )
   announceChange()
@@ -195,7 +196,7 @@ function setZoom(value: number): void {
   emit('update:zoom', next)
   // Уменьшение сокращает пределы сдвига, и прежнее смещение вывело бы кадр за
   // край картинки — подрезаем сразу, не дожидаясь следующего жеста.
-  offset.value = clampOffset(offset.value, naturalSize.value, viewport.value, next)
+  offset.value = clampOffset(offset.value, naturalSize.value, frame.value, next)
   announceChange()
 }
 
@@ -225,7 +226,7 @@ const drag = useDragGesture({
         y: dragStart.value.y + (event.clientY - dragOrigin.value.y),
       },
       naturalSize.value,
-      viewport.value,
+      frame.value,
       currentZoom.value,
     )
   },
@@ -308,13 +309,7 @@ function load(source: GrImageCropProps['src']): void {
     naturalSize.value = { width: element.naturalWidth, height: element.naturalHeight }
     offset.value = { x: 0, y: 0 }
     emit('load', { ...naturalSize.value })
-
-    // Рамка получает своё соотношение вместе с картинкой — меряем уже после
-    // того, как раскладка это учла.
-    void nextTick(() => {
-      measureViewport()
-      announceChange()
-    })
+    announceChange()
   })
   element.addEventListener('error', event => emit('error', event))
   element.src = url
@@ -322,13 +317,6 @@ function load(source: GrImageCropProps['src']): void {
 
 let observer: ResizeObserver | null = null
 
-/**
- * Замер окна.
- *
- * Зовётся ещё раз после загрузки картинки: до неё рамка не имеет своего
- * соотношения (`aspect-ratio` ставится вместе с картинкой), и первое измерение
- * приходит на переходной высоте. Кадр от неё считался бы не тем, что видно.
- */
 function measureViewport(): void {
   const element = viewportEl.value
   if (!element)
@@ -345,7 +333,7 @@ onMounted(() => {
         width: entry?.contentRect.width ?? 0,
         height: entry?.contentRect.height ?? 0,
       }
-      offset.value = clampOffset(offset.value, naturalSize.value, viewport.value, currentZoom.value)
+      offset.value = clampOffset(offset.value, naturalSize.value, frame.value, currentZoom.value)
       // Размер окна изменился — изменилась и вырезаемая область: у адаптивной
       // раскладки это происходит и без участия пользователя, а первое
       // измерение приходит уже после `load`. Потребитель, собравший файл по
@@ -380,7 +368,9 @@ async function toBlob(): Promise<Blob | null> {
 
   const rect = currentRect()
   const canvas = document.createElement('canvas')
-  const size = outputSize(rect, props.output)
+  // Соотношение области — соотношение рамки по построению; взятое из самой
+  // области, оно несло бы хвосты деления в округление второй стороны.
+  const size = outputSize(rect, props.output, ratio.value)
   canvas.width = size.width
   canvas.height = size.height
 
@@ -435,11 +425,17 @@ defineExpose({
       Без роли `aria-label` на этом узле и вовсе запрещён (axe:
       `aria-prohibited-attr`), а без подписи область остаётся безымянной.
     -->
+    <!--
+      Соотношение у рамки и без картинки: высоту пустой рамке задаёт оно, а не
+      своя минимальная высота, и пришедшая картинка раскладку не сдвигает.
+      Слишком высокое содержимое `#empty` рамку не растянет — `overflow: hidden`
+      снимает с неё автоматический минимум, и лишнее обрезается.
+    -->
     <div
       ref="viewportEl"
       role="application"
-      :class="[viewportClass, hasImage ? '' : [emptyClass, sizeEmptyClass[resolvedSize]]]"
-      :style="hasImage ? { aspectRatio: String(aspectRatio) } : undefined"
+      :class="[viewportClass, hasImage ? '' : emptyClass]"
+      :style="{ aspectRatio: String(ratio) }"
       :tabindex="disabled || !hasImage ? -1 : 0"
       :aria-label="t('grMedia.imageCrop.frame', 'Frame: arrow keys move the image, plus and minus zoom')"
       :aria-disabled="disabled || undefined"

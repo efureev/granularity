@@ -4,6 +4,7 @@ import {
   clampOffset,
   coverScale,
   cropRect,
+  frameFor,
   offsetBounds,
   viewportFor,
 } from '../cropGeometry'
@@ -93,6 +94,60 @@ describe('cropRect', () => {
         }
       }
     }
+  })
+})
+
+describe('кадр в точном соотношении рамки', () => {
+  const PHOTO = { width: 1600, height: 1200 }
+  const PORTRAIT = { width: 1200, height: 1600 }
+
+  it('рамка доводит измеренное окно до соотношения и накрывает его целиком', () => {
+    // Рамка 300×225 с бордером в пиксель: внутри остаётся 298×223, это 1.336, а не 4:3.
+    const frame = frameFor({ width: 298, height: 223 }, 4 / 3)
+
+    expect(frame.width / frame.height).toBe(4 / 3)
+    expect(frame.width).toBeGreaterThanOrEqual(298)
+    expect(frame.height).toBeGreaterThanOrEqual(223)
+    // Наименьшая такая рамка: лишнее — доля пикселя по одной оси, не больше.
+    expect(Math.min(frame.width - 298, frame.height - 223)).toBe(0)
+  })
+
+  it('на бессмысленном соотношении рамка квадратная', () => {
+    expect(frameFor({ width: 300, height: 120 }, 0)).toEqual({ width: 300, height: 300 })
+    expect(frameFor({ width: 300, height: 120 }, Number.NaN)).toEqual({ width: 300, height: 300 })
+  })
+
+  it('без увеличения картинка того же соотношения уходит в кадр целиком — без доли пикселя', () => {
+    for (const measured of [{ width: 298, height: 223 }, { width: 667, height: 499.75 }, { width: 318, height: 238.5 }]) {
+      const frame = frameFor(measured, 4 / 3)
+
+      expect(cropRect(PHOTO, frame, 1, { x: 0, y: 0 })).toEqual({ sx: 0, sy: 0, sw: 1600, sh: 1200 })
+    }
+
+    for (const measured of [{ width: 398, height: 531.33 }, { width: 333, height: 444 }, { width: 667, height: 889.33 }]) {
+      const frame = frameFor(measured, 3 / 4)
+
+      expect(cropRect(PORTRAIT, frame, 1, { x: 0, y: 0 })).toEqual({ sx: 0, sy: 0, sw: 1200, sh: 1600 })
+    }
+  })
+
+  it('захваченная область держит соотношение рамки при любом увеличении и сдвиге', () => {
+    const frame = frameFor({ width: 298, height: 223 }, 4 / 3)
+
+    for (const zoom of [1, 1.3, 2, 3.7]) {
+      for (const x of [-5000, -37, 0, 42, 5000]) {
+        const rect = cropRect(LANDSCAPE, frame, zoom, { x, y: x / 2 })
+
+        expect(rect.sw / rect.sh).toBeCloseTo(4 / 3, 12)
+      }
+    }
+  })
+
+  it('край кадра не уходит за исходник и на шуме деления', () => {
+    // Окно 1001.3 на картинке 1000×1000: деление на масштаб и обратно даёт
+    // sx = −5.7e-14 и sw = 1000.0000000000001.
+    expect(cropRect({ width: 1000, height: 1000 }, { width: 1001.3, height: 1001.3 }, 1, { x: 0, y: 0 }))
+      .toEqual({ sx: 0, sy: 0, sw: 1000, sh: 1000 })
   })
 })
 

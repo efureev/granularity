@@ -83,6 +83,7 @@ export const demoPathByPreviewKey = {
   'extra-media-image-crop-avatar': 'extra/granularity-media/GrImageCropAvatarPreviewDemo.vue',
   'extra-media-image-crop-weight': 'extra/granularity-media/GrImageCropWeightDemo.vue',
   'extra-media-image-crop-basic': 'extra/granularity-media/GrImageCropBasicDemo.vue',
+  'extra-media-image-crop-cover': 'extra/granularity-media/GrImageCropCoverUploadDemo.vue',
   'extra-datasource-basic': 'extra/granularity-datasource/UseDataSourceBasicDemo.vue',
   'extra-datasource-url': 'extra/granularity-datasource/UseDataSourceUrlDemo.vue',
   'extra-chrono-calendar-basic': 'extra/granularity-chrono/GrCalendarBasicDemo.vue',

@@ -15,10 +15,12 @@ const VIEWPORT_WIDTH = 300
  */
 class StubImage {
   static last: StubImage | null = null
+  /** Собственный размер следующей картинки: тест меняет его до монтирования. */
+  static natural = NATURAL
 
   crossOrigin = ''
-  naturalWidth = NATURAL.width
-  naturalHeight = NATURAL.height
+  naturalWidth = StubImage.natural.width
+  naturalHeight = StubImage.natural.height
   #src = ''
   #listeners = new Map<string, (event: unknown) => void>()
 
@@ -78,6 +80,7 @@ afterEach(() => {
   globalThis.Image = originalImage
   globalThis.ResizeObserver = originalObserver
   StubImage.last = null
+  StubImage.natural = NATURAL
 })
 
 async function mountLoaded(props: Record<string, unknown> = {}) {
@@ -94,6 +97,27 @@ function lastRect(wrapper: CropWrapper): GrCropRect {
   const events = wrapper.emitted('change')
 
   return events![events!.length - 1]![0] as GrCropRect
+}
+
+/** Окно получило новый размер — так, как его отдаёт браузер: в дробных CSS-пикселях. */
+async function resize(width: number, height: number): Promise<void> {
+  resizeCallbacks.forEach(callback => callback(
+    [{ contentRect: { width, height } } as ResizeObserverEntry],
+    {} as ResizeObserver,
+  ))
+  await nextTick()
+}
+
+function frameOf(wrapper: CropWrapper): HTMLElement {
+  return wrapper.find('[role="application"]').element as HTMLElement
+}
+
+function stubCanvas(): ReturnType<typeof vi.fn> {
+  const drawImage = vi.fn()
+  vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue({ drawImage } as unknown as CanvasRenderingContext2D)
+  HTMLCanvasElement.prototype.toBlob = (callback: (blob: Blob | null) => void) => callback(new Blob())
+
+  return drawImage
 }
 
 describe('GrImageCrop', () => {
@@ -180,36 +204,64 @@ describe('GrImageCrop', () => {
     expect(wrapper.emitted('update:zoom')?.at(-1)?.[0]).toBeCloseTo(2.15)
   })
 
-  it('кадр считается от измеренного окна, а не от расчётного', async () => {
-    // Рамка ниже расчётной высоты: `aspect-ratio` вместе с рамкой даёт
-    // содержимое меньше, чем `ширина / соотношение`.
-    Object.defineProperty(HTMLElement.prototype, 'clientHeight', {
-      configurable: true,
-      get: () => VIEWPORT_WIDTH / 2,
-    })
+  it('пустая рамка уже держит соотношение кадра — картинка не сдвигает раскладку', async () => {
+    const wrapper = mount(GrImageCrop, { props: { aspectRatio: 4 / 3 } })
+    const empty = frameOf(wrapper)
 
-    const wrapper = await mountLoaded()
+    // Высоту пустой рамке задаёт соотношение, а не своя минимальная высота:
+    // иначе с приходом картинки рамка прыгала бы со 192px на высоту кадра.
+    const emptyRatio = empty.style.aspectRatio
+    expect(Number.parseFloat(emptyRatio)).toBeCloseTo(4 / 3)
+    expect(empty.className).not.toMatch(/\bmin-h-/)
+
+    await wrapper.setProps({ src: '/photo.jpg' })
+    StubImage.last?.emit('load')
+    await nextTick()
+
+    expect(wrapper.find('img').exists()).toBe(true)
+    expect(frameOf(wrapper)).toBe(empty)
+    expect(frameOf(wrapper).style.aspectRatio).toBe(emptyRatio)
+  })
+
+  it('кадр держит соотношение рамки, хотя окно меряется с долей пикселя', async () => {
+    StubImage.natural = { width: 1600, height: 1200 }
+    const wrapper = await mountLoaded({ aspectRatio: 4 / 3 })
+
+    // Рамка 669px шириной: CSS держит 4:3 вместе с бордером, а внутри — 667×499.75,
+    // это 1.3347. Снятый прямо с окна, кадр вышел бы 1600×1198.8 со сдвигом 0.6 вниз.
+    await resize(667, 499.75)
+
+    const whole = { sx: 0, sy: 0, sw: 1600, sh: 1200 }
+    expect(lastRect(wrapper)).toEqual(whole)
+    expect((wrapper.vm as unknown as { rect: () => GrCropRect }).rect()).toEqual(whole)
+  })
+
+  it('кадр держит соотношение рамки и после увеличения', async () => {
+    StubImage.natural = { width: 1600, height: 1200 }
+    const wrapper = await mountLoaded({ aspectRatio: 4 / 3 })
+    await resize(298, 223)
+
+    await wrapper.find('[role="application"]').trigger('keydown', { key: '+' })
+
     const rect = lastRect(wrapper)
-
-    // Окно 300×150 на картинке 1600×900: в кадр идёт полоса 2:1, а не квадрат.
-    expect(rect.sw / rect.sh).toBeCloseTo(2)
+    expect(rect.sw).toBeLessThan(1600)
+    expect(rect.sw / rect.sh).toBeCloseTo(4 / 3, 12)
   })
 
   it('изменение размера окна сообщается как изменение кадра', async () => {
-    const wrapper = await mountLoaded()
+    const wrapper = await mountLoaded({ zoom: 2 })
+    await wrapper.find('[role="application"]').trigger('keydown', { key: 'ArrowLeft' })
     const before = lastRect(wrapper)
 
-    // Окно стало вдвое ниже: у адаптивной раскладки это происходит и без
-    // участия пользователя, а первое измерение приходит уже после `load`.
-    resizeCallbacks.forEach(callback => callback(
-      [{ contentRect: { width: VIEWPORT_WIDTH, height: VIEWPORT_WIDTH / 2 } } as ResizeObserverEntry],
-      {} as ResizeObserver,
-    ))
-    await nextTick()
+    // Окно стало вдвое уже: у адаптивной раскладки это происходит и без участия
+    // пользователя. Тот же сдвиг в пикселях экрана теперь вдвое длиннее в
+    // пикселях исходника — потребитель, собравший файл по прежнему кадру,
+    // получил бы не то, что видит.
+    await resize(VIEWPORT_WIDTH / 2, VIEWPORT_WIDTH / 2)
 
     const after = lastRect(wrapper)
-    expect(after.sh).not.toBeCloseTo(before.sh)
-    expect(after.sw / after.sh).toBeCloseTo(2)
+    expect(after.sx).not.toBeCloseTo(before.sx)
+    expect(after.sw / after.sh).toBeCloseTo(1)
   })
 
   it('отключённый компонент не двигает кадр', async () => {
@@ -240,6 +292,21 @@ describe('GrImageCrop', () => {
     // И холст того же размера: без `output` разрешение исходника не теряется.
     expect(call[7]).toBe(900)
     expect(call[8]).toBe(900)
+  })
+
+  it('экспорт по одной ширине получает высоту из соотношения рамки, а не из доли пикселя', async () => {
+    StubImage.natural = { width: 1200, height: 1600 }
+    const drawImage = stubCanvas()
+
+    const wrapper = await mountLoaded({ aspectRatio: 3 / 4, output: { width: 1200, type: 'image/jpeg' } })
+    // Рамка 400px шириной: снаружи 400×533.33, внутри — 398×531.33, это 0.749.
+    await resize(398, 531.33)
+    await (wrapper.vm as unknown as { crop: () => Promise<Blob | null> }).crop()
+
+    // Картинка того же соотношения целиком: 1200×1600, а не 1200×1602.
+    const call = drawImage.mock.calls[0]!
+    expect(call.slice(1, 5)).toEqual([0, 0, 1200, 1600])
+    expect(call.slice(7, 9)).toEqual([1200, Math.round(1200 / (3 / 4))])
   })
 
   it('одна сторона в `output` не растягивает кадр', async () => {

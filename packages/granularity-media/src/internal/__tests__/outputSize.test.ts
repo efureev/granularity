@@ -27,6 +27,14 @@ describe('outputSize', () => {
     expect(outputSize(LANDSCAPE, { width: 1000, height: 240 })).toEqual({ width: 320, height: 240 })
   })
 
+  it('заданное соотношение сильнее шума в области', () => {
+    // Область 1025×512.4999999 — та же 2:1, только с хвостом деления. Высота по
+    // ней округлилась бы вниз, 512, хотя 1025 / 2 = 512.5 и ответ кадра — 513.
+    expect(outputSize({ sw: 1025, sh: 512.4999999 }, { width: 1025 }, 2)).toEqual({ width: 1025, height: 513 })
+    expect(outputSize({ sw: 1200, sh: 1602 }, { width: 1200 }, 3 / 4)).toEqual({ width: 1200, height: 1600 })
+    expect(outputSize({ sw: 1600, sh: 1199.4 }, { height: 600 }, 4 / 3)).toEqual({ width: 800, height: 600 })
+  })
+
   it('вырожденная область не делит на ноль', () => {
     expect(outputSize({ sw: 0, sh: 0 }, { width: 100 })).toEqual({ width: 100, height: 100 })
   })

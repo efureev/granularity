@@ -1,3 +1,5 @@
+import { Buffer } from 'node:buffer'
+
 import { expect, test } from '@playwright/test'
 
 import { companionPath, componentPath } from './components'
@@ -943,5 +945,48 @@ test.describe('GrJsonViewer: узкая панель', () => {
 
     expect(widths.length).toBeGreaterThan(0)
     expect(Math.min(...widths)).toBeGreaterThan(12)
+  })
+})
+
+/**
+ * Пустая рамка `GrImageCrop` стояла на своей минимальной высоте (192px), а
+ * соотношение получала только вместе с картинкой: фото, пришедшее после
+ * монтирования, сдвигало всё под рамкой. А кадр снимался с окна в дробных
+ * CSS-пикселях, внутри бордера, и обложка 4:3 шириной 1200 выходила 1200×899.
+ */
+test.describe('GrImageCrop: рамка до и после картинки', () => {
+  test('пустая рамка уже в соотношении кадра, фото её не сдвигает, файл — ровно 1200 × 900', async ({ page }) => {
+    await page.goto(companionPath('GrImageCrop'))
+    const demo = page.locator('[data-demo="image-crop-cover"]')
+    await demo.waitFor()
+    const frame = demo.getByRole('application')
+
+    const empty = (await frame.boundingBox())!
+    expect(empty.width / empty.height).toBeCloseTo(4 / 3, 2)
+
+    // Подсказка `#empty` — по центру рамки.
+    const hint = (await frame.getByText('Обложка 4 : 3').boundingBox())!
+    expect(Math.abs(hint.y + hint.height / 2 - (empty.y + empty.height / 2))).toBeLessThanOrEqual(12)
+
+    // Фото 1600×1200 — того же соотношения, что рамка: в кадр оно уходит целиком.
+    const photo = await page.evaluate(async () => {
+      const canvas = new OffscreenCanvas(1600, 1200)
+      const context = canvas.getContext('2d')!
+      context.fillStyle = '#0f766e'
+      context.fillRect(0, 0, 1600, 1200)
+      context.fillStyle = '#fbbf24'
+      context.fillRect(400, 300, 800, 600)
+      const blob = await canvas.convertToBlob({ type: 'image/jpeg' })
+
+      return [...new Uint8Array(await blob.arrayBuffer())]
+    })
+    await demo.locator('input[type="file"]').setInputFiles({ name: 'sofa.jpg', mimeType: 'image/jpeg', buffer: Buffer.from(photo) })
+    await frame.locator('img').waitFor()
+
+    const loaded = (await frame.boundingBox())!
+    expect(Math.abs(loaded.height - empty.height)).toBeLessThanOrEqual(0.5)
+
+    await demo.getByRole('button', { name: 'Сохранить обложку' }).click()
+    await expect(demo.locator('[data-demo-cover-size]')).toHaveText('1200 × 900')
   })
 })

@@ -22,14 +22,22 @@ export interface GrOutputSize {
   height: number
 }
 
-export function outputSize(area: { sw: number, sh: number }, output?: GrOutputRequest): GrOutputSize {
-  const ratio = area.sh > 0 ? area.sw / area.sh : 1
+/**
+ * `ratio` — соотношение, которое область держит по построению (рамка кропа).
+ * Без него оно выводится из самой области, а та несёт хвосты деления: на границе
+ * `.5` они решают, в какую сторону округлится вторая сторона.
+ */
+export function outputSize(
+  area: { sw: number, sh: number },
+  output?: GrOutputRequest,
+  ratio: number = area.sh > 0 ? area.sw / area.sh : 1,
+): GrOutputSize {
   const round = (value: number) => Math.max(1, Math.round(value))
 
   if (output?.width && output?.height) {
-    const scale = Math.min(output.width / (area.sw || 1), output.height / (area.sh || 1))
-
-    return { width: round(area.sw * scale), height: round(area.sh * scale) }
+    return output.width / output.height > ratio
+      ? { width: round(output.height * ratio), height: round(output.height) }
+      : { width: round(output.width), height: round(output.width / ratio) }
   }
 
   if (output?.width)

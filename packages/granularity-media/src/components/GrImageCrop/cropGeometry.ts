@@ -82,11 +82,30 @@ export function clampOffset(
 }
 
 /**
+ * Допуск привязки к пикселю исходника.
+ *
+ * Деление на масштаб и обратно оставляет хвост порядка 1e-13: без привязки
+ * картинка 1000×1000 под окном 1001.3 уходит в кадр как `sw = 1000.0000000000001`
+ * при `sx = −5.7e-14` — за краем исходника. Миллионная доля пикселя на
+ * результате не видна, а лишний ряд при округлении размера — виден.
+ */
+const SOURCE_PIXEL_SNAP = 1e-6
+
+function snapToPixel(value: number): number {
+  const nearest = Math.round(value)
+
+  return Math.abs(value - nearest) < SOURCE_PIXEL_SNAP ? nearest : value
+}
+
+/**
  * Область исходного изображения под окном кропа.
  *
  * Смещение подрезается здесь же, а не доверяется вызывающему: `zoom` меняется
  * колесом и слайдером, и уменьшение всегда сокращает пределы — смещение,
  * законное миг назад, после него выводит кадр за край.
+ *
+ * Соотношение сторон области — ровно соотношение окна: окно в точном
+ * соотношении даёт точную область (`frameFor`).
  */
 export function cropRect(
   image: GrCropSize,
@@ -102,14 +121,22 @@ export function cropRect(
   if (scale <= 0)
     return { sx: 0, sy: 0, sw: 0, sh: 0 }
   const safe = clampOffset(offset, image, viewport, zoom)
-  const display = displaySize(image, viewport, zoom)
+  const sw = Math.min(image.width, snapToPixel(viewport.width / scale))
+  const sh = Math.min(image.height, snapToPixel(viewport.height / scale))
+  const sx = snapToPixel((image.width - sw) / 2 - safe.x / scale)
+  const sy = snapToPixel((image.height - sh) / 2 - safe.y / scale)
 
   return {
-    sx: (display.width - viewport.width) / 2 / scale - safe.x / scale,
-    sy: (display.height - viewport.height) / 2 / scale - safe.y / scale,
-    sw: viewport.width / scale,
-    sh: viewport.height / scale,
+    sx: Math.min(image.width - sw, Math.max(0, sx)),
+    sy: Math.min(image.height - sh, Math.max(0, sy)),
+    sw,
+    sh,
   }
+}
+
+/** Соотношение сторон, пригодное для деления: бессмысленное — квадрат. */
+export function frameRatio(aspectRatio: number): number {
+  return Number.isFinite(aspectRatio) && aspectRatio > 0 ? aspectRatio : 1
 }
 
 /**
@@ -119,7 +146,25 @@ export function cropRect(
  * разбирать в рантайме, а ошибка формата всплыла бы уже на экране.
  */
 export function viewportFor(width: number, aspectRatio: number): GrCropSize {
-  const ratio = aspectRatio > 0 ? aspectRatio : 1
+  return { width, height: width / frameRatio(aspectRatio) }
+}
+
+/**
+ * Рамка кадра: измеренное окно, доведённое до точного соотношения сторон.
+ *
+ * Окно меряется в дробных CSS-пикселях и с `aspectRatio` совпадает лишь до доли
+ * пикселя: соотношение CSS держит рамка целиком, с бордером, а содержимое внутри
+ * уже на пиксель с каждой стороны по обеим осям. Снятый прямо с окна, кадр
+ * картинки 1600×1200 в рамке 4:3 выходит 1600×1198.8 со сдвигом 0.6 вниз, а
+ * экспорт по одной ширине — на пару строк выше заказанного.
+ *
+ * Рамка — наименьшая точная, накрывающая окно: картинка, покрывшая рамку,
+ * покрывает и окно, так что полос фона по краю не бывает, а за видимым краем
+ * остаётся не больше доли пикселя по одной оси.
+ */
+export function frameFor(viewport: GrCropSize, aspectRatio: number): GrCropSize {
+  const ratio = frameRatio(aspectRatio)
+  const width = Math.max(viewport.width, viewport.height * ratio)
 
   return { width, height: width / ratio }
 }

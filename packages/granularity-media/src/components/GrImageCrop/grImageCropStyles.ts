@@ -42,14 +42,6 @@ export const sizeTextClass = {
   lg: 'text-[length:var(--gr-control-text-lg)] leading-[var(--gr-control-leading-lg)]',
 } as const satisfies Record<GrImageCropSize, string>
 
-/** Минимальная высота пустого состояния — по той же шкале, что кегль. */
-export const sizeEmptyClass = {
-  xs: 'min-h-32',
-  sm: 'min-h-40',
-  md: 'min-h-48',
-  lg: 'min-h-56',
-} as const satisfies Record<GrImageCropSize, string>
-
 /**
  * Safelist пуст: всё, что рисует кадрирование, лежит целыми литералами здесь
  * и в шаблоне, и granum извлекает это сам — модуль уезжает в общий
