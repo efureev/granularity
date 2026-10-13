@@ -92,20 +92,24 @@ describe('выбор единицы: от суток — по календарю
 })
 
 describe('нулевой разрыв и дата без времени', () => {
-  it('нулевой разрыв — «сейчас», а не будущее', () => {
+  it('нулевой разрыв печатается «сейчас», а не будущим', () => {
     // `Intl` печатает +0 как «in 0 sec.», а −0 — как «0 sec. ago» и «now».
-    expect(Object.is(gap('2026-08-12 12:00').value, -0)).toBe(true)
-    expect(Object.is(selectRelativeAmount(NOW, new Date(NOW.getTime() + 400)).value, -0)).toBe(true)
-    expect(formatRelativeTime('en', gap('2026-08-12 12:00'), { numeric: 'always' })).toBe('0 seconds ago')
+    const zero = gap('2026-08-12 12:00')
+    const ahead = selectRelativeAmount(NOW, new Date(NOW.getTime() + 400))
+
+    expect(zero).toEqual({ value: 0, unit: 'second' })
+    expect(ahead).toEqual({ value: 0, unit: 'second' })
+    expect(formatRelativeTime('en', zero, { numeric: 'always' })).toBe('0 seconds ago')
+    expect(formatRelativeTime('en', ahead, { numeric: 'always' })).toBe('0 seconds ago')
+    expect(formatRelativeTime('en', zero)).toBe('now')
+    expect(formatRelativeTime('en', { value: 0, unit: 'day' }, { numeric: 'always' })).toBe('0 days ago')
   })
 
   it('будущее ближе nowWithin — тоже «сейчас»: часы, с которыми сравнивают, отстают', () => {
     const ahead = new Date(NOW.getTime() + 4000)
 
     expect(selectRelativeAmount(NOW, ahead)).toEqual({ value: 4, unit: 'second' })
-    const within = selectRelativeAmount(NOW, ahead, { nowWithin: 5000 })
-    expect(within.unit).toBe('second')
-    expect(Object.is(within.value, -0)).toBe(true)
+    expect(selectRelativeAmount(NOW, ahead, { nowWithin: 5000 })).toEqual({ value: 0, unit: 'second' })
     // Прошлое допуск не трогает, а будущее за ним остаётся будущим.
     expect(selectRelativeAmount(NOW, new Date(NOW.getTime() - 4000), { nowWithin: 5000 })).toEqual({ value: -4, unit: 'second' })
     expect(selectRelativeAmount(NOW, new Date(NOW.getTime() + 6000), { nowWithin: 5000 })).toEqual({ value: 6, unit: 'second' })
@@ -118,8 +122,7 @@ describe('нулевой разрыв и дата без времени', () => 
     // Полночь 7 октября — через 15 часов, но это завтра.
     expect(days('2026-10-07')).toEqual({ value: 1, unit: 'day' })
     expect(days('2026-10-05')).toEqual({ value: -1, unit: 'day' })
-    expect(days('2026-10-06').unit).toBe('day')
-    expect(Object.is(days('2026-10-06').value, -0)).toBe(true)
+    expect(days('2026-10-06')).toEqual({ value: 0, unit: 'day' })
     expect(days('2026-10-20')).toEqual({ value: 2, unit: 'week' })
     expect(days('2026-12-06')).toEqual({ value: 2, unit: 'month' })
   })

@@ -270,19 +270,67 @@ describe('GrRelativeTime — живое обновление', () => {
     second.unmount()
   })
 
-  it('будущее меньше такта у живой метки — «сейчас»: часы сравнения отстают на такт', async () => {
+  it('будущее меньше секундного такта — «сейчас»: часы сравнения отстают, источник спешит', async () => {
     // Сервер с часами, убежавшими на пару секунд, — обычное дело.
     const ahead = mountLive({ value: new Date(Date.now() + 2000) })
+    const still = mountLive({ value: new Date(Date.now() + 2000), live: false })
     const far = mountLive({ value: new Date(Date.now() + 20_000) })
     const fixed = mountMark({ value: new Date(NOW.getTime() + 2000) })
 
     expect(ahead.text()).toBe('now')
+    expect(still.text()).toBe('now')
     expect(far.text()).toBe('in 20 seconds')
-    // С `base` часы не отстают: две секунды вперёд — это будущее.
+    // С `base` сравнивают с заданным моментом: две секунды вперёд — это будущее.
     expect(fixed.text()).toBe('in 2 seconds')
     ahead.unmount()
+    still.unmount()
     far.unmount()
     fixed.unmount()
+  })
+
+  /**
+   * Метка, дозревшая до минут, переезжает на минутный тикер, а его «сейчас»
+   * могло отстать на полминуты — и снова давало секунды. Метка возвращалась на
+   * секундный тикер, тот давал минуты, и так по кругу: `Maximum recursive
+   * updates` в разработке и зависшая вкладка в проде.
+   */
+  it('переезд на тикер другого такта не качает метку между единицами', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const error = vi.spyOn(console, 'error').mockImplementation(() => {})
+    const older = mountLive({ value: new Date(Date.now() - 120_000) })
+    await nextTick()
+    expect(chronoTickerIntervals()).toEqual([30_000])
+
+    vi.advanceTimersByTime(25_000)
+    const fresh = mountLive({ value: new Date() })
+    await nextTick()
+
+    for (let step = 0; step < 14; step += 1) {
+      vi.advanceTimersByTime(5000)
+      await nextTick()
+      await nextTick()
+    }
+
+    const recursion = [...warn.mock.calls, ...error.mock.calls].flat().map(String).filter(text => /recursive/i.test(text))
+    expect(recursion).toEqual([])
+    expect(fresh.text()).toBe('1 minute ago')
+    older.unmount()
+    fresh.unmount()
+    warn.mockRestore()
+    error.mockRestore()
+  })
+
+  it('новое значение сравнивается со свежими часами и на минутном такте', async () => {
+    const wrapper = mountLive({ value: new Date(Date.now() - 120_000) })
+    await nextTick()
+    expect(chronoTickerIntervals()).toEqual([30_000])
+
+    // Такт — полминуты: последний тик отстал на 20 секунд.
+    vi.advanceTimersByTime(20_000)
+    await wrapper.setProps({ value: new Date(Date.now() - 180_000) })
+
+    expect(wrapper.text()).toBe('3 minutes ago')
+    wrapper.unmount()
   })
 
   it('live=false не заводит таймера вовсе', async () => {

@@ -44,15 +44,6 @@ function toward(value: number): number {
   return Math.trunc(value)
 }
 
-/**
- * Нулевой разрыв — «сейчас», и знак у него прошлый. `Intl` различает знак нуля:
- * `+0` печатается «in 0 sec.», `−0` — «0 sec. ago», а при `numeric: 'auto'` оба
- * дают «now». Только что случившееся будущим не бывает.
- */
-function nowLeaning(amount: RelativeAmount): RelativeAmount {
-  return amount.value === 0 ? { value: -0, unit: amount.unit } : amount
-}
-
 export interface SelectRelativeAmountOptions {
   /**
    * `to` — календарная дата без времени: разрыв меряется днями календаря от
@@ -73,14 +64,14 @@ export interface SelectRelativeAmountOptions {
  */
 export function selectRelativeAmount(from: Date, to: Date, options: SelectRelativeAmountOptions = {}): RelativeAmount {
   if (options.dateOnly)
-    return nowLeaning(calendarAmount(toPlainDate(from), toPlainDate(to)))
+    return calendarAmount(toPlainDate(from), toPlainDate(to))
 
   const raw = to.getTime() - from.getTime()
   const elapsed = raw > 0 && raw < (options.nowWithin ?? 0) ? 0 : raw
   const magnitude = Math.abs(elapsed)
 
   if (magnitude < MS_IN_MINUTE)
-    return nowLeaning({ value: toward(elapsed / MS_IN_SECOND), unit: 'second' })
+    return { value: toward(elapsed / MS_IN_SECOND), unit: 'second' }
   if (magnitude < MS_IN_HOUR)
     return { value: toward(elapsed / MS_IN_MINUTE), unit: 'minute' }
   if (magnitude < MS_IN_DAY)
@@ -141,7 +132,11 @@ export function formatRelativeTime(
     formats.set(key, format)
   }
 
-  return format.format(amount.value, amount.unit)
+  // Нулевой разрыв — «сейчас», и знак у него прошлый. `Intl` различает знак
+  // нуля: `+0` печатается «in 0 sec.» и «in 0 days», `−0` — «0 sec. ago», а при
+  // `numeric: 'auto'` оба дают «now» и «today». Только что случившееся будущим
+  // не бывает.
+  return format.format(amount.value === 0 ? -0 : amount.value, amount.unit)
 }
 
 /** Для тестов и для смены локали приложением на лету. */

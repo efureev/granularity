@@ -10,7 +10,7 @@ import { computed, getCurrentScope, onScopeDispose, ref, shallowRef, toValue, wa
  *
  * ```ts
  * const now = useChronoNow(30_000)
- * const text = computed(() => formatRelativeTime(locale, selectRelativeAmount(value, now.value)))
+ * const text = computed(() => formatRelativeTime(locale, selectRelativeAmount(now.value, value)))
  * ```
  *
  * Такт задаётся вызывающим и может быть реактивным: `GrRelativeTime` замедляет
