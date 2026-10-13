@@ -5,6 +5,17 @@ All notable changes to the [`@feugene/granularity`](.) package are documented in
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Fixed
+
+- **Подсказка пустого нативного `GrSelect` — цветом подсказки.** Опция-подсказка из 1.0.20 и опция
+  очистки рисовались цветом значения и читались выбранными. Пока поле пустое, текст `<select>` —
+  `--gr-muted-fg`, как `::placeholder` у `GrInput`, а опции раскрытого списка — обычным цветом.
+  Пустое поле помечено `data-gr-select-empty`. Цвет ставится стилем в строке: утилиты с теми же
+  телами сливались с общими правилами и сдвигали их порядок — у элементов с двумя классами цвета
+  менялся победитель.
+
 ## [v1.0.20] 2026-10-13
 
 ### Fixed

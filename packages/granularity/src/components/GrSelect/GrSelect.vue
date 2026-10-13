@@ -415,7 +415,9 @@ function markSlotSelection(nodes: VNode[]): VNode[] {
         return node
       const key = String(raw)
       const selected = key === '' ? !props.multiple && modelSingle.value === '' : isSelected(fromDomValue(key))
-      return cloneVNode(node, { selected })
+      const enabled = node.props?.disabled === undefined || node.props.disabled === false
+      const style = enabled ? optionStyle() : undefined
+      return cloneVNode(node, style ? { selected, style } : { selected })
     }
 
     if ((node.type === 'optgroup' || node.type === Fragment) && Array.isArray(node.children))
@@ -850,6 +852,28 @@ const nativePlaceholderVisible = computed(() => {
   return !flatOptions.value.some(o => isEmptySelectValue(o.value))
 })
 
+/** Нативный выбор показывает «ничего не выбрано» — подсказку или опцию очистки. */
+const nativeShowsEmpty = computed(() => (
+  modelSingle.value === '' && (nativePlaceholderVisible.value || nativeClearOptionVisible.value)
+))
+
+/**
+ * Пока поле пустое, его текст — цветом подсказки, как `::placeholder` у
+ * `GrInput`: иначе подсказка читается выбранным значением. Опции раскрытого
+ * списка наследовали бы этот цвет — им возвращается обычный.
+ *
+ * Стилем в строке, а не утилитами: правило `color: var(--gr-muted-fg)` уже есть
+ * в общей таблице, и второе с тем же телом сливается с ним и сдвигает порядок
+ * правил — у соседа с двумя классами цвета молча меняется победитель.
+ */
+const nativeEmptyStyle = computed(() => (nativeShowsEmpty.value ? { color: 'var(--gr-muted-fg)' } : undefined))
+const nativeOptionStyle = computed(() => (nativeShowsEmpty.value ? { color: 'var(--gr-fg)' } : undefined))
+
+/** Тот же стиль для опций из слота: их клонирует рендер, выше по файлу. */
+function optionStyle(): { color: string } | undefined {
+  return nativeOptionStyle.value
+}
+
 const panelClearVisible = computed(() => {
   if (!resolvedClearable.value)
     return false
@@ -994,10 +1018,12 @@ const themeAttrs = useGrThemeAttrs()
       :aria-labelledby="aria.labelledBy()"
       :aria-required="isRequired ? 'true' : undefined"
       :aria-readonly="isReadonly ? 'true' : undefined"
+      :data-gr-select-empty="nativeShowsEmpty ? '' : undefined"
       :class="isLinkNative ? grSelectLinkNativeOverlayClass : [baseClassName, nativeClassName]"
+      :style="isLinkNative ? undefined : nativeEmptyStyle"
       @change="onChange"
     >
-      <option v-if="nativeClearOptionVisible" value="" :selected="!multiple && modelSingle === ''">
+      <option v-if="nativeClearOptionVisible" value="" :selected="!multiple && modelSingle === ''" :style="nativeOptionStyle">
         {{ placeholder || t('gr.select.clearOption', 'None') }}
       </option>
       <option v-else-if="nativePlaceholderVisible" value="" disabled hidden selected data-gr-select-placeholder>
@@ -1017,6 +1043,7 @@ const themeAttrs = useGrThemeAttrs()
               :value="keyOf(opt.value)"
               :selected="isSelected(opt.value)"
               :disabled="opt.disabled"
+              :style="opt.disabled ? undefined : nativeOptionStyle"
             >
               {{ opt.label }}
             </option>
@@ -1026,6 +1053,7 @@ const themeAttrs = useGrThemeAttrs()
             :value="keyOf(item.value)"
             :selected="isSelected(item.value)"
             :disabled="item.disabled"
+            :style="item.disabled ? undefined : nativeOptionStyle"
           >
             {{ item.label }}
           </option>

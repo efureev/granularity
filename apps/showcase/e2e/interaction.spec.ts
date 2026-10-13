@@ -2458,4 +2458,47 @@ test.describe('GrSelect: пустой нативный выбор', () => {
       chosen: 0,
     })
   })
+
+  /**
+   * Подсказка рисовалась цветом значения и читалась выбранным. Пока поле
+   * пустое, текст — цветом подсказки, как `::placeholder` у `GrInput`, а
+   * опции раскрытого списка — обычным цветом.
+   */
+  test('подсказка — цветом подсказки, опции и выбранное значение — обычным', async ({ page }) => {
+    await openShowcasePage(page, componentPath('GrSelect'))
+    const select = page.locator('select[aria-label="Pick workspace"]').first()
+    await select.waitFor()
+
+    const colors = () => select.evaluate((node: HTMLSelectElement) => {
+      const probe = (token: string) => {
+        const element = document.createElement('span')
+        element.style.color = `var(${token})`
+        node.parentElement!.append(element)
+        const color = getComputedStyle(element).color
+        element.remove()
+        return color
+      }
+      const option = [...node.options].find(item => !item.disabled)!
+
+      return {
+        select: getComputedStyle(node).color,
+        option: getComputedStyle(option).color,
+        muted: probe('--gr-muted-fg'),
+        fg: probe('--gr-fg'),
+      }
+    })
+
+    const empty = await colors()
+    expect(empty.muted).not.toBe(empty.fg)
+    expect(empty.select).toBe(empty.muted)
+    expect(empty.option).toBe(empty.fg)
+
+    // Цвет у поля с переходом: читаем, когда он доехал.
+    await select.selectOption({ index: 1 })
+    expect(await select.getAttribute('data-gr-select-empty')).toBeNull()
+    await expect.poll(async () => {
+      const chosen = await colors()
+      return chosen.select === chosen.fg
+    }).toBe(true)
+  })
 })

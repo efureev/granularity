@@ -210,6 +210,48 @@ describe('GrSelect', () => {
       expect(first.textContent?.trim()).toBe('None')
     })
 
+    /**
+     * Подсказка рисовалась цветом значения и читалась как выбранное. Пока поле
+     * показывает подсказку или опцию очистки, текст — цветом подсказки, как
+     * `::placeholder` у `GrInput`, а опции раскрытого списка — обычным.
+     */
+    it('пустое поле помечено и красит текст цветом подсказки; выбор снимает метку', async () => {
+      const wrapper = mount(GrSelect, {
+        props: { modelValue: undefined as unknown as string, ariaLabel: 'Country', options: countries },
+        attachTo: document.body,
+      })
+      const select = wrapper.get('select')
+
+      expect(select.attributes('data-gr-select-empty')).toBeDefined()
+      expect(select.element.style.color).toBe('var(--gr-muted-fg)')
+      expect([...select.element.options].filter(option => !option.disabled).map(option => option.style.color))
+        .toEqual(['var(--gr-fg)', 'var(--gr-fg)'])
+
+      await wrapper.setProps({ modelValue: 'FR' })
+      expect(select.attributes('data-gr-select-empty')).toBeUndefined()
+      expect(select.element.style.color).toBe('')
+      expect([...select.element.options].map(option => option.style.color)).toEqual(['', ''])
+      wrapper.unmount()
+    })
+
+    it('опции из слота тоже возвращают обычный цвет, недоступные — нет', () => {
+      const wrapper = mount(GrSelect, {
+        props: { modelValue: undefined as unknown as string, ariaLabel: 'Country' },
+        slots: { default: '<option value="DE">Germany</option><option value="XX" disabled>Closed</option>' },
+      })
+      const colors = [...wrapper.get('select').element.options].map(option => [option.value, option.style.color])
+
+      expect(colors).toEqual([['', ''], ['DE', 'var(--gr-fg)'], ['XX', '']])
+    })
+
+    it('с clearable метка стоит, пока текущая — опция очистки', async () => {
+      const wrapper = mount(GrSelect, { props: { modelValue: '', clearable: true, ariaLabel: 'Country', options: countries } })
+
+      expect(wrapper.get('select').attributes('data-gr-select-empty')).toBeDefined()
+      await wrapper.setProps({ modelValue: 'DE' })
+      expect(wrapper.get('select').attributes('data-gr-select-empty')).toBeUndefined()
+    })
+
     it('опция с пустым значением в списке сама и есть «ничего не выбрано»', () => {
       const wrapper = mount(GrSelect, {
         props: { modelValue: '', ariaLabel: 'Country', options: [{ value: '', label: 'Any country' }, ...countries] },
