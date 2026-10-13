@@ -7,9 +7,17 @@
  * содержимое перестало бы слушаться темы ровно там, где его читают.
  */
 
-[data-gr-rich-text-content] .ProseMirror {
+/*
+ * Высоту области ввода и болванки до монтирования задаёт одно правило: разойдись
+ * они — поле на гидрации прыгало бы ровно на разницу.
+ */
+[data-gr-rich-text-content] .ProseMirror,
+[data-gr-rich-text-content] [data-gr-rich-text-reserve] {
   min-height: var(--gr-rich-text-min-height, 8rem);
   max-height: var(--gr-rich-text-max-height, none);
+}
+
+[data-gr-rich-text-content] .ProseMirror {
   overflow-y: auto;
   outline: none;
   white-space: pre-wrap;

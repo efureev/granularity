@@ -1,7 +1,13 @@
+import { readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
+
 import { CharacterCount } from '@tiptap/extensions'
+import { renderToString } from 'vue/server-renderer'
 import { mount } from '@vue/test-utils'
-import { nextTick } from 'vue'
+import { createSSRApp, h, nextTick } from 'vue'
 import { describe, expect, it, vi } from 'vitest'
+
+import GrPopover from '@feugene/granularity/components/GrPopover'
 
 import GrRichText from '../GrRichText.vue'
 
@@ -412,6 +418,49 @@ describe('GrRichText — смена схемы и расширений на жи
   })
 })
 
+describe('GrRichText — место до монтирования', () => {
+  /**
+   * Хост области ввода на сервере был пустым, а высоту (`--gr-rich-text-min-height`)
+   * держит только `.ProseMirror`, которого до монтирования нет: на гидрации поле
+   * вырастало на всю высоту области ввода и сдвигало всё ниже.
+   */
+  it('серверная разметка держит место болванкой с боксом области ввода', async () => {
+    const html = await renderToString(createSSRApp({
+      render: () => h(GrRichText, { modelValue: '<p>Текст</p>' }),
+    }))
+    const host = new DOMParser().parseFromString(html, 'text/html').querySelector('[data-gr-rich-text-content]')!
+    const reserve = host.querySelector('[data-gr-rich-text-reserve]')
+
+    expect(reserve).not.toBeNull()
+    expect(reserve!.getAttribute('aria-hidden')).toBe('true')
+
+    // Бокс тот же: те же классы, что получит область ввода.
+    const wrapper = mountEditor({ modelValue: '<p>Текст</p>' })
+    await ready(wrapper)
+    expect(reserve!.className).toBe(area(wrapper).className.replace(/\b(?:tiptap|ProseMirror)\b/g, '').trim().replace(/\s+/g, ' '))
+    wrapper.unmount()
+  })
+
+  it('после монтирования болванки нет — место держит сама область ввода', async () => {
+    const wrapper = mountEditor({ modelValue: '<p>Текст</p>' })
+    await ready(wrapper)
+
+    expect(wrapper.find('[data-gr-rich-text-reserve]').exists()).toBe(false)
+    expect(wrapper.findAll('[data-gr-rich-text-content] > *').map(node => node.classes().includes('ProseMirror'))).toEqual([true])
+    wrapper.unmount()
+  })
+
+  it('высоту болванки и области ввода задаёт одно правило', () => {
+    // Разойдись правила — поле на гидрации прыгало бы ровно на разницу.
+    const css = readFileSync(resolve(__dirname, '../styles.css'), 'utf8')
+    const rule = /([^{}]+)\{[^}]*min-height:\s*var\(--gr-rich-text-min-height[^}]*\}/.exec(css)
+
+    expect(rule?.[1]).toContain('.ProseMirror')
+    expect(rule?.[1]).toContain('[data-gr-rich-text-reserve]')
+    expect(rule?.[0]).toContain('max-height: var(--gr-rich-text-max-height')
+  })
+})
+
 describe('GrRichText — пузырьковый тулбар', () => {
   it('встаёт у выделения с кнопками внутри', async () => {
     const wrapper = mountEditor({ modelValue: '<p>текст</p>', toolbar: 'bubble' })
@@ -533,6 +582,41 @@ describe('GrRichText — пузырьковый тулбар', () => {
     expect(document.activeElement).toBe(area(wrapper))
 
     wrapper.unmount()
+  })
+
+  /**
+   * Видимая часть урезалась вьюпортом и обрезающими предками, но не
+   * `scroll-padding`, которым сайт объявляет липкую шапку: выделение под шапкой
+   * держало пузырёк поверх навигации сайта.
+   */
+  it('выделение под липкой шапкой (scroll-padding) прячет пузырёк, у её кромки — ставит его под выделением', async () => {
+    document.documentElement.style.scrollPaddingTop = '80px'
+    const wrapper = mountEditor({ modelValue: '<p>текст</p>', toolbar: 'bubble' })
+
+    try {
+      await ready(wrapper)
+      await selectAllWithBubble(wrapper)
+      // Сторону выбирает поле; где панель встанет на самом деле, в jsdom не
+      // проверить: вьюпорт там нулевой высоты, и `flip` переворачивает любую.
+      const side = () => wrapper.findComponent(GrPopover).props('placement')
+
+      // Выделение 20…32 — целиком под шапкой в 80px.
+      await scrollSelectionTo(wrapper, 20)
+      expect(bubblePanel()?.style.display).toBe('none')
+
+      // Чуть ниже шапки: над выделением места нет, пузырёк встаёт под ним.
+      await scrollSelectionTo(wrapper, 90)
+      expect(bubblePanel()?.style.display).not.toBe('none')
+      expect(side()).toBe('bottom')
+
+      // Места над выделением хватает — пузырёк снова над ним.
+      await scrollSelectionTo(wrapper, 400)
+      expect(side()).toBe('top')
+    }
+    finally {
+      document.documentElement.style.scrollPaddingTop = ''
+      wrapper.unmount()
+    }
   })
 
   it('закрытый Esc пузырёк прокрутка не возвращает', async () => {

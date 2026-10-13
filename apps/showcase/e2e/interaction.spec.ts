@@ -2337,4 +2337,48 @@ test.describe('GrRichText: пузырёк при прокрутке', () => {
     await expect(bubble).toBeVisible()
     expect((await settled(bubbleTop)) - (await settled(selectionTop))).toBeCloseTo(before.bubble - before.selection, 0)
   })
+
+  /**
+   * Липкую шапку сайт объявляет `scroll-padding` страницы. Видимая часть его не
+   * учитывала: выделение под шапкой держало пузырёк поверх навигации сайта, а
+   * у самой её кромки пузырёк вставал над выделением — то есть на шапку.
+   */
+  test('шапка из scroll-padding: под ней пузырёк прячется, у её кромки встаёт под выделением', async ({ page }) => {
+    const INSET = 80
+    await page.setViewportSize({ width: 1280, height: 800 })
+    await openShowcasePage(page, companionPath('GrRichText'))
+    await page.evaluate(inset => document.documentElement.style.setProperty('scroll-padding-top', `${inset}px`), INSET)
+    const field = page.getByRole('textbox', { name: 'Все кнопки' })
+    await field.evaluate(node => node.scrollIntoView({ block: 'center', behavior: 'instant' }))
+
+    await field.locator('p').first().click({ position: { x: 2, y: 4 } })
+    for (let i = 0; i < 6; i += 1)
+      await page.keyboard.press('Shift+ArrowRight')
+
+    const bubble = page.locator('[data-gr-rich-text-bubble]')
+    await expect(bubble).toBeVisible()
+
+    const selection = () => page.evaluate(() => {
+      const rect = window.getSelection()!.getRangeAt(0).getBoundingClientRect()
+      return { top: rect.top, bottom: rect.bottom }
+    })
+    const moveSelectionTo = async (top: number) => {
+      const delta = (await selection()).top - top
+      await page.evaluate(by => window.scrollBy({ top: by, behavior: 'instant' }), delta)
+      await settled(async () => (await selection()).top)
+    }
+
+    // Под шапкой целиком.
+    await moveSelectionTo(INSET - 40)
+    await expect(bubble).toBeHidden()
+
+    // Сразу под шапкой: над выделением места на пузырёк нет — он под ним.
+    await moveSelectionTo(INSET + 6)
+    await expect(bubble).toBeVisible()
+    const box = (await bubble.boundingBox())!
+    const rect = await selection()
+    expect(box.y).toBeGreaterThanOrEqual(rect.bottom)
+    expect(box.y).toBeGreaterThanOrEqual(INSET)
+    await expect(field).toBeFocused()
+  })
 })

@@ -225,8 +225,9 @@ function editorAttributes(): Record<string, string> {
  * Редактор поднимается **после монтирования**, а не в `setup`.
  *
  * ProseMirror требует DOM, поэтому на сервере его нет вовсе: серверная разметка
- * — пустая оболочка, а участок помечен `data-allow-mismatch`, иначе гидрация
- * сообщит о расхождении, которого мы и добиваемся сознательно.
+ * — оболочка с болванкой высоты (`data-gr-rich-text-reserve`), а участок помечен
+ * `data-allow-mismatch`, иначе гидрация сообщит о расхождении, которого мы и
+ * добиваемся сознательно.
  */
 function create(content: unknown): void {
   if (!hostEl.value)
@@ -438,35 +439,87 @@ function updateBubble(): void {
   placeBubble()
 }
 
+interface VisibleArea {
+  top: number
+  left: number
+  right: number
+  bottom: number
+}
+
+/** Отступ `scroll-padding` в пикселях: `auto` — ноль, проценты — от области прокрутки. */
+function scrollPadding(value: string, size: number): number {
+  return value.endsWith('%')
+    ? (Number.parseFloat(value) / 100) * size
+    : Number.parseFloat(value) || 0
+}
+
+/** Сузить видимую часть до области прокрутки, за вычетом её `scroll-padding`. */
+function clipBy(area: VisibleArea, box: VisibleArea, style: CSSStyleDeclaration): void {
+  const width = box.right - box.left
+  const height = box.bottom - box.top
+
+  area.top = Math.max(area.top, box.top + scrollPadding(style.scrollPaddingTop, height))
+  area.bottom = Math.min(area.bottom, box.bottom - scrollPadding(style.scrollPaddingBottom, height))
+  area.left = Math.max(area.left, box.left + scrollPadding(style.scrollPaddingLeft, width))
+  area.right = Math.min(area.right, box.right - scrollPadding(style.scrollPaddingRight, width))
+}
+
 /**
  * Видимая часть элемента: вьюпорт, урезанный каждым предком, который обрезает
  * содержимое (`overflow` не `visible`), — сам элемент включительно.
+ *
+ * Каждая область прокрутки, страница тоже, урезается своим `scroll-padding`:
+ * так сайты объявляют липкую шапку (`html { scroll-padding-top: 80px }`), и
+ * выделение под ней пользователь не видит, хотя оно во вьюпорте.
  */
-function visibleArea(element: Element): { top: number, left: number, right: number, bottom: number } {
-  const area = { top: 0, left: 0, right: window.innerWidth, bottom: window.innerHeight }
+function visibleArea(element: Element): VisibleArea {
+  const viewport = { top: 0, left: 0, right: window.innerWidth, bottom: window.innerHeight }
+  const area = { ...viewport }
+  const page = document.scrollingElement ?? document.documentElement
+
+  if (page)
+    clipBy(area, viewport, getComputedStyle(page))
 
   for (let node: Element | null = element; node; node = node.parentElement) {
+    if (node === page)
+      continue
+
     const style = getComputedStyle(node)
     if (style.overflowX === 'visible' && style.overflowY === 'visible')
       continue
 
+    // Область прокрутки — внутри рамки: `client*` её и меряют.
     const rect = node.getBoundingClientRect()
-    area.top = Math.max(area.top, rect.top)
-    area.left = Math.max(area.left, rect.left)
-    area.right = Math.min(area.right, rect.right)
-    area.bottom = Math.min(area.bottom, rect.bottom)
+    const top = rect.top + node.clientTop
+    const left = rect.left + node.clientLeft
+    clipBy(area, { top, left, right: left + (node.clientWidth || rect.width), bottom: top + (node.clientHeight || rect.height) }, style)
   }
 
   return area
 }
+
+/** Сторона пузырька: над выделением, а если над ним в видимой части места нет — под ним. */
+const bubblePlacement = ref<'top' | 'bottom'>('top')
+const bubbleEl = ref<HTMLElement | null>(null)
+
+/** Зазор панели от якоря — `offsetPx` поповера по умолчанию. */
+const BUBBLE_GAP_PX = 8
+/** Высота пузырька до первого замера: ряд кнопок ступени `sm` с полем. */
+const BUBBLE_HEIGHT_FALLBACK_PX = 40
 
 /**
  * Якорь пузырька — прямоугольник выделения в координатах вьюпорта: у выделения
  * нет своего элемента, и `GrPopover` для такого случая принимает `anchor`.
  *
  * Координаты вьюпорта устаревают с любой прокруткой, поэтому, пока пузырёк
- * включён, якорь пересчитывается на `scroll` и `resize`. Выделение, ушедшее за
- * видимую часть поля или страницы, якоря не даёт: пузырёк прячется.
+ * включён, якорь пересчитывается на `scroll` и `resize`.
+ *
+ * Пузырёк держится за край выделения: над ним — за верхний, под ним — за
+ * нижний. Край, ушедший за видимую часть (за край поля, страницы или под
+ * липкую шапку), держать нельзя: тогда пузырёк переходит к другому краю, а
+ * когда не видно обоих — прячется, а не висит над чужим содержимым. Места над
+ * выделением внутри видимой части не хватает — пузырёк встаёт под ним, а не
+ * наезжает на шапку.
  */
 function placeBubble(): void {
   const instance = editor.value
@@ -483,11 +536,25 @@ function placeBubble(): void {
     const top = Math.min(start.top, end.top)
     const bottom = Math.max(start.bottom, end.bottom)
     const area = visibleArea(instance.view.dom)
-    const visible = bottom > area.top && top < area.bottom && right > area.left && left < area.right
 
-    bubbleRect.value = visible
-      ? { x: left, y: top, width: Math.max(right - left, 1), height: Math.max(bottom - top, 1) }
-      : null
+    const across = right > area.left && left < area.right
+    const topVisible = across && top >= area.top && top < area.bottom
+    const bottomVisible = across && bottom > area.top && bottom <= area.bottom
+
+    if (!topVisible && !bottomVisible) {
+      bubbleRect.value = null
+      return
+    }
+
+    const needed = (bubbleEl.value?.offsetHeight || BUBBLE_HEIGHT_FALLBACK_PX) + BUBBLE_GAP_PX
+    const roomAbove = top - area.top
+    const roomBelow = area.bottom - bottom
+    const fitsAbove = topVisible && roomAbove >= needed
+
+    bubblePlacement.value = fitsAbove || !bottomVisible || (topVisible && roomAbove >= roomBelow && roomBelow < needed)
+      ? 'top'
+      : 'bottom'
+    bubbleRect.value = { x: left, y: top, width: Math.max(right - left, 1), height: Math.max(bottom - top, 1) }
   }
   catch {
     // Позиция вне отрисованного документа — показывать нечего.
@@ -619,8 +686,12 @@ const rootClasses = computed(() => [
     </div>
 
     <!-- Содержимое приезжает после монтирования: ProseMirror требует DOM, и на
-         сервере области ввода не существует. -->
-    <div ref="hostEl" data-gr-rich-text-content data-allow-mismatch="children" />
+         сервере области ввода не существует. До него хост держит место болванкой
+         с тем же боксом, что займёт область ввода, — иначе поле на гидрации
+         вырастало бы на всю её высоту и сдвигало всё ниже. -->
+    <div ref="hostEl" data-gr-rich-text-content data-allow-mismatch="children">
+      <div v-if="!editor" data-gr-rich-text-reserve :class="contentClass" aria-hidden="true" />
+    </div>
 
     <div v-if="$slots.footer" data-gr-rich-text-footer :class="fieldFooterClass">
       <slot name="footer" />
@@ -631,7 +702,7 @@ const rootClasses = computed(() => [
       trigger="manual"
       :open="bubbleOpen"
       :anchor="bubbleRect"
-      placement="top"
+      :placement="bubblePlacement"
       size="sm"
       padding="none"
       :content-class="bubblePanelClass"
@@ -641,7 +712,7 @@ const rootClasses = computed(() => [
       @update:open="onBubbleOpen"
     >
       <template #content>
-        <div data-gr-rich-text-bubble :class="bubbleClass">
+        <div ref="bubbleEl" data-gr-rich-text-bubble :class="bubbleClass">
           <!-- `mousedown.prevent` здесь обязателен, в отличие от панели сверху:
                пузырёк держится на фокусе в тексте, и уход фокуса на кнопку гасит
                его блюром прямо под курсором — второй формат подряд применить уже

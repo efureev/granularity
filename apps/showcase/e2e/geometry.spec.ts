@@ -1,6 +1,9 @@
 import { Buffer } from 'node:buffer'
 
+import { GrRichText } from '@feugene/granularity-editor/components/GrRichText'
 import { expect, test } from '@playwright/test'
+import { createSSRApp, h } from 'vue'
+import { renderToString } from 'vue/server-renderer'
 
 import { companionPath, componentPath } from './components'
 
@@ -1022,5 +1025,52 @@ test.describe('GrTimePicker inline: колонки у выбранного зн�
     }
 
     expect(await demo.locator('[role="listbox"][data-unit="hour"]').evaluate(node => node.scrollTop)).toBeGreaterThan(0)
+  })
+})
+
+/**
+ * Хост области ввода `GrRichText` приходил с сервера пустым, а высоту держит
+ * только `.ProseMirror`, которого до монтирования нет: на гидрации поле
+ * вырастало на всю высоту области ввода. Ответ в тикете с min = max = 8rem
+ * прыгал с 231px на 359px и сдвигал всё ниже.
+ *
+ * Серверная разметка снимается здесь же, в Node, из собранного пакета, и
+ * ставится на страницу рядом с живым полем тех же пропов: стили у них общие.
+ */
+test.describe('GrRichText: место до монтирования', () => {
+  test('серверная разметка поля с min = max занимает ровно столько, сколько поле после монтирования', async ({ page }) => {
+    const heights = '--gr-rich-text-min-height: 8rem; --gr-rich-text-max-height: 8rem'
+    const html = await renderToString(createSSRApp({
+      render: () => h(GrRichText, { schema: 'article', toolbar: 'both', ariaLabel: 'SSR', style: heights }),
+    }))
+
+    await page.goto(companionPath('GrRichText'))
+    const live = page.getByRole('textbox', { name: 'Все кнопки' })
+    await live.waitFor()
+
+    const measured = await live.evaluate((node, { html, heights }) => {
+      const field = node.closest('[data-gr-rich-text]') as HTMLElement
+      field.style.cssText += heights
+
+      const stage = document.createElement('div')
+      stage.style.width = `${field.getBoundingClientRect().width}px`
+      stage.innerHTML = html
+      field.after(stage)
+
+      const server = stage.querySelector('[data-gr-rich-text]')!
+      const height = (element: Element | null) => element?.getBoundingClientRect().height ?? -1
+
+      return {
+        serverHost: height(server.querySelector('[data-gr-rich-text-content]')),
+        serverField: height(server),
+        liveHost: height(field.querySelector('[data-gr-rich-text-content]')),
+        liveEditor: height(field.querySelector('.ProseMirror')),
+        liveField: height(field),
+      }
+    }, { html, heights })
+
+    expect(measured.liveEditor).toBe(128)
+    expect(measured.serverHost).toBe(measured.liveHost)
+    expect(measured.serverField).toBe(measured.liveField)
   })
 })
