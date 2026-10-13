@@ -5,6 +5,15 @@ All notable changes to the [`@feugene/granularity-code`](.) package are document
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Fixed
+
+- **Подписи пропуска `GrDiff` без i18n согласуют число.** Словари пакета держат формы
+  `one`/`other`, а встроенный запасной текст был одной строкой во множественном числе: приложение
+  без адаптера i18n показывало «Show 1 more lines». Теперь запасной английский текст выбирает форму
+  сам — у `expand`, `expandTop`, `expandBottom` и `hidden`.
+
 ## [v1.0.3] 2026-10-06
 
 ### Fixed

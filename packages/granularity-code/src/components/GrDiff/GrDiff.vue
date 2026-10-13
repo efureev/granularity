@@ -134,6 +134,15 @@ const emit = defineEmits<GrDiffEmits>()
 
 const { t } = useGranularityTranslations()
 
+/**
+ * Строка с числом строк. Словари пакета держат формы `one`/`other`, а без
+ * адаптера i18n `t` отдаёт запасной текст как есть — одна английская строка на
+ * все числа печатала бы «Show 1 more lines». Запасной текст выбирает форму сам.
+ */
+function linesText(key: string, n: number, one: string, other: string): string {
+  return t(key, n === 1 ? one : other, { n, count: n })
+}
+
 const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrDiff' })
 const resolvedWrap = useGrComponentProp('GrDiff', 'wrap', () => props.wrap, false)
 const resolvedLineNumbers = useGrComponentProp('GrDiff', 'lineNumbers', () => props.lineNumbers, true)
@@ -505,27 +514,27 @@ defineExpose({
             :class="diffGapClass"
             @click="expand(entry, 'top')"
           >
-            {{ t('grCode.diff.expand', 'Show {count} more lines', { n: entry.hidden, count: entry.hidden }) }}
+            {{ linesText('grCode.diff.expand', entry.hidden, 'Show {n} more line', 'Show {n} more lines') }}
           </button>
 
           <template v-else>
             <button
               type="button"
               :class="diffGapEdgeClass"
-              :aria-label="t('grCode.diff.expandTop', 'Show {count} lines at the top of the gap', { n: resolvedExpandStep, count: resolvedExpandStep })"
+              :aria-label="linesText('grCode.diff.expandTop', resolvedExpandStep, 'Show {n} line at the top of the gap', 'Show {n} lines at the top of the gap')"
               @click="expand(entry, 'top')"
             >
               <span aria-hidden="true">↓ {{ resolvedExpandStep }}</span>
             </button>
 
             <span :class="diffGapCountClass">
-              {{ t('grCode.diff.hidden', '{count} lines hidden', { n: entry.hidden, count: entry.hidden }) }}
+              {{ linesText('grCode.diff.hidden', entry.hidden, '{n} line hidden', '{n} lines hidden') }}
             </span>
 
             <button
               type="button"
               :class="diffGapEdgeClass"
-              :aria-label="t('grCode.diff.expandBottom', 'Show {count} lines at the bottom of the gap', { n: resolvedExpandStep, count: resolvedExpandStep })"
+              :aria-label="linesText('grCode.diff.expandBottom', resolvedExpandStep, 'Show {n} line at the bottom of the gap', 'Show {n} lines at the bottom of the gap')"
               @click="expand(entry, 'bottom')"
             >
               <span aria-hidden="true">↑ {{ resolvedExpandStep }}</span>

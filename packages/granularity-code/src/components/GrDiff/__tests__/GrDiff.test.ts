@@ -77,6 +77,29 @@ describe('GrDiff', () => {
       expect(buttons.at(-1)!.attributes('aria-label')).toMatch(/bottom of the gap|в конце пропуска/)
     })
 
+    /**
+     * Без адаптера i18n `t` отдаёт запасной текст как есть, а словари держат
+     * `one`/`other`: одна строка на все числа печатала бы «Show 1 more lines».
+     */
+    it('без i18n подписи пропуска согласуют число с формой', () => {
+      const single = mount(GrDiff, { props: { before: long, after: long.replace('line 3', 'line 3 changed'), context: 2 } })
+      const labels = (wrapper: typeof single) => wrapper.findAll('button').map(button => button.attributes('aria-label') ?? button.text())
+
+      // Сверху скрыта одна строка, снизу — двадцать четыре при шаге 10.
+      expect(labels(single)).toEqual([
+        'Show 1 more line',
+        'Show 10 lines at the top of the gap',
+        'Show 10 lines at the bottom of the gap',
+      ])
+      expect(single.text()).toContain('24 lines hidden')
+
+      const stepOne = mount(GrDiff, { props: { before: long, after: changed, context: 2, expandStep: 1 } })
+      expect(labels(stepOne).slice(0, 2)).toEqual([
+        'Show 1 line at the top of the gap',
+        'Show 1 line at the bottom of the gap',
+      ])
+    })
+
     it('нажатие открывает ровно шаг, а не весь пропуск', async () => {
       const wrapper = mount(GrDiff, {
         props: { before: long, after: changed, context: 2, expandStep: 4 },
