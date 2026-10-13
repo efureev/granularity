@@ -481,6 +481,73 @@ describe('GrRichText — пузырьковый тулбар', () => {
     wrapper.unmount()
   })
 
+  /** Выделение уехало вместе с документом: подменённые координаты и событие прокрутки. */
+  async function scrollSelectionTo(wrapper: Editor, top: number, target: EventTarget = window) {
+    const view = (instanceOf(wrapper) as unknown as { view: { coordsAtPos: (pos: number) => unknown } }).view
+    view.coordsAtPos = () => ({ left: 10, right: 40, top, bottom: top + 12 })
+    target.dispatchEvent(new Event('scroll'))
+    for (let i = 0; i < 3; i += 1) await nextTick()
+    await new Promise(resolve => setTimeout(resolve, 0))
+  }
+
+  /**
+   * Якорь пузырька — координаты вьюпорта, снятые на смене выделения. Прокрутка
+   * колесом выделение не меняет, и пузырёк оставался на прежнем месте экрана —
+   * над тем, что приехало под него, хотя фокус и выделение по-прежнему в поле.
+   */
+  it('пузырёк едет за выделением при прокрутке страницы и вложенной области', async () => {
+    const wrapper = mountEditor({ modelValue: '<p>текст</p>', toolbar: 'bubble' })
+    await ready(wrapper)
+    await selectAllWithBubble(wrapper)
+    await new Promise(resolve => setTimeout(resolve, 0))
+    const top = () => Number.parseFloat(bubblePanel()?.style.top ?? 'NaN')
+    const before = top()
+
+    await scrollSelectionTo(wrapper, 320)
+    expect(top() - before).toBeCloseTo(300)
+
+    // Прокрутка внутренней области не всплывает до `window` — её ловит захват.
+    const scroller = document.createElement('div')
+    document.body.append(scroller)
+    await scrollSelectionTo(wrapper, 220, scroller)
+    expect(top() - before).toBeCloseTo(200)
+    expect(bubblePanel()?.style.display).not.toBe('none')
+
+    scroller.remove()
+    wrapper.unmount()
+  })
+
+  it('выделение за краем видимой области — пузырёк спрятан, вернулось — снова на месте', async () => {
+    const wrapper = mountEditor({ modelValue: '<p>текст</p>', toolbar: 'bubble' })
+    await ready(wrapper)
+    await selectAllWithBubble(wrapper)
+
+    await scrollSelectionTo(wrapper, -400)
+    expect(bubblePanel()?.style.display).toBe('none')
+
+    await scrollSelectionTo(wrapper, window.innerHeight + 50)
+    expect(bubblePanel()?.style.display).toBe('none')
+
+    await scrollSelectionTo(wrapper, 200)
+    expect(bubblePanel()?.style.display).not.toBe('none')
+    expect(document.activeElement).toBe(area(wrapper))
+
+    wrapper.unmount()
+  })
+
+  it('закрытый Esc пузырёк прокрутка не возвращает', async () => {
+    const wrapper = mountEditor({ modelValue: '<p>текст</p>', toolbar: 'bubble' })
+    await ready(wrapper)
+    await selectAllWithBubble(wrapper)
+
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }))
+    for (let i = 0; i < 3; i += 1) await nextTick()
+    await scrollSelectionTo(wrapper, 200)
+
+    expect(bubblePanel()?.style.display).toBe('none')
+    wrapper.unmount()
+  })
+
   /**
    * Регрессия: панель поповера ограничена `max-width` в 22rem, а квадратная
    * кнопка не сжимается (`min-w` в `GrButton`). Десять кнопок ступени `sm`

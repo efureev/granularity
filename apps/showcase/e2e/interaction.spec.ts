@@ -2279,3 +2279,62 @@ test.describe('GrMarkdown: имена задач', () => {
     await expect(notes.getByRole('checkbox', { name: 'мост в редактор' })).toHaveAttribute('aria-readonly', 'true')
   })
 })
+
+/**
+ * Якорь пузырька `GrRichText` снимался в координатах вьюпорта на смене
+ * выделения, а прокрутка колесом выделение не меняет: пузырёк оставался на
+ * прежнем месте экрана и висел над тем, что приехало под него.
+ */
+test.describe('GrRichText: пузырёк при прокрутке', () => {
+  /** Значение, переставшее меняться: панель въезжает анимацией, страница прокручивается плавно. */
+  async function settled(read: () => Promise<number>): Promise<number> {
+    let previous = Number.NaN
+    await expect.poll(async () => {
+      const current = await read()
+      const still = Math.abs(current - previous) < 0.01
+      previous = current
+      return still
+    }, { intervals: [120] }).toBe(true)
+
+    return previous
+  }
+
+  test('пузырёк едет за выделением, а ушедшее за край выделение его прячет', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 800 })
+    await openShowcasePage(page, companionPath('GrRichText'))
+    const field = page.getByRole('textbox', { name: 'Все кнопки' })
+    await field.evaluate(node => node.scrollIntoView({ block: 'center', behavior: 'instant' }))
+
+    // Клик у левого края ставит курсор в начало строки. `Home` здесь не годится:
+    // Chrome прокручивает им всю страницу наверх.
+    await field.locator('p').first().click({ position: { x: 2, y: 4 } })
+    for (let i = 0; i < 6; i += 1)
+      await page.keyboard.press('Shift+ArrowRight')
+
+    const bubble = page.locator('[data-gr-rich-text-bubble]')
+    await expect(bubble).toBeVisible()
+
+    const selectionTop = () => page.evaluate(() => window.getSelection()!.getRangeAt(0).getBoundingClientRect().top)
+    const bubbleTop = async () => (await bubble.boundingBox())!.y
+    const scrollBy = (top: number) => page.evaluate(delta => window.scrollBy({ top: delta, behavior: 'instant' }), top)
+
+    const before = { selection: await settled(selectionTop), bubble: await settled(bubbleTop) }
+
+    await scrollBy(120)
+    const shift = (await settled(selectionTop)) - before.selection
+    expect(shift).toBeCloseTo(-120, 0)
+    expect((await settled(bubbleTop)) - before.bubble).toBeCloseTo(shift, 0)
+    await expect(field).toBeFocused()
+
+    // Выделение ушло за верхний край — пузырёк прячется, а не висит над чужим.
+    await scrollBy((await selectionTop()) + 200)
+    expect(await settled(selectionTop)).toBeLessThan(0)
+    await expect(bubble).toBeHidden()
+    await expect(field).toBeFocused()
+
+    // Вернулось — пузырёк снова у выделения.
+    await scrollBy((await selectionTop()) - before.selection)
+    await expect(bubble).toBeVisible()
+    expect((await settled(bubbleTop)) - (await settled(selectionTop))).toBeCloseTo(before.bubble - before.selection, 0)
+  })
+})

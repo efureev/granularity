@@ -395,11 +395,21 @@ const actionGroups = computed(() => {
 
 // ————— Пузырьковое меню.
 
+/**
+ * Пузырёк включён выделением: есть непустое выделение, фокус в поле, и Esc его
+ * не закрыл. Показан он, только пока выделение видно (`bubbleRect`): прокрутка
+ * уводит его под край — пузырёк прячется, а не висит над чужим содержимым, и
+ * возвращается вместе с выделением.
+ */
+const bubbleActive = ref(false)
 const bubbleRect = ref<{ x: number, y: number, width: number, height: number } | null>(null)
 
-const bubbleOpen = computed(() => showBubble.value && !field.locked.value && bubbleRect.value !== null)
+const bubbleOpen = computed(() => (
+  showBubble.value && !field.locked.value && bubbleActive.value && bubbleRect.value !== null
+))
 
 function closeBubble(): void {
+  bubbleActive.value = false
   bubbleRect.value = null
 }
 
@@ -416,37 +426,108 @@ function onBubbleOpen(next: boolean): void {
     closeBubble()
 }
 
-/**
- * Якорь пузырька — прямоугольник выделения в координатах вьюпорта: у выделения
- * нет своего элемента, и `GrPopover` для такого случая принимает `anchor`.
- */
 function updateBubble(): void {
   const instance = editor.value
   if (!showBubble.value || !instance || field.locked.value)
     return closeBubble()
 
-  const { from, to, empty } = instance.state.selection
-  if (empty)
+  if (instance.state.selection.empty)
     return closeBubble()
+
+  bubbleActive.value = true
+  placeBubble()
+}
+
+/**
+ * Видимая часть элемента: вьюпорт, урезанный каждым предком, который обрезает
+ * содержимое (`overflow` не `visible`), — сам элемент включительно.
+ */
+function visibleArea(element: Element): { top: number, left: number, right: number, bottom: number } {
+  const area = { top: 0, left: 0, right: window.innerWidth, bottom: window.innerHeight }
+
+  for (let node: Element | null = element; node; node = node.parentElement) {
+    const style = getComputedStyle(node)
+    if (style.overflowX === 'visible' && style.overflowY === 'visible')
+      continue
+
+    const rect = node.getBoundingClientRect()
+    area.top = Math.max(area.top, rect.top)
+    area.left = Math.max(area.left, rect.left)
+    area.right = Math.min(area.right, rect.right)
+    area.bottom = Math.min(area.bottom, rect.bottom)
+  }
+
+  return area
+}
+
+/**
+ * Якорь пузырька — прямоугольник выделения в координатах вьюпорта: у выделения
+ * нет своего элемента, и `GrPopover` для такого случая принимает `anchor`.
+ *
+ * Координаты вьюпорта устаревают с любой прокруткой, поэтому, пока пузырёк
+ * включён, якорь пересчитывается на `scroll` и `resize`. Выделение, ушедшее за
+ * видимую часть поля или страницы, якоря не даёт: пузырёк прячется.
+ */
+function placeBubble(): void {
+  const instance = editor.value
+  if (!instance)
+    return closeBubble()
+
+  const { from, to } = instance.state.selection
 
   try {
     const start = instance.view.coordsAtPos(from)
     const end = instance.view.coordsAtPos(to)
     const left = Math.min(start.left, end.left)
     const right = Math.max(start.right, end.right)
+    const top = Math.min(start.top, end.top)
+    const bottom = Math.max(start.bottom, end.bottom)
+    const area = visibleArea(instance.view.dom)
+    const visible = bottom > area.top && top < area.bottom && right > area.left && left < area.right
 
-    bubbleRect.value = {
-      x: left,
-      y: Math.min(start.top, end.top),
-      width: Math.max(right - left, 1),
-      height: Math.max(end.bottom - start.top, 1),
-    }
+    bubbleRect.value = visible
+      ? { x: left, y: top, width: Math.max(right - left, 1), height: Math.max(bottom - top, 1) }
+      : null
   }
   catch {
     // Позиция вне отрисованного документа — показывать нечего.
-    closeBubble()
+    bubbleRect.value = null
   }
 }
+
+function onViewportChange(): void {
+  if (bubbleActive.value)
+    placeBubble()
+}
+
+/**
+ * Слушатели живут, только пока пузырёк включён. `scroll` — в фазе захвата на
+ * `window`: событие прокрутки не всплывает, а захват ловит его у любого
+ * прокручиваемого предка, а не только у страницы.
+ */
+const viewportListener = { capture: true, passive: true } as const
+
+watch(bubbleActive, (active) => {
+  if (typeof window === 'undefined')
+    return
+
+  if (active) {
+    window.addEventListener('scroll', onViewportChange, viewportListener)
+    window.addEventListener('resize', onViewportChange, { passive: true })
+  }
+  else {
+    window.removeEventListener('scroll', onViewportChange, viewportListener)
+    window.removeEventListener('resize', onViewportChange)
+  }
+})
+
+onBeforeUnmount(() => {
+  if (typeof window === 'undefined')
+    return
+
+  window.removeEventListener('scroll', onViewportChange, viewportListener)
+  window.removeEventListener('resize', onViewportChange)
+})
 
 defineSlots<{
   /**
