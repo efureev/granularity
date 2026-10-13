@@ -5,6 +5,23 @@ All notable changes to the [`@feugene/granularity`](.) package are documented in
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Fixed
+
+- **Цвет динамики `GrStatistic` следует полярности.** Строка под значением красила рост зелёным,
+  а падение красным при любой `polarity`: растущий отток получал зелёную стрелку, падающая
+  просрочка — красную. Теперь тон динамики считает `deltaTone(направление, полярность)`:
+  `negative-good` красит `up` в `danger`, `down` — в `success`, `none` — без тона. Без полярности
+  рост по-прежнему хорош.
+
+### Added
+
+- **`trendPolarity` у `GrStatistic`.** Полярность только для динамики: абсолютному показателю
+  (отток 2.4 %) знака у значения нет, и `polarity` красила бы само число красным за то, что оно
+  положительное. С `trendPolarity="negative-good"` значение остаётся нейтральным, а «↑ +0.6 п. п.» —
+  красным. Не задан — берётся `polarity`; настраивается и через `GrConfigProvider`.
+
 ## [v1.0.18] 2026-10-07
 
 ### Fixed

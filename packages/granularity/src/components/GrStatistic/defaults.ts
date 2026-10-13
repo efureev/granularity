@@ -14,6 +14,7 @@ import type { GrStatisticSize } from './grStatisticStyles'
 export interface GrStatisticConfigurableProps {
   size: GrStatisticSize
   polarity: GrDeltaPolarity
+  trendPolarity: GrDeltaPolarity
 }
 
 declare module '../../composables/useGrComponentConfig' {

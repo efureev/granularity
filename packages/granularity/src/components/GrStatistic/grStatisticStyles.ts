@@ -1,5 +1,6 @@
 import type { GrComponentSize } from '../shared/sizes'
 
+import type { GrDeltaTone } from '../shared/deltaTone'
 import type { GrTone } from '../shared/tones'
 
 export type GrStatisticSize = GrComponentSize
@@ -84,10 +85,14 @@ export const statisticValueClassByTone: Record<GrStatisticTone, string> = {
 }
 
 // Строка динамики: рост — успех, падение — опасность, без изменений — приглушённый.
-export const statisticTrendClassByTrend: Record<GrStatisticTrend, string> = {
-  up: 'text-[var(--gr-success-text)]',
-  down: 'text-[var(--gr-danger-text)]',
-  flat: 'text-[var(--gr-muted-fg)]',
+/**
+ * Цвет строки динамики — по тону, а не по направлению: рост хорош для выручки
+ * и плох для оттока, и решает это полярность (`deltaTone`), а не стрелка.
+ */
+export const statisticTrendClassByTone: Record<GrDeltaTone, string> = {
+  success: 'text-[var(--gr-success-text)]',
+  danger: 'text-[var(--gr-danger-text)]',
+  neutral: 'text-[var(--gr-muted-fg)]',
 }
 
 export const statisticTitleClass = 'font-medium tracking-wide text-[var(--gr-statistic-title-color,var(--gr-muted-fg))]'

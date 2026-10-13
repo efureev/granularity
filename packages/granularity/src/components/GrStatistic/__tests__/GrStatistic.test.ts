@@ -128,6 +128,62 @@ describe('GrStatistic — тон из знака значения', () => {
   })
 })
 
+describe('GrStatistic — тон динамики по полярности', () => {
+  const trendClasses = (props: Partial<GrStatisticProps>) =>
+    mount(GrStatistic, { props: { value: 10, trendText: '+0.6 pp', ...props } as GrStatisticProps })
+      .get('[data-testid="gr-statistic-trend"]')
+      .classes()
+      .join(' ')
+
+  /**
+   * Строка динамики красила рост зелёным, а падение красным при любой
+   * `polarity`: растущий отток получал зелёную стрелку, падающая просрочка —
+   * красную.
+   */
+  it('при negative-good рост — danger, падение — success', () => {
+    expect(trendClasses({ trend: 'up', polarity: 'negative-good' })).toContain('var(--gr-danger-text)')
+    expect(trendClasses({ trend: 'down', polarity: 'negative-good' })).toContain('var(--gr-success-text)')
+  })
+
+  it('polarity="none" и flat динамику не красят', () => {
+    expect(trendClasses({ trend: 'up', polarity: 'none' })).toContain('var(--gr-muted-fg)')
+    expect(trendClasses({ trend: 'down', polarity: 'none' })).toContain('var(--gr-muted-fg)')
+    expect(trendClasses({ trend: 'flat', polarity: 'positive-good' })).toContain('var(--gr-muted-fg)')
+  })
+
+  it('без полярности рост хорош: умолчание прежнее', () => {
+    expect(trendClasses({ trend: 'up' })).toContain('var(--gr-success-text)')
+    expect(trendClasses({ trend: 'down' })).toContain('var(--gr-danger-text)')
+  })
+
+  it('trendPolarity красит динамику, не трогая абсолютное значение', () => {
+    // Отток 2.4 % — абсолютный показатель: знака у него нет, красить само число
+    // не за что, а рост на 0.6 п. п. — плохая новость.
+    const wrapper = mount(GrStatistic, { props: { value: 2.4, suffix: '%', trend: 'up', trendText: '+0.6 pp', trendPolarity: 'negative-good' } })
+
+    expect(wrapper.get('[data-testid="gr-statistic-trend"]').classes().join(' ')).toContain('var(--gr-danger-text)')
+    expect(wrapper.get('[data-testid="gr-statistic-value"]').html()).toContain('var(--gr-fg)')
+    expect(wrapper.get('[data-testid="gr-statistic-value"]').html()).not.toContain('var(--gr-danger-text)')
+  })
+
+  it('trendPolarity сильнее polarity и читается из GrConfigProvider', () => {
+    const Harness = defineComponent({
+      components: { GrConfigProvider, GrStatistic },
+      template: `
+        <GrConfigProvider :component-defaults="{ GrStatistic: { trendPolarity: 'negative-good' } }">
+          <GrStatistic :value="5" trend="up" trend-text="+1" data-case="config" />
+          <GrStatistic :value="5" trend="up" trend-text="+1" trend-polarity="positive-good" polarity="negative-good" data-case="local" />
+        </GrConfigProvider>
+      `,
+    })
+    const wrapper = mount(Harness)
+    const trend = (name: string) => wrapper.get(`[data-case="${name}"] [data-testid="gr-statistic-trend"]`).classes().join(' ')
+
+    expect(trend('config')).toContain('var(--gr-danger-text)')
+    expect(trend('local')).toContain('var(--gr-success-text)')
+  })
+})
+
 describe('GrStatistic — доступность динамики и загрузки', () => {
   it('направление тренда доносит скрытая подпись, а не только цвет и иконка', () => {
     const cases = [

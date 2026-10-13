@@ -55,5 +55,20 @@ const presets = [
         />
       </GrCard>
     </div>
+
+    <GrCard class="p-4 sm:max-w-80">
+      <!--
+        Отток — абсолютный показатель: знака у числа нет, красить его не за что.
+        Полярность задаётся динамике — рост оттока красный.
+      -->
+      <GrStatistic
+        title="Monthly churn"
+        :value="2.4"
+        suffix="%"
+        trend="up"
+        trend-text="+0.6 pp to last month"
+        trend-polarity="negative-good"
+      />
+    </GrCard>
   </div>
 </template>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useGrComponentProp, useGrComponentSize } from '../shared/configContext'
+import { useGrComponentDefaults, useGrComponentProp, useGrComponentSize } from '../shared/configContext'
 import { computed, markRaw, onBeforeUnmount, onMounted, ref, useSlots, watch, watchEffect, type Component } from 'vue'
 
 import { useGranularityTranslations } from '../../internal/granularityI18n'
@@ -22,7 +22,7 @@ import {
   statisticRootClass,
   statisticTitleClass,
   statisticTitleSizeBySize,
-  statisticTrendClassByTrend,
+  statisticTrendClassByTone,
   statisticTrendSizeBySize,
   statisticValueClass,
   type GrStatisticSize,
@@ -78,12 +78,22 @@ export interface GrStatisticProps {
   /** Тон значения; точечно перекрывается `--gr-statistic-value-color`. */
   tone?: GrStatisticTone
   /**
-   * Что считать хорошим: тон выводится из знака самого значения. Для выручки
-   * рост — успех, для себестоимости и оттока — наоборот. Явный `tone` сильнее:
-   * выведенный тон — умолчание, а не диктат.
+   * Что считать хорошим для **значения со знаком** — сальдо, прирост, разница:
+   * тон выводится из знака самого значения. Для выручки рост — успех, для
+   * себестоимости и оттока — наоборот. Явный `tone` сильнее: выведенный тон —
+   * умолчание, а не диктат.
+   *
+   * Абсолютный показатель (отток 2.4 %, время ответа) знака не несёт — для него
+   * полярность задают динамике, `trendPolarity`, а значение остаётся нейтральным.
    */
   polarity?: GrDeltaPolarity
-  /** Направление динамики — задаёт цвет и иконку строки под значением. */
+  /**
+   * Что считать хорошим для **динамики**: `negative-good` красит рост в
+   * `danger`, падение — в `success`, `none` — без тона. Не задана — берётся
+   * `polarity`, а без неё рост хорош.
+   */
+  trendPolarity?: GrDeltaPolarity
+  /** Направление динамики — задаёт иконку строки под значением, а с полярностью — и цвет. */
   trend?: GrStatisticTrend
   /** Текст динамики (например `+12,5% к прошлой неделе`). */
   trendText?: string
@@ -136,6 +146,7 @@ const props = withDefaults(
     // `tone="neutral"` не смог бы отменить `polarity`.
     tone: undefined,
     polarity: undefined,
+    trendPolarity: undefined,
     trend: undefined,
     trendText: undefined,
     loading: false,
@@ -358,6 +369,28 @@ const resolvedTone = computed<GrStatisticTone>(() => {
   return numeric === null ? 'neutral' : deltaTone(numeric, resolvedPolarity.value)
 })
 
+const statisticDefaults = useGrComponentDefaults('GrStatistic')
+
+/**
+ * Полярность динамики — цепочкой руками: её умолчание не константа, а
+ * `polarity`. Свой проп → `polarity` плитки → глобальные `trendPolarity` и
+ * `polarity` → «рост хорош». Последнее звено держит прежний вид плитки, у
+ * которой полярность не задана нигде.
+ */
+const resolvedTrendPolarity = computed<GrDeltaPolarity>(() => (
+  props.trendPolarity
+  ?? props.polarity
+  ?? statisticDefaults.value.trendPolarity
+  ?? statisticDefaults.value.polarity
+  ?? 'positive-good'
+))
+
+const TREND_SIGN: Record<GrStatisticTrend, number> = { up: 1, down: -1, flat: 0 }
+
+const trendClass = computed(() => statisticTrendClassByTone[
+  deltaTone(TREND_SIGN[props.trend ?? 'flat'], resolvedTrendPolarity.value)
+])
+
 const trendIconByTrend: Record<GrStatisticTrend, Component> = {
   up: IconTrendingUp,
   down: IconTrendingDown,
@@ -492,7 +525,7 @@ defineSlots<{
         data-gr-statistic-trend
         data-testid="gr-statistic-trend"
         class="mt-1 inline-flex items-center gap-1"
-        :class="[statisticTrendSizeBySize[resolvedSize], statisticTrendClassByTrend[trend ?? 'flat']]"
+        :class="[statisticTrendSizeBySize[resolvedSize], trendClass]"
       >
         <span v-if="trendLabel" data-gr-statistic-trend-label class="sr-only">{{ trendLabel }}</span>
 
