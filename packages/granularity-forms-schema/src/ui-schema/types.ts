@@ -111,7 +111,10 @@ export interface GrUiSection {
   headingLevel?: 2 | 3 | 4 | 5 | 6
   landmark?: boolean
   columns?: GrUiColumns
-  /** Шаблонные пути по порядку. `'*'` — все, не попавшие в другие секции. */
+  /**
+   * Шаблонные пути корневых полей — секция рисует ровно их и в этом порядке.
+   * `'*'` раскрывается на своём месте во все поля, не названные ни одной секцией.
+   */
   fields: string[]
   when?: GrUiCondition
 }
@@ -127,7 +130,10 @@ export interface GrUiSchema {
   fields?: Record<string, GrUiFieldOptions>
   /** Умолчания на все поля. */
   defaults?: Pick<GrUiFieldOptions, 'labelPosition' | 'labelWidth' | 'showMessage' | 'span'>
-  /** Порядок корневых полей, когда секций нет. `'*'` — остальные по схеме. */
+  /**
+   * Порядок корневых полей. `'*'` — остальные по схеме. С секциями задаёт
+   * порядок остатка, который забирает секция с `'*'`.
+   */
   order?: string[]
   /** Не рендерить вовсе — в отличие от условного `when`. */
   hidden?: string[]

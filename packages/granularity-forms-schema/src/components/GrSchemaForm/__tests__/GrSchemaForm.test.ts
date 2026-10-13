@@ -175,6 +175,100 @@ describe('uiSchema', () => {
   })
 })
 
+describe('секции раскладки', () => {
+  const billing: JsonSchemaDocument = {
+    type: 'object',
+    properties: {
+      type: { type: 'string', enum: ['person', 'company'] },
+      companyName: { type: 'string' },
+      vatId: { type: 'string' },
+      contactName: { type: 'string' },
+      email: { type: 'string', format: 'email' },
+      country: { type: 'string' },
+      language: { type: 'string' },
+      notes: { type: 'string' },
+    },
+  }
+
+  /** Пути полей по секциям — в порядке на экране. */
+  function sectionPaths(wrapper: ReturnType<typeof mountForm>): string[][] {
+    return wrapper.findAll('[data-gr-schema-object]').map(section =>
+      section.findAll('[data-gr-schema-field]').map(field => field.attributes('data-path')!))
+  }
+
+  /**
+   * Секция передавала свой список полей узлу, а узел его не читал и брал всех
+   * детей корня: каждая секция рисовала всю форму, и она шла дважды.
+   */
+  it('каждая секция рисует ровно свои поля в заданном порядке', () => {
+    const wrapper = mountForm(billing, {
+      uiSchema: {
+        layout: {
+          columns: 2,
+          sections: [
+            { id: 'who', title: 'Who is billed', fields: ['type', 'companyName', 'vatId', 'contactName', 'email'] },
+            { id: 'how', title: 'How they are billed', fields: ['notes', 'country', 'language'] },
+          ],
+        },
+      },
+    })
+
+    expect(sectionPaths(wrapper)).toEqual([
+      ['type', 'companyName', 'vatId', 'contactName', 'email'],
+      ['notes', 'country', 'language'],
+    ])
+    wrapper.unmount()
+  })
+
+  it('«*» забирает поля, не названные ни одной секцией, на своём месте в списке', () => {
+    const wrapper = mountForm(billing, {
+      uiSchema: {
+        layout: {
+          sections: [
+            { id: 'who', title: 'Who is billed', fields: ['email', 'type'] },
+            { id: 'rest', title: 'Everything else', fields: ['notes', '*'] },
+          ],
+        },
+      },
+    })
+
+    expect(sectionPaths(wrapper)).toEqual([
+      ['email', 'type'],
+      ['notes', 'companyName', 'vatId', 'contactName', 'country', 'language'],
+    ])
+    wrapper.unmount()
+  })
+
+  it('скрытое поле и условие when работают и внутри секции', async () => {
+    const model = reactive<Record<string, unknown>>({ type: 'person' })
+    const wrapper = mountForm(billing, {
+      modelValue: model,
+      uiSchema: {
+        hidden: ['language'],
+        fields: { vatId: { when: { path: 'type', eq: 'company' } } },
+        layout: {
+          sections: [
+            { id: 'who', title: 'Who is billed', fields: ['type', 'vatId', 'email'] },
+            { id: 'how', title: 'How they are billed', fields: ['*'] },
+          ],
+        },
+      },
+    })
+    await nextTick()
+
+    expect(sectionPaths(wrapper)).toEqual([
+      ['type', 'email'],
+      ['companyName', 'contactName', 'country', 'notes'],
+    ])
+
+    model.type = 'company'
+    await nextTick()
+
+    expect(sectionPaths(wrapper)[0]).toEqual(['type', 'vatId', 'email'])
+    wrapper.unmount()
+  })
+})
+
 describe('серверные ошибки', () => {
   it('ошибка садится на поле и снимается правкой', async () => {
     const model: Record<string, unknown> = { email: 'a@b.co' }
@@ -197,6 +291,23 @@ describe('серверные ошибки', () => {
     await nextTick()
 
     expect(wrapper.find('[data-gr-schema-form-errors]').text()).toContain('Нельзя')
+  })
+
+  /**
+   * Сводку рисовал `GrAlert` с `state="danger"` — пропа с таким именем нет, и
+   * тон оставался умолчательным `info`: отказ в сохранении выглядел нейтральной
+   * справкой со значком ⓘ.
+   */
+  it('сводка отказа — тоном ошибки: цвет и значок говорят «не сохранено»', async () => {
+    const wrapper = mountForm(basic, { serverErrors: { violations: [{ propertyPath: 'plan', message: 'The Team plan allows 4 seats' }] } })
+    await nextTick()
+
+    const summary = wrapper.find('[data-gr-schema-form-errors]')
+    expect(summary.text()).toContain('The Team plan allows 4 seats')
+    expect(summary.attributes('style')).toContain('var(--gr-danger-light)')
+    expect(summary.attributes('style')).not.toContain('var(--gr-info')
+    expect(summary.attributes('role')).toBe('alert')
+    expect(summary.attributes('state')).toBeUndefined()
   })
 })
 

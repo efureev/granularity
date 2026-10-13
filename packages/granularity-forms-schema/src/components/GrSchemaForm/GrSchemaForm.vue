@@ -110,7 +110,10 @@ export interface GrSchemaFormProps<T extends Record<string, unknown> = Record<st
    */
   headingLevel?: 2 | 3 | 4 | 5 | 6
 
-  /** Сводка ошибок формы и осиротевших серверных сообщений. */
+  /**
+   * Сводка ошибок формы и осиротевших серверных сообщений — над полями, тоном
+   * `danger`: сохранение не прошло.
+   */
   showFormErrors?: boolean
 }
 
@@ -319,17 +322,22 @@ const rootFields = computed(() =>
 
 const sections = computed<GrUiSection[]>(() => ui.value.layout?.sections ?? [])
 
+/**
+ * Поля секции — в порядке её списка. `'*'` раскрывается на своём месте в
+ * остаток: корневые поля, которых не назвала ни одна секция, в порядке `order`.
+ * Скрытых полей в `rootFields` нет, условие `when` проверяет само поле.
+ */
 function sectionFields(section: GrUiSection): GrSchemaFieldInstance[] {
-  const explicit = section.fields.filter(key => key !== '*')
   const claimed = new Set(sections.value.flatMap(item => item.fields).filter(key => key !== '*'))
 
-  if (section.fields.includes('*'))
-    return rootFields.value.filter(field => !claimed.has(field.templatePath) || explicit.includes(field.templatePath))
-
-  return explicit
-    .map(key => rootFields.value.find(field => field.templatePath === key))
-    .filter((field): field is GrSchemaFieldInstance => Boolean(field))
+  return section.fields.flatMap(key => (
+    key === '*'
+      ? rootFields.value.filter(field => !claimed.has(field.templatePath))
+      : rootFields.value.filter(field => field.templatePath === key)
+  ))
 }
+
+const fieldsBySection = computed(() => new Map(sections.value.map(section => [section, sectionFields(section)])))
 
 function isSectionVisible(section: GrUiSection): boolean {
   if (!section.when)
@@ -533,10 +541,12 @@ defineExpose({
     @invalid="onInvalid"
   >
     <slot name="formErrors" :errors="formErrors">
+      <!-- В сводке только ошибки — осиротевшие серверные и уровня схемы: сохранение
+           не прошло, и тон обязан сказать это цветом и значком. `role="alert"`
+           `danger` даёт сам. -->
       <GrAlert
         v-if="showFormErrors && formErrors.length > 0"
-        state="danger"
-        role="alert"
+        tone="danger"
         :class="schemaFormErrorsClass"
         data-gr-schema-form-errors
       >
@@ -553,7 +563,8 @@ defineExpose({
         <template v-for="section in sections" :key="section.id">
           <SchemaObjectNode
             v-if="isSectionVisible(section)"
-            :node="{ ...root!, title: section.title, description: section.description, additional: false, fields: sectionFields(section).map(field => field.node) }"
+            :node="{ ...root!, title: section.title, description: section.description, additional: false, fields: fieldsBySection.get(section)!.map(field => field.node) }"
+            :only="fieldsBySection.get(section)"
             path=""
             name=""
             :columns="section.columns ?? resolvedColumns"

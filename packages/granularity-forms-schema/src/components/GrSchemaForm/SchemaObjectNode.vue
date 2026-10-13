@@ -15,7 +15,7 @@ import { computed } from 'vue'
 
 import GrFormSection from '@feugene/granularity/components/GrFormSection'
 
-import type { GrSchemaObjectNode } from '../../model'
+import type { GrSchemaFieldInstance, GrSchemaObjectNode } from '../../model'
 import type { GrUiColumns } from '../../ui-schema'
 
 import { useSchemaForm } from './context'
@@ -39,18 +39,25 @@ const props = withDefaults(defineProps<{
    * поле с тем же именем спорило бы с ним за значение.
    */
   omit?: readonly string[]
+  /**
+   * Поля, выбранные вызывающим, — вместо всех детей узла. Так секция формы
+   * рисует свой список: у секций один узел на всех, корень, и без списка
+   * каждая из них рисовала бы всю форму.
+   */
+  only?: readonly GrSchemaFieldInstance[]
 }>(), {
   indices: undefined,
   columns: undefined,
   headingLevel: 3,
   plain: false,
   omit: undefined,
+  only: undefined,
 })
 
 const form = useSchemaForm()
 
 const fields = computed(() => {
-  const all = form?.fieldsOf(props.name, props.path, props.indices ?? []) ?? []
+  const all = props.only ?? form?.fieldsOf(props.name, props.path, props.indices ?? []) ?? []
   const omit = props.omit
 
   return omit && omit.length > 0 ? all.filter(field => !omit.includes(field.node.key)) : all
