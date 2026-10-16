@@ -746,7 +746,7 @@ export async function setupI18n() {
 - [`@feugene/granularity-datasource`](../../granularity-datasource) `0.1.2`
 - [`@feugene/granularity-devtools`](../../granularity-devtools) `1.0.0`
 - [`@feugene/granularity-test-kit`](../../granularity-test-kit) `1.2.0`
-- [`@feugene/unplugin-granularity`](../../unplugin-granularity) `1.1.0`
+- [`@feugene/unplugin-granularity`](../../unplugin-granularity) `1.1.1`
 <!-- ecosystem:generated:end -->
 
 Резолвер каждый спутник экспортирует сам — из subpath `./resolver`. Кроме

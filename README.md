@@ -26,7 +26,7 @@ The published packages:
 - [`@feugene/granularity-forms-schema`](./packages/granularity-forms-schema/README.md) `1.1.1` — Schema-driven forms for the @feugene/granularity design system — zod and JSON Schema into real form fields, zero dependencies.
 - [`@feugene/granularity-media`](./packages/granularity-media/README.md) `1.1.0` — Media components for @feugene/granularity: image cropping, camera capture, code scanning and video playback.
 - [`@feugene/granularity-test-kit`](./packages/granularity-test-kit/README.md) `1.2.0` — Test gates for @feugene/granularity design-system packages — token, registry and defaults contracts as reusable factories.
-- [`@feugene/unplugin-granularity`](./packages/unplugin-granularity/README.md) `1.1.0` — unplugin-vue-components resolver for @feugene/granularity — granular auto-import for components and directives.
+- [`@feugene/unplugin-granularity`](./packages/unplugin-granularity/README.md) `1.1.1` — unplugin-vue-components resolver for @feugene/granularity — granular auto-import for components and directives.
 <!-- ecosystem:generated:end -->
 
 Not published, and living in `apps/`:

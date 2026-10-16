@@ -156,7 +156,7 @@ on this one — the core stays lean, and you install only what you reach for.
 | [`@feugene/granularity-forms-schema`](../granularity-forms-schema) | 1.1.1 | Schema-driven forms — zod and JSON Schema into real form fields, zero dependencies. |
 | [`@feugene/granularity-media`](../granularity-media) | 1.1.0 | Media components: image cropping, camera capture, code scanning and video playback. |
 | [`@feugene/granularity-test-kit`](../granularity-test-kit) | 1.2.0 | Test gates for @feugene/granularity design-system packages — token, registry and defaults contracts as reusable factories. |
-| [`@feugene/unplugin-granularity`](../unplugin-granularity) | 1.1.0 | unplugin-vue-components resolver — granular auto-import for components and directives. |
+| [`@feugene/unplugin-granularity`](../unplugin-granularity) | 1.1.1 | unplugin-vue-components resolver — granular auto-import for components and directives. |
 <!-- ecosystem:generated:end -->
 
 ## Documentation
