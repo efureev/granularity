@@ -58,6 +58,19 @@ describe('collectEntryFiles', () => {
     ])
   })
 
+  it('встроенный контракт granum в вес не идёт: дескриптор с ним выбрасывает бандлер приложения', () => {
+    const withContract: Record<string, string> = {
+      '/pkg/dist/components/GrY/index.js': 'export { grYConfig } from "./chunks/config.js"',
+      '/pkg/dist/components/GrY/chunks/config.js': 'import { t as defineGranumComponent } from "../../../granum/contract.js"',
+      '/pkg/dist/granum/contract.js': 'export const t = () => {}',
+    }
+
+    expect(collectEntryFiles('/pkg/dist/components/GrY/index.js', (path: string) => withContract[path]).sort()).toEqual([
+      '/pkg/dist/components/GrY/chunks/config.js',
+      '/pkg/dist/components/GrY/index.js',
+    ])
+  })
+
   it('цикл импортов не зацикливает обход', () => {
     const cyclic: Record<string, string> = {
       '/pkg/a.js': 'import "./b.js"',

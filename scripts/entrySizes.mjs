@@ -30,9 +30,18 @@ export function parseImports(source) {
 }
 
 /**
+ * Контракт granum, встроенный сборкой провайдера. Его тянут только дескрипторы
+ * компонентов (`grButtonConfig`), а `defineGranumComponent` помечен чистым:
+ * бандлер приложения, которое конфигов не читает, выбрасывает дескриптор вместе
+ * с контрактом. Посчитанный, он прибавил бы каждому компоненту ~4 kB, которых
+ * потребитель не получает.
+ */
+const EMBEDDED_CONTRACT_RE = /[\\/]granum[\\/]contract\.js$/
+
+/**
  * Все файлы, которые приедут вместе с entry: сам файл плюс всё, до чего
  * дотягиваются относительные импорты. Внешние пакеты (`vue`) не в счёт — они
- * у потребителя уже есть.
+ * у потребителя уже есть; встроенный контракт granum — тоже, см. выше.
  */
 export function collectEntryFiles(entryFile, readFile = path => readFileSync(path, 'utf8')) {
   const seen = new Set()
@@ -55,7 +64,9 @@ export function collectEntryFiles(entryFile, readFile = path => readFileSync(pat
     seen.add(current)
 
     for (const specifier of parseImports(source)) {
-      pending.push(resolve(dirname(current), specifier))
+      const target = resolve(dirname(current), specifier)
+      if (!EMBEDDED_CONTRACT_RE.test(target))
+        pending.push(target)
     }
   }
 
