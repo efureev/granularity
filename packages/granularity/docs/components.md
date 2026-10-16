@@ -35,7 +35,12 @@ const query = ref('')
 
 Подкомпонент живёт в подпути родителя:
 `import { GrList, GrListItem } from '@feugene/granularity/components/GrList'`.
-Отдельные подпути `components/GrListItem` тоже есть и ведут туда же.
+Отдельные подпути `components/GrListItem` тоже есть и ведут туда же. granum 2.1
+сводит такой подпуть к владельцу: часть, импортированная при селекции без
+`GrList`, — `ComponentOutsideSelectionError` на `GrList`, в режиме
+`components: 'imports'` её импорт добавляет в селекцию `GrList`, а
+`virtual:granum/components` реэкспортирует части выбранного владельца. granum
+2.0 подпутей частей не проверяет — с ним импортируйте часть из подпути родителя.
 
 ## Типы компонента
 

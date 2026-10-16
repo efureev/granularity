@@ -5,6 +5,17 @@ All notable changes to the [`@feugene/unplugin-granularity`](.) package are docu
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Docs
+
+- **Почему часть составного компонента приезжает из подпути родителя.** Прежнее
+  объяснение («селекция granum знает компонент только по родителю») с granum 2.1
+  неверно: он сводит к владельцу и подпуть самой части, если пакет собран 2.1.
+  Резолвер по-прежнему ведёт часть в подпуть родителя — такой импорт guard и
+  селекция судят по владельцу с любой версии granum 2.x. README и комментарий
+  индекса исправлены.
+
 ## [v1.1.0] 2026-10-16
 
 ### Changed

@@ -131,8 +131,8 @@ my-app/
     "vue": "^3.5.40"
   },
   "devDependencies": {
-    "@feugene/granum": "^2.0.0",
-    "@feugene/granum-engine-wind": "^2.0.0",
+    "@feugene/granum": "^2.1.0",
+    "@feugene/granum-engine-wind": "^2.1.0",
     "@vitejs/plugin-vue": "^6.0.8",
     "typescript": "^6.0.2",
     "vite": "^8.2.2",

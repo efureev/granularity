@@ -5,6 +5,20 @@ All notable changes to the [`@feugene/granularity`](.) package are documented in
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Fixed
+
+- **Манифест знает части составных компонентов.** Пакет собран granum 2.1: его
+  сборка записывает в манифест 22 части у их владельцев (`GrListItem` у `GrList`,
+  `GrTabPanel` у `GrTabPanels`, восемь частей `GrDropdownMenu`) — поле
+  `subcomponents`. Приложение на granum 2.1 сводит подпуть части к владельцу: часть,
+  импортированная при селекции без владельца, — `ComponentOutsideSelectionError` на
+  владельце, `components: 'imports'` берёт владельца в селекцию, а `granum doctor`
+  больше не предупреждает `subcomponents-missing` (с ним `doctor --strict` у
+  приложения на 2.1 падал). Peer granum прежний — `>=2.0.0 <3.0.0`: granum 2.0 поле
+  не читает и судит импорт части, как раньше.
+
 ## [v1.1.0] 2026-10-16
 
 Переезд на `@feugene/granum` 2.0 и `@feugene/fint-i18n` 0.9. Приложению — поднять

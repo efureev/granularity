@@ -10,8 +10,9 @@ export interface GranularityComponentEntry {
   readonly packageName: string
   /**
    * Компонент, чей subpath отдаёт модуль. У части составного компонента
-   * (`GrListItem`) — родитель (`GrList`): селекция granum знает компонент
-   * только по нему, и guard проверяет импорт по нему же.
+   * (`GrListItem`) — родитель (`GrList`): импорт по его подпути guard и
+   * селекция granum судят по владельцу с любой версии 2.x, а подпуть самой
+   * части сводят к владельцу только с 2.1.
    */
   readonly owner: string
 }

@@ -93,7 +93,9 @@ GranularityResolver({
 экспортирует; имя, которое экспортируют два пакета, резолвер не трогает, и такой компонент импортируют руками.
 
 Часть составного компонента (`GrListItem`, `GrTabPanel`, `GrDropdownMenuItem`) приезжает из подпути
-родителя — `@feugene/granularity/components/GrList`: селекция granum знает компонент по нему.
+родителя — `@feugene/granularity/components/GrList`. Такой импорт guard и селекция granum судят по
+владельцу с любой версии 2.x; подпуть самой части granum сводит к владельцу только с 2.1 (см.
+[`components.md`](./components.md)).
 
 Резолверы спутников (`@feugene/granularity-chrono/resolver` и другие) и общая фабрика
 `createGranularResolver` остаются для конфигов, где их уже подключили, — с ними рядом единый резолвер

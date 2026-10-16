@@ -87,8 +87,8 @@ packages/<my-package>/
     "vue": "^3.5.0"
   },
   "devDependencies": {
-    "@feugene/granum": "^2.0.0",
-    "@feugene/granum-engine-wind": "^2.0.0"
+    "@feugene/granum": "^2.1.0",
+    "@feugene/granum-engine-wind": "^2.1.0"
   },
   "scripts": {
     "build": "vite build && vue-tsc -p tsconfig.build.json",
@@ -509,6 +509,10 @@ export * from './components/GrMyThing'
 у него и так есть:
 
 - подпуть `./components/<Name>` на каждый компонент — его пишет `granum codegen`;
+- у части составного компонента (`GrSchemaField` у `GrSchemaForm`) — подпуть-алиас на модуль
+  владельца: его пишет `granum codegen --subcomponents`, а сборка granum 2.1 записывает части в манифест
+  владельца (`subcomponents`). Пакет, собранный granum 2.0, приложение на 2.1 видит без частей: `doctor`
+  предупреждает `subcomponents-missing`, guard их импорт не проверяет;
 - `./package.json` в `exports`, иначе резолвер не прочитает карту;
 - имя пакета вида `@feugene/granularity-<имя>`. Пакет с другим именем потребитель называет сам:
   `GranularityResolver({ packages: ['@feugene/granularity', '@acme/kit'] })`.
