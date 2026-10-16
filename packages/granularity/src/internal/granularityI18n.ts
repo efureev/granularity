@@ -18,6 +18,15 @@ function isGranularityI18nLike(value: unknown): value is GranularityI18nLike {
   return typeof (value as GranularityI18nLike | null)?.t === 'function'
 }
 
+/** Чем адаптер переключает язык: `syncLocale` контракта или `setLocale` инстанса fint-i18n. */
+export function localeSwitchOf(adapter: GranularityI18nLike | null | undefined): ((locale: string) => void | Promise<void>) | undefined {
+  if (adapter?.syncLocale)
+    return next => adapter.syncLocale!(next)
+  if (adapter?.setLocale)
+    return next => adapter.setLocale!(next)
+  return undefined
+}
+
 export function resolveGranularityI18n(context?: AppContext | GranularityI18nLike | null): GranularityI18nLike | null {
   if (isGranularityI18nLike(context)) {
     return context

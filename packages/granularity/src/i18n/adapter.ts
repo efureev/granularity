@@ -29,7 +29,17 @@ export type GranularityI18nAdapter = {
    */
   te?: (key: string) => boolean
   locale?: Readonly<Ref<string>>
+  /**
+   * Переключить язык. Его зовёт `GrConfigProvider` по пропу `locale`;
+   * источником истины остаётся сам адаптер.
+   */
   syncLocale?: (locale: string) => void | Promise<void>
+  /**
+   * То же под именем `@feugene/fint-i18n`: её инстанс подключается адаптером
+   * как есть, а язык у него меняет `setLocale()`. Провайдер зовёт `syncLocale`,
+   * а когда его нет — `setLocale`.
+   */
+  setLocale?: (locale: string) => void | Promise<void>
 }
 
 export const GRANULARITY_I18N_KEY: InjectionKey<GranularityI18nAdapter | null> = Symbol.for('@feugene/granularity')

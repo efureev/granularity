@@ -18,7 +18,7 @@
 import { computed, onBeforeUnmount, provide, watch } from 'vue'
 
 import { GRANULARITY_I18N_KEY, type GranularityI18nAdapter } from '../../i18n/adapter'
-import { resolveGranularityI18n } from '../../internal/granularityI18n'
+import { localeSwitchOf, resolveGranularityI18n } from '../../internal/granularityI18n'
 import { applyGrZIndexBase } from './zIndexScale'
 import {
   GR_CONFIG_KEY,
@@ -38,8 +38,9 @@ export interface GrConfigProviderProps {
   /** Адаптер переводов (fint-i18n-совместимый). Прокидывается вложенным компонентам. */
   i18n?: GranularityI18nAdapter | null
   /**
-   * Просьба к адаптеру переключить язык (`syncLocale`). Источником истины
-   * остаётся сам адаптер — провайдер лишь передаёт ему намерение.
+   * Просьба к адаптеру переключить язык (`syncLocale`, у инстанса fint-i18n —
+   * `setLocale`). Источником истины остаётся сам адаптер — провайдер лишь
+   * передаёт ему намерение.
    */
   locale?: string
   /**
@@ -122,8 +123,7 @@ provide<GranularityI18nAdapter>(GRANULARITY_I18N_KEY, {
     return activeI18n.value?.locale
   },
   get syncLocale() {
-    const adapter = activeI18n.value
-    return adapter?.syncLocale ? (next: string) => adapter.syncLocale!(next) : undefined
+    return localeSwitchOf(activeI18n.value)
   },
 })
 
@@ -132,7 +132,7 @@ watch(
   ([locale, adapter]) => {
     if (!locale || adapter?.locale?.value === locale)
       return
-    void adapter?.syncLocale?.(locale)
+    void localeSwitchOf(adapter)?.(locale)
   },
   { immediate: true },
 )

@@ -1,10 +1,13 @@
 import { mount } from '@vue/test-utils'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
+import { defineComponent, h } from 'vue'
 
 import { createFintI18n } from '@feugene/fint-i18n/core'
 
 import { GRANULARITY_I18N_BLOCK } from '../messages/const'
+import { en } from '../messages/en'
 import { ru } from '../messages/ru'
+import GrConfigProvider from '../../components/GrConfigProvider/GrConfigProvider.vue'
 import GrPagination from '../../components/GrPagination/GrPagination.vue'
 
 /**
@@ -59,5 +62,31 @@ describe('granularity + fint-i18n (реальный инстанс)', () => {
       'Введите минимум 21 символ',
       'Введите минимум 11 символов',
     ])
+  })
+
+  it('проп locale у GrConfigProvider переключает язык инстанса fint-i18n', async () => {
+    // У инстанса fint нет `syncLocale` из контракта адаптера — язык у него
+    // меняет `setLocale()`. Провайдер обязан позвать его сам.
+    const i18n = createFintI18n({ locale: 'en', fallbackLocale: 'en', loaders: [en, ru] })
+    i18n.registerBlocks([GRANULARITY_I18N_BLOCK])
+    await i18n.loadUsedBlocks('en')
+
+    const wrapper = mount(defineComponent({
+      props: { locale: { type: String, required: true } },
+      setup: props => () => h(GrConfigProvider, { locale: props.locale }, {
+        default: () => h(GrPagination, { page: 2, pageSize: 10, total: 50 }),
+      }),
+    }), {
+      props: { locale: 'ru' },
+      global: { provide: { [Symbol.for('FintI18n')]: i18n } },
+    })
+
+    await vi.waitFor(() => expect(i18n.locale.value).toBe('ru'))
+    await vi.waitFor(() => expect(wrapper.text()).toContain('Назад'))
+
+    await wrapper.setProps({ locale: 'en' })
+    await vi.waitFor(() => expect(i18n.locale.value).toBe('en'))
+    await vi.waitFor(() => expect(wrapper.text()).toContain('Next'))
+    expect(wrapper.text()).not.toContain('Назад')
   })
 })
