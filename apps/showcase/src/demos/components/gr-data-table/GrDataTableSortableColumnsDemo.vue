@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { GrDataColumn } from '@feugene/granularity'
-import { GrDataTable } from '@feugene/granularity'
 
 const rows = [
   { id: 1, name: 'Alpha', incidents: 2, owner: 'Platform' },

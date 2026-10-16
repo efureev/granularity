@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { GrBadge, GrCard } from '@feugene/granularity'
-
 const metrics = [
   { id: 'budget', label: 'Error budget', value: '98.4%', tone: 'success', badge: 'Healthy' },
   { id: 'reviews', label: 'Pending reviews', value: '7', tone: 'warning', badge: 'Attention' },

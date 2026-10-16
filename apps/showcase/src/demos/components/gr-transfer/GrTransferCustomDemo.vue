@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrChip, GrTransfer } from '@feugene/granularity'
-
 const granted = ref<string[]>(['read'])
 
 const permissions = [

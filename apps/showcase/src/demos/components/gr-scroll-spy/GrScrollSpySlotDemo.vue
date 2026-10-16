@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrBadge, GrScrollSpy } from '@feugene/granularity'
-
 const sections = [
   { id: 'spy-slot-brief', label: 'Бриф' },
   { id: 'spy-slot-research', label: 'Исследование' },

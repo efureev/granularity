@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrFormField, GrTextarea } from '@feugene/granularity'
-
 const note = ref('Клиент просил перезвонить после 18:00.\nНапомнить про счёт за март.')
 const draft = ref('')
 </script>

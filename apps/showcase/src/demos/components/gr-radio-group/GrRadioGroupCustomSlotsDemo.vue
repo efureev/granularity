@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrBadge, GrRadio, GrRadioGroup } from '@feugene/granularity'
-
 const channel = ref('slack')
 </script>
 

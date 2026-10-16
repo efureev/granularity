@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrSegmented, GrTimeline, GrTimelineItem } from '@feugene/granularity'
-
 /**
  * Ширина контейнера, а не окна: сжатие считается по доступному месту, поэтому
  * увидеть его можно не трогая размер браузера.

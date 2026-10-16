@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { GrList, GrListItem } from '@feugene/granularity'
+import { GrList, GrListItem } from '@feugene/granularity/components/GrList'
 
 const rows = [
   { id: 'a', title: 'Первый пункт' },

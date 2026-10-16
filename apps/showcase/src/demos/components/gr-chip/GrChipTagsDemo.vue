@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrCard, GrChip } from '@feugene/granularity'
-
 // Метки задачи: состав ведёт приложение, чип только просит его убрать.
 const tags = ref(['design', 'frontend', 'нужен ревью', 'v0.25'])
 

@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrFormField, GrTextarea } from '@feugene/granularity'
-
 const changelog = ref('fix: чипы автокомплита видно на светлой теме\nfeat: счётчик строк\n')
 const script = ref('INT. OFFICE — DAY\n\nОна открывает ноутбук.\n')
 </script>

@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrSortableList } from '@feugene/granularity'
-
 type Column = { id: string, title: string }
 
 const columns = ref<Column[]>([

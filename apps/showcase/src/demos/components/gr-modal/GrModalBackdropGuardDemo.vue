@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrButton, GrModal } from '@feugene/granularity'
-
 const open = ref(false)
 </script>
 

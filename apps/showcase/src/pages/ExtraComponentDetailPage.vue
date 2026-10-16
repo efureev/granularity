@@ -3,7 +3,6 @@ import { computed } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 
 import { useFintI18n } from '@feugene/fint-i18n/vue'
-import { GrBadge } from '@feugene/granularity'
 
 import ApiTable from '../components/doc/ApiTable.vue'
 import CodeBlock from '../components/doc/CodeBlock.vue'

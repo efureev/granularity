@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrButton, GrCheckbox } from '@feugene/granularity'
-
 const marketing = ref(true)
 const productUpdates = ref(false)
 const submission = ref('Submit the form to inspect native checkbox values.')

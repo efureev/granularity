@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrSelect } from '@feugene/granularity'
-
 const CATALOG = [
   { value: 'ams', label: 'Amsterdam' },
   { value: 'ber', label: 'Berlin' },

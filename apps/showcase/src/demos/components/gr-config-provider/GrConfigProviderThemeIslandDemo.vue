@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrButton, GrConfigProvider, GrDropdown, GrInput, GrSelect } from '@feugene/granularity'
-
 const value = ref('a')
 const options = [
   { value: 'a', label: 'Первый' },

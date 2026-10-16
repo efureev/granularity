@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrButton, GrForm, GrFormField, GrInput, GrSelect } from '@feugene/granularity'
-
 // Подпись сбоку стоит на линии своего поля, есть у строки подсказка или ошибка.
 const terms = ref('net-30')
 const prefix = ref('INV-')

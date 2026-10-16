@@ -2,7 +2,6 @@
 import { ref } from 'vue'
 
 import type { ResponseErrorInfo } from '@feugene/granularity'
-import { GrBadge, GrButton, GrConfirmDialog, GrSegmented } from '@feugene/granularity'
 
 const open = ref(false)
 const loading = ref(false)

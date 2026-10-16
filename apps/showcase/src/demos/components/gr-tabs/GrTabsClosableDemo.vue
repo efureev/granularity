@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrButton, GrTabs, type GrTab } from '@feugene/granularity'
+import type { GrTab } from '@feugene/granularity'
 
 const initial: GrTab[] = [
   { value: 'readme', label: 'README.md', icon: 'i-lucide-pin', closable: false },

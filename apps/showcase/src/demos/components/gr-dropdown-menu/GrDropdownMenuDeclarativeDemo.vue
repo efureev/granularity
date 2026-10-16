@@ -2,7 +2,6 @@
 import { computed, ref } from 'vue'
 
 import type { GrDropdownMenuAction, GrDropdownMenuEntry } from '@feugene/granularity'
-import { GrButton, GrDropdownMenu } from '@feugene/granularity'
 
 const density = ref<'compact' | 'cozy'>('cozy')
 const showArchived = ref(false)

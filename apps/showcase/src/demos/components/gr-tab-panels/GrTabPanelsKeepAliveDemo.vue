@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrInput, GrTabPanel, GrTabPanels, GrTabs } from '@feugene/granularity'
-
 const tab = ref('draft')
 const draft = ref('Черновик переживает переключение вкладок')
 const mounted = ref<string[]>([])

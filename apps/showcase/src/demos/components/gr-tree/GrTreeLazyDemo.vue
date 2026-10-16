@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { GrTree, type GrTreeNode } from '@feugene/granularity'
+import type { GrTreeNode } from '@feugene/granularity'
 
 type Folder = { id: string, label: string, isLeaf?: boolean, children?: Folder[] }
 

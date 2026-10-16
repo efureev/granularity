@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { GrLink, type GrLinkTone } from '@feugene/granularity'
+import type { GrLinkTone } from '@feugene/granularity'
 
 const tones: GrLinkTone[] = ['primary', 'neutral', 'success', 'warning', 'danger', 'info', 'slate', 'azure']
 </script>

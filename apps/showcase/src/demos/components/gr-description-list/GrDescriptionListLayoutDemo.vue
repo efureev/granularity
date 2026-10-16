@@ -2,7 +2,6 @@
 import { ref } from 'vue'
 
 import type { GrDescriptionItem, GrDescriptionColumns, GrDescriptionLayout } from '@feugene/granularity'
-import { GrDescriptionList, GrSegmented } from '@feugene/granularity'
 
 const items: GrDescriptionItem[] = [
   { label: 'Plan', value: 'Business' },

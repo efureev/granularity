@@ -1,7 +1,3 @@
-<script setup lang="ts">
-import { GrButton, GrCard, GrEmptyState } from '@feugene/granularity'
-</script>
-
 <template>
   <GrCard class="grid gap-4 md:grid-cols-[minmax(0,220px)_1fr] md:items-center">
     <div class="rounded-xl border border-dashed border-[var(--gr-brd)] bg-[var(--gr-muted)] p-4 text-sm text-[var(--gr-muted-fg)]">

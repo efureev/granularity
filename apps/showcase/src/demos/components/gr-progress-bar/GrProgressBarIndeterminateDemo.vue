@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { onBeforeUnmount, ref } from 'vue'
 
-import { GrButton, GrProgressBar } from '@feugene/granularity'
-
 const known = ref(false)
 const progress = ref(0)
 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { GrIcon, GR_TONES } from '@feugene/granularity'
+import { GR_TONES } from '@feugene/granularity'
 </script>
 
 <template>

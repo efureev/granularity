@@ -2,7 +2,6 @@
 import { ref } from 'vue'
 
 import type { GrSegmentedOption } from '@feugene/granularity'
-import { GrSegmented } from '@feugene/granularity'
 
 import IconCalendarDays from '~icons/lucide/calendar-days'
 import IconLayoutGrid from '~icons/lucide/layout-grid'

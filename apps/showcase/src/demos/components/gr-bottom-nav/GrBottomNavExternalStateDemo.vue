@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrBottomNav, GrButton, GrCard } from '@feugene/granularity'
-
 const currentSection = ref('feed')
 const items = [
   { label: 'Feed', value: 'feed', icon: 'i-lucide-newspaper' },

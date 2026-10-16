@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrBadge, GrButton, GrButtonGroup, GrCard } from '@feugene/granularity'
-
 const activeFilter = ref<'all' | 'failed' | 'review'>('all')
 </script>
 

@@ -2,7 +2,6 @@
 import { ref } from 'vue'
 
 import type { GrDropdownMenuAction, GrDropdownMenuEntry } from '@feugene/granularity'
-import { GrCard, GrContextMenu } from '@feugene/granularity'
 
 // Модель общая с `GrDropdownMenu`, поэтому и второй уровень тот же:
 // пункт с `children` раскрывает подменю, `select` по нему не приходит.

@@ -1,7 +1,3 @@
-<script setup lang="ts">
-import { GrTimeline, GrTimelineItem } from '@feugene/granularity'
-</script>
-
 <template>
   <div class="max-w-md">
     <GrTimeline>

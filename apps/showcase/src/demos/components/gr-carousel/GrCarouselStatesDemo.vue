@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrCarousel, GrCarouselSlide, GrSegmented } from '@feugene/granularity'
-
 const count = ref(1)
 
 const options = [

@@ -1,15 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import {
-  GrBadge,
-  GrButton,
-  GrDropdownMenu,
-  GrDropdownMenuDivider,
-  GrDropdownMenuGroup,
-  GrDropdownMenuItem,
-} from '@feugene/granularity'
-
 const selectedAction = ref('Publish now')
 </script>
 

@@ -1,13 +1,9 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import {
-  GrInput,
-  GrSelect,
-  type GrInputEmits,
-  type GrInputProps,
-  type GrSelectInstance,
-} from '@feugene/granularity'
+import type { GrInputEmits, GrInputProps, GrSelectInstance } from '@feugene/granularity'
+import { GrInput } from '@feugene/granularity/components/GrInput'
+import { GrSelect } from '@feugene/granularity/components/GrSelect'
 
 /**
  * Страница-улика для публичных типов.

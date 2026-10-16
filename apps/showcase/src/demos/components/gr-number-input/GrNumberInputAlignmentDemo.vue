@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrNumberInput, GrRadioGroup } from '@feugene/granularity'
-
 const alignment = ref<'left' | 'center' | 'right'>('right')
 const alignmentOptions = [
   { label: 'Left', value: 'left' },

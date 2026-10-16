@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { GrButton, GrDropdown } from '@feugene/granularity'
+import { GrButton } from '@feugene/granularity/components/GrButton'
+import { GrDropdown } from '@feugene/granularity/components/GrDropdown'
 
 /** `triggerProps` обязаны попасть на сам интерактивный элемент — иначе `aria-expanded` читается не с того узла. */
 </script>

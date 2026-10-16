@@ -1,12 +1,4 @@
 <script setup lang="ts">
-import {
-  GrButton,
-  GrDropdownMenu,
-  GrDropdownMenuHeader,
-  GrDropdownMenuList,
-  GrKbd,
-} from '@feugene/granularity'
-
 // Каждый хоткей — массив клавиш: рендерим их как отдельные `GrKbd`-чипы,
 // так «⌘ K» читается чище, чем слипшееся «⌘K».
 const shortcuts = [

@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrDrawer, GrModal, useTheme } from '@feugene/granularity'
+import { useTheme } from '@feugene/granularity'
+import { GrDrawer } from '@feugene/granularity/components/GrDrawer'
+import { GrModal } from '@feugene/granularity/components/GrModal'
 
 /**
  * Страница-улика для стека слоёв и темы на сервере.

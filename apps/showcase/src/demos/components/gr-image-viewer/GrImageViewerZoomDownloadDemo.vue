@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrButton, GrImageViewer } from '@feugene/granularity'
-
 const blueprint = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000">
     <rect width="1600" height="1000" fill="#0f172a" />

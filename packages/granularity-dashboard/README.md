@@ -23,13 +23,10 @@ yarn add @feugene/granularity-dashboard
 
 ```vue
 <script setup lang="ts">
-import {
-  GrDashboard,
-  GrDashboardItem,
-  GrDashboardToolbar,
-  localStorageLayoutStorage,
-  useDashboardLayout,
-} from '@feugene/granularity-dashboard'
+import { localStorageLayoutStorage, useDashboardLayout } from '@feugene/granularity-dashboard'
+import { GrDashboard } from '@feugene/granularity-dashboard/components/GrDashboard'
+import { GrDashboardItem } from '@feugene/granularity-dashboard/components/GrDashboardItem'
+import { GrDashboardToolbar } from '@feugene/granularity-dashboard/components/GrDashboardToolbar'
 import { ref } from 'vue'
 
 const mode = ref<'view' | 'edit'>('view')
@@ -86,14 +83,14 @@ export default defineGranumConfig({
 
 ### Авто-импорт
 
-Резолвер пакета ставится **перед** жадным `GranularityResolver()` ядра: компоненты начинаются с
-того же префикса `Gr*`, и жадный резолвер перехватил бы их.
+Один резолвер на ядро и все спутники: `GranularityResolver()` (`@feugene/unplugin-granularity`
+`>=1.1.0`) находит пакет в `package.json` приложения и читает его `exports`. Собственный
+`GranularityDashboardResolver()` остаётся для уже написанных конфигов; порядок не важен.
 
 ```ts
-import { GranularityDashboardResolver } from '@feugene/granularity-dashboard/resolver'
 import { GranularityResolver } from '@feugene/unplugin-granularity'
 
-Components({ resolvers: [GranularityDashboardResolver(), GranularityResolver()] })
+Components({ resolvers: GranularityResolver() })
 ```
 
 ### Переводы

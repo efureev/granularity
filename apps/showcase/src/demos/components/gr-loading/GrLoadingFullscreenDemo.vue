@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrButton, GrLoading } from '@feugene/granularity'
-
 const loading = ref(false)
 
 function runFullscreenSync() {

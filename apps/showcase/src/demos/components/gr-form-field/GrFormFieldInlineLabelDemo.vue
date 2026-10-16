@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 
-import { GrFormField, GrInput, GrSegmented, GrSwitch } from '@feugene/granularity'
-
 const size = ref<'sm' | 'md'>('md')
 const compact = ref(true)
 

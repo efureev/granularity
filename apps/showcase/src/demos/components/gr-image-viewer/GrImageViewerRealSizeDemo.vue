@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrButton, GrImageViewer } from '@feugene/granularity'
-
 // Локальный кадр 4752×3168: настоящая фотография, а не SVG-заглушка — зерно на
 // реальных 100% видно только у растра. Vite отдаёт ей хешированный URL, поэтому
 // путь остаётся импортом, а не строкой в `public/`.

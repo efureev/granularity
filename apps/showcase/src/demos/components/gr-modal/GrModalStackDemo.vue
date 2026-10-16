@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { nextTick, ref } from 'vue'
 
-import { GrButton, GrDialog, GrModal } from '@feugene/granularity'
-
 /**
  * Лесенка окон: каждое следующее открывается изнутри предыдущего.
  *

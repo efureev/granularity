@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { GrSidebar, GrSidebarGroup, GrSidebarItem } from '@feugene/granularity'
+import { GrSidebar, GrSidebarGroup, GrSidebarItem } from '@feugene/granularity/components/GrSidebar'
 </script>
 
 <template>

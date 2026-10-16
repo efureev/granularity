@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrBadge, GrButton, GrPromptDialog } from '@feugene/granularity'
-
 const open = ref(false)
 const value = ref('Q2 North Star')
 const savedValue = ref(value.value)

@@ -5,8 +5,6 @@ import {
   useRoute,
 } from 'vue-router'
 
-import { GrButton } from '@feugene/granularity'
-
 import { showcaseTopNavigationItems } from '../../app/showcase'
 import { useShowcasePageI18n } from '../../app/useShowcasePageI18n'
 import type { ShowcaseNavigationItem } from '../../app/showcase'

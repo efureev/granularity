@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { GrBreadcrumbs, type GrBreadcrumbItem } from '@feugene/granularity'
+import type { GrBreadcrumbItem } from '@feugene/granularity'
 
 const path: GrBreadcrumbItem[] = [
   { label: 'Home', href: '#/', icon: 'i-lucide-house' },

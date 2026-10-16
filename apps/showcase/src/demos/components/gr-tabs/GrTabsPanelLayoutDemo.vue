@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 
-import { GrBadge, GrButton, GrTabs } from '@feugene/granularity'
-
 type ViewKey = 'summary' | 'incidents' | 'contacts'
 
 const currentTab = ref<ViewKey>('summary')

@@ -1,7 +1,3 @@
-<script setup lang="ts">
-import { GrKbd } from '@feugene/granularity'
-</script>
-
 <template>
   <div class="grid gap-4 text-sm">
     <div class="flex flex-wrap items-center gap-5">

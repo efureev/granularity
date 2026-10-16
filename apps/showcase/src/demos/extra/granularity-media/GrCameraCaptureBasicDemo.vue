@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref, useTemplateRef } from 'vue'
 
-import { GrBadge } from '@feugene/granularity'
 import type { GrCameraStatus } from '@feugene/granularity-media'
 
 /**

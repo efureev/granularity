@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrBreadcrumbs, GrSegmented, type GrBreadcrumbItem } from '@feugene/granularity'
+import type { GrBreadcrumbItem } from '@feugene/granularity'
 
 const path: GrBreadcrumbItem[] = [
   { label: 'Storage', href: '#/storage' },

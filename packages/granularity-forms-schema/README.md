@@ -10,7 +10,7 @@ yarn add @feugene/granularity-forms-schema
 
 ```vue
 <script setup lang="ts">
-import { GrSchemaForm } from '@feugene/granularity-forms-schema'
+import { GrSchemaForm } from '@feugene/granularity-forms-schema/components/GrSchemaForm'
 import { zodAdapter } from '@feugene/granularity-forms-schema/zod'
 import { z } from 'zod'
 

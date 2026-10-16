@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrSlider } from '@feugene/granularity'
-
 const price = ref<[number, number]>([200, 700])
 </script>
 

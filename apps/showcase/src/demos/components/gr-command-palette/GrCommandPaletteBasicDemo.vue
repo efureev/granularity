@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 
-import { GrButton, GrCommandPalette, GrKbd, useTheme, vHotkey, type GrCommandItem } from '@feugene/granularity'
+import { useTheme, vHotkey, type GrCommandItem } from '@feugene/granularity'
 
 const open = ref(false)
 const lastCommand = ref<string | null>(null)

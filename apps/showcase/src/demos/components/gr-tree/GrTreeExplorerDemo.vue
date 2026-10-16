@@ -4,7 +4,7 @@ import { ref } from 'vue'
 import IconFile from '~icons/lucide/file'
 import IconFolder from '~icons/lucide/folder'
 
-import { GrTree, grTreeViewVars } from '@feugene/granularity'
+import { grTreeViewVars } from '@feugene/granularity'
 import type { GrTreeKey, GrTreeNode } from '@feugene/granularity'
 
 type Item = { id: string, label: string, children?: Item[] }

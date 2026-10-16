@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { GrConfigProvider } from '@feugene/granularity'
-
 import ConfigReader from './ConfigReader.vue'
 </script>
 

@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, useSlots } from 'vue'
 
-import { GrCard } from '@feugene/granularity'
 import InlineRichText from '../content/InlineRichText.vue'
 
 defineProps<{

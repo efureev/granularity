@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { GrBadge, GrCard, GrStatistic } from '@feugene/granularity'
-
 const uptime = '99.982'
 </script>
 

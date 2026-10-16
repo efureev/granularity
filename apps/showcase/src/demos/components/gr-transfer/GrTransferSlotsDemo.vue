@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrButton, GrEmptyState, GrTransfer } from '@feugene/granularity'
-
 import IconInbox from '~icons/lucide/inbox'
 
 const recipients = ref<string[]>([])

@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrCard, GrChip, GrChipGroup } from '@feugene/granularity'
-
 const periods = [
   { value: 'day', label: 'День' },
   { value: 'week', label: 'Неделя' },

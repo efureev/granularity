@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrAffix, GrInput, GrSwitch } from '@feugene/granularity'
-
 const sticky = ref(true)
 const query = ref('')
 

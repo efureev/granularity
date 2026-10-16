@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrButton, GrPopover, GrSegmented } from '@feugene/granularity'
-
 /**
  * Высота устроена как ширина — `min()` из хука и неотключаемого предела, — но
  * второй операнд здесь не константа, а замер слоя: сколько места осталось до

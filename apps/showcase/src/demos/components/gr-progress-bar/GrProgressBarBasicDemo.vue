@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GR_TONES, GrButton, GrProgressBar, type GrTone } from '@feugene/granularity'
+import { GR_TONES, type GrTone } from '@feugene/granularity'
 
 const progress = ref(32)
 const tone = ref<GrTone>('primary')

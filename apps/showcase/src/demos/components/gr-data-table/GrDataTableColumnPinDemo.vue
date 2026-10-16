@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 
-import { GrDataTable, type GrColumnPin } from '@feugene/granularity'
+import type { GrColumnPin } from '@feugene/granularity'
 
 type Deal = {
   id: number

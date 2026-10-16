@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 
-import { GrAvatar, GrBottomNav, GrSegmented } from '@feugene/granularity'
 import type { GrComponentSize } from '@feugene/granularity'
 
 const section = ref('chats')

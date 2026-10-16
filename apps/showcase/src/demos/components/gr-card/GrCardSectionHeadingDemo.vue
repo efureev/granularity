@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { GrCard, GrDescriptionList } from '@feugene/granularity'
-
 const items = [
   { label: 'Gross', value: '$26,100' },
   { label: 'Refunds', value: '$1,355' },

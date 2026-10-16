@@ -2,7 +2,6 @@
 import { computed, ref } from 'vue'
 
 import type { GrImageViewerSource } from '@feugene/granularity'
-import { GrBadge, GrButton, GrImageViewer } from '@feugene/granularity'
 
 function createSlide(label: string, background: string) {
   return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`

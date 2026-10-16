@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrAvatar, GrBadge, GrDivider, GrLink, GrStatistic, GrTable } from '@feugene/granularity'
 import type { GrBadgeTone } from '@feugene/granularity'
 import type { GrDashboardResponsiveLayout } from '@feugene/granularity-dashboard'
 

@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrCheckboxGroup, GrSegmented } from '@feugene/granularity'
-
 const options = [
   { value: 'email', label: 'Email' },
   { value: 'sms', label: 'SMS' },

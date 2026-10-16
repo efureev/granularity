@@ -1,18 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
 
-import {
-  GrAlert,
-  GrBadge,
-  GrButton,
-  GrCard,
-  GrCheckbox,
-  GrFormField,
-  GrInput,
-  GrLink,
-  GrSegmented,
-  GrSwitch,
-} from '@feugene/granularity'
 import { grThemeTokens } from '@feugene/granularity/tokens'
 
 import { APP_THEMES, useAppTheme, type AppTheme } from './theme'

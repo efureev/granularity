@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrInput, GrTooltip } from '@feugene/granularity'
-
 const tooltipText = ref('Escalation policy will be applied to new alerts only.')
 const iconColor = ref('var(--gr-warning)')
 

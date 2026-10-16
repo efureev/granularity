@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { GrBadge, GrProgressBar } from '@feugene/granularity'
-
 const rows = [
   { label: 'Imported from legacy job', raw: -18, tone: 'danger' as const },
   { label: 'Actual processed records', raw: 58, tone: 'info' as const },

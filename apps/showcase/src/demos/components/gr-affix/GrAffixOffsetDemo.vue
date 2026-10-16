@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { GrAffix, GrChip } from '@feugene/granularity'
-
 const rows = [
   { id: 'r1', name: 'Отчёт по продажам', owner: 'Марина К.', status: 'Готов' },
   { id: 'r2', name: 'Сверка с 1С', owner: 'Дмитрий О.', status: 'В работе' },

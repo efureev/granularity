@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrTransfer } from '@feugene/granularity'
-
 const columns = ref<string[]>(['date', 'amount', 'status'])
 
 const available = [

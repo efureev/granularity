@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrButton, GrPopover } from '@feugene/granularity'
-
 const open = ref(false)
 const archived = ref(false)
 

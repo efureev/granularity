@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrRadio, GrRadioGroup, GrSwitch } from '@feugene/granularity'
-
 const environment = ref('staging')
 const disabled = ref(false)
 </script>

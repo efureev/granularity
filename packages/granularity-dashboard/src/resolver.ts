@@ -7,17 +7,15 @@ import { GRANULARITY_DASHBOARD_COMPONENTS } from './componentNames'
 export const GRANULARITY_DASHBOARD_PACKAGE_NAME = '@feugene/granularity-dashboard'
 
 /**
- * Резолвер `unplugin-vue-components` для `@feugene/granularity-dashboard`.
+ * Резолвер `unplugin-vue-components` для `@feugene/granularity-dashboard` — явный список его
+ * компонентов.
  *
- * Список имён — whitelist, а не префикс `Gr*`: компоненты пакета начинаются с
- * того же префикса, что и ядерные, и жадный core-резолвер перехватил бы их,
- * импортировав из несуществующего пути внутри `@feugene/granularity`.
+ * Новому конфигу он не нужен: `GranularityResolver()` из
+ * `@feugene/unplugin-granularity` `>=1.1.0` находит пакет в `package.json`
+ * приложения и резолвит ядро вместе со спутниками, в любом порядке. Этот
+ * резолвер остаётся для уже написанных конфигов и работает рядом с единым.
  *
- * ⚠️ Ставьте его **перед** `GranularityResolver()` ядра — точный список должен
- * отработать первым.
- *
- * `importStyle: false` — CSS компонента доставляет granum из манифеста пакета,
- * отдельный side-effect импорта стилей не нужен.
+ * `importStyle: false` — CSS компонента доставляет granum из манифеста пакета.
  */
 export function GranularityDashboardResolver(): ComponentResolver {
   return createGranularResolver({

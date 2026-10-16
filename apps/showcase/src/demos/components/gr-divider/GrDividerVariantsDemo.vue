@@ -1,7 +1,3 @@
-<script setup lang="ts">
-import { GrDivider } from '@feugene/granularity'
-</script>
-
 <template>
   <div class="grid max-w-md gap-4">
     <div class="showcase-demo-text text-sm">solid · dashed · dotted</div>

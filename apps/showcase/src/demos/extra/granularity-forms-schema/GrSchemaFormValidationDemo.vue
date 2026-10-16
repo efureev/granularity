@@ -2,8 +2,6 @@
 import { ref } from 'vue'
 import { z } from 'zod'
 
-import { GrButton } from '@feugene/granularity'
-import { GrSchemaForm } from '@feugene/granularity-forms-schema'
 import type { GrUiSchema } from '@feugene/granularity-forms-schema/ui-schema'
 import { zodAdapter } from '@feugene/granularity-forms-schema/zod'
 

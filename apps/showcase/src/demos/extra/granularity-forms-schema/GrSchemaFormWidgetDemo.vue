@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrRating } from '@feugene/granularity'
-import { GrSchemaForm } from '@feugene/granularity-forms-schema'
+import { GrRating } from '@feugene/granularity/components/GrRating'
 import { jsonSchemaAdapter } from '@feugene/granularity-forms-schema/json-schema'
 import type { JsonSchemaDocument } from '@feugene/granularity-forms-schema/json-schema'
 import type { GrUiSchema } from '@feugene/granularity-forms-schema/ui-schema'

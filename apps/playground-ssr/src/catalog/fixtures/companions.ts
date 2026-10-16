@@ -1,38 +1,38 @@
 import { h } from 'vue'
 
-import {
-  GrChartArea,
-  GrChartBar,
-  GrChartBullet,
-  GrChartFunnel,
-  GrChartHeatmap,
-  GrChartLine,
-  GrChartPie,
-  GrChartRadar,
-  GrChartWaterfall,
-  GrSparkline,
-} from '@feugene/granularity-charts'
-import {
-  GrCalendar,
-  GrDatePicker,
-  GrDateRangePicker,
-  GrDateTimePicker,
-  GrDuration,
-  GrRelativeTime,
-  GrTimePicker,
-} from '@feugene/granularity-chrono'
-import {
-  GrDashboard,
-  GrDashboardItem,
-  GrDashboardItemSettings,
-  GrDashboardPalette,
-  GrDashboardToolbar,
-} from '@feugene/granularity-dashboard'
-import { GrMarkdown, GrRichText } from '@feugene/granularity-editor'
-import { GrCodeBlock, GrCodeEditor, GrDiff } from '@feugene/granularity-code'
-import { GrSchemaForm } from '@feugene/granularity-forms-schema'
+import { GrChartArea } from '@feugene/granularity-charts/components/GrChartArea'
+import { GrChartBar } from '@feugene/granularity-charts/components/GrChartBar'
+import { GrChartBullet } from '@feugene/granularity-charts/components/GrChartBullet'
+import { GrChartFunnel } from '@feugene/granularity-charts/components/GrChartFunnel'
+import { GrChartHeatmap } from '@feugene/granularity-charts/components/GrChartHeatmap'
+import { GrChartLine } from '@feugene/granularity-charts/components/GrChartLine'
+import { GrChartPie } from '@feugene/granularity-charts/components/GrChartPie'
+import { GrChartRadar } from '@feugene/granularity-charts/components/GrChartRadar'
+import { GrChartWaterfall } from '@feugene/granularity-charts/components/GrChartWaterfall'
+import { GrSparkline } from '@feugene/granularity-charts/components/GrSparkline'
+import { GrCalendar } from '@feugene/granularity-chrono/components/GrCalendar'
+import { GrDatePicker } from '@feugene/granularity-chrono/components/GrDatePicker'
+import { GrDateRangePicker } from '@feugene/granularity-chrono/components/GrDateRangePicker'
+import { GrDateTimePicker } from '@feugene/granularity-chrono/components/GrDateTimePicker'
+import { GrDuration } from '@feugene/granularity-chrono/components/GrDuration'
+import { GrRelativeTime } from '@feugene/granularity-chrono/components/GrRelativeTime'
+import { GrTimePicker } from '@feugene/granularity-chrono/components/GrTimePicker'
+import { GrDashboard } from '@feugene/granularity-dashboard/components/GrDashboard'
+import { GrDashboardItem } from '@feugene/granularity-dashboard/components/GrDashboardItem'
+import { GrDashboardItemSettings } from '@feugene/granularity-dashboard/components/GrDashboardItemSettings'
+import { GrDashboardPalette } from '@feugene/granularity-dashboard/components/GrDashboardPalette'
+import { GrDashboardToolbar } from '@feugene/granularity-dashboard/components/GrDashboardToolbar'
+import { GrMarkdown } from '@feugene/granularity-editor/components/GrMarkdown'
+import { GrRichText } from '@feugene/granularity-editor/components/GrRichText'
+import { GrCodeBlock } from '@feugene/granularity-code/components/GrCodeBlock'
+import { GrCodeEditor } from '@feugene/granularity-code/components/GrCodeEditor'
+import { GrDiff } from '@feugene/granularity-code/components/GrDiff'
+import { GrSchemaForm } from '@feugene/granularity-forms-schema/components/GrSchemaForm'
 import { jsonSchemaAdapter, type JsonSchemaDocument } from '@feugene/granularity-forms-schema/json-schema'
-import { GrCameraCapture, GrCodeScanner, GrImageCrop, GrVideoPlayer } from '@feugene/granularity-media'
+import { GrCameraCapture } from '@feugene/granularity-media/components/GrCameraCapture'
+import { GrCodeScanner } from '@feugene/granularity-media/components/GrCodeScanner'
+import { GrImageCrop } from '@feugene/granularity-media/components/GrImageCrop'
+import { GrVideoPlayer } from '@feugene/granularity-media/components/GrVideoPlayer'
 
 import type { ComponentFixture } from '../fixture'
 

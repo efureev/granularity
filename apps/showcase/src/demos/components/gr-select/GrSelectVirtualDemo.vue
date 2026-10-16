@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrSelect } from '@feugene/granularity'
-
 // Сто групп по сто позиций. Группы переживают окно: если панель прокручена
 // внутрь группы, её обёртка всё равно есть и берёт имя через `aria-label`.
 const groupedOptions = Array.from({ length: 100 }, (_, groupIndex) => ({

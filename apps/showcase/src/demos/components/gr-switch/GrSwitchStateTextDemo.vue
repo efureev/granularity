@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrSwitch } from '@feugene/granularity'
-
 const notifications = ref(true)
 const digest = ref(false)
 const large = ref(true)

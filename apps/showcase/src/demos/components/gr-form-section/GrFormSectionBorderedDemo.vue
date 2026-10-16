@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrFormField, GrFormSection, GrInput, GrTextarea } from '@feugene/granularity'
-
 const projectName = ref('Granularity')
 const apiToken = ref('')
 const notes = ref('Rotate the token every 90 days.')

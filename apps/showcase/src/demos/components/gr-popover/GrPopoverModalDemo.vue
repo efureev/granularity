@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrButton, GrFormField, GrInput, GrPopover, GrSwitch } from '@feugene/granularity'
-
 const modal = ref(true)
 const open = ref(false)
 const amount = ref('1200')

@@ -2,7 +2,6 @@
 import { ref } from 'vue'
 
 import type { GrContextMenuOpenContext, GrDropdownMenuAction, GrDropdownMenuEntry } from '@feugene/granularity'
-import { GrCard, GrContextMenu, GrTree } from '@feugene/granularity'
 
 type Node = {
   id: string

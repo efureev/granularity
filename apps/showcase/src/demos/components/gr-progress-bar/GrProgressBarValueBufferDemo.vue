@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 
-import { GrButton, GrProgressBar } from '@feugene/granularity'
-
 const played = ref(28)
 const buffered = computed(() => Math.min(100, played.value + 24))
 

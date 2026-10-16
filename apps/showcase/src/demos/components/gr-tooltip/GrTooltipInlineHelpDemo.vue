@@ -1,7 +1,3 @@
-<script setup lang="ts">
-import { GrTooltip } from '@feugene/granularity'
-</script>
-
 <template>
   <div class="grid gap-4">
     <label class="inline-flex items-center gap-2 text-sm font-600 text-[var(--gr-fg)]">

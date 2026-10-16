@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrBadge, GrTree } from '@feugene/granularity'
-
 type Permission = { id: string, label: string, children?: Permission[] }
 
 // Типовой сценарий чекбоксов в дереве — выдача прав по разделам.

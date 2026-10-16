@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrFormField, GrTextarea } from '@feugene/granularity'
-
 const comment = ref('Поле растёт под текст: директива `v-autosize` была в пакете и просто не была подключена.')
 const summary = ref('')
 </script>

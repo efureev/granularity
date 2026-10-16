@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 
-import { GrButton, GrEmptyState, GrInput } from '@feugene/granularity'
-
 const query = ref('treasury')
 
 const description = computed(() => {

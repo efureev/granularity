@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 
-import { GrSwitch } from '@feugene/granularity'
-
 /**
  * Ревизии записи приходят объектами, и порядок ключей у них разный: одна
  * пришла из API, другая собрана в форме.

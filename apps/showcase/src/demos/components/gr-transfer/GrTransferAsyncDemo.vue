@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrTransfer } from '@feugene/granularity'
-
 type Person = { id: string, label: string }
 
 const DIRECTORY: Person[] = [

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrButton, GrInput, vLoading } from '@feugene/granularity'
+import { vLoading } from '@feugene/granularity'
 
 const loading = ref(false)
 const name = ref('Alan Turing')

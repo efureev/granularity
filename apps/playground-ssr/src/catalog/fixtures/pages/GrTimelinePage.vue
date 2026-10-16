@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { GrTimeline, GrTimelineItem } from '@feugene/granularity'
+import { GrTimeline, GrTimelineItem } from '@feugene/granularity/components/GrTimeline'
 </script>
 
 <template>

@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrTransfer } from '@feugene/granularity'
-
 type Permission = { id: string, label: string }
 
 const catalog: Permission[] = Array.from({ length: 400 }, (_, index) => ({

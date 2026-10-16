@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrButton, GrTreeSelect } from '@feugene/granularity'
-
 type Region = {
   id: string
   label: string

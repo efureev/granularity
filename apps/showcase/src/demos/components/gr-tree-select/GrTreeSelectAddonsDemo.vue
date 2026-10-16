@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrTreeSelect } from '@feugene/granularity'
-
 interface CostCentre {
   id: number
   label: string

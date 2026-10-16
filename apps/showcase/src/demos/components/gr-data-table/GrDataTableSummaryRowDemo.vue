@@ -2,7 +2,6 @@
 import { computed, ref } from 'vue'
 
 import type { GrDataColumn, GrDataTableSize } from '@feugene/granularity'
-import { GrDataTable, GrSegmented } from '@feugene/granularity'
 
 const rows = [
   { id: 1, channel: 'Direct', gross: 12400, refunds: 320 },

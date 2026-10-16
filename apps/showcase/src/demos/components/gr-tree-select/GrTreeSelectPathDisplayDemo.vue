@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrBadge, GrTreeSelect } from '@feugene/granularity'
-
 type TreeSelectItem = {
   id: number
   label: string

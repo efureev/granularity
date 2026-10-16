@@ -92,66 +92,6 @@
   resolved "https://registry.yarnpkg.com/@asamuzakjp/nwsapi/-/nwsapi-2.3.9.tgz#ad5549322dfe9d153d4b4dd6f7ff2ae234b06e24"
   integrity sha512-n8GuYSrI9bF7FFZ/SjhwevlHc8xaVlb/7HmHelnc/PZXBD2ZR49NnN9sMMuDdEGPeeRQ5d0hqlSlEpgCX3Wl0Q==
 
-"@ast-grep/napi-darwin-arm64@0.36.3":
-  version "0.36.3"
-  resolved "https://registry.yarnpkg.com/@ast-grep/napi-darwin-arm64/-/napi-darwin-arm64-0.36.3.tgz#21300034de594055beb56d5e5e26589380934918"
-  integrity sha512-uM0Hrm5gcHqaBL64ktmPBFMTorTlPKWsUfi0E2Cg09GJfeYWvZmicCqgd7qVtjURmQvFQdb4JSqHIkJvws6Uqw==
-
-"@ast-grep/napi-darwin-x64@0.36.3":
-  version "0.36.3"
-  resolved "https://registry.yarnpkg.com/@ast-grep/napi-darwin-x64/-/napi-darwin-x64-0.36.3.tgz#fed71faf76258349e02659a3e51ded785724a914"
-  integrity sha512-wEMeQw8lRL66puG2m8m0kDRQDtubygj59HA/cmut2V5SPx/13BN3wuEk6JPv97gqGUCUGhG2+5Z6UZ/Ll2q01Q==
-
-"@ast-grep/napi-linux-arm64-gnu@0.36.3":
-  version "0.36.3"
-  resolved "https://registry.yarnpkg.com/@ast-grep/napi-linux-arm64-gnu/-/napi-linux-arm64-gnu-0.36.3.tgz#fe01aa917e0574dc165ff38bf68cfe5fdf62c9a7"
-  integrity sha512-sMsTMaUjW7SM8KPbLviCSBuM4zgJcwvie1yZI92HKSlFzC7ABe7X7UvyUREB+JwqccDVEL5yOJAjqB8eFSCizw==
-
-"@ast-grep/napi-linux-arm64-musl@0.36.3":
-  version "0.36.3"
-  resolved "https://registry.yarnpkg.com/@ast-grep/napi-linux-arm64-musl/-/napi-linux-arm64-musl-0.36.3.tgz#7c98cc4d49ec8692d4c601561b1327a5cd8814a2"
-  integrity sha512-2XRmNYuovZu0Pa4J3or4PKMkQZnXXfpVcCrPwWB/2ytX7XUo+TWLgYE8rPVnJOyw5zujkveFb0XUrro9mQgLzw==
-
-"@ast-grep/napi-linux-x64-gnu@0.36.3":
-  version "0.36.3"
-  resolved "https://registry.yarnpkg.com/@ast-grep/napi-linux-x64-gnu/-/napi-linux-x64-gnu-0.36.3.tgz#4a949cd56208c5674621cec45517a0477b864f2c"
-  integrity sha512-mTwPRbBi1feGqR2b5TWC5gkEDeRi8wfk4euF5sKNihfMGHj6pdfINHQ3QvLVO4C7z0r/wgWLAvditFA0b997dg==
-
-"@ast-grep/napi-linux-x64-musl@0.36.3":
-  version "0.36.3"
-  resolved "https://registry.yarnpkg.com/@ast-grep/napi-linux-x64-musl/-/napi-linux-x64-musl-0.36.3.tgz#8c1d2094fb3b002dbdebd140f7e7e57731f1c33f"
-  integrity sha512-tMGPrT+zuZzJK6n1cD1kOii7HYZE9gUXjwtVNE/uZqXEaWP6lmkfoTMbLjnxEe74VQbmaoDGh1/cjrDBnqC6Uw==
-
-"@ast-grep/napi-win32-arm64-msvc@0.36.3":
-  version "0.36.3"
-  resolved "https://registry.yarnpkg.com/@ast-grep/napi-win32-arm64-msvc/-/napi-win32-arm64-msvc-0.36.3.tgz#e1ccf039ddb37ffb26d6da516b9e6c8dcf5c7b87"
-  integrity sha512-7pFyr9+dyV+4cBJJ1I57gg6PDXP3GBQeVAsEEitzEruxx4Hb4cyNro54gGtlsS+6ty+N0t004tPQxYO2VrsPIg==
-
-"@ast-grep/napi-win32-ia32-msvc@0.36.3":
-  version "0.36.3"
-  resolved "https://registry.yarnpkg.com/@ast-grep/napi-win32-ia32-msvc/-/napi-win32-ia32-msvc-0.36.3.tgz#4917947a8ae07c236854aa6cd42d6bfd1325679d"
-  integrity sha512-MPAgccH9VscRaFuEBMzDGPS+3c4cKNVGIVJ7WSNa1nZtLQ0eFEaPJ7pyDnCezgVSxfNFVYBvKyyF/vcm7Qc9+A==
-
-"@ast-grep/napi-win32-x64-msvc@0.36.3":
-  version "0.36.3"
-  resolved "https://registry.yarnpkg.com/@ast-grep/napi-win32-x64-msvc/-/napi-win32-x64-msvc-0.36.3.tgz#1ee5792353f2389b4040cdca87b00fa535644560"
-  integrity sha512-TIVtuSbXhty9kaSEfr4ULWx5PAuUeGgUkFaR60lmOs7sGTWgpig+suwKfTmevoAblFknCW/aMHOwziwJoUZA6A==
-
-"@ast-grep/napi@^0.36.2":
-  version "0.36.3"
-  resolved "https://registry.yarnpkg.com/@ast-grep/napi/-/napi-0.36.3.tgz#677ee5061de98989915c5987672443bbe7ffc003"
-  integrity sha512-ExypohE8L7FvKBHxu7UpwcV9XVfyS+AqNZKyKIfxYwJyD9l7Gw6pmMYd7J2uopJsPEIUf44/emEFds6nFUx/dw==
-  optionalDependencies:
-    "@ast-grep/napi-darwin-arm64" "0.36.3"
-    "@ast-grep/napi-darwin-x64" "0.36.3"
-    "@ast-grep/napi-linux-arm64-gnu" "0.36.3"
-    "@ast-grep/napi-linux-arm64-musl" "0.36.3"
-    "@ast-grep/napi-linux-x64-gnu" "0.36.3"
-    "@ast-grep/napi-linux-x64-musl" "0.36.3"
-    "@ast-grep/napi-win32-arm64-msvc" "0.36.3"
-    "@ast-grep/napi-win32-ia32-msvc" "0.36.3"
-    "@ast-grep/napi-win32-x64-msvc" "0.36.3"
-
 "@axe-core/playwright@^4.13.0":
   version "4.13.0"
   resolved "https://registry.yarnpkg.com/@axe-core/playwright/-/playwright-4.13.0.tgz#4826467c9622df26f0d75b4c1747c8d92ee599de"
@@ -790,20 +730,20 @@
   resolved "https://registry.yarnpkg.com/@exodus/bytes/-/bytes-1.15.1.tgz#b13bc464ca162c17abf0837fb3a11aeab79e45d1"
   integrity sha512-S6mL0yNB/Abt9Ei4tq8gDhcczc4S3+vQ4ra7vxnAf+YHC02srtqxKKZghx2Dq6p0e66THKwR6r8N6P95wEty7Q==
 
-"@feugene/fint-i18n@^0.7.0":
-  version "0.7.0"
-  resolved "https://registry.yarnpkg.com/@feugene/fint-i18n/-/fint-i18n-0.7.0.tgz#f2a84266f372936d113dd99012135d538a897742"
-  integrity sha512-/3mmlOhNVjFyfp1ov8VohUVh6Q8jOqcvrLOGnuKtBYz8pCgG0mmUoCt8gSobetEyxbCQD3waZv42GDNmjH7wXA==
+"@feugene/fint-i18n@^0.9.0":
+  version "0.9.0"
+  resolved "https://registry.yarnpkg.com/@feugene/fint-i18n/-/fint-i18n-0.9.0.tgz#861a7b5784d71f4de67a89c407f9f47e87db6ae4"
+  integrity sha512-MY0x1PM2Ua0El4BZXWeerUmL6ylFOPhquEtAuLd3tPu2A81ZiKhYAdtCvttXjPe7TLNpPBSfqCGP/JmANs6J5Q==
 
-"@feugene/granum-engine-wind@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@feugene/granum-engine-wind/-/granum-engine-wind-1.0.0.tgz#ce7747d73ba73b809ac1e38fce0d0023e00cecd0"
-  integrity sha512-pcMWSMhTujAYrDOg5F/pmeu/zyA3+8ImWNXU5hNQx3NoKYtQNVmpf+LdBf5uE1aO//86vKADo6jbic7EQJcpfQ==
+"@feugene/granum-engine-wind@^2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@feugene/granum-engine-wind/-/granum-engine-wind-2.0.0.tgz#1d98715001ae4a0e59ad82984915a208e84405d5"
+  integrity sha512-bISxKUvKeshyTx61J40P7LjgWXLjvl0UHkVfH+LYEZ2X3uTcrkPP4YsIcArIAdtiEj4cGEKUkntUpBk0B7PCcg==
 
-"@feugene/granum@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@feugene/granum/-/granum-1.0.0.tgz#834598afc104164385f6628e267d990898bb549a"
-  integrity sha512-br5/SPcuMpeDu1j7/cn21ytKOPR3azv6kByuaVCL6LeGOdDfXNanhAUvTmGWHph3feKEfAC3T2VOkUPSzd6X2Q==
+"@feugene/granum@^2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@feugene/granum/-/granum-2.0.0.tgz#492c953c9c411ecfb93aa34a5347f39373858ae2"
+  integrity sha512-uyfQTdH13n7icL8yYUADPorca+gSAJw4voty7Bm7Qj76BdluGLOhAvGR/xKZyqM+lP145iTwN7wt4/8kV0JwDA==
 
 "@floating-ui/core@^1.8.0":
   version "1.8.0"
@@ -4044,7 +3984,7 @@ lru-cache@^5.1.1:
   dependencies:
     yallist "^3.0.2"
 
-magic-string@^0.30.17, magic-string@^0.30.21, magic-string@^0.30.4:
+magic-string@^0.30.21, magic-string@^0.30.4:
   version "0.30.21"
   resolved "https://registry.yarnpkg.com/magic-string/-/magic-string-0.30.21.tgz#56763ec09a0fa8091df27879fd94d19078c00d91"
   integrity sha512-vd2F4YUyEXKGcLHoq+TEyCjxueSeHnFxyyjNp80yg0XV4vUhnDer/lvvlqM/arB5bXQN5K2/3oinyCRyx8T2CQ==
@@ -5774,15 +5714,6 @@ vite-plugin-inspect@^11.3.3:
     sirv "^3.0.2"
     unplugin-utils "^0.3.1"
     vite-dev-rpc "^2.0.0"
-
-vite-plugin-lib-inject-css@^2.2.2:
-  version "2.2.2"
-  resolved "https://registry.yarnpkg.com/vite-plugin-lib-inject-css/-/vite-plugin-lib-inject-css-2.2.2.tgz#1a08274b2a79c8cc60168a125ab3b417d8c066a4"
-  integrity sha512-NF30p0GwtfSAmVlxo2NgPXM2rEdtgV7LFi4lkzajKD7P3Ru/ZAFmI533M0Z5qyMZpvNMxVGkewzpjD0HOWtbDQ==
-  dependencies:
-    "@ast-grep/napi" "^0.36.2"
-    magic-string "^0.30.17"
-    picocolors "^1.1.1"
 
 vite-plugin-vue-devtools@^8.2.1:
   version "8.2.1"

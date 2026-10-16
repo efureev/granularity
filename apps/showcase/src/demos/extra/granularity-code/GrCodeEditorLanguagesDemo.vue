@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, shallowRef, watch } from 'vue'
 
-import { GrSegmented } from '@feugene/granularity'
-
 /**
  * Три языка — три отдельных npm-пакета CodeMirror, и грузит их **приложение**.
  *

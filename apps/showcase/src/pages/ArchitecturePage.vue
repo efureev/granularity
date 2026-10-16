@@ -3,7 +3,6 @@ import { computed, ref, watch } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
 
 import { useFintI18n } from '@feugene/fint-i18n/vue'
-import { GrCard, GrSelect } from '@feugene/granularity'
 
 import ShowcasePageHero from '../components/showcase/ShowcasePageHero.vue'
 import { useShowcasePageI18n } from '../app/useShowcasePageI18n'

@@ -2,7 +2,6 @@
 import { ref } from 'vue'
 
 import type { GrTabsOrientation } from '@feugene/granularity'
-import { GrSegmented, GrTabPanel, GrTabPanels, GrTabs } from '@feugene/granularity'
 
 const tab = ref('overview')
 const orientation = ref<GrTabsOrientation>('horizontal')

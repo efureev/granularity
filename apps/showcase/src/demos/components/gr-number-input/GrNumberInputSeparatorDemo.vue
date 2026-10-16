@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrFormField, GrNumberInput } from '@feugene/granularity'
-
 const amountComma = ref<number | null>(1.25)
 const percentage = ref<number | null>(42.5)
 </script>

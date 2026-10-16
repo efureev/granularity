@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 
-import { GrButton, GrDrawer, GrInput } from '@feugene/granularity'
-
 const open = ref(false)
 const query = ref('')
 

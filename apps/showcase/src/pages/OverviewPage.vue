@@ -2,10 +2,6 @@
 import { computed } from 'vue'
 
 import { useFintI18n } from '@feugene/fint-i18n/vue'
-import {
-  GrButton,
-  GrCard,
-} from '@feugene/granularity'
 
 import CodeBlock from '../components/doc/CodeBlock.vue'
 import {

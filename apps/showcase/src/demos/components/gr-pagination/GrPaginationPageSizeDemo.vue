@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 
-import { GrBadge, GrButton, GrPagination } from '@feugene/granularity'
-
 const total = ref(58)
 const page = ref(5)
 const pageSize = ref(12)

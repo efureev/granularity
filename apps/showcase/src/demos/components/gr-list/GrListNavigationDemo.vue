@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrBadge, GrList, GrListItem } from '@feugene/granularity'
-
 const lastAction = ref('—')
 
 const sections = [

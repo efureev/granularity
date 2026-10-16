@@ -48,15 +48,12 @@ export default defineGranumConfig({
 ```ts
 // vite.config.ts — авто-импорт
 import { GranularityResolver } from '@feugene/unplugin-granularity'
-import { GranularityChartsResolver } from '@feugene/granularity-charts/resolver'
 
-Components({
-  resolvers: [
-    GranularityChartsResolver(), // whitelist — раньше…
-    GranularityResolver(), // …жадного Gr*-резолвера ядра
-  ],
-})
+Components({ resolvers: GranularityResolver() })
 ```
+
+Резолвер ядра (`@feugene/unplugin-granularity` `>=1.1.0`) находит пакет в `package.json` приложения
+сам; собственный `GranularityChartsResolver()` остаётся для уже написанных конфигов.
 
 Локали подключаются вместе со словарём ядра:
 

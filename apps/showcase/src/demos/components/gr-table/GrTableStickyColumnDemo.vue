@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { GrTable } from '@feugene/granularity'
-
 const months = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август']
 
 const rows = [

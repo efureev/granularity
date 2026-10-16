@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrCard, GrOtpInput } from '@feugene/granularity'
-
 const code = ref('42')
 </script>
 

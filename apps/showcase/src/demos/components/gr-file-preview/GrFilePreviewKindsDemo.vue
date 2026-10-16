@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { GrFilePreview } from '@feugene/granularity'
-
 // Картинка нарисована на месте, а не взята с внешнего хоста: демо снимается в
 // визуальный эталон, и чужой сервер сделал бы снимок невоспроизводимым.
 const thumbnail = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`

@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 
-import { GrFormFile } from '@feugene/granularity'
-
 /** Набор заполнен заранее: порядок показывать нечем, пока файлов нет. */
 function seed(name: string, size: number): File {
   return new File([new Uint8Array(size)], name, { type: 'image/png' })

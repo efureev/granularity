@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrButton, GrConfirmDialog } from '@feugene/granularity'
-
 const open = ref(false)
 const approved = ref(false)
 </script>

@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { GrBadgeWrap, GrButton, GrCard } from '@feugene/granularity'
 import { ref } from 'vue'
 
 const unread = ref(3)

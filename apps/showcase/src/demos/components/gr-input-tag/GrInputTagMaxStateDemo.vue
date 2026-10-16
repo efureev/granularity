@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 
-import { GrBadge, GrInputTag } from '@feugene/granularity'
-
 const skills = ref(['vue', 'typescript'])
 const remaining = computed(() => 4 - skills.value.length)
 </script>

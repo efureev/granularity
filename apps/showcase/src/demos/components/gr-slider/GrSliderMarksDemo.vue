@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrSlider } from '@feugene/granularity'
-
 const quality = ref(50)
 
 const marks = {

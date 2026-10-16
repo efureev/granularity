@@ -137,10 +137,8 @@ function normalizeThemeTokenSection(section: string) {
   }
 }
 
-const rootImportSnippet = `import {
-  GrButton,
-  GrCard,
-} from '@feugene/granularity'
+const staticSheetSnippet = `import { GrButton } from '@feugene/granularity/components/GrButton'
+import { GrCard } from '@feugene/granularity/components/GrCard'
 
 import '@feugene/granularity/styles.css'`
 
@@ -432,7 +430,7 @@ export const showcaseFoundationGuides: ShowcaseFoundationGuide[] = [
     codeSamples: [
       {
         title: 'Без granum: статический лист',
-        code: rootImportSnippet,
+        code: staticSheetSnippet,
         language: 'ts',
       },
       {

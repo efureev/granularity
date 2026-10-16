@@ -2,7 +2,6 @@
 import { ref } from 'vue'
 
 import type { GrDropdownMenuAction, GrDropdownMenuEntry } from '@feugene/granularity'
-import { GrCard, GrContextMenu } from '@feugene/granularity'
 
 const items: GrDropdownMenuEntry[] = [
   { key: 'paste', label: 'Вставить', shortcut: '⌘V' },

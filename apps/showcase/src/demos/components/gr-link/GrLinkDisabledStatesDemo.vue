@@ -1,7 +1,3 @@
-<script setup lang="ts">
-import { GrCard, GrLink } from '@feugene/granularity'
-</script>
-
 <template>
   <GrCard class="grid gap-3 p-4 text-sm">
     <div class="flex flex-wrap items-center gap-3">

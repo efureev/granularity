@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { GrSplitter } from '@feugene/granularity'
 
 const treeWidth = ref(25)
 const consoleHeight = ref(65)

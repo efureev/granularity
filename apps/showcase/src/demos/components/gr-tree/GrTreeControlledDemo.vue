@@ -2,7 +2,6 @@
 import { computed, ref } from 'vue'
 
 import type { GrTreeKey } from '@feugene/granularity'
-import { GrRadioGroup, GrTree } from '@feugene/granularity'
 
 type TreeItem = {
   id: number

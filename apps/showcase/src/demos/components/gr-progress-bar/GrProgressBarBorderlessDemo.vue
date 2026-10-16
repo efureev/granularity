@@ -1,7 +1,3 @@
-<script setup lang="ts">
-import { GrCard, GrProgressBar } from '@feugene/granularity'
-</script>
-
 <template>
   <div class="grid gap-4 sm:grid-cols-2">
     <GrCard padding="md" body-class="grid gap-2">

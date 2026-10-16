@@ -2,7 +2,6 @@
 import { ref } from 'vue'
 
 import type { GrDataColumn } from '@feugene/granularity'
-import { GrBadge, GrButton, GrDataTable } from '@feugene/granularity'
 import IconTrash from '~icons/lucide/trash2'
 
 const lastAction = ref('No actions yet')

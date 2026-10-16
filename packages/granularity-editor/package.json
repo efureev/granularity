@@ -90,9 +90,9 @@
     "./package.json": "./package.json"
   },
   "peerDependencies": {
-    "@feugene/fint-i18n": ">=0.7.0 <1.0.0",
+    "@feugene/fint-i18n": ">=0.9.0 <1.0.0",
     "@feugene/granularity": ">=1.0.0 <2.0.0",
-    "@feugene/granum": ">=1.0.0 <2.0.0",
+    "@feugene/granum": ">=2.0.0 <3.0.0",
     "@feugene/unplugin-granularity": ">=1.0.0 <2.0.0",
     "@tiptap/core": "^3.30.0",
     "@tiptap/extensions": "^3.30.0",
@@ -128,11 +128,11 @@
   },
   "devDependencies": {
     "@antfu/eslint-config": "^9.3.0",
-    "@feugene/fint-i18n": "^0.7.0",
+    "@feugene/fint-i18n": "^0.9.0",
     "@feugene/granularity": "^1.0.0",
     "@feugene/granularity-test-kit": "^1.1.0",
-    "@feugene/granum": "^1.0.0",
-    "@feugene/granum-engine-wind": "^1.0.0",
+    "@feugene/granum": "^2.0.0",
+    "@feugene/granum-engine-wind": "^2.0.0",
     "@feugene/unplugin-granularity": "^1.0.0",
     "@tiptap/core": "^3.30.5",
     "@tiptap/extensions": "^3.30.5",

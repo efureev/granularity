@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrBadge } from '@feugene/granularity'
 import type { GrDashboardResponsiveLayout } from '@feugene/granularity-dashboard'
 
 /**

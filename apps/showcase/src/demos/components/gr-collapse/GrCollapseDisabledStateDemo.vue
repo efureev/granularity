@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrButton, GrCollapse, GrCollapseItem } from '@feugene/granularity'
-
 const disabled = ref(false)
 const expanded = ref<Array<string | number>>(['active'])
 </script>

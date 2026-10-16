@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrAffix, GrButton, GrFormField, GrInput, GrTextarea } from '@feugene/granularity'
-
 const fields = ref({
   title: 'Договор поставки № 4417',
   counterparty: 'ООО «Севертранс»',

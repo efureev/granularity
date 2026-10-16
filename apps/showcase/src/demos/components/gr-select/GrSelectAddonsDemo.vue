@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrSelect } from '@feugene/granularity'
-
 const currencies = [
   { value: 'eur', label: 'Euro' },
   { value: 'usd', label: 'US Dollar' },

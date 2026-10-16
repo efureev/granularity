@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 
-import { GrSwitch } from '@feugene/granularity'
 import type { GrCodeLine, GrCodeRole, GrCodeTokenizer } from '@feugene/granularity-code'
 
 const SOURCE = `// Разбор конфигурации приложения

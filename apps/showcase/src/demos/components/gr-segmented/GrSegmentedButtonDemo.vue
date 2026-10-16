@@ -2,7 +2,6 @@
 import { ref } from 'vue'
 
 import type { GrSegmentedOption, GrSelectOption, GrSegmentedSize } from '@feugene/granularity'
-import { GrFormField, GrSegmented, GrSelect } from '@feugene/granularity'
 
 const view = ref<'board' | 'calendar' | 'table'>('board')
 const size = ref<GrSegmentedSize>('md')

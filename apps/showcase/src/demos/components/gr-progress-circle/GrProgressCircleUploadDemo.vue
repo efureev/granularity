@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { onBeforeUnmount, ref } from 'vue'
 import IconX from '~icons/lucide/x'
-import { GrButton, GrProgressCircle } from '@feugene/granularity'
 
 type Stage = 'idle' | 'connecting' | 'uploading' | 'done'
 

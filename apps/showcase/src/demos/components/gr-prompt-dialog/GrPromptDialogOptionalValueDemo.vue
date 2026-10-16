@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrButton, GrPromptDialog } from '@feugene/granularity'
-
 const open = ref(false)
 const note = ref('Call finance before noon')
 const lastSubmitted = ref(note.value)

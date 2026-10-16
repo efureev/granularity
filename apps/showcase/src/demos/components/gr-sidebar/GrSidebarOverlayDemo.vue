@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrButton, GrSidebar, GrSidebarGroup, GrSidebarItem } from '@feugene/granularity'
-
 // Режим задаёт приложение: своей системы брейкпоинтов у пакета нет, а
 // спрашивать среду в setup нельзя — гидрация разойдётся.
 const narrow = ref(true)

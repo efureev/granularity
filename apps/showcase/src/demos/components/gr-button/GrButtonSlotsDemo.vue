@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrButton, GrIcon, GrKbd } from '@feugene/granularity'
 import IconPlus from '~icons/lucide/plus'
 
 const saving = ref(false)

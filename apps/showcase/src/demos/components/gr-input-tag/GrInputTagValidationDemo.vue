@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrFormField, GrInputTag } from '@feugene/granularity'
-
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const KNOWN_DOMAINS = ['example.com', 'granularity.dev']
 

@@ -1,12 +1,4 @@
 <script setup lang="ts">
-import {
-  GrButton,
-  GrDropdownMenu,
-  GrDropdownMenuHeader,
-  GrDropdownMenuItem,
-  GrDropdownMenuList,
-} from '@feugene/granularity'
-
 const actions = ['Duplicate', 'Move to archive', 'Copy public URL']
 </script>
 

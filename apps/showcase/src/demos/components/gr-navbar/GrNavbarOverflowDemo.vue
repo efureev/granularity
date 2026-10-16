@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { GrAvatar, GrButton, GrKbd, GrNavbar } from '@feugene/granularity'
-
 // Разделов больше, чем помещается в 600px: уступает `left`, а не действия.
 const sections = ['Overview', 'Invoices', 'Customers', 'Reports', 'Settings']
 </script>

@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { GrDelta } from '@feugene/granularity'
-
 const rows = [
   { metric: 'Revenue', value: 8.4, polarity: 'positive-good' as const },
   { metric: 'Churn', value: 2.1, polarity: 'negative-good' as const },

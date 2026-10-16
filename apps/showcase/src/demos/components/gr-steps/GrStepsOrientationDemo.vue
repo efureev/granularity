@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrSteps } from '@feugene/granularity'
 import type { GrStep } from '@feugene/granularity'
 
 const steps: GrStep[] = [

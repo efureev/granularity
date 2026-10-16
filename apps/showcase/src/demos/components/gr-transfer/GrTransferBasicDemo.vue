@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrTransfer } from '@feugene/granularity'
-
 const members = ref<string[]>(['sokolov'])
 
 const directory = [

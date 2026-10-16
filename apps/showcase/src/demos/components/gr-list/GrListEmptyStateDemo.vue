@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 
-import { GrButton, GrList, GrListItem, GrSegmented } from '@feugene/granularity'
-
 type Mode = 'items' | 'empty' | 'loading'
 
 const mode = ref<Mode>('items')

@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrBadge, GrButton, GrButtonGroup } from '@feugene/granularity'
-
 const currentView = ref('board')
 
 const views = [

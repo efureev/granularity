@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { GrButton, useDialogService } from '@feugene/granularity'
+import { useDialogService } from '@feugene/granularity'
 
 /**
  * Отдельный компонент здесь по существу, а не для красоты: `useDialogService()`

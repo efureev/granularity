@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrButton, GrModal, GrPromptDialog, GrSelect } from '@feugene/granularity'
-
 const variants = ['primary', 'secondary', 'outline', 'ghost', 'ghost-border', 'destructive'] as const
 const sizes = ['xs', 'sm', 'md', 'lg'] as const
 const isModalOpen = ref(false)

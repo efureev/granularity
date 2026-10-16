@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrSplitter } from '@feugene/granularity'
+import { GrSplitter } from '@feugene/granularity/components/GrSplitter'
 
 // Стартовый размер приходит пропом: замер контейнера доступен только клиенту.
 const size = ref(30)

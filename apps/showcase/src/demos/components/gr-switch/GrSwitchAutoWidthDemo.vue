@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrSwitch } from '@feugene/granularity'
-
 const shortLabels = ref(true)
 const availability = ref(true)
 const access = ref(false)

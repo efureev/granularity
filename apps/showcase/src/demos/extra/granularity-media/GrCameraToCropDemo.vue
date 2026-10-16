@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, useTemplateRef } from 'vue'
 
-import { GrAvatar, GrButton } from '@feugene/granularity'
-
 /**
  * Путь целиком: камера отдаёт кадр как есть, кроп режет из него квадрат.
  * Разделение ответственности видно только так — на словах оно выглядит

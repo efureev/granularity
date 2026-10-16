@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 
-import { GrFormField, GrInput } from '@feugene/granularity'
-
 const email = ref('john')
 const error = computed(() =>
   email.value && !email.value.includes('@') ? 'Enter a valid email address' : undefined,

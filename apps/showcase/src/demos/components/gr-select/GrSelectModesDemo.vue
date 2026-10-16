@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrSelect } from '@feugene/granularity'
-
 const options = [
   { value: 'alpha', label: 'Alpha workspace' },
   { value: 'beta', label: 'Beta workspace' },

@@ -94,6 +94,9 @@ export function createImportSnippet(entity?: ShowcaseEntityRegistryItem, transla
   if (entity.kind === 'utility')
     return `import { ${entity.name} } from '@feugene/granularity/fileValidation'`
 
+  if (entity.kind === 'component')
+    return `import { ${entity.name} } from '@feugene/granularity/components/${entity.name}'`
+
   return `import { ${entity.name} } from '@feugene/granularity'`
 }
 

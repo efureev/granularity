@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { GrAvatar, GrCard, GrCarousel, GrCarouselSlide } from '@feugene/granularity'
-
 const reviews = [
   { id: 'a', name: 'Марина К.', role: 'Продуктовый аналитик', text: 'Отчёт, который раньше собирали полдня, теперь готов к утренней планёрке.' },
   { id: 'b', name: 'Дмитрий О.', role: 'Руководитель поддержки', text: 'Очередь обращений видно целиком, а не по одному экрану за раз.' },

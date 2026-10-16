@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrFormField, GrTextarea } from '@feugene/granularity'
-
 const shortNote = ref('Release notes highlight the latest API additions.')
 const longNote = ref('This textarea starts taller and fits editorial copy, migration notes or incident postmortems.')
 </script>

@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrColorPicker } from '@feugene/granularity'
-
 const accent = ref('#8b5cf6')
 const surface = ref('#0f172a')
 

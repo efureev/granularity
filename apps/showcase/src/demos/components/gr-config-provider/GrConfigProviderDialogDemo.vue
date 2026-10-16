@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrButton, GrConfigProvider } from '@feugene/granularity'
-
 import DialogCaller from './DialogCaller.vue'
 
 const size = ref<'sm' | 'lg'>('sm')

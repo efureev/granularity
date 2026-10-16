@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrButton, GrCard, GrStatistic } from '@feugene/granularity'
-
 const revenue = ref(1284500)
 const users = ref(18342)
 const conversion = ref(4.8)

@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrFormField, GrIcon, GrInput } from '@feugene/granularity'
-
 const query = ref('')
 const price = ref('1 290')
 </script>

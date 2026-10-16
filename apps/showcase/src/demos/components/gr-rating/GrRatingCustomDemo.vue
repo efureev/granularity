@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrRating } from '@feugene/granularity'
-
 const likes = ref(3)
 const difficulty = ref(2)
 const size = ref(4)

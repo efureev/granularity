@@ -1,13 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 
-import {
-  GrFormField,
-  GrRadioGroup,
-  GrSwitch,
-  GrTransfer,
-  type GrComponentSize,
-} from '@feugene/granularity'
+import type { GrComponentSize } from '@feugene/granularity'
 
 import CodeBlock from '../../../components/doc/CodeBlock.vue'
 

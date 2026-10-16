@@ -1,7 +1,5 @@
 <script setup lang="ts">
 import { RouterLink } from 'vue-router'
-
-import { GrButton } from '@feugene/granularity'
 </script>
 
 <template>

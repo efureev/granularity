@@ -1,14 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import {
-  GrAvatar,
-  GrCommandPalette,
-  GrKbd,
-  GrNavbar,
-  vHotkey,
-  type GrCommandItem,
-} from '@feugene/granularity'
+import { vHotkey, type GrCommandItem } from '@feugene/granularity'
 
 import SearchIcon from '~icons/lucide/search'
 

@@ -9,13 +9,15 @@
   },
   "devDependencies": {
     "@feugene/granularity-devtools": "^1.0.0",
-    "@feugene/granum": "^1.0.0",
-    "@feugene/granum-engine-wind": "^1.0.0",
+    "@feugene/granum": "^2.0.0",
+    "@feugene/granum-engine-wind": "^2.0.0",
+    "@feugene/unplugin-granularity": "^1.0.0",
     "@unocss/reset": "^66.8.1",
     "@vitejs/plugin-vue": "^6.0.8",
     "rollup-plugin-visualizer": "^7.1.1",
     "typescript": "^6.0.3",
     "unplugin-icons": "^23.0.1",
+    "unplugin-vue-components": "^32.1.0",
     "vite": "^8.2.2",
     "vite-plugin-vue-devtools": "^8.2.1",
     "vitest": "^4.1.11"

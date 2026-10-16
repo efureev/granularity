@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrBadge, GrButton, GrDropdown, GrSwitch } from '@feugene/granularity'
-
 const disabled = ref(false)
 const lastAction = ref('—')
 

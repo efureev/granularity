@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, useTemplateRef } from 'vue'
 
-import { GrButton, GrRadioGroup } from '@feugene/granularity'
-
 /**
  * Картинка синтезированная: демо обязано работать без сети и без файла на
  * диске, а кадрировать нужно что-то заведомо не квадратное — иначе не видно,

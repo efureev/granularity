@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 
-import { GrSegmented, GrSwitch } from '@feugene/granularity'
 import { diffLines, GR_DIFF_DEFAULT_BUDGET } from '@feugene/granularity-code/diff'
 
 const lineCount = ref(1000)

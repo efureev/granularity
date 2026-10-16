@@ -1,7 +1,3 @@
-<script setup lang="ts">
-import { GrButton, GrConfigProvider, GrInput } from '@feugene/granularity'
-</script>
-
 <template>
   <!-- Внешний провайдер: size = lg. -->
   <GrConfigProvider size="lg">

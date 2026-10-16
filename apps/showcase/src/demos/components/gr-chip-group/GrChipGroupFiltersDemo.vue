@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 
-import { GrCard, GrChip, GrChipGroup } from '@feugene/granularity'
-
 const statuses = [
   { value: 'open', label: 'Открытые' },
   { value: 'review', label: 'На ревью' },

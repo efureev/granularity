@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { GrKbd } from '@feugene/granularity'
-
 import { useShowcaseSearch } from '../../app/useShowcaseSearch'
 import SearchIcon from '~icons/lucide/search'
 

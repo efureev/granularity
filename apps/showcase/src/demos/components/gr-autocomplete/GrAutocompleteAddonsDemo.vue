@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrAutocomplete } from '@feugene/granularity'
-
 const airports = [
   { value: 'LED', label: 'Saint Petersburg — LED' },
   { value: 'AER', label: 'Sochi — AER' },

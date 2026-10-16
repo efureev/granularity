@@ -9,36 +9,15 @@ import { GRANULARITY_CHRONO_COMPONENTS } from './componentNames'
 export const GRANULARITY_CHRONO_PACKAGE_NAME = '@feugene/granularity-chrono'
 
 /**
- * Резолвер `unplugin-vue-components` для `@feugene/granularity-chrono`.
+ * Резолвер `unplugin-vue-components` для `@feugene/granularity-chrono` — явный список его
+ * компонентов.
  *
- * Построен на общей фабрике `createGranularResolver` из
- * `@feugene/unplugin-granularity`. Резолвит компоненты пакета на их
- * гранулярные subpath-экспорты. CSS компонента доставляет granum из манифеста
- * пакета, поэтому отдельный `styles.css`-side-effect не нужен
- * (`importStyle: false`).
+ * Новому конфигу он не нужен: `GranularityResolver()` из
+ * `@feugene/unplugin-granularity` `>=1.1.0` находит пакет в `package.json`
+ * приложения и резолвит ядро вместе со спутниками, в любом порядке. Этот
+ * резолвер остаётся для уже написанных конфигов и работает рядом с единым.
  *
- * ⚠️ Ставьте этот резолвер **перед** жадным `GranularityResolver()` ядра —
- * иначе core-резолвер (совпадает с любым `Gr*`) перехватит `GrCalendar`
- * и импортирует его из несуществующего пути в `@feugene/granularity`.
- *
- * @example
- * ```ts
- * // vite.config.ts
- * import Components from 'unplugin-vue-components/vite'
- * import { GranularityResolver } from '@feugene/unplugin-granularity'
- * import { GranularityChronoResolver } from '@feugene/granularity-chrono/resolver'
- *
- * export default defineConfig({
- *   plugins: [
- *     Components({
- *       resolvers: [
- *         GranularityChronoResolver(), // whitelist — раньше…
- *         GranularityResolver(),       // …жадного Gr*-резолвера ядра
- *       ],
- *     }),
- *   ],
- * })
- * ```
+ * `importStyle: false` — CSS компонента доставляет granum из манифеста пакета.
  */
 export function GranularityChronoResolver(): ComponentResolver {
   return createGranularResolver({

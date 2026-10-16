@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrButton, GrPromptDialog } from '@feugene/granularity'
-
 const passwordOpen = ref(false)
 const backupCodeOpen = ref(false)
 const password = ref('')

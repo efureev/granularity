@@ -2,7 +2,6 @@
 import { computed, ref } from 'vue'
 
 import type { GrDataColumn } from '@feugene/granularity'
-import { GrDataTable, GrDelta } from '@feugene/granularity'
 
 type Channel = {
   id: number

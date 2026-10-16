@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrBadge } from '@feugene/granularity'
-
 /**
  * Ролик лежит в `public/demo` и собирается скриптом
  * `scripts/generate-demo-video.mjs`: витрина обязана работать без сети, а

@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrCard, GrSegmented, GrStatistic } from '@feugene/granularity'
-
 const margin = ref(-1240)
 
 const presets = [

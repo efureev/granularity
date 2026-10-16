@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrAutocomplete } from '@feugene/granularity'
-
 // Справочник, ради которого виртуализация и нужна: без неё каждая панель
 // рендерила бы все совпадения разом.
 const options = Array.from({ length: 10000 }, (_, index) => ({

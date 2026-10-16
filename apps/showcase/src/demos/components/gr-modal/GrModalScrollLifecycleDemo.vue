@@ -2,7 +2,6 @@
 import { computed, ref } from 'vue'
 
 import type { GrModalScrollBehavior } from '@feugene/granularity'
-import { GrBadge, GrButton, GrModal, GrSegmented } from '@feugene/granularity'
 
 const open = ref(false)
 const scrollBehavior = ref<GrModalScrollBehavior>('inside')

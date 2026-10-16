@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { GrSkeleton } from '@feugene/granularity'
-
 const rows = [1, 2, 3]
 </script>
 

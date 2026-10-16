@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 
-import { GrFilePreview, GrImageViewer } from '@feugene/granularity'
-
 // Картинки нарисованы на месте: демо попадает в визуальный эталон, а внешний
 // хост сделал бы снимок зависящим от сети.
 function receipt(hue: number): string {

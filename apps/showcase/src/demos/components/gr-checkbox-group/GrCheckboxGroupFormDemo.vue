@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
 
-import { GrButton, GrCheckbox, GrCheckboxGroup, GrForm, GrFormField, type GrFormRules } from '@feugene/granularity'
+import type { GrFormRules } from '@feugene/granularity'
 
 const options = [
   { value: 'incidents', label: 'Incidents' },

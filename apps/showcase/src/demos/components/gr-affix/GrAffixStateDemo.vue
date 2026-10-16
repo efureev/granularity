@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrAffix, GrBadge, GrButton } from '@feugene/granularity'
-
 const log = ref<string[]>([])
 
 function onStickyChange(stuck: boolean): void {

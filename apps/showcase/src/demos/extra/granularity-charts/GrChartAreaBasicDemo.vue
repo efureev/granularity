@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 
-import { GR_TONES, GrButton, type GrTone } from '@feugene/granularity'
+import { GR_TONES, type GrTone } from '@feugene/granularity'
 
 // `GrChartArea` подставляется авто-импортом (`unplugin-vue-components`).
 

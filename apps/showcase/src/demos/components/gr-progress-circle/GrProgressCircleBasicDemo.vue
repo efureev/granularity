@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { GrProgressCircle } from '@feugene/granularity'
-
 const sizes = ['xs', 'sm', 'md', 'lg'] as const
 const tones = [
   { tone: 'primary', value: 72 },

@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 
-import { GrButton, GrFormField } from '@feugene/granularity'
-
 import StarRatingInput from './StarRatingInput.vue'
 
 const rating = ref(0)

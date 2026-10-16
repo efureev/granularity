@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 
-import { GrButton, GrFormField, GrSwitch } from '@feugene/granularity'
 import type { GrCodeIssue } from '@feugene/granularity-code'
 
 const config = ref(`{

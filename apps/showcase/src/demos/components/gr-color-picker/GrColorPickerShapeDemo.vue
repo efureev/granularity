@@ -2,7 +2,6 @@
 import { ref } from 'vue'
 
 import type { GrComponentSize, GrControlShape } from '@feugene/granularity'
-import { GrColorPicker, GrSegmented } from '@feugene/granularity'
 
 const shape = ref<GrControlShape>('pill')
 const sizes: GrComponentSize[] = ['xs', 'sm', 'md', 'lg']

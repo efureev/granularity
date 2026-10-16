@@ -1,7 +1,3 @@
-<script setup lang="ts">
-import { GrLink } from '@feugene/granularity'
-</script>
-
 <template>
   <div class="grid gap-3 text-sm">
     <GrLink href="https://example.com/docs/showcase" external size="md">

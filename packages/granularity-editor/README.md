@@ -16,7 +16,7 @@ TipTap — **peer**, а не своя зависимость пакета. Prose
 ```vue
 <script setup lang="ts">
 import { ref } from 'vue'
-import { GrRichText } from '@feugene/granularity-editor'
+import { GrRichText } from '@feugene/granularity-editor/components/GrRichText'
 
 const description = ref('<p>Описание товара</p>')
 </script>

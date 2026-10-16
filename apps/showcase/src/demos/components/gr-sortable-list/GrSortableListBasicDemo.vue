@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrBadge, GrSortableList } from '@feugene/granularity'
-
 type Step = { id: string, title: string, owner: string }
 
 const steps = ref<Step[]>([

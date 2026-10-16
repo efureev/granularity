@@ -4,7 +4,6 @@ import { RouterLink, useRoute } from 'vue-router'
 import IconArrowLeft from '~icons/lucide/arrow-left'
 
 import { useFintI18n } from '@feugene/fint-i18n/vue'
-import { GrBadge, GrCard } from '@feugene/granularity'
 
 import ShowcasePageHero from '../components/showcase/ShowcasePageHero.vue'
 import {

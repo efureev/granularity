@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 
-import { GrBadge, GrButton, GrDropdown } from '@feugene/granularity'
-
 const options = computed(() => [
   { value: 'errors', label: 'Errors' },
   { value: 'warnings', label: 'Warnings' },

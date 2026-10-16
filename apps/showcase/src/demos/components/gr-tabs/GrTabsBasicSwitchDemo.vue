@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 
-import { GrBadge, GrTabs } from '@feugene/granularity'
-
 const currentTab = ref('overview')
 const tabs = [
   { value: 'overview', label: 'Overview' },

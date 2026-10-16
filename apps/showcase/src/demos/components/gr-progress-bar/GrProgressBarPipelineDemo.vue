@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { GrBadge, GrProgressBar } from '@feugene/granularity'
-
 const stages = [
   { label: 'Validation', value: 100, tone: 'success' as const },
   { label: 'Fraud screening', value: 72, tone: 'warning' as const },

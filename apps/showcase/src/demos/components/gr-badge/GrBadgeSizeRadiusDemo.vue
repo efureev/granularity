@@ -1,7 +1,3 @@
-<script setup lang="ts">
-import { GrBadge } from '@feugene/granularity'
-</script>
-
 <template>
   <div class="flex flex-wrap items-center gap-2">
     <GrBadge size="xs" tone="success" radius="square">xs square</GrBadge>

@@ -2,7 +2,6 @@
 import { ref } from 'vue'
 
 // `GrRelativeTime` подставляется авто-импортом (`unplugin-vue-components`).
-import { GrButton } from '@feugene/granularity'
 
 /**
  * Здесь `base` не задан: отсчёт идёт от общих часов пакета, и текст обновляется

@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrAvatar, GrBadge, GrButton, GrNavbar } from '@feugene/granularity'
-
 const notifications = ref(3)
 </script>
 

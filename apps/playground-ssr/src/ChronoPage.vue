@@ -1,15 +1,13 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrFormField } from '@feugene/granularity'
-import {
-  GrCalendar,
-  GrDatePicker,
-  GrDateRangePicker,
-  GrDateTimePicker,
-  GrRelativeTime,
-  GrTimePicker,
-} from '@feugene/granularity-chrono'
+import { GrFormField } from '@feugene/granularity/components/GrFormField'
+import { GrCalendar } from '@feugene/granularity-chrono/components/GrCalendar'
+import { GrDatePicker } from '@feugene/granularity-chrono/components/GrDatePicker'
+import { GrDateRangePicker } from '@feugene/granularity-chrono/components/GrDateRangePicker'
+import { GrDateTimePicker } from '@feugene/granularity-chrono/components/GrDateTimePicker'
+import { GrRelativeTime } from '@feugene/granularity-chrono/components/GrRelativeTime'
+import { GrTimePicker } from '@feugene/granularity-chrono/components/GrTimePicker'
 
 /**
  * Companion-пакет `@feugene/granularity-chrono` на сервере.

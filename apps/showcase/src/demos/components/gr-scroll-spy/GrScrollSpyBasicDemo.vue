@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { GrScrollSpy } from '@feugene/granularity'
-
 const sections = [
   { id: 'spy-basic-purpose', label: 'Назначение' },
   { id: 'spy-basic-scope', label: 'Область действия' },

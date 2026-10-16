@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrTabs } from '@feugene/granularity'
-
 const sizes = ['xs', 'sm', 'md', 'lg'] as const
 
 const active = ref('overview')

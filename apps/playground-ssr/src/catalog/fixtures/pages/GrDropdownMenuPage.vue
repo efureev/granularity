@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { GrButton, GrDropdownMenu } from '@feugene/granularity'
+import { GrButton } from '@feugene/granularity/components/GrButton'
+import { GrDropdownMenu } from '@feugene/granularity/components/GrDropdownMenu'
 
 import type { GrDropdownMenuEntry } from '@feugene/granularity'
 

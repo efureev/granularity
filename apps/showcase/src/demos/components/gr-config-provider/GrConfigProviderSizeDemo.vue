@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrButton, GrConfigProvider, GrInput, type GrComponentSize } from '@feugene/granularity'
+import type { GrComponentSize } from '@feugene/granularity'
 
 const size = ref<GrComponentSize>('md')
 const value = ref('Config-driven size')

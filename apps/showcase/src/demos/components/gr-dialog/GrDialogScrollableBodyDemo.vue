@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 
-import { GrButton, GrDialog, GrFormField, GrInput, GrSegmented, GrSwitch } from '@feugene/granularity'
-
 const open = ref(false)
 const scrollBehavior = ref<'inside' | 'outside'>('inside')
 const saved = ref(false)

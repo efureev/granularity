@@ -1,16 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import {
-  GrAutocomplete,
-  GrButton,
-  GrDropdown,
-  GrFormField,
-  GrModal,
-  GrSelect,
-  GrTooltip,
-} from '@feugene/granularity'
-
 // `GrDatePicker` из companion-пакета подставляется авто-импортом.
 const open = ref(false)
 

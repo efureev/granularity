@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 
-import { GrCheckbox, GrSwitch } from '@feugene/granularity'
-
 const weeklyDigest = ref(true)
 const incidentAlerts = ref(false)
 const controlsDisabled = ref(false)

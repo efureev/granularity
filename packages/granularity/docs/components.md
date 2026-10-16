@@ -1,6 +1,6 @@
 # Каталог компонентов
 
-`@feugene/granularity` публикует компоненты через root barrel и через component subpath export-ы.
+`@feugene/granularity` публикует каждый компонент своим subpath export-ом `@feugene/granularity/components/<Имя>`.
 
 ## Рекомендуемый импорт
 
@@ -25,22 +25,17 @@ const query = ref('')
 Каждый компонент — отдельная entry сборки, поэтому в бандл приезжает ровно то,
 что импортировано, вместе со своим CSS ([`packaging.md`](./packaging.md)).
 
-Для быстрого старта допустим root import:
+Корень пакета компоненты тоже экспортирует, но импортировать их оттуда в
+приложении на granum нельзя: `import { GrButton } from '@feugene/granularity'`
+— ошибка сборки `ComponentRootImportError` под `js.guard`. Селекция granum видит
+компонент только по подпути, а корень тянет весь пакет — в dev и в SSR это все
+его компоненты. Утилиты, константы, плагины и типы из корня брать можно. Вместо
+подпутей подойдёт и `virtual:granum/components` — реэкспорт выбранных
+компонентов ([`granum.md`](./granum.md)).
 
-```vue
-<script setup lang="ts">
-import { ref } from 'vue'
-
-import { GrButton, GrInput } from '@feugene/granularity'
-
-const query = ref('')
-</script>
-
-<template>
-  <GrInput v-model="query" placeholder="Поиск" />
-  <GrButton>Найти</GrButton>
-</template>
-```
+Подкомпонент живёт в подпути родителя:
+`import { GrList, GrListItem } from '@feugene/granularity/components/GrList'`.
+Отдельные подпути `components/GrListItem` тоже есть и ведут туда же.
 
 ## Типы компонента
 
@@ -57,7 +52,8 @@ const query = ref('')
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrInput, GrSelect } from '@feugene/granularity'
+import { GrInput } from '@feugene/granularity/components/GrInput'
+import { GrSelect } from '@feugene/granularity/components/GrSelect'
 import type { GrInputEmits, GrInputProps, GrSelectInstance } from '@feugene/granularity'
 
 interface FieldProps extends GrInputProps {

@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrAutocomplete, GrCard } from '@feugene/granularity'
-
 const city = ref('')
 const stack = ref<string[]>([])
 

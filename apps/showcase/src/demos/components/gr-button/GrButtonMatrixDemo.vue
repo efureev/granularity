@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { CSSProperties } from 'vue'
 
-import { GR_TONES, GrButton, type GrButtonVariant } from '@feugene/granularity'
+import { GR_TONES, type GrButtonVariant } from '@feugene/granularity'
 
 const buttonVariants = ['primary', 'secondary', 'outline', 'ghost', 'ghost-border'] as const satisfies readonly GrButtonVariant[]
 const buttonTones = GR_TONES

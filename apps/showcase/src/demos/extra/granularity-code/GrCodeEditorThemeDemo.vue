@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref, shallowRef, watch } from 'vue'
 
-import { GrSegmented } from '@feugene/granularity'
-
 /**
  * Тему подключает **потребитель**, а не пакет.
  *

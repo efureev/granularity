@@ -2,7 +2,6 @@
 import { ref } from 'vue'
 
 import type { GrControlShape } from '@feugene/granularity'
-import { GrFormField, GrNumberInput, GrSegmented } from '@feugene/granularity'
 
 const shape = ref<GrControlShape>('pill')
 const amount = ref<number | null>(1240.5)

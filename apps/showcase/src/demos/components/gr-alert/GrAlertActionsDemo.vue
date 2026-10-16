@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrAlert, GrButton } from '@feugene/granularity'
-
 const visible = ref(true)
 const attempts = ref(0)
 </script>

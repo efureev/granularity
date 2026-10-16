@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { GrBadge, GrCard } from '@feugene/granularity'
-
 const orders = [
   { id: 'A-1041', customer: 'Ada Lovelace', status: 'Активен', dot: 'success' as const },
   { id: 'A-1042', customer: 'Grace Hopper', status: 'Ждёт оплаты', dot: 'warning' as const },

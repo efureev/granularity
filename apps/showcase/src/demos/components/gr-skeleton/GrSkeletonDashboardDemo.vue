@@ -1,7 +1,3 @@
-<script setup lang="ts">
-import { GrSkeleton } from '@feugene/granularity'
-</script>
-
 <template>
   <div class="grid gap-3 md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
     <div class="grid gap-3 rounded-xl border border-[var(--gr-brd)] bg-[var(--gr-card)] p-4">

@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { GrBadge, GrCard } from '@feugene/granularity'
+import { GrBadge } from '@feugene/granularity/components/GrBadge'
+import { GrCard } from '@feugene/granularity/components/GrCard'
 
 import { componentPath, FIXTURE_PACKAGES } from './fixtures'
 

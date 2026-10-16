@@ -2,7 +2,6 @@
 import { computed, ref } from 'vue'
 
 import type { GrSegmentedOption } from '@feugene/granularity'
-import { GrBadge, GrSegmented } from '@feugene/granularity'
 
 const period = ref<'day' | 'week' | 'month'>('week')
 

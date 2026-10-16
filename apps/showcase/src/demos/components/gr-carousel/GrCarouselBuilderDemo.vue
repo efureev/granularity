@@ -1,15 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 
-import {
-  GrCarousel,
-  GrCarouselSlide,
-  GrFormField,
-  GrRadioGroup,
-  GrSelect,
-  GrSwitch,
-  type GrTone,
-} from '@feugene/granularity'
+import type { GrTone } from '@feugene/granularity'
 
 import CodeBlock from '../../../components/doc/CodeBlock.vue'
 

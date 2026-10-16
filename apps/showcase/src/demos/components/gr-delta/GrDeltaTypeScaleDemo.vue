@@ -1,7 +1,3 @@
-<script setup lang="ts">
-import { GrDelta } from '@feugene/granularity'
-</script>
-
 <template>
   <!--
     Разметка величины во всех трёх строках одна и та же — `size` не задан

@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrFileUpload } from '@feugene/granularity'
 import type { GrUploadState } from '@feugene/granularity'
 
 /**

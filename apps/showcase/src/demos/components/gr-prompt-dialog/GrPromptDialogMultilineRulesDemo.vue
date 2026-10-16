@@ -2,7 +2,6 @@
 import { ref } from 'vue'
 
 import type { GrFormRule } from '@feugene/granularity'
-import { GrBadge, GrButton, GrPromptDialog } from '@feugene/granularity'
 
 const open = ref(false)
 const reason = ref('')

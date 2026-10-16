@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 
-import { GrBadge, GrButton } from '@feugene/granularity'
-
 /**
  * Шапка и подвал поля — зоны внутри рамки, а не блоки рядом с ней.
  *

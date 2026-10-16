@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { GrTable } from '@feugene/granularity'
-
 interface LedgerRow {
   date: string
   document: string

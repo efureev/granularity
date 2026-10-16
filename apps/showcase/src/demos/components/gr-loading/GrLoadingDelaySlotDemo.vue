@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrButton, GrLoading, GrProgressBar } from '@feugene/granularity'
-
 const fastLoading = ref(false)
 const exportLoading = ref(false)
 const percent = ref(0)

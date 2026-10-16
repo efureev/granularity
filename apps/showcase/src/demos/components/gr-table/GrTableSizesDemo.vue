@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { GrTable } from '@feugene/granularity'
-
 const sizes = ['xs', 'sm', 'md', 'lg'] as const
 
 const rows = [

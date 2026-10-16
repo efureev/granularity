@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
 
-import { GrButton, GrForm, GrFormField, GrInput } from '@feugene/granularity'
 import type { GrFormInstance, GrFormRules } from '@feugene/granularity'
 
 type FormInstance = GrFormInstance

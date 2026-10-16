@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrBadge, GrSelect } from '@feugene/granularity'
-
 const options = [
   { value: 'ru', label: 'Russia' },
   { value: 'kz', label: 'Kazakhstan' },

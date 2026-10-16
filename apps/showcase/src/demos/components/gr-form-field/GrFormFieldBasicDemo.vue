@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrFormField, GrInput } from '@feugene/granularity'
-
 const name = ref('Operations dashboard')
 </script>
 

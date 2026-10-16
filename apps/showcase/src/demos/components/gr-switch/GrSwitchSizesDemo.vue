@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrSwitch } from '@feugene/granularity'
-
 const xsValue = ref(false)
 const smValue = ref(false)
 const mdValue = ref(true)

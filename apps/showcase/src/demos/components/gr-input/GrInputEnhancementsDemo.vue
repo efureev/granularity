@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrFormField, GrInput } from '@feugene/granularity'
-
 const search = ref('Granularity')
 const bio = ref('Design-system engineer')
 const password = ref('s3cr3t-pass')

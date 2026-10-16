@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { onBeforeUnmount, ref, useTemplateRef, watch } from 'vue'
 
-import { GrSegmented, GrSlider } from '@feugene/granularity'
-
 /**
  * Сколько на самом деле весит результат.
  *

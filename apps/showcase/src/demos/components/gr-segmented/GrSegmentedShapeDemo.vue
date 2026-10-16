@@ -2,7 +2,6 @@
 import { ref } from 'vue'
 
 import type { GrControlShape, GrSegmentedOption } from '@feugene/granularity'
-import { GrSegmented, GrSelect } from '@feugene/granularity'
 
 const view = ref<'grid' | 'list'>('grid')
 const owner = ref('me')

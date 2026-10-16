@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { GrScrollSpy } from '@feugene/granularity'
-
 const sections = [
   { id: 'spy-nested-install', label: 'Установка' },
   { id: 'spy-nested-yarn', label: 'Yarn', level: 2 },

@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrBadge, GrCollapse, GrCollapseItem } from '@feugene/granularity'
-
 const expanded = ref<Array<string | number>>(['summary', 'alerts'])
 </script>
 

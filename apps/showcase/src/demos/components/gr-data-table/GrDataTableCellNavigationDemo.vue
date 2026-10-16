@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { GrDataTable, type GrDataColumn } from '@feugene/granularity'
+import type { GrDataColumn } from '@feugene/granularity'
 
 type Ticket = { id: number, title: string, assignee: string, priority: string, updated: string }
 

@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrAlert, GrButton, GrCard, GrOtpInput } from '@feugene/granularity'
-
 const code = ref('')
 const verified = ref<string | null>(null)
 

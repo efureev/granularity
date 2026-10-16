@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { GrAvatar, GrAvatarGroup, GrCard } from '@feugene/granularity'
-
 const team = [
   { name: 'Alex Doe', status: 'online' as const },
   { name: 'Quinn Ali', status: 'busy' as const },

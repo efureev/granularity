@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrInput, GrSwitch } from '@feugene/granularity'
-
 const enabled = ref(true)
 const activeBackgroundColor = ref('#22c55e')
 const inactiveBackgroundColor = ref('#e5e7eb')

@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrButton, GrDrawer } from '@feugene/granularity'
-
 const open = ref(false)
 const size = ref<'md' | 'lg'>('md')
 

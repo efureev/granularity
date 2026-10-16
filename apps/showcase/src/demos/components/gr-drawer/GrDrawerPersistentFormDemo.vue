@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrButton, GrDrawer, GrFormField, GrInput, GrTextarea } from '@feugene/granularity'
-
 const open = ref(false)
 const saving = ref(false)
 const status = ref('—')

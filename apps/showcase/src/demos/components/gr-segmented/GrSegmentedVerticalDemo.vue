@@ -2,7 +2,6 @@
 import { computed, ref } from 'vue'
 
 import type { GrSegmentedOption, GrSegmentedOrientation } from '@feugene/granularity'
-import { GrSegmented } from '@feugene/granularity'
 
 const scope = ref('all')
 const orientation = ref<GrSegmentedOrientation>('vertical')

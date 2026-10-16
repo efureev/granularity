@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrFileUpload } from '@feugene/granularity'
 import type { GrFileUploadRequestCtx } from '@feugene/granularity'
 
 const lastPercent = ref(0)

@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrFormField, GrSwitch, GrTextarea } from '@feugene/granularity'
-
 const draft = ref('Ship the new showcase after validating all public entities.')
 const reviewNotes = ref('')
 const invalid = ref(false)

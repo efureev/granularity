@@ -6,8 +6,6 @@ import {
   useRoute,
 } from 'vue-router'
 
-import { GrButton } from '@feugene/granularity'
-
 import {
   getShowcaseEntityByPath,
   getShowcasePageByName,

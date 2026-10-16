@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrSelect } from '@feugene/granularity'
-
 // Узкая колонка на 190px: чипы переносятся, а поле растёт вместе с рядами —
 // рамка и кольцо фокуса вокруг всех чипов, а не только первого ряда.
 const labelOptions = [

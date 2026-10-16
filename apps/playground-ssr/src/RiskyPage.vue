@@ -3,30 +3,26 @@ import { ref } from 'vue'
 
 import { GrCodeBlock } from '@feugene/granularity-code/components/GrCodeBlock'
 
-import {
-  GrAffix,
-  GrCarousel,
-  GrCarouselSlide,
-  GrCollapse,
-  GrCollapseItem,
-  GrCommandPalette,
-  GrContextMenu,
-  GrDataTable,
-  GrDrawer,
-  GrFileUpload,
-  GrImageViewer,
-  GrInputTag,
-  GrKbd,
-  GrOtpInput,
-  GrScrollSpy,
-  GrSegmented,
-  GrSlider,
-  GrSplitter,
-  GrStatistic,
-  GrToaster,
-  GrTree,
-  GrTreeSelect,
-} from '@feugene/granularity'
+import { GrAffix } from '@feugene/granularity/components/GrAffix'
+import { GrCarousel, GrCarouselSlide } from '@feugene/granularity/components/GrCarousel'
+import { GrCollapse, GrCollapseItem } from '@feugene/granularity/components/GrCollapse'
+import { GrCommandPalette } from '@feugene/granularity/components/GrCommandPalette'
+import { GrContextMenu } from '@feugene/granularity/components/GrContextMenu'
+import { GrDataTable } from '@feugene/granularity/components/GrDataTable'
+import { GrDrawer } from '@feugene/granularity/components/GrDrawer'
+import { GrFileUpload } from '@feugene/granularity/components/GrFileUpload'
+import { GrImageViewer } from '@feugene/granularity/components/GrImageViewer'
+import { GrInputTag } from '@feugene/granularity/components/GrInputTag'
+import { GrKbd } from '@feugene/granularity/components/GrKbd'
+import { GrOtpInput } from '@feugene/granularity/components/GrOtpInput'
+import { GrScrollSpy } from '@feugene/granularity/components/GrScrollSpy'
+import { GrSegmented } from '@feugene/granularity/components/GrSegmented'
+import { GrSlider } from '@feugene/granularity/components/GrSlider'
+import { GrSplitter } from '@feugene/granularity/components/GrSplitter'
+import { GrStatistic } from '@feugene/granularity/components/GrStatistic'
+import { GrToaster } from '@feugene/granularity/components/GrToaster'
+import { GrTree } from '@feugene/granularity/components/GrTree'
+import { GrTreeSelect } from '@feugene/granularity/components/GrTreeSelect'
 
 /**
  * Страница-улика: компоненты, у которых серверный рендер может сломаться не

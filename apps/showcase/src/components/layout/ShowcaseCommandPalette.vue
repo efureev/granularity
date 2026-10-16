@@ -3,7 +3,7 @@ import { computed, watch } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
 
 import { useFintI18n } from '@feugene/fint-i18n/vue'
-import { GrCommandPalette, GrKbd, type GrCommandItem } from '@feugene/granularity'
+import type { GrCommandItem } from '@feugene/granularity'
 
 import { useShowcaseSearch } from '../../app/useShowcaseSearch'
 

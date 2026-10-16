@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrDataTable } from '@feugene/granularity'
-
 type Deal = { id: number, client: string, stage: string, owner: string, amount: number }
 
 const columns = [

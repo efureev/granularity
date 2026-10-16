@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrButton, GrFormField, GrInput, GrPopover } from '@feugene/granularity'
-
 const open = ref(false)
 const name = ref('Weekly digest')
 const recipients = ref('team@acme.io')

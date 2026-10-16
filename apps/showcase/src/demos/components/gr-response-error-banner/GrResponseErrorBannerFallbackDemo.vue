@@ -1,12 +1,7 @@
 <script setup lang="ts">
 import { ref, shallowRef } from 'vue'
 
-import {
-  GrButton,
-  GrResponseErrorBanner,
-  type ResponseErrorInfo,
-  useResponseError,
-} from '@feugene/granularity'
+import { type ResponseErrorInfo, useResponseError } from '@feugene/granularity'
 
 const { currentError, setRaw, dismiss } = useResponseError()
 const source = ref('—')

@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrInputTag } from '@feugene/granularity'
-
 const tags = ref(['critical', 'backend'])
 </script>
 

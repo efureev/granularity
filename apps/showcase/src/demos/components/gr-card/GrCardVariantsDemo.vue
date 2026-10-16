@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrCard } from '@feugene/granularity'
-
 const opened = ref('—')
 </script>
 

@@ -2,7 +2,6 @@
 import { ref } from 'vue'
 
 import type { GrFormFileError } from '@feugene/granularity'
-import { GrButton, GrFormFile, GrFormField } from '@feugene/granularity'
 
 const files = ref<File[]>([])
 // `v-model:errors` — двусторонний канал: сюда пишет и внутренняя валидация,

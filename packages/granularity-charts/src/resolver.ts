@@ -9,21 +9,15 @@ import { GRANULARITY_CHARTS_COMPONENTS } from './componentNames'
 export const GRANULARITY_CHARTS_PACKAGE_NAME = '@feugene/granularity-charts'
 
 /**
- * Резолвер `unplugin-vue-components` для `@feugene/granularity-charts`.
+ * Резолвер `unplugin-vue-components` для `@feugene/granularity-charts` — явный список его
+ * компонентов.
  *
- * ⚠️ Ставьте его **перед** жадным `GranularityResolver()` ядра — иначе
- * core-резолвер (совпадает с любым `Gr*`) перехватит `GrChartLine` и
- * импортирует его из несуществующего пути в `@feugene/granularity`.
+ * Новому конфигу он не нужен: `GranularityResolver()` из
+ * `@feugene/unplugin-granularity` `>=1.1.0` находит пакет в `package.json`
+ * приложения и резолвит ядро вместе со спутниками, в любом порядке. Этот
+ * резолвер остаётся для уже написанных конфигов и работает рядом с единым.
  *
- * @example
- * ```ts
- * Components({
- *   resolvers: [
- *     GranularityChartsResolver(), // whitelist — раньше…
- *     GranularityResolver(),       // …жадного Gr*-резолвера ядра
- *   ],
- * })
- * ```
+ * `importStyle: false` — CSS компонента доставляет granum из манифеста пакета.
  */
 export function GranularityChartsResolver(): ComponentResolver {
   return createGranularResolver({

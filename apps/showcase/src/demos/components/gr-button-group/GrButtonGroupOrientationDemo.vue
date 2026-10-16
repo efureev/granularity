@@ -1,7 +1,3 @@
-<script setup lang="ts">
-import { GrButton, GrButtonGroup } from '@feugene/granularity'
-</script>
-
 <template>
   <div class="flex flex-wrap items-start gap-8">
     <GrButtonGroup aria-label="Слои карты" orientation="vertical" variant="outline">

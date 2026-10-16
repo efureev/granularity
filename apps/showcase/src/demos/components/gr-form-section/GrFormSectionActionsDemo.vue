@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrBadge, GrButton, GrCard, GrFormField, GrFormSection, GrInput } from '@feugene/granularity'
-
 const members = ref([
   { id: 1, email: 'ada@example.com' },
   { id: 2, email: 'grace@example.com' },

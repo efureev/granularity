@@ -1,7 +1,3 @@
-<script setup lang="ts">
-import { GrBadge, GrButton, GrCard } from '@feugene/granularity'
-</script>
-
 <template>
   <GrCard padding="md" body-class="grid gap-2">
     <template #header>

@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 
-import { GrButton, GrStatistic } from '@feugene/granularity'
 import type { GrDashboardPaletteItem, GrDashboardResponsiveLayout } from '@feugene/granularity-dashboard'
 import { addItem, removeItem } from '@feugene/granularity-dashboard'
 

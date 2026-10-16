@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { GrChip } from '@feugene/granularity'
-
 const tones = ['neutral', 'primary', 'success', 'warning', 'danger', 'info', 'slate', 'azure'] as const
 const sizes = ['xs', 'sm', 'md', 'lg'] as const
 </script>

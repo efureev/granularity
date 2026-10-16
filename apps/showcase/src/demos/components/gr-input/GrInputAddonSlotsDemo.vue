@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrFormField, GrInput, GrSwitch } from '@feugene/granularity'
-
 // Два поля управляют содержимым prefix и suffix целевого инпута — реактивно.
 const prefixText = ref('International account')
 const suffixText = ref('Primary settlement account')

@@ -2,9 +2,11 @@
 
 [`@feugene/unplugin-granularity`](../../unplugin-granularity/README.md) — отдельный build-time пакет-резолвер для
 [`unplugin-vue-components`](https://github.com/unplugin/unplugin-vue-components), заточенный под `@feugene/granularity`.
-Он вставляет в SFC **статические `import`-ы** на granular subpath exports пакета
-(`@feugene/granularity/components/<Name>`, `@feugene/granularity/directives/<name>`), поэтому tree-shaking
-остаётся максимально плотным: в бандл попадает ровно то, что встретилось в шаблонах.
+Он вставляет в SFC **статические `import`-ы** на granular subpath exports пакетов
+(`@feugene/granularity/components/<Name>`, `@feugene/granularity-chrono/components/<Name>`,
+`@feugene/granularity/directives/<name>`), поэтому tree-shaking остаётся максимально плотным: в бандл
+попадает ровно то, что встретилось в шаблонах. Один резолвер обслуживает ядро и все спутники: компоненты
+он берёт из `exports` пакетов, которые установило приложение, — список вести не нужно.
 
 ## Когда использовать
 
@@ -55,15 +57,17 @@ Go
 </template>
 ```
 
-Плагин сам добавит в собранный SFC импорты самих компонентов — и всё: CSS
-подключать не нужно. У большинства компонентов своего CSS нет вовсе, а у тех, у
+Плагин сам добавит в собранный SFC импорты самих компонентов — из подпути пакета, а не из корня, который
+granum отвергает ошибкой `ComponentRootImportError`. CSS подключать не нужно. У большинства компонентов своего CSS нет вовсе, а у тех, у
 кого есть, его granum берёт из манифеста пакета — см. «Нюансы».
 
 ## Опции
 
 ```ts
 GranularityResolver({
-  prefix: 'Gr', // префикс компонентов, по умолчанию 'Gr'
+  packages: ['@feugene/granularity', '@feugene/granularity-chrono'], // по умолчанию — из package.json
+  root: process.cwd(), // откуда читать package.json и искать пакеты
+  prefix: 'Gr', // имя без префикса резолвер не смотрит
   importStyle: false, // подключать component-level CSS, по умолчанию false
   directives: true, // резолвить директивы из whitelist, по умолчанию true
   exclude: /^GrIcon$/, // компоненты/директивы, которые резолвер игнорирует
@@ -72,35 +76,28 @@ GranularityResolver({
 
 | Опция | Тип | По умолчанию | Описание |
 |-------|-----|--------------|----------|
-| `prefix` | `string` | `'Gr'` | Префикс, по которому резолвер узнаёт компоненты пакета. |
-| `importStyle` | `boolean \| 'css'` | `false` | Включать ли рядом с компонентом side-effect импорт `styles.css`. Ядру не нужно. |
+| `packages` | `string[]` | все `@feugene/granularity*` из `package.json` приложения | Чьи компоненты резолвить. Не нашлось ни одного — ядро. |
+| `root` | `string` | `process.cwd()` | Корень приложения: его `package.json` и точка поиска пакетов. |
+| `prefix` | `string` | `'Gr'` | Имена без префикса резолвер не смотрит. |
+| `importStyle` | `boolean \| 'css'` | `false` | Включать ли рядом с компонентом side-effect импорт `styles.css`. Пакетам экосистемы не нужно. |
 | `directives` | `boolean` | `true` | Резолвить ли директивы из встроенного whitelist. `false` — выключить. |
 | `exclude` | `RegExp` | — | Исключения: компоненты/директивы, которые резолвер пропустит. |
 
 Поддерживаемые из коробки директивы: `v-autofocus`, `v-autosize`, `v-click-outside`, `v-dropzone`, `v-hotkey`,
 `v-loading`.
 
-## Companion-пакеты и общая фабрика `createGranularResolver`
+## Спутники и части составных компонентов
 
-Тот же авто-импорт можно включить для **пакетов-спутников** экосистемы (например
-[`@feugene/granularity-chrono`](../../granularity-chrono/README.md)). Их компоненты тоже
-начинаются на `Gr*`, поэтому жадный core-резолвер по префиксу перехватил бы их и попытался
-импортировать из несуществующего пути в `@feugene/granularity`. Решение — **whitelist-резолвер**,
-построенный на общей фабрике `createGranularResolver`, и правильный порядок регистрации:
+Спутники отдельного резолвера не требуют: `GranularityResolver()` находит их в `package.json` приложения и
+читает их `exports` так же, как ядро. Порядок резолверов не важен — имя ведёт ровно в тот пакет, который его
+экспортирует; имя, которое экспортируют два пакета, резолвер не трогает, и такой компонент импортируют руками.
 
-```ts
-import { GranularityResolver } from '@feugene/unplugin-granularity'
-import { GranularityChronoResolver } from '@feugene/granularity-chrono/resolver'
+Часть составного компонента (`GrListItem`, `GrTabPanel`, `GrDropdownMenuItem`) приезжает из подпути
+родителя — `@feugene/granularity/components/GrList`: селекция granum знает компонент по нему.
 
-Components({
-  resolvers: [
-    GranularityChronoResolver(), // whitelist — раньше…
-    GranularityResolver(), // …жадного Gr*-резолвера ядра
-  ],
-})
-```
-
-Как собрать собственный companion-пакет и его резолвер — см.
+Резолверы спутников (`@feugene/granularity-chrono/resolver` и другие) и общая фабрика
+`createGranularResolver` остаются для конфигов, где их уже подключили, — с ними рядом единый резолвер
+работает так же. Как собрать собственный companion-пакет — см.
 [`companion-packages.md`](./companion-packages.md).
 
 ## Нюансы
@@ -108,9 +105,10 @@ Components({
 - **Это build-time инструмент.** Он подхватывает **только** то, что упомянуто в `<template>`. Использование компонента
   через `<component :is="..." />` или в `render()`-функции резолвер не увидит — в таких местах нужен прямой импорт или
   `createGranularity` (для директив).
-- **Whitelist директив — явный.** Если в пакете появилась новая директива, её нужно добавить в whitelist резолвера
-  (или передать через `directives: [...]`). Это сделано сознательно: резолвер не сканирует `node_modules` — он
-  детерминирован и быстр.
+- **Неизвестное имя не резолвится.** Опечатка в теге (`<GrButon>`) не превращается в импорт несуществующего
+  пути: резолвер знает только то, что пакеты публикуют, и Vue предупредит о неизвестном компоненте в консоли.
+- **Whitelist директив — явный.** Если в пакете появилась новая директива, её нужно добавить в whitelist резолвера.
+  Компоненты резолвер читает из `exports` установленных пакетов — один раз, при первом теге.
 - **CSS.** Через резолвер подключать нечего: чанки компонентов CSS не импортируют, собственный `styles.css`
   компонента granum берёт из манифеста пакета в слой `granum.components`, а utility-классы генерирует движок
   по выбранным компонентам. Статический запасной вариант без granum — `@feugene/granularity/styles.css`

@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrFileUpload } from '@feugene/granularity'
-
 const message = ref('Try selecting more than one file in the active uploader')
 const submitted = ref([new File(['contract'], 'contract.pdf', { type: 'application/pdf' })])
 

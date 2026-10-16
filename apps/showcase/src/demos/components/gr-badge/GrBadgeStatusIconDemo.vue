@@ -2,8 +2,6 @@
 import IconCheck from '~icons/lucide/check'
 import IconLoader from '~icons/lucide/loader-circle'
 import IconX from '~icons/lucide/x'
-
-import { GrBadge } from '@feugene/granularity'
 </script>
 
 <template>

@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, useTemplateRef } from 'vue'
 
-import { GrButton, GrFormField, GrSegmented } from '@feugene/granularity'
-
 type State = 'edit' | 'readonly' | 'disabled' | 'invalid'
 
 const state = ref<State>('edit')

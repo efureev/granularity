@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { GrButton, GrPopover } from '@feugene/granularity'
-
 const placements = ['top', 'right', 'bottom', 'left'] as const
 </script>
 

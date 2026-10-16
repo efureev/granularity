@@ -18,7 +18,7 @@ API, а не на библиотеке. Наружу объявлены толь
 ```vue
 <script setup lang="ts">
 import { ref, useTemplateRef } from 'vue'
-import { GrImageCrop } from '@feugene/granularity-media'
+import { GrImageCrop } from '@feugene/granularity-media/components/GrImageCrop'
 
 const file = ref<File | null>(null)
 const cropper = useTemplateRef('cropper')
@@ -84,8 +84,8 @@ async function save() {
 ## Подключение к сборке
 
 Пакет — рядом с ядром, именем: `granum` читает манифест из его `dist`, а не
-сканирует `node_modules`. Резолвер авто-импорта — **перед** жадным
-`GranularityResolver()`.
+сканирует `node_modules`. Авто-импорт — `GranularityResolver()` из
+`@feugene/unplugin-granularity` `>=1.1.0`: пакет он найдёт в `package.json` приложения сам.
 
 ```ts
 // granum.config.ts

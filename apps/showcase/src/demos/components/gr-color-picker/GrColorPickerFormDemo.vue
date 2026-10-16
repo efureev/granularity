@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
 
-import { GrButton, GrColorPicker, GrForm, GrFormField, GrInput, type GrFormRules } from '@feugene/granularity'
+import type { GrFormRules } from '@feugene/granularity'
 
 const model = reactive({ name: '', accent: '#22c55e' })
 

@@ -99,7 +99,9 @@ defineGranumConfig({
 
 Своя тема приложения задаётся в том же месте — `themes.define` с `extends`
 или `tokensRef`; переопределение отдельных токенов — `themes.tokenOverrides`.
-Подробности — [`theming.md`](./theming.md).
+Темы пакета приезжают CSS-файлами, и значения из `define` и `tokenOverrides`
+granum ставит после файла под его селектор — они побеждают. Подробности —
+[`theming.md`](./theming.md).
 
 ### Обрезка неиспользуемых токенов
 
@@ -130,7 +132,11 @@ defineGranumConfig({
 ```
 
 `guard` ловит импорт компонента, которого нет в селекции: его CSS в сборку не
-попал бы, и компонент отрендерился бы голым. Режим `components: 'imports'`
+попал бы, и компонент отрендерился бы голым. Тот же `guard` отвергает компонент
+из корня пакета — `import { GrButton } from '@feugene/granularity'` даёт
+`ComponentRootImportError`: селекция видит компонент только по подпути
+`@feugene/granularity/components/<Имя>`, а корень тянет весь пакет. Утилиты,
+плагины и типы из корня брать можно. Режим `components: 'imports'`
 считает селекцию по импортам и тегам в `appSources` — тогда списка можно не
 вести вовсе.
 

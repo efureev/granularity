@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrButton, GrFormField, GrInput } from '@feugene/granularity'
+import { GrInput } from '@feugene/granularity/components/GrInput'
 
 type GrInputInstance = InstanceType<typeof GrInput>
 

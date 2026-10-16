@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 
-import { GrBadge, GrSidebar } from '@feugene/granularity'
-
 const currentSection = ref('api')
 const sections = [
   { label: 'Overview', value: 'overview' },

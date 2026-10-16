@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrBadge, GrFormField, GrFormFile } from '@feugene/granularity'
 import type { FileValidationIssue } from '@feugene/granularity'
 
 const selectedFile = ref<File | null>(null)

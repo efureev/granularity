@@ -1,7 +1,3 @@
-<script setup lang="ts">
-import { GrList, GrListItem } from '@feugene/granularity'
-</script>
-
 <template>
   <GrList>
     <!--

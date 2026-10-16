@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { nextTick, onBeforeUnmount, ref, useTemplateRef } from 'vue'
 
-import { GrAvatar, GrCard } from '@feugene/granularity'
-
 /**
  * Один кадр — три файла, и каждый показан там, где он потом и появится.
  *

@@ -1,7 +1,10 @@
+import type { ComponentResolverObject } from 'unplugin-vue-components/types'
 import { readdirSync, readFileSync, statSync } from 'node:fs'
-import { join } from 'node:path'
+import { join, relative } from 'node:path'
 import { fileURLToPath, URL } from 'node:url'
 import { describe, expect, it } from 'vitest'
+
+import { granularityAutoImportResolvers } from '../app/autoImportResolvers'
 
 function collectVueFiles(directoryPath: string): string[] {
   const entries = readdirSync(directoryPath, { withFileTypes: true })
@@ -19,58 +22,59 @@ function collectVueFiles(directoryPath: string): string[] {
   })
 }
 
-function collectGranularityExports(source: string): Set<string> {
-  return new Set([...source.matchAll(/\b(Gr[A-Z][A-Za-z0-9]*)\b/g)].map(match => match[1]))
+/** Теги `Gr*` из шаблона — всё, что вне `<script>` и `<style>`. */
+function collectTemplateComponents(source: string): Set<string> {
+  const template = source
+    .replace(/<script\b[^>]*>[\s\S]*?<\/script>/g, '')
+    .replace(/<style\b[^>]*>[\s\S]*?<\/style>/g, '')
+    .replace(/<!--[\s\S]*?-->/g, '')
+
+  return new Set([...template.matchAll(/<(Gr[A-Z][A-Za-z0-9]*)\b/g)].map(match => match[1]))
 }
 
-function collectGranularityImports(source: string): Set<string> {
-  const imports = new Set<string>()
+/** Компоненты, импортированные из корня пакета экосистемы, а не из подпути. */
+function collectRootComponentImports(source: string): string[] {
+  const names: string[] = []
 
-  for (const match of source.matchAll(/import\s*\{([^}]*)\}\s*from\s*['"]@feugene\/granularity['"]/g)) {
+  for (const match of source.matchAll(/^import\s*\{([^}]*)\}\s*from\s*'@feugene\/granularity(?:-[a-z-]+)?'/gm)) {
     for (const specifier of match[1].split(',')) {
-      const normalizedSpecifier = specifier.trim().replace(/^type\s+/, '')
-
-      if (!normalizedSpecifier)
-        continue
-
-      imports.add(normalizedSpecifier.split(/\s+as\s+/)[0].trim())
+      const name = specifier.trim()
+      if (/^Gr[A-Z]/.test(name))
+        names.push(name)
     }
   }
 
-  return imports
+  return names
 }
 
-function collectTemplateComponents(source: string): Set<string> {
-  const templateMatch = source.match(/<template>([\s\S]*?)<\/template>/)
+const srcRoot = fileURLToPath(new URL('..', import.meta.url))
+const vueFiles = collectVueFiles(srcRoot)
+const componentResolver = granularityAutoImportResolvers()[0] as ComponentResolverObject
+const resolve = componentResolver.resolve as (name: string) => { from: string } | undefined
 
-  if (!templateMatch)
-    return new Set()
+describe('импорт компонентов в витрине', () => {
+  /**
+   * Компонент в шаблоне не импортируется руками: его подставляет авто-импорт
+   * (`app/autoImportResolvers.ts`). Значит, каждый тег `Gr*` резолвер обязан
+   * знать — иначе Vue отрендерит пустой элемент с предупреждением в консоли, а
+   * сборка пройдёт.
+   */
+  it('каждый тег Gr* в шаблонах резолвится авто-импортом', () => {
+    const unresolved = vueFiles.flatMap(filePath => [...collectTemplateComponents(readFileSync(filePath, 'utf8'))]
+      .filter(name => !resolve(name))
+      .map(name => `${relative(srcRoot, filePath)}: ${name}`))
 
-  return new Set([...templateMatch[1].matchAll(/<\/?(Gr[A-Z][A-Za-z0-9]*)\b/g)].map(match => match[1]))
-}
+    expect(unresolved).toEqual([])
+  })
 
-const demosRoot = fileURLToPath(new URL('../demos', import.meta.url))
-// `demos/extra/*` — демо companion-пакетов, которые СПЕЦИАЛЬНО опираются на
-// авто-импорт `unplugin-vue-components` (см. `app/autoImportResolvers.ts`),
-// поэтому не обязаны явно импортировать компоненты. Исключаем их из проверки.
-const demoFiles = collectVueFiles(demosRoot).filter(filePath => !filePath.includes('/demos/extra/'))
-const granularityIndexSource = readFileSync(
-  fileURLToPath(new URL('../../../../packages/granularity/src/index.ts', import.meta.url)),
-  'utf8',
-)
-const granularityExports = collectGranularityExports(granularityIndexSource)
+  /**
+   * Корень пакета тянет все его компоненты, и granum отвергает такой импорт
+   * ошибкой `ComponentRootImportError`. Тест называет файл раньше сборки.
+   */
+  it('компоненты не импортируются из корня пакета', () => {
+    const rootImports = vueFiles.flatMap(filePath => collectRootComponentImports(readFileSync(filePath, 'utf8'))
+      .map(name => `${relative(srcRoot, filePath)}: ${name}`))
 
-describe('showcase demos imports', () => {
-  it('явно импортирует из @feugene/granularity все используемые Gr-компоненты в demo-файлах', () => {
-    for (const filePath of demoFiles) {
-      const fileSource = readFileSync(filePath, 'utf8')
-      const usedComponents = [...collectTemplateComponents(fileSource)]
-        .filter(componentName => granularityExports.has(componentName))
-        .sort()
-      const importedComponents = collectGranularityImports(fileSource)
-      const missingImports = usedComponents.filter(componentName => !importedComponents.has(componentName))
-
-      expect(missingImports, filePath).toEqual([])
-    }
+    expect(rootImports).toEqual([])
   })
 })

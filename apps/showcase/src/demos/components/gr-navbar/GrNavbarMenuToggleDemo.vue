@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrNavbar } from '@feugene/granularity'
-
 const isMenuOpen = ref(false)
 const navItems = ['Overview', 'Deployments', 'Billing', 'Settings']
 </script>

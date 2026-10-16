@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { GrIcon, GrLink } from '@feugene/granularity'
-
 const items = [
   'Sync billing status every 5 minutes',
   'Re-run failed payout webhooks automatically',

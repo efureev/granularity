@@ -3,8 +3,6 @@ import { computed, ref } from 'vue'
 import { RouterLink } from 'vue-router'
 import IconArrowRight from '~icons/lucide/arrow-right'
 
-import { GrCard } from '@feugene/granularity'
-
 import ShowcasePageHero from '../showcase/ShowcasePageHero.vue'
 import { compareEntityGroups } from '../../app/showcaseEntityGroups'
 import { useShowcasePageI18n } from '../../app/useShowcasePageI18n'

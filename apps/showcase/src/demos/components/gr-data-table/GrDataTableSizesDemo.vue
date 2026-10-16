@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { GrDataTable } from '@feugene/granularity'
-
 const sizes = ['xs', 'sm', 'md', 'lg'] as const
 
 const columns = [

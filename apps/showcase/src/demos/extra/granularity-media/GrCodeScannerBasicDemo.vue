@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrBadge, GrSwitch } from '@feugene/granularity'
 import type { GrCodeResult } from '@feugene/granularity-media'
 
 const found = ref<GrCodeResult[]>([])

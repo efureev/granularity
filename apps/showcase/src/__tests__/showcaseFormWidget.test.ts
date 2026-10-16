@@ -3,7 +3,7 @@ import { mount } from '@vue/test-utils'
 import { describe, expect, it, vi } from 'vitest'
 import { defineComponent, h, nextTick } from 'vue'
 
-import { GrFormField } from '@feugene/granularity'
+import { GrFormField } from '@feugene/granularity/components/GrFormField'
 
 import SeverityField from '../demos/extra/granularity-forms-schema/SeverityField.vue'
 

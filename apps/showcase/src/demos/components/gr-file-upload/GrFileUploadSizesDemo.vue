@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { GrFileUpload } from '@feugene/granularity'
-
 const sizes = ['xs', 'sm', 'md', 'lg'] as const
 </script>
 

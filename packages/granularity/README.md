@@ -18,8 +18,8 @@ strategies.
 ## What makes `granularity` good
 
 - **Fast start without unnecessary magic.** You can simply import components and ready-made style entrypoints.
-- **Granular imports.** Components are available both from the root API and via `subpath exports`, if you need finer
-  control over bundle size.
+- **Granular imports.** Every component is its own subpath export, so the bundle carries exactly what you
+  import and nothing next to it.
 - **Sane styling.** Tokens, base styles, themes, and component-level CSS are split into clear layers.
 - **Ready for real scale.** The package works for "just plugged in a few components" as well as scenarios where
   dependency-aware imports, safelist, and precise CSS pipeline tuning matter.
@@ -31,7 +31,9 @@ strategies.
 
 ## Technical highlights
 
-- root export: `@feugene/granularity`;
+- root export: `@feugene/granularity` — plugins, composables, utilities, constants and types. Components come
+  from their subpaths: with `granum`, a component imported from the root is a `ComponentRootImportError`,
+  because the selection only sees a component by its subpath and the root loads the whole package;
 - component subpath exports: `@feugene/granularity/components/<ComponentName>`;
 - ready-made CSS entrypoint: `@feugene/granularity/styles.css` — tokens, base layer, preflight and the
   built-in `light`/`dark` themes in one file, for consumers who do not run the build pipeline. A
@@ -101,6 +103,18 @@ import 'virtual:granum.css'
 
 That single module carries five cascade layers: tokens, base, themes, the CSS of the components you
 selected, and the utility classes they are built from.
+
+Components are imported from their subpaths:
+
+```vue
+<script setup lang="ts">
+import { GrButton } from '@feugene/granularity/components/GrButton'
+</script>
+
+<template>
+  <GrButton>Save</GrButton>
+</template>
+```
 
 Without the plugin there is still a static fallback — `@feugene/granularity/styles.css` — with tokens,
 the base layer, the preflight and the built-in `light`/`dark` themes. What it does not carry is the

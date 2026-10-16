@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { GrJsonViewer } from '@feugene/granularity'
-
 // Ровно та форма, в которой ответ приходит из БД: `unknown` со всеми типами
 // JSON, включая `null` и вложенный массив.
 const response = {

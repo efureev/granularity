@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrFormField, GrTextarea } from '@feugene/granularity'
-
 const post = ref('Выпустили гранулярность 0.49: каждый компонент едет своим subpath-экспортом.')
 const note = ref('')
 </script>

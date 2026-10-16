@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
-import { GrBadge, GrLink } from '@feugene/granularity'
-
 type InlineRichTextPart = {
   type: 'text' | 'badge' | 'link'
   content: string

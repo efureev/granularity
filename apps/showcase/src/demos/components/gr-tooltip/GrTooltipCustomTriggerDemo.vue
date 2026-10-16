@@ -1,7 +1,3 @@
-<script setup lang="ts">
-import { GrTooltip } from '@feugene/granularity'
-</script>
-
 <template>
   <div class="flex flex-wrap items-center gap-4">
     <GrTooltip text="Custom slot lets you attach the tooltip to any trigger element.">

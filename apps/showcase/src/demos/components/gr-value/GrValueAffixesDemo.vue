@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { GrCard, GrValue } from '@feugene/granularity'
-
 const amount = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 2 }).format(1284500.5)
 </script>
 

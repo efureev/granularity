@@ -2,7 +2,6 @@
 import { computed, ref } from 'vue'
 
 import type { GrRadioGroupOrientation } from '@feugene/granularity'
-import { GrRadioGroup, GrSegmented } from '@feugene/granularity'
 
 const status = ref('review')
 const orientation = ref<GrRadioGroupOrientation>('vertical')

@@ -1,7 +1,3 @@
-<script setup lang="ts">
-import { GrButton, GrButtonGroup, GrTooltip } from '@feugene/granularity'
-</script>
-
 <template>
   <div class="grid gap-4">
     <!-- Оформление задаётся один раз на группе, а не повторяется на каждой кнопке. -->

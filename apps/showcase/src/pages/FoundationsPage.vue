@@ -3,7 +3,7 @@ import { computed, ref } from 'vue'
 
 import { useFintI18n } from '@feugene/fint-i18n/vue'
 import type { GrComponentSize } from '@feugene/granularity'
-import { GR_CONTROL_HEIGHTS_PX, GrBadge, GrCard, GrColorPicker, GrInput, GrLink, GrNumberInput, GrSegmented, GrSelect, GrSwitch } from '@feugene/granularity'
+import { GR_CONTROL_HEIGHTS_PX } from '@feugene/granularity'
 
 import InlineRichText from '../components/content/InlineRichText.vue'
 import CodeBlock from '../components/doc/CodeBlock.vue'

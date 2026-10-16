@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrButton, GrTable } from '@feugene/granularity'
-
 const loading = ref(true)
 
 const rows = [

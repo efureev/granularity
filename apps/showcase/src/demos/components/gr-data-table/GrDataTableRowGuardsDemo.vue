@@ -2,7 +2,6 @@
 import { ref } from 'vue'
 
 import type { GrDataColumn } from '@feugene/granularity'
-import { GrBadge, GrDataTable } from '@feugene/granularity'
 
 type Invoice = {
   id: number

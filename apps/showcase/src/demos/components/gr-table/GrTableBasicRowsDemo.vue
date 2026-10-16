@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { GrBadgeTone } from '@feugene/granularity'
-import { GrBadge, GrTable } from '@feugene/granularity'
 
 interface TableRow {
   campaign: string

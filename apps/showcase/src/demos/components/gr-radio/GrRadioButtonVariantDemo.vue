@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrRadio } from '@feugene/granularity'
-
 const density = ref('balanced')
 </script>
 

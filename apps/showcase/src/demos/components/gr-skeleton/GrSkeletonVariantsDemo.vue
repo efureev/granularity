@@ -1,7 +1,3 @@
-<script setup lang="ts">
-import { GrSkeleton } from '@feugene/granularity'
-</script>
-
 <template>
   <div class="grid gap-4">
     <div class="grid gap-3 sm:grid-cols-3">

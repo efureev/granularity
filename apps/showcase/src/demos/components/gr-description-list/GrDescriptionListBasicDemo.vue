@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { GrDescriptionItem } from '@feugene/granularity'
-import { GrBadge, GrDescriptionList } from '@feugene/granularity'
 
 const items: GrDescriptionItem[] = [
   { label: 'Status', value: 'Active', name: 'status' },

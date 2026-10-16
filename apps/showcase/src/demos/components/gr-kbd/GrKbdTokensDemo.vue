@@ -2,7 +2,7 @@
 import { computed, onMounted, ref } from 'vue'
 
 import type { GrKbdPlatform, GrKbdTokenGroup } from '@feugene/granularity'
-import { GR_KBD_TOKENS, GrKbd, GrSegmented } from '@feugene/granularity'
+import { GR_KBD_TOKENS } from '@feugene/granularity'
 
 const platform = ref<GrKbdPlatform>('auto')
 

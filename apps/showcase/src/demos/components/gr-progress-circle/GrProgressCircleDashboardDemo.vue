@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted } from 'vue'
-import { GrCard, GrProgressCircle } from '@feugene/granularity'
 
 import { useTweenedValue } from './useTweenedValue'
 

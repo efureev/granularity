@@ -1,8 +1,5 @@
 <script setup lang="ts">
-import {
-  GrButton,
-  useTheme,
-} from '@feugene/granularity'
+import { useTheme } from '@feugene/granularity'
 
 import IconMoon from '~icons/lucide/moon'
 import IconSun from '~icons/lucide/sun'

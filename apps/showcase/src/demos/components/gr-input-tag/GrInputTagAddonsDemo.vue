@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrInputTag } from '@feugene/granularity'
-
 const recipients = ref(['ops@acme.io'])
 </script>
 

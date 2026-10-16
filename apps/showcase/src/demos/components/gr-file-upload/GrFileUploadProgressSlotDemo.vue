@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { GrButton, GrFileUpload } from '@feugene/granularity'
 import type { GrFileUploadRequestCtx, GrUploadState } from '@feugene/granularity'
 
 /**

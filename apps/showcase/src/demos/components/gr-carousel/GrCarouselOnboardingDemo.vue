@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { GrButton, GrCarousel, GrCarouselSlide } from '@feugene/granularity'
-
 const steps = [
   { id: 'project', n: '1', title: 'Заведите проект', text: 'Название и часовой пояс — остальное можно поменять позже.', cta: 'Создать проект' },
   { id: 'team', n: '2', title: 'Позовите команду', text: 'Приглашение по ссылке, роли настраиваются потом.', cta: 'Скопировать ссылку' },

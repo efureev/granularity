@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrDataTable } from '@feugene/granularity'
-
 type Shipment = {
   id: number
   code: string

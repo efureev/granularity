@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 
-import { GrFormField, GrRadio, GrRadioGroup } from '@feugene/granularity'
-
 // Значения числовые: перечисления в реальных формах — это обычно id, а не строка.
 const planId = ref(2)
 

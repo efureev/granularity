@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { GrIcon } from '@feugene/granularity'
-
 const sizes = [12, 16, 20, 28, 36]
 </script>
 

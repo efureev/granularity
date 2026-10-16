@@ -62,7 +62,7 @@
 Наиболее здоровый сценарий такой:
 
 1. если интеграция проектируется с нуля, рекомендуемый вариант i18n-слоя — `@feugene/fint-i18n`; если в приложении уже
-   есть зрелый i18n-слой, `granularity` можно встраивать и в него;
+   есть зрелый i18n-слой, `granularity` встраивается и в него — адаптером (см. «Своё i18n: адаптер» ниже);
 2. переводы для `granularity` подключаются в этот же слой рядом с остальными словарями, например через package-level
    entrypoint `@feugene/granularity/i18n`;
 3. при необходимости тексты дизайн-системы переопределяются на стороне приложения;
@@ -73,8 +73,8 @@
 ## Публичный API пакета
 
 Пакет публикует package-level entrypoint `@feugene/granularity/i18n`, который можно использовать вместе с
-`@feugene/fint-i18n` (начиная с `@feugene/fint-i18n@^0.3.0` — объявлена как optional peer dependency пакета;
-более старые версии не тестировались и не гарантируются).
+`@feugene/fint-i18n` — optional peer dependency пакета, `>=0.9.0 <1.0.0`: пакет тестируется на 0.9, более
+старые версии не гарантируются.
 
 Он экспортирует:
 
@@ -106,6 +106,46 @@ await i18n.loadUsedBlocks('ru')
 // provide/inject, и компоненты останутся на встроенных fallback-текстах.
 installI18n(app, i18n)
 ```
+
+Язык переключает `i18n.setLocale('en')`. `GrConfigProvider` с пропом `locale` зовёт его сам: у
+инстанса fint нет `syncLocale` из контракта адаптера, и провайдер берёт `setLocale`.
+
+### Своё i18n: адаптер
+
+Если в приложении уже есть свой переводчик, `granularity` подключается к нему адаптером — объектом
+`GranularityI18nAdapter` из `@feugene/granularity/i18n`:
+
+| Поле | Обязательно | Зачем |
+| --- | --- | --- |
+| `t(key, params?)` | да | перевод; параметры — `{n}`, `{count}` и именованные |
+| `te(key)` | нет | «есть ли перевод»; без него пакет сравнивает `t(key) === key` |
+| `locale` | нет | `Ref` активной локали — для `Intl` и сортировки |
+| `syncLocale(locale)` | нет | смена языка по пропу `locale` у `GrConfigProvider` |
+
+Адаптер отдают пропом `i18n` у `GrConfigProvider` или через `app.provide(GRANULARITY_I18N_KEY, adapter)`.
+Пример для `vue-i18n` в режиме Composition API:
+
+```ts
+import { GRANULARITY_I18N_KEY, type GranularityI18nAdapter } from '@feugene/granularity/i18n'
+import { createI18n } from 'vue-i18n'
+
+const vueI18n = createI18n({ legacy: false, locale: 'ru', fallbackLocale: 'en', messages })
+const { t, te, locale } = vueI18n.global
+
+const adapter: GranularityI18nAdapter = {
+  t: (key, params) => t(key, params ?? {}),
+  te: key => te(key),
+  locale,
+  syncLocale: (next) => { locale.value = next },
+}
+
+app.use(vueI18n)
+app.provide(GRANULARITY_I18N_KEY, adapter)
+```
+
+Словари пакета (`en`, `ru`, `es`) — загрузчики в формате `fint-i18n`; с другим переводчиком строки
+`gr.*` приложение кладёт в свои сообщения, а чего там нет, компонент покажет встроенным английским
+текстом.
 
 Это не отменяет базовые правила интеграции:
 

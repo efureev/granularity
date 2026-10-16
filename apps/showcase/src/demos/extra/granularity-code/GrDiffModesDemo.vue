@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrSegmented, GrSwitch } from '@feugene/granularity'
-
 /** Две ревизии конфига окружения — типичный вход журнала аудита. */
 const BEFORE = `service: billing
 replicas: 2

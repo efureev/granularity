@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { reactive } from 'vue'
 
-import { GrList, GrListItem, GrSwitch } from '@feugene/granularity'
-
 const settings = reactive({
   alerts: true,
   summaries: false,

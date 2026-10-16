@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { GrAvatar, GrCard } from '@feugene/granularity'
-
 /**
  * Имён больше, чем слотов палитры: так в кадр попадают все шесть, и видно, что
  * повтор цвета у разных людей — норма, а не сбой.

@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 
-import { GrCarousel, GrCarouselSlide } from '@feugene/granularity'
-
 const frame = ref(0)
 
 const photos = [

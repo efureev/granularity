@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 
 import { useFintI18n } from '@feugene/fint-i18n/vue'
-import { GrSegmented, type GrSegmentedOption } from '@feugene/granularity'
+import type { GrSegmentedOption } from '@feugene/granularity'
 
 const i18n = useFintI18n()
 

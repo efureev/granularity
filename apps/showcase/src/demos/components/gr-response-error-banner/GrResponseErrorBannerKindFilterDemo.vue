@@ -1,16 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, shallowRef } from 'vue'
 
-import {
-  GrButton,
-  GrCard,
-  GrFormField,
-  GrResponseErrorBanner,
-  GrSelect,
-  type ResponseErrorInfo,
-  type ResponseErrorKind,
-  useResponseError,
-} from '@feugene/granularity'
+import { type ResponseErrorInfo, type ResponseErrorKind, useResponseError } from '@feugene/granularity'
 
 class FakeHttpError extends Error {
   isAxiosError = true

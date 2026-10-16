@@ -2,7 +2,6 @@
 import { ref } from 'vue'
 
 import type { GrControlShape } from '@feugene/granularity'
-import { GrSegmented, GrTreeSelect } from '@feugene/granularity'
 
 interface CostCentre {
   id: number

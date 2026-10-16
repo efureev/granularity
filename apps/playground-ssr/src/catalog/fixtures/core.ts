@@ -1,83 +1,79 @@
 import { Fragment, h } from 'vue'
 
-import {
-  GrAffix,
-  GrAlert,
-  GrAutocomplete,
-  GrAvatar,
-  GrBadge,
-  GrBadgeWrap,
-  GrBottomNav,
-  GrBreadcrumbs,
-  GrButton,
-  GrButtonGroup,
-  GrCard,
-  GrCarousel,
-  GrCarouselSlide,
-  GrCheckbox,
-  GrCheckboxGroup,
-  GrChip,
-  GrChipGroup,
-  GrCollapse,
-  GrCollapseItem,
-  GrColorPicker,
-  GrCommandPalette,
-  GrConfigProvider,
-  GrConfirmDialog,
-  GrContextMenu,
-  GrDataTable,
-  GrDelta,
-  GrDescriptionList,
-  GrDialog,
-  GrDialogServiceHost,
-  GrDivider,
-  GrDrawer,
-  GrEmptyState,
-  GrFilePreview,
-  GrFileUpload,
-  GrFormField,
-  GrFormFile,
-  GrFormSection,
-  GrIcon,
-  GrImageViewer,
-  GrInput,
-  GrInputTag,
-  GrJsonViewer,
-  GrKbd,
-  GrLink,
-  GrLoading,
-  GrModal,
-  GrNavbar,
-  GrNumberInput,
-  GrOtpInput,
-  GrPagination,
-  GrPopover,
-  GrProgressBar,
-  GrProgressCircle,
-  GrPromptDialog,
-  GrRadio,
-  GrRadioGroup,
-  GrRating,
-  GrResponseErrorBanner,
-  GrScrollSpy,
-  GrSegmented,
-  GrSelect,
-  GrSkeleton,
-  GrSlider,
-  GrStatistic,
-  GrSteps,
-  GrSwitch,
-  GrTable,
-  GrTabs,
-  GrTextarea,
-  GrToaster,
-  GrTooltip,
-  GrTransfer,
-  GrTree,
-  GrTreeSections,
-  GrTreeSelect,
-  GrValue,
-} from '@feugene/granularity'
+import { GrAffix } from '@feugene/granularity/components/GrAffix'
+import { GrAlert } from '@feugene/granularity/components/GrAlert'
+import { GrAutocomplete } from '@feugene/granularity/components/GrAutocomplete'
+import { GrAvatar } from '@feugene/granularity/components/GrAvatar'
+import { GrBadge } from '@feugene/granularity/components/GrBadge'
+import { GrBadgeWrap } from '@feugene/granularity/components/GrBadgeWrap'
+import { GrBottomNav } from '@feugene/granularity/components/GrBottomNav'
+import { GrBreadcrumbs } from '@feugene/granularity/components/GrBreadcrumbs'
+import { GrButton } from '@feugene/granularity/components/GrButton'
+import { GrButtonGroup } from '@feugene/granularity/components/GrButtonGroup'
+import { GrCard } from '@feugene/granularity/components/GrCard'
+import { GrCarousel, GrCarouselSlide } from '@feugene/granularity/components/GrCarousel'
+import { GrCheckbox } from '@feugene/granularity/components/GrCheckbox'
+import { GrCheckboxGroup } from '@feugene/granularity/components/GrCheckboxGroup'
+import { GrChip } from '@feugene/granularity/components/GrChip'
+import { GrChipGroup } from '@feugene/granularity/components/GrChipGroup'
+import { GrCollapse, GrCollapseItem } from '@feugene/granularity/components/GrCollapse'
+import { GrColorPicker } from '@feugene/granularity/components/GrColorPicker'
+import { GrCommandPalette } from '@feugene/granularity/components/GrCommandPalette'
+import { GrConfigProvider } from '@feugene/granularity/components/GrConfigProvider'
+import { GrConfirmDialog } from '@feugene/granularity/components/GrConfirmDialog'
+import { GrContextMenu } from '@feugene/granularity/components/GrContextMenu'
+import { GrDataTable } from '@feugene/granularity/components/GrDataTable'
+import { GrDelta } from '@feugene/granularity/components/GrDelta'
+import { GrDescriptionList } from '@feugene/granularity/components/GrDescriptionList'
+import { GrDialog } from '@feugene/granularity/components/GrDialog'
+import { GrDialogServiceHost } from '@feugene/granularity/components/GrDialogService'
+import { GrDivider } from '@feugene/granularity/components/GrDivider'
+import { GrDrawer } from '@feugene/granularity/components/GrDrawer'
+import { GrEmptyState } from '@feugene/granularity/components/GrEmptyState'
+import { GrFilePreview } from '@feugene/granularity/components/GrFilePreview'
+import { GrFileUpload } from '@feugene/granularity/components/GrFileUpload'
+import { GrFormField } from '@feugene/granularity/components/GrFormField'
+import { GrFormFile } from '@feugene/granularity/components/GrFormFile'
+import { GrFormSection } from '@feugene/granularity/components/GrFormSection'
+import { GrIcon } from '@feugene/granularity/components/GrIcon'
+import { GrImageViewer } from '@feugene/granularity/components/GrImageViewer'
+import { GrInput } from '@feugene/granularity/components/GrInput'
+import { GrInputTag } from '@feugene/granularity/components/GrInputTag'
+import { GrJsonViewer } from '@feugene/granularity/components/GrJsonViewer'
+import { GrKbd } from '@feugene/granularity/components/GrKbd'
+import { GrLink } from '@feugene/granularity/components/GrLink'
+import { GrLoading } from '@feugene/granularity/components/GrLoading'
+import { GrModal } from '@feugene/granularity/components/GrModal'
+import { GrNavbar } from '@feugene/granularity/components/GrNavbar'
+import { GrNumberInput } from '@feugene/granularity/components/GrNumberInput'
+import { GrOtpInput } from '@feugene/granularity/components/GrOtpInput'
+import { GrPagination } from '@feugene/granularity/components/GrPagination'
+import { GrPopover } from '@feugene/granularity/components/GrPopover'
+import { GrProgressBar } from '@feugene/granularity/components/GrProgressBar'
+import { GrProgressCircle } from '@feugene/granularity/components/GrProgressCircle'
+import { GrPromptDialog } from '@feugene/granularity/components/GrPromptDialog'
+import { GrRadio } from '@feugene/granularity/components/GrRadio'
+import { GrRadioGroup } from '@feugene/granularity/components/GrRadioGroup'
+import { GrRating } from '@feugene/granularity/components/GrRating'
+import { GrResponseErrorBanner } from '@feugene/granularity/components/GrResponseErrorBanner'
+import { GrScrollSpy } from '@feugene/granularity/components/GrScrollSpy'
+import { GrSegmented } from '@feugene/granularity/components/GrSegmented'
+import { GrSelect } from '@feugene/granularity/components/GrSelect'
+import { GrSkeleton } from '@feugene/granularity/components/GrSkeleton'
+import { GrSlider } from '@feugene/granularity/components/GrSlider'
+import { GrStatistic } from '@feugene/granularity/components/GrStatistic'
+import { GrSteps } from '@feugene/granularity/components/GrSteps'
+import { GrSwitch } from '@feugene/granularity/components/GrSwitch'
+import { GrTable } from '@feugene/granularity/components/GrTable'
+import { GrTabs } from '@feugene/granularity/components/GrTabs'
+import { GrTextarea } from '@feugene/granularity/components/GrTextarea'
+import { GrToaster } from '@feugene/granularity/components/GrToaster'
+import { GrTooltip } from '@feugene/granularity/components/GrTooltip'
+import { GrTransfer } from '@feugene/granularity/components/GrTransfer'
+import { GrTree } from '@feugene/granularity/components/GrTree'
+import { GrTreeSections } from '@feugene/granularity/components/GrTreeSections'
+import { GrTreeSelect } from '@feugene/granularity/components/GrTreeSelect'
+import { GrValue } from '@feugene/granularity/components/GrValue'
 
 import type { ComponentFixture } from '../fixture'
 

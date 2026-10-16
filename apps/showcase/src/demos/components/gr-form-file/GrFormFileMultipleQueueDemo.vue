@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 
-import { GrBadge, GrFormFile } from '@feugene/granularity'
-
 const attachments = ref<File[]>([])
 
 const totalSizeLabel = computed(() => {

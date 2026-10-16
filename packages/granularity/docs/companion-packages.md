@@ -34,7 +34,6 @@ packages/<my-package>/
 ├── CHANGELOG.md
 └── src/
     ├── index.ts                 # root barrel
-    ├── resolver.ts              # (опц.) резолвер авто-импорта
     ├── components/
     │   └── GrMyThing/
     │       ├── GrMyThing.vue
@@ -84,12 +83,12 @@ packages/<my-package>/
   },
   "peerDependencies": {
     "@feugene/granularity": ">=1.0.0 <2.0.0",
-    "@feugene/granum": ">=1.0.0 <2.0.0",
+    "@feugene/granum": ">=2.0.0 <3.0.0",
     "vue": "^3.5.0"
   },
   "devDependencies": {
-    "@feugene/granum": "^1.0.0",
-    "@feugene/granum-engine-wind": "^1.0.0"
+    "@feugene/granum": "^2.0.0",
+    "@feugene/granum-engine-wind": "^2.0.0"
   },
   "scripts": {
     "build": "vite build && vue-tsc -p tsconfig.build.json",
@@ -136,10 +135,13 @@ peer: словарь, против которого написаны класс�
 `yarn sizes:check` в корне роняет CI, если пакет с компонентными подпутями остался без любого из
 двух скриптов или без маркера в README.
 
-- `@feugene/granularity`, `@feugene/granum`, `vue` — **peer**-зависимости (одна версия
-  рантайма на всё приложение). Две копии granum в графе особенно вредны: хелперы
-  отпечатка словаря в них разные, отпечатки перестают сравниваться, и приложение
-  молча пересчитывает классы пакета на каждой сборке.
+- `@feugene/granularity`, `@feugene/granum`, `vue` — **peer**-зависимости: ядро и `vue` —
+  одна копия рантайма на всё приложение, granum — одна версия конвейера. Две копии granum в
+  графе особенно вредны: хелперы отпечатка словаря в них разные, отпечатки перестают
+  сравниваться, и приложение молча пересчитывает классы пакета на каждой сборке. В рантайм
+  granum не попадает: хелперы `@feugene/granum/contract`, которыми описаны компоненты,
+  `granumProvider()` встраивает в `dist/granum/contract.js`, и `dist` пакета granum не
+  импортирует.
 - Собственные зависимости пакета идут в `dependencies` — их и оплачивает только тот, кто установит
   companion-пакет. У `granularity-chrono` их нет вовсе: своя арифметика дат и `Intl` вместо
   date-библиотеки.
@@ -183,7 +185,6 @@ import { myProvider } from './src/granular-provider'
 const extraEntries: Record<string, string> = {
   'granular-provider': 'src/granular-provider/index.ts',
   'granular-provider-node': 'src/granular-provider/node.ts',
-  'resolver': 'src/resolver.ts',
 }
 
 export default defineConfig({
@@ -383,7 +384,7 @@ i18n-entries в сборку. `sideEffects` не должен блокирова
   "./i18n":     { "types": "./dist/types/i18n/index.d.ts", "import": "./dist/i18n/index.js" },
   "./i18n/all": { "types": "./dist/types/i18n/all.d.ts",   "import": "./dist/i18n/all.js" }
 },
-"peerDependencies": { "@feugene/fint-i18n": "^0.3.0" },
+"peerDependencies": { "@feugene/fint-i18n": ">=0.9.0 <1.0.0" },
 "peerDependenciesMeta": { "@feugene/fint-i18n": { "optional": true } }
 ```
 
@@ -502,62 +503,22 @@ export * from './components/GrMyThing'
 
 ## 8. Авто-импорт через `unplugin-granularity`
 
-Чтобы `<GrMyThing>` работал в шаблонах без ручных `import`, добавьте **резолвер** для
-`unplugin-vue-components`, построенный на общей фабрике `createGranularResolver` из
-`@feugene/unplugin-granularity`.
+Своего резолвера пакету не нужно. `GranularityResolver()` из `@feugene/unplugin-granularity`
+находит в `package.json` приложения все `@feugene/granularity-*` и читает их `exports`: каждый ключ
+`./components/<Name>` становится тегом `<Name>` без ручного `import`. От пакета требуется ровно то, что
+у него и так есть:
 
-Так как компоненты пакета тоже начинаются на `Gr*`, жадный core-резолвер по префиксу перехватил бы их
-и импортировал из несуществующего пути в `@feugene/granularity`. Поэтому используем **whitelist**
-(явный список имён), а не `prefix`. И — важно — CSS у пакета инлайнится (`libInjectCss`), поэтому
-`importStyle: false` (отдельный `styles.css`-side-effect не нужен).
+- подпуть `./components/<Name>` на каждый компонент — его пишет `granum codegen`;
+- `./package.json` в `exports`, иначе резолвер не прочитает карту;
+- имя пакета вида `@feugene/granularity-<имя>`. Пакет с другим именем потребитель называет сам:
+  `GranularityResolver({ packages: ['@feugene/granularity', '@acme/kit'] })`.
 
-```ts
-// src/resolver.ts
-import { createGranularResolver } from '@feugene/unplugin-granularity'
-import type { ComponentResolver } from 'unplugin-vue-components/types'
+Имя компонента, которое уже есть у ядра или другого спутника, резолвер не трогает: импорт такого
+компонента потребитель пишет руками. Поэтому имена не повторяют чужие.
 
-export function MyPackageResolver(): ComponentResolver {
-  return createGranularResolver({
-    packageName: '@feugene/my-package',
-    components: ['GrMyThing'], // whitelist
-    importStyle: false, // CSS инлайнится в JS-чанк
-  })
-}
-```
-
-Добавьте `resolver` в lib-entries и в `exports` пакета, а `@feugene/unplugin-granularity` и
-`unplugin-vue-components` — в **optional** peer-зависимости (нужны только тем, кто пользуется
-авто-импортом):
-
-```jsonc
-// package.json
-"exports": {
-  "./resolver": { "types": "./dist/types/resolver.d.ts", "import": "./dist/resolver.js" }
-},
-"peerDependencies": {
-  "@feugene/unplugin-granularity": ">=0.4.0 <1.0.0",
-  "unplugin-vue-components": ">=0.26.0"
-},
-"peerDependenciesMeta": {
-  "@feugene/unplugin-granularity": { "optional": true },
-  "unplugin-vue-components": { "optional": true }
-}
-```
-
-`resolver.ts` держите external от `@feugene/unplugin-granularity` и `unplugin-vue-components` в
-`vite.config.ts` (это build-time хелперы, а не рантайм пакета).
-
-Потребитель регистрирует резолвер **перед** core-резолвером (whitelist точнее и должен отработать
-первым, иначе жадный `Gr*` ядра перехватит имя):
-
-```ts
-Components({
-  resolvers: [
-    MyPackageResolver(), // whitelist — раньше…
-    GranularityResolver(), // …жадного Gr*-резолвера ядра
-  ],
-})
-```
+`createGranularResolver` — общая фабрика резолвера с явным списком имён — остаётся для пакетов, которые
+уже публикуют `./resolver`: с ним рядом единый резолвер работает так же, и порядок регистрации не важен.
+Новому пакету `./resolver` заводить незачем.
 
 Подробнее про сам резолвер и его опции — [`unplugin.md`](./unplugin.md).
 
@@ -689,7 +650,7 @@ npx --yes publint@latest --pack npm   # проверка соответстви�
 - [ ] Компоненты `Gr*` + `config.ts` (`defineGranumComponent`), общие хелперы в `components/shared/`, темизация через DS-токены.
 - [ ] (Опц., если есть встроенные строки) `src/i18n`: уникальный блок (не `gr`), per-locale loaders, `all.ts` вне barrel; экспорты `./i18n` + `./i18n/all`, `fint-i18n` — optional peer; компоненты читают перевод через резолвер с fallback.
 - [ ] Granular-provider: `shared.ts` с диалектом движка и реестром-мапой, доноры строками, browser/node entry; в приложении подключается по имени пакета.
-- [ ] (Опц.) `./resolver` на `createGranularResolver` (whitelist + `importStyle: false`), optional peers, регистрируется раньше core-резолвера.
+- [ ] `exports` объявляет `./package.json` и подпуть `./components/<Name>` на каждый компонент — по ним `GranularityResolver()` находит компоненты пакета.
 - [ ] Гейты: восемь фабрик из `@feugene/granularity-test-kit/gates` (актуальный список — `REQUIRED_GATES` в `gates/coverage.ts`, его же сверяет `defineGateCoverage`); свои гейты домена — рядом.
 - [ ] Доки: сквозные `model` / `a11y` / `keyboard` / `theming` / `ssr`, страница на каждый компонент в `docs/components/`, индекс `docs/components.md`, компоненты в развилках `docs/COMPONENT-MAP.md`.
 - [ ] `build` зелёный, `publint` — `All good!`.

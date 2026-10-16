@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrCheckbox } from '@feugene/granularity'
-
 const accepted = ref(false)
 const previewOpens = ref(0)
 </script>

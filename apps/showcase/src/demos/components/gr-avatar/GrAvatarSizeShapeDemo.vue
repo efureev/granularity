@@ -1,7 +1,3 @@
-<script setup lang="ts">
-import { GrAvatar } from '@feugene/granularity'
-</script>
-
 <template>
   <div class="grid gap-4">
     <div class="flex flex-wrap items-center gap-4">

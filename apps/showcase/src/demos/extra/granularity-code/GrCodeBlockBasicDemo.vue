@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrSegmented } from '@feugene/granularity'
-
 /** Ответ сервиса, как он приходит из БД: `unknown`, а не заранее известная форма. */
 const response = {
   id: 'ord_8241',

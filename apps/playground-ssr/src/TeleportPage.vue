@@ -1,7 +1,12 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrColorPicker, GrDropdown, GrSelect, GrTooltip, GrButton, GrFormField } from '@feugene/granularity'
+import { GrButton } from '@feugene/granularity/components/GrButton'
+import { GrColorPicker } from '@feugene/granularity/components/GrColorPicker'
+import { GrDropdown } from '@feugene/granularity/components/GrDropdown'
+import { GrFormField } from '@feugene/granularity/components/GrFormField'
+import { GrSelect } from '@feugene/granularity/components/GrSelect'
+import { GrTooltip } from '@feugene/granularity/components/GrTooltip'
 
 /**
  * Страница только из телепортирующих компонентов — сжатый набор для тестов.

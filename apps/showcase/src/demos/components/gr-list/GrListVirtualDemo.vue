@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrBadge, GrButton, GrList, GrListItem } from '@feugene/granularity'
-
 type Build = { id: number, title: string, description: string, status: string }
 
 const builds: Build[] = Array.from({ length: 5000 }, (_, index) => ({

@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 
-import { GrRadio } from '@feugene/granularity'
-
 const delivery = ref('weekly')
 
 const selectedLabel = computed(() => {

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
-import { GrButtonGroup, GrButton, useGrFormControl } from '@feugene/granularity'
+import { useGrFormControl } from '@feugene/granularity'
 
 /**
  * Свой контрол на три кнопки.

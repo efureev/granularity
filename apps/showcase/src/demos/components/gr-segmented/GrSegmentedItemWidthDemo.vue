@@ -2,7 +2,6 @@
 import { ref } from 'vue'
 
 import type { GrSegmentedItemWidth, GrSegmentedOption } from '@feugene/granularity'
-import { GrSegmented } from '@feugene/granularity'
 
 const mode = ref<GrSegmentedItemWidth>('content')
 const filter = ref('all')

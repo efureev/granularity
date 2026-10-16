@@ -1,16 +1,12 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import {
-  addItem,
-  GrDashboard,
-  GrDashboardItem,
-  GrDashboardItemSettings,
-  GrDashboardPalette,
-  GrDashboardToolbar,
-  type GrDashboardDropEvent,
-  type GrDashboardResponsiveLayout,
-} from '@feugene/granularity-dashboard'
+import { addItem, type GrDashboardDropEvent, type GrDashboardResponsiveLayout } from '@feugene/granularity-dashboard'
+import { GrDashboard } from '@feugene/granularity-dashboard/components/GrDashboard'
+import { GrDashboardItem } from '@feugene/granularity-dashboard/components/GrDashboardItem'
+import { GrDashboardItemSettings } from '@feugene/granularity-dashboard/components/GrDashboardItemSettings'
+import { GrDashboardPalette } from '@feugene/granularity-dashboard/components/GrDashboardPalette'
+import { GrDashboardToolbar } from '@feugene/granularity-dashboard/components/GrDashboardToolbar'
 
 /**
  * Companion-пакет `@feugene/granularity-dashboard` на сервере.

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrButton, GrCard, GrSteps } from '@feugene/granularity'
+import { GrSteps } from '@feugene/granularity/components/GrSteps'
 import type { GrStep } from '@feugene/granularity'
 
 // Семь этапов не помещаются в боковую колонку: там лента вырождается в подпись

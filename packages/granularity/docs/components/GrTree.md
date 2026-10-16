@@ -53,7 +53,8 @@
 
 ```vue
 <script setup lang="ts">
-import { GrTree, grTreeViewVars } from '@feugene/granularity'
+import { grTreeViewVars } from '@feugene/granularity'
+import { GrTree } from '@feugene/granularity/components/GrTree'
 </script>
 
 <template>

@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref, watchEffect } from 'vue'
 
-import { GrCard } from '@feugene/granularity'
-
 import { resolveDemoSource } from '../../demos/registry'
 import InlineRichText from '../content/InlineRichText.vue'
 import CodeBlock from './CodeBlock.vue'

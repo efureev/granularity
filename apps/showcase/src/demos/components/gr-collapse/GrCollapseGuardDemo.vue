@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrCollapse, GrCollapseItem, GrFormField, GrInput, GrSwitch } from '@feugene/granularity'
-
 const expanded = ref<Array<string | number>>(['draft'])
 const draft = ref('Quarterly report')
 const dirty = ref(true)

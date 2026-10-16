@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { GrButton, GrCard, GrDataTable } from '@feugene/granularity'
 
 type Order = {
   id: number

@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, shallowRef } from 'vue'
 
-import { GrButton, GrSegmented } from '@feugene/granularity'
 import { createShikiTokenizer, GR_CODE_SHIKI_THEME } from '@feugene/granularity-code'
 import type { GrCodeTokenizer, ShikiLike } from '@feugene/granularity-code'
 

@@ -7,36 +7,15 @@ import { GRANULARITY_CODE_COMPONENTS } from './componentNames'
 export const GRANULARITY_CODE_PACKAGE_NAME = '@feugene/granularity-code'
 
 /**
- * Резолвер `unplugin-vue-components` для `@feugene/granularity-code`.
+ * Резолвер `unplugin-vue-components` для `@feugene/granularity-code` — явный список его
+ * компонентов.
  *
- * CSS компонента резолвер не подключает (`importStyle: false`), и это верно
- * по-прежнему, но по другой причине: его доставляет granum из манифеста
- * пакета. Раньше CSS ехал в чанке компонента (`libInjectCss`), и side-effect
- * был не нужен потому, что стили уже приехали; теперь он не нужен потому, что
- * приехал бы вторым экземпляром — вне слоёв `granum.*`.
+ * Новому конфигу он не нужен: `GranularityResolver()` из
+ * `@feugene/unplugin-granularity` `>=1.1.0` находит пакет в `package.json`
+ * приложения и резолвит ядро вместе со спутниками, в любом порядке. Этот
+ * резолвер остаётся для уже написанных конфигов и работает рядом с единым.
  *
- * ⚠️ Ставьте этот резолвер **перед** жадным `GranularityResolver()` ядра —
- * иначе core-резолвер (совпадает с любым `Gr*`) перехватит `GrCodeBlock`
- * и импортирует его из несуществующего пути в `@feugene/granularity`.
- *
- * @example
- * ```ts
- * // vite.config.ts
- * import Components from 'unplugin-vue-components/vite'
- * import { GranularityResolver } from '@feugene/unplugin-granularity'
- * import { GranularityCodeResolver } from '@feugene/granularity-code/resolver'
- *
- * export default defineConfig({
- *   plugins: [
- *     Components({
- *       resolvers: [
- *         GranularityCodeResolver(), // whitelist — раньше…
- *         GranularityResolver(),     // …жадного Gr*-резолвера ядра
- *       ],
- *     }),
- *   ],
- * })
- * ```
+ * `importStyle: false` — CSS компонента доставляет granum из манифеста пакета.
  */
 export function GranularityCodeResolver(): ComponentResolver {
   return createGranularResolver({

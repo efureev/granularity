@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, useTemplateRef } from 'vue'
 
-import { GrButton, GrCard, GrForm, GrFormField, GrInput, GrSteps } from '@feugene/granularity'
 import type { GrStep } from '@feugene/granularity'
 
 // Мастер оформления: шаг не отпускает, пока его поля не сойдутся.

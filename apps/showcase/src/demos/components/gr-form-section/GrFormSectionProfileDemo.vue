@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrFormField, GrFormSection, GrInput, GrTextarea } from '@feugene/granularity'
-
 const teamName = ref('Platform operations')
 const summary = ref('Coordinates deployments, release notes and service health updates.')
 </script>

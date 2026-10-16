@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrBadge, GrFormField, GrFormSection, GrInput } from '@feugene/granularity'
-
 const owner = ref('release-manager@company.dev')
 const runbook = ref('docs/runbooks/incident-handoff')
 </script>

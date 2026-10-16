@@ -2,7 +2,6 @@
 import { ref } from 'vue'
 
 import type { GrDropdownMenuAction, GrDropdownMenuEntry } from '@feugene/granularity'
-import { GrButton, GrDropdownMenu } from '@feugene/granularity'
 
 const lastAction = ref('—')
 

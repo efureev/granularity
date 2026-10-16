@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrAutocomplete } from '@feugene/granularity'
-
 const options = [
   { value: 'vue', label: 'Vue' },
   { value: 'react', label: 'React' },

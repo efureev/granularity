@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrBadge, GrKbd, vHotkey } from '@feugene/granularity'
+import { vHotkey } from '@feugene/granularity'
 
 const vHotkeyDirective = vHotkey
 

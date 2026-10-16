@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrSlider } from '@feugene/granularity'
-
 const brand = ref(65)
 const accent = ref(40)
 const large = ref(70)

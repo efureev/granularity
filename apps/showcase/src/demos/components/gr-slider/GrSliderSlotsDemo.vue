@@ -3,8 +3,6 @@ import { ref } from 'vue'
 import IconFlame from '~icons/lucide/flame'
 import IconSnowflake from '~icons/lucide/snowflake'
 
-import { GrCard, GrSlider } from '@feugene/granularity'
-
 const temperature = ref(22)
 const budget = ref<[number, number]>([30, 70])
 

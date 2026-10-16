@@ -1,16 +1,7 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
 
-import {
-  GrAutocomplete,
-  GrButton,
-  GrForm,
-  GrFormField,
-  GrInput,
-  GrSelect,
-  type GrFormInstance,
-  type GrFormRules,
-} from '@feugene/granularity'
+import type { GrFormInstance, GrFormRules } from '@feugene/granularity'
 
 const model = reactive({ username: '', country: '', framework: '', password: '', confirm: '' })
 

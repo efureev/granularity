@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { reactive } from 'vue'
 
-import { GrBadge, GrSidebar, GrSwitch } from '@feugene/granularity'
-
 const filters = reactive({
   active: true,
   assigned: false,

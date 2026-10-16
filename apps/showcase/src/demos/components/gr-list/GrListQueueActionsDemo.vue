@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { GrBadge, GrButton, GrList, GrListItem } from '@feugene/granularity'
-
 const jobs = [
   { title: 'Publish release notes', description: 'Ready for review by marketing', status: 'Ready' },
   { title: 'Re-sync bank accounts', description: 'Waiting for background worker', status: 'Queued' },

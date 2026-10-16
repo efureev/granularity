@@ -2,7 +2,6 @@
 import { ref } from 'vue'
 
 import type { GrKbdPlatform } from '@feugene/granularity'
-import { GrKbd, GrSegmented } from '@feugene/granularity'
 
 const platform = ref<GrKbdPlatform>('auto')
 

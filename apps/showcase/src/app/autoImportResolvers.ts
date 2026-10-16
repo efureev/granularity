@@ -1,43 +1,22 @@
+import { fileURLToPath, URL } from 'node:url'
+
 import { GranularityResolver } from '@feugene/unplugin-granularity'
-import { GranularityChartsResolver } from '@feugene/granularity-charts/resolver'
-import { GranularityCodeResolver } from '@feugene/granularity-code/resolver'
-import { GranularityChronoResolver } from '@feugene/granularity-chrono/resolver'
-import { GranularityDashboardResolver } from '@feugene/granularity-dashboard/resolver'
-import { GranularityEditorResolver } from '@feugene/granularity-editor/resolver'
-import { GranularityFormsSchemaResolver } from '@feugene/granularity-forms-schema/resolver'
-import { GranularityMediaResolver } from '@feugene/granularity-media/resolver'
 
 /**
- * Резолверы `unplugin-vue-components` для авто-импорта компонентов дизайн-системы
- * в шаблонах витрины — сразу для трёх пакетов:
+ * Резолвер `unplugin-vue-components` для авто-импорта компонентов дизайн-системы
+ * в шаблонах витрины — один на ядро и все спутники.
  *
- * - `@feugene/granularity` (ядро) — жадный `Gr*`-резолвер;
- * - `@feugene/granularity-chrono` (companion) — whitelist-резолвер на общей
- *   фабрике `createGranularResolver`;
- * - `@feugene/granularity-charts` (companion) — он же;
- * - `@feugene/granularity-dashboard` (companion) — он же.
- * - `@feugene/granularity-forms-schema` (companion) — он же;
- * - `@feugene/granularity-editor` (companion) — он же;
- * - `@feugene/granularity-media` (companion) — он же;
- * - `@feugene/granularity-code` (companion) — он же.
+ * Компоненты он берёт из `exports` пакетов, которые витрина объявила в своём
+ * `package.json`: список вести не нужно, порядок резолверов не важен. Часть
+ * составного компонента (`GrDropdownMenuItem`) приезжает из подпути родителя —
+ * так её видит селекция granum, и так же лежит `dist`, куда ведёт алиас
+ * `vite.config.ts`.
  *
- * Порядок важен: whitelist-резолверы компаньонов идут **первыми**, иначе жадный
- * core-резолвер перехватил бы `GrCalendar`, `GrChartLine` и остальные и
- * импортировал бы их из несуществующего пути в ядре.
- *
- * `importStyle: false` для ядра — CSS витрины собирает `granum()` по манифестам
- * пакетов, а подпутей `components/<Name>/styles.css` ядро не публикует вовсе:
- * включённая опция сломала бы сборку.
+ * `root` задан явно: конфиг исполняют и `vite`, и `vitest`, а рабочий каталог у
+ * них не обязан совпадать с каталогом витрины.
  */
 export function granularityAutoImportResolvers() {
-  return [
-    GranularityChronoResolver(),
-    GranularityChartsResolver(),
-    GranularityDashboardResolver(),
-    GranularityFormsSchemaResolver(),
-    GranularityEditorResolver(),
-    GranularityMediaResolver(),
-    GranularityCodeResolver(),
-    GranularityResolver({ importStyle: false }),
-  ]
+  return GranularityResolver({
+    root: fileURLToPath(new URL('../../', import.meta.url)),
+  })
 }

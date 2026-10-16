@@ -53,7 +53,8 @@
     "src/**/*.ts",
     "src/**/*.d.ts",
     "src/**/*.tsx",
-    "src/**/*.vue"
+    "src/**/*.vue",
+    "../../packages/granularity/src/components/*/defaults.ts"
   ],
   "exclude": [
     "node_modules",

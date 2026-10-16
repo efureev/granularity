@@ -1,7 +1,3 @@
-<script setup lang="ts">
-import { GrDelta } from '@feugene/granularity'
-</script>
-
 <template>
   <div class="grid gap-2 text-sm">
     <p>

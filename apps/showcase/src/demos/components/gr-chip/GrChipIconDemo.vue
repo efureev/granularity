@@ -4,8 +4,6 @@ import { ref } from 'vue'
 import IconCheck from '~icons/lucide/check'
 import IconUser from '~icons/lucide/user'
 
-import { GrChip } from '@feugene/granularity'
-
 const subscribed = ref(false)
 </script>
 

@@ -14,12 +14,5 @@ export default defineConfig({
     // Добирает то, чего нет в jsdom. Сам файл ничего не делает в
     // `environment: 'node'` — см. комментарий внутри.
     setupFiles: ['./test/setup-dom.ts'],
-    server: {
-      deps: {
-        // Пакет собран с `libInjectCss`: его чанки импортируют `.css`, чего
-        // Node сам не умеет. Инлайним, чтобы CSS обработал vite.
-        inline: [/@feugene\/granularity/],
-      },
-    },
   },
 })

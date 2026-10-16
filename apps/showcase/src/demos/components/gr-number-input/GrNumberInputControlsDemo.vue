@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrFormField, GrNumberInput } from '@feugene/granularity'
-
 const amount = ref<number | null>(128.5)
 const quantity = ref<number | null>(3)
 </script>

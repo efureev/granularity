@@ -1,18 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 
-import {
-  GrButton,
-  GrFormField,
-  GrInput,
-  GrRadioGroup,
-  GrSelect,
-  GrSwitch,
-  GrCard,
-  type GrButtonSize,
-  type GrButtonTone,
-  type GrButtonVariant,
-} from '@feugene/granularity'
+import type { GrButtonSize, GrButtonTone, GrButtonVariant } from '@feugene/granularity'
 import IconSparkles from '~icons/lucide/sparkles'
 
 import CodeBlock from '../../../components/doc/CodeBlock.vue'

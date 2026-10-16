@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrBadge, GrFileUpload } from '@feugene/granularity'
-
 type UploadedFile = { id: string, name: string }
 
 const uploaded = ref<UploadedFile[]>([])

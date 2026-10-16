@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrButton, GrDrawer, GrSegmented } from '@feugene/granularity'
-
 const open = ref(false)
 const sort = ref('recent')
 

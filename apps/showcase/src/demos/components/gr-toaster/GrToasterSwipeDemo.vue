@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrButton, GrSegmented, GrToaster, useToast, type GrToasterPlacement } from '@feugene/granularity'
+import { useToast, type GrToasterPlacement } from '@feugene/granularity'
 
 import { useShowcaseToasterHost } from './showcaseToasterHost'
 

@@ -1,7 +1,3 @@
-<script setup lang="ts">
-import { GrButton, GrCard } from '@feugene/granularity'
-</script>
-
 <template>
   <!-- Отступ и раскладка тела — пропами карточки, а не `class` снаружи. -->
   <GrCard padding="md" body-class="grid gap-4">

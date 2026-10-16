@@ -2,8 +2,6 @@
 import { computed, ref } from 'vue'
 import { RouterLink } from 'vue-router'
 
-import { GrCard, GrBadge } from '@feugene/granularity'
-
 import ShowcasePageHero from '../components/showcase/ShowcasePageHero.vue'
 import { showcaseComponentEntities } from '../app/showcase'
 import { compareEntityGroups } from '../app/showcaseEntityGroups'

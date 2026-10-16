@@ -1,12 +1,10 @@
 <script setup lang="ts">
-import {
-  GrChartArea,
-  GrChartBar,
-  GrChartLine,
-  GrChartPie,
-  GrChartRadar,
-  GrSparkline,
-} from '@feugene/granularity-charts'
+import { GrChartArea } from '@feugene/granularity-charts/components/GrChartArea'
+import { GrChartBar } from '@feugene/granularity-charts/components/GrChartBar'
+import { GrChartLine } from '@feugene/granularity-charts/components/GrChartLine'
+import { GrChartPie } from '@feugene/granularity-charts/components/GrChartPie'
+import { GrChartRadar } from '@feugene/granularity-charts/components/GrChartRadar'
+import { GrSparkline } from '@feugene/granularity-charts/components/GrSparkline'
 
 /**
  * Companion-пакет `@feugene/granularity-charts` на сервере.

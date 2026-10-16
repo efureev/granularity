@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
 
-import { GrButton, GrForm, GrFormField, GrInput, type GrFormInstance, type GrFormRules } from '@feugene/granularity'
+import type { GrFormInstance, GrFormRules } from '@feugene/granularity'
 
 const model = reactive({ name: '', email: '', password: '' })
 

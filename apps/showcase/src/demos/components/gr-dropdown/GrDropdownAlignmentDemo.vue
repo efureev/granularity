@@ -1,7 +1,3 @@
-<script setup lang="ts">
-import { GrButton, GrDropdown } from '@feugene/granularity'
-</script>
-
 <template>
   <div class="grid gap-4 lg:grid-cols-3">
     <GrDropdown placement="bottom-start" width="12rem">

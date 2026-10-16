@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrButton, GrPopover, GrSegmented } from '@feugene/granularity'
-
 /**
  * Чем открывается панель и что считается триггером.
  *

@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrBadge, GrButton, GrDropdownMenu, GrDropdownMenuItem } from '@feugene/granularity'
-
 const lastAction = ref('Not selected yet')
 
 const actions = [

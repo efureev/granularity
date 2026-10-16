@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { GrDelta, GrTable } from '@feugene/granularity'
-
 interface ChannelRow {
   channel: string
   gross: number

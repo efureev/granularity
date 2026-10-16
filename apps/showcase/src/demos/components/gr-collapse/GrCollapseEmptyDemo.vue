@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 
-import { GrCollapse, GrCollapseItem, GrSwitch } from '@feugene/granularity'
-
 const sections = [
   { name: 'billing', title: 'Billing', body: 'Invoices, payment method and tax details.' },
   { name: 'members', title: 'Members', body: 'Roles, invitations and seat limits.' },

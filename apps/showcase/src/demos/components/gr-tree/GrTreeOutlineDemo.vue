@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrTree, grTreeViewVars } from '@feugene/granularity'
+import { grTreeViewVars } from '@feugene/granularity'
 import type { GrTreeKey, GrTreeVisibleRow } from '@feugene/granularity'
 
 type Item = { id: string, label: string, children?: Item[] }

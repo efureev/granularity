@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrOtpInput } from '@feugene/granularity'
-
 const values = ref<Record<string, string>>({ xs: '12', sm: '123', md: '1234', lg: '12345' })
 </script>
 

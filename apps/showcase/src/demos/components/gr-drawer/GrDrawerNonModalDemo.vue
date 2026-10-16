@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrButton, GrCheckbox, GrDrawer, GrTable } from '@feugene/granularity'
-
 const open = ref(false)
 const onlyOverdue = ref(false)
 const clicks = ref(0)

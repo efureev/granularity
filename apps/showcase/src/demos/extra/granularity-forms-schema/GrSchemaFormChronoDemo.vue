@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 
-import { GrSegmented } from '@feugene/granularity'
-import { GrSchemaForm } from '@feugene/granularity-forms-schema'
 import { jsonSchemaAdapter } from '@feugene/granularity-forms-schema/json-schema'
 import type { JsonSchemaDocument } from '@feugene/granularity-forms-schema/json-schema'
 import { chronoRenderers } from '@feugene/granularity-forms-schema/renderers/chrono'

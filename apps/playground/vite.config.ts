@@ -3,8 +3,10 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { visualizer } from 'rollup-plugin-visualizer'
 import Icons from 'unplugin-icons/vite'
+import Components from 'unplugin-vue-components/vite'
 import VueDevtools from 'vite-plugin-vue-devtools'
 import { granum } from '@feugene/granum/vite'
+import { GranularityResolver } from '@feugene/unplugin-granularity'
 
 import granumConfig from './granum.config'
 
@@ -55,6 +57,13 @@ export default defineConfig(({ mode }) => ({
     Icons({
       compiler: 'vue3',
       autoInstall: false,
+    }),
+    // Компоненты в шаблонах — авто-импортом из их подпутей; `AppSubpath.vue`
+    // показывает тот же импорт, написанный руками.
+    Components({
+      dts: fileURLToPath(new URL('./src/components.d.ts', import.meta.url)),
+      resolvers: GranularityResolver({ root: fileURLToPath(new URL('./', import.meta.url)) }),
+      dirs: [],
     }),
     granum(granumConfig),
   ],

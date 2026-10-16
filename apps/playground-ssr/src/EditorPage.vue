@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrFormField } from '@feugene/granularity'
-import { GrRichText } from '@feugene/granularity-editor'
+import { GrFormField } from '@feugene/granularity/components/GrFormField'
+import { GrRichText } from '@feugene/granularity-editor/components/GrRichText'
 
 /**
  * Companion-пакет `@feugene/granularity-editor` на сервере.

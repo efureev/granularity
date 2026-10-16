@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrCard, GrCarousel, GrCarouselSlide } from '@feugene/granularity'
-
 const step = ref(0)
 
 const releases = [

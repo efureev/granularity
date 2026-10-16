@@ -1,13 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import {
-  GrBadge,
-  GrButton,
-  GrConfigProvider,
-  GrInput,
-  type GrComponentDefaults,
-} from '@feugene/granularity'
+import type { GrComponentDefaults } from '@feugene/granularity'
 
 const value = ref('Igor Petrov')
 

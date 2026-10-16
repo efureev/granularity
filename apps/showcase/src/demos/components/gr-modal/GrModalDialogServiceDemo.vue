@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrButton, GrModal, useDialogService } from '@feugene/granularity'
+import { useDialogService } from '@feugene/granularity'
 
 const dialog = useDialogService()
 

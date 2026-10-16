@@ -128,10 +128,10 @@ describe('showcase bootstrap config', () => {
     expect(showcaseI18nMessagesEntry).toContain('\'./locales/ru/showcase.json\'')
   })
 
-  it('использует router shell и root public API пакета в layout-компоненте', () => {
+  it('использует router shell, а компоненты layout приезжают авто-импортом', () => {
     expect(showcaseAppEntry).toContain('<RouterView />')
-    expect(showcaseLayoutEntry).toContain('from \'@feugene/granularity\'')
-    expect(showcaseLayoutEntry).not.toContain('@feugene/granularity/components/')
+    expect(showcaseLayoutEntry).toContain('<GrButton')
+    expect(showcaseLayoutEntry).not.toContain('from \'@feugene/granularity')
   })
 
   it('подключает девять провайдеров именами пакетов и выбирает всё', () => {

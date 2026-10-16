@@ -2,7 +2,6 @@
 import { computed, ref } from 'vue'
 
 import type { GrSegmentedOption } from '@feugene/granularity'
-import { GrButton, GrFormField, GrSegmented } from '@feugene/granularity'
 
 const locale = ref<'ru' | 'en'>('ru')
 const status = ref<'draft' | 'review' | 'published'>('review')

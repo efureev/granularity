@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrButton, GrCard, GrStatistic } from '@feugene/granularity'
-
 const loading = ref(false)
 
 function refresh(): void {

@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrCheckbox, GrFormField, GrFormSection, GrInput } from '@feugene/granularity'
-
 const channel = ref('release-updates')
 const includeStakeholders = ref(true)
 const requireApproval = ref(false)

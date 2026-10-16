@@ -129,26 +129,18 @@ theme and base layers.
 // vite.config.ts
 import Components from 'unplugin-vue-components/vite'
 import { GranularityResolver } from '@feugene/unplugin-granularity'
-import { GranularityChronoResolver } from '@feugene/granularity-chrono/resolver'
 
 export default defineConfig({
   plugins: [
-    Components({
-      resolvers: [
-        GranularityChronoResolver(), // whitelist — must come first…
-        GranularityResolver(), // …before the greedy Gr* core resolver
-      ],
-    }),
+    Components({ resolvers: GranularityResolver() }),
   ],
 })
 ```
 
-The chrono resolver uses an explicit whitelist of its components, so it must be
-registered **before** the core `GranularityResolver()`, which greedily claims any
-`Gr*` name.
-
-Requires the optional peers `@feugene/unplugin-granularity` (`>=0.4.0`) and
-`unplugin-vue-components` — install them only if you use auto-import.
+`GranularityResolver()` (`@feugene/unplugin-granularity` `>=1.1.0`) finds this
+package in the application's `package.json` and reads its `exports`: the core and
+every companion resolve through one resolver, in any order. The package's own
+`GranularityChronoResolver()` from `./resolver` still works for existing configs.
 
 ## Registries
 

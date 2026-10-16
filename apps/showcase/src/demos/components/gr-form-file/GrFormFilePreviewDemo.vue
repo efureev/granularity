@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrFormFile, GrSwitch } from '@feugene/granularity'
-
 const gallery = ref<File[]>([])
 const locked = ref(false)
 </script>

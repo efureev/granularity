@@ -1,17 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 
-import {
-  GrBadge,
-  GrFormField,
-  GrInput,
-  GrRadioGroup,
-  GrSelect,
-  GrSwitch,
-  type GrBadgeRadius,
-  type GrBadgeSize,
-  type GrBadgeTone,
-} from '@feugene/granularity'
+import type { GrBadgeRadius, GrBadgeSize, GrBadgeTone } from '@feugene/granularity'
 
 import CodeBlock from '../../../components/doc/CodeBlock.vue'
 

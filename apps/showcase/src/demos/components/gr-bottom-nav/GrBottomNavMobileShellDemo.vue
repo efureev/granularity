@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 
-import { GrBottomNav, GrCard } from '@feugene/granularity'
-
 const currentSection = ref('approvals')
 const items = [
   { label: 'Approvals', value: 'approvals', icon: 'i-lucide-check-check', href: '#approvals' },

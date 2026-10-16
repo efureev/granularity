@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrFormField, GrSwitch, GrTextarea } from '@feugene/granularity'
-
 const disabled = ref(false)
 const summary = ref('Subscribers will receive a digest every Monday at 09:00.')
 </script>

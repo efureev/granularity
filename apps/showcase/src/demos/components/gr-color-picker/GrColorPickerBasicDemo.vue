@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrColorPicker } from '@feugene/granularity'
-
 const brand = ref('#3b82f6')
 const overlay = ref('#0f172acc')
 

@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { GrBadge, GrTimeline, GrTimelineItem } from '@feugene/granularity'
-
 interface AuditEvent {
   id: number
   day: string

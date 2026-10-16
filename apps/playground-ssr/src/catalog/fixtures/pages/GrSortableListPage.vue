@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrSortableList } from '@feugene/granularity'
+import { GrSortableList } from '@feugene/granularity/components/GrSortableList'
 
 const items = ref([
   { id: 'a', label: 'Первый' },

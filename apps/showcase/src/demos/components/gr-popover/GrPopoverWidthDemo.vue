@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrButton, GrPopover, GrSegmented } from '@feugene/granularity'
-
 /**
  * Ширина панели — две независимые оси, и демо показывает именно их
  * независимость: потолок переключается слева, источник ширины — справа, и

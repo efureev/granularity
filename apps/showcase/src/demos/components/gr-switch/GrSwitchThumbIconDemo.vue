@@ -6,8 +6,6 @@ import IconMoon from '~icons/lucide/moon'
 import IconSun from '~icons/lucide/sun'
 import IconX from '~icons/lucide/x'
 
-import { GrButton, GrSwitch } from '@feugene/granularity'
-
 const autosave = ref(true)
 const theme = ref(false)
 const access = ref(true)

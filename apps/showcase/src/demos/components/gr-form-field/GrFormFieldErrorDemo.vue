@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 
-import { GrFormField, GrInput } from '@feugene/granularity'
-
 const slug = ref('')
 
 const error = computed(() => {

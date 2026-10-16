@@ -1,21 +1,19 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import {
-  GrAlert,
-  GrAutocomplete,
-  GrBadge,
-  GrButton,
-  GrCard,
-  GrCheckbox,
-  GrDropdown,
-  GrFormField,
-  GrInput,
-  GrModal,
-  GrSelect,
-  GrTable,
-  GrTooltip,
-} from '@feugene/granularity'
+import { GrAlert } from '@feugene/granularity/components/GrAlert'
+import { GrAutocomplete } from '@feugene/granularity/components/GrAutocomplete'
+import { GrBadge } from '@feugene/granularity/components/GrBadge'
+import { GrButton } from '@feugene/granularity/components/GrButton'
+import { GrCard } from '@feugene/granularity/components/GrCard'
+import { GrCheckbox } from '@feugene/granularity/components/GrCheckbox'
+import { GrDropdown } from '@feugene/granularity/components/GrDropdown'
+import { GrFormField } from '@feugene/granularity/components/GrFormField'
+import { GrInput } from '@feugene/granularity/components/GrInput'
+import { GrModal } from '@feugene/granularity/components/GrModal'
+import { GrSelect } from '@feugene/granularity/components/GrSelect'
+import { GrTable } from '@feugene/granularity/components/GrTable'
+import { GrTooltip } from '@feugene/granularity/components/GrTooltip'
 
 /**
  * Страница разделена по тому, как компонент ведёт себя при серверном рендере:

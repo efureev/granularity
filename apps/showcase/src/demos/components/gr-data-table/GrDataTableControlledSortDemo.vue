@@ -2,7 +2,6 @@
 import { computed, ref } from 'vue'
 
 import type { GrDataColumn } from '@feugene/granularity'
-import { GrBadge, GrDataTable } from '@feugene/granularity'
 
 const rows = [
   { id: 1, service: 'Auth', incidents: 2, updatedAt: 3 },

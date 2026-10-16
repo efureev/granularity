@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 
-import { GrBadge, GrCollapse, GrCollapseItem } from '@feugene/granularity'
-
 const active = ref<string | number | undefined>('profile')
 
 const activeLabel = computed(() => {

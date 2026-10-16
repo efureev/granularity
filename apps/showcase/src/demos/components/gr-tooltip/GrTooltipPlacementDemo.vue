@@ -2,7 +2,6 @@
 import { ref } from 'vue'
 
 import type { GrTooltipPlacement } from '@feugene/granularity'
-import { GrButton, GrSegmented, GrSwitch, GrTooltip } from '@feugene/granularity'
 
 const placement = ref<GrTooltipPlacement>('top')
 const openDelay = ref(400)

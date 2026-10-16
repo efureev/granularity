@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { GrBadge, useGrConfig } from '@feugene/granularity'
+import { useGrConfig } from '@feugene/granularity'
 
 // Любой компонент может прочитать конфиг ближайшего GrConfigProvider.
 const config = useGrConfig()

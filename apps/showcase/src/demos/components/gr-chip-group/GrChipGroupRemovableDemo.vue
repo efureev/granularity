@@ -2,7 +2,6 @@
 import { ref } from 'vue'
 
 import type { GrChipValue } from '@feugene/granularity'
-import { GrChip, GrChipGroup } from '@feugene/granularity'
 
 // Метки можно и выбирать, и снимать: выбор ведёт группа, состав — приложение.
 const labels = ref(['срочно', 'бэкенд', 'регресс', 'релиз 0.25'])

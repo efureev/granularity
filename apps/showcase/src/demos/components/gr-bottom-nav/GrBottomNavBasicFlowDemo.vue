@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 
-import { GrBottomNav, GrCard } from '@feugene/granularity'
-
 const currentSection = ref('overview')
 const items = [
   { label: 'Overview', value: 'overview', icon: 'i-lucide-layout-dashboard' },

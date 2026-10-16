@@ -2,7 +2,6 @@
 import { computed, ref } from 'vue'
 
 import type { GrDataColumn } from '@feugene/granularity'
-import { GrButton, GrDataTable } from '@feugene/granularity'
 
 const activeFilter = ref<'all' | 'critical'>('all')
 

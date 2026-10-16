@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrPagination } from '@feugene/granularity'
-
 const page = ref(1)
 const pageSize = ref(10)
 const narrowPage = ref(1)

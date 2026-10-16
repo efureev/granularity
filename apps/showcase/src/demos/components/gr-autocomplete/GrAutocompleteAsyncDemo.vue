@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrAutocomplete, type GrAutocompleteOption } from '@feugene/granularity'
+import type { GrAutocompleteOption } from '@feugene/granularity'
 
 // Игрушечная «база» пользователей — эмулируем удалённый поиск с задержкой.
 const DIRECTORY: GrAutocompleteOption[] = [

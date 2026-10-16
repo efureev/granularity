@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { GrButton, GrResponseErrorBanner, useResponseError } from '@feugene/granularity'
+import { useResponseError } from '@feugene/granularity'
 
 const { currentError, setRaw, dismiss } = useResponseError()
 

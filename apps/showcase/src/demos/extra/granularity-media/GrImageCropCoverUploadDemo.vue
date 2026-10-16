@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { onBeforeUnmount, ref, useTemplateRef, watch } from 'vue'
 
-import { GrButton, GrFormField, GrFormFile } from '@feugene/granularity'
-
 /**
  * Обложка карточки товара. Фото приходит позже страницы: продавец выбирает
  * файл, когда рамка уже стоит на месте. Пустая рамка держит соотношение

@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrBadge, GrSidebar, GrSidebarGroup, GrSidebarItem } from '@feugene/granularity'
-
 const currentSection = ref('overview')
 const collapsed = ref(false)
 

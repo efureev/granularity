@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { GrAffix, GrScrollSpy } from '@feugene/granularity'
-
 const sections = [
   { id: 'spy-affix-summary', label: 'Сводка' },
   { id: 'spy-affix-parties', label: 'Стороны' },

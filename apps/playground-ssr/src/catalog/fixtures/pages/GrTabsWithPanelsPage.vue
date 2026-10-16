@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrTabPanel, GrTabsWithPanels } from '@feugene/granularity'
+import { GrTabPanel } from '@feugene/granularity/components/GrTabPanels'
+import { GrTabsWithPanels } from '@feugene/granularity/components/GrTabsWithPanels'
 
 const active = ref('overview')
 const tabs = [

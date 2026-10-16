@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { GrSegmented, GrTimeline, GrTimelineItem } from '@feugene/granularity'
 
 type Layout = 'stacked' | 'time' | 'alternate' | 'horizontal'
 

@@ -1,19 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 
-import {
-  GrButton,
-  GrCard,
-  GrFormField,
-  GrInput,
-  GrNumberInput,
-  GrRadioGroup,
-  GrSelect,
-  GrToaster,
-  type GrToastTone,
-  type GrToasterPlacement,
-  useToast,
-} from '@feugene/granularity'
+import { type GrToastTone, type GrToasterPlacement, useToast } from '@feugene/granularity'
 
 import CodeBlock from '../../../components/doc/CodeBlock.vue'
 import { useShowcaseToasterHost } from './showcaseToasterHost'
@@ -98,7 +86,9 @@ const previewCode = computed(() => {
 
   return [
     '<script setup lang="ts">',
-    'import { GrButton, GrToaster, useToast } from \'@feugene/granularity\'',
+    'import { useToast } from \'@feugene/granularity\'',
+    'import { GrButton } from \'@feugene/granularity/components/GrButton\'',
+    'import { GrToaster } from \'@feugene/granularity/components/GrToaster\'',
     '',
     'const { push } = useToast()',
     '',

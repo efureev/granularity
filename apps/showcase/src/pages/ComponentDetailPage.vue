@@ -4,8 +4,6 @@ import { RouterLink, useRoute } from 'vue-router'
 
 import { useFintI18n } from '@feugene/fint-i18n/vue'
 
-import { GrCard } from '@feugene/granularity'
-
 import {
   getShowcaseComponentBySlug,
 } from '../app/showcase'

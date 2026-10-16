@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { GrSidebar, GrSidebarGroup, GrSidebarItem } from '@feugene/granularity'
-
 const collapsed = ref(false)
 const current = ref('billing.invoices')
 

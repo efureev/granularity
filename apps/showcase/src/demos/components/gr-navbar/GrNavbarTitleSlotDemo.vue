@@ -1,7 +1,3 @@
-<script setup lang="ts">
-import { GrBadge, GrButton, GrInput, GrNavbar } from '@feugene/granularity'
-</script>
-
 <template>
   <div class="grid gap-3 rounded-xl border border-[var(--gr-brd)] bg-[var(--gr-bg)] p-3">
     <GrNavbar sticky>

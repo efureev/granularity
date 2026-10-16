@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, shallowRef } from 'vue'
 
-import { GrButton } from '@feugene/granularity'
-
 const template = ref(`Здравствуйте, {{ name }}!
 
 Заказ {{ order.id }} отправлен. Трек-номер: {{ order.track }}.

@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 
-import { GrFormField, GrFormFile } from '@feugene/granularity'
-
 const selectedFile = ref<File | null>(null)
 
 const summary = computed(() => {

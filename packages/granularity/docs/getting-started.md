@@ -131,8 +131,8 @@ my-app/
     "vue": "^3.5.40"
   },
   "devDependencies": {
-    "@feugene/granum": "^1.0.0",
-    "@feugene/granum-engine-wind": "^1.0.0",
+    "@feugene/granum": "^2.0.0",
+    "@feugene/granum-engine-wind": "^2.0.0",
     "@vitejs/plugin-vue": "^6.0.8",
     "typescript": "^6.0.2",
     "vite": "^8.2.2",
@@ -279,8 +279,9 @@ const name = ref('')
 ```
 
 Импорт по subpath, а не из корневого бареля: он попадает ровно в тот чанк, где
-нужен, и не тянет соседей. Барель (`import { GrButton } from '@feugene/granularity'`)
-тоже работает и удобен в прототипах, но гранулярность на нём держится хуже.
+нужен, и не тянет соседей. Компонент из бареля (`import { GrButton } from '@feugene/granularity'`)
+granum отвергает ошибкой сборки `ComponentRootImportError`: селекция видит
+компонент только по подпути, а барель тянет весь пакет.
 
 Автоматизировать импорты можно резолвером — см.
 [«Авто-импорт компонентов»](#авто-импорт-компонентов).
@@ -586,22 +587,11 @@ createServer(async (request, response) => {
 Если тема выбирается на сервере (из куки, из профиля), нужен
 `granularityThemePlugin` — он уже стоит в каркасе выше.
 
-**Тесты серверного рендера гоняются сборщиком, а не голым Node.** Чанки пакета
-импортируют собственный `.css`, чего Node не умеет — импорт компонента падает с
-`ERR_UNKNOWN_FILE_EXTENSION`. В vitest это лечится инлайном:
+**Голый Node импортирует пакет как есть.** Чанки `dist` не импортируют ни
+`.css`, ни granum — снаружи у них только `vue` и `@floating-ui/dom`, — поэтому
+тестам серверного рендера инлайн зависимостей (`server.deps.inline`) не нужен.
 
-```ts
-// vitest.config.ts
-import { defineConfig } from 'vitest/config'
-
-export default defineConfig({
-  test: {
-    server: { deps: { inline: [/@feugene\/granularity/] } },
-  },
-})
-```
-
-И рендерить сервером из jsdom-теста нельзя: в jsdom `window` существует, гарды
+Рендерить сервером из jsdom-теста нельзя: в jsdom `window` существует, гарды
 `typeof window === 'undefined'` сочтут себя клиентом, и «серверный» HTML выйдет
 таким, какого настоящий сервер никогда не отдаст. Снимайте серверный рендер в
 чистом Node (`globalSetup`), а гидрируйте уже готовый снимок — образец в
@@ -713,7 +703,7 @@ export async function setupI18n() {
 
 ## Остальные пакеты семейства
 
-### Пакет-спутник: четыре шага
+### Пакет-спутник: три шага
 
 Спутник подключается всегда одинаково, независимо от того, какой именно:
 
@@ -729,11 +719,13 @@ export async function setupI18n() {
    })
    ```
 
-3. **Резолвер** — если пользуетесь авто-импортом (см. ниже).
-4. **Блок i18n и лоадеры** — по образцу из главы про локализацию.
+3. **Блок i18n и лоадеры** — по образцу из главы про локализацию.
 
-Компоненты импортируются так же, как у ядра: `@feugene/granularity-chrono/components/GrDatePicker`
-или из корневого бареля пакета.
+Авто-импорту отдельный шаг не нужен: `GranularityResolver()` найдёт спутник в
+`package.json` приложения сам (см. ниже).
+
+Компоненты импортируются так же, как у ядра: `@feugene/granularity-chrono/components/GrDatePicker`.
+Из корневого бареля пакета компонент granum не пропустит — `ComponentRootImportError`.
 
 ### Что есть в семействе
 
@@ -779,26 +771,20 @@ yarn add -D @feugene/unplugin-granularity unplugin-vue-components
 // vite.config.ts
 import Components from 'unplugin-vue-components/vite'
 import { GranularityResolver } from '@feugene/unplugin-granularity'
-import { GranularityChronoResolver } from '@feugene/granularity-chrono/resolver'
 
 export default defineConfig({
   plugins: [
     vue(),
     Components({
       dts: 'src/components.d.ts',
-      resolvers: [
-        // Резолверы спутников идут раньше: они знают точный список своих имён,
-        // а `GranularityResolver` забирает любое имя на `Gr`.
-        GranularityChronoResolver(),
-        GranularityResolver({ importStyle: false }),
-      ],
+      resolvers: GranularityResolver(),
     }),
   ],
 })
 ```
 
-Порядок здесь не стилистика: жадный резолвер ядра, поставленный первым, перехватит
-`GrDatePicker` и попытается найти его в ядре, где его нет. Подробности —
+Резолвер один на ядро и все спутники: пакеты он находит в `package.json`
+приложения, компоненты — в их `exports`, и импорт ставит из подпути. Подробности —
 в [`unplugin.md`](./unplugin.md).
 
 ### Глобальные дефолты и runtime-регистрация

@@ -1,7 +1,3 @@
-<script setup lang="ts">
-import { GrCard, GrStatistic } from '@feugene/granularity'
-</script>
-
 <template>
   <div class="grid gap-4 sm:grid-cols-3">
     <GrCard class="p-4">

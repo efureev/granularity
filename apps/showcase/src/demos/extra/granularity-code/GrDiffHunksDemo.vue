@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 
-import { GrButton, GrSwitch } from '@feugene/granularity'
 import type { GrDiffHunk } from '@feugene/granularity-code'
 
 /**

@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { GrBadge, GrCard, GrIcon } from '@feugene/granularity'
 import IconCircleCheck from '~icons/lucide/circle-check-big'
 
 const stats = [

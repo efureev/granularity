@@ -2,8 +2,6 @@
 import { computed, ref, shallowRef } from 'vue'
 import { z } from 'zod'
 
-import { GrJsonViewer, GrSegmented } from '@feugene/granularity'
-import { GrSchemaForm } from '@feugene/granularity-forms-schema'
 import type { GrSchemaModel } from '@feugene/granularity-forms-schema'
 import { jsonSchemaAdapter } from '@feugene/granularity-forms-schema/json-schema'
 import type { JsonSchemaDocument } from '@feugene/granularity-forms-schema/json-schema'

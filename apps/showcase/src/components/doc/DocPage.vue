@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { GrCard } from '@feugene/granularity'
-
 import ShowcasePageHero from '../showcase/ShowcasePageHero.vue'
 import InlineRichText from '../content/InlineRichText.vue'
 import type { ShowcaseApiSectionMeta, ShowcaseExampleMeta } from '../../content/model'
