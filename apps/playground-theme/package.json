@@ -4,14 +4,14 @@
   "version": "0.1.0",
   "type": "module",
   "dependencies": {
-    "@feugene/granularity": "^1.0.0",
+    "@feugene/granularity": "^1.1.0",
     "@unocss/reset": "^66.8.1",
     "vue": "^3.5.42"
   },
   "devDependencies": {
     "@feugene/granum": "^2.0.0",
     "@feugene/granum-engine-wind": "^2.0.0",
-    "@feugene/unplugin-granularity": "^1.0.0",
+    "@feugene/unplugin-granularity": "^1.1.0",
     "@vitejs/plugin-vue": "^6.0.8",
     "typescript": "^6.0.3",
     "unplugin-vue-components": "^32.1.0",

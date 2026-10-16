@@ -66,7 +66,7 @@ import { en, GR_CHARTS_I18N_BLOCK, ru } from '@feugene/granularity-charts/i18n'
 <!-- entry-sizes:generated:start lang=ru -->
 | Что берут | gzip | от бареля |
 | --- | ---: | ---: |
-| весь пакет из корня | 81.1 kB | 100 % |
+| весь пакет из корня | 81.0 kB | 100 % |
 | самый лёгкий компонент — `GrSparkline` | 8.4 kB | 10 % |
 | медианный компонент — `GrChartHeatmap` | 30.3 kB | 37 % |
 | 5 самых тяжёлых вместе | 55.9 kB | 69 % |

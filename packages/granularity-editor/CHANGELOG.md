@@ -5,6 +5,23 @@ All notable changes to the [`@feugene/granularity-editor`](.) package are docume
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/).
 
+## [v1.1.0] 2026-10-16
+
+### Changed
+
+- **Peer `@feugene/granum` — `>=2.0.0 <3.0.0`.** Пакет собран granum 2.0: `dist`
+  не импортирует granum — контракт встроен в `dist/granum/contract.js`, и
+  SSR-сервер с внешними пакетами, задеплоенный с `--omit=dev`, больше не падает с
+  `ERR_MODULE_NOT_FOUND`. Приложению — `@feugene/granum` и
+  `@feugene/granum-engine-wind` `^2.0.0`.
+- **Компонент из корня пакета — `ComponentRootImportError`** у приложения на
+  granum 2.0. Компоненты берут из `<пакет>/components/<Имя>`.
+- **Авто-импорт — один `GranularityResolver()`** из `@feugene/unplugin-granularity`
+  1.1: он находит пакет в `package.json` приложения сам, порядок резолверов больше
+  не важен. Собственный `./resolver` остаётся для уже написанных конфигов.
+- **Необязательный peer `@feugene/fint-i18n` — `>=0.9.0 <1.0.0`.** Пакет тестируется
+  на 0.9 вместе с ядром; на 0.7 и 0.8 он не проверялся.
+
 ## [v1.0.6] 2026-10-13
 
 ### Fixed

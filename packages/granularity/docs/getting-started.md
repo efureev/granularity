@@ -125,7 +125,7 @@ my-app/
     "typecheck": "vue-tsc --noEmit -p tsconfig.json"
   },
   "dependencies": {
-    "@feugene/granularity": "^1.0.0",
+    "@feugene/granularity": "^1.1.0",
     "@floating-ui/dom": "^1.8.0",
     "@unocss/reset": "^66.7.5",
     "vue": "^3.5.40"
@@ -732,21 +732,21 @@ export async function setupI18n() {
 <!-- ecosystem:generated:start -->
 | Пакет | Версия | Компоненты | Блок i18n | Резолвер |
 | --- | --- | --- | --- | --- |
-| `@feugene/granularity` | 1.0.21 | ядро, 106 subpath-экспортов `./components/Gr*` | `gr` | `GranularityResolver` (из `@feugene/unplugin-granularity`) |
-| `@feugene/granularity-charts` | 1.0.4 | `GrChartArea`, `GrChartBar`, `GrChartBullet`, `GrChartFunnel`, `GrChartHeatmap`, `GrChartLine`, `GrChartPie`, `GrChartRadar`, `GrChartWaterfall`, `GrSparkline` | `grCharts` | `GranularityChartsResolver` |
-| `@feugene/granularity-chrono` | 1.0.6 | `GrCalendar`, `GrDatePicker`, `GrDateRangePicker`, `GrDateTimePicker`, `GrDuration`, `GrRelativeTime`, `GrTimePicker` | `grChrono` | `GranularityChronoResolver` |
-| `@feugene/granularity-code` | 1.0.4 | `GrCodeBlock`, `GrCodeEditor`, `GrDiff` | `grCode` | `GranularityCodeResolver` |
-| `@feugene/granularity-dashboard` | 1.0.4 | `GrDashboard`, `GrDashboardItem`, `GrDashboardItemSettings`, `GrDashboardPalette`, `GrDashboardToolbar` | `grDashboard` | `GranularityDashboardResolver` |
-| `@feugene/granularity-editor` | 1.0.6 | `GrMarkdown`, `GrRichText` | `grEditor` | `GranularityEditorResolver` |
-| `@feugene/granularity-forms-schema` | 1.0.4 | `GrSchemaForm` | `grForms` | `GranularityFormsSchemaResolver` |
-| `@feugene/granularity-media` | 1.0.6 | `GrCameraCapture`, `GrCodeScanner`, `GrImageCrop`, `GrVideoPlayer` | `grMedia` | `GranularityMediaResolver` |
+| `@feugene/granularity` | 1.1.0 | ядро, 106 subpath-экспортов `./components/Gr*` | `gr` | `GranularityResolver` (из `@feugene/unplugin-granularity`) |
+| `@feugene/granularity-charts` | 1.1.0 | `GrChartArea`, `GrChartBar`, `GrChartBullet`, `GrChartFunnel`, `GrChartHeatmap`, `GrChartLine`, `GrChartPie`, `GrChartRadar`, `GrChartWaterfall`, `GrSparkline` | `grCharts` | `GranularityChartsResolver` |
+| `@feugene/granularity-chrono` | 1.1.0 | `GrCalendar`, `GrDatePicker`, `GrDateRangePicker`, `GrDateTimePicker`, `GrDuration`, `GrRelativeTime`, `GrTimePicker` | `grChrono` | `GranularityChronoResolver` |
+| `@feugene/granularity-code` | 1.1.0 | `GrCodeBlock`, `GrCodeEditor`, `GrDiff` | `grCode` | `GranularityCodeResolver` |
+| `@feugene/granularity-dashboard` | 1.1.0 | `GrDashboard`, `GrDashboardItem`, `GrDashboardItemSettings`, `GrDashboardPalette`, `GrDashboardToolbar` | `grDashboard` | `GranularityDashboardResolver` |
+| `@feugene/granularity-editor` | 1.1.0 | `GrMarkdown`, `GrRichText` | `grEditor` | `GranularityEditorResolver` |
+| `@feugene/granularity-forms-schema` | 1.1.0 | `GrSchemaForm` | `grForms` | `GranularityFormsSchemaResolver` |
+| `@feugene/granularity-media` | 1.1.0 | `GrCameraCapture`, `GrCodeScanner`, `GrImageCrop`, `GrVideoPlayer` | `grMedia` | `GranularityMediaResolver` |
 
 Компонентов не добавляют, но входят в семейство:
 
 - [`@feugene/granularity-datasource`](../../granularity-datasource) `0.1.2`
 - [`@feugene/granularity-devtools`](../../granularity-devtools) `1.0.0`
-- [`@feugene/granularity-test-kit`](../../granularity-test-kit) `1.1.0`
-- [`@feugene/unplugin-granularity`](../../unplugin-granularity) `1.0.0`
+- [`@feugene/granularity-test-kit`](../../granularity-test-kit) `1.2.0`
+- [`@feugene/unplugin-granularity`](../../unplugin-granularity) `1.1.0`
 <!-- ecosystem:generated:end -->
 
 Резолвер каждый спутник экспортирует сам — из subpath `./resolver`. Кроме

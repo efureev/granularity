@@ -5,6 +5,33 @@ All notable changes to the [`@feugene/unplugin-granularity`](.) package are docu
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/).
 
+## [v1.1.0] 2026-10-16
+
+### Changed
+
+- **`GranularityResolver()` — один резолвер на ядро и все спутники.** Компоненты он
+  берёт из `exports` установленных пакетов: находит в `dependencies`,
+  `devDependencies` и `peerDependencies` приложения все `@feugene/granularity` и
+  `@feugene/granularity-*` и читает их ключи `./components/<Name>`. Спутникам больше
+  не нужны свои резолверы со списками, а порядок регистрации — не важен.
+- **Неизвестное имя не резолвится.** Прежний резолвер отдавал любое имя на `Gr` в
+  ядро, и опечатка или компонент спутника превращались в импорт несуществующего
+  пути — сборка падала у потребителя. Теперь такое имя остаётся Vue, и тот
+  предупреждает о неизвестном компоненте. Имя, которое экспортируют два пакета,
+  тоже не резолвится.
+- **Часть составного компонента — из подпути родителя.** `GrListItem` приезжает из
+  `@feugene/granularity/components/GrList`: туда ведёт его запись в `exports`, и
+  селекция granum знает компонент по родителю.
+
+### Added
+
+- Опции `packages` (чьи компоненты резолвить) и `root` (откуда читать
+  `package.json`).
+- `buildComponentIndex`, `componentsOfExports`, `discoverGranularityPackages`,
+  `GRANULARITY_PACKAGE_PATTERN` — индекс компонентов для своих инструментов.
+- Гейт дрейфа импортирует каждый модуль, куда резолвер ведёт имя компонента ядра,
+  и проверяет, что компонент там правда есть.
+
 ## [v1.0.0] 2026-09-28
 
 Привязка к мажору ядра: peer на `@feugene/granularity` стал `>=1.0.0 <2.0.0`.

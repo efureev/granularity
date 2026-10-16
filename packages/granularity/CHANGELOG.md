@@ -5,6 +5,64 @@ All notable changes to the [`@feugene/granularity`](.) package are documented in
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/).
 
+## [v1.1.0] 2026-10-16
+
+Переезд на `@feugene/granum` 2.0 и `@feugene/fint-i18n` 0.9. Приложению — поднять
+`@feugene/granum` и `@feugene/granum-engine-wind` до `^2.0.0` и пройти раздел
+«From 1.x to 2.0» в `MIGRATION.md` granum: неизвестный ключ `granum.config` там
+стал ошибкой. `@feugene/fint-i18n`, если стоит, — `^0.9.0`.
+
+### Changed
+
+- **Peer `@feugene/granum` — `>=2.0.0 <3.0.0`.** Пакет собран granum 2.0. Формат
+  манифеста прежний, но рецепты темизации и запрет корневого импорта, на которые
+  опирается документация, работают только с 2.0.
+- **Компонент из корня пакета — ошибка сборки приложения.** С granum 2.0
+  `import { GrButton } from '@feugene/granularity'` даёт `ComponentRootImportError`
+  под `js.guard`: селекция видит компонент только по подпути, а корень тянет весь
+  пакет. Компоненты берут из `@feugene/granularity/components/<Имя>` или
+  `virtual:granum/components`; утилиты, плагины, константы и типы из корня — можно.
+  README и документация переведены на подпути.
+- **Необязательный peer `@feugene/fint-i18n` — `>=0.9.0 <1.0.0`.** Пакет тестируется
+  на 0.9; на 0.7 и 0.8 он не проверялся, и обещать их диапазон было нечем.
+  Ломающее в fint 0.8 (`beforeLoadBlock` получает `{ block, locale }`) пакет не
+  задевает.
+- **Контракт адаптера переводов — необязательное поле `setLocale`.** Так язык меняет
+  инстанс `@feugene/fint-i18n`, который подключается адаптером как есть.
+
+### Fixed
+
+- **`dist` не импортирует granum.** Дескрипторы компонентов тянули
+  `@feugene/granum/contract` в рантайм, и SSR-сервер с внешними пакетами,
+  задеплоенный с `--omit=dev`, падал на первом компоненте с `ERR_MODULE_NOT_FOUND`.
+  Сборка granum 2.0 встраивает контракт в `dist/granum/contract.js`; снаружи у
+  чанков остались только `vue` и `@floating-ui/dom`.
+- **Рецепты темизации действуют.** `themes.tokenOverrides` и
+  `themes.define.<тема>.tokensRef` встают после файла темы пакета под его селектор
+  и побеждают; `themes.define.<имя>` с `extends: 'dark'` наследует значения тёмной
+  темы. granum 1.x ставил эти блоки раньше файлов тем, и рецепты не действовали.
+  Ключ с `--` в `tokenOverrides` — `InvalidConfigError`, а не `----gr-*`.
+- **`locale` у `GrConfigProvider` переключает язык инстанса fint-i18n.** Провайдер
+  звал только `syncLocale` из контракта адаптера, а у `FintI18n` такого метода нет —
+  язык там меняет `setLocale()`. `<GrConfigProvider locale="en">` при рекомендованном
+  стеке молча ничего не делал. Теперь без `syncLocale` провайдер зовёт `setLocale`;
+  это закреплено тестом с настоящим `createFintI18n`.
+
+### Docs
+
+- `localization.md`: раздел «Своё i18n: адаптер» — поля контракта и проверенный пример
+  для `vue-i18n`; версия fint-i18n — 0.9; смена языка — `setLocale()` или проп
+  `locale` у `GrConfigProvider`.
+- `theming.md`: `define.<тема>.tokensRef` не заменяет файл пакета, а ложится поверх
+  него — файлу достаточно изменённых ролей; третья тема — `define` с `extends`;
+  ключ `themes.themeFiles` пресета v1 убран отовсюду.
+- `getting-started.md`: голому Node инлайн `server.deps.inline` не нужен — чанки не
+  импортируют ни `.css`, ни granum; авто-импорт — один `GranularityResolver()`.
+- `unplugin.md`, `companion-packages.md`: единый резолвер на ядро и спутники, своему
+  пакету `./resolver` не нужен.
+- `installation.md`, `granum.md`, `components.md`, `README.md`: granum 2.0, `dist`
+  без granum, компоненты — из подпутей.
+
 ## [v1.0.21] 2026-10-13
 
 ### Fixed
