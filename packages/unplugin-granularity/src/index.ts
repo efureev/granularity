@@ -1,4 +1,12 @@
 export {
+  buildComponentIndex,
+  componentsOfExports,
+  discoverGranularityPackages,
+  GRANULARITY_PACKAGE_PATTERN,
+  type GranularityComponentEntry,
+  type GranularityComponentIndex,
+} from './componentIndex'
+export {
   createGranularResolver,
   GranularityResolver,
   type GranularityResolverOptions,

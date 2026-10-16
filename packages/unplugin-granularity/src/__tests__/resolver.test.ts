@@ -65,13 +65,13 @@ describe('createGranularResolver', () => {
   })
 })
 
-describe('GranularityResolver (core preset)', () => {
+describe('GranularityResolver', () => {
   it('returns a component resolver + a directive resolver by default', () => {
     const [component, directive] = GranularityResolver() as ComponentResolverObject[]
 
     expect(component?.type).toBe('component')
-    // Без `sideEffects`: свой CSS компонент тянет из собственного чанка, а
-    // subpath на `styles.css` ядро не публикует — ссылка на него ломала бы
+    // Без `sideEffects`: CSS компонента приносит granum из манифеста, а
+    // subpath на `styles.css` пакеты не публикуют — ссылка на него ломала бы
     // сборку потребителя.
     expect(resolveWith(component!, 'GrInput')).toEqual({
       name: 'GrInput',
@@ -104,25 +104,56 @@ describe('GranularityResolver (core preset)', () => {
       from: '@feugene/granularity/components/GrCard',
     })
   })
+
+  it('не резолвит имя, которого пакеты не экспортируют, — вместо пути в никуда', () => {
+    const [component] = GranularityResolver() as ComponentResolverObject[]
+
+    expect(resolveWith(component!, 'GrNope')).toBeUndefined()
+    expect(resolveWith(component!, 'ElButton')).toBeUndefined()
+  })
+
+  it('один резолвер на ядро и спутники — без списков и без порядка', () => {
+    const [component] = GranularityResolver({
+      packages: ['@feugene/granularity-chrono', '@feugene/granularity'],
+    }) as ComponentResolverObject[]
+
+    expect(resolveWith(component!, 'GrDatePicker')).toEqual({
+      name: 'GrDatePicker',
+      from: '@feugene/granularity-chrono/components/GrDatePicker',
+    })
+    expect(resolveWith(component!, 'GrButton')).toEqual({
+      name: 'GrButton',
+      from: '@feugene/granularity/components/GrButton',
+    })
+  })
+
+  it('exclude и prefix отсекают имя до индекса', () => {
+    const [excluded] = GranularityResolver({ exclude: /^GrCard$/ }) as ComponentResolverObject[]
+    expect(resolveWith(excluded!, 'GrCard')).toBeUndefined()
+    expect(resolveWith(excluded!, 'GrButton')).toBeTruthy()
+
+    const [prefixed] = GranularityResolver({ prefix: 'Xh' }) as ComponentResolverObject[]
+    expect(resolveWith(prefixed!, 'GrButton')).toBeUndefined()
+  })
 })
 
 describe('части составных компонентов', () => {
-  const resolver = GranularityResolver({ importStyle: true })[0] as ComponentResolverObject
+  const resolver = GranularityResolver()[0] as ComponentResolverObject
 
   /**
-   * Своей директории в `src` у части нет, но subpath есть: ядро публикует его
-   * алиасом на модуль родителя с `0.28.2`. Плагину поэтому нечего знать про
-   * состав составных компонентов — он строит путь по имени, как для всех.
+   * Своя запись в `exports` у части есть, но ведёт она в модуль родителя.
+   * Резолвер импортирует часть из подпути родителя: селекция granum знает
+   * компонент по нему, и guard проверяет импорт по нему же.
    */
-  it('резолвятся своим subpath, как обычные компоненты', () => {
+  it('резолвятся из подпути родителя', () => {
     expect(resolveWith(resolver, 'GrTimelineItem')).toEqual({
       name: 'GrTimelineItem',
-      from: '@feugene/granularity/components/GrTimelineItem',
-      sideEffects: '@feugene/granularity/components/GrTimelineItem/styles.css',
+      from: '@feugene/granularity/components/GrTimeline',
     })
 
-    expect(resolveWith(resolver, 'GrListItem')).toMatchObject({
-      from: '@feugene/granularity/components/GrListItem',
+    expect(resolveWith(resolver, 'GrListItem')).toEqual({
+      name: 'GrListItem',
+      from: '@feugene/granularity/components/GrList',
     })
   })
 

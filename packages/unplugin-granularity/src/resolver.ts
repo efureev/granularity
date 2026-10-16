@@ -1,5 +1,11 @@
 import type { ComponentResolver, ComponentResolverObject } from 'unplugin-vue-components/types'
+import process from 'node:process'
 
+import {
+  buildComponentIndex,
+  discoverGranularityPackages,
+  type GranularityComponentIndex,
+} from './componentIndex'
 import {
   GRANULARITY_DEFAULT_PREFIX,
   GRANULARITY_DIRECTIVES,
@@ -113,15 +119,28 @@ export function createGranularResolver(options: GranularResolverOptions): Compon
 }
 
 /**
- * Опции фабрики {@link GranularityResolver} (core-preset пакета
- * `@feugene/granularity`).
+ * Опции фабрики {@link GranularityResolver}: один резолвер на всю экосистему —
+ * ядро и спутники.
  */
 export interface GranularityResolverOptions {
   /**
-   * Префикс имён компонентов в шаблонах.
+   * Пакеты, чьи компоненты резолвить.
    *
-   * По умолчанию `'Gr'` — совпадает с соглашением пакета `@feugene/granularity`.
-   * Можно переопределить, если в приложении есть коллизии с другими библиотеками.
+   * По умолчанию — все `@feugene/granularity` и `@feugene/granularity-*` из
+   * `dependencies`, `devDependencies` и `peerDependencies` приложения
+   * (`<root>/package.json`); не нашлось ни одного — одно ядро.
+   */
+  packages?: readonly string[]
+
+  /**
+   * Корень приложения: отсюда читается его `package.json` и ищутся пакеты.
+   *
+   * @default process.cwd()
+   */
+  root?: string
+
+  /**
+   * Префикс имён компонентов в шаблонах: имя без него резолвер не смотрит.
    *
    * @default 'Gr'
    */
@@ -133,10 +152,10 @@ export interface GranularityResolverOptions {
    * - `true` / `'css'` — в `sideEffects` попадёт `<pkg>/components/<Name>/styles.css`;
    * - `false` — ничего не подгружаем.
    *
-   * **Ядру это не нужно, и по умолчанию выключено.** Чанки ядра CSS не
-   * импортируют: `styles.css` компонента granum берёт из манифеста пакета в
-   * слой `granum.components`. Subpath `components/<Name>/styles.css` ядро не
-   * публикует, поэтому включённая опция дала бы `ERR_PACKAGE_PATH_NOT_EXPORTED`
+   * **Пакетам экосистемы это не нужно, и по умолчанию выключено.** Их чанки
+   * CSS не импортируют: `styles.css` компонента granum берёт из манифеста пакета
+   * в слой `granum.components`. Subpath `components/<Name>/styles.css` пакеты не
+   * публикуют, поэтому включённая опция дала бы `ERR_PACKAGE_PATH_NOT_EXPORTED`
    * на сборке потребителя — на каждом компоненте, а не только на редком.
    *
    * Опция остаётся для провайдера, который раздаёт CSS отдельными файлами и
@@ -163,6 +182,8 @@ export interface GranularityResolverOptions {
 
 /** Нормализованная форма опций — все значения разрешены. */
 interface ResolvedOptions {
+  readonly packages: readonly string[] | undefined
+  readonly root: string
   readonly prefix: string
   readonly importStyle: boolean
   readonly directives: boolean
@@ -172,10 +193,47 @@ interface ResolvedOptions {
 /** @internal */
 function normalizeOptions(options: GranularityResolverOptions): ResolvedOptions {
   return {
+    packages: options.packages,
+    root: options.root ?? process.cwd(),
     prefix: options.prefix ?? GRANULARITY_DEFAULT_PREFIX,
     importStyle: options.importStyle === true || options.importStyle === 'css',
     directives: options.directives !== false,
     exclude: options.exclude,
+  }
+}
+
+/**
+ * Резолвер компонентов по индексу из `exports`. Индекс строится при первом
+ * имени из шаблона, а не при создании резолвера: конфиг Vite исполняется и там,
+ * где компонентов никто не резолвит.
+ *
+ * @internal
+ */
+function buildComponentResolver(options: ResolvedOptions): ComponentResolverObject {
+  const { root, prefix, importStyle, exclude } = options
+  let index: GranularityComponentIndex | undefined
+
+  const load = (): GranularityComponentIndex => {
+    if (!index) {
+      const discovered = options.packages ?? discoverGranularityPackages(root)
+      index = buildComponentIndex(discovered.length > 0 ? discovered : [GRANULARITY_PACKAGE_NAME], root)
+    }
+    return index
+  }
+
+  return {
+    type: 'component',
+    resolve(name) {
+      if (exclude?.test(name) || !name.startsWith(prefix))
+        return
+
+      const entry = load().components.get(name)
+      if (!entry)
+        return
+
+      const from = `${entry.packageName}/components/${entry.owner}`
+      return importStyle ? { name, from, sideEffects: `${from}/styles.css` } : { name, from }
+    },
   }
 }
 
@@ -202,15 +260,15 @@ function buildDirectiveResolver({ exclude }: ResolvedOptions): ComponentResolver
 /**
  * Фабрика резолвера для [`unplugin-vue-components`](https://github.com/unplugin/unplugin-vue-components).
  *
- * Резолвит компоненты и директивы `@feugene/granularity` на **гранулярные
- * sub-path**-экспорты пакета, а не на общий корневой `index`. За счёт этого
- * tree-shaking в приложении потребителя работает максимально плотно: в бандл
- * попадает ровно то, что встретилось в шаблонах.
+ * Один резолвер на всю экосистему: компоненты ядра и спутников, части
+ * составных компонентов и директивы ядра. Компонент резолвится на
+ * **гранулярный sub-path**-экспорт своего пакета, а не на корневой `index`:
+ * в бандл попадает ровно то, что встретилось в шаблонах, а granum видит
+ * компонент по подпути — корень его guard отвергает.
  *
- * Для companion-пакетов (например `@feugene/granularity-chrono`) используйте
- * их собственный резолвер, построенный на {@link createGranularResolver}, и
- * ставьте его **перед** этим (жадным по `Gr*`) резолвером — иначе core-резолвер
- * перехватит одноимённые компоненты companion-пакета.
+ * Список компонентов не ведётся руками: резолвер читает `exports` пакетов,
+ * которые установило приложение. Имя, которого ни один пакет не экспортирует,
+ * и имя, которое экспортируют два пакета, он не резолвит.
  *
  * @example
  * ```ts
@@ -229,15 +287,7 @@ function buildDirectiveResolver({ exclude }: ResolvedOptions): ComponentResolver
  */
 export function GranularityResolver(options: GranularityResolverOptions = {}): ComponentResolver[] {
   const resolved = normalizeOptions(options)
-
-  const resolvers: ComponentResolver[] = [
-    createGranularResolver({
-      packageName: GRANULARITY_PACKAGE_NAME,
-      prefix: resolved.prefix,
-      importStyle: resolved.importStyle,
-      exclude: resolved.exclude,
-    }),
-  ]
+  const resolvers: ComponentResolver[] = [buildComponentResolver(resolved)]
 
   if (resolved.directives)
     resolvers.push(buildDirectiveResolver(resolved))

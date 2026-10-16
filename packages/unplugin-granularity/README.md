@@ -1,13 +1,16 @@
 # @feugene/unplugin-granularity
 
 [`unplugin-vue-components`](https://github.com/unplugin/unplugin-vue-components)
-резолвер для дизайн-системы [`@feugene/granularity`](https://github.com/efureev/granularity).
+резолвер для дизайн-системы [`@feugene/granularity`](https://github.com/efureev/granularity) — один на
+ядро и все пакеты-спутники.
 
-Резолвит компоненты `Gr*` и поддерживаемые директивы `v-*` из шаблонов Vue на
-**гранулярные sub-path-экспорты** пакета (`@feugene/granularity/components/<Name>`,
-`@feugene/granularity/directives/<module>`), а не на общий корневой `index`.
-За счёт этого tree-shaking работает максимально плотно: в бандл попадает ровно
-то, что встретилось в шаблонах — ничего сверх.
+Резолвит компоненты `Gr*` и директивы `v-*` из шаблонов Vue на **гранулярные sub-path-экспорты**
+пакетов (`@feugene/granularity/components/<Name>`, `@feugene/granularity-chrono/components/<Name>`,
+`@feugene/granularity/directives/<module>`), а не на корневой `index`: в бандл попадает ровно то, что
+встретилось в шаблонах, а granum видит компонент по подпути — импорт из корня он отвергает.
+
+Список компонентов вести не нужно: резолвер находит пакеты экосистемы в `package.json` приложения и
+читает их `exports`.
 
 ## Установка
 
@@ -57,8 +60,6 @@ export default defineConfig({
 import { GrButton } from '@feugene/granularity/components/GrButton'
 import { GrInput } from '@feugene/granularity/components/GrInput'
 import { vHotkey } from '@feugene/granularity/directives/hotkey'
-import '@feugene/granularity/components/GrButton/styles.css'
-import '@feugene/granularity/components/GrInput/styles.css'
 ```
 
 Никаких `@feugene/granularity` (корневой импорт) здесь нет — Rollup/Rolldown
@@ -68,7 +69,9 @@ import '@feugene/granularity/components/GrInput/styles.css'
 
 ```ts
 GranularityResolver({
-  prefix: 'Gr', // префикс компонентов; default 'Gr'
+  packages: ['@feugene/granularity', '@feugene/granularity-chrono'], // default — из package.json
+  root: process.cwd(), // откуда читать package.json и искать пакеты
+  prefix: 'Gr', // имена без префикса не резолвятся; default 'Gr'
   importStyle: false, // подтягивать <pkg>/components/<Name>/styles.css; default false
   directives: true, // авто-импорт директив (v-hotkey и т.п.); default true
   exclude: /^GrIn/, // игнорировать имена по RegExp
@@ -77,10 +80,30 @@ GranularityResolver({
 
 | Опция         | Тип                          | По умолчанию | Назначение                                              |
 | ------------- | ---------------------------- | ------------ | -------------------------------------------------------- |
-| `prefix`      | `string`                     | `'Gr'`       | Какие компоненты из шаблонов считать «своими».          |
-| `importStyle` | `boolean \| 'css'`           | `false`      | Подгружать ли CSS компонента как side-effect. Ядру не нужно — см. «Нюансы». |
+| `packages`    | `string[]`                   | все `@feugene/granularity*` из `package.json` | Чьи компоненты резолвить. Не нашлось ни одного — ядро. |
+| `root`        | `string`                     | `process.cwd()` | Корень приложения: его `package.json` и точка поиска пакетов. |
+| `prefix`      | `string`                     | `'Gr'`       | Имена без префикса резолвер не смотрит.                  |
+| `importStyle` | `boolean \| 'css'`           | `false`      | Подгружать ли CSS компонента как side-effect. Пакетам экосистемы не нужно — см. «Нюансы». |
 | `directives`  | `boolean`                    | `true`       | Включать ли второй резолвер — для директив.              |
 | `exclude`     | `RegExp \| undefined`        | —            | Исключение из обработки (применяется и к компонентам, и к директивам). |
+
+## Как резолвер находит компоненты
+
+- **Пакеты** — из `dependencies`, `devDependencies` и `peerDependencies` приложения: все
+  `@feugene/granularity` и `@feugene/granularity-*`. Пакеты без компонентов (`-test-kit`, `-devtools`)
+  ничего не добавляют.
+- **Компоненты** — ключи `./components/<Name>` в `exports` каждого пакета. Индекс строится один раз, при
+  первом теге из шаблона.
+- **Части составных компонентов** (`GrListItem`, `GrTabPanel`) импортируются из подпути родителя —
+  `@feugene/granularity/components/GrList`: туда ведёт их запись в `exports`, и селекция granum знает
+  компонент по нему.
+- **Неизвестное имя** (опечатка, свой компонент приложения) не резолвится: импорта несуществующего пути
+  не будет, Vue предупредит о неизвестном компоненте.
+- **Имя, которое экспортируют два пакета**, резолвер не трогает: такой компонент импортируют руками.
+
+Порядок резолверов не важен: имя ведёт ровно в тот пакет, который его экспортирует. Собственные
+резолверы спутников (`@feugene/granularity-chrono/resolver` и другие) и фабрика
+`createGranularResolver` остаются для уже написанных конфигов и работают рядом.
 
 ## Поддерживаемые директивы
 
@@ -93,10 +116,10 @@ GranularityResolver({
 | `v-hotkey`          | `vHotkey`                                | `@feugene/granularity/directives/hotkey`            |
 | `v-loading`         | `vLoading`                               | `@feugene/granularity/directives/loading`           |
 
-Whitelist фиксированный — так резолвер остаётся быстрым и детерминированным
-(никакого рантайм-скана `node_modules`). При добавлении новой директивы в
-`@feugene/granularity` — добавьте её и в
-[`src/manifest.ts`](./src/manifest.ts) этого пакета.
+Директивы — фиксированным списком: имя экспорта и модуль из имени в шаблоне не
+выводятся. При добавлении новой директивы в `@feugene/granularity` — добавьте её и в
+[`src/manifest.ts`](./src/manifest.ts) этого пакета; гейт пакета сверяет список с
+`exports` ядра.
 
 ## Нюансы
 
@@ -110,8 +133,8 @@ Whitelist фиксированный — так резолвер остаётс�
   раздают CSS отдельными файлами в `exports`. Статический запасной вариант без
   granum — `@feugene/granularity/styles.css` (токены, темы, base и preflight, без
   утилит).
-- **Коллизии имён.** Если в приложении есть свой `Gr…`, который не относится
-  к granularity, используйте `exclude` (например `/^GrLegacy/`) или поменяйте `prefix`.
+- **Свои компоненты на `Gr…`.** Компонент приложения, которого нет в `exports` пакетов, резолвер не
+  тронет. Если имя совпало с компонентом пакета — исключите его `exclude` (например `/^GrLegacy/`).
 - **`GlobalComponents` для Volar.** Резолвер работает вместе с
   `dts` опцией `Components({ dts: 'components.d.ts' })` — тогда Volar/`vue-tsc`
   подхватят типы компонентов в шаблонах автоматически.

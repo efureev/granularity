@@ -3,7 +3,7 @@ import { createRequire } from 'node:module'
 import { describe, expect, it } from 'vitest'
 
 import { GRANULARITY_DIRECTIVES, GRANULARITY_PACKAGE_NAME } from '../manifest'
-import { createGranularResolver } from '../resolver'
+import { GranularityResolver } from '../resolver'
 
 /**
  * Гейт дрейфа: whitelist резолвера против того, что ядро правда отгружает.
@@ -51,6 +51,13 @@ const coreComponents = CORE_KEYS
   .filter(key => /^\.\/components\/[A-Za-z]+$/.test(key))
   .map(key => key.slice('./components/'.length))
 
+/**
+ * Подпути без компонента с тем же именем. `GrDialogService` — сервис диалогов:
+ * подпуть отдаёт `useDialogService`, плагин и хост `GrDialogServiceHost`, а
+ * тега `<GrDialogService>` не бывает.
+ */
+const NOT_A_TAG = new Set(['GrDialogService'])
+
 describe('манифест директив против exports ядра', () => {
   it.each(Object.entries(GRANULARITY_DIRECTIVES))('%s указывает на живой subpath', (_name, descriptor) => {
     expect(CORE_KEYS).toContain(`./directives/${descriptor.module}`)
@@ -74,14 +81,27 @@ describe('манифест директив против exports ядра', () =
 })
 
 describe('резолвинг компонентов против exports ядра', () => {
-  const resolver = createGranularResolver({ packageName: GRANULARITY_PACKAGE_NAME, prefix: 'Gr' })
+  const resolver = GranularityResolver({ packages: [GRANULARITY_PACKAGE_NAME] })[0] as ComponentResolverObject
 
-  it('каждый компонентный subpath ядра резолвится в него же', () => {
+  it('каждый компонентный subpath ядра резолвится в опубликованный subpath', () => {
     const broken = coreComponents
       .map(name => ({ name, from: resolveWith(resolver, name)?.from }))
       .filter(({ from }) => !from || !CORE_KEYS.includes(from.replace(GRANULARITY_PACKAGE_NAME, '.')))
 
     expect(broken).toEqual([])
+  })
+
+  it('модуль, куда резолвер ведёт имя, правда экспортирует компонент с этим именем', async () => {
+    const missing: string[] = []
+
+    for (const name of coreComponents.filter(name => !NOT_A_TAG.has(name))) {
+      const from = resolveWith(resolver, name)!.from!
+      const module = await import(from) as Record<string, unknown>
+      if (!module[name])
+        missing.push(`${name} ← ${from}`)
+    }
+
+    expect(missing).toEqual([])
   })
 
   it('компоненты в ядре есть', () => {
