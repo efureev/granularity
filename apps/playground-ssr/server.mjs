@@ -60,9 +60,11 @@ const server = createHttpServer((request, response) => {
       const { renderPath } = await vite.ssrLoadModule('/src/entry-server.ts')
       const { PLAYGROUND_PAGES } = await vite.ssrLoadModule('/src/pages.ts')
       const pathname = new URL(request.url ?? '/', 'http://localhost').pathname
-      const { html, teleports } = await renderPath(pathname)
+      const { html, teleports, htmlAttrs } = await renderPath(pathname, { cookie: request.headers.cookie })
+      const rootAttrs = Object.entries(htmlAttrs).map(([name, value]) => ` ${name}="${value}"`).join('')
 
       const page = template
+        .replace('<html lang="ru">', `<html lang="ru"${rootAttrs}>`)
         .replace('<!--app-nav-->', renderNav(PLAYGROUND_PAGES, pathname))
         .replace('<!--app-html-->', html)
         .replace('<!--app-teleports-->', renderTeleports(teleports))

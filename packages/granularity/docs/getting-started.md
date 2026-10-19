@@ -356,21 +356,27 @@ SPA: компоненты пакета пишутся одинаково для 
 // src/app.ts
 import { createSSRApp, type Component } from 'vue'
 
-import { granularityThemePlugin, granularityToastPlugin } from '@feugene/granularity'
+import { createCookieStorage } from '@feugene/granum/runtime'
+import { GR_THEME_STORAGE_KEY, type GrModeName, granularityThemePlugin, granularityToastPlugin } from '@feugene/granularity'
+import manifest from 'virtual:granum/themes'
 
 import App from './App.vue'
 
 /**
  * В SSR приложение создаётся заново на каждый запрос: общий инстанс протёк бы
- * состоянием одного пользователя в ответ другому.
+ * состоянием одного пользователя в ответ другому. `mode` — режим запроса из cookie.
  */
-export function createApp(root: Component = App) {
+export function createApp(root: Component = App, mode?: GrModeName) {
   const app = createSSRApp(root)
 
   // `useToast` намеренно запрещает модульный синглтон на сервере — без плагина
-  // `GrToaster` роняет рендер. `setTheme` без плагина по той же причине бросает.
+  // `GrToaster` роняет рендер. `setMode` без плагина по той же причине бросает.
   app.use(granularityToastPlugin)
-  app.use(granularityThemePlugin)
+  app.use(granularityThemePlugin, {
+    manifest,
+    storage: createCookieStorage({ name: GR_THEME_STORAGE_KEY }),
+    initial: mode,
+  })
 
   return app
 }
@@ -570,24 +576,20 @@ createServer(async (request, response) => {
 и `createLoading()` монтируют хост в `document.body` и на сервере бросают:
 `if (typeof window !== 'undefined')` вокруг вызова либо перенос в `onMounted`.
 
-**Тема ставится до первого рендера.** Сервер не знает выбор пользователя, поэтому
-в `<head>` кладётся инлайновый скрипт — иначе пользователь с тёмной темой увидит
-вспышку светлой:
+**Режим ставится до первого рендера.** Выбор пользователя сервер видит только в
+cookie; когда её нет, пару ставит скрипт в `<head>` — иначе пользователь с тёмным
+режимом увидит вспышку светлого. Скрипт отдаёт плагин granum:
 
-```html
-<script>
-  try {
-    var t = localStorage.getItem('gr-theme')
-      || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
-    document.documentElement.dataset.theme = 'slate-' + t
-  } catch {}
-</script>
+```ts
+// vite.config.ts
+granum(granumConfig, { themeScript: { storageKey: 'gr-theme', cookie: 'gr-theme' } })
 ```
 
-Ключ `gr-theme` (имя режима) и пара `slate-<режим>` в `[data-theme]` — тот же
-контракт, что у `useTheme()`.
-Если тема выбирается на сервере (из куки, из профиля), нужен
-`granularityThemePlugin` — он уже стоит в каркасе выше.
+Скрипт берёт пары из того же манифеста, что и CSS, и не трогает пару, уже
+пришедшую с сервера. Режим из cookie сервер ставит на `<html>` сам —
+`themeRootAttributes(manifest, modeFromCookie(manifest, cookie, 'gr-theme')?.name)`
+([`ssr.md`](./ssr.md#режим-без-мигания)); состояние режима на сервере держит
+`granularityThemePlugin` из каркаса выше.
 
 **Голый Node импортирует пакет как есть.** Чанки `dist` не импортируют ни
 `.css`, ни granum — снаружи у них только `vue` и `@floating-ui/dom`, — поэтому

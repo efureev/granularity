@@ -5,6 +5,15 @@ All notable changes to the [`@feugene/granularity-devtools`](.) package are docu
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Changed
+
+- **Раздел «Granularity app» показывает тему и режим.** Тема сборки, режим с его
+  `colorScheme`, набор режимов из манифеста и пара на корне приложения; разошлась пара
+  с режимом состояния — видны обе. Читается новое состояние `useTheme` ядра (манифест
+  и `mode`); источник режима и `system prefers dark` — как прежде.
+
 ## [v1.0.0] 2026-09-28
 
 Привязка к мажору ядра: peer на `@feugene/granularity` стал `>=1.0.0 <2.0.0`.

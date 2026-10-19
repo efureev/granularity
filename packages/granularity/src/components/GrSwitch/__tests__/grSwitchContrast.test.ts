@@ -6,7 +6,7 @@ import {
   getContrastRatio,
   resolveColorExpression,
   themeVarsByName,
-  type ThemeName,
+  THEME_MODES,
 } from '../../../__tests__/cssContrast'
 import { thumbBase, thumbContentColorClass } from '../grSwitchStyles'
 
@@ -21,7 +21,7 @@ import { thumbBase, thumbContentColorClass } from '../grSwitchStyles'
  * Гейт заведён вместе с иконкой, но закрывает и спиннер, живший без проверки.
  */
 const AA_NON_TEXT = 3
-const THEMES: ThemeName[] = ['light', 'dark']
+const THEMES = THEME_MODES
 
 describe('GrSwitch · контраст содержимого бегунка', () => {
   it('спиннер и знак различимы на заливке бегунка в обеих темах', () => {

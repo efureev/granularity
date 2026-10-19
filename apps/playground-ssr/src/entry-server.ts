@@ -1,12 +1,27 @@
 import { renderToString, type SSRContext } from '@vue/server-renderer'
 import type { Component } from 'vue'
 
+import { modeFromCookie, themeRootAttributes } from '@feugene/granum/runtime'
+import { GR_THEME_STORAGE_KEY } from '@feugene/granularity'
+import themeManifest from 'virtual:granum/themes'
+
 import { createApp } from './app'
 import { resolvePage } from './pages'
 
 export interface SsrResult {
   html: string
   teleports: Record<string, string>
+  /**
+   * Атрибуты `<html>`: пара режима из cookie запроса. Без cookie пусто —
+   * решать за пользователя по системной схеме сервер не может, это делает
+   * скрипт в `<head>`.
+   */
+  htmlAttrs: Record<string, string>
+}
+
+export interface SsrRequest {
+  /** Заголовок `Cookie` запроса. */
+  cookie?: string
 }
 
 /**
@@ -24,17 +39,19 @@ export interface SsrResult {
  * смонтируй другую, и стенд начал бы производить те самые расхождения, ради
  * поиска которых существует.
  */
-export function renderPath(pathname: string): Promise<SsrResult> {
-  return render(resolvePage(pathname))
+export function renderPath(pathname: string, request: SsrRequest = {}): Promise<SsrResult> {
+  return render(resolvePage(pathname), request)
 }
 
-export async function render(root?: Component): Promise<SsrResult> {
-  const app = createApp(root)
+export async function render(root?: Component, request: SsrRequest = {}): Promise<SsrResult> {
+  const mode = modeFromCookie(themeManifest, request.cookie, GR_THEME_STORAGE_KEY)?.name
+  const app = createApp(root, { mode })
   const ssrContext: SSRContext = {}
   const html = await renderToString(app, ssrContext)
 
   return {
     html,
     teleports: (ssrContext.teleports ?? {}) as Record<string, string>,
+    htmlAttrs: mode === undefined ? {} : themeRootAttributes(themeManifest, mode),
   }
 }

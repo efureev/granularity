@@ -54,10 +54,10 @@ const props = withDefaults(defineProps<{
 const canvasEl = ref<HTMLCanvasElement | null>(null)
 const config = useGrConfig()
 
-/** Кеш резолва цветов. Сбрасывается сменой темы: та же переменная даёт другой цвет. */
+/** Кеш резолва цветов. Сбрасывается сменой темы или режима поддерева: та же переменная даёт другой цвет. */
 let colors = new Map<string, string>()
 
-watch(() => config.theme?.value, () => {
+watch(() => [config.theme?.value, config.mode?.value], () => {
   colors = new Map()
   draw()
 })

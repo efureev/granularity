@@ -466,8 +466,8 @@ async function runNetworkDemo() {
 
     <template v-else-if="previewKey === 'use-theme-runtime'">
       <div class="flex flex-wrap items-center gap-3">
-        <GrButton class="justify-self-start" @click="runtimeTheme.toggleTheme()">
-          Toggle theme ({{ runtimeTheme.theme.value }})
+        <GrButton class="justify-self-start" @click="runtimeTheme.toggleMode()">
+          Toggle theme ({{ runtimeTheme.mode.value }})
         </GrButton>
         <GrBadge>{{ runtimeTheme.isDark.value ? 'dark' : 'light' }}</GrBadge>
       </div>

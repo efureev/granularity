@@ -1,3 +1,4 @@
+import { defineComponent, h } from 'vue'
 import { describe, expect, it } from 'vitest'
 
 import { useTheme } from '@feugene/granularity'
@@ -212,26 +213,59 @@ describe('серверный рендер: стек слоёв и тема', () 
     expect(teleportedContent(teleports)).not.toContain('Верхний слой стека')
   })
 
-  it('тему можно читать без плагина, а писать — нет', async () => {
-    const { theme, isDark, setTheme, toggleTheme } = useTheme()
+  it('режим можно читать без плагина, а писать — нет', async () => {
+    const { mode, isDark, setMode, toggleMode } = useTheme()
 
     // Чтение на сервере — обычное дело: шаблон смотрит `isDark`.
-    expect(theme.value).toBe('light')
+    expect(mode.value).toBe('light')
     expect(isDark.value).toBe(false)
 
     // А запись течёт между запросами, поэтому без плагина запрещена.
-    expect(() => setTheme('dark')).toThrow(/granularityThemePlugin/)
-    expect(() => toggleTheme()).toThrow(/granularityThemePlugin/)
+    expect(() => setMode('dark')).toThrow(/granularityThemePlugin/)
+    expect(() => toggleMode()).toThrow(/granularityThemePlugin/)
   })
 
-  it('тема, выставленная в одном рендере, не видна следующему', async () => {
-    const first = await render(OverlayStackPage)
-    expect(first.html).toContain('Тема тёмная: нет')
+  it('режим из cookie: серверный HTML несёт пару, шаблон видит режим', async () => {
+    const { html, htmlAttrs } = await render(OverlayStackPage, { cookie: 'session=1; gr-theme=dark' })
 
+    expect(htmlAttrs).toEqual({ 'data-theme': 'slate-dark' })
+    expect(html).toContain('Тема тёмная: да')
+  })
+
+  it('без cookie и с неизвестным режимом пары нет: решает скрипт в head', async () => {
+    for (const cookie of [undefined, 'gr-theme=sepia']) {
+      const { html, htmlAttrs } = await render(OverlayStackPage, { cookie })
+
+      expect(htmlAttrs).toEqual({})
+      expect(html).toContain('Тема тёмная: нет')
+    }
+  })
+
+  it('режим одного запроса не утекает в следующий', async () => {
+    const dark = await render(OverlayStackPage, { cookie: 'gr-theme=dark' })
+    const anonymous = await render(OverlayStackPage)
+
+    expect(dark.html).toContain('Тема тёмная: да')
+    expect(anonymous.html).toContain('Тема тёмная: нет')
+    expect(anonymous.htmlAttrs).toEqual({})
+  })
+
+  it('режим, выставленный внутри рендера, не виден следующему', async () => {
     // Плагин ставит `app.ts`, поэтому внутри рендера запись разрешена — и обязана
     // остаться внутри него.
+    const Switching = defineComponent({
+      setup() {
+        const theme = useTheme()
+        theme.setMode('dark')
+        return () => h('p', `Тема тёмная: ${theme.isDark.value ? 'да' : 'нет'}`)
+      },
+    })
+
+    expect((await render(Switching)).html).toContain('Тема тёмная: да')
+
+    const first = await render(OverlayStackPage)
     const second = await render(OverlayStackPage)
-    expect(second.html).toContain('Тема тёмная: нет')
+    expect(first.html).toContain('Тема тёмная: нет')
     expect(second.html).toBe(first.html)
   })
 })

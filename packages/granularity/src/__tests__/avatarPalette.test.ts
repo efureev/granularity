@@ -7,7 +7,7 @@ import {
   readComponentThemeVars,
   resolveColorExpression,
   themeVarsByName,
-  type ThemeName,
+  type GrModeName,
 } from './cssContrast'
 
 /**
@@ -46,9 +46,9 @@ const AA_TEXT = 4.5
 const MIN_DISTANCE = 4
 
 const SLOTS = [1, 2, 3, 4, 5, 6] as const
-const THEMES = Object.keys(themeVarsByName) as ThemeName[]
+const THEMES = Object.keys(themeVarsByName)
 
-function colorOf(theme: ThemeName, token: string) {
+function colorOf(theme: GrModeName, token: string) {
   const expression = readComponentThemeVars('GrAvatar', theme)[token]
   if (!expression)
     throw new Error(`слот ${token} не объявлен в теме компонента`)

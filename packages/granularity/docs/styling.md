@@ -191,14 +191,16 @@ right-to-left остаётся за приложением.
 синхронизация между вкладками и с `prefers-color-scheme`) и `initThemeEarly()`
 (ранний вызов до монтирования Vue, чтобы избежать «мигания»). Хранят и отдают они
 имя режима (`'dark'`), в атрибут пишут пару. Какие режимы попадают в собранный
-CSS, решает `modes` конфига granum, а не рантайм.
+CSS, решает `modes` конфига granum, а не рантайм: набор режимов и их пары
+приходят в рантайм манифестом `virtual:granum/themes`.
 
 ```ts
 import { initThemeEarly, useTheme } from '@feugene/granularity'
+import manifest from 'virtual:granum/themes'
 
-initThemeEarly() // до app.mount()
+initThemeEarly({ manifest }) // до app.mount()
 
-const { theme, isDark, setTheme, toggleTheme } = useTheme()
+const { theme, mode, modes, isDark, setMode, toggleMode } = useTheme()
 ```
 
-Выбор темы хранится в `localStorage` под ключом `gr-theme`.
+Выбор режима хранится в `localStorage` под ключом `gr-theme`.

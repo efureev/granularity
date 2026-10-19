@@ -1,5 +1,6 @@
 import { defineGranumProvider } from '@feugene/granum/contract'
 import { grThemeCatalog } from './generated'
+import { GR_DEFAULT_THEME_ID } from './manifest'
 
 export const GRANULARITY_TOKENS_PROVIDER_ID = '@feugene/granularity-tokens'
 
@@ -15,7 +16,7 @@ export const granularityTokensProvider = defineGranumProvider({
   theme: {
     tokensCss: 'tokens.css',
     registry: 'themes/registry.json',
-    defaultTheme: 'slate',
+    defaultTheme: GR_DEFAULT_THEME_ID,
     catalog: Object.fromEntries(grThemeCatalog.map(theme => [theme.id, {
       title: theme.title,
       ...(theme.description !== undefined ? { description: theme.description } : {}),

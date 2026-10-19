@@ -3,8 +3,8 @@
   "contractVersion": 2,
   "id": "@feugene/granularity-showcase-icons",
   "version": "0.0.0",
-  "generatedBy": "@feugene/granum@2.1.0",
-  "hash": "sha256-07c1990c108ac3e9940449994cb6e82cdee0fbd81d6ebe26673e8bb1bc64643b",
+  "generatedBy": "@feugene/granum@3.0.0-next.1",
+  "hash": "sha256-bc402ae77f5fa5a306ddd8c06aeb58d7e5c836ccd21b0b15df47f914f773a154",
   "dependencies": [],
   "theme": {
     "declares": []

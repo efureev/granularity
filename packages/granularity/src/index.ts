@@ -145,8 +145,8 @@ export type {
 // Публичен ради сторонних контролов — без него контракт пакета не выполнить.
 export { useGrFormControl } from './composables/useGrFormControl'
 export type { GrFormControlProps, GrFormControlState } from './composables/useGrFormControl'
-export { GRANULARITY_THEME_STATE, granularityThemePlugin, initThemeEarly, useTheme } from './composables/useTheme'
-export type { ThemeName, UseThemeOptions } from './composables/useTheme'
+export { GR_THEME_STORAGE_KEY, GRANULARITY_THEME_STATE, granularityThemePlugin, initThemeEarly, useTheme } from './composables/useTheme'
+export type { GrModeEntry, GrModeName, GrThemeId, GrThemeManifest, UseThemeOptions, UseThemeReturn } from './composables/useTheme'
 export { GRANULARITY_HOTKEYS_STATE, granularityHotkeysPlugin, useHotkeys } from './composables/useHotkeys'
 export type { GranularityHotkeysPluginOptions, GrHotkeyDefinition, GrHotkeyRegistry } from './composables/useHotkeys'
 export { GRANULARITY_TOAST_STATE, granularityToastPlugin, useToast } from './composables/useToast'

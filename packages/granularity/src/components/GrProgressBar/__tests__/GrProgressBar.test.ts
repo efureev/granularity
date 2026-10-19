@@ -6,7 +6,7 @@ import GrConfigProvider from '../../GrConfigProvider/GrConfigProvider.vue'
 import GrProgressBar from '../GrProgressBar.vue'
 import { GR_TONES } from '../../shared/tones'
 import { bufferClass, grProgressBarFillClass, progressIndeterminateReducedClass, trackSizes } from '../grStyle'
-import { MODES, readComponentThemeVars } from '../../../__tests__/cssContrast'
+import { readComponentThemeVars, THEME_MODES as MODES } from '../../../__tests__/cssContrast'
 
 const TRACK = '[data-gr-progress-bar-track]'
 const FILL = '[data-gr-progress-bar-fill]'

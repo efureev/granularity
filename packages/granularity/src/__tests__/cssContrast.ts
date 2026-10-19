@@ -1,9 +1,11 @@
 import { grDerivedTokens } from '@feugene/granularity-tokens'
 import { contrast, deltaE, luminance, parseHex, type Rgb } from '@feugene/granularity-tokens/theme'
 
-import { componentThemeVars, MODES, type ModeName, themeVars } from './themeCss'
+import type { GrModeName } from '../composables/useTheme'
+import { componentThemeVars, MODES, themeVars } from './themeCss'
 
-export { type ModeName, MODES }
+export type { GrModeName }
+export { MODES as THEME_MODES }
 
 /**
  * Разрешение CSS-цветов и расчёт контраста для тестов.
@@ -168,14 +170,12 @@ export function getColorClassExpression(className: string, prefix: string): stri
 }
 
 /** Примитивы и роли по режимам темы `slate` — из данных пакета токенов. */
-export const themeVarsByName = Object.fromEntries(MODES.map(mode => [mode, themeVars(mode)])) as Record<ModeName, Record<string, string>>
+export const themeVarsByName = Object.fromEntries(MODES.map(mode => [mode, themeVars(mode)])) as Record<GrModeName, Record<string, string>>
 
 /** Производные формулы (`--gr-primary-hover` и т.п.) — из реестра пакета токенов. */
 export const derivedThemeVars: Record<string, string> = Object.fromEntries(grDerivedTokens.map(token => [token.name, token.formula]))
 
-export type ThemeName = ModeName
-
 /** Токены компонента в режиме — `components/GrX/themes/slate/`: `root.json` и файл режима поверх. */
-export function readComponentThemeVars(component: string, mode: ModeName): Record<string, string> {
+export function readComponentThemeVars(component: string, mode: GrModeName): Record<string, string> {
   return componentThemeVars(component, mode)
 }

@@ -7,7 +7,8 @@ import {
   getContrastRatio,
   resolveColorExpression,
   themeVarsByName,
-  type ThemeName,
+  type GrModeName,
+  THEME_MODES,
 } from '../../../__tests__/cssContrast'
 import { jsonValueClass, jsonViewerKeyClass, jsonViewerRootClass } from '../grJsonViewerStyles'
 
@@ -29,7 +30,7 @@ const AA_NORMAL_TEXT = 4.5
  */
 const MIN_DELTA_E = 12
 
-const THEMES: ThemeName[] = ['light', 'dark']
+const THEMES = THEME_MODES
 
 /** Роли, несущие смысл. `object`/`array`/`unsupported`/`truncation` — служебные. */
 const COLORED = [
@@ -39,7 +40,7 @@ const COLORED = [
   ['literal', jsonValueClass.boolean],
 ] as const
 
-function resolve(expression: string, theme: ThemeName) {
+function resolve(expression: string, theme: GrModeName) {
   return resolveColorExpression(expression, themeVarsByName[theme], derivedThemeVars)
 }
 

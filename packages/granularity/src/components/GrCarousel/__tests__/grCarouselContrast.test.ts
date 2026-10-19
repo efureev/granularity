@@ -6,7 +6,8 @@ import {
   getContrastRatio,
   resolveColorExpression,
   themeVarsByName,
-  type ThemeName,
+  type GrModeName,
+  THEME_MODES,
 } from '../../../__tests__/cssContrast'
 import { carouselDotStates, grCarouselDotActiveClass } from '../grCarouselStyles'
 
@@ -20,10 +21,10 @@ import { carouselDotStates, grCarouselDotActiveClass } from '../grCarouselStyles
  * компонента.
  */
 const AA_NON_TEXT = 3
-const THEMES: ThemeName[] = ['light', 'dark']
+const THEMES = THEME_MODES
 const SURFACES = ['--gr-bg', '--gr-card'] as const
 
-function resolve(expression: string, theme: ThemeName) {
+function resolve(expression: string, theme: GrModeName) {
   return resolveColorExpression(expression, themeVarsByName[theme], derivedThemeVars)
 }
 

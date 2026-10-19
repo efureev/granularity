@@ -40,6 +40,7 @@ export function registerAppState(api: DevtoolsApi, app: App): void {
         }
       },
       prefersDark: () => globalThis.matchMedia?.('(prefers-color-scheme: dark)')?.matches ?? null,
+      readRoot: attribute => globalThis.document?.documentElement.getAttribute(attribute) ?? null,
     })
   }
 
@@ -51,7 +52,7 @@ export function registerAppState(api: DevtoolsApi, app: App): void {
     id: INSPECTOR_ID,
     label: 'Granularity app',
     icon: 'settings',
-    noSelectionText: 'Theme and toast queue — the state that belongs to the application, not to a component',
+    noSelectionText: 'Theme, mode and toast queue — the state that belongs to the application, not to a component',
   })
 
   api.on.getInspectorTree((payload: { inspectorId: string, rootNodes: unknown[] }) => {

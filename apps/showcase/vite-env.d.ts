@@ -1,5 +1,6 @@
 /// <reference types="vite/client" />
 /// <reference types="unplugin-icons/types/vue" />
+/// <reference types="@feugene/granum/client" />
 
 /**
  * Глобальные `$t`, `$i18n` и директива `v-t` от `fint-i18n`.

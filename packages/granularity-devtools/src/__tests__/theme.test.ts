@@ -3,24 +3,61 @@ import { describe, expect, it } from 'vitest'
 import type { ThemeStateLike } from '../resolve/theme'
 import { themeReport, themeState } from '../resolve/theme'
 
+const MANIFEST: ThemeStateLike['manifest'] = {
+  theme: { id: 'slate' },
+  modes: [
+    { name: 'light', colorScheme: 'light', value: 'slate-light' },
+    { name: 'dark', colorScheme: 'dark', value: 'slate-dark' },
+    { name: 'ocean', colorScheme: 'dark', value: 'slate-ocean' },
+  ],
+  activation: { attribute: 'data-theme' },
+}
+
 function state(patch: Partial<ThemeStateLike> = {}): ThemeStateLike {
-  return { theme: { value: 'dark' }, storageKey: 'gr-theme', persist: true, ...patch }
+  return { manifest: MANIFEST, mode: { value: 'dark' }, storageKey: 'gr-theme', persist: true, ...patch }
 }
 
-function probe(stored: string | null, prefersDark: boolean | null = false) {
-  return { readStored: () => stored, prefersDark: () => prefersDark }
+function probe(stored: string | null, prefersDark: boolean | null = false, root: string | null = 'slate-dark') {
+  return { readStored: () => stored, prefersDark: () => prefersDark, readRoot: () => root }
 }
 
-describe('источник темы', () => {
+function row(rows: { key: string, value: unknown }[], key: string): unknown {
+  return rows.find(item => item.key === key)?.value
+}
+
+describe('тема и режим', () => {
   it('без состояния молчит', () => {
     expect(themeReport(undefined, probe(null))).toBeNull()
   })
 
-  it('совпало с сохранённым — тему выбрал пользователь', () => {
+  it('тема сборки, режим с colorScheme и набор режимов — из манифеста', () => {
+    const rows = themeState(themeReport(state({ mode: { value: 'ocean' } }), probe('ocean', false, 'slate-ocean'))!)
+
+    expect(row(rows, 'theme')).toBe('slate')
+    expect(row(rows, 'mode')).toBe('ocean (dark)')
+    expect(row(rows, 'modes')).toBe('light, dark, ocean')
+    expect(row(rows, 'root attribute')).toBe('slate-ocean')
+  })
+
+  it('пара на корне разошлась с режимом — показываем обе', () => {
+    const rows = themeState(themeReport(state(), probe('dark', false, 'slate-light'))!)
+
+    expect(row(rows, 'root attribute')).toBe('slate-light — expected slate-dark')
+  })
+
+  it('у состояния свой target — атрибут читается с него, а не с документа', () => {
+    const target = () => ({ getAttribute: () => 'slate-dark' })
+
+    expect(themeReport(state({ target }), probe('dark', false, null))?.rootValue).toBe('slate-dark')
+  })
+})
+
+describe('источник режима', () => {
+  it('совпал с сохранённым — режим выбрал пользователь', () => {
     expect(themeReport(state(), probe('dark'))?.source).toBe('storage')
   })
 
-  it('в хранилище пусто — тема пришла из системы', () => {
+  it('в хранилище пусто — режим пришёл из системы', () => {
     expect(themeReport(state(), probe(null, true))?.source).toBe('system')
   })
 
@@ -33,12 +70,12 @@ describe('источник темы', () => {
   })
 
   it('сохранено одно, показано другое — так и говорим, а не выдумываем', () => {
-    expect(themeReport(state({ theme: { value: 'light' } }), probe('dark'))?.source).toBe('unknown')
+    expect(themeReport(state({ mode: { value: 'light' } }), probe('dark'))?.source).toBe('unknown')
   })
 
-  it('без matchMedia системная тема остаётся неизвестной, а не «светлой»', () => {
+  it('без matchMedia системная схема остаётся неизвестной, а не «светлой»', () => {
     const rows = themeState(themeReport(state(), probe('dark', null))!)
 
-    expect(rows.find(row => row.key === 'system prefers dark')?.value).toBe('unknown')
+    expect(row(rows, 'system prefers dark')).toBe('unknown')
   })
 })

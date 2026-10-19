@@ -110,7 +110,7 @@ export interface ModalOverlay {
   portalTarget: ComputedRef<string | HTMLElement>
   teleportEnabled: ComputedRef<boolean>
   /** `data-theme` на телепортированный корень: в DOM он вне обёртки провайдера. */
-  themeAttrs: ComputedRef<{ 'data-theme'?: string }>
+  themeAttrs: ComputedRef<Record<string, string>>
   /** Для `@after-leave` панели. Компонент оборачивает, если ему нужен эмит `closed`. */
   onPanelAfterLeave: () => void
   /**

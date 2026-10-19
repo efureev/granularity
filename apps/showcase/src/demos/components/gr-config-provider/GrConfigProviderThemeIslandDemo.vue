@@ -9,9 +9,9 @@ const options = [
 </script>
 
 <template>
-  <!-- Тема поддерева: `data-theme` на обёртке провайдера. Тема документа
+  <!-- Режим поддерева: пара `data-theme` на обёртке провайдера. Режим документа
        остаётся за `useTheme` — это именно остров. -->
-  <GrConfigProvider theme="dark" size="sm">
+  <GrConfigProvider mode="dark" size="sm">
     <div class="grid gap-3 rounded-xl border border-[var(--gr-brd)] bg-[var(--gr-card)] p-4 text-[var(--gr-card-fg)]">
       <div class="text-sm font-semibold">
         Тёмный остров внутри страницы
@@ -21,7 +21,7 @@ const options = [
         <GrInput model-value="Поле" class="max-w-[12rem]" aria-label="Поле острова" />
 
         <!-- Панели телепортируются в body, вне обёртки провайдера, и всё равно
-             остаются тёмными: тему они ставят себе сами из контекста. -->
+             остаются тёмными: пару они ставят себе сами из контекста. -->
         <GrSelect v-model="value" :options="options" class="max-w-[12rem]" aria-label="Выбор" />
 
         <GrDropdown width="12rem">

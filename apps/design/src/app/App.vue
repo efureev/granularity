@@ -11,7 +11,7 @@ import AppSidebar from './parts/AppSidebar.vue'
 import { THEME_STORAGE_KEY } from './theme'
 
 const route = useRoute()
-const { isDark, toggleTheme } = useTheme({ storageKey: THEME_STORAGE_KEY })
+const { isDark, toggleMode } = useTheme({ storageKey: THEME_STORAGE_KEY })
 
 /**
  * Узкий экран решает приложение, а не панель: своих брейкпоинтов у пакета нет.
@@ -68,7 +68,7 @@ watch(() => route.fullPath, () => {
           tone="neutral"
           square
           :aria-label="isDark ? 'Светлая тема' : 'Тёмная тема'"
-          @click="toggleTheme"
+          @click="toggleMode"
         >
           <GrIcon>
             <IconSun v-if="isDark" />

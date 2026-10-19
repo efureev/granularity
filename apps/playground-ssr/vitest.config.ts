@@ -1,10 +1,15 @@
 import { fileURLToPath, URL } from 'node:url'
+import { granum } from '@feugene/granum/vite'
 import { defineConfig } from 'vitest/config'
 import vue from '@vitejs/plugin-vue'
 
+import granumConfig from './granum.config'
+
 export default defineConfig({
   root: fileURLToPath(new URL('./', import.meta.url)),
-  plugins: [vue()],
+  // granum — ради `virtual:granum/themes`: манифест режимов приложение берёт
+  // у сборки, и сервер стенда отдаёт пары из него же.
+  plugins: [vue(), granum(granumConfig)],
   test: {
     environment: 'node',
     include: ['src/**/*.{test,spec}.{ts,tsx}'],

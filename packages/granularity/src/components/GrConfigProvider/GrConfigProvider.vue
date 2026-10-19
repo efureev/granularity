@@ -6,19 +6,19 @@
  * - `size` — дефолтного размера контролов (не нужно повторять `size` в каждом вызове);
  * - `componentDefaults` — per-component дефолтных пропсов;
  * - `i18n` — адаптера переводов (иначе приложение инжектит его вручную);
- * - `theme` — темы поддерева;
+ * - `mode` и `theme` — острова режима и превью темы;
  * - `portalTarget` — точки монтирования оверлеев;
  * - `zIndexBase` — базы шкалы слоёв.
  *
  * Провайдеры можно вкладывать: дочерний мержится поверх родительского, поэтому
- * можно задать «глобальную» тему и точечно переопределить её в поддереве.
+ * можно задать режим поддереву и точечно переопределить его глубже.
  *
  * Рендерится прозрачно (`display: contents`), чтобы не влиять на layout.
  */
 import { computed, onBeforeUnmount, provide, watch } from 'vue'
 
 import { GRANULARITY_I18N_KEY, type GranularityI18nAdapter } from '../../i18n/adapter'
-import { themeActivationValue } from '../../composables/internal/themeActivation'
+import { fallbackThemeManifest, type GrModeName, type GrThemeId, peekThemeState, themeActivationAttrs } from '../../composables/internal/themeState'
 import { localeSwitchOf, resolveGranularityI18n } from '../../internal/granularityI18n'
 import { applyGrZIndexBase } from './zIndexScale'
 import {
@@ -45,11 +45,17 @@ export interface GrConfigProviderProps {
    */
   locale?: string
   /**
-   * Режим поддерева — остров: имя режима (`dark`) уезжает в `data-theme` парой
-   * `slate-dark`, пара пишется как есть. Режим **документа** — работа
-   * `useTheme`/`initThemeEarly`.
+   * Режим поддерева — остров: `dark` уезжает в `data-theme` парой темы сборки
+   * (`slate-dark`). Режим **документа** — работа `useTheme`/`initThemeEarly`.
    */
-  theme?: string
+  mode?: GrModeName
+  /**
+   * Превью другой темы каталога: `theme="clay" mode="dark"` пишет
+   * `data-theme="clay-dark"`. Блоки её пар собирает granum по `previews`
+   * конфига — без них превью не найдёт ни одного селектора. Без `mode`
+   * показывает тему в режиме документа.
+   */
+  theme?: GrThemeId
   /**
    * Куда монтировать оверлеи поддерева. По умолчанию — общий `#gr-portal` в
    * `body`. Своё значение нужно там, где приложение живёт в контейнере:
@@ -73,6 +79,7 @@ const props = withDefaults(
     componentDefaults: undefined,
     i18n: undefined,
     locale: undefined,
+    mode: undefined,
     theme: undefined,
     portalTarget: undefined,
     zIndexBase: undefined,
@@ -85,7 +92,18 @@ const parent = useGrConfig()
 
 const size = computed(() => props.size ?? parent.size.value)
 const theme = computed(() => props.theme ?? parent.theme?.value)
-const themeAttribute = computed(() => theme.value === undefined ? undefined : themeActivationValue(theme.value))
+const mode = computed(() => props.mode ?? parent.mode?.value)
+const themeState = peekThemeState()
+const themeAttrs = computed(() => themeActivationAttrs(themeState, theme.value, mode.value))
+
+// Имя режима в пропе темы даёт пару `dark-light`, которая молча не найдёт ни
+// одного селектора.
+if (__GR_DEV__ && props.theme !== undefined && (themeState?.manifest ?? fallbackThemeManifest()).modes.some(entry => entry.name === props.theme)) {
+  console.warn(
+    `[granularity] GrConfigProvider: theme="${props.theme}" — это режим, а не тема. `
+    + `Остров режима задаётся пропом mode="${props.theme}".`,
+  )
+}
 // Цель портала наследуется вниз: вложенный провайдер без своего значения
 // оставляет оверлеи там же, где их ждёт родительское приложение.
 const portalTarget = computed(() => props.portalTarget ?? parent.portalTarget?.value)
@@ -102,7 +120,7 @@ const componentDefaults = computed<GrComponentDefaults>(() => {
   return merged
 })
 
-provide<GrConfigContext>(GR_CONFIG_KEY, { size, componentDefaults, theme, portalTarget })
+provide<GrConfigContext>(GR_CONFIG_KEY, { size, componentDefaults, theme, mode, portalTarget })
 
 // ————— i18n.
 //
@@ -171,7 +189,7 @@ defineSlots<{
   <component
     :is="props.tag"
     data-gr-config-provider
-    :data-theme="themeAttribute"
+    v-bind="themeAttrs"
     :style="wrapperStyle"
   >
     <slot />

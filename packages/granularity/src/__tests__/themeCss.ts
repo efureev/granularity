@@ -4,6 +4,8 @@ import { join, resolve } from 'node:path'
 
 import slateData from '@feugene/granularity-tokens/themes/slate/theme.json'
 
+import type { GrModeName } from '../composables/useTheme'
+
 /**
  * Тема в тестах ядра — данными и готовым CSS.
  *
@@ -17,11 +19,16 @@ import slateData from '@feugene/granularity-tokens/themes/slate/theme.json'
 const pkgDir = process.cwd()
 
 export const THEME = 'slate'
-export const MODES = ['light', 'dark'] as const
-export type ModeName = (typeof MODES)[number]
+
+type TokenMap = Record<string, string>
+
+const slate = slateData as { root: TokenMap, modes: Record<GrModeName, { tokens: TokenMap }> }
+
+/** Режимы темы — из её данных: набор держит тема, а не тест. */
+export const MODES: readonly GrModeName[] = Object.keys(slate.modes)
 
 /** Пара активации режима — значение `data-theme`. */
-export const pair = (mode: ModeName): string => `${THEME}-${mode}`
+export const pair = (mode: GrModeName): string => `${THEME}-${mode}`
 
 let cachedCss: string | undefined
 
@@ -30,16 +37,12 @@ export function themeCss(): string {
   return cachedCss
 }
 
-type TokenMap = Record<string, string>
-
 function withDashes(tokens: TokenMap | undefined): TokenMap {
   return Object.fromEntries(Object.entries(tokens ?? {}).map(([name, value]) => [`--${name}`, value]))
 }
 
-const slate = slateData as { root: TokenMap, modes: Record<ModeName, { tokens: TokenMap }> }
-
 /** Примитивы и роли режима — как их видит элемент без собственных объявлений. */
-export function themeVars(mode: ModeName): TokenMap {
+export function themeVars(mode: GrModeName): TokenMap {
   return { ...withDashes(slate.root), ...withDashes(slate.modes[mode].tokens) }
 }
 
@@ -48,7 +51,7 @@ function readJson(path: string): TokenMap | undefined {
 }
 
 /** Токены компонента в режиме: `root.json` и файл режима поверх. */
-export function componentThemeVars(component: string, mode: ModeName): TokenMap {
+export function componentThemeVars(component: string, mode: GrModeName): TokenMap {
   const dir = resolve(pkgDir, 'src/components', component, 'themes', THEME)
 
   return { ...withDashes(readJson(join(dir, 'root.json'))), ...withDashes(readJson(join(dir, 'modes', `${mode}.json`))) }

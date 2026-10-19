@@ -1,7 +1,7 @@
 import { computed, getCurrentInstance, inject, type ComputedRef, type InjectionKey } from 'vue'
 
 import type { GrComponentDefaultsRegistry } from '../../composables/useGrComponentConfig'
-import { themeActivationValue } from '../../composables/internal/themeActivation'
+import { type GrModeName, type GrThemeId, peekThemeState, themeActivationAttrs } from '../../composables/internal/themeState'
 
 /**
  * Контекст `GrConfigProvider` — глобальные дефолты для вложенных GR-компонентов:
@@ -53,10 +53,12 @@ export interface GrConfigContext {
   /** Дефолтные пропсы по компонентам. */
   componentDefaults: ComputedRef<GrComponentDefaults>
   /**
-   * Тема поддерева (`data-theme`). Необязательна: тип публичный, и контекст
-   * строят руками — например хост императивных диалогов.
+   * Тема поддерева — превью другой темы каталога. Необязательна: тип публичный,
+   * и контекст строят руками — например хост императивных диалогов.
    */
-  theme?: ComputedRef<string | undefined>
+  theme?: ComputedRef<GrThemeId | undefined>
+  /** Режим поддерева — остров. Необязателен по той же причине, что и `theme`. */
+  mode?: ComputedRef<GrModeName | undefined>
   /**
    * Куда монтируются оверлеи поддерева (`usePortalTarget`). Необязательно, как
    * и `theme`: контекст строят руками — например хост императивных диалогов.
@@ -86,6 +88,7 @@ const EMPTY_CONFIG: GrConfigContext = {
   size: computed(() => undefined),
   componentDefaults: computed(() => EMPTY_COMPONENT_DEFAULTS),
   theme: computed(() => undefined),
+  mode: computed(() => undefined),
   portalTarget: computed(() => undefined),
 }
 
@@ -263,12 +266,12 @@ export function useGrComponentProp<
 }
 
 /**
- * Атрибут темы для **телепортируемого** корня панели.
+ * Атрибут режима для **телепортируемого** корня панели.
  *
  * Панель уезжает в `body`, то есть вне DOM-поддерева провайдера, и `data-theme`
  * с его обёртки на неё не наследуется. В дереве компонентов она при этом
- * остаётся внутри — `inject` работает, — поэтому тему панель ставит себе сама.
- * Без этого «тёмный остров» ломался бы на первом же открытом дропдауне.
+ * остаётся внутри — `inject` работает, — поэтому пару панель ставит себе сама.
+ * Без этого остров режима и превью темы ломались бы на первом же открытом дропдауне.
  *
  * ```vue
  * <teleport to="body">
@@ -276,10 +279,8 @@ export function useGrComponentProp<
  * </teleport>
  * ```
  */
-export function useGrThemeAttrs(): ComputedRef<{ 'data-theme'?: string }> {
+export function useGrThemeAttrs(): ComputedRef<Record<string, string>> {
   const config = useGrConfig()
-  return computed(() => {
-    const theme = config.theme?.value
-    return theme ? { 'data-theme': themeActivationValue(theme) } : {}
-  })
+  const state = peekThemeState()
+  return computed(() => themeActivationAttrs(state, config.theme?.value, config.mode?.value))
 }

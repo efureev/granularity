@@ -1,28 +1,68 @@
+import type { GranumThemeStorage, GranumThemeTarget } from '@feugene/granum/runtime'
+import type { App, ComputedRef } from 'vue'
+// Через `imports` пакета, а не по имени: granum держит внешним всё своё, кроме
+// контракта, и рантайм в `dist` стал бы импортом devDependency приложения —
+// SSR-сервер, задеплоенный с `--omit=dev`, падал бы на импорте пакета.
+import { createThemeController } from '#granum-runtime'
 import { computed, hasInjectionContext, inject, ref } from 'vue'
-import type { App, InjectionKey, Ref } from 'vue'
 
-import { themeActivationValue } from './internal/themeActivation'
+import {
+  fallbackThemeManifest,
+  getModuleThemeState,
+  GRANULARITY_THEME_STATE,
+  type GrModeEntry,
+  type GrModeName,
+  type GrThemeId,
+  type GrThemeManifest,
+  setModuleThemeState,
+  type ThemeState,
+} from './internal/themeState'
 
-export type ThemeName = 'light' | 'dark'
+export { GRANULARITY_THEME_STATE }
+export type { GrModeEntry, GrModeName, GrThemeId, GrThemeManifest }
+
+/** Ключ хранилища режима по умолчанию; значение — имя режима (`dark`), не пара. */
+export const GR_THEME_STORAGE_KEY = 'gr-theme'
 
 export type UseThemeOptions = {
   /**
-   * Ключ для хранения выбранной темы в localStorage.
-   * По умолчанию: `gr-theme`.
+   * Манифест режимов сборки — `import manifest from 'virtual:granum/themes'`.
+   * Без него — тема каталога по умолчанию (`slate`) с режимами `light`/`dark`,
+   * как в готовом `@feugene/granularity/themes/<id>.css`. Приложение на granum
+   * с другой темой или своими режимами обязано его передать: пары чужой темы в
+   * его CSS не совпадут ни с одним селектором.
+   *
+   * Задаётся там, где создаётся состояние, — `granularityThemePlugin`,
+   * `initThemeEarly` или первый `useTheme()` без плагина.
    */
+  manifest?: GrThemeManifest
+
+  /** Ключ хранилища. По умолчанию `gr-theme`. */
   storageKey?: string
 
   /**
-   * Если `false` — не читать/не писать localStorage (полезно для SSR/embedded сценариев).
-   * По умолчанию: `true`.
+   * Если `false` — выбор не читается и не запоминается (SSR/embedded).
+   * По умолчанию `true`.
    */
   persist?: boolean
 
   /**
-   * Куда писать `data-theme`. По умолчанию — `<html>` (канон одного приложения).
+   * Хранилище вместо `localStorage` — например `createCookieStorage()` из
+   * `@feugene/granum/runtime`: режим из cookie сервер отдаёт парой в HTML.
+   */
+  storage?: GranumThemeStorage
+
+  /**
+   * Режим на старте мимо хранилища и системной схемы. Нужен серверу: режим
+   * запроса — `modeFromCookie(manifest, request.headers.cookie, 'gr-theme')`.
+   */
+  initial?: GrModeName
+
+  /**
+   * Куда писать пару. По умолчанию — `<html>` (канон одного приложения).
    *
    * Геттер, а не элемент: на момент `app.use(...)` корень приложения ещё не
-   * смонтирован. Обязателен нескольким приложениям с независимыми темами:
+   * смонтирован. Обязателен нескольким приложениям с независимыми режимами:
    * селектор режима атрибутный (`[data-theme="slate-dark"]`), поэтому режим работает от
    * любого контейнера, а без `target` все приложения писали бы в один `<html>`
    * и побеждал бы последний.
@@ -30,108 +70,128 @@ export type UseThemeOptions = {
   target?: () => HTMLElement | null
 }
 
-const DEFAULT_STORAGE_KEY = 'gr-theme'
 const IS_SERVER = typeof window === 'undefined'
 
-function readStoredTheme(storageKey: string, persist: boolean): ThemeName | null {
-  if (typeof window === 'undefined' || !persist)
-    return null
+function rootOf(state: ThemeState): HTMLElement | null {
+  return state.target?.() ?? (typeof document === 'undefined' ? null : document.documentElement)
+}
 
-  // Доступ к `localStorage` может бросать `SecurityError` в Safari private mode
-  // и при отключённых cookies/storage — поэтому оборачиваем в try/catch.
+// Доступ к `localStorage` бросает в Safari private mode и при отключённых
+// cookies/storage, а заглушка окружения может не иметь методов.
+function storageOf(state: ThemeState): Partial<GranumThemeStorage> | null {
   try {
-    const storage = window.localStorage
-    if (typeof storage?.getItem !== 'function')
-      return null
+    return state.storage ?? window.localStorage ?? null
+  }
+  catch {
+    return null
+  }
+}
 
-    const stored = storage.getItem(storageKey)
-    if (stored === 'light' || stored === 'dark')
-      return stored
+function readStored(state: ThemeState): string | null {
+  if (!state.persist)
+    return null
+  try {
+    return storageOf(state)?.getItem?.(state.storageKey) ?? null
+  }
+  catch {
+    return null
+  }
+}
+
+function writeStored(state: ThemeState, mode: GrModeName): void {
+  if (!state.persist || state.silent)
+    return
+  try {
+    storageOf(state)?.setItem?.(state.storageKey, mode)
   }
   catch {
     // ignore
   }
-
-  return null
 }
 
-function getSystemTheme(): ThemeName {
-  if (typeof window === 'undefined')
-    return 'light'
-  return window.matchMedia?.('(prefers-color-scheme: dark)')?.matches ? 'dark' : 'light'
-}
-
-function getPreferredTheme(storageKey = DEFAULT_STORAGE_KEY, persist = true): ThemeName {
-  return readStoredTheme(storageKey, persist) ?? getSystemTheme()
-}
-
-function applyTheme(theme: ThemeName, target?: () => HTMLElement | null) {
-  if (typeof document === 'undefined')
-    return
-
-  // Канон GR — пара `<тема>-<режим>` в `data-theme`: на `<html>` либо на корне
-  // приложения, когда состояние задало `target`. Хранится и отдаётся имя режима.
-  const root = target?.() ?? document.documentElement
-  root.dataset.theme = themeActivationValue(theme)
+function modeEntry(state: ThemeState, name: GrModeName): GrModeEntry | undefined {
+  return state.manifest.modes.find(entry => entry.name === name)
 }
 
 /**
- * Состояние темы одного приложения.
- *
- * `theme` общий для всех вызовов `useTheme()` внутри приложения: свой `ref` на
- * вызов означал бы, что переключение темы в одном компоненте не трогает
- * `theme`/`isDark` в другом — менялся бы только DOM-атрибут, а реактивные
- * потребители разъехались бы.
+ * Контроллер granum над состоянием: пара на корне, запись выбора, чтение пары
+ * обратно (RT-5). Цель и хранилище — посредники, а не элемент и `localStorage`:
+ * корень приложения появляется после `app.use`, а `storageKey`/`persist`
+ * уточняет вызов `useTheme(options)`.
  */
-type ThemeState = {
-  theme: Ref<ThemeName>
-  storageKey: string
-  persist: boolean
-  /** Корень, получающий `data-theme`; не задан — `<html>`. */
-  target?: () => HTMLElement | null
-  listenersBound: boolean
-  /**
-   * Снимает window-слушатели состояния. Появляется после `bindListeners`;
-   * зовёт `app.onUnmount` у app-scoped состояний — модульный синглтон живёт со
-   * страницей, и снимать его незачем.
-   */
-  teardownListeners?: () => void
-  /** Разрешена ли мутация — см. `resolveThemeState`. */
-  writable: boolean
+function connect(state: ThemeState, initial: GrModeName | undefined): void {
+  const target: GranumThemeTarget = {
+    getAttribute: name => rootOf(state)?.getAttribute(name) ?? null,
+    setAttribute: (name, value) => rootOf(state)?.setAttribute(name, value),
+  }
+
+  const controller = createThemeController(state.manifest, {
+    target,
+    storage: {
+      getItem: () => readStored(state),
+      setItem: (_key, value) => writeStored(state, value),
+    },
+    storageKey: state.storageKey,
+    initial: initial ?? 'auto',
+    prefersDark: () => window.matchMedia?.('(prefers-color-scheme: dark)')?.matches ?? false,
+  })
+
+  state.controller = controller
+  state.mode.value = controller.mode
+  controller.subscribe((mode) => {
+    state.mode.value = mode
+  })
 }
 
 function createThemeState(options: UseThemeOptions = {}, writable = true): ThemeState {
-  const storageKey = options.storageKey ?? DEFAULT_STORAGE_KEY
-  const persist = options.persist ?? true
-
-  return {
-    theme: ref<ThemeName>(getPreferredTheme(storageKey, persist)),
-    storageKey,
-    persist,
+  const manifest = options.manifest ?? fallbackThemeManifest()
+  const state: ThemeState = {
+    manifest,
+    mode: ref(options.initial ?? manifest.defaultMode),
+    storageKey: options.storageKey ?? GR_THEME_STORAGE_KEY,
+    persist: options.persist ?? true,
+    storage: options.storage,
     target: options.target,
+    controller: null,
+    silent: false,
     listenersBound: false,
     writable,
   }
+
+  if (!IS_SERVER)
+    connect(state, options.initial)
+
+  return state
 }
 
-/** Ключ provide/inject для app-scoped состояния темы (устанавливает плагин ниже). */
-export const GRANULARITY_THEME_STATE: InjectionKey<ThemeState> = Symbol.for('@feugene/granularity/theme-state')
+/** Смена режима, которую нельзя запоминать: иначе система или соседняя вкладка решили бы за пользователя. */
+function applySilently(state: ThemeState, mode: GrModeName): void {
+  state.silent = true
+  try {
+    state.controller?.setMode(mode)
+  }
+  finally {
+    state.silent = false
+  }
+}
 
 /**
- * Vue-плагин: даёт каждому приложению собственное состояние темы через
- * `app.provide`. Обязателен для (а) SSR, если приложение переключает тему на
- * сервере — иначе тема одного запроса уедет в ответ следующему, — и (б)
- * нескольких Vue-приложений на одной странице, которым нужны независимые темы.
+ * Vue-плагин: даёт каждому приложению собственное состояние режима через
+ * `app.provide`. Обязателен для (а) SSR, если приложение выбирает режим на
+ * сервере, — иначе режим одного запроса уедет в ответ следующему, — и (б)
+ * нескольких Vue-приложений на одной странице, которым нужны независимые режимы.
  *
  * Для (б) обязателен и `target` — корень, получающий `data-theme`: без него
  * изолировано только состояние, а атрибут все приложения пишут в один `<html>`,
  * и побеждает последний.
  *
  * ```ts
- * app.use(granularityThemePlugin)
+ * import manifest from 'virtual:granum/themes'
+ *
+ * app.use(granularityThemePlugin, { manifest })
  * app.use(granularityThemePlugin, {
+ *   manifest,
  *   storageKey: 'admin-theme',
- *   persist: false,
  *   target: () => document.getElementById('admin-app'),
  * })
  * ```
@@ -152,9 +212,6 @@ export const granularityThemePlugin = {
   },
 }
 
-// Ленивый модульный синглтон — канонический фолбэк для простых SPA без плагина.
-let moduleThemeState: ThemeState | null = null
-
 /** Сброс dev-предупреждения о фолбэке. Внутреннее API — нужно тестам. */
 export function resetThemeContextWarning(): void {
   contextFallbackWarned = false
@@ -170,7 +227,7 @@ function resolveThemeState(options: UseThemeOptions): ThemeState {
   }
 
   // На сервере без плагина модульное состояние текло бы между запросами. Но
-  // читать тему на сервере — нормальный сценарий (шаблон смотрит `isDark`), и
+  // читать режим на сервере — нормальный сценарий (шаблон смотрит `isDark`), и
   // ронять на нём весь рендер нельзя: отдаём состояние на один вызов и запрещаем
   // мутацию — течёт именно она.
   if (IS_SERVER)
@@ -190,13 +247,16 @@ function resolveThemeState(options: UseThemeOptions): ThemeState {
     )
   }
 
-  if (!moduleThemeState)
-    moduleThemeState = createThemeState(options)
+  let state = getModuleThemeState()
+  if (!state) {
+    state = createThemeState(options)
+    setModuleThemeState(state)
+  }
 
-  return moduleThemeState
+  return state
 }
 
-// Подписки на системную тему и синхронизацию между вкладками. Привязаны к
+// Подписки на системную схему и синхронизацию между вкладками. Привязаны к
 // состоянию, а не к модулю: у каждого приложения своё. Одна подписка на
 // состояние, а не на потребителя, — `onScopeDispose` здесь был бы вреден, он
 // порвал бы общую подписку при размонтировании одного из них.
@@ -205,26 +265,26 @@ function bindListeners(state: ThemeState) {
     return
   state.listenersBound = true
 
-  // Cross-tab: другая вкладка записала тему в localStorage.
+  // Cross-tab: другая вкладка записала режим в localStorage. Своё хранилище
+  // (cookie) событий `storage` не порождает.
   const onStorage = (event: StorageEvent): void => {
-    if (!state.persist || event.key !== state.storageKey)
+    if (!state.persist || state.storage || event.key !== state.storageKey)
       return
-    if (event.newValue === 'light' || event.newValue === 'dark') {
-      state.theme.value = event.newValue
-      applyTheme(event.newValue, state.target)
-    }
+    if (event.newValue !== null && modeEntry(state, event.newValue))
+      applySilently(state, event.newValue)
   }
   window.addEventListener?.('storage', onStorage)
 
   // Системная смена `prefers-color-scheme` — следуем ей только если пользователь
-  // НЕ выбрал тему явно (в storage ничего не сохранено).
+  // НЕ выбрал режим явно (в хранилище ничего нет).
   const mql = window.matchMedia?.('(prefers-color-scheme: dark)')
   const onSchemeChange = (event: MediaQueryListEvent): void => {
-    if (readStoredTheme(state.storageKey, state.persist) !== null)
+    if (readStored(state) !== null)
       return
-    const next: ThemeName = event.matches ? 'dark' : 'light'
-    state.theme.value = next
-    applyTheme(next, state.target)
+    const scheme = event.matches ? 'dark' : 'light'
+    const next = state.manifest.modes.find(entry => entry.colorScheme === scheme)
+    if (next)
+      applySilently(state, next.name)
   }
   mql?.addEventListener?.('change', onSchemeChange)
 
@@ -236,33 +296,53 @@ function bindListeners(state: ThemeState) {
   }
 }
 
-/**
- * Для применения темы максимально рано (до монтирования Vue), чтобы избежать "мигания".
- * Также сидирует модульное состояние, чтобы значение в `useTheme()` совпадало с уже
- * применённым к документу.
- *
- * Функция клиентская: её зовут из браузерной точки входа до создания приложения,
- * то есть app-scoped состояние инжектить там ещё неоткуда. Расхождения с плагином
- * это не даёт — оба сидируются из одного `localStorage`.
- */
-export function initThemeEarly(options: UseThemeOptions = {}) {
-  const storageKey = options.storageKey ?? DEFAULT_STORAGE_KEY
-  const persist = options.persist ?? true
-  const preferred = getPreferredTheme(storageKey, persist)
-
-  moduleThemeState ??= createThemeState(options)
-  moduleThemeState.storageKey = storageKey
-  moduleThemeState.persist = persist
-  moduleThemeState.theme.value = preferred
-
-  applyTheme(preferred)
+/** Пара текущего режима на корне — без записи в хранилище. */
+function applyToRoot(state: ThemeState): void {
+  const entry = modeEntry(state, state.mode.value)
+  const root = rootOf(state)
+  if (entry && root && root.getAttribute(state.manifest.activation.attribute) !== entry.value)
+    root.setAttribute(state.manifest.activation.attribute, entry.value)
 }
 
-export function useTheme(options: UseThemeOptions = {}) {
+/**
+ * Ставит пару до монтирования Vue, чтобы не было «мигания», и сидирует
+ * модульное состояние: `useTheme()` отдаёт то, что уже на документе.
+ *
+ * Пара, уже стоящая на корне (серверный HTML, скрипт в `<head>`), побеждает
+ * хранилище — контроллер её только узнаёт. Функция клиентская: её зовут из
+ * браузерной точки входа до создания приложения, то есть app-scoped состояние
+ * инжектить там ещё неоткуда. Расхождения с плагином это не даёт — оба
+ * читают одно хранилище и одну пару.
+ */
+export function initThemeEarly(options: UseThemeOptions = {}) {
+  if (IS_SERVER)
+    return
+
+  getModuleThemeState()?.teardownListeners?.()
+  setModuleThemeState(createThemeState(options))
+}
+
+export interface UseThemeReturn {
+  /** Тема сборки — только чтение: рантайм тему не меняет. */
+  readonly theme: GrThemeId
+  readonly mode: ComputedRef<GrModeName>
+  /** Режимы сборки: имя, `colorScheme` и пара активации. */
+  readonly modes: readonly GrModeEntry[]
+  /** По `colorScheme` режима, а не по имени. */
+  readonly isDark: ComputedRef<boolean>
+  /** Режима нет в сборке — ошибка. */
+  setMode: (next: GrModeName) => void
+  /** Между первым светлым и первым тёмным режимом манифеста. */
+  toggleMode: () => void
+  /** Пара текущего режима на корне — без записи в хранилище. */
+  initTheme: () => void
+}
+
+export function useTheme(options: UseThemeOptions = {}): UseThemeReturn {
   const state = resolveThemeState(options)
 
-  // Опции вызова уточняют состояние — тот же приём, что был у модульного
-  // синглтона: слушателям нужно знать, какой ключ отслеживать.
+  // Опции вызова уточняют состояние: слушателям нужно знать, какой ключ
+  // отслеживать. Манифест — нет: он задаётся там, где состояние создаётся.
   if (options.storageKey !== undefined)
     state.storageKey = options.storageKey
   if (options.persist !== undefined)
@@ -271,48 +351,53 @@ export function useTheme(options: UseThemeOptions = {}) {
     state.target = options.target
 
   bindListeners(state)
+  if (state.controller)
+    applyToRoot(state)
 
-  const theme = state.theme
-  const isDark = computed(() => theme.value === 'dark')
+  const mode = computed(() => state.mode.value)
+  const isDark = computed(() => modeEntry(state, state.mode.value)?.colorScheme === 'dark')
 
-  function setTheme(next: ThemeName) {
+  function setMode(next: GrModeName) {
     if (!state.writable) {
       throw new Error(
-        '[granularity] useTheme: setTheme/toggleTheme require `app.use(granularityThemePlugin)` during SSR — '
-        + 'the module-singleton fallback is disabled server-side, so a theme set by one request would leak into '
-        + 'the next response. Reading `theme`/`isDark` on the server works without the plugin.',
+        '[granularity] useTheme: setMode/toggleMode require `app.use(granularityThemePlugin)` during SSR — '
+        + 'the module-singleton fallback is disabled server-side, so a mode set by one request would leak into '
+        + 'the next response. Reading `mode`/`isDark` on the server works without the plugin.',
       )
     }
 
-    theme.value = next
-    applyTheme(next, state.target)
-
-    if (state.persist && typeof window !== 'undefined') {
-      // См. комментарий в `readStoredTheme`: запись тоже может бросать.
-      try {
-        const storage = window.localStorage
-        if (typeof storage?.setItem === 'function')
-          storage.setItem(state.storageKey, next)
-      }
-      catch {
-        // ignore
-      }
+    if (state.controller) {
+      state.controller.setMode(next)
+      return
     }
+
+    if (!modeEntry(state, next)) {
+      throw new Error(
+        `[granularity] useTheme: mode '${next}' is not in the build of theme '${state.manifest.theme.id}'. `
+        + `Available: ${state.manifest.modes.map(entry => entry.name).join(', ')}.`,
+      )
+    }
+    state.mode.value = next
   }
 
-  function toggleTheme() {
-    setTheme(theme.value === 'dark' ? 'light' : 'dark')
+  function toggleMode() {
+    const scheme = modeEntry(state, state.mode.value)?.colorScheme
+    const next = state.manifest.modes.find(entry => entry.colorScheme !== scheme)
+    if (next)
+      setMode(next.name)
   }
 
   function initTheme() {
-    applyTheme(theme.value, state.target)
+    applyToRoot(state)
   }
 
   return {
-    theme,
+    theme: state.manifest.theme.id,
+    mode,
+    modes: state.manifest.modes,
     isDark,
-    setTheme,
-    toggleTheme,
+    setMode,
+    toggleMode,
     initTheme,
   }
 }

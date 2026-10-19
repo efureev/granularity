@@ -149,12 +149,14 @@ import { GrCard } from '@feugene/granularity/components/GrCard'
 import '@feugene/granularity/styles.css'`
 
 const useThemeSnippet = `import { initThemeEarly, useTheme } from '@feugene/granularity'
+import manifest from 'virtual:granum/themes'
 
-initThemeEarly()
+initThemeEarly({ manifest })
 
 const {
+  mode,
   isDark,
-  toggleTheme,
+  toggleMode,
 } = useTheme()`
 
 const granumBasicSnippet = `// granum.config.ts
@@ -459,7 +461,7 @@ export const showcaseFoundationGuides: ShowcaseFoundationGuide[] = [
     keyPoints: [
       `Тема \`${slateEntry.id}\` из каталога \`@feugene/granularity-tokens\`: режимы ${slateEntry.modes.map(mode => mode.name).join(', ')}.`,
       'Режим включается парой `data-theme="slate-<режим>"`; режим по умолчанию висит ещё и на `:root`. Классов `.light`/`.dark` нет.',
-      '`useTheme()` и `initThemeEarly()` уже дают базовый runtime-контракт для переключения темы.',
+      '`useTheme()` и `initThemeEarly()` переключают режимы темы сборки: набор и пары — из `virtual:granum/themes`.',
     ],
     recommendations: [
       'Инициализируйте тему максимально рано, чтобы избежать визуального flash на старте.',

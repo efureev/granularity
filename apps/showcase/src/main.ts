@@ -2,6 +2,7 @@ import { createApp } from 'vue'
 
 import { installGranularityDevtools } from '@feugene/granularity-devtools'
 import { initThemeEarly } from '@feugene/granularity'
+import themeManifest from 'virtual:granum/themes'
 
 // Сброс браузерных стилей в слое `reset`: вне слоёв он бьёт утилиты granum.
 import './styles/reset.css'
@@ -16,7 +17,7 @@ import App from './App.vue'
 import { router } from './app/router'
 import { setupShowcaseI18n } from './i18n'
 
-initThemeEarly()
+initThemeEarly({ manifest: themeManifest })
 
 /**
  * Точка входа асинхронна из-за локалей: словари грузятся динамически, и до

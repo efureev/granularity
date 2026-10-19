@@ -15,9 +15,23 @@ to [Semantic Versioning](https://semver.org/).
   Тема `slate` с режимами `light` и `dark` приезжает данными; режим по умолчанию объявлен на
   `:root` и на паре `slate-light`, тёмный — на `[data-theme="slate-dark"]`. Селекторов
   `[data-theme='dark']`, `.light` и `.dark` нет. Конфиг приложения — `theme` и `modes` вместо
-  `themes`. `useTheme`/`initThemeEarly` по-прежнему хранят и отдают имя режима (`'dark'`), а в
-  атрибут пишут пару; `GrConfigProvider theme="dark"` ставит острову `slate-dark`, пару пишет
-  как есть.
+  `themes`.
+- **Рантайм режимов — поверх контроллера granum.** `useTheme()` отдаёт `{ theme, mode, modes,
+  isDark, setMode, toggleMode, initTheme }`: `theme` — id темы сборки (только чтение), режим —
+  `mode`. `setTheme`/`toggleTheme` и тип `ThemeName` сняты; вместо них `setMode`/`toggleMode` и
+  типы `GrThemeId`, `GrModeName`, `GrModeEntry`, `GrThemeManifest`. Набор режимов и пары — из
+  манифеста `virtual:granum/themes` (опция `manifest` у `granularityThemePlugin`,
+  `initThemeEarly` и `useTheme`); без него — тема `slate` каталога. `isDark` — по `colorScheme`
+  режима, `toggleMode` — между первым светлым и первым тёмным. Ключ `gr-theme` по-прежнему хранит
+  имя режима: сохранённый `dark` поднимается как режим, неизвестный пропускается. Пара, уже
+  стоящая на корне (серверный HTML, скрипт в `<head>`), побеждает хранилище. Новые опции
+  `storage` (cookie granum — режим видит сервер) и `initial` (режим запроса), экспорт
+  `GR_THEME_STORAGE_KEY`.
+- **`GrConfigProvider`: `mode` — остров режима, `theme` — превью темы.** `mode="dark"` пишет
+  `slate-dark`, `theme="clay" mode="dark"` — `clay-dark`; превью без `mode` — в режиме документа.
+  `theme="dark"` больше не остров (в dev-сборке — предупреждение), пара в пропе не принимается.
+  `useGrThemeAttrs()` отдаёт `Record<string, string>` с атрибутом активации манифеста; в
+  `GrConfigContext` и `granularityGlobal()` — поле `mode`.
 - **Токены компонентов по темам — данными в `themesDir`.** `GrAvatar`, `GrBadge`, `GrButton`,
   `GrDataTable`, `GrImageViewer`, `GrProgressBar` и `GrSegmented` держат значения в
   `src/components/GrX/themes/slate/{root.json,modes/<режим>.json}`; `tokenDefinitionsRef` и

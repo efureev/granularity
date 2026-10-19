@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils'
-import { defineComponent, h, inject, unref, type PropType } from 'vue'
+import { defineComponent, h, inject, nextTick, unref, type PropType } from 'vue'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import GrBadge from '../../GrBadge/GrBadge.vue'
@@ -15,6 +15,8 @@ import GrSwitch from '../../GrSwitch/GrSwitch.vue'
 import GrRating from '../../GrRating/GrRating.vue'
 import GrSlider from '../../GrSlider/GrSlider.vue'
 import GrTooltip from '../../GrTooltip/GrTooltip.vue'
+import GrModal from '../../GrModal/GrModal.vue'
+import { granularityThemePlugin } from '../../../composables/useTheme'
 import { GRANULARITY_I18N_KEY } from '../../../i18n/adapter'
 import { useGranularityTranslations } from '../../../internal/granularityI18n'
 import { resetUnsupportedSizeWarnings, useGrComponentProp, useGrComponentSize, useGrConfig } from '../../shared/configContext'
@@ -516,34 +518,74 @@ describe('i18n: адаптер отдаётся реактивно', () => {
   })
 })
 
-describe('theme: тема поддерева', () => {
-  it('обёртка получает data-theme, вложенный провайдер перекрывает', () => {
+describe('mode и theme: остров режима и превью темы', () => {
+  afterEach(() => {
+    document.body.innerHTML = ''
+    vi.restoreAllMocks()
+  })
+
+  const providerAttr = (wrapper: ReturnType<typeof mount>, index = 0, name = 'data-theme') =>
+    wrapper.findAll('[data-gr-config-provider]')[index]?.attributes(name)
+
+  it('mode — пара темы сборки; вложенный провайдер перекрывает', () => {
     const wrapper = mount(defineComponent({
-      setup: () => () => h(GrConfigProvider, { theme: 'dark' }, {
-        default: () => h(GrConfigProvider, { theme: 'ocean' }, { default: () => h('span', 'x') }),
+      setup: () => () => h(GrConfigProvider, { mode: 'dark' }, {
+        default: () => h(GrConfigProvider, { mode: 'light' }, { default: () => h('span', 'x') }),
       }),
     }))
 
-    const providers = wrapper.findAll('[data-gr-config-provider]')
-    expect(providers[0].attributes('data-theme')).toBe('slate-dark')
-    expect(providers[1].attributes('data-theme')).toBe('slate-ocean')
+    expect(providerAttr(wrapper, 0)).toBe('slate-dark')
+    expect(providerAttr(wrapper, 1)).toBe('slate-light')
   })
 
-  it('тема наследуется вложенным провайдером, который её не задаёт', () => {
+  it('режим наследуется вложенным провайдером, который его не задаёт', () => {
     const wrapper = mount(defineComponent({
-      setup: () => () => h(GrConfigProvider, { theme: 'dark' }, {
+      setup: () => () => h(GrConfigProvider, { mode: 'dark' }, {
         default: () => h(GrConfigProvider, null, { default: () => h('span', 'x') }),
       }),
     }))
 
-    expect(wrapper.findAll('[data-gr-config-provider]')[1].attributes('data-theme')).toBe('slate-dark')
+    expect(providerAttr(wrapper, 1)).toBe('slate-dark')
   })
 
-  it('телепортированная панель ставит тему себе сама', () => {
+  it('theme — превью: пара `<тема>-<режим>`; без mode — режим документа, вложенный mode — остров превью', () => {
+    const wrapper = mount(defineComponent({
+      setup: () => () => h('div', [
+        h(GrConfigProvider, { theme: 'clay', mode: 'dark' }, { default: () => h('span', 'a') }),
+        h(GrConfigProvider, { theme: 'clay' }, {
+          default: () => h(GrConfigProvider, { mode: 'dark' }, { default: () => h('span', 'b') }),
+        }),
+      ]),
+    }))
+
+    expect(providerAttr(wrapper, 0)).toBe('clay-dark')
+    expect(providerAttr(wrapper, 1)).toBe('clay-light')
+    expect(providerAttr(wrapper, 2)).toBe('clay-dark')
+  })
+
+  it('атрибут и пары — из манифеста приложения', () => {
+    const manifest = {
+      theme: { id: 'ink', title: 'Ink' },
+      modes: [
+        { name: 'light', colorScheme: 'light' as const, value: 'ink-light' },
+        { name: 'dim', colorScheme: 'dark' as const, value: 'ink-dim' },
+      ],
+      defaultMode: 'light',
+      activation: { attribute: 'data-look' },
+    }
+    const wrapper = mount(defineComponent({
+      setup: () => () => h(GrConfigProvider, { mode: 'dim' }, { default: () => h('span', 'x') }),
+    }), { global: { plugins: [[granularityThemePlugin, { manifest, persist: false, target: () => null }]] } })
+
+    expect(providerAttr(wrapper, 0, 'data-look')).toBe('ink-dim')
+    expect(providerAttr(wrapper, 0)).toBeUndefined()
+  })
+
+  it('телепортированный поповер ставит пару себе сама', () => {
     // В DOM панель уезжает в `body`, вне обёртки провайдера, и `data-theme`
     // с неё не наследуется. В дереве компонентов панель остаётся внутри.
     const wrapper = mount(defineComponent({
-      setup: () => () => h(GrConfigProvider, { theme: 'dark' }, {
+      setup: () => () => h(GrConfigProvider, { mode: 'dark' }, {
         default: () => h(GrTooltip, { content: 'Подсказка', open: true }, { default: () => h('button', 'T') }),
       }),
     }), { attachTo: document.body })
@@ -554,20 +596,36 @@ describe('theme: тема поддерева', () => {
     wrapper.unmount()
   })
 
-  it('имя режима становится парой темы, пара пишется как есть', () => {
+  it('открытая модалка внутри превью получает пару превью', async () => {
     const wrapper = mount(defineComponent({
-      setup: () => () => h(GrConfigProvider, { theme: 'slate-dark' }, { default: () => h('span', 'x') }),
-    }))
+      setup: () => () => h(GrConfigProvider, { theme: 'clay', mode: 'dark' }, {
+        default: () => h(GrModal, { modelValue: true, ariaLabel: 'Окно' }, { default: () => h('p', 'тело') }),
+      }),
+    }), { attachTo: document.body })
+    await nextTick()
 
-    expect(wrapper.find('[data-gr-config-provider]').attributes('data-theme')).toBe('slate-dark')
+    const dialog = document.body.querySelector('[role="dialog"]')
+    expect(dialog?.getAttribute('data-theme')).toBe('clay-dark')
+
+    wrapper.unmount()
   })
 
-  it('без темы атрибут не появляется вовсе', () => {
+  it('theme с именем режима — dev-предупреждение: это режим, а не тема', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+
+    mount(defineComponent({
+      setup: () => () => h(GrConfigProvider, { theme: 'dark' }, { default: () => h('span', 'x') }),
+    }))
+
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('mode="dark"'))
+  })
+
+  it('без mode и theme атрибут не появляется вовсе', () => {
     const wrapper = mount(defineComponent({
       setup: () => () => h(GrConfigProvider, null, { default: () => h('span', 'x') }),
     }))
 
-    expect(wrapper.find('[data-gr-config-provider]').attributes('data-theme')).toBeUndefined()
+    expect(providerAttr(wrapper, 0)).toBeUndefined()
   })
 })
 

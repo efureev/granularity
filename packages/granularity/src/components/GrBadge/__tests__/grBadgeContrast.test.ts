@@ -9,7 +9,7 @@ import {
   readComponentThemeVars,
   resolveColorExpression,
   themeVarsByName,
-  type ThemeName,
+  THEME_MODES,
 } from '../../../__tests__/cssContrast'
 import { badgeDotToneClass, darkToneClassByTone, lightToneClassByTone } from '../grBadgeStyles'
 
@@ -34,7 +34,7 @@ const AA_NORMAL_TEXT = 4.5
  * снисхождению: кружок опознаётся формой и положением, а не начертанием.
  */
 const AA_NON_TEXT = 3
-const THEMES: ThemeName[] = ['light', 'dark']
+const THEMES = THEME_MODES
 
 type BadgeMode = { name: string, dark: boolean }
 

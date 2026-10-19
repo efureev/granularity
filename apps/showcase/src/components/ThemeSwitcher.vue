@@ -13,7 +13,7 @@ const props = withDefaults(
   },
 )
 
-const { isDark, toggleTheme } = useTheme({ storageKey: props.storageKey })
+const { isDark, toggleMode } = useTheme({ storageKey: props.storageKey })
 </script>
 
 <template>
@@ -22,7 +22,7 @@ const { isDark, toggleTheme } = useTheme({ storageKey: props.storageKey })
     size="sm"
     square
     :aria-label="$t('showcase.theme.toggle')"
-    @click="toggleTheme"
+    @click="toggleMode"
   >
     <IconMoon v-if="isDark" class="h-4 w-4" aria-hidden="true" />
     <IconSun v-else class="h-4 w-4" aria-hidden="true" />

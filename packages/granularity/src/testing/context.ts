@@ -37,7 +37,10 @@ export function i18nAdapter(options: I18nAdapterOptions | Record<string, string>
 export interface GranularityGlobalOptions {
   size?: GrComponentSize
   componentDefaults?: GrComponentDefaults
+  /** Превью темы поддерева — проп `theme` провайдера. */
   theme?: string
+  /** Остров режима — проп `mode` провайдера. */
+  mode?: string
   portalTarget?: string | HTMLElement
   /** Адаптер перевода: готовый, словарь `{ ключ: перевод }` или опции `i18nAdapter`. */
   i18n?: GranularityI18nAdapter | I18nAdapterOptions | Record<string, string>
@@ -62,6 +65,7 @@ export function granularityGlobal(options: GranularityGlobalOptions = {}): { pro
     size: computed(() => options.size),
     componentDefaults: computed(() => options.componentDefaults ?? {}),
     theme: computed(() => options.theme),
+    mode: computed(() => options.mode),
     portalTarget: computed(() => options.portalTarget),
   }
 

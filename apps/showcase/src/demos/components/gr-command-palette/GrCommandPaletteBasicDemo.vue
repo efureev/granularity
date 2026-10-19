@@ -7,7 +7,7 @@ const open = ref(false)
 const lastCommand = ref<string | null>(null)
 
 // Команда «Toggle theme» настоящая: переключает тему витрины через `useTheme()`.
-const { isDark, toggleTheme } = useTheme()
+const { isDark, toggleMode } = useTheme()
 
 const commands = computed<GrCommandItem[]>(() => [
   { id: 'new-doc', label: 'New document', icon: 'i-lucide-file-plus', group: 'File', shortcut: ['⌘', 'N'], keywords: ['create'] },
@@ -31,14 +31,14 @@ const commands = computed<GrCommandItem[]>(() => [
 function onSelect(item: GrCommandItem): void {
   lastCommand.value = item.label
   if (item.id === 'theme')
-    toggleTheme()
+    toggleMode()
 }
 
 // Сочетание, которое палитра только показывает, здесь работает по-настоящему:
 // `v-hotkey` вешает глобальный слушатель (Meta — macOS, Ctrl — остальные).
 const hotkeys = {
-  'Meta+J': toggleTheme,
-  'Ctrl+J': toggleTheme,
+  'Meta+J': toggleMode,
+  'Ctrl+J': toggleMode,
 }
 </script>
 

@@ -2,7 +2,7 @@ import { mount } from '@vue/test-utils'
 import { createApp, defineComponent } from 'vue'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { granularityThemePlugin, initThemeEarly, useTheme, type UseThemeOptions } from '../useTheme'
+import { granularityThemePlugin, type GrThemeManifest, initThemeEarly, useTheme, type UseThemeOptions } from '../useTheme'
 
 const DEFAULT_STORAGE_KEY = 'gr-theme'
 
@@ -17,6 +17,7 @@ function resetThemeEnvironment(): void {
   vi.unstubAllGlobals()
   document.documentElement.className = ''
   delete document.documentElement.dataset.theme
+  document.documentElement.removeAttribute('data-look')
 
   const storage = new Map<string, string>()
   const localStorageMock: Storage = {
@@ -42,52 +43,71 @@ function resetThemeEnvironment(): void {
   })
 }
 
+const OCEAN_MANIFEST: GrThemeManifest = {
+  theme: { id: 'clay', title: 'Глина' },
+  modes: [
+    { name: 'light', colorScheme: 'light', value: 'clay-light' },
+    { name: 'ocean', colorScheme: 'dark', value: 'clay-ocean' },
+    { name: 'dark', colorScheme: 'dark', value: 'clay-dark' },
+  ],
+  defaultMode: 'light',
+  activation: { attribute: 'data-look' },
+}
+
 describe('useTheme (helpers)', () => {
   beforeEach(resetThemeEnvironment)
 
-  it('initThemeEarly should apply the preferred theme to the document', () => {
-    window.localStorage.setItem(DEFAULT_STORAGE_KEY, 'light')
-    initThemeEarly()
-    expect(document.documentElement.dataset.theme).toBe('slate-light')
-
+  it('initThemeEarly ставит пару сохранённого режима; старый сохранённый `dark` поднимается как режим', () => {
     window.localStorage.setItem(DEFAULT_STORAGE_KEY, 'dark')
     initThemeEarly()
     expect(document.documentElement.dataset.theme).toBe('slate-dark')
-    // Класс `.theme-dark` снят: тема выражается только data-атрибутом.
+    expect(useTheme().mode.value).toBe('dark')
+    // Класс `.theme-dark` снят: режим выражается только data-атрибутом.
     expect(document.documentElement.classList.contains('theme-dark')).toBe(false)
-  })
 
-  it('initThemeEarly should read from localStorage first', () => {
-    window.localStorage.setItem(DEFAULT_STORAGE_KEY, 'dark')
-    initThemeEarly()
-    expect(document.documentElement.dataset.theme).toBe('slate-dark')
-
+    delete document.documentElement.dataset.theme
     window.localStorage.setItem(DEFAULT_STORAGE_KEY, 'light')
     initThemeEarly()
     expect(document.documentElement.dataset.theme).toBe('slate-light')
   })
 
-  it('initThemeEarly should support custom storageKey', () => {
+  it('пара на корне (серверный HTML, скрипт в head) побеждает хранилище и не перезаписывается', () => {
+    document.documentElement.dataset.theme = 'slate-dark'
+    window.localStorage.setItem(DEFAULT_STORAGE_KEY, 'light')
+
+    initThemeEarly()
+
+    expect(document.documentElement.dataset.theme).toBe('slate-dark')
+    expect(useTheme().mode.value).toBe('dark')
+    expect(window.localStorage.getItem(DEFAULT_STORAGE_KEY)).toBe('light')
+  })
+
+  it('неизвестный сохранённый режим не применяется — дальше системная схема', () => {
+    window.localStorage.setItem(DEFAULT_STORAGE_KEY, 'sepia')
+    initThemeEarly()
+    expect(document.documentElement.dataset.theme).toBe('slate-light')
+  })
+
+  it('initThemeEarly читает свой storageKey', () => {
     window.localStorage.setItem('my-theme', 'dark')
     initThemeEarly({ storageKey: 'my-theme' })
     expect(document.documentElement.dataset.theme).toBe('slate-dark')
 
     delete document.documentElement.dataset.theme
-    document.documentElement.className = ''
     initThemeEarly()
     expect(document.documentElement.dataset.theme).toBe('slate-light')
   })
 
-  it('initThemeEarly should fallback to prefers-color-scheme when storage is empty', () => {
+  it('без сохранённого — первый режим с colorScheme системной схемы', () => {
     const matchMedia = vi.fn().mockReturnValue({ matches: true })
     vi.stubGlobal('matchMedia', matchMedia)
 
-    initThemeEarly()
-    expect(document.documentElement.dataset.theme).toBe('slate-dark')
+    initThemeEarly({ manifest: OCEAN_MANIFEST })
+    expect(document.documentElement.getAttribute('data-look')).toBe('clay-ocean')
     expect(matchMedia).toHaveBeenCalledWith('(prefers-color-scheme: dark)')
   })
 
-  it('initThemeEarly should not throw when localStorage is missing getItem', () => {
+  it('initThemeEarly не бросает, если у localStorage нет getItem', () => {
     Object.defineProperty(window, 'localStorage', {
       value: {},
       configurable: true,
@@ -96,24 +116,24 @@ describe('useTheme (helpers)', () => {
     expect(() => initThemeEarly()).not.toThrow()
   })
 
-  it('useTheme should persist into provided storageKey by default', () => {
-    const { setTheme } = useTheme({ storageKey: 'app-theme' })
-    setTheme('dark')
+  it('useTheme пишет режим под свой storageKey', () => {
+    const { setMode } = useTheme({ storageKey: 'app-theme' })
+    setMode('dark')
 
     expect(window.localStorage.getItem('app-theme')).toBe('dark')
     expect(window.localStorage.getItem(DEFAULT_STORAGE_KEY)).toBe(null)
     expect(document.documentElement.dataset.theme).toBe('slate-dark')
   })
 
-  it('useTheme should not touch localStorage when persist=false', () => {
-    const { setTheme } = useTheme({ storageKey: 'app-theme', persist: false })
-    setTheme('dark')
+  it('useTheme с persist=false хранилище не трогает', () => {
+    const { setMode } = useTheme({ storageKey: 'app-theme', persist: false })
+    setMode('dark')
 
     expect(window.localStorage.getItem('app-theme')).toBe(null)
     expect(document.documentElement.dataset.theme).toBe('slate-dark')
   })
 
-  it('useTheme should not throw when localStorage is missing setItem', () => {
+  it('useTheme не бросает, если у localStorage нет setItem', () => {
     Object.defineProperty(window, 'localStorage', {
       value: {
         getItem: () => null,
@@ -121,9 +141,111 @@ describe('useTheme (helpers)', () => {
       configurable: true,
     })
 
-    const { setTheme } = useTheme({ storageKey: 'app-theme' })
-    expect(() => setTheme('dark')).not.toThrow()
+    const { setMode } = useTheme({ storageKey: 'app-theme' })
+    expect(() => setMode('dark')).not.toThrow()
     expect(document.documentElement.dataset.theme).toBe('slate-dark')
+  })
+})
+
+describe('useTheme — режимы манифеста', () => {
+  beforeEach(resetThemeEnvironment)
+
+  function mountWith(options: UseThemeOptions) {
+    let api: ReturnType<typeof useTheme> | null = null
+    const wrapper = mount(defineComponent({
+      setup() {
+        api = useTheme()
+        return () => null
+      },
+    }), { global: { plugins: [[granularityThemePlugin, options]] } })
+
+    return { wrapper, api: api! }
+  }
+
+  it('тема и режимы — из манифеста; isDark по colorScheme, а не по имени', () => {
+    const { wrapper, api } = mountWith({ manifest: OCEAN_MANIFEST })
+
+    expect(api.theme).toBe('clay')
+    expect(api.modes.map(entry => entry.name)).toEqual(['light', 'ocean', 'dark'])
+    expect(api.isDark.value).toBe(false)
+
+    api.setMode('ocean')
+    expect(api.mode.value).toBe('ocean')
+    expect(api.isDark.value).toBe(true)
+    expect(document.documentElement.getAttribute('data-look')).toBe('clay-ocean')
+    expect(window.localStorage.getItem(DEFAULT_STORAGE_KEY)).toBe('ocean')
+
+    wrapper.unmount()
+  })
+
+  it('toggleMode — между первым светлым и первым тёмным режимом', () => {
+    const { wrapper, api } = mountWith({ manifest: OCEAN_MANIFEST })
+
+    api.toggleMode()
+    expect(api.mode.value).toBe('ocean')
+
+    api.setMode('dark')
+    api.toggleMode()
+    expect(api.mode.value).toBe('light')
+
+    wrapper.unmount()
+  })
+
+  it('режима нет в сборке — ошибка с набором режимов', () => {
+    const { wrapper, api } = mountWith({ manifest: OCEAN_MANIFEST })
+
+    expect(() => api.setMode('sepia')).toThrow(/light, ocean, dark/)
+    expect(api.mode.value).toBe('light')
+
+    wrapper.unmount()
+  })
+
+  it('системная схема меняет режим, пока выбор не сохранён, и сама не сохраняется', () => {
+    let listener: ((event: MediaQueryListEvent) => void) | undefined
+    vi.stubGlobal('matchMedia', vi.fn().mockReturnValue({
+      matches: false,
+      addEventListener: (_: string, handler: (event: MediaQueryListEvent) => void) => {
+        listener = handler
+      },
+      removeEventListener: () => {},
+    }))
+
+    const { wrapper, api } = mountWith({ manifest: OCEAN_MANIFEST })
+    listener!({ matches: true } as MediaQueryListEvent)
+
+    expect(api.mode.value).toBe('ocean')
+    expect(window.localStorage.getItem(DEFAULT_STORAGE_KEY)).toBe(null)
+
+    api.setMode('light')
+    listener!({ matches: true } as MediaQueryListEvent)
+    expect(api.mode.value).toBe('light')
+
+    wrapper.unmount()
+  })
+
+  it('своё хранилище (cookie) вместо localStorage', () => {
+    const cookie = new Map<string, string>([['gr-theme', 'dark']])
+    const storage = { getItem: (key: string) => cookie.get(key) ?? null, setItem: (key: string, value: string) => void cookie.set(key, value) }
+
+    const { wrapper, api } = mountWith({ storage })
+    expect(api.mode.value).toBe('dark')
+
+    api.setMode('light')
+    expect(cookie.get('gr-theme')).toBe('light')
+    expect(window.localStorage.getItem(DEFAULT_STORAGE_KEY)).toBe(null)
+
+    wrapper.unmount()
+  })
+
+  it('initial — режим мимо хранилища: так сервер отдаёт режим запроса', () => {
+    window.localStorage.setItem(DEFAULT_STORAGE_KEY, 'light')
+
+    const { wrapper, api } = mountWith({ initial: 'dark' })
+
+    expect(api.mode.value).toBe('dark')
+    expect(document.documentElement.dataset.theme).toBe('slate-dark')
+
+    wrapper.unmount()
   })
 })
 /**
@@ -153,10 +275,10 @@ describe('useTheme — состояние приложения', () => {
     const first = mountWithTheme()
     const second = mountWithTheme()
 
-    first.api.setTheme('dark')
+    first.api.setMode('dark')
 
     // Канонический фолбэк для SPA: `useTheme()` из любого места — одна тема.
-    expect(second.api.theme.value).toBe('dark')
+    expect(second.api.mode.value).toBe('dark')
     expect(second.api.isDark.value).toBe(true)
 
     first.wrapper.unmount()
@@ -167,12 +289,12 @@ describe('useTheme — состояние приложения', () => {
     const first = mountWithTheme([granularityThemePlugin])
     const second = mountWithTheme([granularityThemePlugin])
 
-    first.api.setTheme('dark')
-    second.api.setTheme('light')
+    first.api.setMode('dark')
+    second.api.setMode('light')
 
     // Иначе два независимых приложения на одной странице делили бы одну тему.
-    expect(first.api.theme.value).toBe('dark')
-    expect(second.api.theme.value).toBe('light')
+    expect(first.api.mode.value).toBe('dark')
+    expect(second.api.mode.value).toBe('light')
 
     first.wrapper.unmount()
     second.wrapper.unmount()
@@ -186,8 +308,8 @@ describe('useTheme — состояние приложения', () => {
     const first = mountWithTheme([granularityThemePlugin, { target: () => rootA, persist: false }])
     const second = mountWithTheme([granularityThemePlugin, { target: () => rootB, persist: false }])
 
-    first.api.setTheme('dark')
-    second.api.setTheme('light')
+    first.api.setMode('dark')
+    second.api.setMode('light')
 
     // Ради этого target и существует: темы приложений не перетирают друг друга.
     expect(rootA.dataset.theme).toBe('slate-dark')
@@ -205,15 +327,15 @@ describe('useTheme — состояние приложения', () => {
     document.body.append(root)
 
     const { wrapper, api } = mountWithTheme([granularityThemePlugin, { storageKey: 'dead-theme', target: () => root }])
-    expect(api.theme.value).toBe('light')
+    expect(api.mode.value).toBe('light')
 
     wrapper.unmount()
 
     // Слушатель мёртвого приложения не должен ни менять состояние, ни трогать DOM.
     window.dispatchEvent(new StorageEvent('storage', { key: 'dead-theme', newValue: 'dark' }))
 
-    expect(api.theme.value).toBe('light')
-    expect(root.dataset.theme).toBeUndefined()
+    expect(api.mode.value).toBe('light')
+    expect(root.dataset.theme).toBe('slate-light')
 
     root.remove()
   })
@@ -226,7 +348,7 @@ describe('useTheme — состояние приложения', () => {
 
     window.dispatchEvent(new StorageEvent('storage', { key: 'scoped-theme', newValue: 'dark' }))
 
-    expect(api.theme.value).toBe('dark')
+    expect(api.mode.value).toBe('dark')
     expect(root.dataset.theme).toBe('slate-dark')
     expect(document.documentElement.dataset.theme).toBeUndefined()
 
@@ -242,7 +364,7 @@ describe('useTheme — состояние приложения', () => {
     app.use(granularityThemePlugin, { persist: false, target: () => root })
     app.mount(document.createElement('div'))
 
-    app.runWithContext(() => useTheme()).setTheme('dark')
+    app.runWithContext(() => useTheme()).setMode('dark')
 
     expect(root.dataset.theme).toBe('slate-dark')
     expect(document.documentElement.dataset.theme).toBeUndefined()
@@ -254,7 +376,7 @@ describe('useTheme — состояние приложения', () => {
   it('плагин принимает свои `storageKey` и `persist`', () => {
     const { wrapper, api } = mountWithTheme([granularityThemePlugin, { storageKey: 'admin-theme' }])
 
-    api.setTheme('dark')
+    api.setMode('dark')
 
     expect(window.localStorage.getItem('admin-theme')).toBe('dark')
     expect(window.localStorage.getItem(DEFAULT_STORAGE_KEY)).toBe(null)

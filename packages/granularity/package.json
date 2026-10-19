@@ -45,6 +45,9 @@
   "sideEffects": [
     "**/*.css"
   ],
+  "imports": {
+    "#granum-runtime": "@feugene/granum/runtime"
+  },
   "exports": {
     ".": {
       "types": "./dist/types/index.d.ts",

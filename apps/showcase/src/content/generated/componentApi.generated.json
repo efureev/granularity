@@ -2844,8 +2844,15 @@
             "default": "undefined"
           },
           {
+            "name": "mode",
+            "description": "Режим поддерева — остров: `dark` уезжает в `data-theme` парой темы сборки (`slate-dark`). Режим **документа** — работа `useTheme`/`initThemeEarly`.",
+            "type": "string | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "theme",
-            "description": "Режим поддерева — остров: имя режима (`dark`) уезжает в `data-theme` парой `slate-dark`, пара пишется как есть. Режим **документа** — работа `useTheme`/`initThemeEarly`.",
+            "description": "Превью другой темы каталога: `theme=\"clay\" mode=\"dark\"` пишет `data-theme=\"clay-dark\"`. Блоки её пар собирает granum по `previews` конфига — без них превью не найдёт ни одного селектора. Без `mode` показывает тему в режиме документа.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
