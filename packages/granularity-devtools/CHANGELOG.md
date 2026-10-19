@@ -7,6 +7,8 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v2.0.0] 2026-10-19
+
 ### Changed
 
 - **Peer `@feugene/granularity` — `>=2.0.0 <3.0.0`.** Панель читает тему и режим ядра 2

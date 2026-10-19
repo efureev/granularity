@@ -7,9 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v2.0.0] 2026-10-19
+
 ### Changed
 
-- **Peer `@feugene/granum` — `>=3.0.0-next.2 <4.0.0`.** Ядро `@feugene/granularity` теперь
+- **Peer `@feugene/granum` — `>=3.0.0 <4.0.0`.** Ядро `@feugene/granularity` теперь
   провайдер granum 3 (манифест формата 3, контракт версии 2), и спутник объявляет тот же мажор.
 - **`componentTokens` читает токены тем по раскладке `themesDir` granum 3** —
   `<Компонент>/themes/<тема>/root.{json,css}` и `modes/<режим>.{json,css}` вместо

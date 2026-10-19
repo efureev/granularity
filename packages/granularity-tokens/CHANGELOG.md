@@ -7,6 +7,8 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v1.0.0] 2026-10-19
+
 ### Added
 
 - **`docs/themes.md`** — что тема обязана объявить, суффиксы ролей и ловушки контраста, свой

@@ -126,14 +126,14 @@ my-app/
     "typecheck": "vue-tsc --noEmit -p tsconfig.json"
   },
   "dependencies": {
-    "@feugene/granularity": "^1.1.0",
+    "@feugene/granularity": "^2.0.0",
     "@floating-ui/dom": "^1.8.0",
     "@unocss/reset": "^66.7.5",
     "vue": "^3.5.40"
   },
   "devDependencies": {
-    "@feugene/granum": "^3.0.0-next.2",
-    "@feugene/granum-engine-wind": "^3.0.0-next.2",
+    "@feugene/granum": "^3.0.0",
+    "@feugene/granum-engine-wind": "^3.0.0",
     "@vitejs/plugin-vue": "^6.0.8",
     "typescript": "^6.0.2",
     "vite": "^8.2.2",
@@ -737,22 +737,22 @@ export async function setupI18n() {
 <!-- ecosystem:generated:start -->
 | Пакет | Версия | Компоненты | Блок i18n | Резолвер |
 | --- | --- | --- | --- | --- |
-| `@feugene/granularity` | 1.1.1 | ядро, 106 subpath-экспортов `./components/Gr*` | `gr` | `GranularityResolver` (из `@feugene/unplugin-granularity`) |
-| `@feugene/granularity-charts` | 1.1.0 | `GrChartArea`, `GrChartBar`, `GrChartBullet`, `GrChartFunnel`, `GrChartHeatmap`, `GrChartLine`, `GrChartPie`, `GrChartRadar`, `GrChartWaterfall`, `GrSparkline` | `grCharts` | `GranularityChartsResolver` |
-| `@feugene/granularity-chrono` | 1.1.0 | `GrCalendar`, `GrDatePicker`, `GrDateRangePicker`, `GrDateTimePicker`, `GrDuration`, `GrRelativeTime`, `GrTimePicker` | `grChrono` | `GranularityChronoResolver` |
-| `@feugene/granularity-code` | 1.1.0 | `GrCodeBlock`, `GrCodeEditor`, `GrDiff` | `grCode` | `GranularityCodeResolver` |
-| `@feugene/granularity-dashboard` | 1.1.0 | `GrDashboard`, `GrDashboardItem`, `GrDashboardItemSettings`, `GrDashboardPalette`, `GrDashboardToolbar` | `grDashboard` | `GranularityDashboardResolver` |
-| `@feugene/granularity-editor` | 1.1.1 | `GrMarkdown`, `GrRichText` | `grEditor` | `GranularityEditorResolver` |
-| `@feugene/granularity-forms-schema` | 1.1.1 | `GrSchemaForm` | `grForms` | `GranularityFormsSchemaResolver` |
-| `@feugene/granularity-media` | 1.1.0 | `GrCameraCapture`, `GrCodeScanner`, `GrImageCrop`, `GrVideoPlayer` | `grMedia` | `GranularityMediaResolver` |
+| `@feugene/granularity` | 2.0.0 | ядро, 106 subpath-экспортов `./components/Gr*` | `gr` | `GranularityResolver` (из `@feugene/unplugin-granularity`) |
+| `@feugene/granularity-charts` | 2.0.0 | `GrChartArea`, `GrChartBar`, `GrChartBullet`, `GrChartFunnel`, `GrChartHeatmap`, `GrChartLine`, `GrChartPie`, `GrChartRadar`, `GrChartWaterfall`, `GrSparkline` | `grCharts` | `GranularityChartsResolver` |
+| `@feugene/granularity-chrono` | 2.0.0 | `GrCalendar`, `GrDatePicker`, `GrDateRangePicker`, `GrDateTimePicker`, `GrDuration`, `GrRelativeTime`, `GrTimePicker` | `grChrono` | `GranularityChronoResolver` |
+| `@feugene/granularity-code` | 2.0.0 | `GrCodeBlock`, `GrCodeEditor`, `GrDiff` | `grCode` | `GranularityCodeResolver` |
+| `@feugene/granularity-dashboard` | 2.0.0 | `GrDashboard`, `GrDashboardItem`, `GrDashboardItemSettings`, `GrDashboardPalette`, `GrDashboardToolbar` | `grDashboard` | `GranularityDashboardResolver` |
+| `@feugene/granularity-editor` | 2.0.0 | `GrMarkdown`, `GrRichText` | `grEditor` | `GranularityEditorResolver` |
+| `@feugene/granularity-forms-schema` | 2.0.0 | `GrSchemaForm` | `grForms` | `GranularityFormsSchemaResolver` |
+| `@feugene/granularity-media` | 2.0.0 | `GrCameraCapture`, `GrCodeScanner`, `GrImageCrop`, `GrVideoPlayer` | `grMedia` | `GranularityMediaResolver` |
 
 Компонентов не добавляют, но входят в семейство:
 
 - [`@feugene/granularity-datasource`](../../granularity-datasource) `0.1.2`
-- [`@feugene/granularity-devtools`](../../granularity-devtools) `1.0.0`
-- [`@feugene/granularity-test-kit`](../../granularity-test-kit) `1.2.0`
+- [`@feugene/granularity-devtools`](../../granularity-devtools) `2.0.0`
+- [`@feugene/granularity-test-kit`](../../granularity-test-kit) `2.0.0`
 - [`@feugene/granularity-tokens`](../../granularity-tokens) `1.0.0`
-- [`@feugene/unplugin-granularity`](../../unplugin-granularity) `1.1.1`
+- [`@feugene/unplugin-granularity`](../../unplugin-granularity) `1.2.0`
 <!-- ecosystem:generated:end -->
 
 Резолвер каждый спутник экспортирует сам — из subpath `./resolver`. Кроме

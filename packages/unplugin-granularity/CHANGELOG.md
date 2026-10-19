@@ -7,6 +7,8 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v1.2.0] 2026-10-19
+
 ### Changed
 
 - **Peer `@feugene/granularity` — `>=1.0.0 <3.0.0`.** Резолвер судит по `exports` пакета, а

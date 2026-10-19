@@ -7,6 +7,8 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v2.0.0] 2026-10-19
+
 Ломающий выпуск: темы и режимы. Как переехать — [`docs/migration-2.md`](./docs/migration-2.md).
 
 ### Changed
@@ -14,7 +16,7 @@ to [Semantic Versioning](https://semver.org/).
 - **`docs/theming.md` разделён.** Режимы в приложении — переключение, острова, SSR, свои
   режимы в конфиге, токены компонентов по темам — [`docs/modes.md`](./docs/modes.md); темы, роли,
   ловушки контраста, свой режим и своя тема — `docs/themes.md` пакета `@feugene/granularity-tokens`.
-- **Нужен granum 3.** Peer `@feugene/granum` — `>=3.0.0-next.2 <4.0.0`: манифест ядра —
+- **Нужен granum 3.** Peer `@feugene/granum` — `>=3.0.0 <4.0.0`: манифест ядра —
   формата 3, контракт — версии 2, и granum 2 их не читает. Рантайм режимов granum
   встроен в `dist`, отдельной зависимости приложению он не добавляет.
 - **Тема — из каталога `@feugene/granularity-tokens`, режим — парой `data-theme="slate-<режим>"`.**

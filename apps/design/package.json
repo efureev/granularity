@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "type": "module",
   "dependencies": {
-    "@feugene/granularity": "^1.1.0",
+    "@feugene/granularity": "^2.0.0",
     "@feugene/granularity-tokens": "^1.0.0",
     "marked": "^18.0.12",
     "vue": "^3.5.42",
@@ -12,8 +12,8 @@
   },
   "devDependencies": {
     "@antfu/eslint-config": "^9.3.0",
-    "@feugene/granum": "^3.0.0-next.2",
-    "@feugene/granum-engine-wind": "^3.0.0-next.2",
+    "@feugene/granum": "^3.0.0",
+    "@feugene/granum-engine-wind": "^3.0.0",
     "@feugene/unplugin-granularity": "^1.1.0",
     "@iconify-json/lucide": "^1.2.126",
     "@unocss/reset": "^66.8.1",

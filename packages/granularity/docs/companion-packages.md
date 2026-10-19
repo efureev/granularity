@@ -83,12 +83,12 @@ packages/<my-package>/
   },
   "peerDependencies": {
     "@feugene/granularity": ">=1.0.0 <2.0.0",
-    "@feugene/granum": ">=3.0.0-next.2 <4.0.0",
+    "@feugene/granum": ">=3.0.0 <4.0.0",
     "vue": "^3.5.0"
   },
   "devDependencies": {
-    "@feugene/granum": "^3.0.0-next.2",
-    "@feugene/granum-engine-wind": "^3.0.0-next.2"
+    "@feugene/granum": "^3.0.0",
+    "@feugene/granum-engine-wind": "^3.0.0"
   },
   "scripts": {
     "build": "vite build && vue-tsc -p tsconfig.build.json",
