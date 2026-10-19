@@ -221,7 +221,7 @@ const { target, enabled } = usePortalTarget()
 v1) в granum нет: конфиг с ним — ошибка.
 
 **Тему собирать из данных, а не писать CSS руками.** `extendTheme` (поверх
-готовой) и `createTheme` (с нуля) из `@feugene/granularity/theme` отдают и
+готовой) и `createTheme` (с нуля) из `@feugene/granularity-tokens/theme` отдают и
 токены, и CSS; `createTheme` падает на неполноте, а `tone()` закрывает роли
 пачками. Сгенерированный файл держите под скриптом с флагом `--check`, чтобы он
 не разошёлся с источником ([`theming.md`](./theming.md)).

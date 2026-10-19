@@ -1,0 +1,11 @@
+{
+  "id": "slate",
+  "title": "Сланец",
+  "description": "Холодные нейтрали шкалы slate, индиго-акцент и контраст, выверенный по AA в обоих режимах.",
+  "docs": "https://granularity.tech/themes/slate",
+  "defaultMode": "light",
+  "modes": [
+    { "name": "light", "title": "Светлый", "colorScheme": "light" },
+    { "name": "dark", "title": "Тёмный", "colorScheme": "dark" }
+  ]
+}

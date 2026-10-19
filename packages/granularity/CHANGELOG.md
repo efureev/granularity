@@ -50,6 +50,26 @@ to [Semantic Versioning](https://semver.org/).
   покой брался из `--gr-{tone}-light`, а наведение — 20 % тона в фоне, и в тёмной
   теме второе выходило темнее и серее первого. Наведение и нажатие подмешивают тон
   в саму soft-заливку (10 % и 16 %) и идут вслед за покоем в обеих темах.
+- **Тёмные тени в `styles.css` больше не светлые.** `--gr-shadow-1..3` были
+  объявлены и примитивом в `:root`, и в каждой теме; в `styles.css` темы
+  подключены раньше `tokens.css`, и при равной специфичности тёмная тема получала
+  светлые тени. Тени уровней 1–3 теперь объявляет только тема. На сборке через
+  granum вид не меняется.
+
+### Removed
+
+- **Словарь токенов, данные тем и сборка темы переехали в
+  `@feugene/granularity-tokens`** — он теперь зависимость ядра. Подпути
+  `@feugene/granularity/theme` и `/theme/apply` убраны: те же `extendTheme`,
+  `createTheme`, `tone`, `validateTheme` и `applyTheme` —
+  `@feugene/granularity-tokens/theme` и `/theme/apply`. Сырые `tokens/*.json`
+  ядро больше не публикует: реестр — `@feugene/granularity-tokens/tokens/*.json`,
+  значения — `@feugene/granularity-tokens/themes/slate/`. В
+  `@feugene/granularity/tokens` остался реестр покомпонентных токенов
+  `grComponentTokens`; `grFoundationTokens`, `grDerivedTokens` и роли
+  (`grRoleTokens` вместо `grThemeTokens`, без значений) — в пакете токенов,
+  значения по режимам — в данных темы. `extendTheme` сверяет `componentTokens` с
+  реестром, только если передан `knownComponentTokens`.
 
 ## [v1.1.1] 2026-10-16
 

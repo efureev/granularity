@@ -8,7 +8,8 @@ import { validateGranumConfig } from '@feugene/granum/vite'
 import { windEngine } from '@feugene/granum-engine-wind'
 import { afterAll, describe, expect, it } from 'vitest'
 
-import { grThemeTokens } from '@feugene/granularity/tokens'
+import { type GrThemeData, resolveModes } from '@feugene/granularity-tokens'
+import slateData from '@feugene/granularity-tokens/themes/slate/theme.json'
 
 /**
  * Рецепты «Подключение» из `packages/granularity/docs/theming.md` — на настоящем
@@ -24,7 +25,8 @@ const root = fileURLToPath(new URL('../../', import.meta.url))
 const scratch = mkdtempSync(join(tmpdir(), 'theme-recipes-'))
 afterAll(() => rmSync(scratch, { recursive: true, force: true }))
 
-const darkPrimary = grThemeTokens.find(token => token.name === '--gr-primary')!.values.dark
+const dark = resolveModes(slateData as GrThemeData).get('dark')!
+const darkPrimary = dark['gr-primary']!
 const base = {
   engine: windEngine(),
   providers: ['@feugene/granularity'],
@@ -84,7 +86,7 @@ describe('рецепты темизации из theming.md', () => {
       define: { ocean: { extends: 'dark', tokens: { 'gr-primary': '#0ea5e9' } } },
     })
     const ocean = [...css.matchAll(/\[data-theme="ocean"\]\s*\{([^}]*)\}/g)].map(match => match[1]!).join('\n')
-    const darkBg = grThemeTokens.find(token => token.name === '--gr-bg')!.values.dark
+    const darkBg = dark['gr-bg']!
 
     expect(ocean).toContain('--gr-primary: #0ea5e9')
     expect(ocean).toContain(`--gr-bg: ${darkBg}`)

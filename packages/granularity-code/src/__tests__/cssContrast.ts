@@ -2,7 +2,7 @@ import { createRequire } from 'node:module'
 import { readFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 
-import { contrast, deltaE } from '@feugene/granularity/theme'
+import { contrast, deltaE } from '@feugene/granularity-tokens/theme'
 
 /**
  * Разрешение CSS-цветов и расчёт контраста для тестов пакета.
@@ -15,7 +15,7 @@ import { contrast, deltaE } from '@feugene/granularity/theme'
  * **Про копию.** У ядра есть свой `src/__tests__/cssContrast.ts` — он не
  * публикуется, и спутнику недоступен. Скопирован отсюда только разбор
  * выражений; сама цветовая математика (`contrast`, `deltaE`) берётся из
- * публичного `@feugene/granularity/theme`, поэтому расходиться в числах гейтам
+ * публичного `@feugene/granularity-tokens/theme`, поэтому расходиться в числах гейтам
  * ядра и пакета неоткуда.
  *
  * Правильное место для этого модуля — `granularity-test-kit`: контраст палитры

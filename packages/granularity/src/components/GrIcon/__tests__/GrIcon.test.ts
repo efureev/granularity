@@ -10,8 +10,8 @@ import GrIcon from '../GrIcon.vue'
  */
 describe('GrIcon', () => {
   it('ставит --gr-icon-size токеном шкалы, а не числом', () => {
-    // Значения живут в `tokens/foundation.json`: иконка обязана масштабироваться
-    // вместе с темой, а не вместе с пересборкой пакета.
+    // Значения живут в `root` темы (`@feugene/granularity-tokens`): иконка
+    // обязана масштабироваться вместе с темой, а не вместе с пересборкой пакета.
     const sizes: ('xs' | 'sm' | 'md' | 'lg')[] = ['xs', 'sm', 'md', 'lg']
 
     for (const size of sizes) {

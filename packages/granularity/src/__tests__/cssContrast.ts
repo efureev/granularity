@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
-import { contrast, deltaE, luminance, parseHex, type Rgb } from '../theme/color'
+import { contrast, deltaE, luminance, parseHex, type Rgb } from '@feugene/granularity-tokens/theme'
 
 /**
  * Разрешение CSS-цветов и расчёт контраста для тестов.
@@ -85,7 +85,7 @@ function splitTopLevel(input: string): string[] {
 }
 
 /**
- * Цвет здесь — тройка каналов, а математика общая с темами (`src/theme/color.ts`):
+ * Цвет здесь — тройка каналов, а математика общая с темами (`@feugene/granularity-tokens/theme`):
  * контраст, ΔE и подмес обязаны считаться одинаково у гейтов, у генератора
  * токенов и у `extendTheme`, иначе «проверено» и «сгенерировано» разъедутся.
  */

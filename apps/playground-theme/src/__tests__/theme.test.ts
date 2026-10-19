@@ -4,7 +4,8 @@ import { fileURLToPath, URL } from 'node:url'
 
 import { describe, expect, it } from 'vitest'
 
-import { grThemeTokens } from '@feugene/granularity/tokens'
+import { grRoleTokens, type GrThemeData, resolveModes } from '@feugene/granularity-tokens'
+import slateData from '@feugene/granularity-tokens/themes/slate/theme.json'
 
 /**
  * Проверка кастомной темы — ровно та, что описана в
@@ -105,7 +106,7 @@ describe('тема ocean', () => {
 
   it('полнота набора обеспечена композицией, а не перечислением', () => {
     // 90 ролей в файле при десятке в конфиге — это и есть наследование от базы.
-    const missing = grThemeTokens
+    const missing = grRoleTokens
       .map(token => token.name)
       .filter(name => !declarations.has(name))
 
@@ -195,7 +196,7 @@ describe('тема contrast', () => {
   const AAA_TEXT = 7
 
   it('объявляет все роли сама: ни одна не придёт из `:root`', () => {
-    const missing = grThemeTokens.map(token => token.name).filter(name => !decls.has(name))
+    const missing = grRoleTokens.map(token => token.name).filter(name => !decls.has(name))
 
     expect(missing, 'у темы без базы незаявленная роль приедет из светлой темы пакета').toEqual([])
   })
@@ -203,7 +204,8 @@ describe('тема contrast', () => {
   it('не заимствует ни одной поверхности у светлой темы пакета', () => {
     // Смысл высококонтрастной темы теряется от любого приглушённого значения,
     // просочившегося из `light`.
-    const light = new Map(grThemeTokens.map(token => [token.name, token.values.light]))
+    const slateLight = resolveModes(slateData as GrThemeData).get('light')!
+    const light = new Map(grRoleTokens.map(token => [token.name, slateLight[token.name.slice(2)]]))
 
     for (const surface of ['--gr-bg', '--gr-muted', '--gr-secondary', '--gr-brd', '--gr-sidebar'])
       expect(read(surface), surface).not.toBe(light.get(surface))

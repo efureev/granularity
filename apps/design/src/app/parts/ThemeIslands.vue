@@ -1,14 +1,12 @@
 <script setup lang="ts">
-import type { GrThemeName } from '@feugene/granularity/tokens'
-
-import { THEMES } from '../tokens'
+import { type ModeName, THEMES } from '../tokens'
 
 /**
  * Одно содержимое в обеих темах рядом. Темы пакета объявлены атрибутом
  * `[data-theme]` и работают от любого контейнера, поэтому остров светлой темы
  * честно светлый и внутри тёмной страницы.
  */
-defineSlots<{ default: (props: { theme: GrThemeName }) => unknown }>()
+defineSlots<{ default: (props: { theme: ModeName }) => unknown }>()
 </script>
 
 <template>

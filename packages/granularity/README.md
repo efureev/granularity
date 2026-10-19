@@ -40,7 +40,7 @@ strategies.
   component's own CSS is not there: with `granum` it arrives through the manifest;
 - low-level foundation exports: `@feugene/granularity/styles/tokens.css`, `@feugene/granularity/styles/base.css`, `@feugene/granularity/styles/preflight.css`, `@feugene/granularity/styles/themes/light.css`, `@feugene/granularity/styles/themes/dark.css`;
 - package-level API: `@feugene/granularity/directives`, `@feugene/granularity/fileValidation`;
-- design tokens as data: `@feugene/granularity/tokens` (typed registry) and the raw `@feugene/granularity/tokens/*.json` source the CSS is generated from;
+- design tokens as data: the registry of component tokens at `@feugene/granularity/tokens`; global tokens, theme data and the theme builder live in [`@feugene/granularity-tokens`](../granularity-tokens/README.md), a dependency of this package;
 - build manifest: `@feugene/granularity/granum.manifest.json` — what the application's `granum()` plugin
   reads; it also records the utility vocabulary the classes belong to in its `engine` block. The
   provider registry itself stays available as `@feugene/granularity/granular-provider` for
@@ -156,6 +156,7 @@ on this one — the core stays lean, and you install only what you reach for.
 | [`@feugene/granularity-forms-schema`](../granularity-forms-schema) | 1.1.1 | Schema-driven forms — zod and JSON Schema into real form fields, zero dependencies. |
 | [`@feugene/granularity-media`](../granularity-media) | 1.1.0 | Media components: image cropping, camera capture, code scanning and video playback. |
 | [`@feugene/granularity-test-kit`](../granularity-test-kit) | 1.2.0 | Test gates for @feugene/granularity design-system packages — token, registry and defaults contracts as reusable factories. |
+| [`@feugene/granularity-tokens`](../granularity-tokens) | 1.0.0 | Design tokens and themes of @feugene/granularity: the token registry, theme data by mode and the theme builder. |
 | [`@feugene/unplugin-granularity`](../unplugin-granularity) | 1.1.1 | unplugin-vue-components resolver — granular auto-import for components and directives. |
 <!-- ecosystem:generated:end -->
 
@@ -164,7 +165,7 @@ on this one — the core stays lean, and you install only what you reach for.
 - [`docs/README.md`](./docs/README.md) — overview and documentation map
 - [`docs/installation.md`](./docs/installation.md) — installation, public entrypoints, and adoption strategies
 - [`docs/styling.md`](./docs/styling.md) — style layers, themes, and import order
-- [`docs/tokens.md`](./docs/tokens.md) — design token reference (generated from `tokens/*.json`)
+- [`docs/tokens.md`](./docs/tokens.md) — component token reference (generated from each component's `tokens.json`); global tokens and themes — [`@feugene/granularity-tokens`](../granularity-tokens/docs/tokens.md)
 - [`docs/entry-sizes.md`](./docs/entry-sizes.md) — the weight of every component as a subpath (generated from the build)
 - [`docs/theming.md`](./docs/theming.md) — building a custom theme (roles, contrast rules, wiring)
 - [`docs/keyboard.md`](./docs/keyboard.md) — keyboard contract per component

@@ -61,7 +61,7 @@ describe('showcase bootstrap config', () => {
     expect(showcasePackageJson).toContain('"generate:api": "node ./scripts/generate-component-api.mjs"')
     expect(showcasePackageJson).toContain('"generate:search": "node ./scripts/generate-showcase-search-index.mjs"')
     expect(showcasePackageJson).toContain('"generate:search:local": "yarn prepare:granularity && node ./scripts/generate-showcase-search-index.mjs"')
-    expect(showcasePackageJson).toContain('"prepare:granularity": "yarn workspace @feugene/granularity build"')
+    expect(showcasePackageJson).toContain('"prepare:granularity": "yarn workspace @feugene/granularity-tokens build && yarn workspace @feugene/granularity build"')
     /*
      * `build:icons` стоит первым во всём, что читает `granum.config.ts`:
      * правила иконок приезжают провайдером, и без его манифеста сборка не

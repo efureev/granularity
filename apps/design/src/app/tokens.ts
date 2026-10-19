@@ -1,43 +1,54 @@
 import {
   grFoundationTokens,
-  grThemeTokens,
+  grRoleTokens,
   type GrFoundationToken,
-  type GrThemeName,
-  type GrThemeToken,
-} from '@feugene/granularity/tokens'
+  type GrRoleToken,
+  type GrThemeData,
+  resolveModes,
+} from '@feugene/granularity-tokens'
+import slateData from '@feugene/granularity-tokens/themes/slate/theme.json'
 
-export const THEMES: { id: GrThemeName, label: string }[] = [
+/** Режим темы `slate` — то, что ядро пока называет темой `light`/`dark`. */
+export type ModeName = 'light' | 'dark'
+
+export const THEMES: { id: ModeName, label: string }[] = [
   { id: 'light', label: 'Светлая' },
   { id: 'dark', label: 'Тёмная' },
 ]
 
-export function themeSection(section: string): GrThemeToken[] {
-  return grThemeTokens.filter(token => token.section === section)
+const slate = slateData as GrThemeData
+const slateModes = resolveModes(slate)
+
+export type FoundationToken = GrFoundationToken & { value: string }
+
+export function themeSection(section: string): GrRoleToken[] {
+  return grRoleTokens.filter(token => token.section === section)
 }
 
-export function foundationSection(section: string): GrFoundationToken[] {
-  return grFoundationTokens.filter(token => token.section === section)
+export function foundationSection(section: string): FoundationToken[] {
+  return grFoundationTokens
+    .filter(token => token.section === section)
+    .map(token => ({ ...token, value: slate.root[token.name.slice(2)] }))
 }
 
-const themeByName = new Map(grThemeTokens.map(token => [token.name, token]))
-const foundationByName = new Map(grFoundationTokens.map(token => [token.name, token]))
+const roleNames = new Set(grRoleTokens.map(token => token.name))
 
 export function hasThemeToken(name: string): boolean {
-  return themeByName.has(name)
+  return roleNames.has(name)
 }
 
 export function foundationValue(name: string): string | undefined {
-  return foundationByName.get(name)?.value
+  return slate.root[name.slice(2)]
 }
 
 /**
  * Значение роли в теме с раскрытыми ссылками `var(--gr-x)`. Формулы
  * `color-mix` не вычисляются — для них возвращается `undefined`.
  */
-export function resolveColor(name: string, theme: GrThemeName, depth = 0): string | undefined {
+export function resolveColor(name: string, theme: ModeName, depth = 0): string | undefined {
   if (depth > 8)
     return undefined
-  const raw = themeByName.get(name)?.values[theme] ?? foundationByName.get(name)?.value
+  const raw = slateModes.get(theme)?.[name.slice(2)] ?? foundationValue(name)
   if (!raw)
     return undefined
   const reference = raw.match(/^var\((--[\w-]+)\)$/)

@@ -9,7 +9,8 @@ import {
   showcaseQuickStartCards,
   showcaseThemeTokens,
 } from '../foundations'
-import { grFoundationTokens, grThemeTokens } from '@feugene/granularity/tokens'
+import { grFoundationTokens, type GrThemeData, grRoleTokens, resolveModes } from '@feugene/granularity-tokens'
+import slateData from '@feugene/granularity-tokens/themes/slate/theme.json'
 
 describe('showcase foundations content', () => {
   it('собирает полный foundations coverage для styling, themes, tokens, granum и localization', () => {
@@ -64,17 +65,20 @@ describe('showcase foundations content', () => {
   // и молча их протухала. Теперь источник один — данные пакета; проверяем, что
   // витрина показывает ровно их, а не собственную версию.
   it('не расходится с данными пакета', () => {
-    for (const token of grThemeTokens) {
+    const slate = slateData as GrThemeData
+    const modes = resolveModes(slate)
+
+    for (const token of grRoleTokens) {
       const shown = showcaseThemeTokens.find(item => item.name === token.name)
 
       expect(shown, token.name).toBeDefined()
-      expect(shown!.values.light.value, `${token.name} (light)`).toBe(token.values.light)
-      expect(shown!.values.dark.value, `${token.name} (dark)`).toBe(token.values.dark)
+      expect(shown!.values.light.value, `${token.name} (light)`).toBe(modes.get('light')![token.name.slice(2)])
+      expect(shown!.values.dark.value, `${token.name} (dark)`).toBe(modes.get('dark')![token.name.slice(2)])
     }
 
     for (const token of grFoundationTokens) {
       expect(showcaseFoundationTokens.find(item => item.name === token.name)?.value, token.name)
-        .toBe(token.value)
+        .toBe(slate.root[token.name.slice(2)])
     }
   })
 

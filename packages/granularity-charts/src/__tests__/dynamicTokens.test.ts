@@ -1,5 +1,5 @@
 import { defineDynamicTokensGate } from '@feugene/granularity-test-kit/gates'
-import { grDerivedTokens, grFoundationTokens, grThemeTokens } from '@feugene/granularity/tokens'
+import { grDerivedTokens, grFoundationTokens, grRoleTokens } from '@feugene/granularity-tokens'
 
 import { granularityChartsComponentConfigs } from '../granular-provider/shared'
 
@@ -13,5 +13,5 @@ import { granularityChartsComponentConfigs } from '../granular-provider/shared'
  */
 defineDynamicTokensGate({
   componentConfigs: granularityChartsComponentConfigs,
-  knownTokens: [...grFoundationTokens, ...grDerivedTokens, ...grThemeTokens].map(token => token.name),
+  knownTokens: [...grFoundationTokens, ...grDerivedTokens, ...grRoleTokens].map(token => token.name),
 })

@@ -543,12 +543,13 @@ defineStyleTokensGate()
 
 ```ts
 // src/__tests__/componentTokens.test.ts
-import { grComponentTokens, grDerivedTokens, grFoundationTokens, grThemeTokens } from '@feugene/granularity/tokens'
+import { grComponentTokens } from '@feugene/granularity/tokens'
 import { defineComponentTokensGate } from '@feugene/granularity-test-kit/gates'
+import { grDerivedTokens, grFoundationTokens, grRoleTokens } from '@feugene/granularity-tokens'
 
-// Всё, что объявило ядро, легально как употребление — но не как объявление.
+// Всё, что объявили ядро и пакет токенов, легально как употребление — но не как объявление.
 defineComponentTokensGate({
-  globalTokens: [...grFoundationTokens, ...grDerivedTokens, ...grThemeTokens, ...grComponentTokens],
+  globalTokens: [...grFoundationTokens, ...grDerivedTokens, ...grRoleTokens, ...grComponentTokens],
 })
 ```
 
@@ -581,7 +582,8 @@ defineGateCoverage()
 
 Тест-кит идёт в `devDependencies` и **не зависит от ядра**: реестры токенов и конфигов приходят
 аргументом. Поэтому его же фабрики зовёт само ядро, а направление зависимостей остаётся
-односторонним.
+односторонним. Реестр глобальных токенов спутник берёт у `@feugene/granularity-tokens` — тоже
+`devDependency`: в рантайме CSS спутника читает `var(--gr-*)`, и пакет токенов ему не нужен.
 
 Гейты читают собранный `dist` тест-кита — как витрина читает собранный `dist` ядра. Корневые
 `test:*` и `typecheck:*` собирают его сами; при прямом `yarn workspace <pkg> test:run` он должен быть

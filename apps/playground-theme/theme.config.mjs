@@ -1,4 +1,5 @@
-import { createTheme, extendTheme, tone } from '@feugene/granularity/theme'
+import { grComponentTokens } from '@feugene/granularity/tokens'
+import { createTheme, extendTheme, tone } from '@feugene/granularity-tokens/theme'
 
 /**
  * Поверхности темы `ocean` — от них считается всё остальное. `tone` берёт отсюда
@@ -106,7 +107,9 @@ export const ocean = extendTheme({
     '--gr-sidebar-ring': '#38bdf8',
   },
 
-  // Кнопки красятся своим слоем: между темами он не наследуется.
+  // Кнопки красятся своим слоем: между темами он не наследуется. Имена
+  // сверяются с реестром ядра — опечатка упадёт на сборке, а не в браузере.
+  knownComponentTokens: grComponentTokens.map(token => token.name),
   componentTokens: {
     '--gr-button-primary-bg': 'var(--gr-primary)',
     '--gr-button-primary-bg-hover': 'var(--gr-primary-hover)',

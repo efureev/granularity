@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import type { GrThemeName } from '@feugene/granularity/tokens'
 import IconCheck from '~icons/lucide/check'
 import IconX from '~icons/lucide/x'
 
 import DocSection from '../parts/DocSection.vue'
-import { contrastRatio, resolveColor, THEMES } from '../tokens'
+import { contrastRatio, type ModeName, resolveColor, THEMES } from '../tokens'
 
 interface Pair {
   label: string
@@ -30,7 +29,7 @@ const pairs: Pair[] = [
   ...['primary', ...TONES].map(tone => ({ label: `${tone}: подпись на заливке`, fg: `--gr-${tone}-solid-fg`, bg: `--gr-${tone}-solid`, min: 4.5 })),
 ]
 
-function ratio(pair: Pair, theme: GrThemeName): number | undefined {
+function ratio(pair: Pair, theme: ModeName): number | undefined {
   const fg = resolveColor(pair.fg, theme)
   const bg = resolveColor(pair.bg, theme)
   return fg && bg ? contrastRatio(fg, bg) : undefined

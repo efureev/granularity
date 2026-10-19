@@ -1,9 +1,11 @@
-import { grComponentTokens, grFoundationTokens } from '@feugene/granularity/tokens'
+import { grComponentTokens } from '@feugene/granularity/tokens'
+import { grFoundationTokens } from '@feugene/granularity-tokens'
 
 /**
  * Токены компонента с их фактическими значениями.
  *
- * Реестр токенов пакет публикует сам (`@feugene/granularity/tokens`), поэтому
+ * Реестры токенов публикуются как данные (`@feugene/granularity/tokens` и
+ * `@feugene/granularity-tokens`), поэтому
  * список объявленного известен точно. Значение берётся из вычисленного стиля
  * корневого элемента — то есть с учётом темы, провайдера и правок потребителя.
  */

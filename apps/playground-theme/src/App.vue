@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
 
-import { grThemeTokens } from '@feugene/granularity/tokens'
+import { grRoleTokens } from '@feugene/granularity-tokens'
 
 import { APP_THEMES, useAppTheme, type AppTheme } from './theme'
 
@@ -29,7 +29,7 @@ function readRoleValues(): void {
   const styles = getComputedStyle(document.documentElement)
 
   roleValues.value = Object.fromEntries(
-    grThemeTokens.map(token => [token.name, styles.getPropertyValue(token.name).trim()]),
+    grRoleTokens.map(token => [token.name, styles.getPropertyValue(token.name).trim()]),
   )
 }
 
@@ -38,10 +38,10 @@ onMounted(readRoleValues)
 watch(theme, () => requestAnimationFrame(readRoleValues))
 
 const surfaceRoles = computed(() =>
-  grThemeTokens.filter(token => token.section === 'Surface roles'),
+  grRoleTokens.filter(token => token.section === 'Surface roles'),
 )
 const statusRoles = computed(() =>
-  grThemeTokens.filter(token => token.section === 'Status roles'),
+  grRoleTokens.filter(token => token.section === 'Status roles'),
 )
 
 function onThemeChange(next: string | number): void {
@@ -178,7 +178,7 @@ function onThemeChange(next: string | number): void {
               Роли текущей темы
             </h2>
             <p class="mt-1 text-sm text-[var(--gr-muted-fg)]">
-              Список ролей приходит из <code>@feugene/granularity/tokens</code>, значения —
+              Список ролей приходит из <code>@feugene/granularity-tokens</code>, значения —
               из вычисленных стилей. Пропусти роль в теме — здесь появится значение
               светлой темы, унаследованное от <code>:root</code>.
             </p>

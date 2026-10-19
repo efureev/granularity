@@ -1,6 +1,7 @@
 /*
- * СГЕНЕРИРОВАНО `yarn generate:tokens` из `tokens/*.json` — правки здесь потеряются.
- * Менять значения и комментарии нужно в JSON, затем перегенерировать.
+ * СГЕНЕРИРОВАНО `yarn workspace @feugene/granularity-tokens generate` из темы `slate`
+ * пакета `@feugene/granularity-tokens` — правки здесь потеряются.
+ * Менять значения и комментарии нужно там, затем перегенерировать.
  */
 :root {
   /* Foundations: neutral palette */
@@ -150,9 +151,6 @@
 
   /* Elevation */
   --gr-shadow-0: none;
-  --gr-shadow-1: 0 1px 2px rgba(15, 23, 42, 0.08);
-  --gr-shadow-2: 0 8px 24px rgba(15, 23, 42, 0.14);
-  --gr-shadow-3: 0 16px 48px rgba(15, 23, 42, 0.20);
 
   /* Motion */
   --gr-duration-fast: 150ms;

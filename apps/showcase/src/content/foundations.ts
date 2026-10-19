@@ -3,7 +3,8 @@ import localizationDocSource from '../../../../packages/granularity/docs/localiz
 import stylingDocSource from '../../../../packages/granularity/docs/styling.md?raw'
 import granumDocSource from '../../../../packages/granularity/docs/granum.md?raw'
 import { granularityDefaultThemes, granularityThemeNames } from '@feugene/granularity/granular-provider'
-import { grDerivedTokens, grFoundationTokens, grThemeTokens, type GrTokenValues } from '@feugene/granularity/tokens'
+import { grDerivedTokens, grFoundationTokens, type GrThemeData, grRoleTokens, resolveModes } from '@feugene/granularity-tokens'
+import slateData from '@feugene/granularity-tokens/themes/slate/theme.json'
 
 type ShowcaseCodeSample = {
   title: string
@@ -85,13 +86,17 @@ function extractHexValue(value: string) {
   return value.match(/#(?:[\da-f]{3}|[\da-f]{6})\b/i)?.[0] ?? null
 }
 
-function toThemeValues(values: GrTokenValues): ShowcaseThemeToken['values'] {
+// Витрина показывает только тему `slate`: её режимы и есть темы `light`/`dark` ядра.
+const slate = slateData as GrThemeData
+const slateModes = resolveModes(slate)
+
+function toThemeValues(valueOf: (mode: ShowcaseThemeName) => string): ShowcaseThemeToken['values'] {
   return Object.fromEntries(
     granularityThemeNames.map(theme => [
       theme,
       {
-        value: values[theme],
-        hexValue: extractHexValue(values[theme]),
+        value: valueOf(theme),
+        hexValue: extractHexValue(valueOf(theme)),
       },
     ]),
   ) as ShowcaseThemeToken['values']
@@ -239,15 +244,16 @@ await i18n.loadUsedBlocks('ru')
 // В точке входа приложения — иначе granularity не найдёт инстанс через provide/inject
 installI18n(app, i18n)`
 
-// Токены приезжают ДАННЫМИ из пакета (`tokens/*.json` → `@feugene/granularity/tokens`).
+// Токены приезжают ДАННЫМИ из пакета: реестр — `@feugene/granularity-tokens`,
+// значения — данные темы `slate` оттуда же.
 // Раньше здесь лежали копии `tokens.css`/`themes/*.css` литералами и словарь описаний:
 // копии протухали молча (страница показывала `--gr-primary: #6366f1` спустя две
 // починки контраста), а описания дублировали то, что и так есть в данных.
 const foundationTokensFromData: ShowcaseFoundationToken[] = [
   ...grFoundationTokens.map(token => ({
     name: token.name,
-    value: token.value,
-    hexValue: extractHexValue(token.value),
+    value: slate.root[token.name.slice(2)],
+    hexValue: extractHexValue(slate.root[token.name.slice(2)]),
     description: token.description,
     section: normalizeFoundationTokenSection(token.section),
   })),
@@ -263,18 +269,18 @@ const foundationTokensFromData: ShowcaseFoundationToken[] = [
 ]
 
 const themeTokensFromData: ShowcaseThemeToken[] = [
-  ...grThemeTokens.map(token => ({
+  ...grRoleTokens.map(token => ({
     name: token.name,
     section: token.section,
-    description: token.description ?? `Theme token из группы \`${token.section}\`, задающий semantic цветовой контракт текущего режима.`,
-    values: toThemeValues(token.values),
+    description: token.description,
+    values: toThemeValues(mode => slateModes.get(mode)![token.name.slice(2)]),
   })),
   // Фолбэки `@supports not (color-mix)` — тот же токен, но уже вычисленным hex.
   ...grDerivedTokens.map(token => ({
     name: token.name,
     section: normalizeThemeTokenSection(token.section),
     description: token.description,
-    values: toThemeValues(token.values),
+    values: toThemeValues(mode => slate.modes[mode].fallbacks![0].tokens[token.name.slice(2)]),
   })),
 ]
 

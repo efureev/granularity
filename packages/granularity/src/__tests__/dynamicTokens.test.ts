@@ -1,7 +1,8 @@
 import { defineDynamicTokensGate } from '@feugene/granularity-test-kit/gates'
 
+import { grDerivedTokens, grFoundationTokens, grRoleTokens } from '@feugene/granularity-tokens'
+
 import { granularityComponentConfigs } from '../granular-provider/shared'
-import { grDerivedTokens, grFoundationTokens, grThemeTokens } from '../tokens'
 
 /**
  * Токен, чьё имя собирается в рантайме, не находит ни один статический
@@ -17,7 +18,7 @@ import { grDerivedTokens, grFoundationTokens, grThemeTokens } from '../tokens'
  */
 defineDynamicTokensGate({
   componentConfigs: granularityComponentConfigs,
-  knownTokens: [...grFoundationTokens, ...grDerivedTokens, ...grThemeTokens].map(token => token.name),
+  knownTokens: [...grFoundationTokens, ...grDerivedTokens, ...grRoleTokens].map(token => token.name),
   appSuppliedName: {
     // Проп `zIndexVar` документирован как escape-hatch мимо `--gr-z-loading`:
     // имя задаёт ПРИЛОЖЕНИЕ, держать его — забота потребителя. Собственный

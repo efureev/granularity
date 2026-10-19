@@ -1,4 +1,5 @@
-import { grComponentTokens, grDerivedTokens, grFoundationTokens, grThemeTokens } from '@feugene/granularity/tokens'
+import { grComponentTokens } from '@feugene/granularity/tokens'
+import { grDerivedTokens, grFoundationTokens, grRoleTokens } from '@feugene/granularity-tokens'
 import { defineComponentTokensGate } from '@feugene/granularity-test-kit/gates'
 
 /**
@@ -11,5 +12,5 @@ import { defineComponentTokensGate } from '@feugene/granularity-test-kit/gates'
  * заново — нет.
  */
 defineComponentTokensGate({
-  globalTokens: [...grFoundationTokens, ...grDerivedTokens, ...grThemeTokens, ...grComponentTokens],
+  globalTokens: [...grFoundationTokens, ...grDerivedTokens, ...grRoleTokens, ...grComponentTokens],
 })

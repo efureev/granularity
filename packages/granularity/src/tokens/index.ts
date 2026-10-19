@@ -1,21 +1,13 @@
 /**
- * Справочник токенов как данные: `@feugene/granularity/tokens`.
+ * Реестр покомпонентных токенов ядра: `@feugene/granularity/tokens`.
  *
- * Источник — `tokens/*.json` пакета, из них же генерируются CSS-файлы, так что
- * этот модуль не может разойтись с реальными значениями (гейт — тест
- * `src/__tests__/tokens.generated.test.ts`).
+ * Источник — `tokens.json` рядом с кодом каждого компонента (гейт — тест
+ * `src/__tests__/tokens.generated.test.ts`). Глобальные токены — примитивы,
+ * роли, производные — и данные тем живут в `@feugene/granularity-tokens`.
  *
  * Намеренно НЕ реэкспортируется из корневого `src/index.ts`: это данные для
  * доков и инструментов, приложениям в рантайме они не нужны, и тащить их в
  * основной бандл было бы прямым нарушением идеологии гранулярности.
  */
-export { grComponentTokens, grDerivedTokens, grFoundationTokens, grThemeNames, grThemeTokens } from './generated'
-export type {
-  GrComponentToken,
-  GrComponentTokenKind,
-  GrDerivedToken,
-  GrFoundationToken,
-  GrThemeName,
-  GrThemeToken,
-  GrTokenValues,
-} from './types'
+export { grComponentTokens } from './generated'
+export type { GrComponentToken, GrComponentTokenKind } from './types'

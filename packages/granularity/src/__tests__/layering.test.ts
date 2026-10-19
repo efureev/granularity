@@ -3,7 +3,8 @@ import { resolve } from 'node:path'
 
 import { describe, expect, it } from 'vitest'
 
-import { grFoundationTokens } from '../tokens'
+import { grFoundationTokens, type GrThemeData } from '@feugene/granularity-tokens'
+import slate from '@feugene/granularity-tokens/themes/slate/theme.json'
 
 // В jsdom `import.meta.url` не file-scheme — пути от cwd пакета, как в `cssContrast.ts`.
 const componentsDir = resolve(process.cwd(), 'src/components')
@@ -41,7 +42,7 @@ describe('слоирование (docs/z-index.md)', () => {
     ])
 
     // Порядок значений = порядок слоёв, шаг оставляет место приложению.
-    const values = scale.map(token => Number.parseInt(token.value, 10))
+    const values = scale.map(token => Number.parseInt((slate as GrThemeData).root[token.name.slice(2)], 10))
     expect(values).toEqual([...values].sort((left, right) => left - right))
     expect(new Set(values).size).toBe(values.length)
   })

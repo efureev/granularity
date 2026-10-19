@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { grDerivedTokens } from '@feugene/granularity/tokens'
+import { grDerivedTokens } from '@feugene/granularity-tokens'
 
 import ColorSwatch from '../parts/ColorSwatch.vue'
 import DocSection from '../parts/DocSection.vue'

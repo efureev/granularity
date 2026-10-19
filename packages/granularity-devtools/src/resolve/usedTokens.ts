@@ -1,5 +1,6 @@
 import type { ConsumedIndex } from './emptyTokens'
-import { grComponentTokens, grFoundationTokens } from '@feugene/granularity/tokens'
+import { grComponentTokens } from '@feugene/granularity/tokens'
+import { grFoundationTokens } from '@feugene/granularity-tokens'
 
 /**
  * Все токены дизайн-системы, которые компонент читает на самом деле, — с тем,
@@ -13,7 +14,8 @@ import { grComponentTokens, grFoundationTokens } from '@feugene/granularity/toke
  * «какие токены надо задать, чтобы перекрасить вот это» до сих пор решался
  * чтением исходников.
  *
- * Владелец берётся из реестров пакета (`@feugene/granularity/tokens`), а
+ * Владелец берётся из реестров (`@feugene/granularity/tokens` и
+ * `@feugene/granularity-tokens`), а
  * значение — из вычисленного стиля того элемента, чьё правило токен читает.
  */
 

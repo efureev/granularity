@@ -1,4 +1,4 @@
-/* Тема "contrast" собрана из @feugene/granularity/theme — правки здесь потеряются. */
+/* Тема "contrast" собрана из @feugene/granularity-tokens/theme — правки здесь потеряются. */
 [data-theme='contrast'] {
   --gr-bg: #ffffff;
   --gr-fg: #000000;

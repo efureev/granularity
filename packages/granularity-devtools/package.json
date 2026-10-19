@@ -48,6 +48,7 @@
     "./package.json": "./package.json"
   },
   "dependencies": {
+    "@feugene/granularity-tokens": "^1.0.0",
     "@vue/devtools-api": "^8.2.1",
     "@vue/devtools-kit": "^8.2.1"
   },

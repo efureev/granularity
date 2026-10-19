@@ -1,0 +1,91 @@
+{
+  "name": "@feugene/granularity-tokens",
+  "description": "Design tokens and themes of @feugene/granularity: the token registry, theme data by mode and the theme builder.",
+  "version": "1.0.0",
+  "license": "LicenseRef-Granularity-EUC-1.1",
+  "author": {
+    "name": "Evgeniy Fureev",
+    "url": "https://github.com/efureev"
+  },
+  "homepage": "https://efureev.github.io/granularity",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/efureev/granularity.git",
+    "directory": "packages/granularity-tokens"
+  },
+  "bugs": {
+    "url": "https://github.com/efureev/granularity/issues"
+  },
+  "keywords": [
+    "granularity",
+    "design-system",
+    "design-tokens",
+    "themes",
+    "css-variables",
+    "dark-mode"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "type": "module",
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "main": "./dist/index.js",
+  "types": "./dist/types/index.d.ts",
+  "files": [
+    "dist",
+    "tokens",
+    "themes"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./theme": {
+      "types": "./dist/types/theme/index.d.ts",
+      "import": "./dist/theme/index.js",
+      "default": "./dist/theme/index.js"
+    },
+    "./theme/node": {
+      "types": "./dist/types/theme/node.d.ts",
+      "import": "./dist/theme/node.js",
+      "default": "./dist/theme/node.js"
+    },
+    "./theme/apply": {
+      "types": "./dist/types/theme/apply.d.ts",
+      "import": "./dist/theme/apply.js",
+      "default": "./dist/theme/apply.js"
+    },
+    "./themes/*": "./dist/themes/*",
+    "./tokens.css": "./dist/tokens.css",
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "build": "vite build && node scripts/generate.mjs --dist && tsc -p tsconfig.build.json",
+    "dev": "vite build --watch",
+    "generate": "node scripts/generate.mjs",
+    "lint": "eslint . --cache",
+    "lint:fix": "eslint . --cache --fix",
+    "test": "vitest --config vitest.config.ts",
+    "test:run": "vitest run --config vitest.config.ts",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "devDependencies": {
+    "@antfu/eslint-config": "^9.3.0",
+    "@feugene/granularity-test-kit": "^1.2.0",
+    "@types/node": "^26.4.0",
+    "eslint": "^10.9.1",
+    "globals": "^16.5.0",
+    "jsdom": "^29.1.1",
+    "typescript": "^6.0.3",
+    "vite": "^8.2.2",
+    "vitest": "^4.1.11"
+  }
+}

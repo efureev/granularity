@@ -31,31 +31,35 @@
 
 ## Токены — генерируются, а не пишутся руками
 
-`src/styles/tokens.css` и `src/styles/themes/*.css` **сгенерированы** из
-`tokens/*.json` пакета. Правка CSS напрямую бессмысленна: следующий
-`yarn generate:tokens` её затрёт, а тест `src/__tests__/tokens.generated.test.ts`
+`src/styles/tokens.css` и `src/styles/themes/*.css` **сгенерированы** из темы
+`slate` пакета `@feugene/granularity-tokens`. Правка CSS напрямую бессмысленна:
+следующая генерация её затрёт, а тест `src/__tests__/tokens.generated.test.ts`
 уронит сборку раньше.
 
 ```bash
-yarn workspace @feugene/granularity generate:tokens          # перегенерировать
-yarn workspace @feugene/granularity generate:tokens --check  # проверить расхождение
+yarn workspace @feugene/granularity-tokens generate          # перегенерировать
+yarn workspace @feugene/granularity-tokens generate --check  # проверить расхождение
 ```
 
-Что откуда берётся:
+Что откуда берётся (пути — в `packages/granularity-tokens`):
 
 | Источник | Что в нём | Что из него генерируется |
 | --- | --- | --- |
-| `tokens/foundation.json` | примитивы: палитра, типографика, spacing, радиусы, тени, motion, z-index | `styles/tokens.css` |
-| `tokens/themes/{light,dark}.json` | семантические роли темы | `styles/themes/*.css` |
-| `tokens/derived.json` | формулы hover/active (`base` + `amount` + `mixWith`) | `color-mix`-объявления **и** вычисленные фолбэки в `@supports not (color-mix)` |
+| `tokens/{foundation,roles,derived}.json` | реестр: имена, группы, описания, формулы hover/active — без значений | порядок и комментарии CSS, TS-справочник |
+| `themes/slate/root.json` | примитивы: палитра, типографика, spacing, радиусы, motion, z-index | `styles/tokens.css` |
+| `themes/slate/modes/{light,dark}.json` | роли и тени режима | `styles/themes/*.css` |
 
-Фолбэки считаются той же формулой, что стоит в CSS, — раньше это были 40 хексов,
-поддерживаемых вручную, и часть из них разошлась с реальными значениями ролей.
+Формулы производных — `color-mix`-объявления в `tokens.css`; фолбэки для
+`@supports not (color-mix)` считает сборка темы той же формулой — раньше это были
+40 хексов, поддерживаемых вручную, и часть из них разошлась с реальными значениями
+ролей.
 
-Те же данные доступны как TS-справочник — `@feugene/granularity/tokens`
-(`grFoundationTokens`, `grThemeTokens`, `grDerivedTokens`). Он не входит в
-корневой бандл: это данные для доков и инструментов. Человекочитаемая таблица —
-[`docs/tokens.md`](./tokens.md), тоже генерируемая.
+Те же данные доступны как TS-справочник — `@feugene/granularity-tokens`
+(`grFoundationTokens`, `grRoleTokens`, `grDerivedTokens`, каталог тем), значения —
+`@feugene/granularity-tokens/themes/slate/theme.json`. У ядра в
+`@feugene/granularity/tokens` — только реестр покомпонентных токенов. Ни то, ни
+другое не входит в корневой бандл: это данные для доков и инструментов.
+Человекочитаемая таблица — `docs/tokens.md` пакета токенов, тоже генерируемая.
 
 ## Что объединяет эти файлы
 

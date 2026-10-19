@@ -11,6 +11,5 @@
 - `internal/` — внутренние утилиты и адаптеры, которые не должны становиться публичным API.
 - `styles/` — только статические CSS-ассеты пакета: base, tokens и theme-файлы.
 - `testing/` — тестовые утилиты для потребителя (`@feugene/granularity/testing`), без привязки к раннеру.
-- `theme/` — сборка тем из данных (`extendTheme`, `createTheme`, `tone()`) и рантайм-подключение (`theme/apply`).
-- `tokens/` — справочник токенов как данные (`@feugene/granularity/tokens`), генерируется из `tokens/*.json`.
+- `tokens/` — реестр покомпонентных токенов как данные (`@feugene/granularity/tokens`), генерируется из `tokens.json` компонентов. Глобальные токены, темы и их сборка — в `@feugene/granularity-tokens`.
 - `vue/` — `createGranularity`/`installGranularity`: единый bootstrap-вход приложения.

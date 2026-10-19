@@ -67,16 +67,12 @@ const extraEntries: Record<string, string> = {
   'vue/index': 'src/vue/index.ts',
   'granular-provider': 'src/granular-provider/index.ts',
   'granular-provider-node': 'src/granular-provider/node.ts',
-  // Справочник токенов (данные из `tokens/*.json`) — отдельной entry,
-  // чтобы не попадать в основной бандл: он нужен докам и инструментам.
+  // Реестр покомпонентных токенов — отдельной entry, чтобы не попадать в
+  // основной бандл: он нужен докам и инструментам.
   'tokens': 'src/tokens/index.ts',
   // Тестовые утилиты — своей entry по той же причине: в бандл приложения
   // они попадать не должны, из root-barrel не реэкспортируются.
   'testing': 'src/testing/index.ts',
-  // Композиция тем: сборочная часть тянет справочник токенов, рантайм —
-  // нет. Отсюда две entry, а не одна.
-  'theme': 'src/theme/index.ts',
-  'theme-apply': 'src/theme/apply.ts',
 }
 
 /**

@@ -40,8 +40,7 @@
   "types": "./dist/types/index.d.ts",
   "web-types": "./dist/web-types.json",
   "files": [
-    "dist",
-    "tokens"
+    "dist"
   ],
   "sideEffects": [
     "**/*.css"
@@ -622,18 +621,10 @@
       "import": "./dist/testing.js",
       "default": "./dist/testing.js"
     },
-    "./theme": {
-      "types": "./dist/types/theme/index.d.ts",
-      "import": "./dist/theme.js",
-      "default": "./dist/theme.js"
-    },
-    "./theme/apply": {
-      "types": "./dist/types/theme/apply.d.ts",
-      "import": "./dist/theme-apply.js",
-      "default": "./dist/theme-apply.js"
-    },
-    "./tokens/*.json": "./tokens/*.json",
     "./package.json": "./package.json"
+  },
+  "dependencies": {
+    "@feugene/granularity-tokens": "^1.0.0"
   },
   "peerDependencies": {
     "@feugene/fint-i18n": ">=0.9.0 <1.0.0",
@@ -678,7 +669,7 @@
     "dev": "vite build --watch",
     "doctor": "granum doctor ./granum.config.mjs --strict --allow=important-in-provider-css",
     "generate:registry": "node scripts/generate-registry.mjs",
-    "generate:tokens": "node --experimental-strip-types scripts/generate-tokens.mjs",
+    "generate:tokens": "node scripts/generate-tokens.mjs",
     "lint": "eslint . --cache",
     "lint:fix": "eslint . --cache --fix",
     "sizes": "node ../../scripts/report-entry-sizes.mjs .",

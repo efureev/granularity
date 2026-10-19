@@ -1,6 +1,7 @@
 /*
- * СГЕНЕРИРОВАНО `yarn generate:tokens` из `tokens/*.json` — правки здесь потеряются.
- * Менять значения и комментарии нужно в JSON, затем перегенерировать.
+ * СГЕНЕРИРОВАНО `yarn workspace @feugene/granularity-tokens generate` из темы `slate`
+ * пакета `@feugene/granularity-tokens` — правки здесь потеряются.
+ * Менять значения и комментарии нужно там, затем перегенерировать.
  */
 /*
  * Светлая тема. Кроме `:root` — атрибут `[data-theme='light']` и класс `.light`:

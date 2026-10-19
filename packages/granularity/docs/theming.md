@@ -4,7 +4,8 @@
 объявить, как её подключить, что проверить перед выкладкой.
 
 Смежное: [`styling.md`](./styling.md) — слои CSS и порядок импортов;
-[`tokens.md`](./tokens.md) — полная таблица токенов с текущими значениями.
+`docs/tokens.md` пакета `@feugene/granularity-tokens` — полная таблица токенов с
+текущими значениями, [`tokens.md`](./tokens.md) — покомпонентные токены ядра.
 
 ## Что такое тема в терминах пакета
 
@@ -35,17 +36,17 @@
 }
 ```
 
-Полный список ролей, которые обязана объявить тема, — в
-[`tokens.md`](./tokens.md), раздел «Семантические роли по темам». Он
-генерируется из данных пакета, поэтому не устаревает.
+Полный список ролей, которые обязана объявить тема, — в `docs/tokens.md`
+пакета `@feugene/granularity-tokens`, раздел «Роли по режимам». Он генерируется
+из данных пакета, поэтому не устаревает.
 
 Тот же список доступен программно — удобно, чтобы не сверять глазами:
 
 ```ts
-import { grThemeTokens } from '@feugene/granularity/tokens'
+import { grRoleTokens } from '@feugene/granularity-tokens'
 
 // имена всех ролей, которые ожидает пакет
-const required = grThemeTokens.map(token => token.name)
+const required = grRoleTokens.map(token => token.name)
 ```
 
 ## Суффиксы ролей: где какой цвет применяется
@@ -190,13 +191,13 @@ Solid-кнопке нужен светлый текст, а под него за
 своей темы: 90 ролей руками, и ещё раз столько же внимания каждый раз, когда
 пакет заводит новую роль.
 
-`@feugene/granularity/theme` собирает тему из данных пакета. Путей два:
+`@feugene/granularity-tokens/theme` собирает тему из данных пакета. Путей два:
 `extendTheme` — поверх готовой темы, объявляете только отличия; `createTheme` —
 с нуля, все роли свои (см. «Тема с нуля» ниже).
 
 ```js
 // theme.config.mjs
-import { extendTheme, tone } from '@feugene/granularity/theme'
+import { extendTheme, tone } from '@feugene/granularity-tokens/theme'
 
 const surfaces = {
   '--gr-bg': '#041e2b',
@@ -273,7 +274,7 @@ tone('success', '#3ddc97', { base: 'dark' })
 дисциплиной, а проверкой на сборке:
 
 ```js
-import { createTheme, tone } from '@feugene/granularity/theme'
+import { createTheme, tone } from '@feugene/granularity-tokens/theme'
 
 const surfaces = { '--gr-bg': '#ffffff', '--gr-fg': '#000000', '--gr-card': '#ffffff' }
 
@@ -310,7 +311,7 @@ export const contrast = createTheme({
 **Когда пакет добавит роль**, тема с нуля упадёт на следующей сборке с её именем.
 Это и есть цена выбора: решение о новом цвете принимает автор темы, а не пакет за
 него. Посмотреть, что пакет положил в эту роль, можно в
-[`tokens.md`](./tokens.md) или через `grThemeTokens`.
+`docs/tokens.md` пакета `@feugene/granularity-tokens` или через `grRoleTokens`.
 
 ### Куда девать результат
 
@@ -335,7 +336,7 @@ await writeFile('src/styles/theme-ocean.css', ocean.css)
 справочник токенов:
 
 ```ts
-import { applyTheme } from '@feugene/granularity/theme/apply'
+import { applyTheme } from '@feugene/granularity-tokens/theme/apply'
 
 const remove = applyTheme(ocean.css, { name: 'ocean' })
 ```
@@ -527,18 +528,18 @@ const treeTokens = grComponentTokens.filter(token => token.owner === 'GrTree')
 
 ## Проверка перед выкладкой
 
-1. **Полнота.** Ни одна роль из `grThemeTokens` не должна остаться
+1. **Полнота.** Ни одна роль из `grRoleTokens` не должна остаться
    неопределённой: пропущенная роль унаследуется из `:root`, то есть из
    светлой темы — в тёмной кастомной теме это выглядит как случайное белое
    пятно.
 
    ```ts
-   import { grThemeTokens } from '@feugene/granularity/tokens'
+   import { grRoleTokens } from '@feugene/granularity-tokens'
 
    const declared = new Set(
      [...themeCss.matchAll(/(--gr-[\w-]+)\s*:/g)].map(match => match[1]),
    )
-   const missing = grThemeTokens
+   const missing = grRoleTokens
      .map(token => token.name)
      .filter(name => !declared.has(name))
    ```
@@ -563,6 +564,7 @@ const treeTokens = grComponentTokens.filter(token => token.owner === 'GrTree')
 
 ## Смежное
 
-- [`tokens.md`](./tokens.md) — все токены и их назначение.
+- `docs/tokens.md` пакета `@feugene/granularity-tokens` — все глобальные токены и их назначение;
+  [`tokens.md`](./tokens.md) — покомпонентные.
 - [`styling.md`](./styling.md) — слои CSS, порядок импортов, `tokens` vs `theme`.
 - [`ssr.md`](./ssr.md) — тема при серверном рендере.
