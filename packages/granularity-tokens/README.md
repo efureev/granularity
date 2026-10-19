@@ -22,7 +22,7 @@ yarn add @feugene/granularity-tokens
 | Реестр без значений: примитивы, роли, формулы производных | `tokens/*.json` | `@feugene/granularity-tokens` |
 | Каталог тем: id, название, режимы, ссылка на дизайн-систему | `themes/*/theme.json` | `@feugene/granularity-tokens` (`grThemeCatalog`) |
 | Данные темы со значениями и фолбэками | `themes/<slug>/` | `@feugene/granularity-tokens/themes/<slug>/theme.json` |
-| Сборка темы: `defineTheme`, `extendTheme`, `tone`, проверки | `src/theme/` | `@feugene/granularity-tokens/theme` |
+| Сборка темы и режима: `defineTheme`, `extendMode`, `createMode`, `tone`, проверки | `src/theme/` | `@feugene/granularity-tokens/theme` |
 | Тема из папки: `loadTheme` | `src/theme/node.ts` | `@feugene/granularity-tokens/theme/node` |
 | Подключение готового CSS в браузере | `src/theme/apply.ts` | `@feugene/granularity-tokens/theme/apply` |
 
@@ -61,20 +61,26 @@ const brand = loadTheme(new URL('./src/themes/brand/', import.meta.url))
 
 `loadTheme` проверяет полноту по реестру, контраст по WCAG и различимость тонов в каждом режиме и
 падает с именем токена и режима — неполная или нечитаемая тема не доезжает до пользователя. В
-`sources` он отдаёт прочитанные файлы: правка любого из них обязана пересобрать тему.
+`sources` он отдаёт прочитанные файлы: правка любого из них обязана пересобрать тему. В `extends` —
+тема каталога в цепочке: по ней granum берёт токены компонентов. Результат идёт в `theme` или
+`previews` конфига granum.
 
-Режим поверх встроенного — `extendTheme`, семья ролей тона из одного цвета — `tone`:
+Режим поверх готового — `extendMode` (с нуля — `createMode`), семья ролей тона из одного цвета —
+`tone`. Базой может быть режим встроенной темы, `{ theme, mode }` любой темы или другой режим:
 
 ```ts
-import { extendTheme, tone } from '@feugene/granularity-tokens/theme'
+import { extendMode, tone } from '@feugene/granularity-tokens/theme'
 
 const surfaces = { '--gr-bg': '#041e2b', '--gr-fg': '#e8f4fa', '--gr-card': '#0a2f42' }
 
-export const ocean = extendTheme({
+export const ocean = extendMode({
   name: 'ocean',
   base: 'dark',
   tokens: { ...surfaces, ...tone('azure', '#38bdf8', { base: surfaces }) },
 })
+
+ocean.definition // → modes.define.ocean конфига granum: extends, colorScheme, только отличия
+ocean.css // CSS под парой slate-ocean — для подключения без granum
 ```
 
 ## Как подключить

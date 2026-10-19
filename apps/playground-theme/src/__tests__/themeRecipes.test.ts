@@ -9,11 +9,12 @@ import { windEngine } from '@feugene/granum-engine-wind'
 import { afterAll, describe, expect, it } from 'vitest'
 
 import { type GrThemeData, resolveModes } from '@feugene/granularity-tokens'
+import { loadTheme } from '@feugene/granularity-tokens/theme/node'
 import slateData from '@feugene/granularity-tokens/themes/slate/theme.json'
 
 /**
- * Рецепты «Подключение» из `packages/granularity/docs/theming.md` — на настоящем
- * granum и манифесте пакета.
+ * Рецепты «Подключение» и «Своя тема» из `packages/granularity/docs/theming.md`
+ * — на настоящем granum и манифесте пакета.
  *
  * Тема пакета приезжает данными каталога, режим включается парой
  * `data-theme="slate-<режим>"`. Рецепт работает, только если значение
@@ -35,8 +36,8 @@ const base = {
   theme: 'slate',
 }
 
-async function themesLayer(modes: Record<string, unknown>): Promise<string> {
-  const config = { ...base, modes }
+async function themesLayer(modes: Record<string, unknown>, theme: unknown = base.theme): Promise<string> {
+  const config = { ...base, theme, modes }
   validateGranumConfig(config)
   return (await emitCss(await prepareApp(config as Parameters<typeof prepareApp>[0], root))).layers.themes
 }
@@ -91,6 +92,16 @@ describe('рецепты темизации из theming.md', () => {
 
     expect(ocean).toContain('--gr-primary: #0ea5e9')
     expect(ocean).toContain(`--gr-bg: ${dark['gr-bg']}`)
+  })
+
+  it('своя тема из папки активной: её режимы под :root и своими парами, отличия поверх «Сланца»', async () => {
+    const brand = loadTheme(new URL('../themes/brand/', import.meta.url))
+    const css = await themesLayer({ names: ['light', 'dark'] }, brand)
+
+    expect(brand.extends).toBe('slate')
+    expect(css).toContain(':root, [data-theme="brand-light"]')
+    expect(lastPrimary(css, 'brand-dark')).toBe('#5eead4')
+    expect(css).not.toContain('data-theme="slate-')
   })
 
   it('ключа `themes` у granum 3 нет — подсказка ведёт к `theme` и `modes`', () => {

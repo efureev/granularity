@@ -1,32 +1,26 @@
-import { execFileSync } from 'node:child_process'
-import { readFileSync } from 'node:fs'
 import { fileURLToPath, URL } from 'node:url'
 
-import { describe, expect, it } from 'vitest'
+import { emitCss, prepareApp } from '@feugene/granum/node'
+import { beforeAll, describe, expect, it } from 'vitest'
 
 import { grRoleTokens, type GrThemeData, resolveModes } from '@feugene/granularity-tokens'
 import slateData from '@feugene/granularity-tokens/themes/slate/theme.json'
 
+import granumConfig from '../../granum.config'
+import { contrast as contrastMode, ocean } from '../../theme.config'
+
 /**
- * Проверка кастомной темы — ровно та, что описана в
+ * Проверка своих режимов и своей темы — ровно та, что описана в
  * `packages/granularity/docs/theming.md`.
  *
- * Тема собрана `extendTheme` (`theme.config.mjs`), поэтому полнота набора здесь
- * больше не проверяется: она обеспечена построением, а не бдительностью. Взамен
- * проверяется, что собранный файл не отстал от конфига — единственный способ
- * отстать, который у темы остался.
- *
- * Контрастные проверки остаются: они читают итоговый CSS, то есть проверяют
- * ровно то, что увидит браузер, — и служат образцом такой проверки для
- * приложения.
+ * Режимы собраны `extendMode`/`createMode` (`theme.config.ts`), поэтому
+ * полнота набора обеспечена построением, а не бдительностью. Контраст здесь
+ * проверяется по собранному набору ролей — тому, что увидит браузер, — и
+ * служит образцом такой проверки для приложения. Отдельно — что granum
+ * действительно положил режимы и превью под их пары.
  */
 
-const themeCss = readFileSync(
-  fileURLToPath(new URL('../styles/theme-ocean.css', import.meta.url)),
-  'utf8',
-)
-
-/** Объявления темы: `--gr-x: value;` вне комментариев. */
+/** Объявления блока: `--gr-x: value;` вне комментариев. */
 function parseDeclarations(css: string): Map<string, string> {
   const withoutComments = css.replace(/\/\*[\s\S]*?\*\//g, '')
 
@@ -36,7 +30,7 @@ function parseDeclarations(css: string): Map<string, string> {
   )
 }
 
-const declarations = parseDeclarations(themeCss)
+const declarations = new Map(Object.entries(ocean.tokens))
 
 // --- контраст (WCAG 2.1) ---------------------------------------------------
 
@@ -93,31 +87,30 @@ const TONES = ['success', 'warning', 'danger', 'info', 'slate', 'azure'] as cons
 const AA_TEXT = 4.5
 const AA_LARGE = 3
 
-describe('тема ocean', () => {
-  it('собранный файл не отстал от `theme.config.mjs`', () => {
-    // Тот же приём, что у генератора токенов пакета: сравниваем, а не верим.
-    expect(() => {
-      execFileSync('node', ['scripts/generate-theme.mjs', '--check'], {
-        cwd: fileURLToPath(new URL('../..', import.meta.url)),
-        stdio: 'pipe',
-      })
-    }).not.toThrow()
-  })
-
+describe('режим ocean', () => {
   it('полнота набора обеспечена композицией, а не перечислением', () => {
-    // 90 ролей в файле при десятке в конфиге — это и есть наследование от базы.
+    // Все роли в наборе при десятке в конфиге — это и есть наследование от базы.
     const missing = grRoleTokens
       .map(token => token.name)
       .filter(name => !declarations.has(name))
 
-    expect(missing, 'роль, которой нет в теме, унаследовалась бы из :root — то есть из светлой').toEqual([])
+    expect(missing, 'роль, которой нет в режиме, унаследовалась бы из :root — то есть из светлого').toEqual([])
   })
 
-  it('производные состояния посчитаны от цветов ЭТОЙ темы', () => {
-    // Без своего блока `@supports` тема получила бы фолбэки светлой темы.
-    const fallback = themeCss.slice(themeCss.indexOf('@supports'))
+  it('в modes.define уходят только отличия от тёмного режима', () => {
+    const dark = resolveModes(slateData as GrThemeData).get('dark')!
 
-    expect(fallback).toContain("[data-theme='ocean']")
+    expect(ocean.definition.extends).toBe('dark')
+    expect(ocean.definition.colorScheme).toBe('dark')
+    for (const [token, value] of Object.entries(ocean.definition.tokens).filter(([token]) => !token.startsWith('gr-button-')))
+      expect(value, token).not.toBe(dark[token])
+  })
+
+  it('производные состояния посчитаны от цветов ЭТОГО режима', () => {
+    // CSS режима для подключения без granum: без своего `@supports` он получил бы фолбэки светлого.
+    const fallback = ocean.css.slice(ocean.css.indexOf('@supports'))
+
+    expect(fallback).toContain('[data-theme="slate-ocean"]')
     expect(fallback).toMatch(/--gr-primary-hover:\s*#[\da-f]{6}/i)
   })
 
@@ -176,33 +169,30 @@ describe('тема ocean', () => {
 })
 
 /**
- * Тема с нуля проверяется тем же способом — контраст читается из итогового CSS.
- * Разница в договоре: у `contrast` нет базы, поэтому полнота набора здесь не
- * следствие наследования, а условие сборки (`createTheme` падает без неё).
+ * Режим с нуля проверяется тем же способом. Разница в договоре: у `contrast`
+ * нет базы, поэтому полнота набора здесь не следствие наследования, а условие
+ * сборки (`createMode` падает без неё).
  */
-describe('тема contrast', () => {
-  const css = readFileSync(
-    fileURLToPath(new URL('../styles/theme-contrast.css', import.meta.url)),
-    'utf8',
-  )
-  const decls = parseDeclarations(css)
+describe('режим contrast', () => {
+  const decls = new Map(Object.entries(contrastMode.tokens))
   const read = (token: string): string => {
     const declared = decls.get(token)
-    if (!declared) throw new Error(`тема не объявляет ${token}`)
+    if (!declared) throw new Error(`режим не объявляет ${token}`)
 
     return declared
   }
 
   const AAA_TEXT = 7
 
-  it('объявляет все роли сама: ни одна не придёт из `:root`', () => {
+  it('объявляет все роли сам: ни одна не придёт из `:root`', () => {
     const missing = grRoleTokens.map(token => token.name).filter(name => !decls.has(name))
 
-    expect(missing, 'у темы без базы незаявленная роль приедет из светлой темы пакета').toEqual([])
+    expect(missing, 'у режима без базы незаявленная роль приедет из светлого режима пакета').toEqual([])
+    expect(Object.keys(contrastMode.definition.tokens)).toHaveLength(grRoleTokens.length)
   })
 
-  it('не заимствует ни одной поверхности у светлой темы пакета', () => {
-    // Смысл высококонтрастной темы теряется от любого приглушённого значения,
+  it('не заимствует ни одной поверхности у светлого режима пакета', () => {
+    // Смысл высококонтрастного режима теряется от любого приглушённого значения,
     // просочившегося из `light`.
     const slateLight = resolveModes(slateData as GrThemeData).get('light')!
     const light = new Map(grRoleTokens.map(token => [token.name, slateLight[token.name.slice(2)]]))
@@ -212,7 +202,7 @@ describe('тема contrast', () => {
   })
 
   it('основной текст держит AAA, а не только AA', () => {
-    // Ради этого тема и написана: AA здесь недостаточный порог.
+    // Ради этого режим и написан: AA здесь недостаточный порог.
     for (const surface of ['--gr-bg', '--gr-card', '--gr-popover'])
       expect(contrast(read('--gr-fg'), read(surface)), surface).toBeGreaterThanOrEqual(AAA_TEXT)
 
@@ -220,7 +210,7 @@ describe('тема contrast', () => {
   })
 
   it('текст на solid читается во всех трёх состояниях', () => {
-    // Состояния solid — свои роли темы, а не производные формулой: у темы с
+    // Состояния solid — свои роли режима, а не производные формулой: у режима с
     // нуля их некому вывести, и проверить их больше нечем.
     for (const tone of TONES) {
       const fg = read(`--gr-${tone}-solid-fg`)
@@ -230,10 +220,51 @@ describe('тема contrast', () => {
     }
   })
 
-  it('производные состояния посчитаны от её собственных цветов', () => {
-    const fallback = css.slice(css.indexOf('@supports'))
+  it('производные состояния посчитаны от его собственных цветов', () => {
+    const fallback = contrastMode.css.slice(contrastMode.css.indexOf('@supports'))
 
-    expect(fallback).toContain("[data-theme='contrast']")
+    expect(fallback).toContain('[data-theme="slate-contrast"]')
     expect(fallback).toMatch(/--gr-primary-hover:\s*#[\da-f]{6}/i)
+  })
+})
+
+/**
+ * Что из этого собрал granum: режимы — под своими парами с токенами
+ * компонентов базы, своя тема — полными блоками пар превью и никогда под `:root`.
+ */
+describe('сборка granum', () => {
+  let themes = ''
+
+  beforeAll(async () => {
+    const root = fileURLToPath(new URL('../../', import.meta.url))
+    themes = (await emitCss(await prepareApp({ ...granumConfig, components: ['@feugene/granularity:GrButton'] }, root))).layers.themes
+  }, 60_000)
+
+  const block = (selector: string): Map<string, string> => {
+    const bodies = [...themes.matchAll(/([^{}]+)\{([^{}]*)\}/g)]
+      .filter(([, head]) => head!.split(',').map(part => part.trim()).includes(selector))
+      .map(([, , body]) => body!)
+    return parseDeclarations(bodies.join('\n'))
+  }
+
+  it('ocean и contrast — под парами slate; токены кнопки ocean — свои, поверх тёмного режима', () => {
+    expect(block('[data-theme="slate-ocean"]').get('--gr-primary')).toBe(ocean.tokens['--gr-primary'])
+    expect(block('[data-theme="slate-ocean"]').get('--gr-button-primary-bg')).toBe('var(--gr-primary)')
+    expect(block('[data-theme="slate-contrast"]').get('--gr-bg')).toBe('#ffffff')
+  })
+
+  it('brand — превью: блоки обеих пар, примитивы темы в них, под :root не выходит', () => {
+    const light = block('[data-theme="brand-light"]')
+
+    expect(light.get('--gr-primary')).toBe('#0f766e')
+    expect(light.get('--gr-radius-md')).toBe('10px')
+    expect(block('[data-theme="brand-dark"]').get('--gr-primary')).toBe('#5eead4')
+    expect(themes).not.toContain(':root, [data-theme="brand-')
+  })
+
+  it('brand наследует токены компонентов «Сланца» по цепочке extends', () => {
+    // Токены кнопки по темам объявлены только для `slate`: без `extends` в теме
+    // приложения превью осталось бы с одними фолбэками компонента.
+    expect([...block('[data-theme="brand-dark"]').keys()].some(token => token.startsWith('--gr-button-'))).toBe(true)
   })
 })

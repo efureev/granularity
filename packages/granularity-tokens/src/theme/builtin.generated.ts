@@ -1,7 +1,15 @@
 // СГЕНЕРИРОВАНО `yarn workspace @feugene/granularity-tokens generate` — правки здесь потеряются.
 
-/** Режимы темы `slate` — база `extendTheme` и `tone` по имени. */
+/** Тема, режимы которой — база `extendMode` и `tone` по имени. */
+export const GR_BUILTIN_THEME = 'slate'
+
+/** Режимы темы `slate` — база `extendMode` и `tone` по имени. */
 export type GrBuiltinMode = 'light' | 'dark'
+
+export const grBuiltinModeSchemes: Record<GrBuiltinMode, 'light' | 'dark'> = {
+  "light": "light",
+  "dark": "dark"
+}
 
 export const grBuiltinModes: Record<GrBuiltinMode, Record<string, string>> = {
   "light": {

@@ -14,6 +14,16 @@ export const router = createRouter({
       component: () => import('./pages/FoundationPage.vue'),
     },
     {
+      path: '/themes',
+      name: 'themes',
+      component: () => import('./pages/ThemesPage.vue'),
+    },
+    {
+      path: '/themes/:theme',
+      name: 'theme',
+      component: () => import('./pages/ThemePage.vue'),
+    },
+    {
       path: '/components/:component/:version?',
       name: 'component',
       component: () => import('./pages/ComponentPage.vue'),

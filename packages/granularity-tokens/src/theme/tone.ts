@@ -118,7 +118,7 @@ function isDark(tokens: GrThemeTokens): boolean {
  * не вышло — падаем с именем роли, а не отдаём нечитаемое.
  *
  * ```ts
- * extendTheme({ name: 'ocean', base: 'dark', tokens: { ...tone('success', '#3ddc97', { base: 'dark' }) } })
+ * extendMode({ name: 'ocean', base: 'dark', tokens: { ...tone('success', '#3ddc97', { base: 'dark' }) } })
  * ```
  */
 export function tone(name: string, seed: string, options: ToneOptions): GrThemeTokens {

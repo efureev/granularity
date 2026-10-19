@@ -30,6 +30,11 @@ to [Semantic Versioning](https://semver.org/).
   стоящая на корне (серверный HTML, скрипт в `<head>`), побеждает хранилище. Новые опции
   `storage` (cookie granum — режим видит сервер) и `initial` (режим запроса), экспорт
   `GR_THEME_STORAGE_KEY`.
+- **Пропсы по умолчанию — и из темы сборки.** `componentDefaults` темы (`extensions.granularity`
+  манифеста `virtual:granum/themes`) доходят до компонентов без провайдера, если манифест отдан
+  `granularityThemePlugin`/`initThemeEarly`/`useTheme`. Новый слой приложения —
+  `createGranularity({ componentDefaults })`. Порядок: тема → приложение → `GrConfigProvider` →
+  локальный проп. `themeComponentDefaults(manifest)` отдаёт слой темы явно.
 - **`GrConfigProvider`: `mode` — остров режима, `theme` — превью темы.** `mode="dark"` пишет
   `slate-dark`, `theme="clay" mode="dark"` — `clay-dark`; превью без `mode` — в режиме документа.
   `theme="dark"` больше не остров (в dev-сборке — предупреждение), пара в пропе не принимается.

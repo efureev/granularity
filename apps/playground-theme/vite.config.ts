@@ -6,6 +6,7 @@ import Components from 'unplugin-vue-components/vite'
 import { defineConfig } from 'vite'
 
 import granumConfig from './granum.config'
+import { THEME_STORAGE_KEY } from './src/storage'
 
 export default defineConfig({
   root: fileURLToPath(new URL('./', import.meta.url)),
@@ -17,6 +18,6 @@ export default defineConfig({
       resolvers: GranularityResolver({ root: fileURLToPath(new URL('./', import.meta.url)) }),
       dirs: [],
     }),
-    granum(granumConfig),
+    granum(granumConfig, { themeScript: { storageKey: THEME_STORAGE_KEY } }),
   ],
 })

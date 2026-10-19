@@ -1,0 +1,13 @@
+{
+  "gr-ring": "#2dd4bf",
+  "gr-primary": "#5eead4",
+  "gr-primary-fg": "#0f172a",
+  "gr-primary-text": "#99f6e4",
+  "gr-primary-solid": "#0f766e",
+  "gr-primary-solid-hover": "#0d6b63",
+  "gr-primary-solid-active": "#0b5f58",
+  "gr-accent": "#134e4a",
+  "gr-accent-fg": "#99f6e4",
+  "gr-sidebar-primary": "#0f766e",
+  "gr-sidebar-primary-fg": "#ffffff"
+}

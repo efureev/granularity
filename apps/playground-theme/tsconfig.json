@@ -50,6 +50,7 @@
     "vitest.config.ts",
     "vite-env.d.ts",
     "granum.config.ts",
+    "theme.config.ts",
     "src/**/*.ts",
     "src/**/*.d.ts",
     "src/**/*.tsx",

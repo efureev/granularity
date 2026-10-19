@@ -33,6 +33,7 @@ const ALLOWED_VALUES: Record<string, string> = {
   'GrDelta/deltaDirection': 'документировано: направление величины считают там, где стрелки дельты нет',
   'GrDelta/deltaTone': 'документирован: тот же тон нужен `GrStatistic` и `GrBadge`, где разметка дельты не подходит',
   'GrTree/grTreeViewVars': 'документирован в components/GrTree.md: готовые виды — набор значений тех же токенов, что задаёт `size`, и потребитель раскладывает его в `style`',
+  'GrConfigProvider/themeComponentDefaults': 'документирован в theming.md: слой пропсов по умолчанию темы сборки для своего провайдера',
   'GrDialogService/dialogService': 'императивный сервис — сам по себе публичный API',
   'GrDialogService/granularityDialogServicePlugin': 'ставится в app.use()',
   'GrDialogService/teardownDialogService': 'нужен в тестах потребителя и при hot-reload',

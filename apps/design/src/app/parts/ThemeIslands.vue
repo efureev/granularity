@@ -1,26 +1,37 @@
 <script setup lang="ts">
-import { type ModeName, THEMES } from '../tokens'
+import { computed } from 'vue'
+
+import type { GrModeEntry } from '@feugene/granularity'
+import themeManifest from 'virtual:granum/themes'
+
+import { themeModes } from '../themes'
 
 /**
- * Одно содержимое в обеих темах рядом. Темы пакета объявлены атрибутом
- * `[data-theme]` и работают от любого контейнера, поэтому остров светлой темы
- * честно светлый и внутри тёмной страницы.
+ * Одно содержимое во всех режимах темы рядом. Режим — пара в атрибуте
+ * поддерева, поэтому остров светлого режима честно светлый и внутри тёмной
+ * страницы. Без `theme` — активная тема сборки, с ним — тема превью.
  */
-defineSlots<{ default: (props: { theme: ModeName }) => unknown }>()
+const props = defineProps<{ theme?: string }>()
+
+defineSlots<{ default: (props: { mode: GrModeEntry }) => unknown }>()
+
+const modes = computed(() => themeModes(themeManifest, props.theme))
 </script>
 
 <template>
   <div class="grid gap-4 xl:grid-cols-2">
-    <div
-      v-for="theme in THEMES"
-      :key="theme.id"
-      :data-theme="`slate-${theme.id}`"
-      class="flex min-w-0 flex-col gap-4 rounded-[var(--gr-radius-lg)] border border-[var(--gr-brd)] bg-[var(--gr-bg)] p-4 text-[var(--gr-fg)] lg:p-5"
+    <GrConfigProvider
+      v-for="mode in modes"
+      :key="mode.name"
+      :theme="props.theme"
+      :mode="mode.name"
     >
-      <p class="text-[length:var(--gr-text-xs)] font-600 leading-[var(--gr-leading-xs)] text-[var(--gr-muted-fg)]">
-        {{ theme.label }} тема
-      </p>
-      <slot :theme="theme.id" />
-    </div>
+      <div class="flex h-full min-w-0 flex-col gap-4 rounded-[var(--gr-radius-lg)] border border-[var(--gr-brd)] bg-[var(--gr-bg)] p-4 text-[var(--gr-fg)] lg:p-5">
+        <p class="text-[length:var(--gr-text-xs)] font-600 leading-[var(--gr-leading-xs)] text-[var(--gr-muted-fg)]">
+          {{ mode.title ?? mode.name }} · <code class="font-[var(--gr-font-mono)] font-400">{{ mode.value }}</code>
+        </p>
+        <slot :mode="mode" />
+      </div>
+    </GrConfigProvider>
   </div>
 </template>

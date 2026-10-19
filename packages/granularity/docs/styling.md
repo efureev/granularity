@@ -58,7 +58,8 @@
 Человекочитаемая таблица — `docs/tokens.md` пакета токенов, тоже генерируемая.
 
 Готовый `themes/<тема>.css` для подключения без granum собирает сборка пакета
-(`scripts/theme-css.mjs`) тем же `emitCss`, что и приложение на granum, поэтому
+(`scripts/theme-css.mjs`) через `emitThemeStylesheet` granum — по тем же правилам, что и
+приложение на granum, поэтому
 вычисленные значения у обоих путей совпадают: это сверяет
 `yarn workspace @feugene/granularity themes:values:check` в Chromium.
 

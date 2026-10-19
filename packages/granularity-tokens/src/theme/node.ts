@@ -34,7 +34,13 @@ export interface GrThemeSource {
   sources: string[]
 }
 
-export type GrLoadedTheme = GrThemeData & { sources: string[] }
+/**
+ * Тема приложения для `theme` или `previews` конфига granum. `extends` — id
+ * ближайшей темы каталога в цепочке: по ней granum берёт токены компонентов,
+ * которые компоненты держат только для тем каталога. `sources` — файлы, правка
+ * которых перезагружает конфиг в dev.
+ */
+export type GrLoadedTheme = GrThemeData & { extends?: string, sources: string[] }
 
 export interface LoadThemeOptions extends Omit<DefineThemeOptions, 'themes'> {
   /** Где искать тему-базу по id, кроме соседних папок и встроенных тем пакета. */
@@ -129,10 +135,12 @@ export function loadTheme(dir: string | URL, options: LoadThemeOptions = {}): Gr
     return { ...defineTheme(source.input, defineOptions), sources: source.sources }
 
   const parent = loadTheme(candidates[0], options)
-  const { sources: parentSources, ...parentData } = parent
+  const { sources: parentSources, extends: parentCatalog, ...parentData } = parent
+  const catalog = dirname(candidates[0]) === BUILTIN_THEMES ? parent.id : parentCatalog
 
   return {
     ...defineTheme(source.input, { ...defineOptions, themes: { [parent.id]: parentData } }),
+    ...(catalog !== undefined ? { extends: catalog } : {}),
     sources: [...parentSources, ...source.sources],
   }
 }

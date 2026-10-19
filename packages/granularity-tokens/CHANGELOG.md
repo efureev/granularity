@@ -17,14 +17,20 @@ to [Semantic Versioning](https://semver.org/).
   реестру, контраст и различимость тонов в каждом режиме, фолбэки производных для браузеров без
   `color-mix`. Результат — данные в форме `GranumThemeData` контракта granum 3.
 - **`loadTheme`** (`/theme/node`) читает тему из папки, находит тему-базу по id и отдаёт
-  прочитанные файлы в `sources`.
+  прочитанные файлы в `sources`, а тему каталога в цепочке — в `extends`: по ней granum берёт
+  токены компонентов для темы приложения в `theme` или `previews`.
 - **Провайдер granum без компонентов — владелец каталога тем.** `granum.manifest.json` с каталогом
   (`slate`), реестром токенов (`themes/registry.json`) и формулами производных (`tokens.css` на
   `:root, [data-theme]`); сборка — `granumProvider()` granum 3. Ядро подключает пакет
   зависимостью провайдера.
-- `extendTheme`, `createTheme`, `tone`, `validateTheme`, цветовая математика и `applyTheme` — те же,
-  что были в `@feugene/granularity/theme`. `extendTheme` сверяет покомпонентные токены с
-  `knownComponentTokens`, если список передан: реестр компонентов живёт у пакетов с компонентами.
+- **`extendMode`, `createMode`** — режим поверх готового и с нуля (были `extendTheme`/`createTheme`
+  в `@feugene/granularity/theme`). Базой служит любой режим любой темы: `'dark'` встроенной,
+  `{ theme, mode }` темы данными или другой собранный режим. Результат — полный набор ролей, CSS
+  под парой `<тема>-<режим>` и `definition` — готовый вход `modes.define` конфига granum с одними
+  отличиями. Покомпонентные токены сверяются с `knownComponentTokens`, если список передан.
+- `tone`, `validateTheme`, цветовая математика и `applyTheme` — те же, что были в
+  `@feugene/granularity/theme`. `GR_BUILTIN_THEME` и схемы встроенных режимов генерируются из темы
+  по умолчанию.
 - Гейты значений идут по каждой паре «тема × режим»: различимость тонов, запрет тона в роли текста,
   граница контрола, палитра графиков, тени по режимам, полнота и каталог.
 - **`grThemeManifest(id?)` и `GR_DEFAULT_THEME_ID`.** Манифест режимов темы каталога в форме

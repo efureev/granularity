@@ -23,6 +23,7 @@ import { localeSwitchOf, resolveGranularityI18n } from '../../internal/granulari
 import { applyGrZIndexBase } from './zIndexScale'
 import {
   GR_CONFIG_KEY,
+  mergeComponentDefaults,
   useGrConfig,
   type GrComponentDefaults,
   type GrComponentSize,
@@ -107,18 +108,8 @@ if (__GR_DEV__ && props.theme !== undefined && (themeState?.manifest ?? fallback
 // Цель портала наследуется вниз: вложенный провайдер без своего значения
 // оставляет оверлеи там же, где их ждёт родительское приложение.
 const portalTarget = computed(() => props.portalTarget ?? parent.portalTarget?.value)
-const componentDefaults = computed<GrComponentDefaults>(() => {
-  const inherited = parent.componentDefaults.value as Record<string, Record<string, unknown>>
-  const own = (props.componentDefaults ?? {}) as Record<string, Record<string, unknown>>
-
-  // Мержим на уровне пропов, а не компонентов: иначе вложенный провайдер,
-  // переопределяющий один `variant`, стирал бы у родителя весь блок `GrButton`.
-  const merged: Record<string, Record<string, unknown>> = { ...inherited }
-  for (const [component, componentProps] of Object.entries(own))
-    merged[component] = { ...(inherited[component] ?? {}), ...componentProps }
-
-  return merged
-})
+// Родитель верхнего провайдера — пропсы по умолчанию темы сборки и приложения.
+const componentDefaults = computed<GrComponentDefaults>(() => mergeComponentDefaults(parent.componentDefaults.value, props.componentDefaults))
 
 provide<GrConfigContext>(GR_CONFIG_KEY, { size, componentDefaults, theme, mode, portalTarget })
 

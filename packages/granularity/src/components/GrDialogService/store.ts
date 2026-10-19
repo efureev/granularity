@@ -86,7 +86,12 @@ export interface DialogServiceState {
 
 export function createDialogServiceState(): DialogServiceState {
   return {
-    queue: reactive<DialogRequest[]>([]),
+    // Приведение, а не `reactive<DialogRequest[]>`: тип `Reactive` разворачивает
+    // `AppContext` заявки вглубь, и с дополнением типов vue-router
+    // (`$router.currentRoute` — `ShallowRef`) он перестаёт совпадать с `AppContext`.
+    // Без vue-router в программе приведение выглядит лишним — отсюда и отключение.
+    // eslint-disable-next-line ts/no-unnecessary-type-assertion
+    queue: reactive([]) as DialogRequest[],
     mounted: false,
     container: null,
     appContext: null,

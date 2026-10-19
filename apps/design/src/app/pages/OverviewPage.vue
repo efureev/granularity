@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { RouterLink } from 'vue-router'
 
-import { grFoundationTokens, grRoleTokens } from '@feugene/granularity-tokens'
+import { grFoundationTokens, grRoleTokens, grThemeCatalog } from '@feugene/granularity-tokens'
 import IconArrowRight from '~icons/lucide/arrow-right'
 
 import { catalog, conceptVersions } from '../catalog'
@@ -32,7 +32,7 @@ const principles = [
 const stats = [
   { value: grRoleTokens.length, label: 'ролей темы' },
   { value: grFoundationTokens.length, label: 'примитивов' },
-  { value: 2, label: 'темы' },
+  { value: grThemeCatalog.length, label: plural(grThemeCatalog.length, ['тема', 'темы', 'тем']).replace(/^\d+ /, '') },
   { value: catalog.reduce((sum, item) => sum + item.versions.length, 0), label: 'версий макетов' },
 ]
 </script>

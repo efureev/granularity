@@ -5,7 +5,7 @@ import IconCheck from '~icons/lucide/check'
 import IconX from '~icons/lucide/x'
 
 import DocSection from '../parts/DocSection.vue'
-import { contrastRatio, type ModeName, resolveColor, THEMES } from '../tokens'
+import { contrastRatio, type ModeName, resolveColor, SLATE_MODES } from '../tokens'
 
 interface Pair {
   label: string
@@ -157,7 +157,7 @@ function save(): void {
               <th scope="col" class="px-4 py-3 text-start font-500">
                 Порог
               </th>
-              <th v-for="theme in THEMES" :key="theme.id" scope="col" class="px-4 py-3 text-start font-500">
+              <th v-for="theme in SLATE_MODES" :key="theme.id" scope="col" class="px-4 py-3 text-start font-500">
                 {{ theme.label }}
               </th>
             </tr>
@@ -171,7 +171,7 @@ function save(): void {
               <td class="px-4 py-2.5 font-[var(--gr-font-mono)] [font-variant-numeric:tabular-nums]">
                 {{ pair.min }}:1
               </td>
-              <td v-for="theme in THEMES" :key="theme.id" class="px-4 py-2.5">
+              <td v-for="theme in SLATE_MODES" :key="theme.id" class="px-4 py-2.5">
                 <template v-if="ratio(pair, theme.id) !== undefined">
                   <span class="inline-flex items-center gap-2">
                     <span

@@ -6,6 +6,7 @@ export {
   type GrConfigContext,
   type GrConfigSource,
   type GrConfigurableComponent,
+  themeComponentDefaults,
   useGrComponentDefaults,
   useGrComponentProp,
   useGrComponentSize,

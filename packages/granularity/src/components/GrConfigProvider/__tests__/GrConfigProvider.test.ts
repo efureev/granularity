@@ -17,9 +17,10 @@ import GrSlider from '../../GrSlider/GrSlider.vue'
 import GrTooltip from '../../GrTooltip/GrTooltip.vue'
 import GrModal from '../../GrModal/GrModal.vue'
 import { granularityThemePlugin } from '../../../composables/useTheme'
+import { createGranularity } from '../../../vue/plugin'
 import { GRANULARITY_I18N_KEY } from '../../../i18n/adapter'
 import { useGranularityTranslations } from '../../../internal/granularityI18n'
-import { resetUnsupportedSizeWarnings, useGrComponentProp, useGrComponentSize, useGrConfig } from '../../shared/configContext'
+import { resetUnsupportedSizeWarnings, themeComponentDefaults, useGrComponentProp, useGrComponentSize, useGrConfig } from '../../shared/configContext'
 import { resetGrZIndexOwner } from '../zIndexScale'
 
 // Тестовый потребитель конфига: рендерит разрешённый размер и дефолтные пропсы.
@@ -515,6 +516,61 @@ describe('i18n: адаптер отдаётся реактивно', () => {
 
     await wrapper.setProps({ locale: 'es' })
     expect(syncLocale).toHaveBeenLastCalledWith('es')
+  })
+})
+
+/**
+ * Тема несёт пропсы по умолчанию в `extensions.granularity.componentDefaults`
+ * манифеста сборки: то, чего токеном не выразить. Приложение отдаёт манифест
+ * плагину режимов — и компоненты берут их без провайдера.
+ */
+describe('componentDefaults темы и приложения', () => {
+  const manifest = {
+    theme: { id: 'clay', title: 'Глина' },
+    modes: [{ name: 'light', colorScheme: 'light' as const, value: 'clay-light' }],
+    defaultMode: 'light',
+    activation: { attribute: 'data-theme' },
+    extensions: { granularity: { componentDefaults: { GrButton: { variant: 'outline', tone: 'neutral' } } } },
+  }
+  const themePlugin = [granularityThemePlugin, { manifest, persist: false, target: () => null }] as const
+  const button = (props: Record<string, unknown> | null = null) => h(GrButton, props, { default: () => 'Ok' })
+  const attrs = (wrapper: ReturnType<typeof mount>) => {
+    const node = wrapper.get('[data-gr-button]')
+    return [node.attributes('data-gr-variant'), node.attributes('data-gr-tone')]
+  }
+
+  it('тема с componentDefaults меняет проп по умолчанию — без провайдера', () => {
+    const wrapper = mount(defineComponent({ setup: () => () => button() }), { global: { plugins: [themePlugin as never] } })
+
+    expect(attrs(wrapper)).toEqual(['outline', 'neutral'])
+  })
+
+  it('слои: тема < приложение < провайдер < локальный проп', () => {
+    const wrapper = mount(defineComponent({
+      setup: () => () => h('div', [
+        button(),
+        h(GrConfigProvider, { componentDefaults: { GrButton: { tone: 'danger' } } }, { default: () => [button(), button({ tone: 'success' })] }),
+      ]),
+    }), { global: { plugins: [themePlugin as never, createGranularity({ componentDefaults: { GrButton: { variant: 'ghost' } } })] } })
+    const buttons = wrapper.findAll('[data-gr-button]').map(node => [node.attributes('data-gr-variant'), node.attributes('data-gr-tone')])
+
+    expect(buttons).toEqual([['ghost', 'neutral'], ['ghost', 'danger'], ['ghost', 'success']])
+  })
+
+  it('без манифеста с extensions — собственные дефолты компонента', () => {
+    const plain = { ...manifest, extensions: undefined }
+    const wrapper = mount(defineComponent({ setup: () => () => button() }), {
+      global: { plugins: [[granularityThemePlugin, { manifest: plain, persist: false, target: () => null }] as never] },
+    })
+
+    expect(attrs(wrapper)).toEqual(['primary', 'primary'])
+  })
+
+  it('themeComponentDefaults: не та форма — undefined; ответ общий на манифест', () => {
+    expect(themeComponentDefaults({ ...manifest, extensions: { granularity: { componentDefaults: { GrButton: 'outline' } } } })).toBeUndefined()
+    expect(themeComponentDefaults(null)).toBeUndefined()
+    expect(themeComponentDefaults(manifest)).toBe(themeComponentDefaults(manifest))
+    expect(Object.isFrozen(themeComponentDefaults(manifest))).toBe(true)
   })
 })
 

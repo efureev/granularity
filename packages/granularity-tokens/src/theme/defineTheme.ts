@@ -2,16 +2,12 @@ import { grDerivedTokens, grFoundationTokens, grRoleTokens } from '../generated'
 import { resolveModes } from '../modes'
 import type { GrColorScheme, GrModeData, GrRegistry, GrThemeData } from '../types'
 import { mixSrgb } from './color'
-import { GrThemeError } from './extendTheme'
+import { GrThemeDefinitionError, GrThemeError, MODE_NAME, THEME_ID } from './errors'
 import { resolveRole, type GrThemeTokens } from './roles'
 import { validateTheme, type GrThemeIssue } from './validate'
 
 /** Условие фолбэка производных: браузер без `color-mix`. */
 export const NO_COLOR_MIX = 'not (color: color-mix(in srgb, #000 50%, #fff))'
-
-const THEME_ID = /^[a-z][a-z0-9-]*$/
-// Без дефиса: пара `<тема>-<режим>` на корне разбирается по последнему дефису.
-const MODE_NAME = /^[a-z][a-z0-9]*$/
 
 export interface GrModeInput {
   title?: string
@@ -47,17 +43,6 @@ export interface DefineThemeOptions {
   themes?: Readonly<Record<string, GrThemeData>>
   /** Реестр, по которому проверяется полнота. По умолчанию — реестр пакета. */
   registry?: GrRegistry
-}
-
-/** Ошибка формы или полноты темы — в отличие от `GrThemeError`, не про цвет. */
-export class GrThemeDefinitionError extends Error {
-  readonly code: 'invalid-theme-id' | 'invalid-mode-name' | 'unknown-token' | 'theme-incomplete' | 'mode-extends-unresolved' | 'mode-extends-cycle' | 'theme-extends-unresolved'
-
-  constructor(code: GrThemeDefinitionError['code'], message: string) {
-    super(message)
-    this.name = 'GrThemeDefinitionError'
-    this.code = code
-  }
 }
 
 function withDashes(tokens: Readonly<Record<string, string>>): GrThemeTokens {

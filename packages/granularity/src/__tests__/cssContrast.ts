@@ -52,7 +52,7 @@ function splitTopLevel(input: string): string[] {
 /**
  * Цвет здесь — тройка каналов, а математика общая с темами (`@feugene/granularity-tokens/theme`):
  * контраст, ΔE и подмес обязаны считаться одинаково у гейтов, у генератора
- * токенов и у `extendTheme`, иначе «проверено» и «сгенерировано» разъедутся.
+ * токенов и у `extendMode`, иначе «проверено» и «сгенерировано» разъедутся.
  */
 function hexToRgb(hex: string): RgbColor {
   const [r, g, b] = parseHex(hex)

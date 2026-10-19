@@ -1,14 +1,20 @@
 import { defineGranumConfig } from '@feugene/granum/vite'
 import { windEngine } from '@feugene/granum-engine-wind'
+import { loadTheme } from '@feugene/granularity-tokens/theme/node'
+
+import { contrast, ocean } from './theme.config'
 
 /**
- * Конфиг приложения для granum.
+ * Три способа своей палитры в одной сборке.
  *
- * Темы приложения (`ocean`, `contrast`) подключаются НЕ здесь, а обычным
- * импортом CSS в `src/main.ts`. `theme` выбирает тему каталога пакета, `modes`
- * — её режимы, которые уезжают в сборку парами `slate-<режим>`; третья тема —
- * это CSS самого приложения, и granum о ней знать не обязан: она лежит в своём
- * слое и перекрывает пакетные значения по селектору `[data-theme='ocean']`.
+ * - `ocean` и `contrast` — режимы темы `slate` (`modes.define`): встают под
+ *   свои пары `slate-ocean`/`slate-contrast` и берут токены компонентов у
+ *   режима `extends`. Собраны `extendMode`/`createMode` в `theme.config.mjs`.
+ * - `brand` — своя тема приложения из папки `src/themes/brand/` (`extends:
+ *   slate`, только отличия). Активная тема одна, поэтому `brand` едет превью:
+ *   полными блоками пар `brand-light`/`brand-dark`, которые включает
+ *   `<GrConfigProvider theme="brand">`. Правка её файлов в dev перезапускает
+ *   конфиг — их перечисляет `sources`.
  *
  * `components: 'all'` намеренно: стенд рисует полный каталог ролей, и селекция
  * по списку здесь только маскировала бы пропуски темы.
@@ -18,6 +24,10 @@ export default defineGranumConfig({
   providers: ['@feugene/granularity'],
   components: 'all',
   theme: 'slate',
-  modes: { names: ['light', 'dark'] },
+  previews: [loadTheme(new URL('./src/themes/brand/', import.meta.url))],
+  modes: {
+    names: ['light', 'dark', 'ocean', 'contrast'],
+    define: { ocean: ocean.definition, contrast: contrast.definition },
+  },
   appSources: { dirs: ['src'] },
 })

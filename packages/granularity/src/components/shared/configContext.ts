@@ -1,7 +1,8 @@
 import { computed, getCurrentInstance, inject, type ComputedRef, type InjectionKey } from 'vue'
 
 import type { GrComponentDefaultsRegistry } from '../../composables/useGrComponentConfig'
-import { type GrModeName, type GrThemeId, peekThemeState, themeActivationAttrs } from '../../composables/internal/themeState'
+import { type GrModeName, type GrThemeId, type GrThemeManifest, peekThemeState, themeActivationAttrs } from '../../composables/internal/themeState'
+import { GR_APP_COMPONENT_DEFAULTS } from './appComponentDefaults'
 
 /**
  * Контекст `GrConfigProvider` — глобальные дефолты для вложенных GR-компонентов:
@@ -92,9 +93,78 @@ const EMPTY_CONFIG: GrConfigContext = {
   portalTarget: computed(() => undefined),
 }
 
-/** Возвращает ближайший `GrConfigProvider` или пустой конфиг, если провайдера нет. */
+type DefaultsRecord = Record<string, Record<string, unknown>>
+
+function isDefaultsRecord(value: unknown): value is DefaultsRecord {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
+    && Object.values(value).every(props => typeof props === 'object' && props !== null && !Array.isArray(props))
+}
+
+const themeDefaultsCache = new WeakMap<GrThemeManifest, GrComponentDefaults | null>()
+
+/**
+ * Пропсы по умолчанию, которые несёт тема сборки: `componentDefaults` в
+ * `extensions.granularity` манифеста `virtual:granum/themes`. Так тема меняет
+ * то, чего токеном не выразить, — вид индикатора загрузки, форму группы. Нет
+ * или не та форма — `undefined`.
+ */
+export function themeComponentDefaults(manifest: GrThemeManifest | null | undefined): GrComponentDefaults | undefined {
+  if (!manifest)
+    return undefined
+  if (!themeDefaultsCache.has(manifest)) {
+    const raw = (manifest.extensions?.granularity as { componentDefaults?: unknown } | undefined)?.componentDefaults
+    themeDefaultsCache.set(manifest, isDefaultsRecord(raw) && Object.keys(raw).length > 0 ? Object.freeze(raw) : null)
+  }
+  return themeDefaultsCache.get(manifest) ?? undefined
+}
+
+/** Слияние по пропам, а не по компонентам: верхний слой меняет один проп, не стирая блок. */
+export function mergeComponentDefaults(...layers: (GrComponentDefaults | DefaultsRecord | null | undefined)[]): GrComponentDefaults {
+  const merged: DefaultsRecord = {}
+  for (const layer of layers) {
+    for (const [component, props] of Object.entries((layer ?? {}) as DefaultsRecord))
+      merged[component] = { ...merged[component], ...props }
+  }
+  return merged
+}
+
+const NO_LAYER = Object.freeze({})
+const rootConfigs = new WeakMap<object, WeakMap<object, GrConfigContext>>()
+
+/**
+ * Конфиг без провайдера в дереве: пропсы по умолчанию темы сборки, поверх —
+ * приложения (`createGranularity`). Кешируется на пару источников: иначе каждый
+ * компонент без провайдера заводил бы свой `computed`.
+ */
+function rootConfig(): GrConfigContext {
+  const manifest = peekThemeState()?.manifest
+  const theme = themeComponentDefaults(manifest)
+  const app = inject(GR_APP_COMPONENT_DEFAULTS, null)
+  if (!theme && !app)
+    return EMPTY_CONFIG
+
+  const themeKey = theme ? manifest! : NO_LAYER
+  const appKey = app ?? NO_LAYER
+  let byApp = rootConfigs.get(themeKey)
+  if (!byApp) {
+    byApp = new WeakMap()
+    rootConfigs.set(themeKey, byApp)
+  }
+  let config = byApp.get(appKey)
+  if (!config) {
+    const componentDefaults = Object.freeze(mergeComponentDefaults(theme, app))
+    config = { ...EMPTY_CONFIG, componentDefaults: computed(() => componentDefaults) }
+    byApp.set(appKey, config)
+  }
+  return config
+}
+
+/**
+ * Ближайший `GrConfigProvider`; без него — пропсы по умолчанию темы сборки и
+ * приложения, а без них — пустой конфиг.
+ */
 export function useGrConfig(): GrConfigContext {
-  return inject(GR_CONFIG_KEY, EMPTY_CONFIG)
+  return inject(GR_CONFIG_KEY, null) ?? rootConfig()
 }
 
 /**
@@ -129,7 +199,7 @@ export function resolveGrConfig(source?: GrConfigSource | null): GrConfigContext
   }
 
   if (getCurrentInstance())
-    return inject(GR_CONFIG_KEY, EMPTY_CONFIG)
+    return useGrConfig()
 
   return EMPTY_CONFIG
 }

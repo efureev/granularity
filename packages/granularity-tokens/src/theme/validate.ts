@@ -1,7 +1,6 @@
 import { grDerivedTokens, grRoleTokens } from '../generated'
 import type { GrRegistry } from '../types'
 import { contrast, deltaE, mixSrgb } from './color'
-import type { GrTheme } from './extendTheme'
 import { resolveRole, type GrThemeTokens } from './roles'
 
 export interface GrThemeIssue {
@@ -45,7 +44,7 @@ function derivedOf(role: string, registry?: GrRegistry): { amount: number, mixWi
     .map(token => ({ amount: token.amount, mixWith: token.mixWith }))
 }
 
-export function validateTheme(theme: GrTheme | { name: string, tokens: GrThemeTokens }, registry?: GrRegistry): GrThemeIssue[] {
+export function validateTheme(theme: { name: string, tokens: GrThemeTokens }, registry?: GrRegistry): GrThemeIssue[] {
   const { tokens } = theme
   const issues: GrThemeIssue[] = []
 

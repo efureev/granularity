@@ -1,16 +1,16 @@
 import { createApp } from 'vue'
 
-import App from './App.vue'
+import { granularityThemePlugin } from '@feugene/granularity'
+import themeManifest from 'virtual:granum/themes'
 
-// Порядок импортов задан явно (последовательные `await`, а не `Promise.all`):
-// сначала reset, затем весь CSS granum одним модулем, затем темы приложения.
-// Конфликта селекторов у `[data-theme='ocean']` с пакетными темами нет —
-// значения атрибута разные, — но порядок стоит держать предсказуемым.
-// Отдельной entry под утилиты приложения больше нет: они лежат в слое
-// `granum.utilities` того же модуля.
+import App from './App.vue'
+import { THEME_STORAGE_KEY } from './storage'
+
+// Сначала reset, затем весь CSS granum одним модулем: режимы темы и превью в
+// нём же, отдельного CSS приложения под них нет.
 await import('./reset')
 await import('./granularity')
-await import('./styles/theme-ocean.css')
-await import('./styles/theme-contrast.css')
 
-createApp(App).mount('#app')
+createApp(App)
+  .use(granularityThemePlugin, { manifest: themeManifest, storageKey: THEME_STORAGE_KEY })
+  .mount('#app')

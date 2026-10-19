@@ -2,17 +2,23 @@
 import { RouterLink, useRoute } from 'vue-router'
 
 import IconLayoutGrid from '~icons/lucide/layout-grid'
+import IconLibrary from '~icons/lucide/library'
 import IconMousePointerClick from '~icons/lucide/mouse-pointer-click'
+import IconSwatchBook from '~icons/lucide/swatch-book'
+import themeManifest from 'virtual:granum/themes'
 
 import { catalog } from '../catalog'
 import { foundations } from '../foundations'
 import { plural } from '../plural'
+import { designThemes, THEME_BUILD_LABEL } from '../themes'
 
 defineProps<{ overlay: boolean }>()
 
 const open = defineModel<boolean>('open', { default: false })
 
 const route = useRoute()
+
+const themes = designThemes(themeManifest)
 
 const componentIcons: Record<string, typeof IconLayoutGrid> = {
   button: IconMousePointerClick,
@@ -54,6 +60,26 @@ const componentIcons: Record<string, typeof IconLayoutGrid> = {
           :as="RouterLink"
           :to="`/foundations/${foundation.id}`"
           :active="route.name === 'foundation' && route.params.foundation === foundation.id"
+        />
+      </GrSidebarGroup>
+
+      <GrSidebarGroup label="Темы">
+        <GrSidebarItem
+          label="Каталог тем"
+          :icon="IconLibrary"
+          :as="RouterLink"
+          to="/themes"
+          :active="route.name === 'themes'"
+        />
+        <GrSidebarItem
+          v-for="theme in themes"
+          :key="theme.entry.id"
+          :label="theme.entry.title"
+          :icon="IconSwatchBook"
+          :badge="THEME_BUILD_LABEL[theme.build]"
+          :as="RouterLink"
+          :to="`/themes/${theme.entry.id}`"
+          :active="route.name === 'theme' && route.params.theme === theme.entry.id"
         />
       </GrSidebarGroup>
 

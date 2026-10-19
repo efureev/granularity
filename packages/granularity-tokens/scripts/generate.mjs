@@ -15,7 +15,7 @@ import { runnerImport } from 'vite'
  *
  * Каждая тема строится `defineTheme` — тем же кодом, что у приложения. Отсюда:
  *   src/generated.ts                — реестр и каталог тем для TS-потребителей;
- *   src/theme/builtin.generated.ts  — режимы темы по умолчанию для `extendTheme`/`tone`;
+ *   src/theme/builtin.generated.ts  — режимы темы по умолчанию для `extendMode`/`tone`;
  *   docs/tokens.md                  — справочник.
  *
  * CSS тем отсюда не пишется: селекторы режимов назначает сборка granum, а готовый
@@ -168,11 +168,18 @@ function renderBuiltinTs({ resolveModes }, theme) {
     Object.fromEntries(Object.entries(tokens).map(([token, value]) => [`--${token}`, value])),
   ]))
 
+  const schemes = Object.fromEntries(Object.entries(theme.data.modes).map(([name, mode]) => [name, mode.colorScheme]))
+
   return [
     GENERATED_BANNER_TS,
     '',
-    `/** Режимы темы \`${theme.data.id}\` — база \`extendTheme\` и \`tone\` по имени. */`,
+    `/** Тема, режимы которой — база \`extendMode\` и \`tone\` по имени. */`,
+    `export const GR_BUILTIN_THEME = '${theme.data.id}'`,
+    '',
+    `/** Режимы темы \`${theme.data.id}\` — база \`extendMode\` и \`tone\` по имени. */`,
     `export type GrBuiltinMode = ${[...modes.keys()].map(name => `'${name}'`).join(' | ')}`,
+    '',
+    `export const grBuiltinModeSchemes: Record<GrBuiltinMode, 'light' | 'dark'> = ${JSON.stringify(schemes, null, 2)}`,
     '',
     `export const grBuiltinModes: Record<GrBuiltinMode, Record<string, string>> = ${JSON.stringify(builtin, null, 2)}`,
     '',
@@ -233,7 +240,7 @@ function renderDocs({ raw, themes, resolveModes }) {
     'исходникам они не находятся.',
     '',
     '**Каждая объявленная здесь роль обязательна для каждого режима.** `defineTheme`',
-    'и `extendTheme` падают с перечнем недостающих, если тема не задала хотя бы одну.',
+    'и `createMode` падают с перечнем недостающих, если тема не задала хотя бы одну.',
     'Поэтому роль из этого раздела нельзя удалить как «неиспользуемую», даже если',
     'её не читает ни один компонент: это ломающее изменение для всех, кто собрал',
     'свою тему.',

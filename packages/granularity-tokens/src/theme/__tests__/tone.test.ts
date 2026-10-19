@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { contrast, mixSrgb } from '../color'
-import { extendTheme } from '../extendTheme'
+import { extendMode } from '../mode'
 import { GrToneError, tone } from '../tone'
 import { validateTheme } from '../validate'
 
@@ -30,7 +30,7 @@ describe('семья ролей из одного цвета', () => {
     const fg = family['--gr-success-fg']
 
     // Формула состояний та же, что у пакета: подмес `--gr-fg` 8% и 16%.
-    const themeFg = extendTheme({ name: 'x', base, validate: false }).tokens['--gr-fg']
+    const themeFg = extendMode({ name: 'x', base, validate: false }).tokens['--gr-fg']
 
     expect(contrast(fg, fill)).toBeGreaterThanOrEqual(AA)
     expect(contrast(fg, mixSrgb(fill, themeFg, 92))).toBeGreaterThanOrEqual(AA)
@@ -38,7 +38,7 @@ describe('семья ролей из одного цвета', () => {
   })
 
   it('solid держит свой текст, а `-text` читается на подложке, фоне и карточке', () => {
-    const theme = extendTheme({ name: 'x', base: 'light', validate: false }).tokens
+    const theme = extendMode({ name: 'x', base: 'light', validate: false }).tokens
     const family = tone('brand', '#7c9cf5', { base: 'light' })
 
     expect(contrast(family['--gr-brand-solid-fg'], family['--gr-brand-solid'])).toBeGreaterThanOrEqual(AA)
@@ -102,7 +102,7 @@ describe('семья ролей из одного цвета', () => {
 
   /** Смысл упражнения: перекрашенный тон не должен ронять проверку темы. */
   it('тон, вставленный в тему, проходит её проверку', () => {
-    const theme = extendTheme({
+    const theme = extendMode({
       name: 'ocean',
       base: 'dark',
       tokens: tone('success', '#3ddc97', { base: 'dark' }),

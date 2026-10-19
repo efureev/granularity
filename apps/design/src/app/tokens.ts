@@ -8,16 +8,15 @@ import {
 } from '@feugene/granularity-tokens'
 import slateData from '@feugene/granularity-tokens/themes/slate/theme.json'
 
-/** Режим темы `slate` — то, что ядро пока называет темой `light`/`dark`. */
-export type ModeName = 'light' | 'dark'
-
-export const THEMES: { id: ModeName, label: string }[] = [
-  { id: 'light', label: 'Светлая' },
-  { id: 'dark', label: 'Тёмная' },
-]
+/** Режим темы `slate`. */
+export type ModeName = string
 
 const slate = slateData as GrThemeData
 const slateModes = resolveModes(slate)
+
+/** Режимы темы `slate` в порядке данных — колонки таблиц контраста. */
+export const SLATE_MODES: { id: ModeName, label: string }[] = Object.entries(slate.modes)
+  .map(([id, mode]) => ({ id, label: mode.title ?? id }))
 
 export type FoundationToken = GrFoundationToken & { value: string }
 

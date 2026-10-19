@@ -1,17 +1,19 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
 
+import { useTheme } from '@feugene/granularity'
 import { grRoleTokens } from '@feugene/granularity-tokens'
+import themeManifest from 'virtual:granum/themes'
 
-import { APP_THEMES, useAppTheme, type AppTheme } from './theme'
+const { mode, modes, setMode } = useTheme()
 
-const { theme, setTheme } = useAppTheme()
-
-const themeOptions = APP_THEMES.map(name => ({
-  label: name,
-  value: name,
-  ariaLabel: `Тема ${name}`,
+const modeOptions = modes.map(entry => ({
+  label: entry.title ?? entry.name,
+  value: entry.name,
+  ariaLabel: `Режим ${entry.title ?? entry.name}`,
 }))
+
+const preview = themeManifest.previews?.[0]
 
 const tones = ['success', 'warning', 'danger', 'info', 'slate', 'azure'] as const
 
@@ -34,8 +36,8 @@ function readRoleValues(): void {
 }
 
 onMounted(readRoleValues)
-// Значения читаются после того, как браузер применил новый селектор темы.
-watch(theme, () => requestAnimationFrame(readRoleValues))
+// Значения читаются после того, как браузер применил новую пару режима.
+watch(mode, () => requestAnimationFrame(readRoleValues))
 
 const surfaceRoles = computed(() =>
   grRoleTokens.filter(token => token.section === 'Surface roles'),
@@ -44,8 +46,8 @@ const statusRoles = computed(() =>
   grRoleTokens.filter(token => token.section === 'Status roles'),
 )
 
-function onThemeChange(next: string | number): void {
-  setTheme(next as AppTheme)
+function onModeChange(next: string | number): void {
+  setMode(String(next))
 }
 </script>
 
@@ -58,30 +60,30 @@ function onThemeChange(next: string | number): void {
             playground-theme
           </p>
           <h1 class="text-2xl font-semibold">
-            Кастомные темы: поверх пакета и с нуля
+            Свои режимы и своя тема
           </h1>
           <p class="mt-2 max-w-2xl text-sm text-[var(--gr-muted-fg)]">
-            Обе темы описаны данными в <code>theme.config.mjs</code> и собраны в CSS
-            шагом сборки. <code>ocean</code> берёт за базу тёмную тему пакета
-            (<code>extendTheme</code>) — незаявленная роль приходит из неё.
-            <code>contrast</code> собрана с нуля (<code>createTheme</code>) и обязана
-            объявить все роли сама: не хватит одной — сборка упадёт, а не подмешает
-            палитру светлой темы. Ни один компонент про них не знает: они читают
-            семантические роли.
+            <code>ocean</code> и <code>contrast</code> — режимы темы «Сланец» из
+            <code>modes.define</code>, описанные данными в <code>theme.config.ts</code>.
+            <code>ocean</code> берёт за базу тёмный режим (<code>extendMode</code>) —
+            незаявленная роль приходит из него. <code>contrast</code> собран с нуля
+            (<code>createMode</code>) и обязан объявить все роли сам: не хватит одной —
+            сборка упадёт, а не подмешает палитру светлого режима. Ни один компонент
+            про них не знает: они читают семантические роли.
           </p>
         </div>
 
-        <GrFormField label="Тема">
+        <GrFormField label="Режим">
           <GrSegmented
-            :model-value="theme"
-            :options="themeOptions"
-            @update:model-value="onThemeChange"
+            :model-value="mode"
+            :options="modeOptions"
+            @update:model-value="onModeChange"
           />
         </GrFormField>
       </header>
 
       <GrAlert tone="info">
-        Переключайте темы и смотрите на этот экран целиком: ошибки в суффиксах
+        Переключайте режимы и смотрите на этот экран целиком: ошибки в суффиксах
         ролей видны в соседстве компонентов, а не по отдельности.
       </GrAlert>
 
@@ -109,7 +111,7 @@ function onThemeChange(next: string | number): void {
                 v-for="tone in tones"
                 :key="`solid-${tone}`"
                 :tone="tone"
-                variant="solid"
+                dark
               >
                 {{ tone }}
               </GrBadge>
@@ -120,7 +122,6 @@ function onThemeChange(next: string | number): void {
                 v-for="tone in tones"
                 :key="`soft-${tone}`"
                 :tone="tone"
-                variant="soft"
               >
                 {{ tone }}
               </GrBadge>
@@ -170,17 +171,58 @@ function onThemeChange(next: string | number): void {
         </GrAlert>
       </section>
 
+      <!-- Своя тема приложения — превью: её пары собраны в CSS, корень она не занимает -->
+      <GrCard v-if="preview" class="p-5">
+        <div class="flex flex-col gap-4">
+          <div>
+            <h2 class="text-base font-semibold">
+              Тема «{{ preview.theme.title }}» — превью
+            </h2>
+            <p class="mt-1 text-sm text-[var(--gr-muted-fg)]">
+              Папка <code>src/themes/{{ preview.theme.id }}/</code> объявляет только отличия от
+              «Сланца». Активная тема у сборки одна, поэтому своя тема показана островами:
+              <code>&lt;GrConfigProvider theme="{{ preview.theme.id }}" mode="…"&gt;</code>.
+            </p>
+          </div>
+
+          <div class="grid gap-4 md:grid-cols-2">
+            <GrConfigProvider
+              v-for="entry in preview.modes"
+              :key="entry.name"
+              :theme="preview.theme.id"
+              :mode="entry.name"
+            >
+              <div class="flex flex-col gap-3 rounded-[var(--gr-radius-lg)] border border-[var(--gr-brd)] bg-[var(--gr-bg)] p-4 text-[var(--gr-fg)]">
+                <p class="text-xs text-[var(--gr-muted-fg)]">
+                  {{ entry.title ?? entry.name }} · <code>{{ entry.value }}</code>
+                </p>
+                <div class="flex flex-wrap gap-2">
+                  <GrButton>Основное действие</GrButton>
+                  <GrButton variant="secondary">
+                    Второе
+                  </GrButton>
+                  <GrBadge tone="success">
+                    Бейдж
+                  </GrBadge>
+                </div>
+                <GrInput model-value="Поле ввода" aria-label="Поле ввода" />
+              </div>
+            </GrConfigProvider>
+          </div>
+        </div>
+      </GrCard>
+
       <!-- Роли темы живьём: значения читаются из getComputedStyle -->
       <GrCard class="p-5">
         <div class="flex flex-col gap-4">
           <div>
             <h2 class="text-base font-semibold">
-              Роли текущей темы
+              Роли текущего режима
             </h2>
             <p class="mt-1 text-sm text-[var(--gr-muted-fg)]">
               Список ролей приходит из <code>@feugene/granularity-tokens</code>, значения —
-              из вычисленных стилей. Пропусти роль в теме — здесь появится значение
-              светлой темы, унаследованное от <code>:root</code>.
+              из вычисленных стилей. Пропусти роль в режиме — здесь появится значение
+              светлого режима, унаследованное от <code>:root</code>.
             </p>
           </div>
 

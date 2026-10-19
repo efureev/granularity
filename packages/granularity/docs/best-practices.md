@@ -55,7 +55,9 @@ export function focusFirst(control: GrInputInstance | undefined): void {
 ([`sizes.md`](./sizes.md#как-разрешается-значение)):
 
 1. локальный проп на компоненте;
-2. `componentDefaults[Component]` ближайшего провайдера;
+2. `componentDefaults[Component]` ближайшего провайдера — поверх
+   `createGranularity({ componentDefaults })` приложения и пропсов по умолчанию
+   темы сборки ([`theming.md`](./theming.md#пропсы-по-умолчанию-темы));
 3. глобальный `size` того же провайдера;
 4. дефолт компонента.
 
@@ -212,9 +214,8 @@ const { target, enabled } = usePortalTarget()
 
 **`useTheme()` переключает режимы, а не темы.** Набор режимов — из манифеста
 `virtual:granum/themes`, поэтому свой режим из `modes.define` переключается тем же
-`setMode`, а `isDark` смотрит на его `colorScheme`. Тему выбирает сборка; тема-слой
-приложения поверх CSS пакета — свой контроллер над `[data-theme]`, рабочий
-пример — `apps/playground-theme`.
+`setMode`, а `isDark` смотрит на его `colorScheme`. Тему выбирает сборка: встроенную
+по id или свою из папки (`loadTheme`); рабочий пример — `apps/playground-theme`.
 
 **Перекрашивать тему пакета — в конфиге granum.** `modes.tokenOverrides`
 ложится в блок пары режима после данных темы и побеждает их; свой режим —
@@ -222,11 +223,11 @@ const { target, enabled } = usePortalTarget()
 ([`theming.md`](./theming.md#подключение)). Ключа `themes` у granum 3 нет:
 конфиг с ним — ошибка.
 
-**Тему собирать из данных, а не писать CSS руками.** `extendTheme` (поверх
-готовой) и `createTheme` (с нуля) из `@feugene/granularity-tokens/theme` отдают и
-токены, и CSS; `createTheme` падает на неполноте, а `tone()` закрывает роли
-пачками. Сгенерированный файл держите под скриптом с флагом `--check`, чтобы он
-не разошёлся с источником ([`theming.md`](./theming.md)).
+**Режим и тему собирать из данных, а не писать CSS руками.** `extendMode` (поверх
+готового) и `createMode` (с нуля) из `@feugene/granularity-tokens/theme` отдают и
+вход `modes.define`, и CSS; `createMode` падает на неполноте, а `tone()` закрывает
+роли пачками. Своя тема — папкой и `loadTheme`: та же проверка полноты и контраста
+в каждом режиме ([`theming.md`](./theming.md)).
 
 **Ставить режим до первого рендера** — скриптом в `<head>` от granum
 (`granum(config, { themeScript: { storageKey: 'gr-theme' } })`) или парой в серверном

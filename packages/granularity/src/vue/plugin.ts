@@ -1,5 +1,7 @@
 import type { App, Component, Directive, Plugin } from 'vue'
 
+import { GR_APP_COMPONENT_DEFAULTS } from '../components/shared/appComponentDefaults'
+
 /**
  * Лёгкий контейнер, который может быть зарегистрирован в Vue:
  * - SFC-компонент (Vue сам компилирует `__name` из имени файла) — достаточно просто передать сам компонент,
@@ -39,6 +41,13 @@ export interface CreateGranularityOptions {
    * Произвольные `app.config.globalProperties` — по умолчанию ничего не ставим.
    */
   globalProperties?: Record<string, unknown>
+  /**
+   * Пропсы по умолчанию на всё приложение: `{ GrButton: { variant: 'secondary' } }`.
+   * Ложатся поверх `componentDefaults` темы сборки и под любой `GrConfigProvider`.
+   * Тип — тот же `GrComponentDefaults`, что у провайдера; здесь он открытый,
+   * чтобы плагин не тянул реестр компонентов.
+   */
+  componentDefaults?: Readonly<Record<string, Readonly<Record<string, unknown>>>>
 }
 
 /**
@@ -131,6 +140,8 @@ export function installGranularity(app: App, options: CreateGranularityOptions =
     for (const [key, value] of Object.entries(options.globalProperties))
       app.config.globalProperties[key] = value
   }
+  if (options.componentDefaults)
+    app.provide(GR_APP_COMPONENT_DEFAULTS, options.componentDefaults)
 }
 
 /**

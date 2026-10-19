@@ -6,8 +6,8 @@ import { describe, expect, it } from 'vitest'
 
 import { mixSrgb } from '../color'
 import { resolveModes } from '../../modes'
-import { defineTheme, GrThemeDefinitionError, NO_COLOR_MIX } from '../defineTheme'
-import { GrThemeError } from '../extendTheme'
+import { defineTheme, NO_COLOR_MIX } from '../defineTheme'
+import { GrThemeDefinitionError, GrThemeError } from '../errors'
 import { loadTheme, readThemeSource } from '../node'
 
 const slateDir = resolve(process.cwd(), 'themes/slate')
@@ -146,5 +146,21 @@ describe('defineTheme: наследование', () => {
     expect(brand.modes.dim.colorScheme).toBe('dark')
     expect(brand.sources).toContain(join(dir, 'modes/dim.json'))
     expect(brand.sources).toContain(join(slateDir, 'theme.json'))
+    // Тема каталога в цепочке — для токенов компонентов, которых у темы приложения нет.
+    expect(brand.extends).toBe('slate')
+  })
+
+  it('тема от темы приложения называет в `extends` тему каталога, а не соседа', () => {
+    const root = mkdtempSync(join(tmpdir(), 'gr-theme-'))
+    for (const [id, base] of [['brand', 'slate'], ['night', 'brand']] as const) {
+      mkdirSync(join(root, id), { recursive: true })
+      writeFileSync(join(root, id, 'theme.json'), JSON.stringify({ id, title: id, extends: base }))
+    }
+
+    const night = loadTheme(join(root, 'night'), { validate: false })
+
+    expect(night.extends).toBe('slate')
+    expect(night.sources).toContain(join(root, 'brand/theme.json'))
+    expect(loadTheme(slateDir).extends).toBeUndefined()
   })
 })
