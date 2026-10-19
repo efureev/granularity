@@ -1,0 +1,56 @@
+{
+  "D1": {
+    "why": "Тёмный остров на светлой странице наследовал soft-фоны, рамки весов и недоступное состояние GrButton, посчитанные на <html> по светлым ролям: формулы были объявлены только в светлом блоке. Теперь они в root.json темы компонента, granum объявляет их на каждом [data-theme], и остров считает их от своих ролей.",
+    "keys": [
+      "island-dark-in-light --gr-button-azure-border",
+      "island-dark-in-light --gr-button-azure-border-soft",
+      "island-dark-in-light --gr-button-azure-soft-bg",
+      "island-dark-in-light --gr-button-azure-soft-bg-active",
+      "island-dark-in-light --gr-button-azure-soft-bg-hover",
+      "island-dark-in-light --gr-button-danger-border",
+      "island-dark-in-light --gr-button-danger-border-soft",
+      "island-dark-in-light --gr-button-danger-soft-bg",
+      "island-dark-in-light --gr-button-danger-soft-bg-active",
+      "island-dark-in-light --gr-button-danger-soft-bg-hover",
+      "island-dark-in-light --gr-button-disabled-bg",
+      "island-dark-in-light --gr-button-disabled-brd",
+      "island-dark-in-light --gr-button-disabled-fg",
+      "island-dark-in-light --gr-button-info-border",
+      "island-dark-in-light --gr-button-info-border-soft",
+      "island-dark-in-light --gr-button-info-soft-bg",
+      "island-dark-in-light --gr-button-info-soft-bg-active",
+      "island-dark-in-light --gr-button-info-soft-bg-hover",
+      "island-dark-in-light --gr-button-neutral-border",
+      "island-dark-in-light --gr-button-neutral-soft-bg",
+      "island-dark-in-light --gr-button-neutral-soft-bg-active",
+      "island-dark-in-light --gr-button-neutral-soft-bg-hover",
+      "island-dark-in-light --gr-button-primary-border",
+      "island-dark-in-light --gr-button-primary-border-soft",
+      "island-dark-in-light --gr-button-primary-soft-bg",
+      "island-dark-in-light --gr-button-primary-soft-bg-active",
+      "island-dark-in-light --gr-button-primary-soft-bg-hover",
+      "island-dark-in-light --gr-button-slate-border",
+      "island-dark-in-light --gr-button-slate-border-soft",
+      "island-dark-in-light --gr-button-slate-soft-bg",
+      "island-dark-in-light --gr-button-slate-soft-bg-active",
+      "island-dark-in-light --gr-button-slate-soft-bg-hover",
+      "island-dark-in-light --gr-button-success-border",
+      "island-dark-in-light --gr-button-success-border-soft",
+      "island-dark-in-light --gr-button-success-soft-bg",
+      "island-dark-in-light --gr-button-success-soft-bg-active",
+      "island-dark-in-light --gr-button-success-soft-bg-hover",
+      "island-dark-in-light --gr-button-warning-border",
+      "island-dark-in-light --gr-button-warning-border-soft",
+      "island-dark-in-light --gr-button-warning-soft-bg",
+      "island-dark-in-light --gr-button-warning-soft-bg-active",
+      "island-dark-in-light --gr-button-warning-soft-bg-hover"
+    ]
+  },
+  "D2": {
+    "why": "Тёмная подсветка индикатора GrSegmented висела только на .dark, а штатная активация атрибутом её не включала. В themesDir селектор режима назначает granum.",
+    "keys": [
+      "island-dark-in-light --gr-segmented-indicator-highlight-shadow",
+      "page-dark --gr-segmented-indicator-highlight-shadow"
+    ]
+  }
+}

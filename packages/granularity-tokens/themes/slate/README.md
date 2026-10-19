@@ -36,4 +36,5 @@
 
 ## Как подключить
 
-`theme: 'slate'` в конфиге granum (с granum 3) — или ничего: `slate` — тема по умолчанию.
+`theme: 'slate'` в конфиге granum — или ничего: `slate` — тема по умолчанию. Без granum —
+`@feugene/granularity/themes/slate.css`.

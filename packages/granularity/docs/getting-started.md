@@ -52,7 +52,8 @@ export default defineGranumConfig({
   components: [
     { provider: '@feugene/granularity', names: ['GrButton', 'GrInput'] },
   ],
-  themes: { names: ['light', 'dark'] },
+  theme: 'slate',
+  modes: { names: ['light', 'dark'] },
   appSources: { dirs: ['src'] },
 })
 ```
@@ -80,8 +81,8 @@ import 'virtual:granum.css' // токены, база, темы, CSS компо�
 
 Порядок слоёв объявлен первой строкой этого файла, поэтому утилита в разметке
 приложения перебивает базовый стиль компонента, а нелейерный CSS приложения
-перебивает всё. Фундамент (`:root { --gr-* }`, `base.css`, темы
-`[data-theme=dark]`, покомпонентные переменные) и утилитарные классы — и ваши,
+перебивает всё. Фундамент (`:root { --gr-* }`, `base.css`, режимы темы
+`[data-theme="slate-dark"]`, покомпонентные переменные) и утилитарные классы — и ваши,
 и те, которыми нарисованы шаблоны компонентов пакета, — лежат в одном файле, и
 забыть половину нечего.
 
@@ -578,12 +579,13 @@ createServer(async (request, response) => {
   try {
     var t = localStorage.getItem('gr-theme')
       || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
-    document.documentElement.dataset.theme = t
+    document.documentElement.dataset.theme = 'slate-' + t
   } catch {}
 </script>
 ```
 
-Ключ `gr-theme` и атрибут `[data-theme]` — тот же контракт, что у `useTheme()`.
+Ключ `gr-theme` (имя режима) и пара `slate-<режим>` в `[data-theme]` — тот же
+контракт, что у `useTheme()`.
 Если тема выбирается на сервере (из куки, из профиля), нужен
 `granularityThemePlugin` — он уже стоит в каркасе выше.
 
@@ -714,7 +716,8 @@ export async function setupI18n() {
    export default defineGranumConfig({
      engine: windEngine(),
      providers: ['@feugene/granularity', '@feugene/granularity-chrono'],
-     themes: { names: ['light', 'dark'] },
+     theme: 'slate',
+     modes: { names: ['light', 'dark'] },
      appSources: { dirs: ['src'] },
    })
    ```

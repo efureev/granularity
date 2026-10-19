@@ -11,16 +11,18 @@ import { runnerImport } from 'vite'
  *
  *   tokens/{foundation,roles,derived}.json — реестр: имена, группы, описания, формулы;
  *   themes/<slug>/                          — значения темы: theme.json, root.json, modes/*.json,
- *                                             notes.json (пояснения к значениям для CSS и доки).
+ *                                             notes.json (пояснения к значениям для доки).
  *
  * Каждая тема строится `defineTheme` — тем же кодом, что у приложения. Отсюда:
  *   src/generated.ts                — реестр и каталог тем для TS-потребителей;
  *   src/theme/builtin.generated.ts  — режимы темы по умолчанию для `extendTheme`/`tone`;
- *   docs/tokens.md                  — справочник;
- *   CSS ядра `@feugene/granularity` — `src/styles/tokens.css` и `themes/{light,dark}.css`
- *                                     темы по умолчанию, пока ядро не берёт тему через каталог granum.
+ *   docs/tokens.md                  — справочник.
  *
- * `--dist` пишет раскладку `dist/` (данные тем, реестр для granum, формулы) — шаг сборки.
+ * CSS тем отсюда не пишется: селекторы режимов назначает сборка granum, а готовый
+ * CSS для подключения без granum собирает ядро (`@feugene/granularity/themes/<id>.css`).
+ *
+ * `--dist` пишет в `generated/` данные тем, реестр для granum и формулы — шаг сборки:
+ * плагин granum проверяет их по реестру и копирует в `dist` рядом с манифестом.
  * `--check` только сверяет и падает на расхождении (гейт `src/__tests__/generated.test.ts`).
  *
  * Модули пакета грузятся через `runnerImport` vite: они на TypeScript с
@@ -28,51 +30,18 @@ import { runnerImport } from 'vite'
  */
 
 const pkgDir = fileURLToPath(new URL('..', import.meta.url))
-const coreDir = resolve(pkgDir, '../granularity')
 
 const DEFAULT_THEME = 'slate'
 
 const GENERATED_BANNER_TS
   = '// СГЕНЕРИРОВАНО `yarn workspace @feugene/granularity-tokens generate` — правки здесь потеряются.'
 
-const CORE_BANNER_CSS = [
-  '/*',
-  ' * СГЕНЕРИРОВАНО `yarn workspace @feugene/granularity-tokens generate` из темы `slate`',
-  ' * пакета `@feugene/granularity-tokens` — правки здесь потеряются.',
-  ' * Менять значения и комментарии нужно там, затем перегенерировать.',
-  ' */',
-].join('\n')
-
 /**
- * Селекторы CSS ядра по режимам. Это раскладка ядра 1.x: на каталоге granum 3
- * селекторы назначает сборка приложения, и этот блок уходит вместе с записью
- * CSS ядра.
+ * Формулы — на корне и на каждом элементе с режимом: значение `var()` в
+ * кастомном свойстве подставляется там, где свойство объявлено, и остров
+ * режима иначе получил бы hover-цвета, посчитанные от ролей страницы.
  */
-const CORE_MODES = {
-  light: {
-    selectors: [':root', '[data-theme=\'light\']', '.light'],
-    note: [
-      'Светлая тема. Кроме `:root` — атрибут `[data-theme=\'light\']` и класс `.light`:',
-      'остров `GrConfigProvider theme="light"` внутри тёмной страницы объявляет роли на',
-      'себе и перекрывает унаследованные тёмные.',
-    ].join('\n'),
-  },
-  dark: {
-    selectors: ['[data-theme=\'dark\']', '.dark'],
-    note: [
-      'Тёмная тема. Канон — атрибут `[data-theme=\'dark\']` на `<html>` (его ставит',
-      '`useTheme`/`initThemeEarly`). Селектор `.dark` оставлен для интеропа с',
-      'class-стратегией Tailwind/UnoCSS: приложение может уже переключать тему им.',
-    ].join('\n'),
-  },
-}
-
-/** Где пересчитываются производные в CSS ядра: корень и любой остров темы. */
-const CORE_DERIVED_SELECTORS = [':root', '[data-theme]', '.light', '.dark']
-/** То же для формул пакета токенов: классов режимов granum 3 не выводит. */
 const DERIVED_SELECTORS = [':root', '[data-theme]']
-
-const NO_COLOR_MIX_RULE = '@supports not (color: color-mix(in srgb, #000 50%, #fff)) {'
 
 async function readJson(path) {
   return JSON.parse(await readFile(path, 'utf8'))
@@ -135,32 +104,7 @@ async function readData() {
   return { raw: { foundation, roles, derived }, registry, themes, resolveModes }
 }
 
-// --- CSS ядра --------------------------------------------------------------
-
-function renderNote(note, indent) {
-  const lines = note.split('\n')
-  if (lines.length === 1)
-    return [`${indent}/* ${lines[0]} */`]
-
-  return [`${indent}/*`, ...lines.map(line => `${indent} * ${line}`.trimEnd()), `${indent} */`]
-}
-
-function renderGroup(group, values, notes, indent) {
-  const groupNote = group.note ?? notes.groups?.[group.title]
-  const lines = groupNote
-    ? renderNote(`${group.title}\n\n${groupNote}`, indent)
-    : [`${indent}/* ${group.title} */`]
-
-  for (const token of group.tokens) {
-    const note = notes.tokens?.[bare(token.name)]
-    if (note)
-      lines.push(...renderNote(note, indent))
-
-    lines.push(`${indent}${token.name}: ${values[bare(token.name)]};`)
-  }
-
-  return lines
-}
+// --- CSS -------------------------------------------------------------------
 
 function renderDerivedBlock(derived, selectors) {
   const lines = [`${selectors.join(',\n')} {`]
@@ -178,71 +122,6 @@ function renderDerivedBlock(derived, selectors) {
   lines.push('}', '')
 
   return lines
-}
-
-function renderCoreTokensCss({ raw }, theme) {
-  const lines = [CORE_BANNER_CSS, ':root {']
-
-  for (const [index, group] of raw.foundation.groups.entries()) {
-    if (index > 0)
-      lines.push('')
-
-    lines.push(...renderGroup(group, theme.data.root, {}, '  '))
-  }
-
-  lines.push('}', '')
-
-  // Формулы — и на каждом элементе, объявляющем тему, а не только на `:root`.
-  // Значение `var()` в кастомном свойстве подставляется там, где свойство
-  // объявлено, и наследуется уже готовым: остров `data-theme` внутри страницы
-  // другой темы получил бы hover-цвета, посчитанные от ролей страницы.
-  lines.push(...renderDerivedBlock(raw.derived, CORE_DERIVED_SELECTORS))
-
-  return lines.join('\n')
-}
-
-function renderCoreModeCss({ raw, resolveModes }, theme, mode) {
-  const { selectors, note } = CORE_MODES[mode]
-  const values = resolveModes(theme.data).get(mode)
-  const data = theme.data.modes[mode]
-  const notes = theme.notes.modes?.[mode] ?? {}
-  const lines = [CORE_BANNER_CSS, ...renderNote(note, ''), `${selectors.join(',\n')} {`]
-
-  // Нативные контролы и полосы прокрутки острова следуют его теме, а не странице.
-  lines.push(`  color-scheme: ${data.colorScheme};`, '')
-
-  for (const [index, group] of raw.roles.groups.entries()) {
-    if (index > 0)
-      lines.push('')
-
-    lines.push(...renderGroup(group, values, notes, '  '))
-  }
-
-  lines.push('}', '')
-
-  // Фолбэк для браузеров без `color-mix`: та же формула, посчитанная заранее.
-  const fallbacks = data.fallbacks?.[0]?.tokens ?? {}
-  lines.push(NO_COLOR_MIX_RULE)
-  lines.push(`${selectors.map(item => `  ${item}`).join(',\n')} {`)
-
-  for (const [index, group] of raw.derived.groups.entries()) {
-    if (index > 0)
-      lines.push('')
-
-    lines.push(`    /* ${group.fallbackTitle} */`)
-
-    for (const token of group.tokens) {
-      const value = fallbacks[bare(token.name)]
-      if (value === undefined)
-        throw new Error(`тема ${theme.data.id}, режим ${mode}: нет фолбэка ${token.name}`)
-
-      lines.push(`    ${token.name}: ${value};`)
-    }
-  }
-
-  lines.push('  }', '}', '')
-
-  return lines.join('\n')
 }
 
 // --- TS --------------------------------------------------------------------
@@ -415,9 +294,9 @@ function distOutputs({ raw, registry, themes }) {
   ])
 
   return [
-    ['dist/themes/registry.json', `${JSON.stringify(kinds, null, 2)}\n`],
-    ['dist/tokens.css', renderDerivedBlock(raw.derived, DERIVED_SELECTORS).join('\n')],
-    ...themes.map(theme => [`dist/themes/${theme.data.id}/theme.json`, `${JSON.stringify(theme.data, null, 2)}\n`]),
+    ['generated/themes/registry.json', `${JSON.stringify(kinds, null, 2)}\n`],
+    ['generated/tokens.css', renderDerivedBlock(raw.derived, DERIVED_SELECTORS).join('\n')],
+    ...themes.map(theme => [`generated/themes/${theme.data.id}/theme.json`, `${JSON.stringify(theme.data, null, 2)}\n`]),
   ]
 }
 
@@ -435,8 +314,6 @@ async function main() {
         ['src/generated.ts', renderTs(data)],
         ['src/theme/builtin.generated.ts', renderBuiltinTs(data, slate)],
         ['docs/tokens.md', renderDocs(data)],
-        [resolve(coreDir, 'src/styles/tokens.css'), renderCoreTokensCss(data, slate)],
-        ...Object.keys(CORE_MODES).map(mode => [resolve(coreDir, `src/styles/themes/${mode}.css`), renderCoreModeCss(data, slate, mode)]),
       ]
 
   const stale = []

@@ -158,7 +158,8 @@ describe('showcase bootstrap config', () => {
       '@feugene/granularity-showcase-icons',
     ])
     expect(showcaseGranumConfig.components).toBe('all')
-    expect(showcaseGranumConfig.themes).toEqual({ names: ['light', 'dark'] })
+    expect(showcaseGranumConfig.theme).toBe('slate')
+    expect(showcaseGranumConfig.modes).toEqual({ names: ['light', 'dark'] })
     expect(showcaseGranumConfig.appSources).toEqual({ dirs: ['src'] })
 
     // Движок — ванильный инстанс без своих правил: иконки `i-lucide-*`

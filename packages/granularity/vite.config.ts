@@ -8,9 +8,9 @@ import { windEngine } from '@feugene/granum-engine-wind'
 import { granularityProvider } from './src/granular-provider'
 
 /**
- * Копирует сырые CSS-токены/темы/preflight (`src/styles/*`) в `dist/styles/`,
- * чтобы потребитель мог подключить тему без granum —
- * `import '@feugene/granularity/styles/index.css'` (см. `exports` в package.json).
+ * Копирует базовый слой и preflight (`src/styles/*`) в `dist/styles/` для
+ * подключения без granum — `import '@feugene/granularity/styles.css'`. Тему
+ * рядом (`dist/themes/<id>.css`) пишет следующий шаг сборки, `scripts/theme-css.mjs`.
  */
 function copyStylesPlugin() {
   return {

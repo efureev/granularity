@@ -48,11 +48,11 @@ describe('useTheme (helpers)', () => {
   it('initThemeEarly should apply the preferred theme to the document', () => {
     window.localStorage.setItem(DEFAULT_STORAGE_KEY, 'light')
     initThemeEarly()
-    expect(document.documentElement.dataset.theme).toBe('light')
+    expect(document.documentElement.dataset.theme).toBe('slate-light')
 
     window.localStorage.setItem(DEFAULT_STORAGE_KEY, 'dark')
     initThemeEarly()
-    expect(document.documentElement.dataset.theme).toBe('dark')
+    expect(document.documentElement.dataset.theme).toBe('slate-dark')
     // Класс `.theme-dark` снят: тема выражается только data-атрибутом.
     expect(document.documentElement.classList.contains('theme-dark')).toBe(false)
   })
@@ -60,22 +60,22 @@ describe('useTheme (helpers)', () => {
   it('initThemeEarly should read from localStorage first', () => {
     window.localStorage.setItem(DEFAULT_STORAGE_KEY, 'dark')
     initThemeEarly()
-    expect(document.documentElement.dataset.theme).toBe('dark')
+    expect(document.documentElement.dataset.theme).toBe('slate-dark')
 
     window.localStorage.setItem(DEFAULT_STORAGE_KEY, 'light')
     initThemeEarly()
-    expect(document.documentElement.dataset.theme).toBe('light')
+    expect(document.documentElement.dataset.theme).toBe('slate-light')
   })
 
   it('initThemeEarly should support custom storageKey', () => {
     window.localStorage.setItem('my-theme', 'dark')
     initThemeEarly({ storageKey: 'my-theme' })
-    expect(document.documentElement.dataset.theme).toBe('dark')
+    expect(document.documentElement.dataset.theme).toBe('slate-dark')
 
     delete document.documentElement.dataset.theme
     document.documentElement.className = ''
     initThemeEarly()
-    expect(document.documentElement.dataset.theme).toBe('light')
+    expect(document.documentElement.dataset.theme).toBe('slate-light')
   })
 
   it('initThemeEarly should fallback to prefers-color-scheme when storage is empty', () => {
@@ -83,7 +83,7 @@ describe('useTheme (helpers)', () => {
     vi.stubGlobal('matchMedia', matchMedia)
 
     initThemeEarly()
-    expect(document.documentElement.dataset.theme).toBe('dark')
+    expect(document.documentElement.dataset.theme).toBe('slate-dark')
     expect(matchMedia).toHaveBeenCalledWith('(prefers-color-scheme: dark)')
   })
 
@@ -102,7 +102,7 @@ describe('useTheme (helpers)', () => {
 
     expect(window.localStorage.getItem('app-theme')).toBe('dark')
     expect(window.localStorage.getItem(DEFAULT_STORAGE_KEY)).toBe(null)
-    expect(document.documentElement.dataset.theme).toBe('dark')
+    expect(document.documentElement.dataset.theme).toBe('slate-dark')
   })
 
   it('useTheme should not touch localStorage when persist=false', () => {
@@ -110,7 +110,7 @@ describe('useTheme (helpers)', () => {
     setTheme('dark')
 
     expect(window.localStorage.getItem('app-theme')).toBe(null)
-    expect(document.documentElement.dataset.theme).toBe('dark')
+    expect(document.documentElement.dataset.theme).toBe('slate-dark')
   })
 
   it('useTheme should not throw when localStorage is missing setItem', () => {
@@ -123,7 +123,7 @@ describe('useTheme (helpers)', () => {
 
     const { setTheme } = useTheme({ storageKey: 'app-theme' })
     expect(() => setTheme('dark')).not.toThrow()
-    expect(document.documentElement.dataset.theme).toBe('dark')
+    expect(document.documentElement.dataset.theme).toBe('slate-dark')
   })
 })
 /**
@@ -190,8 +190,8 @@ describe('useTheme — состояние приложения', () => {
     second.api.setTheme('light')
 
     // Ради этого target и существует: темы приложений не перетирают друг друга.
-    expect(rootA.dataset.theme).toBe('dark')
-    expect(rootB.dataset.theme).toBe('light')
+    expect(rootA.dataset.theme).toBe('slate-dark')
+    expect(rootB.dataset.theme).toBe('slate-light')
     expect(document.documentElement.dataset.theme).toBeUndefined()
 
     first.wrapper.unmount()
@@ -227,7 +227,7 @@ describe('useTheme — состояние приложения', () => {
     window.dispatchEvent(new StorageEvent('storage', { key: 'scoped-theme', newValue: 'dark' }))
 
     expect(api.theme.value).toBe('dark')
-    expect(root.dataset.theme).toBe('dark')
+    expect(root.dataset.theme).toBe('slate-dark')
     expect(document.documentElement.dataset.theme).toBeUndefined()
 
     wrapper.unmount()
@@ -244,7 +244,7 @@ describe('useTheme — состояние приложения', () => {
 
     app.runWithContext(() => useTheme()).setTheme('dark')
 
-    expect(root.dataset.theme).toBe('dark')
+    expect(root.dataset.theme).toBe('slate-dark')
     expect(document.documentElement.dataset.theme).toBeUndefined()
 
     app.unmount()

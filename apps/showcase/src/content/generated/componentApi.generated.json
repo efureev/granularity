@@ -2845,7 +2845,7 @@
           },
           {
             "name": "theme",
-            "description": "Тема поддерева: значение уезжает в `data-theme`. Тема **документа** — работа `useTheme`/`initThemeEarly`, здесь именно остров.",
+            "description": "Режим поддерева — остров: имя режима (`dark`) уезжает в `data-theme` парой `slate-dark`, пара пишется как есть. Режим **документа** — работа `useTheme`/`initThemeEarly`.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"

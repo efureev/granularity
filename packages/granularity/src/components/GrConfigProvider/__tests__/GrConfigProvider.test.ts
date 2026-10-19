@@ -525,8 +525,8 @@ describe('theme: тема поддерева', () => {
     }))
 
     const providers = wrapper.findAll('[data-gr-config-provider]')
-    expect(providers[0].attributes('data-theme')).toBe('dark')
-    expect(providers[1].attributes('data-theme')).toBe('ocean')
+    expect(providers[0].attributes('data-theme')).toBe('slate-dark')
+    expect(providers[1].attributes('data-theme')).toBe('slate-ocean')
   })
 
   it('тема наследуется вложенным провайдером, который её не задаёт', () => {
@@ -536,7 +536,7 @@ describe('theme: тема поддерева', () => {
       }),
     }))
 
-    expect(wrapper.findAll('[data-gr-config-provider]')[1].attributes('data-theme')).toBe('dark')
+    expect(wrapper.findAll('[data-gr-config-provider]')[1].attributes('data-theme')).toBe('slate-dark')
   })
 
   it('телепортированная панель ставит тему себе сама', () => {
@@ -549,9 +549,17 @@ describe('theme: тема поддерева', () => {
     }), { attachTo: document.body })
 
     const panel = document.body.querySelector('[data-gr-tooltip-panel]')
-    expect(panel?.getAttribute('data-theme')).toBe('dark')
+    expect(panel?.getAttribute('data-theme')).toBe('slate-dark')
 
     wrapper.unmount()
+  })
+
+  it('имя режима становится парой темы, пара пишется как есть', () => {
+    const wrapper = mount(defineComponent({
+      setup: () => () => h(GrConfigProvider, { theme: 'slate-dark' }, { default: () => h('span', 'x') }),
+    }))
+
+    expect(wrapper.find('[data-gr-config-provider]').attributes('data-theme')).toBe('slate-dark')
   })
 
   it('без темы атрибут не появляется вовсе', () => {

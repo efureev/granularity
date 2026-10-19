@@ -9,6 +9,37 @@ to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- **Тема — из каталога `@feugene/granularity-tokens`, режим — парой `data-theme="slate-<режим>"`.**
+  Ядро больше не объявляет тем: провайдер — контракт granum 3 (`contractVersion: 2`) с
+  зависимостью `@feugene/granularity-tokens`, владельцем каталога, и только `baseCss` в `theme`.
+  Тема `slate` с режимами `light` и `dark` приезжает данными; режим по умолчанию объявлен на
+  `:root` и на паре `slate-light`, тёмный — на `[data-theme="slate-dark"]`. Селекторов
+  `[data-theme='dark']`, `.light` и `.dark` нет. Конфиг приложения — `theme` и `modes` вместо
+  `themes`. `useTheme`/`initThemeEarly` по-прежнему хранят и отдают имя режима (`'dark'`), а в
+  атрибут пишут пару; `GrConfigProvider theme="dark"` ставит острову `slate-dark`, пару пишет
+  как есть.
+- **Токены компонентов по темам — данными в `themesDir`.** `GrAvatar`, `GrBadge`, `GrButton`,
+  `GrDataTable`, `GrImageViewer`, `GrProgressBar` и `GrSegmented` держат значения в
+  `src/components/GrX/themes/slate/{root.json,modes/<режим>.json}`; `tokenDefinitionsRef` и
+  `tokenDefinitions` сняты. `--gr-segmented-indicator-highlight-shadow` теперь `kind: "theme"`.
+- **Без granum — `@feugene/granularity/themes/slate.css` и `styles.css`.** Готовый CSS темы
+  собирает сборка пакета тем же `emitCss`, что и приложение: примитивы и формулы, режимы, токены
+  компонентов ядра, фолбэки `@supports` — в этом порядке. `styles.css` = `themes/slate.css` +
+  `styles/base.css`. Подпути `styles/tokens.css`, `styles/themes/light.css` и
+  `styles/themes/dark.css` сняты, экспорт `granularityThemeNames`/`granularityDefaultThemes`
+  из `granular-provider` — тоже.
+
+### Fixed
+
+- **Тёмный остров на светлой странице получал светлые кнопки.** 42 токена `GrButton` — soft-фоны
+  тонов с наведением и нажатием, рамки весов, нейтральная рамка и недоступное состояние —
+  были объявлены только в светлом блоке, и остров наследовал их посчитанными на `<html>` по
+  светлым ролям. Теперь они объявлены на каждом `[data-theme]` и считаются от ролей острова.
+- **Тёмная подсветка индикатора `GrSegmented` не включалась атрибутом**: значение висело только
+  на `.dark`.
+- **`styles.css`: фолбэки `@supports not (color-mix)` перебивались формулами.** Темы шли до
+  `tokens.css`, и при равной специфичности формула, объявленная позже, побеждала фолбэк.
+
 - **`GrButton`: дотянут вид и отклик — API прежний.** Подпись — medium через новый
   хук `--gr-button-font-weight`. Фокус — `outline` 2px с отступом 2px вместо
   `ring` вплотную: кольцо больше не сливается с заливкой того же тона и остаётся

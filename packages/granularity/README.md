@@ -35,10 +35,11 @@ strategies.
   from their subpaths: with `granum`, a component imported from the root is a `ComponentRootImportError`,
   because the selection only sees a component by its subpath and the root loads the whole package;
 - component subpath exports: `@feugene/granularity/components/<ComponentName>`;
-- ready-made CSS entrypoint: `@feugene/granularity/styles.css` — tokens, base layer, preflight and the
-  built-in `light`/`dark` themes in one file, for consumers who do not run the build pipeline. A
+- ready-made CSS entrypoint: `@feugene/granularity/styles.css` — the `slate` theme in both modes
+  (`light`, `dark`) with the core component tokens and the base layer in one file, for consumers who
+  do not run the build pipeline. A mode is switched by the pair `data-theme="slate-dark"`. A
   component's own CSS is not there: with `granum` it arrives through the manifest;
-- low-level foundation exports: `@feugene/granularity/styles/tokens.css`, `@feugene/granularity/styles/base.css`, `@feugene/granularity/styles/preflight.css`, `@feugene/granularity/styles/themes/light.css`, `@feugene/granularity/styles/themes/dark.css`;
+- low-level foundation exports: `@feugene/granularity/themes/<theme>.css` (a ready theme of the catalog, `themes/slate.css`), `@feugene/granularity/styles/base.css`, `@feugene/granularity/styles/preflight.css`;
 - package-level API: `@feugene/granularity/directives`, `@feugene/granularity/fileValidation`;
 - design tokens as data: the registry of component tokens at `@feugene/granularity/tokens`; global tokens, theme data and the theme builder live in [`@feugene/granularity-tokens`](../granularity-tokens/README.md), a dependency of this package;
 - build manifest: `@feugene/granularity/granum.manifest.json` — what the application's `granum()` plugin

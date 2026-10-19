@@ -26,8 +26,13 @@ function readStoredTheme(): AppTheme | null {
   }
 }
 
+/** Режимы пакета включаются парой `slate-<режим>`; темы приложения — своим именем. */
+export function themeAttribute(theme: AppTheme): string {
+  return theme === 'light' || theme === 'dark' ? `slate-${theme}` : theme
+}
+
 function applyTheme(theme: AppTheme): void {
-  document.documentElement.dataset.theme = theme
+  document.documentElement.dataset.theme = themeAttribute(theme)
   // `.theme-dark` — deprecated-алиас пакета; поддерживаем ради стороннего кода,
   // который на него ещё смотрит.
   document.documentElement.classList.toggle('theme-dark', theme === 'dark')
@@ -39,8 +44,9 @@ export function useAppTheme() {
   // Начальное значение уже проставлено инлайновым скриптом в `index.html`
   // (иначе была бы вспышка чужой темы) — здесь только синхронизируем состояние.
   onMounted(() => {
+    const attribute = document.documentElement.dataset.theme?.replace(/^slate-/, '')
     theme.value = readStoredTheme()
-      ?? (document.documentElement.dataset.theme as AppTheme | undefined)
+      ?? APP_THEMES.find(name => name === attribute)
       ?? 'light'
   })
 

@@ -214,11 +214,11 @@ const { target, enabled } = usePortalTarget()
 Нужна третья — заводите свой контроллер поверх `[data-theme]` и подключайте CSS
 темы обычным импортом. Рабочий пример — `apps/playground-theme`.
 
-**Перекрашивать встроенную тему — в конфиге granum.** `themes.tokenOverrides`
-и `themes.define.<имя>.tokensRef` ложатся после файла темы пакета под её
-селектор и побеждают его; третья тема — `themes.define` с `extends`
-([`theming.md`](./theming.md#подключение)). Ключа `themes.themeFiles` (пресет
-v1) в granum нет: конфиг с ним — ошибка.
+**Перекрашивать тему пакета — в конфиге granum.** `modes.tokenOverrides`
+ложится в блок пары режима после данных темы и побеждает их; свой режим —
+`modes.define` с `extends` и `tokens` или `tokensRef`
+([`theming.md`](./theming.md#подключение)). Ключа `themes` у granum 3 нет:
+конфиг с ним — ошибка.
 
 **Тему собирать из данных, а не писать CSS руками.** `extendTheme` (поверх
 готовой) и `createTheme` (с нуля) из `@feugene/granularity-tokens/theme` отдают и

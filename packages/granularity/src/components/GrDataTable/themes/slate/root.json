@@ -1,0 +1,4 @@
+{
+  "gr-datatable-detail-bg": "color-mix(in srgb, var(--gr-muted) 45%, transparent)",
+  "gr-datatable-detail-accent": "var(--gr-primary)"
+}

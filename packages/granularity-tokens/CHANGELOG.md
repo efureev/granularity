@@ -18,6 +18,10 @@ to [Semantic Versioning](https://semver.org/).
   `color-mix`. Результат — данные в форме `GranumThemeData` контракта granum 3.
 - **`loadTheme`** (`/theme/node`) читает тему из папки, находит тему-базу по id и отдаёт
   прочитанные файлы в `sources`.
+- **Провайдер granum без компонентов — владелец каталога тем.** `granum.manifest.json` с каталогом
+  (`slate`), реестром токенов (`themes/registry.json`) и формулами производных (`tokens.css` на
+  `:root, [data-theme]`); сборка — `granumProvider()` granum 3. Ядро подключает пакет
+  зависимостью провайдера.
 - `extendTheme`, `createTheme`, `tone`, `validateTheme`, цветовая математика и `applyTheme` — те же,
   что были в `@feugene/granularity/theme`. `extendTheme` сверяет покомпонентные токены с
   `knownComponentTokens`, если список передан: реестр компонентов живёт у пакетов с компонентами.

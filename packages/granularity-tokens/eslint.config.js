@@ -21,6 +21,7 @@ export default antfu(
       'dist/**',
       'node_modules/**',
       'coverage/**',
+      'generated/**',
       // Сгенерированы `scripts/generate.mjs` — правится только генератор.
       'src/generated.ts',
       'src/theme/builtin.generated.ts',

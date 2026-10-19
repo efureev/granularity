@@ -15,10 +15,10 @@ import slateData from '@feugene/granularity-tokens/themes/slate/theme.json'
  * Рецепты «Подключение» из `packages/granularity/docs/theming.md` — на настоящем
  * granum и манифесте пакета.
  *
- * Темы пакета приезжают CSS-файлами, и рецепт работает, только если значение
- * приложения встаёт после файла темы под её селектор. Тест проверяет ровно это:
- * в слое `themes` последнее объявление `--gr-primary` для тёмной темы — значение
- * приложения.
+ * Тема пакета приезжает данными каталога, режим включается парой
+ * `data-theme="slate-<режим>"`. Рецепт работает, только если значение
+ * приложения ложится в блок своей пары после данных темы: тест проверяет ровно
+ * это — последнее объявление `--gr-primary` под парой.
  */
 
 const root = fileURLToPath(new URL('../../', import.meta.url))
@@ -32,10 +32,11 @@ const base = {
   providers: ['@feugene/granularity'],
   components: [] as string[],
   appSources: { dirs: [] as string[] },
+  theme: 'slate',
 }
 
-async function themesLayer(themes: Record<string, unknown>): Promise<string> {
-  const config = { ...base, themes }
+async function themesLayer(modes: Record<string, unknown>): Promise<string> {
+  const config = { ...base, modes }
   validateGranumConfig(config)
   return (await emitCss(await prepareApp(config as Parameters<typeof prepareApp>[0], root))).layers.themes
 }
@@ -47,55 +48,55 @@ function primaryBlocks(css: string): Array<{ selector: string, primary: string }
     .filter(block => block.primary)
 }
 
-function lastDarkPrimary(css: string): string | undefined {
-  return primaryBlocks(css).filter(block => block.selector.includes('[data-theme=\'dark\']')).at(-1)?.primary
+function lastPrimary(css: string, pair: string): string | undefined {
+  return primaryBlocks(css).filter(block => block.selector.includes(`[data-theme="${pair}"]`)).at(-1)?.primary
 }
 
 describe('рецепты темизации из theming.md', () => {
-  it('тема пакета приезжает файлом: без рецепта у тёмной темы её собственный primary', async () => {
-    expect(lastDarkPrimary(await themesLayer({ names: ['light', 'dark'] }))).toBe(darkPrimary)
+  it('тема пакета приезжает данными: у тёмного режима его собственный primary', async () => {
+    expect(lastPrimary(await themesLayer({ names: ['light', 'dark'] }), 'slate-dark')).toBe(darkPrimary)
   })
 
-  it('точечный override: tokenOverrides побеждает файл тёмной темы', async () => {
+  it('точечный override: tokenOverrides режима побеждает данные темы', async () => {
     const css = await themesLayer({ names: ['light', 'dark'], tokenOverrides: { dark: { 'gr-primary': '#4fd1e0' } } })
 
-    expect(lastDarkPrimary(css)).toBe('#4fd1e0')
+    expect(lastPrimary(css, 'slate-dark')).toBe('#4fd1e0')
   })
 
   it('ключ с `--` — ошибка конфига, а не `----gr-primary`', () => {
     expect(() => validateGranumConfig({
       ...base,
-      themes: { names: ['light', 'dark'], tokenOverrides: { dark: { '--gr-primary': '#4fd1e0' } } },
+      modes: { names: ['light', 'dark'], tokenOverrides: { dark: { '--gr-primary': '#4fd1e0' } } },
     })).toThrow(/must not start with '--'/)
   })
 
-  it('перекрасить встроенную тему: define.dark.tokensRef ложится поверх файла пакета', async () => {
-    const file = join(scratch, 'dark-rebrand.css')
-    writeFileSync(file, '[data-theme=\'dark\'] { --gr-primary: #ff00aa; }\n')
+  it('свой режим из файла: define.<имя>.tokensRef поверх тёмного, остальное — от него', async () => {
+    const file = join(scratch, 'rebrand.css')
+    writeFileSync(file, ':root { --gr-primary: #ff00aa; }\n')
 
-    const css = await themesLayer({ names: ['light', 'dark'], define: { dark: { tokensRef: pathToFileURL(file).href } } })
+    const css = await themesLayer({ names: ['light', 'dark', 'rebrand'], define: { rebrand: { extends: 'dark', tokensRef: pathToFileURL(file).href } } })
+    const rebrand = [...css.matchAll(/\[data-theme="slate-rebrand"\]\s*\{([^}]*)\}/g)].map(match => match[1]!).join('\n')
 
-    expect(lastDarkPrimary(css)).toBe('#ff00aa')
-    // Файл пакета остаётся: роли, которых в файле приложения нет, приходят из него.
-    expect(primaryBlocks(css).some(block => block.primary === darkPrimary)).toBe(true)
+    expect(lastPrimary(css, 'slate-rebrand')).toBe('#ff00aa')
+    expect(rebrand).toContain(`--gr-bg: ${dark['gr-bg']}`)
+    expect(lastPrimary(css, 'slate-dark')).toBe(darkPrimary)
   })
 
-  it('третья тема: define с extends наследует тёмную и встаёт под свой data-theme', async () => {
+  it('третий режим: define с extends наследует тёмный и встаёт под свою пару', async () => {
     const css = await themesLayer({
       names: ['light', 'dark', 'ocean'],
       define: { ocean: { extends: 'dark', tokens: { 'gr-primary': '#0ea5e9' } } },
     })
-    const ocean = [...css.matchAll(/\[data-theme="ocean"\]\s*\{([^}]*)\}/g)].map(match => match[1]!).join('\n')
-    const darkBg = dark['gr-bg']!
+    const ocean = [...css.matchAll(/\[data-theme="slate-ocean"\]\s*\{([^}]*)\}/g)].map(match => match[1]!).join('\n')
 
     expect(ocean).toContain('--gr-primary: #0ea5e9')
-    expect(ocean).toContain(`--gr-bg: ${darkBg}`)
+    expect(ocean).toContain(`--gr-bg: ${dark['gr-bg']}`)
   })
 
-  it('ключа themes.themeFiles пресета v1 у granum нет', () => {
+  it('ключа `themes` у granum 3 нет — подсказка ведёт к `theme` и `modes`', () => {
     expect(() => validateGranumConfig({
       ...base,
-      themes: { names: ['light', 'dark'], themeFiles: { dark: './x.css' } },
-    })).toThrow(/unknown option/)
+      themes: { names: ['light', 'dark'] },
+    })).toThrow(/modes/)
   })
 })

@@ -1,6 +1,7 @@
 import { computed, getCurrentInstance, inject, type ComputedRef, type InjectionKey } from 'vue'
 
 import type { GrComponentDefaultsRegistry } from '../../composables/useGrComponentConfig'
+import { themeActivationValue } from '../../composables/internal/themeActivation'
 
 /**
  * Контекст `GrConfigProvider` — глобальные дефолты для вложенных GR-компонентов:
@@ -279,6 +280,6 @@ export function useGrThemeAttrs(): ComputedRef<{ 'data-theme'?: string }> {
   const config = useGrConfig()
   return computed(() => {
     const theme = config.theme?.value
-    return theme ? { 'data-theme': theme } : {}
+    return theme ? { 'data-theme': themeActivationValue(theme) } : {}
   })
 }

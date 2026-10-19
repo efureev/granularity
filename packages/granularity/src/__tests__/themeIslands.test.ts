@@ -1,96 +1,143 @@
-import { readFileSync } from 'node:fs'
-import { resolve } from 'node:path'
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeAll, describe, expect, it } from 'vitest'
 
-import { themeVarsByName } from './cssContrast'
+import { componentFormulaTokens, pair, themeCss, themeVars } from './themeCss'
 
 /**
- * Остров темы внутри страницы другой темы.
+ * Режимы темы по CSS, который получает потребитель: остров режима, пара на
+ * корне и порядок слоёв в `themes/slate.css`.
  *
- * Светлая тема объявлялась только на `:root`, и поддерево
- * `GrConfigProvider theme="light"` внутри `<html data-theme="dark">` наследовало
- * тёмные роли: `bg-[var(--gr-bg)]` в нём считался `#0f172a`. Тёмный остров на
- * светлой странице работал, потому что тёмная тема с самого начала висела на
- * атрибуте. Теперь обе темы объявлены и на атрибуте, и на классе.
- *
- * jsdom считает каскад и наследование кастомных свойств, поэтому проверка идёт
- * по настоящим файлам тем, а не по их разбору.
+ * jsdom считает каскад и наследование кастомных свойств, но `var()` в них не
+ * подставляет. Поэтому «пересчитано ли на острове» видно по метке: её ставим
+ * на `<html>` инлайном, и элемент острова получает метку только тогда, когда
+ * своего объявления у него нет — значение `var()` подставляется там, где
+ * свойство объявлено, и унаследованная формула посчитана от ролей страницы.
  */
-function css(path: string): string {
-  return readFileSync(resolve(process.cwd(), path), 'utf8')
-}
+const LIGHT = pair('light')
+const DARK = pair('dark')
+const SENTINEL = 'inherited-from-root'
 
-const sheets = [
-  css('src/styles/themes/light.css'),
-  css('src/styles/themes/dark.css'),
-  css('src/styles/tokens.css'),
-  css('src/components/GrProgressBar/themes/light.css'),
-  css('src/components/GrProgressBar/themes/dark.css'),
-]
+let css: string
 
-function mountPage(rootTheme: 'light' | 'dark', islandTheme: 'light' | 'dark') {
-  const style = document.createElement('style')
-  style.textContent = sheets.join('\n')
-  document.head.append(style)
-
-  if (rootTheme === 'dark')
-    document.documentElement.setAttribute('data-theme', 'dark')
-
-  document.body.innerHTML = `<div data-theme="${islandTheme}"><span data-inner></span></div>`
-
-  return {
-    island: document.querySelector<HTMLElement>(`[data-theme="${islandTheme}"]`)!,
-    inner: document.querySelector<HTMLElement>('[data-inner]')!,
-    cleanup: () => style.remove(),
-  }
-}
+beforeAll(() => {
+  css = themeCss()
+})
 
 afterEach(() => {
   document.documentElement.removeAttribute('data-theme')
+  document.documentElement.removeAttribute('style')
+  document.head.innerHTML = ''
   document.body.innerHTML = ''
-  document.head.querySelectorAll('style').forEach(node => node.remove())
 })
 
-const LIGHT_BG = themeVarsByName.light['--gr-bg']
-const DARK_BG = themeVarsByName.dark['--gr-bg']
+function mount(page: string | null, island: string): HTMLElement {
+  const style = document.createElement('style')
+  style.textContent = css
+  document.head.append(style)
+  if (page)
+    document.documentElement.setAttribute('data-theme', page)
+  document.body.innerHTML = `<div data-theme="${island}"><span data-inner></span></div>`
 
-describe('остров темы', () => {
+  return document.querySelector<HTMLElement>('[data-inner]')!
+}
+
+const valueOf = (element: Element, token: string): string => getComputedStyle(element).getPropertyValue(token).trim()
+
+function inheritedFromRoot(inner: HTMLElement, tokens: readonly string[]): string[] {
+  for (const token of tokens)
+    document.documentElement.style.setProperty(token, SENTINEL)
+
+  return tokens.filter(token => valueOf(inner, token) === SENTINEL)
+}
+
+describe('остров режима', () => {
   it('светлый остров внутри тёмной страницы получает светлые роли', () => {
-    const { inner } = mountPage('dark', 'light')
+    const inner = mount(DARK, LIGHT)
 
-    expect(getComputedStyle(document.documentElement).getPropertyValue('--gr-bg').trim()).toBe(DARK_BG)
-    expect(getComputedStyle(inner).getPropertyValue('--gr-bg').trim()).toBe(LIGHT_BG)
+    expect(valueOf(document.documentElement, '--gr-bg')).toBe(themeVars('dark')['--gr-bg'])
+    expect(valueOf(inner, '--gr-bg')).toBe(themeVars('light')['--gr-bg'])
   })
 
   it('тёмный остров внутри светлой страницы получает тёмные роли', () => {
-    const { inner } = mountPage('light', 'dark')
+    const inner = mount(null, DARK)
 
-    expect(getComputedStyle(document.documentElement).getPropertyValue('--gr-bg').trim()).toBe(LIGHT_BG)
-    expect(getComputedStyle(inner).getPropertyValue('--gr-bg').trim()).toBe(DARK_BG)
+    expect(valueOf(document.documentElement, '--gr-bg')).toBe(themeVars('light')['--gr-bg'])
+    expect(valueOf(inner, '--gr-bg')).toBe(themeVars('dark')['--gr-bg'])
   })
 
-  it('остров объявляет `color-scheme` своей темы — нативные контролы следуют за ним', () => {
-    expect(css('src/styles/themes/light.css')).toMatch(/\[data-theme='light'\],\n\.light \{\n {2}color-scheme: light;/)
-    expect(css('src/styles/themes/dark.css')).toMatch(/\.dark \{\n {2}color-scheme: dark;/)
+  it('остров объявляет `color-scheme` своего режима — нативные контролы следуют за ним', () => {
+    expect(valueOf(mount(null, DARK), 'color-scheme')).toBe('dark')
+    expect(valueOf(mount(DARK, LIGHT), 'color-scheme')).toBe('light')
   })
 
-  // Значение `var()` в кастомном свойстве подставляется там, где свойство
-  // объявлено: формулы и ссылки, объявленные только на `:root`, остров
-  // унаследовал бы уже посчитанными от ролей страницы.
-  it('производные формулы и токены компонентов пересчитываются на острове', () => {
-    const { island } = mountPage('dark', 'light')
-    const derivedBlock = css('src/styles/tokens.css').split('\n').slice(css('src/styles/tokens.css').split('\n').indexOf(':root,'))
-    const derivedSelector = derivedBlock.slice(0, derivedBlock.findIndex(line => line.endsWith('{')) + 1).join(' ').replace(/\s*\{$/, '')
-
-    expect(island.matches(derivedSelector)).toBe(true)
-    expect(island.matches(':root, [data-theme=\'light\'], .light')).toBe(true)
-    expect(css('src/components/GrProgressBar/themes/light.css')).toContain(':root,\n[data-theme=\'light\'],\n.light {')
+  it('производные формулы пересчитываются на острове', () => {
+    expect(inheritedFromRoot(mount(DARK, LIGHT), ['--gr-primary-hover', '--gr-brd-active'])).toEqual([])
   })
 
-  it('фолбэк без `color-mix` объявлен на тех же селекторах, что и тема', () => {
-    const light = css('src/styles/themes/light.css')
-    const fallback = light.slice(light.indexOf('@supports not'))
+  // D1: soft-фоны, рамки и недоступное состояние кнопки были объявлены только
+  // в светлом блоке, и тёмный остров наследовал их посчитанными по светлым ролям.
+  describe('формулы токенов компонентов пересчитываются на острове (D1)', () => {
+    const formulas = componentFormulaTokens()
 
-    expect(fallback).toContain('  :root,\n  [data-theme=\'light\'],\n  .light {')
+    it('формулы есть — гейт не пуст', () => {
+      expect(formulas.length).toBeGreaterThan(40)
+    })
+
+    it('тёмный остров на светлой странице', () => {
+      expect(inheritedFromRoot(mount(null, DARK), formulas)).toEqual([])
+    })
+
+    it('светлый остров на тёмной странице', () => {
+      expect(inheritedFromRoot(mount(DARK, LIGHT), formulas)).toEqual([])
+    })
+  })
+})
+
+describe('пара режима на корне', () => {
+  // D2: тёмное значение висело только на `.dark`, а штатный атрибут его не включал.
+  it('подсветка индикатора `GrSegmented` на тёмной паре — тёмная (D2)', () => {
+    const token = '--gr-segmented-indicator-highlight-shadow'
+    mount(null, LIGHT)
+    const light = valueOf(document.documentElement, token)
+    document.documentElement.setAttribute('data-theme', DARK)
+
+    expect(light).not.toBe('')
+    expect(valueOf(document.documentElement, token)).not.toBe(light)
+  })
+
+  it('без атрибута действует режим по умолчанию', () => {
+    mount(null, LIGHT)
+
+    expect(valueOf(document.documentElement, '--gr-bg')).toBe(themeVars('light')['--gr-bg'])
+    expect(valueOf(document.documentElement, 'color-scheme')).toBe('light')
+  })
+
+  it('классы `.light`/`.dark` режим не включают', () => {
+    expect(css).not.toMatch(/\.(?:light|dark)\b/)
+  })
+})
+
+// D4: в прежнем `styles/index.css` темы шли до `tokens.css`, и формула при равной
+// специфичности перебивала фолбэк `@supports`, объявленный раньше неё.
+describe('порядок слоёв в `themes/slate.css` (D4)', () => {
+  const firstFallback = () => css.indexOf('@supports')
+
+  it('фолбэки `@supports` идут после всех формул и режимов', () => {
+    const lastFormula = Math.max(...[...css.matchAll(/^\s*--gr-[\w-]+: color-mix\(/gm)].map(match => match.index))
+    const lastMode = Math.max(css.indexOf(`[data-theme="${LIGHT}"] {`), css.indexOf(`[data-theme="${DARK}"] {`))
+
+    expect(firstFallback()).toBeGreaterThan(lastFormula)
+    expect(firstFallback()).toBeGreaterThan(lastMode)
+  })
+
+  it('фолбэк объявлен на тех же селекторах, что и режим', () => {
+    const fallbacks = css.slice(firstFallback())
+
+    expect(fallbacks).toContain(`  :root, [data-theme="${LIGHT}"] {`)
+    expect(fallbacks).toContain(`  [data-theme="${DARK}"] {`)
+  })
+
+  it('примитивы `:root` — до режимов', () => {
+    expect(css.indexOf(':root {')).toBeGreaterThan(-1)
+    expect(css.indexOf(':root {')).toBeLessThan(css.indexOf(`[data-theme="${LIGHT}"] {`))
   })
 })

@@ -334,11 +334,9 @@ describe('GrButton — отключённое состояние', () => {
     const roles = [['bg', '--gr-disabled-bg'], ['fg', '--gr-disabled-fg'], ['brd', '--gr-disabled-brd']] as const
 
     for (const theme of ['light', 'dark'] as const) {
-      // Тёмная тема переопределяет не всё: базой идёт `:root` из светлого файла.
       const buttonVars = {
         ...themeVarsByName[theme],
-        ...grButtonLightThemeVars,
-        ...(theme === 'dark' ? grButtonDarkThemeVars : {}),
+        ...(theme === 'dark' ? grButtonDarkThemeVars : grButtonLightThemeVars),
       }
 
       for (const [part, role] of roles) {

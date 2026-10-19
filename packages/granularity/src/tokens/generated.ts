@@ -1693,9 +1693,9 @@ export const grComponentTokens: GrComponentToken[] = [
   {
     "owner": "GrSegmented",
     "name": "--gr-segmented-indicator-highlight-shadow",
-    "kind": "hook",
+    "kind": "theme",
     "default": "0 0 0 0 transparent",
-    "description": "Дополнительная подсветка бегунка: по умолчанию выключена, включается темой поверх основной тени."
+    "description": "Дополнительная подсветка бегунка поверх основной тени: в светлом режиме выключена, в тёмном — тонкое светлое кольцо."
   },
   {
     "owner": "GrSegmented",

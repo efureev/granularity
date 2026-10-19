@@ -17,9 +17,9 @@ import { fileURLToPath } from 'node:url'
  *   src/tokens/generated.ts — `grComponentTokens` для TS-потребителей;
  *   docs/tokens.md          — раздел «Покомпонентные точки кастомизации».
  *
- * Глобальные токены — примитивы, роли, производные — и CSS темы
- * (`src/styles/tokens.css`, `src/styles/themes/*.css`) генерирует пакет
- * `@feugene/granularity-tokens`: `yarn workspace @feugene/granularity-tokens generate`.
+ * Глобальные токены — примитивы, роли, производные — живут в пакете
+ * `@feugene/granularity-tokens`; CSS темы для подключения без granum собирает
+ * `scripts/theme-css.mjs` на сборке пакета.
  *
  * Запуск: `yarn generate:tokens` (перезаписывает), `--check` — только проверка
  * расхождения (используется тестом `src/__tests__/tokens.generated.test.ts`).
@@ -110,7 +110,7 @@ function renderDocs(components) {
     '',
     '| Значение | Что это значит |',
     '| --- | --- |',
-    '| тема компонента | объявлен в `components/<Gr…>/themes/*.css`, переключается вместе с темой |',
+    '| тема компонента | объявлен в `components/<Gr…>/themes/<тема>/` (`root.json`, `modes/<режим>.json`), переключается вместе с режимом |',
     '| CSS компонента | объявлен в собственном `<style>` компонента |',
     '| инлайн-стиль | компонент присваивает его сам, обычно от ступени `size` |',
     '| только хук | нигде не присваивается: работает дефолт из `var(--gr-x, дефолт)` |',

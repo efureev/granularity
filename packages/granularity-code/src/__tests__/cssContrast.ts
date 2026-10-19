@@ -1,15 +1,13 @@
-import { createRequire } from 'node:module'
-import { readFileSync } from 'node:fs'
-import { dirname, resolve } from 'node:path'
-
+import { grDerivedTokens } from '@feugene/granularity-tokens'
 import { contrast, deltaE } from '@feugene/granularity-tokens/theme'
+import slateData from '@feugene/granularity-tokens/themes/slate/theme.json'
 
 /**
  * Разрешение CSS-цветов и расчёт контраста для тестов пакета.
  *
  * Зачем вообще: jsdom не считает каскад и не умеет `color-mix()`, поэтому
  * проверить «что реально увидит пользователь» через `getComputedStyle` нельзя.
- * Тема читается файлом, `var()`/`color-mix()` разворачиваются вручную, контраст
+ * Тема читается данными, `var()`/`color-mix()` разворачиваются вручную, контраст
  * считается по формуле WCAG.
  *
  * **Про копию.** У ядра есть свой `src/__tests__/cssContrast.ts` — он не
@@ -21,37 +19,9 @@ import { contrast, deltaE } from '@feugene/granularity-tokens/theme'
  * Правильное место для этого модуля — `granularity-test-kit`: контраст палитры
  * понадобится каждому спутнику, который заведёт свою. Вынос отложен намеренно —
  * он трогает три пакета и не должен ехать внутри заведения нового.
- *
- * ВНИМАНИЕ: `parseVars` — намеренно наивный регэксп по всему тексту файла,
- * включая комментарии.
  */
 
 export interface RgbColor { r: number, g: number, b: number }
-
-const requireFromHere = createRequire(import.meta.url)
-
-/** Корень установленного ядра: тема читается из того, что отгружается. */
-const corePackageDir = dirname(requireFromHere.resolve('@feugene/granularity/package.json'))
-
-function readCoreCss(relativePath: string): string {
-  const path = resolve(corePackageDir, relativePath)
-
-  try {
-    return readFileSync(path, 'utf8')
-  }
-  catch {
-    throw new Error(
-      `Не прочитан ${relativePath} ядра. Гейт контраста читает собранный \`dist\` — `
-      + 'выполни `yarn build:granularity`.',
-    )
-  }
-}
-
-export function parseVars(content: string): Record<string, string> {
-  return Object.fromEntries(
-    [...content.matchAll(/--([\w-]+):([^;]+);/g)].map(([, key, value]) => [`--${key}`, value!.trim()]),
-  )
-}
 
 /** Разбивает по запятым верхнего уровня, не залезая внутрь скобок. */
 function splitTopLevel(input: string): string[] {
@@ -193,12 +163,21 @@ export function getColorClassExpression(className: string, prefix: string): stri
   return undefined
 }
 
-/** Токены глобальных тем ядра + производные из `tokens.css`. */
+type TokenMap = Record<string, string>
+
+const slate = slateData as { root: TokenMap, modes: Record<'light' | 'dark', { tokens: TokenMap }> }
+
+function withDashes(tokens: TokenMap): TokenMap {
+  return Object.fromEntries(Object.entries(tokens).map(([name, value]) => [`--${name}`, value]))
+}
+
+/** Примитивы и роли режимов темы `slate` — из данных пакета токенов, которые отгружаются. */
 export const themeVarsByName = {
-  light: parseVars(readCoreCss('dist/styles/themes/light.css')),
-  dark: parseVars(readCoreCss('dist/styles/themes/dark.css')),
+  light: { ...withDashes(slate.root), ...withDashes(slate.modes.light.tokens) },
+  dark: { ...withDashes(slate.root), ...withDashes(slate.modes.dark.tokens) },
 } as const
 
-export const derivedThemeVars = parseVars(readCoreCss('dist/styles/tokens.css'))
+/** Производные формулы (`--gr-primary-hover` и т.п.) — из реестра пакета токенов. */
+export const derivedThemeVars: TokenMap = Object.fromEntries(grDerivedTokens.map(token => [token.name, token.formula]))
 
 export type ThemeName = keyof typeof themeVarsByName

@@ -2,8 +2,7 @@ import installationDocSource from '../../../../packages/granularity/docs/install
 import localizationDocSource from '../../../../packages/granularity/docs/localization.md?raw'
 import stylingDocSource from '../../../../packages/granularity/docs/styling.md?raw'
 import granumDocSource from '../../../../packages/granularity/docs/granum.md?raw'
-import { granularityDefaultThemes, granularityThemeNames } from '@feugene/granularity/granular-provider'
-import { grDerivedTokens, grFoundationTokens, type GrThemeData, grRoleTokens, resolveModes } from '@feugene/granularity-tokens'
+import { grDerivedTokens, grFoundationTokens, grRoleTokens, grThemeCatalog, type GrThemeData, resolveModes } from '@feugene/granularity-tokens'
 import slateData from '@feugene/granularity-tokens/themes/slate/theme.json'
 
 type ShowcaseCodeSample = {
@@ -51,7 +50,8 @@ export type ShowcaseThemeToken = {
   }>
 }
 
-type ShowcaseThemeName = (typeof granularityThemeNames)[number]
+const showcaseModes = ['light', 'dark'] as const
+type ShowcaseThemeName = (typeof showcaseModes)[number]
 
 function takeLeadingBlock(source: string, linesCount = 48) {
   return source
@@ -86,13 +86,14 @@ function extractHexValue(value: string) {
   return value.match(/#(?:[\da-f]{3}|[\da-f]{6})\b/i)?.[0] ?? null
 }
 
-// Витрина показывает только тему `slate`: её режимы и есть темы `light`/`dark` ядра.
+// Витрина показывает тему `slate` каталога пакета токенов в её режимах `light`/`dark`.
 const slate = slateData as GrThemeData
+const slateEntry = grThemeCatalog.find(entry => entry.id === slate.id)!
 const slateModes = resolveModes(slate)
 
 function toThemeValues(valueOf: (mode: ShowcaseThemeName) => string): ShowcaseThemeToken['values'] {
   return Object.fromEntries(
-    granularityThemeNames.map(theme => [
+    showcaseModes.map(theme => [
       theme,
       {
         value: valueOf(theme),
@@ -190,8 +191,9 @@ export default defineGranumConfig({
   components: [
     { provider: '@feugene/granularity', names: ['GrButton', 'GrCard'] },
   ],
-  // Оставляем только перечисленные темы; своя задаётся \`themes.define\`.
-  themes: { names: ['light', 'dark'] },
+  // Тема каталога и её режимы; свой режим задаётся \`modes.define\`.
+  theme: 'slate',
+  modes: { names: ['light', 'dark'] },
   appSources: { dirs: ['src'] },
 })`
 
@@ -205,7 +207,8 @@ export default defineGranumConfig({
   components: [
     { provider: '@feugene/granularity', names: ['GrButton', 'GrCard'] },
   ],
-  themes: { names: ['light', 'dark'] },
+  theme: 'slate',
+  modes: { names: ['light', 'dark'] },
   appSources: { dirs: ['src'] },
   // Токены, которых не берёт ни компонент селекции, ни разметка приложения,
   // из CSS вырезаются. Порядок внедрения: 'report' → план в отчёте → 'on'.
@@ -334,9 +337,9 @@ const themeExcerptTokenNames = [
   '--gr-info',
 ] as const
 
-const lightThemeCssExcerpt = renderThemeExcerpt('light', ':root', themeExcerptTokenNames)
+const lightThemeCssExcerpt = renderThemeExcerpt('light', ':root, [data-theme="slate-light"]', themeExcerptTokenNames)
 
-const darkThemeCssExcerpt = renderThemeExcerpt('dark', '[data-theme=\'dark\']', themeExcerptTokenNames)
+const darkThemeCssExcerpt = renderThemeExcerpt('dark', '[data-theme="slate-dark"]', themeExcerptTokenNames)
 
 // Срез обязан дотягиваться дальше палитры — до типографики, интервалов и
 // радиусов: иначе страница Foundations показывает один список цветов. Граница
@@ -403,9 +406,9 @@ export const showcaseFoundationStats = [
   },
   {
     id: 'theme-modes',
-    label: 'Встроенные темы',
-    value: `${granularityThemeNames.length}`,
-    description: `Дефолтно пакет публикует ${granularityThemeNames.join(' и ')}, при этом по умолчанию активна ${granularityDefaultThemes.join(', ')} theme.`,
+    label: 'Режимы темы',
+    value: `${slateEntry.modes.length}`,
+    description: `Тема \`${slateEntry.id}\` публикует режимы ${slateEntry.modes.map(mode => mode.name).join(' и ')}, по умолчанию активен ${slateEntry.defaultMode}.`,
   },
   {
     id: 'token-count',
@@ -449,13 +452,13 @@ export const showcaseFoundationGuides: ShowcaseFoundationGuide[] = [
   {
     id: 'themes',
     title: 'Themes',
-    summary: 'Встроенные `light` и `dark` темы отделены от foundation-токенов и могут жить рядом с кастомными theme layers приложения.',
+    summary: 'Режимы `light` и `dark` темы `slate` отделены от foundation-токенов и могут жить рядом с режимами приложения.',
     description: 'Theme layer определяет semantic значения вроде `--gr-bg`, `--gr-primary`, `--gr-brd` и статусные роли. Это позволяет использовать один набор foundations и переключать только визуальный режим.',
     narrativeSource: takeHeadingBlock(stylingDocSource, '## Встроенные темы'),
     sourcePath: 'packages/granularity/docs/styling.md',
     keyPoints: [
-      `Пакет публикует встроенные темы: ${granularityThemeNames.join(', ')}.`,
-      '`light.css` использует `:root`, а `dark.css` — `[data-theme=\'dark\']` и `.dark` (интероп с class-стратегией Tailwind/UnoCSS).',
+      `Тема \`${slateEntry.id}\` из каталога \`@feugene/granularity-tokens\`: режимы ${slateEntry.modes.map(mode => mode.name).join(', ')}.`,
+      'Режим включается парой `data-theme="slate-<режим>"`; режим по умолчанию висит ещё и на `:root`. Классов `.light`/`.dark` нет.',
       '`useTheme()` и `initThemeEarly()` уже дают базовый runtime-контракт для переключения темы.',
     ],
     recommendations: [
@@ -487,9 +490,9 @@ export const showcaseFoundationGuides: ShowcaseFoundationGuide[] = [
     summary: 'Токены фиксируют стабильные дизайн-значения, которые не должны дублироваться по темам и компонентам.',
     description: 'Foundation tokens описывают palette scale, typography, spacing, radii, elevation и motion. Они лежат отдельно от theme layer, чтобы продукт мог переиспользовать базовый контракт и менять только semantic цвета.',
     narrativeSource: tokensCssExcerpt,
-    sourcePath: 'packages/granularity/src/styles/tokens.css',
+    sourcePath: 'packages/granularity-tokens/tokens/foundation.json',
     keyPoints: [
-      `В \`tokens.css\` уже вынесено ${foundationTokenCount} токенов и производных формул.`,
+      `В реестре \`@feugene/granularity-tokens\` ${foundationTokenCount} токенов и производных формул.`,
       'Практическое правило из docs: всё, что одинаково для тем, живёт в `tokens`, а не в theme files.',
       'Производные interaction values вроде `--gr-primary-hover` считаются от semantic-переменных и не требуют копирования по темам.',
     ],

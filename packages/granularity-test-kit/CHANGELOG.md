@@ -5,6 +5,16 @@ All notable changes to `@feugene/granularity-test-kit` are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+
+- **`componentTokens` читает токены тем по раскладке `themesDir` granum 3** —
+  `<Компонент>/themes/<тема>/root.{json,css}` и `modes/<режим>.{json,css}` вместо
+  `themes/*.css`. JSON-ключи сверяются с реестром (`requireThemeKind`), ссылки из
+  значений — с объявленными токенами, а сами объявления считаются употреблением.
+  Новые экспорты — `readThemeSources`, `readComponentThemeSources`.
+
 ## [v1.2.0] 2026-10-16
 
 ### Changed

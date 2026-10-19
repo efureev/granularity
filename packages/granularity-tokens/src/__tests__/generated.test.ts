@@ -12,7 +12,7 @@ const pkgDir = process.cwd()
 /**
  * Гейт против ручной правки сгенерированного и против неполной темы.
  *
- * Сгенерированные файлы — TS-справочник, документ и CSS ядра — собираются из
+ * Сгенерированные файлы — TS-справочник и документ — собираются из
  * реестра и данных тем; единственный способ узнать, что кто-то поправил их
  * напрямую (или поменял данные и забыл перегенерировать), — прогнать генератор
  * и сравнить. Без этого расхождение всплывёт только в браузере.
@@ -55,8 +55,9 @@ describe('реестр и темы как данные', () => {
     expect(withoutFallback).toEqual([])
   })
 
-  it('формула производного в CSS — та же, что в справочнике', () => {
-    const css = readFileSync(resolve(pkgDir, '../granularity/src/styles/tokens.css'), 'utf8')
+  it('формула производного в CSS для granum — та же, что в справочнике', () => {
+    execFileSync('node', ['scripts/generate.mjs', '--dist'], { cwd: pkgDir, stdio: 'pipe' })
+    const css = readFileSync(resolve(pkgDir, 'generated/tokens.css'), 'utf8')
 
     for (const token of grDerivedTokens)
       expect(css).toContain(`${token.name}: ${token.formula};`)

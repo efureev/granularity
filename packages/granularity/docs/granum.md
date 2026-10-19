@@ -93,14 +93,17 @@ defineGranumConfig({
 defineGranumConfig({
   engine: windEngine(),
   providers: ['@feugene/granularity'],
-  themes: { names: ['light', 'dark'] },
+  theme: 'slate',
+  modes: { names: ['light', 'dark'] },
 })
 ```
 
-Своя тема приложения задаётся в том же месте — `themes.define` с `extends`
-или `tokensRef`; переопределение отдельных токенов — `themes.tokenOverrides`.
-Темы пакета приезжают CSS-файлами, и значения из `define` и `tokenOverrides`
-granum ставит после файла под его селектор — они побеждают. Подробности —
+`theme` выбирает тему каталога `@feugene/granularity-tokens` (по умолчанию —
+`slate`), `modes` — её режимы в сборке; режим включается парой
+`data-theme="slate-<режим>"`. Свой режим задаётся в том же месте —
+`modes.define` с `extends` и `tokens` или `tokensRef`; переопределение отдельных
+токенов — `modes.tokenOverrides`. Значения из `define` и `tokenOverrides` granum
+кладёт в блок пары после данных темы — они побеждают. Подробности —
 [`theming.md`](./theming.md).
 
 ### Обрезка неиспользуемых токенов

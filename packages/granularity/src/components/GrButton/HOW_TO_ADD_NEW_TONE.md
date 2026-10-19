@@ -6,29 +6,22 @@
 
 ### Куда вносить изменения
 
-1. `packages/granularity/src/styles/themes/light.css`
-   - Добавь semantic token'ы светлой темы:
-     - `--gr-<tone>`
-     - `--gr-<tone>-light`
-     - `--gr-<tone>-foreground`
-     - `--gr-<tone>-text`
-2. `packages/granularity/src/styles/themes/dark.css`
-   - Добавь те же token'ы для тёмной темы.
-3. `packages/granularity/src/styles/tokens.css`
-   - Добавь derived token'ы для interaction state:
-     - `--gr-<tone>-hover`
-     - `--gr-<tone>-active`
-   - Если проект поддерживает fallback внутри `@supports not (color: color-mix(...))`, добавь и fallback-значения в theme-файлы.
-4. `packages/granularity/src/components/GrButton/tokens.css`
-   - Добавь component-level token'ы для `GrButton`:
-     - `--gr-button-<tone>-background`
-     - `--gr-button-<tone>-background-hover`
-     - `--gr-button-<tone>-background-active`
-     - `--gr-button-<tone>-foreground`
-     - `--gr-button-<tone>-soft-background`
-     - `--gr-button-<tone>-soft-background-hover`
-     - `--gr-button-<tone>-soft-background-active`
-   - При необходимости задай button-specific filled background, если прямое использование `--gr-<tone>` не даёт нужный контраст для белого/тёмного текста.
+1. `packages/granularity-tokens/tokens/roles.json`
+   - Зарегистрируй semantic token'ы тона: `--gr-<tone>`, `--gr-<tone>-light`,
+     `--gr-<tone>-fg`, `--gr-<tone>-text`, `--gr-<tone>-solid` и соседей.
+2. `packages/granularity-tokens/themes/slate/modes/{light,dark}.json`
+   - Задай их значения в каждом режиме темы `slate` (ключи без `--`).
+3. `packages/granularity-tokens/tokens/derived.json`
+   - Добавь формулы interaction state: `--gr-<tone>-hover`, `--gr-<tone>-active`.
+     Фолбэки для `@supports not (color-mix)` сборка темы посчитает сама.
+   - Перегенерируй: `yarn workspace @feugene/granularity-tokens generate`.
+4. `packages/granularity/src/components/GrButton/themes/slate/root.json`
+   - Добавь component-level token'ы `GrButton` (ключи без `--`): `gr-button-<tone>-bg`,
+     `-bg-hover`, `-bg-active`, `-fg`, `-soft-bg`, `-soft-bg-hover`, `-soft-bg-active`,
+     `-border-soft`, `-border`. Формулы, одинаковые во всех режимах, живут здесь:
+     granum объявляет их на каждом `[data-theme]`, и остров режима считает их от
+     своих ролей. Разное по режимам — в `themes/slate/modes/<режим>.json`.
+   - Зарегистрируй их в `GrButton/tokens.json` с `kind: "theme"`.
 5. `packages/granularity/src/components/GrButton/grButtonStyles.ts`
    - Добавь новый `tone` в тип `GrButtonTone`.
    - Добавь новую запись в объект `tones`.
@@ -51,9 +44,9 @@
 
 ### Почему нужны все эти шаги
 
-- `light.css` и `dark.css` задают реальные semantic-цвета.
-- `src/styles/tokens.css` генерирует общие `hover/active` formula token'ы, на которые потом опирается компонент.
-- `GrButton/tokens.css` — это слой component token'ов. Здесь можно:
+- режимы темы `slate` задают реальные semantic-цвета;
+- `tokens/derived.json` даёт общие `hover/active` формулы, на которые потом опирается компонент;
+- `GrButton/themes/slate/` — слой component token'ов. Здесь можно:
   - просто пробросить semantic token;
   - либо зафиксировать отдельный button-specific цвет, если для кнопки нужен другой контраст.
 - `grButtonStyles.ts` связывает tone с конкретными utility-классами и одновременно формирует safelist через `tones`.
@@ -62,50 +55,52 @@
 
 #### 1. Semantic token'ы в теме
 
-```css
-/* light.css */
---gr-brand-alt: #0ea5e9;
---gr-brand-alt-light: #e0f2fe;
---gr-brand-alt-fg: #ffffff;
---gr-brand-alt-text: #075985;
+```json
+// packages/granularity-tokens/themes/slate/modes/light.json
+"gr-brand-alt": "#0ea5e9",
+"gr-brand-alt-light": "#e0f2fe",
+"gr-brand-alt-fg": "#ffffff",
+"gr-brand-alt-text": "#075985"
 ```
 
-```css
-/* dark.css */
---gr-brand-alt: #38bdf8;
---gr-brand-alt-light: #0c4a6e;
---gr-brand-alt-fg: #0f172a;
---gr-brand-alt-text: #bae6fd;
+```json
+// packages/granularity-tokens/themes/slate/modes/dark.json
+"gr-brand-alt": "#38bdf8",
+"gr-brand-alt-light": "#0c4a6e",
+"gr-brand-alt-fg": "#0f172a",
+"gr-brand-alt-text": "#bae6fd"
 ```
 
 #### 2. Interaction formula token'ы
 
+Запись в `tokens/derived.json` пакета токенов — генератор превратит её в
+
 ```css
-/* src/styles/tokens.css */
 --gr-brand-alt-hover: color-mix(in srgb, var(--gr-brand-alt) 92%, var(--gr-fg));
 --gr-brand-alt-active: color-mix(in srgb, var(--gr-brand-alt) 84%, var(--gr-fg));
 ```
 
 #### 3. Component token'ы для `GrButton`
 
-```css
-/* GrButton/tokens.css */
---gr-button-brand-alt-bg: var(--gr-brand-alt);
---gr-button-brand-alt-bg-hover: var(--gr-brand-alt-hover);
---gr-button-brand-alt-bg-active: var(--gr-brand-alt-active);
---gr-button-brand-alt-fg: var(--gr-brand-alt-fg);
---gr-button-brand-alt-soft-bg: var(--gr-brand-alt-light);
---gr-button-brand-alt-soft-bg-hover: color-mix(in srgb, var(--gr-brand-alt) 20%, var(--gr-bg));
---gr-button-brand-alt-soft-bg-active: color-mix(in srgb, var(--gr-brand-alt) 26%, var(--gr-bg));
+```json
+// GrButton/themes/slate/root.json
+"gr-button-brand-alt-bg": "var(--gr-brand-alt-solid)",
+"gr-button-brand-alt-bg-hover": "var(--gr-brand-alt-solid-hover)",
+"gr-button-brand-alt-bg-active": "var(--gr-brand-alt-solid-active)",
+"gr-button-brand-alt-fg": "var(--gr-brand-alt-solid-fg)",
+"gr-button-brand-alt-soft-bg": "var(--gr-brand-alt-light)",
+"gr-button-brand-alt-soft-bg-hover": "color-mix(in srgb, var(--gr-brand-alt) 10%, var(--gr-button-brand-alt-soft-bg))",
+"gr-button-brand-alt-soft-bg-active": "color-mix(in srgb, var(--gr-brand-alt) 16%, var(--gr-button-brand-alt-soft-bg))"
 ```
 
-Если filled-кнопка с `var(--gr-brand-alt)` не проходит контраст, как это уже сделано для отдельных tone в `GrButton`, можно задать более тёмные button-specific значения:
+Если filled-кнопка не проходит контраст, можно задать button-specific значения
+по режимам — в `GrButton/themes/slate/modes/<режим>.json`:
 
-```css
---gr-button-brand-alt-bg: #0369a1;
---gr-button-brand-alt-bg-hover: #075985;
---gr-button-brand-alt-bg-active: #0c4a6e;
---gr-button-brand-alt-fg: #ffffff;
+```json
+"gr-button-brand-alt-bg": "#0369a1",
+"gr-button-brand-alt-bg-hover": "#075985",
+"gr-button-brand-alt-bg-active": "#0c4a6e",
+"gr-button-brand-alt-fg": "#ffffff"
 ```
 
 #### 4. Подключение в `grButtonStyles.ts`

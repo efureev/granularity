@@ -12,8 +12,5 @@ export const grImageViewerConfig = defineGranumComponent(import.meta.url, {
   dynamicTokens: ['gr-z-modal'],
   dependencies: ['GrIcon'],
   safelist: grImageViewerSafelist,
-  tokenDefinitionsRef: {
-    light: { url: './themes/light.css', selector: ':root' },
-    dark: { url: './themes/dark.css', as: '.dark, [data-theme="dark"]' },
-  },
+  themesDir: './themes',
 })

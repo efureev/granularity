@@ -326,8 +326,8 @@ await writeFile('src/styles/theme-ocean.css', ocean.css)
 ```
 
 Дальше это обычный CSS приложения: импорт в `main.ts` для своей темы или
-`themes.define.<имя>.tokensRef`, если вы перекрашиваете встроенную
-([«Перекрасить встроенную тему»](#перекрасить-встроенную-тему)). Рабочий пример
+`modes.define.<имя>.tokensRef`, если это режим поверх темы пакета
+([«Свой режим в конфиге»](#свой-режим-в-конфиге)). Рабочий пример
 целиком — [`apps/playground-theme`](../../../apps/playground-theme/README.md):
 конфиг темы, генератор, проверка «файл не отстал от конфига».
 
@@ -343,87 +343,73 @@ const remove = applyTheme(ocean.css, { name: 'ocean' })
 
 ## Подключение
 
+Тема пакета — тема `slate` каталога `@feugene/granularity-tokens`, её режимы —
+`light` и `dark`. Режим включается парой `data-theme="slate-<режим>"`; режим по
+умолчанию висит ещё и на `:root`. Всё, что ниже, — способы добавить режим или
+поменять значения, не трогая пакет.
+
+### Свой режим в конфиге
+
+Режим объявляется в `modes.define` с `extends`: базой станет режим темы целиком,
+поверх лягут ваши `tokens`, а режим встанет под свою пару
+`[data-theme="slate-ocean"]` — с токенами компонентов базового режима:
+
+```ts
+defineGranumConfig({
+  engine: windEngine(),
+  providers: ['@feugene/granularity'],
+  theme: 'slate',
+  modes: {
+    names: ['light', 'dark', 'ocean'],
+    define: {
+      ocean: { extends: 'dark', colorScheme: 'dark', tokens: { 'gr-primary': '#0ea5e9' }, title: 'Океан' },
+    },
+  },
+})
+```
+
+Значения можно взять и файлом — `tokensRef` с одним плоским блоком; собранный
+`extendTheme` тоже подходит. Режим с именем, которое уже есть у темы, granum
+отвергает (`activation-collision`): у каждой пары своё значение.
+
+`engine: windEngine()` здесь и ниже — обязательное поле конфига, а не опция
+темы: движок утилит приезжает отдельным пакетом `@feugene/granum-engine-wind`
+и выбирается приложением (см. [`installation.md`](./installation.md)). Ключа
+`themes` у granum 3 нет — конфиг с ним падает `InvalidConfigError` с подсказкой
+про `theme` и `modes`.
+
 ### Третья тема: свой CSS-слой приложения
 
-Ниже — как тема подключается. **Чем её собрать**, описано выше: писать 90 ролей
-руками не нужно, это делает `extendTheme`.
-
-Новая тема — это просто CSS приложения, подключённый после foundation-слоя
-пакета:
+Тему можно подключить и обычным CSS приложения после foundation-слоя пакета —
+так сделано в [`apps/playground-theme`](../../../apps/playground-theme/README.md):
 
 ```ts
 // src/main.ts
 await import('./reset')
-await import('./granularity') // foundation пакета (tokens + light/dark)
-await import('./styles/theme-ocean.css') // тема приложения
+await import('./granularity') // foundation пакета (тема slate)
+await import('./styles/theme-ocean.css') // тема приложения: [data-theme='ocean'] { … }
 await import('./app-styles')
 ```
 
-Конфликта селекторов нет: `[data-theme='ocean']` и `[data-theme='dark']` никогда
-не матчатся одновременно, поэтому порядок важен только для читаемости.
+Конфликта селекторов нет: `[data-theme='ocean']` и `[data-theme="slate-dark"]`
+никогда не совпадают. Минус пути — токены компонентов ядра (`--gr-button-*` и
+т.п.) остаются от режима по умолчанию; режим из `modes.define` их наследует от
+своего `extends`.
 
-Третью тему можно объявить и в конфиге, без файла: `themes.define` с
-`extends`. Базой станет тема пакета целиком — её файл, — поверх ляжут ваши
-`tokens`, а тема встанет под `[data-theme="ocean"]`:
+### Точечный override
 
-```ts
-defineGranumConfig({
-  engine: windEngine(),
-  providers: ['@feugene/granularity'],
-  themes: {
-    names: ['light', 'dark', 'ocean'],
-    define: {
-      ocean: { extends: 'dark', tokens: { 'gr-primary': '#0ea5e9' } },
-    },
-  },
-})
-```
-
-Ключа `themes.themeFiles` в granum нет — это пресет v1, и granum 2 отвергает
-конфиг с ним ошибкой `InvalidConfigError`.
-
-### Перекрасить встроенную тему
-
-Если тем по-прежнему две, а поменять надо только цвета — тему с тем же именем
-объявляет приложение. granum читает из вашего файла значения токенов и ставит
-их под селектор темы пакета, сразу после её файла, — поэтому они побеждают.
-`engine: windEngine()` здесь и ниже — обязательное поле конфига, а не опция
-темы: движок утилит приезжает отдельным пакетом `@feugene/granum-engine-wind`
-и выбирается приложением (см. [`installation.md`](./installation.md)):
+Если нужно поменять две-три роли режима, файл заводить не обязательно:
 
 ```ts
 defineGranumConfig({
   engine: windEngine(),
   providers: ['@feugene/granularity'],
-  themes: {
-    names: ['light', 'dark'],
-    define: {
-      // Значения файла лягут под `[data-theme='dark'], .dark` после `dark.css`
-      // пакета: селектор из самого файла granum не берёт.
-      dark: { tokensRef: new URL('./src/styles/dark-rebrand.css', import.meta.url).href },
-    },
-  },
-})
-```
-
-Файл пакета остаётся в сборке, и роли, которых нет в вашем файле, приходят из
-него. Поэтому файлу достаточно изменённых ролей; собранный
-`extendTheme({ name: 'dark', base: 'dark', tokens })` тоже подходит.
-
-### Точечный override без своего файла
-
-Если нужно поменять две-три роли **встроенной** темы, целый файл заводить не
-обязательно — короткий путь остаётся коротким:
-
-```ts
-defineGranumConfig({
-  engine: windEngine(),
-  providers: ['@feugene/granularity'],
-  themes: {
+  theme: 'slate',
+  modes: {
     names: ['light', 'dark'],
     // Ключи — без префикса `--`: его добавляет генератор, а ключ с `--`
     // granum отклоняет ошибкой конфига `InvalidConfigError`.
-    // Значение встаёт после файла темы пакета под её селектор и побеждает.
+    // Значение ложится в блок пары режима после данных темы и побеждает.
     tokenOverrides: {
       dark: { 'gr-primary': '#4fd1e0' },
     },
@@ -431,26 +417,32 @@ defineGranumConfig({
 })
 ```
 
+`tokenOverrides.root` меняет примитивы — то, что одинаково во всех режимах.
+
 Работающий пример — приложение [`apps/playground-theme`](../../../apps/playground-theme/README.md):
-тема `ocean` третьим слоем, свой контроллер переключения и автопроверка темы.
+тема `ocean` третьим слоем, свой контроллер переключения и автопроверка темы;
+рецепты этого раздела проверяет его `themeRecipes.test.ts`.
 
 ## Переключение в рантайме
 
-Канон — атрибут `[data-theme]` на `<html>`:
+Канон — атрибут `[data-theme]` на `<html>`: пара режима темы пакета или имя
+темы-слоя приложения:
 
 ```ts
+document.documentElement.dataset.theme = 'slate-dark'
 document.documentElement.dataset.theme = 'ocean'
 ```
 
 **Ограничение, о котором надо знать заранее:** `useTheme()` типизирован как
-`'light' | 'dark'` и умеет ровно эти две темы — persistence в `localStorage`
-(ключ `gr-theme`), синхронизацию между вкладками и слежение за
-`prefers-color-scheme`. Третью тему он не переключит: для неё нужен свой
-контроллер, который просто пишет `dataset.theme`. Переиспользовать при этом
-можно только контракт селектора, не сам композабл.
+`'light' | 'dark'` и умеет ровно эти два режима — persistence в `localStorage`
+(ключ `gr-theme`, хранится имя режима), синхронизацию между вкладками и
+слежение за `prefers-color-scheme`; в атрибут он пишет пару `slate-<режим>`.
+Третью тему он не переключит: для неё нужен свой контроллер, который просто
+пишет `dataset.theme`. Переиспользовать при этом можно только контракт
+селектора, не сам композабл.
 
-Если тем ровно две, но с другими цветами, — берите `light`/`dark` как имена и
-`useTheme()` работает как есть.
+Если режимов ровно два, но с другими цветами, — перекрасьте `light`/`dark`
+через `modes.tokenOverrides`, и `useTheme()` работает как есть.
 
 **В SSR состояние темы придётся объявить явно.** `useTheme()` без плагина держит его на
 уровне модуля — на сервере это одно состояние на все запросы, и выбор одного пользователя
@@ -493,12 +485,15 @@ import { grComponentTokens } from '@feugene/granularity/tokens'
 const treeTokens = grComponentTokens.filter(token => token.owner === 'GrTree')
 ```
 
-Четыре компонента держат собственный theme-слой поверх глобальных ролей —
-`GrButton` (`--gr-button-*`), `GrBadge` (`--gr-badge-*`), `GrProgressBar` и
-`GrImageViewer`. Все четыре слоя — ссылки на роли, а не значения: кнопка берёт
-заливку из `--gr-{tone}-solid`, бейдж — из `-solid` в светлой теме и из роли тона
-в тёмной, прогресс — из тона, просмотрщик — из констант тёмного хрома, одинаковых
-в обеих темах по построению.
+Семь компонентов держат значения своих токенов по темам поверх глобальных ролей —
+`GrButton` (`--gr-button-*`), `GrBadge` (`--gr-badge-*`), `GrAvatar`, `GrDataTable`,
+`GrProgressBar`, `GrImageViewer` и `GrSegmented`: `src/components/GrX/themes/slate/`
+с `root.json` (одинаковое во всех режимах) и `modes/<режим>.json`. Почти всё там —
+ссылки на роли, а не значения: кнопка берёт заливку из `--gr-{tone}-solid`, бейдж —
+из `-solid` в светлом режиме и из роли тона в тёмном, прогресс — из тона,
+просмотрщик — из констант тёмного хрома, одинаковых в обоих режимах по построению.
+Формула со ссылкой `var()` объявляется на каждом `[data-theme]`, поэтому остров
+режима пересчитывает её от своих ролей.
 
 Слой бейджа существует ровно затем, что **нужный вес заливки у тем разный**.
 В светлой теме `--gr-{tone}` — это заливка под тёмный текст, и filled-бейдж читался

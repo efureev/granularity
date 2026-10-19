@@ -61,7 +61,8 @@ describe('публикация точек входа', () => {
     const packageJson = JSON.parse(readFileSync(resolve(packageDir, 'package.json'), 'utf8')) as {
       exports: Record<string, unknown>
     }
-    const viteConfig = readFileSync(resolve(packageDir, 'vite.config.ts'), 'utf8')
+    // `theme/node` читает файлы и собирается отдельным конфигом — браузерная сборка провайдера granum его не примет.
+    const viteConfig = ['vite.config.ts', 'vite.node.config.ts'].map(file => readFileSync(resolve(packageDir, file), 'utf8')).join('\n')
 
     for (const entry of ['index', 'node', 'apply']) {
       expect(packageJson.exports[entry === 'index' ? './theme' : `./theme/${entry}`], entry).toBeDefined()

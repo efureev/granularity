@@ -11,6 +11,7 @@ export default defineGranumConfig({
   engine: windEngine(),
   providers: ['@feugene/granularity'],
   components: 'all',
-  themes: { names: ['light', 'dark'] },
+  theme: 'slate',
+  modes: { names: ['light', 'dark'] },
   appSources: { dirs: ['src/app'] },
 })

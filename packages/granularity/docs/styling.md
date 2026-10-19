@@ -6,17 +6,17 @@
 слои, из которых он собран.
 
 - `@feugene/granularity/styles.css`
-  - токены, обе встроенные темы (`light` и `dark`), базовые правила и preflight —
-    одним файлом;
+  - тема `slate` в обоих режимах (`light` и `dark`) с токенами компонентов ядра,
+    базовые правила и reset — одним файлом;
   - для потребителя, который не подключает granum;
   - **utility-классов компонентов в нём нет**: их генерирует движок приложения по
     тем компонентам, которые выбраны. Без granum компонент получит токены и
     темы, но ни раскладочных утилит, ни собственного CSS — его тоже доставляет
     granum из манифеста.
-- `@feugene/granularity/styles/tokens.css` — только design tokens.
-- `@feugene/granularity/styles/themes/light.css`, `.../dark.css` — встроенные темы
-  с семантическими токенами.
-- `@feugene/granularity/styles/base.css` — базовые правила поверх токенов и тем:
+- `@feugene/granularity/themes/<тема>.css` — готовый CSS темы каталога
+  (`themes/slate.css`): примитивы и формулы, режимы, токены компонентов ядра и
+  фолбэки `@supports` — в порядке слоёв granum.
+- `@feugene/granularity/styles/base.css` — базовые правила поверх темы:
   reset и кламп движения по `prefers-reduced-motion`.
 - `@feugene/granularity/styles/preflight.css` — preflight-слой.
 
@@ -29,30 +29,26 @@
 такой файл был бы кусочком без токенов и тем, и подключать его отдельно
 бессмысленно.
 
-## Токены — генерируются, а не пишутся руками
+## Тема — данные, CSS собирает granum
 
-`src/styles/tokens.css` и `src/styles/themes/*.css` **сгенерированы** из темы
-`slate` пакета `@feugene/granularity-tokens`. Правка CSS напрямую бессмысленна:
-следующая генерация её затрёт, а тест `src/__tests__/tokens.generated.test.ts`
-уронит сборку раньше.
-
-```bash
-yarn workspace @feugene/granularity-tokens generate          # перегенерировать
-yarn workspace @feugene/granularity-tokens generate --check  # проверить расхождение
-```
+Токенов и тем в виде CSS в исходниках пакета нет. Реестр токенов и значения темы
+`slate` живут данными в `@feugene/granularity-tokens`, значения токенов
+компонентов по темам — рядом с компонентами (`src/components/GrX/themes/slate/`,
+поле `themesDir` в `config.ts`). Селекторы режимов назначает granum: режим
+включается парой `data-theme="slate-<режим>"`, режим по умолчанию объявлен ещё и
+на `:root`.
 
 Что откуда берётся (пути — в `packages/granularity-tokens`):
 
-| Источник | Что в нём | Что из него генерируется |
-| --- | --- | --- |
-| `tokens/{foundation,roles,derived}.json` | реестр: имена, группы, описания, формулы hover/active — без значений | порядок и комментарии CSS, TS-справочник |
-| `themes/slate/root.json` | примитивы: палитра, типографика, spacing, радиусы, motion, z-index | `styles/tokens.css` |
-| `themes/slate/modes/{light,dark}.json` | роли и тени режима | `styles/themes/*.css` |
+| Источник | Что в нём |
+| --- | --- |
+| `tokens/{foundation,roles,derived}.json` | реестр: имена, группы, описания, формулы hover/active — без значений |
+| `themes/slate/root.json` | примитивы: палитра, типографика, spacing, радиусы, motion, z-index |
+| `themes/slate/modes/{light,dark}.json` | роли и тени режима |
 
-Формулы производных — `color-mix`-объявления в `tokens.css`; фолбэки для
-`@supports not (color-mix)` считает сборка темы той же формулой — раньше это были
-40 хексов, поддерживаемых вручную, и часть из них разошлась с реальными значениями
-ролей.
+Формулы производных — `color-mix`-объявления на корне и на каждом
+`[data-theme]`; фолбэки для `@supports not (color-mix)` считает сборка темы той
+же формулой.
 
 Те же данные доступны как TS-справочник — `@feugene/granularity-tokens`
 (`grFoundationTokens`, `grRoleTokens`, `grDerivedTokens`, каталог тем), значения —
@@ -61,27 +57,33 @@ yarn workspace @feugene/granularity-tokens generate --check  # проверит�
 другое не входит в корневой бандл: это данные для доков и инструментов.
 Человекочитаемая таблица — `docs/tokens.md` пакета токенов, тоже генерируемая.
 
+Готовый `themes/<тема>.css` для подключения без granum собирает сборка пакета
+(`scripts/theme-css.mjs`) тем же `emitCss`, что и приложение на granum, поэтому
+вычисленные значения у обоих путей совпадают: это сверяет
+`yarn workspace @feugene/granularity themes:values:check` в Chromium.
+
 ## Что объединяет эти файлы
 
 `packages/granularity/src/styles/index.css` — source-группа foundation-стилей:
 
 ```css
-@import './tokens.css';
-@import './themes/light.css';
-@import './themes/dark.css';
+@import '../themes/slate.css';
 @import './base.css';
 ```
 
 Она и уезжает в `dist/styles/index.css`, то есть в публичный
-`@feugene/granularity/styles.css`. Ничего поверх неё пакет не досбирает:
-utility-классы компонентов генерирует движок **на стороне приложения**, по списку
-выбранных компонентов и по классам, которые сборка пакета записала в манифест.
+`@feugene/granularity/styles.css`. Порядок внутри `themes/slate.css` решает исход
+при равной специфичности: примитивы и формулы, затем режимы, затем фолбэки
+`@supports` — фолбэк обязан идти после формулы, которую он заменяет. Utility-классы
+компонентов пакет не досбирает: их генерирует движок **на стороне приложения**,
+по списку выбранных компонентов и по классам, которые сборка пакета записала в
+манифест.
 
 ## Границы ответственности
 
 ### `styles.css`
 
-Готовый foundation: токены, обе встроенные темы, base и preflight. Берите его,
+Готовый foundation: тема `slate` в обоих режимах и base. Берите его,
 если приложение не подключает granum, — тогда компоненты получат токены и темы,
 но ни раскладочных утилит, ни собственного CSS: оба приезжают только через
 granum.
@@ -105,20 +107,20 @@ foundation, и утилиты выбранных компонентов одни
 
 Нижний уровень API для ручной композиции:
 
-- `styles/tokens.css`;
-- `styles/themes/light.css`;
-- `styles/themes/dark.css`;
+- `themes/slate.css` (и любая другая тема каталога — `themes/<тема>.css`);
 - `styles/base.css`;
 - `styles/preflight.css`.
 
-Полезны, если приложение собирает foundation само или заменяет theme layer своей
-реализацией.
+Полезны, если приложение собирает foundation само. Токенов спутников
+(`@feugene/granularity-chrono` и других) в `themes/<тема>.css` нет: без granum их
+собрать некому.
 
 ## Встроенные темы
 
-Пакет публикует две встроенные темы — `light` и `dark`, — и обе входят в
-`styles.css`. Если приложение управляет темами само, встроенные файлы можно не
-подключать и собрать свой theme layer поверх `tokens.css` + `base.css`.
+Пакет берёт тему `slate` из каталога `@feugene/granularity-tokens` — режимы
+`light` и `dark`, по умолчанию `light`. В приложении на granum тему выбирает
+`theme`, режимы — `modes` конфига; без granum оба режима входят в `styles.css`.
+Режим включается парой `data-theme="slate-dark"` на `<html>` или на острове.
 
 ## Граница ответственности: `tokens` vs `theme`
 
@@ -143,21 +145,24 @@ import '@feugene/granularity/styles.css'
 
 Подходит, если приложение использует много компонентов и не хочет отдельно управлять CSS-сборкой.
 
-### Использовать свою тему приложения
+### Перекрасить тему без granum
 
-Если у приложения есть собственный theme layer, можно вручную собрать foundation без встроенных тем:
+Своя палитра ложится **после** темы пакета под те же пары: токены компонентов
+ядра (`--gr-button-*` и т.п.) приходят из `themes/slate.css` и ссылаются на роли,
+поэтому достаточно переопределить роли.
 
 ```ts
-import '@feugene/granularity/styles/tokens.css'
-import './styles/app-theme.css'
+import '@feugene/granularity/themes/slate.css'
+import './styles/app-theme.css' // :root, [data-theme="slate-light"] { --gr-primary: … }
 import '@feugene/granularity/styles/base.css'
 ```
 
-Дальше component CSS можно подключать либо плагином granum, либо готовыми component/full bundles.
+В приложении на granum то же делают `modes.tokenOverrides` и `modes.define`
+(см. [`theming.md`](./theming.md)).
 
 ## Что важно помнить
 
-- `styles.css` — foundation целиком: tokens + `light` + `dark` + base + preflight. Utility-классов
+- `styles.css` — foundation целиком: тема `slate` в обоих режимах + base. Utility-классов
   компонентов в нём нет.
 - `src/styles/index.css` — source-группа, из которой он собирается.
 - CSS компонента приезжает из манифеста через granum, а не с его чанком; отдельного subpath на него нет.
@@ -176,20 +181,17 @@ right-to-left остаётся за приложением.
 
 ## Темизация: канон
 
-Тёмную тему можно активировать несколькими селекторами, но **канон один** —
-атрибут `[data-theme]` на `<html>`:
+Режим включается **одним** способом — парой `<тема>-<режим>` в атрибуте
+`data-theme` на `<html>` или на корне острова: `data-theme="slate-dark"`. Без
+атрибута действует режим по умолчанию (`slate-light`). Классов `.light`/`.dark`
+и прочих селекторов режима нет; вариант `dark:` движка строится по тем же
+тёмным парам.
 
-- **`[data-theme="dark"]` / `[data-theme="light"]`** — единственный рекомендуемый
-  механизм. Его выставляют `useTheme()` / `initThemeEarly()`.
-- **`.dark`** — дополнительный селектор в `themes/dark.css` для интеропа с
-  class-стратегией Tailwind/UnoCSS: если приложение уже переключает тему этим
-  классом, токены подхватятся. Класс `.theme-dark` снят.
-
-Единственный рантайм-API переключения темы — `useTheme()` (реактивное состояние,
-persistence, синхронизация между вкладками и с `prefers-color-scheme`) и
-`initThemeEarly()` (ранний вызов до монтирования Vue, чтобы избежать «мигания»).
-`defaultThemes` у granular-provider — это build-time настройка активных тем в
-собранном CSS, а не рантайм-переключение; не путайте её с `useTheme`.
+Рантайм-API переключения — `useTheme()` (реактивное состояние, persistence,
+синхронизация между вкладками и с `prefers-color-scheme`) и `initThemeEarly()`
+(ранний вызов до монтирования Vue, чтобы избежать «мигания»). Хранят и отдают они
+имя режима (`'dark'`), в атрибут пишут пару. Какие режимы попадают в собранный
+CSS, решает `modes` конфига granum, а не рантайм.
 
 ```ts
 import { initThemeEarly, useTheme } from '@feugene/granularity'

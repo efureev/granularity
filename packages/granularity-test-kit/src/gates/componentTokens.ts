@@ -1,5 +1,5 @@
-import { existsSync, readFileSync } from 'node:fs'
-import { resolve } from 'node:path'
+import { existsSync, readdirSync, readFileSync } from 'node:fs'
+import { join, relative, resolve } from 'node:path'
 
 import { describe, expect, it } from 'vitest'
 
@@ -57,7 +57,7 @@ export interface ComponentTokensGateOptions {
    * переименование ради буквальности стоило бы потребителю мажорной версии.
    */
   ownerPrefixOverrides?: Readonly<Record<string, string>>
-  /** Переменная из `themes/*.css` зарегистрирована владельцем как `kind: "theme"`. */
+  /** Переменная из `themes/<тема>/**` зарегистрирована владельцем как `kind: "theme"`. */
   requireThemeKind?: boolean
   /** В пакете есть хотя бы один компонент со своими токенами. */
   requireRegistries?: boolean
@@ -76,6 +76,46 @@ function readRegistry(path: string, owner: string, sourceDir: string, prefixed: 
   const parsed = JSON.parse(readFileSync(full, 'utf8')) as { tokens: RegisteredToken[] }
 
   return { owner, path, sourceDir, prefixed, tokens: parsed.tokens }
+}
+
+/**
+ * Файлы тем компонента (`themesDir` granum): `<тема>/root.{json,css}` и
+ * `<тема>/modes/<режим>.{json,css}`. JSON отдаётся строками `--имя: значение;`,
+ * чтобы скан видел в нём и объявления, и ссылки на чужие токены — как в CSS.
+ * Путь — относительно `baseDir`.
+ */
+export function readThemeSources(themesDir: string, baseDir: string = themesDir): SourceFile[] {
+  if (!existsSync(themesDir))
+    return []
+
+  const files = readdirSync(themesDir, { withFileTypes: true })
+    .filter(theme => theme.isDirectory())
+    .flatMap((theme) => {
+      const dir = join(themesDir, theme.name)
+      const modesDir = join(dir, 'modes')
+      const modes = existsSync(modesDir) ? readdirSync(modesDir).map(name => join(modesDir, name)) : []
+
+      return [...readdirSync(dir).map(name => join(dir, name)), ...modes]
+    })
+    .filter(file => /\.(?:json|css)$/.test(file))
+    .sort()
+
+  return files.map((file) => {
+    const text = readFileSync(file, 'utf8')
+    const source = file.endsWith('.json')
+      ? Object.entries(JSON.parse(text) as Record<string, string>).map(([name, value]) => `--${name}: ${value};`).join('\n')
+      : text
+
+    return { path: relative(baseDir, file), source }
+  })
+}
+
+/** Темы всех компонентов пакета — пути от `srcDir`, как у `readSources`. */
+export function readComponentThemeSources(srcDir: string, prefix = 'Gr'): SourceFile[] {
+  const componentsDir = resolve(srcDir, 'components')
+
+  return componentDirs(componentsDir, prefix)
+    .flatMap(owner => readThemeSources(resolve(componentsDir, owner, 'themes'), srcDir))
 }
 
 /** Реестры пакета: по одному на компонент плюс объявленные отдельно. */
@@ -126,23 +166,20 @@ export function collectStaleTokens(registries: readonly TokenRegistry[]): string
      */
     const shared = resolve(registry.sourceDir, '..', 'shared')
     const dirs = existsSync(shared) ? [registry.sourceDir, shared] : [registry.sourceDir]
-    const used = new Set(dirs.flatMap(dir => readSources({ dir }).flatMap(({ source }) => [...tokenNamesIn(source)])))
+    const sources = [...dirs.flatMap(dir => readSources({ dir })), ...readThemeSources(resolve(registry.sourceDir, 'themes'))]
+    const used = new Set(sources.flatMap(({ source }) => [...tokenNamesIn(source)]))
 
     return registry.tokens.filter(token => !used.has(token.name)).map(token => `${token.name} (${registry.path})`)
   })
 }
 
-/** Объявлено в `themes/*.css`, но у владельца записано не как `theme`. */
+/** Объявлено в `themes/<тема>/**`, но у владельца записано не как `theme`. */
 export function collectWrongThemeKind(
   registries: readonly TokenRegistry[],
   registered: ReadonlyMap<string, TokenRegistry>,
 ): string[] {
   return registries.flatMap((registry) => {
-    const themesDir = resolve(registry.sourceDir, 'themes')
-    if (!existsSync(themesDir))
-      return []
-
-    const declared = readSources({ dir: themesDir }).flatMap(({ source }) =>
+    const declared = readThemeSources(resolve(registry.sourceDir, 'themes')).flatMap(({ source }) =>
       [...source.replace(/\/\*[\s\S]*?\*\//g, '').matchAll(/(--gr-[a-z0-9-]+)\s*:/g)]
         .map(match => match[1])
         .filter((name): name is string => name !== undefined))
@@ -202,7 +239,10 @@ export function defineComponentTokensGate(options: ComponentTokensGateOptions): 
 
   describe('покомпонентные токены', () => {
     it('каждая переменная в исходниках объявлена — глобально или в реестре компонента', () => {
-      const sources = readSources({ dir: srcDir, excludeTopDirs: options.excludeTopDirs })
+      const sources = [
+        ...readSources({ dir: srcDir, excludeTopDirs: options.excludeTopDirs }),
+        ...readComponentThemeSources(srcDir, options.prefix),
+      ]
 
       expect(
         collectUnknownTokens(sources, globalTokens, registered),
@@ -223,7 +263,7 @@ export function defineComponentTokensGate(options: ComponentTokensGateOptions): 
     it.runIf(options.requireThemeKind ?? true)('токены покомпонентных тем зарегистрированы как `theme`', () => {
       expect(
         collectWrongThemeKind(registries, registered),
-        'объявлен в `themes/*.css` — значит `kind: "theme"` у своего компонента',
+        'объявлен в `themes/<тема>/` — значит `kind: "theme"` у своего компонента',
       ).toEqual([])
     })
 

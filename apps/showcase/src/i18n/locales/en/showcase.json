@@ -404,7 +404,7 @@
     "recommendationsTitle": "Practical recommendations",
     "connectedDocExcerptTitle": "Connected doc excerpt",
     "currentTokenRegistryTitle": "Current token registry",
-    "currentTokenRegistryDescription": "This table is built from the current `packages/granularity/src/styles/tokens.css`, so it reflects the actual foundation tokens in the package.",
+    "currentTokenRegistryDescription": "This table is built from the registry and the `slate` theme of `@feugene/granularity-tokens`, so it reflects the actual foundation tokens in the package.",
     "tokensCount": "tokens",
     "expandSection": "Expand",
     "collapseSection": "Collapse",

@@ -48,6 +48,7 @@
       "import": "./dist/index.js",
       "default": "./dist/index.js"
     },
+    "./granum.manifest.json": "./dist/granum.manifest.json",
     "./theme": {
       "types": "./dist/types/theme/index.d.ts",
       "import": "./dist/theme/index.js",
@@ -68,7 +69,7 @@
     "./package.json": "./package.json"
   },
   "scripts": {
-    "build": "vite build && node scripts/generate.mjs --dist && tsc -p tsconfig.build.json",
+    "build": "node scripts/generate.mjs --dist && vite build && vite build --config vite.node.config.ts && tsc -p tsconfig.build.json",
     "dev": "vite build --watch",
     "generate": "node scripts/generate.mjs",
     "lint": "eslint . --cache",
@@ -80,6 +81,8 @@
   "devDependencies": {
     "@antfu/eslint-config": "^9.3.0",
     "@feugene/granularity-test-kit": "^1.2.0",
+    "@feugene/granum": "^2.1.0",
+    "@feugene/granum-engine-wind": "^2.1.0",
     "@types/node": "^26.4.0",
     "eslint": "^10.9.1",
     "globals": "^16.5.0",

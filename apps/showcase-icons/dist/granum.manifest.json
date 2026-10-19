@@ -1,16 +1,13 @@
 {
-  "granum": 2,
-  "contractVersion": 1,
+  "granum": 3,
+  "contractVersion": 2,
   "id": "@feugene/granularity-showcase-icons",
   "version": "0.0.0",
   "generatedBy": "@feugene/granum@2.1.0",
-  "hash": "sha256-5d87db03ff2801d75d64c024d8cd5b0fa2afa5aeed0778f485057cc80fec2a9e",
+  "hash": "sha256-07c1990c108ac3e9940449994cb6e82cdee0fbd81d6ebe26673e8bb1bc64643b",
   "dependencies": [],
   "theme": {
-    "declares": [],
-    "defaultThemes": [],
-    "themes": {},
-    "tokenDefinitions": {}
+    "declares": []
   },
   "engine": {
     "dialect": "unocss/preset-wind3+granum@66",

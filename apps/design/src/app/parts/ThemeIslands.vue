@@ -14,7 +14,7 @@ defineSlots<{ default: (props: { theme: ModeName }) => unknown }>()
     <div
       v-for="theme in THEMES"
       :key="theme.id"
-      :data-theme="theme.id"
+      :data-theme="`slate-${theme.id}`"
       class="flex min-w-0 flex-col gap-4 rounded-[var(--gr-radius-lg)] border border-[var(--gr-brd)] bg-[var(--gr-bg)] p-4 text-[var(--gr-fg)] lg:p-5"
     >
       <p class="text-[length:var(--gr-text-xs)] font-600 leading-[var(--gr-leading-xs)] text-[var(--gr-muted-fg)]">

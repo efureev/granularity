@@ -10,6 +10,8 @@ import {
   collectUnknownTokens,
   collectWrongThemeKind,
   ownerPrefix,
+  readComponentThemeSources,
+  readThemeSources,
   readTokenRegistries,
   type TokenRegistry,
 } from '../gates/componentTokens'
@@ -39,7 +41,10 @@ beforeAll(() => {
   ({ dir, cleanup } = createFixturePackage({
     'src/components/GrThing/GrThing.vue': '<template><div :style="{ gap: \'var(--gr-thing-gap)\' }" /></template>',
     'src/components/GrThing/styles.css': '.gr-thing { background: var(--gr-thing-bg); color: var(--gr-fg); }',
-    'src/components/GrThing/themes/soft.css': ':root { --gr-thing-bg: #fff; }',
+    'src/components/GrThing/themes/slate/root.json': JSON.stringify({ 'gr-thing-bg': 'var(--gr-bg)' }),
+    'src/components/GrThing/themes/slate/modes/dark.json': JSON.stringify({ 'gr-thing-bg': '#000' }),
+    'src/components/GrThing/themes/slate/modes/light.css': '.x { --gr-thing-bg: #fff; }',
+    'src/components/GrThing/themes/README.md': '--gr-thing-ignored: 1;',
     'src/components/GrThing/tokens.json': JSON.stringify(thingTokens),
     'src/components/GrOther/GrOther.vue': '<template><div class="gr-other" /></template>',
     'src/composables/tokens.json': JSON.stringify({
@@ -78,6 +83,11 @@ describe('collectUnknownTokens', () => {
     expect(collectUnknownTokens(sources, new Set(['--gr-fg']), registered())).toEqual([])
   })
 
+  it('видит ссылку из значения в JSON темы компонента', () => {
+    expect(collectUnknownTokens(readComponentThemeSources(srcDir), new Set(['--gr-fg']), registered()))
+      .toEqual(['--gr-bg (components/GrThing/themes/slate/root.json)'])
+  })
+
   it('ловит опечатку в чужом имени и называет файл', () => {
     const sources = [{ path: 'components/GrThing/GrThing.vue', source: 'color: var(--gr-destructive)' }]
 
@@ -101,8 +111,21 @@ describe('collectStaleTokens', () => {
   })
 })
 
+describe('readThemeSources', () => {
+  it('JSON и CSS темы по раскладке `themesDir`, JSON — строками объявлений; README мимо', () => {
+    const sources = readThemeSources(resolve(srcDir, 'components/GrThing/themes'))
+
+    expect(sources.map(source => source.path)).toEqual(['slate/modes/dark.json', 'slate/modes/light.css', 'slate/root.json'])
+    expect(sources.find(source => source.path === 'slate/root.json')?.source).toBe('--gr-thing-bg: var(--gr-bg);')
+  })
+
+  it('темы пакета — с путём от `src`', () => {
+    expect(readComponentThemeSources(srcDir).map(source => source.path)).toContain('components/GrThing/themes/slate/modes/dark.json')
+  })
+})
+
 describe('collectWrongThemeKind', () => {
-  it('молчит, когда переменная из `themes/*.css` записана как `theme`', () => {
+  it('молчит, когда переменная из `themes/<тема>/` записана как `theme`', () => {
     const registered = new Map(registries.flatMap(registry => registry.tokens.map(token => [token.name, registry] as const)))
 
     expect(collectWrongThemeKind(registries, registered)).toEqual([])
@@ -116,6 +139,22 @@ describe('collectWrongThemeKind', () => {
     const registered = new Map(registry.tokens.map(token => [token.name, registry] as const))
 
     expect(collectWrongThemeKind([registry], registered)).toEqual(['--gr-thing-bg (src/components/GrThing/tokens.json)'])
+  })
+
+  it('ловит лишний токен в файле режима', () => {
+    const { dir: extraDir, cleanup: drop } = createFixturePackage({
+      'src/components/GrThing/tokens.json': JSON.stringify(thingTokens),
+      'src/components/GrThing/themes/slate/modes/dark.json': JSON.stringify({ 'gr-thing-bg': '#000', 'gr-thing-extra': '#111' }),
+    })
+    try {
+      const extra = readTokenRegistries(resolve(extraDir, 'src'))
+      const registered = new Map(extra.flatMap(registry => registry.tokens.map(token => [token.name, registry] as const)))
+
+      expect(collectWrongThemeKind(extra, registered)).toEqual(['--gr-thing-extra (src/components/GrThing/tokens.json)'])
+    }
+    finally {
+      drop()
+    }
   })
 })
 

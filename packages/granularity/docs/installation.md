@@ -189,12 +189,13 @@ defineGranumConfig({
   engine: windEngine(),
   providers: ['@feugene/granularity'],
   components: [{ provider: '@feugene/granularity', names: ['GrButton'] }],
-  themes: { names: ['light', 'dark'] },
+  theme: 'slate',
+  modes: { names: ['light', 'dark'] },
 })
 ```
 
-Своя тема приложения задаётся здесь же — `themes.define` с `extends` или
-`tokensRef`; переопределение отдельных значений — `themes.tokenOverrides`.
+Свой режим задаётся здесь же — `modes.define` с `extends` и `tokens` или
+`tokensRef`; переопределение отдельных значений — `modes.tokenOverrides`.
 Подробности — в [`theming.md`](./theming.md).
 
 ### Обрезка неиспользуемых токенов

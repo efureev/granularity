@@ -152,13 +152,13 @@ describe('showcase layout integration', () => {
     const { wrapper } = await mountShowcaseAt('/')
     const themeToggleButton = findButtonByAriaLabel(wrapper, 'Toggle theme')
 
-    expect(document.documentElement.dataset.theme).toBe('light')
+    expect(document.documentElement.dataset.theme).toBe('slate-light')
     expect(themeToggleButton).toBeTruthy()
 
     await themeToggleButton?.trigger('click')
     await flushPromises()
 
-    expect(document.documentElement.dataset.theme).toBe('dark')
+    expect(document.documentElement.dataset.theme).toBe('slate-dark')
     expect(window.localStorage.getItem('gr-theme')).toBe('dark')
   })
 
@@ -167,14 +167,14 @@ describe('showcase layout integration', () => {
     const runtimeThemeToggleButton = findButtonByText(wrapper, 'Toggle theme (light)')
 
     expect(wrapper.text()).toContain('Demo использует `persist: false`')
-    expect(document.documentElement.dataset.theme).toBe('light')
+    expect(document.documentElement.dataset.theme).toBe('slate-light')
     expect(window.localStorage.getItem('showcase-package-demo-theme')).toBeNull()
     expect(runtimeThemeToggleButton).toBeTruthy()
 
     await runtimeThemeToggleButton?.trigger('click')
     await flushPromises()
 
-    expect(document.documentElement.dataset.theme).toBe('dark')
+    expect(document.documentElement.dataset.theme).toBe('slate-dark')
     expect(wrapper.text()).toContain('Toggle theme (dark)')
     expect(wrapper.text()).toContain('dark')
     expect(window.localStorage.getItem('showcase-package-demo-theme')).toBeNull()

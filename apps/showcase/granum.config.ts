@@ -34,6 +34,7 @@ export default defineGranumConfig({
     '@feugene/granularity-showcase-icons',
   ],
   components: 'all',
-  themes: { names: ['light', 'dark'] },
+  theme: 'slate',
+  modes: { names: ['light', 'dark'] },
   appSources: { dirs: ['src'] },
 })

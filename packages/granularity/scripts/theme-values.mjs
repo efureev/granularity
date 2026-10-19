@@ -1,4 +1,5 @@
 import { readFile, writeFile } from 'node:fs/promises'
+import { dirname, resolve } from 'node:path'
 import process from 'node:process'
 import { fileURLToPath } from 'node:url'
 
@@ -15,6 +16,12 @@ import { windEngine } from '@feugene/granum-engine-wind'
  * granum, пакет — из собранного `dist`), значения считает Chromium: jsdom не
  * подставляет `var()` в кастомных свойствах.
  *
+ * Сверяются два пути к теме: сборка приложения на granum и `styles.css` пакета
+ * для подключения без granum (`dist/styles/index.css` с подставленными
+ * `@import`). У второго токенов меньше — в нём нет CSS компонентов и утилит, —
+ * поэтому он сверяется по своим токенам, а полнота темы в нём проверяется
+ * отдельно: каждый токен слоёв темы granum обязан там быть.
+ *
  * Цветовой токен сверяется по итоговому цвету: пробник с `color: var(--x)`
  * превращает `color-mix(…)` в конкретный цвет, и одинаковый цвет, записанный
  * другой формулой, расхождением не считается. Остальные токены — по тексту с
@@ -22,45 +29,58 @@ import { windEngine } from '@feugene/granum-engine-wind'
  *
  *   node scripts/theme-values.mjs --write          записать снимок
  *   node scripts/theme-values.mjs                  сверить, код 1 при расхождении
- *   node scripts/theme-values.mjs --allow <file>   JSON-список ожидаемых расхождений
- *                                                  `["<контекст> <токен>", …]`
+ *   node scripts/theme-values.mjs --allow <file>   ожидаемые расхождения: список `["<контекст> <токен>", …]`
+ *                                                  или группы с причиной (`theme-values.allow.json`)
  */
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url))
 const BASELINE = fileURLToPath(new URL('./theme-values.baseline.json', import.meta.url))
 
 /**
- * Страница темы и остров другой темы внутри неё. Значение читается на элементе
- * внутри контекста — там, где его видит компонент, а не где оно объявлено.
+ * Страница режима и остров другого режима внутри неё. Значение читается на
+ * элементе внутри контекста — там, где его видит компонент, а не где оно
+ * объявлено. Режим включается парой `<тема>-<режим>`; без атрибута действует
+ * режим по умолчанию.
  */
 const CONTEXTS = [
   { name: 'page-light', page: null, island: null },
-  { name: 'page-dark', page: 'dark', island: null },
-  { name: 'island-dark-in-light', page: null, island: 'dark' },
-  { name: 'island-light-in-dark', page: 'dark', island: 'light' },
+  { name: 'page-dark', page: 'slate-dark', island: null },
+  { name: 'island-dark-in-light', page: null, island: 'slate-dark' },
+  { name: 'island-light-in-dark', page: 'slate-dark', island: 'slate-light' },
 ]
 
 /** Цвет-маркер: пробник, унаследовавший его, значит, что значение токена не цвет. */
 const MARKER = 'rgb(1, 2, 3)'
 
-async function buildCss() {
+async function buildGranumCss() {
   const app = await prepareApp({
     engine: windEngine(),
     providers: ['@feugene/granularity'],
     components: 'all',
-    themes: { names: ['light', 'dark'] },
     appSources: { dirs: [] },
   }, ROOT)
+  const { css, layers } = await emitCss(app)
 
-  return (await emitCss(app)).css
+  return { css, themeTokens: declaredTokens(`${layers.tokens}\n${layers.themes}`) }
+}
+
+/** `styles.css` пакета с подставленными относительными `@import` — так его видит бандлер потребителя. */
+async function readStylesCss(file = resolve(ROOT, 'dist/styles/index.css')) {
+  const text = await readFile(file, 'utf8')
+  const parts = await Promise.all(text.split(/(@import\s+'[^']+';)/).map(async (part) => {
+    const target = /^@import\s+'([^']+)';$/.exec(part)?.[1]
+
+    return target ? readStylesCss(resolve(dirname(file), target)) : part
+  }))
+
+  return parts.join('')
 }
 
 function declaredTokens(css) {
   return [...new Set([...css.matchAll(/(--gr-[\w-]+)\s*:/g)].map(match => match[1]))].sort()
 }
 
-async function measure(css) {
-  const tokens = declaredTokens(css)
+async function measure(css, tokens = declaredTokens(css)) {
   const browser = await chromium.launch()
 
   try {
@@ -137,16 +157,52 @@ function differences(baseline, current) {
   return found
 }
 
+/** Список `["<контекст> <токен>", …]` либо группы `{ "<дефект>": { why, keys } }` — причина рядом с ключами. */
 async function readAllowList(args) {
   const index = args.indexOf('--allow')
   if (index === -1)
     return new Set()
 
-  return new Set(JSON.parse(await readFile(args[index + 1], 'utf8')))
+  const list = JSON.parse(await readFile(args[index + 1], 'utf8'))
+
+  return new Set(Array.isArray(list) ? list : Object.values(list).flatMap(group => group.keys))
+}
+
+/** Срез снимка по токенам: `styles.css` сверяется только по тому, что в нём объявлено. */
+function pick(snapshot, tokens) {
+  const keep = new Set(tokens)
+
+  return {
+    contexts: Object.fromEntries(Object.entries(snapshot.contexts).map(([name, context]) => [name, {
+      ...context,
+      tokens: Object.fromEntries(Object.entries(context.tokens).filter(([token]) => keep.has(token))),
+    }])),
+  }
+}
+
+function report(label, found, allowed) {
+  const unexpected = found.filter(item => !allowed.has(item.key))
+  const stale = [...allowed].filter(key => !found.some(item => item.key === key))
+
+  for (const item of found.filter(item => allowed.has(item.key)))
+    console.log(`[theme-values] ${label} ожидаемо  ${item.key}: ${item.text}`)
+  for (const item of unexpected)
+    console.error(`[theme-values] ${label} РАСХОЖДЕНИЕ ${item.key}: ${item.text}`)
+  for (const key of stale)
+    console.error(`[theme-values] ${label} исключение не сработало: ${key}`)
+
+  if (unexpected.length > 0 || stale.length > 0) {
+    console.error(`[theme-values] ${label}: ${unexpected.length} расхождений, ${stale.length} лишних исключений`)
+    return false
+  }
+
+  console.log(`[theme-values] ${label}: совпадает со снимком (${found.length} ожидаемых расхождений)`)
+  return true
 }
 
 const args = process.argv.slice(2)
-const current = await measure(await buildCss())
+const granum = await buildGranumCss()
+const current = await measure(granum.css)
 
 if (args.includes('--write')) {
   await writeFile(BASELINE, `${JSON.stringify(current, null, 2)}\n`)
@@ -157,20 +213,16 @@ if (args.includes('--write')) {
 
 const baseline = JSON.parse(await readFile(BASELINE, 'utf8'))
 const allowed = await readAllowList(args)
-const found = differences(baseline, current)
-const unexpected = found.filter(item => !allowed.has(item.key))
-const stale = [...allowed].filter(key => !found.some(item => item.key === key))
 
-for (const item of found.filter(item => allowed.has(item.key)))
-  console.log(`[theme-values] ожидаемо  ${item.key}: ${item.text}`)
-for (const item of unexpected)
-  console.error(`[theme-values] РАСХОЖДЕНИЕ ${item.key}: ${item.text}`)
-for (const key of stale)
-  console.error(`[theme-values] исключение не сработало: ${key}`)
+const stylesCss = await readStylesCss()
+const stylesTokens = declaredTokens(stylesCss)
+const lostInStyles = granum.themeTokens.filter(token => !stylesTokens.includes(token))
+const styles = await measure(stylesCss, stylesTokens)
 
-if (unexpected.length > 0 || stale.length > 0) {
-  console.error(`[theme-values] ${unexpected.length} расхождений, ${stale.length} лишних исключений`)
+const granumOk = report('granum', differences(baseline, current), allowed)
+const stylesOk = report('styles.css', differences(pick(baseline, stylesTokens), styles), allowed)
+for (const token of lostInStyles)
+  console.error(`[theme-values] styles.css: нет токена темы ${token}`)
+
+if (!granumOk || !stylesOk || lostInStyles.length > 0)
   process.exit(1)
-}
-
-console.log(`[theme-values] совпадает со снимком (${found.length} ожидаемых расхождений)`)

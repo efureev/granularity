@@ -27,6 +27,7 @@ export default defineGranumConfig({
     '@feugene/granularity-editor',
   ],
   components: 'all',
-  themes: { names: ['light', 'dark'] },
+  theme: 'slate',
+  modes: { names: ['light', 'dark'] },
   appSources: { dirs: ['src'] },
 })

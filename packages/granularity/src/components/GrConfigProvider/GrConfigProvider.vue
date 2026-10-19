@@ -18,6 +18,7 @@
 import { computed, onBeforeUnmount, provide, watch } from 'vue'
 
 import { GRANULARITY_I18N_KEY, type GranularityI18nAdapter } from '../../i18n/adapter'
+import { themeActivationValue } from '../../composables/internal/themeActivation'
 import { localeSwitchOf, resolveGranularityI18n } from '../../internal/granularityI18n'
 import { applyGrZIndexBase } from './zIndexScale'
 import {
@@ -44,8 +45,9 @@ export interface GrConfigProviderProps {
    */
   locale?: string
   /**
-   * Тема поддерева: значение уезжает в `data-theme`. Тема **документа** —
-   * работа `useTheme`/`initThemeEarly`, здесь именно остров.
+   * Режим поддерева — остров: имя режима (`dark`) уезжает в `data-theme` парой
+   * `slate-dark`, пара пишется как есть. Режим **документа** — работа
+   * `useTheme`/`initThemeEarly`.
    */
   theme?: string
   /**
@@ -83,6 +85,7 @@ const parent = useGrConfig()
 
 const size = computed(() => props.size ?? parent.size.value)
 const theme = computed(() => props.theme ?? parent.theme?.value)
+const themeAttribute = computed(() => theme.value === undefined ? undefined : themeActivationValue(theme.value))
 // Цель портала наследуется вниз: вложенный провайдер без своего значения
 // оставляет оверлеи там же, где их ждёт родительское приложение.
 const portalTarget = computed(() => props.portalTarget ?? parent.portalTarget?.value)
@@ -168,7 +171,7 @@ defineSlots<{
   <component
     :is="props.tag"
     data-gr-config-provider
-    :data-theme="theme"
+    :data-theme="themeAttribute"
     :style="wrapperStyle"
   >
     <slot />

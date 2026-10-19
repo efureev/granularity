@@ -92,7 +92,7 @@ async function hideChrome(page: import('@playwright/test').Page): Promise<void> 
     content: `
       .showcase-header { visibility: hidden !important; }
       .showcase-shell { background-image: none !important; }
-      :root, [data-theme='dark'] { --preview-surface: var(--gr-bg) !important; }
+      :root, [data-theme='slate-dark'] { --preview-surface: var(--gr-bg) !important; }
 
       /*
        * \`content-visibility: auto\` велит браузеру не красить то, чего нет на

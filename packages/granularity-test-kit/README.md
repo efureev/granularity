@@ -58,7 +58,7 @@ entries carry `name`, `kind`, `default` and `description`.
 | `extraRegistries` | `[]` | registries outside `components/` (`['composables']` in the core) |
 | `requireOwnerPrefix` | `true` | a component's own token starts with its own prefix |
 | `ownerPrefixOverrides` | `{}` | families named shorter than their component (`GrProgressBar` → `--gr-progress-`) |
-| `requireThemeKind` | `true` | variables declared in `themes/*.css` are registered as `kind: "theme"` |
+| `requireThemeKind` | `true` | variables declared in `themes/<theme>/` (`root.{json,css}`, `modes/<mode>.{json,css}`) are registered as `kind: "theme"` |
 | `requireRegistries` | `true` | the package has at least one component with its own tokens |
 
 ### `defineRegistryGate(options)`

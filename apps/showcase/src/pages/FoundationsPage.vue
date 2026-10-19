@@ -502,7 +502,7 @@ const integrationCodeSamples: Record<string, Array<{ code: string, language: str
             </div>
 
             <div
-                :data-theme="activeThemeName === 'dark' ? 'dark' : undefined"
+                :data-theme="activeThemeName === 'dark' ? 'slate-dark' : undefined"
                 :style="themePreviewContainerStyle"
                 class="showcase-panel rounded-3xl border p-4"
             >

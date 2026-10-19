@@ -1,61 +1,24 @@
-import { readFileSync } from 'node:fs'
-import { resolve } from 'node:path'
+import { grDerivedTokens } from '@feugene/granularity-tokens'
 import { contrast, deltaE, luminance, parseHex, type Rgb } from '@feugene/granularity-tokens/theme'
+
+import { componentThemeVars, MODES, type ModeName, themeVars } from './themeCss'
+
+export { type ModeName, MODES }
 
 /**
  * Разрешение CSS-цветов и расчёт контраста для тестов.
  *
- * Зачем: jsdom не считает каскад и не умеет `color-mix()`, поэтому проверить
+ * Зачем: jsdom не подставляет `var()` и не умеет `color-mix()`, поэтому проверить
  * «что реально увидит пользователь» через `getComputedStyle` нельзя. Здесь
- * тема читается как файл, `var()`/`color-mix()` разворачиваются вручную, и
+ * тема читается данными, `var()`/`color-mix()` разворачиваются вручную, и
  * контраст считается по формуле WCAG. Это позволяет держать AA-гарантию в
  * юнит-тестах, а не только в axe поверх собранной витрины.
- *
- * ВНИМАНИЕ: `parseVars` — намеренно наивный регэксп по всему тексту файла,
- * **включая комментарии**. Поэтому в комментариях внутри `themes/*.css`
- * нельзя писать имя токена с двоеточием сразу после (`--gr-x:`): такая строка
- * будет прочитана как объявление и «съест» следующее до ближайшей `;`.
  */
 
 export type RgbColor = {
   r: number
   g: number
   b: number
-}
-
-export function parseVars(content: string): Record<string, string> {
-  return Object.fromEntries(
-    [...content.matchAll(/--([\w-]+):\s*([^;]+);/g)].map(([, key, value]) => [`--${key}`, value.trim()]),
-  )
-}
-
-export function extractCssBlock(content: string, selector: string): string {
-  const start = content.indexOf(selector)
-
-  if (start === -1) {
-    throw new Error(`CSS block not found for selector: ${selector}`)
-  }
-
-  const openBrace = content.indexOf('{', start)
-
-  if (openBrace === -1) {
-    throw new Error(`CSS block has no opening brace: ${selector}`)
-  }
-
-  let depth = 0
-
-  for (let index = openBrace; index < content.length; index += 1) {
-    if (content[index] === '{')
-      depth += 1
-    if (content[index] === '}')
-      depth -= 1
-
-    if (depth === 0) {
-      return content.slice(openBrace + 1, index)
-    }
-  }
-
-  throw new Error(`CSS block has no closing brace: ${selector}`)
 }
 
 /** Разбивает по запятым верхнего уровня, не залезая внутрь скобок. */
@@ -204,25 +167,15 @@ export function getColorClassExpression(className: string, prefix: string): stri
   return undefined
 }
 
-function readSrc(relativePath: string): string {
-  return readFileSync(resolve(process.cwd(), relativePath), 'utf8')
-}
+/** Примитивы и роли по режимам темы `slate` — из данных пакета токенов. */
+export const themeVarsByName = Object.fromEntries(MODES.map(mode => [mode, themeVars(mode)])) as Record<ModeName, Record<string, string>>
 
-/** Токены глобальных тем + производные из `tokens.css`. */
-export const themeVarsByName = {
-  light: parseVars(readSrc('src/styles/themes/light.css')),
-  dark: parseVars(readSrc('src/styles/themes/dark.css')),
-} as const
+/** Производные формулы (`--gr-primary-hover` и т.п.) — из реестра пакета токенов. */
+export const derivedThemeVars: Record<string, string> = Object.fromEntries(grDerivedTokens.map(token => [token.name, token.formula]))
 
-export const derivedThemeVars = parseVars(readSrc('src/styles/tokens.css'))
+export type ThemeName = ModeName
 
-export type ThemeName = keyof typeof themeVarsByName
-
-/**
- * Токены компонентной темы (`components/GrX/themes/*.css`). В light-файле
- * блок объявлен на `:root`, в dark — на `.dark,`.
- */
-export function readComponentThemeVars(component: string, theme: ThemeName): Record<string, string> {
-  const content = readSrc(`src/components/${component}/themes/${theme}.css`)
-  return parseVars(extractCssBlock(content, theme === 'light' ? ':root' : '.dark,'))
+/** Токены компонента в режиме — `components/GrX/themes/slate/`: `root.json` и файл режима поверх. */
+export function readComponentThemeVars(component: string, mode: ModeName): Record<string, string> {
+  return componentThemeVars(component, mode)
 }

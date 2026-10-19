@@ -158,13 +158,13 @@
     try {
         var t = localStorage.getItem('gr-theme')
                 || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
-        document.documentElement.dataset.theme = t
+        document.documentElement.dataset.theme = 'slate-' + t
     } catch {
     }
 </script>
 ```
 
-Ключ `gr-theme` и атрибут — тот же контракт, что использует `useTheme()`
+Ключ `gr-theme` (имя режима) и пара `slate-<режим>` в атрибуте — тот же контракт, что использует `useTheme()`
 (см. [`theming.md`](./theming.md)).
 
 Если приложение выбирает тему **на сервере** — из куки, из профиля пользователя, — поставьте

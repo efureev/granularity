@@ -1,13 +1,10 @@
-import { readFileSync } from 'node:fs'
-import { resolve } from 'node:path'
-
 import { describe, expect, it } from 'vitest'
 
 import {
   derivedThemeVars,
   getColorDistance,
   getContrastRatio,
-  parseVars,
+  readComponentThemeVars,
   resolveColorExpression,
   themeVarsByName,
   type ThemeName,
@@ -48,16 +45,11 @@ const AA_TEXT = 4.5
  */
 const MIN_DISTANCE = 4
 
-/** Слоты палитры: имя токена → выражение вида `var(--gr-info-light)`. */
-const paletteVars = parseVars(
-  readFileSync(resolve(process.cwd(), 'src/components/GrAvatar/themes/light.css'), 'utf8'),
-)
-
 const SLOTS = [1, 2, 3, 4, 5, 6] as const
 const THEMES = Object.keys(themeVarsByName) as ThemeName[]
 
 function colorOf(theme: ThemeName, token: string) {
-  const expression = paletteVars[token]
+  const expression = readComponentThemeVars('GrAvatar', theme)[token]
   if (!expression)
     throw new Error(`слот ${token} не объявлен в теме компонента`)
 
@@ -65,10 +57,11 @@ function colorOf(theme: ThemeName, token: string) {
 }
 
 describe('палитра автоцвета GrAvatar', () => {
-  it('все двенадцать слотов объявлены', () => {
+  it.each(THEMES)('в теме %s объявлены все двенадцать слотов', (theme) => {
+    const declared = readComponentThemeVars('GrAvatar', theme)
     const missing = SLOTS
       .flatMap(slot => [`--gr-avatar-${slot}-bg`, `--gr-avatar-${slot}-fg`])
-      .filter(token => !paletteVars[token])
+      .filter(token => !declared[token])
 
     expect(missing, missing.join(', ')).toEqual([])
   })

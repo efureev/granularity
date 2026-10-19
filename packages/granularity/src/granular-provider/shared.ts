@@ -1,9 +1,10 @@
 // `id`, `theme.*` и реестр компонентов провайдера.
 //
-// Пути темы — относительно корня раскладки `dist`, а не URL: базу приложение
-// берёт из директории манифеста, который пишет `granumProvider()` (C-16).
-// Исходники лежат зеркально в `src/`, поэтому `styles/tokens.css` собирается
-// из `src/styles/tokens.css` — плагин сборки копирует их сам.
+// Тем у ядра нет: каталог, реестр и формулы — у `@feugene/granularity-tokens`,
+// владельца тем, которого приложение получает строковой зависимостью (A-31).
+// Ядро даёт базовый слой и токены своих компонентов по темам (`themesDir`).
+// Пути — относительно корня раскладки `dist` (C-16); исходники лежат зеркально
+// в `src/`, плагин сборки копирует их сам.
 //
 // `apps/showcase/scripts/generate-component-api.mjs` читает список компонентов
 // из `Object.keys(granularityComponentConfigs)` через vite SSR.
@@ -118,21 +119,11 @@ export const GRANULARITY_PROVIDER_ID = '@feugene/granularity'
  */
 export const GRANULARITY_ENGINE_DIALECT = 'unocss/preset-wind3+granum@66'
 
-/** Встроенные темы пакета. Единственный источник правды о списке тем. */
-export const granularityThemeNames = ['light', 'dark'] as const
-export type GranularityThemeName = (typeof granularityThemeNames)[number]
-
-/** Темы, активные по умолчанию, если окружение не переопределяет выбор. */
-export const granularityDefaultThemes: readonly GranularityThemeName[] = ['light']
+/** Владелец каталога тем: ядро берёт его темы, а не объявляет свои. */
+export const GRANULARITY_TOKENS_PROVIDER_ID = '@feugene/granularity-tokens'
 
 const theme = {
   baseCss: 'styles/base.css',
-  tokensCss: 'styles/tokens.css',
-  themes: {
-    light: 'styles/themes/light.css',
-    dark: 'styles/themes/dark.css',
-  },
-  defaultThemes: granularityDefaultThemes,
 } as const
 
 /**
@@ -254,9 +245,10 @@ export function createGranularityProvider(
 
   return defineGranumProvider({
     id: GRANULARITY_PROVIDER_ID,
-    contractVersion: 1,
+    contractVersion: 2,
     engine: { dialect: GRANULARITY_ENGINE_DIALECT },
     components,
     theme,
+    dependencies: [GRANULARITY_TOKENS_PROVIDER_ID],
   })
 }

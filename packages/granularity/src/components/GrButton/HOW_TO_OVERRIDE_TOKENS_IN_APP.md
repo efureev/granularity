@@ -53,21 +53,25 @@
 Подходит для brand theme / white-label / кастомной темы продукта.
 
 ```css
-/* app.css */
-:root {
+/* app.css — на парах режимов: пакет объявляет токены кнопки на каждом
+   `[data-theme]`, и значение только на `:root` остров режима бы перекрыл */
+:root,
+[data-theme="slate-light"] {
   --gr-button-info-bg: #0f766e;
   --gr-button-info-bg-hover: #115e59;
   --gr-button-info-bg-active: #134e4a;
   --gr-button-info-fg: #ffffff;
 }
 
-.dark {
+[data-theme="slate-dark"] {
   --gr-button-info-bg: #0f766e;
   --gr-button-info-bg-hover: #115e59;
   --gr-button-info-bg-active: #134e4a;
   --gr-button-info-fg: #f8fafc;
 }
 ```
+
+В приложении на granum то же короче — `modes.tokenOverrides` в `granum.config.ts`.
 
 #### Локально внутри конкретного экрана / feature-блока
 
@@ -138,5 +142,5 @@
 1. Переопределяй сразу весь набор state token'ов: `default`, `hover`, `active`.
 2. Для filled button всегда проверяй контраст текста.
 3. Если используешь локальный scope, переопределяй token'ы на контейнере, который реально оборачивает `GrButton`.
-4. Для dark theme задавай отдельные значения, если в продукте используется `[data-theme='dark']` или `.dark`.
+4. Для тёмного режима задавай отдельные значения на его паре — `[data-theme="slate-dark"]`.
 5. Если цвет меняется только для playground / demo, лучше использовать локальный scope, а не глобальный `:root`.

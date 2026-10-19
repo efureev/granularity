@@ -99,7 +99,7 @@ describe('showcase foundations content', () => {
     expect(showcaseQuickStartCards.every(card => card.code.includes('@feugene/granum-engine-wind'))).toBe(true)
     expect(showcaseQuickStartCards.find(card => card.id === 'quick-start-granum-basic')?.code).not.toContain('components:')
     expect(showcaseQuickStartCards.find(card => card.id === 'quick-start-granum-components')?.code).toContain('names: [\'GrButton\', \'GrCard\']')
-    expect(showcaseQuickStartCards.find(card => card.id === 'quick-start-granum-themes')?.code).toContain('themes: { names: [\'light\', \'dark\'] }')
+    expect(showcaseQuickStartCards.find(card => card.id === 'quick-start-granum-themes')?.code).toContain('modes: { names: [\'light\', \'dark\'] }')
     expect(showcaseQuickStartCards.find(card => card.id === 'quick-start-granum-prune')?.code).toContain('pruneTokens: { mode: \'on\' }')
     expect(showcaseQuickStartCards.find(card => card.id === 'quick-start-granum-guard')?.code).toContain('js: { guard: \'error\' }')
     expect(showcaseInstallationNarrative).toContain('granum(granumConfig)')

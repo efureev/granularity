@@ -404,7 +404,7 @@
     "recommendationsTitle": "Практические рекомендации",
     "connectedDocExcerptTitle": "Подключённый фрагмент документации",
     "currentTokenRegistryTitle": "Текущий реестр токенов",
-    "currentTokenRegistryDescription": "Таблица собирается из актуального `packages/granularity/src/styles/tokens.css`, поэтому отражает текущий набор foundation tokens в пакете.",
+    "currentTokenRegistryDescription": "Таблица собирается из реестра и темы `slate` пакета `@feugene/granularity-tokens`, поэтому отражает текущий набор foundation tokens в пакете.",
     "tokensCount": "токенов",
     "expandSection": "Развернуть",
     "collapseSection": "Свернуть",

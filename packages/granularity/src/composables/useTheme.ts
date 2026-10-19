@@ -1,6 +1,8 @@
 import { computed, hasInjectionContext, inject, ref } from 'vue'
 import type { App, InjectionKey, Ref } from 'vue'
 
+import { themeActivationValue } from './internal/themeActivation'
+
 export type ThemeName = 'light' | 'dark'
 
 export type UseThemeOptions = {
@@ -21,7 +23,7 @@ export type UseThemeOptions = {
    *
    * Геттер, а не элемент: на момент `app.use(...)` корень приложения ещё не
    * смонтирован. Обязателен нескольким приложениям с независимыми темами:
-   * селектор тем атрибутный (`[data-theme='dark']`), поэтому тема работает от
+   * селектор режима атрибутный (`[data-theme="slate-dark"]`), поэтому режим работает от
    * любого контейнера, а без `target` все приложения писали бы в один `<html>`
    * и побеждал бы последний.
    */
@@ -67,11 +69,10 @@ function applyTheme(theme: ThemeName, target?: () => HTMLElement | null) {
   if (typeof document === 'undefined')
     return
 
-  // Канон GR — атрибут `[data-theme]`: на `<html>` (см. docs/styling.md →
-  // «Темизация») либо на корне приложения, когда состояние задало `target`.
-  // `useTheme`/`initThemeEarly` — единственный рантайм-API переключения темы.
+  // Канон GR — пара `<тема>-<режим>` в `data-theme`: на `<html>` либо на корне
+  // приложения, когда состояние задало `target`. Хранится и отдаётся имя режима.
   const root = target?.() ?? document.documentElement
-  root.dataset.theme = theme
+  root.dataset.theme = themeActivationValue(theme)
 }
 
 /**
