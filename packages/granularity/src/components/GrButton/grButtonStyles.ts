@@ -14,6 +14,11 @@ export type GrButtonClassOptions = {
   /** Необязательные: `grButtonClass` — публичный хелпер, его зовёт и `GrRadio`. */
   disabled?: boolean
   block?: boolean
+  loading?: boolean
+  /** Есть аддон слева: отступ с его стороны на 2px меньше, чтобы глиф стоял оптически по центру. */
+  prefix?: boolean
+  /** Есть аддон справа — то же со стороны конца. */
+  suffix?: boolean
 }
 
 export type GrButtonToneTokens = {
@@ -26,13 +31,28 @@ export type GrButtonToneTokens = {
   softBackgroundHover: string
   softBackgroundActive: string
   softForeground: string
+  /** Рамка secondary в покое: тон приглушён, чтобы второстепенный вес не спорил с primary. */
+  borderSoft: string
   border: string
   borderHover: string
   borderActive: string
 }
 
+/**
+ * Фокус — `outline` с отступом, а не `ring`. Кольцо вплотную к заливке того же
+ * тона читалось утолщением кнопки (индиго на индиго — 1.4:1), а `box-shadow`
+ * в forced-colors выключается целиком; `outline` там остаётся и перекрашивается
+ * в системный цвет.
+ */
 export const base
-  = 'inline-flex items-center justify-center gap-2 select-none whitespace-nowrap rounded-ss-[var(--gr-button-radius-ss,var(--gr-button-radius,0.375rem))] rounded-se-[var(--gr-button-radius-se,var(--gr-button-radius,0.375rem))] rounded-ee-[var(--gr-button-radius-ee,var(--gr-button-radius,0.375rem))] rounded-es-[var(--gr-button-radius-es,var(--gr-button-radius,0.375rem))] transition-colors duration-[var(--gr-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] disabled:cursor-not-allowed'
+  = 'relative inline-flex max-w-full items-center justify-center select-none whitespace-nowrap [font-weight:var(--gr-button-font-weight,var(--gr-font-medium))] rounded-ss-[var(--gr-button-radius-ss,var(--gr-button-radius,0.375rem))] rounded-se-[var(--gr-button-radius-se,var(--gr-button-radius,0.375rem))] rounded-ee-[var(--gr-button-radius-ee,var(--gr-button-radius,0.375rem))] rounded-es-[var(--gr-button-radius-es,var(--gr-button-radius,0.375rem))] transition-[color,background-color,border-color,box-shadow,transform] duration-[var(--gr-duration-fast)] ease-[var(--gr-ease-out)] outline-none focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--gr-ring)] disabled:cursor-not-allowed'
+
+/**
+ * Нажатие — вдавливание на 2%. Только у живой кнопки: отключённая и ждущая
+ * сервер на нажатие не отвечают, и сжатие соврало бы. С reduced-motion
+ * остаётся одна смена цвета.
+ */
+export const pressClass = 'motion-safe:active:scale-98'
 
 /** Кнопка на всю ширину контейнера. */
 export const blockClass = 'w-full'
@@ -52,17 +72,39 @@ export const disabledClassByVariant: Record<GrButtonVariant, string> = {
   'primary': 'bg-[var(--gr-button-disabled-bg)] text-[var(--gr-button-disabled-fg)] border border-[var(--gr-button-disabled-brd)] cursor-not-allowed',
   'secondary': 'bg-[var(--gr-button-disabled-bg)] text-[var(--gr-button-disabled-fg)] border border-[var(--gr-button-disabled-brd)] cursor-not-allowed',
   'outline': 'bg-transparent text-[var(--gr-button-disabled-fg)] border border-[var(--gr-button-disabled-brd)] cursor-not-allowed',
-  'ghost': 'bg-transparent text-[var(--gr-button-disabled-fg)] cursor-not-allowed',
+  'ghost': 'bg-transparent text-[var(--gr-button-disabled-fg)] border border-transparent cursor-not-allowed',
   'ghost-border': 'bg-transparent text-[var(--gr-button-disabled-fg)] border border-transparent cursor-not-allowed',
 }
 
 export const grButtonBaseClass = base
 
+/** Высота, кегль и зазор ступени — без боковых отступов: те зависят от аддонов. */
+export const sizeBase: Record<GrButtonSize, string> = {
+  xs: 'h-7 text-[length:var(--gr-text-xs)] leading-[var(--gr-leading-xs)] gap-1',
+  sm: 'h-8 text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)] gap-1.5',
+  md: 'h-10 text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)] gap-2',
+  lg: 'h-11 text-[length:var(--gr-text-base)] leading-[var(--gr-leading-base)] gap-2',
+}
+
+export const paddingStart: Record<GrButtonSize, string> = { xs: 'ps-2.5', sm: 'ps-3', md: 'ps-4', lg: 'ps-5' }
+export const paddingEnd: Record<GrButtonSize, string> = { xs: 'pe-2.5', sm: 'pe-3', md: 'pe-4', lg: 'pe-5' }
+export const paddingStartAdorned: Record<GrButtonSize, string> = { xs: 'ps-2', sm: 'ps-2.5', md: 'ps-3.5', lg: 'ps-4.5' }
+export const paddingEndAdorned: Record<GrButtonSize, string> = { xs: 'pe-2', sm: 'pe-2.5', md: 'pe-3.5', lg: 'pe-4.5' }
+
+/** Ступень целиком, без аддонов. Её же берёт отключённое радио-«кнопка» `GrRadio`. */
 export const sizes: Record<GrButtonSize, string> = {
-  xs: 'h-7 text-[length:var(--gr-text-xs)] leading-[var(--gr-leading-xs)] px-2.5',
-  sm: 'h-8 text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)] px-3',
-  md: 'h-10 text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)] px-4',
-  lg: 'h-11 text-[length:var(--gr-text-base)] leading-[var(--gr-leading-base)] px-5',
+  xs: `${sizeBase.xs} ${paddingStart.xs} ${paddingEnd.xs}`,
+  sm: `${sizeBase.sm} ${paddingStart.sm} ${paddingEnd.sm}`,
+  md: `${sizeBase.md} ${paddingStart.md} ${paddingEnd.md}`,
+  lg: `${sizeBase.lg} ${paddingStart.lg} ${paddingEnd.lg}`,
+}
+
+/** Свои глифы кнопки — спиннер и стрелка внешней ссылки — растут со ступенью, как иконка: 14 / 16 / 16 / 20. */
+export const glyphSizes: Record<GrButtonSize, string> = {
+  xs: 'h-3.5 w-3.5',
+  sm: 'h-4 w-4',
+  md: 'h-4 w-4',
+  lg: 'h-5 w-5',
 }
 
 /**
@@ -89,8 +131,9 @@ export const tones: Record<GrButtonTone, GrButtonToneTokens> = {
     softBackgroundHover: 'var(--gr-button-primary-soft-bg-hover)',
     softBackgroundActive: 'var(--gr-button-primary-soft-bg-active)',
     softForeground: 'var(--gr-accent-fg)',
-    border: 'var(--gr-primary)',
-    borderHover: 'var(--gr-primary-hover)',
+    borderSoft: 'var(--gr-button-primary-border-soft)',
+    border: 'var(--gr-button-primary-border)',
+    borderHover: 'var(--gr-primary)',
     borderActive: 'var(--gr-primary-active)',
   },
   neutral: {
@@ -99,11 +142,12 @@ export const tones: Record<GrButtonTone, GrButtonToneTokens> = {
     solidBackgroundActive: 'var(--gr-secondary-active)',
     solidForeground: 'var(--gr-secondary-fg)',
     accentText: 'var(--gr-fg)',
-    softBackground: 'var(--gr-secondary)',
-    softBackgroundHover: 'var(--gr-secondary-hover)',
-    softBackgroundActive: 'var(--gr-secondary-active)',
+    softBackground: 'var(--gr-button-neutral-soft-bg)',
+    softBackgroundHover: 'var(--gr-button-neutral-soft-bg-hover)',
+    softBackgroundActive: 'var(--gr-button-neutral-soft-bg-active)',
     softForeground: 'var(--gr-secondary-fg)',
-    border: 'var(--gr-brd)',
+    borderSoft: 'var(--gr-button-neutral-border)',
+    border: 'var(--gr-button-neutral-border)',
     borderHover: 'var(--gr-brd-hover,var(--gr-brd))',
     borderActive: 'var(--gr-brd-active,var(--gr-brd))',
   },
@@ -117,8 +161,9 @@ export const tones: Record<GrButtonTone, GrButtonToneTokens> = {
     softBackgroundHover: 'var(--gr-button-success-soft-bg-hover)',
     softBackgroundActive: 'var(--gr-button-success-soft-bg-active)',
     softForeground: 'var(--gr-success-text,var(--gr-success))',
-    border: 'var(--gr-success)',
-    borderHover: 'var(--gr-success-hover)',
+    borderSoft: 'var(--gr-button-success-border-soft)',
+    border: 'var(--gr-button-success-border)',
+    borderHover: 'var(--gr-success)',
     borderActive: 'var(--gr-success-active)',
   },
   warning: {
@@ -131,8 +176,9 @@ export const tones: Record<GrButtonTone, GrButtonToneTokens> = {
     softBackgroundHover: 'var(--gr-button-warning-soft-bg-hover)',
     softBackgroundActive: 'var(--gr-button-warning-soft-bg-active)',
     softForeground: 'var(--gr-warning-text,var(--gr-warning))',
-    border: 'var(--gr-warning)',
-    borderHover: 'var(--gr-warning-hover)',
+    borderSoft: 'var(--gr-button-warning-border-soft)',
+    border: 'var(--gr-button-warning-border)',
+    borderHover: 'var(--gr-warning)',
     borderActive: 'var(--gr-warning-active)',
   },
   danger: {
@@ -145,8 +191,9 @@ export const tones: Record<GrButtonTone, GrButtonToneTokens> = {
     softBackgroundHover: 'var(--gr-button-danger-soft-bg-hover)',
     softBackgroundActive: 'var(--gr-button-danger-soft-bg-active)',
     softForeground: 'var(--gr-danger-text,var(--gr-danger))',
-    border: 'var(--gr-danger)',
-    borderHover: 'var(--gr-danger-hover)',
+    borderSoft: 'var(--gr-button-danger-border-soft)',
+    border: 'var(--gr-button-danger-border)',
+    borderHover: 'var(--gr-danger)',
     borderActive: 'var(--gr-danger-active)',
   },
   info: {
@@ -159,8 +206,9 @@ export const tones: Record<GrButtonTone, GrButtonToneTokens> = {
     softBackgroundHover: 'var(--gr-button-info-soft-bg-hover)',
     softBackgroundActive: 'var(--gr-button-info-soft-bg-active)',
     softForeground: 'var(--gr-info-text,var(--gr-info))',
-    border: 'var(--gr-info)',
-    borderHover: 'var(--gr-info-hover)',
+    borderSoft: 'var(--gr-button-info-border-soft)',
+    border: 'var(--gr-button-info-border)',
+    borderHover: 'var(--gr-info)',
     borderActive: 'var(--gr-info-active)',
   },
   slate: {
@@ -173,8 +221,9 @@ export const tones: Record<GrButtonTone, GrButtonToneTokens> = {
     softBackgroundHover: 'var(--gr-button-slate-soft-bg-hover)',
     softBackgroundActive: 'var(--gr-button-slate-soft-bg-active)',
     softForeground: 'var(--gr-slate-text,var(--gr-slate))',
-    border: 'var(--gr-slate)',
-    borderHover: 'var(--gr-slate-hover)',
+    borderSoft: 'var(--gr-button-slate-border-soft)',
+    border: 'var(--gr-button-slate-border)',
+    borderHover: 'var(--gr-slate)',
     borderActive: 'var(--gr-slate-active)',
   },
   azure: {
@@ -187,11 +236,26 @@ export const tones: Record<GrButtonTone, GrButtonToneTokens> = {
     softBackgroundHover: 'var(--gr-button-azure-soft-bg-hover)',
     softBackgroundActive: 'var(--gr-button-azure-soft-bg-active)',
     softForeground: 'var(--gr-azure-text,var(--gr-azure))',
-    border: 'var(--gr-azure)',
-    borderHover: 'var(--gr-azure-hover)',
+    borderSoft: 'var(--gr-button-azure-border-soft)',
+    border: 'var(--gr-button-azure-border)',
+    borderHover: 'var(--gr-azure)',
     borderActive: 'var(--gr-azure-active)',
   },
 }
+
+/**
+ * Объём solid-кнопки: блик в 1px по верхней кромке и тень `--gr-shadow-1`, в
+ * нажатии тень уходит внутрь. Отключённая кнопка этих классов не получает —
+ * объём снимается вместе с вариантом.
+ *
+ * `--gr-button-divider` — шов между соседними solid-звеньями, его ставит
+ * `GrButtonGroup`. Не своим `box-shadow`: лист группы живёт в слое
+ * компонентов и утилите кнопки проиграл бы при любой специфичности.
+ */
+export const solidShadowClass = 'shadow-[var(--gr-button-divider,0_0_transparent),var(--gr-button-shadow)] active:shadow-[var(--gr-button-divider,0_0_transparent),var(--gr-button-shadow-active)] hover:active:shadow-[var(--gr-button-divider,0_0_transparent),var(--gr-button-shadow-active)]'
+
+/** «Обычная» нейтральная кнопка лежит на поверхности карточки и чуть приподнята над ней. */
+export const surfaceShadowClass = 'shadow-[var(--gr-shadow-1)]'
 
 function withVar(token: string): string {
   return `[${token}]`
@@ -211,6 +275,7 @@ export function variantClass(variant: GrButtonVariant, tone: GrButtonTone): stri
       `hover:active:bg-${withVar(tokens.solidBackgroundActive)}`,
       `active:border-${withVar(tokens.solidBackgroundActive)}`,
       `hover:active:border-${withVar(tokens.solidBackgroundActive)}`,
+      solidShadowClass,
     ].join(' ')
   }
 
@@ -218,14 +283,15 @@ export function variantClass(variant: GrButtonVariant, tone: GrButtonTone): stri
     return [
       `bg-${withVar(tokens.softBackground)}`,
       `text-${withVar(tokens.softForeground)}`,
-      `border border-${withVar(tokens.border)}`,
+      `border border-${withVar(tokens.borderSoft)}`,
       `hover:bg-${withVar(tokens.softBackgroundHover)}`,
-      `hover:border-${withVar(tokens.borderHover)}`,
+      `hover:border-${withVar(tokens.border)}`,
       `active:bg-${withVar(tokens.softBackgroundActive)}`,
       `hover:active:bg-${withVar(tokens.softBackgroundActive)}`,
-      `active:border-${withVar(tokens.borderActive)}`,
-      `hover:active:border-${withVar(tokens.borderActive)}`,
-    ].join(' ')
+      `active:border-${withVar(tokens.borderHover)}`,
+      `hover:active:border-${withVar(tokens.borderHover)}`,
+      tone === 'neutral' ? surfaceShadowClass : '',
+    ].filter(Boolean).join(' ')
   }
 
   if (variant === 'outline') {
@@ -246,6 +312,7 @@ export function variantClass(variant: GrButtonVariant, tone: GrButtonTone): stri
     return [
       'bg-transparent',
       `text-${withVar(tokens.accentText)}`,
+      'border border-transparent',
       `hover:bg-${withVar(tokens.softBackgroundHover)}`,
       `active:bg-${withVar(tokens.softBackgroundActive)}`,
       `hover:active:bg-${withVar(tokens.softBackgroundActive)}`,
@@ -257,7 +324,7 @@ export function variantClass(variant: GrButtonVariant, tone: GrButtonTone): stri
     `text-${withVar(tokens.accentText)}`,
     'border border-transparent',
     `hover:bg-${withVar(tokens.softBackgroundHover)}`,
-    `hover:border-${withVar(tokens.borderHover)}`,
+    `hover:border-${withVar(tokens.border)}`,
     `active:bg-${withVar(tokens.softBackgroundActive)}`,
     `hover:active:bg-${withVar(tokens.softBackgroundActive)}`,
     `active:border-${withVar(tokens.borderActive)}`,
@@ -265,12 +332,24 @@ export function variantClass(variant: GrButtonVariant, tone: GrButtonTone): stri
   ].join(' ')
 }
 
+function sizeClass(options: GrButtonClassOptions): string {
+  if (options.square)
+    return squareSizes[options.size]
+
+  return [
+    sizeBase[options.size],
+    options.prefix ? paddingStartAdorned[options.size] : paddingStart[options.size],
+    options.suffix ? paddingEndAdorned[options.size] : paddingEnd[options.size],
+  ].join(' ')
+}
+
 export function grButtonClass(options: GrButtonClassOptions): string {
   return [
-    options.square ? squareSizes[options.size] : sizes[options.size],
+    sizeClass(options),
     options.block ? blockClass : '',
-    // `loading` сюда не входит: у него свой спиннер, и выглядеть отключённым он
-    // не должен.
+    // `loading` отключённым не выглядит: о нём говорит спиннер. Но нажатие он
+    // не принимает — и не изображает.
     options.disabled ? disabledClassByVariant[options.variant] : variantClass(options.variant, options.tone),
+    options.disabled || options.loading ? '' : pressClass,
   ].filter(Boolean).join(' ')
 }

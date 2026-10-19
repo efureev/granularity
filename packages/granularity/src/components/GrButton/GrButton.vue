@@ -1,17 +1,22 @@
 <script setup lang="ts">
-import { computed, markRaw, ref, useAttrs, type Component } from 'vue'
+import { computed, markRaw, ref, Text, useAttrs, useSlots, type Component } from 'vue'
 
+import IconExternal from '~icons/lucide/external-link'
 import IconLoader from '~icons/lucide/loader-circle'
 
 import { useGrComponentProp, useGrComponentSize } from '../shared/configContext'
 import { useGrButtonGroup } from '../shared/buttonGroupContext'
 import { useGrFormContext } from '../shared/formContext'
+import { provideGrIconSizeHint } from '../shared/iconSizeHint'
 import { definedAttrs } from '../shared/polymorphicRoot'
+import { meaningfulSlotNodes } from '../shared/slotNodes'
+import { titleWhenTruncated } from '../shared/truncationTitle'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 
 export type { GrButtonSize, GrButtonTone, GrButtonVariant } from './grButtonStyles'
 
 import {
+  glyphSizes,
   grButtonBaseClass,
   grButtonClass,
   type GrButtonSize,
@@ -36,8 +41,9 @@ export interface GrButtonProps {
   /** Высота и кегль по шкале контролов. По умолчанию `md`; берётся из группы и `GrConfigProvider`. */
   size?: GrButtonSize
   /**
-   * Действие выполняется: спиннер на месте префикса, `aria-busy` и перехват
-   * клика. Кнопка при этом остаётся в фокусе — нативный `disabled` не ставится.
+   * Действие выполняется: спиннер на месте префикса, а без него — поверх
+   * подписи, ширина не меняется; `aria-busy` и перехват клика. Кнопка при этом
+   * остаётся в фокусе — нативный `disabled` не ставится.
    */
   loading?: boolean
   /** i18n: что именно грузится. `aria-busy` сам по себе часть AT не объявляет. */
@@ -63,7 +69,10 @@ export interface GrButtonProps {
   target?: string
   /** `rel` кнопки-ссылки. Без него при `target="_blank"` ставится `noopener noreferrer`. */
   rel?: string
-  /** Открывать ссылку в новой вкладке: `target="_blank"` и `rel="noopener noreferrer"`. */
+  /**
+   * Открывать ссылку в новой вкладке: `target="_blank"` и `rel="noopener noreferrer"`.
+   * Уход объявляется заранее — значком справа и скрытым текстом в имени.
+   */
   external?: boolean
 }
 
@@ -100,6 +109,9 @@ const resolvedSize = useGrComponentSize(() => props.size ?? group?.size.value, {
 const resolvedVariant = useGrComponentProp('GrButton', 'variant', () => props.variant ?? group?.variant.value, 'primary')
 const resolvedTone = useGrComponentProp('GrButton', 'tone', () => props.tone ?? group?.tone.value, 'primary')
 const isSquare = useGrComponentProp('GrButton', 'square', () => props.square, false)
+
+const iconSizeBySize: Record<GrButtonSize, GrButtonSize> = { xs: 'xs', sm: 'sm', md: 'sm', lg: 'lg' }
+provideGrIconSizeHint(computed(() => iconSizeBySize[resolvedSize.value]))
 
 const { t } = useGranularityTranslations()
 const resolvedLoadingText = computed(() => props.loadingText ?? t('gr.button.loading', 'Loading…'))
@@ -145,6 +157,47 @@ const looksDisabled = computed(() => isDisabled.value || attrs['aria-disabled'] 
 const resolvedTarget = computed(() => props.target ?? (props.external ? '_blank' : undefined))
 const resolvedRel = computed(() => props.rel ?? (resolvedTarget.value === '_blank' ? 'noopener noreferrer' : undefined))
 
+/**
+ * Смена контекста объявляется заранее (WCAG 3.2.5) — так же, как у `GrLink`:
+ * условие — ссылка реально уводит в новую вкладку, а не проп `external`.
+ */
+const opensInNewTab = computed(() => isLink.value && !isDisabled.value && resolvedTarget.value === '_blank')
+const newTabHint = computed(() => t('gr.button.opensInNewTab', 'opens in a new tab'))
+
+// `aria-label` перекрывает содержимое вместе со скрытой подсказкой — дописываем её к нему.
+const resolvedAriaLabel = computed(() => {
+  if (!props.ariaLabel)
+    return undefined
+  return opensInNewTab.value ? `${props.ariaLabel}, ${newTabHint.value}` : props.ariaLabel
+})
+
+const slots = useSlots()
+
+// Слоты нереактивны, поэтому их разбор — функции, которые зовёт рендер, а не
+// computed: кэш не узнал бы, что родитель убрал аддон.
+function hasSlotContent(name: 'prefix' | 'suffix'): boolean {
+  const slot = slots[name]
+  return slot ? meaningfulSlotNodes(slot()).length > 0 : false
+}
+
+/**
+ * Подпись из одного текста оборачивается — только так её можно обрезать
+ * многоточием. Иконку или разметку в основном слоте не трогаем: обёртка
+ * сдвинула бы их выравнивание.
+ */
+function labelIsText(): boolean {
+  const nodes = slots.default ? meaningfulSlotNodes(slots.default()) : []
+  return nodes.length > 0 && nodes.every(node => node.type === Text)
+}
+
+/**
+ * Без префикса спиннеру некуда встать, и он ложится поверх содержимого — ширина
+ * кнопки не меняется, соседи не едут. С префиксом спиннер занимает его место.
+ */
+function spinnerOverContent(): boolean {
+  return props.loading && !hasSlotContent('prefix')
+}
+
 const rootAttrs = computed(() => {
   const liveLink = isLink.value && !isDisabled.value
   const own = definedAttrs({
@@ -155,7 +208,7 @@ const rootAttrs = computed(() => {
     'rel': liveLink ? resolvedRel.value : undefined,
     'aria-busy': props.loading ? 'true' : undefined,
     'aria-disabled': ariaDisabled.value,
-    'aria-label': props.ariaLabel,
+    'aria-label': resolvedAriaLabel.value,
     'tabindex': isLink.value && isDisabled.value ? -1 : undefined,
   })
 
@@ -202,16 +255,26 @@ defineExpose({
   blur,
 })
 
-const className = computed(() => {
-  return grButtonClass({
-    variant: resolvedVariant.value,
-    tone: resolvedTone.value,
-    size: resolvedSize.value,
-    square: isSquare.value,
-    disabled: looksDisabled.value,
-    block: props.block,
-  })
-})
+function rootClass(): string[] {
+  const suffix = hasSlotContent('suffix') || (opensInNewTab.value && !isSquare.value)
+
+  return [
+    grButtonBaseClass,
+    grButtonClass({
+      variant: resolvedVariant.value,
+      tone: resolvedTone.value,
+      size: resolvedSize.value,
+      square: isSquare.value,
+      disabled: looksDisabled.value,
+      block: props.block,
+      loading: props.loading,
+      prefix: hasSlotContent('prefix'),
+      suffix,
+    }),
+    // Ждущая сервер кнопка не запрещена, а занята — курсор говорит именно это.
+    looksDisabled.value ? 'cursor-not-allowed' : props.loading ? 'cursor-progress' : '',
+  ]
+}
 
 defineSlots<{
   /** Содержимое кнопки. */
@@ -230,18 +293,59 @@ defineSlots<{
     data-gr-button
     :data-gr-variant="resolvedVariant"
     :data-gr-tone="resolvedTone"
+    :data-gr-busy-overlay="spinnerOverContent() ? '' : undefined"
     v-bind="rootAttrs"
-    :class="[grButtonBaseClass, className, blocked ? 'cursor-not-allowed' : '']"
+    :class="rootClass()"
     @click.capture="onClickCapture"
   >
     <!-- Спиннер занимает место префикса: две иконки рядом читались бы как ошибка. -->
-    <IconLoader v-if="props.loading" class="h-4 w-4 animate-spin" aria-hidden="true" />
-    <slot v-else name="prefix" />
+    <IconLoader v-if="props.loading && !spinnerOverContent()" class="animate-spin" :class="glyphSizes[resolvedSize]" aria-hidden="true" />
+    <slot v-else-if="!props.loading" name="prefix" />
 
-    <slot />
+    <span v-if="labelIsText()" data-gr-button-label class="min-w-0 truncate" @mouseenter="titleWhenTruncated">
+      <slot />
+    </span>
+    <slot v-else />
 
     <slot name="suffix" />
 
+    <IconExternal v-if="opensInNewTab && !isSquare" :class="glyphSizes[resolvedSize]" aria-hidden="true" />
+
+    <span v-if="spinnerOverContent()" data-gr-button-spinner class="absolute inset-0 flex items-center justify-center" aria-hidden="true">
+      <IconLoader class="animate-spin" :class="glyphSizes[resolvedSize]" />
+    </span>
+
     <span v-if="props.loading" class="sr-only">{{ resolvedLoadingText }}</span>
+    <span v-if="opensInNewTab && !props.ariaLabel" class="sr-only">({{ newTabHint }})</span>
   </component>
 </template>
+
+<style>
+/*
+ * Загрузка без префикса: спиннер лежит поверх содержимого, а содержимое гаснет.
+ * Прозрачностью, а не `visibility` — иначе подпись выпала бы из доступного
+ * имени. Голый текстовый узел селектором не достать, поэтому текст гасится
+ * заливкой глифов: `color` остаётся прежним, и спиннер рисуется цветом подписи.
+ */
+[data-gr-button][data-gr-busy-overlay] {
+  -webkit-text-fill-color: transparent;
+}
+
+[data-gr-button][data-gr-busy-overlay] > :not([data-gr-button-spinner]) {
+  opacity: 0;
+}
+
+/*
+ * Зона касания: на грубом указателе низкая кнопка добирает высоту до
+ * `--gr-button-touch-size` невидимым `::after`. Вид и плотность ряда прежние;
+ * кнопка выше порога ничего не получает — `min()` обнуляет вылет.
+ */
+@media (pointer: coarse) {
+  [data-gr-button]::after {
+    content: '';
+    position: absolute;
+    inset-inline: 0;
+    inset-block: min(0px, calc((100% - var(--gr-button-touch-size, 2.75rem)) / 2));
+  }
+}
+</style>

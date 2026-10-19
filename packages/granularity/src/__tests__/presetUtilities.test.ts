@@ -51,6 +51,15 @@ const UTILITIES_THE_PACKAGE_RELIES_ON = [
   'touch-none',
   // Прокрутка списка опций к активному элементу: GrTimePicker, GrSelect.
   'scroll-py-1',
+  // GrButton: фокус-контур с отступом, вдавливание без reduced-motion, курсор
+  // занятой кнопки и логические отступы с полушагом у аддонов.
+  'outline-solid',
+  'outline-2',
+  'outline-offset-2',
+  'motion-safe:active:scale-98',
+  'cursor-progress',
+  'ps-4.5',
+  'pe-3.5',
 ] as const
 
 describe('утилиты, на которые опирается пакет', () => {

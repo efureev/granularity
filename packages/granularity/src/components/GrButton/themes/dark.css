@@ -5,7 +5,8 @@
  * теме — пастельные заливки под тёмный текст, а кнопка остаётся насыщенной со
  * светлой подписью. Soft-заливки и недоступное состояние сюда не попадают
  * намеренно: они объявлены в `:root` через тон и общие роли и пересчитываются в
- * тёмной теме сами.
+ * тёмной теме сами. Объём solid-кнопки повторён: на тёмном фоне блик тише, а
+ * вдавленная тень плотнее.
  */
 .dark,
 [data-theme='dark'] {
@@ -43,4 +44,7 @@
   --gr-button-azure-bg-hover: var(--gr-azure-solid-hover);
   --gr-button-azure-bg-active: var(--gr-azure-solid-active);
   --gr-button-azure-fg: var(--gr-azure-solid-fg);
+
+  --gr-button-shadow: inset 0 1px 0 color-mix(in srgb, var(--gr-slate-0) 12%, transparent), var(--gr-shadow-1);
+  --gr-button-shadow-active: inset 0 1px 2px color-mix(in srgb, var(--gr-slate-900) 60%, transparent);
 }

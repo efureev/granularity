@@ -97,6 +97,17 @@ defineSlots<{
     z-index: 1;
 }
 
+/* Шов между соседними solid-звеньями: заливки одного цвета сливаются, и
+   «Опубликовать ▾» читалось бы одной кнопкой с шевроном в подписи. Кнопка
+   рисует его своей тенью — здесь только переменная. */
+[data-gr-button-group][data-attached][data-orientation='horizontal'] > [data-gr-variant='primary'] + [data-gr-variant='primary'] {
+    --gr-button-divider: inset 1px 0 0 color-mix(in srgb, var(--gr-slate-0) 28%, transparent);
+}
+
+[data-gr-button-group][data-attached][data-orientation='vertical'] > [data-gr-variant='primary'] + [data-gr-variant='primary'] {
+    --gr-button-divider: inset 0 1px 0 color-mix(in srgb, var(--gr-slate-0) 28%, transparent);
+}
+
 /* ————— Горизонтальная группа. */
 
 [data-gr-button-group][data-attached][data-orientation='horizontal'] > :is([data-gr-button], :has([data-gr-button])) ~ :is([data-gr-button], :has([data-gr-button])) {

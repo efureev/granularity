@@ -123,9 +123,9 @@ describe('GrPromptDialog', () => {
     await nextTick()
 
     expect(wrapper.find('[data-testid="gr-prompt-cancel"]').classes()).toContain('h-7')
-    expect(wrapper.find('[data-testid="gr-prompt-cancel"]').classes()).toContain('px-2.5')
+    expect(wrapper.find('[data-testid="gr-prompt-cancel"]').classes()).toContain('ps-2.5')
     expect(wrapper.find('[data-testid="gr-prompt-confirm"]').classes()).toContain('h-7')
-    expect(wrapper.find('[data-testid="gr-prompt-confirm"]').classes()).toContain('px-2.5')
+    expect(wrapper.find('[data-testid="gr-prompt-confirm"]').classes()).toContain('ps-2.5')
 
     wrapper.unmount()
   })

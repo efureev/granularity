@@ -516,55 +516,78 @@ floating-компоненты не выходят по построению (v-c
 | `--gr-button-radius-ee` | только хук | var(--gr-button-radius) | Скругление одного угла (конец блока, конец строки). Прикреплённая `GrButtonGroup` гасит им внутренние углы звеньев. |
 | `--gr-button-radius-es` | только хук | var(--gr-button-radius) | Скругление одного угла (конец блока, начало строки). Прикреплённая `GrButtonGroup` гасит им внутренние углы звеньев. |
 | `--gr-button-square-size` | только хук | высота кнопки текущей ступени | Сторона квадратной кнопки (`square`): иконка без подписи обязана остаться квадратом на любой ступени. |
+| `--gr-button-font-weight` | только хук | var(--gr-font-medium) | Начертание подписи. Кнопка читается как действие, а не как текст рядом с полем, поэтому по умолчанию — medium. |
+| `--gr-button-touch-size` | только хук | 2.75rem | Высота зоны касания на грубом указателе (`pointer: coarse`). Кнопка ниже неё добирает высоту невидимым `::after`, вид не меняется. |
+| `--gr-button-divider` | только хук | нет (`0 0 transparent`) | Шов solid-кнопки внутри прикреплённой `GrButtonGroup`: группа ставит его второму из соседних primary-звеньев, кнопка рисует его своей тенью. |
 | `--gr-button-primary-bg` | тема компонента | var(--gr-primary-solid) | Заливка solid-кнопки тона `primary`. |
 | `--gr-button-primary-bg-hover` | тема компонента | var(--gr-primary-solid-hover) | Заливка solid-кнопки тона `primary` под курсором. |
 | `--gr-button-primary-bg-active` | тема компонента | var(--gr-primary-solid-active) | Заливка solid-кнопки тона `primary` в момент нажатия. |
 | `--gr-button-primary-fg` | тема компонента | var(--gr-primary-solid-fg) | Цвет текста на solid-кнопке тона `primary`. Приходит из `--gr-primary-solid-fg`: заливка кнопки рассчитана нести светлый текст, и глобальный `-fg` тона на ней не подходит. |
 | `--gr-button-primary-soft-bg` | тема компонента | color-mix(in srgb, var(--gr-primary) 14%, var(--gr-bg)) | Заливка soft-кнопки тона `primary`. |
-| `--gr-button-primary-soft-bg-hover` | тема компонента | color-mix(in srgb, var(--gr-primary) 18%, var(--gr-bg)) | Заливка soft-кнопки тона `primary` под курсором. |
-| `--gr-button-primary-soft-bg-active` | тема компонента | color-mix(in srgb, var(--gr-primary) 24%, var(--gr-bg)) | Заливка soft-кнопки тона `primary` в момент нажатия. |
+| `--gr-button-primary-soft-bg-hover` | тема компонента | color-mix(in srgb, var(--gr-primary) 10%, var(--gr-button-primary-soft-bg)) | Заливка soft-кнопки тона `primary` под курсором. Тон подмешивается в саму soft-заливку, поэтому наведение темнеет в светлой теме и светлеет в тёмной. |
+| `--gr-button-primary-soft-bg-active` | тема компонента | color-mix(in srgb, var(--gr-primary) 16%, var(--gr-button-primary-soft-bg)) | Заливка soft-кнопки тона `primary` в момент нажатия. |
+| `--gr-button-primary-border-soft` | тема компонента | color-mix(in srgb, var(--gr-primary) 38%, var(--gr-bg)) | Рамка secondary-кнопки тона `primary` в покое: тон приглушён, чтобы второстепенный вес не спорил с primary. |
+| `--gr-button-primary-border` | тема компонента | color-mix(in srgb, var(--gr-primary) 70%, var(--gr-bg)) | Рамка outline-кнопки тона `primary` в покое и secondary под курсором. Полный тон рамка получает под указателем. |
 | `--gr-button-success-bg` | тема компонента | var(--gr-success-solid) | Заливка solid-кнопки тона `success`. |
 | `--gr-button-success-bg-hover` | тема компонента | var(--gr-success-solid-hover) | Заливка solid-кнопки тона `success` под курсором. |
 | `--gr-button-success-bg-active` | тема компонента | var(--gr-success-solid-active) | Заливка solid-кнопки тона `success` в момент нажатия. |
 | `--gr-button-success-fg` | тема компонента | var(--gr-success-solid-fg) | Цвет текста на solid-кнопке тона `success`. Приходит из `--gr-success-solid-fg`: заливка кнопки рассчитана нести светлый текст, и глобальный `-fg` тона на ней не подходит. |
-| `--gr-button-success-soft-bg` | тема компонента | color-mix(in srgb, var(--gr-success) 14%, var(--gr-bg)) | Заливка soft-кнопки тона `success`. |
-| `--gr-button-success-soft-bg-hover` | тема компонента | color-mix(in srgb, var(--gr-success) 18%, var(--gr-bg)) | Заливка soft-кнопки тона `success` под курсором. |
-| `--gr-button-success-soft-bg-active` | тема компонента | color-mix(in srgb, var(--gr-success) 24%, var(--gr-bg)) | Заливка soft-кнопки тона `success` в момент нажатия. |
+| `--gr-button-success-soft-bg` | тема компонента | var(--gr-success-light) | Заливка soft-кнопки тона `success`. |
+| `--gr-button-success-soft-bg-hover` | тема компонента | color-mix(in srgb, var(--gr-success) 10%, var(--gr-button-success-soft-bg)) | Заливка soft-кнопки тона `success` под курсором. Тон подмешивается в саму soft-заливку, поэтому наведение темнеет в светлой теме и светлеет в тёмной. |
+| `--gr-button-success-soft-bg-active` | тема компонента | color-mix(in srgb, var(--gr-success) 16%, var(--gr-button-success-soft-bg)) | Заливка soft-кнопки тона `success` в момент нажатия. |
+| `--gr-button-success-border-soft` | тема компонента | color-mix(in srgb, var(--gr-success) 38%, var(--gr-bg)) | Рамка secondary-кнопки тона `success` в покое: тон приглушён, чтобы второстепенный вес не спорил с primary. |
+| `--gr-button-success-border` | тема компонента | color-mix(in srgb, var(--gr-success) 70%, var(--gr-bg)) | Рамка outline-кнопки тона `success` в покое и secondary под курсором. Полный тон рамка получает под указателем. |
 | `--gr-button-warning-bg` | тема компонента | var(--gr-warning-solid) | Заливка solid-кнопки тона `warning`. |
 | `--gr-button-warning-bg-hover` | тема компонента | var(--gr-warning-solid-hover) | Заливка solid-кнопки тона `warning` под курсором. |
 | `--gr-button-warning-bg-active` | тема компонента | var(--gr-warning-solid-active) | Заливка solid-кнопки тона `warning` в момент нажатия. |
 | `--gr-button-warning-fg` | тема компонента | var(--gr-warning-solid-fg) | Цвет текста на solid-кнопке тона `warning`. Приходит из `--gr-warning-solid-fg`: заливка кнопки рассчитана нести светлый текст, и глобальный `-fg` тона на ней не подходит. |
-| `--gr-button-warning-soft-bg` | тема компонента | color-mix(in srgb, var(--gr-warning) 14%, var(--gr-bg)) | Заливка soft-кнопки тона `warning`. |
-| `--gr-button-warning-soft-bg-hover` | тема компонента | color-mix(in srgb, var(--gr-warning) 18%, var(--gr-bg)) | Заливка soft-кнопки тона `warning` под курсором. |
-| `--gr-button-warning-soft-bg-active` | тема компонента | color-mix(in srgb, var(--gr-warning) 24%, var(--gr-bg)) | Заливка soft-кнопки тона `warning` в момент нажатия. |
+| `--gr-button-warning-soft-bg` | тема компонента | var(--gr-warning-light) | Заливка soft-кнопки тона `warning`. |
+| `--gr-button-warning-soft-bg-hover` | тема компонента | color-mix(in srgb, var(--gr-warning) 10%, var(--gr-button-warning-soft-bg)) | Заливка soft-кнопки тона `warning` под курсором. Тон подмешивается в саму soft-заливку, поэтому наведение темнеет в светлой теме и светлеет в тёмной. |
+| `--gr-button-warning-soft-bg-active` | тема компонента | color-mix(in srgb, var(--gr-warning) 16%, var(--gr-button-warning-soft-bg)) | Заливка soft-кнопки тона `warning` в момент нажатия. |
+| `--gr-button-warning-border-soft` | тема компонента | color-mix(in srgb, var(--gr-warning) 38%, var(--gr-bg)) | Рамка secondary-кнопки тона `warning` в покое: тон приглушён, чтобы второстепенный вес не спорил с primary. |
+| `--gr-button-warning-border` | тема компонента | color-mix(in srgb, var(--gr-warning) 70%, var(--gr-bg)) | Рамка outline-кнопки тона `warning` в покое и secondary под курсором. Полный тон рамка получает под указателем. |
 | `--gr-button-danger-bg` | тема компонента | var(--gr-danger-solid) | Заливка solid-кнопки тона `danger`. |
 | `--gr-button-danger-bg-hover` | тема компонента | var(--gr-danger-solid-hover) | Заливка solid-кнопки тона `danger` под курсором. |
 | `--gr-button-danger-bg-active` | тема компонента | var(--gr-danger-solid-active) | Заливка solid-кнопки тона `danger` в момент нажатия. |
 | `--gr-button-danger-fg` | тема компонента | var(--gr-danger-solid-fg) | Цвет текста на solid-кнопке тона `danger`. Приходит из `--gr-danger-solid-fg`: заливка кнопки рассчитана нести светлый текст, и глобальный `-fg` тона на ней не подходит. |
-| `--gr-button-danger-soft-bg` | тема компонента | color-mix(in srgb, var(--gr-danger) 14%, var(--gr-bg)) | Заливка soft-кнопки тона `danger`. |
-| `--gr-button-danger-soft-bg-hover` | тема компонента | color-mix(in srgb, var(--gr-danger) 18%, var(--gr-bg)) | Заливка soft-кнопки тона `danger` под курсором. |
-| `--gr-button-danger-soft-bg-active` | тема компонента | color-mix(in srgb, var(--gr-danger) 24%, var(--gr-bg)) | Заливка soft-кнопки тона `danger` в момент нажатия. |
+| `--gr-button-danger-soft-bg` | тема компонента | var(--gr-danger-light) | Заливка soft-кнопки тона `danger`. |
+| `--gr-button-danger-soft-bg-hover` | тема компонента | color-mix(in srgb, var(--gr-danger) 10%, var(--gr-button-danger-soft-bg)) | Заливка soft-кнопки тона `danger` под курсором. Тон подмешивается в саму soft-заливку, поэтому наведение темнеет в светлой теме и светлеет в тёмной. |
+| `--gr-button-danger-soft-bg-active` | тема компонента | color-mix(in srgb, var(--gr-danger) 16%, var(--gr-button-danger-soft-bg)) | Заливка soft-кнопки тона `danger` в момент нажатия. |
+| `--gr-button-danger-border-soft` | тема компонента | color-mix(in srgb, var(--gr-danger) 38%, var(--gr-bg)) | Рамка secondary-кнопки тона `danger` в покое: тон приглушён, чтобы второстепенный вес не спорил с primary. |
+| `--gr-button-danger-border` | тема компонента | color-mix(in srgb, var(--gr-danger) 70%, var(--gr-bg)) | Рамка outline-кнопки тона `danger` в покое и secondary под курсором. Полный тон рамка получает под указателем. |
 | `--gr-button-info-bg` | тема компонента | var(--gr-info-solid) | Заливка solid-кнопки тона `info`. |
 | `--gr-button-info-bg-hover` | тема компонента | var(--gr-info-solid-hover) | Заливка solid-кнопки тона `info` под курсором. |
 | `--gr-button-info-bg-active` | тема компонента | var(--gr-info-solid-active) | Заливка solid-кнопки тона `info` в момент нажатия. |
 | `--gr-button-info-fg` | тема компонента | var(--gr-info-solid-fg) | Цвет текста на solid-кнопке тона `info`. Приходит из `--gr-info-solid-fg`: заливка кнопки рассчитана нести светлый текст, и глобальный `-fg` тона на ней не подходит. |
-| `--gr-button-info-soft-bg` | тема компонента | color-mix(in srgb, var(--gr-info) 14%, var(--gr-bg)) | Заливка soft-кнопки тона `info`. |
-| `--gr-button-info-soft-bg-hover` | тема компонента | color-mix(in srgb, var(--gr-info) 18%, var(--gr-bg)) | Заливка soft-кнопки тона `info` под курсором. |
-| `--gr-button-info-soft-bg-active` | тема компонента | color-mix(in srgb, var(--gr-info) 24%, var(--gr-bg)) | Заливка soft-кнопки тона `info` в момент нажатия. |
+| `--gr-button-info-soft-bg` | тема компонента | var(--gr-info-light) | Заливка soft-кнопки тона `info`. |
+| `--gr-button-info-soft-bg-hover` | тема компонента | color-mix(in srgb, var(--gr-info) 10%, var(--gr-button-info-soft-bg)) | Заливка soft-кнопки тона `info` под курсором. Тон подмешивается в саму soft-заливку, поэтому наведение темнеет в светлой теме и светлеет в тёмной. |
+| `--gr-button-info-soft-bg-active` | тема компонента | color-mix(in srgb, var(--gr-info) 16%, var(--gr-button-info-soft-bg)) | Заливка soft-кнопки тона `info` в момент нажатия. |
+| `--gr-button-info-border-soft` | тема компонента | color-mix(in srgb, var(--gr-info) 38%, var(--gr-bg)) | Рамка secondary-кнопки тона `info` в покое: тон приглушён, чтобы второстепенный вес не спорил с primary. |
+| `--gr-button-info-border` | тема компонента | color-mix(in srgb, var(--gr-info) 70%, var(--gr-bg)) | Рамка outline-кнопки тона `info` в покое и secondary под курсором. Полный тон рамка получает под указателем. |
 | `--gr-button-slate-bg` | тема компонента | var(--gr-slate-solid) | Заливка solid-кнопки тона `slate`. |
 | `--gr-button-slate-bg-hover` | тема компонента | var(--gr-slate-solid-hover) | Заливка solid-кнопки тона `slate` под курсором. |
 | `--gr-button-slate-bg-active` | тема компонента | var(--gr-slate-solid-active) | Заливка solid-кнопки тона `slate` в момент нажатия. |
 | `--gr-button-slate-fg` | тема компонента | var(--gr-slate-solid-fg) | Цвет текста на solid-кнопке тона `slate`. Приходит из `--gr-slate-solid-fg`: заливка кнопки рассчитана нести светлый текст, и глобальный `-fg` тона на ней не подходит. |
-| `--gr-button-slate-soft-bg` | тема компонента | color-mix(in srgb, var(--gr-slate) 14%, var(--gr-bg)) | Заливка soft-кнопки тона `slate`. |
-| `--gr-button-slate-soft-bg-hover` | тема компонента | color-mix(in srgb, var(--gr-slate) 18%, var(--gr-bg)) | Заливка soft-кнопки тона `slate` под курсором. |
-| `--gr-button-slate-soft-bg-active` | тема компонента | color-mix(in srgb, var(--gr-slate) 24%, var(--gr-bg)) | Заливка soft-кнопки тона `slate` в момент нажатия. |
+| `--gr-button-slate-soft-bg` | тема компонента | var(--gr-slate-light) | Заливка soft-кнопки тона `slate`. |
+| `--gr-button-slate-soft-bg-hover` | тема компонента | color-mix(in srgb, var(--gr-slate) 10%, var(--gr-button-slate-soft-bg)) | Заливка soft-кнопки тона `slate` под курсором. Тон подмешивается в саму soft-заливку, поэтому наведение темнеет в светлой теме и светлеет в тёмной. |
+| `--gr-button-slate-soft-bg-active` | тема компонента | color-mix(in srgb, var(--gr-slate) 16%, var(--gr-button-slate-soft-bg)) | Заливка soft-кнопки тона `slate` в момент нажатия. |
+| `--gr-button-slate-border-soft` | тема компонента | color-mix(in srgb, var(--gr-slate) 38%, var(--gr-bg)) | Рамка secondary-кнопки тона `slate` в покое: тон приглушён, чтобы второстепенный вес не спорил с primary. |
+| `--gr-button-slate-border` | тема компонента | color-mix(in srgb, var(--gr-slate) 70%, var(--gr-bg)) | Рамка outline-кнопки тона `slate` в покое и secondary под курсором. Полный тон рамка получает под указателем. |
 | `--gr-button-azure-bg` | тема компонента | var(--gr-azure-solid) | Заливка solid-кнопки тона `azure`. |
 | `--gr-button-azure-bg-hover` | тема компонента | var(--gr-azure-solid-hover) | Заливка solid-кнопки тона `azure` под курсором. |
 | `--gr-button-azure-bg-active` | тема компонента | var(--gr-azure-solid-active) | Заливка solid-кнопки тона `azure` в момент нажатия. |
 | `--gr-button-azure-fg` | тема компонента | var(--gr-azure-solid-fg) | Цвет текста на solid-кнопке тона `azure`. Приходит из `--gr-azure-solid-fg`: заливка кнопки рассчитана нести светлый текст, и глобальный `-fg` тона на ней не подходит. |
-| `--gr-button-azure-soft-bg` | тема компонента | color-mix(in srgb, var(--gr-azure) 14%, var(--gr-bg)) | Заливка soft-кнопки тона `azure`. |
-| `--gr-button-azure-soft-bg-hover` | тема компонента | color-mix(in srgb, var(--gr-azure) 18%, var(--gr-bg)) | Заливка soft-кнопки тона `azure` под курсором. |
-| `--gr-button-azure-soft-bg-active` | тема компонента | color-mix(in srgb, var(--gr-azure) 24%, var(--gr-bg)) | Заливка soft-кнопки тона `azure` в момент нажатия. |
+| `--gr-button-azure-soft-bg` | тема компонента | var(--gr-azure-light) | Заливка soft-кнопки тона `azure`. |
+| `--gr-button-azure-soft-bg-hover` | тема компонента | color-mix(in srgb, var(--gr-azure) 10%, var(--gr-button-azure-soft-bg)) | Заливка soft-кнопки тона `azure` под курсором. Тон подмешивается в саму soft-заливку, поэтому наведение темнеет в светлой теме и светлеет в тёмной. |
+| `--gr-button-azure-soft-bg-active` | тема компонента | color-mix(in srgb, var(--gr-azure) 16%, var(--gr-button-azure-soft-bg)) | Заливка soft-кнопки тона `azure` в момент нажатия. |
+| `--gr-button-azure-border-soft` | тема компонента | color-mix(in srgb, var(--gr-azure) 38%, var(--gr-bg)) | Рамка secondary-кнопки тона `azure` в покое: тон приглушён, чтобы второстепенный вес не спорил с primary. |
+| `--gr-button-azure-border` | тема компонента | color-mix(in srgb, var(--gr-azure) 70%, var(--gr-bg)) | Рамка outline-кнопки тона `azure` в покое и secondary под курсором. Полный тон рамка получает под указателем. |
+| `--gr-button-neutral-soft-bg` | тема компонента | var(--gr-card) | Заливка нейтральной secondary-кнопки — «обычной» кнопки формы: поверхность карточки. |
+| `--gr-button-neutral-soft-bg-hover` | тема компонента | color-mix(in srgb, var(--gr-fg) 6%, var(--gr-card)) | Заливка нейтральной soft-кнопки под курсором. Подмешивается цвет текста: своего цвета у нейтрального тона нет. |
+| `--gr-button-neutral-soft-bg-active` | тема компонента | color-mix(in srgb, var(--gr-fg) 11%, var(--gr-card)) | Заливка нейтральной soft-кнопки в момент нажатия. |
+| `--gr-button-neutral-border` | тема компонента | color-mix(in srgb, var(--gr-brd) 50%, var(--gr-brd-hover)) | Рамка нейтральных secondary и outline: заметнее `--gr-brd`, чтобы белая кнопка не терялась на светлом фоне. |
+| `--gr-button-shadow` | тема компонента | inset 0 1px 0 color-mix(in srgb, var(--gr-slate-0) 16%, transparent), var(--gr-shadow-1) | Объём solid-кнопки: блик по верхней кромке и мелкая тень. В тёмной теме блик тише. |
+| `--gr-button-shadow-active` | тема компонента | inset 0 1px 2px color-mix(in srgb, var(--gr-slate-900) 24%, transparent) | Тень solid-кнопки в момент нажатия: уходит внутрь, кнопка выглядит вдавленной. |
 | `--gr-button-disabled-bg` | тема компонента | var(--gr-disabled-bg) | Заливка недоступной кнопки: она гасится поверхностью, а не прозрачностью. Ссылка на общую роль — недоступное во всём пакете перекрашивается одним местом. |
 | `--gr-button-disabled-fg` | тема компонента | var(--gr-disabled-fg) | Цвет текста недоступной кнопки. Ссылка на общую роль недоступного состояния. |
 | `--gr-button-disabled-brd` | тема компонента | var(--gr-disabled-brd) | Цвет рамки недоступной кнопки. Ссылка на общую роль недоступного состояния. |

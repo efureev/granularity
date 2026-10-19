@@ -1099,7 +1099,7 @@
           },
           {
             "name": "loading",
-            "description": "Действие выполняется: спиннер на месте префикса, `aria-busy` и перехват клика. Кнопка при этом остаётся в фокусе — нативный `disabled` не ставится.",
+            "description": "Действие выполняется: спиннер на месте префикса, а без него — поверх подписи, ширина не меняется; `aria-busy` и перехват клика. Кнопка при этом остаётся в фокусе — нативный `disabled` не ставится.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"
@@ -1155,7 +1155,7 @@
           },
           {
             "name": "external",
-            "description": "Открывать ссылку в новой вкладке: `target=\"_blank\"` и `rel=\"noopener noreferrer\"`.",
+            "description": "Открывать ссылку в новой вкладке: `target=\"_blank\"` и `rel=\"noopener noreferrer\"`. Уход объявляется заранее — значком справа и скрытым текстом в имени.",
             "type": "boolean | undefined",
             "required": false,
             "default": "false"

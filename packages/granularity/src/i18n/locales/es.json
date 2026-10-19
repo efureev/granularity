@@ -387,7 +387,8 @@
     "empty": "Todavía no hay nada"
   },
   "button": {
-    "loading": "Cargando…"
+    "loading": "Cargando…",
+    "opensInNewTab": "se abre en una pestaña nueva"
   },
   "table": {
     "empty": "Todavía no hay nada"

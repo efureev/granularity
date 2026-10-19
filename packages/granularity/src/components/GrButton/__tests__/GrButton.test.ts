@@ -1,6 +1,8 @@
 import { mount } from '@vue/test-utils'
+import { h } from 'vue'
 import { describe, expect, it, vi } from 'vitest'
 
+import GrIcon from '../../GrIcon/GrIcon.vue'
 import GrButton from '../GrButton.vue'
 import { grButtonClass, type GrButtonTone, type GrButtonVariant } from '../grButtonStyles'
 import {
@@ -109,7 +111,8 @@ describe('GrButton', () => {
     expect(button.attributes('data-gr-variant')).toBe('outline')
     expect(button.attributes('data-gr-tone')).toBe('warning')
     expect(button.classes()).toContain('text-[var(--gr-warning-text,var(--gr-warning))]')
-    expect(button.classes()).toContain('border-[var(--gr-warning)]')
+    expect(button.classes()).toContain('border-[var(--gr-button-warning-border)]')
+    expect(className).toContain('hover:border-[var(--gr-warning)]')
     expect(className).toContain('hover:bg-[var(--gr-button-warning-soft-bg-hover)]')
     expect(className).toContain('active:bg-[var(--gr-button-warning-soft-bg-active)]')
     expect(className).toContain('hover:active:bg-[var(--gr-button-warning-soft-bg-active)]')
@@ -463,5 +466,230 @@ describe('GrButton — императивный API', () => {
     expect(document.activeElement).not.toBe(wrapper.element)
 
     wrapper.unmount()
+  })
+})
+
+describe('GrButton — вес, рамки и объём', () => {
+  it('secondary приглушает рамку в покое и доводит её до тона к нажатию', () => {
+    const className = grButtonClass({ variant: 'secondary', tone: 'primary', size: 'md', square: false })
+
+    expect(className).toContain('border-[var(--gr-button-primary-border-soft)]')
+    expect(className).toContain('hover:border-[var(--gr-button-primary-border)]')
+    expect(className).toContain('active:border-[var(--gr-primary)]')
+  })
+
+  it('нейтральная secondary лежит на поверхности карточки и приподнята тенью', () => {
+    const className = grButtonClass({ variant: 'secondary', tone: 'neutral', size: 'md', square: false })
+
+    expect(className).toContain('bg-[var(--gr-button-neutral-soft-bg)]')
+    expect(className).toContain('border-[var(--gr-button-neutral-border)]')
+    expect(className).toContain('shadow-[var(--gr-shadow-1)]')
+  })
+
+  it('объём есть у solid и снимается вместе с вариантом в отключённом виде', () => {
+    const live = grButtonClass({ variant: 'primary', tone: 'primary', size: 'md', square: false })
+    const disabled = grButtonClass({ variant: 'primary', tone: 'primary', size: 'md', square: false, disabled: true })
+
+    expect(live).toContain('shadow-[var(--gr-button-divider,0_0_transparent),var(--gr-button-shadow)]')
+    expect(live).toContain('active:shadow-[var(--gr-button-divider,0_0_transparent),var(--gr-button-shadow-active)]')
+    expect(disabled).not.toContain('shadow-')
+  })
+
+  // Рамка в 1px есть у всех весов: иначе ghost на 2px уже соседей в ряду.
+  it('ghost держит прозрачную рамку — и живой, и отключённый', () => {
+    const live = grButtonClass({ variant: 'ghost', tone: 'primary', size: 'md', square: false }).split(' ')
+    const disabled = grButtonClass({ variant: 'ghost', tone: 'primary', size: 'md', square: false, disabled: true }).split(' ')
+
+    expect(live).toEqual(expect.arrayContaining(['border', 'border-transparent']))
+    expect(disabled).toEqual(expect.arrayContaining(['border', 'border-transparent']))
+  })
+
+  it('подпись — medium через переопределяемый токен', () => {
+    const wrapper = mount(GrButton, { slots: { default: 'Save' } })
+
+    expect(wrapper.get('[data-gr-button]').classes()).toContain('[font-weight:var(--gr-button-font-weight,var(--gr-font-medium))]')
+  })
+
+  // Кольцо вплотную к заливке того же тона читалось утолщением кнопки, а
+  // `box-shadow` в forced-colors пропадает целиком.
+  it('фокус — outline с отступом, а не ring', () => {
+    const classes = mount(GrButton, { slots: { default: 'Save' } }).get('[data-gr-button]').classes()
+
+    expect(classes).toEqual(expect.arrayContaining([
+      'focus-visible:outline-solid',
+      'focus-visible:outline-2',
+      'focus-visible:outline-offset-2',
+      'focus-visible:outline-[var(--gr-ring)]',
+    ]))
+    expect(classes.some(cls => /(?:^|:)ring(?:-|$)/.test(cls))).toBe(false)
+  })
+})
+
+describe('GrButton — нажатие и курсор', () => {
+  it('живая кнопка вдавливается, отключённая и ждущая — нет', () => {
+    const live = mount(GrButton, { slots: { default: 'Save' } }).get('[data-gr-button]').classes()
+    const disabled = mount(GrButton, { props: { disabled: true }, slots: { default: 'Save' } }).get('[data-gr-button]').classes()
+    const loading = mount(GrButton, { props: { loading: true }, slots: { default: 'Save' } }).get('[data-gr-button]').classes()
+
+    expect(live).toContain('motion-safe:active:scale-98')
+    expect(disabled).not.toContain('motion-safe:active:scale-98')
+    expect(loading).not.toContain('motion-safe:active:scale-98')
+  })
+
+  it('ждущая сервер кнопка занята, а не запрещена', () => {
+    const loading = mount(GrButton, { props: { loading: true }, slots: { default: 'Save' } }).get('[data-gr-button]').classes()
+    const disabled = mount(GrButton, { props: { disabled: true }, slots: { default: 'Save' } }).get('[data-gr-button]').classes()
+
+    expect(loading).toContain('cursor-progress')
+    expect(loading).not.toContain('cursor-not-allowed')
+    expect(disabled).toContain('cursor-not-allowed')
+  })
+})
+
+describe('GrButton — загрузка без скачка ширины', () => {
+  it('без префикса спиннер ложится поверх содержимого, подпись остаётся в DOM', () => {
+    const wrapper = mount(GrButton, { props: { loading: true }, slots: { default: 'Save' } })
+    const button = wrapper.get('[data-gr-button]')
+
+    expect(button.attributes('data-gr-busy-overlay')).toBe('')
+    expect(button.find('[data-gr-button-spinner]').attributes('aria-hidden')).toBe('true')
+    expect(button.get('[data-gr-button-label]').text()).toBe('Save')
+  })
+
+  it('с префиксом спиннер встаёт на его место, а не поверх подписи', () => {
+    const wrapper = mount(GrButton, {
+      props: { loading: true },
+      slots: { prefix: '<i data-testid="pre" />', default: 'Save' },
+    })
+    const button = wrapper.get('[data-gr-button]')
+
+    expect(button.attributes('data-gr-busy-overlay')).toBeUndefined()
+    expect(button.find('[data-gr-button-spinner]').exists()).toBe(false)
+    expect(button.find('svg.animate-spin').exists()).toBe(true)
+  })
+
+  it('без загрузки поверх ничего не лежит', () => {
+    const button = mount(GrButton, { slots: { default: 'Save' } }).get('[data-gr-button]')
+
+    expect(button.attributes('data-gr-busy-overlay')).toBeUndefined()
+    expect(button.find('[data-gr-button-spinner]').exists()).toBe(false)
+  })
+
+  it('спиннер растёт со ступенью', () => {
+    const xs = mount(GrButton, { props: { loading: true, size: 'xs' }, slots: { default: 'Save' } })
+    const lg = mount(GrButton, { props: { loading: true, size: 'lg' }, slots: { default: 'Save' } })
+
+    expect(xs.get('svg.animate-spin').classes()).toEqual(expect.arrayContaining(['h-3.5', 'w-3.5']))
+    expect(lg.get('svg.animate-spin').classes()).toEqual(expect.arrayContaining(['h-5', 'w-5']))
+  })
+})
+
+describe('GrButton — отступы, зазор и иконки по ступени', () => {
+  it('со стороны аддона отступ на 2px меньше', () => {
+    const plain = mount(GrButton, { slots: { default: 'Save' } }).get('[data-gr-button]').classes()
+    const adorned = mount(GrButton, {
+      slots: { prefix: '<i />', default: 'Save', suffix: '<i />' },
+    }).get('[data-gr-button]').classes()
+
+    expect(plain).toEqual(expect.arrayContaining(['ps-4', 'pe-4']))
+    expect(adorned).toEqual(expect.arrayContaining(['ps-3.5', 'pe-3.5']))
+    expect(adorned).not.toContain('ps-4')
+  })
+
+  it('пустой аддон отступ не трогает', () => {
+    const classes = mount(GrButton, {
+      slots: { prefix: '<template v-if="false"><i /></template>', default: 'Save' },
+    }).get('[data-gr-button]').classes()
+
+    expect(classes).toContain('ps-4')
+  })
+
+  it('зазор растёт со ступенью', () => {
+    expect(grButtonClass({ variant: 'primary', tone: 'primary', size: 'xs', square: false })).toContain('gap-1')
+    expect(grButtonClass({ variant: 'primary', tone: 'primary', size: 'sm', square: false })).toContain('gap-1.5')
+    expect(grButtonClass({ variant: 'primary', tone: 'primary', size: 'lg', square: false })).toContain('gap-2')
+  })
+
+  it('иконка в слоте берёт ступень от кнопки: 14 / 16 / 16 / 20', () => {
+    const iconSize = (size: 'xs' | 'sm' | 'md' | 'lg') => mount(GrButton, {
+      props: { size },
+      slots: { default: () => h(GrIcon, null, () => h('svg')) },
+    }).get('.gr-icon').attributes('style')
+
+    expect(iconSize('xs')).toContain('--gr-icon-size: var(--gr-icon-size-xs)')
+    expect(iconSize('sm')).toContain('--gr-icon-size: var(--gr-icon-size-sm)')
+    expect(iconSize('md')).toContain('--gr-icon-size: var(--gr-icon-size-sm)')
+    expect(iconSize('lg')).toContain('--gr-icon-size: var(--gr-icon-size-lg)')
+  })
+
+  it('явный размер иконки сильнее подсказки кнопки', () => {
+    const wrapper = mount(GrButton, {
+      props: { size: 'xs' },
+      slots: { default: () => h(GrIcon, { size: 'lg' }, () => h('svg')) },
+    })
+
+    expect(wrapper.get('.gr-icon').attributes('style')).toContain('--gr-icon-size: var(--gr-icon-size-lg)')
+  })
+})
+
+describe('GrButton — длинная подпись', () => {
+  it('текстовая подпись оборачивается и режется многоточием', () => {
+    const label = mount(GrButton, { slots: { default: 'Экспортировать отчёт за квартал' } }).get('[data-gr-button-label]')
+
+    expect(label.classes()).toEqual(expect.arrayContaining(['min-w-0', 'truncate']))
+  })
+
+  // Обёртка сдвинула бы выравнивание иконки в квадратной кнопке.
+  it('иконку и разметку в основном слоте не оборачивает', () => {
+    const wrapper = mount(GrButton, { props: { square: true, ariaLabel: 'Копировать' }, slots: { default: '<svg />' } })
+
+    expect(wrapper.find('[data-gr-button-label]').exists()).toBe(false)
+  })
+
+  it('обрезанная подпись получает полный текст подсказкой', async () => {
+    const wrapper = mount(GrButton, { slots: { default: 'Экспортировать отчёт' } })
+    const label = wrapper.get('[data-gr-button-label]')
+
+    Object.defineProperty(label.element, 'scrollWidth', { configurable: true, value: 200 })
+    Object.defineProperty(label.element, 'clientWidth', { configurable: true, value: 120 })
+    await label.trigger('mouseenter')
+
+    expect(label.attributes('title')).toBe('Экспортировать отчёт')
+  })
+})
+
+describe('GrButton — ссылка в новую вкладку', () => {
+  it('показывает стрелку и объявляет смену вкладки', () => {
+    const wrapper = mount(GrButton, { props: { href: 'https://example.com', external: true }, slots: { default: 'Docs' } })
+    const link = wrapper.get('[data-gr-button]')
+
+    expect(link.findAll('svg').length).toBe(1)
+    expect(link.get('.sr-only').text()).toBe('(opens in a new tab)')
+    expect(link.classes()).toContain('pe-3.5')
+  })
+
+  it('та же подсказка — от явного target="_blank", а не только от external', () => {
+    const wrapper = mount(GrButton, { props: { href: 'https://example.com', target: '_blank' }, slots: { default: 'Docs' } })
+
+    expect(wrapper.get('.sr-only').text()).toBe('(opens in a new tab)')
+  })
+
+  it('с aria-label подсказка дописывается в само имя', () => {
+    const wrapper = mount(GrButton, {
+      props: { href: 'https://example.com', external: true, square: true, ariaLabel: 'GitHub' },
+      slots: { default: '<svg />' },
+    })
+    const link = wrapper.get('[data-gr-button]')
+
+    expect(link.attributes('aria-label')).toBe('GitHub, opens in a new tab')
+    expect(link.find('.sr-only').exists()).toBe(false)
+  })
+
+  it('обычная и отключённая ссылки подсказки не получают', () => {
+    const plain = mount(GrButton, { props: { href: '/reports' }, slots: { default: 'Отчёты' } })
+    const disabled = mount(GrButton, { props: { href: 'https://example.com', external: true, disabled: true }, slots: { default: 'Docs' } })
+
+    expect(plain.find('.sr-only').exists()).toBe(false)
+    expect(disabled.find('.sr-only').exists()).toBe(false)
   })
 })

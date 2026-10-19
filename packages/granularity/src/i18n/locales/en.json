@@ -385,7 +385,8 @@
     "empty": "Nothing here yet"
   },
   "button": {
-    "loading": "Loading…"
+    "loading": "Loading…",
+    "opensInNewTab": "opens in a new tab"
   },
   "table": {
     "empty": "Nothing here yet"

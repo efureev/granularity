@@ -106,9 +106,9 @@ describe('GrConfirmDialog', () => {
     expect(wrapper.find('[data-gr-dialog-footer]').classes()).not.toContain('border-t')
 
     expect(wrapper.find('[data-testid="gr-confirm-cancel"]').classes()).toContain('h-7')
-    expect(wrapper.find('[data-testid="gr-confirm-cancel"]').classes()).toContain('px-2.5')
+    expect(wrapper.find('[data-testid="gr-confirm-cancel"]').classes()).toContain('ps-2.5')
     expect(wrapper.find('[data-testid="gr-confirm-confirm"]').classes()).toContain('h-7')
-    expect(wrapper.find('[data-testid="gr-confirm-confirm"]').classes()).toContain('px-2.5')
+    expect(wrapper.find('[data-testid="gr-confirm-confirm"]').classes()).toContain('ps-2.5')
 
     wrapper.unmount()
   })

@@ -26,6 +26,7 @@ type ButtonToneTokens = {
   softBackgroundHover: string
   softBackgroundActive: string
   softForeground: string
+  borderSoft: string
   border: string
   borderHover: string
   borderActive: string
@@ -42,8 +43,9 @@ const buttonToneTokens: Record<ButtonTone, ButtonToneTokens> = {
     softBackgroundHover: 'var(--gr-button-primary-soft-bg-hover)',
     softBackgroundActive: 'var(--gr-button-primary-soft-bg-active)',
     softForeground: 'var(--gr-accent-fg)',
-    border: 'var(--gr-primary)',
-    borderHover: 'var(--gr-primary-hover)',
+    borderSoft: 'var(--gr-button-primary-border-soft)',
+    border: 'var(--gr-button-primary-border)',
+    borderHover: 'var(--gr-primary)',
     borderActive: 'var(--gr-primary-active)',
   },
   neutral: {
@@ -52,11 +54,12 @@ const buttonToneTokens: Record<ButtonTone, ButtonToneTokens> = {
     solidBackgroundActive: 'var(--gr-secondary-active)',
     solidForeground: 'var(--gr-secondary-fg)',
     accentText: 'var(--gr-fg)',
-    softBackground: 'var(--gr-secondary)',
-    softBackgroundHover: 'var(--gr-secondary-hover)',
-    softBackgroundActive: 'var(--gr-secondary-active)',
+    softBackground: 'var(--gr-button-neutral-soft-bg)',
+    softBackgroundHover: 'var(--gr-button-neutral-soft-bg-hover)',
+    softBackgroundActive: 'var(--gr-button-neutral-soft-bg-active)',
     softForeground: 'var(--gr-secondary-fg)',
-    border: 'var(--gr-brd)',
+    borderSoft: 'var(--gr-button-neutral-border)',
+    border: 'var(--gr-button-neutral-border)',
     borderHover: 'var(--gr-brd-hover,var(--gr-brd))',
     borderActive: 'var(--gr-brd-active,var(--gr-brd))',
   },
@@ -70,8 +73,9 @@ const buttonToneTokens: Record<ButtonTone, ButtonToneTokens> = {
     softBackgroundHover: 'var(--gr-button-success-soft-bg-hover)',
     softBackgroundActive: 'var(--gr-button-success-soft-bg-active)',
     softForeground: 'var(--gr-success-text,var(--gr-success))',
-    border: 'var(--gr-success)',
-    borderHover: 'var(--gr-success-hover)',
+    borderSoft: 'var(--gr-button-success-border-soft)',
+    border: 'var(--gr-button-success-border)',
+    borderHover: 'var(--gr-success)',
     borderActive: 'var(--gr-success-active)',
   },
   warning: {
@@ -84,8 +88,9 @@ const buttonToneTokens: Record<ButtonTone, ButtonToneTokens> = {
     softBackgroundHover: 'var(--gr-button-warning-soft-bg-hover)',
     softBackgroundActive: 'var(--gr-button-warning-soft-bg-active)',
     softForeground: 'var(--gr-warning-text,var(--gr-warning))',
-    border: 'var(--gr-warning)',
-    borderHover: 'var(--gr-warning-hover)',
+    borderSoft: 'var(--gr-button-warning-border-soft)',
+    border: 'var(--gr-button-warning-border)',
+    borderHover: 'var(--gr-warning)',
     borderActive: 'var(--gr-warning-active)',
   },
   danger: {
@@ -98,8 +103,9 @@ const buttonToneTokens: Record<ButtonTone, ButtonToneTokens> = {
     softBackgroundHover: 'var(--gr-button-danger-soft-bg-hover)',
     softBackgroundActive: 'var(--gr-button-danger-soft-bg-active)',
     softForeground: 'var(--gr-danger-text,var(--gr-danger))',
-    border: 'var(--gr-danger)',
-    borderHover: 'var(--gr-danger-hover)',
+    borderSoft: 'var(--gr-button-danger-border-soft)',
+    border: 'var(--gr-button-danger-border)',
+    borderHover: 'var(--gr-danger)',
     borderActive: 'var(--gr-danger-active)',
   },
   info: {
@@ -112,8 +118,9 @@ const buttonToneTokens: Record<ButtonTone, ButtonToneTokens> = {
     softBackgroundHover: 'var(--gr-button-info-soft-bg-hover)',
     softBackgroundActive: 'var(--gr-button-info-soft-bg-active)',
     softForeground: 'var(--gr-info-text,var(--gr-info))',
-    border: 'var(--gr-info)',
-    borderHover: 'var(--gr-info-hover)',
+    borderSoft: 'var(--gr-button-info-border-soft)',
+    border: 'var(--gr-button-info-border)',
+    borderHover: 'var(--gr-info)',
     borderActive: 'var(--gr-info-active)',
   },
   slate: {
@@ -126,8 +133,9 @@ const buttonToneTokens: Record<ButtonTone, ButtonToneTokens> = {
     softBackgroundHover: 'var(--gr-button-slate-soft-bg-hover)',
     softBackgroundActive: 'var(--gr-button-slate-soft-bg-active)',
     softForeground: 'var(--gr-slate-text,var(--gr-slate))',
-    border: 'var(--gr-slate)',
-    borderHover: 'var(--gr-slate-hover)',
+    borderSoft: 'var(--gr-button-slate-border-soft)',
+    border: 'var(--gr-button-slate-border)',
+    borderHover: 'var(--gr-slate)',
     borderActive: 'var(--gr-slate-active)',
   },
   azure: {
@@ -140,92 +148,74 @@ const buttonToneTokens: Record<ButtonTone, ButtonToneTokens> = {
     softBackgroundHover: 'var(--gr-button-azure-soft-bg-hover)',
     softBackgroundActive: 'var(--gr-button-azure-soft-bg-active)',
     softForeground: 'var(--gr-azure-text,var(--gr-azure))',
-    border: 'var(--gr-azure)',
-    borderHover: 'var(--gr-azure-hover)',
+    borderSoft: 'var(--gr-button-azure-border-soft)',
+    border: 'var(--gr-button-azure-border)',
+    borderHover: 'var(--gr-azure)',
     borderActive: 'var(--gr-azure-active)',
   },
 }
 
+function byState<T>(state: ButtonState, rest: T, hover: T, active: T): T {
+  if (state === 'hover')
+    return hover
+  return state === 'active' ? active : rest
+}
+
+// Фокус и нажатие — как у самой кнопки: контур с отступом и вдавливание на 2%.
+function forcedStyle(state: ButtonState): CSSProperties {
+  if (state === 'focus')
+    return { outline: '2px solid var(--gr-ring)', outlineOffset: '2px' }
+  if (state === 'active')
+    return { transform: 'scale(0.98)' }
+  return {}
+}
+
 function getButtonPreviewStyle(variant: ButtonVariant, tone: ButtonTone, state: ButtonState): CSSProperties {
   const tokens = buttonToneTokens[tone]
-  const isFocus = state === 'focus'
+  const softBackground = byState(state, 'transparent', tokens.softBackgroundHover, tokens.softBackgroundActive)
 
   if (variant === 'primary') {
+    const background = byState(state, tokens.solidBackground, tokens.solidBackgroundHover, tokens.solidBackgroundActive)
     return {
-      backgroundColor: state === 'hover'
-        ? tokens.solidBackgroundHover
-        : state === 'active'
-          ? tokens.solidBackgroundActive
-          : tokens.solidBackground,
-      borderColor: state === 'hover'
-        ? tokens.solidBackgroundHover
-        : state === 'active'
-          ? tokens.solidBackgroundActive
-          : tokens.solidBackground,
+      backgroundColor: background,
+      borderColor: background,
       color: tokens.solidForeground,
-      boxShadow: isFocus ? '0 0 0 2px var(--gr-ring)' : undefined,
+      boxShadow: state === 'active' ? 'var(--gr-button-shadow-active)' : 'var(--gr-button-shadow)',
+      ...forcedStyle(state),
     }
   }
 
   if (variant === 'secondary') {
     return {
-      backgroundColor: state === 'hover'
-        ? tokens.softBackgroundHover
-        : state === 'active'
-          ? tokens.softBackgroundActive
-          : tokens.softBackground,
-      borderColor: state === 'hover'
-        ? tokens.borderHover
-        : state === 'active'
-          ? tokens.borderActive
-          : tokens.border,
+      backgroundColor: byState(state, tokens.softBackground, tokens.softBackgroundHover, tokens.softBackgroundActive),
+      borderColor: byState(state, tokens.borderSoft, tokens.border, tokens.borderHover),
       color: tokens.softForeground,
-      boxShadow: isFocus ? '0 0 0 2px var(--gr-ring)' : undefined,
+      ...forcedStyle(state),
     }
   }
 
   if (variant === 'outline') {
     return {
-      backgroundColor: state === 'hover'
-        ? tokens.softBackgroundHover
-        : state === 'active'
-          ? tokens.softBackgroundActive
-          : 'transparent',
-      borderColor: state === 'hover'
-        ? tokens.borderHover
-        : state === 'active'
-          ? tokens.borderActive
-          : tokens.border,
+      backgroundColor: softBackground,
+      borderColor: byState(state, tokens.border, tokens.borderHover, tokens.borderActive),
       color: tokens.accentText,
-      boxShadow: isFocus ? '0 0 0 2px var(--gr-ring)' : undefined,
+      ...forcedStyle(state),
     }
   }
 
   if (variant === 'ghost') {
     return {
-      backgroundColor: state === 'hover'
-        ? tokens.softBackgroundHover
-        : state === 'active'
-          ? tokens.softBackgroundActive
-          : 'transparent',
+      backgroundColor: softBackground,
       color: tokens.accentText,
-      boxShadow: isFocus ? '0 0 0 2px var(--gr-ring)' : undefined,
+      ...forcedStyle(state),
     }
   }
 
   return {
-    backgroundColor: state === 'hover'
-      ? tokens.softBackgroundHover
-      : state === 'active'
-        ? tokens.softBackgroundActive
-        : 'transparent',
-    borderColor: state === 'hover'
-      ? tokens.borderHover
-      : state === 'active'
-        ? tokens.borderActive
-        : 'transparent',
+    backgroundColor: softBackground,
+    borderColor: byState(state, 'transparent', tokens.border, tokens.borderActive),
     color: tokens.accentText,
-    boxShadow: isFocus ? '0 0 0 2px var(--gr-ring)' : undefined,
+    ...forcedStyle(state),
   }
 }
 </script>

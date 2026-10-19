@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 
 import { useGrComponentSize } from '../shared/configContext'
+import { useGrIconSizeHint } from '../shared/iconSizeHint'
 import {
   grIconToneClass,
   iconBaseClass,
@@ -38,8 +39,10 @@ const props = withDefaults(
 )
 
 // Число — «локальный» escape-hatch мимо конфига; шкала идёт через провайдер.
+// Подсказка контейнера (кнопка) стоит между собственным пропом и провайдером.
+const sizeHint = useGrIconSizeHint()
 const resolvedScaleSize = useGrComponentSize(
-  () => (typeof props.size === 'number' ? undefined : props.size),
+  () => (typeof props.size === 'number' ? undefined : props.size ?? sizeHint?.value),
   { component: 'GrIcon' },
 )
 

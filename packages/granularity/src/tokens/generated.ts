@@ -2094,6 +2094,27 @@ export const grComponentTokens: GrComponentToken[] = [
   },
   {
     "owner": "GrButton",
+    "name": "--gr-button-font-weight",
+    "kind": "hook",
+    "default": "var(--gr-font-medium)",
+    "description": "Начертание подписи. Кнопка читается как действие, а не как текст рядом с полем, поэтому по умолчанию — medium."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-touch-size",
+    "kind": "hook",
+    "default": "2.75rem",
+    "description": "Высота зоны касания на грубом указателе (`pointer: coarse`). Кнопка ниже неё добирает высоту невидимым `::after`, вид не меняется."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-divider",
+    "kind": "hook",
+    "default": "нет (`0 0 transparent`)",
+    "description": "Шов solid-кнопки внутри прикреплённой `GrButtonGroup`: группа ставит его второму из соседних primary-звеньев, кнопка рисует его своей тенью."
+  },
+  {
+    "owner": "GrButton",
     "name": "--gr-button-primary-bg",
     "kind": "theme",
     "default": "var(--gr-primary-solid)",
@@ -2131,15 +2152,29 @@ export const grComponentTokens: GrComponentToken[] = [
     "owner": "GrButton",
     "name": "--gr-button-primary-soft-bg-hover",
     "kind": "theme",
-    "default": "color-mix(in srgb, var(--gr-primary) 18%, var(--gr-bg))",
-    "description": "Заливка soft-кнопки тона `primary` под курсором."
+    "default": "color-mix(in srgb, var(--gr-primary) 10%, var(--gr-button-primary-soft-bg))",
+    "description": "Заливка soft-кнопки тона `primary` под курсором. Тон подмешивается в саму soft-заливку, поэтому наведение темнеет в светлой теме и светлеет в тёмной."
   },
   {
     "owner": "GrButton",
     "name": "--gr-button-primary-soft-bg-active",
     "kind": "theme",
-    "default": "color-mix(in srgb, var(--gr-primary) 24%, var(--gr-bg))",
+    "default": "color-mix(in srgb, var(--gr-primary) 16%, var(--gr-button-primary-soft-bg))",
     "description": "Заливка soft-кнопки тона `primary` в момент нажатия."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-primary-border-soft",
+    "kind": "theme",
+    "default": "color-mix(in srgb, var(--gr-primary) 38%, var(--gr-bg))",
+    "description": "Рамка secondary-кнопки тона `primary` в покое: тон приглушён, чтобы второстепенный вес не спорил с primary."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-primary-border",
+    "kind": "theme",
+    "default": "color-mix(in srgb, var(--gr-primary) 70%, var(--gr-bg))",
+    "description": "Рамка outline-кнопки тона `primary` в покое и secondary под курсором. Полный тон рамка получает под указателем."
   },
   {
     "owner": "GrButton",
@@ -2173,22 +2208,36 @@ export const grComponentTokens: GrComponentToken[] = [
     "owner": "GrButton",
     "name": "--gr-button-success-soft-bg",
     "kind": "theme",
-    "default": "color-mix(in srgb, var(--gr-success) 14%, var(--gr-bg))",
+    "default": "var(--gr-success-light)",
     "description": "Заливка soft-кнопки тона `success`."
   },
   {
     "owner": "GrButton",
     "name": "--gr-button-success-soft-bg-hover",
     "kind": "theme",
-    "default": "color-mix(in srgb, var(--gr-success) 18%, var(--gr-bg))",
-    "description": "Заливка soft-кнопки тона `success` под курсором."
+    "default": "color-mix(in srgb, var(--gr-success) 10%, var(--gr-button-success-soft-bg))",
+    "description": "Заливка soft-кнопки тона `success` под курсором. Тон подмешивается в саму soft-заливку, поэтому наведение темнеет в светлой теме и светлеет в тёмной."
   },
   {
     "owner": "GrButton",
     "name": "--gr-button-success-soft-bg-active",
     "kind": "theme",
-    "default": "color-mix(in srgb, var(--gr-success) 24%, var(--gr-bg))",
+    "default": "color-mix(in srgb, var(--gr-success) 16%, var(--gr-button-success-soft-bg))",
     "description": "Заливка soft-кнопки тона `success` в момент нажатия."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-success-border-soft",
+    "kind": "theme",
+    "default": "color-mix(in srgb, var(--gr-success) 38%, var(--gr-bg))",
+    "description": "Рамка secondary-кнопки тона `success` в покое: тон приглушён, чтобы второстепенный вес не спорил с primary."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-success-border",
+    "kind": "theme",
+    "default": "color-mix(in srgb, var(--gr-success) 70%, var(--gr-bg))",
+    "description": "Рамка outline-кнопки тона `success` в покое и secondary под курсором. Полный тон рамка получает под указателем."
   },
   {
     "owner": "GrButton",
@@ -2222,22 +2271,36 @@ export const grComponentTokens: GrComponentToken[] = [
     "owner": "GrButton",
     "name": "--gr-button-warning-soft-bg",
     "kind": "theme",
-    "default": "color-mix(in srgb, var(--gr-warning) 14%, var(--gr-bg))",
+    "default": "var(--gr-warning-light)",
     "description": "Заливка soft-кнопки тона `warning`."
   },
   {
     "owner": "GrButton",
     "name": "--gr-button-warning-soft-bg-hover",
     "kind": "theme",
-    "default": "color-mix(in srgb, var(--gr-warning) 18%, var(--gr-bg))",
-    "description": "Заливка soft-кнопки тона `warning` под курсором."
+    "default": "color-mix(in srgb, var(--gr-warning) 10%, var(--gr-button-warning-soft-bg))",
+    "description": "Заливка soft-кнопки тона `warning` под курсором. Тон подмешивается в саму soft-заливку, поэтому наведение темнеет в светлой теме и светлеет в тёмной."
   },
   {
     "owner": "GrButton",
     "name": "--gr-button-warning-soft-bg-active",
     "kind": "theme",
-    "default": "color-mix(in srgb, var(--gr-warning) 24%, var(--gr-bg))",
+    "default": "color-mix(in srgb, var(--gr-warning) 16%, var(--gr-button-warning-soft-bg))",
     "description": "Заливка soft-кнопки тона `warning` в момент нажатия."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-warning-border-soft",
+    "kind": "theme",
+    "default": "color-mix(in srgb, var(--gr-warning) 38%, var(--gr-bg))",
+    "description": "Рамка secondary-кнопки тона `warning` в покое: тон приглушён, чтобы второстепенный вес не спорил с primary."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-warning-border",
+    "kind": "theme",
+    "default": "color-mix(in srgb, var(--gr-warning) 70%, var(--gr-bg))",
+    "description": "Рамка outline-кнопки тона `warning` в покое и secondary под курсором. Полный тон рамка получает под указателем."
   },
   {
     "owner": "GrButton",
@@ -2271,22 +2334,36 @@ export const grComponentTokens: GrComponentToken[] = [
     "owner": "GrButton",
     "name": "--gr-button-danger-soft-bg",
     "kind": "theme",
-    "default": "color-mix(in srgb, var(--gr-danger) 14%, var(--gr-bg))",
+    "default": "var(--gr-danger-light)",
     "description": "Заливка soft-кнопки тона `danger`."
   },
   {
     "owner": "GrButton",
     "name": "--gr-button-danger-soft-bg-hover",
     "kind": "theme",
-    "default": "color-mix(in srgb, var(--gr-danger) 18%, var(--gr-bg))",
-    "description": "Заливка soft-кнопки тона `danger` под курсором."
+    "default": "color-mix(in srgb, var(--gr-danger) 10%, var(--gr-button-danger-soft-bg))",
+    "description": "Заливка soft-кнопки тона `danger` под курсором. Тон подмешивается в саму soft-заливку, поэтому наведение темнеет в светлой теме и светлеет в тёмной."
   },
   {
     "owner": "GrButton",
     "name": "--gr-button-danger-soft-bg-active",
     "kind": "theme",
-    "default": "color-mix(in srgb, var(--gr-danger) 24%, var(--gr-bg))",
+    "default": "color-mix(in srgb, var(--gr-danger) 16%, var(--gr-button-danger-soft-bg))",
     "description": "Заливка soft-кнопки тона `danger` в момент нажатия."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-danger-border-soft",
+    "kind": "theme",
+    "default": "color-mix(in srgb, var(--gr-danger) 38%, var(--gr-bg))",
+    "description": "Рамка secondary-кнопки тона `danger` в покое: тон приглушён, чтобы второстепенный вес не спорил с primary."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-danger-border",
+    "kind": "theme",
+    "default": "color-mix(in srgb, var(--gr-danger) 70%, var(--gr-bg))",
+    "description": "Рамка outline-кнопки тона `danger` в покое и secondary под курсором. Полный тон рамка получает под указателем."
   },
   {
     "owner": "GrButton",
@@ -2320,22 +2397,36 @@ export const grComponentTokens: GrComponentToken[] = [
     "owner": "GrButton",
     "name": "--gr-button-info-soft-bg",
     "kind": "theme",
-    "default": "color-mix(in srgb, var(--gr-info) 14%, var(--gr-bg))",
+    "default": "var(--gr-info-light)",
     "description": "Заливка soft-кнопки тона `info`."
   },
   {
     "owner": "GrButton",
     "name": "--gr-button-info-soft-bg-hover",
     "kind": "theme",
-    "default": "color-mix(in srgb, var(--gr-info) 18%, var(--gr-bg))",
-    "description": "Заливка soft-кнопки тона `info` под курсором."
+    "default": "color-mix(in srgb, var(--gr-info) 10%, var(--gr-button-info-soft-bg))",
+    "description": "Заливка soft-кнопки тона `info` под курсором. Тон подмешивается в саму soft-заливку, поэтому наведение темнеет в светлой теме и светлеет в тёмной."
   },
   {
     "owner": "GrButton",
     "name": "--gr-button-info-soft-bg-active",
     "kind": "theme",
-    "default": "color-mix(in srgb, var(--gr-info) 24%, var(--gr-bg))",
+    "default": "color-mix(in srgb, var(--gr-info) 16%, var(--gr-button-info-soft-bg))",
     "description": "Заливка soft-кнопки тона `info` в момент нажатия."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-info-border-soft",
+    "kind": "theme",
+    "default": "color-mix(in srgb, var(--gr-info) 38%, var(--gr-bg))",
+    "description": "Рамка secondary-кнопки тона `info` в покое: тон приглушён, чтобы второстепенный вес не спорил с primary."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-info-border",
+    "kind": "theme",
+    "default": "color-mix(in srgb, var(--gr-info) 70%, var(--gr-bg))",
+    "description": "Рамка outline-кнопки тона `info` в покое и secondary под курсором. Полный тон рамка получает под указателем."
   },
   {
     "owner": "GrButton",
@@ -2369,22 +2460,36 @@ export const grComponentTokens: GrComponentToken[] = [
     "owner": "GrButton",
     "name": "--gr-button-slate-soft-bg",
     "kind": "theme",
-    "default": "color-mix(in srgb, var(--gr-slate) 14%, var(--gr-bg))",
+    "default": "var(--gr-slate-light)",
     "description": "Заливка soft-кнопки тона `slate`."
   },
   {
     "owner": "GrButton",
     "name": "--gr-button-slate-soft-bg-hover",
     "kind": "theme",
-    "default": "color-mix(in srgb, var(--gr-slate) 18%, var(--gr-bg))",
-    "description": "Заливка soft-кнопки тона `slate` под курсором."
+    "default": "color-mix(in srgb, var(--gr-slate) 10%, var(--gr-button-slate-soft-bg))",
+    "description": "Заливка soft-кнопки тона `slate` под курсором. Тон подмешивается в саму soft-заливку, поэтому наведение темнеет в светлой теме и светлеет в тёмной."
   },
   {
     "owner": "GrButton",
     "name": "--gr-button-slate-soft-bg-active",
     "kind": "theme",
-    "default": "color-mix(in srgb, var(--gr-slate) 24%, var(--gr-bg))",
+    "default": "color-mix(in srgb, var(--gr-slate) 16%, var(--gr-button-slate-soft-bg))",
     "description": "Заливка soft-кнопки тона `slate` в момент нажатия."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-slate-border-soft",
+    "kind": "theme",
+    "default": "color-mix(in srgb, var(--gr-slate) 38%, var(--gr-bg))",
+    "description": "Рамка secondary-кнопки тона `slate` в покое: тон приглушён, чтобы второстепенный вес не спорил с primary."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-slate-border",
+    "kind": "theme",
+    "default": "color-mix(in srgb, var(--gr-slate) 70%, var(--gr-bg))",
+    "description": "Рамка outline-кнопки тона `slate` в покое и secondary под курсором. Полный тон рамка получает под указателем."
   },
   {
     "owner": "GrButton",
@@ -2418,22 +2523,78 @@ export const grComponentTokens: GrComponentToken[] = [
     "owner": "GrButton",
     "name": "--gr-button-azure-soft-bg",
     "kind": "theme",
-    "default": "color-mix(in srgb, var(--gr-azure) 14%, var(--gr-bg))",
+    "default": "var(--gr-azure-light)",
     "description": "Заливка soft-кнопки тона `azure`."
   },
   {
     "owner": "GrButton",
     "name": "--gr-button-azure-soft-bg-hover",
     "kind": "theme",
-    "default": "color-mix(in srgb, var(--gr-azure) 18%, var(--gr-bg))",
-    "description": "Заливка soft-кнопки тона `azure` под курсором."
+    "default": "color-mix(in srgb, var(--gr-azure) 10%, var(--gr-button-azure-soft-bg))",
+    "description": "Заливка soft-кнопки тона `azure` под курсором. Тон подмешивается в саму soft-заливку, поэтому наведение темнеет в светлой теме и светлеет в тёмной."
   },
   {
     "owner": "GrButton",
     "name": "--gr-button-azure-soft-bg-active",
     "kind": "theme",
-    "default": "color-mix(in srgb, var(--gr-azure) 24%, var(--gr-bg))",
+    "default": "color-mix(in srgb, var(--gr-azure) 16%, var(--gr-button-azure-soft-bg))",
     "description": "Заливка soft-кнопки тона `azure` в момент нажатия."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-azure-border-soft",
+    "kind": "theme",
+    "default": "color-mix(in srgb, var(--gr-azure) 38%, var(--gr-bg))",
+    "description": "Рамка secondary-кнопки тона `azure` в покое: тон приглушён, чтобы второстепенный вес не спорил с primary."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-azure-border",
+    "kind": "theme",
+    "default": "color-mix(in srgb, var(--gr-azure) 70%, var(--gr-bg))",
+    "description": "Рамка outline-кнопки тона `azure` в покое и secondary под курсором. Полный тон рамка получает под указателем."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-neutral-soft-bg",
+    "kind": "theme",
+    "default": "var(--gr-card)",
+    "description": "Заливка нейтральной secondary-кнопки — «обычной» кнопки формы: поверхность карточки."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-neutral-soft-bg-hover",
+    "kind": "theme",
+    "default": "color-mix(in srgb, var(--gr-fg) 6%, var(--gr-card))",
+    "description": "Заливка нейтральной soft-кнопки под курсором. Подмешивается цвет текста: своего цвета у нейтрального тона нет."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-neutral-soft-bg-active",
+    "kind": "theme",
+    "default": "color-mix(in srgb, var(--gr-fg) 11%, var(--gr-card))",
+    "description": "Заливка нейтральной soft-кнопки в момент нажатия."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-neutral-border",
+    "kind": "theme",
+    "default": "color-mix(in srgb, var(--gr-brd) 50%, var(--gr-brd-hover))",
+    "description": "Рамка нейтральных secondary и outline: заметнее `--gr-brd`, чтобы белая кнопка не терялась на светлом фоне."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-shadow",
+    "kind": "theme",
+    "default": "inset 0 1px 0 color-mix(in srgb, var(--gr-slate-0) 16%, transparent), var(--gr-shadow-1)",
+    "description": "Объём solid-кнопки: блик по верхней кромке и мелкая тень. В тёмной теме блик тише."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-shadow-active",
+    "kind": "theme",
+    "default": "inset 0 1px 2px color-mix(in srgb, var(--gr-slate-900) 24%, transparent)",
+    "description": "Тень solid-кнопки в момент нажатия: уходит внутрь, кнопка выглядит вдавленной."
   },
   {
     "owner": "GrButton",

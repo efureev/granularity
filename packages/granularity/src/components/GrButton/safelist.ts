@@ -3,8 +3,16 @@ import {
   base,
   blockClass,
   disabledClassByVariant,
-  sizes,
+  paddingEnd,
+  paddingEndAdorned,
+  paddingStart,
+  paddingStartAdorned,
+  pressClass,
+  sizeBase,
+  solidShadowClass,
+  glyphSizes,
   squareSizes,
+  surfaceShadowClass,
   tones,
   variantClass,
   type GrButtonTone,
@@ -18,10 +26,15 @@ const variantTokens = (Object.keys(tones) as GrButtonTone[]).flatMap(tone =>
 
 export const grButtonClassTokens = {
   base: splitClassTokens(base),
-  sizes: Object.values(sizes).flatMap(splitClassTokens),
+  sizes: [sizeBase, paddingStart, paddingEnd, paddingStartAdorned, paddingEndAdorned, glyphSizes]
+    .flatMap(map => Object.values(map).flatMap(splitClassTokens)),
   squareSizes: Object.values(squareSizes).flatMap(splitClassTokens),
   variants: variantTokens,
-  states: [...splitClassTokens(blockClass), ...Object.values(disabledClassByVariant).flatMap(splitClassTokens)],
+  states: [
+    ...splitClassTokens(blockClass),
+    ...splitClassTokens(pressClass),
+    ...Object.values(disabledClassByVariant).flatMap(splitClassTokens),
+  ],
 } as const
 
 /**
@@ -31,13 +44,16 @@ export const grButtonClassTokens = {
  * `GrButtonGroup` или `GrConfigProvider`, поэтому объявлена вся матрица — 8 × 5.
  *
  * Собранное узнаётся по скобкам, которые подставляет `withVar`. Литеральные
- * куски той же функции (`bg-transparent`, `border`, `border-transparent`), база,
+ * куски той же функции (`bg-transparent`, `border`, `border-transparent`, тени
+ * объёма), база,
  * размеры, квадрат, `block` и отключённое состояние лежат строками целиком —
  * granum извлекает их из чанков компонента сам.
  *
  * Ту же матрицу рисует вид `button` у `GrRadio` (через `grButtonClass`): к нему
  * она приезжает зависимостью `GrButton` вместе со всеми классами её чанка.
  */
+const literalVariantTokens = new Set([...splitClassTokens(solidShadowClass), ...splitClassTokens(surfaceShadowClass)])
+
 export const grButtonSafelist = [...new Set(
-  grButtonClassTokens.variants.filter(token => token.includes('[')),
+  grButtonClassTokens.variants.filter(token => token.includes('[') && !literalVariantTokens.has(token)),
 )]

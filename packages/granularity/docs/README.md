@@ -78,6 +78,8 @@
 - [`file-validation.md`](./file-validation.md) — `fileValidation` API и повторное использование логики валидации файлов.
 - [`components.md`](./components.md) — каталог опубликованных компонентов, импорты и правило
   ведения страниц; [`components/`](./components/) — страница на компонент с его особенностями.
+- [`design/`](./design/) — дизайн компонентов: реализованная версия, концепты на том же API и что
+  потребуется для их реализации. Сейчас — [`design/GrButton.md`](./design/GrButton.md).
 - [`ADDING_COMPONENTS.md`](./ADDING_COMPONENTS.md) — внутренний процесс добавления нового компонента в пакет.
 
 ## Как подключать
