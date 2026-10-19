@@ -657,6 +657,7 @@
     "@feugene/granum-engine-wind": "^2.1.0",
     "@floating-ui/dom": "^1.8.0",
     "@iconify-json/lucide": "^1.2.126",
+    "@playwright/test": "^1.62.1",
     "@types/node": "^25.9.5",
     "@vitejs/plugin-vue": "^6.0.8",
     "@vitest/coverage-v8": "^4.1.11",
@@ -686,6 +687,8 @@
     "test": "vitest --config vitest.config.ts",
     "test:coverage": "vitest run --config vitest.config.ts --coverage",
     "test:run": "vitest run --config vitest.config.ts",
-    "typecheck": "vue-tsc --noEmit -p tsconfig.json"
+    "typecheck": "vue-tsc --noEmit -p tsconfig.json",
+    "themes:values": "node scripts/theme-values.mjs --write",
+    "themes:values:check": "node scripts/theme-values.mjs"
   }
 }
