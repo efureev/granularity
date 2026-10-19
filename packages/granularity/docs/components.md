@@ -252,7 +252,7 @@ GrSelect>` для них не работает, такой компонент к
   написанный руками, разойдётся с кодом молча;
 - того, что уже описано сквозным документом: клавиатура —
   [`keyboard.md`](./keyboard.md), размеры — [`sizes.md`](./sizes.md), токены и
-  темы — [`tokens.md`](./tokens.md) и [`theming.md`](./theming.md), слои —
+  темы — [`tokens.md`](./tokens.md) и [`modes.md`](./modes.md), слои —
   [`z-index.md`](./z-index.md), стек оверлеев — [`overlays.md`](./overlays.md),
   серверный рендер — [`ssr.md`](./ssr.md),
   движение — [`motion.md`](./motion.md). В сквозном документе компонент

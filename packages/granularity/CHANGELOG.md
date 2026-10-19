@@ -7,8 +7,13 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+Ломающий выпуск: темы и режимы. Как переехать — [`docs/migration-2.md`](./docs/migration-2.md).
+
 ### Changed
 
+- **`docs/theming.md` разделён.** Режимы в приложении — переключение, острова, SSR, свои
+  режимы в конфиге, токены компонентов по темам — [`docs/modes.md`](./docs/modes.md); темы, роли,
+  ловушки контраста, свой режим и своя тема — `docs/themes.md` пакета `@feugene/granularity-tokens`.
 - **Нужен granum 3.** Peer `@feugene/granum` — `>=3.0.0-next.2 <4.0.0`: манифест ядра —
   формата 3, контракт — версии 2, и granum 2 их не читает. Рантайм режимов granum
   встроен в `dist`, отдельной зависимости приложению он не добавляет.
@@ -113,15 +118,15 @@ to [Semantic Versioning](https://semver.org/).
 
 - **Словарь токенов, данные тем и сборка темы переехали в
   `@feugene/granularity-tokens`** — он теперь зависимость ядра. Подпути
-  `@feugene/granularity/theme` и `/theme/apply` убраны: те же `extendTheme`,
-  `createTheme`, `tone`, `validateTheme` и `applyTheme` —
-  `@feugene/granularity-tokens/theme` и `/theme/apply`. Сырые `tokens/*.json`
+  `@feugene/granularity/theme` и `/theme/apply` убраны: `tone`, `validateTheme` и
+  `applyTheme` — `@feugene/granularity-tokens/theme` и `/theme/apply`, а
+  `extendTheme`/`createTheme` стали `extendMode`/`createMode` — они строят режим темы. Сырые `tokens/*.json`
   ядро больше не публикует: реестр — `@feugene/granularity-tokens/tokens/*.json`,
   значения — `@feugene/granularity-tokens/themes/slate/`. В
   `@feugene/granularity/tokens` остался реестр покомпонентных токенов
   `grComponentTokens`; `grFoundationTokens`, `grDerivedTokens` и роли
   (`grRoleTokens` вместо `grThemeTokens`, без значений) — в пакете токенов,
-  значения по режимам — в данных темы. `extendTheme` сверяет `componentTokens` с
+  значения по режимам — в данных темы. `extendMode` сверяет `componentTokens` с
   реестром, только если передан `knownComponentTokens`.
 
 ## [v1.1.1] 2026-10-16

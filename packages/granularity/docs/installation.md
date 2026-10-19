@@ -196,7 +196,7 @@ defineGranumConfig({
 
 Свой режим задаётся здесь же — `modes.define` с `extends` и `tokens` или
 `tokensRef`; переопределение отдельных значений — `modes.tokenOverrides`.
-Подробности — в [`theming.md`](./theming.md).
+Подробности — в [`modes.md`](./modes.md).
 
 ### Обрезка неиспользуемых токенов
 

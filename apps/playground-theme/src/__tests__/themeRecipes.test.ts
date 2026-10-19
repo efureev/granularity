@@ -13,7 +13,7 @@ import { loadTheme } from '@feugene/granularity-tokens/theme/node'
 import slateData from '@feugene/granularity-tokens/themes/slate/theme.json'
 
 /**
- * Рецепты «Подключение» и «Своя тема» из `packages/granularity/docs/theming.md`
+ * Рецепты «Свои режимы в конфиге» из `packages/granularity/docs/modes.md` и «Своя тема приложения» из `packages/granularity-tokens/docs/themes.md`
  * — на настоящем granum и манифесте пакета.
  *
  * Тема пакета приезжает данными каталога, режим включается парой
@@ -53,7 +53,7 @@ function lastPrimary(css: string, pair: string): string | undefined {
   return primaryBlocks(css).filter(block => block.selector.includes(`[data-theme="${pair}"]`)).at(-1)?.primary
 }
 
-describe('рецепты темизации из theming.md', () => {
+describe('рецепты режимов и темы из modes.md и themes.md', () => {
   it('тема пакета приезжает данными: у тёмного режима его собственный primary', async () => {
     expect(lastPrimary(await themesLayer({ names: ['light', 'dark'] }), 'slate-dark')).toBe(darkPrimary)
   })

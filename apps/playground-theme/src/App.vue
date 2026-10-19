@@ -87,7 +87,7 @@ function onModeChange(next: string | number): void {
         ролей видны в соседстве компонентов, а не по отдельности.
       </GrAlert>
 
-      <!-- Плотный экран из docs/theming.md → «Проверка перед выкладкой», п. 3 -->
+      <!-- Плотный экран из docs/themes.md пакета токенов → «Проверка перед выкладкой», п. 4 -->
       <section class="grid gap-4 lg:grid-cols-2">
         <GrCard class="p-4">
           <div class="flex flex-col gap-4">

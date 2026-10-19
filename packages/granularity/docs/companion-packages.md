@@ -224,9 +224,12 @@ export default defineConfig({
 ## 4. Компоненты
 
 Компоненты именуются с префиксом `Gr*` и повторяют структуру ядра: `GrMyThing.vue` + `config.ts`
-(`defineGranumComponent`) + `index.ts`. Темизация — через DS-токены (`var(--gr-*)`, `var(--bg)`,
-`var(--primary)` …), чтобы light/dark работали автоматически. Детали — в
-[`ADDING_COMPONENTS.md`](./ADDING_COMPONENTS.md).
+(`defineGranumComponent`) + `index.ts`. Цвета — только роли дизайн-системы (`var(--gr-bg)`,
+`var(--gr-primary)` …): их значения задают тема и режим приложения, поэтому компонент спутника
+следует за любым режимом и островом `GrConfigProvider mode` без своего CSS по режимам. Своих тем у
+спутника нет; значения своих токенов для конкретной темы — папкой `themes/<тема>/` и `themesDir`,
+как у ядра, и только когда общих ролей мало. Детали — в
+[`ADDING_COMPONENTS.md`](./ADDING_COMPONENTS.md) и [`modes.md`](./modes.md).
 
 ```ts
 // src/components/GrMyThing/config.ts

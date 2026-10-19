@@ -26,8 +26,10 @@ yarn add @feugene/granularity-tokens
 | Тема из папки: `loadTheme` | `src/theme/node.ts` | `@feugene/granularity-tokens/theme/node` |
 | Подключение готового CSS в браузере | `src/theme/apply.ts` | `@feugene/granularity-tokens/theme/apply` |
 
-Темы и правила их использования — [`themes/README.md`](./themes/README.md). Справочник всех
-токенов со значениями каждой пары «тема × режим» — [`docs/tokens.md`](./docs/tokens.md).
+Каталог тем и раскладка папки темы — [`themes/README.md`](./themes/README.md). Что тема обязана
+объявить, какие роли где применяются, ловушки контраста, свой режим и своя тема —
+[`docs/themes.md`](./docs/themes.md). Справочник всех токенов со значениями каждой пары
+«тема × режим» — [`docs/tokens.md`](./docs/tokens.md).
 
 ## Реестр и значения
 

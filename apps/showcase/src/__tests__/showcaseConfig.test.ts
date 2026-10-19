@@ -18,6 +18,11 @@ const showcaseMainEntry = readFileSync(
   'utf8',
 )
 
+const showcaseThemeStyles = readFileSync(
+  fileURLToPath(new URL('../styles/showcase-theme.css', import.meta.url)),
+  'utf8',
+)
+
 /** Сброс браузерных стилей: проверяется, что он уезжает в слой, а не мимо слоёв. */
 const showcaseResetEntry = readFileSync(
   fileURLToPath(new URL('../styles/reset.css', import.meta.url)),
@@ -162,6 +167,12 @@ describe('showcase bootstrap config', () => {
     expect(showcaseGranumConfig.theme).toBe('slate')
     expect(showcaseGranumConfig.modes).toEqual({ names: ['light', 'dark'] })
     expect(showcaseGranumConfig.appSources).toEqual({ dirs: ['src'] })
+
+    // Стили витрины цепляются за режим по суффиксу пары, а не за имя темы:
+    // смена темы в конфиге не должна молча отключать тёмный хром.
+    expect(showcaseThemeStyles).toContain(`[data-theme$='-dark']`)
+    expect(showcaseThemeStyles).not.toMatch(/\[data-theme=['"][a-z]+-(?:light|dark)['"]\]/)
+    expect(showcaseThemeStyles).not.toMatch(/\[data-theme=['"](?:light|dark)['"]\]|\.dark\b/)
 
     // Движок — ванильный инстанс без своих правил: иконки `i-lucide-*`
     // приезжают провайдером `@feugene/granularity-showcase-icons`. Правило в

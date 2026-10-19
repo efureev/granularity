@@ -168,7 +168,8 @@ on this one — the core stays lean, and you install only what you reach for.
 - [`docs/styling.md`](./docs/styling.md) — style layers, themes, and import order
 - [`docs/tokens.md`](./docs/tokens.md) — component token reference (generated from each component's `tokens.json`); global tokens and themes — [`@feugene/granularity-tokens`](../granularity-tokens/docs/tokens.md)
 - [`docs/entry-sizes.md`](./docs/entry-sizes.md) — the weight of every component as a subpath (generated from the build)
-- [`docs/theming.md`](./docs/theming.md) — building a custom theme (roles, contrast rules, wiring)
+- [`docs/modes.md`](./docs/modes.md) — modes in the app: switching, islands, SSR, your own modes in the config
+- [`themes.md`](../granularity-tokens/docs/themes.md) of `@feugene/granularity-tokens` — themes: roles, contrast rules, building your own mode or theme
 - [`docs/keyboard.md`](./docs/keyboard.md) — keyboard contract per component
 - [`docs/overlays.md`](./docs/overlays.md) — overlay contract: portal, layer stack, Esc, `inert`, focus
 - [`docs/z-index.md`](./docs/z-index.md) — layering scale

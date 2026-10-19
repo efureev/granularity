@@ -28,7 +28,8 @@
 дефолт, пока тема не сказала иначе. Переопределяются как любые CSS-переменные:
 
 ```css
-[data-theme="slate-dark"] {
+/* тёмные режимы любой темы — по суффиксу пары */
+[data-theme$="-dark"] {
   --gr-calendar-range-bg: color-mix(in srgb, var(--gr-primary) 18%, transparent);
 }
 ```

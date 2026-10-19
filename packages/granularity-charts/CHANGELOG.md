@@ -9,8 +9,10 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Changed
 
-- **Peer `@feugene/granum` — `>=3.0.0-next.2 <4.0.0`.** Ядро `@feugene/granularity` теперь
-  провайдер granum 3 (манифест формата 3, контракт версии 2), и спутник объявляет тот же мажор.
+- **Peer `@feugene/granum` — `>=3.0.0-next.2 <4.0.0`, `@feugene/granularity` — `>=2.0.0 <3.0.0`.**
+  Ядро 2 — провайдер granum 3 (манифест формата 3, контракт версии 2) с темой из
+  `@feugene/granularity-tokens`, и спутник объявляет те же мажоры: с ядром 1 на granum 2 он
+  не соберётся.
 
 ### Fixed
 

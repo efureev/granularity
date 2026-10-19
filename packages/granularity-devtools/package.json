@@ -53,7 +53,7 @@
     "@vue/devtools-kit": "^8.2.1"
   },
   "peerDependencies": {
-    "@feugene/granularity": ">=1.0.0 <2.0.0",
+    "@feugene/granularity": ">=2.0.0 <3.0.0",
     "vue": "^3.5.0"
   },
   "devDependencies": {

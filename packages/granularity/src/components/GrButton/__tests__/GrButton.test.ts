@@ -12,13 +12,14 @@ import {
   getLuminance,
   readComponentThemeVars,
   resolveColorExpression,
+  THEME_MODES,
+  themeModesOfScheme,
   themeVarsByName,
 } from '../../../__tests__/cssContrast'
 
-const lightThemeVars = themeVarsByName.light
-const darkThemeVars = themeVarsByName.dark
-const grButtonLightThemeVars = readComponentThemeVars('GrButton', 'light')
-const grButtonDarkThemeVars = readComponentThemeVars('GrButton', 'dark')
+/** Роли режима и токены кнопки поверх — то, что видит кнопка в этом режиме темы. */
+const buttonVarsOf = (key: string) => ({ ...themeVarsByName[key], ...readComponentThemeVars('GrButton', key) })
+
 const variants: GrButtonVariant[] = ['primary', 'secondary', 'outline', 'ghost', 'ghost-border']
 const tones: GrButtonTone[] = ['primary', 'neutral', 'success', 'warning', 'danger', 'info', 'slate', 'azure']
 const filledTones: GrButtonTone[] = ['primary', 'success', 'warning', 'danger', 'info', 'slate', 'azure']
@@ -182,18 +183,20 @@ describe('GrButton', () => {
     expect(ghostBorder).toContain('hover:active:border-[var(--gr-success-active)]')
   })
 
-  it('в light theme filled success, warning, slate и azure кнопки используют светлый foreground с достаточным контрастом', () => {
+  it('в светлых режимах filled success, warning, slate и azure кнопки используют светлый foreground с достаточным контрастом', () => {
     const failures: string[] = []
 
-    for (const tone of ['success', 'warning', 'slate', 'azure'] as const) {
-      for (const state of states) {
-        const colors = getButtonColors('primary', tone, state)
-        const text = resolveColorExpression(colors.text, { ...lightThemeVars, ...grButtonLightThemeVars }, derivedThemeVars)
-        const background = resolveColorExpression(colors.background, { ...lightThemeVars, ...grButtonLightThemeVars }, derivedThemeVars)
-        const contrast = getContrastRatio(text, background)
+    for (const key of themeModesOfScheme('light')) {
+      for (const tone of ['success', 'warning', 'slate', 'azure'] as const) {
+        for (const state of states) {
+          const colors = getButtonColors('primary', tone, state)
+          const text = resolveColorExpression(colors.text, buttonVarsOf(key), derivedThemeVars)
+          const background = resolveColorExpression(colors.background, buttonVarsOf(key), derivedThemeVars)
+          const contrast = getContrastRatio(text, background)
 
-        if (getLuminance(text) <= getLuminance(background) || contrast < 4.5) {
-          failures.push(`${tone}:${state}:${contrast.toFixed(2)}`)
+          if (getLuminance(text) <= getLuminance(background) || contrast < 4.5) {
+            failures.push(`${key}:${tone}:${state}:${contrast.toFixed(2)}`)
+          }
         }
       }
     }
@@ -201,17 +204,19 @@ describe('GrButton', () => {
     expect(failures).toEqual([])
   })
 
-  it('в dark theme filled-кнопки используют светлый foreground для primary и semantic tones', () => {
+  it('в тёмных режимах filled-кнопки используют светлый foreground для primary и semantic tones', () => {
     const failures: string[] = []
 
-    for (const tone of filledTones) {
-      for (const state of states) {
-        const colors = getButtonColors('primary', tone, state)
-        const text = resolveColorExpression(colors.text, { ...darkThemeVars, ...grButtonDarkThemeVars }, derivedThemeVars)
-        const background = resolveColorExpression(colors.background, { ...darkThemeVars, ...grButtonDarkThemeVars }, derivedThemeVars)
+    for (const key of themeModesOfScheme('dark')) {
+      for (const tone of filledTones) {
+        for (const state of states) {
+          const colors = getButtonColors('primary', tone, state)
+          const text = resolveColorExpression(colors.text, buttonVarsOf(key), derivedThemeVars)
+          const background = resolveColorExpression(colors.background, buttonVarsOf(key), derivedThemeVars)
 
-        if (getLuminance(text) <= getLuminance(background)) {
-          failures.push(`${tone}:${state}`)
+          if (getLuminance(text) <= getLuminance(background)) {
+            failures.push(`${key}:${tone}:${state}`)
+          }
         }
       }
     }
@@ -219,13 +224,10 @@ describe('GrButton', () => {
     expect(failures).toEqual([])
   })
 
-  it('сохраняет достаточный контраст текста и заливки для всех tone × tone в light и dark темах', () => {
+  it('сохраняет достаточный контраст текста и заливки для всех tone × tone в каждом режиме каждой темы', () => {
     const failures: string[] = []
 
-    for (const [themeName, themeVars] of Object.entries({
-      light: { ...lightThemeVars, ...grButtonLightThemeVars },
-      dark: { ...darkThemeVars, ...grButtonLightThemeVars, ...grButtonDarkThemeVars },
-    })) {
+    for (const [themeName, themeVars] of THEME_MODES.map(key => [key, buttonVarsOf(key)] as const)) {
       for (const variant of variants) {
         for (const tone of tones) {
           for (const state of states) {
@@ -333,11 +335,8 @@ describe('GrButton — отключённое состояние', () => {
   it('гаснет теми же ролями, что и остальной пакет', () => {
     const roles = [['bg', '--gr-disabled-bg'], ['fg', '--gr-disabled-fg'], ['brd', '--gr-disabled-brd']] as const
 
-    for (const theme of ['light', 'dark'] as const) {
-      const buttonVars = {
-        ...themeVarsByName[theme],
-        ...(theme === 'dark' ? grButtonDarkThemeVars : grButtonLightThemeVars),
-      }
+    for (const theme of THEME_MODES) {
+      const buttonVars = buttonVarsOf(theme)
 
       for (const [part, role] of roles) {
         const own = resolveColorExpression(`var(--gr-button-disabled-${part})`, buttonVars, derivedThemeVars)

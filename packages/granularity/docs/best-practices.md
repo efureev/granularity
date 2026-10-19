@@ -57,7 +57,7 @@ export function focusFirst(control: GrInputInstance | undefined): void {
 1. локальный проп на компоненте;
 2. `componentDefaults[Component]` ближайшего провайдера — поверх
    `createGranularity({ componentDefaults })` приложения и пропсов по умолчанию
-   темы сборки ([`theming.md`](./theming.md#пропсы-по-умолчанию-темы));
+   темы сборки ([`modes.md`](./modes.md#пропсы-по-умолчанию-темы));
 3. глобальный `size` того же провайдера;
 4. дефолт компонента.
 
@@ -210,7 +210,7 @@ const { target, enabled } = usePortalTarget()
 
 ---
 
-## 7. Темы
+## 7. Темы и режимы
 
 **`useTheme()` переключает режимы, а не темы.** Набор режимов — из манифеста
 `virtual:granum/themes`, поэтому свой режим из `modes.define` переключается тем же
@@ -220,20 +220,25 @@ const { target, enabled } = usePortalTarget()
 **Перекрашивать тему пакета — в конфиге granum.** `modes.tokenOverrides`
 ложится в блок пары режима после данных темы и побеждает их; свой режим —
 `modes.define` с `extends` и `tokens` или `tokensRef`
-([`theming.md`](./theming.md#подключение)). Ключа `themes` у granum 3 нет:
+([`modes.md`](./modes.md#свои-режимы-в-конфиге)). Ключа `themes` у granum 3 нет:
 конфиг с ним — ошибка.
 
 **Режим и тему собирать из данных, а не писать CSS руками.** `extendMode` (поверх
 готового) и `createMode` (с нуля) из `@feugene/granularity-tokens/theme` отдают и
 вход `modes.define`, и CSS; `createMode` падает на неполноте, а `tone()` закрывает
 роли пачками. Своя тема — папкой и `loadTheme`: та же проверка полноты и контраста
-в каждом режиме ([`theming.md`](./theming.md)).
+в каждом режиме ([`themes.md`](../../granularity-tokens/docs/themes.md) пакета токенов).
 
 **Ставить режим до первого рендера** — скриптом в `<head>` от granum
 (`granum(config, { themeScript: { storageKey: 'gr-theme' } })`) или парой в серверном
 HTML ([`ssr.md`](./ssr.md#режим-без-мигания)). Ключ `gr-theme` и пары манифеста —
 тот же контракт, что у `useTheme()`. Иначе пользователь с тёмным режимом увидит
 вспышку светлого.
+
+**Стили приложения цеплять за режим по суффиксу пары**, а не за имя темы:
+`[data-theme$='-dark']`, не `[data-theme='slate-dark']` и тем более не
+`[data-theme='dark']` — смена темы на сборке не должна молча отключать ваш тёмный хром.
+Остров режима — `<GrConfigProvider mode="dark">`, а не атрибут руками.
 
 **Проверять контраст гейтом, а не глазами.** В пакете это делают
 `GrLink.contrast.test.ts` и `tonePalette.test.ts`; в приложении с своей темой —
@@ -377,7 +382,7 @@ forwards`/`both` и то, что показывает исходный кадр.
 - [`form-controls.md`](./form-controls.md) — контракт форм-контрола целиком
 - [`overlays.md`](./overlays.md) — стек слоёв, портал, Esc, `inert`
 - [`keyboard.md`](./keyboard.md) — клавиатура по компонентам
-- [`theming.md`](./theming.md) — своя тема
+- [`modes.md`](./modes.md) — режимы; своя тема и роли — [`themes.md`](../../granularity-tokens/docs/themes.md) пакета токенов
 - [`testing.md`](./testing.md) — тестовые утилиты
 - [`sizes.md`](./sizes.md), [`z-index.md`](./z-index.md), [`motion.md`](./motion.md),
   [`announcer.md`](./announcer.md), [`virtual-list.md`](./virtual-list.md)

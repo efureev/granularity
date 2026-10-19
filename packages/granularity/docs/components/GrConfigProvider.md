@@ -30,7 +30,7 @@
 | Нужно | Берите |
 | --- | --- |
 | Значение нужно одному компоненту | проп на самом компоненте |
-| Меняется палитра, а не дефолты | `packages/granularity/docs/theming.md` |
+| Меняется палитра, а не дефолты | `packages/granularity-tokens/docs/themes.md` |
 | Нужны переводы, а не их подключение | `packages/granularity/docs/localization.md` |
 
 Рендерится прозрачно (`display: contents`) и работает через `provide`/`inject`,

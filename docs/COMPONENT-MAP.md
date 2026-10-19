@@ -381,7 +381,7 @@
 | --- | --- |
 | индикатор поверх готового блока, императивно | `v-loading` — [директивы](../packages/granularity/docs/directives.md) |
 | строк тысячи, а разметку строки пишете свою | `useVirtualList` — [виртуализация](../packages/granularity/docs/virtual-list.md) |
-| светлая и тёмная тема приложения | `useTheme` — [темы](../packages/granularity/docs/theming.md) |
+| светлый и тёмный режим приложения, остров режима | `useTheme`, `GrConfigProvider mode` — [режимы](../packages/granularity/docs/modes.md) |
 | уведомление из кода | `useToast` — очередь единственного [`GrToaster`](../packages/granularity/docs/components/GrToaster.md) |
 | таблица ↔ фильтры ↔ страница ↔ URL ↔ сервер | `useDataSource` — [`granularity-datasource`](../packages/granularity-datasource/README.md) |
 | горячие клавиши на элементе | `v-hotkey` — [директивы](../packages/granularity/docs/directives.md) |

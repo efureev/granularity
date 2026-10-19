@@ -11,7 +11,7 @@ import { contrast as contrastMode, ocean } from '../../theme.config'
 
 /**
  * Проверка своих режимов и своей темы — ровно та, что описана в
- * `packages/granularity/docs/theming.md`.
+ * `packages/granularity-tokens/docs/themes.md`.
  *
  * Режимы собраны `extendMode`/`createMode` (`theme.config.ts`), поэтому
  * полнота набора обеспечена построением, а не бдительностью. Контраст здесь
@@ -71,7 +71,7 @@ function value(token: string): string {
  * Производные состояния тема не объявляет — их считает пакет формулой
  * `color-mix(in srgb, <роль> N%, --gr-fg)`. Повторяем формулу, чтобы проверить
  * контраст в hover/active: именно там `-fg` чаще всего и проваливается
- * (ловушка №2 из docs/theming.md).
+ * (ловушка №2 из docs/themes.md пакета токенов).
  */
 function mixWithFg(role: string, amount: number): string {
   const base = toRgb(value(role))

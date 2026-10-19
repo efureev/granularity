@@ -98,7 +98,7 @@ export function defineRegistryGate(options: RegistryGateOptions): void {
 
       if (!codegen) {
         throw new Error(
-          'Гейту реестров нужен `@feugene/granum` (>=2.0.0): по нему он '
+          'Гейту реестров нужен `@feugene/granum` (>=3): по нему он '
           + 'узнаёт части составных компонентов. Установите пакет или уберите вызов '
           + '`defineRegistryGate`.',
         )

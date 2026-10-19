@@ -11,6 +11,7 @@
 ## С чего начать
 
 - Если нужен быстрый старт: откройте [`installation.md`](./installation.md).
+- Если переезжаете с 1.x: откройте [`migration-2.md`](./migration-2.md).
 - Если нужен каркас приложения целиком — SPA или SSR: откройте [`getting-started.md`](./getting-started.md).
 - Если приложение уже пишется и хочется не переделывать: откройте [`best-practices.md`](./best-practices.md).
 - Если важно понять устройство слоёв стилей: откройте [`styling.md`](./styling.md).
@@ -36,6 +37,7 @@
 ## Карта документации
 
 - [`installation.md`](./installation.md) — установка, public entrypoint-ы, quick start и выбор стратегии подключения.
+- [`migration-2.md`](./migration-2.md) — переезд с 1.x: конфиг granum, `useTheme`, селекторы режимов, `GrConfigProvider mode`, подпути CSS и импорты.
 - [`getting-started.md`](./getting-started.md) — приложение с нуля: полные каркасы SPA и SSR, подключение
   локализации и остальных пакетов семейства.
 - [`best-practices.md`](./best-practices.md) — практики прикладной разработки: импорт и конфиг, формы и обёртки,
@@ -44,7 +46,8 @@
   RTL не поддерживается.
 - [`tokens.md`](./tokens.md) — покомпонентные токены (генерируется из `tokens.json` компонентов, руками не править);
   глобальные токены и темы — в `@feugene/granularity-tokens`.
-- [`theming.md`](./theming.md) — как собрать свою тему: роли, суффиксы `-fg`/`-light`/`-text`, композиция
+- [`modes.md`](./modes.md) — режимы: переключение, острова, SSR, свои режимы в конфиге, токены компонентов по темам
+- [`themes.md`](../../granularity-tokens/docs/themes.md) пакета токенов — как собрать свою тему: роли, суффиксы `-fg`/`-light`/`-text`, композиция
   режим поверх готового (`extendMode`) и с нуля (`createMode`), своя тема приложения (`loadTheme`), подключение, проверка контраста.
 - [`keyboard.md`](./keyboard.md) — клавиатурный контракт: общие правила и таблица по компонентам.
 - [`form-controls.md`](./form-controls.md) — контракт форм-контрола: пропы, методы `focus()`/`blur()`, события и граница фокуса у составных.

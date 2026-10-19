@@ -50,7 +50,7 @@
     "./package.json": "./package.json"
   },
   "peerDependencies": {
-    "@feugene/granularity": ">=1.0.0 <2.0.0",
+    "@feugene/granularity": ">=1.0.0 <3.0.0",
     "unplugin-vue-components": ">=0.26.0"
   },
   "devDependencies": {

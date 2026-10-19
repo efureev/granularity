@@ -159,7 +159,7 @@ import '@feugene/granularity/styles/base.css'
 ```
 
 В приложении на granum то же делают `modes.tokenOverrides` и `modes.define`
-(см. [`theming.md`](./theming.md)).
+(см. [`modes.md`](./modes.md)).
 
 ## Что важно помнить
 

@@ -3,7 +3,7 @@ import { computed, ref } from 'vue'
 
 import { useFintI18n } from '@feugene/fint-i18n/vue'
 import type { GrComponentSize } from '@feugene/granularity'
-import { GR_CONTROL_HEIGHTS_PX } from '@feugene/granularity'
+import { GR_CONTROL_HEIGHTS_PX, useTheme } from '@feugene/granularity'
 
 import InlineRichText from '../components/content/InlineRichText.vue'
 import CodeBlock from '../components/doc/CodeBlock.vue'
@@ -37,6 +37,8 @@ const foundationTokenGroups = computed(() => foundationTokenSectionOrder.map(sec
   tokens: showcaseFoundationTokens.filter(token => token.section === section),
 })))
 const isDarkThemePreview = ref(false)
+// Пара тёмного режима — из манифеста сборки: имя темы витрина не повторяет.
+const darkModePair = useTheme().modes.find(mode => mode.colorScheme === 'dark')?.value
 const activeThemeName = computed(() => isDarkThemePreview.value ? 'dark' : 'light')
 const activeThemeLabel = computed(() => i18n.t(`showcase.foundationsPage.theme.${activeThemeName.value}`))
 const themeTokenSectionOrder = [...new Set(showcaseThemeTokens.map(token => token.section))]
@@ -502,7 +504,7 @@ const integrationCodeSamples: Record<string, Array<{ code: string, language: str
             </div>
 
             <div
-                :data-theme="activeThemeName === 'dark' ? 'slate-dark' : undefined"
+                :data-theme="activeThemeName === 'dark' ? darkModePair : undefined"
                 :style="themePreviewContainerStyle"
                 class="showcase-panel rounded-3xl border p-4"
             >

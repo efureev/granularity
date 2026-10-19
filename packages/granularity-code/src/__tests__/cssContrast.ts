@@ -1,6 +1,10 @@
-import { grDerivedTokens } from '@feugene/granularity-tokens'
+import { readFileSync } from 'node:fs'
+import { createRequire } from 'node:module'
+import { join } from 'node:path'
+import process from 'node:process'
+
+import { grDerivedTokens, grThemeCatalog, resolveModes, type GrThemeData } from '@feugene/granularity-tokens'
 import { contrast, deltaE } from '@feugene/granularity-tokens/theme'
-import slateData from '@feugene/granularity-tokens/themes/slate/theme.json'
 
 /**
  * Разрешение CSS-цветов и расчёт контраста для тестов пакета.
@@ -165,19 +169,33 @@ export function getColorClassExpression(className: string, prefix: string): stri
 
 type TokenMap = Record<string, string>
 
-const slate = slateData as { root: TokenMap, modes: Record<'light' | 'dark', { tokens: TokenMap }> }
-
-function withDashes(tokens: TokenMap): TokenMap {
-  return Object.fromEntries(Object.entries(tokens).map(([name, value]) => [`--${name}`, value]))
+function withDashes(tokens: Readonly<TokenMap> | undefined): TokenMap {
+  return Object.fromEntries(Object.entries(tokens ?? {}).map(([name, value]) => [`--${name}`, value]))
 }
 
-/** Примитивы и роли режимов темы `slate` — из данных пакета токенов, которые отгружаются. */
-export const themeVarsByName = {
-  light: { ...withDashes(slate.root), ...withDashes(slate.modes.light.tokens) },
-  dark: { ...withDashes(slate.root), ...withDashes(slate.modes.dark.tokens) },
-} as const
+// В jsdom `import.meta.url` не file-scheme — данные тем ищутся от cwd пакета.
+const requireFromPackage = createRequire(join(process.cwd(), 'package.json'))
+
+function themeData(theme: string): GrThemeData {
+  return JSON.parse(readFileSync(requireFromPackage.resolve(`@feugene/granularity-tokens/themes/${theme}/theme.json`), 'utf8')) as GrThemeData
+}
+
+/**
+ * Примитивы и роли каждой темы каталога в каждом её режиме — из данных пакета
+ * токенов, которые отгружаются. Ключ — пара `<тема>-<режим>`: набор держит
+ * каталог, а не тест.
+ */
+export const themeVarsByName: Readonly<Record<string, TokenMap>> = Object.fromEntries(grThemeCatalog.flatMap((entry) => {
+  const data = themeData(entry.id)
+  const modes = resolveModes(data)
+
+  return entry.modes.map(mode => [`${entry.id}-${mode.name}`, { ...withDashes(data.root), ...withDashes(modes.get(mode.name)) }])
+}))
 
 /** Производные формулы (`--gr-primary-hover` и т.п.) — из реестра пакета токенов. */
 export const derivedThemeVars: TokenMap = Object.fromEntries(grDerivedTokens.map(token => [token.name, token.formula]))
 
-export type ThemeName = keyof typeof themeVarsByName
+export type ThemeName = string
+
+/** Контексты гейтов — пары `<тема>-<режим>` всех тем каталога. */
+export const THEME_MODES: readonly ThemeName[] = Object.keys(themeVarsByName)

@@ -1,11 +1,22 @@
 import { grDerivedTokens } from '@feugene/granularity-tokens'
 import { contrast, deltaE, luminance, parseHex, type Rgb } from '@feugene/granularity-tokens/theme'
 
-import type { GrModeName } from '../composables/useTheme'
-import { componentThemeVars, MODES, themeVars } from './themeCss'
+import { componentThemeVars, THEME_MODES as CONTEXTS, type ThemeMode, themeVars } from './themeCss'
 
-export type { GrModeName }
-export { MODES as THEME_MODES }
+export type { ThemeMode }
+/** Ключ контекста гейта — пара «тема-режим» (`slate-dark`). */
+export type GrModeName = string
+
+/** Контексты гейтов: каждая тема каталога в каждом своём режиме. */
+export const THEME_MODE_CONTEXTS: readonly ThemeMode[] = CONTEXTS
+
+/** Ключи контекстов — пары `<тема>-<режим>`; по ним индексированы все карты ниже. */
+export const THEME_MODES: readonly GrModeName[] = CONTEXTS.map(context => context.key)
+
+/** Ключи контекстов с данной схемой — для проверок, зависящих от светлого или тёмного фона. */
+export function themeModesOfScheme(scheme: ThemeMode['colorScheme']): GrModeName[] {
+  return CONTEXTS.filter(context => context.colorScheme === scheme).map(context => context.key)
+}
 
 /**
  * Разрешение CSS-цветов и расчёт контраста для тестов.
@@ -169,13 +180,13 @@ export function getColorClassExpression(className: string, prefix: string): stri
   return undefined
 }
 
-/** Примитивы и роли по режимам темы `slate` — из данных пакета токенов. */
-export const themeVarsByName = Object.fromEntries(MODES.map(mode => [mode, themeVars(mode)])) as Record<GrModeName, Record<string, string>>
+/** Примитивы и роли каждой темы в каждом режиме — из данных пакета токенов. */
+export const themeVarsByName = Object.fromEntries(THEME_MODES.map(key => [key, themeVars(key)])) as Record<GrModeName, Record<string, string>>
 
 /** Производные формулы (`--gr-primary-hover` и т.п.) — из реестра пакета токенов. */
 export const derivedThemeVars: Record<string, string> = Object.fromEntries(grDerivedTokens.map(token => [token.name, token.formula]))
 
-/** Токены компонента в режиме — `components/GrX/themes/slate/`: `root.json` и файл режима поверх. */
-export function readComponentThemeVars(component: string, mode: GrModeName): Record<string, string> {
-  return componentThemeVars(component, mode)
+/** Токены компонента в режиме темы — `components/GrX/themes/<тема>/` по правилу granum. */
+export function readComponentThemeVars(component: string, key: GrModeName): Record<string, string> {
+  return componentThemeVars(component, key)
 }

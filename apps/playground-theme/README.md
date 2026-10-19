@@ -1,6 +1,6 @@
 # playground-theme
 
-Рабочий пример из [`packages/granularity/docs/theming.md`](../../packages/granularity/docs/theming.md):
+Рабочий пример из [`modes.md`](../../packages/granularity/docs/modes.md) ядра и [`themes.md`](../../packages/granularity-tokens/docs/themes.md) пакета токенов:
 свои режимы поверх темы пакета и своя тема приложения — в одной сборке granum.
 
 ```bash
@@ -20,7 +20,7 @@ yarn workspace @feugene/granularity-playground-theme test:run
 | `vite.config.ts` | ранний скрипт режима в `<head>` — опция `themeScript` плагина granum |
 | `src/App.vue` | переключатель режимов из манифеста и острова превью `<GrConfigProvider theme="brand" mode="…">` |
 | `src/__tests__/theme.test.ts` | автопроверка: полнота ролей, контраст по WCAG, что granum положил режимы и превью под их пары |
-| `src/__tests__/themeRecipes.test.ts` | рецепты раздела «Подключение» `theming.md` на настоящем granum |
+| `src/__tests__/themeRecipes.test.ts` | рецепты раздела «Свои режимы в конфиге» `modes.md` и «Своя тема приложения» `themes.md` на настоящем granum |
 
 ## Режим или тема
 

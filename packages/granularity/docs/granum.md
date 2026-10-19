@@ -104,7 +104,7 @@ defineGranumConfig({
 `modes.define` с `extends` и `tokens` или `tokensRef`; переопределение отдельных
 токенов — `modes.tokenOverrides`. Значения из `define` и `tokenOverrides` granum
 кладёт в блок пары после данных темы — они побеждают. Подробности —
-[`theming.md`](./theming.md).
+[`modes.md`](./modes.md).
 
 ### Обрезка неиспользуемых токенов
 
@@ -236,7 +236,7 @@ defineGranumConfig({
 - [`@feugene/granum`][granum] ([документация `docs/ru`][granum-docs],
   [быстрый старт][granum-getting-started], [CLI][granum-cli],
   [движки и диалекты][granum-engines])
-- [`theming.md`](./theming.md) — темы и токены пакета
+- [`modes.md`](./modes.md) — режимы; темы и роли — [`themes.md`](../../granularity-tokens/docs/themes.md) пакета токенов
 - [`styling.md`](./styling.md) — сценарии подключения CSS
 
 [granum]: https://github.com/efureev/granum

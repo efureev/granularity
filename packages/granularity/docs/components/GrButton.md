@@ -4,7 +4,7 @@
 
 Как завести собственный тон — [`../../src/components/GrButton/HOW_TO_ADD_NEW_TONE.md`](../../src/components/GrButton/HOW_TO_ADD_NEW_TONE.md),
 как перекрыть токены в приложении — [`../../src/components/GrButton/HOW_TO_OVERRIDE_TOKENS_IN_APP.md`](../../src/components/GrButton/HOW_TO_OVERRIDE_TOKENS_IN_APP.md).
-Размеры — [`../sizes.md`](../sizes.md), палитра — [`../theming.md`](../theming.md).
+Размеры — [`../sizes.md`](../sizes.md), палитра — [`themes.md`](../../../granularity-tokens/docs/themes.md).
 Дизайн и три концепта на том же API — [`../design/GrButton.md`](../design/GrButton.md).
 
 ## Когда брать
@@ -127,7 +127,7 @@ primary. Нейтральная secondary — «обычная» кнопка ф
 Подпись — `--gr-button-font-weight`, по умолчанию medium.
 
 Наведение и нажатие soft-заливки подмешивают тон в саму заливку, а не в фон.
-Поэтому они темнеют в светлой теме и светлеют в тёмной — вслед за покоем.
+Поэтому они темнеют в светлом режиме и светлеют в тёмной — вслед за покоем.
 
 ## Зона касания на тач-экране
 

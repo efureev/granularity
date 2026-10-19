@@ -6,6 +6,7 @@ import {
   getColorDistance,
   getContrastRatio,
   resolveColorExpression,
+  THEME_MODES,
   themeVarsByName,
   type ThemeName,
 } from '../../../__tests__/cssContrast'
@@ -20,7 +21,7 @@ import type { GrCodeRole } from '../../../highlight/tokenizeJson'
  * **друг от друга** — ключ, строка, число и литерал стоят рядом в одной строке,
  * и два близких оттенка там сливаются в один. Ровно на этом пакет уже
  * попадался: `--gr-info` был индиго в двух шагах от `--gr-primary`
- * (`docs/theming.md`, ловушка №5).
+ * (`docs/themes.md` пакета токенов, ловушка №5).
  *
  * Порог контраста — AA 4.5:1: кегль блока 10–13px, послаблений для крупного
  * текста здесь нет ни на одной ступени.
@@ -63,7 +64,7 @@ function isAlike(a: GrCodeRole, b: GrCodeRole): boolean {
   return INTENTIONALLY_ALIKE.some(([x, y]) => (x === a && y === b) || (x === b && y === a))
 }
 
-const THEMES: ThemeName[] = ['light', 'dark']
+const THEMES = THEME_MODES
 
 /** Роли, которые несут смысл и обязаны быть различимы. `plain` цвета не задаёт. */
 /**
@@ -87,7 +88,7 @@ function expressionOf(role: GrCodeRole): string {
 }
 
 function resolve(expression: string, theme: ThemeName) {
-  return resolveColorExpression(expression, themeVarsByName[theme], derivedThemeVars)
+  return resolveColorExpression(expression, themeVarsByName[theme]!, derivedThemeVars)
 }
 
 const backgroundExpression = getColorClassExpression(codeBlockRootClass, 'bg-[')

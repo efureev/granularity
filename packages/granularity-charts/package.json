@@ -136,7 +136,7 @@
   },
   "peerDependencies": {
     "@feugene/fint-i18n": ">=0.9.0 <1.0.0",
-    "@feugene/granularity": ">=1.0.0 <2.0.0",
+    "@feugene/granularity": ">=2.0.0 <3.0.0",
     "@feugene/granum": ">=3.0.0-next.2 <4.0.0",
     "@feugene/unplugin-granularity": ">=1.0.0 <2.0.0",
     "unplugin-vue-components": ">=0.26.0",

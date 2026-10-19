@@ -831,7 +831,7 @@ granum why-css granum.config.ts <класс>
 - [`granum.md`](./granum.md) — плагин и манифест
 - [`ssr.md`](./ssr.md) — SSR-контракт компонентов
 - [`localization.md`](./localization.md) — локализация
-- [`theming.md`](./theming.md) — своя тема
+- [`modes.md`](./modes.md) — режимы; своя тема — [`themes.md`](../../granularity-tokens/docs/themes.md) пакета токенов
 - [`unplugin.md`](./unplugin.md) — авто-импорт
 - [`companion-packages.md`](./companion-packages.md) — свой пакет-спутник
 - Рабочие приложения репозитория: `apps/playground-5` (SPA),

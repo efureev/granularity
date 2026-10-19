@@ -12,7 +12,7 @@ const oceanSurfaces = {
 }
 
 /**
- * Режим `ocean` темы `slate` — пример из `packages/granularity/docs/theming.md`.
+ * Режим `ocean` темы `slate` — пример из `packages/granularity-tokens/docs/themes.md`.
  *
  * Объявляет ТОЛЬКО то, что отличается от тёмного режима. Всё остальное —
  * включая роли, которых на момент написания режима ещё не существовало, —
