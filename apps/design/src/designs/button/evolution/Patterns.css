@@ -1,0 +1,4 @@
+a{color:#3730a3}a:hover{color:#1e1b4b}
+.row-actions{display:flex;gap:2px;opacity:0}
+.trow:hover .row-actions,.trow:focus-within .row-actions,.trow.is-hover .row-actions{opacity:1}
+.trow:hover,.trow.is-hover{background:var(--bg)}

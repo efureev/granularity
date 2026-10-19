@@ -7,6 +7,8 @@
 
 Поведение реализованной кнопки — [`../components/GrButton.md`](../components/GrButton.md),
 токены — [`../tokens.md`](../tokens.md), темы — [`../theming.md`](../theming.md).
+Макеты всех четырёх версий — в приложении дизайн-системы [`apps/design`](../../../../apps/design/README.md)
+(`yarn dev:design`).
 
 ## Четыре версии рядом
 

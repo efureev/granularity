@@ -33,6 +33,7 @@ Not published, and living in `apps/`:
 
 - `apps/showcase` — live component showcase, deployed to GitHub Pages.
 - `apps/playground*` — sandboxes for integration scenarios (not published, not covered by CI).
+- `apps/design` — design-system app: foundations from the package tokens and every design version of a component, implemented and experimental (`yarn dev:design`).
 
 **Which component do I reach for?** [`docs/COMPONENT-MAP.md`](./docs/COMPONENT-MAP.md) answers that across
 every package at once: forks that ask the distinguishing question first, then an alphabetical

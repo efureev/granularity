@@ -1,0 +1,7 @@
+a{color:#3730a3}a:hover{color:#1e1b4b}
+.pills{display:flex;flex-wrap:wrap;gap:6px}
+.ctl{display:flex;flex-direction:column;gap:8px}
+.inp{height:36px;padding:0 12px;border:1px solid var(--brd-2);border-radius:8px;background:var(--card);color:var(--fg);font:400 14px/20px Inter,system-ui,sans-serif;outline:none}
+.inp:focus-visible{outline:2px solid var(--ring);outline-offset:2px}
+.pv{display:flex;align-items:center;justify-content:center}
+.pv.is-block{width:360px}
