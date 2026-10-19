@@ -45,9 +45,6 @@
   "sideEffects": [
     "**/*.css"
   ],
-  "imports": {
-    "#granum-runtime": "@feugene/granum/runtime"
-  },
   "exports": {
     ".": {
       "types": "./dist/types/index.d.ts",
@@ -632,7 +629,7 @@
   },
   "peerDependencies": {
     "@feugene/fint-i18n": ">=0.9.0 <1.0.0",
-    "@feugene/granum": ">=2.0.0 <3.0.0",
+    "@feugene/granum": ">=3.0.0-next.2 <4.0.0",
     "@floating-ui/dom": "^1.8.0",
     "vue": "^3.5.0"
   },
@@ -648,8 +645,8 @@
     "@antfu/eslint-config": "^9.3.0",
     "@feugene/fint-i18n": "^0.9.0",
     "@feugene/granularity-test-kit": "^1.1.0",
-    "@feugene/granum": "^2.1.0",
-    "@feugene/granum-engine-wind": "^2.1.0",
+    "@feugene/granum": "^3.0.0-next.2",
+    "@feugene/granum-engine-wind": "^3.0.0-next.2",
     "@floating-ui/dom": "^1.8.0",
     "@iconify-json/lucide": "^1.2.126",
     "@playwright/test": "^1.62.1",

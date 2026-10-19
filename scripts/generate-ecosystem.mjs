@@ -239,7 +239,8 @@ function checkVersionMentions(rows) {
   for (const file of VERSION_MENTIONS) {
     const source = readFileSync(resolve(ROOT, file), 'utf8')
 
-    for (const [, name, range] of source.matchAll(/(@feugene\/[a-z-]+)["'`]?\s*:?\s*["'`]?([\^~]?\d+\.\d+\.\d+)/g)) {
+    // Суффикс предрелиза — часть диапазона: `^3.0.0` предрелиза `3.0.0-next.2` не включает.
+    for (const [, name, range] of source.matchAll(/(@feugene\/[a-z-]+)["'`]?\s*:?\s*["'`]?([\^~]?\d+\.\d+\.\d+(?:-[\w.]+)?)/g)) {
       const version = known.get(name)
 
       if (version && !semver.satisfies(version, range))

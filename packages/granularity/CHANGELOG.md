@@ -9,6 +9,9 @@ to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- **Нужен granum 3.** Peer `@feugene/granum` — `>=3.0.0-next.2 <4.0.0`: манифест ядра —
+  формата 3, контракт — версии 2, и granum 2 их не читает. Рантайм режимов granum
+  встроен в `dist`, отдельной зависимости приложению он не добавляет.
 - **Тема — из каталога `@feugene/granularity-tokens`, режим — парой `data-theme="slate-<режим>"`.**
   Ядро больше не объявляет тем: провайдер — контракт granum 3 (`contractVersion: 2`) с
   зависимостью `@feugene/granularity-tokens`, владельцем каталога, и только `baseCss` в `theme`.
@@ -37,7 +40,7 @@ to [Semantic Versioning](https://semver.org/).
   `src/components/GrX/themes/slate/{root.json,modes/<режим>.json}`; `tokenDefinitionsRef` и
   `tokenDefinitions` сняты. `--gr-segmented-indicator-highlight-shadow` теперь `kind: "theme"`.
 - **Без granum — `@feugene/granularity/themes/slate.css` и `styles.css`.** Готовый CSS темы
-  собирает сборка пакета тем же `emitCss`, что и приложение: примитивы и формулы, режимы, токены
+  собирает сборка пакета по тем же правилам granum, что и приложение (`emitThemeStylesheet`): примитивы и формулы, режимы, токены
   компонентов ядра, фолбэки `@supports` — в этом порядке. `styles.css` = `themes/slate.css` +
   `styles/base.css`. Подпути `styles/tokens.css`, `styles/themes/light.css` и
   `styles/themes/dark.css` сняты, экспорт `granularityThemeNames`/`granularityDefaultThemes`

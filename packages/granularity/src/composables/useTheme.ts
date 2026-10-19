@@ -1,9 +1,6 @@
 import type { GranumThemeStorage, GranumThemeTarget } from '@feugene/granum/runtime'
 import type { App, ComputedRef } from 'vue'
-// Через `imports` пакета, а не по имени: granum держит внешним всё своё, кроме
-// контракта, и рантайм в `dist` стал бы импортом devDependency приложения —
-// SSR-сервер, задеплоенный с `--omit=dev`, падал бы на импорте пакета.
-import { createThemeController } from '#granum-runtime'
+import { createThemeController } from '@feugene/granum/runtime'
 import { computed, hasInjectionContext, inject, ref } from 'vue'
 
 import {
@@ -99,7 +96,7 @@ function readStored(state: ThemeState): string | null {
 }
 
 function writeStored(state: ThemeState, mode: GrModeName): void {
-  if (!state.persist || state.silent)
+  if (!state.persist)
     return
   try {
     storageOf(state)?.setItem?.(state.storageKey, mode)
@@ -153,7 +150,6 @@ function createThemeState(options: UseThemeOptions = {}, writable = true): Theme
     storage: options.storage,
     target: options.target,
     controller: null,
-    silent: false,
     listenersBound: false,
     writable,
   }
@@ -166,13 +162,7 @@ function createThemeState(options: UseThemeOptions = {}, writable = true): Theme
 
 /** Смена режима, которую нельзя запоминать: иначе система или соседняя вкладка решили бы за пользователя. */
 function applySilently(state: ThemeState, mode: GrModeName): void {
-  state.silent = true
-  try {
-    state.controller?.setMode(mode)
-  }
-  finally {
-    state.silent = false
-  }
+  state.controller?.setMode(mode, { persist: false })
 }
 
 /**

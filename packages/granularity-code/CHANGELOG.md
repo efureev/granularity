@@ -5,6 +5,13 @@ All notable changes to the [`@feugene/granularity-code`](.) package are document
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Changed
+
+- **Peer `@feugene/granum` — `>=3.0.0-next.2 <4.0.0`.** Ядро `@feugene/granularity` теперь
+  провайдер granum 3 (манифест формата 3, контракт версии 2), и спутник объявляет тот же мажор.
+
 ## [v1.1.0] 2026-10-16
 
 ### Changed

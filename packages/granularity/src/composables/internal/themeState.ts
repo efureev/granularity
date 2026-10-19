@@ -1,4 +1,5 @@
 import type { GranumModeEntry, GranumThemeController, GranumThemeManifest, GranumThemeStorage } from '@feugene/granum/runtime'
+import { themeModeValue } from '@feugene/granum/runtime'
 import type { InjectionKey, Ref } from 'vue'
 import { grThemeManifest } from '@feugene/granularity-tokens'
 import { hasInjectionContext, inject } from 'vue'
@@ -35,8 +36,6 @@ export interface ThemeState {
   target?: () => HTMLElement | null
   /** На клиенте; сервер DOM не трогает и контроллера не заводит. */
   controller: GranumThemeController | null
-  /** Смена режима, которую нельзя запоминать: системная схема, чужая вкладка. */
-  silent: boolean
   listenersBound: boolean
   /**
    * Снимает window-слушатели состояния. Появляется после `bindListeners`;
@@ -87,9 +86,10 @@ export function peekThemeState(): ThemeState | null {
  * Атрибут активации поддерева: остров режима (`mode`) или превью темы
  * (`theme`). Без обоих — пусто, поддерево наследует корень.
  *
- * Пару активной темы берёт из манифеста; пару превью собирает правилом granum
- * по умолчанию `<тема>-<режим>` — в манифесте сборки её нет. Превью без режима
- * показывает тему в режиме документа.
+ * Пары активной темы и превью — из манифеста сборки. Пары превью, не
+ * объявленного в `previews` конфига granum, в CSS нет; тогда остаётся
+ * значение по шаблону — для `themes/<id>.css`, подключённого без granum. Превью
+ * без режима показывает тему в режиме документа.
  */
 export function themeActivationAttrs(
   state: Pick<ThemeState, 'manifest' | 'mode'> | null,
@@ -102,9 +102,9 @@ export function themeActivationAttrs(
   const manifest = state?.manifest ?? fallbackThemeManifest()
   const themeId = theme ?? manifest.theme.id
   const modeName = mode ?? state?.mode.value ?? manifest.defaultMode
-  const own = themeId === manifest.theme.id
-    ? manifest.modes.find(entry => entry.name === modeName)?.value
-    : undefined
+  const template = manifest.activation.value ?? '{theme}-{mode}'
+  const value = themeModeValue(manifest, modeName, themeId)
+    ?? template.replaceAll('{theme}', themeId).replaceAll('{mode}', modeName)
 
-  return { [manifest.activation.attribute]: own ?? `${themeId}-${modeName}` }
+  return { [manifest.activation.attribute]: value }
 }

@@ -7,6 +7,11 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+
+- **Peer `@feugene/granum` — `>=3.0.0-next.2 <4.0.0`.** Ядро `@feugene/granularity` теперь
+  провайдер granum 3 (манифест формата 3, контракт версии 2), и спутник объявляет тот же мажор.
+
 ### Fixed
 
 - **Холст графика перечитывает цвета и при смене режима острова.** Кеш резолва цветов
