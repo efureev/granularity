@@ -7,6 +7,15 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- **Остров превью берёт пропсы по умолчанию своей темы.** `GrConfigProvider theme="<превью>"`
+  подменяет слой темы сборки `componentDefaults` темы превью — с granum 3.4 манифест несёт
+  `extensions` и у `previews`. Пропсы приложения и провайдеров выше острова остаются сверху;
+  у темы превью без своих пропсов слой темы снимается. `themeComponentDefaults(manifest, themeId?)`
+  отдаёт слой темы превью явно; `GrConfigContext` — слои `themeDefaults` и `overrideDefaults`
+  порознь.
+
 ### Docs
 
 - `modes.md`: раздел «Свой CSS под режим» — роли, вариант `dark:`, `light-dark()`, суффикс пары, пара; ловушка вложенных островов. `best-practices.md` ссылается на него.

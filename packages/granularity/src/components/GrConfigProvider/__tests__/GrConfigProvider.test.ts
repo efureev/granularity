@@ -566,6 +566,40 @@ describe('componentDefaults темы и приложения', () => {
     expect(attrs(wrapper)).toEqual(['primary', 'primary'])
   })
 
+  it('остров превью подменяет слой темы, а пропсы приложения и провайдеров остаются сверху', () => {
+    const withPreviews = {
+      ...manifest,
+      previews: [
+        {
+          theme: { id: 'paper', title: 'Бумага' },
+          modes: [{ name: 'light', colorScheme: 'light' as const, value: 'paper-light' }],
+          extensions: { granularity: { componentDefaults: { GrButton: { variant: 'ghost' } } } },
+        },
+        { theme: { id: 'ink', title: 'Чернила' }, modes: [{ name: 'light', colorScheme: 'light' as const, value: 'ink-light' }] },
+      ],
+    }
+    const plugin = [granularityThemePlugin, { manifest: withPreviews, persist: false, target: () => null }] as const
+    const wrapper = mount(defineComponent({
+      setup: () => () => h('div', [
+        button(),
+        h(GrConfigProvider, { theme: 'paper' }, {
+          default: () => [button(), h(GrConfigProvider, { componentDefaults: { GrButton: { tone: 'danger' } } }, { default: () => button() })],
+        }),
+        h(GrConfigProvider, { theme: 'ink' }, { default: () => button() }),
+      ]),
+    }), { global: { plugins: [plugin as never, createGranularity({ componentDefaults: { GrButton: { tone: 'success' } } })] } })
+    const buttons = wrapper.findAll('[data-gr-button]').map(node => [node.attributes('data-gr-variant'), node.attributes('data-gr-tone')])
+
+    expect(buttons).toEqual([
+      ['outline', 'success'],
+      ['ghost', 'success'],
+      ['ghost', 'danger'],
+      ['primary', 'success'],
+    ])
+    expect(themeComponentDefaults(withPreviews, 'paper')).toEqual({ GrButton: { variant: 'ghost' } })
+    expect(themeComponentDefaults(withPreviews, 'clay')).toBe(themeComponentDefaults(withPreviews))
+  })
+
   it('themeComponentDefaults: не та форма — undefined; ответ общий на манифест', () => {
     expect(themeComponentDefaults({ ...manifest, extensions: { granularity: { componentDefaults: { GrButton: 'outline' } } } })).toBeUndefined()
     expect(themeComponentDefaults(null)).toBeUndefined()

@@ -147,7 +147,8 @@ defineGranumConfig({
 группы кнопок): `componentDefaults` в `extensions.granularity` манифеста `virtual:granum/themes`.
 Компоненты берут их без провайдера, если манифест отдан `granularityThemePlugin`, `initThemeEarly`
 или `useTheme`. Порядок слоёв: тема → `createGranularity({ componentDefaults })` приложения →
-`GrConfigProvider` → локальный проп. Как тема их объявляет —
+`GrConfigProvider` → локальный проп. Остров превью `GrConfigProvider theme="…"` подменяет
+слой темы пропсами темы превью. Как тема их объявляет —
 [`themes.md`](../../granularity-tokens/docs/themes.md#пропсы-по-умолчанию-темы).
 
 ## Токены компонентов по темам

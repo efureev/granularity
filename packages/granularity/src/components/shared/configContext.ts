@@ -54,6 +54,13 @@ export interface GrConfigContext {
   /** Дефолтные пропсы по компонентам. */
   componentDefaults: ComputedRef<GrComponentDefaults>
   /**
+   * Слои `componentDefaults` порознь: темы — и всё, что над ней (приложение,
+   * провайдеры). Остров превью подменяет только слой темы. Необязательны:
+   * контекст, построенный руками, несёт один `componentDefaults`.
+   */
+  themeDefaults?: ComputedRef<GrComponentDefaults | undefined>
+  overrideDefaults?: ComputedRef<GrComponentDefaults>
+  /**
    * Тема поддерева — превью другой темы каталога. Необязательна: тип публичный,
    * и контекст строят руками — например хост императивных диалогов.
    */
@@ -100,22 +107,32 @@ function isDefaultsRecord(value: unknown): value is DefaultsRecord {
     && Object.values(value).every(props => typeof props === 'object' && props !== null && !Array.isArray(props))
 }
 
-const themeDefaultsCache = new WeakMap<GrThemeManifest, GrComponentDefaults | null>()
+const themeDefaultsCache = new WeakMap<GrThemeManifest, Map<string, GrComponentDefaults | null>>()
 
 /**
- * Пропсы по умолчанию, которые несёт тема сборки: `componentDefaults` в
+ * Пропсы по умолчанию, которые несёт тема: `componentDefaults` в
  * `extensions.granularity` манифеста `virtual:granum/themes`. Так тема меняет
- * то, чего токеном не выразить, — вид индикатора загрузки, форму группы. Нет
- * или не та форма — `undefined`.
+ * то, чего токеном не выразить, — вид индикатора загрузки, форму группы.
+ * Без `themeId` — тема сборки; с ним — тема превью из `previews` манифеста
+ * (granum 3.4). Нет или не та форма — `undefined`.
  */
-export function themeComponentDefaults(manifest: GrThemeManifest | null | undefined): GrComponentDefaults | undefined {
+export function themeComponentDefaults(manifest: GrThemeManifest | null | undefined, themeId?: GrThemeId): GrComponentDefaults | undefined {
   if (!manifest)
     return undefined
-  if (!themeDefaultsCache.has(manifest)) {
-    const raw = (manifest.extensions?.granularity as { componentDefaults?: unknown } | undefined)?.componentDefaults
-    themeDefaultsCache.set(manifest, isDefaultsRecord(raw) && Object.keys(raw).length > 0 ? Object.freeze(raw) : null)
+  const id = themeId ?? manifest.theme.id
+  let byTheme = themeDefaultsCache.get(manifest)
+  if (!byTheme) {
+    byTheme = new Map()
+    themeDefaultsCache.set(manifest, byTheme)
   }
-  return themeDefaultsCache.get(manifest) ?? undefined
+  if (!byTheme.has(id)) {
+    const extensions = id === manifest.theme.id
+      ? manifest.extensions
+      : manifest.previews?.find(preview => preview.theme.id === id)?.extensions
+    const raw = (extensions?.granularity as { componentDefaults?: unknown } | undefined)?.componentDefaults
+    byTheme.set(id, isDefaultsRecord(raw) && Object.keys(raw).length > 0 ? Object.freeze(raw) : null)
+  }
+  return byTheme.get(id) ?? undefined
 }
 
 /** Слияние по пропам, а не по компонентам: верхний слой меняет один проп, не стирая блок. */
@@ -153,7 +170,13 @@ function rootConfig(): GrConfigContext {
   let config = byApp.get(appKey)
   if (!config) {
     const componentDefaults = Object.freeze(mergeComponentDefaults(theme, app))
-    config = { ...EMPTY_CONFIG, componentDefaults: computed(() => componentDefaults) }
+    const overrides = app ?? EMPTY_COMPONENT_DEFAULTS
+    config = {
+      ...EMPTY_CONFIG,
+      componentDefaults: computed(() => componentDefaults),
+      themeDefaults: computed(() => theme),
+      overrideDefaults: computed(() => overrides),
+    }
     byApp.set(appKey, config)
   }
   return config

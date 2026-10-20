@@ -24,6 +24,7 @@ import { applyGrZIndexBase } from './zIndexScale'
 import {
   GR_CONFIG_KEY,
   mergeComponentDefaults,
+  themeComponentDefaults,
   useGrConfig,
   type GrComponentDefaults,
   type GrComponentSize,
@@ -108,10 +109,19 @@ if (__GR_DEV__ && props.theme !== undefined && (themeState?.manifest ?? fallback
 // Цель портала наследуется вниз: вложенный провайдер без своего значения
 // оставляет оверлеи там же, где их ждёт родительское приложение.
 const portalTarget = computed(() => props.portalTarget ?? parent.portalTarget?.value)
-// Родитель верхнего провайдера — пропсы по умолчанию темы сборки и приложения.
-const componentDefaults = computed<GrComponentDefaults>(() => mergeComponentDefaults(parent.componentDefaults.value, props.componentDefaults))
+// Слои порознь: тема — снизу, приложение и провайдеры — над ней. Остров превью
+// подменяет только слой темы, пропсы приложения и родителей остаются сверху.
+// Родитель без слоёв (контекст, построенный руками) — весь в слоях над темой.
+const themeDefaults = computed<GrComponentDefaults | undefined>(() => props.theme !== undefined
+  ? themeComponentDefaults(themeState?.manifest, props.theme)
+  : parent.themeDefaults?.value)
+const overrideDefaults = computed<GrComponentDefaults>(() => mergeComponentDefaults(
+  parent.overrideDefaults ? parent.overrideDefaults.value : parent.componentDefaults.value,
+  props.componentDefaults,
+))
+const componentDefaults = computed<GrComponentDefaults>(() => mergeComponentDefaults(themeDefaults.value, overrideDefaults.value))
 
-provide<GrConfigContext>(GR_CONFIG_KEY, { size, componentDefaults, theme, mode, portalTarget })
+provide<GrConfigContext>(GR_CONFIG_KEY, { size, componentDefaults, themeDefaults, overrideDefaults, theme, mode, portalTarget })
 
 // ————— i18n.
 //
