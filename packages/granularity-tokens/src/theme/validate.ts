@@ -38,10 +38,33 @@ function toneNames(registry?: GrRegistry): string[] {
     .map(name => name.replace('--gr-', ''))
 }
 
-function derivedOf(role: string, registry?: GrRegistry): { amount: number, mixWith: string }[] {
+function derivedOf(role: string, registry?: GrRegistry): { name: string, amount: number, mixWith: string }[] {
   return (registry?.derived ?? grDerivedTokens)
     .filter(token => token.base === role)
-    .map(token => ({ amount: token.amount, mixWith: token.mixWith }))
+    .map(token => ({ name: token.name, amount: token.amount, mixWith: token.mixWith }))
+}
+
+const MIX = /^color-mix\(\s*in srgb\s*,\s*var\((--[\w-]+)\)\s+(\d+)%\s*,\s*var\((--[\w-]+)\)\s*\)$/
+
+/**
+ * Цвет состояния заливки. Тема вправе переопределить производное — у «Глины»
+ * наведение уходит прочь от цвета подписи, — и тогда проверяется её формула или
+ * значение, а не формула реестра: иначе валидатор судил бы о состоянии, которого
+ * на экране нет.
+ */
+function stateOf(tokens: GrThemeTokens, token: { name: string, amount: number, mixWith: string }, fill: string): string | null {
+  const own = tokens[token.name]
+  if (own === undefined) {
+    const mixed = resolveRole(tokens, token.mixWith)
+    return mixed ? mixSrgb(fill, mixed, token.amount) : null
+  }
+
+  const formula = own.trim().match(MIX)
+  if (!formula)
+    return resolveRole(tokens, token.name)
+
+  const [base, mixWith] = [resolveRole(tokens, formula[1]), resolveRole(tokens, formula[3])]
+  return base && mixWith ? mixSrgb(base, mixWith, Number(formula[2])) : null
 }
 
 export function validateTheme(theme: { name: string, tokens: GrThemeTokens }, registry?: GrRegistry): GrThemeIssue[] {
@@ -80,22 +103,23 @@ export function validateTheme(theme: { name: string, tokens: GrThemeTokens }, re
     if (!fill || !foreground)
       return
 
-    for (const { amount, mixWith } of derivedOf(fillRole, registry)) {
-      const mixed = value(mixWith)
-      if (!mixed)
+    for (const token of derivedOf(fillRole, registry)) {
+      const color = stateOf(tokens, token, fill)
+      if (!color)
         continue
 
-      const state = contrast(foreground, mixSrgb(fill, mixed, amount))
+      const state = contrast(foreground, color)
       if (state >= AA_TEXT)
         continue
 
+      const against = tokens[token.name] === undefined ? `${fillRole} (${token.amount}%)` : token.name
       issues.push({
         kind: 'contrast',
         token: fgRole,
-        against: `${fillRole} (${amount}%)`,
+        against,
         actual: Math.round(state * 100) / 100,
         expected: AA_TEXT,
-        message: `${what}: ${fgRole} на состоянии ${fillRole} (${amount}%) даёт ${state.toFixed(2)}:1 при пороге ${AA_TEXT}:1`,
+        message: `${what}: ${fgRole} на состоянии ${against} даёт ${state.toFixed(2)}:1 при пороге ${AA_TEXT}:1`,
       })
     }
   }

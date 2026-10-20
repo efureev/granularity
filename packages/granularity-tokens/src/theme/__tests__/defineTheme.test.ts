@@ -9,6 +9,7 @@ import { resolveModes } from '../../modes'
 import { defineTheme, NO_COLOR_MIX } from '../defineTheme'
 import { GrThemeDefinitionError, GrThemeError } from '../errors'
 import { loadTheme, readThemeSource } from '../node'
+import { validateTheme } from '../validate'
 
 const slateDir = resolve(process.cwd(), 'themes/slate')
 const slate = loadTheme(slateDir)
@@ -162,5 +163,33 @@ describe('defineTheme: наследование', () => {
     expect(night.extends).toBe('slate')
     expect(night.sources).toContain(join(root, 'brand/theme.json'))
     expect(loadTheme(slateDir).extends).toBeUndefined()
+  })
+})
+
+describe('validateTheme: производное, переопределённое темой', () => {
+  // Заливка с тёмной подписью: формула реестра темнит её примесью `--gr-fg`,
+  // и наведение проваливает контраст. Тема уводит наведение в сторону карточки —
+  // проверяться обязано её состояние, а не реестровое.
+  const tokens = {
+    ...Object.fromEntries(Object.entries(slate.modes.light.tokens).map(([name, value]) => [`--${name}`, value])),
+    '--gr-primary': '#c8693f',
+    '--gr-primary-fg': '#1b1a17',
+    '--gr-fg': '#1b1a17',
+  }
+
+  it('без переопределения — провал на реестровом состоянии', () => {
+    const issues = validateTheme({ name: 'light', tokens }).filter(issue => issue.token === '--gr-primary-fg')
+
+    expect(issues.map(issue => issue.against)).toContain('--gr-primary (84%)')
+  })
+
+  it('с переопределением — проверено состояние темы', () => {
+    const own = {
+      ...tokens,
+      '--gr-primary-hover': 'color-mix(in srgb, var(--gr-primary) 88%, var(--gr-card))',
+      '--gr-primary-active': 'color-mix(in srgb, var(--gr-primary) 80%, var(--gr-card))',
+    }
+
+    expect(validateTheme({ name: 'light', tokens: own }).filter(issue => issue.token === '--gr-primary-fg')).toEqual([])
   })
 })
