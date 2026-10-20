@@ -1,5 +1,5 @@
 import { mount } from '@vue/test-utils'
-import { createApp, defineComponent } from 'vue'
+import { computed, createApp, defineComponent } from 'vue'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { granularityThemePlugin, type GrThemeManifest, initThemeEarly, useTheme, type UseThemeOptions } from '../useTheme'
@@ -44,14 +44,33 @@ function resetThemeEnvironment(): void {
 }
 
 const OCEAN_MANIFEST: GrThemeManifest = {
-  theme: { id: 'clay', title: 'Глина' },
-  modes: [
-    { name: 'light', colorScheme: 'light', value: 'clay-light' },
-    { name: 'ocean', colorScheme: 'dark', value: 'clay-ocean' },
-    { name: 'dark', colorScheme: 'dark', value: 'clay-dark' },
-  ],
-  defaultMode: 'light',
+  themes: [{
+    id: 'clay',
+    title: 'Глина',
+    modes: [
+      { name: 'light', colorScheme: 'light', value: 'clay-light' },
+      { name: 'ocean', colorScheme: 'dark', value: 'clay-ocean' },
+      { name: 'dark', colorScheme: 'dark', value: 'clay-dark' },
+    ],
+    defaultMode: 'light',
+  }],
+  defaultTheme: 'clay',
   activation: { attribute: 'data-look' },
+}
+
+/** Основная `clay` и дополнительная `paper` со своим листом. */
+const TWO_THEMES: GrThemeManifest = {
+  ...OCEAN_MANIFEST,
+  themes: [
+    OCEAN_MANIFEST.themes[0],
+    {
+      id: 'paper',
+      title: 'Бумага',
+      modes: [{ name: 'light', colorScheme: 'light', value: 'paper-light' }, { name: 'dark', colorScheme: 'dark', value: 'paper-dark' }],
+      defaultMode: 'light',
+      href: '/assets/granum-theme-paper.css',
+    },
+  ],
 }
 
 describe('useTheme (helpers)', () => {
@@ -165,7 +184,7 @@ describe('useTheme — режимы манифеста', () => {
   it('тема и режимы — из манифеста; isDark по colorScheme, а не по имени', () => {
     const { wrapper, api } = mountWith({ manifest: OCEAN_MANIFEST })
 
-    expect(api.theme).toBe('clay')
+    expect(api.theme.value).toBe('clay')
     expect(api.modes.map(entry => entry.name)).toEqual(['light', 'ocean', 'dark'])
     expect(api.isDark.value).toBe(false)
 
@@ -175,6 +194,93 @@ describe('useTheme — режимы манифеста', () => {
     expect(document.documentElement.getAttribute('data-look')).toBe('clay-ocean')
     expect(window.localStorage.getItem(DEFAULT_STORAGE_KEY)).toBe('ocean')
 
+    wrapper.unmount()
+  })
+
+  /** Лист темы, вставленный контроллером, «загружается» по команде теста. */
+  async function loadSheet(theme: string): Promise<void> {
+    await Promise.resolve()
+    document.head.querySelector(`link[data-granum-theme="${theme}"]`)?.dispatchEvent(new Event('load'))
+  }
+
+  it('setTheme: лист дополнительной темы, потом пара; ключ выбора — тема и режим', async () => {
+    document.head.innerHTML = ''
+    const { wrapper, api } = mountWith({ manifest: TWO_THEMES })
+    expect(api.themes.map(entry => entry.id)).toEqual(['clay', 'paper'])
+    api.setMode('dark')
+
+    const switching = api.setTheme('paper')
+    expect(document.documentElement.getAttribute('data-look')).toBe('clay-dark')
+    await loadSheet('paper')
+    await switching
+    expect(api.theme.value).toBe('paper')
+    expect(api.mode.value).toBe('dark')
+    expect(api.modes.map(entry => entry.name)).toEqual(['light', 'dark'])
+    expect(document.documentElement.getAttribute('data-look')).toBe('paper-dark')
+    expect(window.localStorage.getItem(DEFAULT_STORAGE_KEY)).toBe('paper-dark')
+
+    // Режима `ocean` у бумаги нет — первый той же схемы.
+    await api.setTheme('clay', { mode: 'ocean' })
+    expect(document.documentElement.getAttribute('data-look')).toBe('clay-ocean')
+    expect(window.localStorage.getItem(DEFAULT_STORAGE_KEY)).toBe('ocean')
+    await expect(api.setTheme('ink')).rejects.toThrow(/theme 'ink' is not in the build/)
+    wrapper.unmount()
+  })
+
+  it('деструктуризация не теряет смену темы: theme — ref, modes — массив, который меняется на месте', async () => {
+    document.head.innerHTML = ''
+    const { wrapper, api } = mountWith({ manifest: TWO_THEMES })
+    const { theme, modes, setTheme } = api
+    const pairs = computed(() => modes.map(entry => entry.value).join(','))
+    expect(pairs.value).toBe('clay-light,clay-ocean,clay-dark')
+
+    const switching = setTheme('paper')
+    await loadSheet('paper')
+    await switching
+    expect(theme.value).toBe('paper')
+    expect(modes.map(entry => entry.name)).toEqual(['light', 'dark'])
+    expect(pairs.value).toBe('paper-light,paper-dark')
+    wrapper.unmount()
+  })
+
+  it('initTheme ставит пару дополнительной темы — после её листа, который загрузчик находит, а не дублирует', async () => {
+    document.head.innerHTML = ''
+    const { wrapper, api } = mountWith({ manifest: TWO_THEMES })
+    const switching = api.setTheme('paper', { mode: 'dark' })
+    await loadSheet('paper')
+    await switching
+
+    document.documentElement.removeAttribute('data-look')
+    api.initTheme()
+    await Promise.resolve()
+    await Promise.resolve()
+    expect(document.documentElement.getAttribute('data-look')).toBe('paper-dark')
+    expect(document.head.querySelectorAll('link[data-granum-theme]')).toHaveLength(1)
+    wrapper.unmount()
+  })
+
+  it('initial — выбор темы и режима мимо хранилища: дополнительная тема встаёт после листа', async () => {
+    document.head.innerHTML = ''
+    window.localStorage.setItem(DEFAULT_STORAGE_KEY, 'light')
+    const { wrapper, api } = mountWith({ manifest: TWO_THEMES, initial: { theme: 'paper', mode: 'dark' } })
+    await loadSheet('paper')
+    await Promise.resolve()
+    expect(api.theme.value).toBe('paper')
+    expect(api.mode.value).toBe('dark')
+    expect(document.documentElement.getAttribute('data-look')).toBe('paper-dark')
+    expect(window.localStorage.getItem(DEFAULT_STORAGE_KEY)).toBe('light')
+    wrapper.unmount()
+  })
+
+  it('выбор дополнительной темы в другой вкладке переключает тему, не перезаписывая хранилище', async () => {
+    document.head.innerHTML = ''
+    const { wrapper, api } = mountWith({ manifest: TWO_THEMES })
+    window.dispatchEvent(new StorageEvent('storage', { key: DEFAULT_STORAGE_KEY, newValue: 'paper-dark' }))
+    await loadSheet('paper')
+    await Promise.resolve()
+    expect(api.theme.value).toBe('paper')
+    expect(document.documentElement.getAttribute('data-look')).toBe('paper-dark')
+    expect(window.localStorage.getItem(DEFAULT_STORAGE_KEY)).toBeNull()
     wrapper.unmount()
   })
 

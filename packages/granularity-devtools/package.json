@@ -54,11 +54,13 @@
   },
   "peerDependencies": {
     "@feugene/granularity": ">=2.0.0 <3.0.0",
+    "@feugene/granum": ">=3.8.0 <4.0.0",
     "vue": "^3.5.0"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^9.3.0",
     "@feugene/granularity": "^2.0.0",
+    "@feugene/granum": "^3.8.0",
     "@types/node": "^26.4.0",
     "eslint": "^10.9.1",
     "globals": "^16.5.0",

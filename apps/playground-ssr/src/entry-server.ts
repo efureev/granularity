@@ -1,7 +1,7 @@
 import { renderToString, type SSRContext } from '@vue/server-renderer'
 import type { Component } from 'vue'
 
-import { modeFromCookie, themeRootAttributes } from '@feugene/granum/runtime'
+import { themeFromCookie, themeRootAttributes } from '@feugene/granum/runtime'
 import { GR_THEME_STORAGE_KEY } from '@feugene/granularity'
 import themeManifest from 'virtual:granum/themes'
 
@@ -44,14 +44,14 @@ export function renderPath(pathname: string, request: SsrRequest = {}): Promise<
 }
 
 export async function render(root?: Component, request: SsrRequest = {}): Promise<SsrResult> {
-  const mode = modeFromCookie(themeManifest, request.cookie, GR_THEME_STORAGE_KEY)?.name
-  const app = createApp(root, { mode })
+  const selection = themeFromCookie(themeManifest, request.cookie, GR_THEME_STORAGE_KEY)
+  const app = createApp(root, selection === undefined ? {} : { theme: { theme: selection.theme.id, mode: selection.mode.name } })
   const ssrContext: SSRContext = {}
   const html = await renderToString(app, ssrContext)
 
   return {
     html,
     teleports: (ssrContext.teleports ?? {}) as Record<string, string>,
-    htmlAttrs: mode === undefined ? {} : themeRootAttributes(themeManifest, mode),
+    htmlAttrs: selection === undefined ? {} : themeRootAttributes(themeManifest, { theme: selection.theme.id, mode: selection.mode.name }),
   }
 }

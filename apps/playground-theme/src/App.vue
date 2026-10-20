@@ -13,7 +13,7 @@ const modeOptions = modes.map(entry => ({
   ariaLabel: `Режим ${entry.title ?? entry.name}`,
 }))
 
-const previews = themeManifest.previews ?? []
+const additionalThemes = themeManifest.themes.filter(theme => theme.id !== themeManifest.defaultTheme)
 const saving = ref(true)
 const range = ref('week')
 const ranges = [
@@ -178,31 +178,31 @@ function onModeChange(next: string | number): void {
         </GrAlert>
       </section>
 
-      <!-- Темы превью: их пары собраны отдельным листом, корень они не занимают -->
-      <GrCard v-for="preview in previews" :key="preview.theme.id" class="p-5">
+      <!-- Дополнительные темы: каждая своим листом, корень они не занимают -->
+      <GrCard v-for="extra in additionalThemes" :key="extra.id" class="p-5">
         <div class="flex flex-col gap-4">
           <div>
             <h2 class="text-base font-semibold">
-              Тема «{{ preview.theme.title }}» — превью
+              Тема «{{ extra.title }}»
             </h2>
             <p class="mt-1 text-sm text-[var(--gr-muted-fg)]">
-              <template v-if="preview.theme.id === 'brand'">
+              <template v-if="extra.id === 'brand'">
                 Папка <code>src/themes/brand/</code> объявляет только отличия от «Сланца».
               </template>
               <template v-else>
                 Тема каталога пакета токенов. Пропсы по умолчанию — её: загрузка светом по
                 подписи и группа-лоток.
               </template>
-              Активная тема у сборки одна, поэтому превью показано островами:
-              <code>&lt;GrConfigProvider theme="{{ preview.theme.id }}" mode="…"&gt;</code>.
+              Дополнительная тема сборки — своим листом; здесь она показана островами:
+              <code>&lt;GrConfigProvider theme="{{ extra.id }}" mode="…"&gt;</code>.
             </p>
           </div>
 
           <div class="grid gap-4 md:grid-cols-2">
             <GrConfigProvider
-              v-for="entry in preview.modes"
+              v-for="entry in extra.modes"
               :key="entry.name"
-              :theme="preview.theme.id"
+              :theme="extra.id"
               :mode="entry.name"
             >
               <div class="flex flex-col gap-3 rounded-[var(--gr-radius-lg)] border border-[var(--gr-brd)] bg-[var(--gr-bg)] p-4 text-[var(--gr-fg)]">

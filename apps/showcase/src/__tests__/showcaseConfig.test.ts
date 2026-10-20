@@ -164,8 +164,7 @@ describe('showcase bootstrap config', () => {
       '@feugene/granularity-showcase-icons',
     ])
     expect(showcaseGranumConfig.components).toBe('all')
-    expect(showcaseGranumConfig.theme).toBe('slate')
-    expect(showcaseGranumConfig.modes).toEqual({ names: ['light', 'dark'] })
+    expect(showcaseGranumConfig.themes).toEqual([{ theme: 'slate', modes: ['light', 'dark'] }])
     expect(showcaseGranumConfig.appSources).toEqual({ dirs: ['src'] })
 
     // Стили витрины цепляются за режим по суффиксу пары, а не за имя темы:

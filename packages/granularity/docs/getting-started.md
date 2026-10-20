@@ -52,8 +52,7 @@ export default defineGranumConfig({
   components: [
     { provider: '@feugene/granularity', names: ['GrButton', 'GrInput'] },
   ],
-  theme: 'slate',
-  modes: { names: ['light', 'dark'] },
+  themes: [{ theme: 'slate', modes: ['light', 'dark'] }],
   appSources: { dirs: ['src'] },
 })
 ```
@@ -145,8 +144,8 @@ my-app/
     "vue": "^3.5.40"
   },
   "devDependencies": {
-    "@feugene/granum": "^3.0.0",
-    "@feugene/granum-engine-wind": "^3.0.0",
+    "@feugene/granum": "^3.8.0",
+    "@feugene/granum-engine-wind": "^3.8.0",
     "@vitejs/plugin-vue": "^6.0.8",
     "typescript": "^6.0.2",
     "vite": "^8.2.2",
@@ -375,16 +374,17 @@ SPA: компоненты пакета пишутся одинаково для 
 import { createSSRApp, type Component } from 'vue'
 
 import { createCookieStorage } from '@feugene/granum/runtime'
-import { GR_THEME_STORAGE_KEY, type GrModeName, granularityThemePlugin, granularityToastPlugin } from '@feugene/granularity'
+import { GR_THEME_STORAGE_KEY, granularityThemePlugin, granularityToastPlugin, type GrThemeSelection } from '@feugene/granularity'
 import manifest from 'virtual:granum/themes'
 
 import App from './App.vue'
 
 /**
  * В SSR приложение создаётся заново на каждый запрос: общий инстанс протёк бы
- * состоянием одного пользователя в ответ другому. `mode` — режим запроса из cookie.
+ * состоянием одного пользователя в ответ другому. `theme` — тема и режим запроса
+ * из cookie (`themeFromCookie`, см. ssr.md).
  */
-export function createApp(root: Component = App, mode?: GrModeName) {
+export function createApp(root: Component = App, theme?: GrThemeSelection) {
   const app = createSSRApp(root)
 
   // `useToast` намеренно запрещает модульный синглтон на сервере — без плагина
@@ -393,7 +393,7 @@ export function createApp(root: Component = App, mode?: GrModeName) {
   app.use(granularityThemePlugin, {
     manifest,
     storage: createCookieStorage({ name: GR_THEME_STORAGE_KEY }),
-    initial: mode,
+    initial: theme,
   })
 
   return app
@@ -604,8 +604,8 @@ granum(granumConfig, { themeScript: { storageKey: 'gr-theme', cookie: 'gr-theme'
 ```
 
 Скрипт берёт пары из того же манифеста, что и CSS, и не трогает пару, уже
-пришедшую с сервера. Режим из cookie сервер ставит на `<html>` сам —
-`themeRootAttributes(manifest, modeFromCookie(manifest, cookie, 'gr-theme')?.name)`
+пришедшую с сервера. Выбор из cookie сервер ставит на `<html>` сам —
+`themeRootAttributes(manifest, { theme, mode })` по `themeFromCookie(manifest, cookie, 'gr-theme')`
 ([`ssr.md`](./ssr.md#режим-без-мигания)); состояние режима на сервере держит
 `granularityThemePlugin` из каркаса выше.
 
@@ -736,8 +736,7 @@ export async function setupI18n() {
    export default defineGranumConfig({
      engine: windEngine(),
      providers: ['@feugene/granularity', '@feugene/granularity-chrono'],
-     theme: 'slate',
-     modes: { names: ['light', 'dark'] },
+     themes: [{ theme: 'slate', modes: ['light', 'dark'] }],
      appSources: { dirs: ['src'] },
    })
    ```

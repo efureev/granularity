@@ -1,3 +1,4 @@
+import { findTheme } from '@feugene/granum/runtime'
 import { computed, getCurrentInstance, inject, type ComputedRef, type InjectionKey } from 'vue'
 
 import type { GrComponentDefaultsRegistry } from '../../composables/useGrComponentConfig'
@@ -55,13 +56,13 @@ export interface GrConfigContext {
   componentDefaults: ComputedRef<GrComponentDefaults>
   /**
    * Слои `componentDefaults` порознь: темы — и всё, что над ней (приложение,
-   * провайдеры). Остров превью подменяет только слой темы. Необязательны:
+   * провайдеры). Остров темы подменяет только слой темы. Необязательны:
    * контекст, построенный руками, несёт один `componentDefaults`.
    */
   themeDefaults?: ComputedRef<GrComponentDefaults | undefined>
   overrideDefaults?: ComputedRef<GrComponentDefaults>
   /**
-   * Тема поддерева — превью другой темы каталога. Необязательна: тип публичный,
+   * Тема поддерева — остров другой темы сборки. Необязательна: тип публичный,
    * и контекст строят руками — например хост императивных диалогов.
    */
   theme?: ComputedRef<GrThemeId | undefined>
@@ -111,24 +112,21 @@ const themeDefaultsCache = new WeakMap<GrThemeManifest, Map<string, GrComponentD
 
 /**
  * Пропсы по умолчанию, которые несёт тема: `componentDefaults` в
- * `extensions.granularity` манифеста `virtual:granum/themes`. Так тема меняет
- * то, чего токеном не выразить, — вид индикатора загрузки, форму группы.
- * Без `themeId` — тема сборки; с ним — тема превью из `previews` манифеста
- * (granum 3.4). Нет или не та форма — `undefined`.
+ * `extensions.granularity` её записи в манифесте `virtual:granum/themes`. Так
+ * тема меняет то, чего токеном не выразить, — вид индикатора загрузки, форму
+ * группы. Без `themeId` — основная тема сборки. Нет или не та форма — `undefined`.
  */
 export function themeComponentDefaults(manifest: GrThemeManifest | null | undefined, themeId?: GrThemeId): GrComponentDefaults | undefined {
   if (!manifest)
     return undefined
-  const id = themeId ?? manifest.theme.id
+  const id = themeId ?? manifest.defaultTheme
   let byTheme = themeDefaultsCache.get(manifest)
   if (!byTheme) {
     byTheme = new Map()
     themeDefaultsCache.set(manifest, byTheme)
   }
   if (!byTheme.has(id)) {
-    const extensions = id === manifest.theme.id
-      ? manifest.extensions
-      : manifest.previews?.find(preview => preview.theme.id === id)?.extensions
+    const extensions = findTheme(manifest, id)?.extensions
     const raw = (extensions?.granularity as { componentDefaults?: unknown } | undefined)?.componentDefaults
     byTheme.set(id, isDefaultsRecord(raw) && Object.keys(raw).length > 0 ? Object.freeze(raw) : null)
   }
@@ -149,32 +147,36 @@ const NO_LAYER = Object.freeze({})
 const rootConfigs = new WeakMap<object, WeakMap<object, GrConfigContext>>()
 
 /**
- * Конфиг без провайдера в дереве: пропсы по умолчанию темы сборки, поверх —
- * приложения (`createGranularity`). Кешируется на пару источников: иначе каждый
- * компонент без провайдера заводил бы свой `computed`.
+ * Конфиг без провайдера в дереве: пропсы по умолчанию текущей темы документа,
+ * поверх — приложения (`createGranularity`). Тема меняется в рантайме, поэтому
+ * слой темы — `computed` от состояния. Кешируется на пару источников: иначе
+ * каждый компонент без провайдера заводил бы свой `computed`.
  */
 function rootConfig(): GrConfigContext {
-  const manifest = peekThemeState()?.manifest
-  const theme = themeComponentDefaults(manifest)
+  const state = peekThemeState()
+  const manifest = state?.manifest
   const app = inject(GR_APP_COMPONENT_DEFAULTS, null)
-  if (!theme && !app)
+  const themed = manifest?.themes.some(theme => themeComponentDefaults(manifest, theme.id) !== undefined) ?? false
+  if (!themed && !app)
     return EMPTY_CONFIG
 
-  const themeKey = theme ? manifest! : NO_LAYER
+  const stateKey = themed ? state! : NO_LAYER
   const appKey = app ?? NO_LAYER
-  let byApp = rootConfigs.get(themeKey)
+  let byApp = rootConfigs.get(stateKey)
   if (!byApp) {
     byApp = new WeakMap()
-    rootConfigs.set(themeKey, byApp)
+    rootConfigs.set(stateKey, byApp)
   }
   let config = byApp.get(appKey)
   if (!config) {
-    const componentDefaults = Object.freeze(mergeComponentDefaults(theme, app))
     const overrides = app ?? EMPTY_COMPONENT_DEFAULTS
+    const theme = computed(() => (themed ? themeComponentDefaults(manifest, state!.theme.value) : undefined))
     config = {
       ...EMPTY_CONFIG,
-      componentDefaults: computed(() => componentDefaults),
-      themeDefaults: computed(() => theme),
+      // Объект общий для всех компонентов без провайдера: запись в него поменяла бы
+      // пропсы по умолчанию всему приложению.
+      componentDefaults: computed(() => Object.freeze(mergeComponentDefaults(theme.value, app))),
+      themeDefaults: theme,
       overrideDefaults: computed(() => overrides),
     }
     byApp.set(appKey, config)
@@ -364,7 +366,7 @@ export function useGrComponentProp<
  * Панель уезжает в `body`, то есть вне DOM-поддерева провайдера, и `data-theme`
  * с его обёртки на неё не наследуется. В дереве компонентов она при этом
  * остаётся внутри — `inject` работает, — поэтому пару панель ставит себе сама.
- * Без этого остров режима и превью темы ломались бы на первом же открытом дропдауне.
+ * Без этого острова режима и темы ломались бы на первом же открытом дропдауне.
  *
  * ```vue
  * <teleport to="body">

@@ -6,8 +6,8 @@ import themeManifest from 'virtual:granum/themes'
 import App from './App.vue'
 import { THEME_STORAGE_KEY } from './storage'
 
-// Сначала reset, затем весь CSS granum одним модулем: режимы темы и превью в
-// нём же, отдельного CSS приложения под них нет.
+// Сначала reset, затем CSS granum: общий лист с режимами основной темы и листы
+// дополнительных тем — отдельного CSS приложения под них нет.
 await import('./reset')
 await import('./granularity')
 

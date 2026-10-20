@@ -9,20 +9,15 @@
  * атрибут переписал кто-то мимо `useTheme`.
  */
 
+import type { GranumThemeManifest } from '@feugene/granum/runtime'
+import { findTheme, themeSelectionKey } from '@feugene/granum/runtime'
+
 export type ThemeSource = 'storage' | 'system' | 'not-persisted' | 'unknown'
 
-interface ModeEntryLike {
-  name: string
-  colorScheme: string
-  value: string
-}
-
 export interface ThemeStateLike {
-  manifest: {
-    theme: { id: string }
-    modes: readonly ModeEntryLike[]
-    activation: { attribute: string }
-  }
+  manifest: GranumThemeManifest
+  /** Текущая тема на корне. */
+  theme: { value: string }
   mode: { value: string }
   storageKey: string
   persist: boolean
@@ -58,36 +53,39 @@ export function themeReport(state: ThemeStateLike | undefined, probe: ThemeProbe
     return null
 
   const { manifest } = state
+  const themeId = state.theme.value
+  const modes = findTheme(manifest, themeId)?.modes ?? []
   const mode = state.mode.value
-  const entry = manifest.modes.find(item => item.name === mode)
+  const entry = modes.find(item => item.name === mode)
   const attribute = manifest.activation.attribute
   const root = state.target?.()
   const stored = state.persist ? probe.readStored(state.storageKey) : null
 
   return {
-    theme: manifest.theme.id,
+    theme: themeId,
     mode,
     colorScheme: entry?.colorScheme ?? null,
-    modes: manifest.modes.map(item => item.name),
+    modes: modes.map(item => item.name),
     rootValue: root ? root.getAttribute(attribute) : probe.readRoot(attribute),
     expectedValue: entry?.value ?? null,
     // Порядок тот же, что у самого ядра при старте: сохранённое сильнее
     // системного, а без хранения источником остаётся система.
-    source: resolveSource(state, stored),
+    source: resolveSource(state, stored, themeSelectionKey(manifest, themeId, mode)),
     storageKey: state.storageKey,
     stored,
     systemPrefersDark: probe.prefersDark(),
   }
 }
 
-function resolveSource(state: ThemeStateLike, stored: string | null): ThemeSource {
+/** `key` — ключ выбора текущих темы и режима, как его пишет контроллер granum. */
+function resolveSource(state: ThemeStateLike, stored: string | null, key: string): ThemeSource {
   if (!state.persist)
     return 'not-persisted'
   if (stored === null)
     return 'system'
   // Сохранённое есть, но режим другой — пару принёс сервер или режим сменили
   // мимо хранилища. Врать «из хранилища» нельзя.
-  return stored === state.mode.value ? 'storage' : 'unknown'
+  return stored === key ? 'storage' : 'unknown'
 }
 
 const SOURCE_LABELS: Record<ThemeSource, string> = {

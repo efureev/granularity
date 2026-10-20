@@ -8,7 +8,7 @@
  */
 export { grDerivedTokens, grFoundationTokens, grRoleTokens, grThemeCatalog } from './generated'
 export { GR_DEFAULT_THEME_ID, grThemeManifest } from './manifest'
-export type { GrThemeManifest, GrThemeManifestMode } from './manifest'
+export type { GrThemeManifest, GrThemeManifestMode, GrThemeManifestTheme } from './manifest'
 export { resolveModes } from './modes'
 export type {
   GrCatalogMode,

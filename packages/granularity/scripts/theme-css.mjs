@@ -102,8 +102,8 @@ export async function themeParts(id) {
   const entry = catalog()[id]
   if (!entry?.modes)
     throw new Error(`[theme-css] темы ${id} нет в каталоге ${TOKENS_PROVIDER_ID}`)
-  const { parts, resolution } = await emitThemeStylesheet({ providers: [sourceProvider()], theme: id, modes: { names: entry.modes }, root: ROOT })
-  const defaultMode = resolution.themes.defaultMode
+  const { parts, resolution } = await emitThemeStylesheet({ providers: [sourceProvider()], themes: [{ theme: id, modes: entry.modes }], root: ROOT })
+  const defaultMode = resolution.themes.default?.defaultMode
 
   return {
     root: `${banner('root', { id })}\n${parts.root.trim()}\n`,

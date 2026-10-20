@@ -4,17 +4,31 @@ import type { ThemeStateLike } from '../resolve/theme'
 import { themeReport, themeState } from '../resolve/theme'
 
 const MANIFEST: ThemeStateLike['manifest'] = {
-  theme: { id: 'slate' },
-  modes: [
-    { name: 'light', colorScheme: 'light', value: 'slate-light' },
-    { name: 'dark', colorScheme: 'dark', value: 'slate-dark' },
-    { name: 'ocean', colorScheme: 'dark', value: 'slate-ocean' },
+  themes: [
+    {
+      id: 'slate',
+      title: 'Сланец',
+      modes: [
+        { name: 'light', colorScheme: 'light', value: 'slate-light' },
+        { name: 'dark', colorScheme: 'dark', value: 'slate-dark' },
+        { name: 'ocean', colorScheme: 'dark', value: 'slate-ocean' },
+      ],
+      defaultMode: 'light',
+    },
+    {
+      id: 'clay',
+      title: 'Глина',
+      modes: [{ name: 'light', colorScheme: 'light', value: 'clay-light' }, { name: 'dark', colorScheme: 'dark', value: 'clay-dark' }],
+      defaultMode: 'light',
+      href: '/assets/granum-theme-clay.css',
+    },
   ],
+  defaultTheme: 'slate',
   activation: { attribute: 'data-theme' },
 }
 
 function state(patch: Partial<ThemeStateLike> = {}): ThemeStateLike {
-  return { manifest: MANIFEST, mode: { value: 'dark' }, storageKey: 'gr-theme', persist: true, ...patch }
+  return { manifest: MANIFEST, theme: { value: 'slate' }, mode: { value: 'dark' }, storageKey: 'gr-theme', persist: true, ...patch }
 }
 
 function probe(stored: string | null, prefersDark: boolean | null = false, root: string | null = 'slate-dark') {
@@ -37,6 +51,16 @@ describe('тема и режим', () => {
     expect(row(rows, 'mode')).toBe('ocean (dark)')
     expect(row(rows, 'modes')).toBe('light, dark, ocean')
     expect(row(rows, 'root attribute')).toBe('slate-ocean')
+  })
+
+  it('тема, переключённая в рантайме, — её режимы и пары', () => {
+    const rows = themeState(themeReport(state({ theme: { value: 'clay' } }), probe('clay-dark', false, 'clay-dark'))!)
+
+    expect(row(rows, 'theme')).toBe('clay')
+    expect(row(rows, 'modes')).toBe('light, dark')
+    expect(row(rows, 'root attribute')).toBe('clay-dark')
+    // Ключ выбора дополнительной темы — с её именем: это и есть «сохранено пользователем».
+    expect(themeReport(state({ theme: { value: 'clay' } }), probe('clay-dark'))!.source).toBe('storage')
   })
 
   it('пара на корне разошлась с режимом — показываем обе', () => {

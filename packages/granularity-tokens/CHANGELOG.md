@@ -7,6 +7,11 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+
+- **`grThemeManifest()` — форма манифеста granum 3.8**: `{ themes: [{ id, title, modes, defaultMode }], defaultTheme, activation }`
+  вместо `{ theme, modes, defaultMode, activation }`. Тип темы — `GrThemeManifestTheme`.
+
 ## [v1.2.0] 2026-10-20
 
 ### Added

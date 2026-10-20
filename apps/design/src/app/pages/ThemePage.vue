@@ -14,8 +14,8 @@ import NotFoundPage from './NotFoundPage.vue'
 const route = useRoute()
 
 const theme = computed(() => findDesignTheme(themeManifest, String(route.params.theme)))
-/** Тема превью пишется в острова явно, активная — наследуется от корня. */
-const islandTheme = computed(() => (theme.value?.build === 'preview' ? theme.value.entry.id : undefined))
+/** Дополнительная тема пишется в острова явно, основная — наследуется от корня. */
+const islandTheme = computed(() => (theme.value?.build === 'built' ? theme.value.entry.id : undefined))
 
 const roles = [
   { title: 'Поверхности и текст', names: ['--gr-bg', '--gr-card', '--gr-muted', '--gr-fg', '--gr-muted-fg', '--gr-brd'] },
@@ -59,11 +59,11 @@ const periods = [
 
     <GrAlert v-if="theme.build === 'absent'" tone="warning" title="Тема не собрана">
       Блоков её пар нет в CSS этой сборки: добавьте <code>'{{ theme.entry.id }}'</code> в
-      <code>previews</code> конфига granum.
+      <code>themes</code> конфига granum.
     </GrAlert>
 
     <template v-else>
-      <DocSection title="Режимы" lead="Режим включается парой в атрибуте корня или поддерева; режим по умолчанию у активной темы висит ещё и на :root.">
+      <DocSection title="Режимы" lead="Режим включается парой в атрибуте корня или поддерева; режим по умолчанию у основной темы действует и без атрибута.">
         <div class="overflow-x-auto" tabindex="0" role="region" aria-label="Режимы темы">
           <table class="w-full min-w-[480px] border-collapse text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-base)]">
             <thead>

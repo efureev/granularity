@@ -14,7 +14,8 @@
 - `granum()` — плагин приложения из `@feugene/granum/vite`; читает манифесты
   провайдеров и отдаёт виртуальные модули: `virtual:granum.css` (весь CSS),
   `virtual:granum/layers/<layer>.css` (один слой), `virtual:granum/components`
-  (реэкспорт селекции), `virtual:granum/themes` (манифест тем для рантайма).
+  (реэкспорт селекции), `virtual:granum/themes` (манифест тем для рантайма),
+  `virtual:granum/themes/<id>.css` и `virtual:granum/themes.css` (листы дополнительных тем).
 - `defineGranumConfig` — типизированный `granum.config.ts` приложения.
 - `windEngine()` из `@feugene/granum-engine-wind` — движок утилит. Своей
   реализации движка granum не содержит, поэтому в `devDependencies` приложения
@@ -63,7 +64,7 @@ import 'virtual:granum.css'
 - в сборку входят все компоненты провайдера (`components: 'all'`);
 - подмешиваются токены и база пакетов и тема каталога по умолчанию — `slate`
   в одном режиме по умолчанию, `light` (каталог приезжает зависимостью ядра,
-  `@feugene/granularity-tokens`); второй режим — `modes: { names: ['light', 'dark'] }`;
+  `@feugene/granularity-tokens`); второй режим — `themes: [{ theme: 'slate', modes: ['light', 'dark'] }]`;
 - классы разметки приложения извлекаются из `appSources`;
 - правила и варианты приходят от `windEngine()` — `preset-wind3` плюс одно
   доп-правило (опция `extraRules`, включена по умолчанию).
@@ -94,18 +95,22 @@ defineGranumConfig({
 defineGranumConfig({
   engine: windEngine(),
   providers: ['@feugene/granularity'],
-  theme: 'slate',
-  modes: { names: ['light', 'dark'] },
+  themes: [
+    { theme: 'slate', default: true, modes: ['light', 'dark'] },
+    { theme: 'clay', modes: ['light', 'dark'] },
+  ],
 })
 ```
 
-`theme` выбирает тему каталога `@feugene/granularity-tokens` (по умолчанию —
-`slate`), `modes` — её режимы в сборке; режим включается парой
-`data-theme="slate-<режим>"`. Свой режим задаётся в том же месте —
+`themes` перечисляет темы каталога `@feugene/granularity-tokens` в сборке (без ключа — одна
+`slate`), `modes` записи — режимы темы; тема и режим включаются парой
+`data-theme="<тема>-<режим>"`. Основная тема — единственная или помеченная `default: true` —
+лежит в общем листе и выходит под `:root`; дополнительная собирается своим листом, который
+рантайм грузит по адресу из манифеста. Свой режим задаётся в записи темы —
 `modes.define` с `extends` и `tokens` или `tokensRef`; переопределение отдельных
 токенов — `modes.tokenOverrides`. Значения из `define` и `tokenOverrides` granum
-кладёт в блок пары после данных темы — они побеждают. Подробности —
-[`modes.md`](./modes.md).
+кладёт в блок пары после данных темы — они побеждают. Атрибут и шаблон пары — `activation`,
+общий на все темы. Подробности — [`modes.md`](./modes.md).
 
 ### Обрезка неиспользуемых токенов
 
@@ -227,7 +232,7 @@ defineGranumConfig({
 ## Отчёт сборки
 
 Рядом с бандлом приложения появляется `dist/granum-report.json`: селекция и её
-цепочки, активные темы, классы без правила с источниками, safelist, покрытый
+цепочки, темы сборки, классы без правила с источниками, safelist, покрытый
 статикой, план обрезки токенов, токены без объявления и размеры слоёв по
 собранному ассету. Прочитать его глазами — `granum report`, проверить
 конфигурацию без сборки — `granum doctor granum.config.ts`.

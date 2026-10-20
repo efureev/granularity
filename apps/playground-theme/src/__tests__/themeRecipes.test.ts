@@ -34,11 +34,10 @@ const base = {
   providers: ['@feugene/granularity'],
   components: [] as string[],
   appSources: { dirs: [] as string[] },
-  theme: 'slate',
 }
 
-async function themesLayer(modes: Record<string, unknown>, theme: unknown = base.theme): Promise<string> {
-  const config = { ...base, theme, modes }
+async function themesLayer(modes: Record<string, unknown>, theme: unknown = 'slate'): Promise<string> {
+  const config = { ...base, themes: [{ theme, modes }] }
   validateGranumConfig(config)
   return (await emitCss(await prepareApp(config as Parameters<typeof prepareApp>[0], root))).layers.themes
 }
@@ -68,7 +67,7 @@ describe('рецепты режимов и темы из modes.md и themes.md',
   it('ключ с `--` — ошибка конфига, а не `----gr-primary`', () => {
     expect(() => validateGranumConfig({
       ...base,
-      modes: { names: ['light', 'dark'], tokenOverrides: { dark: { '--gr-primary': '#4fd1e0' } } },
+      themes: [{ theme: 'slate', modes: { names: ['light', 'dark'], tokenOverrides: { dark: { '--gr-primary': '#4fd1e0' } } } }],
     })).toThrow(/must not start with '--'/)
   })
 
@@ -109,20 +108,19 @@ describe('рецепты режимов и темы из modes.md и themes.md',
     expect(hover(inherited)).not.toBe(hover(own))
   })
 
-  it('своя тема из папки активной: её режимы под :root и своими парами, отличия поверх «Сланца»', async () => {
+  it('своя тема из папки основной: её режимы под :root и своими парами, отличия поверх «Сланца»', async () => {
     const brand = loadTheme(new URL('../themes/brand/', import.meta.url))
     const css = await themesLayer({ names: ['light', 'dark'] }, brand)
 
     expect(brand.extends).toBe('slate')
-    expect(css).toContain(':root, [data-theme="brand-light"]')
+    expect(css).toContain(':where(:root), [data-theme="brand-light"]')
     expect(lastPrimary(css, 'brand-dark')).toBe('#5eead4')
     expect(css).not.toContain('data-theme="slate-')
   })
 
-  it('ключа `themes` у granum 3 нет — подсказка ведёт к `theme` и `modes`', () => {
-    expect(() => validateGranumConfig({
-      ...base,
-      themes: { names: ['light', 'dark'] },
-    })).toThrow(/modes/)
+  it('`themes` объектом (granum 2) и прежние `theme`/`modes` — ошибка с подсказкой, куда переехало значение', () => {
+    expect(() => validateGranumConfig({ ...base, themes: { names: ['light', 'dark'] } })).toThrow(/themes\[i\]\.modes\.names/)
+    expect(() => validateGranumConfig({ ...base, theme: 'slate' })).toThrow(/replaced in granum 3\.8/)
+    expect(() => validateGranumConfig({ ...base, modes: { names: ['light'] } })).toThrow(/moved in granum 3\.8/)
   })
 })

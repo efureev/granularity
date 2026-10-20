@@ -1,11 +1,11 @@
-import { grThemeCatalog, type GrThemeCatalogEntry } from '@feugene/granularity-tokens'
 import type { GranumModeEntry, GranumThemeManifest } from '@feugene/granum/runtime'
+import { grThemeCatalog, type GrThemeCatalogEntry } from '@feugene/granularity-tokens'
 
 /**
- * Где тема каталога в CSS сборки: активная — под `:root` и своими парами,
- * превью — только парами (`previews` конфига granum), иначе её блоков нет.
+ * Где тема каталога в CSS сборки: основная — в общем листе и под `:root`,
+ * дополнительная — своим листом (`themes` конфига granum), иначе её блоков нет.
  */
-export type ThemeBuild = 'active' | 'preview' | 'absent'
+export type ThemeBuild = 'default' | 'built' | 'absent'
 
 export interface DesignTheme {
   entry: GrThemeCatalogEntry
@@ -15,24 +15,22 @@ export interface DesignTheme {
 }
 
 /**
- * Темы превью для конфига granum: весь каталог, кроме активной. Дизайн-система
- * показывает каждую тему на настоящих компонентах, а полные блоки пар с токенами
- * компонентов собирает только granum.
+ * Темы сборки для конфига granum: весь каталог со всеми режимами каждой темы,
+ * основная — `main`. Дизайн-система показывает каждую тему на настоящих
+ * компонентах, а полные блоки пар с токенами компонентов собирает только granum.
  */
-export function previewThemeIds(active: string): string[] {
-  return grThemeCatalog.map(theme => theme.id).filter(id => id !== active)
+export function buildThemes(main: string): { theme: string, default: boolean, modes: string[] }[] {
+  return grThemeCatalog.map(theme => ({ theme: theme.id, default: theme.id === main, modes: theme.modes.map(mode => mode.name) }))
 }
 
-export function themeModes(manifest: GranumThemeManifest, theme: string = manifest.theme.id): readonly GranumModeEntry[] {
-  if (theme === manifest.theme.id)
-    return manifest.modes
-  return manifest.previews?.find(preview => preview.theme.id === theme)?.modes ?? []
+export function themeModes(manifest: GranumThemeManifest, theme: string = manifest.defaultTheme): readonly GranumModeEntry[] {
+  return manifest.themes.find(entry => entry.id === theme)?.modes ?? []
 }
 
 export function designThemes(manifest: GranumThemeManifest): DesignTheme[] {
   return grThemeCatalog.map((entry) => {
     const modes = themeModes(manifest, entry.id)
-    const build: ThemeBuild = entry.id === manifest.theme.id ? 'active' : modes.length > 0 ? 'preview' : 'absent'
+    const build: ThemeBuild = entry.id === manifest.defaultTheme ? 'default' : modes.length > 0 ? 'built' : 'absent'
     return { entry, build, modes }
   })
 }
@@ -42,7 +40,7 @@ export function findDesignTheme(manifest: GranumThemeManifest, id: string): Desi
 }
 
 export const THEME_BUILD_LABEL: Record<ThemeBuild, string> = {
-  active: 'активная',
-  preview: 'превью',
+  default: 'основная',
+  built: 'дополнительная',
   absent: 'вне сборки',
 }

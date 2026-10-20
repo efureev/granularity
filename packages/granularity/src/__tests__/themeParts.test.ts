@@ -44,12 +44,15 @@ describe.each(THEMES)('тема %s', (theme) => {
     expect(withoutBanner(themeCss(theme))).toBe(parts.map(withoutBanner).join('\n\n'))
   })
 
-  it('`root` не знает режимов, `:root` — только у режима по умолчанию', () => {
-    expect(withoutBanner(themePartCss(theme, 'root'))).not.toMatch(new RegExp(`data-theme="${theme}-`))
+  it('`root` без блоков режимов, `:root` — только у режима по умолчанию', () => {
+    // Пары в `root` — только список общей границы формул, блока режима там нет.
+    expect(withoutBanner(themePartCss(theme, 'root'))).not.toMatch(new RegExp(`^\\[data-theme="${theme}-[a-z0-9]+"\\] \\{`, 'm'))
     for (const { mode } of modes) {
       const css = withoutBanner(themePartCss(theme, mode))
       expect(css.includes(':root'), mode).toBe(mode === defaultMode)
       expect(css, mode).toContain(`[data-theme="${theme}-${mode}"]`)
+      // Баннер режима по умолчанию объясняет `:root` — у остальных режимов его нет.
+      expect(themePartCss(theme, mode).includes('режим по умолчанию'), mode).toBe(mode === defaultMode)
     }
   })
 

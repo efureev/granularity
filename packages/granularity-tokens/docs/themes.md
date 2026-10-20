@@ -1,13 +1,14 @@
 # Темы
 
 Тема — дизайн-язык целиком: примитивы (скругления, шрифты, отступы), роли каждого режима и
-производные состояния. Режим — вариант внутри темы: `light`, `dark` или свой. Тема выбирается на
-сборке приложения, режим переключается в рантайме — об этом [`modes.md`](../../granularity/docs/modes.md)
+производные состояния. Режим — вариант внутри темы: `light`, `dark` или свой. Темы и режимы
+приложения перечисляет сборка, переключает рантайм — об этом [`modes.md`](../../granularity/docs/modes.md)
 ядра.
 
 Здесь: что тема обязана объявить, какие роли где применяются и на чём уже ломались, как собрать
 свой режим или свою тему и что проверить перед выкладкой. Сами понятия — что входит в тему, что
-есть у режима, что такое пара, превью и режим приложения — в [`concepts.md`](./concepts.md).
+есть у режима, что такое пара, основная и дополнительная тема и режим приложения — в
+[`concepts.md`](./concepts.md).
 
 Смежное: [`tokens.md`](./tokens.md) — полная таблица глобальных токенов со значениями каждой пары
 «тема × режим»; [`themes/README.md`](../themes/README.md) — каталог и раскладка папки темы;
@@ -28,15 +29,22 @@
 
 ## Каталог и выбор темы
 
-Встроенные темы — каталог `grThemeCatalog`: id, название, режимы, ссылка на дизайн-систему. Тема
-выбирается в конфиге granum — `theme: 'slate'`; в CSS приложения едет одна активная тема. Режимы
-переключаются парой `data-theme="<тема>-<режим>"`, режим по умолчанию висит ещё и на `:root`.
+Встроенные темы — каталог `grThemeCatalog`: id, название, режимы, ссылка на дизайн-систему. Темы
+сборки перечисляет `themes` конфига granum — без ключа это одна `slate`:
 
-**Превью** — другие темы рядом с активной: `previews: ['clay']` в конфиге granum собирает полные
-блоки их пар (`[data-theme="clay-dark"]`) с токенами компонентов, но под `:root` превью не выходит
-никогда. Поддерево включает его `<GrConfigProvider theme="clay" mode="dark">`. Каждая тема превью
-добавляет к CSS свой вес — для приложений это инструмент показа (дизайн-система, портал), а не
-переключатель тем.
+```ts
+themes: [
+  { theme: 'slate', default: true, modes: ['light', 'dark'] },
+  { theme: 'clay', modes: ['light', 'dark'] },
+]
+```
+
+Тема и режим включаются парой `data-theme="<тема>-<режим>"`. **Основная** тема (единственная или
+`default: true`) лежит в общем листе, и её режим по умолчанию висит ещё и на `:root`.
+**Дополнительная** собирается своим листом — полные блоки её пар (`[data-theme="clay-dark"]`) с
+токенами компонентов — и под `:root` не выходит никогда. Лист грузят по адресу из манифеста
+`useTheme().setTheme('clay')` и остров `<GrConfigProvider theme="clay" mode="dark">`; страница,
+которая показывает тему всегда, импортирует его статически — `virtual:granum/themes/clay.css`.
 
 ## Минимальный скелет
 
@@ -236,8 +244,8 @@ export const ocean = extendMode({
   componentTokens: { '--gr-button-primary-bg': 'var(--gr-primary)' },
 })
 
-ocean.definition // вход modes.define granum: extends, colorScheme, только отличия
-ocean.fallbacks // фолбэки производных от ролей режима — в modes.define с granum 3.4
+ocean.definition // вход modes.define записи темы в granum: extends, colorScheme, только отличия
+ocean.fallbacks // фолбэки производных от ролей режима — в modes.define рядом с definition
 ocean.tokens // полный набор ролей: своё поверх базы
 ocean.css // CSS под парой, включая фолбэк производных для браузеров без color-mix
 ```
@@ -317,7 +325,7 @@ export const contrast = createMode({
 
 ### Куда девать результат
 
-В приложении на granum — в конфиг, режимом темы:
+В приложении на granum — в конфиг, режимом темы в её записи `themes`:
 
 ```ts
 // granum.config.ts
@@ -325,22 +333,23 @@ import { contrast, ocean } from './theme.config'
 
 defineGranumConfig({
   // …
-  theme: 'slate',
-  modes: {
-    names: ['light', 'dark', 'ocean', 'contrast'],
-    define: {
-      ocean: { ...ocean.definition, fallbacks: ocean.fallbacks },
-      contrast: { ...contrast.definition, fallbacks: contrast.fallbacks },
+  themes: [{
+    theme: 'slate',
+    modes: {
+      names: ['light', 'dark', 'ocean', 'contrast'],
+      define: {
+        ocean: { ...ocean.definition, fallbacks: ocean.fallbacks },
+        contrast: { ...contrast.definition, fallbacks: contrast.fallbacks },
+      },
     },
-  },
+  }],
 })
 ```
 
 Режим встаёт под свою пару `slate-ocean` и получает токены компонентов от
 `extends`. `fallbacks` — фолбэки `@supports not (color-mix)`, посчитанные от
 ролей самого режима: без них браузер без `color-mix` получил бы hover и active
-базы. Поле `fallbacks` у `modes.define` есть с granum 3.4; на более раннем
-передавайте один `definition`.
+базы.
 
 Без granum или в браузере (редактор тем, тема из пользовательских настроек) —
 готовый CSS режима, рантайм-подпутём, который не тянет справочник токенов:
@@ -377,8 +386,9 @@ const brand = loadTheme(new URL('./src/themes/brand/', import.meta.url))
 
 defineGranumConfig({
   // …
-  theme: brand, // активная тема — вместо 'slate'
-  // или превью рядом с активной: previews: [brand]
+  themes: [{ theme: brand, modes: ['light', 'dark'] }], // основная тема — вместо 'slate'
+  // или дополнительная рядом со slate:
+  // themes: [{ theme: 'slate', default: true }, { theme: brand }]
 })
 ```
 
@@ -388,9 +398,10 @@ defineGranumConfig({
 - Режим файла может наследовать другой режим той же темы:
   `modes/dim.json` — `{ "extends": "dark", "tokens": { … } }`.
 
-Активная тема у сборки одна. Превью — полные блоки пар `brand-light`/`brand-dark`,
-которые включает `<GrConfigProvider theme="brand" mode="dark">`; под `:root` превью
-не выходит. Рабочий пример — [`apps/playground-theme`](../../../apps/playground-theme/README.md).
+Основная тема у сборки одна. Дополнительная — свой лист с полными блоками пар
+`brand-light`/`brand-dark`, который грузят `useTheme().setTheme('brand')` и остров
+`<GrConfigProvider theme="brand" mode="dark">`; под `:root` она не выходит. Рабочий пример —
+[`apps/playground-theme`](../../../apps/playground-theme/README.md).
 
 ### Пропсы по умолчанию темы
 
@@ -410,14 +421,12 @@ app.use(granularityThemePlugin, { manifest })
 ```
 
 Порядок слоёв: тема → `createGranularity({ componentDefaults })` приложения →
-`GrConfigProvider` → локальный проп. `themeComponentDefaults(manifest)` отдаёт слой
-темы явно — например для своего провайдера.
+`GrConfigProvider` → локальный проп. Слой темы — пропсы текущей темы документа:
+после `setTheme` компоненты берут пропсы новой темы. `themeComponentDefaults(manifest, id)`
+отдаёт слой темы явно — например для своего провайдера; без `id` — основной темы.
 
-Тема превью несёт свои пропсы по умолчанию с granum 3.4: манифест отдаёт
-`extensions` и у `previews`. Остров `GrConfigProvider theme="<превью>"` подменяет
-ими слой темы сборки, а пропсы приложения и провайдеров остаются сверху.
-`themeComponentDefaults(manifest, '<превью>')` — тот же слой явно. На granum
-раньше 3.4 остров превью берёт собственные дефолты компонентов.
+Манифест несёт `extensions` у каждой темы сборки. Остров `GrConfigProvider theme="<id>"`
+подменяет ими слой темы документа, а пропсы приложения и провайдеров остаются сверху.
 
 ## Проверка перед выкладкой
 

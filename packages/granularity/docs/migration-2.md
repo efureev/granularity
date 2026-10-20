@@ -21,8 +21,8 @@ granum 2 и 3 несовместимы.
 
 ## Конфиг granum
 
-Ключа `themes` больше нет: тема выбирается одна, режимы — отдельно. Конфиг со старым
-ключом падает `InvalidConfigError` с подсказкой.
+Ключ `themes` поменял смысл: в 1.x это были режимы, теперь — список тем сборки, и режимы у
+каждой темы свои. Конфиг со старой формой падает `InvalidConfigError` с подсказкой.
 
 ```ts
 // 1.x
@@ -31,23 +31,23 @@ defineGranumConfig({
   themes: { names: ['light', 'dark'] },
 })
 
-// 2.0
+// 2.x на granum 3.8
 defineGranumConfig({
   engine: windEngine(),
   providers: ['@feugene/granularity'],
-  theme: 'slate',
-  modes: { names: ['light', 'dark'] },
+  themes: [{ theme: 'slate', modes: ['light', 'dark'] }],
 })
 ```
 
-Свой режим — `modes.define` с `extends` и `tokens`, точечные значения —
-`modes.tokenOverrides` по имени режима ([`modes.md`](./modes.md#свои-режимы-в-конфиге)).
-Полная карта ключей — `MIGRATION.md` granum, раздел «From 2.x to 3.0».
+Свой режим — `modes: { names, define }` записи темы, `define` с `extends` и `tokens`;
+точечные значения — `modes.tokenOverrides` по имени режима
+([`modes.md`](./modes.md#свои-режимы-в-конфиге)). Полная карта ключей — `MIGRATION.md`
+granum, разделы «From 2.x to 3.0» и «From 3.7 to 3.8».
 
 ## Переключение режима
 
-`useTheme()` переключает режимы темы сборки поверх контроллера granum. Набор режимов и
-их пары — манифест `virtual:granum/themes`; его нужно отдать один раз, там, где
+`useTheme()` переключает тему и режим поверх контроллера granum. Темы сборки, их режимы и
+пары — манифест `virtual:granum/themes`; его нужно отдать один раз, там, где
 создаётся состояние:
 
 ```ts
@@ -59,15 +59,16 @@ initThemeEarly({ manifest }) // или app.use(granularityThemePlugin, { manifes
 
 | 1.x | 2.0 |
 | --- | --- |
-| `theme` — `'light' \| 'dark'` | `theme` — id темы сборки (только чтение), режим — `mode` |
-| `setTheme('dark')` | `setMode('dark')` |
+| `theme` — `'light' \| 'dark'` | `theme` — id текущей темы сборки, режим — `mode` |
+| `setTheme('dark')` | `setMode('dark')`; `setTheme(id)` переключает **тему** сборки, имя режима ему не передают |
 | `toggleTheme()` | `toggleMode()` — между первым светлым и первым тёмным режимом |
 | тип `ThemeName` | `GrModeName`, `GrThemeId`; режимы с `colorScheme` — `modes` |
 | `isDark` по имени | `isDark` по `colorScheme` режима: свой `ocean` с `colorScheme: 'dark'` тёмный |
 | `document.documentElement.dataset.theme = 'dark'` | `useTheme().setMode('dark')` — атрибут ставит контроллер |
 
-**Ключ хранилища прежний** — `gr-theme`, и хранится в нём по-прежнему имя режима:
-выбор пользователя переживает обновление. Сохранённый `dark` поднимается как режим.
+**Ключ хранилища прежний** — `gr-theme`, и у основной темы в нём по-прежнему имя режима:
+выбор пользователя переживает обновление. Сохранённый `dark` поднимается как режим. Выбор
+дополнительной темы хранится как `<тема>-<режим>`.
 
 ## CSS приложения
 
@@ -79,16 +80,16 @@ initThemeEarly({ manifest }) // или app.use(granularityThemePlugin, { manifes
 | `.dark .x` | то же — классов `.light`/`.dark` granum не выводит |
 | `dark:` в утилитах | работает без правок: granum строит вариант по парам тёмных режимов |
 
-Без атрибута действует режим по умолчанию — его блок висит ещё и на `:root`.
+Без атрибута действует режим по умолчанию основной темы — его блок висит ещё и на `:root`.
 
-## Остров режима и превью темы
+## Остров режима и остров темы
 
 `GrConfigProvider` развёл два смысла `theme`:
 
 | 1.x | 2.0 |
 | --- | --- |
 | `<GrConfigProvider theme="dark">` | `<GrConfigProvider mode="dark">` — остров режима |
-| — | `<GrConfigProvider theme="clay" mode="dark">` — превью другой темы из `previews` конфига granum |
+| — | `<GrConfigProvider theme="clay" mode="dark">` — остров другой темы из `themes` конфига granum |
 
 `theme="dark"` больше не остров: в dev-сборке провайдер предупредит, что это режим.
 `useGrThemeAttrs()` отдаёт `Record<string, string>` с атрибутом активации манифеста —
@@ -120,15 +121,15 @@ initThemeEarly({ manifest }) // или app.use(granularityThemePlugin, { manifes
 | --- | --- |
 | `extendTheme({ name: 'ocean', base: 'dark', … })` — «тема» | `extendMode(…)` — **режим** темы; в конфиг — `modes.define.ocean = ocean.definition` |
 | `createTheme(…)` | `createMode(…)` |
-| — | своя тема целиком: папка `themes/<id>/` и `loadTheme`, в конфиг — `theme: brand` |
+| — | своя тема целиком: папка `themes/<id>/` и `loadTheme`, в конфиг — `themes: [{ theme: brand }]` |
 
 Значения своего режима больше не нужно класть в CSS руками: `definition` — готовый вход
 `modes.define`, а токены компонентов режим берёт у своей базы.
 
 ## SSR
 
-Режим запроса сервер берёт из cookie (`createCookieStorage()` granum на клиенте,
-`modeFromCookie` на сервере) и ставит пару на `<html>`; без cookie пару ставит ранний
+Выбор запроса сервер берёт из cookie (`createCookieStorage()` granum на клиенте,
+`themeFromCookie` на сервере) и ставит пару на `<html>`; без cookie пару ставит ранний
 скрипт `granum(config, { themeScript: … })`. Состояние режима на сервере — только через
 `granularityThemePlugin`, иначе режим одного запроса уедет в следующий. Подробности —
 [`ssr.md`](./ssr.md#режим-без-мигания).

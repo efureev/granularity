@@ -25,9 +25,9 @@ granum отвергает ошибкой сборки `ComponentRootImportError`
 - [`vue`][vue] `^3` — peer-зависимость пакета (устанавливает приложение).
 - [`@floating-ui/dom`][floating-ui] `^1.8` — **обязательная** runtime
   peer-зависимость пакета (устанавливает приложение).
-- [`@feugene/granum`][granum] `≥ 3.0 < 4` — peer-зависимость пакета
+- [`@feugene/granum`][granum] `≥ 3.8 < 4` — peer-зависимость пакета
   (устанавливает приложение, на build-time).
-- `@feugene/granum-engine-wind` `^3.0` — движок утилит; тоже ставит приложение.
+- `@feugene/granum-engine-wind` `^3.8` — движок утилит; тоже ставит приложение.
   Своей реализации движка в granum нет, и словарь классов выбирает тот, кто
   отвечает за результат сборки, то есть приложение.
 - [`vite`][vite] `^8` — peer-зависимость granum: плагин живёт в сборке
@@ -183,24 +183,23 @@ defineGranumConfig({
 
 ### Тема и режимы
 
-Тема в сборке одна — по умолчанию тема каталога `slate`, и режим в CSS тоже
-один — режим по умолчанию темы, `light`. Тёмный режим и остальные — решение
-приложения: назовите тему и режимы явно (с granum 3.3; до него без `modes.names`
-ехали все режимы темы):
+Без настройки тема в сборке одна — тема каталога `slate`, и режим в CSS тоже
+один — режим по умолчанию темы, `light`. Тёмный режим и другие темы — решение
+приложения: перечислите темы сборки и их режимы в `themes`:
 
 ```ts
 defineGranumConfig({
   engine: windEngine(),
   providers: ['@feugene/granularity'],
   components: [{ provider: '@feugene/granularity', names: ['GrButton'] }],
-  theme: 'slate',
-  modes: { names: ['light', 'dark'] },
+  themes: [{ theme: 'slate', modes: ['light', 'dark'] }],
 })
 ```
 
-Свой режим задаётся здесь же — `modes.define` с `extends` и `tokens` или
-`tokensRef`; переопределение отдельных значений — `modes.tokenOverrides`.
-Подробности — в [`modes.md`](./modes.md).
+Тем может быть несколько: основная (единственная или с `default: true`) лежит в общем листе,
+остальные — своими листами, которые рантайм грузит при переключении. Свой режим задаётся в записи
+темы — `modes: { names, define }` с `extends` и `tokens` или `tokensRef`; переопределение
+отдельных значений — `modes.tokenOverrides`. Подробности — в [`modes.md`](./modes.md).
 
 ### Обрезка неиспользуемых токенов
 
@@ -227,7 +226,7 @@ defineGranumConfig({
 `granum.manifest.json`. Приложение объявляет только свои исходники —
 `appSources`.
 
-Все доступные опции (`engine`, `components`, `theme`, `previews`, `modes`,
+Все доступные опции (`engine`, `components`, `themes`, `activation`,
 `appSources`, `css`, `js`, `pruneTokens`, `report`) описаны в [`granum.md`](./granum.md) и
 [документации granum][granum-usage].
 

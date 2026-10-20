@@ -9,18 +9,19 @@ import slate from '../../themes/slate/theme.json'
 describe('grThemeManifest', () => {
   it('тема по умолчанию — та же, что объявляет провайдер granum', () => {
     expect(granularityTokensProvider.theme?.defaultTheme).toBe(GR_DEFAULT_THEME_ID)
-    expect(grThemeManifest().theme.id).toBe(GR_DEFAULT_THEME_ID)
+    expect(grThemeManifest().defaultTheme).toBe(GR_DEFAULT_THEME_ID)
+    expect(grThemeManifest().themes.map(theme => theme.id)).toEqual([GR_DEFAULT_THEME_ID])
   })
 
   it('режимы каталога парами `<тема>-<режим>`, режим по умолчанию первым', () => {
-    const manifest = grThemeManifest('slate')
+    const theme = grThemeManifest('slate').themes[0]
 
-    expect(manifest.defaultMode).toBe(slate.defaultMode)
-    expect(manifest.modes[0]?.name).toBe(slate.defaultMode)
-    expect(manifest.modes.map(mode => [mode.name, mode.colorScheme, mode.value])).toEqual(
+    expect(theme.defaultMode).toBe(slate.defaultMode)
+    expect(theme.modes[0]?.name).toBe(slate.defaultMode)
+    expect(theme.modes.map(mode => [mode.name, mode.colorScheme, mode.value])).toEqual(
       slate.modes.map(mode => [mode.name, mode.colorScheme, `slate-${mode.name}`]),
     )
-    expect(manifest.activation.attribute).toBe('data-theme')
+    expect(grThemeManifest('slate').activation.attribute).toBe('data-theme')
   })
 
   // Пакет не зависит от granum в рантайме: манифест для готового листа нужен
@@ -29,9 +30,12 @@ describe('grThemeManifest', () => {
     const manifest = grThemeManifest('slate')
 
     expect(manifest).toEqual(createThemeManifest({
-      theme: manifest.theme,
-      modes: slate.modes as Array<{ name: string, title?: string, colorScheme: GrColorScheme }>,
-      defaultMode: slate.defaultMode,
+      themes: [{
+        id: manifest.defaultTheme,
+        title: manifest.themes[0].title,
+        modes: slate.modes as Array<{ name: string, title?: string, colorScheme: GrColorScheme }>,
+        defaultMode: slate.defaultMode,
+      }],
     }))
   })
 

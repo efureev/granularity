@@ -193,9 +193,9 @@ export default defineGranumConfig({
   components: [
     { provider: '@feugene/granularity', names: ['GrButton', 'GrCard'] },
   ],
-  // Тема каталога и её режимы; свой режим задаётся \`modes.define\`.
-  theme: 'slate',
-  modes: { names: ['light', 'dark'] },
+  // Темы сборки: основная и её режимы; свой режим — \`modes.define\`,
+  // ещё одна тема своим листом — следующей записью.
+  themes: [{ theme: 'slate', modes: ['light', 'dark'] }],
   appSources: { dirs: ['src'] },
 })`
 
@@ -209,8 +209,7 @@ export default defineGranumConfig({
   components: [
     { provider: '@feugene/granularity', names: ['GrButton', 'GrCard'] },
   ],
-  theme: 'slate',
-  modes: { names: ['light', 'dark'] },
+  themes: [{ theme: 'slate', modes: ['light', 'dark'] }],
   appSources: { dirs: ['src'] },
   // Токены, которых не берёт ни компонент селекции, ни разметка приложения,
   // из CSS вырезаются. Порядок внедрения: 'report' → план в отчёте → 'on'.

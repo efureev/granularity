@@ -2859,14 +2859,14 @@
           },
           {
             "name": "mode",
-            "description": "Режим поддерева — остров: `dark` уезжает в `data-theme` парой темы сборки (`slate-dark`). Режим **документа** — работа `useTheme`/`initThemeEarly`.",
+            "description": "Режим поддерева — остров: `dark` уезжает в `data-theme` парой текущей темы документа (`slate-dark`). Режима у темы нет — первый той же схемы, иначе её режим по умолчанию. Режим **документа** — работа `useTheme`/`initThemeEarly`.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
           },
           {
             "name": "theme",
-            "description": "Превью другой темы каталога: `theme=\"clay\" mode=\"dark\"` пишет `data-theme=\"clay-dark\"`. Блоки её пар собирает granum по `previews` конфига — без них превью не найдёт ни одного селектора. Без `mode` показывает тему в режиме документа.",
+            "description": "Остров другой темы сборки: `theme=\"clay\" mode=\"dark\"` пишет `data-theme=\"clay-dark\"`. Тема обязана быть в `themes` конфига granum — иначе её пар нет в CSS. Лист дополнительной темы остров подгружает сам по адресу из манифеста; страница, которая показывает тему всегда, импортирует его заранее (`virtual:granum/themes/<id>.css`) — тогда нет кадра без значений, а загрузчик узнаёт лист и второй раз его не качает. Без `mode` — режим документа, если он у темы есть, иначе той же схемы.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"

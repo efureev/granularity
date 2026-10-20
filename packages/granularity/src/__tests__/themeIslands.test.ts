@@ -157,9 +157,14 @@ describe.each(THEMES)('тема %s', (theme) => {
       expect(fallbacks).toContain(`  [data-theme="${DARK}"] {`)
     })
 
-    it('примитивы `:root` — до режимов', () => {
-      expect(css.indexOf(':root {')).toBeGreaterThan(-1)
-      expect(css.indexOf(':root {')).toBeLessThan(css.indexOf(`[data-theme="${LIGHT}"] {`))
+    // Примитивы — под корнем без атрибута и парами темы, а не под голым `:root`:
+    // корень с парой другой темы их не получает (T-8 granum).
+    it('примитивы — до режимов, под корнем без атрибута и парами темы', () => {
+      const primitives = css.search(/^:root:not\(\[data-theme\]\), \[data-theme="[^"]+"\](?:, \[data-theme="[^"]+"\])* \{$/m)
+
+      expect(primitives).toBeGreaterThan(-1)
+      expect(css.slice(primitives, css.indexOf('{', primitives))).toContain(`[data-theme="${LIGHT}"]`)
+      expect(primitives).toBeLessThan(css.indexOf(`[data-theme="${LIGHT}"] {`))
     })
   })
 })

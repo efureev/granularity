@@ -1,7 +1,7 @@
 import { createSSRApp, type Component } from 'vue'
 
 import { createCookieStorage } from '@feugene/granum/runtime'
-import { GR_THEME_STORAGE_KEY, type GrModeName, granularityThemePlugin, granularityToastPlugin } from '@feugene/granularity'
+import { GR_THEME_STORAGE_KEY, granularityThemePlugin, granularityToastPlugin, type GrThemeSelection } from '@feugene/granularity'
 import themeManifest from 'virtual:granum/themes'
 
 import App from './App.vue'
@@ -13,10 +13,10 @@ import App from './App.vue'
  * `root` подменяется только тестами: им нужна ещё и страница-улика
  * (`ProblemPage.vue`) с компонентами без обёртки `ClientOnly`.
  *
- * `mode` — режим запроса, его сервер берёт из cookie. На клиенте его нет:
- * контроллер узнаёт пару, которую сервер уже поставил на `<html>`.
+ * `theme` — тема и режим запроса, их сервер берёт из cookie. На клиенте выбора
+ * нет: контроллер узнаёт пару, которую сервер уже поставил на `<html>`.
  */
-export function createApp(root: Component = App, options: { mode?: GrModeName } = {}) {
+export function createApp(root: Component = App, options: { theme?: GrThemeSelection } = {}) {
   const app = createSSRApp(root)
 
   // Обязательно для SSR: `useToast` намеренно запрещает модульный синглтон на
@@ -30,7 +30,7 @@ export function createApp(root: Component = App, options: { mode?: GrModeName } 
   app.use(granularityThemePlugin, {
     manifest: themeManifest,
     storage: createCookieStorage({ name: GR_THEME_STORAGE_KEY }),
-    initial: options.mode,
+    initial: options.theme,
   })
 
   return app

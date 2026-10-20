@@ -57,8 +57,8 @@ async function buildGranumCss() {
     engine: windEngine(),
     providers: ['@feugene/granularity'],
     components: 'all',
-    // Снимок сверяет оба режима: без `modes.names` granum собирает только режим по умолчанию.
-    modes: { names: ['light', 'dark'] },
+    // Снимок сверяет оба режима: без `modes` granum собирает только режим по умолчанию.
+    themes: [{ theme: 'slate', modes: ['light', 'dark'] }],
     appSources: { dirs: [] },
   }, ROOT)
   const { css, layers } = await emitCss(app)

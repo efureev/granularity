@@ -39,8 +39,8 @@
 
 ## Как подключить
 
-`theme: 'clay'` в конфиге granum. Без granum —
+`{ theme: 'clay' }` в `themes` конфига granum — основной темой или дополнительной. Без granum —
 `@feugene/granularity/themes/clay/root.css` и файлы нужных режимов, `themes/clay/light.css`,
 `themes/clay/dark.css`; целиком — `@feugene/granularity/themes/clay.css`. Пропсы компонентов по
-умолчанию тема несёт в манифесте режимов: приложение отдаёт его плагину режимов ядра
+умолчанию тема несёт в манифесте тем: приложение отдаёт его плагину режимов ядра
 (`granularityThemePlugin`, `initThemeEarly`).

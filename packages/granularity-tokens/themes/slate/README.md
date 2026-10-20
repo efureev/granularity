@@ -2,7 +2,7 @@
 
 Холодные нейтрали шкалы slate, индиго-акцент и контраст, выверенный по AA в обоих режимах.
 
-Тема называется по шкале, на которой построена (`--gr-slate-*`), и в конфиге (`theme: 'slate'`) с
+Тема называется по шкале, на которой построена (`--gr-slate-*`), и в конфиге (`{ theme: 'slate' }`) с
 тоном `tone="slate"` не встречается.
 
 ## Для чего
@@ -36,6 +36,6 @@
 
 ## Как подключить
 
-`theme: 'slate'` в конфиге granum — или ничего: `slate` — тема по умолчанию. Без granum —
+`{ theme: 'slate' }` в `themes` конфига granum — или ничего: `slate` — тема по умолчанию. Без granum —
 `@feugene/granularity/themes/slate/root.css` и файлы нужных режимов, `themes/slate/light.css`,
 `themes/slate/dark.css`; целиком — `@feugene/granularity/themes/slate.css`.

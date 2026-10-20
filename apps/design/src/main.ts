@@ -5,6 +5,8 @@ import themeManifest from 'virtual:granum/themes'
 
 import './styles/reset.css'
 import 'virtual:granum.css'
+// Дополнительные темы приложение показывает всегда: их листы — сразу, без кадра без значений.
+import 'virtual:granum/themes.css'
 
 import App from './app/App.vue'
 import { router } from './app/router'

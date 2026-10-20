@@ -16,7 +16,7 @@ import GrRating from '../../GrRating/GrRating.vue'
 import GrSlider from '../../GrSlider/GrSlider.vue'
 import GrTooltip from '../../GrTooltip/GrTooltip.vue'
 import GrModal from '../../GrModal/GrModal.vue'
-import { granularityThemePlugin } from '../../../composables/useTheme'
+import { granularityThemePlugin, useTheme } from '../../../composables/useTheme'
 import { createGranularity } from '../../../vue/plugin'
 import { GRANULARITY_I18N_KEY } from '../../../i18n/adapter'
 import { useGranularityTranslations } from '../../../internal/granularityI18n'
@@ -525,13 +525,16 @@ describe('i18n: адаптер отдаётся реактивно', () => {
  * плагину режимов — и компоненты берут их без провайдера.
  */
 describe('componentDefaults темы и приложения', () => {
-  const manifest = {
-    theme: { id: 'clay', title: 'Глина' },
+  const clay = {
+    id: 'clay',
+    title: 'Глина',
     modes: [{ name: 'light', colorScheme: 'light' as const, value: 'clay-light' }],
     defaultMode: 'light',
-    activation: { attribute: 'data-theme' },
-    extensions: { granularity: { componentDefaults: { GrButton: { variant: 'outline', tone: 'neutral' } } } },
+    extensions: { granularity: { componentDefaults: { GrButton: { variant: 'outline', tone: 'neutral' } } } } as Record<string, unknown> | undefined,
   }
+  const manifest = { themes: [clay], defaultTheme: 'clay', activation: { attribute: 'data-theme' } }
+  /** Манифест с другими `extensions` основной темы. */
+  const withExtensions = (extensions: Record<string, unknown> | undefined) => ({ ...manifest, themes: [{ ...clay, extensions }] })
   const themePlugin = [granularityThemePlugin, { manifest, persist: false, target: () => null }] as const
   const button = (props: Record<string, unknown> | null = null) => h(GrButton, props, { default: () => 'Ok' })
   const attrs = (wrapper: ReturnType<typeof mount>) => {
@@ -558,7 +561,7 @@ describe('componentDefaults темы и приложения', () => {
   })
 
   it('без манифеста с extensions — собственные дефолты компонента', () => {
-    const plain = { ...manifest, extensions: undefined }
+    const plain = withExtensions(undefined)
     const wrapper = mount(defineComponent({ setup: () => () => button() }), {
       global: { plugins: [[granularityThemePlugin, { manifest: plain, persist: false, target: () => null }] as never] },
     })
@@ -566,19 +569,22 @@ describe('componentDefaults темы и приложения', () => {
     expect(attrs(wrapper)).toEqual(['primary', 'primary'])
   })
 
-  it('остров превью подменяет слой темы, а пропсы приложения и провайдеров остаются сверху', () => {
-    const withPreviews = {
+  it('остров темы подменяет слой темы, а пропсы приложения и провайдеров остаются сверху', () => {
+    const withAdditional = {
       ...manifest,
-      previews: [
+      themes: [
+        clay,
         {
-          theme: { id: 'paper', title: 'Бумага' },
+          id: 'paper',
+          title: 'Бумага',
           modes: [{ name: 'light', colorScheme: 'light' as const, value: 'paper-light' }],
+          defaultMode: 'light',
           extensions: { granularity: { componentDefaults: { GrButton: { variant: 'ghost' } } } },
         },
-        { theme: { id: 'ink', title: 'Чернила' }, modes: [{ name: 'light', colorScheme: 'light' as const, value: 'ink-light' }] },
+        { id: 'ink', title: 'Чернила', modes: [{ name: 'light', colorScheme: 'light' as const, value: 'ink-light' }], defaultMode: 'light' },
       ],
     }
-    const plugin = [granularityThemePlugin, { manifest: withPreviews, persist: false, target: () => null }] as const
+    const plugin = [granularityThemePlugin, { manifest: withAdditional, persist: false, target: () => null }] as const
     const wrapper = mount(defineComponent({
       setup: () => () => h('div', [
         button(),
@@ -596,19 +602,160 @@ describe('componentDefaults темы и приложения', () => {
       ['ghost', 'danger'],
       ['primary', 'success'],
     ])
-    expect(themeComponentDefaults(withPreviews, 'paper')).toEqual({ GrButton: { variant: 'ghost' } })
-    expect(themeComponentDefaults(withPreviews, 'clay')).toBe(themeComponentDefaults(withPreviews))
+    expect(themeComponentDefaults(withAdditional, 'paper')).toEqual({ GrButton: { variant: 'ghost' } })
+    expect(themeComponentDefaults(withAdditional, 'clay')).toBe(themeComponentDefaults(withAdditional))
   })
 
   it('themeComponentDefaults: не та форма — undefined; ответ общий на манифест', () => {
-    expect(themeComponentDefaults({ ...manifest, extensions: { granularity: { componentDefaults: { GrButton: 'outline' } } } })).toBeUndefined()
+    expect(themeComponentDefaults(withExtensions({ granularity: { componentDefaults: { GrButton: 'outline' } } }))).toBeUndefined()
     expect(themeComponentDefaults(null)).toBeUndefined()
     expect(themeComponentDefaults(manifest)).toBe(themeComponentDefaults(manifest))
     expect(Object.isFrozen(themeComponentDefaults(manifest))).toBe(true)
   })
+
+  /** Основная `clay` и дополнительная `paper` со своим листом и своими пропсами. */
+  const twoThemes = {
+    ...manifest,
+    themes: [
+      clay,
+      {
+        id: 'paper',
+        title: 'Бумага',
+        modes: [{ name: 'light', colorScheme: 'light' as const, value: 'paper-light' }],
+        defaultMode: 'light',
+        href: '/assets/granum-theme-paper.css',
+        extensions: { granularity: { componentDefaults: { GrButton: { variant: 'ghost' } } } },
+      },
+    ],
+  }
+  const loadSheet = async (theme: string): Promise<void> => {
+    await nextTick()
+    document.head.querySelector(`link[data-granum-theme="${theme}"]`)?.dispatchEvent(new Event('load'))
+  }
+
+  it('смена темы документа меняет слой пропсов темы у компонентов без провайдера', async () => {
+    document.head.innerHTML = ''
+    const plugin = [granularityThemePlugin, { manifest: twoThemes, persist: false }] as const
+    let theme: ReturnType<typeof useTheme> | undefined
+    const wrapper = mount(defineComponent({
+      setup: () => {
+        theme = useTheme()
+        return () => button()
+      },
+    }), { global: { plugins: [plugin as never] } })
+    expect(attrs(wrapper)).toEqual(['outline', 'neutral'])
+
+    const switching = theme!.setTheme('paper')
+    await loadSheet('paper')
+    await switching
+    await nextTick()
+    expect(theme!.theme.value).toBe('paper')
+    expect(document.documentElement.getAttribute('data-theme')).toBe('paper-light')
+    expect(attrs(wrapper)).toEqual(['ghost', 'primary'])
+    wrapper.unmount()
+    document.documentElement.removeAttribute('data-theme')
+  })
+
+  it('корневой слой пропсов заморожен: он общий для всех компонентов без провайдера', () => {
+    let config: ReturnType<typeof useGrConfig> | undefined
+    mount(defineComponent({
+      setup: () => {
+        config = useGrConfig()
+        return () => null
+      },
+    }), { global: { plugins: [themePlugin as never] } })
+    expect(Object.isFrozen(config!.componentDefaults.value)).toBe(true)
+  })
+
+  /** Основная `slate` с `ocean` и дополнительная `paper` без него. */
+  const withOcean = {
+    themes: [
+      {
+        id: 'slate',
+        title: 'Сланец',
+        modes: [
+          { name: 'light', colorScheme: 'light' as const, value: 'slate-light' },
+          { name: 'dark', colorScheme: 'dark' as const, value: 'slate-dark' },
+          { name: 'ocean', colorScheme: 'dark' as const, value: 'slate-ocean' },
+        ],
+        defaultMode: 'light',
+      },
+      {
+        id: 'paper',
+        title: 'Бумага',
+        modes: [
+          { name: 'light', colorScheme: 'light' as const, value: 'paper-light' },
+          { name: 'dark', colorScheme: 'dark' as const, value: 'paper-dark' },
+        ],
+        defaultMode: 'light',
+        href: '/assets/granum-theme-paper.css',
+      },
+    ],
+    defaultTheme: 'slate',
+    activation: { attribute: 'data-theme' },
+  }
+
+  it('остров режима, которого у новой темы документа нет, — режим той же схемы и предупреждение', async () => {
+    document.head.innerHTML = ''
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    let theme: ReturnType<typeof useTheme> | undefined
+    const wrapper = mount(defineComponent({
+      setup: () => {
+        theme = useTheme()
+        return () => h(GrConfigProvider, { mode: 'ocean' }, { default: () => h('span', 'x') })
+      },
+    }), { global: { plugins: [[granularityThemePlugin, { manifest: withOcean, persist: false, target: () => null }] as never] } })
+    const island = () => wrapper.get('[data-gr-config-provider]').attributes('data-theme')
+    expect(island()).toBe('slate-ocean')
+    expect(warn).not.toHaveBeenCalled()
+
+    const switching = theme!.setTheme('paper')
+    await loadSheet('paper')
+    await switching
+    await nextTick()
+    expect(island()).toBe('paper-dark')
+    expect(warn.mock.calls.map(call => String(call[0]))).toEqual([expect.stringMatching(/у темы «paper» нет режима «ocean»/)])
+    wrapper.unmount()
+    warn.mockRestore()
+  })
+
+  it('theme= с именем режима любой темы сборки — предупреждение; лист, который не загрузился, — тоже', async () => {
+    document.head.innerHTML = ''
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const wrapper = mount(defineComponent({
+      setup: () => () => h('div', [
+        h(GrConfigProvider, { theme: 'ocean' }, { default: () => h('span', 'x') }),
+        h(GrConfigProvider, { theme: 'paper' }, { default: () => h('span', 'y') }),
+      ]),
+    }), { global: { plugins: [[granularityThemePlugin, { manifest: withOcean, persist: false, target: () => null }] as never] } })
+    await nextTick()
+    document.head.querySelector('link[data-granum-theme="paper"]')?.dispatchEvent(new Event('error'))
+    await new Promise(resolve => setTimeout(resolve, 0))
+    const messages = warn.mock.calls.map(call => String(call[0]))
+    expect(messages.some(message => /theme="ocean" — это режим, а не тема/.test(message))).toBe(true)
+    expect(messages.some(message => /лист темы «paper» не загрузился/.test(message))).toBe(true)
+    wrapper.unmount()
+    warn.mockRestore()
+  })
+
+  it('остров дополнительной темы сам подгружает её лист — один раз', async () => {
+    document.head.innerHTML = ''
+    const plugin = [granularityThemePlugin, { manifest: twoThemes, persist: false, target: () => null }] as const
+    const wrapper = mount(defineComponent({
+      setup: () => () => h('div', [
+        h(GrConfigProvider, { theme: 'paper' }, { default: () => button() }),
+        h(GrConfigProvider, { theme: 'paper' }, { default: () => button() }),
+        h(GrConfigProvider, { theme: 'clay' }, { default: () => button() }),
+      ]),
+    }), { global: { plugins: [plugin as never] } })
+    await nextTick()
+    const links = [...document.head.querySelectorAll('link[data-granum-theme]')]
+    expect(links.map(link => [link.getAttribute('data-granum-theme'), link.getAttribute('href')])).toEqual([['paper', '/assets/granum-theme-paper.css']])
+    wrapper.unmount()
+  })
 })
 
-describe('mode и theme: остров режима и превью темы', () => {
+describe('mode и theme: острова режима и темы', () => {
   afterEach(() => {
     document.body.innerHTML = ''
     vi.restoreAllMocks()
@@ -638,7 +785,7 @@ describe('mode и theme: остров режима и превью темы', ()
     expect(providerAttr(wrapper, 1)).toBe('slate-dark')
   })
 
-  it('theme — превью: пара `<тема>-<режим>`; без mode — режим документа, вложенный mode — остров превью', () => {
+  it('theme — остров темы: пара `<тема>-<режим>`; без mode — режим документа, вложенный mode — остров в нём', () => {
     const wrapper = mount(defineComponent({
       setup: () => () => h('div', [
         h(GrConfigProvider, { theme: 'clay', mode: 'dark' }, { default: () => h('span', 'a') }),
@@ -655,12 +802,16 @@ describe('mode и theme: остров режима и превью темы', ()
 
   it('атрибут и пары — из манифеста приложения', () => {
     const manifest = {
-      theme: { id: 'ink', title: 'Ink' },
-      modes: [
-        { name: 'light', colorScheme: 'light' as const, value: 'ink-light' },
-        { name: 'dim', colorScheme: 'dark' as const, value: 'ink-dim' },
-      ],
-      defaultMode: 'light',
+      themes: [{
+        id: 'ink',
+        title: 'Ink',
+        modes: [
+          { name: 'light', colorScheme: 'light' as const, value: 'ink-light' },
+          { name: 'dim', colorScheme: 'dark' as const, value: 'ink-dim' },
+        ],
+        defaultMode: 'light',
+      }],
+      defaultTheme: 'ink',
       activation: { attribute: 'data-look' },
     }
     const wrapper = mount(defineComponent({
@@ -686,7 +837,7 @@ describe('mode и theme: остров режима и превью темы', ()
     wrapper.unmount()
   })
 
-  it('открытая модалка внутри превью получает пару превью', async () => {
+  it('открытая модалка внутри острова темы получает его пару', async () => {
     const wrapper = mount(defineComponent({
       setup: () => () => h(GrConfigProvider, { theme: 'clay', mode: 'dark' }, {
         default: () => h(GrModal, { modelValue: true, ariaLabel: 'Окно' }, { default: () => h('p', 'тело') }),

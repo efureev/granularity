@@ -37,6 +37,7 @@ export default defineConfig({
         'vue',
         '@vue/devtools-api',
         /^@feugene\/granularity(?:-tokens)?(?:\/.*)?$/,
+        /^@feugene\/granum(?:\/.*)?$/,
       ],
       output: {
         chunkFileNames: 'chunks/[name]-[hash].js',

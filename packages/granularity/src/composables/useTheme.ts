@@ -1,24 +1,30 @@
 import type { GranumThemeStorage, GranumThemeTarget } from '@feugene/granum/runtime'
 import type { App, ComputedRef } from 'vue'
-import { createThemeController } from '@feugene/granum/runtime'
-import { computed, hasInjectionContext, inject, ref } from 'vue'
+import { carryThemeMode, createThemeController, findTheme, isSelectableTheme, loadThemeSheet, readThemeSelection } from '@feugene/granum/runtime'
+import { computed, hasInjectionContext, inject, ref, shallowReactive } from 'vue'
 
 import {
+  currentThemeEntry,
   fallbackThemeManifest,
   getModuleThemeState,
   GRANULARITY_THEME_STATE,
   type GrModeEntry,
   type GrModeName,
+  type GrThemeEntry,
   type GrThemeId,
   type GrThemeManifest,
+  type GrThemeSelection,
   setModuleThemeState,
   type ThemeState,
 } from './internal/themeState'
 
 export { GRANULARITY_THEME_STATE }
-export type { GrModeEntry, GrModeName, GrThemeId, GrThemeManifest }
+export type { GrModeEntry, GrModeName, GrThemeEntry, GrThemeId, GrThemeManifest, GrThemeSelection }
 
-/** Ключ хранилища режима по умолчанию; значение — имя режима (`dark`), не пара. */
+/**
+ * Ключ хранилища выбора по умолчанию. Значение — не пара, а ключ выбора granum:
+ * у основной темы имя режима (`dark`), у дополнительной — `<тема>-<режим>`.
+ */
 export const GR_THEME_STORAGE_KEY = 'gr-theme'
 
 export type UseThemeOptions = {
@@ -50,10 +56,13 @@ export type UseThemeOptions = {
   storage?: GranumThemeStorage
 
   /**
-   * Режим на старте мимо хранилища и системной схемы. Нужен серверу: режим
-   * запроса — `modeFromCookie(manifest, request.headers.cookie, 'gr-theme')`.
+   * Выбор на старте мимо хранилища и системной схемы: имя режима основной темы
+   * или `{ theme?, mode? }`. Нужен серверу: выбор запроса —
+   * `themeFromCookie(manifest, request.headers.cookie, 'gr-theme')`, и тема в нём
+   * обязательна — по ней компоненты берут пропсы по умолчанию, и без неё
+   * серверный HTML разошёлся бы с гидрацией.
    */
-  initial?: GrModeName
+  initial?: GrModeName | GrThemeSelection
 
   /**
    * Куда писать пару. По умолчанию — `<html>` (канон одного приложения).
@@ -95,19 +104,49 @@ function readStored(state: ThemeState): string | null {
   }
 }
 
-function writeStored(state: ThemeState, mode: GrModeName): void {
+function writeStored(state: ThemeState, key: string): void {
   if (!state.persist)
     return
   try {
-    storageOf(state)?.setItem?.(state.storageKey, mode)
+    storageOf(state)?.setItem?.(state.storageKey, key)
   }
   catch {
     // ignore
   }
 }
 
+/** Режим текущей темы по имени. */
 function modeEntry(state: ThemeState, name: GrModeName): GrModeEntry | undefined {
-  return state.manifest.modes.find(entry => entry.name === name)
+  return currentThemeEntry(state)?.modes.find(entry => entry.name === name)
+}
+
+function selectable(state: ThemeState) {
+  return (theme: GrThemeEntry): boolean => isSelectableTheme(state.manifest, theme)
+}
+
+/** Тема и режим в состоянии; режимы меняются на месте — их держит и деструктуризация `useTheme()`. */
+function select(state: ThemeState, theme: GrThemeEntry, mode: GrModeName): void {
+  if (state.theme.value !== theme.id || state.modes.length === 0)
+    state.modes.splice(0, state.modes.length, ...theme.modes)
+  state.theme.value = theme.id
+  state.mode.value = mode
+}
+
+function unknownTheme(manifest: GrThemeManifest, id: GrThemeId): Error {
+  return new Error(`[granularity] useTheme: theme '${id}' is not in the build. Themes: ${manifest.themes.map(entry => entry.id).join(', ')}.`)
+}
+
+/**
+ * Выбор `initial` — по правилу контроллера granum, чтобы сервер (где
+ * контроллера нет) и клиент начинали одинаково: тема или режим не из сборки —
+ * ошибка, без режима — режим по умолчанию темы.
+ */
+function initialSelection(manifest: GrThemeManifest, initial: GrModeName | GrThemeSelection | undefined): { theme: GrThemeEntry, mode: GrModeName } {
+  const choice = typeof initial === 'string' ? { mode: initial } : initial ?? {}
+  const theme = findTheme(manifest, choice.theme ?? manifest.defaultTheme)
+  if (!theme)
+    throw unknownTheme(manifest, choice.theme ?? manifest.defaultTheme)
+  return { theme, mode: carryThemeMode(theme, undefined, choice.mode ?? theme.defaultMode).name }
 }
 
 /**
@@ -116,7 +155,7 @@ function modeEntry(state: ThemeState, name: GrModeName): GrModeEntry | undefined
  * корень приложения появляется после `app.use`, а `storageKey`/`persist`
  * уточняет вызов `useTheme(options)`.
  */
-function connect(state: ThemeState, initial: GrModeName | undefined): void {
+function connect(state: ThemeState, initial: GrModeName | GrThemeSelection | undefined): void {
   const target: GranumThemeTarget = {
     getAttribute: name => rootOf(state)?.getAttribute(name) ?? null,
     setAttribute: (name, value) => rootOf(state)?.setAttribute(name, value),
@@ -134,17 +173,18 @@ function connect(state: ThemeState, initial: GrModeName | undefined): void {
   })
 
   state.controller = controller
-  state.mode.value = controller.mode
-  controller.subscribe((mode) => {
-    state.mode.value = mode
-  })
+  select(state, controller.theme, controller.mode)
+  controller.subscribe(next => select(state, controller.theme, next.mode))
 }
 
 function createThemeState(options: UseThemeOptions = {}, writable = true): ThemeState {
   const manifest = options.manifest ?? fallbackThemeManifest()
+  const initial = initialSelection(manifest, options.initial)
   const state: ThemeState = {
     manifest,
-    mode: ref(options.initial ?? manifest.defaultMode),
+    theme: ref(initial.theme.id),
+    mode: ref(initial.mode),
+    modes: shallowReactive([...initial.theme.modes]),
     storageKey: options.storageKey ?? GR_THEME_STORAGE_KEY,
     persist: options.persist ?? true,
     storage: options.storage,
@@ -260,8 +300,13 @@ function bindListeners(state: ThemeState) {
   const onStorage = (event: StorageEvent): void => {
     if (!state.persist || state.storage || event.key !== state.storageKey)
       return
-    if (event.newValue !== null && modeEntry(state, event.newValue))
-      applySilently(state, event.newValue)
+    const next = readThemeSelection(state.manifest, event.newValue, selectable(state))
+    if (!next)
+      return
+    if (next.theme.id === state.theme.value)
+      applySilently(state, next.mode.name)
+    else
+      void state.controller?.setTheme(next.theme.id, { mode: next.mode.name, persist: false }).catch(() => {})
   }
   window.addEventListener?.('storage', onStorage)
 
@@ -272,7 +317,7 @@ function bindListeners(state: ThemeState) {
     if (readStored(state) !== null)
       return
     const scheme = event.matches ? 'dark' : 'light'
-    const next = state.manifest.modes.find(entry => entry.colorScheme === scheme)
+    const next = currentThemeEntry(state)?.modes.find(entry => entry.colorScheme === scheme)
     if (next)
       applySilently(state, next.name)
   }
@@ -286,12 +331,28 @@ function bindListeners(state: ThemeState) {
   }
 }
 
-/** Пара текущего режима на корне — без записи в хранилище. */
+/**
+ * Пара текущего режима на корне — без записи в хранилище. Пара дополнительной
+ * темы — только после её листа: без него значения были бы чужими. Загрузчик
+ * находит уже вставленный лист и второй не ставит.
+ */
 function applyToRoot(state: ThemeState): void {
   const entry = modeEntry(state, state.mode.value)
-  const root = rootOf(state)
-  if (entry && root && root.getAttribute(state.manifest.activation.attribute) !== entry.value)
-    root.setAttribute(state.manifest.activation.attribute, entry.value)
+  if (!entry)
+    return
+  const theme = state.theme.value
+  const apply = (): void => {
+    const root = rootOf(state)
+    // Пока грузился лист, выбор мог смениться — тогда пару ставит новый выбор.
+    if (state.theme.value !== theme || state.mode.value !== entry.name)
+      return
+    if (root && root.getAttribute(state.manifest.activation.attribute) !== entry.value)
+      root.setAttribute(state.manifest.activation.attribute, entry.value)
+  }
+  if (theme === state.manifest.defaultTheme)
+    apply()
+  else
+    loadThemeSheet(state.manifest, theme).then(apply, () => {})
 }
 
 /**
@@ -313,15 +374,26 @@ export function initThemeEarly(options: UseThemeOptions = {}) {
 }
 
 export interface UseThemeReturn {
-  /** Тема сборки — только чтение: рантайм тему не меняет. */
-  readonly theme: GrThemeId
+  /** Текущая тема на корне: меняется `setTheme` и выбором в другой вкладке. */
+  readonly theme: ComputedRef<GrThemeId>
+  /** Темы сборки: основная и дополнительные с адресами листов. */
+  readonly themes: readonly GrThemeEntry[]
   readonly mode: ComputedRef<GrModeName>
-  /** Режимы сборки: имя, `colorScheme` и пара активации. */
+  /**
+   * Режимы текущей темы: имя, `colorScheme` и пара активации. Реактивный
+   * массив, который `setTheme` меняет на месте, — деструктуризация его не теряет.
+   */
   readonly modes: readonly GrModeEntry[]
   /** По `colorScheme` режима, а не по имени. */
   readonly isDark: ComputedRef<boolean>
-  /** Режима нет в сборке — ошибка. */
+  /** Режима нет у текущей темы — ошибка. */
   setMode: (next: GrModeName) => void
+  /**
+   * Переключить тему: лист дополнительной темы загружается, потом ставится пара.
+   * Режим — `mode`, иначе одноимённый текущему, иначе той же схемы, иначе режим
+   * по умолчанию темы. Темы нет в сборке — ошибка.
+   */
+  setTheme: (next: GrThemeId, options?: { readonly mode?: GrModeName }) => Promise<void>
   /** Между первым светлым и первым тёмным режимом манифеста. */
   toggleMode: () => void
   /** Пара текущего режима на корне — без записи в хранилище. */
@@ -344,17 +416,22 @@ export function useTheme(options: UseThemeOptions = {}): UseThemeReturn {
   if (state.controller)
     applyToRoot(state)
 
+  const theme = computed(() => state.theme.value)
   const mode = computed(() => state.mode.value)
   const isDark = computed(() => modeEntry(state, state.mode.value)?.colorScheme === 'dark')
 
-  function setMode(next: GrModeName) {
+  function assertWritable(): void {
     if (!state.writable) {
       throw new Error(
-        '[granularity] useTheme: setMode/toggleMode require `app.use(granularityThemePlugin)` during SSR — '
-        + 'the module-singleton fallback is disabled server-side, so a mode set by one request would leak into '
-        + 'the next response. Reading `mode`/`isDark` on the server works without the plugin.',
+        '[granularity] useTheme: setMode/setTheme/toggleMode require `app.use(granularityThemePlugin)` during SSR — '
+        + 'the module-singleton fallback is disabled server-side, so a choice made by one request would leak into '
+        + 'the next response. Reading `theme`/`mode`/`isDark` on the server works without the plugin.',
       )
     }
+  }
+
+  function setMode(next: GrModeName) {
+    assertWritable()
 
     if (state.controller) {
       state.controller.setMode(next)
@@ -363,16 +440,37 @@ export function useTheme(options: UseThemeOptions = {}): UseThemeReturn {
 
     if (!modeEntry(state, next)) {
       throw new Error(
-        `[granularity] useTheme: mode '${next}' is not in the build of theme '${state.manifest.theme.id}'. `
-        + `Available: ${state.manifest.modes.map(entry => entry.name).join(', ')}.`,
+        `[granularity] useTheme: mode '${next}' is not in the build of theme '${state.theme.value}'. `
+        + `Available: ${currentThemeEntry(state)?.modes.map(entry => entry.name).join(', ') ?? '—'}.`,
       )
     }
     state.mode.value = next
   }
 
+  // Не `async`: запрет записи без плагина — синхронная ошибка, как у `setMode`,
+  // а не отклонённый промис, который на сервере никто не ждёт.
+  function setTheme(next: GrThemeId, setOptions: { readonly mode?: GrModeName } = {}): Promise<void> {
+    assertWritable()
+
+    if (state.controller)
+      return state.controller.setTheme(next, setOptions.mode !== undefined ? { mode: setOptions.mode } : {})
+
+    // Сервер с плагином: тема и режим запроса — без DOM и без листов, по правилу контроллера.
+    try {
+      const theme = findTheme(state.manifest, next)
+      if (!theme)
+        throw unknownTheme(state.manifest, next)
+      select(state, theme, carryThemeMode(theme, modeEntry(state, state.mode.value), setOptions.mode).name)
+      return Promise.resolve()
+    }
+    catch (error) {
+      return Promise.reject(error)
+    }
+  }
+
   function toggleMode() {
     const scheme = modeEntry(state, state.mode.value)?.colorScheme
-    const next = state.manifest.modes.find(entry => entry.colorScheme !== scheme)
+    const next = currentThemeEntry(state)?.modes.find(entry => entry.colorScheme !== scheme)
     if (next)
       setMode(next.name)
   }
@@ -382,11 +480,13 @@ export function useTheme(options: UseThemeOptions = {}): UseThemeReturn {
   }
 
   return {
-    theme: state.manifest.theme.id,
+    theme,
+    themes: state.manifest.themes,
     mode,
-    modes: state.manifest.modes,
+    modes: state.modes,
     isDark,
     setMode,
+    setTheme,
     toggleMode,
     initTheme,
   }

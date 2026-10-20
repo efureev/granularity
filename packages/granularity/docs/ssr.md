@@ -113,7 +113,7 @@
 
 | API                                        | На сервере                                                                                                                                                                                                                                                                      |
 |--------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `useTheme()`                               | **читать можно, писать — только с `app.use(granularityThemePlugin)`**: `mode`/`isDark` на сервере отдают режим запроса (`initial` плагина) или режим по умолчанию, а `setMode`/`toggleMode` без плагина бросают. Течёт именно мутация: модульное состояние общее на все запросы, и выбор одного пользователя ушёл бы в ответ другому |
+| `useTheme()`                               | **читать можно, писать — только с `app.use(granularityThemePlugin)`**: `theme`/`mode`/`isDark` на сервере отдают выбор запроса (`initial` плагина) или режим по умолчанию основной темы, а `setMode`/`toggleMode` без плагина бросают. Течёт именно мутация: модульное состояние общее на все запросы, и выбор одного пользователя ушёл бы в ответ другому |
 | `initThemeEarly()`                         | на сервере ничего не делает — его задача убрать «мигание» режима до монтирования, вызывать в браузерной точке входа                                                                                                                                                              |
 | `useToast()`                               | **требует `app.use(granularityToastPlugin)`**: на сервере модульный синглтон запрещён намеренно (одно mutable-состояние на модуль текло бы между запросами), без плагина бросает ошибку с объяснением. С плагином безопасен, таймеры автодисмисса на сервере не заводятся       |
 | `useDialogService()`                       | сам композабл безопасен, но любой его метод на сервере **бросает ошибку**: он монтирует хост в `document.body`. Императивные вызовы прячьте за клиентской проверкой. `app.use(granularityDialogServicePlugin)` даёт приложению своё состояние и снимает хост по `app.unmount()` |
@@ -148,24 +148,27 @@
 
 ## Режим без «мигания»
 
-Режим живёт парой `data-theme="<тема>-<режим>"` на `<html>`. Поставить её надо до
+Тема и режим живут парой `data-theme="<тема>-<режим>"` на `<html>`. Поставить её надо до
 первой отрисовки, а выбор пользователя хранится в браузере. Решений два, и оба
 берут пары из манифеста сборки `virtual:granum/themes` — того же, по которому
 собран CSS, поэтому руками пары не пишутся.
 
-**Cookie: пара приходит в серверном HTML.** Режим хранится в cookie
+**Cookie: пара приходит в серверном HTML.** Выбор хранится в cookie
 (`createCookieStorage`), сервер читает её из запроса и сразу отдаёт
 `<html data-theme="slate-dark">`, а приложение рендерит в том же режиме:
 
 ```ts
 // entry-server.ts
-import { modeFromCookie, themeRootAttributes } from '@feugene/granum/runtime'
+import { themeFromCookie, themeRootAttributes, themeSheetLink } from '@feugene/granum/runtime'
 import { GR_THEME_STORAGE_KEY } from '@feugene/granularity'
 import manifest from 'virtual:granum/themes'
 
-const mode = modeFromCookie(manifest, request.headers.cookie, GR_THEME_STORAGE_KEY)?.name
-const app = createApp(App, mode) // granularityThemePlugin с { manifest, storage, initial: mode }
-const htmlAttrs = mode ? themeRootAttributes(manifest, mode) : {} // { 'data-theme': 'slate-dark' }
+const selection = themeFromCookie(manifest, request.headers.cookie, GR_THEME_STORAGE_KEY)
+const theme = selection && { theme: selection.theme.id, mode: selection.mode.name }
+const app = createApp(App, theme) // granularityThemePlugin с { manifest, storage, initial: theme }
+const htmlAttrs = theme ? themeRootAttributes(manifest, theme) : {} // { 'data-theme': 'slate-dark' }
+// дополнительной теме нужен её лист в <head>; у основной его нет — undefined
+const sheet = selection && themeSheetLink(manifest, selection.theme.id)
 ```
 
 ```ts
@@ -173,16 +176,23 @@ const htmlAttrs = mode ? themeRootAttributes(manifest, mode) : {} // { 'data-the
 app.use(granularityThemePlugin, {
   manifest,
   storage: createCookieStorage({ name: GR_THEME_STORAGE_KEY }),
-  initial: mode, // на клиенте не передаётся: пару с сервера контроллер узнаёт сам
+  initial: theme, // на клиенте не передаётся: пару с сервера контроллер узнаёт сам
 })
 ```
 
-Неизвестный режим и отсутствие cookie дают `undefined`: решать за пользователя по
-системной схеме сервер не может, и пару тогда не пишет.
+В `initial` уходит тема, а не только режим: по ней компоненты берут пропсы по умолчанию
+(`componentDefaults` темы), и сервер, отрисовавший основную тему под парой дополнительной,
+разошёлся бы с гидрацией.
+
+Неизвестный выбор и отсутствие cookie дают `undefined`: решать за пользователя по
+системной схеме сервер не может, и пару тогда не пишет. Выбор дополнительной темы без её
+`<link>` в `<head>` даёт кадр с парой, у которой нет значений: лист дополнительной темы в общем CSS
+не лежит.
 
 **Скрипт в `<head>`: пара до первого кадра.** Его отдаёт плагин granum — читает
 cookie, затем `localStorage`, затем `prefers-color-scheme`, и не трогает пару,
-уже пришедшую с сервера:
+уже пришедшую с сервера. Для дополнительной темы он сначала вставляет блокирующий
+отрисовку `<link>` её листа, потом ставит пару:
 
 ```ts
 // vite.config.ts
