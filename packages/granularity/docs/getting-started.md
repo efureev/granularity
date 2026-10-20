@@ -144,8 +144,8 @@ my-app/
     "vue": "^3.5.40"
   },
   "devDependencies": {
-    "@feugene/granum": "^3.8.0",
-    "@feugene/granum-engine-wind": "^3.8.0",
+    "@feugene/granum": "^3.8.1",
+    "@feugene/granum-engine-wind": "^3.8.1",
     "@vitejs/plugin-vue": "^6.0.8",
     "typescript": "^6.0.2",
     "vite": "^8.2.2",
@@ -604,7 +604,10 @@ granum(granumConfig, { themeScript: { storageKey: 'gr-theme', cookie: 'gr-theme'
 ```
 
 Скрипт берёт пары из того же манифеста, что и CSS, и не трогает пару, уже
-пришедшую с сервера. Выбор из cookie сервер ставит на `<html>` сам —
+пришедшую с сервера. Если в сборке есть дополнительные темы, порядок слоёв
+объявляется в `<head>` до скрипта — `<style>@layer reset, granum;</style>`:
+лист такой темы объявляет слои granum, и в dev раньше сброса
+([modes.md](./modes.md#несколько-тем-в-одной-сборке)). Выбор из cookie сервер ставит на `<html>` сам —
 `themeRootAttributes(manifest, { theme, mode })` по `themeFromCookie(manifest, cookie, 'gr-theme')`
 ([`ssr.md`](./ssr.md#режим-без-мигания)); состояние режима на сервере держит
 `granularityThemePlugin` из каркаса выше.

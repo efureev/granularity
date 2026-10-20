@@ -46,7 +46,7 @@ const periods = [
           {{ THEME_BUILD_LABEL[theme.build] }}
         </GrBadge>
         <GrBadge tone="neutral" size="sm">
-          <code class="font-[var(--gr-font-mono)]">theme: '{{ theme.entry.id }}'</code>
+          <code class="font-[var(--gr-font-mono)]">{ theme: '{{ theme.entry.id }}' }</code>
         </GrBadge>
         <GrBadge v-if="theme.entry.extends" tone="neutral" size="sm">
           поверх «{{ theme.entry.extends }}»

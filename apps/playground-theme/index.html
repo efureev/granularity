@@ -4,6 +4,11 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>granularity — кастомная тема</title>
+    <!--
+      Порядок слоёв — до скрипта темы: лист дополнительной темы объявляет слои
+      granum, а в dev сброс приходит из JS уже после его ссылки.
+    -->
+    <style>@layer reset, granum;</style>
   </head>
   <body>
     <div id="app"></div>

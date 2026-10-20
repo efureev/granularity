@@ -167,7 +167,8 @@ const selection = themeFromCookie(manifest, request.headers.cookie, GR_THEME_STO
 const theme = selection && { theme: selection.theme.id, mode: selection.mode.name }
 const app = createApp(App, theme) // granularityThemePlugin с { manifest, storage, initial: theme }
 const htmlAttrs = theme ? themeRootAttributes(manifest, theme) : {} // { 'data-theme': 'slate-dark' }
-// дополнительной теме нужен её лист в <head>; у основной его нет — undefined
+// дополнительной теме нужен её лист в <head> — после стилей страницы: лист объявляет
+// слои granum, и раньше стилей объявил бы их до сброса приложения; у основной листа нет — undefined
 const sheet = selection && themeSheetLink(manifest, selection.theme.id)
 ```
 
@@ -192,7 +193,10 @@ app.use(granularityThemePlugin, {
 **Скрипт в `<head>`: пара до первого кадра.** Его отдаёт плагин granum — читает
 cookie, затем `localStorage`, затем `prefers-color-scheme`, и не трогает пару,
 уже пришедшую с сервера. Для дополнительной темы он сначала вставляет блокирующий
-отрисовку `<link>` её листа, потом ставит пару:
+отрисовку `<link>` её листа, потом ставит пару. Плагин ставит скрипт последним в
+`<head>`, после стилей; шаблон, который вставляет его сам, ставит туда же, а в dev,
+где стили приходят из JS, порядок слоёв объявляется до скрипта —
+`<style>@layer reset, granum;</style>` ([modes.md](./modes.md#несколько-тем-в-одной-сборке)):
 
 ```ts
 // vite.config.ts
