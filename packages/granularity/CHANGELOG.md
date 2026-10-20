@@ -9,6 +9,7 @@ to [Semantic Versioning](https://semver.org/).
 
 ### Docs
 
+- `granum.md`: по умолчанию в сборке тема каталога `slate` со всеми режимами, а не тема `light` из `defaultThemes`.
 - `installation.md`: granum и движок — `≥ 3.0 < 4` и `^3.0`; по умолчанию в сборке тема каталога `slate` со всеми её режимами, опции конфига — `theme`, `previews`, `modes` вместо `themes`.
 
 ## [v2.0.0] 2026-10-19
