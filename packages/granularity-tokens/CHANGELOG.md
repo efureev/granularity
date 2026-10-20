@@ -7,6 +7,8 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v1.1.1] 2026-10-20
+
 ### Docs
 
 - README темы `slate`: без granum тема подключается по частям — `themes/slate/root.css` ядра и файлы
