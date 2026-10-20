@@ -7,6 +7,8 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v2.2.0] 2026-10-20
+
 ### Added
 
 - **Тема по частям.** Рядом с `themes/<тема>.css` сборка кладёт `themes/<тема>/root.css` — всё,
