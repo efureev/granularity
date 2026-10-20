@@ -131,10 +131,20 @@ describe('collectWrongThemeKind', () => {
     expect(collectWrongThemeKind(registries, registered)).toEqual([])
   })
 
-  it('ловит переменную темы, записанную другим `kind`', () => {
+  it('хук тема вправе задать: так она меняет точку кастомизации', () => {
     const registry: TokenRegistry = {
       ...registryOf(registries, 'GrThing'),
       tokens: [{ name: '--gr-thing-bg', kind: 'hook', default: '#fff', description: 'фон' }],
+    }
+    const registered = new Map(registry.tokens.map(token => [token.name, registry] as const))
+
+    expect(collectWrongThemeKind([registry], registered)).toEqual([])
+  })
+
+  it('ловит переменную темы, записанную другим `kind`', () => {
+    const registry: TokenRegistry = {
+      ...registryOf(registries, 'GrThing'),
+      tokens: [{ name: '--gr-thing-bg', kind: 'inline', default: '#fff', description: 'фон' }],
     }
     const registered = new Map(registry.tokens.map(token => [token.name, registry] as const))
 

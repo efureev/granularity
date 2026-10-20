@@ -173,7 +173,12 @@ export function collectStaleTokens(registries: readonly TokenRegistry[]): string
   })
 }
 
-/** Объявлено в `themes/<тема>/**`, но у владельца записано не как `theme`. */
+/**
+ * Объявлено в `themes/<тема>/**`, но у владельца записано не как `theme` и не как
+ * `hook`. Хук тема вправе задать — так она меняет точку кастомизации («Глина» —
+ * заливку нейтральной кнопки); `css` и `inline` присваивает сам компонент, и
+ * значение темы спорило бы с ним.
+ */
 export function collectWrongThemeKind(
   registries: readonly TokenRegistry[],
   registered: ReadonlyMap<string, TokenRegistry>,
@@ -186,7 +191,7 @@ export function collectWrongThemeKind(
 
     return [...new Set(declared)]
       .filter(name => registered.get(name)?.owner !== registry.owner
-        || registered.get(name)?.tokens.find(token => token.name === name)?.kind !== 'theme')
+        || !['theme', 'hook'].includes(registered.get(name)?.tokens.find(token => token.name === name)?.kind ?? ''))
       .map(name => `${name} (${registry.path})`)
   })
 }
@@ -263,7 +268,7 @@ export function defineComponentTokensGate(options: ComponentTokensGateOptions): 
     it.runIf(options.requireThemeKind ?? true)('токены покомпонентных тем зарегистрированы как `theme`', () => {
       expect(
         collectWrongThemeKind(registries, registered),
-        'объявлен в `themes/<тема>/` — значит `kind: "theme"` у своего компонента',
+        'объявлен в `themes/<тема>/` — значит `kind: "theme"` или `"hook"` у своего компонента',
       ).toEqual([])
     })
 
