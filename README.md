@@ -21,7 +21,7 @@ The published packages:
 - [`@feugene/granularity-code`](./packages/granularity-code/README.md) `2.0.0` — Code surfaces for @feugene/granularity: view, edit and diff — the viewer and the diff carry no dependencies at all.
 - [`@feugene/granularity-dashboard`](./packages/granularity-dashboard/README.md) `2.0.0` — Widget grid for the @feugene/granularity design system — drag, resize, breakpoints and layout persistence, zero dependencies.
 - [`@feugene/granularity-datasource`](./packages/granularity-datasource/README.md) `0.1.2` — List state for @feugene/granularity: sorting, filters, paging, URL sync and race-free fetching behind one composable.
-- [`@feugene/granularity-devtools`](./packages/granularity-devtools/README.md) `2.0.0` — Vue DevTools panel for @feugene/granularity — where a prop value came from, the overlay layer stack and design-system warnings.
+- [`@feugene/granularity-devtools`](./packages/granularity-devtools/README.md) `2.1.0` — Vue DevTools panel for @feugene/granularity — where a prop value came from, the overlay layer stack and design-system warnings.
 - [`@feugene/granularity-editor`](./packages/granularity-editor/README.md) `2.0.0` — Rich-text editing for @feugene/granularity: a TipTap-backed GrRichText field with a design-system toolbar.
 - [`@feugene/granularity-forms-schema`](./packages/granularity-forms-schema/README.md) `2.0.0` — Schema-driven forms for the @feugene/granularity design system — zod and JSON Schema into real form fields, zero dependencies.
 - [`@feugene/granularity-media`](./packages/granularity-media/README.md) `2.0.0` — Media components for @feugene/granularity: image cropping, camera capture, code scanning and video playback.

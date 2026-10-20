@@ -1,7 +1,7 @@
 {
   "name": "@feugene/granularity-devtools",
   "description": "Vue DevTools panel for @feugene/granularity — where a prop value came from, the overlay layer stack and design-system warnings.",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "license": "LicenseRef-Granularity-EUC-1.1",
   "author": {
     "name": "Evgeniy Fureev",
@@ -53,13 +53,13 @@
     "@vue/devtools-kit": "^8.2.1"
   },
   "peerDependencies": {
-    "@feugene/granularity": ">=2.0.0 <3.0.0",
+    "@feugene/granularity": ">=2.4.0 <3.0.0",
     "@feugene/granum": ">=3.8.0 <4.0.0",
     "vue": "^3.5.0"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^9.3.0",
-    "@feugene/granularity": "^2.0.0",
+    "@feugene/granularity": "^2.4.0",
     "@feugene/granum": "^3.8.0",
     "@types/node": "^26.4.0",
     "eslint": "^10.9.1",
