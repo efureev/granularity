@@ -7,6 +7,10 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Docs
+
+- `installation.md`: granum и движок — `≥ 3.0 < 4` и `^3.0`; по умолчанию в сборке тема каталога `slate` со всеми её режимами, опции конфига — `theme`, `previews`, `modes` вместо `themes`.
+
 ## [v2.0.0] 2026-10-19
 
 Ломающий выпуск: темы и режимы. Как переехать — [`docs/migration-2.md`](./docs/migration-2.md).

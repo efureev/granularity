@@ -30,9 +30,9 @@
 
 ## Дизайн-система
 
-[granularity.tech/themes/slate](https://granularity.tech/themes/slate). Пока страницы на портале
-нет, основы и компоненты темы открываются в приложении дизайн-системы монорепозитория:
-`yarn dev:design` (`apps/design`).
+[granularity.tech/themes/slate](https://granularity.tech/themes/slate) — режимы, образец и роли
+темы на портале. Основы и компоненты темы целиком открываются в приложении дизайн-системы
+монорепозитория: `yarn dev:design` (`apps/design`).
 
 ## Как подключить
 

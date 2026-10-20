@@ -7,6 +7,10 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Docs
+
+- README темы `slate`: страница темы на портале есть — `granularity.tech/themes/slate`.
+
 ## [v1.0.0] 2026-10-19
 
 ### Added

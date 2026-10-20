@@ -25,9 +25,9 @@ granum отвергает ошибкой сборки `ComponentRootImportError`
 - [`vue`][vue] `^3` — peer-зависимость пакета (устанавливает приложение).
 - [`@floating-ui/dom`][floating-ui] `^1.8` — **обязательная** runtime
   peer-зависимость пакета (устанавливает приложение).
-- [`@feugene/granum`][granum] `≥ 2.0 < 3` — peer-зависимость пакета
+- [`@feugene/granum`][granum] `≥ 3.0 < 4` — peer-зависимость пакета
   (устанавливает приложение, на build-time).
-- `@feugene/granum-engine-wind` `^2.0` — движок утилит; тоже ставит приложение.
+- `@feugene/granum-engine-wind` `^3.0` — движок утилит; тоже ставит приложение.
   Своей реализации движка в granum нет, и словарь классов выбирает тот, кто
   отвечает за результат сборки, то есть приложение.
 - [`vite`][vite] `^8` — peer-зависимость granum: плагин живёт в сборке
@@ -93,7 +93,7 @@ yarn add -D @feugene/granum @feugene/granum-engine-wind
 ## Базовый `granum.config.ts`
 
 Самый минимальный рабочий конфиг — движок, имя пакета в `providers` и
-директории исходников приложения. Никаких `components`, `themes`,
+директории исходников приложения. Никаких `components`, `theme`, `modes`,
 `pruneTokens` пока нет:
 
 ```ts
@@ -111,7 +111,9 @@ export default defineGranumConfig({
 
 - утилиты генерирует `windEngine()` — `preset-wind3` плюс доп-правило пакета;
   `engine` единственное обязательное поле конфига, опустить его нельзя;
-- в сборку подмешиваются `tokens.css`, `base.css` и тема `light` пакета;
+- в сборку подмешиваются токены и база пакетов и тема каталога по умолчанию —
+  `slate` со всеми её режимами (`light`, `dark`); каталог приезжает
+  зависимостью ядра, `@feugene/granularity-tokens`;
 - включены все компоненты, объявленные в провайдере (эквивалент
   `components: 'all'` по умолчанию), их CSS и safelist;
 - классы разметки самого приложения извлекаются из `appSources`.
@@ -179,10 +181,10 @@ defineGranumConfig({
 графу из манифеста. Импорт компонента вне селекции ловит `js.guard` — по
 умолчанию ошибкой сборки, а не голым рендером.
 
-### Темы
+### Тема и режимы
 
-По умолчанию активны темы, объявленные провайдером в `defaultThemes` (у пакета
-это `light`). Возьмём обе:
+Тема в сборке одна — по умолчанию тема каталога `slate`, и в CSS едут все её
+режимы. Назвать тему явно и ограничить набор режимов:
 
 ```ts
 defineGranumConfig({
@@ -223,8 +225,8 @@ defineGranumConfig({
 `granum.manifest.json`. Приложение объявляет только свои исходники —
 `appSources`.
 
-Все доступные опции (`engine`, `components`, `themes`, `appSources`, `css`,
-`js`, `pruneTokens`, `report`) описаны в [`granum.md`](./granum.md) и
+Все доступные опции (`engine`, `components`, `theme`, `previews`, `modes`,
+`appSources`, `css`, `js`, `pruneTokens`, `report`) описаны в [`granum.md`](./granum.md) и
 [документации granum][granum-usage].
 
 ## Подключение к `Vite`
