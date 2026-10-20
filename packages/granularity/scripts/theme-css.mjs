@@ -70,16 +70,27 @@ function sourceProvider() {
   }
 }
 
+/**
+ * Режимы — все режимы темы, явным набором. Без `modes.names` granum собирает только режим по
+ * умолчанию, а у готового файла выбирающего нет: он для тех, кто подключает тему без granum.
+ */
 export async function themeCss(id) {
-  const { layers } = await emitThemeStylesheet({ providers: [sourceProvider()], theme: id, root: ROOT })
+  const names = catalog()[id]?.modes
+  if (!names)
+    throw new Error(`[theme-css] темы ${id} нет в каталоге ${TOKENS_PROVIDER_ID}`)
+  const { layers } = await emitThemeStylesheet({ providers: [sourceProvider()], theme: id, modes: { names }, root: ROOT })
 
   return `${BANNER.replaceAll('{id}', id)}\n${layers.tokens.trim()}\n\n${layers.themes.trim()}\n`
 }
 
-function catalogThemes() {
+function catalog() {
   const manifest = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.resolve(`${TOKENS_PROVIDER_ID}/granum.manifest.json`))), 'granum.manifest.json'), 'utf8'))
 
-  return Object.keys(manifest.theme.catalog ?? {}).sort()
+  return manifest.theme.catalog ?? {}
+}
+
+function catalogThemes() {
+  return Object.keys(catalog()).sort()
 }
 
 const args = process.argv.slice(2)
