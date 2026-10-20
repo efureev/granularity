@@ -13,7 +13,14 @@ const modeOptions = modes.map(entry => ({
   ariaLabel: `Режим ${entry.title ?? entry.name}`,
 }))
 
-const preview = themeManifest.previews?.[0]
+const previews = themeManifest.previews ?? []
+const saving = ref(true)
+const range = ref('week')
+const ranges = [
+  { label: 'День', value: 'day' },
+  { label: 'Неделя', value: 'week' },
+  { label: 'Месяц', value: 'month' },
+]
 
 const tones = ['success', 'warning', 'danger', 'info', 'slate', 'azure'] as const
 
@@ -171,16 +178,22 @@ function onModeChange(next: string | number): void {
         </GrAlert>
       </section>
 
-      <!-- Своя тема приложения — превью: её пары собраны в CSS, корень она не занимает -->
-      <GrCard v-if="preview" class="p-5">
+      <!-- Темы превью: их пары собраны отдельным листом, корень они не занимают -->
+      <GrCard v-for="preview in previews" :key="preview.theme.id" class="p-5">
         <div class="flex flex-col gap-4">
           <div>
             <h2 class="text-base font-semibold">
               Тема «{{ preview.theme.title }}» — превью
             </h2>
             <p class="mt-1 text-sm text-[var(--gr-muted-fg)]">
-              Папка <code>src/themes/{{ preview.theme.id }}/</code> объявляет только отличия от
-              «Сланца». Активная тема у сборки одна, поэтому своя тема показана островами:
+              <template v-if="preview.theme.id === 'brand'">
+                Папка <code>src/themes/brand/</code> объявляет только отличия от «Сланца».
+              </template>
+              <template v-else>
+                Тема каталога пакета токенов. Пропсы по умолчанию — её: загрузка светом по
+                подписи и группа-лоток.
+              </template>
+              Активная тема у сборки одна, поэтому превью показано островами:
               <code>&lt;GrConfigProvider theme="{{ preview.theme.id }}" mode="…"&gt;</code>.
             </p>
           </div>
@@ -196,14 +209,31 @@ function onModeChange(next: string | number): void {
                 <p class="text-xs text-[var(--gr-muted-fg)]">
                   {{ entry.title ?? entry.name }} · <code>{{ entry.value }}</code>
                 </p>
-                <div class="flex flex-wrap gap-2">
-                  <GrButton>Основное действие</GrButton>
+                <div class="flex flex-wrap items-center gap-2">
+                  <GrButton tone="neutral">
+                    Основное действие
+                  </GrButton>
                   <GrButton variant="secondary">
                     Второе
                   </GrButton>
                   <GrBadge tone="success">
                     Бейдж
                   </GrBadge>
+                </div>
+                <div class="flex flex-wrap items-center gap-2">
+                  <GrButton tone="neutral" variant="outline" :loading="saving" @click="saving = !saving">
+                    Сохраняем
+                  </GrButton>
+                  <GrButtonGroup size="sm" aria-label="Период">
+                    <GrButton
+                      v-for="item in ranges"
+                      :key="item.value"
+                      :aria-pressed="range === item.value ? 'true' : 'false'"
+                      @click="range = item.value"
+                    >
+                      {{ item.label }}
+                    </GrButton>
+                  </GrButtonGroup>
                 </div>
                 <GrInput model-value="Поле ввода" aria-label="Поле ввода" />
               </div>

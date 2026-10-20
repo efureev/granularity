@@ -1,4 +1,4 @@
-a{color:#973f22}a:hover{color:#141413}
+a{color:#8a3b1c}a:hover{color:#1c1b18}
 .pills{display:flex;flex-wrap:wrap;gap:6px}
 .ctl{display:flex;flex-direction:column;gap:8px}
 .inp{height:36px;padding:0 12px;border:1px solid var(--hair-2);border-radius:8px;background:var(--card);color:var(--fg);font:400 14px/20px system-ui,sans-serif;outline:none}

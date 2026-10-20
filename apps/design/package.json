@@ -12,10 +12,12 @@
   },
   "devDependencies": {
     "@antfu/eslint-config": "^9.3.0",
+    "@axe-core/playwright": "^4.13.0",
     "@feugene/granum": "^3.7.1",
     "@feugene/granum-engine-wind": "^3.7.1",
     "@feugene/unplugin-granularity": "^1.1.0",
     "@iconify-json/lucide": "^1.2.126",
+    "@playwright/test": "^1.62.1",
     "@unocss/reset": "^66.8.1",
     "@vitejs/plugin-vue": "^6.0.8",
     "eslint": "^10.9.1",
@@ -36,6 +38,8 @@
     "lint:fix": "eslint . --cache --fix",
     "typecheck": "vue-tsc --noEmit -p tsconfig.json",
     "test": "vitest --config vitest.config.ts",
-    "test:run": "vitest run --config vitest.config.ts"
+    "test:run": "vitest run --config vitest.config.ts",
+    "test:e2e": "playwright test",
+    "test:e2e:update": "playwright test --update-snapshots"
   }
 }

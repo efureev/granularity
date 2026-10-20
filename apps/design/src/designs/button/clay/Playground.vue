@@ -154,7 +154,7 @@ const vals = computed(() => {
 </div>
 
 <div style="display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 16px">
-<pre class="mono" style="margin: 0; padding: 18px 20px; border-radius: 12px; background: #141413; color: #f0eee6; white-space: pre; overflow: auto; min-height: 200px">{{ vals.code }}</pre>
+<pre class="mono" style="margin: 0; padding: 18px 20px; border-radius: 12px; background: #1c1b18; color: #edeae2; white-space: pre; overflow: auto; min-height: 200px">{{ vals.code }}</pre>
 <div class="card" style="padding: 18px 20px; display: flex; flex-direction: column; gap: 8px">
 <span class="colh">что услышит скринридер</span>
 <template v-for="(r, rIndex) in vals.a11y" :key="rIndex">

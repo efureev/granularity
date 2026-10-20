@@ -27,6 +27,8 @@ const tones = ['primary', 'neutral', 'success', 'danger'] as const
 const query = ref('Поиск по проекту')
 const notify = ref(true)
 const period = ref('week')
+const scale = ref('День')
+const scales = ['День', 'Неделя', 'Месяц']
 const periods = [
   { label: 'День', value: 'day' },
   { label: 'Неделя', value: 'week' },
@@ -142,6 +144,17 @@ const periods = [
               <GrButton variant="outline" tone="danger">
                 Удалить
               </GrButton>
+            </div>
+            <!-- Пропсы по умолчанию темы: вид загрузки и группы — свои у каждой темы -->
+            <div class="flex flex-wrap items-center gap-3">
+              <GrButton tone="neutral" loading>
+                Сохраняем
+              </GrButton>
+              <GrButtonGroup size="sm" aria-label="Масштаб">
+                <GrButton v-for="item in scales" :key="item" :aria-pressed="scale === item ? 'true' : 'false'" @click="scale = item">
+                  {{ item }}
+                </GrButton>
+              </GrButtonGroup>
             </div>
             <div class="flex flex-wrap items-center gap-2">
               <GrBadge tone="success">

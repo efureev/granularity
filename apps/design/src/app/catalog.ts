@@ -134,8 +134,8 @@ export const catalog: CatalogComponent[] = [
         title: 'Глина',
         status: 'concept',
         tagline: 'Тёплая бумага, графитовые чернила и одна глиняная точка на экран.',
-        docHeading: 'Глина — концепт',
-        palette: ['#d97757', '#141413', '#faf9f5'],
+        docHeading: 'Глина — тема `clay`',
+        palette: ['#d27a55', '#1c1b18', '#f5f2ea'],
         boards: [
           board('overview', 'Overview', 'Концепция'),
           board('variants', 'Variants', 'Варианты × тоны'),

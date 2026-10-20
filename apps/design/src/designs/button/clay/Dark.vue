@@ -93,7 +93,7 @@ const vals = computed(() => {
 </div>
 <div class="card" style="padding: 22px; display: flex; flex-direction: column; gap: 8px">
 <h3 class="heading" style="font-size: 19px">Фокус светлее</h3>
-<p class="body">Синий контур поднят до #6aa3e8, чтобы держать 3:1 на тёмном фоне. Это по-прежнему единственный холодный цвет на экране.</p>
+<p class="body">Синий контур поднят до #6fa2e2, чтобы держать 3:1 на тёмном фоне. Это по-прежнему единственный холодный цвет на экране.</p>
 </div>
 </div>
 

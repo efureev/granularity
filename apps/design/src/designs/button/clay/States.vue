@@ -105,7 +105,7 @@ const vals = computed(() => {
 <span class="cap">outline</span><div><button class="gb s-md v-outline t-neutral is-disabled" type="button" aria-disabled="true">Экспорт</button></div>
 <span class="cap">с причиной</span><div style="padding-top: 30px"><span class="anchor"><button class="gb s-md v-primary t-primary is-disabled is-focus" type="button" aria-disabled="true" aria-describedby="why">Отправить</button><span id="why" class="tip" role="tooltip">Сначала добавьте получателя</span></span></div>
 </div>
-<p class="body">Заливка становится бумагой на тон темнее фона (Gray 150), подпись — серым 450. Кнопка выглядит пустой, а не сломанной; причину показывает подсказка, если кнопка оставлена в фокусе.</p>
+<p class="body">Заливка становится бумагой на тон темнее фона, подпись — тёплым серым (роли `--gr-disabled-*`). Кнопка выглядит пустой, а не сломанной; причину показывает подсказка, если кнопка оставлена в фокусе.</p>
 </div>
 
 </div>

@@ -14,6 +14,7 @@ declare module 'vue' {
     GrAlert: typeof import('@feugene/granularity/components/GrAlert')['GrAlert']
     GrBadge: typeof import('@feugene/granularity/components/GrBadge')['GrBadge']
     GrButton: typeof import('@feugene/granularity/components/GrButton')['GrButton']
+    GrButtonGroup: typeof import('@feugene/granularity/components/GrButtonGroup')['GrButtonGroup']
     GrCard: typeof import('@feugene/granularity/components/GrCard')['GrCard']
     GrCheckbox: typeof import('@feugene/granularity/components/GrCheckbox')['GrCheckbox']
     GrConfigProvider: typeof import('@feugene/granularity/components/GrConfigProvider')['GrConfigProvider']

@@ -1,6 +1,6 @@
 import { fileURLToPath, URL } from 'node:url'
 
-import { emitCss, prepareApp } from '@feugene/granum/node'
+import { emitCss, prepareApp, resolveThemeManifest } from '@feugene/granum/node'
 import { beforeAll, describe, expect, it } from 'vitest'
 
 import { grRoleTokens, type GrThemeData, resolveModes } from '@feugene/granularity-tokens'
@@ -230,18 +230,22 @@ describe('режим contrast', () => {
 
 /**
  * Что из этого собрал granum: режимы — под своими парами с токенами
- * компонентов базы, своя тема — полными блоками пар превью и никогда под `:root`.
+ * компонентов базы в общем листе; темы превью — полными блоками своих пар,
+ * никогда под `:root` и только в листе превью (`css.previews: 'separate'`).
  */
 describe('сборка granum', () => {
+  const root = fileURLToPath(new URL('../../', import.meta.url))
   let themes = ''
+  let previews: Readonly<Record<string, string>> = {}
 
   beforeAll(async () => {
-    const root = fileURLToPath(new URL('../../', import.meta.url))
-    themes = (await emitCss(await prepareApp({ ...granumConfig, components: ['@feugene/granularity:GrButton'] }, root))).layers.themes
+    const emitted = await emitCss(await prepareApp({ ...granumConfig, components: ['@feugene/granularity:GrButton'] }, root))
+    themes = emitted.layers.themes
+    previews = emitted.previews
   }, 60_000)
 
-  const block = (selector: string): Map<string, string> => {
-    const bodies = [...themes.matchAll(/([^{}]+)\{([^{}]*)\}/g)]
+  const block = (selector: string, css: string = themes): Map<string, string> => {
+    const bodies = [...css.matchAll(/([^{}]+)\{([^{}]*)\}/g)]
       .filter(([, head]) => head!.split(',').map(part => part.trim()).includes(selector))
       .map(([, , body]) => body!)
     return parseDeclarations(bodies.join('\n'))
@@ -253,18 +257,35 @@ describe('сборка granum', () => {
     expect(block('[data-theme="slate-contrast"]').get('--gr-bg')).toBe('#ffffff')
   })
 
+  it('превью — только в листе превью: в общем листе их пар нет', () => {
+    expect(Object.keys(previews).sort()).toEqual(['brand', 'clay'])
+    expect(themes).not.toMatch(/data-theme="(?:brand|clay)-/)
+  })
+
   it('brand — превью: блоки обеих пар, примитивы темы в них, под :root не выходит', () => {
-    const light = block('[data-theme="brand-light"]')
+    const light = block('[data-theme="brand-light"]', previews.brand)
 
     expect(light.get('--gr-primary')).toBe('#0f766e')
     expect(light.get('--gr-radius-md')).toBe('10px')
-    expect(block('[data-theme="brand-dark"]').get('--gr-primary')).toBe('#5eead4')
-    expect(themes).not.toContain(':root, [data-theme="brand-')
+    expect(block('[data-theme="brand-dark"]', previews.brand).get('--gr-primary')).toBe('#5eead4')
+    expect(previews.brand).not.toContain(':root')
   })
 
   it('brand наследует токены компонентов «Сланца» по цепочке extends', () => {
     // Токены кнопки по темам объявлены только для `slate`: без `extends` в теме
     // приложения превью осталось бы с одними фолбэками компонента.
-    expect([...block('[data-theme="brand-dark"]').keys()].some(token => token.startsWith('--gr-button-'))).toBe(true)
+    expect([...block('[data-theme="brand-dark"]', previews.brand).keys()].some(token => token.startsWith('--gr-button-'))).toBe(true)
+  })
+
+  it('clay — тема каталога превью: свои токены кнопки и пропсы по умолчанию в манифесте', () => {
+    expect(block('[data-theme="clay-light"]', previews.clay).get('--gr-button-neutral-bg')).toBe('var(--gr-fg)')
+    expect(block('[data-theme="clay-dark"]', previews.clay).get('--gr-button-shadow')).toBe('none')
+
+    const { providers, theme, previews: choices, modes } = granumConfig
+    const manifest = resolveThemeManifest({ providers, theme, previews: choices, modes, root })
+    const clay = manifest.previews?.find(preview => preview.theme.id === 'clay')
+    expect(clay?.extensions?.granularity).toEqual({
+      componentDefaults: { GrButton: { loadingIndicator: 'shimmer' }, GrButtonGroup: { appearance: 'tray' } },
+    })
   })
 })

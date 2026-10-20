@@ -32,7 +32,7 @@
 <span class="h3" style="font-size: 14px">Предложенная правка</span>
 <span class="cap">абзац 2</span>
 </div>
-<p class="serif" style="font-size: 15px; line-height: 1.55; color: var(--fg-2)"><span style="text-decoration: line-through; color: var(--muted-fg)">удержались на уровне</span> <span style="background: color-mix(in srgb, #d97757 18%, transparent); border-radius: 3px; padding: 0 2px; color: var(--fg)">не превысили уровень</span> второго квартала.</p>
+<p class="serif" style="font-size: 15px; line-height: 1.55; color: var(--fg-2)"><span style="text-decoration: line-through; color: var(--muted-fg)">удержались на уровне</span> <span style="background: color-mix(in srgb, #d27a55 18%, transparent); border-radius: 3px; padding: 0 2px; color: var(--fg)">не превысили уровень</span> второго квартала.</p>
 <div style="display: flex; align-items: center; gap: 8px">
 <button class="gb s-sm v-primary t-primary" type="button">Принять правку</button>
 <button class="gb s-sm v-ghost t-neutral" type="button">Отклонить</button>
@@ -66,7 +66,7 @@
 </div>
 
 <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px">
-<div class="paper" style="min-height: 260px; padding: 28px; display: flex; align-items: center; justify-content: center; background: color-mix(in srgb, #141413 6%, var(--bg))">
+<div class="paper" style="min-height: 260px; padding: 28px; display: flex; align-items: center; justify-content: center; background: color-mix(in srgb, #1c1b18 6%, var(--bg))">
 <div role="dialog" aria-labelledby="dlg-t" style="width: 420px; padding: 24px; background: var(--card); border: 1px solid var(--hair); border-radius: 16px; display: flex; flex-direction: column; gap: 10px">
 <h4 id="dlg-t" class="heading" style="font-size: 20px">Удалить «Квартальный отчёт»?</h4>
 <p class="body">Документ пропадёт у всех читателей. Восстановить его не получится.</p>

@@ -11,6 +11,20 @@ yarn workspace @feugene/granularity-design test:run
 Как витрина, приложение работает с собранным `dist` пакета: `dev` пересобирает его
 сам, а после правки библиотеки при запущенном сервере — `yarn build:granularity`.
 
+## Темы в браузере
+
+```bash
+yarn workspace @feugene/granularity-design test:e2e          # axe и эталоны страниц тем
+yarn workspace @feugene/granularity-design test:e2e:update   # переснять эталоны
+```
+
+`e2e/themes.spec.ts` открывает `/themes/<slug>` каждой темы каталога: axe с
+`color-contrast` по островам режимов и эталон раздела «Компоненты» в каждом режиме.
+Новая тема каталога попадает в прогон сама; эталоны для неё снимаются тем же
+коммитом. Слой локальный, как визуальный гейт витрины: эталоны
+`*-chromium-darwin.png` снимаются на машине владельца, и перед съёмкой `dist`
+пакета обязан быть свежим (`yarn build:granularity`).
+
 ## Что где
 
 | Раздел | Откуда данные |
