@@ -9,6 +9,7 @@ to [Semantic Versioning](https://semver.org/).
 
 ### Docs
 
+- `modes.md`: раздел «Свой CSS под режим» — роли, вариант `dark:`, `light-dark()`, суффикс пары, пара; ловушка вложенных островов. `best-practices.md` ссылается на него.
 - `granum.md`, `installation.md`: granum и движок — `≥ 3.0 < 4` и `^3.0`; по умолчанию в сборке тема каталога `slate` в режиме по умолчанию `light` (с granum 3.3), второй режим — `modes.names`; опции конфига — `theme`, `previews`, `modes` вместо `themes`.
 
 ## [v2.0.0] 2026-10-19
