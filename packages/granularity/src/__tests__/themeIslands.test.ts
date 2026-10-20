@@ -130,12 +130,20 @@ describe.each(THEMES)('тема %s', (theme) => {
   describe('порядок слоёв в `themes/<тема>.css` (D4)', () => {
     const firstFallback = () => css.indexOf('@supports')
 
-    it('фолбэки `@supports` идут после всех формул и режимов', () => {
-      const lastFormula = Math.max(...[...css.matchAll(/^\s*--gr-[\w-]+: color-mix\(/gm)].map(match => match.index))
-      const lastMode = Math.max(css.indexOf(`[data-theme="${LIGHT}"] {`), css.indexOf(`[data-theme="${DARK}"] {`))
+    // Файл — склейка `root.css` и режимов: фолбэк режима идёт за его блоком, а не
+    // за всеми режимами. Блок другого режима ниже фолбэка ничего не ломает —
+    // на элементе с той парой он и должен побеждать фолбэк, пришедший через `:root`.
+    it('фолбэки `@supports` идут после формул `root` и после блока своего режима', () => {
+      const root = css.indexOf(`[data-theme="${LIGHT}"] {`)
+      const lastRootFormula = Math.max(...[...css.slice(0, root).matchAll(/^\s*--gr-[\w-]+: color-mix\(/gm)].map(match => match.index))
 
-      expect(firstFallback()).toBeGreaterThan(lastFormula)
-      expect(firstFallback()).toBeGreaterThan(lastMode)
+      expect(firstFallback()).toBeGreaterThan(lastRootFormula)
+      for (const key of [LIGHT, DARK!]) {
+        const own = css.indexOf(`[data-theme="${key}"] {`)
+        const fallback = css.indexOf(`[data-theme="${key}"] {`, css.indexOf('@supports', own))
+
+        expect(fallback, key).toBeGreaterThan(own)
+      }
     })
 
     it('фолбэк объявлен на тех же селекторах, что и режим', () => {

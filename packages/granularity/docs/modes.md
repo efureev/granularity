@@ -43,7 +43,9 @@ setMode('ocean') // режим из modes.define — тем же вызовом
 
 Без `manifest` действует тема каталога по умолчанию — `slate` с режимами
 `light`/`dark`: так собран готовый `@feugene/granularity/themes/slate.css` для
-подключения без granum. Приложению на granum с другой темой или своими режимами
+подключения без granum. Приложение без granum, взявшее тему по частям
+(`themes/slate/root.css` и свои режимы), отдаёт манифест своих режимов —
+`createThemeManifest` из `@feugene/granum/runtime`. Приложению на granum с другой темой или своими режимами
 манифест передавать обязательно — пары `slate-*` в его CSS не совпадут ни с одним
 селектором.
 

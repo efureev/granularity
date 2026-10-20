@@ -10,7 +10,8 @@ import { granularityProvider } from './src/granular-provider'
 /**
  * Копирует базовый слой и preflight (`src/styles/*`) в `dist/styles/` для
  * подключения без granum — `import '@feugene/granularity/styles.css'`. Тему
- * рядом (`dist/themes/<id>.css`) пишет следующий шаг сборки, `scripts/theme-css.mjs`.
+ * рядом (`dist/themes/<id>.css` и по частям, `dist/themes/<id>/`) пишет следующий
+ * шаг сборки, `scripts/theme-css.mjs`.
  */
 function copyStylesPlugin() {
   return {

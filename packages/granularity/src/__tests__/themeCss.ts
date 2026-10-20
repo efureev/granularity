@@ -101,6 +101,20 @@ export function themeCss(theme: GrThemeId = DEFAULT_THEME): string {
   return css
 }
 
+const partCache = new Map<string, string>()
+
+/** Часть темы — `root` или режим: файл `themes/<тема>/<часть>.css`. */
+export function themePartCss(theme: GrThemeId, part: string): string {
+  const key = `${theme}/${part}`
+  let css = partCache.get(key)
+  if (css === undefined) {
+    css = execFileSync('node', ['scripts/theme-css.mjs', '--stdout', theme, part], { cwd: pkgDir, encoding: 'utf8' })
+    partCache.set(key, css)
+  }
+
+  return css
+}
+
 function withDashes(tokens: Readonly<TokenMap> | undefined): TokenMap {
   return Object.fromEntries(Object.entries(tokens ?? {}).map(([name, value]) => [`--${name}`, value]))
 }
