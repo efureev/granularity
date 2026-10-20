@@ -81,8 +81,8 @@
   "devDependencies": {
     "@antfu/eslint-config": "^9.3.0",
     "@feugene/granularity-test-kit": "^2.0.0",
-    "@feugene/granum": "^3.5.0",
-    "@feugene/granum-engine-wind": "^3.5.0",
+    "@feugene/granum": "^3.7.1",
+    "@feugene/granum-engine-wind": "^3.7.1",
     "@types/node": "^26.4.0",
     "eslint": "^10.9.1",
     "globals": "^16.5.0",
