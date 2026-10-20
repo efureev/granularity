@@ -755,7 +755,7 @@ export async function setupI18n() {
 <!-- ecosystem:generated:start -->
 | Пакет | Версия | Компоненты | Блок i18n | Резолвер |
 | --- | --- | --- | --- | --- |
-| `@feugene/granularity` | 2.2.0 | ядро, 106 subpath-экспортов `./components/Gr*` | `gr` | `GranularityResolver` (из `@feugene/unplugin-granularity`) |
+| `@feugene/granularity` | 2.3.0 | ядро, 106 subpath-экспортов `./components/Gr*` | `gr` | `GranularityResolver` (из `@feugene/unplugin-granularity`) |
 | `@feugene/granularity-charts` | 2.0.0 | `GrChartArea`, `GrChartBar`, `GrChartBullet`, `GrChartFunnel`, `GrChartHeatmap`, `GrChartLine`, `GrChartPie`, `GrChartRadar`, `GrChartWaterfall`, `GrSparkline` | `grCharts` | `GranularityChartsResolver` |
 | `@feugene/granularity-chrono` | 2.0.0 | `GrCalendar`, `GrDatePicker`, `GrDateRangePicker`, `GrDateTimePicker`, `GrDuration`, `GrRelativeTime`, `GrTimePicker` | `grChrono` | `GranularityChronoResolver` |
 | `@feugene/granularity-code` | 2.0.0 | `GrCodeBlock`, `GrCodeEditor`, `GrDiff` | `grCode` | `GranularityCodeResolver` |

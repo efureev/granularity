@@ -7,6 +7,8 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v2.3.0] 2026-10-20
+
 ### Added
 
 - **`GrButton`: загрузка светом по подписи — `loadingIndicator="shimmer"`.** Свет проходит по
