@@ -7,6 +7,8 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v1.2.0] 2026-10-20
+
 ### Added
 
 - **Тема «Глина» — `clay`.** Тёплая бумага и графит, один акцент цвета глины; режимы
