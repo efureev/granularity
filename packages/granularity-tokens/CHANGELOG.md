@@ -7,12 +7,16 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v1.1.0] 2026-10-20
+
 ### Added
 
 - **`mode.fallbacks` у `createMode` и `extendMode`** — фолбэки `@supports not (color-mix)`,
   посчитанные от ролей самого режима, данными. В `modes.define` granum 3.4:
   `{ ...ocean.definition, fallbacks: ocean.fallbacks }` — без них браузер без `color-mix`
   получает hover и active базы. `definition` не меняется и годится для granum раньше 3.4.
+- **`grThemeManifest()` несёт `activation.value`** — шаблон пары `{theme}-{mode}`, как манифест
+  сборки granum; совпадение с `createThemeManifest` granum 3.4 держит тест.
 
 ### Docs
 
