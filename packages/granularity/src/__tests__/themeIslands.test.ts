@@ -146,10 +146,14 @@ describe.each(THEMES)('тема %s', (theme) => {
       }
     })
 
-    it('фолбэк объявлен на тех же селекторах, что и режим', () => {
+    // Фолбэк режима по умолчанию не выходит под голым `:root`: в браузере без
+    // `color-mix` он совпал бы с `<html data-theme="<тёмная пара>">` и перебил бы
+    // тёмный режим на корне. Корень без атрибута и своя пара — этого хватает.
+    it('фолбэк режима по умолчанию — на корне без атрибута и своей паре, тёмного — на своей паре', () => {
       const fallbacks = css.slice(firstFallback())
 
-      expect(fallbacks).toContain(`  :root, [data-theme="${LIGHT}"] {`)
+      expect(fallbacks).toContain(`  :root:not([data-theme]), [data-theme="${LIGHT}"] {`)
+      expect(fallbacks).not.toContain(`  :root, [data-theme="${LIGHT}"] {`)
       expect(fallbacks).toContain(`  [data-theme="${DARK}"] {`)
     })
 
