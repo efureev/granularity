@@ -252,9 +252,14 @@ export default defineConfig({
 В точке входа приложения импортируется виртуальный CSS плагина — один модуль
 со всеми пятью слоями каскада:
 
+```css
+/* reset.css */
+@import '@unocss/reset/tailwind-compat.css' layer(reset);
+```
+
 ```ts
 // main.ts
-import '@unocss/reset/tailwind-compat.css'
+import './reset.css' // сброс — в своём слое и первым
 import 'virtual:granum.css'
 
 import { createApp } from 'vue'

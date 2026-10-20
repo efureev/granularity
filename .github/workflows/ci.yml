@@ -467,6 +467,13 @@ jobs:
         if: always()
         run: yarn check:licenses
 
+      # Сброс браузерных стилей вне слоя бьёт любой `@layer` и перебивает утилиты
+      # компонентов: красная кнопка теряла контраст, таблицы схлопывались. Примеры
+      # доки и песочницы обязаны класть его в слой — их копируют в чужие проекты.
+      - name: Reset in a layer
+        if: always()
+        run: yarn check:reset-layer
+
       # `vue-tsc` эмитит `.d.ts` на сборке — красный typecheck ломает публикацию типов.
       - name: Typecheck package
         if: always()

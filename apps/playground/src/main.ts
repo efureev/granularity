@@ -21,7 +21,7 @@ import App from './App.vue'
 // Токены, база, встроенные темы `light`/`dark`, CSS выбранных компонентов и
 // утилиты разметки приезжают одним виртуальным модулем, пятью каскадными
 // слоями; селекция задана в `apps/playground/granum.config.ts`.
-import '@unocss/reset/tailwind-compat.css'
+import './styles/reset.css'
 import 'virtual:granum.css'
 // Тема стенда — нелейерный CSS, поэтому по правилам каскада она выигрывает у
 // любого слоя granum независимо от порядка импортов. Раньше порядок решал всё:

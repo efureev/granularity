@@ -74,10 +74,22 @@ export default defineGranumConfig({
 Весь CSS granum приезжает одним модулем, а разделение живёт внутри него —
 пятью слоями каскада:
 
+```css
+/* src/reset.css */
+@import '@unocss/reset/tailwind-compat.css' layer(reset);
+```
+
 ```ts
-import '@unocss/reset/tailwind-compat.css' // сброс браузерных стилей
+import './reset.css' // сброс браузерных стилей — в своём слое и первым
 import 'virtual:granum.css' // токены, база, темы, CSS компонентов, утилиты
 ```
+
+**Сброс — в слое и первым.** Нелейерный CSS бьёт любой `@layer` независимо от
+специфичности: сброс вне слоя перебил бы утилиты компонентов — `button { color:
+inherit }` снимает цвет текста кнопки, `table { border-collapse: collapse }`
+схлопывает таблицы. Из JS слой не задать, отсюда CSS-файл. Слой встаёт в каскад
+по первому появлению, поэтому `reset`, подключённый первым, оказывается до слоёв
+granum и проигрывает им, как и положено сбросу.
 
 Порядок слоёв объявлен первой строкой этого файла, поэтому утилита в разметке
 приложения перебивает базовый стиль компонента, а нелейерный CSS приложения
@@ -109,6 +121,7 @@ my-app/
 └── src/
     ├── main.ts
     ├── App.vue
+    ├── reset.css
     ├── reset.ts
     └── granularity.ts
 ```
@@ -226,11 +239,16 @@ declare module 'virtual:granum.css'
 ### Точка входа
 
 Каждый CSS-вход вынесен в отдельный модуль — так сборщик кладёт их в разные
-чанки, и порядок загрузки остаётся тем, который задан в `main.ts`:
+чанки, а порядок задают последовательные `await` в `main.ts`:
+
+```css
+/* src/reset.css */
+@import '@unocss/reset/tailwind-compat.css' layer(reset);
+```
 
 ```ts
 // src/reset.ts
-import '@unocss/reset/tailwind-compat.css'
+import './reset.css'
 
 export {}
 ```
@@ -248,10 +266,10 @@ import { createApp } from 'vue'
 
 import App from './App.vue'
 
-await Promise.all([
-  import('./reset'),
-  import('./granularity'),
-])
+// Сначала сброс, затем CSS granum: слой встаёт в каскад по первому появлению.
+// Параллельная загрузка в dev вставила бы стили в порядке исполнения модулей.
+await import('./reset')
+await import('./granularity')
 
 createApp(App).mount('#app')
 ```
@@ -429,7 +447,7 @@ createApp().mount('#app')
 
 ```ts
 // src/styles.ts
-import '@unocss/reset/tailwind-compat.css'
+import './reset.css' // `@import '@unocss/reset/tailwind-compat.css' layer(reset);`
 import 'virtual:granum.css'
 
 export {}

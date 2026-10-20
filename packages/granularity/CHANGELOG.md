@@ -7,6 +7,14 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Docs
+
+- **Сброс браузерных стилей — в слое.** `getting-started.md` и `installation.md` подключают
+  `@unocss/reset` CSS-файлом `@import '@unocss/reset/tailwind-compat.css' layer(reset);`, первым, а не
+  импортом из JS: нелейерный сброс перебивал утилиты компонентов. В примере точки входа CSS-модули
+  грузятся последовательно — слой встаёт в каскад по первому появлению. Песочницы переведены так же;
+  гейт — `yarn check:reset-layer` в корне.
+
 ## [v2.2.0] 2026-10-20
 
 ### Added

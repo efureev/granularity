@@ -54,9 +54,11 @@ describe('playground-5 config', () => {
     expect(playground5CssEntry).toContain(`import 'virtual:granum.css'`)
     expect(playground5ViteEnv).toContain(`declare module 'virtual:granum.css'`)
     // Слои каскада внутри одного ассета — отдельной entry под app-CSS больше нет.
-    expect(playground5MainEntry).toContain('await Promise.all([')
-    expect(playground5MainEntry).toContain(`import('./reset')`)
-    expect(playground5MainEntry).toContain(`import('./granularity')`)
+    // Сброс — в своём слое и строго первым: слой встаёт в каскад по первому появлению.
+    expect(playground5MainEntry).not.toContain('Promise.all')
+    expect(playground5MainEntry.indexOf(`await import('./reset')`)).toBeGreaterThan(-1)
+    expect(playground5MainEntry.indexOf(`await import('./reset')`)).toBeLessThan(playground5MainEntry.indexOf(`await import('./granularity')`))
+    expect(read('../reset.css')).toContain(`@import '@unocss/reset/tailwind-compat.css' layer(reset);`)
     expect(playground5MainEntry).not.toContain('app-styles')
   })
 
