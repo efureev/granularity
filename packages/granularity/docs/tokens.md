@@ -180,12 +180,20 @@
 | `--gr-button-disabled-bg` | тема компонента | var(--gr-disabled-bg) | Заливка недоступной кнопки: она гасится поверхностью, а не прозрачностью. Ссылка на общую роль — недоступное во всём пакете перекрашивается одним местом. |
 | `--gr-button-disabled-fg` | тема компонента | var(--gr-disabled-fg) | Цвет текста недоступной кнопки. Ссылка на общую роль недоступного состояния. |
 | `--gr-button-disabled-brd` | тема компонента | var(--gr-disabled-brd) | Цвет рамки недоступной кнопки. Ссылка на общую роль недоступного состояния. |
+| `--gr-button-neutral-bg` | только хук | var(--gr-secondary) | Заливка solid-кнопки тона `neutral`. Тема задаёт её, когда главная кнопка — не серая плашка: у «Глины» это графит, в тёмном режиме — светлая заливка. |
+| `--gr-button-neutral-bg-hover` | только хук | var(--gr-secondary-hover) | Заливка solid-кнопки `neutral` под указателем. |
+| `--gr-button-neutral-bg-active` | только хук | var(--gr-secondary-active) | Заливка solid-кнопки `neutral` в нажатии. |
+| `--gr-button-neutral-fg` | только хук | var(--gr-secondary-fg) | Подпись solid-кнопки `neutral`. Задаётся вместе с её заливкой. |
+| `--gr-button-ghost-bg-hover` | только хук | var(--gr-button-<тон>-soft-bg-hover) | Подложка прозрачных весов (`outline`, `ghost`, `ghost-border`) под указателем — одна на все тоны. Без неё — подложка тона; у «Глины» — оттенок бумаги. |
+| `--gr-button-ghost-bg-active` | только хук | var(--gr-button-<тон>-soft-bg-active) | Подложка прозрачных весов в нажатии — одна на все тоны. |
+| `--gr-button-shimmer-duration` | только хук | 1.8s | Один проход света по подписи при `loadingIndicator="shimmer"`. |
 
 ### GrButtonGroup
 
 | Токен | Откуда | По умолчанию | Назначение |
 | --- | --- | --- | --- |
 | `--gr-button-group-radius` | CSS компонента | var(--gr-button-radius, 0.375rem) | Скругление внешних углов группы. По умолчанию наследует радиус кнопки — внутренние углы группа гасит сама. |
+| `--gr-button-group-tray-bg` | только хук | var(--gr-muted) | Подложка лотка (`appearance="tray"`), на которой лежат звенья группы. |
 
 ### GrCarousel
 

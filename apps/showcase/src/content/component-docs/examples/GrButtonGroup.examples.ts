@@ -30,6 +30,13 @@ export const grButtonGroupExamples: ShowcaseComponentExampleDoc[] = [
     previewKey: 'gr-button-group-orientation',
   },
   {
+    id: 'button-group-tray',
+    title: 'Tray',
+    description: '`appearance="tray"` — звенья лежат в общем лотке с зазором, выбранное (`aria-pressed="true"`) — лист с рамкой поверх лотка. Вес и тон звена решает группа; тема включает лоток для всех групп через `componentDefaults` («Глина»).',
+    status: 'ready',
+    previewKey: 'gr-button-group-tray',
+  },
+  {
     id: 'button-group-filter-rail',
     title: 'Filter rail composition',
     description: 'Группа подходит и для shallow filters: рядом с cards/list states можно быстро переключать сегменты без отдельного tabs-компонента.',

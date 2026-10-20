@@ -1126,6 +1126,13 @@
             "default": "undefined"
           },
           {
+            "name": "loadingIndicator",
+            "description": "Вид загрузки. `spinner` — спиннер; `shimmer` — свет проходит по подписи, а подпись, иконки и ширина остаются на месте. Без текстовой подписи (кнопка из иконки) мерцать нечему — там спиннер. По умолчанию `spinner`; тема меняет его через `componentDefaults` («Глина»).",
+            "type": "GrButtonLoadingIndicator | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "block",
             "description": "Кнопка на всю ширину контейнера.",
             "type": "boolean | undefined",
@@ -1255,10 +1262,17 @@
           },
           {
             "name": "attached",
-            "description": "Склеивать кнопки в один блок. `false` — обычный ряд с зазором: каждая кнопка сохраняет свои радиусы и границы.",
+            "description": "Склеивать кнопки в один блок. `false` — обычный ряд с зазором: каждая кнопка сохраняет свои радиусы и границы. В лотке не действует.",
             "type": "boolean | undefined",
             "required": false,
             "default": "true"
+          },
+          {
+            "name": "appearance",
+            "description": "Вид группы. `default` — ряд по `attached`; `tray` — лоток: звенья лежат в общей подложке с зазором, прозрачные, а выбранное (`aria-pressed=\"true\"` или `aria-current`) — лист с рамкой поверх лотка. Вес и тон звена в лотке решает группа, свой проп кнопки сильнее. По умолчанию `default`; тема меняет его через `componentDefaults` («Глина»).",
+            "type": "GrButtonGroupAppearance | undefined",
+            "required": false,
+            "default": "undefined"
           }
         ]
       },
@@ -7319,6 +7333,13 @@
         "origin": "generated",
         "items": [
           {
+            "name": "spinner",
+            "description": "Свой компонент спиннера вместо иконки по умолчанию.",
+            "type": "Component | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "text",
             "description": "Подпись под спиннером. Пустая строка убирает её совсем. По умолчанию — из локали.",
             "type": "string | undefined",
@@ -7329,13 +7350,6 @@
             "name": "zIndexVar",
             "description": "Имя CSS-переменной слоя — escape-hatch мимо `--gr-z-loading`.",
             "type": "string | undefined",
-            "required": false,
-            "default": "undefined"
-          },
-          {
-            "name": "spinner",
-            "description": "Свой компонент спиннера вместо иконки по умолчанию.",
-            "type": "Component | undefined",
             "required": false,
             "default": "undefined"
           },

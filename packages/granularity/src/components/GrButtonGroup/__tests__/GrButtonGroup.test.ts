@@ -129,3 +129,54 @@ describe('GrButtonGroup — оформление кнопок', () => {
     expect(mount(Harness).get('button').classes()).toContain('h-7')
   })
 })
+
+describe('GrButtonGroup · лоток', () => {
+  function mountTray(groupProps: Record<string, unknown> = {}, pressedProps: Record<string, unknown> = {}) {
+    return mount(GrButtonGroup, {
+      props: { appearance: 'tray', ...groupProps },
+      slots: {
+        default: () => [
+          h(GrButton, { 'aria-pressed': 'true', ...pressedProps }, { default: () => 'День' }),
+          h(GrButton, { 'aria-pressed': 'false' }, { default: () => 'Неделя' }),
+        ],
+      },
+    })
+  }
+
+  it('звенья в общей подложке, без склейки: прозрачные, выбранное — лист с рамкой', () => {
+    const wrapper = mountTray()
+    const group = wrapper.get('[data-gr-button-group]')
+    const [pressed, plain] = wrapper.findAll('[data-gr-button]')
+
+    expect(group.attributes('data-appearance')).toBe('tray')
+    expect(group.attributes('data-attached')).toBeUndefined()
+    expect(group.classes()).toContain('bg-[var(--gr-button-group-tray-bg,var(--gr-muted))]')
+    expect(plain.attributes('data-gr-variant')).toBe('ghost')
+    expect(plain.attributes('data-gr-tone')).toBe('neutral')
+    expect(pressed.attributes('data-gr-variant')).toBe('secondary')
+    expect(pressed.attributes('data-gr-tone')).toBe('neutral')
+  })
+
+  it('свой вес и тон кнопки сильнее лотка', () => {
+    const [pressed] = mountTray({}, { variant: 'primary', tone: 'danger' }).findAll('[data-gr-button]')
+
+    expect(pressed.attributes('data-gr-variant')).toBe('primary')
+    expect(pressed.attributes('data-gr-tone')).toBe('danger')
+  })
+
+  it('вид по умолчанию — из componentDefaults (тема, провайдер)', () => {
+    const wrapper = mount(GrConfigProvider, {
+      props: { componentDefaults: { GrButtonGroup: { appearance: 'tray' } } },
+      slots: { default: () => h(GrButtonGroup, null, { default: () => h(GrButton, null, { default: () => 'Один' }) }) },
+    })
+
+    expect(wrapper.get('[data-gr-button-group]').attributes('data-appearance')).toBe('tray')
+  })
+
+  it('без лотка — прежняя склейка', () => {
+    const group = mount(GrButtonGroup, { slots: { default: () => h(GrButton, null, { default: () => 'Один' }) } }).get('[data-gr-button-group]')
+
+    expect(group.attributes('data-appearance')).toBeUndefined()
+    expect(group.attributes('data-attached')).toBe('')
+  })
+})

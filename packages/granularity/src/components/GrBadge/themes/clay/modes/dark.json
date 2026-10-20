@@ -1,0 +1,6 @@
+{
+  "gr-badge-danger-bg": "var(--gr-danger-text)",
+  "gr-badge-danger-fg": "var(--gr-bg)",
+  "gr-badge-info-bg": "var(--gr-info-text)",
+  "gr-badge-info-fg": "var(--gr-bg)"
+}

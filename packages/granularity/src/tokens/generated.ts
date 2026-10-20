@@ -900,11 +900,67 @@ export const grComponentTokens: GrComponentToken[] = [
     "description": "Цвет рамки недоступной кнопки. Ссылка на общую роль недоступного состояния."
   },
   {
+    "owner": "GrButton",
+    "name": "--gr-button-neutral-bg",
+    "kind": "hook",
+    "default": "var(--gr-secondary)",
+    "description": "Заливка solid-кнопки тона `neutral`. Тема задаёт её, когда главная кнопка — не серая плашка: у «Глины» это графит, в тёмном режиме — светлая заливка."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-neutral-bg-hover",
+    "kind": "hook",
+    "default": "var(--gr-secondary-hover)",
+    "description": "Заливка solid-кнопки `neutral` под указателем."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-neutral-bg-active",
+    "kind": "hook",
+    "default": "var(--gr-secondary-active)",
+    "description": "Заливка solid-кнопки `neutral` в нажатии."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-neutral-fg",
+    "kind": "hook",
+    "default": "var(--gr-secondary-fg)",
+    "description": "Подпись solid-кнопки `neutral`. Задаётся вместе с её заливкой."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-ghost-bg-hover",
+    "kind": "hook",
+    "default": "var(--gr-button-<тон>-soft-bg-hover)",
+    "description": "Подложка прозрачных весов (`outline`, `ghost`, `ghost-border`) под указателем — одна на все тоны. Без неё — подложка тона; у «Глины» — оттенок бумаги."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-ghost-bg-active",
+    "kind": "hook",
+    "default": "var(--gr-button-<тон>-soft-bg-active)",
+    "description": "Подложка прозрачных весов в нажатии — одна на все тоны."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-shimmer-duration",
+    "kind": "hook",
+    "default": "1.8s",
+    "description": "Один проход света по подписи при `loadingIndicator=\"shimmer\"`."
+  },
+  {
     "owner": "GrButtonGroup",
     "name": "--gr-button-group-radius",
     "kind": "css",
     "default": "var(--gr-button-radius, 0.375rem)",
     "description": "Скругление внешних углов группы. По умолчанию наследует радиус кнопки — внутренние углы группа гасит сама."
+  },
+  {
+    "owner": "GrButtonGroup",
+    "name": "--gr-button-group-tray-bg",
+    "kind": "hook",
+    "default": "var(--gr-muted)",
+    "description": "Подложка лотка (`appearance=\"tray\"`), на которой лежат звенья группы."
   },
   {
     "owner": "GrCarousel",

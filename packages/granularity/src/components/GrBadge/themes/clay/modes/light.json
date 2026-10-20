@@ -1,0 +1,10 @@
+{
+  "gr-badge-primary-bg": "var(--gr-primary-text)",
+  "gr-badge-primary-fg": "var(--gr-card)",
+  "gr-badge-success-bg": "var(--gr-success-text)",
+  "gr-badge-success-fg": "var(--gr-card)",
+  "gr-badge-warning-bg": "var(--gr-warning-text)",
+  "gr-badge-warning-fg": "var(--gr-card)",
+  "gr-badge-azure-bg": "var(--gr-azure-text)",
+  "gr-badge-azure-fg": "var(--gr-card)"
+}

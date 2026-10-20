@@ -1,0 +1,19 @@
+{
+  "gr-button-primary-border-soft": "color-mix(in srgb, var(--gr-fg) 15%, var(--gr-bg))",
+  "gr-button-primary-border": "color-mix(in srgb, var(--gr-fg) 30%, var(--gr-bg))",
+  "gr-button-success-border-soft": "color-mix(in srgb, var(--gr-fg) 15%, var(--gr-bg))",
+  "gr-button-success-border": "color-mix(in srgb, var(--gr-fg) 30%, var(--gr-bg))",
+  "gr-button-warning-border-soft": "color-mix(in srgb, var(--gr-fg) 15%, var(--gr-bg))",
+  "gr-button-warning-border": "color-mix(in srgb, var(--gr-fg) 30%, var(--gr-bg))",
+  "gr-button-danger-border-soft": "color-mix(in srgb, var(--gr-fg) 15%, var(--gr-bg))",
+  "gr-button-danger-border": "color-mix(in srgb, var(--gr-fg) 30%, var(--gr-bg))",
+  "gr-button-info-border-soft": "color-mix(in srgb, var(--gr-fg) 15%, var(--gr-bg))",
+  "gr-button-info-border": "color-mix(in srgb, var(--gr-fg) 30%, var(--gr-bg))",
+  "gr-button-slate-border-soft": "color-mix(in srgb, var(--gr-fg) 15%, var(--gr-bg))",
+  "gr-button-slate-border": "color-mix(in srgb, var(--gr-fg) 30%, var(--gr-bg))",
+  "gr-button-azure-border-soft": "color-mix(in srgb, var(--gr-fg) 15%, var(--gr-bg))",
+  "gr-button-azure-border": "color-mix(in srgb, var(--gr-fg) 30%, var(--gr-bg))",
+  "gr-button-neutral-border": "color-mix(in srgb, var(--gr-fg) 15%, var(--gr-bg))",
+  "gr-button-ghost-bg-hover": "color-mix(in srgb, var(--gr-fg) 8%, transparent)",
+  "gr-button-ghost-bg-active": "color-mix(in srgb, var(--gr-fg) 14%, transparent)"
+}

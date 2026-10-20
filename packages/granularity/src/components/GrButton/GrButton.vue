@@ -19,6 +19,7 @@ import {
   glyphSizes,
   grButtonBaseClass,
   grButtonClass,
+  type GrButtonLoadingIndicator,
   type GrButtonSize,
   type GrButtonTone,
   type GrButtonVariant,
@@ -46,6 +47,13 @@ export interface GrButtonProps {
    * остаётся в фокусе — нативный `disabled` не ставится.
    */
   loading?: boolean
+  /**
+   * Вид загрузки. `spinner` — спиннер; `shimmer` — свет проходит по подписи, а
+   * подпись, иконки и ширина остаются на месте. Без текстовой подписи (кнопка из
+   * иконки) мерцать нечему — там спиннер. По умолчанию `spinner`; тема меняет его
+   * через `componentDefaults` («Глина»).
+   */
+  loadingIndicator?: GrButtonLoadingIndicator
   /** i18n: что именно грузится. `aria-busy` сам по себе часть AT не объявляет. */
   loadingText?: string
   /**
@@ -86,6 +94,7 @@ const props = withDefaults(
     tone: undefined,
     size: undefined,
     loading: false,
+    loadingIndicator: undefined,
     loadingText: undefined,
     disabled: false,
     square: undefined,
@@ -106,9 +115,15 @@ const props = withDefaults(
 const group = useGrButtonGroup()
 
 const resolvedSize = useGrComponentSize(() => props.size ?? group?.size.value, { component: 'GrButton' })
-const resolvedVariant = useGrComponentProp('GrButton', 'variant', () => props.variant ?? group?.variant.value, 'primary')
-const resolvedTone = useGrComponentProp('GrButton', 'tone', () => props.tone ?? group?.tone.value, 'primary')
+// В лотке звено — прозрачная кнопка, а выбранное (`aria-pressed`/`aria-current`)
+// — лист поверх лотка: нейтральная плашка с рамкой. Свой вес кнопки сильнее.
+const inTray = computed(() => group?.appearance?.value === 'tray')
+const attrs = useAttrs()
+const pressedInTray = computed(() => inTray.value && ['true', 'page', 'step', 'location', 'date', 'time'].includes(String(attrs['aria-pressed'] ?? attrs['aria-current'] ?? '')))
+const resolvedVariant = useGrComponentProp('GrButton', 'variant', () => props.variant ?? (inTray.value ? (pressedInTray.value ? 'secondary' : 'ghost') : group?.variant.value), 'primary')
+const resolvedTone = useGrComponentProp('GrButton', 'tone', () => props.tone ?? group?.tone.value ?? (inTray.value ? 'neutral' : undefined), 'primary')
 const isSquare = useGrComponentProp('GrButton', 'square', () => props.square, false)
+const resolvedLoadingIndicator = useGrComponentProp('GrButton', 'loadingIndicator', () => props.loadingIndicator, 'spinner')
 
 const iconSizeBySize: Record<GrButtonSize, GrButtonSize> = { xs: 'xs', sm: 'sm', md: 'sm', lg: 'lg' }
 provideGrIconSizeHint(computed(() => iconSizeBySize[resolvedSize.value]))
@@ -151,7 +166,6 @@ const ariaDisabled = computed(() => (props.loading || (isLink.value && isDisable
 // отключённой, без нативного `disabled`. Раньше вид подправлял лист потребителя,
 // но он живёт в слое `granum.components` и цветам варианта — утилитам из
 // `granum.utilities` — проигрывал всегда.
-const attrs = useAttrs()
 const looksDisabled = computed(() => isDisabled.value || attrs['aria-disabled'] === 'true' || attrs['aria-disabled'] === true)
 
 const resolvedTarget = computed(() => props.target ?? (props.external ? '_blank' : undefined))
@@ -195,7 +209,12 @@ function labelIsText(): boolean {
  * кнопки не меняется, соседи не едут. С префиксом спиннер занимает его место.
  */
 function spinnerOverContent(): boolean {
-  return props.loading && !hasSlotContent('prefix')
+  return props.loading && !shimmerLabel() && !hasSlotContent('prefix')
+}
+
+/** Загрузка мерцанием подписи — только у текстовой подписи: у иконки мерцать нечему. */
+function shimmerLabel(): boolean {
+  return props.loading && resolvedLoadingIndicator.value === 'shimmer' && labelIsText()
 }
 
 const rootAttrs = computed(() => {
@@ -294,13 +313,14 @@ defineSlots<{
     :data-gr-variant="resolvedVariant"
     :data-gr-tone="resolvedTone"
     :data-gr-busy-overlay="spinnerOverContent() ? '' : undefined"
+    :data-gr-busy-shimmer="shimmerLabel() ? '' : undefined"
     v-bind="rootAttrs"
     :class="rootClass()"
     @click.capture="onClickCapture"
   >
     <!-- Спиннер занимает место префикса: две иконки рядом читались бы как ошибка. -->
-    <IconLoader v-if="props.loading && !spinnerOverContent()" class="animate-spin" :class="glyphSizes[resolvedSize]" aria-hidden="true" />
-    <slot v-else-if="!props.loading" name="prefix" />
+    <IconLoader v-if="props.loading && !shimmerLabel() && !spinnerOverContent()" class="animate-spin" :class="glyphSizes[resolvedSize]" aria-hidden="true" />
+    <slot v-else-if="!props.loading || shimmerLabel()" name="prefix" />
 
     <span v-if="labelIsText()" data-gr-button-label class="min-w-0 truncate" @mouseenter="titleWhenTruncated">
       <slot />
@@ -333,6 +353,40 @@ defineSlots<{
 
 [data-gr-button][data-gr-busy-overlay] > :not([data-gr-button-spinner]) {
   opacity: 0;
+}
+
+/*
+ * Загрузка мерцанием подписи: свет проходит по тексту, подпись и ширина на месте.
+ * Градиент кладётся на глифы самой подписи (`background-clip: text`), а не на
+ * корень — там он срезал бы заливку кнопки. `color` не трогается: иконки
+ * аддонов рисуются им и не мерцают.
+ */
+[data-gr-button][data-gr-busy-shimmer] [data-gr-button-label] {
+  background-image: linear-gradient(100deg, currentColor 35%, color-mix(in srgb, currentColor 35%, transparent) 50%, currentColor 65%);
+  background-size: 250% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gr-button-shimmer var(--gr-button-shimmer-duration, 1.8s) linear infinite;
+}
+
+@keyframes gr-button-shimmer {
+  from {
+    background-position: 100% 0;
+  }
+
+  to {
+    background-position: -150% 0;
+  }
+}
+
+/* Без движения сигналом остаётся приглушённая подпись. */
+@media (prefers-reduced-motion: reduce) {
+  [data-gr-button][data-gr-busy-shimmer] [data-gr-button-label] {
+    animation: none;
+    background-image: none;
+    -webkit-text-fill-color: color-mix(in srgb, currentColor 70%, transparent);
+  }
 }
 
 /*

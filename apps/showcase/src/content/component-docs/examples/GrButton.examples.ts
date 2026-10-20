@@ -9,6 +9,13 @@ export const grButtonExamples: ShowcaseComponentExampleDoc[] = [
     previewKey: 'gr-button-slots-and-states',
   },
   {
+    id: 'button-shimmer',
+    title: 'Загрузка светом по подписи',
+    description: '`loading-indicator="shimmer"` — свет проходит по подписи: подпись, иконки и ширина на месте, `aria-busy` и скрытый текст — как у спиннера. Тема включает такой вид для всех кнопок через `componentDefaults` («Глина»); у кнопки из одной иконки мерцать нечему — там спиннер.',
+    status: 'ready',
+    previewKey: 'gr-button-shimmer',
+  },
+  {
     id: 'button-builder',
     title: 'Interactive button constructor',
     description: 'Живой playground для всех ключевых пропсов `GrButton`: меняйте `variant`, `tone`, size, type и состояния без переключения между отдельными demo-картами.',

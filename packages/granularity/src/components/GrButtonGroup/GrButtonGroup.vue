@@ -2,7 +2,8 @@
 import { computed } from 'vue'
 
 import type { GrButtonSize, GrButtonTone, GrButtonVariant } from '../GrButton/grButtonStyles'
-import { provideGrButtonGroup } from '../shared/buttonGroupContext'
+import { provideGrButtonGroup, type GrButtonGroupAppearance } from '../shared/buttonGroupContext'
+import { useGrComponentProp } from '../shared/configContext'
 
 export type GrButtonGroupOrientation = 'horizontal' | 'vertical'
 
@@ -13,9 +14,17 @@ export interface GrButtonGroupProps {
   orientation?: GrButtonGroupOrientation
   /**
    * Склеивать кнопки в один блок. `false` — обычный ряд с зазором: каждая
-   * кнопка сохраняет свои радиусы и границы.
+   * кнопка сохраняет свои радиусы и границы. В лотке не действует.
    */
   attached?: boolean
+  /**
+   * Вид группы. `default` — ряд по `attached`; `tray` — лоток: звенья лежат в
+   * общей подложке с зазором, прозрачные, а выбранное (`aria-pressed="true"` или
+   * `aria-current`) — лист с рамкой поверх лотка. Вес и тон звена в лотке
+   * решает группа, свой проп кнопки сильнее. По умолчанию `default`; тема меняет
+   * его через `componentDefaults` («Глина»).
+   */
+  appearance?: GrButtonGroupAppearance
   /** Оформление, общее для кнопок группы. Проп самой кнопки сильнее. */
   size?: GrButtonSize
   /** Вес всех кнопок группы: `primary`, `outline`, `ghost` и т. д. Проп самой кнопки сильнее. */
@@ -28,15 +37,23 @@ const props = withDefaults(defineProps<GrButtonGroupProps>(), {
   ariaLabel: undefined,
   orientation: 'horizontal',
   attached: true,
+  appearance: undefined,
   size: undefined,
   variant: undefined,
   tone: undefined,
 })
 
+/** Лоток: подложка цвета бумаги с полями и зазором 2px вокруг звеньев. */
+const trayClass = 'gap-0.5 p-0.5 rounded-[var(--gr-radius-md)] bg-[var(--gr-button-group-tray-bg,var(--gr-muted))]'
+
+const resolvedAppearance = useGrComponentProp('GrButtonGroup', 'appearance', () => props.appearance, 'default')
+const tray = computed(() => resolvedAppearance.value === 'tray')
+
 provideGrButtonGroup({
   size: computed(() => props.size),
   variant: computed(() => props.variant),
   tone: computed(() => props.tone),
+  appearance: resolvedAppearance,
 })
 
 defineSlots<{
@@ -51,10 +68,11 @@ defineSlots<{
     class="inline-flex"
     :class="[
       orientation === 'vertical' ? 'flex-col items-stretch' : 'items-stretch',
-      attached ? '' : 'gap-2',
+      tray ? trayClass : attached ? '' : 'gap-2',
     ]"
     :data-orientation="orientation"
-    :data-attached="attached ? '' : undefined"
+    :data-attached="attached && !tray ? '' : undefined"
+    :data-appearance="tray ? 'tray' : undefined"
     role="group"
     :aria-label="ariaLabel"
   >

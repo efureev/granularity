@@ -8,7 +8,7 @@ export { grButtonConfig } from './config'
 // а вместе с ним — аугментацию реестра `GrConfigProvider`.
 export type { GrButtonConfigurableProps } from './defaults'
 
-export type { GrButtonSize, GrButtonTone, GrButtonVariant } from './grButtonStyles'
+export type { GrButtonLoadingIndicator, GrButtonSize, GrButtonTone, GrButtonVariant } from './grButtonStyles'
 export { grButtonSafelist } from './safelist'
 export type { GrButtonProps } from './GrButton.vue'
 export type GrButtonInstance = ComponentExposed<typeof GrButtonComponent>

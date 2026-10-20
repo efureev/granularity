@@ -2,6 +2,7 @@ import { mount } from '@vue/test-utils'
 import { h } from 'vue'
 import { describe, expect, it, vi } from 'vitest'
 
+import GrConfigProvider from '../../GrConfigProvider/GrConfigProvider.vue'
 import GrIcon from '../../GrIcon/GrIcon.vue'
 import GrButton from '../GrButton.vue'
 import { grButtonClass, type GrButtonTone, type GrButtonVariant } from '../grButtonStyles'
@@ -114,9 +115,9 @@ describe('GrButton', () => {
     expect(button.classes()).toContain('text-[var(--gr-warning-text,var(--gr-warning))]')
     expect(button.classes()).toContain('border-[var(--gr-button-warning-border)]')
     expect(className).toContain('hover:border-[var(--gr-warning)]')
-    expect(className).toContain('hover:bg-[var(--gr-button-warning-soft-bg-hover)]')
-    expect(className).toContain('active:bg-[var(--gr-button-warning-soft-bg-active)]')
-    expect(className).toContain('hover:active:bg-[var(--gr-button-warning-soft-bg-active)]')
+    expect(className).toContain('hover:bg-[var(--gr-button-ghost-bg-hover,var(--gr-button-warning-soft-bg-hover))]')
+    expect(className).toContain('active:bg-[var(--gr-button-ghost-bg-active,var(--gr-button-warning-soft-bg-active))]')
+    expect(className).toContain('hover:active:bg-[var(--gr-button-ghost-bg-active,var(--gr-button-warning-soft-bg-active))]')
   })
 
   it('поддерживает новые semantic tones slate и azure', () => {
@@ -148,7 +149,7 @@ describe('GrButton', () => {
     const azureClassName = azure.attributes('class') ?? ''
     expect(azure.attributes('data-gr-tone')).toBe('azure')
     expect(azure.classes()).toContain('text-[var(--gr-azure-text,var(--gr-azure))]')
-    expect(azureClassName).toContain('hover:bg-[var(--gr-button-azure-soft-bg-hover)]')
+    expect(azureClassName).toContain('hover:bg-[var(--gr-button-ghost-bg-hover,var(--gr-button-azure-soft-bg-hover))]')
     expect(azureClassName).toContain('hover:active:border-[var(--gr-azure-active)]')
   })
 
@@ -175,18 +176,21 @@ describe('GrButton', () => {
     expect(filled).toContain('hover:active:bg-[var(--gr-button-info-bg-active,var(--gr-info-active))]')
     expect(filled).toContain('hover:active:border-[var(--gr-button-info-bg-active,var(--gr-info-active))]')
 
-    expect(ghost).toContain('hover:bg-[var(--gr-button-info-soft-bg-hover)]')
-    expect(ghost).toContain('active:bg-[var(--gr-button-info-soft-bg-active)]')
-    expect(ghost).toContain('hover:active:bg-[var(--gr-button-info-soft-bg-active)]')
+    expect(ghost).toContain('hover:bg-[var(--gr-button-ghost-bg-hover,var(--gr-button-info-soft-bg-hover))]')
+    expect(ghost).toContain('active:bg-[var(--gr-button-ghost-bg-active,var(--gr-button-info-soft-bg-active))]')
+    expect(ghost).toContain('hover:active:bg-[var(--gr-button-ghost-bg-active,var(--gr-button-info-soft-bg-active))]')
 
-    expect(ghostBorder).toContain('hover:active:bg-[var(--gr-button-success-soft-bg-active)]')
+    expect(ghostBorder).toContain('hover:active:bg-[var(--gr-button-ghost-bg-active,var(--gr-button-success-soft-bg-active))]')
     expect(ghostBorder).toContain('hover:active:border-[var(--gr-success-active)]')
   })
 
-  it('в светлых режимах filled success, warning, slate и azure кнопки используют светлый foreground с достаточным контрастом', () => {
+  // Светлая подпись на заливке — выбор «Сланца», а не свойство кнопки: у «Глины»
+  // светлые земляные тона несут графитовую подпись. Контраст любой темы держит
+  // тест «tone × tone» ниже.
+  it('у «Сланца» в светлом режиме filled success, warning, slate и azure кнопки используют светлый foreground с достаточным контрастом', () => {
     const failures: string[] = []
 
-    for (const key of themeModesOfScheme('light')) {
+    for (const key of themeModesOfScheme('light').filter(mode => mode.startsWith('slate-'))) {
       for (const tone of ['success', 'warning', 'slate', 'azure'] as const) {
         for (const state of states) {
           const colors = getButtonColors('primary', tone, state)
@@ -204,10 +208,10 @@ describe('GrButton', () => {
     expect(failures).toEqual([])
   })
 
-  it('в тёмных режимах filled-кнопки используют светлый foreground для primary и semantic tones', () => {
+  it('у «Сланца» в тёмном режиме filled-кнопки используют светлый foreground для primary и semantic tones', () => {
     const failures: string[] = []
 
-    for (const key of themeModesOfScheme('dark')) {
+    for (const key of themeModesOfScheme('dark').filter(mode => mode.startsWith('slate-'))) {
       for (const tone of filledTones) {
         for (const state of states) {
           const colors = getButtonColors('primary', tone, state)
@@ -221,6 +225,32 @@ describe('GrButton', () => {
       }
     }
 
+    expect(failures).toEqual([])
+  })
+
+  // Правило «Глины»: залитая кнопка под указателем уходит прочь от цвета подписи —
+  // под графитовой светлеет, под светлой темнеет, — и контраст только растёт.
+  it('у «Глины» наведение и нажатие filled-кнопки не снижают контраст подписи', () => {
+    const failures: string[] = []
+
+    for (const key of THEME_MODES.filter(mode => mode.startsWith('clay-'))) {
+      for (const tone of tones) {
+        const ratioOf = (state: (typeof states)[number]) => {
+          const colors = getButtonColors('primary', tone, state)
+          return getContrastRatio(
+            resolveColorExpression(colors.text, buttonVarsOf(key), derivedThemeVars),
+            resolveColorExpression(colors.background, buttonVarsOf(key), derivedThemeVars),
+          )
+        }
+        const rest = ratioOf('rest')
+        for (const state of ['hover', 'active'] as const) {
+          if (ratioOf(state) < rest)
+            failures.push(`${key}:${tone}:${state}: ${ratioOf(state).toFixed(2)} < ${rest.toFixed(2)}`)
+        }
+      }
+    }
+
+    expect(THEME_MODES.some(mode => mode.startsWith('clay-'))).toBe(true)
     expect(failures).toEqual([])
   })
 
@@ -688,5 +718,47 @@ describe('GrButton — ссылка в новую вкладку', () => {
 
     expect(plain.find('.sr-only').exists()).toBe(false)
     expect(disabled.find('.sr-only').exists()).toBe(false)
+  })
+})
+
+describe('GrButton · загрузка мерцанием подписи', () => {
+  it('свет по подписи: без спиннера, подпись и префикс на месте, aria-busy и скрытый текст', () => {
+    const wrapper = mount(GrButton, {
+      props: { loading: true, loadingIndicator: 'shimmer' },
+      slots: { default: () => 'Сохранить', prefix: () => h('i', { 'data-prefix': '' }) },
+    })
+    const button = wrapper.get('[data-gr-button]')
+
+    expect(button.attributes('data-gr-busy-shimmer')).toBe('')
+    expect(button.attributes('data-gr-busy-overlay')).toBeUndefined()
+    expect(button.attributes('aria-busy')).toBe('true')
+    expect(wrapper.find('.animate-spin').exists()).toBe(false)
+    expect(wrapper.find('[data-prefix]').exists()).toBe(true)
+    expect(wrapper.get('[data-gr-button-label]').text()).toBe('Сохранить')
+    expect(wrapper.find('.sr-only').exists()).toBe(true)
+  })
+
+  it('у кнопки без текстовой подписи мерцать нечему — остаётся спиннер', () => {
+    const wrapper = mount(GrButton, {
+      props: { loading: true, loadingIndicator: 'shimmer', square: true, ariaLabel: 'Обновить' },
+      slots: { default: () => h('svg', { 'data-icon': '' }) },
+    })
+
+    expect(wrapper.get('[data-gr-button]').attributes('data-gr-busy-shimmer')).toBeUndefined()
+    expect(wrapper.find('.animate-spin').exists()).toBe(true)
+  })
+
+  it('без загрузки атрибута нет; по умолчанию — спиннер', () => {
+    expect(mount(GrButton, { props: { loadingIndicator: 'shimmer' }, slots: { default: () => 'Ок' } }).get('[data-gr-button]').attributes('data-gr-busy-shimmer')).toBeUndefined()
+    expect(mount(GrButton, { props: { loading: true }, slots: { default: () => 'Ок' } }).find('.animate-spin').exists()).toBe(true)
+  })
+
+  it('вид загрузки — из componentDefaults (тема, провайдер)', () => {
+    const wrapper = mount(GrConfigProvider, {
+      props: { componentDefaults: { GrButton: { loadingIndicator: 'shimmer' } } },
+      slots: { default: () => h(GrButton, { loading: true }, { default: () => 'Сохранить' }) },
+    })
+
+    expect(wrapper.get('[data-gr-button]').attributes('data-gr-busy-shimmer')).toBe('')
   })
 })

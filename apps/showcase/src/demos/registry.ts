@@ -174,6 +174,8 @@ export const demoPathByPreviewKey = {
   'gr-button-group-segmented': 'components/gr-button-group/GrButtonGroupSegmentedDemo.vue',
   'gr-button-group-shared-style': 'components/gr-button-group/GrButtonGroupSharedStyleDemo.vue',
   'gr-button-group-toolbar': 'components/gr-button-group/GrButtonGroupToolbarDemo.vue',
+  'gr-button-group-tray': 'components/gr-button-group/GrButtonGroupTrayDemo.vue',
+  'gr-button-shimmer': 'components/gr-button/GrButtonShimmerDemo.vue',
   'gr-button-slots-and-states': 'components/gr-button/GrButtonSlotsDemo.vue',
   'gr-button-state-matrix': 'components/gr-button/GrButtonMatrixDemo.vue',
   'gr-card-action-panel': 'components/gr-card/GrCardActionPanelDemo.vue',

@@ -1,4 +1,4 @@
-import type { GrButtonSize, GrButtonTone, GrButtonVariant } from './grButtonStyles'
+import type { GrButtonLoadingIndicator, GrButtonSize, GrButtonTone, GrButtonVariant } from './grButtonStyles'
 
 /**
  * Пропы `GrButton`, которые можно задать глобально через
@@ -13,6 +13,7 @@ export interface GrButtonConfigurableProps {
   tone: GrButtonTone
   size: GrButtonSize
   square: boolean
+  loadingIndicator: GrButtonLoadingIndicator
 }
 
 /**

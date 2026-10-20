@@ -19,7 +19,7 @@ describe('component docs metadata', () => {
       'api',
       'integration-notes',
     ])
-    expect(doc.examples).toHaveLength(3)
+    expect(doc.examples).toHaveLength(4)
     expect(doc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(doc.examples.every(example => example.previewKey?.startsWith('gr-button'))).toBe(true)
   })
@@ -331,7 +331,7 @@ describe('component docs metadata', () => {
     const listDoc = getShowcaseComponentDoc(listEntity!)
     const tableDoc = getShowcaseComponentDoc(tableEntity!)
 
-    expect(buttonGroupDoc.examples).toHaveLength(5)
+    expect(buttonGroupDoc.examples).toHaveLength(6)
     expect(buttonGroupDoc.examples.every(example => example.status === 'ready')).toBe(true)
     expect(buttonGroupDoc.examples.every(example => example.previewKey?.startsWith('gr-button-group'))).toBe(true)
 

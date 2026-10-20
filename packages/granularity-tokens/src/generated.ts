@@ -1150,6 +1150,26 @@ export const grDerivedTokens: GrDerivedToken[] = [
 
 export const grThemeCatalog: GrThemeCatalogEntry[] = [
   {
+    "id": "clay",
+    "title": "Глина",
+    "description": "Тёплая бумага, графитовые чернила и одна глиняная точка на экран.",
+    "docs": "https://granularity.tech/themes/clay",
+    "extends": "slate",
+    "defaultMode": "light",
+    "modes": [
+      {
+        "name": "light",
+        "title": "Светлый",
+        "colorScheme": "light"
+      },
+      {
+        "name": "dark",
+        "title": "Тёмный",
+        "colorScheme": "dark"
+      }
+    ]
+  },
+  {
     "id": "slate",
     "title": "Сланец",
     "description": "Холодные нейтрали шкалы slate, индиго-акцент и контраст, выверенный по AA в обоих режимах.",

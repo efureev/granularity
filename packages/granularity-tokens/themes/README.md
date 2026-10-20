@@ -7,6 +7,7 @@
 | Тема | Название | Режимы | Характер | Дизайн-система |
 | --- | --- | --- | --- | --- |
 | `slate` | Сланец | `light`, `dark` | холодные нейтрали, индиго-акцент, контраст по AA | [granularity.tech/themes/slate](https://granularity.tech/themes/slate) |
+| `clay` | Глина | `light`, `dark` | тёплая бумага, графитовые чернила, один глиняный акцент; наследует `slate` | [granularity.tech/themes/clay](https://granularity.tech/themes/clay) |
 
 Каждая тема — папка с `README.md`: для чего она, правила использования, которых нет в токенах, и
 ссылка на её дизайн-систему.

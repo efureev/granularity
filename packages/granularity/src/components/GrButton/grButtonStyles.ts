@@ -3,6 +3,8 @@ import type { GrComponentSize } from '../shared/sizes'
 import type { GrTone } from '../shared/tones'
 
 export type GrButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'ghost-border'
+/** Вид загрузки: спиннер или свет, проходящий по подписи. */
+export type GrButtonLoadingIndicator = 'spinner' | 'shimmer'
 export type GrButtonTone = GrTone
 export type GrButtonSize = GrComponentSize
 
@@ -137,10 +139,12 @@ export const tones: Record<GrButtonTone, GrButtonToneTokens> = {
     borderActive: 'var(--gr-primary-active)',
   },
   neutral: {
-    solidBackground: 'var(--gr-secondary)',
-    solidBackgroundHover: 'var(--gr-secondary-hover)',
-    solidBackgroundActive: 'var(--gr-secondary-active)',
-    solidForeground: 'var(--gr-secondary-fg)',
+    // Заливка нейтральной solid-кнопки — хук: тема, где главная кнопка не серая
+    // плашка, задаёт её («Глина» — графит); без хука это `--gr-secondary`.
+    solidBackground: 'var(--gr-button-neutral-bg,var(--gr-secondary))',
+    solidBackgroundHover: 'var(--gr-button-neutral-bg-hover,var(--gr-secondary-hover))',
+    solidBackgroundActive: 'var(--gr-button-neutral-bg-active,var(--gr-secondary-active))',
+    solidForeground: 'var(--gr-button-neutral-fg,var(--gr-secondary-fg))',
     accentText: 'var(--gr-fg)',
     softBackground: 'var(--gr-button-neutral-soft-bg)',
     softBackgroundHover: 'var(--gr-button-neutral-soft-bg-hover)',
@@ -261,8 +265,21 @@ function withVar(token: string): string {
   return `[${token}]`
 }
 
+/**
+ * Подложка прозрачных весов (`outline`, `ghost`, `ghost-border`) под указателем.
+ * Токен тона они делят с плашкой `secondary`, поэтому оттенок, общий для всех
+ * тонов («Глина» — оттенок бумаги), тема задаёт отдельным хуком, не трогая плашку.
+ */
+function transparentFill(tokens: GrButtonToneTokens): { hover: string, active: string } {
+  return {
+    hover: `var(--gr-button-ghost-bg-hover,${tokens.softBackgroundHover})`,
+    active: `var(--gr-button-ghost-bg-active,${tokens.softBackgroundActive})`,
+  }
+}
+
 export function variantClass(variant: GrButtonVariant, tone: GrButtonTone): string {
   const tokens = tones[tone]
+  const transparent = transparentFill(tokens)
 
   if (variant === 'primary') {
     return [
@@ -299,10 +316,10 @@ export function variantClass(variant: GrButtonVariant, tone: GrButtonTone): stri
       'bg-transparent',
       `text-${withVar(tokens.accentText)}`,
       `border border-${withVar(tokens.border)}`,
-      `hover:bg-${withVar(tokens.softBackgroundHover)}`,
+      `hover:bg-${withVar(transparent.hover)}`,
       `hover:border-${withVar(tokens.borderHover)}`,
-      `active:bg-${withVar(tokens.softBackgroundActive)}`,
-      `hover:active:bg-${withVar(tokens.softBackgroundActive)}`,
+      `active:bg-${withVar(transparent.active)}`,
+      `hover:active:bg-${withVar(transparent.active)}`,
       `active:border-${withVar(tokens.borderActive)}`,
       `hover:active:border-${withVar(tokens.borderActive)}`,
     ].join(' ')
@@ -313,9 +330,9 @@ export function variantClass(variant: GrButtonVariant, tone: GrButtonTone): stri
       'bg-transparent',
       `text-${withVar(tokens.accentText)}`,
       'border border-transparent',
-      `hover:bg-${withVar(tokens.softBackgroundHover)}`,
-      `active:bg-${withVar(tokens.softBackgroundActive)}`,
-      `hover:active:bg-${withVar(tokens.softBackgroundActive)}`,
+      `hover:bg-${withVar(transparent.hover)}`,
+      `active:bg-${withVar(transparent.active)}`,
+      `hover:active:bg-${withVar(transparent.active)}`,
     ].join(' ')
   }
 
@@ -323,10 +340,10 @@ export function variantClass(variant: GrButtonVariant, tone: GrButtonTone): stri
     'bg-transparent',
     `text-${withVar(tokens.accentText)}`,
     'border border-transparent',
-    `hover:bg-${withVar(tokens.softBackgroundHover)}`,
+    `hover:bg-${withVar(transparent.hover)}`,
     `hover:border-${withVar(tokens.border)}`,
-    `active:bg-${withVar(tokens.softBackgroundActive)}`,
-    `hover:active:bg-${withVar(tokens.softBackgroundActive)}`,
+    `active:bg-${withVar(transparent.active)}`,
+    `hover:active:bg-${withVar(transparent.active)}`,
     `active:border-${withVar(tokens.borderActive)}`,
     `hover:active:border-${withVar(tokens.borderActive)}`,
   ].join(' ')
