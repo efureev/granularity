@@ -32,4 +32,6 @@ export const grMarkdownConfig = defineGranumComponent(import.meta.url, {
   dependencies: [
     { provider: '@feugene/granularity', components: ['GrAlert', 'GrCheckbox', 'GrTable'] },
   ],
+  // Отступ якоря под липкой шапкой ставит инлайном `GrAffix` ядра; вне него — 0.
+  hookTokens: ['--gr-affix-offset'],
 })

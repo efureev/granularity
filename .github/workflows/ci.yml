@@ -1148,6 +1148,10 @@ jobs:
       - name: Build tokens package
         run: yarn build:tokens
 
+      # `vite.config.ts` пакета берёт хуки реестра хелпером тест-кита из его `dist`.
+      - name: Build test kit
+        run: yarn build:test-kit
+
       - name: Build package
         run: yarn build:granularity
 

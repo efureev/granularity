@@ -103,6 +103,7 @@ src/components/<ComponentName>/
 - `dependencies` на другие granular-компоненты;
 - `cssFiles`, если у компонента есть локальные CSS-файлы;
 - `dynamicTokens` — токены, чьё ИМЯ компонент собирает в рантайме;
+- `hookTokens` — только хуки ЧУЖОГО компонента, которые он читает (свои приносит сборка из `tokens.json`);
 - имя итогового component style asset.
 
 Пример для компонента без собственных CSS-файлов:
@@ -150,6 +151,32 @@ export const grPopoverConfig = defineGranumComponent(import.meta.url, {
 берёт из списка имён: список разошёлся бы с кодом молча и продолжал бы требовать
 имя, которого никто не читает. Отдельным правилом гейт ловит любой новый
 источник сборки `var()`, а посмотреть не смог — падает.
+
+#### `hookTokens` — свои из `tokens.json`, чужие руками
+
+Токен «только хук» (`kind: "hook"` в `tokens.json`) компонент читает через
+`var(--gr-x, дефолт)`, и тема его намеренно не задаёт. granum с 3.7 называет такой
+токен находкой `token-fallback-only` — «всегда рисует запасное значение», обычно
+признак переименования, — если дескриптор не объявил его хуком. `doctor` пакета идёт
+с `--strict`, а у приложения та же находка вышла бы на каждом компоненте.
+
+Свои хуки объявлять не нужно: `withRegistryHookTokens` из
+`@feugene/granularity-test-kit` в `vite.config.ts` пакета берёт их из `tokens.json`
+компонента и его группы (`group`) и кладёт в манифест (`tokens.hooks`). Руками
+объявляется только то, что компонент читает у ДРУГОГО: хук соседа или токен, который
+сосед ставит инлайном.
+
+```ts
+export const grProgressCircleConfig = defineGranumComponent(import.meta.url, {
+  name: 'GrProgressCircle',
+  safelist: grProgressCircleSafelist,
+  // Длительность бесконечной анимации — общий хук с `GrProgressBar`.
+  hookTokens: ['--gr-progress-indeterminate-duration'],
+})
+```
+
+Природа в `tokens.json` обязана быть верной: токен, который ничей CSS не присваивает,
+— `hook`, а не `css`. Неверная природа выходит той же находкой.
 
 Пример для компонента с зависимостями:
 

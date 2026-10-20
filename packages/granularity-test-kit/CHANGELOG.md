@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **`withRegistryHookTokens(provider, srcDir)`** в корневой точке входа: хуки реестра
+  (`kind: "hook"` в `tokens.json` компонента и его группы) — в `hookTokens` дескрипторов на
+  сборке пакета, перед `granumProvider`. granum 3.7 называет токен, который читается только
+  через `var(--x, запасное)`, находкой `token-fallback-only`, если дескриптор не объявил его
+  хуком; природу токена знает только реестр, и второй список в `config.ts` не нужен.
+
 ## [v2.0.0] 2026-10-19
 
 ### Changed

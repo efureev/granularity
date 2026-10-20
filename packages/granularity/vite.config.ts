@@ -4,6 +4,7 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import Icons from 'unplugin-icons/vite'
 import { granumProvider } from '@feugene/granum/build'
+import { withRegistryHookTokens } from '@feugene/granularity-test-kit'
 import { windEngine } from '@feugene/granum-engine-wind'
 import { granularityProvider } from './src/granular-provider'
 
@@ -129,7 +130,9 @@ export default defineConfig({
     // Список классов каждого компонента отфильтрован именно этой реализацией,
     // и её отпечаток уезжает в манифест как факт о списке.
     granumProvider({
-      provider: granularityProvider,
+      // Хуки реестра (`tokens.json`, `kind: "hook"`) — в дескрипторы: манифест
+      // объявляет их, и `doctor` не считает точки кастомизации забытыми токенами.
+      provider: withRegistryHookTokens(granularityProvider, fileURLToPath(new URL('./src', import.meta.url))),
       engine: windEngine(),
       entries: extraEntries,
     }),

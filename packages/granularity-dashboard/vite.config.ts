@@ -1,6 +1,8 @@
+import { fileURLToPath, URL } from 'node:url'
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { granumProvider } from '@feugene/granum/build'
+import { withRegistryHookTokens } from '@feugene/granularity-test-kit'
 import { windEngine } from '@feugene/granum-engine-wind'
 
 import { granularityDashboardProvider } from './src/granular-provider'
@@ -47,7 +49,9 @@ export default defineConfig({
      * мимо слоёв `granum.*` (INV-CSS-5). Своего CSS у компонентов пока нет.
      */
     granumProvider({
-      provider: granularityDashboardProvider,
+      // Хуки реестра (`tokens.json`, `kind: "hook"`) — в дескрипторы: манифест
+      // объявляет их, и `doctor` не считает точки кастомизации забытыми токенами.
+      provider: withRegistryHookTokens(granularityDashboardProvider, fileURLToPath(new URL('./src', import.meta.url))),
       engine: windEngine(),
       entries: extraEntries,
     }),

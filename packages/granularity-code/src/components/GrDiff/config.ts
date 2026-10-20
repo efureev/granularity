@@ -14,4 +14,7 @@ import { grDiffSafelist } from './safelist'
 export const grDiffConfig = defineGranumComponent(import.meta.url, {
   name: 'GrDiff',
   safelist: grDiffSafelist,
+  // Подсветка — палитра `GrCodeBlock`: её хуки объявляет его реестр. Спейсеры
+  // виртуального списка ставит инлайном `useVirtualList` ядра.
+  hookTokens: ['--gr-code-block-*', '--gr-virtual-before', '--gr-virtual-after'],
 })

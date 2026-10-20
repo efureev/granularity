@@ -12,4 +12,7 @@ export const grDashboardItemConfig = defineGranumComponent(import.meta.url, {
   group: 'GrDashboardFrame',
   safelist: grDashboardItemSafelist,
   dependencies: [{ provider: '@feugene/granularity', components: ['GrCard'] }],
+  // Смещение перетаскивания и размер — инлайном ставит `GrDashboard` на время
+  // жеста; слоем granum их не задаёт никто, и это не забытые токены.
+  hookTokens: ['--gr-dashboard-drag-x', '--gr-dashboard-drag-y', '--gr-dashboard-resize-w', '--gr-dashboard-resize-h'],
 })

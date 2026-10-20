@@ -7,6 +7,12 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+
+- **Манифест объявляет хуки компонентов** (`tokens.hooks`): на granum 3.7 `doctor` приложения
+  не выдаёт `token-fallback-only` на точках кастомизации. Хуки берутся из `tokens.json` на сборке
+  (`withRegistryHookTokens` тест-кита); зазоры `--gr-schema-form-gap-x`, `-gap-y` и `-row-gap` в реестре — `hook`, а не `css`: их не присваивает ни один CSS.
+
 ## [v2.0.0] 2026-10-19
 
 ### Changed

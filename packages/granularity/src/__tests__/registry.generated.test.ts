@@ -114,7 +114,9 @@ describe('реестры компонентов', () => {
 
     expect(viteConfig).not.toContain('granularity:components>')
     expect(viteConfig).toContain('granumProvider({')
-    expect(viteConfig).toContain('provider: granularityProvider')
+    // Хуки реестра — в дескрипторы: без них `doctor` granum 3.7 называет
+    // каждую точку кастомизации забытым токеном (`token-fallback-only`).
+    expect(viteConfig).toContain('provider: withRegistryHookTokens(granularityProvider,')
     // Движок сборки задаётся явно: без него granum не знает, чьим словарём
     // отфильтрован список классов манифеста, и отказывается собирать пакет.
     expect(viteConfig).toContain('engine: windEngine()')

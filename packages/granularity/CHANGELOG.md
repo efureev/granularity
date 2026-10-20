@@ -7,6 +7,16 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+
+- **Манифест объявляет хуки компонентов** (`tokens.hooks`): на granum 3.7 `doctor` приложения
+  не выдаёт `token-fallback-only` на точках кастомизации — 35 компонентов, 147 токенов
+  `kind: "hook"`. Хуки берутся из `tokens.json` на сборке (`withRegistryHookTokens` тест-кита);
+  `GrProgressCircle` объявляет общий с `GrProgressBar` `--gr-progress-indeterminate-duration`.
+- **Готовые листы темы** (`themes/<тема>.css` и части) собраны granum 3.7: фолбэк `@supports`
+  режима по умолчанию выходит под `:root:not([data-theme])` и своей парой, а не под голым `:root`, —
+  в браузере без `color-mix` он больше не перебивает тёмную пару на `<html>`.
+
 ### Docs
 
 - **Сброс браузерных стилей — в слое.** `getting-started.md` и `installation.md` подключают

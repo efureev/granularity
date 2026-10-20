@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Манифест объявляет хуки компонентов** (`tokens.hooks`): на granum 3.7 `doctor` приложения
+  не выдаёт `token-fallback-only` на точках кастомизации. Хуки берутся из `tokens.json` на сборке
+  (`withRegistryHookTokens` тест-кита).
+
 ## [v2.0.0] 2026-10-19
 
 ### Changed

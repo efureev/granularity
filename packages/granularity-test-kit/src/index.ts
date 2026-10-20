@@ -8,3 +8,4 @@ export {
   stripComments,
   tokenNamesIn,
 } from './sources'
+export { withRegistryHookTokens } from './hookTokens'

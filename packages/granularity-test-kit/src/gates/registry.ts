@@ -154,6 +154,9 @@ export function defineRegistryGate(options: RegistryGateOptions): void {
       expect(viteConfig).not.toContain('granularity:components>')
       expect(viteConfig).toContain('granumProvider({')
       expect(viteConfig).toContain('engine: windEngine()')
+      // Хуки реестра — в дескрипторы: без них `doctor` granum 3.7 называет
+      // каждую точку кастомизации забытым токеном (`token-fallback-only`).
+      expect(viteConfig).toMatch(/provider: withRegistryHookTokens\(/)
       for (const component of publicComponents)
         expect(viteConfig, `${component} перечислен руками`).not.toContain(`'components/${pathOf.get(component) ?? component}/index'`)
     })

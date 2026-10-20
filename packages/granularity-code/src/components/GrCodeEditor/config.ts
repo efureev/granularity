@@ -10,4 +10,6 @@ import { grCodeEditorSafelist } from './safelist'
 export const grCodeEditorConfig = defineGranumComponent(import.meta.url, {
   name: 'GrCodeEditor',
   safelist: grCodeEditorSafelist,
+  // Подсветка — палитра `GrCodeBlock`: её хуки объявляет его реестр.
+  hookTokens: ['--gr-code-block-*'],
 })
