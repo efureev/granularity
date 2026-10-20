@@ -7,6 +7,8 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v2.1.0] 2026-10-20
+
 ### Added
 
 - **Остров превью берёт пропсы по умолчанию своей темы.** `GrConfigProvider theme="<превью>"`
