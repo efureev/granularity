@@ -7,6 +7,13 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- **`mode.fallbacks` у `createMode` и `extendMode`** — фолбэки `@supports not (color-mix)`,
+  посчитанные от ролей самого режима, данными. В `modes.define` granum 3.4:
+  `{ ...ocean.definition, fallbacks: ocean.fallbacks }` — без них браузер без `color-mix`
+  получает hover и active базы. `definition` не меняется и годится для granum раньше 3.4.
+
 ### Docs
 
 - **`docs/concepts.md`** — понятия: тема и что в неё входит, режим и что у него есть, пара, активная

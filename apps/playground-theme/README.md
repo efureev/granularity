@@ -14,7 +14,7 @@ yarn workspace @feugene/granularity-playground-theme test:run
 | Файл | Что в нём смотреть |
 | --- | --- |
 | `theme.config.ts` | режимы данными: `ocean` поверх тёмного (`extendMode`), высококонтрастный `contrast` с нуля (`createMode`) |
-| `granum.config.ts` | режимы — в `modes.define` (`ocean.definition`), своя тема — в `previews` (`loadTheme`) |
+| `granum.config.ts` | режимы — в `modes.define` (`ocean.definition` и `ocean.fallbacks`), своя тема — в `previews` (`loadTheme`) |
 | `src/themes/brand/` | своя тема приложения: `theme.json` с `"extends": "slate"`, `root.json` и `modes/*.json` — только отличия |
 | `src/main.ts` | `granularityThemePlugin` с манифестом сборки `virtual:granum/themes` |
 | `vite.config.ts` | ранний скрипт режима в `<head>` — опция `themeScript` плагина granum |

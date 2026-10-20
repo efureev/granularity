@@ -83,6 +83,7 @@ export const ocean = extendMode({
 })
 
 ocean.definition // → modes.define.ocean конфига granum: extends, colorScheme, только отличия
+ocean.fallbacks // → modes.define.ocean.fallbacks (granum 3.4): hover и active от ролей режима
 ocean.css // CSS под парой slate-ocean — для подключения без granum
 ```
 

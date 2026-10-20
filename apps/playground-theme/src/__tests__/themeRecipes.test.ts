@@ -9,6 +9,7 @@ import { windEngine } from '@feugene/granum-engine-wind'
 import { afterAll, describe, expect, it } from 'vitest'
 
 import { type GrThemeData, resolveModes } from '@feugene/granularity-tokens'
+import { extendMode } from '@feugene/granularity-tokens/theme'
 import { loadTheme } from '@feugene/granularity-tokens/theme/node'
 import slateData from '@feugene/granularity-tokens/themes/slate/theme.json'
 
@@ -92,6 +93,20 @@ describe('рецепты режимов и темы из modes.md и themes.md',
 
     expect(ocean).toContain('--gr-primary: #0ea5e9')
     expect(ocean).toContain(`--gr-bg: ${dark['gr-bg']}`)
+  })
+
+  it('режим из extendMode с fallbacks: hover без color-mix — от его primary, а не от тёмного', async () => {
+    const ocean = extendMode({ name: 'ocean', base: 'dark', tokens: { '--gr-primary': '#0ea5e9' }, validate: false })
+    const supported = (css: string) => css.slice(css.indexOf('@supports'))
+    const hover = (css: string) => [...supported(css).matchAll(/\[data-theme="slate-ocean"\]\s*\{([^}]*)\}/g)]
+      .map(match => /--gr-primary-hover:\s*([^;]+)/.exec(match[1]!)?.[1]?.trim())
+      .filter(Boolean)
+      .at(-1)
+    const own = await themesLayer({ names: ['light', 'dark', 'ocean'], define: { ocean: { ...ocean.definition, fallbacks: ocean.fallbacks } } })
+    const inherited = await themesLayer({ names: ['light', 'dark', 'ocean'], define: { ocean: ocean.definition } })
+
+    expect(hover(own)).toBe(ocean.fallbacks[0]!.tokens['gr-primary-hover'])
+    expect(hover(inherited)).not.toBe(hover(own))
   })
 
   it('своя тема из папки активной: её режимы под :root и своими парами, отличия поверх «Сланца»', async () => {

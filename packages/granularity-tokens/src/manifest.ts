@@ -19,7 +19,7 @@ export interface GrThemeManifest {
   readonly theme: { readonly id: string, readonly title: string }
   readonly modes: readonly GrThemeManifestMode[]
   readonly defaultMode: string
-  readonly activation: { readonly attribute: string }
+  readonly activation: { readonly attribute: string, readonly value: string }
 }
 
 /**
@@ -46,6 +46,6 @@ export function grThemeManifest(id: string = GR_DEFAULT_THEME_ID): GrThemeManife
       value: `${entry.id}-${mode.name}`,
     })),
     defaultMode: entry.defaultMode,
-    activation: { attribute: 'data-theme' },
+    activation: { attribute: 'data-theme', value: '{theme}-{mode}' },
   }
 }

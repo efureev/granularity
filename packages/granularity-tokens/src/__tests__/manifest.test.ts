@@ -1,6 +1,8 @@
+import { createThemeManifest } from '@feugene/granum/runtime'
 import { describe, expect, it } from 'vitest'
 
 import { GR_DEFAULT_THEME_ID, grThemeManifest } from '../manifest'
+import type { GrColorScheme } from '../types'
 import { granularityTokensProvider } from '../granum-provider'
 import slate from '../../themes/slate/theme.json'
 
@@ -19,6 +21,18 @@ describe('grThemeManifest', () => {
       slate.modes.map(mode => [mode.name, mode.colorScheme, `slate-${mode.name}`]),
     )
     expect(manifest.activation.attribute).toBe('data-theme')
+  })
+
+  // Пакет не зависит от granum в рантайме: манифест для готового листа нужен
+  // как раз приложению без него. Правило пары держит этот тест.
+  it('совпадает с createThemeManifest granum по той же теме', () => {
+    const manifest = grThemeManifest('slate')
+
+    expect(manifest).toEqual(createThemeManifest({
+      theme: manifest.theme,
+      modes: slate.modes as Array<{ name: string, title?: string, colorScheme: GrColorScheme }>,
+      defaultMode: slate.defaultMode,
+    }))
   })
 
   it('неизвестная тема — ошибка со списком каталога', () => {

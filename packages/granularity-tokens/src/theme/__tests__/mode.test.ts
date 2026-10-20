@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest'
 import { grRoleTokens } from '../../generated'
 import { grBuiltinModes } from '../builtin.generated'
 import { mixSrgb } from '../color'
+import { NO_COLOR_MIX } from '../defineTheme'
 import { GrThemeDefinitionError, GrThemeError } from '../errors'
 import { createMode, extendMode, renderModeCss } from '../mode'
 import { loadTheme } from '../node'
@@ -239,6 +240,18 @@ describe('режим входом modes.define', () => {
       title: 'Океан',
       tokens: { 'gr-bg': '#041e2b', 'gr-card': '#0a2f42', 'gr-button-primary-bg': 'var(--gr-primary)' },
     })
+  })
+
+  it('фолбэки — от ролей режима, а не базы; те же значения, что в его CSS', () => {
+    const ocean = extendMode({ name: 'ocean', base: 'dark', tokens: { '--gr-primary': '#0ea5e9' }, validate: false })
+    const dark = extendMode({ name: 'plain', base: 'dark', tokens: {}, validate: false })
+
+    expect(ocean.fallbacks).toHaveLength(1)
+    expect(ocean.fallbacks[0].supports).toBe(NO_COLOR_MIX)
+    const hover = ocean.fallbacks[0].tokens['gr-primary-hover']
+    expect(hover).toMatch(/^#[\da-f]{6}$/i)
+    expect(hover).not.toBe(dark.fallbacks[0].tokens['gr-primary-hover'])
+    expect(ocean.css).toContain(`--gr-primary-hover: ${hover};`)
   })
 
   it('ключи без `--` тоже принимаются', () => {

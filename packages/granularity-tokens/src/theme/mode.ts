@@ -1,8 +1,9 @@
 import { grDerivedTokens, grRoleTokens } from '../generated'
 import { resolveModes } from '../modes'
-import type { GrColorScheme, GrThemeData } from '../types'
+import type { GrColorScheme, GrModeFallback, GrThemeData } from '../types'
 import { GR_BUILTIN_THEME, grBuiltinModes, grBuiltinModeSchemes, type GrBuiltinMode } from './builtin.generated'
 import { mixSrgb } from './color'
+import { NO_COLOR_MIX } from './defineTheme'
 import { GrThemeDefinitionError, GrThemeError, MODE_NAME } from './errors'
 import { resolveRole, themeRoleNames, type GrThemeTokens } from './roles'
 import { validateTheme } from './validate'
@@ -34,6 +35,12 @@ export interface GrMode {
   css: string
   /** Тот же режим входом `modes.define` granum. */
   definition: GrModeDefinition
+  /**
+   * Производные, посчитанные от ролей режима, — для браузеров без `color-mix`.
+   * В `modes.define` с granum 3.4: `{ ...mode.definition, fallbacks: mode.fallbacks }`;
+   * без них режим берёт фолбэки базы, посчитанные от её ролей.
+   */
+  fallbacks: GrModeFallback[]
 }
 
 /** Режим темы данными — например своей темы приложения из `loadTheme`. */
@@ -164,13 +171,9 @@ function renderComponentDeclarations(tokens: GrThemeTokens, indent: string): str
  * её общая математика (`color.ts`), поэтому разойтись с живым `color-mix` не
  * может.
  */
-function renderFallback(tokens: GrThemeTokens, selector: string): string[] {
-  const lines = [
-    '',
-    '@supports not (color: color-mix(in srgb, #000 50%, #fff)) {',
-    `  ${selector} {`,
-  ]
-
+/** Производные режима в hex: `--gr-primary-hover` → `#4338ca`. */
+function fallbackValues(tokens: GrThemeTokens): Array<[string, string]> {
+  const values: Array<[string, string]> = []
   for (const token of grDerivedTokens) {
     const base = resolveRole(tokens, token.base)
     const mixWith = resolveRole(tokens, token.mixWith)
@@ -180,12 +183,20 @@ function renderFallback(tokens: GrThemeTokens, selector: string): string[] {
     if (!base || !mixWith)
       continue
 
-    lines.push(`    ${token.name}: ${mixSrgb(base, mixWith, token.amount)};`)
+    values.push([token.name, mixSrgb(base, mixWith, token.amount)])
   }
+  return values
+}
 
-  lines.push('  }', '}')
-
-  return lines
+function renderFallback(tokens: GrThemeTokens, selector: string): string[] {
+  return [
+    '',
+    `@supports ${NO_COLOR_MIX} {`,
+    `  ${selector} {`,
+    ...fallbackValues(tokens).map(([token, value]) => `    ${token}: ${value};`),
+    '  }',
+    '}',
+  ]
 }
 
 export function renderModeCss(mode: Pick<GrMode, 'name' | 'selector' | 'tokens'> & Partial<Pick<GrMode, 'componentTokens'>>): string {
@@ -260,6 +271,10 @@ function buildMode(options: BuildOptions): GrMode {
       ...(options.title !== undefined ? { title: options.title } : {}),
       tokens: Object.fromEntries([...Object.entries(roles), ...Object.entries(componentTokens)].map(([token, value]) => [bare(token), value])),
     },
+    fallbacks: (() => {
+      const values = fallbackValues(tokens)
+      return values.length > 0 ? [{ supports: NO_COLOR_MIX, tokens: Object.fromEntries(values.map(([token, value]) => [bare(token), value])) }] : []
+    })(),
   }
 
   if (options.validate !== false) {

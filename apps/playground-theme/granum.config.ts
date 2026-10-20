@@ -27,7 +27,10 @@ export default defineGranumConfig({
   previews: [loadTheme(new URL('./src/themes/brand/', import.meta.url))],
   modes: {
     names: ['light', 'dark', 'ocean', 'contrast'],
-    define: { ocean: ocean.definition, contrast: contrast.definition },
+    define: {
+      ocean: { ...ocean.definition, fallbacks: ocean.fallbacks },
+      contrast: { ...contrast.definition, fallbacks: contrast.fallbacks },
+    },
   },
   appSources: { dirs: ['src'] },
 })

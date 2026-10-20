@@ -237,6 +237,7 @@ export const ocean = extendMode({
 })
 
 ocean.definition // вход modes.define granum: extends, colorScheme, только отличия
+ocean.fallbacks // фолбэки производных от ролей режима — в modes.define с granum 3.4
 ocean.tokens // полный набор ролей: своё поверх базы
 ocean.css // CSS под парой, включая фолбэк производных для браузеров без color-mix
 ```
@@ -327,14 +328,19 @@ defineGranumConfig({
   theme: 'slate',
   modes: {
     names: ['light', 'dark', 'ocean', 'contrast'],
-    define: { ocean: ocean.definition, contrast: contrast.definition },
+    define: {
+      ocean: { ...ocean.definition, fallbacks: ocean.fallbacks },
+      contrast: { ...contrast.definition, fallbacks: contrast.fallbacks },
+    },
   },
 })
 ```
 
 Режим встаёт под свою пару `slate-ocean` и получает токены компонентов от
-`extends`. Фолбэки `@supports not (color-mix)` такой режим пока берёт у базы:
-у `modes.define` granum нет поля для своих.
+`extends`. `fallbacks` — фолбэки `@supports not (color-mix)`, посчитанные от
+ролей самого режима: без них браузер без `color-mix` получил бы hover и active
+базы. Поле `fallbacks` у `modes.define` есть с granum 3.4; на более раннем
+передавайте один `definition`.
 
 Без granum или в браузере (редактор тем, тема из пользовательских настроек) —
 готовый CSS режима, рантайм-подпутём, который не тянет справочник токенов:
@@ -405,8 +411,13 @@ app.use(granularityThemePlugin, { manifest })
 
 Порядок слоёв: тема → `createGranularity({ componentDefaults })` приложения →
 `GrConfigProvider` → локальный проп. `themeComponentDefaults(manifest)` отдаёт слой
-темы явно — например для своего провайдера. У превью своих пропсов по умолчанию
-нет: манифест несёт `extensions` только активной темы.
+темы явно — например для своего провайдера.
+
+Тема превью несёт свои пропсы по умолчанию с granum 3.4: манифест отдаёт
+`extensions` и у `previews`. Остров `GrConfigProvider theme="<превью>"` подменяет
+ими слой темы сборки, а пропсы приложения и провайдеров остаются сверху.
+`themeComponentDefaults(manifest, '<превью>')` — тот же слой явно. На granum
+раньше 3.4 остров превью берёт собственные дефолты компонентов.
 
 ## Проверка перед выкладкой
 
