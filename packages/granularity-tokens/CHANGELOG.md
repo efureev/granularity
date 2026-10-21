@@ -7,6 +7,8 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v2.0.0] 2026-10-21
+
 Мажор: тема — полный набор значений, включая значения компонентов. Переезд — `docs/migration-3.md`
 ядра.
 

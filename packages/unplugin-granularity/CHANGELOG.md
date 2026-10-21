@@ -7,6 +7,13 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v1.2.1] 2026-10-21
+
+### Changed
+
+- **Peer `@feugene/granularity` — `>=1.0.0 <4.0.0`.** Подпути компонентов у ядра 3 те же, что у
+  ядра 2: значения у темы поменяли данные тем, а не `exports`.
+
 ## [v1.2.0] 2026-10-19
 
 ### Changed
