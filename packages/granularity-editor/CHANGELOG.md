@@ -7,6 +7,8 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v2.0.1] 2026-10-21
+
 ### Fixed
 
 - **Манифест объявляет хуки компонентов** (`tokens.hooks`): на granum 3.7 `doctor` приложения

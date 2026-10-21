@@ -1,7 +1,7 @@
 {
   "name": "@feugene/granularity-dashboard",
   "description": "Widget grid for the @feugene/granularity design system — drag, resize, breakpoints and layout persistence, zero dependencies.",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "license": "LicenseRef-Granularity-EUC-1.1",
   "author": {
     "name": "Evgeniy Fureev",
