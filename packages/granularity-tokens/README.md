@@ -22,7 +22,7 @@ yarn add @feugene/granularity-tokens
 | --- | --- | --- |
 | Реестр без значений: примитивы, роли, формулы производных | `tokens/*.json` | `@feugene/granularity-tokens` |
 | Каталог тем: id, название, режимы, ссылка на дизайн-систему | `themes/*/theme.json` | `@feugene/granularity-tokens` (`grThemeCatalog`) |
-| Данные темы со значениями и фолбэками | `themes/<slug>/` | `@feugene/granularity-tokens/themes/<slug>/theme.json` |
+| Данные темы со значениями и фолбэками | `themes/<slug>/` | `@feugene/granularity-tokens/themes/<slug>/theme.json`; по выбору в рантайме — `loadThemeData(id)` |
 | Сборка темы и режима: `defineTheme`, `extendMode`, `createMode`, `tone`, проверки | `src/theme/` | `@feugene/granularity-tokens/theme` |
 | Тема из папки: `loadTheme` | `src/theme/node.ts` | `@feugene/granularity-tokens/theme/node` |
 | Подключение готового CSS в браузере | `src/theme/apply.ts` | `@feugene/granularity-tokens/theme/apply` |
@@ -50,6 +50,17 @@ const surfaces = grRoleTokens
 ```
 
 Ключи в данных темы — без `--` (`gr-bg`), как их ждёт granum; в реестре имя полное (`--gr-bg`).
+
+Тему, которую выбирают в рантайме, — страница показывает значения той темы, что включена
+сейчас, — грузит `loadThemeData`: у каждой темы каталога свой чанк, и загружается только
+запрошенная. Тема не из каталога — отказ со списком тем.
+
+```ts
+import { loadThemeData, resolveModes } from '@feugene/granularity-tokens'
+
+const clay = await loadThemeData('clay')
+const light = resolveModes(clay).get('light')!
+```
 
 ## Своя тема
 

@@ -24,6 +24,8 @@ export default antfu(
       'generated/**',
       // Сгенерированы `scripts/generate.mjs` — правится только генератор.
       'src/generated.ts',
+      'src/themeData.generated.ts',
+      'src/theme-data/**',
       'src/theme/builtin.generated.ts',
       'docs/tokens.md',
     ],

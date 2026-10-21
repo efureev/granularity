@@ -15,6 +15,9 @@ import { runnerImport } from 'vite'
  *
  * Каждая тема строится `defineTheme` — тем же кодом, что у приложения. Отсюда:
  *   src/generated.ts                — реестр и каталог тем для TS-потребителей;
+ *   src/theme-data/<id>.generated.ts, src/themeData.generated.ts
+ *                                   — полные данные каждой темы и их ленивые загрузчики
+ *                                     (`loadThemeData`): чанк на тему;
  *   src/theme/builtin.generated.ts  — режимы темы по умолчанию для `extendMode`/`tone`;
  *   docs/tokens.md                  — справочник.
  *
@@ -157,6 +160,34 @@ function renderTs({ registry, themes }) {
     `export const grDerivedTokens: GrDerivedToken[] = ${literal(registry.derived)}`,
     '',
     `export const grThemeCatalog: GrThemeCatalogEntry[] = ${literal(themes.map(catalogEntry))}`,
+    '',
+  ].join('\n')
+}
+
+function renderThemeDataTs(theme) {
+  return [
+    GENERATED_BANNER_TS,
+    '',
+    'import type { GrThemeData } from \'../types\'',
+    '',
+    `/** Полные данные темы \`${theme.data.id}\`: наследование \`extends\` раскрыто. */`,
+    `const data: GrThemeData = ${JSON.stringify(theme.data, null, 2)}`,
+    '',
+    'export default data',
+    '',
+  ].join('\n')
+}
+
+function renderThemeLoadersTs({ themes }) {
+  return [
+    GENERATED_BANNER_TS,
+    '',
+    'import type { GrThemeData } from \'./types\'',
+    '',
+    '/** Загрузчики данных тем каталога — по чанку на тему: страница тянет только свою. */',
+    'export const grThemeDataLoaders: Readonly<Record<string, () => Promise<{ default: GrThemeData }>>> = {',
+    ...themes.map(theme => `  ${/^[a-z]\w*$/.test(theme.data.id) ? theme.data.id : `'${theme.data.id}'`}: () => import('./theme-data/${theme.data.id}.generated'),`),
+    '}',
     '',
   ].join('\n')
 }
@@ -319,6 +350,8 @@ async function main() {
     ? distOutputs(data)
     : [
         ['src/generated.ts', renderTs(data)],
+        ...data.themes.map(theme => [`src/theme-data/${theme.data.id}.generated.ts`, renderThemeDataTs(theme)]),
+        ['src/themeData.generated.ts', renderThemeLoadersTs(data)],
         ['src/theme/builtin.generated.ts', renderBuiltinTs(data, slate)],
         ['docs/tokens.md', renderDocs(data)],
       ]
