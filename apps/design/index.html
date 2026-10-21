@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>granularity — дизайн-система</title>
     <!--
+      Порядок слоёв — до скрипта темы: лист сохранённой дополнительной темы, который
+      ставит скрипт, объявляет слои granum, а в dev сброс приходит из JS уже после него.
+    -->
+    <style>@layer reset, granum;</style>
+    <!--
       Шрифты подключаются документом, а не макетом: @font-face из shadow DOM
       Chrome не применяет, а объявленные здесь семейства видны и внутри него.
     -->
