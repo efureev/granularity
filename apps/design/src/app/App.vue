@@ -67,7 +67,7 @@ watch(() => route.fullPath, () => {
           variant="ghost"
           tone="neutral"
           square
-          :aria-label="isDark ? 'Светлая тема' : 'Тёмная тема'"
+          :aria-label="isDark ? 'Светлый режим' : 'Тёмный режим'"
           @click="toggleMode"
         >
           <GrIcon>

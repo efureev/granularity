@@ -39,6 +39,15 @@ export function findDesignTheme(manifest: GranumThemeManifest, id: string): Desi
   return designThemes(manifest).find(theme => theme.entry.id === id)
 }
 
+/**
+ * Тема островов страницы — всегда явно, и у основной тоже: тему документа
+ * переключают, и остров, наследующий её, показал бы на странице «Сланца»
+ * другую тему. Темы вне сборки — без острова: её пар в CSS нет.
+ */
+export function islandTheme(theme: DesignTheme): string | undefined {
+  return theme.build === 'absent' ? undefined : theme.entry.id
+}
+
 export const THEME_BUILD_LABEL: Record<ThemeBuild, string> = {
   default: 'основная',
   built: 'дополнительная',

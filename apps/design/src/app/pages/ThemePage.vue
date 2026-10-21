@@ -2,20 +2,45 @@
 import { computed, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
+import { useTheme } from '@feugene/granularity'
 import themeManifest from 'virtual:granum/themes'
+import IconCheck from '~icons/lucide/check'
 
 import ColorSwatch from '../parts/ColorSwatch.vue'
 import DocSection from '../parts/DocSection.vue'
 import PageHeader from '../parts/PageHeader.vue'
 import ThemeIslands from '../parts/ThemeIslands.vue'
-import { findDesignTheme, THEME_BUILD_LABEL } from '../themes'
+import { THEME_STORAGE_KEY } from '../theme'
+import { findDesignTheme, islandTheme, THEME_BUILD_LABEL } from '../themes'
 import NotFoundPage from './NotFoundPage.vue'
 
 const route = useRoute()
 
 const theme = computed(() => findDesignTheme(themeManifest, String(route.params.theme)))
-/** Дополнительная тема пишется в острова явно, основная — наследуется от корня. */
-const islandTheme = computed(() => (theme.value?.build === 'built' ? theme.value.entry.id : undefined))
+const islands = computed(() => (theme.value ? islandTheme(theme.value) : undefined))
+
+// Тема всего приложения — та же, что у оболочки: `setTheme` грузит лист
+// дополнительной темы и ставит пару на корень, выбор запоминается.
+const { theme: appTheme, setTheme } = useTheme({ storageKey: THEME_STORAGE_KEY })
+const applying = ref(false)
+const applyError = ref<string>()
+const applied = computed(() => theme.value?.entry.id === appTheme.value)
+
+async function applyToApp(): Promise<void> {
+  if (!theme.value)
+    return
+  applying.value = true
+  applyError.value = undefined
+  try {
+    await setTheme(theme.value.entry.id)
+  }
+  catch (error) {
+    applyError.value = (error as Error).message
+  }
+  finally {
+    applying.value = false
+  }
+}
 
 const roles = [
   { title: 'Поверхности и текст', names: ['--gr-bg', '--gr-card', '--gr-muted', '--gr-fg', '--gr-muted-fg', '--gr-brd'] },
@@ -55,7 +80,22 @@ const periods = [
           {{ theme.entry.docs }}
         </GrLink>
       </div>
+      <div v-if="theme.build !== 'absent'" class="flex flex-wrap items-center gap-3">
+        <p v-if="applied" class="flex items-center gap-1.5 text-[length:var(--gr-text-sm)] font-500 leading-[var(--gr-leading-sm)] text-[var(--gr-success-text)]">
+          <GrIcon size="sm">
+            <IconCheck />
+          </GrIcon>
+          Тема всего приложения
+        </p>
+        <GrButton v-else :loading="applying" @click="applyToApp">
+          Применить ко всему приложению
+        </GrButton>
+      </div>
     </PageHeader>
+
+    <GrAlert v-if="applyError" tone="danger" title="Тему не удалось применить">
+      {{ applyError }}
+    </GrAlert>
 
     <GrAlert v-if="theme.build === 'absent'" tone="warning" title="Тема не собрана">
       Блоков её пар нет в CSS этой сборки: добавьте <code>'{{ theme.entry.id }}'</code> в
@@ -100,7 +140,7 @@ const periods = [
       </DocSection>
 
       <DocSection title="Основы" lead="Роли и форма — значения этой темы в каждом её режиме.">
-        <ThemeIslands :theme="islandTheme">
+        <ThemeIslands :theme="islands">
           <div class="flex flex-col gap-5">
             <div v-for="group in roles" :key="group.title" class="flex flex-col gap-2">
               <h3 class="text-[length:var(--gr-text-sm)] font-600 leading-[var(--gr-leading-sm)]">
@@ -132,7 +172,7 @@ const periods = [
       </DocSection>
 
       <DocSection title="Компоненты" lead="Настоящие компоненты пакета под парой темы: токены компонентов и пропсы по умолчанию — её.">
-        <ThemeIslands :theme="islandTheme">
+        <ThemeIslands :theme="islands">
           <div class="flex flex-col gap-4">
             <div class="flex flex-wrap items-center gap-2">
               <GrButton v-for="tone in tones" :key="tone" :tone="tone">

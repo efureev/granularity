@@ -4,7 +4,7 @@ import { grThemeCatalog } from '@feugene/granularity-tokens'
 import type { GranumThemeManifest } from '@feugene/granum/runtime'
 
 import granumConfig from '../../granum.config'
-import { buildThemes, designThemes, findDesignTheme, themeModes } from '../app/themes'
+import { buildThemes, designThemes, findDesignTheme, islandTheme, themeModes } from '../app/themes'
 
 const slateModes = [
   { name: 'light', colorScheme: 'light' as const, value: 'slate-light' },
@@ -33,6 +33,12 @@ describe('раздел «Темы»', () => {
     expect(findDesignTheme(manifest, 'slate')).toMatchObject({ build: 'default', modes: slateModes })
     expect(findDesignTheme(manifest, 'clay')).toMatchObject({ build: 'built' })
     expect(findDesignTheme(manifest, 'missing')).toBeUndefined()
+  })
+
+  it('острова — с явной темой, и у основной: тему документа переключают', () => {
+    expect(islandTheme(findDesignTheme(manifest, 'slate')!)).toBe('slate')
+    expect(islandTheme(findDesignTheme(manifest, 'clay')!)).toBe('clay')
+    expect(islandTheme({ ...findDesignTheme(manifest, 'clay')!, build: 'absent' })).toBeUndefined()
   })
 
   it('режимы островов: основной темы, дополнительной; темы вне сборки — пусто', () => {
