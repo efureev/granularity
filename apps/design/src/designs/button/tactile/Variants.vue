@@ -73,7 +73,7 @@ const vals = computed(() => {
 <div class="stage" style="min-height: 96px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px"><button class="gb s-md v-primary t-primary" type="button">Сохранить</button><span class="cap">10 px</span></div>
 <div class="stage shape-capsule" style="min-height: 96px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px"><button class="gb s-md v-primary t-primary" type="button">Сохранить</button><span class="cap">капсула</span></div>
 </div>
-<p class="body">Радиус по ступени: 8 / 8 / 10 / 12. Капсула включается одним <span class="code">--gr-button-radius: 999px</span> на теме — группы держат её сами.</p>
+<p class="body">Радиус по ступени: 8 / 8 / 10 / 12. Капсула включается одним <span class="code">--gr-button-radius: 999px</span> в приложении — группы держат её сами.</p>
 </div>
 
 <div class="panel" style="padding: 24px; display: flex; flex-direction: column; gap: 14px">

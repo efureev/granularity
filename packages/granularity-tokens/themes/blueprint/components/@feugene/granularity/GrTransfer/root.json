@@ -1,0 +1,6 @@
+{
+  "gr-transfer-arrived-bg": "color-mix(in srgb, var(--gr-primary) 32%, transparent)",
+  "gr-transfer-drop-bg": "color-mix(in srgb, var(--gr-primary) 6%, transparent)",
+  "gr-transfer-indicator-width": "3px",
+  "gr-transfer-selected-bg": "color-mix(in srgb, var(--gr-primary) 12%, transparent)"
+}

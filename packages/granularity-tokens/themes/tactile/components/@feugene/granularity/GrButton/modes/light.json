@@ -1,0 +1,12 @@
+{
+  "gr-button-shadow": "inset 0 1px 0 color-mix(in srgb, var(--gr-slate-0) 24%, transparent), inset 0 -1px 0 rgba(0, 0, 0, 0.14), 0 1px 2px rgba(15, 23, 42, 0.12)",
+  "gr-button-shadow-active": "inset 0 2px 5px rgba(15, 23, 42, 0.28)",
+  "gr-button-primary-glow": "color-mix(in srgb, var(--gr-button-primary-bg) 42%, transparent)",
+  "gr-button-success-glow": "color-mix(in srgb, var(--gr-button-success-bg) 42%, transparent)",
+  "gr-button-warning-glow": "color-mix(in srgb, var(--gr-button-warning-bg) 42%, transparent)",
+  "gr-button-danger-glow": "color-mix(in srgb, var(--gr-button-danger-bg) 42%, transparent)",
+  "gr-button-info-glow": "color-mix(in srgb, var(--gr-button-info-bg) 42%, transparent)",
+  "gr-button-slate-glow": "color-mix(in srgb, var(--gr-button-slate-bg) 42%, transparent)",
+  "gr-button-azure-glow": "color-mix(in srgb, var(--gr-button-azure-bg) 42%, transparent)",
+  "gr-button-neutral-glow": "color-mix(in srgb, var(--gr-button-neutral-bg) 42%, transparent)"
+}

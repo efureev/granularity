@@ -345,36 +345,78 @@ export const grComponentTokens: GrComponentToken[] = [
   {
     "owner": "GrButton",
     "name": "--gr-button-radius",
+    "kind": "hook",
+    "default": "радиус ступени `--gr-button-radius-<ступень>`",
+    "description": "Один радиус на все ступени — ручка приложения (`999px` — капсула). Без неё кнопка берёт радиус своей ступени из темы."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-radius-xs",
     "kind": "theme",
     "default": "0.375rem",
-    "description": "Скругление кнопки. Его же по умолчанию наследуют внешние углы `GrButtonGroup`."
+    "description": "Скругление кнопки ступени `xs`. Тема задаёт форму по ступеням: у «Сланца» все 6px, у «Тактильной» — 8 / 8 / 10 / 12px."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-radius-sm",
+    "kind": "theme",
+    "default": "0.375rem",
+    "description": "Скругление кнопки ступени `sm`. Тема задаёт форму по ступеням: у «Сланца» все 6px, у «Тактильной» — 8 / 8 / 10 / 12px."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-radius-md",
+    "kind": "theme",
+    "default": "0.375rem",
+    "description": "Скругление кнопки ступени `md`. Тема задаёт форму по ступеням: у «Сланца» все 6px, у «Тактильной» — 8 / 8 / 10 / 12px."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-radius-lg",
+    "kind": "theme",
+    "default": "0.375rem",
+    "description": "Скругление кнопки ступени `lg`. Тема задаёт форму по ступеням: у «Сланца» все 6px, у «Тактильной» — 8 / 8 / 10 / 12px."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-step-radius",
+    "kind": "css",
+    "default": "`--gr-button-radius-<ступень>` текущей ступени",
+    "description": "Радиус текущей ступени: его ставит класс ступени, `--gr-button-corner-radius` берёт его, когда ручка `--gr-button-radius` не задана."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-corner-radius",
+    "kind": "css",
+    "default": "var(--gr-button-radius, var(--gr-button-step-radius)); в склеенной группе впереди `--gr-button-group-radius`",
+    "description": "Радиус углов кнопки: ручка приложения, иначе радиус ступени; в склеенной `GrButtonGroup` — её ручка впереди. Углы читают его, пока свой угол не задан."
   },
   {
     "owner": "GrButton",
     "name": "--gr-button-radius-ss",
     "kind": "hook",
-    "default": "var(--gr-button-radius)",
+    "default": "var(--gr-button-corner-radius)",
     "description": "Скругление одного угла (начало блока, начало строки). Прикреплённая `GrButtonGroup` гасит им внутренние углы звеньев."
   },
   {
     "owner": "GrButton",
     "name": "--gr-button-radius-se",
     "kind": "hook",
-    "default": "var(--gr-button-radius)",
+    "default": "var(--gr-button-corner-radius)",
     "description": "Скругление одного угла (начало блока, конец строки). Прикреплённая `GrButtonGroup` гасит им внутренние углы звеньев."
   },
   {
     "owner": "GrButton",
     "name": "--gr-button-radius-ee",
     "kind": "hook",
-    "default": "var(--gr-button-radius)",
+    "default": "var(--gr-button-corner-radius)",
     "description": "Скругление одного угла (конец блока, конец строки). Прикреплённая `GrButtonGroup` гасит им внутренние углы звеньев."
   },
   {
     "owner": "GrButton",
     "name": "--gr-button-radius-es",
     "kind": "hook",
-    "default": "var(--gr-button-radius)",
+    "default": "var(--gr-button-corner-radius)",
     "description": "Скругление одного угла (конец блока, начало строки). Прикреплённая `GrButtonGroup` гасит им внутренние углы звеньев."
   },
   {
@@ -388,9 +430,9 @@ export const grComponentTokens: GrComponentToken[] = [
   {
     "owner": "GrButton",
     "name": "--gr-button-font-weight",
-    "kind": "hook",
+    "kind": "theme",
     "default": "var(--gr-font-medium)",
-    "description": "Начертание подписи. Кнопка читается как действие, а не как текст рядом с полем, поэтому по умолчанию — medium."
+    "description": "Начертание подписи. Кнопка читается как действие, а не как текст рядом с полем: у «Сланца» — medium, у «Чертежа» — 600."
   },
   {
     "owner": "GrButton",
@@ -893,6 +935,13 @@ export const grComponentTokens: GrComponentToken[] = [
   },
   {
     "owner": "GrButton",
+    "name": "--gr-button-surface-shadow",
+    "kind": "theme",
+    "default": "var(--gr-shadow-1)",
+    "description": "Тень нейтральной `secondary` — плашки, лежащей на поверхности карточки. У «Чертежа» — без тени."
+  },
+  {
+    "owner": "GrButton",
     "name": "--gr-button-disabled-bg",
     "kind": "theme",
     "default": "var(--gr-disabled-bg)",
@@ -1068,17 +1117,220 @@ export const grComponentTokens: GrComponentToken[] = [
   },
   {
     "owner": "GrButton",
+    "name": "--gr-button-primary-glow",
+    "kind": "theme",
+    "default": "transparent",
+    "description": "Цвет тени тона `primary` у solid-кнопки: у «Тактильной» — заливка тона, в светлом режиме 42 %, в тёмном 62 %."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-neutral-glow",
+    "kind": "theme",
+    "default": "transparent",
+    "description": "Цвет тени тона `neutral` у solid-кнопки: у «Тактильной» — заливка тона, в светлом режиме 42 %, в тёмном 62 %."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-success-glow",
+    "kind": "theme",
+    "default": "transparent",
+    "description": "Цвет тени тона `success` у solid-кнопки: у «Тактильной» — заливка тона, в светлом режиме 42 %, в тёмном 62 %."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-warning-glow",
+    "kind": "theme",
+    "default": "transparent",
+    "description": "Цвет тени тона `warning` у solid-кнопки: у «Тактильной» — заливка тона, в светлом режиме 42 %, в тёмном 62 %."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-danger-glow",
+    "kind": "theme",
+    "default": "transparent",
+    "description": "Цвет тени тона `danger` у solid-кнопки: у «Тактильной» — заливка тона, в светлом режиме 42 %, в тёмном 62 %."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-info-glow",
+    "kind": "theme",
+    "default": "transparent",
+    "description": "Цвет тени тона `info` у solid-кнопки: у «Тактильной» — заливка тона, в светлом режиме 42 %, в тёмном 62 %."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-slate-glow",
+    "kind": "theme",
+    "default": "transparent",
+    "description": "Цвет тени тона `slate` у solid-кнопки: у «Тактильной» — заливка тона, в светлом режиме 42 %, в тёмном 62 %."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-azure-glow",
+    "kind": "theme",
+    "default": "transparent",
+    "description": "Цвет тени тона `azure` у solid-кнопки: у «Тактильной» — заливка тона, в светлом режиме 42 %, в тёмном 62 %."
+  },
+  {
+    "owner": "GrButton",
     "name": "--gr-button-shimmer-duration",
     "kind": "theme",
     "default": "1.8s",
     "description": "Один проход света по подписи при `loadingIndicator=\"shimmer\"`."
   },
   {
+    "owner": "GrButton",
+    "name": "--gr-button-motion-duration",
+    "kind": "theme",
+    "default": "var(--gr-duration-fast)",
+    "description": "Длительность отклика кнопки — цвета, тени, подъёма, отступа фокуса."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-motion-ease",
+    "kind": "theme",
+    "default": "var(--gr-ease-out)",
+    "description": "Кривая отклика кнопки. У «Тактильной» — пружина."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-focus-offset",
+    "kind": "theme",
+    "default": "2px",
+    "description": "Отступ контура фокуса от кнопки."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-focus-offset-from",
+    "kind": "theme",
+    "default": "2px",
+    "description": "Отступ контура в момент появления фокуса: контур едет от него к `--gr-button-focus-offset`. У «Тактильной» — 6px, у «Сланца» равен конечному, и контур не движется."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-lift",
+    "kind": "theme",
+    "default": "0px",
+    "description": "Подъём живой кнопки под указателем, по вертикали; с reduced-motion — без подъёма. У «Тактильной» — `-1px`."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-solid-image",
+    "kind": "theme",
+    "default": "none",
+    "description": "Слой поверх заливки solid-кнопки (`background-image`): у «Тактильной» — градиент света сверху."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-glow",
+    "kind": "theme",
+    "default": "0 0 0 0",
+    "description": "Геометрия тени цвета тона у solid-кнопки в покое; цвет — `--gr-button-<тон>-glow`."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-glow-hover",
+    "kind": "theme",
+    "default": "0 0 0 0",
+    "description": "Геометрия тени цвета тона под указателем."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-response-color",
+    "kind": "theme",
+    "default": "transparent",
+    "description": "Слой отклика прозрачных весов (`outline`, `ghost`, `ghost-border`) под указателем: у «Тактильной» — подложка, у «Чертежа» — линия хода. Считается от `currentColor` кнопки."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-response-soft-color",
+    "kind": "theme",
+    "default": "transparent",
+    "description": "Слой отклика `secondary` под указателем."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-response-solid-color",
+    "kind": "theme",
+    "default": "transparent",
+    "description": "Слой отклика solid-кнопки под указателем: у «Чертежа» — линия цветом подписи на 65 %."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-response-inset",
+    "kind": "theme",
+    "default": "0",
+    "description": "Положение слоя отклика (`inset`): вся кнопка — `0`, нижняя кромка — `auto -1px -1px`."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-response-height",
+    "kind": "theme",
+    "default": "auto",
+    "description": "Высота слоя отклика: `auto` — по `inset`, линия — `2px`."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-response-from",
+    "kind": "theme",
+    "default": "none",
+    "description": "Трансформация слоя в покое: подложка растёт из `scale(.88)`, линия — из `scaleX(0)`."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-response-opacity",
+    "kind": "theme",
+    "default": "0",
+    "description": "Прозрачность слоя в покое; под указателем — 1."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-response-origin",
+    "kind": "theme",
+    "default": "50%",
+    "description": "Точка, от которой растёт слой, — доля ширины от начала строки: `50%` — из центра, `0%` — от начала строки (линия хода). В RTL отражается."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-response-duration",
+    "kind": "theme",
+    "default": "var(--gr-duration-fast)",
+    "description": "Длительность появления слоя отклика."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-response-ease",
+    "kind": "theme",
+    "default": "var(--gr-ease-out)",
+    "description": "Кривая появления слоя отклика."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-disabled-border-style",
+    "kind": "theme",
+    "default": "solid",
+    "description": "Стиль рамки недоступной кнопки: пунктир читается и без цвета."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-disabled-image",
+    "kind": "theme",
+    "default": "none",
+    "description": "Слой поверх заливки недоступной кнопки: у «Тактильной» — штриховка."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-track-duration",
+    "kind": "theme",
+    "default": "1.1s",
+    "description": "Период бегущего отрезка загрузки (`loadingIndicator: \"track\"`); с reduced-motion — медленнее, но не выключается: другого сигнала у загрузки нет."
+  },
+  {
     "owner": "GrButtonGroup",
     "name": "--gr-button-group-radius",
-    "kind": "css",
-    "default": "var(--gr-button-radius)",
-    "description": "Скругление внешних углов группы. По умолчанию наследует радиус кнопки — внутренние углы группа гасит сама."
+    "kind": "hook",
+    "default": "радиус кнопки `--gr-button-corner-radius`",
+    "description": "Скругление внешних углов склеенной группы — ручка приложения. Без неё звенья берут свой радиус (`--gr-button-corner-radius`), внутренние углы группа гасит сама. Читает её лист `GrButton`."
   },
   {
     "owner": "GrButtonGroup",

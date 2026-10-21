@@ -22,7 +22,7 @@ describe('loadThemeData', () => {
   })
 
   it('тема не из каталога — отказ со списком тем', async () => {
-    await expect(loadThemeData('ink')).rejects.toThrow(/темы "ink" нет в каталоге — есть clay, slate/)
+    await expect(loadThemeData('ink')).rejects.toThrow(`темы "ink" нет в каталоге — есть ${grThemeCatalog.map(entry => entry.id).join(', ')}`)
     await expect(loadThemeData('constructor')).rejects.toThrow(/нет в каталоге/)
   })
 })

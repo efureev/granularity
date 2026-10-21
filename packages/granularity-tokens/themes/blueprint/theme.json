@@ -1,0 +1,31 @@
+{
+  "id": "blueprint",
+  "title": "Чертёж",
+  "description": "Плоская точность: заливка, линия и шрифт. Без теней и бликов; главный сигнал — линия хода по нижней кромке.",
+  "docs": "https://granularity.tech/themes/blueprint",
+  "version": "1.0.0",
+  "targets": {
+    "@feugene/granularity": "^3.0.0"
+  },
+  "defaultMode": "light",
+  "modes": {
+    "light": {
+      "title": "Светлый",
+      "colorScheme": "light"
+    },
+    "dark": {
+      "title": "Тёмный",
+      "colorScheme": "dark"
+    }
+  },
+  "extensions": {
+    "granularity": {
+      "componentDefaults": {
+        "GrButton": {
+          "loadingIndicator": "track",
+          "prefixCell": true
+        }
+      }
+    }
+  }
+}

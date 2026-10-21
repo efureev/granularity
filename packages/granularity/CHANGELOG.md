@@ -7,6 +7,36 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+Минор: вид кнопки — у темы. Форма, отклик и объём `GrButton` стали токенами вида `theme`, на них
+стоят новые темы каталога «Тактильная» и «Чертёж». Значения, которые кнопка видит у «Сланца» и
+«Глины», не меняются — это сверяет снимок `themes:values:check`.
+
+### Added
+
+- **`GrButton`: проп `prefixCell`** — префикс в квадратной ячейке высотой с кнопку, за
+  перегородкой; спиннер загрузки занимает ячейку. Включает тема через `componentDefaults`.
+- **`GrButton`: `loadingIndicator: 'track'`** — загрузка отрезком, бегущим по нижней кромке;
+  подпись и ширина на месте, с reduced-motion отрезок замедляется, а не выключается. Период —
+  `--gr-button-track-duration`.
+- **Токены вида `theme` у `GrButton`**:
+  - радиусы ступеней `--gr-button-radius-{xs,sm,md,lg}`;
+  - объём solid: слой поверх заливки `--gr-button-solid-image`, тень цвета тона — геометрия
+    `--gr-button-glow`, `-glow-hover` и цвет `--gr-button-<тон>-glow`;
+  - тень нейтральной плашки `--gr-button-surface-shadow`;
+  - отклик под указателем — слой `::before` (`--gr-button-response-*`), подъём `--gr-button-lift`,
+    темп `--gr-button-motion-duration` и `-ease`;
+  - отступ контура фокуса `--gr-button-focus-offset` и `-offset-from`;
+  - недоступная кнопка: `--gr-button-disabled-border-style`, `--gr-button-disabled-image`.
+
+### Changed
+
+- **`--gr-button-radius` — ручка приложения, а не токен темы.** Без неё кнопка берёт радиус своей
+  ступени из темы; с ней — один радиус на все ступени, как прежде. `--gr-button-group-radius`
+  тоже хук: внешние углы склеенной группы по умолчанию — радиус ступени звеньев.
+- **`--gr-button-font-weight` — токен вида `theme`**: начертание подписи решает тема.
+- Своей теме без `extends` нужны значения новых токенов — `granum doctor` называет их поимённо
+  (`theme-incomplete`); начать с копии — `gr-theme-copy slate <id>`.
+
 ## [v3.0.0] 2026-10-21
 
 Мажор: значения у темы. Имена токенов компонентов — контракт ядра, значения даёт тема. Переезд —

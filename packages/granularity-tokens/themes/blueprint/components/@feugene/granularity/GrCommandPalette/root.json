@@ -1,0 +1,6 @@
+{
+  "gr-command-active-bg": "color-mix(in srgb, var(--gr-muted) 45%, transparent)",
+  "gr-command-input-font-size": "15px",
+  "gr-command-item-radius": "10px",
+  "gr-command-match-bg": "color-mix(in srgb, var(--gr-primary) 22%, transparent)"
+}

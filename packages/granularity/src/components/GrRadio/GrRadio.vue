@@ -239,6 +239,7 @@ defineSlots<{
     ref="rootEl"
     data-gr-button
     data-gr-radio
+    :data-gr-variant="checked ? props.selectedButtonVariant : props.buttonVariant"
     role="radio"
     :aria-checked="checked ? 'true' : 'false'"
     :aria-label="ariaLabel"

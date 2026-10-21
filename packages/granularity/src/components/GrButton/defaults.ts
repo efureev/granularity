@@ -14,6 +14,7 @@ export interface GrButtonConfigurableProps {
   size: GrButtonSize
   square: boolean
   loadingIndicator: GrButtonLoadingIndicator
+  prefixCell: boolean
 }
 
 /**

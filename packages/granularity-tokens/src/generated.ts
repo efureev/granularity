@@ -1150,11 +1150,34 @@ export const grDerivedTokens: GrDerivedToken[] = [
 
 export const grThemeCatalog: GrThemeCatalogEntry[] = [
   {
+    "id": "blueprint",
+    "title": "Чертёж",
+    "description": "Плоская точность: заливка, линия и шрифт. Без теней и бликов; главный сигнал — линия хода по нижней кромке.",
+    "docs": "https://granularity.tech/themes/blueprint",
+    "version": "1.0.0",
+    "targets": {
+      "@feugene/granularity": "^3.0.0"
+    },
+    "defaultMode": "light",
+    "modes": [
+      {
+        "name": "light",
+        "title": "Светлый",
+        "colorScheme": "light"
+      },
+      {
+        "name": "dark",
+        "title": "Тёмный",
+        "colorScheme": "dark"
+      }
+    ]
+  },
+  {
     "id": "clay",
     "title": "Глина",
     "description": "Тёплая бумага, графитовые чернила и одна глиняная точка на экран.",
     "docs": "https://granularity.tech/themes/clay",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "targets": {
       "@feugene/granularity": "^3.0.0"
     },
@@ -1177,10 +1200,34 @@ export const grThemeCatalog: GrThemeCatalogEntry[] = [
     "title": "Сланец",
     "description": "Холодные нейтрали шкалы slate, индиго-акцент и контраст, выверенный по AA в обоих режимах.",
     "docs": "https://granularity.tech/themes/slate",
+    "version": "1.1.0",
+    "targets": {
+      "@feugene/granularity": "^3.0.0"
+    },
+    "defaultMode": "light",
+    "modes": [
+      {
+        "name": "light",
+        "title": "Светлый",
+        "colorScheme": "light"
+      },
+      {
+        "name": "dark",
+        "title": "Тёмный",
+        "colorScheme": "dark"
+      }
+    ]
+  },
+  {
+    "id": "tactile",
+    "title": "Тактильная",
+    "description": "Кнопка как предмет: свет сверху, тень цвета тона снизу, подъём под указателем и пружина в отклике.",
+    "docs": "https://granularity.tech/themes/tactile",
     "version": "1.0.0",
     "targets": {
       "@feugene/granularity": "^3.0.0"
     },
+    "extends": "slate",
     "defaultMode": "light",
     "modes": [
       {

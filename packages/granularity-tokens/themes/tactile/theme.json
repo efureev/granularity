@@ -1,0 +1,22 @@
+{
+  "id": "tactile",
+  "title": "Тактильная",
+  "description": "Кнопка как предмет: свет сверху, тень цвета тона снизу, подъём под указателем и пружина в отклике.",
+  "docs": "https://granularity.tech/themes/tactile",
+  "version": "1.0.0",
+  "targets": {
+    "@feugene/granularity": "^3.0.0"
+  },
+  "extends": "slate",
+  "defaultMode": "light",
+  "modes": {
+    "light": {
+      "title": "Светлый",
+      "colorScheme": "light"
+    },
+    "dark": {
+      "title": "Тёмный",
+      "colorScheme": "dark"
+    }
+  }
+}

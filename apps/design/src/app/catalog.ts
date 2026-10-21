@@ -100,7 +100,7 @@ export const catalog: CatalogComponent[] = [
         title: 'Тактильная',
         status: 'concept',
         tagline: 'Кнопка как предмет: свет сверху, тень снизу, отклик телом.',
-        docHeading: 'Тактильная — концепт',
+        docHeading: 'Тактильная — тема `tactile`',
         palette: ['#4f46e5', '#ffffff', '#eef2ff'],
         boards: [
           board('overview', 'Overview', 'Концепция', { options: [shape] }),
@@ -117,7 +117,7 @@ export const catalog: CatalogComponent[] = [
         title: 'Чертёж',
         status: 'concept',
         tagline: 'Плоская кнопка: заливка, линия и шрифт. Под указателем — линия хода по нижней кромке.',
-        docHeading: 'Чертёж — концепт',
+        docHeading: 'Чертёж — тема `blueprint`',
         palette: ['#3730a3', '#ffffff', '#f1f5f9'],
         boards: [
           board('overview', 'Overview', 'Концепция'),

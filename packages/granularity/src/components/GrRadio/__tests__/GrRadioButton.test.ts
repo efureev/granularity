@@ -24,9 +24,19 @@ describe('GrRadio (button)', () => {
 
     expect(btn.attributes('class')).toContain('inline-flex')
     expect(btn.attributes('class')).toContain('items-center')
-    expect(btn.attributes('class')).toContain('rounded-ss-[var(--gr-button-radius-ss,var(--gr-button-radius))]')
+    expect(btn.attributes('class')).toContain('rounded-ss-[var(--gr-button-radius-ss,var(--gr-button-corner-radius))]')
+    expect(btn.attributes('class')).toContain('[--gr-button-step-radius:var(--gr-button-radius-lg)]')
     expect(btn.attributes('class')).toContain('h-11')
     expect(btn.attributes('class')).toContain('bg-[var(--gr-button-primary-bg)]')
+  })
+
+  // Слой отклика кнопки выбирает цвет по весу: выбранная solid-радио под
+  // указателем откликается как solid, а не как прозрачный вес.
+  it('называет вес, которым нарисована: выбранная — selectedButtonVariant', () => {
+    const props = { value: 'a', variant: 'button' as const, buttonVariant: 'outline' as const, selectedButtonVariant: 'primary' as const }
+
+    expect(mount(GrRadio, { props: { ...props, modelValue: 'a' }, slots: { default: 'A' } }).get('[data-gr-radio]').attributes('data-gr-variant')).toBe('primary')
+    expect(mount(GrRadio, { props: { ...props, modelValue: 'b' }, slots: { default: 'A' } }).get('[data-gr-radio]').attributes('data-gr-variant')).toBe('outline')
   })
 
   // См. GrRadiobox.test.ts: в button-режиме тот же контракт — никакого вложенного

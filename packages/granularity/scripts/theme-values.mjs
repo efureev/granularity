@@ -41,7 +41,8 @@ import { GR_BASE_THEME_ID, grThemeCatalog } from '@feugene/granularity-tokens'
  * другой формулой, расхождением не считается. Остальные — по тексту с
  * подставленными `var()` и единым пробелом после запятой.
  *
- *   node scripts/theme-values.mjs --write          записать снимок
+ *   node scripts/theme-values.mjs --write          записать снимок всех тем
+ *   node scripts/theme-values.mjs --write-new      дописать снимок новых тем каталога, не трогая остальные
  *   node scripts/theme-values.mjs                  сверить, код 1 при расхождении
  *   node scripts/theme-values.mjs --allow <file>   ожидаемые расхождения: список `["<тема> <контекст> <токен>", …]`
  *                                                  или группы с причиной (`theme-values.allow.json`)
@@ -334,7 +335,18 @@ if (args.includes('--write')) {
   process.exit(0)
 }
 
-const baseline = Object.fromEntries(Object.entries(JSON.parse(await readFile(BASELINE, 'utf8')).themes).map(([id, contexts]) => [id, normalizeSnapshot(contexts)]))
+const stored = JSON.parse(await readFile(BASELINE, 'utf8')).themes
+
+if (args.includes('--write-new')) {
+  const added = grThemeCatalog.filter(theme => !stored[theme.id])
+  for (const theme of added)
+    stored[theme.id] = current[theme.id]
+  await writeFile(BASELINE, `${JSON.stringify({ themes: Object.fromEntries(Object.entries(stored).sort(([a], [b]) => (a < b ? -1 : 1))) }, null, 2)}\n`)
+  console.log(`[theme-values] снимок дописан: ${added.map(theme => theme.id).join(', ') || 'новых тем нет'}`)
+  process.exit(0)
+}
+
+const baseline = Object.fromEntries(Object.entries(stored).map(([id, contexts]) => [id, normalizeSnapshot(contexts)]))
 const allowed = await readAllowList(args)
 let ok = true
 
@@ -345,7 +357,7 @@ for (const id of Object.keys(baseline).filter(id => !(id in current))) {
 
 for (const theme of grThemeCatalog) {
   if (!baseline[theme.id]) {
-    console.error(`[theme-values] ${theme.id}: снимка нет — запишите его до первой правки значений (--write)`)
+    console.error(`[theme-values] ${theme.id}: снимка нет — запишите его до первой правки значений (--write-new)`)
     ok = false
     continue
   }

@@ -7,8 +7,10 @@
 
 | Тема | Название | Версия | Режимы | Характер | Как устроена | Дизайн-система |
 | --- | --- | --- | --- | --- | --- | --- |
-| `slate` | Сланец | 1.0.0 | `light`, `dark` | холодные нейтрали, индиго-акцент, контраст по AA | базовая тема пакета | [granularity.tech/themes/slate](https://granularity.tech/themes/slate) |
-| `clay` | Глина | 1.0.0 | `light`, `dark` | тёплая бумага, графитовые чернила, один глиняный акцент | копия `slate` | [granularity.tech/themes/clay](https://granularity.tech/themes/clay) |
+| `slate` | Сланец | 1.1.0 | `light`, `dark` | холодные нейтрали, индиго-акцент, контраст по AA | базовая тема пакета | [granularity.tech/themes/slate](https://granularity.tech/themes/slate) |
+| `clay` | Глина | 1.1.0 | `light`, `dark` | тёплая бумага, графитовые чернила, один глиняный акцент | копия `slate` | [granularity.tech/themes/clay](https://granularity.tech/themes/clay) |
+| `tactile` | Тактильная | 1.0.0 | `light`, `dark` | кнопка-предмет: свет сверху, тень цвета тона, подъём и пружина | наследник `slate` | [granularity.tech/themes/tactile](https://granularity.tech/themes/tactile) |
+| `blueprint` | Чертёж | 1.0.0 | `light`, `dark` | плоская точность: без теней, линия хода, ячейка иконки | копия `slate` | [granularity.tech/themes/blueprint](https://granularity.tech/themes/blueprint) |
 
 Каждая тема — папка с `README.md`: для чего она, правила использования, которых нет в токенах, и
 ссылка на её дизайн-систему. Темы каталога выходят связкой с ядром: компонент с новым токеном вида

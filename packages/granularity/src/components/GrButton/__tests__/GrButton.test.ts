@@ -254,6 +254,35 @@ describe('GrButton', () => {
     expect(failures).toEqual([])
   })
 
+  // Блик поверх заливки («Тактильная») светлее всего у верхней кромки: подпись
+  // обязана держать AA и там, а не только на чистой заливке.
+  it('подпись solid-кнопки держит контраст и под бликом заливки', () => {
+    const failures: string[] = []
+    const glossed = THEME_MODES.filter(key => buttonVarsOf(key)['--gr-button-solid-image'] !== 'none')
+
+    for (const key of glossed) {
+      const vars = buttonVarsOf(key)
+      const stop = /color-mix\(in srgb, (.+?) (\d+)%, transparent\)/.exec(vars['--gr-button-solid-image'])
+      if (!stop) {
+        failures.push(`${key}: первая точка блика не разобрана — ${vars['--gr-button-solid-image']}`)
+        continue
+      }
+      for (const tone of tones) {
+        for (const state of states) {
+          const colors = getButtonColors('primary', tone, state)
+          const text = resolveColorExpression(colors.text, vars, derivedThemeVars)
+          const top = resolveColorExpression(`color-mix(in srgb, ${stop[1]} ${stop[2]}%, ${colors.background})`, vars, derivedThemeVars)
+          const ratio = getContrastRatio(text, top)
+          if (ratio < 4.5)
+            failures.push(`${key}:${tone}:${state}:${ratio.toFixed(2)}`)
+        }
+      }
+    }
+
+    expect(glossed.length).toBeGreaterThan(0)
+    expect(failures).toEqual([])
+  })
+
   it('сохраняет достаточный контраст текста и заливки для всех tone × tone в каждом режиме каждой темы', () => {
     const failures: string[] = []
 
@@ -361,14 +390,21 @@ describe('GrButton — отключённое состояние', () => {
    * недоступное состояние обязано было оставаться читаемым. Требование снято
    * осознанно: WCAG 1.4.3 недоступные контролы исключает, а кнопка, гаснущая
    * не так, как всё вокруг, читалась как активная.
+   *
+   * Подпись гаснет общей ролью всегда. Заливка и рамка уходят от ролей только у
+   * темы, давшей недоступной кнопке свой сигнал, читаемый без цвета, — пунктир
+   * рамки («Чертёж»: без заливки, пунктир `--gr-brd-hover`).
    */
   it('гаснет теми же ролями, что и остальной пакет', () => {
     const roles = [['bg', '--gr-disabled-bg'], ['fg', '--gr-disabled-fg'], ['brd', '--gr-disabled-brd']] as const
 
     for (const theme of THEME_MODES) {
       const buttonVars = buttonVarsOf(theme)
+      const ownSignal = buttonVars['--gr-button-disabled-border-style'] === 'dashed'
 
       for (const [part, role] of roles) {
+        if (ownSignal && part !== 'fg')
+          continue
         const own = resolveColorExpression(`var(--gr-button-disabled-${part})`, buttonVars, derivedThemeVars)
         const shared = resolveColorExpression(`var(${role})`, themeVarsByName[theme], derivedThemeVars)
 
@@ -510,16 +546,33 @@ describe('GrButton — вес, рамки и объём', () => {
 
     expect(className).toContain('bg-[var(--gr-button-neutral-soft-bg)]')
     expect(className).toContain('border-[var(--gr-button-neutral-border)]')
-    expect(className).toContain('shadow-[var(--gr-shadow-1)]')
+    expect(className).toContain('shadow-[var(--gr-button-surface-shadow)]')
   })
 
   it('объём есть у solid и снимается вместе с вариантом в отключённом виде', () => {
     const live = grButtonClass({ variant: 'primary', tone: 'primary', size: 'md', square: false })
     const disabled = grButtonClass({ variant: 'primary', tone: 'primary', size: 'md', square: false, disabled: true })
 
-    expect(live).toContain('shadow-[var(--gr-button-divider,0_0_transparent),var(--gr-button-shadow)]')
+    expect(live).toContain('shadow-[var(--gr-button-divider,0_0_transparent),var(--gr-button-shadow),var(--gr-button-glow)_var(--gr-button-primary-glow)]')
+    expect(live).toContain('hover:shadow-[var(--gr-button-divider,0_0_transparent),var(--gr-button-shadow),var(--gr-button-glow-hover)_var(--gr-button-primary-glow)]')
     expect(live).toContain('active:shadow-[var(--gr-button-divider,0_0_transparent),var(--gr-button-shadow-active)]')
+    expect(live).toContain('bg-[image:var(--gr-button-solid-image)]')
     expect(disabled).not.toContain('shadow-')
+    expect(disabled).not.toContain('--gr-button-solid-image')
+  })
+
+  // Формула темы не знает тона элемента: цвет тени — токен на тон.
+  it('тень solid-кнопки берёт цвет своего тона', () => {
+    for (const tone of filledTones)
+      expect(grButtonClass({ variant: 'primary', tone, size: 'md', square: false })).toContain(`var(--gr-button-glow)_var(--gr-button-${tone}-glow)`)
+  })
+
+  it('недоступная кнопка берёт стиль рамки и штриховку у темы', () => {
+    for (const variant of ['primary', 'secondary'] as const) {
+      const classes = grButtonClass({ variant, tone: 'primary', size: 'md', square: false, disabled: true }).split(' ')
+      expect(classes).toEqual(expect.arrayContaining(['[border-style:var(--gr-button-disabled-border-style)]', 'bg-[image:var(--gr-button-disabled-image)]']))
+    }
+    expect(grButtonClass({ variant: 'outline', tone: 'primary', size: 'md', square: false, disabled: true }).split(' ')).toContain('[border-style:var(--gr-button-disabled-border-style)]')
   })
 
   // Рамка в 1px есть у всех весов: иначе ghost на 2px уже соседей в ряду.
@@ -531,10 +584,10 @@ describe('GrButton — вес, рамки и объём', () => {
     expect(disabled).toEqual(expect.arrayContaining(['border', 'border-transparent']))
   })
 
-  it('подпись — medium через переопределяемый токен', () => {
+  it('начертание подписи — токен темы', () => {
     const wrapper = mount(GrButton, { slots: { default: 'Save' } })
 
-    expect(wrapper.get('[data-gr-button]').classes()).toContain('[font-weight:var(--gr-button-font-weight,var(--gr-font-medium))]')
+    expect(wrapper.get('[data-gr-button]').classes()).toContain('[font-weight:var(--gr-button-font-weight)]')
   })
 
   // Кольцо вплотную к заливке того же тона читалось утолщением кнопки, а
@@ -545,7 +598,10 @@ describe('GrButton — вес, рамки и объём', () => {
     expect(classes).toEqual(expect.arrayContaining([
       'focus-visible:outline-solid',
       'focus-visible:outline-2',
-      'focus-visible:outline-offset-2',
+      'outline-offset-[var(--gr-button-focus-offset-from)]',
+      'focus-visible:outline-offset-[var(--gr-button-focus-offset)]',
+      // С reduced-motion контур не въезжает: покой и фокус — один отступ.
+      'motion-reduce:outline-offset-[var(--gr-button-focus-offset)]',
       'focus-visible:outline-[var(--gr-ring)]',
     ]))
     expect(classes.some(cls => /(?:^|:)ring(?:-|$)/.test(cls))).toBe(false)
@@ -558,9 +614,9 @@ describe('GrButton — нажатие и курсор', () => {
     const disabled = mount(GrButton, { props: { disabled: true }, slots: { default: 'Save' } }).get('[data-gr-button]').classes()
     const loading = mount(GrButton, { props: { loading: true }, slots: { default: 'Save' } }).get('[data-gr-button]').classes()
 
-    expect(live).toContain('motion-safe:active:scale-98')
-    expect(disabled).not.toContain('motion-safe:active:scale-98')
-    expect(loading).not.toContain('motion-safe:active:scale-98')
+    expect(live).toEqual(expect.arrayContaining(['motion-safe:active:scale-98', 'motion-safe:hover:translate-y-[var(--gr-button-lift)]']))
+    expect(disabled.some(cls => cls.startsWith('motion-safe:'))).toBe(false)
+    expect(loading.some(cls => cls.startsWith('motion-safe:'))).toBe(false)
   })
 
   it('ждущая сервер кнопка занята, а не запрещена', () => {
@@ -718,6 +774,95 @@ describe('GrButton — ссылка в новую вкладку', () => {
 
     expect(plain.find('.sr-only').exists()).toBe(false)
     expect(disabled.find('.sr-only').exists()).toBe(false)
+  })
+})
+
+describe('GrButton — скругление по ступеням', () => {
+  it('ступень ставит свой радиус, углы берут его после ручки приложения', () => {
+    for (const size of ['xs', 'sm', 'md', 'lg'] as const) {
+      for (const square of [false, true]) {
+        const classes = grButtonClass({ variant: 'primary', tone: 'primary', size, square }).split(' ')
+        expect(classes).toContain(`[--gr-button-step-radius:var(--gr-button-radius-${size})]`)
+      }
+    }
+    const classes = mount(GrButton, { slots: { default: 'Save' } }).get('[data-gr-button]').classes()
+    for (const corner of ['ss', 'se', 'ee', 'es'])
+      expect(classes).toContain(`rounded-${corner}-[var(--gr-button-radius-${corner},var(--gr-button-corner-radius))]`)
+  })
+})
+
+describe('GrButton — ячейка иконки', () => {
+  const icon = () => h('i', { 'data-prefix': '' })
+
+  it('префикс в ячейке у начального края: без бокового отступа, за перегородкой', () => {
+    const wrapper = mount(GrButton, { props: { prefixCell: true }, slots: { default: () => 'Экспорт', prefix: icon } })
+    const button = wrapper.get('[data-gr-button]')
+    const cell = wrapper.get('[data-gr-button-cell]')
+
+    expect(cell.find('[data-prefix]').exists()).toBe(true)
+    expect(cell.classes()).toEqual(expect.arrayContaining(['aspect-square', 'self-stretch', 'border-e']))
+    expect(button.classes()).toContain('ps-0')
+    expect(button.classes().some(cls => /^ps-\d/.test(cls) && cls !== 'ps-0')).toBe(false)
+  })
+
+  it('ячейки нет без префикса и у квадратной кнопки', () => {
+    expect(mount(GrButton, { props: { prefixCell: true }, slots: { default: () => 'Ок' } }).find('[data-gr-button-cell]').exists()).toBe(false)
+    const square = mount(GrButton, { props: { prefixCell: true, square: true, ariaLabel: 'Экспорт' }, slots: { prefix: icon } })
+    expect(square.find('[data-gr-button-cell]').exists()).toBe(false)
+  })
+
+  it('спиннер загрузки занимает ячейку, а не встаёт рядом', () => {
+    const wrapper = mount(GrButton, { props: { prefixCell: true, loading: true }, slots: { default: () => 'Экспорт', prefix: icon } })
+
+    expect(wrapper.get('[data-gr-button-cell]').find('.animate-spin').exists()).toBe(true)
+    expect(wrapper.findAll('.animate-spin')).toHaveLength(1)
+    expect(wrapper.find('[data-prefix]').exists()).toBe(false)
+  })
+
+  it('ячейку включает тема через componentDefaults', () => {
+    const wrapper = mount(GrConfigProvider, {
+      props: { componentDefaults: { GrButton: { prefixCell: true } } },
+      slots: { default: () => h(GrButton, null, { default: () => 'Экспорт', prefix: icon }) },
+    })
+
+    expect(wrapper.find('[data-gr-button-cell]').exists()).toBe(true)
+  })
+})
+
+describe('GrButton · загрузка бегущим отрезком', () => {
+  it('отрезок по кромке: без спиннера, содержимое на месте, aria-busy и скрытый текст', () => {
+    const wrapper = mount(GrButton, {
+      props: { loading: true, loadingIndicator: 'track' },
+      slots: { default: () => 'Сохранить', prefix: () => h('i', { 'data-prefix': '' }) },
+    })
+    const button = wrapper.get('[data-gr-button]')
+
+    expect(button.attributes('data-gr-busy-track')).toBe('')
+    expect(button.attributes('data-gr-busy-overlay')).toBeUndefined()
+    expect(button.attributes('aria-busy')).toBe('true')
+    expect(wrapper.get('[data-gr-button-track]').attributes('aria-hidden')).toBe('true')
+    expect(wrapper.find('.animate-spin').exists()).toBe(false)
+    expect(wrapper.find('[data-prefix]').exists()).toBe(true)
+    expect(wrapper.get('[data-gr-button-label]').text()).toBe('Сохранить')
+    expect(wrapper.find('.sr-only').exists()).toBe(true)
+  })
+
+  it('кромка есть у любой кнопки — квадратная тоже бежит отрезком', () => {
+    const wrapper = mount(GrButton, {
+      props: { loading: true, loadingIndicator: 'track', square: true, ariaLabel: 'Обновить' },
+      slots: { default: () => h('svg', { 'data-icon': '' }) },
+    })
+
+    expect(wrapper.find('[data-gr-button-track]').exists()).toBe(true)
+    expect(wrapper.find('.animate-spin').exists()).toBe(false)
+    expect(wrapper.find('[data-icon]').exists()).toBe(true)
+  })
+
+  it('без загрузки отрезка нет', () => {
+    const wrapper = mount(GrButton, { props: { loadingIndicator: 'track' }, slots: { default: () => 'Ок' } })
+
+    expect(wrapper.find('[data-gr-button-track]').exists()).toBe(false)
+    expect(wrapper.get('[data-gr-button]').attributes('data-gr-busy-track')).toBeUndefined()
   })
 })
 

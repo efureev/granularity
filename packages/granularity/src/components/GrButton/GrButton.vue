@@ -50,10 +50,17 @@ export interface GrButtonProps {
   /**
    * Вид загрузки. `spinner` — спиннер; `shimmer` — свет проходит по подписи, а
    * подпись, иконки и ширина остаются на месте. Без текстовой подписи (кнопка из
-   * иконки) мерцать нечему — там спиннер. По умолчанию `spinner`; тема меняет его
-   * через `componentDefaults` («Глина»).
+   * иконки) мерцать нечему — там спиннер. `track` — отрезок бежит по нижней
+   * кромке, содержимое на месте. По умолчанию `spinner`; тема меняет его через
+   * `componentDefaults` («Глина» — `shimmer`, «Чертёж» — `track`).
    */
   loadingIndicator?: GrButtonLoadingIndicator
+  /**
+   * Префикс в квадратной ячейке высотой с кнопку, за перегородкой. Только с
+   * подписью: у квадратной кнопки ячейка и есть кнопка. По умолчанию `false`;
+   * тема включает её через `componentDefaults` («Чертёж»).
+   */
+  prefixCell?: boolean
   /** i18n: что именно грузится. `aria-busy` сам по себе часть AT не объявляет. */
   loadingText?: string
   /**
@@ -95,6 +102,7 @@ const props = withDefaults(
     size: undefined,
     loading: false,
     loadingIndicator: undefined,
+    prefixCell: undefined,
     loadingText: undefined,
     disabled: false,
     square: undefined,
@@ -124,6 +132,7 @@ const resolvedVariant = useGrComponentProp('GrButton', 'variant', () => props.va
 const resolvedTone = useGrComponentProp('GrButton', 'tone', () => props.tone ?? group?.tone.value ?? (inTray.value ? 'neutral' : undefined), 'primary')
 const isSquare = useGrComponentProp('GrButton', 'square', () => props.square, false)
 const resolvedLoadingIndicator = useGrComponentProp('GrButton', 'loadingIndicator', () => props.loadingIndicator, 'spinner')
+const resolvedPrefixCell = useGrComponentProp('GrButton', 'prefixCell', () => props.prefixCell, false)
 
 const iconSizeBySize: Record<GrButtonSize, GrButtonSize> = { xs: 'xs', sm: 'sm', md: 'sm', lg: 'lg' }
 provideGrIconSizeHint(computed(() => iconSizeBySize[resolvedSize.value]))
@@ -209,12 +218,26 @@ function labelIsText(): boolean {
  * кнопки не меняется, соседи не едут. С префиксом спиннер занимает его место.
  */
 function spinnerOverContent(): boolean {
-  return props.loading && !shimmerLabel() && !hasSlotContent('prefix')
+  return props.loading && !shimmerLabel() && !trackLoading() && !hasSlotContent('prefix')
 }
 
 /** Загрузка мерцанием подписи — только у текстовой подписи: у иконки мерцать нечему. */
 function shimmerLabel(): boolean {
   return props.loading && resolvedLoadingIndicator.value === 'shimmer' && labelIsText()
+}
+
+/** Загрузка отрезком по нижней кромке: содержимое на месте, кромка есть у любой кнопки. */
+function trackLoading(): boolean {
+  return props.loading && resolvedLoadingIndicator.value === 'track'
+}
+
+/** Спиннер на месте префикса: две иконки рядом читались бы как ошибка. */
+function spinnerInPrefix(): boolean {
+  return props.loading && !shimmerLabel() && !trackLoading() && !spinnerOverContent()
+}
+
+function prefixInCell(): boolean {
+  return resolvedPrefixCell.value && !isSquare.value && hasSlotContent('prefix')
 }
 
 const rootAttrs = computed(() => {
@@ -288,6 +311,7 @@ function rootClass(): string[] {
       block: props.block,
       loading: props.loading,
       prefix: hasSlotContent('prefix'),
+      prefixCell: prefixInCell(),
       suffix,
     }),
     // Ждущая сервер кнопка не запрещена, а занята — курсор говорит именно это.
@@ -314,13 +338,17 @@ defineSlots<{
     :data-gr-tone="resolvedTone"
     :data-gr-busy-overlay="spinnerOverContent() ? '' : undefined"
     :data-gr-busy-shimmer="shimmerLabel() ? '' : undefined"
+    :data-gr-busy-track="trackLoading() ? '' : undefined"
     v-bind="rootAttrs"
     :class="rootClass()"
     @click.capture="onClickCapture"
   >
-    <!-- Спиннер занимает место префикса: две иконки рядом читались бы как ошибка. -->
-    <IconLoader v-if="props.loading && !shimmerLabel() && !spinnerOverContent()" class="animate-spin" :class="glyphSizes[resolvedSize]" aria-hidden="true" />
-    <slot v-else-if="!props.loading || shimmerLabel()" name="prefix" />
+    <span v-if="prefixInCell()" data-gr-button-cell class="flex aspect-square items-center justify-center self-stretch border-e border-[color-mix(in_srgb,currentColor_24%,transparent)]">
+      <IconLoader v-if="spinnerInPrefix()" class="animate-spin" :class="glyphSizes[resolvedSize]" aria-hidden="true" />
+      <slot v-else name="prefix" />
+    </span>
+    <IconLoader v-else-if="spinnerInPrefix()" class="animate-spin" :class="glyphSizes[resolvedSize]" aria-hidden="true" />
+    <slot v-else-if="!props.loading || shimmerLabel() || trackLoading()" name="prefix" />
 
     <span v-if="labelIsText()" data-gr-button-label class="min-w-0 truncate" @mouseenter="titleWhenTruncated">
       <slot />
@@ -334,6 +362,8 @@ defineSlots<{
     <span v-if="spinnerOverContent()" data-gr-button-spinner class="absolute inset-0 flex items-center justify-center" aria-hidden="true">
       <IconLoader class="animate-spin" :class="glyphSizes[resolvedSize]" />
     </span>
+
+    <span v-if="trackLoading()" data-gr-button-track aria-hidden="true"><span /></span>
 
     <span v-if="props.loading" class="sr-only">{{ resolvedLoadingText }}</span>
     <span v-if="opensInNewTab && !props.ariaLabel" class="sr-only">({{ newTabHint }})</span>
@@ -386,6 +416,116 @@ defineSlots<{
     animation: none;
     background-image: none;
     -webkit-text-fill-color: color-mix(in srgb, currentColor 70%, transparent);
+  }
+}
+
+/*
+ * Загрузка отрезком: он бежит по нижней кромке поверх рамки, содержимое на месте
+ * и чуть приглушено. С reduced-motion отрезок не выключается, а замедляется:
+ * другого сигнала у загрузки нет.
+ */
+[data-gr-button][data-gr-busy-track] > :not([data-gr-button-track]) {
+  opacity: 0.86;
+}
+
+/* Дорожка — во всю кнопку по рамке и со скруглением кнопки: отрезок обрезается по её углам. */
+[data-gr-button-track] {
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+[data-gr-button-track] > span {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 36%;
+  height: 2px;
+  background-color: currentColor;
+  animation: gr-button-track var(--gr-button-track-duration) linear infinite;
+}
+
+[dir='rtl'] [data-gr-button-track] {
+  transform: scaleX(-1);
+}
+
+@keyframes gr-button-track {
+  from {
+    transform: translateX(-100%);
+  }
+
+  to {
+    transform: translateX(280%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-gr-button-track] > span {
+    animation-duration: calc(var(--gr-button-track-duration) * 2.4);
+  }
+}
+
+/*
+ * Радиус углов кнопки: ручка приложения, иначе радиус ступени. В склеенной
+ * `GrButtonGroup` впереди — её ручка `--gr-button-group-radius`; внутренние углы
+ * группа гасит сама. Здесь, а не в листе группы: радиус ступени знает только
+ * кнопка.
+ */
+[data-gr-button] {
+  --gr-button-corner-radius: var(--gr-button-radius, var(--gr-button-step-radius));
+}
+
+[data-gr-button-group][data-attached] [data-gr-button] {
+  --gr-button-corner-radius: var(--gr-button-group-radius, var(--gr-button-radius, var(--gr-button-step-radius)));
+}
+
+/*
+ * Слой отклика под указателем — `::before`: `::after` занят зоной касания. Тема
+ * задаёт его геометрию и цвет: у «Тактильной» — подложка прозрачных весов,
+ * растущая из центра, у «Чертежа» — линия хода по нижней кромке; у «Сланца» он
+ * прозрачен. Цвет считается от `currentColor` кнопки, поэтому формула темы
+ * знает тон без токена на тон. Под содержимым — за счёт `isolate` у кнопки.
+ */
+[data-gr-button]::before {
+  content: '';
+  position: absolute;
+  inset: var(--gr-button-response-inset);
+  height: var(--gr-button-response-height);
+  border-radius: inherit;
+  background-color: var(--gr-button-response-color);
+  opacity: var(--gr-button-response-opacity);
+  transform: var(--gr-button-response-from);
+  transform-origin: var(--gr-button-response-origin) 50%;
+  transition:
+    transform var(--gr-button-response-duration) var(--gr-button-response-ease),
+    opacity var(--gr-button-response-duration) var(--gr-button-response-ease);
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Точка роста считается от начала строки: в RTL — от правого края. */
+[dir='rtl'] [data-gr-button]::before {
+  transform-origin: calc(100% - var(--gr-button-response-origin)) 50%;
+}
+
+[data-gr-button][data-gr-variant='primary']::before {
+  background-color: var(--gr-button-response-solid-color);
+}
+
+[data-gr-button][data-gr-variant='secondary']::before {
+  background-color: var(--gr-button-response-soft-color);
+}
+
+[data-gr-button]:hover:not(:disabled, [aria-disabled='true'])::before {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-gr-button]::before {
+    transition: none;
   }
 }
 

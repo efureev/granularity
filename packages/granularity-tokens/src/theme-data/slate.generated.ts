@@ -8,7 +8,7 @@ const data: GrThemeData = {
   "title": "Сланец",
   "description": "Холодные нейтрали шкалы slate, индиго-акцент и контраст, выверенный по AA в обоих режимах.",
   "docs": "https://granularity.tech/themes/slate",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "targets": {
     "@feugene/granularity": "^3.0.0"
   },
@@ -508,7 +508,6 @@ const data: GrThemeData = {
           "gr-button-disabled-bg": "var(--gr-disabled-bg)",
           "gr-button-disabled-fg": "var(--gr-disabled-fg)",
           "gr-button-disabled-brd": "var(--gr-disabled-brd)",
-          "gr-button-radius": "0.375rem",
           "gr-button-shimmer-duration": "1.8s",
           "gr-button-primary-ghost-bg-hover": "var(--gr-button-primary-soft-bg-hover)",
           "gr-button-primary-ghost-bg-active": "var(--gr-button-primary-soft-bg-active)",
@@ -529,16 +528,59 @@ const data: GrThemeData = {
           "gr-button-neutral-bg": "var(--gr-secondary)",
           "gr-button-neutral-bg-hover": "var(--gr-secondary-hover)",
           "gr-button-neutral-bg-active": "var(--gr-secondary-active)",
-          "gr-button-neutral-fg": "var(--gr-secondary-fg)"
+          "gr-button-neutral-fg": "var(--gr-secondary-fg)",
+          "gr-button-disabled-border-style": "solid",
+          "gr-button-disabled-image": "none",
+          "gr-button-focus-offset": "2px",
+          "gr-button-focus-offset-from": "2px",
+          "gr-button-font-weight": "var(--gr-font-medium)",
+          "gr-button-glow": "0 0 0 0",
+          "gr-button-glow-hover": "0 0 0 0",
+          "gr-button-lift": "0px",
+          "gr-button-motion-duration": "var(--gr-duration-fast)",
+          "gr-button-motion-ease": "var(--gr-ease-out)",
+          "gr-button-radius-lg": "0.375rem",
+          "gr-button-radius-md": "0.375rem",
+          "gr-button-radius-sm": "0.375rem",
+          "gr-button-radius-xs": "0.375rem",
+          "gr-button-response-color": "transparent",
+          "gr-button-response-duration": "var(--gr-duration-fast)",
+          "gr-button-response-ease": "var(--gr-ease-out)",
+          "gr-button-response-from": "none",
+          "gr-button-response-height": "auto",
+          "gr-button-response-inset": "0",
+          "gr-button-response-opacity": "0",
+          "gr-button-response-origin": "50%",
+          "gr-button-response-soft-color": "transparent",
+          "gr-button-response-solid-color": "transparent",
+          "gr-button-solid-image": "none",
+          "gr-button-track-duration": "1.1s",
+          "gr-button-surface-shadow": "var(--gr-shadow-1)"
         },
         "modes": {
           "dark": {
             "gr-button-shadow": "inset 0 1px 0 color-mix(in srgb, var(--gr-slate-0) 12%, transparent), var(--gr-shadow-1)",
-            "gr-button-shadow-active": "inset 0 1px 2px color-mix(in srgb, var(--gr-slate-900) 60%, transparent)"
+            "gr-button-shadow-active": "inset 0 1px 2px color-mix(in srgb, var(--gr-slate-900) 60%, transparent)",
+            "gr-button-primary-glow": "transparent",
+            "gr-button-neutral-glow": "transparent",
+            "gr-button-success-glow": "transparent",
+            "gr-button-warning-glow": "transparent",
+            "gr-button-danger-glow": "transparent",
+            "gr-button-info-glow": "transparent",
+            "gr-button-slate-glow": "transparent",
+            "gr-button-azure-glow": "transparent"
           },
           "light": {
             "gr-button-shadow": "inset 0 1px 0 color-mix(in srgb, var(--gr-slate-0) 16%, transparent), var(--gr-shadow-1)",
-            "gr-button-shadow-active": "inset 0 1px 2px color-mix(in srgb, var(--gr-slate-900) 24%, transparent)"
+            "gr-button-shadow-active": "inset 0 1px 2px color-mix(in srgb, var(--gr-slate-900) 24%, transparent)",
+            "gr-button-primary-glow": "transparent",
+            "gr-button-neutral-glow": "transparent",
+            "gr-button-success-glow": "transparent",
+            "gr-button-warning-glow": "transparent",
+            "gr-button-danger-glow": "transparent",
+            "gr-button-info-glow": "transparent",
+            "gr-button-slate-glow": "transparent",
+            "gr-button-azure-glow": "transparent"
           }
         }
       },

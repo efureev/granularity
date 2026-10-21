@@ -3,7 +3,7 @@
   "title": "Глина",
   "description": "Тёплая бумага, графитовые чернила и одна глиняная точка на экран.",
   "docs": "https://granularity.tech/themes/clay",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "targets": {
     "@feugene/granularity": "^3.0.0"
   },

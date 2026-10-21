@@ -69,7 +69,8 @@ defineGranumConfig({
 - **Токены, ставшие видом `theme`.** Значение задаёт каждая тема; приложение по-прежнему
   переопределяет их `tokenOverrides` или CSS:
   - `--gr-button-neutral-bg`, `-neutral-bg-hover`, `-neutral-bg-active`, `-neutral-fg`;
-  - радиусы `--gr-button-radius`, `--gr-avatar-square-radius`, `--gr-badge-semi-radius-{xs,sm,md,lg}`,
+  - радиусы `--gr-button-radius-{xs,sm,md,lg}` (один радиус на все ступени — ручка приложения
+    `--gr-button-radius`), `--gr-avatar-square-radius`, `--gr-badge-semi-radius-{xs,sm,md,lg}`,
     `--gr-command-item-radius`;
   - тени `--gr-datatable-pinned-shadow`, `-pinned-shadow-end`, `--gr-table-sticky-column-shadow`;
   - цвета `--gr-command-active-bg`, `--gr-command-match-bg`, `--gr-rating-void-color`,

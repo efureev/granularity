@@ -98,13 +98,11 @@ defineSlots<{
  * кнопок. Утилита кнопки читает радиус каждого угла из своей переменной
  * (`--gr-button-radius-ss` … `-ee`), а переменные утилиты не задают — спорить
  * слоям не о чем. Углы логические, поэтому RTL отражает группу сам.
+ *
+ * Внешние углы — радиус самой кнопки с ручкой `--gr-button-group-radius`
+ * впереди. Его считает лист `GrButton`: радиус ступени знает только кнопка.
  */
-[data-gr-button-group] {
-    --gr-button-group-radius: var(--gr-button-radius);
-}
-
 [data-gr-button-group][data-attached] [data-gr-button] {
-    --gr-button-radius: var(--gr-button-group-radius);
     position: relative;
 }
 

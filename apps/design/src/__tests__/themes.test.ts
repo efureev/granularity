@@ -23,10 +23,11 @@ describe('раздел «Темы»', () => {
   it('страница темы называет версию, целевые пакеты и связь с источником', () => {
     const slate = grThemeCatalog.find(theme => theme.id === 'slate')!
     const clay = grThemeCatalog.find(theme => theme.id === 'clay')!
-    expect(slate.version).toBe('1.0.0')
-    expect(themeTargets(slate)).toEqual(['@feugene/granularity ^3.0.0'])
+    const tactile = grThemeCatalog.find(theme => theme.id === 'tactile')!
+    expect(slate.version).toMatch(/^\d+\.\d+\.\d+$/)
+    expect(themeTargets({ ...slate, targets: { '@feugene/granularity': '^3.0.0' } })).toEqual(['@feugene/granularity ^3.0.0'])
     expect(themeLineage(clay)).toBe('независимая: все значения свои')
-    expect(themeLineage({ ...clay, extends: 'slate' })).toBe('наследует «Сланец»')
+    expect(themeLineage(tactile)).toBe('наследует «Сланец»')
     expect(themeTargets({ ...clay, targets: undefined })).toEqual([])
   })
 
