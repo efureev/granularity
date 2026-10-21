@@ -7,6 +7,8 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v1.4.0] 2026-10-21
+
 ### Added
 
 - **`loadThemeData(id)`** — полные данные темы каталога по требованию, для страниц, которые показывают
