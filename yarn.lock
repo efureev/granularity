@@ -735,15 +735,15 @@
   resolved "https://registry.yarnpkg.com/@feugene/fint-i18n/-/fint-i18n-0.9.0.tgz#861a7b5784d71f4de67a89c407f9f47e87db6ae4"
   integrity sha512-MY0x1PM2Ua0El4BZXWeerUmL6ylFOPhquEtAuLd3tPu2A81ZiKhYAdtCvttXjPe7TLNpPBSfqCGP/JmANs6J5Q==
 
-"@feugene/granum-engine-wind@^3.8.1":
-  version "3.8.1"
-  resolved "https://registry.yarnpkg.com/@feugene/granum-engine-wind/-/granum-engine-wind-3.8.1.tgz#5e01f9828596bdcecd6e2347bc2077a1aa7b09ed"
-  integrity sha512-d7KAaKwZpA0VsGCwdJ13FpBH0eHjSpUpBibXJckxYDQiDiKrftb8Jq8wVM03RJYrMpb23L37HO2o1SHlif+/dg==
+"@feugene/granum-engine-wind@^3.9.0":
+  version "3.9.0"
+  resolved "https://registry.yarnpkg.com/@feugene/granum-engine-wind/-/granum-engine-wind-3.9.0.tgz#f1e5d4ecf61f2a584338c3e6f09f0d03dfb73b4b"
+  integrity sha512-h19h3+IW8z0Ko/EgDiJj1BxwR6FdpHN+v+4ePLTZnQmDqSQm1KgZP3T+Cb8zgU7oGFHSe7kf+h/OLZ/8/sdZWg==
 
-"@feugene/granum@^3.8.1":
-  version "3.8.1"
-  resolved "https://registry.yarnpkg.com/@feugene/granum/-/granum-3.8.1.tgz#0ff329e1360d54c04f119ecb4efae74a164f0314"
-  integrity sha512-P9rh1KIsLKGJNFxy85WjFzoTAQSTYsE5F4yI8Di1YjeylDULrLiqW69q6j4cZFzuqbtPry/0XzNMJiwWE0z7dg==
+"@feugene/granum@^3.9.0":
+  version "3.9.0"
+  resolved "https://registry.yarnpkg.com/@feugene/granum/-/granum-3.9.0.tgz#a5476f1328a9d7e8350815f8ab9c908e487cf554"
+  integrity sha512-lVzEMMVWZOlyowD3VrftBAifdv4jBtCPLFBrIKWlDQk1F4BSkpuFJALn43qifdKgZXwKAFctW6aGqAtA/9hObw==
 
 "@floating-ui/core@^1.8.0":
   version "1.8.0"
