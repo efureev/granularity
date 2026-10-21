@@ -9,7 +9,9 @@
  * Их считает `defineTheme` по формулам производных из значений темы, и
  * скопированные устарели бы на первой правке цвета.
  *
- * Источник — id темы каталога (`slate`) или путь к исходнику темы. Копия ложится
+ * Источник — id темы каталога (`slate`) или путь к исходнику темы. Тема каталога
+ * берётся из исходника `themes/<id>` пакета; граф провайдеров (а с ним собранный
+ * манифест) нужен только источнику с `extends` — предка раскрывает granum. Копия ложится
  * в `themes/<id>/` текущего каталога, если не задана `--dest`; версия —
  * `--theme-version`, иначе `0.1.0`. В каталоге пакета `theme.lock.json` запишет
  * следующий `generate`.
@@ -47,16 +49,21 @@ export function stripComputedFallbacks(dir) {
   return stripped
 }
 
+function sourceDir(source, cwd) {
+  return [resolve(cwd, source), join(pkgDir, 'themes', source)].find(dir => existsSync(join(dir, 'theme.json')))
+}
+
 export function copyGranularityTheme({ source, id, dest, title, version, cwd = process.cwd() }) {
-  const sourcePath = resolve(cwd, source)
+  const dir = sourceDir(source, cwd)
+  const standalone = dir !== undefined && JSON.parse(readFileSync(join(dir, 'theme.json'), 'utf8')).extends === undefined
   const result = copyTheme({
-    source: existsSync(join(sourcePath, 'theme.json')) ? sourcePath : source,
+    source: dir ?? source,
     ignore: IGNORE,
     dest: resolve(cwd, dest ?? join('themes', id)),
     id,
     ...(title !== undefined ? { title } : {}),
     ...(version !== undefined ? { version } : {}),
-    config: { providers: [PROVIDER_ID] },
+    ...(standalone ? {} : { config: { providers: [PROVIDER_ID] } }),
     root: pkgDir,
   })
   return { ...result, strippedFallbacks: stripComputedFallbacks(result.dir) }
