@@ -1,0 +1,3 @@
+{
+  "gr-rating-void-color": "color-mix(in srgb, var(--gr-muted-fg) 35%, transparent)"
+}

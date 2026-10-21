@@ -4,8 +4,14 @@
   "description": "Тема приложения поверх «Сланца»: бирюзовый акцент и скругления помягче. Объявляет только отличия.",
   "extends": "slate",
   "defaultMode": "light",
-  "modes": [
-    { "name": "light", "title": "Светлый", "colorScheme": "light" },
-    { "name": "dark", "title": "Тёмный", "colorScheme": "dark" }
-  ]
+  "modes": {
+    "light": {
+      "title": "Светлый",
+      "colorScheme": "light"
+    },
+    "dark": {
+      "title": "Тёмный",
+      "colorScheme": "dark"
+    }
+  }
 }

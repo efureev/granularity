@@ -48,6 +48,22 @@ export function islandTheme(theme: DesignTheme): string | undefined {
   return theme.build === 'absent' ? undefined : theme.entry.id
 }
 
+/**
+ * Как тема связана с источником: наследник идёт за правками родителя на каждой
+ * сборке, независимая тема — копия или своя с нуля — держит все значения сама.
+ */
+export function themeLineage(entry: GrThemeCatalogEntry): string {
+  if (entry.extends === undefined)
+    return 'независимая: все значения свои'
+  const parent = grThemeCatalog.find(theme => theme.id === entry.extends)
+  return `наследует «${parent?.title ?? entry.extends}»`
+}
+
+/** Пакеты компонентов, под версии которых тема написана: `пакет диапазон`. */
+export function themeTargets(entry: GrThemeCatalogEntry): string[] {
+  return Object.entries(entry.targets ?? {}).map(([packageId, range]) => `${packageId} ${range}`)
+}
+
 export const THEME_BUILD_LABEL: Record<ThemeBuild, string> = {
   default: 'основная',
   built: 'дополнительная',

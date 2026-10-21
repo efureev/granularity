@@ -1,6 +1,6 @@
 export { type ComponentDefaultsGateOptions, defineComponentDefaultsGate } from './componentDefaults'
 export { type ComponentDocsGateOptions, defineComponentDocsGate, REQUIRED_DOC_SECTIONS } from './componentDocs'
-export { type ComponentTokensGateOptions, defineComponentTokensGate, type RegisteredToken, TOKEN_KINDS } from './componentTokens'
+export { type ComponentTokensGateOptions, defineComponentTokensGate, type RegisteredToken, type ThemeSourcesOption, TOKEN_KINDS } from './componentTokens'
 export { collectEmitDeclarations, defineEmitNamingGate, type EmitDeclaration, type EmitNamingGateOptions } from './emitNaming'
 export {
   defineDynamicTokensGate,
@@ -35,3 +35,11 @@ export {
   UNO_RADIUS_SCALE,
   UNO_TEXT_SCALE,
 } from './styleTokens'
+export {
+  collectMissingComponentValues,
+  collectUnknownComponentValues,
+  defineThemeGate,
+  type ThemeGateData,
+  type ThemeGateOptions,
+  type ThemeGateToken,
+} from './themeGate'

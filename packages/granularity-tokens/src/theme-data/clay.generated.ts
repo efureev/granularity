@@ -8,6 +8,10 @@ const data: GrThemeData = {
   "title": "Глина",
   "description": "Тёплая бумага, графитовые чернила и одна глиняная точка на экран.",
   "docs": "https://granularity.tech/themes/clay",
+  "version": "1.0.0",
+  "targets": {
+    "@feugene/granularity": "^3.0.0"
+  },
   "root": {
     "gr-slate-0": "#ffffff",
     "gr-slate-50": "#f8fafc",
@@ -376,6 +380,297 @@ const data: GrThemeData = {
     }
   },
   "defaultMode": "light",
+  "components": {
+    "@feugene/granularity": {
+      "GrAffix": {
+        "root": {
+          "gr-affix-shadow-bottom": "0 -8px 24px -12px color-mix(in srgb, var(--gr-fg) 45%, transparent)"
+        }
+      },
+      "GrAvatar": {
+        "root": {
+          "gr-avatar-1-bg": "var(--gr-info-light)",
+          "gr-avatar-1-fg": "var(--gr-info-text)",
+          "gr-avatar-2-bg": "var(--gr-warning-light)",
+          "gr-avatar-2-fg": "var(--gr-warning-text)",
+          "gr-avatar-3-bg": "var(--gr-success-light)",
+          "gr-avatar-3-fg": "var(--gr-success-text)",
+          "gr-avatar-4-bg": "var(--gr-danger-light)",
+          "gr-avatar-4-fg": "var(--gr-danger-text)",
+          "gr-avatar-5-bg": "var(--gr-azure-light)",
+          "gr-avatar-5-fg": "var(--gr-azure-text)",
+          "gr-avatar-6-bg": "var(--gr-slate-light)",
+          "gr-avatar-6-fg": "var(--gr-slate-text)",
+          "gr-avatar-square-radius": "10px"
+        }
+      },
+      "GrBadge": {
+        "root": {
+          "gr-badge-neutral-bg": "var(--gr-fg)",
+          "gr-badge-neutral-fg": "var(--gr-bg)",
+          "gr-badge-semi-radius-lg": "7px",
+          "gr-badge-semi-radius-md": "5px",
+          "gr-badge-semi-radius-sm": "3px",
+          "gr-badge-semi-radius-xs": "3px"
+        },
+        "modes": {
+          "dark": {
+            "gr-badge-azure-bg": "var(--gr-azure)",
+            "gr-badge-azure-fg": "var(--gr-azure-fg)",
+            "gr-badge-danger-bg": "var(--gr-danger-text)",
+            "gr-badge-danger-fg": "var(--gr-bg)",
+            "gr-badge-info-bg": "var(--gr-info-text)",
+            "gr-badge-info-fg": "var(--gr-bg)",
+            "gr-badge-primary-bg": "var(--gr-primary)",
+            "gr-badge-primary-fg": "var(--gr-primary-fg)",
+            "gr-badge-slate-bg": "var(--gr-slate)",
+            "gr-badge-slate-fg": "var(--gr-slate-fg)",
+            "gr-badge-success-bg": "var(--gr-success)",
+            "gr-badge-success-fg": "var(--gr-success-fg)",
+            "gr-badge-warning-bg": "var(--gr-warning)",
+            "gr-badge-warning-fg": "var(--gr-warning-fg)"
+          },
+          "light": {
+            "gr-badge-azure-bg": "var(--gr-azure-text)",
+            "gr-badge-azure-fg": "var(--gr-card)",
+            "gr-badge-danger-bg": "var(--gr-danger-solid)",
+            "gr-badge-danger-fg": "var(--gr-danger-solid-fg)",
+            "gr-badge-info-bg": "var(--gr-info-solid)",
+            "gr-badge-info-fg": "var(--gr-info-solid-fg)",
+            "gr-badge-primary-bg": "var(--gr-primary-text)",
+            "gr-badge-primary-fg": "var(--gr-card)",
+            "gr-badge-slate-bg": "var(--gr-slate-solid)",
+            "gr-badge-slate-fg": "var(--gr-slate-solid-fg)",
+            "gr-badge-success-bg": "var(--gr-success-text)",
+            "gr-badge-success-fg": "var(--gr-card)",
+            "gr-badge-warning-bg": "var(--gr-warning-text)",
+            "gr-badge-warning-fg": "var(--gr-card)"
+          }
+        }
+      },
+      "GrButton": {
+        "root": {
+          "gr-button-azure-bg": "var(--gr-azure-solid)",
+          "gr-button-azure-bg-active": "var(--gr-azure-solid-active)",
+          "gr-button-azure-bg-hover": "var(--gr-azure-solid-hover)",
+          "gr-button-azure-border": "color-mix(in srgb, var(--gr-fg) 30%, var(--gr-bg))",
+          "gr-button-azure-border-soft": "color-mix(in srgb, var(--gr-fg) 15%, var(--gr-bg))",
+          "gr-button-azure-fg": "var(--gr-azure-solid-fg)",
+          "gr-button-azure-ghost-bg-active": "color-mix(in srgb, var(--gr-fg) 14%, transparent)",
+          "gr-button-azure-ghost-bg-hover": "color-mix(in srgb, var(--gr-fg) 8%, transparent)",
+          "gr-button-azure-soft-bg": "var(--gr-azure-light)",
+          "gr-button-azure-soft-bg-active": "color-mix(in srgb, var(--gr-azure) 16%, var(--gr-button-azure-soft-bg))",
+          "gr-button-azure-soft-bg-hover": "color-mix(in srgb, var(--gr-azure) 10%, var(--gr-button-azure-soft-bg))",
+          "gr-button-danger-bg": "var(--gr-danger-solid)",
+          "gr-button-danger-bg-active": "var(--gr-danger-solid-active)",
+          "gr-button-danger-bg-hover": "var(--gr-danger-solid-hover)",
+          "gr-button-danger-border": "color-mix(in srgb, var(--gr-fg) 30%, var(--gr-bg))",
+          "gr-button-danger-border-soft": "color-mix(in srgb, var(--gr-fg) 15%, var(--gr-bg))",
+          "gr-button-danger-fg": "var(--gr-danger-solid-fg)",
+          "gr-button-danger-ghost-bg-active": "color-mix(in srgb, var(--gr-fg) 14%, transparent)",
+          "gr-button-danger-ghost-bg-hover": "color-mix(in srgb, var(--gr-fg) 8%, transparent)",
+          "gr-button-danger-soft-bg": "var(--gr-danger-light)",
+          "gr-button-danger-soft-bg-active": "color-mix(in srgb, var(--gr-danger) 16%, var(--gr-button-danger-soft-bg))",
+          "gr-button-danger-soft-bg-hover": "color-mix(in srgb, var(--gr-danger) 10%, var(--gr-button-danger-soft-bg))",
+          "gr-button-disabled-bg": "var(--gr-disabled-bg)",
+          "gr-button-disabled-brd": "var(--gr-disabled-brd)",
+          "gr-button-disabled-fg": "var(--gr-disabled-fg)",
+          "gr-button-info-bg": "var(--gr-info-solid)",
+          "gr-button-info-bg-active": "var(--gr-info-solid-active)",
+          "gr-button-info-bg-hover": "var(--gr-info-solid-hover)",
+          "gr-button-info-border": "color-mix(in srgb, var(--gr-fg) 30%, var(--gr-bg))",
+          "gr-button-info-border-soft": "color-mix(in srgb, var(--gr-fg) 15%, var(--gr-bg))",
+          "gr-button-info-fg": "var(--gr-info-solid-fg)",
+          "gr-button-info-ghost-bg-active": "color-mix(in srgb, var(--gr-fg) 14%, transparent)",
+          "gr-button-info-ghost-bg-hover": "color-mix(in srgb, var(--gr-fg) 8%, transparent)",
+          "gr-button-info-soft-bg": "var(--gr-info-light)",
+          "gr-button-info-soft-bg-active": "color-mix(in srgb, var(--gr-info) 16%, var(--gr-button-info-soft-bg))",
+          "gr-button-info-soft-bg-hover": "color-mix(in srgb, var(--gr-info) 10%, var(--gr-button-info-soft-bg))",
+          "gr-button-neutral-border": "color-mix(in srgb, var(--gr-fg) 15%, var(--gr-bg))",
+          "gr-button-neutral-ghost-bg-active": "color-mix(in srgb, var(--gr-fg) 14%, transparent)",
+          "gr-button-neutral-ghost-bg-hover": "color-mix(in srgb, var(--gr-fg) 8%, transparent)",
+          "gr-button-neutral-soft-bg": "var(--gr-card)",
+          "gr-button-neutral-soft-bg-active": "color-mix(in srgb, var(--gr-fg) 11%, var(--gr-card))",
+          "gr-button-neutral-soft-bg-hover": "color-mix(in srgb, var(--gr-fg) 6%, var(--gr-card))",
+          "gr-button-primary-bg": "var(--gr-primary-solid)",
+          "gr-button-primary-bg-active": "var(--gr-primary-solid-active)",
+          "gr-button-primary-bg-hover": "var(--gr-primary-solid-hover)",
+          "gr-button-primary-border": "color-mix(in srgb, var(--gr-fg) 30%, var(--gr-bg))",
+          "gr-button-primary-border-soft": "color-mix(in srgb, var(--gr-fg) 15%, var(--gr-bg))",
+          "gr-button-primary-fg": "var(--gr-primary-solid-fg)",
+          "gr-button-primary-ghost-bg-active": "color-mix(in srgb, var(--gr-fg) 14%, transparent)",
+          "gr-button-primary-ghost-bg-hover": "color-mix(in srgb, var(--gr-fg) 8%, transparent)",
+          "gr-button-primary-soft-bg": "color-mix(in srgb, var(--gr-primary) 14%, var(--gr-bg))",
+          "gr-button-primary-soft-bg-active": "color-mix(in srgb, var(--gr-primary) 16%, var(--gr-button-primary-soft-bg))",
+          "gr-button-primary-soft-bg-hover": "color-mix(in srgb, var(--gr-primary) 10%, var(--gr-button-primary-soft-bg))",
+          "gr-button-radius": "0.375rem",
+          "gr-button-shimmer-duration": "1.8s",
+          "gr-button-slate-bg": "var(--gr-slate-solid)",
+          "gr-button-slate-bg-active": "var(--gr-slate-solid-active)",
+          "gr-button-slate-bg-hover": "var(--gr-slate-solid-hover)",
+          "gr-button-slate-border": "color-mix(in srgb, var(--gr-fg) 30%, var(--gr-bg))",
+          "gr-button-slate-border-soft": "color-mix(in srgb, var(--gr-fg) 15%, var(--gr-bg))",
+          "gr-button-slate-fg": "var(--gr-slate-solid-fg)",
+          "gr-button-slate-ghost-bg-active": "color-mix(in srgb, var(--gr-fg) 14%, transparent)",
+          "gr-button-slate-ghost-bg-hover": "color-mix(in srgb, var(--gr-fg) 8%, transparent)",
+          "gr-button-slate-soft-bg": "var(--gr-slate-light)",
+          "gr-button-slate-soft-bg-active": "color-mix(in srgb, var(--gr-slate) 16%, var(--gr-button-slate-soft-bg))",
+          "gr-button-slate-soft-bg-hover": "color-mix(in srgb, var(--gr-slate) 10%, var(--gr-button-slate-soft-bg))",
+          "gr-button-success-bg": "var(--gr-success-solid)",
+          "gr-button-success-bg-active": "var(--gr-success-solid-active)",
+          "gr-button-success-bg-hover": "var(--gr-success-solid-hover)",
+          "gr-button-success-border": "color-mix(in srgb, var(--gr-fg) 30%, var(--gr-bg))",
+          "gr-button-success-border-soft": "color-mix(in srgb, var(--gr-fg) 15%, var(--gr-bg))",
+          "gr-button-success-fg": "var(--gr-success-solid-fg)",
+          "gr-button-success-ghost-bg-active": "color-mix(in srgb, var(--gr-fg) 14%, transparent)",
+          "gr-button-success-ghost-bg-hover": "color-mix(in srgb, var(--gr-fg) 8%, transparent)",
+          "gr-button-success-soft-bg": "var(--gr-success-light)",
+          "gr-button-success-soft-bg-active": "color-mix(in srgb, var(--gr-success) 16%, var(--gr-button-success-soft-bg))",
+          "gr-button-success-soft-bg-hover": "color-mix(in srgb, var(--gr-success) 10%, var(--gr-button-success-soft-bg))",
+          "gr-button-warning-bg": "var(--gr-warning-solid)",
+          "gr-button-warning-bg-active": "var(--gr-warning-solid-active)",
+          "gr-button-warning-bg-hover": "var(--gr-warning-solid-hover)",
+          "gr-button-warning-border": "color-mix(in srgb, var(--gr-fg) 30%, var(--gr-bg))",
+          "gr-button-warning-border-soft": "color-mix(in srgb, var(--gr-fg) 15%, var(--gr-bg))",
+          "gr-button-warning-fg": "var(--gr-warning-solid-fg)",
+          "gr-button-warning-ghost-bg-active": "color-mix(in srgb, var(--gr-fg) 14%, transparent)",
+          "gr-button-warning-ghost-bg-hover": "color-mix(in srgb, var(--gr-fg) 8%, transparent)",
+          "gr-button-warning-soft-bg": "var(--gr-warning-light)",
+          "gr-button-warning-soft-bg-active": "color-mix(in srgb, var(--gr-warning) 16%, var(--gr-button-warning-soft-bg))",
+          "gr-button-warning-soft-bg-hover": "color-mix(in srgb, var(--gr-warning) 10%, var(--gr-button-warning-soft-bg))"
+        },
+        "modes": {
+          "dark": {
+            "gr-button-neutral-bg": "var(--gr-fg)",
+            "gr-button-neutral-bg-active": "color-mix(in srgb, var(--gr-fg) 45%, #ffffff)",
+            "gr-button-neutral-bg-hover": "color-mix(in srgb, var(--gr-fg) 70%, #ffffff)",
+            "gr-button-neutral-fg": "var(--gr-bg)",
+            "gr-button-shadow": "none",
+            "gr-button-shadow-active": "none"
+          },
+          "light": {
+            "gr-button-neutral-bg": "var(--gr-fg)",
+            "gr-button-neutral-bg-active": "color-mix(in srgb, var(--gr-fg) 68%, #000000)",
+            "gr-button-neutral-bg-hover": "color-mix(in srgb, var(--gr-fg) 82%, #000000)",
+            "gr-button-neutral-fg": "var(--gr-card)",
+            "gr-button-shadow": "none",
+            "gr-button-shadow-active": "none"
+          }
+        }
+      },
+      "GrCarousel": {
+        "root": {
+          "gr-carousel-dot-ring-offset": "2px",
+          "gr-carousel-dot-ring-width": "2px"
+        }
+      },
+      "GrColorPicker": {
+        "root": {
+          "gr-color-picker-area-thumb-border": "#fff",
+          "gr-color-picker-area-thumb-ring": "rgba(0, 0, 0, 0.45)"
+        }
+      },
+      "GrCommandPalette": {
+        "root": {
+          "gr-command-active-bg": "color-mix(in srgb, var(--gr-muted) 45%, transparent)",
+          "gr-command-input-font-size": "15px",
+          "gr-command-item-radius": "10px",
+          "gr-command-match-bg": "color-mix(in srgb, var(--gr-primary) 22%, transparent)"
+        }
+      },
+      "GrDataTable": {
+        "root": {
+          "gr-datatable-detail-accent": "var(--gr-primary)",
+          "gr-datatable-detail-bg": "color-mix(in srgb, var(--gr-muted) 45%, transparent)",
+          "gr-datatable-drag-indicator-width": "2px",
+          "gr-datatable-pinned-shadow": "4px 0 6px -4px rgba(0, 0, 0, 0.25)",
+          "gr-datatable-pinned-shadow-end": "-4px 0 6px -4px rgba(0, 0, 0, 0.25)"
+        }
+      },
+      "GrDivider": {
+        "root": {
+          "gr-divider-thickness": "1px"
+        }
+      },
+      "GrImageViewer": {
+        "root": {
+          "gr-image-viewer-chrome-bg": "rgb(0 0 0 / 0.35)",
+          "gr-image-viewer-chrome-bg-hover": "rgb(0 0 0 / 0.55)",
+          "gr-image-viewer-chrome-bg-soft": "rgb(255 255 255 / 0.1)",
+          "gr-image-viewer-chrome-brd": "rgb(255 255 255 / 0.2)",
+          "gr-image-viewer-chrome-fg": "rgb(255 255 255 / 0.95)",
+          "gr-image-viewer-chrome-fg-muted": "rgb(255 255 255 / 0.8)",
+          "gr-image-viewer-ring": "rgb(255 255 255 / 0.8)",
+          "gr-image-viewer-scrim": "rgb(0 0 0 / 0.6)"
+        }
+      },
+      "GrProgressBar": {
+        "root": {
+          "gr-progress-azure-bg": "var(--gr-azure)",
+          "gr-progress-bg": "var(--gr-primary)",
+          "gr-progress-buffer-bg": "color-mix(in srgb, var(--gr-muted-fg) 40%, var(--gr-muted))",
+          "gr-progress-danger-bg": "var(--gr-danger)",
+          "gr-progress-indeterminate-bg": "var(--gr-muted-fg)",
+          "gr-progress-indeterminate-duration": "1.4s",
+          "gr-progress-info-bg": "var(--gr-info)",
+          "gr-progress-neutral-bg": "var(--gr-muted-fg)",
+          "gr-progress-slate-bg": "var(--gr-slate)",
+          "gr-progress-success-bg": "var(--gr-success)",
+          "gr-progress-warning-bg": "var(--gr-warning)"
+        }
+      },
+      "GrProgressCircle": {
+        "root": {
+          "gr-progress-circle-cap": "round"
+        }
+      },
+      "GrRating": {
+        "root": {
+          "gr-rating-void-color": "color-mix(in srgb, var(--gr-muted-fg) 35%, transparent)"
+        }
+      },
+      "GrSegmented": {
+        "modes": {
+          "dark": {
+            "gr-segmented-indicator-highlight-shadow": "0 0 0 1px rgba(248, 250, 252, 0.08)"
+          },
+          "light": {
+            "gr-segmented-indicator-highlight-shadow": "0 0 0 0 transparent"
+          }
+        }
+      },
+      "GrSortableList": {
+        "root": {
+          "gr-sortable-indicator-width": "2px"
+        }
+      },
+      "GrSteps": {
+        "root": {
+          "gr-steps-connector-size": "2px"
+        }
+      },
+      "GrTable": {
+        "root": {
+          "gr-table-sticky-column-shadow": "4px 0 6px -4px rgba(0, 0, 0, 0.25)"
+        }
+      },
+      "GrTimeline": {
+        "root": {
+          "gr-timeline-axis-width": "2px",
+          "gr-timeline-dash": "4px",
+          "gr-timeline-marker-ring": "2px"
+        }
+      },
+      "GrTransfer": {
+        "root": {
+          "gr-transfer-arrived-bg": "color-mix(in srgb, var(--gr-primary) 32%, transparent)",
+          "gr-transfer-drop-bg": "color-mix(in srgb, var(--gr-primary) 6%, transparent)",
+          "gr-transfer-indicator-width": "3px",
+          "gr-transfer-selected-bg": "color-mix(in srgb, var(--gr-primary) 12%, transparent)"
+        }
+      }
+    }
+  },
   "extensions": {
     "granularity": {
       "componentDefaults": {

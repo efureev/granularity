@@ -35,10 +35,10 @@
 
 ## Тема — данные, CSS собирает granum
 
-Токенов и тем в виде CSS в исходниках пакета нет. Реестр токенов и значения темы
-`slate` живут данными в `@feugene/granularity-tokens`, значения токенов
-компонентов по темам — рядом с компонентами (`src/components/GrX/themes/slate/`,
-поле `themesDir` в `config.ts`). Селекторы режимов назначает granum: режим
+Токенов и тем в виде CSS в исходниках пакета нет. Реестр токенов и значения тем
+живут данными в `@feugene/granularity-tokens` — и значения токенов компонентов тоже:
+раздел `components/@feugene/granularity/<GrX>/` каждой темы. У компонента — только имена его
+токенов и их вид, `tokens.json`. Селекторы режимов назначает granum: режим
 включается парой `data-theme="slate-<режим>"`, режим по умолчанию объявлен ещё и
 на `:root`.
 
@@ -49,6 +49,7 @@
 | `tokens/{foundation,roles,derived}.json` | реестр: имена, группы, описания, формулы hover/active — без значений |
 | `themes/slate/root.json` | примитивы: палитра, типографика, spacing, радиусы, motion, z-index |
 | `themes/slate/modes/{light,dark}.json` | роли и тени режима |
+| `themes/slate/components/@feugene/granularity/<GrX>/` | значения токенов вида `theme` компонента: `root.json` и `modes/<режим>.json` |
 
 Формулы производных — `color-mix`-объявления на корне и на каждом
 `[data-theme]`; фолбэки для `@supports not (color-mix)` считает сборка темы той

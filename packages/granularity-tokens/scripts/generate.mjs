@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto'
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { dirname, resolve } from 'node:path'
@@ -43,8 +44,12 @@ const GENERATED_BANNER_TS
  * Формулы — на корне и на каждом элементе с режимом: значение `var()` в
  * кастомном свойстве подставляется там, где свойство объявлено, и остров
  * режима иначе получил бы hover-цвета, посчитанные от ролей страницы.
+ *
+ * Корень — `:where(:root)`, как у режима по умолчанию: в CSS без слоёв
+ * (`dist/themes/<id>.css` ядра) голый `:root` перебил бы специфичностью
+ * значение, которым тема переопределяет формулу в своём режиме по умолчанию.
  */
-const DERIVED_SELECTORS = [':root', '[data-theme]']
+const DERIVED_SELECTORS = [':where(:root)', '[data-theme]']
 
 async function readJson(path) {
   return JSON.parse(await readFile(path, 'utf8'))
@@ -135,6 +140,8 @@ function catalogEntry({ source, data }) {
     title: data.title,
     ...(data.description !== undefined ? { description: data.description } : {}),
     ...(data.docs !== undefined ? { docs: data.docs } : {}),
+    ...(data.version !== undefined ? { version: data.version } : {}),
+    ...(data.targets !== undefined ? { targets: data.targets } : {}),
     ...(source.extends !== undefined ? { extends: source.extends } : {}),
     defaultMode: data.defaultMode,
     modes: Object.entries(data.modes).map(([name, mode]) => ({
@@ -338,6 +345,39 @@ function distOutputs({ raw, registry, themes }) {
   ]
 }
 
+// --- версия по данным --------------------------------------------------------
+
+function stable(value) {
+  if (Array.isArray(value))
+    return value.map(stable)
+  if (typeof value !== 'object' || value === null)
+    return value
+  return Object.fromEntries(Object.keys(value).sort().map(key => [key, stable(value[key])]))
+}
+
+/**
+ * `theme.lock.json` — версия темы и отпечаток её итоговых данных. Данные
+ * изменились, а версия та же — ошибка: тема, которую ставят отдельно от пакета,
+ * узнаёт о правке только по версии. Отпечаток — без самой версии: подъём версии
+ * без правки данных законен.
+ */
+function themeLocks({ themes }) {
+  return themes.map(({ source, data }) => {
+    const { version: _version, ...rest } = data
+    const hash = createHash('sha256').update(JSON.stringify(stable(rest))).digest('hex').slice(0, 16)
+    return { id: data.id, path: resolve(source.dir, 'theme.lock.json'), lock: { version: data.version, hash } }
+  })
+}
+
+function lockProblem({ id, path, lock }) {
+  if (!existsSync(path))
+    return undefined
+  const current = JSON.parse(readFileSync(path, 'utf8'))
+  if (current.hash !== lock.hash && current.version === lock.version)
+    return `тема ${id}: данные изменились, а version та же (${lock.version}) — поднимите version в themes/${id}/theme.json`
+  return undefined
+}
+
 // --- запись ----------------------------------------------------------------
 
 async function main() {
@@ -357,6 +397,15 @@ async function main() {
       ]
 
   const stale = []
+  const locks = dist ? [] : themeLocks(data)
+  const problems = locks.map(lockProblem).filter(Boolean)
+  if (problems.length > 0) {
+    console.error(`[tokens] ${problems.join('\n[tokens] ')}`)
+    process.exitCode = 1
+    return
+  }
+  for (const { path, lock } of locks)
+    outputs.push([path.slice(pkgDir.length), `${JSON.stringify(lock, null, 2)}\n`])
 
   for (const [path, content] of outputs) {
     const absolutePath = resolve(pkgDir, path)

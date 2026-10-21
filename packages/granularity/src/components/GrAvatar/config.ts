@@ -8,5 +8,4 @@ export const grAvatarConfig = defineGranumComponent(import.meta.url, {
   safelist: grAvatarSafelist,
   // Только светлая: слоты палитры ссылаются на `-light`/`-text`, а те
   // переключаются вместе с темой сами — см. комментарий в самом файле.
-  themesDir: './themes',
 })

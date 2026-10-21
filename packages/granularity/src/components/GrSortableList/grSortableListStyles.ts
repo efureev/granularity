@@ -58,6 +58,6 @@ export const contentClass = 'min-w-0 flex-1 text-[length:var(--gr-text-sm)] lead
  * Куда встанет строка — псевдоэлемент самой строки, а не отдельный узел:
  * лишний узел между строками ломает и `divide-y`, и подсчёт позиций.
  */
-export const indicatorBeforeClass = 'before:absolute before:inset-x-0 before:top-0 before:h-[var(--gr-sortable-indicator-width,2px)] before:bg-[var(--gr-sortable-indicator,var(--gr-primary))] before:content-empty'
+export const indicatorBeforeClass = 'before:absolute before:inset-x-0 before:top-0 before:h-[var(--gr-sortable-indicator-width)] before:bg-[var(--gr-sortable-indicator,var(--gr-primary))] before:content-empty'
 
-export const indicatorAfterClass = 'after:absolute after:inset-x-0 after:bottom-0 after:h-[var(--gr-sortable-indicator-width,2px)] after:bg-[var(--gr-sortable-indicator,var(--gr-primary))] after:content-empty'
+export const indicatorAfterClass = 'after:absolute after:inset-x-0 after:bottom-0 after:h-[var(--gr-sortable-indicator-width)] after:bg-[var(--gr-sortable-indicator,var(--gr-primary))] after:content-empty'

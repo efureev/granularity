@@ -52,8 +52,8 @@ export function grCarouselDotActiveClass(tone: GrTone): string {
 
   return [
     `bg-${arbitrary(color)}`,
-    arbitrary(`outline:var(--gr-carousel-dot-ring-width,2px)_solid_${color}`),
-    arbitrary('outline-offset:var(--gr-carousel-dot-ring-offset,2px)'),
+    arbitrary(`outline:var(--gr-carousel-dot-ring-width)_solid_${color}`),
+    arbitrary('outline-offset:var(--gr-carousel-dot-ring-offset)'),
   ].join(' ')
 }
 

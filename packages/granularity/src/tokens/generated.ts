@@ -21,15 +21,23 @@ export const grComponentTokens: GrComponentToken[] = [
     "owner": "GrAffix",
     "name": "--gr-affix-shadow",
     "kind": "hook",
-    "default": "var(--gr-shadow-2), при `placement=\"bottom\"` — зеркальная тень вверх подмесом `--gr-fg`",
+    "default": "var(--gr-shadow-2), при `placement=\"bottom\"` — `var(--gr-affix-shadow-bottom)`",
     "description": "Тень прилипшей панели: она отделяет панель от уезжающего содержимого. Тенью, а не рамкой — рамка меняет высоту в момент прилипания и сдвигает раскладку."
+  },
+  {
+    "owner": "GrAffix",
+    "name": "--gr-affix-shadow-bottom",
+    "kind": "theme",
+    "default": "0 -8px 24px -12px color-mix(in srgb, var(--gr-fg) 45%, transparent)",
+    "description": "Тень аффикса у нижнего края (`placement=\"bottom\"`): зеркало `--gr-shadow-2`, отброшенное вверх. Ручка `--gr-affix-shadow` перекрывает её у экземпляра."
   },
   {
     "owner": "GrAffix",
     "name": "--gr-affix-z",
     "kind": "hook",
     "default": "10",
-    "description": "Порядок внутри своего stacking-контекста. Не глобальный слой: приложение, которому аффикс нужен на шкале, ставит сюда `var(--gr-z-navbar)` — шаг между слоями шкалы оставлен ровно под это (`docs/z-index.md`)."
+    "description": "Порядок внутри своего stacking-контекста. Не глобальный слой: приложение, которому аффикс нужен на шкале, ставит сюда `var(--gr-z-navbar)` — шаг между слоями шкалы оставлен ровно под это (`docs/z-index.md`).",
+    "literal": "Порядок внутри своего stacking-контекста — механика экземпляра, а не язык темы; глобальную шкалу слоёв приложение подставляет само."
   },
   {
     "owner": "GrAlert",
@@ -90,7 +98,7 @@ export const grComponentTokens: GrComponentToken[] = [
   {
     "owner": "GrAvatar",
     "name": "--gr-avatar-square-radius",
-    "kind": "hook",
+    "kind": "theme",
     "default": "10px",
     "description": "Скругление аватара в форме `square`. Не ступень общей шкалы: квадратный аватар мягче плитки, но жёстче чипа."
   },
@@ -181,28 +189,28 @@ export const grComponentTokens: GrComponentToken[] = [
   {
     "owner": "GrBadge",
     "name": "--gr-badge-semi-radius-xs",
-    "kind": "hook",
+    "kind": "theme",
     "default": "3px",
     "description": "Скругление бейджа `radius=\"semi\"` на ступени `xs`."
   },
   {
     "owner": "GrBadge",
     "name": "--gr-badge-semi-radius-sm",
-    "kind": "hook",
+    "kind": "theme",
     "default": "3px",
     "description": "Скругление бейджа `radius=\"semi\"` на ступени `sm`."
   },
   {
     "owner": "GrBadge",
     "name": "--gr-badge-semi-radius-md",
-    "kind": "hook",
+    "kind": "theme",
     "default": "5px",
     "description": "Скругление бейджа `radius=\"semi\"` на ступени `md`."
   },
   {
     "owner": "GrBadge",
     "name": "--gr-badge-semi-radius-lg",
-    "kind": "hook",
+    "kind": "theme",
     "default": "7px",
     "description": "Скругление бейджа `radius=\"semi\"` на ступени `lg`. Лестница 3/3/5/7 своя: бейдж скругляется медленнее, чем растёт."
   },
@@ -323,19 +331,21 @@ export const grComponentTokens: GrComponentToken[] = [
     "name": "--gr-badge-wrap-offset-x",
     "kind": "hook",
     "default": "-0.5rem (для `dot` — 0)",
-    "description": "Горизонтальный сдвиг метки относительно угла обёртки."
+    "description": "Горизонтальный сдвиг метки относительно угла обёртки.",
+    "literal": "Смещение зависит от варианта (`dot` — 0): геометрия компонента."
   },
   {
     "owner": "GrBadgeWrap",
     "name": "--gr-badge-wrap-offset-y",
     "kind": "hook",
     "default": "-0.5rem (для `dot` — 0)",
-    "description": "Вертикальный сдвиг метки относительно угла обёртки."
+    "description": "Вертикальный сдвиг метки относительно угла обёртки.",
+    "literal": "Смещение зависит от варианта (`dot` — 0): геометрия компонента."
   },
   {
     "owner": "GrButton",
     "name": "--gr-button-radius",
-    "kind": "hook",
+    "kind": "theme",
     "default": "0.375rem",
     "description": "Скругление кнопки. Его же по умолчанию наследуют внешние углы `GrButtonGroup`."
   },
@@ -372,7 +382,8 @@ export const grComponentTokens: GrComponentToken[] = [
     "name": "--gr-button-square-size",
     "kind": "hook",
     "default": "высота кнопки текущей ступени",
-    "description": "Сторона квадратной кнопки (`square`): иконка без подписи обязана остаться квадратом на любой ступени."
+    "description": "Сторона квадратной кнопки (`square`): иконка без подписи обязана остаться квадратом на любой ступени.",
+    "literal": "Сторона берётся по ступени `size` из карты компонента (`sizes.md`)."
   },
   {
     "owner": "GrButton",
@@ -386,14 +397,16 @@ export const grComponentTokens: GrComponentToken[] = [
     "name": "--gr-button-touch-size",
     "kind": "hook",
     "default": "2.75rem",
-    "description": "Высота зоны касания на грубом указателе (`pointer: coarse`). Кнопка ниже неё добирает высоту невидимым `::after`, вид не меняется."
+    "description": "Высота зоны касания на грубом указателе (`pointer: coarse`). Кнопка ниже неё добирает высоту невидимым `::after`, вид не меняется.",
+    "literal": "Минимальная зона касания на грубом указателе (WCAG 2.5.5) — требование доступности, а не язык темы."
   },
   {
     "owner": "GrButton",
     "name": "--gr-button-divider",
     "kind": "hook",
     "default": "нет (`0 0 transparent`)",
-    "description": "Шов solid-кнопки внутри прикреплённой `GrButtonGroup`: группа ставит его второму из соседних primary-звеньев, кнопка рисует его своей тенью."
+    "description": "Шов solid-кнопки внутри прикреплённой `GrButtonGroup`: группа ставит его второму из соседних primary-звеньев, кнопка рисует его своей тенью.",
+    "literal": "Нейтральное значение «шва нет»: шов ставит `GrButtonGroup`, тема его не задаёт."
   },
   {
     "owner": "GrButton",
@@ -902,49 +915,161 @@ export const grComponentTokens: GrComponentToken[] = [
   {
     "owner": "GrButton",
     "name": "--gr-button-neutral-bg",
-    "kind": "hook",
+    "kind": "theme",
     "default": "var(--gr-secondary)",
-    "description": "Заливка solid-кнопки тона `neutral`. Тема задаёт её, когда главная кнопка — не серая плашка: у «Глины» это графит, в тёмном режиме — светлая заливка."
+    "description": "Заливка solid-кнопки тона `neutral`. У «Сланца» — плашка `--gr-secondary`; тема, где главная кнопка не серая, задаёт свою: у «Глины» это графит, в тёмном режиме — светлая заливка."
   },
   {
     "owner": "GrButton",
     "name": "--gr-button-neutral-bg-hover",
-    "kind": "hook",
+    "kind": "theme",
     "default": "var(--gr-secondary-hover)",
     "description": "Заливка solid-кнопки `neutral` под указателем."
   },
   {
     "owner": "GrButton",
     "name": "--gr-button-neutral-bg-active",
-    "kind": "hook",
+    "kind": "theme",
     "default": "var(--gr-secondary-active)",
     "description": "Заливка solid-кнопки `neutral` в нажатии."
   },
   {
     "owner": "GrButton",
     "name": "--gr-button-neutral-fg",
-    "kind": "hook",
+    "kind": "theme",
     "default": "var(--gr-secondary-fg)",
-    "description": "Подпись solid-кнопки `neutral`. Задаётся вместе с её заливкой."
+    "description": "Подпись solid-кнопки `neutral`. Тема задаёт её вместе с заливкой."
   },
   {
     "owner": "GrButton",
     "name": "--gr-button-ghost-bg-hover",
     "kind": "hook",
-    "default": "var(--gr-button-<тон>-soft-bg-hover)",
-    "description": "Подложка прозрачных весов (`outline`, `ghost`, `ghost-border`) под указателем — одна на все тоны. Без неё — подложка тона; у «Глины» — оттенок бумаги."
+    "default": "var(--gr-button-<тон>-ghost-bg-hover)",
+    "description": "Подложка прозрачных весов (`outline`, `ghost`, `ghost-border`) под указателем — одна на все тоны: ручка приложения. Без неё — подложка тона из темы, `--gr-button-<тон>-ghost-bg-hover`."
   },
   {
     "owner": "GrButton",
     "name": "--gr-button-ghost-bg-active",
     "kind": "hook",
-    "default": "var(--gr-button-<тон>-soft-bg-active)",
-    "description": "Подложка прозрачных весов в нажатии — одна на все тоны."
+    "default": "var(--gr-button-<тон>-ghost-bg-active)",
+    "description": "Подложка прозрачных весов в нажатии — одна на все тоны: ручка приложения. Без неё — `--gr-button-<тон>-ghost-bg-active` из темы."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-primary-ghost-bg-hover",
+    "kind": "theme",
+    "default": "var(--gr-button-primary-soft-bg-hover)",
+    "description": "Подложка прозрачных весов тона `primary` под указателем. У «Сланца» — soft-подложка тона; у «Глины» — оттенок бумаги, общий для всех тонов."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-primary-ghost-bg-active",
+    "kind": "theme",
+    "default": "var(--gr-button-primary-soft-bg-active)",
+    "description": "Подложка прозрачных весов тона `primary` в нажатии."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-neutral-ghost-bg-hover",
+    "kind": "theme",
+    "default": "var(--gr-button-neutral-soft-bg-hover)",
+    "description": "Подложка прозрачных весов тона `neutral` под указателем. У «Сланца» — soft-подложка тона; у «Глины» — оттенок бумаги, общий для всех тонов."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-neutral-ghost-bg-active",
+    "kind": "theme",
+    "default": "var(--gr-button-neutral-soft-bg-active)",
+    "description": "Подложка прозрачных весов тона `neutral` в нажатии."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-success-ghost-bg-hover",
+    "kind": "theme",
+    "default": "var(--gr-button-success-soft-bg-hover)",
+    "description": "Подложка прозрачных весов тона `success` под указателем. У «Сланца» — soft-подложка тона; у «Глины» — оттенок бумаги, общий для всех тонов."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-success-ghost-bg-active",
+    "kind": "theme",
+    "default": "var(--gr-button-success-soft-bg-active)",
+    "description": "Подложка прозрачных весов тона `success` в нажатии."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-warning-ghost-bg-hover",
+    "kind": "theme",
+    "default": "var(--gr-button-warning-soft-bg-hover)",
+    "description": "Подложка прозрачных весов тона `warning` под указателем. У «Сланца» — soft-подложка тона; у «Глины» — оттенок бумаги, общий для всех тонов."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-warning-ghost-bg-active",
+    "kind": "theme",
+    "default": "var(--gr-button-warning-soft-bg-active)",
+    "description": "Подложка прозрачных весов тона `warning` в нажатии."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-danger-ghost-bg-hover",
+    "kind": "theme",
+    "default": "var(--gr-button-danger-soft-bg-hover)",
+    "description": "Подложка прозрачных весов тона `danger` под указателем. У «Сланца» — soft-подложка тона; у «Глины» — оттенок бумаги, общий для всех тонов."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-danger-ghost-bg-active",
+    "kind": "theme",
+    "default": "var(--gr-button-danger-soft-bg-active)",
+    "description": "Подложка прозрачных весов тона `danger` в нажатии."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-info-ghost-bg-hover",
+    "kind": "theme",
+    "default": "var(--gr-button-info-soft-bg-hover)",
+    "description": "Подложка прозрачных весов тона `info` под указателем. У «Сланца» — soft-подложка тона; у «Глины» — оттенок бумаги, общий для всех тонов."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-info-ghost-bg-active",
+    "kind": "theme",
+    "default": "var(--gr-button-info-soft-bg-active)",
+    "description": "Подложка прозрачных весов тона `info` в нажатии."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-slate-ghost-bg-hover",
+    "kind": "theme",
+    "default": "var(--gr-button-slate-soft-bg-hover)",
+    "description": "Подложка прозрачных весов тона `slate` под указателем. У «Сланца» — soft-подложка тона; у «Глины» — оттенок бумаги, общий для всех тонов."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-slate-ghost-bg-active",
+    "kind": "theme",
+    "default": "var(--gr-button-slate-soft-bg-active)",
+    "description": "Подложка прозрачных весов тона `slate` в нажатии."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-azure-ghost-bg-hover",
+    "kind": "theme",
+    "default": "var(--gr-button-azure-soft-bg-hover)",
+    "description": "Подложка прозрачных весов тона `azure` под указателем. У «Сланца» — soft-подложка тона; у «Глины» — оттенок бумаги, общий для всех тонов."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-azure-ghost-bg-active",
+    "kind": "theme",
+    "default": "var(--gr-button-azure-soft-bg-active)",
+    "description": "Подложка прозрачных весов тона `azure` в нажатии."
   },
   {
     "owner": "GrButton",
     "name": "--gr-button-shimmer-duration",
-    "kind": "hook",
+    "kind": "theme",
     "default": "1.8s",
     "description": "Один проход света по подписи при `loadingIndicator=\"shimmer\"`."
   },
@@ -952,7 +1077,7 @@ export const grComponentTokens: GrComponentToken[] = [
     "owner": "GrButtonGroup",
     "name": "--gr-button-group-radius",
     "kind": "css",
-    "default": "var(--gr-button-radius, 0.375rem)",
+    "default": "var(--gr-button-radius)",
     "description": "Скругление внешних углов группы. По умолчанию наследует радиус кнопки — внутренние углы группа гасит сама."
   },
   {
@@ -1002,7 +1127,8 @@ export const grComponentTokens: GrComponentToken[] = [
     "name": "--gr-carousel-gap",
     "kind": "hook",
     "default": "0.5rem",
-    "description": "Просвет между переключателями в полосе."
+    "description": "Просвет между переключателями в полосе.",
+    "literal": "Геометрия раскладки ленты."
   },
   {
     "owner": "GrCarousel",
@@ -1021,14 +1147,14 @@ export const grComponentTokens: GrComponentToken[] = [
   {
     "owner": "GrCarousel",
     "name": "--gr-carousel-dot-ring-width",
-    "kind": "hook",
+    "kind": "theme",
     "default": "2px",
     "description": "Толщина обвода вокруг текущей точки. Обвод — второй признак текущего кадра помимо заливки: при диаметре в 8 пикселей одного оттенка мало, и на приглушённом тоне разница почти пропадает."
   },
   {
     "owner": "GrCarousel",
     "name": "--gr-carousel-dot-ring-offset",
-    "kind": "hook",
+    "kind": "theme",
     "default": "2px",
     "description": "Зазор между точкой и её обводом."
   },
@@ -1037,28 +1163,32 @@ export const grComponentTokens: GrComponentToken[] = [
     "name": "--gr-carousel-dot-size",
     "kind": "hook",
     "default": "0.5rem",
-    "description": "Диаметр точки-индикатора."
+    "description": "Диаметр точки-индикатора.",
+    "literal": "Геометрия раскладки индикатора."
   },
   {
     "owner": "GrCarousel",
     "name": "--gr-carousel-thumb-width",
     "kind": "hook",
     "default": "4rem",
-    "description": "Ширина миниатюры в полосе."
+    "description": "Ширина миниатюры в полосе.",
+    "literal": "Геометрия раскладки миниатюр."
   },
   {
     "owner": "GrCarousel",
     "name": "--gr-carousel-thumb-height",
     "kind": "hook",
     "default": "2.5rem",
-    "description": "Высота миниатюры. Пропорцию задаёт потребитель парой с шириной: у галереи товара и у ленты обложек она разная."
+    "description": "Высота миниатюры. Пропорцию задаёт потребитель парой с шириной: у галереи товара и у ленты обложек она разная.",
+    "literal": "Геометрия раскладки миниатюр."
   },
   {
     "owner": "GrCarousel",
     "name": "--gr-carousel-thumbs-fade",
     "kind": "hook",
     "default": "1.5rem",
-    "description": "Ширина затухания у края полосы миниатюр. Она же — отступ прокрутки, иначе фокус-кольцо крайней миниатюры оказывается под затуханием."
+    "description": "Ширина затухания у края полосы миниатюр. Она же — отступ прокрутки, иначе фокус-кольцо крайней миниатюры оказывается под затуханием.",
+    "literal": "Размер затухания у края прокрутки — механика ленты."
   },
   {
     "owner": "GrCarousel",
@@ -1093,7 +1223,8 @@ export const grComponentTokens: GrComponentToken[] = [
     "name": "--gr-color-picker-checker-size",
     "kind": "hook",
     "default": "6px",
-    "description": "Сторона клетки шахматной подложки под прозрачным цветом."
+    "description": "Сторона клетки шахматной подложки под прозрачным цветом.",
+    "literal": "Шаг шахматки под прозрачным цветом — механика отрисовки."
   },
   {
     "owner": "GrColorPicker",
@@ -1142,19 +1273,20 @@ export const grComponentTokens: GrComponentToken[] = [
     "name": "--gr-color-picker-area-thumb-size",
     "kind": "hook",
     "default": "0.875rem",
-    "description": "Диаметр ручки на области насыщенность × светлота."
+    "description": "Диаметр ручки на области насыщенность × светлота.",
+    "literal": "Геометрия бегунка."
   },
   {
     "owner": "GrColorPicker",
     "name": "--gr-color-picker-area-thumb-border",
-    "kind": "hook",
+    "kind": "theme",
     "default": "#fff",
     "description": "Внешний обвод ручки области. От темы не зависит намеренно: под ручкой лежит выбираемый цвет, а не подложка компонента."
   },
   {
     "owner": "GrColorPicker",
     "name": "--gr-color-picker-area-thumb-ring",
-    "kind": "hook",
+    "kind": "theme",
     "default": "rgba(0, 0, 0, 0.45)",
     "description": "Внутренний обвод ручки области: держит её видимой в светлом углу, где белого внешнего обвода не видно."
   },
@@ -1168,28 +1300,28 @@ export const grComponentTokens: GrComponentToken[] = [
   {
     "owner": "GrCommandPalette",
     "name": "--gr-command-active-bg",
-    "kind": "hook",
+    "kind": "theme",
     "default": "color-mix(in srgb, var(--gr-muted) 45%, transparent)",
     "description": "Фон активного пункта палитры (наведение и клавиатурный курсор)."
   },
   {
     "owner": "GrCommandPalette",
     "name": "--gr-command-match-bg",
-    "kind": "hook",
+    "kind": "theme",
     "default": "color-mix(in srgb, var(--gr-primary) 22%, transparent)",
     "description": "Подсветка совпавшей подстроки в подписи пункта."
   },
   {
     "owner": "GrCommandPalette",
     "name": "--gr-command-item-radius",
-    "kind": "hook",
+    "kind": "theme",
     "default": "10px",
     "description": "Скругление пункта палитры."
   },
   {
     "owner": "GrCommandPalette",
     "name": "--gr-command-input-font-size",
-    "kind": "hook",
+    "kind": "theme",
     "default": "15px",
     "description": "Кегль строки поиска: крупнее пунктов списка, потому что это единственное поле ввода в оверлее."
   },
@@ -1198,14 +1330,16 @@ export const grComponentTokens: GrComponentToken[] = [
     "name": "--gr-command-list-max-height",
     "kind": "hook",
     "default": "значение пропа `maxHeight` в пикселях",
-    "description": "Максимальная высота списка; дальше список скроллится."
+    "description": "Максимальная высота списка; дальше список скроллится.",
+    "literal": "Значение пропа `maxHeight`."
   },
   {
     "owner": "GrCommandPalette",
     "name": "--gr-command-results-min-height",
     "kind": "hook",
     "default": "0px",
-    "description": "Резерв высоты области результатов — чтобы окно не схлопывалось между «ищем» и «нашлось». Состояние «Ничего не найдено» и загрузка встают по центру резерва."
+    "description": "Резерв высоты области результатов — чтобы окно не схлопывалось между «ищем» и «нашлось». Состояние «Ничего не найдено» и загрузка встают по центру резерва.",
+    "literal": "Нейтральное значение: без минимума."
   },
   {
     "owner": "GrDataTable",
@@ -1224,7 +1358,7 @@ export const grComponentTokens: GrComponentToken[] = [
   {
     "owner": "GrDataTable",
     "name": "--gr-datatable-drag-indicator-width",
-    "kind": "hook",
+    "kind": "theme",
     "default": "2px",
     "description": "Толщина полосы места вставки колонки."
   },
@@ -1240,19 +1374,20 @@ export const grComponentTokens: GrComponentToken[] = [
     "name": "--gr-datatable-resizer-width",
     "kind": "hook",
     "default": "2px",
-    "description": "Толщина полосы изменения ширины колонки."
+    "description": "Толщина полосы изменения ширины колонки.",
+    "literal": "Зона захвата ручки ширины — механика взаимодействия."
   },
   {
     "owner": "GrDataTable",
     "name": "--gr-datatable-pinned-shadow",
-    "kind": "hook",
+    "kind": "theme",
     "default": "4px 0 6px -4px rgba(0, 0, 0, 0.25)",
     "description": "Тень на границе группы колонок, закреплённых слева."
   },
   {
     "owner": "GrDataTable",
     "name": "--gr-datatable-pinned-shadow-end",
-    "kind": "hook",
+    "kind": "theme",
     "default": "-4px 0 6px -4px rgba(0, 0, 0, 0.25)",
     "description": "Тень на границе группы колонок, закреплённых справа."
   },
@@ -1275,42 +1410,48 @@ export const grComponentTokens: GrComponentToken[] = [
     "name": "--gr-delta-arrow-size",
     "kind": "hook",
     "default": "0.875em",
-    "description": "Сторона стрелки направления. Доля от кегля величины, а не ступень шкалы: на ступени md у дельты своего кегля нет — она набирается кеглем строки, в которой стоит, и пиксельный размер оставил бы стрелку мелкой внутри заголовка."
+    "description": "Сторона стрелки направления. Доля от кегля величины, а не ступень шкалы: на ступени md у дельты своего кегля нет — она набирается кеглем строки, в которой стоит, и пиксельный размер оставил бы стрелку мелкой внутри заголовка.",
+    "literal": "Размер стрелки относительно кегля величины."
   },
   {
     "owner": "GrDelta",
     "name": "--gr-delta-arrow-gap",
     "kind": "hook",
     "default": "0.125rem",
-    "description": "Отбивка стрелки от величины. Логическая: в RTL встаёт с нужной стороны."
+    "description": "Отбивка стрелки от величины. Логическая: в RTL встаёт с нужной стороны.",
+    "literal": "Геометрия раскладки стрелки."
   },
   {
     "owner": "GrDelta",
     "name": "--gr-delta-suffix-color",
     "kind": "hook",
     "default": "currentColor",
-    "description": "Цвет приписки после величины. У дельты она приглушения не получает: «−15 %» набирается цветом строки целиком, иначе процент читается подписью. Токен возвращает приглушение тому, кому оно нужно — переопределение GrValue ссылается на него, а не задаёт цвет инлайном."
+    "description": "Цвет приписки после величины. У дельты она приглушения не получает: «−15 %» набирается цветом строки целиком, иначе процент читается подписью. Токен возвращает приглушение тому, кому оно нужно — переопределение GrValue ссылается на него, а не задаёт цвет инлайном.",
+    "literal": "Нейтральное значение: цвет величины."
   },
   {
     "owner": "GrDelta",
     "name": "--gr-delta-suffix-size",
     "kind": "hook",
     "default": "1em",
-    "description": "Кегль приписки после величины. По умолчанию равен кеглю самой величины: уменьшённый процент оказался бы мельче окружающих слов."
+    "description": "Кегль приписки после величины. По умолчанию равен кеглю самой величины: уменьшённый процент оказался бы мельче окружающих слов.",
+    "literal": "Нейтральное значение: кегль величины."
   },
   {
     "owner": "GrDescriptionList",
     "name": "--gr-description-list-column-min",
     "kind": "hook",
     "default": "12rem",
-    "description": "Минимальная ширина колонки. Ниже неё сетка отдаёт колонку целиком, а не делит её: в тесной колонке значение переносится посимвольно, и число «30» читается как «3» и «0». Порог считается от ширины контейнера, а не вьюпорта."
+    "description": "Минимальная ширина колонки. Ниже неё сетка отдаёт колонку целиком, а не делит её: в тесной колонке значение переносится посимвольно, и число «30» читается как «3» и «0». Порог считается от ширины контейнера, а не вьюпорта.",
+    "literal": "Геометрия раскладки колонок."
   },
   {
     "owner": "GrDescriptionList",
     "name": "--gr-description-list-value-min",
     "kind": "hook",
     "default": "5rem",
-    "description": "Сколько места остаётся значению рядом с подписью при `inline`. Складывается с `labelWidth` в минимальную ширину колонки: колонка шириной с одну подпись выжимает значение в букву на строку."
+    "description": "Сколько места остаётся значению рядом с подписью при `inline`. Складывается с `labelWidth` в минимальную ширину колонки: колонка шириной с одну подпись выжимает значение в букву на строку.",
+    "literal": "Геометрия раскладки колонок."
   },
   {
     "owner": "GrDescriptionList",
@@ -1324,7 +1465,8 @@ export const grComponentTokens: GrComponentToken[] = [
     "name": "--gr-description-list-row-gap",
     "kind": "hook",
     "default": "0.375rem (`density=\"compact\"` — 0.125rem)",
-    "description": "Зазор между парами. Не ступень общей шкалы: плотность списка характеристик настраивается отдельно от отступов раскладки."
+    "description": "Зазор между парами. Не ступень общей шкалы: плотность списка характеристик настраивается отдельно от отступов раскладки.",
+    "literal": "Шаг по плотности (`density`) из карты компонента."
   },
   {
     "owner": "GrDescriptionList",
@@ -1336,7 +1478,7 @@ export const grComponentTokens: GrComponentToken[] = [
   {
     "owner": "GrDivider",
     "name": "--gr-divider-thickness",
-    "kind": "hook",
+    "kind": "theme",
     "default": "1px",
     "description": "Толщина разделителя — общая для горизонтального и вертикального."
   },
@@ -1499,14 +1641,16 @@ export const grComponentTokens: GrComponentToken[] = [
     "name": "--gr-navbar-height",
     "kind": "hook",
     "default": "56px",
-    "description": "Высота шапки. Ею же считается отступ содержимого под прилипшей шапкой."
+    "description": "Высота шапки. Ею же считается отступ содержимого под прилипшей шапкой.",
+    "literal": "Геометрия раскладки панели."
   },
   {
     "owner": "GrOtpInput",
     "name": "--gr-otp-input-cell-size",
     "kind": "hook",
     "default": "1.75rem / 2rem / 2.5rem / 2.75rem по ступеням xs…lg",
-    "description": "Сторона ячейки. Повторяет высоту GrInput на той же ступени: код стоит в форме рядом с полями и обязан садиться с ними в одну линию. Через хук — квадратная ячейка это решение оформления, и макет вправе сделать её шире."
+    "description": "Сторона ячейки. Повторяет высоту GrInput на той же ступени: код стоит в форме рядом с полями и обязан садиться с ними в одну линию. Через хук — квадратная ячейка это решение оформления, и макет вправе сделать её шире.",
+    "literal": "Сторона ячейки по ступени `size` из карты компонента."
   },
   {
     "owner": "GrOtpInput",
@@ -1527,14 +1671,16 @@ export const grComponentTokens: GrComponentToken[] = [
     "name": "--gr-popover-max-width",
     "kind": "hook",
     "default": "22rem",
-    "description": "Потолок ширины панели. Содержимое шире прозы — тулбар, палитра, сетка — снимает потолок значением `100vw`. Шире вьюпорта панель не станет и тогда: этот предел — второй операнд `min()` и снаружи не отключается."
+    "description": "Потолок ширины панели. Содержимое шире прозы — тулбар, палитра, сетка — снимает потолок значением `100vw`. Шире вьюпорта панель не станет и тогда: этот предел — второй операнд `min()` и снаружи не отключается.",
+    "literal": "Геометрия раскладки панели."
   },
   {
     "owner": "GrPopover",
     "name": "--gr-popover-max-height",
     "kind": "hook",
     "default": "100vh",
-    "description": "Потолок высоты панели. По умолчанию мнения нет — высоту диктует место, оставшееся до края вьюпорта (замер слоя `--gr-floating-available-height`). Значение задают, когда панель обязана быть ниже доступного места; выше него она не станет и тогда."
+    "description": "Потолок высоты панели. По умолчанию мнения нет — высоту диктует место, оставшееся до края вьюпорта (замер слоя `--gr-floating-available-height`). Значение задают, когда панель обязана быть ниже доступного места; выше него она не станет и тогда.",
+    "literal": "Граница по высоте окна — механика позиционирования."
   },
   {
     "owner": "GrProgressBar",
@@ -1609,7 +1755,7 @@ export const grComponentTokens: GrComponentToken[] = [
   {
     "owner": "GrProgressBar",
     "name": "--gr-progress-indeterminate-duration",
-    "kind": "hook",
+    "kind": "theme",
     "default": "1.4s",
     "description": "Период пробега полосы в неопределённом режиме."
   },
@@ -1618,7 +1764,8 @@ export const grComponentTokens: GrComponentToken[] = [
     "name": "--gr-progress-circle-size",
     "kind": "hook",
     "default": "2rem / 3rem / 4rem / 6rem по ступеням `xs…lg`",
-    "description": "Диаметр кольца. Геометрия дуги считается в единицах `viewBox`, поэтому масштаб можно менять свободно."
+    "description": "Диаметр кольца. Геометрия дуги считается в единицах `viewBox`, поэтому масштаб можно менять свободно.",
+    "literal": "Диаметр по ступени `size` из карты компонента."
   },
   {
     "owner": "GrProgressCircle",
@@ -1630,7 +1777,7 @@ export const grComponentTokens: GrComponentToken[] = [
   {
     "owner": "GrProgressCircle",
     "name": "--gr-progress-circle-cap",
-    "kind": "hook",
+    "kind": "theme",
     "default": "round",
     "description": "Торец дуги значения: `round` или `butt` для строгой шкалы."
   },
@@ -1639,7 +1786,8 @@ export const grComponentTokens: GrComponentToken[] = [
     "name": "--gr-progress-circle-value-size",
     "kind": "hook",
     "default": "кегль по ступени `size`",
-    "description": "Кегль содержимого в центре кольца: свой формат значения может не влезть в дефолтный."
+    "description": "Кегль содержимого в центре кольца: свой формат значения может не влезть в дефолтный.",
+    "literal": "Кегль по ступени `size` из карты компонента."
   },
   {
     "owner": "GrRating",
@@ -1651,7 +1799,7 @@ export const grComponentTokens: GrComponentToken[] = [
   {
     "owner": "GrRating",
     "name": "--gr-rating-void-color",
-    "kind": "hook",
+    "kind": "theme",
     "default": "color-mix(in srgb, var(--gr-muted-fg) 35%, transparent)",
     "description": "Цвет незаполненного символа: шкала обязана читаться целиком, а не только заполненной частью."
   },
@@ -1660,14 +1808,16 @@ export const grComponentTokens: GrComponentToken[] = [
     "name": "--gr-rating-symbol-size",
     "kind": "hook",
     "default": "0.875rem / 1rem / 1.25rem / 1.5rem по ступеням `xs…lg`",
-    "description": "Размер символа шкалы."
+    "description": "Размер символа шкалы.",
+    "literal": "Размер символа по ступени `size` из карты компонента."
   },
   {
     "owner": "GrRating",
     "name": "--gr-rating-font-size-lg",
     "kind": "hook",
     "default": "15px",
-    "description": "Кегль подписи на ступени `lg`: между `md` и `lg` шкалы контролов."
+    "description": "Кегль подписи на ступени `lg`: между `md` и `lg` шкалы контролов.",
+    "literal": "Кегль ступени `lg` из карты компонента."
   },
   {
     "owner": "GrScrollSpy",
@@ -1695,7 +1845,8 @@ export const grComponentTokens: GrComponentToken[] = [
     "name": "--gr-scroll-spy-indent",
     "kind": "hook",
     "default": "0.75rem",
-    "description": "Шаг отступа для вложенного уровня оглавления."
+    "description": "Шаг отступа для вложенного уровня оглавления.",
+    "literal": "Геометрия раскладки вложенных пунктов."
   },
   {
     "owner": "GrSegmented",
@@ -1835,7 +1986,8 @@ export const grComponentTokens: GrComponentToken[] = [
     "name": "--gr-sidebar-nest-indent",
     "kind": "hook",
     "default": "1rem",
-    "description": "Отступ одного уровня вложенности у подпунктов. Отодвигается вся строка вместе с подсветкой, а не только текст."
+    "description": "Отступ одного уровня вложенности у подпунктов. Отодвигается вся строка вместе с подсветкой, а не только текст.",
+    "literal": "Геометрия раскладки вложенных пунктов."
   },
   {
     "owner": "GrSlider",
@@ -1863,14 +2015,16 @@ export const grComponentTokens: GrComponentToken[] = [
     "name": "--gr-slider-track-height",
     "kind": "hook",
     "default": "0.1875rem / 0.25rem / 0.375rem / 0.5rem по ступеням `xs…lg`",
-    "description": "Толщина трека."
+    "description": "Толщина трека.",
+    "literal": "Толщина дорожки по ступени `size` из карты компонента."
   },
   {
     "owner": "GrSlider",
     "name": "--gr-slider-thumb-size",
     "kind": "hook",
     "default": "0.75rem / 0.875rem / 1rem / 1.25rem по ступеням `xs…lg`",
-    "description": "Диаметр ползунка."
+    "description": "Диаметр ползунка.",
+    "literal": "Размер бегунка по ступени `size` из карты компонента."
   },
   {
     "owner": "GrSlider",
@@ -1891,14 +2045,16 @@ export const grComponentTokens: GrComponentToken[] = [
     "name": "--gr-slider-length",
     "kind": "hook",
     "default": "10rem",
-    "description": "Длина вертикального слайдера: горизонтальный тянется по ширине контейнера, вертикальному нужна явная высота."
+    "description": "Длина вертикального слайдера: горизонтальный тянется по ширине контейнера, вертикальному нужна явная высота.",
+    "literal": "Геометрия раскладки вертикальной шкалы."
   },
   {
     "owner": "GrSortableList",
     "name": "--gr-sortable-handle-size",
     "kind": "hook",
     "default": "1.5rem",
-    "description": "Размер ручки переноса."
+    "description": "Размер ручки переноса.",
+    "literal": "Зона захвата ручки — механика взаимодействия."
   },
   {
     "owner": "GrSortableList",
@@ -1924,7 +2080,7 @@ export const grComponentTokens: GrComponentToken[] = [
   {
     "owner": "GrSortableList",
     "name": "--gr-sortable-indicator-width",
-    "kind": "hook",
+    "kind": "theme",
     "default": "2px",
     "description": "Толщина линии места вставки."
   },
@@ -1933,14 +2089,16 @@ export const grComponentTokens: GrComponentToken[] = [
     "name": "--gr-splitter-size",
     "kind": "hook",
     "default": "6px",
-    "description": "Толщина полосы разделителя — ширина её грид-трека."
+    "description": "Толщина полосы разделителя — ширина её грид-трека.",
+    "literal": "Геометрия раскладки разделителя."
   },
   {
     "owner": "GrSplitter",
     "name": "--gr-splitter-hit",
     "kind": "hook",
     "default": "4px",
-    "description": "Запас зоны захвата с каждой стороны полосы: мишень в шесть пикселей мышью не берётся."
+    "description": "Запас зоны захвата с каждой стороны полосы: мишень в шесть пикселей мышью не берётся.",
+    "literal": "Зона захвата разделителя — механика взаимодействия."
   },
   {
     "owner": "GrSplitter",
@@ -1968,7 +2126,8 @@ export const grComponentTokens: GrComponentToken[] = [
     "name": "--gr-splitter-grip",
     "kind": "hook",
     "default": "24px",
-    "description": "Длина насечки посередине разделителя. `0` убирает её."
+    "description": "Длина насечки посередине разделителя. `0` убирает её.",
+    "literal": "Геометрия ручки разделителя."
   },
   {
     "owner": "GrStatistic",
@@ -1994,7 +2153,7 @@ export const grComponentTokens: GrComponentToken[] = [
   {
     "owner": "GrSteps",
     "name": "--gr-steps-connector-size",
-    "kind": "hook",
+    "kind": "theme",
     "default": "2px",
     "description": "Толщина линии между шагами."
   },
@@ -2038,7 +2197,8 @@ export const grComponentTokens: GrComponentToken[] = [
     "name": "--gr-switch-state-text-size",
     "kind": "hook",
     "default": "9px на md, 11px на lg",
-    "description": "Кегль подписи состояния. Собственный, а не ступень шкалы: минимальный --gr-text-xs (12px) в дорожку не помещается. Один токен на обе ступени."
+    "description": "Кегль подписи состояния. Собственный, а не ступень шкалы: минимальный --gr-text-xs (12px) в дорожку не помещается. Один токен на обе ступени.",
+    "literal": "Кегль подписи состояния по ступени `size` из карты компонента."
   },
   {
     "owner": "GrSwitch",
@@ -2050,7 +2210,7 @@ export const grComponentTokens: GrComponentToken[] = [
   {
     "owner": "GrTable",
     "name": "--gr-table-sticky-column-shadow",
-    "kind": "hook",
+    "kind": "theme",
     "default": "4px 0 6px -4px rgba(0, 0, 0, 0.25)",
     "description": "Тень справа у прилипающей первой колонки (`stickyColumn`). Признак того, что под ней уезжает содержимое. Тень, а не рамка: рамка сдвинула бы сетку таблицы."
   },
@@ -2059,7 +2219,8 @@ export const grComponentTokens: GrComponentToken[] = [
     "name": "--gr-tabs-scroll-fade",
     "kind": "hook",
     "default": "1.5rem",
-    "description": "Ширина затухания у края горизонтального ряда вкладок — того края, за которым ряд продолжается. Тем же значением задан `scroll-padding` ряда, поэтому вкладка, подтянутая в видимую часть, не встаёт под затухание."
+    "description": "Ширина затухания у края горизонтального ряда вкладок — того края, за которым ряд продолжается. Тем же значением задан `scroll-padding` ряда, поэтому вкладка, подтянутая в видимую часть, не встаёт под затухание.",
+    "literal": "Размер затухания у края прокрутки — механика ленты."
   },
   {
     "owner": "GrTabs",
@@ -2071,7 +2232,7 @@ export const grComponentTokens: GrComponentToken[] = [
   {
     "owner": "GrTimeline",
     "name": "--gr-timeline-axis-width",
-    "kind": "hook",
+    "kind": "theme",
     "default": "2px",
     "description": "Толщина оси ленты."
   },
@@ -2087,12 +2248,13 @@ export const grComponentTokens: GrComponentToken[] = [
     "name": "--gr-timeline-marker-size",
     "kind": "hook",
     "default": "10px",
-    "description": "Диаметр точки события."
+    "description": "Диаметр точки события.",
+    "literal": "Геометрия маркера."
   },
   {
     "owner": "GrTimeline",
     "name": "--gr-timeline-marker-ring",
-    "kind": "hook",
+    "kind": "theme",
     "default": "2px",
     "description": "Толщина обводки полой точки (`variant=\"outlined\"`, `pending`)."
   },
@@ -2101,33 +2263,37 @@ export const grComponentTokens: GrComponentToken[] = [
     "name": "--gr-timeline-marker-top",
     "kind": "hook",
     "default": "0.35rem",
-    "description": "Отступ точки сверху: выравнивает её по первой строке текста события."
+    "description": "Отступ точки сверху: выравнивает её по первой строке текста события.",
+    "literal": "Геометрия маркера."
   },
   {
     "owner": "GrTimeline",
     "name": "--gr-timeline-gap",
     "kind": "hook",
     "default": "0.75rem",
-    "description": "Расстояние между колонками ленты — осью, меткой времени и содержимым."
+    "description": "Расстояние между колонками ленты — осью, меткой времени и содержимым.",
+    "literal": "Геометрия раскладки."
   },
   {
     "owner": "GrTimeline",
     "name": "--gr-timeline-line-min",
     "kind": "hook",
     "default": "0.75rem",
-    "description": "Минимальная длина отрезка оси: без неё однострочное событие обрывало бы линию."
+    "description": "Минимальная длина отрезка оси: без неё однострочное событие обрывало бы линию.",
+    "literal": "Геометрия раскладки."
   },
   {
     "owner": "GrTimeline",
     "name": "--gr-timeline-time-width",
     "kind": "hook",
     "default": "5.5rem",
-    "description": "Ширина колонки времени в `layout=\"time\"`."
+    "description": "Ширина колонки времени в `layout=\"time\"`.",
+    "literal": "Геометрия раскладки."
   },
   {
     "owner": "GrTimeline",
     "name": "--gr-timeline-dash",
-    "kind": "hook",
+    "kind": "theme",
     "default": "4px",
     "description": "Шаг пунктира на отрезке оси после незавершённого события."
   },
@@ -2136,7 +2302,8 @@ export const grComponentTokens: GrComponentToken[] = [
     "name": "--gr-timeline-item-min-width",
     "kind": "hook",
     "default": "12rem",
-    "description": "Ширина колонки события в горизонтальной ленте."
+    "description": "Ширина колонки события в горизонтальной ленте.",
+    "literal": "Геометрия раскладки."
   },
   {
     "owner": "GrTimeline",
@@ -2157,28 +2324,32 @@ export const grComponentTokens: GrComponentToken[] = [
     "name": "--gr-toaster-stack-peek",
     "kind": "hook",
     "default": "12px",
-    "description": "Насколько выглядывает из-под передней карточки каждая следующая в свёрнутой стопке."
+    "description": "Насколько выглядывает из-под передней карточки каждая следующая в свёрнутой стопке.",
+    "literal": "Геометрия стопки уведомлений — механика стопки."
   },
   {
     "owner": "GrToaster",
     "name": "--gr-toaster-stack-scale",
     "kind": "hook",
     "default": "0.05",
-    "description": "На сколько уменьшается каждая следующая карточка стопки: глубина читается размером, а не только смещением."
+    "description": "На сколько уменьшается каждая следующая карточка стопки: глубина читается размером, а не только смещением.",
+    "literal": "Масштаб карточек в стопке — механика стопки."
   },
   {
     "owner": "GrTransfer",
     "name": "--gr-transfer-panel-max-h",
     "kind": "hook",
     "default": "18rem",
-    "description": "Высота панели. Обе панели обязаны быть одной высоты и прокручиваться внутри себя — иначе перенос двигает вёрстку страницы под курсором."
+    "description": "Высота панели. Обе панели обязаны быть одной высоты и прокручиваться внутри себя — иначе перенос двигает вёрстку страницы под курсором.",
+    "literal": "Геометрия раскладки панели."
   },
   {
     "owner": "GrTransfer",
     "name": "--gr-transfer-fade",
     "kind": "hook",
     "default": "1.25rem",
-    "description": "Высота затухания у края списка. Полоса прокрутки панели на части систем невидима, и без затухания обрезанная посередине строка читается как дефект отрисовки."
+    "description": "Высота затухания у края списка. Полоса прокрутки панели на части систем невидима, и без затухания обрезанная посередине строка читается как дефект отрисовки.",
+    "literal": "Размер затухания у края прокрутки — механика списка."
   },
   {
     "owner": "GrTransfer",
@@ -2190,15 +2361,15 @@ export const grComponentTokens: GrComponentToken[] = [
   {
     "owner": "GrTransfer",
     "name": "--gr-transfer-selected-bg",
-    "kind": "hook",
-    "default": "12 % от `--gr-primary` через `color-mix`",
+    "kind": "theme",
+    "default": "color-mix(in srgb, var(--gr-primary) 12%, transparent)",
     "description": "Подложка отмеченной строки. Тон, а не заливка: текст остаётся обычным `--gr-fg`, и контраст не приходится выверять заново."
   },
   {
     "owner": "GrTransfer",
     "name": "--gr-transfer-arrived-bg",
-    "kind": "hook",
-    "default": "32 % от `--gr-primary` через `color-mix`",
+    "kind": "theme",
+    "default": "color-mix(in srgb, var(--gr-primary) 32%, transparent)",
     "description": "Начальный кадр подсветки строки, только что приехавшей из соседней панели. Подсветка гаснет сама и под `prefers-reduced-motion` не показывается вовсе."
   },
   {
@@ -2218,8 +2389,8 @@ export const grComponentTokens: GrComponentToken[] = [
   {
     "owner": "GrTransfer",
     "name": "--gr-transfer-drop-bg",
-    "kind": "hook",
-    "default": "6 % от `--gr-primary` через `color-mix`",
+    "kind": "theme",
+    "default": "color-mix(in srgb, var(--gr-primary) 6%, transparent)",
     "description": "Подложка панели-приёмника. Одной рамки мало: на широком экране она за пределами взгляда, занятого курсором."
   },
   {
@@ -2239,8 +2410,8 @@ export const grComponentTokens: GrComponentToken[] = [
   {
     "owner": "GrTransfer",
     "name": "--gr-transfer-indicator-width",
-    "kind": "hook",
-    "default": "2px",
+    "kind": "theme",
+    "default": "3px",
     "description": "Толщина линии места вставки."
   },
   {
@@ -2584,21 +2755,24 @@ export const grComponentTokens: GrComponentToken[] = [
     "name": "--gr-value-prefix-color",
     "kind": "hook",
     "default": "цвет величины (наследуется)",
-    "description": "Цвет приписки перед значением. По умолчанию наследует цвет величины: знак валюты — часть суммы, и краснеть при отрицательном значении обязан вместе с ней."
+    "description": "Цвет приписки перед значением. По умолчанию наследует цвет величины: знак валюты — часть суммы, и краснеть при отрицательном значении обязан вместе с ней.",
+    "literal": "Нейтральное значение: цвет величины."
   },
   {
     "owner": "GrValue",
     "name": "--gr-value-prefix-size",
     "kind": "hook",
     "default": "кегль величины (наследуется)",
-    "description": "Кегль приписки перед значением. По умолчанию равен кеглю самой величины: приглушённый и уменьшенный знак валюты читается подписью рядом с числом, а не его частью."
+    "description": "Кегль приписки перед значением. По умолчанию равен кеглю самой величины: приглушённый и уменьшенный знак валюты читается подписью рядом с числом, а не его частью.",
+    "literal": "Нейтральное значение: кегль величины."
   },
   {
     "owner": "GrValue",
     "name": "--gr-value-prefix-gap",
     "kind": "hook",
     "default": "0",
-    "description": "Отбивка между припиской и значением. По умолчанию нулевая: «$ 14,99» с зазором читается как опечатка."
+    "description": "Отбивка между припиской и значением. По умолчанию нулевая: «$ 14,99» с зазором читается как опечатка.",
+    "literal": "Нейтральное значение: без отступа."
   },
   {
     "owner": "GrValue",
@@ -2612,14 +2786,16 @@ export const grComponentTokens: GrComponentToken[] = [
     "name": "--gr-value-suffix-size",
     "kind": "hook",
     "default": "0.85em",
-    "description": "Кегль приписки после значения. Доля от кегля величины, а не ступень шкалы: примитив своей шкалы размеров не имеет и набирается кеглем места, где стоит."
+    "description": "Кегль приписки после значения. Доля от кегля величины, а не ступень шкалы: примитив своей шкалы размеров не имеет и набирается кеглем места, где стоит.",
+    "literal": "Кегль суффикса относительно кегля величины."
   },
   {
     "owner": "GrValue",
     "name": "--gr-value-suffix-gap",
     "kind": "hook",
     "default": "0.25rem",
-    "description": "Отбивка между значением и припиской после него. Задаётся логическим отступом, поэтому в RTL встаёт с нужной стороны."
+    "description": "Отбивка между значением и припиской после него. Задаётся логическим отступом, поэтому в RTL встаёт с нужной стороны.",
+    "literal": "Геометрия раскладки суффикса."
   },
   {
     "owner": "composables",

@@ -12,7 +12,7 @@ export const transferPanelBase = 'flex min-w-0 flex-1 flex-col overflow-hidden r
  * Одной рамки мало: на широком экране она за пределами взгляда, занятого
  * курсором. Мягкая подложка сообщает «сюда» там, где человек и смотрит.
  */
-export const transferPanelDropClass = 'border-[var(--gr-transfer-drop-brd,var(--gr-primary))] bg-[var(--gr-transfer-drop-bg,color-mix(in_srgb,var(--gr-primary)_6%,transparent))]'
+export const transferPanelDropClass = 'border-[var(--gr-transfer-drop-brd,var(--gr-primary))] bg-[var(--gr-transfer-drop-bg)]'
 
 export const transferHeaderBase = 'flex items-center gap-2 border-b border-[var(--gr-brd)]'
 
@@ -46,7 +46,7 @@ export const transferOptionStates = {
   // не приходится выверять заново. Мягкой подложки под `--gr-primary` в темах
   // нет (есть только у danger/info/success/warning), поэтому `color-mix` —
   // тот же приём, которым красят наведение `GrTabs` и `GrSelect`.
-  selected: 'bg-[var(--gr-transfer-selected-bg,color-mix(in_srgb,var(--gr-primary)_12%,transparent))] text-[var(--gr-fg)]',
+  selected: 'bg-[var(--gr-transfer-selected-bg)] text-[var(--gr-fg)]',
   idle: 'text-[var(--gr-fg)] hover:bg-[var(--gr-muted)]',
   // Гашение фоном, а не `opacity`: прозрачность разбавляет выверенные на AA
   // токены текста и роняет контраст.
@@ -92,9 +92,9 @@ export const transferLabelClass = 'min-w-0 flex-1 truncate'
  * Место вставки — псевдоэлемент строки-соседа, а не отдельный узел: лишний узел
  * между строками ломает подсчёт позиций и разделители.
  */
-export const transferIndicatorBeforeClass = 'before:absolute before:inset-x-0 before:top-0 before:h-[var(--gr-transfer-indicator-width,3px)] before:rounded-[var(--gr-radius-full)] before:bg-[var(--gr-transfer-indicator,var(--gr-primary))] before:content-empty'
+export const transferIndicatorBeforeClass = 'before:absolute before:inset-x-0 before:top-0 before:h-[var(--gr-transfer-indicator-width)] before:rounded-[var(--gr-radius-full)] before:bg-[var(--gr-transfer-indicator,var(--gr-primary))] before:content-empty'
 
-export const transferIndicatorAfterClass = 'after:absolute after:inset-x-0 after:bottom-0 after:h-[var(--gr-transfer-indicator-width,3px)] after:rounded-[var(--gr-radius-full)] after:bg-[var(--gr-transfer-indicator,var(--gr-primary))] after:content-empty'
+export const transferIndicatorAfterClass = 'after:absolute after:inset-x-0 after:bottom-0 after:h-[var(--gr-transfer-indicator-width)] after:rounded-[var(--gr-radius-full)] after:bg-[var(--gr-transfer-indicator,var(--gr-primary))] after:content-empty'
 
 export const transferEmptyClass = 'flex h-full items-center justify-center px-4 py-6 text-center text-[var(--gr-muted-fg)]'
 

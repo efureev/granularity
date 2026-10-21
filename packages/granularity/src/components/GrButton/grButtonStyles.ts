@@ -32,6 +32,9 @@ export type GrButtonToneTokens = {
   softBackground: string
   softBackgroundHover: string
   softBackgroundActive: string
+  /** Подложка прозрачных весов под указателем и в нажатии — токен темы на тон. */
+  ghostBackgroundHover: string
+  ghostBackgroundActive: string
   softForeground: string
   /** Рамка secondary в покое: тон приглушён, чтобы второстепенный вес не спорил с primary. */
   borderSoft: string
@@ -47,7 +50,7 @@ export type GrButtonToneTokens = {
  * в системный цвет.
  */
 export const base
-  = 'relative inline-flex max-w-full items-center justify-center select-none whitespace-nowrap [font-weight:var(--gr-button-font-weight,var(--gr-font-medium))] rounded-ss-[var(--gr-button-radius-ss,var(--gr-button-radius,0.375rem))] rounded-se-[var(--gr-button-radius-se,var(--gr-button-radius,0.375rem))] rounded-ee-[var(--gr-button-radius-ee,var(--gr-button-radius,0.375rem))] rounded-es-[var(--gr-button-radius-es,var(--gr-button-radius,0.375rem))] transition-[color,background-color,border-color,box-shadow,transform] duration-[var(--gr-duration-fast)] ease-[var(--gr-ease-out)] outline-none focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--gr-ring)] disabled:cursor-not-allowed'
+  = 'relative inline-flex max-w-full items-center justify-center select-none whitespace-nowrap [font-weight:var(--gr-button-font-weight,var(--gr-font-medium))] rounded-ss-[var(--gr-button-radius-ss,var(--gr-button-radius))] rounded-se-[var(--gr-button-radius-se,var(--gr-button-radius))] rounded-ee-[var(--gr-button-radius-ee,var(--gr-button-radius))] rounded-es-[var(--gr-button-radius-es,var(--gr-button-radius))] transition-[color,background-color,border-color,box-shadow,transform] duration-[var(--gr-duration-fast)] ease-[var(--gr-ease-out)] outline-none focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--gr-ring)] disabled:cursor-not-allowed'
 
 /**
  * Нажатие — вдавливание на 2%. Только у живой кнопки: отключённая и ждущая
@@ -124,14 +127,16 @@ export const squareSizes: Record<GrButtonSize, string> = {
 
 export const tones: Record<GrButtonTone, GrButtonToneTokens> = {
   primary: {
-    solidBackground: 'var(--gr-button-primary-bg,var(--gr-primary))',
-    solidBackgroundHover: 'var(--gr-button-primary-bg-hover,var(--gr-primary-hover))',
-    solidBackgroundActive: 'var(--gr-button-primary-bg-active,var(--gr-primary-active))',
-    solidForeground: 'var(--gr-button-primary-fg,var(--gr-primary-fg))',
+    solidBackground: 'var(--gr-button-primary-bg)',
+    solidBackgroundHover: 'var(--gr-button-primary-bg-hover)',
+    solidBackgroundActive: 'var(--gr-button-primary-bg-active)',
+    solidForeground: 'var(--gr-button-primary-fg)',
     accentText: 'var(--gr-accent-fg)',
     softBackground: 'var(--gr-button-primary-soft-bg)',
     softBackgroundHover: 'var(--gr-button-primary-soft-bg-hover)',
     softBackgroundActive: 'var(--gr-button-primary-soft-bg-active)',
+    ghostBackgroundHover: 'var(--gr-button-primary-ghost-bg-hover)',
+    ghostBackgroundActive: 'var(--gr-button-primary-ghost-bg-active)',
     softForeground: 'var(--gr-accent-fg)',
     borderSoft: 'var(--gr-button-primary-border-soft)',
     border: 'var(--gr-button-primary-border)',
@@ -139,107 +144,119 @@ export const tones: Record<GrButtonTone, GrButtonToneTokens> = {
     borderActive: 'var(--gr-primary-active)',
   },
   neutral: {
-    // Заливка нейтральной solid-кнопки — хук: тема, где главная кнопка не серая
-    // плашка, задаёт её («Глина» — графит); без хука это `--gr-secondary`.
-    solidBackground: 'var(--gr-button-neutral-bg,var(--gr-secondary))',
-    solidBackgroundHover: 'var(--gr-button-neutral-bg-hover,var(--gr-secondary-hover))',
-    solidBackgroundActive: 'var(--gr-button-neutral-bg-active,var(--gr-secondary-active))',
-    solidForeground: 'var(--gr-button-neutral-fg,var(--gr-secondary-fg))',
+    solidBackground: 'var(--gr-button-neutral-bg)',
+    solidBackgroundHover: 'var(--gr-button-neutral-bg-hover)',
+    solidBackgroundActive: 'var(--gr-button-neutral-bg-active)',
+    solidForeground: 'var(--gr-button-neutral-fg)',
     accentText: 'var(--gr-fg)',
     softBackground: 'var(--gr-button-neutral-soft-bg)',
     softBackgroundHover: 'var(--gr-button-neutral-soft-bg-hover)',
     softBackgroundActive: 'var(--gr-button-neutral-soft-bg-active)',
+    ghostBackgroundHover: 'var(--gr-button-neutral-ghost-bg-hover)',
+    ghostBackgroundActive: 'var(--gr-button-neutral-ghost-bg-active)',
     softForeground: 'var(--gr-secondary-fg)',
     borderSoft: 'var(--gr-button-neutral-border)',
     border: 'var(--gr-button-neutral-border)',
-    borderHover: 'var(--gr-brd-hover,var(--gr-brd))',
-    borderActive: 'var(--gr-brd-active,var(--gr-brd))',
+    borderHover: 'var(--gr-brd-hover)',
+    borderActive: 'var(--gr-brd-active)',
   },
   success: {
-    solidBackground: 'var(--gr-button-success-bg,var(--gr-success))',
-    solidBackgroundHover: 'var(--gr-button-success-bg-hover,var(--gr-success-hover))',
-    solidBackgroundActive: 'var(--gr-button-success-bg-active,var(--gr-success-active))',
-    solidForeground: 'var(--gr-button-success-fg,var(--gr-success-fg,var(--gr-fg)))',
-    accentText: 'var(--gr-success-text,var(--gr-success))',
+    solidBackground: 'var(--gr-button-success-bg)',
+    solidBackgroundHover: 'var(--gr-button-success-bg-hover)',
+    solidBackgroundActive: 'var(--gr-button-success-bg-active)',
+    solidForeground: 'var(--gr-button-success-fg)',
+    accentText: 'var(--gr-success-text)',
     softBackground: 'var(--gr-button-success-soft-bg)',
     softBackgroundHover: 'var(--gr-button-success-soft-bg-hover)',
     softBackgroundActive: 'var(--gr-button-success-soft-bg-active)',
-    softForeground: 'var(--gr-success-text,var(--gr-success))',
+    ghostBackgroundHover: 'var(--gr-button-success-ghost-bg-hover)',
+    ghostBackgroundActive: 'var(--gr-button-success-ghost-bg-active)',
+    softForeground: 'var(--gr-success-text)',
     borderSoft: 'var(--gr-button-success-border-soft)',
     border: 'var(--gr-button-success-border)',
     borderHover: 'var(--gr-success)',
     borderActive: 'var(--gr-success-active)',
   },
   warning: {
-    solidBackground: 'var(--gr-button-warning-bg,var(--gr-warning))',
-    solidBackgroundHover: 'var(--gr-button-warning-bg-hover,var(--gr-warning-hover))',
-    solidBackgroundActive: 'var(--gr-button-warning-bg-active,var(--gr-warning-active))',
-    solidForeground: 'var(--gr-button-warning-fg,var(--gr-warning-fg,var(--gr-fg)))',
-    accentText: 'var(--gr-warning-text,var(--gr-warning))',
+    solidBackground: 'var(--gr-button-warning-bg)',
+    solidBackgroundHover: 'var(--gr-button-warning-bg-hover)',
+    solidBackgroundActive: 'var(--gr-button-warning-bg-active)',
+    solidForeground: 'var(--gr-button-warning-fg)',
+    accentText: 'var(--gr-warning-text)',
     softBackground: 'var(--gr-button-warning-soft-bg)',
     softBackgroundHover: 'var(--gr-button-warning-soft-bg-hover)',
     softBackgroundActive: 'var(--gr-button-warning-soft-bg-active)',
-    softForeground: 'var(--gr-warning-text,var(--gr-warning))',
+    ghostBackgroundHover: 'var(--gr-button-warning-ghost-bg-hover)',
+    ghostBackgroundActive: 'var(--gr-button-warning-ghost-bg-active)',
+    softForeground: 'var(--gr-warning-text)',
     borderSoft: 'var(--gr-button-warning-border-soft)',
     border: 'var(--gr-button-warning-border)',
     borderHover: 'var(--gr-warning)',
     borderActive: 'var(--gr-warning-active)',
   },
   danger: {
-    solidBackground: 'var(--gr-button-danger-bg,var(--gr-danger))',
-    solidBackgroundHover: 'var(--gr-button-danger-bg-hover,var(--gr-danger-hover))',
-    solidBackgroundActive: 'var(--gr-button-danger-bg-active,var(--gr-danger-active))',
-    solidForeground: 'var(--gr-button-danger-fg,var(--gr-danger-fg,var(--gr-fg)))',
-    accentText: 'var(--gr-danger-text,var(--gr-danger))',
+    solidBackground: 'var(--gr-button-danger-bg)',
+    solidBackgroundHover: 'var(--gr-button-danger-bg-hover)',
+    solidBackgroundActive: 'var(--gr-button-danger-bg-active)',
+    solidForeground: 'var(--gr-button-danger-fg)',
+    accentText: 'var(--gr-danger-text)',
     softBackground: 'var(--gr-button-danger-soft-bg)',
     softBackgroundHover: 'var(--gr-button-danger-soft-bg-hover)',
     softBackgroundActive: 'var(--gr-button-danger-soft-bg-active)',
-    softForeground: 'var(--gr-danger-text,var(--gr-danger))',
+    ghostBackgroundHover: 'var(--gr-button-danger-ghost-bg-hover)',
+    ghostBackgroundActive: 'var(--gr-button-danger-ghost-bg-active)',
+    softForeground: 'var(--gr-danger-text)',
     borderSoft: 'var(--gr-button-danger-border-soft)',
     border: 'var(--gr-button-danger-border)',
     borderHover: 'var(--gr-danger)',
     borderActive: 'var(--gr-danger-active)',
   },
   info: {
-    solidBackground: 'var(--gr-button-info-bg,var(--gr-info))',
-    solidBackgroundHover: 'var(--gr-button-info-bg-hover,var(--gr-info-hover))',
-    solidBackgroundActive: 'var(--gr-button-info-bg-active,var(--gr-info-active))',
-    solidForeground: 'var(--gr-button-info-fg,var(--gr-info-fg,var(--gr-fg)))',
-    accentText: 'var(--gr-info-text,var(--gr-info))',
+    solidBackground: 'var(--gr-button-info-bg)',
+    solidBackgroundHover: 'var(--gr-button-info-bg-hover)',
+    solidBackgroundActive: 'var(--gr-button-info-bg-active)',
+    solidForeground: 'var(--gr-button-info-fg)',
+    accentText: 'var(--gr-info-text)',
     softBackground: 'var(--gr-button-info-soft-bg)',
     softBackgroundHover: 'var(--gr-button-info-soft-bg-hover)',
     softBackgroundActive: 'var(--gr-button-info-soft-bg-active)',
-    softForeground: 'var(--gr-info-text,var(--gr-info))',
+    ghostBackgroundHover: 'var(--gr-button-info-ghost-bg-hover)',
+    ghostBackgroundActive: 'var(--gr-button-info-ghost-bg-active)',
+    softForeground: 'var(--gr-info-text)',
     borderSoft: 'var(--gr-button-info-border-soft)',
     border: 'var(--gr-button-info-border)',
     borderHover: 'var(--gr-info)',
     borderActive: 'var(--gr-info-active)',
   },
   slate: {
-    solidBackground: 'var(--gr-button-slate-bg,var(--gr-slate))',
-    solidBackgroundHover: 'var(--gr-button-slate-bg-hover,var(--gr-slate-hover))',
-    solidBackgroundActive: 'var(--gr-button-slate-bg-active,var(--gr-slate-active))',
-    solidForeground: 'var(--gr-button-slate-fg,var(--gr-slate-fg,var(--gr-fg)))',
-    accentText: 'var(--gr-slate-text,var(--gr-slate))',
+    solidBackground: 'var(--gr-button-slate-bg)',
+    solidBackgroundHover: 'var(--gr-button-slate-bg-hover)',
+    solidBackgroundActive: 'var(--gr-button-slate-bg-active)',
+    solidForeground: 'var(--gr-button-slate-fg)',
+    accentText: 'var(--gr-slate-text)',
     softBackground: 'var(--gr-button-slate-soft-bg)',
     softBackgroundHover: 'var(--gr-button-slate-soft-bg-hover)',
     softBackgroundActive: 'var(--gr-button-slate-soft-bg-active)',
-    softForeground: 'var(--gr-slate-text,var(--gr-slate))',
+    ghostBackgroundHover: 'var(--gr-button-slate-ghost-bg-hover)',
+    ghostBackgroundActive: 'var(--gr-button-slate-ghost-bg-active)',
+    softForeground: 'var(--gr-slate-text)',
     borderSoft: 'var(--gr-button-slate-border-soft)',
     border: 'var(--gr-button-slate-border)',
     borderHover: 'var(--gr-slate)',
     borderActive: 'var(--gr-slate-active)',
   },
   azure: {
-    solidBackground: 'var(--gr-button-azure-bg,var(--gr-azure))',
-    solidBackgroundHover: 'var(--gr-button-azure-bg-hover,var(--gr-azure-hover))',
-    solidBackgroundActive: 'var(--gr-button-azure-bg-active,var(--gr-azure-active))',
-    solidForeground: 'var(--gr-button-azure-fg,var(--gr-azure-fg,var(--gr-fg)))',
-    accentText: 'var(--gr-azure-text,var(--gr-azure))',
+    solidBackground: 'var(--gr-button-azure-bg)',
+    solidBackgroundHover: 'var(--gr-button-azure-bg-hover)',
+    solidBackgroundActive: 'var(--gr-button-azure-bg-active)',
+    solidForeground: 'var(--gr-button-azure-fg)',
+    accentText: 'var(--gr-azure-text)',
     softBackground: 'var(--gr-button-azure-soft-bg)',
     softBackgroundHover: 'var(--gr-button-azure-soft-bg-hover)',
     softBackgroundActive: 'var(--gr-button-azure-soft-bg-active)',
-    softForeground: 'var(--gr-azure-text,var(--gr-azure))',
+    ghostBackgroundHover: 'var(--gr-button-azure-ghost-bg-hover)',
+    ghostBackgroundActive: 'var(--gr-button-azure-ghost-bg-active)',
+    softForeground: 'var(--gr-azure-text)',
     borderSoft: 'var(--gr-button-azure-border-soft)',
     border: 'var(--gr-button-azure-border)',
     borderHover: 'var(--gr-azure)',
@@ -266,14 +283,15 @@ function withVar(token: string): string {
 }
 
 /**
- * Подложка прозрачных весов (`outline`, `ghost`, `ghost-border`) под указателем.
- * Токен тона они делят с плашкой `secondary`, поэтому оттенок, общий для всех
- * тонов («Глина» — оттенок бумаги), тема задаёт отдельным хуком, не трогая плашку.
+ * Подложка прозрачных весов (`outline`, `ghost`, `ghost-border`) под указателем:
+ * токен темы на тон, отдельный от плашки `secondary`, — тема задаёт оттенок, общий
+ * для всех тонов («Глина» — оттенок бумаги), не трогая плашку. Хук поверх — одна
+ * подложка на все тоны от приложения.
  */
 function transparentFill(tokens: GrButtonToneTokens): { hover: string, active: string } {
   return {
-    hover: `var(--gr-button-ghost-bg-hover,${tokens.softBackgroundHover})`,
-    active: `var(--gr-button-ghost-bg-active,${tokens.softBackgroundActive})`,
+    hover: `var(--gr-button-ghost-bg-hover,${tokens.ghostBackgroundHover})`,
+    active: `var(--gr-button-ghost-bg-active,${tokens.ghostBackgroundActive})`,
   }
 }
 

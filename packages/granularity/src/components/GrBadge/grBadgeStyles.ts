@@ -49,10 +49,10 @@ export const badgeIconSizeClassBySize: Record<GrBadgeSize, string> = {
 export const badgeIconClass = 'shrink-0'
 
 export const semiRadiusClassBySize: Record<GrBadgeSize, string> = {
-  xs: 'rounded-[var(--gr-badge-semi-radius-xs,3px)]',
-  sm: 'rounded-[var(--gr-badge-semi-radius-sm,3px)]',
-  md: 'rounded-[var(--gr-badge-semi-radius-md,5px)]',
-  lg: 'rounded-[var(--gr-badge-semi-radius-lg,7px)]',
+  xs: 'rounded-[var(--gr-badge-semi-radius-xs)]',
+  sm: 'rounded-[var(--gr-badge-semi-radius-sm)]',
+  md: 'rounded-[var(--gr-badge-semi-radius-md)]',
+  lg: 'rounded-[var(--gr-badge-semi-radius-lg)]',
 }
 export const lightToneClassByTone: Record<GrBadgeTone, string> = {
   neutral: 'bg-[var(--gr-muted)] text-[var(--gr-fg)] border-[var(--gr-brd)]',
@@ -81,14 +81,14 @@ export const lightToneClassByTone: Record<GrBadgeTone, string> = {
  */
 export const darkToneClassByTone: Record<GrBadgeTone, string> = {
   // Нейтральный вес — инверсия страницы, а не тон: `-solid`-роли у него нет.
-  neutral: 'bg-[var(--gr-badge-neutral-bg,var(--gr-fg))] text-[var(--gr-badge-neutral-fg,var(--gr-bg))] border-[color-mix(in_srgb,var(--gr-fg)_35%,var(--gr-brd))]',
-  primary: 'bg-[var(--gr-badge-primary-bg,var(--gr-primary-solid))] text-[var(--gr-badge-primary-fg,var(--gr-primary-solid-fg))] border-[var(--gr-badge-primary-bg,var(--gr-primary-solid))]',
-  success: 'bg-[var(--gr-badge-success-bg,var(--gr-success-solid))] text-[var(--gr-badge-success-fg,var(--gr-success-solid-fg))] border-[var(--gr-badge-success-bg,var(--gr-success-solid))]',
-  warning: 'bg-[var(--gr-badge-warning-bg,var(--gr-warning-solid))] text-[var(--gr-badge-warning-fg,var(--gr-warning-solid-fg))] border-[var(--gr-badge-warning-bg,var(--gr-warning-solid))]',
-  danger: 'bg-[var(--gr-badge-danger-bg,var(--gr-danger-solid))] text-[var(--gr-badge-danger-fg,var(--gr-danger-solid-fg))] border-[var(--gr-badge-danger-bg,var(--gr-danger-solid))]',
-  info: 'bg-[var(--gr-badge-info-bg,var(--gr-info-solid))] text-[var(--gr-badge-info-fg,var(--gr-info-solid-fg))] border-[var(--gr-badge-info-bg,var(--gr-info-solid))]',
-  slate: 'bg-[var(--gr-badge-slate-bg,var(--gr-slate-solid))] text-[var(--gr-badge-slate-fg,var(--gr-slate-solid-fg))] border-[var(--gr-badge-slate-bg,var(--gr-slate-solid))]',
-  azure: 'bg-[var(--gr-badge-azure-bg,var(--gr-azure-solid))] text-[var(--gr-badge-azure-fg,var(--gr-azure-solid-fg))] border-[var(--gr-badge-azure-bg,var(--gr-azure-solid))]',
+  neutral: 'bg-[var(--gr-badge-neutral-bg)] text-[var(--gr-badge-neutral-fg)] border-[color-mix(in_srgb,var(--gr-fg)_35%,var(--gr-brd))]',
+  primary: 'bg-[var(--gr-badge-primary-bg)] text-[var(--gr-badge-primary-fg)] border-[var(--gr-badge-primary-bg)]',
+  success: 'bg-[var(--gr-badge-success-bg)] text-[var(--gr-badge-success-fg)] border-[var(--gr-badge-success-bg)]',
+  warning: 'bg-[var(--gr-badge-warning-bg)] text-[var(--gr-badge-warning-fg)] border-[var(--gr-badge-warning-bg)]',
+  danger: 'bg-[var(--gr-badge-danger-bg)] text-[var(--gr-badge-danger-fg)] border-[var(--gr-badge-danger-bg)]',
+  info: 'bg-[var(--gr-badge-info-bg)] text-[var(--gr-badge-info-fg)] border-[var(--gr-badge-info-bg)]',
+  slate: 'bg-[var(--gr-badge-slate-bg)] text-[var(--gr-badge-slate-fg)] border-[var(--gr-badge-slate-bg)]',
+  azure: 'bg-[var(--gr-badge-azure-bg)] text-[var(--gr-badge-azure-fg)] border-[var(--gr-badge-azure-bg)]',
 }
 /**
  * Экспортируются ради `GrChip`: у чипа те же три радиуса и та же палитра тонов,

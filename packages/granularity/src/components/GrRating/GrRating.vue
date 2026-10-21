@@ -14,6 +14,7 @@ import {
   ratingSymbolClass,
   ratingTextSizeBySize,
   ratingVoidClass,
+  ratingVoidInvalidClass,
   type GrRatingSize,
   type GrRatingTone,
 } from './grRatingStyles'
@@ -317,7 +318,6 @@ function onKeydown(event: KeyboardEvent): void {
     ref="rootEl"
     data-gr-rating
     class="inline-flex items-center gap-2"
-    :style="isInvalid && !disabled ? { '--gr-rating-void-color': 'var(--gr-invalid-brd)' } : undefined"
     v-bind="aria.rootAttrs()"
   >
     <!-- Нативная форма: роль-виджет не labelable и в submit не попадает. -->
@@ -362,7 +362,7 @@ function onKeydown(event: KeyboardEvent): void {
         @mousemove="onSymbolMouseMove(index, $event)"
       >
         <!-- Нижний слой — «пустой» символ, поверх него обрезанный по ширине «залитый». -->
-        <span class="block h-full w-full" :class="ratingVoidClass" aria-hidden="true">
+        <span class="block h-full w-full" :class="isInvalid && !disabled ? ratingVoidInvalidClass : ratingVoidClass" aria-hidden="true">
           <slot name="symbol" :index="index" :filled="false">
             <component :is="iconTag(icon)" v-if="icon" class="block h-full w-full" :class="iconClass(icon)" />
             <svg v-else viewBox="0 0 24 24" fill="currentColor" class="block h-full w-full">

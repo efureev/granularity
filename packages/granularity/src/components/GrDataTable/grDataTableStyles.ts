@@ -56,9 +56,9 @@ export const columnDraggingClass = 'bg-[var(--gr-muted)]'
  * Место вставки — полоса по краю ячейки заголовка. Псевдоэлемент, а не свой
  * узел: `<th>` не терпит посторонних детей в раскладке таблицы.
  */
-export const columnDropBeforeClass = 'before:absolute before:inset-y-0 before:left-0 before:w-[var(--gr-datatable-drag-indicator-width,2px)] before:bg-[var(--gr-datatable-drag-indicator,var(--gr-primary))] before:content-empty'
+export const columnDropBeforeClass = 'before:absolute before:inset-y-0 before:left-0 before:w-[var(--gr-datatable-drag-indicator-width)] before:bg-[var(--gr-datatable-drag-indicator,var(--gr-primary))] before:content-empty'
 
-export const columnDropAfterClass = 'after:absolute after:inset-y-0 after:right-0 after:w-[var(--gr-datatable-drag-indicator-width,2px)] after:bg-[var(--gr-datatable-drag-indicator,var(--gr-primary))] after:content-empty'
+export const columnDropAfterClass = 'after:absolute after:inset-y-0 after:right-0 after:w-[var(--gr-datatable-drag-indicator-width)] after:bg-[var(--gr-datatable-drag-indicator,var(--gr-primary))] after:content-empty'
 
 /**
  * Подсветка выбранной строки. Живёт здесь, потому что закреплённой ячейке её
@@ -102,9 +102,9 @@ export const columnPinnedClass = 'sticky z-[2] bg-[var(--gr-card)]'
 export const columnPinnedHeadClass = 'sticky z-[2] bg-[var(--gr-muted)]'
 
 /** Граница группы закреплённых колонок — тень, а не рамка: рамка сдвигает сетку. */
-export const columnPinnedLeftEdgeClass = 'shadow-[var(--gr-datatable-pinned-shadow,4px_0_6px_-4px_rgba(0,0,0,0.25))]'
+export const columnPinnedLeftEdgeClass = 'shadow-[var(--gr-datatable-pinned-shadow)]'
 
-export const columnPinnedRightEdgeClass = 'shadow-[var(--gr-datatable-pinned-shadow-end,-4px_0_6px_-4px_rgba(0,0,0,0.25))]'
+export const columnPinnedRightEdgeClass = 'shadow-[var(--gr-datatable-pinned-shadow-end)]'
 
 /** Подпись колонки набирается мельче тела таблицы — она не данные, а навигация. */
 export const headerTextSizes: Record<GrDataTableSize, string> = {
@@ -165,9 +165,9 @@ export const sortIconSizes: Record<GrDataTableSize, GrComponentSize> = {
  * вложенное в строку, а не как следующая строка. Акцентная полоса слева
  * связывает деталь с её строкой, когда между ними уже прокрутили.
  */
-export const detailRowClass = 'bg-[var(--gr-datatable-detail-bg,color-mix(in_srgb,var(--gr-muted)_45%,transparent))]'
+export const detailRowClass = 'bg-[var(--gr-datatable-detail-bg)]'
 
-export const detailCellClass = 'border-t border-[var(--gr-brd)] border-l-2 border-l-[var(--gr-datatable-detail-accent,var(--gr-primary))]'
+export const detailCellClass = 'border-t border-[var(--gr-brd)] border-l-2 border-l-[var(--gr-datatable-detail-accent)]'
 
 /** Содержимое липнет к левому краю: иначе при горизонтальной прокрутке его не видно. */
 export const detailContentClass = 'sticky left-0'

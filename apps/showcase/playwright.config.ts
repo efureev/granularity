@@ -16,6 +16,9 @@ const PORT = Number(process.env.E2E_PORT ?? 4319)
 
 export default defineConfig({
   testDir: './e2e',
+  // Визуальный слой выключен решением владельца: эталоны не снимаются, пока он не
+  // скажет иначе. Включить — убрать строку и вернуть скрипты `test:visual`.
+  testIgnore: ['**/visual.spec.ts'],
   outputDir: './test-results',
   // Прогрев dev-сервера: пребандл зависимостей vite шлёт полную перезагрузку
   // страницы, и до этого шага она попадала на первые тесты — см. `global-setup.ts`.

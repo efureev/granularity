@@ -1,3 +1,6 @@
+import { createRequire } from 'node:module'
+import { dirname, join } from 'node:path'
+
 import { defineComponentTokensGate } from '@feugene/granularity-test-kit/gates'
 import { grDerivedTokens, grFoundationTokens, grRoleTokens } from '@feugene/granularity-tokens'
 
@@ -14,7 +17,14 @@ import { grDerivedTokens, grFoundationTokens, grRoleTokens } from '@feugene/gran
  *
  * `styles/` и `tokens/` из скана исключены: их генерируют реестр и данные тем
  * пакета `@feugene/granularity-tokens`, и литералы там — это они и есть.
+ *
+ * Значения компонентов живут в темах пакета токенов — разделом
+ * `components/@feugene/granularity/<GrX>/` исходника каждой темы; `themesDir` у
+ * компонентов нет. Токен темы компонент читает без запасного значения, а хук
+ * с литералом по умолчанию несёт причину `literal`.
  */
+const themesDir = join(dirname(createRequire(join(process.cwd(), 'package.json')).resolve('@feugene/granularity-tokens/package.json')), 'themes')
+
 defineComponentTokensGate({
   globalTokens: [...grFoundationTokens, ...grDerivedTokens, ...grRoleTokens],
   extraRegistries: ['composables'],
@@ -28,4 +38,9 @@ defineComponentTokensGate({
     GrProgressBar: '--gr-progress-',
     GrSortableList: '--gr-sortable-',
   },
+  themeSources: { themesDir, packageId: '@feugene/granularity' },
+  themeTokenFallback: true,
+  hookLiterals: true,
+  themesDirAbsent: true,
+  themeKindOnly: true,
 })

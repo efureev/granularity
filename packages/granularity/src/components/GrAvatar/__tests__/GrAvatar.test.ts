@@ -43,7 +43,7 @@ describe('GrAvatar', () => {
     expect(image.attributes('src')).toBe('/avatar.png')
     expect(image.attributes('alt')).toBe('Avatar')
     expect(image.attributes('class')).toContain('object-cover')
-    expect(wrapper.attributes('class')).toContain('rounded-[var(--gr-avatar-square-radius,10px)]')
+    expect(wrapper.attributes('class')).toContain('rounded-[var(--gr-avatar-square-radius)]')
     expect(wrapper.text()).not.toContain('AB')
   })
 
@@ -167,7 +167,7 @@ describe('GrAvatar — имя, статус и конфиг', () => {
       `,
     })
 
-    expect(mount(Harness).get('[data-gr-avatar]').classes()).toContain('rounded-[var(--gr-avatar-square-radius,10px)]')
+    expect(mount(Harness).get('[data-gr-avatar]').classes()).toContain('rounded-[var(--gr-avatar-square-radius)]')
   })
 
   it('initialsFrom — чистая функция', () => {
@@ -211,7 +211,7 @@ describe('GrAvatar — раскладка содержимого', () => {
 
     expect(withStatus.classes()).toContain('overflow-visible')
     expect(clipped.className).toContain('overflow-hidden')
-    expect(clipped.className).toContain('rounded-[var(--gr-avatar-square-radius,10px)]')
+    expect(clipped.className).toContain('rounded-[var(--gr-avatar-square-radius)]')
   })
 
   it('кегль считается от диаметра, а не наследуется от страницы', () => {
@@ -275,7 +275,7 @@ describe('GrAvatarGroup', () => {
     const first = wrapper.findAll('[data-gr-avatar]')[0]
 
     expect(first.attributes('style')).toContain('width: 24px')
-    expect(first.classes()).toContain('rounded-[var(--gr-avatar-square-radius,10px)]')
+    expect(first.classes()).toContain('rounded-[var(--gr-avatar-square-radius)]')
   })
 
   // Разные кегли в одном ряду читались бы как сбой: формула обязана быть общей.

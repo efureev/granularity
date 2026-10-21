@@ -186,7 +186,7 @@ export const themeVarsByName = Object.fromEntries(THEME_MODES.map(key => [key, t
 /** Производные формулы (`--gr-primary-hover` и т.п.) — из реестра пакета токенов. */
 export const derivedThemeVars: Record<string, string> = Object.fromEntries(grDerivedTokens.map(token => [token.name, token.formula]))
 
-/** Токены компонента в режиме темы — `components/GrX/themes/<тема>/` по правилу granum. */
+/** Токены компонента в режиме темы — раздел `components` данных темы, по правилу granum. */
 export function readComponentThemeVars(component: string, key: GrModeName): Record<string, string> {
   return componentThemeVars(component, key)
 }

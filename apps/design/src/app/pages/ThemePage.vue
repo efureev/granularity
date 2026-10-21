@@ -9,7 +9,7 @@ import ColorSwatch from '../parts/ColorSwatch.vue'
 import DocSection from '../parts/DocSection.vue'
 import PageHeader from '../parts/PageHeader.vue'
 import ThemeIslands from '../parts/ThemeIslands.vue'
-import { findDesignTheme, islandTheme, THEME_BUILD_LABEL } from '../themes'
+import { findDesignTheme, islandTheme, THEME_BUILD_LABEL, themeLineage, themeTargets } from '../themes'
 import NotFoundPage from './NotFoundPage.vue'
 
 const route = useRoute()
@@ -71,8 +71,14 @@ const periods = [
         <GrBadge tone="neutral" size="sm">
           <code class="font-[var(--gr-font-mono)]">{ theme: '{{ theme.entry.id }}' }</code>
         </GrBadge>
-        <GrBadge v-if="theme.entry.extends" tone="neutral" size="sm">
-          поверх «{{ theme.entry.extends }}»
+        <GrBadge v-if="theme.entry.version" tone="neutral" size="sm">
+          версия {{ theme.entry.version }}
+        </GrBadge>
+        <GrBadge tone="neutral" size="sm">
+          {{ themeLineage(theme.entry) }}
+        </GrBadge>
+        <GrBadge v-for="target in themeTargets(theme.entry)" :key="target" tone="neutral" size="sm">
+          для <code class="font-[var(--gr-font-mono)]">{{ target }}</code>
         </GrBadge>
         <GrLink v-if="theme.entry.docs" :href="theme.entry.docs" class="ms-1 text-[length:var(--gr-text-sm)]">
           {{ theme.entry.docs }}

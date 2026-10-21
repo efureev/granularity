@@ -24,9 +24,9 @@ describe('GrRadio (button)', () => {
 
     expect(btn.attributes('class')).toContain('inline-flex')
     expect(btn.attributes('class')).toContain('items-center')
-    expect(btn.attributes('class')).toContain('rounded-ss-[var(--gr-button-radius-ss,var(--gr-button-radius,0.375rem))]')
+    expect(btn.attributes('class')).toContain('rounded-ss-[var(--gr-button-radius-ss,var(--gr-button-radius))]')
     expect(btn.attributes('class')).toContain('h-11')
-    expect(btn.attributes('class')).toContain('bg-[var(--gr-button-primary-bg,var(--gr-primary))]')
+    expect(btn.attributes('class')).toContain('bg-[var(--gr-button-primary-bg)]')
   })
 
   // См. GrRadiobox.test.ts: в button-режиме тот же контракт — никакого вложенного

@@ -1,8 +1,12 @@
 import { grThemeCatalog } from './generated'
 import type { GrColorScheme } from './types'
 
-/** Тема каталога, которую берёт сборка без `theme` в конфиге granum. */
-export const GR_DEFAULT_THEME_ID = 'slate'
+/**
+ * Базовая тема пакета: с ней компоненты выпускаются и показываются в доке, её
+ * значения пакет держит полными. Основной тему сборки делает не пакет, а
+ * приложение — `default: true` в `themes` своего конфига.
+ */
+export const GR_BASE_THEME_ID = 'slate'
 
 export interface GrThemeManifestMode {
   readonly name: string
@@ -37,7 +41,7 @@ export interface GrThemeManifest {
  * Приложение на granum берёт манифест из `virtual:granum/themes`: там пары тех
  * тем и того набора режимов, что попали в его CSS.
  */
-export function grThemeManifest(id: string = GR_DEFAULT_THEME_ID): GrThemeManifest {
+export function grThemeManifest(id: string = GR_BASE_THEME_ID): GrThemeManifest {
   const entry = grThemeCatalog.find(theme => theme.id === id)
   if (!entry)
     throw new Error(`grThemeManifest: темы "${id}" нет в каталоге — есть ${grThemeCatalog.map(theme => theme.id).join(', ')}`)

@@ -1,0 +1,16 @@
+{
+  "gr-badge-azure-bg": "var(--gr-azure-text)",
+  "gr-badge-azure-fg": "var(--gr-card)",
+  "gr-badge-danger-bg": "var(--gr-danger-solid)",
+  "gr-badge-danger-fg": "var(--gr-danger-solid-fg)",
+  "gr-badge-info-bg": "var(--gr-info-solid)",
+  "gr-badge-info-fg": "var(--gr-info-solid-fg)",
+  "gr-badge-primary-bg": "var(--gr-primary-text)",
+  "gr-badge-primary-fg": "var(--gr-card)",
+  "gr-badge-slate-bg": "var(--gr-slate-solid)",
+  "gr-badge-slate-fg": "var(--gr-slate-solid-fg)",
+  "gr-badge-success-bg": "var(--gr-success-text)",
+  "gr-badge-success-fg": "var(--gr-card)",
+  "gr-badge-warning-bg": "var(--gr-warning-text)",
+  "gr-badge-warning-fg": "var(--gr-card)"
+}

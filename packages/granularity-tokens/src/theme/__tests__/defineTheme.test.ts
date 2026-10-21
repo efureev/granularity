@@ -1,4 +1,4 @@
-import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs'
+import { mkdirSync, mkdtempSync, readdirSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
 
@@ -44,9 +44,12 @@ describe('defineTheme: slate', () => {
     }
   })
 
-  it('`sources` называет все прочитанные файлы', () => {
-    expect(slate.sources.map(path => path.slice(slateDir.length + 1)).sort())
-      .toEqual(['modes/dark.json', 'modes/light.json', 'root.json', 'theme.json'])
+  it('`sources` называет все прочитанные файлы — и раздела компонентов, кроме пояснений', () => {
+    const files = (readdirSync(slateDir, { recursive: true }) as string[])
+      .filter(file => /\.(?:json|css)$/.test(file) && !['notes.json', 'theme.lock.json'].includes(file))
+      .sort()
+    expect(files).toEqual(expect.arrayContaining(['modes/dark.json', 'modes/light.json', 'root.json', 'theme.json', 'components/@feugene/granularity/GrButton/root.json']))
+    expect(slate.sources.map(path => path.slice(slateDir.length + 1)).sort()).toEqual(files)
   })
 })
 
@@ -136,9 +139,9 @@ describe('defineTheme: наследование', () => {
   it('loadTheme находит встроенную тему-базу по id и отдаёт файлы обеих в `sources`', () => {
     const dir = join(mkdtempSync(join(tmpdir(), 'gr-theme-')), 'brand')
     mkdirSync(join(dir, 'modes'), { recursive: true })
-    writeFileSync(join(dir, 'theme.json'), JSON.stringify({ id: 'brand', title: 'Бренд', extends: 'slate' }))
+    writeFileSync(join(dir, 'theme.json'), JSON.stringify({ id: 'brand', title: 'Бренд', extends: 'slate', modes: { dark: {}, dim: { extends: 'dark' } } }))
     writeFileSync(join(dir, 'modes/dark.json'), JSON.stringify({ 'gr-primary': '#a5b4fc' }))
-    writeFileSync(join(dir, 'modes/dim.json'), JSON.stringify({ extends: 'dark', tokens: { 'gr-bg': '#1e293b' } }))
+    writeFileSync(join(dir, 'modes/dim.json'), JSON.stringify({ 'gr-bg': '#1e293b' }))
 
     const brand = loadTheme(dir, { validate: false })
 
@@ -191,5 +194,87 @@ describe('validateTheme: производное, переопределённо�
     }
 
     expect(validateTheme({ name: 'light', tokens: own }).filter(issue => issue.token === '--gr-primary-fg')).toEqual([])
+  })
+})
+
+describe('defineTheme: значения компонентов, версия и целевые пакеты', () => {
+  const UI = '@feugene/granularity'
+  const base = defineTheme({
+    ...source,
+    version: '1.0.0',
+    targets: { [UI]: '^3.0.0' },
+    components: { [UI]: { GrCard: { root: { 'gr-card-pad': '4px' }, modes: { light: { 'gr-card-bg': '#fff' } } } } },
+  }, { validate: false })
+
+  it('раздел, версия и targets — в данных темы', () => {
+    expect(base.version).toBe('1.0.0')
+    expect(base.targets).toEqual({ [UI]: '^3.0.0' })
+    expect(base.components?.[UI]?.GrCard).toEqual({ root: { 'gr-card-pad': '4px' }, modes: { light: { 'gr-card-bg': '#fff' } } })
+  })
+
+  it('наследник: раздел сливается по токену, targets — по пакету, версия только своя', () => {
+    const heir = defineTheme({
+      id: 'heir',
+      title: 'Наследник',
+      extends: 'slate',
+      targets: { '@feugene/granularity-charts': '^2.0.0' },
+      components: {
+        [UI]: { GrCard: { modes: { dark: { 'gr-card-bg': '#000' } } } },
+        '@feugene/granularity-charts': { GrChart: { root: { 'gr-chart-gap': '2px' } } },
+      },
+    }, { validate: false, themes: { slate: base } })
+
+    expect(heir.version).toBeUndefined()
+    expect(heir.targets).toEqual({ [UI]: '^3.0.0', '@feugene/granularity-charts': '^2.0.0' })
+    expect(heir.components?.[UI]?.GrCard).toEqual({ root: { 'gr-card-pad': '4px' }, modes: { light: { 'gr-card-bg': '#fff' }, dark: { 'gr-card-bg': '#000' } } })
+    expect(heir.components?.['@feugene/granularity-charts']?.GrChart).toEqual({ root: { 'gr-chart-gap': '2px' } })
+  })
+
+  it('значение компонента в режиме, которого у темы нет, — ошибка', () => {
+    const run = (): unknown => defineTheme({ ...source, components: { [UI]: { GrCard: { modes: { dim: { 'gr-card-bg': '#111' } } } } } }, { validate: false })
+    expect(codeOf(run)).toBe('mode-extends-unresolved')
+    expect(run).toThrow(/GrCard → dim/)
+  })
+
+  it('ключ раздела с `--` — ошибка, как у токенов темы', () => {
+    expect(codeOf(() => defineTheme({ ...source, components: { [UI]: { GrCard: { root: { '--gr-card-pad': '4px' } } } } }, { validate: false }))).toBe('unknown-token')
+  })
+
+  it('расширения других потребителей переходят как есть, `componentDefaults` — в `extensions.granularity`', () => {
+    const theme = defineTheme({ ...source, extensions: { acme: { density: 'compact' } }, componentDefaults: { GrButton: { loadingIndicator: 'shimmer' } } }, { validate: false })
+    expect(theme.extensions).toEqual({ acme: { density: 'compact' }, granularity: { componentDefaults: { GrButton: { loadingIndicator: 'shimmer' } } } })
+  })
+})
+
+describe('readThemeSource: исходник темы granum', () => {
+  function themeDir(themeJson: Record<string, unknown>, files: Record<string, unknown> = {}): string {
+    const dir = join(mkdtempSync(join(tmpdir(), 'gr-theme-')), 'own')
+    mkdirSync(dir, { recursive: true })
+    writeFileSync(join(dir, 'theme.json'), JSON.stringify(themeJson))
+    for (const [path, content] of Object.entries(files)) {
+      mkdirSync(join(dir, path, '..'), { recursive: true })
+      writeFileSync(join(dir, path), JSON.stringify(content))
+    }
+    return dir
+  }
+
+  it('`componentDefaults` — из `extensions.granularity`, раздел компонентов — из `components/`', () => {
+    const { input } = readThemeSource(themeDir(
+      { id: 'own', title: 'Своя', extends: 'slate', targets: { '@feugene/granularity': '^3.0.0' }, modes: { light: {} }, extensions: { granularity: { componentDefaults: { GrButton: { loadingIndicator: 'shimmer' } } } } },
+      { 'components/@feugene/granularity/GrCard/root.json': { 'gr-card-pad': '4px' }, 'notes.json': { why: 'пояснение' } },
+    ))
+    expect(input.componentDefaults).toEqual({ GrButton: { loadingIndicator: 'shimmer' } })
+    expect(input.extensions).toBeUndefined()
+    expect(input.components).toEqual({ '@feugene/granularity': { GrCard: { root: { 'gr-card-pad': '4px' } } } })
+  })
+
+  it('фолбэки режима в исходнике — ошибка: их считает сборка темы', () => {
+    const dir = themeDir({ id: 'own', title: 'Своя', extends: 'slate', modes: { light: { fallbacks: [{ supports: 'x', tokens: { 'gr-primary-hover': '#000' } }] } } })
+    expect(codeOf(() => readThemeSource(dir))).toBe('unknown-token')
+  })
+
+  it('посторонний файл — ошибка загрузчика granum, а не пропуск', () => {
+    const dir = themeDir({ id: 'own', title: 'Своя', extends: 'slate' }, { 'palette.json': { a: 1 } })
+    expect(() => readThemeSource(dir)).toThrow(/unexpected entry/)
   })
 })

@@ -1,6 +1,5 @@
 import { defineGranumProvider } from '@feugene/granum/contract'
 import { grThemeCatalog } from './generated'
-import { GR_DEFAULT_THEME_ID } from './manifest'
 
 export const GRANULARITY_TOKENS_PROVIDER_ID = '@feugene/granularity-tokens'
 
@@ -8,6 +7,8 @@ export const GRANULARITY_TOKENS_PROVIDER_ID = '@feugene/granularity-tokens'
  * Провайдер granum без компонентов — владелец каталога тем (C-32). Пути — от
  * корня раскладки `dist`: данные тем, реестр и формулы генератор кладёт
  * в `generated/`, а плагин сборки проверяет их по реестру и копирует в `dist`.
+ * Темы по умолчанию у каталога нет: основную тему выбирает приложение, и сборка
+ * без `themes` называет темы каталога ошибкой granum.
  */
 export const granularityTokensProvider = defineGranumProvider({
   id: GRANULARITY_TOKENS_PROVIDER_ID,
@@ -16,7 +17,6 @@ export const granularityTokensProvider = defineGranumProvider({
   theme: {
     tokensCss: 'tokens.css',
     registry: 'themes/registry.json',
-    defaultTheme: GR_DEFAULT_THEME_ID,
     catalog: Object.fromEntries(grThemeCatalog.map(theme => [theme.id, {
       title: theme.title,
       ...(theme.description !== undefined ? { description: theme.description } : {}),

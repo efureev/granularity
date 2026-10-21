@@ -1154,7 +1154,10 @@ export const grThemeCatalog: GrThemeCatalogEntry[] = [
     "title": "Глина",
     "description": "Тёплая бумага, графитовые чернила и одна глиняная точка на экран.",
     "docs": "https://granularity.tech/themes/clay",
-    "extends": "slate",
+    "version": "1.0.0",
+    "targets": {
+      "@feugene/granularity": "^3.0.0"
+    },
     "defaultMode": "light",
     "modes": [
       {
@@ -1174,6 +1177,10 @@ export const grThemeCatalog: GrThemeCatalogEntry[] = [
     "title": "Сланец",
     "description": "Холодные нейтрали шкалы slate, индиго-акцент и контраст, выверенный по AA в обоих режимах.",
     "docs": "https://granularity.tech/themes/slate",
+    "version": "1.0.0",
+    "targets": {
+      "@feugene/granularity": "^3.0.0"
+    },
     "defaultMode": "light",
     "modes": [
       {

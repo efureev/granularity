@@ -100,7 +100,7 @@ defineSlots<{
  * неё, поэтому шкала настраивается темой, а не пропами разметки.
  */
 :where(.gr-icon) {
-  --gr-icon-size: var(--gr-icon-size-md, 18px);
+  --gr-icon-size: var(--gr-icon-size-md);
   width: var(--gr-icon-size);
   min-width: var(--gr-icon-size);
   height: var(--gr-icon-size);

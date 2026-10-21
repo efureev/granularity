@@ -77,7 +77,7 @@ describe('invalid виден глазом', () => {
   it('GrRating: пустые символы', () => {
     const wrapper = mount(GrRating, { props: { modelValue: 0, invalid: true, ariaLabel: 'Оценка' }, global: granularityGlobal() })
 
-    expect(wrapper.get('[data-gr-rating]').attributes('style')).toContain(`--gr-rating-void-color: ${INVALID}`)
+    expect(wrapper.get('[data-gr-rating-symbol] > span').classes()).toContain(`text-[${INVALID}]`)
   })
 
   it('GrTransfer: рамка списка выбранного', () => {

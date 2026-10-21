@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "type": "module",
   "dependencies": {
-    "@feugene/granularity": "^2.0.0",
+    "@feugene/granularity": "^3.0.0",
     "@feugene/granularity-charts": "^2.0.0",
     "@feugene/granularity-chrono": "^2.0.0",
     "@feugene/granularity-code": "^2.0.0",
@@ -16,8 +16,8 @@
     "vue": "^3.5.42"
   },
   "devDependencies": {
-    "@feugene/granum": "^3.9.0",
-    "@feugene/granum-engine-wind": "^3.9.0",
+    "@feugene/granum": "^3.10.0",
+    "@feugene/granum-engine-wind": "^3.10.0",
     "@tiptap/core": "^3.30.5",
     "@tiptap/extensions": "^3.30.5",
     "@tiptap/pm": "^3.30.5",

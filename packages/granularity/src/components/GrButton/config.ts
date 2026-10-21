@@ -4,5 +4,4 @@ import { grButtonSafelist } from './safelist'
 export const grButtonConfig = defineGranumComponent(import.meta.url, {
   name: 'GrButton',
   safelist: grButtonSafelist,
-  themesDir: './themes',
 })

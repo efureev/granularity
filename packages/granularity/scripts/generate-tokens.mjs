@@ -67,6 +67,7 @@ function renderTs(components) {
     kind: token.kind,
     default: token.default,
     description: token.description,
+    ...(token.literal !== undefined ? { literal: token.literal } : {}),
   })))
 
   return [
@@ -110,10 +111,10 @@ function renderDocs(components) {
     '',
     '| Значение | Что это значит |',
     '| --- | --- |',
-    '| тема компонента | объявлен в `components/<Gr…>/themes/<тема>/` (`root.json`, `modes/<режим>.json`), переключается вместе с режимом |',
+    '| тема компонента | значение даёт каждая тема — раздел `components/@feugene/granularity/<Gr…>/` её исходника (`root.json`, `modes/<режим>.json`); компонент читает токен без запасного значения, нехватку называет `granum doctor` |',
     '| CSS компонента | объявлен в собственном `<style>` компонента |',
     '| инлайн-стиль | компонент присваивает его сам, обычно от ступени `size` |',
-    '| только хук | нигде не присваивается: работает дефолт из `var(--gr-x, дефолт)` |',
+    '| только хук | ручка приложения: тема его не задаёт, работает дефолт из `var(--gr-x, дефолт)` — ссылка на токен либо литерал механики с причиной |',
     '',
   ]
 
@@ -123,7 +124,8 @@ function renderDocs(components) {
 
     for (const token of registry.tokens) {
       const kind = COMPONENT_KIND_LABEL[token.kind] ?? token.kind
-      lines.push(`| \`${token.name}\` | ${kind} | ${token.default} | ${token.description} |`)
+      const literal = token.literal !== undefined ? ` Литерал по умолчанию — механика: ${token.literal}` : ''
+      lines.push(`| \`${token.name}\` | ${kind} | ${token.default} | ${token.description}${literal} |`)
     }
 
     lines.push('')

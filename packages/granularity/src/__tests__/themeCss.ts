@@ -1,9 +1,9 @@
 import { execFileSync } from 'node:child_process'
-import { existsSync, readdirSync, readFileSync } from 'node:fs'
+import { readFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
-import { join, resolve } from 'node:path'
+import { join } from 'node:path'
 
-import { GR_DEFAULT_THEME_ID, grThemeCatalog, resolveModes, type GrColorScheme, type GrThemeData } from '@feugene/granularity-tokens'
+import { GR_BASE_THEME_ID, grThemeCatalog, resolveModes, type GrColorScheme, type GrThemeData } from '@feugene/granularity-tokens'
 
 import type { GrModeName, GrThemeId } from '../composables/useTheme'
 
@@ -11,9 +11,9 @@ import type { GrModeName, GrThemeId } from '../composables/useTheme'
  * Темы в тестах ядра — данными и готовым CSS, по всем темам каталога и всем их
  * режимам: набор держит каталог пакета токенов, а не тест.
  *
- * Данные: значения ролей — из пакета токенов, токены компонентов — из
- * `GrX/themes/<тема>/` по правилу granum (A-24): режим, его цепочка `extends`,
- * затем режим по умолчанию — снаружи, цепочка тем — внутри. CSS — тот, что
+ * Данные — из пакета токенов: роли и значения компонентов (раздел `components`
+ * темы) по правилу granum: режим, его цепочка `extends`, затем режим по
+ * умолчанию. Наследование тем в данных уже раскрыто. CSS — тот, что
  * получает потребитель без granum (`scripts/theme-css.mjs`): jsdom считает по
  * нему каскад и наследование.
  *
@@ -24,7 +24,7 @@ const requireFromPackage = createRequire(join(pkgDir, 'package.json'))
 
 type TokenMap = Record<string, string>
 
-export const DEFAULT_THEME: GrThemeId = GR_DEFAULT_THEME_ID
+export const DEFAULT_THEME: GrThemeId = GR_BASE_THEME_ID
 
 export const THEMES: readonly GrThemeId[] = grThemeCatalog.map(entry => entry.id)
 
@@ -65,15 +65,6 @@ function catalogEntry(theme: GrThemeId) {
     throw new Error(`нет темы "${theme}" в каталоге`)
 
   return entry
-}
-
-/** Тема и её предки по `extends` каталога, ближайшая первой. */
-function themeChain(theme: GrThemeId): GrThemeId[] {
-  const chain: GrThemeId[] = []
-  for (let id: GrThemeId | undefined = theme; id !== undefined; id = catalogEntry(id).extends)
-    chain.push(id)
-
-  return chain
 }
 
 const dataCache = new Map<GrThemeId, GrThemeData>()
@@ -140,40 +131,26 @@ function modeSequence(theme: GrThemeId, mode: GrModeName): GrModeName[] {
   return sequence
 }
 
-function readJson(path: string): TokenMap | undefined {
-  if (!existsSync(path))
-    return undefined
+const PACKAGE_ID = '@feugene/granularity'
 
-  return Object.fromEntries(Object.entries(JSON.parse(readFileSync(path, 'utf8')) as TokenMap).filter(([name]) => !name.startsWith('$')))
+function componentValues(component: string, theme: GrThemeId) {
+  return themeData(theme).components?.[PACKAGE_ID]?.[component]
 }
 
-const componentDir = (component: string, theme: GrThemeId): string => resolve(pkgDir, 'src/components', component, 'themes', theme)
-
-/**
- * Токены компонента в режиме темы. Обход в обратном порядке с перезаписью даёт
- * «первое найденное» правила A-24: ближайший режим, внутри него — ближайшая тема.
- */
+/** Токены компонента в режиме темы: `root` раздела, затем ближайший режим цепочки. */
 export function componentThemeVars(component: string, key: string): TokenMap {
   const { theme, mode } = themeModeOf(key)
-  const chain = themeChain(theme)
-  const root: TokenMap = {}
+  const values = componentValues(component, theme)
   const modes: TokenMap = {}
+  for (const name of modeSequence(theme, mode).reverse())
+    Object.assign(modes, values?.modes?.[name])
 
-  for (const id of [...chain].reverse())
-    Object.assign(root, readJson(join(componentDir(component, id), 'root.json')))
-  for (const name of modeSequence(theme, mode).reverse()) {
-    for (const id of [...chain].reverse())
-      Object.assign(modes, readJson(join(componentDir(component, id), 'modes', `${name}.json`)))
-  }
-
-  return { ...withDashes(root), ...withDashes(modes) }
+  return { ...withDashes(values?.root), ...withDashes(modes) }
 }
 
-/** Компоненты со своими значениями хотя бы для одной темы. */
+/** Компоненты со своими значениями хотя бы в одной теме каталога. */
 export function themedComponents(): string[] {
-  const dir = resolve(pkgDir, 'src/components')
-
-  return readdirSync(dir).filter(name => existsSync(join(dir, name, 'themes'))).sort()
+  return [...new Set(THEMES.flatMap(theme => Object.keys(themeData(theme).components?.[PACKAGE_ID] ?? {})))].sort()
 }
 
 /** Токены компонентов темы, значение которых хотя бы в одном её режиме ссылается на `var()`. */

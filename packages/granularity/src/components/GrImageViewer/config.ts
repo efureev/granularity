@@ -12,5 +12,4 @@ export const grImageViewerConfig = defineGranumComponent(import.meta.url, {
   dynamicTokens: ['gr-z-modal'],
   dependencies: ['GrIcon'],
   safelist: grImageViewerSafelist,
-  themesDir: './themes',
 })

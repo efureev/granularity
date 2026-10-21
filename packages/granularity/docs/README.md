@@ -11,7 +11,7 @@
 ## С чего начать
 
 - Если нужен быстрый старт: откройте [`installation.md`](./installation.md).
-- Если переезжаете с 1.x: откройте [`migration-2.md`](./migration-2.md).
+- Если переезжаете с 2.x: откройте [`migration-3.md`](./migration-3.md); с 1.x — сначала [`migration-2.md`](./migration-2.md).
 - Если нужно понять, что такое тема и режим и чем они различаются: откройте
   [`concepts.md`](../../granularity-tokens/docs/concepts.md) пакета токенов.
 - Если нужен каркас приложения целиком — SPA или SSR: откройте [`getting-started.md`](./getting-started.md).
@@ -39,6 +39,7 @@
 ## Карта документации
 
 - [`installation.md`](./installation.md) — установка, public entrypoint-ы, quick start и выбор стратегии подключения.
+- [`migration-3.md`](./migration-3.md) — переезд с 2.x: `themes` обязателен, формат исходника темы, токены компонентов, ставшие видом `theme`, хуки в темах.
 - [`migration-2.md`](./migration-2.md) — переезд с 1.x: конфиг granum, `useTheme`, селекторы режимов, `GrConfigProvider mode`, подпути CSS и импорты.
 - [`getting-started.md`](./getting-started.md) — приложение с нуля: полные каркасы SPA и SSR, подключение
   локализации и остальных пакетов семейства.

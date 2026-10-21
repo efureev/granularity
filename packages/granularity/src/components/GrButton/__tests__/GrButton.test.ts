@@ -71,8 +71,8 @@ describe('GrButton', () => {
 
     expect(button.attributes('data-gr-variant')).toBe('primary')
     expect(button.attributes('data-gr-tone')).toBe('primary')
-    expect(button.classes()).toContain('bg-[var(--gr-button-primary-bg,var(--gr-primary))]')
-    expect(button.classes()).toContain('text-[var(--gr-button-primary-fg,var(--gr-primary-fg))]')
+    expect(button.classes()).toContain('bg-[var(--gr-button-primary-bg)]')
+    expect(button.classes()).toContain('text-[var(--gr-button-primary-fg)]')
   })
 
   it('поддерживает semantic tone для filled tone', () => {
@@ -90,10 +90,10 @@ describe('GrButton', () => {
 
     expect(button.attributes('data-gr-variant')).toBe('primary')
     expect(button.attributes('data-gr-tone')).toBe('success')
-    expect(button.classes()).toContain('bg-[var(--gr-button-success-bg,var(--gr-success))]')
-    expect(button.classes()).toContain('text-[var(--gr-button-success-fg,var(--gr-success-fg,var(--gr-fg)))]')
-    expect(button.classes()).toContain('hover:bg-[var(--gr-button-success-bg-hover,var(--gr-success-hover))]')
-    expect(button.classes()).toContain('active:bg-[var(--gr-button-success-bg-active,var(--gr-success-active))]')
+    expect(button.classes()).toContain('bg-[var(--gr-button-success-bg)]')
+    expect(button.classes()).toContain('text-[var(--gr-button-success-fg)]')
+    expect(button.classes()).toContain('hover:bg-[var(--gr-button-success-bg-hover)]')
+    expect(button.classes()).toContain('active:bg-[var(--gr-button-success-bg-active)]')
   })
 
   it('поддерживает tone-aware outline tone', () => {
@@ -112,12 +112,12 @@ describe('GrButton', () => {
 
     expect(button.attributes('data-gr-variant')).toBe('outline')
     expect(button.attributes('data-gr-tone')).toBe('warning')
-    expect(button.classes()).toContain('text-[var(--gr-warning-text,var(--gr-warning))]')
+    expect(button.classes()).toContain('text-[var(--gr-warning-text)]')
     expect(button.classes()).toContain('border-[var(--gr-button-warning-border)]')
     expect(className).toContain('hover:border-[var(--gr-warning)]')
-    expect(className).toContain('hover:bg-[var(--gr-button-ghost-bg-hover,var(--gr-button-warning-soft-bg-hover))]')
-    expect(className).toContain('active:bg-[var(--gr-button-ghost-bg-active,var(--gr-button-warning-soft-bg-active))]')
-    expect(className).toContain('hover:active:bg-[var(--gr-button-ghost-bg-active,var(--gr-button-warning-soft-bg-active))]')
+    expect(className).toContain('hover:bg-[var(--gr-button-ghost-bg-hover,var(--gr-button-warning-ghost-bg-hover))]')
+    expect(className).toContain('active:bg-[var(--gr-button-ghost-bg-active,var(--gr-button-warning-ghost-bg-active))]')
+    expect(className).toContain('hover:active:bg-[var(--gr-button-ghost-bg-active,var(--gr-button-warning-ghost-bg-active))]')
   })
 
   it('поддерживает новые semantic tones slate и azure', () => {
@@ -142,14 +142,14 @@ describe('GrButton', () => {
     }).get('[data-gr-button]')
 
     expect(slate.attributes('data-gr-tone')).toBe('slate')
-    expect(slate.classes()).toContain('bg-[var(--gr-button-slate-bg,var(--gr-slate))]')
-    expect(slate.classes()).toContain('text-[var(--gr-button-slate-fg,var(--gr-slate-fg,var(--gr-fg)))]')
-    expect(slate.classes()).toContain('hover:bg-[var(--gr-button-slate-bg-hover,var(--gr-slate-hover))]')
+    expect(slate.classes()).toContain('bg-[var(--gr-button-slate-bg)]')
+    expect(slate.classes()).toContain('text-[var(--gr-button-slate-fg)]')
+    expect(slate.classes()).toContain('hover:bg-[var(--gr-button-slate-bg-hover)]')
 
     const azureClassName = azure.attributes('class') ?? ''
     expect(azure.attributes('data-gr-tone')).toBe('azure')
-    expect(azure.classes()).toContain('text-[var(--gr-azure-text,var(--gr-azure))]')
-    expect(azureClassName).toContain('hover:bg-[var(--gr-button-ghost-bg-hover,var(--gr-button-azure-soft-bg-hover))]')
+    expect(azure.classes()).toContain('text-[var(--gr-azure-text)]')
+    expect(azureClassName).toContain('hover:bg-[var(--gr-button-ghost-bg-hover,var(--gr-button-azure-ghost-bg-hover))]')
     expect(azureClassName).toContain('hover:active:border-[var(--gr-azure-active)]')
   })
 
@@ -173,14 +173,14 @@ describe('GrButton', () => {
       square: false,
     })
 
-    expect(filled).toContain('hover:active:bg-[var(--gr-button-info-bg-active,var(--gr-info-active))]')
-    expect(filled).toContain('hover:active:border-[var(--gr-button-info-bg-active,var(--gr-info-active))]')
+    expect(filled).toContain('hover:active:bg-[var(--gr-button-info-bg-active)]')
+    expect(filled).toContain('hover:active:border-[var(--gr-button-info-bg-active)]')
 
-    expect(ghost).toContain('hover:bg-[var(--gr-button-ghost-bg-hover,var(--gr-button-info-soft-bg-hover))]')
-    expect(ghost).toContain('active:bg-[var(--gr-button-ghost-bg-active,var(--gr-button-info-soft-bg-active))]')
-    expect(ghost).toContain('hover:active:bg-[var(--gr-button-ghost-bg-active,var(--gr-button-info-soft-bg-active))]')
+    expect(ghost).toContain('hover:bg-[var(--gr-button-ghost-bg-hover,var(--gr-button-info-ghost-bg-hover))]')
+    expect(ghost).toContain('active:bg-[var(--gr-button-ghost-bg-active,var(--gr-button-info-ghost-bg-active))]')
+    expect(ghost).toContain('hover:active:bg-[var(--gr-button-ghost-bg-active,var(--gr-button-info-ghost-bg-active))]')
 
-    expect(ghostBorder).toContain('hover:active:bg-[var(--gr-button-ghost-bg-active,var(--gr-button-success-soft-bg-active))]')
+    expect(ghostBorder).toContain('hover:active:bg-[var(--gr-button-ghost-bg-active,var(--gr-button-success-ghost-bg-active))]')
     expect(ghostBorder).toContain('hover:active:border-[var(--gr-success-active)]')
   })
 

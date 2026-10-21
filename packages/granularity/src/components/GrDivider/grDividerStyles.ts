@@ -18,10 +18,10 @@ export const lineVariantClass: Record<GrDividerVariant, string> = {
 }
 
 export const horizontalLineClass
-  = 'border-0 border-t-[length:var(--gr-divider-thickness,1px)] border-[var(--gr-brd)]'
+  = 'border-0 border-t-[length:var(--gr-divider-thickness)] border-[var(--gr-brd)]'
 
 export const verticalLineClass
-  = 'border-0 border-l-[length:var(--gr-divider-thickness,1px)] border-[var(--gr-brd)]'
+  = 'border-0 border-l-[length:var(--gr-divider-thickness)] border-[var(--gr-brd)]'
 
 export const horizontalSpacingClass: Record<GrDividerSpacing, string> = {
   none: '',

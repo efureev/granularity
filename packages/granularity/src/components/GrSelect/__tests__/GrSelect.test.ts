@@ -959,7 +959,7 @@ describe('GrSelect — теги', () => {
     // Без своего тона опция берёт общий `tagTone`.
     expect(tags[1].classes()).toContain('bg-[var(--gr-info-light)]')
     // `dark` у опции тоже перекрывает общий: заливка плотная.
-    expect(tags[2].classes()).toContain('bg-[var(--gr-badge-danger-bg,var(--gr-danger-solid))]')
+    expect(tags[2].classes()).toContain('bg-[var(--gr-badge-danger-bg)]')
   })
 
   it('крестик снимает значение', async () => {

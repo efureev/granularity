@@ -310,7 +310,7 @@ describe('GrSegmented', () => {
 
     const style = wrapper.get('[data-gr-segmented]').attributes('style')
 
-    expect(style).toContain('--gr-segmented-indicator-shadow: var(--gr-shadow-1), var(--gr-segmented-indicator-highlight-shadow, 0 0 0 0 transparent)')
+    expect(style).toContain('--gr-segmented-indicator-shadow: var(--gr-shadow-1), var(--gr-segmented-indicator-highlight-shadow)')
   })
 
   it('использует одинаковый inset трека и компактные size-токены для sm и xs', () => {

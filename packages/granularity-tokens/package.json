@@ -1,7 +1,7 @@
 {
   "name": "@feugene/granularity-tokens",
   "description": "Design tokens and themes of @feugene/granularity: the token registry, theme data by mode and the theme builder.",
-  "version": "1.4.0",
+  "version": "2.0.0",
   "license": "LicenseRef-Granularity-EUC-1.1",
   "author": {
     "name": "Evgeniy Fureev",
@@ -40,7 +40,9 @@
   "files": [
     "dist",
     "tokens",
-    "themes"
+    "themes",
+    "scripts/theme-copy.mjs",
+    "scripts/theme-copy.d.mts"
   ],
   "exports": {
     ".": {
@@ -68,21 +70,33 @@
     "./tokens.css": "./dist/tokens.css",
     "./package.json": "./package.json"
   },
+  "bin": {
+    "gr-theme-copy": "./scripts/theme-copy.mjs"
+  },
   "scripts": {
     "build": "node scripts/generate.mjs --dist && vite build && vite build --config vite.node.config.ts && tsc -p tsconfig.build.json",
     "dev": "vite build --watch",
     "generate": "node scripts/generate.mjs",
+    "theme:copy": "node scripts/theme-copy.mjs",
     "lint": "eslint . --cache",
     "lint:fix": "eslint . --cache --fix",
     "test": "vitest --config vitest.config.ts",
     "test:run": "vitest run --config vitest.config.ts",
     "typecheck": "tsc --noEmit -p tsconfig.json"
   },
+  "peerDependencies": {
+    "@feugene/granum": ">=3.10.0 <4.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@feugene/granum": {
+      "optional": true
+    }
+  },
   "devDependencies": {
     "@antfu/eslint-config": "^9.3.0",
     "@feugene/granularity-test-kit": "^2.0.0",
-    "@feugene/granum": "^3.9.0",
-    "@feugene/granum-engine-wind": "^3.9.0",
+    "@feugene/granum": "^3.10.0",
+    "@feugene/granum-engine-wind": "^3.10.0",
     "@types/node": "^26.4.0",
     "eslint": "^10.9.1",
     "globals": "^16.5.0",

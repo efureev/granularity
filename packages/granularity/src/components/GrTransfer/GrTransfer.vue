@@ -1364,7 +1364,7 @@ defineExpose({
  * ровно тот вид, что и так был бы.
  */
 @keyframes gr-transfer-arrive {
-  from { background: var(--gr-transfer-arrived-bg, color-mix(in srgb, var(--gr-primary) 32%, transparent)); }
+  from { background: var(--gr-transfer-arrived-bg); }
   to { background: transparent; }
 }
 

@@ -107,7 +107,7 @@ export const areaDisabledClass = 'cursor-not-allowed'
  * Оба независимы от темы намеренно: под ручкой не подложка компонента, а
  * выбираемый цвет, и `--gr-fg` спорил бы с ним, а не с фоном страницы.
  */
-export const areaThumbClass = 'pointer-events-none absolute h-[var(--gr-color-picker-area-thumb-size,0.875rem)] w-[var(--gr-color-picker-area-thumb-size,0.875rem)] -translate-x-1/2 -translate-y-1/2 rounded-[var(--gr-radius-full)] border-2 border-[var(--gr-color-picker-area-thumb-border,#fff)] shadow-[0_0_0_1px_var(--gr-color-picker-area-thumb-ring,rgba(0,0,0,0.45))]'
+export const areaThumbClass = 'pointer-events-none absolute h-[var(--gr-color-picker-area-thumb-size,0.875rem)] w-[var(--gr-color-picker-area-thumb-size,0.875rem)] -translate-x-1/2 -translate-y-1/2 rounded-[var(--gr-radius-full)] border-2 border-[var(--gr-color-picker-area-thumb-border)] shadow-[0_0_0_1px_var(--gr-color-picker-area-thumb-ring)]'
 
 /** Оба поля осей: доступны диктору и клавиатуре, но не видны. */
 export const areaInputClass = 'sr-only'

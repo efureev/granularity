@@ -41,5 +41,6 @@ export default defineGranumConfig({
   components: [
     { provider: '@feugene/granularity', names: [...playgroundComponents] },
   ],
+  themes: ['slate'],
   appSources: { dirs: ['src'] },
 })

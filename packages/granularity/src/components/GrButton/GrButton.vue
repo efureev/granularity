@@ -367,7 +367,7 @@ defineSlots<{
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  animation: gr-button-shimmer var(--gr-button-shimmer-duration, 1.8s) linear infinite;
+  animation: gr-button-shimmer var(--gr-button-shimmer-duration) linear infinite;
 }
 
 @keyframes gr-button-shimmer {

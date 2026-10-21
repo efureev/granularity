@@ -50,7 +50,7 @@ describe('GrBadge', () => {
       props: { radius: 'semi', size: 'lg' },
       slots: { default: 'Semi' },
     })
-    expect(semi.attributes('class')).toContain('rounded-[var(--gr-badge-semi-radius-lg,7px)]')
+    expect(semi.attributes('class')).toContain('rounded-[var(--gr-badge-semi-radius-lg)]')
 
     const round = mount(GrBadge, { props: { radius: 'round' }, slots: { default: 'Round' } })
     expect(round.attributes('class')).toContain('rounded-[var(--gr-radius-full)]')
@@ -71,11 +71,11 @@ describe('GrBadge', () => {
 
     // Заливка filled идёт через покомпонентный слой: вес у тем разный (в светлой
     // это `-solid` под светлый текст, в тёмной — роль тона под тёмный).
-    expect(wrapper.attributes('class')).toContain('bg-[var(--gr-badge-success-bg,var(--gr-success-solid))]')
+    expect(wrapper.attributes('class')).toContain('bg-[var(--gr-badge-success-bg)]')
     // Полярность текста задаёт тема, а не захардкоженный `text-white`: тот давал
     // 2.54:1 в light и 1.92:1 в dark.
-    expect(wrapper.attributes('class')).toContain('text-[var(--gr-badge-success-fg,var(--gr-success-solid-fg))]')
-    expect(wrapper.attributes('class')).toContain('rounded-[var(--gr-badge-semi-radius-lg,7px)]')
+    expect(wrapper.attributes('class')).toContain('text-[var(--gr-badge-success-fg)]')
+    expect(wrapper.attributes('class')).toContain('rounded-[var(--gr-badge-semi-radius-lg)]')
   })
 
   it('поддерживает новые tones slate и azure', () => {
@@ -91,8 +91,8 @@ describe('GrBadge', () => {
 
     expect(slate.attributes('class')).toContain('bg-[var(--gr-slate-light)]')
     expect(slate.attributes('class')).toContain('text-[var(--gr-slate-text)]')
-    expect(azure.attributes('class')).toContain('bg-[var(--gr-badge-azure-bg,var(--gr-azure-solid))]')
-    expect(azure.attributes('class')).toContain('text-[var(--gr-badge-azure-fg,var(--gr-azure-solid-fg))]')
+    expect(azure.attributes('class')).toContain('bg-[var(--gr-badge-azure-bg)]')
+    expect(azure.attributes('class')).toContain('text-[var(--gr-badge-azure-fg)]')
   })
 
   /**

@@ -1,6 +1,6 @@
 import { grDerivedTokens, grFoundationTokens, grRoleTokens } from '../generated'
 import { resolveModes } from '../modes'
-import type { GrColorScheme, GrModeData, GrRegistry, GrThemeData } from '../types'
+import type { GrColorScheme, GrModeData, GrRegistry, GrThemeComponents, GrThemeComponentValues, GrThemeData } from '../types'
 import { mixSrgb } from './color'
 import { GrThemeDefinitionError, GrThemeError, MODE_NAME, THEME_ID } from './errors'
 import { resolveRole, type GrThemeTokens } from './roles'
@@ -32,8 +32,16 @@ export interface DefineThemeInput {
   root?: Readonly<Record<string, string>>
   modes?: Readonly<Record<string, GrModeInput>>
   baseCss?: readonly string[]
+  /** Версия темы; у наследника — только своя. */
+  version?: string
+  /** Целевые пакеты; у наследника сливаются с родительскими по пакету. */
+  targets?: Readonly<Record<string, string>>
+  /** Значения токенов компонентов; у наследника сливаются с родительскими по токену. */
+  components?: GrThemeComponents
   /** Пропы по умолчанию компонентов: уходят в `extensions.granularity`. */
   componentDefaults?: Readonly<Record<string, Readonly<Record<string, unknown>>>>
+  /** Расширения других потребителей темы, кроме `granularity`: переходят в данные как есть. */
+  extensions?: Readonly<Record<string, unknown>>
 }
 
 export interface DefineThemeOptions {
@@ -71,6 +79,29 @@ function derivedFallback(
 
   const [base, mixWith] = [resolveRole(tokens, token.base), resolveRole(tokens, token.mixWith)]
   return base && mixWith ? mixSrgb(base, mixWith, token.amount) : null
+}
+
+/** Раздел `components` наследника поверх родительского: пакет → компонент → `root` или режим → токен. */
+function mergeComponents(parent: GrThemeComponents | undefined, own: GrThemeComponents | undefined): GrThemeComponents | undefined {
+  if (parent === undefined || own === undefined)
+    return own ?? parent
+  const out: Record<string, Record<string, GrThemeComponentValues>> = {}
+  for (const providerId of new Set([...Object.keys(parent), ...Object.keys(own)])) {
+    const byComponent: Record<string, GrThemeComponentValues> = { ...parent[providerId] }
+    for (const [name, values] of Object.entries(own[providerId] ?? {})) {
+      const base = byComponent[name] ?? {}
+      const root = { ...base.root, ...values.root }
+      const modes: Record<string, Record<string, string>> = { ...base.modes }
+      for (const [mode, tokens] of Object.entries(values.modes ?? {}))
+        modes[mode] = { ...modes[mode], ...tokens }
+      byComponent[name] = {
+        ...(Object.keys(root).length > 0 ? { root } : {}),
+        ...(Object.keys(modes).length > 0 ? { modes } : {}),
+      }
+    }
+    out[providerId] = byComponent
+  }
+  return out
 }
 
 function assertKeys(where: string, tokens: Readonly<Record<string, string>>): void {
@@ -113,6 +144,13 @@ export function defineTheme(input: DefineThemeInput, options: DefineThemeOptions
   assertKeys(`тема "${id}", root`, input.root ?? {})
   for (const [name, mode] of Object.entries(ownModes))
     assertKeys(`тема "${id}", режим "${name}"`, mode.tokens ?? {})
+  for (const [providerId, byComponent] of Object.entries(input.components ?? {})) {
+    for (const [component, values] of Object.entries(byComponent)) {
+      assertKeys(`тема "${id}", ${providerId}:${component} root`, values.root ?? {})
+      for (const [mode, tokens] of Object.entries(values.modes ?? {}))
+        assertKeys(`тема "${id}", ${providerId}:${component} режим "${mode}"`, tokens)
+    }
+  }
 
   const root: Record<string, string> = { ...parent?.root, ...input.root }
   const modeNames = [...new Set([...Object.keys(parent?.modes ?? {}), ...Object.keys(ownModes)])]
@@ -227,6 +265,16 @@ export function defineTheme(input: DefineThemeInput, options: DefineThemeOptions
   if (issues.length > 0)
     throw new GrThemeError(id, issues)
 
+  const components = mergeComponents(parent?.components, input.components)
+  const strayModes = Object.entries(components ?? {}).flatMap(([providerId, byComponent]) => Object.entries(byComponent)
+    .flatMap(([component, values]) => Object.keys(values.modes ?? {})
+      .filter(mode => !modeNames.includes(mode))
+      .map(mode => `${providerId}:${component} → ${mode}`)))
+  if (strayModes.length > 0)
+    throw new GrThemeDefinitionError('mode-extends-unresolved', `тема "${id}": значения компонентов в режимах, которых у темы нет:\n  ${strayModes.join('\n  ')}`)
+  // `targets` — по пакету: наследник, назвавший новый пакет, не теряет цель унаследованного раздела.
+  const targets = parent?.targets || input.targets ? { ...parent?.targets, ...input.targets } : undefined
+
   const baseCss = input.baseCss ?? parent?.baseCss
   const componentDefaults = input.componentDefaults
   const parentDefaults = (parent?.extensions?.granularity as { componentDefaults?: Record<string, Record<string, unknown>> } | undefined)?.componentDefaults
@@ -234,16 +282,25 @@ export function defineTheme(input: DefineThemeInput, options: DefineThemeOptions
     ? Object.fromEntries([...new Set([...Object.keys(parentDefaults ?? {}), ...Object.keys(componentDefaults ?? {})])]
         .map(component => [component, { ...parentDefaults?.[component], ...componentDefaults?.[component] }]))
     : undefined
+  const { granularity: _granularity, ...parentExtensions } = parent?.extensions ?? {}
+  const extensions = {
+    ...parentExtensions,
+    ...input.extensions,
+    ...(mergedDefaults !== undefined ? { granularity: { componentDefaults: mergedDefaults } } : {}),
+  }
 
   return {
     id,
     title: input.title,
     ...(input.description !== undefined ? { description: input.description } : {}),
     ...(input.docs !== undefined ? { docs: input.docs } : {}),
+    ...(input.version !== undefined ? { version: input.version } : {}),
+    ...(targets !== undefined ? { targets } : {}),
     root: sorted(root),
     modes,
     defaultMode,
     ...(baseCss !== undefined ? { baseCss } : {}),
-    ...(mergedDefaults !== undefined ? { extensions: { granularity: { componentDefaults: mergedDefaults } } } : {}),
+    ...(components !== undefined ? { components } : {}),
+    ...(Object.keys(extensions).length > 0 ? { extensions } : {}),
   }
 }

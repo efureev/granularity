@@ -72,12 +72,27 @@ export interface GrThemeData {
   description?: string
   /** Абсолютный URL дизайн-системы темы. */
   docs?: string
+  /** Версия темы — своя, не версия пакета, в котором она лежит. */
+  version?: string
+  /** Пакеты компонентов, под версии которых тема написана: `{ <пакет>: <диапазон semver> }`. */
+  targets?: Readonly<Record<string, string>>
   root: Readonly<Record<string, string>>
   modes: Readonly<Record<string, GrModeData>>
   defaultMode?: string
   baseCss?: readonly string[]
+  /** Значения токенов компонентов: пакет → компонент → `root` и режимы. */
+  components?: GrThemeComponents
   extensions?: Readonly<Record<string, unknown>>
 }
+
+/** Значения токенов одного компонента в теме. Ключи — без `--`. */
+export interface GrThemeComponentValues {
+  root?: Readonly<Record<string, string>>
+  modes?: Readonly<Record<string, Readonly<Record<string, string>>>>
+}
+
+/** Раздел `components` темы — структурно раздел `components` данных темы granum. */
+export type GrThemeComponents = Readonly<Record<string, Readonly<Record<string, GrThemeComponentValues>>>>
 
 /** Режим в каталоге: метаданные без значений. */
 export interface GrCatalogMode {
@@ -92,6 +107,8 @@ export interface GrThemeCatalogEntry {
   title: string
   description?: string
   docs?: string
+  version?: string
+  targets?: Readonly<Record<string, string>>
   extends?: string
   defaultMode: string
   modes: readonly GrCatalogMode[]

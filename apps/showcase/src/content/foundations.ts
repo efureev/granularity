@@ -374,8 +374,8 @@ export const showcaseQuickStartCards: ShowcaseQuickStartCard[] = [
   },
   {
     id: 'quick-start-granum-themes',
-    title: 'Шаг 3. Ограничиваем набор тем',
-    description: 'По умолчанию подключаются темы из `defaultThemes` провайдера. `themes.names` оставляет только перечисленные, `themes.define` добавляет свою тему (`extends` или `tokensRef`), `themes.tokenOverrides` переопределяет отдельные токены.',
+    title: 'Шаг 3. Выбираем темы сборки',
+    description: 'Темы сборки и основную из них выбирает приложение — `themes`; темы по умолчанию у каталога нет, и без ключа сборка падает со списком тем. Режимы — у каждой записи свои, `modes.define` добавляет свой режим, `modes.tokenOverrides` переопределяет отдельные токены, своя тема — объектом из `loadTheme`.',
     code: granumThemesSnippet,
     language: 'ts',
     note: 'Это рекомендуемая production-конфигурация для большинства приложений: контроль над составом компонентов и тем без ручной сборки CSS.',

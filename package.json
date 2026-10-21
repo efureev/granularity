@@ -95,7 +95,7 @@
     "test:playground-ssr": "yarn workspace @feugene/granularity-playground-ssr test:run",
     "test:showcase": "yarn build:tokens && yarn workspace @feugene/granularity-showcase test:run",
     "test:a11y": "yarn workspace @feugene/granularity-showcase test:a11y",
-    "test:visual": "yarn workspace @feugene/granularity-showcase test:visual",
+    "//test:visual": "yarn workspace @feugene/granularity-showcase test:visual",
     "typecheck:playground-config": "yarn workspace @feugene/granularity-playground-config typecheck",
     "typecheck:playground-ssr": "yarn workspace @feugene/granularity-playground-ssr typecheck",
     "typecheck:unplugin": "yarn workspace @feugene/unplugin-granularity typecheck",

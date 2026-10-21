@@ -213,8 +213,8 @@ describe('GrSteps', () => {
     const horizontalConnector = horizontal.get('[data-gr-step-connector]').attributes('class') ?? ''
     const verticalConnector = vertical.get('[data-gr-step-connector]').attributes('class') ?? ''
 
-    expect(horizontalConnector).toContain('h-[var(--gr-steps-connector-size,2px)]')
-    expect(verticalConnector).toContain('w-[var(--gr-steps-connector-size,2px)]')
+    expect(horizontalConnector).toContain('h-[var(--gr-steps-connector-size)]')
+    expect(verticalConnector).toContain('w-[var(--gr-steps-connector-size)]')
   })
 
   it('соединитель есть между шагами и отсутствует после последнего', () => {

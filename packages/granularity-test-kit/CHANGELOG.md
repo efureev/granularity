@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **`defineThemeGate`** — гейт пакета темы: тема собирается сборкой дизайн-системы (`loadTheme`),
+  значения компонентов полны по реестрам целевых пакетов, в разделах — только токены вида `theme`
+  своих компонентов, пакет раздела — в `targets`.
+- **Флаги `defineComponentTokensGate`**, по умолчанию выключены — пакет включает их на своём
+  переводе: `themeSources` (вид токенов в разделах тем пакета токенов), `themeTokenFallback` (токен
+  темы читается без запасного значения), `hookLiterals` (литерал хука — с причиной `literal` в
+  реестре), `themesDirAbsent` (у компонентов нет `themesDir`), `themeKindOnly` (в папке тем
+  компонента — только вид `theme`, без допуска хуков 2.1.0).
+
 ## [v2.1.0] 2026-10-21
 
 ### Added

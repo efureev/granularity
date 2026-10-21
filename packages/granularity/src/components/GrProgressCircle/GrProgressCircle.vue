@@ -213,7 +213,7 @@ const hasCenter = computed(() => hasSlotContent.value || showStatusIcon.value ||
 }
 
 [data-gr-progress-circle-arc] {
-  stroke-linecap: var(--gr-progress-circle-cap, round);
+  stroke-linecap: var(--gr-progress-circle-cap);
   transition: stroke-dasharray var(--gr-duration-base) var(--gr-ease-out);
 }
 
@@ -231,7 +231,7 @@ const hasCenter = computed(() => hasSlotContent.value || showStatusIcon.value ||
 
 [data-gr-progress-circle-indeterminate] [data-gr-progress-circle-arc] {
   animation-name: gr-progress-circle-spin;
-  animation-duration: var(--gr-progress-indeterminate-duration, 1.4s);
+  animation-duration: var(--gr-progress-indeterminate-duration);
   animation-timing-function: linear;
   animation-iteration-count: infinite;
   transition: none;
@@ -245,7 +245,7 @@ const hasCenter = computed(() => hasSlotContent.value || showStatusIcon.value ||
 @media (prefers-reduced-motion: reduce) {
   [data-gr-progress-circle-indeterminate] [data-gr-progress-circle-arc] {
     animation: none;
-    stroke: var(--gr-progress-indeterminate-bg, var(--gr-muted-fg));
+    stroke: var(--gr-progress-indeterminate-bg);
     stroke-dasharray: none;
   }
 }

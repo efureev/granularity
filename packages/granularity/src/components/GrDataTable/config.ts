@@ -7,5 +7,4 @@ export const grDataTableConfig = defineGranumComponent(import.meta.url, {
   dependencies: ['GrTable', 'GrIcon', 'GrCheckbox', 'GrButton', 'GrSkeleton', 'GrDropdownMenu'],
   safelist: grDataTableSafelist,
   // Только светлая: обе роли ссылаются на токены, которые сами меняются с темой.
-  themesDir: './themes',
 })

@@ -49,15 +49,15 @@ export const statusIconSizeBySize: Record<GrProgressCircleSize, string> = {
  * круга `GrProgressBar/themes/*.css` не подключается.
  */
 export const arcColorByTone: Record<GrProgressCircleTone, string> = {
-  primary: 'var(--gr-progress-bg,var(--gr-primary))',
+  primary: 'var(--gr-progress-bg)',
   // Не `--gr-secondary`: на тёмной теме он совпадает с дорожкой `--gr-muted`.
-  neutral: 'var(--gr-progress-neutral-bg,var(--gr-muted-fg))',
-  success: 'var(--gr-progress-success-bg,var(--gr-success))',
-  warning: 'var(--gr-progress-warning-bg,var(--gr-warning))',
-  danger: 'var(--gr-progress-danger-bg,var(--gr-danger))',
-  info: 'var(--gr-progress-info-bg,var(--gr-info))',
-  slate: 'var(--gr-progress-slate-bg,var(--gr-slate))',
-  azure: 'var(--gr-progress-azure-bg,var(--gr-azure))',
+  neutral: 'var(--gr-progress-neutral-bg)',
+  success: 'var(--gr-progress-success-bg)',
+  warning: 'var(--gr-progress-warning-bg)',
+  danger: 'var(--gr-progress-danger-bg)',
+  info: 'var(--gr-progress-info-bg)',
+  slate: 'var(--gr-progress-slate-bg)',
+  azure: 'var(--gr-progress-azure-bg)',
 }
 
 export const rootClass = 'relative inline-flex shrink-0 items-center justify-center'

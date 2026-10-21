@@ -1,8 +1,8 @@
-import { existsSync, readdirSync, readFileSync } from 'node:fs'
+import { readFileSync } from 'node:fs'
 import { mkdir, writeFile } from 'node:fs/promises'
 import { dirname, join, resolve } from 'node:path'
 import process from 'node:process'
-import { fileURLToPath, pathToFileURL } from 'node:url'
+import { fileURLToPath } from 'node:url'
 
 import { emitThemeStylesheet } from '@feugene/granum/node'
 
@@ -20,19 +20,15 @@ import { emitThemeStylesheet } from '@feugene/granum/node'
  *
  * Части отдаёт `emitThemeStylesheet` granum — по тем же правилам, что сборку
  * приложения: селекторы режимов, формулы на границе `[data-theme]` и фолбэки те
- * же, что у приложения на granum. Токенов спутников здесь нет — их знает только
- * сборка приложения со всеми манифестами.
- *
- * Ядро подаётся объектом контракта из исходников, а не из `dist`: в CSS темы
- * участвуют только папки `themesDir` компонентов, а тестам ядра незачем ждать сборки.
+ * же, что у приложения на granum. Значения компонентов ядра приходят с данными
+ * темы — её разделом `components`, — поэтому провайдер нужен один: пакет токенов.
+ * Токенов спутников здесь нет — их знает только сборка приложения со всеми манифестами.
  *
  *   node scripts/theme-css.mjs --dist                   записать файлы каждой темы каталога в `dist/themes/`
  *   node scripts/theme-css.mjs --stdout <id> [часть]    напечатать тему целиком или часть: `root` или имя режима
  */
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url))
-const COMPONENTS = join(ROOT, 'src/components')
-const PROVIDER_ID = '@feugene/granularity'
 const TOKENS_PROVIDER_ID = '@feugene/granularity-tokens'
 
 const BANNERS = {
@@ -61,38 +57,6 @@ function banner(kind, values) {
   return ['/*', ...lines.map(line => ` * ${line}`), ' */'].join('\n')
 }
 
-/** Компоненты с папкой `themes/`; `config.ts` каждого обязан её объявить, иначе сборка granum её не увидит. */
-function themedComponents() {
-  return readdirSync(COMPONENTS, { withFileTypes: true })
-    .filter(entry => entry.isDirectory() && existsSync(join(COMPONENTS, entry.name, 'themes')))
-    .map((entry) => {
-      const config = readFileSync(join(COMPONENTS, entry.name, 'config.ts'), 'utf8')
-      if (!config.includes('themesDir: \'./themes\''))
-        throw new Error(`${entry.name}: есть папка themes/, но config.ts не объявляет themesDir: './themes'`)
-
-      return entry.name
-    })
-    .sort()
-}
-
-/**
- * Ядро объектом контракта: компоненты с `themesDir` и `sourceUrl` их
- * `config.ts`. Классы и CSS компонентов теме не нужны, поэтому `dist` не
- * требуется, а папки тем читаются из исходников.
- */
-function sourceProvider() {
-  return {
-    id: PROVIDER_ID,
-    contractVersion: 2,
-    dependencies: [TOKENS_PROVIDER_ID],
-    components: themedComponents().map(name => ({
-      name,
-      themesDir: `components/${name}/themes`,
-      sourceUrl: pathToFileURL(join(COMPONENTS, name, 'config.ts')).href,
-    })),
-  }
-}
-
 /**
  * Части темы: `root` и по файлу на режим. Режимы — все режимы темы, явным набором:
  * без `modes.names` granum собирает только режим по умолчанию, а у готовых файлов
@@ -102,7 +66,7 @@ export async function themeParts(id) {
   const entry = catalog()[id]
   if (!entry?.modes)
     throw new Error(`[theme-css] темы ${id} нет в каталоге ${TOKENS_PROVIDER_ID}`)
-  const { parts, resolution } = await emitThemeStylesheet({ providers: [sourceProvider()], themes: [{ theme: id, modes: entry.modes }], root: ROOT })
+  const { parts, resolution } = await emitThemeStylesheet({ providers: [TOKENS_PROVIDER_ID], themes: [{ theme: id, modes: entry.modes }], root: ROOT })
   const defaultMode = resolution.themes.default?.defaultMode
 
   return {

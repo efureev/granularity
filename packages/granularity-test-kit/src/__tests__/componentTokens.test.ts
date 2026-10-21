@@ -5,12 +5,19 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { readSources } from '../sources'
 import {
   collectBrokenEntries,
+  collectHookLiterals,
   collectMisnamedTokens,
+  collectSectionKindIssues,
+  collectStaleLiteralReasons,
   collectStaleTokens,
+  collectThemesDirUsage,
+  collectThemeTokenFallbacks,
+  collectTokenReads,
   collectUnknownTokens,
   collectWrongThemeKind,
   ownerPrefix,
   readComponentThemeSources,
+  readThemeSections,
   readThemeSources,
   readTokenRegistries,
   type TokenRegistry,
@@ -131,7 +138,7 @@ describe('collectWrongThemeKind', () => {
     expect(collectWrongThemeKind(registries, registered)).toEqual([])
   })
 
-  it('хук тема вправе задать: так она меняет точку кастомизации', () => {
+  it('хук в папке тем компонента допускается, пока не включён themeKindOnly', () => {
     const registry: TokenRegistry = {
       ...registryOf(registries, 'GrThing'),
       tokens: [{ name: '--gr-thing-bg', kind: 'hook', default: '#fff', description: 'фон' }],
@@ -139,6 +146,7 @@ describe('collectWrongThemeKind', () => {
     const registered = new Map(registry.tokens.map(token => [token.name, registry] as const))
 
     expect(collectWrongThemeKind([registry], registered)).toEqual([])
+    expect(collectWrongThemeKind([registry], registered, ['theme'])).toEqual(['--gr-thing-bg (src/components/GrThing/tokens.json)'])
   })
 
   it('ловит переменную темы, записанную другим `kind`', () => {
@@ -220,5 +228,109 @@ describe('ownerPrefix', () => {
     ['GrChartLine', '--gr-chart-line-'],
   ])('%s → %s', (owner, prefix) => {
     expect(ownerPrefix(owner)).toBe(prefix)
+  })
+})
+
+describe('значения у темы: чтения токенов, литералы хуков, разделы тем', () => {
+  const tokens = {
+    tokens: [
+      { name: '--gr-card-bg', kind: 'theme', default: 'var(--gr-bg)', description: 'фон' },
+      { name: '--gr-card-z', kind: 'hook', default: '10', description: 'слой', literal: 'механика стопки' },
+      { name: '--gr-card-gap', kind: 'hook', default: '4px', description: 'зазор' },
+      { name: '--gr-card-ring', kind: 'hook', default: 'var(--gr-ring)', description: 'кольцо' },
+      { name: '--gr-card-size', kind: 'hook', default: 'по ступени', description: 'сторона', literal: 'ступень size' },
+      { name: '--gr-card-pad', kind: 'inline', default: '0px', description: 'отступ' },
+    ],
+  }
+  let fixture: { dir: string, cleanup: () => void }
+  let src: string
+  let cardRegistries: TokenRegistry[]
+  const registeredOf = () => new Map(cardRegistries.flatMap(registry => registry.tokens.map(token => [token.name, registry] as const)))
+
+  beforeAll(() => {
+    fixture = createFixturePackage({
+      'src/components/GrCard/GrCard.vue': [
+        '<template><div class="bg-[var(--gr-card-bg,var(--gr-bg))] z-[var(--gr-card-z,10)] gap-[var(--gr-card-gap,4px)]" /></template>',
+        '<script setup lang="ts">',
+        '// var(--gr-card-gap, 2px) — в комментарии не чтение',
+        // Текст исходника фикстуры: подстановка шаблона — его часть, а не наша.
+        // eslint-disable-next-line no-template-curly-in-string
+        'const size = (step: string) => `var(--gr-card-size,${step})`',
+        'const ring = \'var(--gr-card-ring,var(--gr-ring))\'',
+        'const text = \'color: var(--gr-fg, #000)\'',
+        'const pad = \'var(--gr-card-pad,0px)\'',
+        '</script>',
+      ].join('\n'),
+      'src/components/GrCard/tokens.json': JSON.stringify(tokens),
+      'src/components/GrCard/config.ts': 'export const c = defineComponent({ name: \'GrCard\', themesDir: \'./themes\' })',
+      'src/components/GrPlain/config.ts': 'export const c = defineComponent({ name: \'GrPlain\' })',
+      'src/components/GrPlain/themes/slate/root.json': '{}',
+      'themes/slate/theme.json': '{}',
+      'themes/slate/components/@acme/ui/GrCard/root.json': JSON.stringify({ 'gr-card-bg': '#fff', '$why': 'пояснение' }),
+      'themes/slate/components/@acme/ui/GrCard/modes/dark.json': JSON.stringify({ 'gr-card-gap': '2px' }),
+      'themes/slate/components/@acme/ui/GrGhost/root.json': JSON.stringify({ 'gr-ghost-x': '1px' }),
+      'themes/notes/README.md': 'не тема',
+    })
+    src = resolve(fixture.dir, 'src')
+    cardRegistries = readTokenRegistries(src)
+  })
+
+  afterAll(() => fixture.cleanup())
+
+  it('чтения — с запасным значением, вложенные и без комментариев', () => {
+    const reads = collectTokenReads(readSources({ dir: src }))
+    expect(reads.map(read => `${read.token}|${read.fallback}`)).toEqual(expect.arrayContaining([
+      '--gr-card-bg|var(--gr-bg)',
+      '--gr-bg|null',
+      // eslint-disable-next-line no-template-curly-in-string
+      '--gr-card-size|${step}',
+      '--gr-fg|#000',
+    ]))
+    expect(reads.some(read => read.fallback === '2px')).toBe(false)
+  })
+
+  it('токен темы — свой вида theme и глобальный — с фолбэком называется', () => {
+    const reads = collectTokenReads(readSources({ dir: src }))
+    expect(collectThemeTokenFallbacks(reads, registeredOf(), new Set(['--gr-fg', '--gr-bg']))).toEqual([
+      '--gr-card-bg, var(--gr-bg) (components/GrCard/GrCard.vue)',
+      '--gr-fg, #000 (components/GrCard/GrCard.vue)',
+    ])
+  })
+
+  it('хук с литералом — только с причиной; ссылка на токен и значение кода причины не требуют', () => {
+    const reads = collectTokenReads(readSources({ dir: src }))
+    expect(collectHookLiterals(reads, registeredOf())).toEqual(['--gr-card-gap, 4px (components/GrCard/GrCard.vue)'])
+  })
+
+  it('причина у токена без литерала или не у хука — протухла', () => {
+    const reads = collectTokenReads(readSources({ dir: src }))
+    expect(collectStaleLiteralReasons(reads, cardRegistries)).toEqual([])
+    const withExtra = cardRegistries.map(registry => ({
+      ...registry,
+      tokens: registry.tokens.map(token => (token.name === '--gr-card-ring' || token.name === '--gr-card-pad' ? { ...token, literal: 'лишняя' } : token)),
+    }))
+    expect(collectStaleLiteralReasons(reads, withExtra)).toEqual([
+      '--gr-card-ring (src/components/GrCard/tokens.json)',
+      '--gr-card-pad (src/components/GrCard/tokens.json)',
+    ])
+  })
+
+  it('`themesDir` в config.ts и папка themes/ у компонента называются', () => {
+    expect(collectThemesDirUsage(src)).toEqual([
+      'src/components/GrCard/config.ts: themesDir',
+      'src/components/GrPlain/themes/',
+    ])
+  })
+
+  it('раздел темы: только токены вида theme своего компонента; компонент без реестра — находка', () => {
+    const sections = readThemeSections({ themesDir: resolve(fixture.dir, 'themes'), packageId: '@acme/ui' })
+    expect(sections.map(section => `${section.theme}/${section.owner}: ${section.tokens.join(',')}`).sort()).toEqual([
+      'slate/GrCard: --gr-card-bg,--gr-card-gap',
+      'slate/GrGhost: --gr-ghost-x',
+    ])
+    expect(collectSectionKindIssues(sections, cardRegistries)).toEqual([
+      'slate: --gr-card-gap в разделе GrCard — вид hook, а тема задаёт только вид theme',
+      'slate: раздел GrGhost — у пакета нет компонента с реестром токенов',
+    ])
   })
 })

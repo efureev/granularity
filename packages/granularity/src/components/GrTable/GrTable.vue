@@ -213,7 +213,7 @@ const stickyColumnClass = computed(() => {
     '[&_tr>*:first-child]:sticky',
     '[&_tr>*:first-child]:left-0',
     '[&_tr>*:first-child]:z-[2]',
-    '[&_tr>*:first-child]:shadow-[var(--gr-table-sticky-column-shadow,4px_0_6px_-4px_rgba(0,0,0,0.25))]',
+    '[&_tr>*:first-child]:shadow-[var(--gr-table-sticky-column-shadow)]',
     '[&>tbody>tr>*:first-child]:bg-[var(--gr-card)]',
     '[&>tfoot>tr>*:first-child]:bg-[var(--gr-card)]',
     // Шапке фон уже задан на `<thead>`, но он скроллится вместе с ней:

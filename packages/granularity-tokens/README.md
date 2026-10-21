@@ -21,10 +21,11 @@ yarn add @feugene/granularity-tokens
 | Что | Где | Подпуть |
 | --- | --- | --- |
 | Реестр без значений: примитивы, роли, формулы производных | `tokens/*.json` | `@feugene/granularity-tokens` |
-| Каталог тем: id, название, режимы, ссылка на дизайн-систему | `themes/*/theme.json` | `@feugene/granularity-tokens` (`grThemeCatalog`) |
-| Данные темы со значениями и фолбэками | `themes/<slug>/` | `@feugene/granularity-tokens/themes/<slug>/theme.json`; по выбору в рантайме — `loadThemeData(id)` |
+| Каталог тем: id, название, версия, целевые пакеты, режимы, ссылка на дизайн-систему | `themes/*/theme.json` | `@feugene/granularity-tokens` (`grThemeCatalog`) |
+| Данные темы со значениями, значениями компонентов и фолбэками | `themes/<slug>/` | `@feugene/granularity-tokens/themes/<slug>/theme.json`; по выбору в рантайме — `loadThemeData(id)` |
 | Сборка темы и режима: `defineTheme`, `extendMode`, `createMode`, `tone`, проверки | `src/theme/` | `@feugene/granularity-tokens/theme` |
-| Тема из папки: `loadTheme` | `src/theme/node.ts` | `@feugene/granularity-tokens/theme/node` |
+| Тема из папки: `loadTheme` — загрузчик granum и `defineTheme` | `src/theme/node.ts` | `@feugene/granularity-tokens/theme/node` |
+| Копия темы: `theme:copy` | `scripts/theme-copy.mjs` | бинарь `gr-theme-copy` |
 | Подключение готового CSS в браузере | `src/theme/apply.ts` | `@feugene/granularity-tokens/theme/apply` |
 
 Каталог тем и раскладка папки темы — [`themes/README.md`](./themes/README.md). Что тема обязана
@@ -64,8 +65,10 @@ const light = resolveModes(clay).get('light')!
 
 ## Своя тема
 
-Папка темы — та же раскладка, что у встроенных: `theme.json`, `root.json`, `modes/<режим>.json`.
-С `"extends": "slate"` объявляются только отличия, остальное дотягивается из базы.
+Папка темы — исходник темы granum, та же раскладка, что у встроенных: `theme.json`, `root.json`,
+`modes/<режим>.json`, значения компонентов в `components/<пакет>/<Компонент>/`. С
+`"extends": "slate"` объявляются только отличия, остальное дотягивается из базы и идёт за её
+правками; копия — `gr-theme-copy slate <id>` — независима от источника.
 
 ```ts
 import { loadTheme } from '@feugene/granularity-tokens/theme/node'
@@ -76,8 +79,9 @@ const brand = loadTheme(new URL('./src/themes/brand/', import.meta.url))
 `loadTheme` проверяет полноту по реестру, контраст по WCAG и различимость тонов в каждом режиме и
 падает с именем токена и режима — неполная или нечитаемая тема не доезжает до пользователя. В
 `sources` он отдаёт прочитанные файлы: правка любого из них обязана пересобрать тему. В `extends` —
-тема каталога в цепочке: по ней granum берёт токены компонентов. Результат идёт в `themes`
-конфига granum — основной или дополнительной темой.
+тема каталога в цепочке: granum дополняет тему её данными. Результат идёт в `themes`
+конфига granum — основной или дополнительной темой. `@feugene/granum` — необязательная
+peer-зависимость: её требуют только `theme/node` и `gr-theme-copy`.
 
 Режим поверх готового — `extendMode` (с нуля — `createMode`), семья ролей тона из одного цвета —
 `tone`. Базой может быть режим встроенной темы, `{ theme, mode }` любой темы или другой режим:
@@ -102,8 +106,9 @@ ocean.css // CSS под парой slate-ocean — для подключения
 
 Пакет — провайдер granum без компонентов, владелец каталога тем: ядро
 `@feugene/granularity` объявляет его зависимостью, и приложению достаточно
-провайдера ядра. Темы сборки и их режимы перечисляет `themes` конфига granum
-(`[{ theme: '<slug>', modes: ['light', 'dark'] }]`, по умолчанию одна `slate`); тема и режим
+провайдера ядра. Темы сборки, их режимы и основную тему перечисляет `themes` конфига granum
+(`[{ theme: '<slug>', modes: ['light', 'dark'] }]`); темы по умолчанию у каталога нет, и сборка без
+`themes` — ошибка со списком тем. Тема и режим
 включаются парой `data-theme="<slug>-<режим>"`, переключает их `useTheme()` ядра. Без granum ядро отдаёт готовый CSS темы —
 `@feugene/granularity/themes/<slug>.css`.
 

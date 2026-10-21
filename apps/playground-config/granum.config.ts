@@ -29,5 +29,6 @@ export default defineGranumConfig({
       names: [...playgroundConfigComponents],
     },
   ],
+  themes: ['slate'],
   appSources: { dirs: ['src'] },
 })

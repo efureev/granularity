@@ -1,8 +1,0 @@
-{
-  "gr-button-shadow": "none",
-  "gr-button-shadow-active": "none",
-  "gr-button-neutral-bg": "var(--gr-fg)",
-  "gr-button-neutral-bg-hover": "color-mix(in srgb, var(--gr-fg) 82%, #000000)",
-  "gr-button-neutral-bg-active": "color-mix(in srgb, var(--gr-fg) 68%, #000000)",
-  "gr-button-neutral-fg": "var(--gr-card)"
-}

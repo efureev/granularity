@@ -1,7 +1,7 @@
 {
   "name": "@feugene/granularity",
   "description": "Granularity design system package with Vue 3 components, consumed via the `@feugene/granum` build pipeline.",
-  "version": "2.4.0",
+  "version": "3.0.0",
   "license": "LicenseRef-Granularity-EUC-1.1",
   "author": {
     "name": "Evgeniy Fureev",
@@ -625,11 +625,11 @@
     "./package.json": "./package.json"
   },
   "dependencies": {
-    "@feugene/granularity-tokens": "^1.3.0"
+    "@feugene/granularity-tokens": "^2.0.0"
   },
   "peerDependencies": {
     "@feugene/fint-i18n": ">=0.9.0 <1.0.0",
-    "@feugene/granum": ">=3.8.0 <4.0.0",
+    "@feugene/granum": ">=3.10.0 <4.0.0",
     "@floating-ui/dom": "^1.8.0",
     "vue": "^3.5.0"
   },
@@ -645,8 +645,8 @@
     "@antfu/eslint-config": "^9.3.0",
     "@feugene/fint-i18n": "^0.9.0",
     "@feugene/granularity-test-kit": "^2.0.0",
-    "@feugene/granum": "^3.9.0",
-    "@feugene/granum-engine-wind": "^3.9.0",
+    "@feugene/granum": "^3.10.0",
+    "@feugene/granum-engine-wind": "^3.10.0",
     "@floating-ui/dom": "^1.8.0",
     "@iconify-json/lucide": "^1.2.126",
     "@playwright/test": "^1.62.1",

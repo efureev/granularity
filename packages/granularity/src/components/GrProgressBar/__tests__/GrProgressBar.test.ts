@@ -203,7 +203,7 @@ describe('GrProgressBar — буфер', () => {
   // совпадал на светлой: загруженная часть не читалась вовсе.
   it('слой видим на дорожке: смесь приглушённого текста с её цветом', () => {
     const MIX = 'color-mix(in srgb, var(--gr-muted-fg) 40%, var(--gr-muted))'
-    expect(bufferClass).toBe('bg-[var(--gr-progress-buffer-bg,color-mix(in_srgb,var(--gr-muted-fg)_40%,var(--gr-muted)))]')
+    expect(bufferClass).toBe('bg-[var(--gr-progress-buffer-bg)]')
 
     for (const mode of MODES)
       expect(readComponentThemeVars('GrProgressBar', mode)['--gr-progress-buffer-bg'], mode).toBe(MIX)
@@ -285,7 +285,7 @@ describe('GrProgressBar — нейтральный тон', () => {
   // пропадала целиком. Нейтральная заливка — приглушённый текст, как у
   // неопределённого прогресса под `reduce`.
   it('заливка — `--gr-muted-fg`, а не цвет дорожки', () => {
-    expect(grProgressBarFillClass('neutral')).toContain('var(--gr-muted-fg)')
+    expect(grProgressBarFillClass('neutral')).toContain('var(--gr-progress-neutral-bg)')
     expect(grProgressBarFillClass('neutral')).not.toContain('--gr-secondary')
 
     for (const mode of MODES)

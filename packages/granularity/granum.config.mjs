@@ -1,5 +1,5 @@
 import { windEngine } from '@feugene/granum-engine-wind'
-import { GR_DEFAULT_THEME_ID, grThemeCatalog } from '@feugene/granularity-tokens'
+import { GR_BASE_THEME_ID, grThemeCatalog } from '@feugene/granularity-tokens'
 
 /**
  * Конфиг для `granum doctor` и прочих команд CLI на самом пакете.
@@ -22,7 +22,7 @@ export default {
   components: 'all',
   themes: grThemeCatalog.map(theme => ({
     theme: theme.id,
-    default: theme.id === GR_DEFAULT_THEME_ID,
+    default: theme.id === GR_BASE_THEME_ID,
     modes: theme.modes.map(mode => mode.name),
   })),
 }

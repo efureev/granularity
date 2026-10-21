@@ -4,7 +4,7 @@ import { grThemeCatalog } from '@feugene/granularity-tokens'
 import type { GranumThemeManifest } from '@feugene/granum/runtime'
 
 import granumConfig from '../../granum.config'
-import { buildThemes, designThemes, findDesignTheme, islandTheme, themeModes } from '../app/themes'
+import { buildThemes, designThemes, findDesignTheme, islandTheme, themeLineage, themeModes, themeTargets } from '../app/themes'
 
 const slateModes = [
   { name: 'light', colorScheme: 'light' as const, value: 'slate-light' },
@@ -20,6 +20,16 @@ const manifest: GranumThemeManifest = {
 }
 
 describe('раздел «Темы»', () => {
+  it('страница темы называет версию, целевые пакеты и связь с источником', () => {
+    const slate = grThemeCatalog.find(theme => theme.id === 'slate')!
+    const clay = grThemeCatalog.find(theme => theme.id === 'clay')!
+    expect(slate.version).toBe('1.0.0')
+    expect(themeTargets(slate)).toEqual(['@feugene/granularity ^3.0.0'])
+    expect(themeLineage(clay)).toBe('независимая: все значения свои')
+    expect(themeLineage({ ...clay, extends: 'slate' })).toBe('наследует «Сланец»')
+    expect(themeTargets({ ...clay, targets: undefined })).toEqual([])
+  })
+
   it('конфиг granum собирает все темы каталога со всеми режимами; основная — slate', () => {
     expect(granumConfig.themes).toEqual(buildThemes('slate'))
     expect(buildThemes('slate').map(theme => `${theme.theme}${theme.default ? '*' : ''}`)).toEqual(grThemeCatalog.map(theme => `${theme.id}${theme.id === 'slate' ? '*' : ''}`))

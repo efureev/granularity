@@ -41,7 +41,7 @@ export const affixEdgeClass: Record<GrAffixPlacement, string> = {
  */
 export const affixSurfaceClass: Record<GrAffixPlacement, string> = {
   top: 'bg-[var(--gr-affix-bg,var(--gr-bg))] shadow-[var(--gr-affix-shadow,var(--gr-shadow-2))]',
-  bottom: 'bg-[var(--gr-affix-bg,var(--gr-bg))] shadow-[var(--gr-affix-shadow,0_-8px_24px_-12px_color-mix(in_srgb,var(--gr-fg)_45%,transparent))]',
+  bottom: 'bg-[var(--gr-affix-bg,var(--gr-bg))] shadow-[var(--gr-affix-shadow,var(--gr-affix-shadow-bottom))]',
 }
 
 /**

@@ -239,7 +239,7 @@ watch(activeSrc, () => {
         data-gr-avatar-skeleton
         width="100%"
         height="100%"
-        :rounded="resolvedShape === 'circle' ? 'var(--gr-radius-full)' : 'var(--gr-avatar-square-radius, 10px)'"
+        :rounded="resolvedShape === 'circle' ? 'var(--gr-radius-full)' : 'var(--gr-avatar-square-radius)'"
       />
 
       <img

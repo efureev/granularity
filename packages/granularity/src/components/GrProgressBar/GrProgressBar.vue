@@ -150,7 +150,7 @@ const valueLabel = computed(() => valueText.value ?? `${Math.round(safe.value)}%
 [data-gr-progress-bar-indeterminate] [data-gr-progress-bar-fill] {
   width: 40%;
   animation-name: gr-progress-indeterminate;
-  animation-duration: var(--gr-progress-indeterminate-duration, 1.4s);
+  animation-duration: var(--gr-progress-indeterminate-duration);
   animation-timing-function: linear;
   animation-iteration-count: infinite;
 }

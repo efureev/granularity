@@ -100,7 +100,7 @@ defineSlots<{
  * слоям не о чем. Углы логические, поэтому RTL отражает группу сам.
  */
 [data-gr-button-group] {
-    --gr-button-group-radius: var(--gr-button-radius, 0.375rem);
+    --gr-button-group-radius: var(--gr-button-radius);
 }
 
 [data-gr-button-group][data-attached] [data-gr-button] {

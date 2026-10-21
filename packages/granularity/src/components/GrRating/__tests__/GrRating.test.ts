@@ -6,6 +6,20 @@ import GrConfigProvider from '../../GrConfigProvider/GrConfigProvider.vue'
 import GrRating from '../GrRating.vue'
 
 describe('GrRating', () => {
+  it('в ошибке пустые символы берут рамку недопустимого значения, не перезаписывая токен темы', () => {
+    const voidOf = (props: Record<string, unknown>) => {
+      const wrapper = mount(GrRating, { props: { modelValue: 2, max: 5, ...props } })
+      return { root: wrapper.get('[data-gr-rating]'), symbol: wrapper.get('[data-gr-rating-symbol] > span') }
+    }
+
+    const invalid = voidOf({ invalid: true })
+    expect(invalid.symbol.classes()).toContain('text-[var(--gr-invalid-brd)]')
+    expect(invalid.root.attributes('style') ?? '').not.toContain('--gr-rating-void-color')
+
+    expect(voidOf({}).symbol.classes()).toContain('text-[var(--gr-rating-void-color)]')
+    expect(voidOf({ invalid: true, disabled: true }).symbol.classes()).toContain('text-[var(--gr-rating-void-color)]')
+  })
+
   it('рендерит шкалу с WAI-ARIA slider-контрактом', () => {
     const wrapper = mount(GrRating, { props: { modelValue: 3, max: 5, ariaLabel: 'Оценка отеля' } })
     const scale = wrapper.get('[data-testid="gr-rating-scale"]')

@@ -48,7 +48,10 @@ export const ratingFillClassByTone: Record<GrRatingTone, string> = {
 }
 
 // «Пустой» символ: приглушённая заливка, чтобы шкала читалась целиком.
-export const ratingVoidClass = 'text-[var(--gr-rating-void-color,color-mix(in_srgb,var(--gr-muted-fg)_35%,transparent))]'
+export const ratingVoidClass = 'text-[var(--gr-rating-void-color)]'
+
+// В ошибке пустые символы берут рамку недопустимого значения: токен темы при этом не перезаписывается.
+export const ratingVoidInvalidClass = 'text-[var(--gr-invalid-brd)]'
 
 export const ratingDisabledClass = 'cursor-not-allowed text-[var(--gr-disabled-fg)]'
 

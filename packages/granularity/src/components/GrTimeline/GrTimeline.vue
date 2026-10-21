@@ -358,14 +358,14 @@ if (__GR_DEV__) {
   box-sizing: border-box;
   width: var(--gr-timeline-marker-size, 10px);
   height: var(--gr-timeline-marker-size, 10px);
-  border-width: var(--gr-timeline-marker-ring, 2px);
+  border-width: var(--gr-timeline-marker-ring);
   border-style: solid;
   border-color: transparent;
 }
 
 [data-gr-timeline-line] {
   flex: 1 1 auto;
-  width: var(--gr-timeline-axis-width, 2px);
+  width: var(--gr-timeline-axis-width);
   min-height: var(--gr-timeline-line-min, 0.75rem);
   margin-top: 0.25rem;
   /* Ровно на столько следующая точка отступает от верха своей строки: без этого
@@ -384,8 +384,8 @@ if (__GR_DEV__) {
   background-color: transparent;
   background-image: repeating-linear-gradient(
     to bottom,
-    var(--gr-timeline-axis-color, var(--gr-brd)) 0 var(--gr-timeline-dash, 4px),
-    transparent var(--gr-timeline-dash, 4px) calc(var(--gr-timeline-dash, 4px) * 2)
+    var(--gr-timeline-axis-color, var(--gr-brd)) 0 var(--gr-timeline-dash),
+    transparent var(--gr-timeline-dash) calc(var(--gr-timeline-dash) * 2)
   );
 }
 
@@ -485,7 +485,7 @@ if (__GR_DEV__) {
 
 [data-gr-timeline][data-orientation='horizontal'] [data-gr-timeline-line] {
   width: auto;
-  height: var(--gr-timeline-axis-width, 2px);
+  height: var(--gr-timeline-axis-width);
   min-width: var(--gr-timeline-line-min, 0.75rem);
   min-height: 0;
   margin-top: 0;
@@ -496,8 +496,8 @@ if (__GR_DEV__) {
 [data-gr-timeline][data-orientation='horizontal'] [data-gr-timeline-item][data-pending] [data-gr-timeline-line] {
   background-image: repeating-linear-gradient(
     to right,
-    var(--gr-timeline-axis-color, var(--gr-brd)) 0 var(--gr-timeline-dash, 4px),
-    transparent var(--gr-timeline-dash, 4px) calc(var(--gr-timeline-dash, 4px) * 2)
+    var(--gr-timeline-axis-color, var(--gr-brd)) 0 var(--gr-timeline-dash),
+    transparent var(--gr-timeline-dash) calc(var(--gr-timeline-dash) * 2)
   );
 }
 </style>

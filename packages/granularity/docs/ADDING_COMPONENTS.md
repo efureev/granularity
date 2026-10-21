@@ -155,7 +155,9 @@ export const grPopoverConfig = defineGranumComponent(import.meta.url, {
 #### `hookTokens` — свои из `tokens.json`, чужие руками
 
 Токен «только хук» (`kind: "hook"` в `tokens.json`) компонент читает через
-`var(--gr-x, дефолт)`, и тема его намеренно не задаёт. granum с 3.7 называет такой
+`var(--gr-x, дефолт)`, и тема его не задаёт: хук — ручка приложения или экземпляра.
+Дефолт — ссылка на токен (`var(--gr-x, var(--gr-bg))`) или литерал механики компонента; у
+литерала в реестре обязана стоять причина `literal` — гейт `componentTokens` иначе красный. granum с 3.7 называет такой
 токен находкой `token-fallback-only` — «всегда рисует запасное значение», обычно
 признак переименования, — если дескриптор не объявил его хуком. `doctor` пакета идёт
 с `--strict`, а у приложения та же находка вышла бы на каждом компоненте.
@@ -167,11 +169,11 @@ export const grPopoverConfig = defineGranumComponent(import.meta.url, {
 сосед ставит инлайном.
 
 ```ts
-export const grProgressCircleConfig = defineGranumComponent(import.meta.url, {
-  name: 'GrProgressCircle',
-  safelist: grProgressCircleSafelist,
-  // Длительность бесконечной анимации — общий хук с `GrProgressBar`.
-  hookTokens: ['--gr-progress-indeterminate-duration'],
+export const grXConfig = defineGranumComponent(import.meta.url, {
+  name: 'GrX',
+  safelist: grXSafelist,
+  // Хук соседа, который X читает со своим запасным значением.
+  hookTokens: ['--gr-neighbour-offset'],
 })
 ```
 
@@ -281,12 +283,15 @@ yarn workspace @feugene/granularity generate:registry
 
 ### Что генератор НЕ делает
 
-- **Значения токенов по темам.** Если у компонента свои значения по темам
-  (`GrButton`, `GrBadge`), положите их в `themes/slate/root.json` и
-  `themes/slate/modes/<режим>.json` (ключи без `--`) и объявите в `config.ts`
-  `themesDir: './themes'` — папку читает сборка пакета и кладёт значения в
-  манифест. Формула со ссылкой `var()`, одинаковая во всех режимах, — в
-  `root.json`: тогда остров режима пересчитывает её от своих ролей.
+- **Значения токенов в темах.** Токен, значение которого — дизайн-решение (цвет, тень, радиус,
+  толщина линии, длительность, кегль), — вида `theme`: компонент читает его без запасного
+  значения, а значение кладётся во **все темы каталога** пакета токенов, в раздел
+  `themes/<тема>/components/@feugene/granularity/<GrX>/` — `root.json` и
+  `modes/<режим>.json`, ключи без `--`. Компонент и его значения во всех темах выходят одним
+  пушем. Формула со ссылкой `var()`, одинаковая во всех режимах, — в `root.json`: тогда остров
+  режима пересчитывает её от своих ролей. `themesDir` у компонентов ядра нет. Полноту по всем
+  темам проверяет `catalogThemes.test.ts`, вид токенов в разделах — `componentTokens.test.ts`, а
+  значения по контекстам — `themes:values:check`.
 - **Ничего для CSS компонента.** И не нужно: `libInjectCss` вписывает
   `import '../styles.css'` внутрь чанка, так что стиль приезжает вместе с
   компонентом. Отдельного subpath на него пакет не публикует — файл без токенов

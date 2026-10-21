@@ -22,4 +22,6 @@ export default {
   ],
   engine: windEngine(),
   components: [{ provider: '@feugene/granularity-code', names: 'all' }],
+  // Темы по умолчанию у каталога нет: без `themes` сборка не выберет её сама.
+  themes: ['slate'],
 }

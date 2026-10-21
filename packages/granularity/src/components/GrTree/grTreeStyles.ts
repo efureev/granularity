@@ -120,7 +120,7 @@ export const grTreeViewVars: Record<GrTreeView, Record<string, string>> = {
     '--gr-tree-row-py': '3px',
     '--gr-tree-row-radius': '0 999px 999px 0',
     '--gr-tree-row-current-bg': 'var(--gr-primary)',
-    '--gr-tree-row-current-hover-bg': 'var(--gr-primary-hover, var(--gr-primary))',
+    '--gr-tree-row-current-hover-bg': 'var(--gr-primary-hover)',
     '--gr-tree-row-current-color': 'var(--gr-primary-fg)',
     /* Рельс — нейтральная шина уровня, а не подсветка: цвет по умолчанию
        выведен из подложки выбора и на ней же дублировался бы акцентом. */

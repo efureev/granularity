@@ -3,14 +3,31 @@
   "title": "Глина",
   "description": "Тёплая бумага, графитовые чернила и одна глиняная точка на экран.",
   "docs": "https://granularity.tech/themes/clay",
-  "extends": "slate",
+  "version": "1.0.0",
+  "targets": {
+    "@feugene/granularity": "^3.0.0"
+  },
   "defaultMode": "light",
-  "modes": [
-    { "name": "light", "title": "Светлый", "colorScheme": "light" },
-    { "name": "dark", "title": "Тёмный", "colorScheme": "dark" }
-  ],
-  "componentDefaults": {
-    "GrButton": { "loadingIndicator": "shimmer" },
-    "GrButtonGroup": { "appearance": "tray" }
+  "modes": {
+    "light": {
+      "title": "Светлый",
+      "colorScheme": "light"
+    },
+    "dark": {
+      "title": "Тёмный",
+      "colorScheme": "dark"
+    }
+  },
+  "extensions": {
+    "granularity": {
+      "componentDefaults": {
+        "GrButton": {
+          "loadingIndicator": "shimmer"
+        },
+        "GrButtonGroup": {
+          "appearance": "tray"
+        }
+      }
+    }
   }
 }

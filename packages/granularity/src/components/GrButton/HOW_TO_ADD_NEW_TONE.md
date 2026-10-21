@@ -9,19 +9,22 @@
 1. `packages/granularity-tokens/tokens/roles.json`
    - Зарегистрируй semantic token'ы тона: `--gr-<tone>`, `--gr-<tone>-light`,
      `--gr-<tone>-fg`, `--gr-<tone>-text`, `--gr-<tone>-solid` и соседей.
-2. `packages/granularity-tokens/themes/slate/modes/{light,dark}.json`
-   - Задай их значения в каждом режиме темы `slate` (ключи без `--`).
+2. `packages/granularity-tokens/themes/<тема>/modes/{light,dark}.json`
+   - Задай их значения в каждом режиме **каждой** темы каталога (ключи без `--`): тема без
+     значения неполна, и сборка темы падает с именем токена.
 3. `packages/granularity-tokens/tokens/derived.json`
    - Добавь формулы interaction state: `--gr-<tone>-hover`, `--gr-<tone>-active`.
      Фолбэки для `@supports not (color-mix)` сборка темы посчитает сама.
    - Перегенерируй: `yarn workspace @feugene/granularity-tokens generate`.
-4. `packages/granularity/src/components/GrButton/themes/slate/root.json`
-   - Добавь component-level token'ы `GrButton` (ключи без `--`): `gr-button-<tone>-bg`,
-     `-bg-hover`, `-bg-active`, `-fg`, `-soft-bg`, `-soft-bg-hover`, `-soft-bg-active`,
-     `-border-soft`, `-border`. Формулы, одинаковые во всех режимах, живут здесь:
-     granum объявляет их на каждом `[data-theme]`, и остров режима считает их от
-     своих ролей. Разное по режимам — в `themes/slate/modes/<режим>.json`.
-   - Зарегистрируй их в `GrButton/tokens.json` с `kind: "theme"`.
+4. `packages/granularity-tokens/themes/<тема>/components/@feugene/granularity/GrButton/root.json`
+   - Добавь component-level token'ы `GrButton` (ключи без `--`) в **каждую** тему каталога:
+     `gr-button-<tone>-bg`, `-bg-hover`, `-bg-active`, `-fg`, `-soft-bg`, `-soft-bg-hover`,
+     `-soft-bg-active`, `-ghost-bg-hover`, `-ghost-bg-active`, `-border-soft`, `-border`.
+     Формулы, одинаковые во всех режимах, живут здесь: granum объявляет их на каждом
+     `[data-theme]`, и остров режима считает их от своих ролей. Разное по режимам — в
+     `modes/<режим>.json` того же раздела.
+   - Зарегистрируй их в `GrButton/tokens.json` с `kind: "theme"`. Компонент читает их без
+     запасного значения: полноту по темам проверяет `catalogThemes.test.ts`.
 5. `packages/granularity/src/components/GrButton/grButtonStyles.ts`
    - Добавь новый `tone` в тип `GrButtonTone`.
    - Добавь новую запись в объект `tones`.
@@ -34,7 +37,10 @@
      - `softBackground`
      - `softBackgroundHover`
      - `softBackgroundActive`
+     - `ghostBackgroundHover`
+     - `ghostBackgroundActive`
      - `softForeground`
+     - `borderSoft`
      - `border`
      - `borderHover`
      - `borderActive`
@@ -46,7 +52,7 @@
 
 - режимы темы `slate` задают реальные semantic-цвета;
 - `tokens/derived.json` даёт общие `hover/active` формулы, на которые потом опирается компонент;
-- `GrButton/themes/slate/` — слой component token'ов. Здесь можно:
+- раздел `GrButton` каждой темы — слой component token'ов. Здесь можно:
   - просто пробросить semantic token;
   - либо зафиксировать отдельный button-specific цвет, если для кнопки нужен другой контраст.
 - `grButtonStyles.ts` связывает tone с конкретными utility-классами и одновременно формирует safelist через `tones`.
@@ -83,18 +89,20 @@
 #### 3. Component token'ы для `GrButton`
 
 ```json
-// GrButton/themes/slate/root.json
+// themes/slate/components/@feugene/granularity/GrButton/root.json
 "gr-button-brand-alt-bg": "var(--gr-brand-alt-solid)",
 "gr-button-brand-alt-bg-hover": "var(--gr-brand-alt-solid-hover)",
 "gr-button-brand-alt-bg-active": "var(--gr-brand-alt-solid-active)",
 "gr-button-brand-alt-fg": "var(--gr-brand-alt-solid-fg)",
 "gr-button-brand-alt-soft-bg": "var(--gr-brand-alt-light)",
 "gr-button-brand-alt-soft-bg-hover": "color-mix(in srgb, var(--gr-brand-alt) 10%, var(--gr-button-brand-alt-soft-bg))",
-"gr-button-brand-alt-soft-bg-active": "color-mix(in srgb, var(--gr-brand-alt) 16%, var(--gr-button-brand-alt-soft-bg))"
+"gr-button-brand-alt-soft-bg-active": "color-mix(in srgb, var(--gr-brand-alt) 16%, var(--gr-button-brand-alt-soft-bg))",
+"gr-button-brand-alt-ghost-bg-hover": "var(--gr-button-brand-alt-soft-bg-hover)",
+"gr-button-brand-alt-ghost-bg-active": "var(--gr-button-brand-alt-soft-bg-active)"
 ```
 
 Если filled-кнопка не проходит контраст, можно задать button-specific значения
-по режимам — в `GrButton/themes/slate/modes/<режим>.json`:
+по режимам — в `modes/<режим>.json` раздела `GrButton` темы:
 
 ```json
 "gr-button-brand-alt-bg": "#0369a1",
@@ -121,16 +129,19 @@ export type GrButtonTone
 ```ts
 const tones = {
   'brand-alt': {
-    solidBackground: 'var(--gr-button-brand-alt-bg,var(--gr-brand-alt))',
-    solidBackgroundHover: 'var(--gr-button-brand-alt-bg-hover,var(--gr-brand-alt-hover))',
-    solidBackgroundActive: 'var(--gr-button-brand-alt-bg-active,var(--gr-brand-alt-active))',
-    solidForeground: 'var(--gr-button-brand-alt-fg,var(--gr-brand-alt-fg,var(--gr-fg)))',
-    accentText: 'var(--gr-brand-alt-text,var(--gr-brand-alt))',
+    solidBackground: 'var(--gr-button-brand-alt-bg)',
+    solidBackgroundHover: 'var(--gr-button-brand-alt-bg-hover)',
+    solidBackgroundActive: 'var(--gr-button-brand-alt-bg-active)',
+    solidForeground: 'var(--gr-button-brand-alt-fg)',
+    accentText: 'var(--gr-brand-alt-text)',
     softBackground: 'var(--gr-button-brand-alt-soft-bg)',
     softBackgroundHover: 'var(--gr-button-brand-alt-soft-bg-hover)',
     softBackgroundActive: 'var(--gr-button-brand-alt-soft-bg-active)',
-    softForeground: 'var(--gr-brand-alt-text,var(--gr-brand-alt))',
-    border: 'var(--gr-brand-alt)',
+    ghostBackgroundHover: 'var(--gr-button-brand-alt-ghost-bg-hover)',
+    ghostBackgroundActive: 'var(--gr-button-brand-alt-ghost-bg-active)',
+    softForeground: 'var(--gr-brand-alt-text)',
+    borderSoft: 'var(--gr-button-brand-alt-border-soft)',
+    border: 'var(--gr-button-brand-alt-border)',
     borderHover: 'var(--gr-brand-alt-hover)',
     borderActive: 'var(--gr-brand-alt-active)',
   },
@@ -144,7 +155,7 @@ const tones = {
 3. Новый tone попадает в safelist через `tones`.
 4. `GrButton.test.ts` покрывает новый tone хотя бы на уровне class output / token usage.
 5. `presetUtilities.test.ts` подтверждает, что нужные утилиты реально генерируются движком.
-6. Filled variant проходит контраст для текста в обеих темах.
+6. Filled variant проходит контраст для текста в каждом режиме каждой темы каталога.
 
 ### Практическое правило
 

@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest'
 
 import GrConfigProvider from '../../GrConfigProvider/GrConfigProvider.vue'
 import GrProgressCircle from '../GrProgressCircle.vue'
+import { readComponentThemeVars, THEME_MODES as MODES } from '../../../__tests__/cssContrast'
 import { grProgressCircleArcColor } from '../grProgressCircleStyles'
 
 function mountCircle(props: Record<string, unknown> = {}, slots = {}) {
@@ -177,9 +178,11 @@ describe('GrProgressCircle', () => {
 })
 
 describe('GrProgressCircle — нейтральный тон', () => {
-  it('дуга не сливается с дорожкой: запасной цвет — `--gr-muted-fg`', () => {
-    // Дорожка — `--gr-muted`; прежний запасной `--gr-secondary` на тёмной теме
-    // с ней совпадал, и нейтральная дуга пропадала целиком.
-    expect(grProgressCircleArcColor('neutral')).toBe('var(--gr-progress-neutral-bg,var(--gr-muted-fg))')
+  it('дуга не сливается с дорожкой: в каждой теме нейтральная дуга — `--gr-muted-fg`', () => {
+    // Дорожка — `--gr-muted`; `--gr-secondary` на тёмной теме с ней совпадал, и
+    // нейтральная дуга пропадала бы целиком.
+    expect(grProgressCircleArcColor('neutral')).toBe('var(--gr-progress-neutral-bg)')
+    for (const mode of MODES)
+      expect(readComponentThemeVars('GrProgressBar', mode)['--gr-progress-neutral-bg'], mode).toBe('var(--gr-muted-fg)')
   })
 })

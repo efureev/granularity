@@ -265,7 +265,7 @@ describe('GrAffix: состояние', () => {
     last().emit({ top: 900, bottom: 901 })
     await nextTick()
 
-    expect(wrapper.find('[data-gr-affix]').classes().join(' ')).toContain('shadow-[var(--gr-affix-shadow,0_-8px_24px_-12px_')
+    expect(wrapper.find('[data-gr-affix]').classes()).toContain('shadow-[var(--gr-affix-shadow,var(--gr-affix-shadow-bottom))]')
   })
 })
 

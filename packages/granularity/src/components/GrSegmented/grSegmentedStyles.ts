@@ -161,7 +161,7 @@ const rootVariantStyles: Record<GrSegmentedVariant, Record<string, string>> = {
     '--gr-segmented-track-shadow': 'none',
     '--gr-segmented-indicator-bg': 'var(--gr-card)',
     '--gr-segmented-indicator-brd': 'color-mix(in srgb, var(--gr-card) 84%, var(--gr-brd) 16%)',
-    '--gr-segmented-indicator-shadow': 'var(--gr-shadow-1), var(--gr-segmented-indicator-highlight-shadow, 0 0 0 0 transparent)',
+    '--gr-segmented-indicator-shadow': 'var(--gr-shadow-1), var(--gr-segmented-indicator-highlight-shadow)',
     '--gr-segmented-item-color': 'var(--gr-muted-fg)',
     '--gr-segmented-item-selected-color': 'var(--gr-fg)',
     '--gr-segmented-item-hover-color': 'var(--gr-fg)',

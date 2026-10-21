@@ -19,7 +19,9 @@ export interface GrComponentToken {
   owner: string
   name: string
   kind: GrComponentTokenKind
-  /** Значение, которое действует, пока токен не переопределён. */
+  /** Значение, которое действует, пока токен не переопределён; у вида `theme` — значение в базовой теме. */
   default: string
   description: string
+  /** У хука с литералом по умолчанию — почему это механика компонента, а не значение темы. */
+  literal?: string
 }

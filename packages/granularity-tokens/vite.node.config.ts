@@ -15,7 +15,7 @@ export default defineConfig({
       fileName: (_format, entryName) => `${entryName}.js`,
     },
     rolldownOptions: {
-      external: [/^node:/],
+      external: [/^node:/, /^@feugene\/granum(?:\/|$)/],
       output: {
         chunkFileNames: 'chunks/node-[name]-[hash].js',
       },

@@ -99,8 +99,8 @@ export const stepsDescriptionClass = 'block mt-0.5 text-[length:var(--gr-control
  * края соседнего.
  */
 export const stepsConnectorClass: Record<GrStepsOrientation, string> = {
-  horizontal: 'absolute top-[calc(var(--gr-steps-marker-size)/2)] h-[var(--gr-steps-connector-size,2px)] -translate-y-1/2 left-[calc(50%+var(--gr-steps-marker-size)/2+0.5rem)] right-[calc(-50%+var(--gr-steps-marker-size)/2+0.5rem)]',
-  vertical: 'absolute left-[calc(var(--gr-steps-marker-size)/2)] w-[var(--gr-steps-connector-size,2px)] -translate-x-1/2 top-[calc(var(--gr-steps-marker-size)+0.375rem)] bottom-1',
+  horizontal: 'absolute top-[calc(var(--gr-steps-marker-size)/2)] h-[var(--gr-steps-connector-size)] -translate-y-1/2 left-[calc(50%+var(--gr-steps-marker-size)/2+0.5rem)] right-[calc(-50%+var(--gr-steps-marker-size)/2+0.5rem)]',
+  vertical: 'absolute left-[calc(var(--gr-steps-marker-size)/2)] w-[var(--gr-steps-connector-size)] -translate-x-1/2 top-[calc(var(--gr-steps-marker-size)+0.375rem)] bottom-1',
 }
 
 export const stepsConnectorDoneClass = 'bg-[var(--gr-steps-connector-done,var(--gr-primary-solid))]'

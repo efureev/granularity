@@ -8,7 +8,7 @@
  * каждая новая тема раздувала бы бандл каждого, кто читает реестр.
  */
 export { grDerivedTokens, grFoundationTokens, grRoleTokens, grThemeCatalog } from './generated'
-export { GR_DEFAULT_THEME_ID, grThemeManifest } from './manifest'
+export { GR_BASE_THEME_ID, grThemeManifest } from './manifest'
 export type { GrThemeManifest, GrThemeManifestMode, GrThemeManifestTheme } from './manifest'
 export { resolveModes } from './modes'
 export { loadThemeData } from './loadThemeData'

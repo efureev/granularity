@@ -1,30 +1,27 @@
 /**
  * Тема из папки — `@feugene/granularity-tokens/theme/node`.
  *
- * Раскладка папки — как у встроенных тем пакета (`themes/<slug>/`):
- * `theme.json`, необязательный `root.json` и `modes/<режим>.json`. Токены
- * компонентов по темам читает не он, а granum по `themesDir` компонента.
+ * Раскладка — исходник темы granum (C-42): `theme.json`, `root.json`,
+ * `modes/<режим>.json`, `base.css`, `components/<пакет>/<Компонент>/`. Читает её
+ * загрузчик granum — строго, посторонний файл называется ошибкой; `notes.json`
+ * (пояснения для доки) и `theme.lock.json` (версия по данным) — не данные темы.
+ * Сверху — проверка дизайн-системы `defineTheme`: полнота по реестру, контраст,
+ * фолбэки производных.
  */
-import { existsSync, readdirSync, readFileSync } from 'node:fs'
+import { existsSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import type { GrColorScheme, GrThemeData } from '../types'
+import { loadThemeSource } from '@feugene/granum/node'
+import type { GrThemeData } from '../types'
 import { defineTheme, type DefineThemeInput, type DefineThemeOptions, type GrModeInput } from './defineTheme'
+import { GrThemeDefinitionError } from './errors'
 
 // Не `new URL(…, import.meta.url)`: сборщик принял бы папку за ассет. Глубина
 // пути одна и та же у `src/theme/node.ts` и `dist/theme/node.js`.
 const BUILTIN_THEMES = resolve(dirname(fileURLToPath(import.meta.url)), '../../themes')
 
-interface ThemeJson {
-  id: string
-  title: string
-  description?: string
-  docs?: string
-  extends?: string
-  defaultMode?: string
-  modes?: { name: string, title?: string, colorScheme?: GrColorScheme }[]
-  componentDefaults?: Record<string, Record<string, unknown>>
-}
+/** Файлы папки темы, которые не данные темы. */
+export const GR_THEME_SOURCE_IGNORE: readonly string[] = ['notes.json', 'theme.lock.json']
 
 export interface GrThemeSource {
   input: DefineThemeInput
@@ -35,9 +32,8 @@ export interface GrThemeSource {
 }
 
 /**
- * Тема приложения для записи `themes` конфига granum. `extends` — id
- * ближайшей темы каталога в цепочке: по ней granum берёт токены компонентов,
- * которые компоненты держат только для тем каталога. `sources` — файлы, правка
+ * Тема приложения для записи `themes` конфига granum: полные данные и
+ * `extends` — id ближайшей темы каталога в цепочке. `sources` — файлы, правка
  * которых перезагружает конфиг в dev.
  */
 export type GrLoadedTheme = GrThemeData & { extends?: string, sources: string[] }
@@ -49,68 +45,54 @@ export interface LoadThemeOptions extends Omit<DefineThemeOptions, 'themes'> {
 
 const toPath = (dir: string | URL): string => (dir instanceof URL ? fileURLToPath(dir) : resolve(dir))
 
-function readJson<T>(path: string, sources: string[]): T {
-  sources.push(path)
-  return JSON.parse(readFileSync(path, 'utf8')) as T
-}
-
-/** Файл режима: плоские значения либо `{ extends, tokens }`. */
-function modeFrom(raw: Record<string, unknown>): GrModeInput {
-  const structured = typeof raw.tokens === 'object' && raw.tokens !== null
-    && Object.keys(raw).every(key => ['extends', 'tokens', 'title', 'colorScheme'].includes(key))
-
-  if (!structured)
-    return { tokens: raw as Record<string, string> }
-
-  return {
-    ...(typeof raw.extends === 'string' ? { extends: raw.extends } : {}),
-    ...(typeof raw.title === 'string' ? { title: raw.title } : {}),
-    ...(raw.colorScheme === 'light' || raw.colorScheme === 'dark' ? { colorScheme: raw.colorScheme } : {}),
-    tokens: raw.tokens as Record<string, string>,
-  }
+interface SourceMode {
+  title?: string
+  colorScheme?: 'light' | 'dark'
+  extends?: string
+  tokens?: Readonly<Record<string, string>>
+  fallbacks?: unknown
 }
 
 /** Исходные данные темы из папки — без сборки: её делает `defineTheme`. */
 export function readThemeSource(dir: string | URL): GrThemeSource {
   const root = toPath(dir)
-  const sources: string[] = []
-  const meta = readJson<ThemeJson>(join(root, 'theme.json'), sources)
-
-  const rootPath = join(root, 'root.json')
-  const rootTokens = existsSync(rootPath) ? readJson<Record<string, string>>(rootPath, sources) : undefined
-
-  const modesDir = join(root, 'modes')
-  const files = existsSync(modesDir)
-    ? readdirSync(modesDir).filter(file => file.endsWith('.json')).map(file => file.slice(0, -'.json'.length)).sort()
-    : []
-  const listed = (meta.modes ?? []).map(mode => mode.name)
+  const { sources, extends: base, ...theme } = loadThemeSource(root, { ignore: GR_THEME_SOURCE_IGNORE })
+  if (typeof base === 'object')
+    throw new GrThemeDefinitionError('theme-extends-unresolved', `${root}: тема наследует тему по id, а не объектом`)
 
   const modes: Record<string, GrModeInput> = {}
-  for (const name of [...new Set([...listed, ...files])]) {
-    const declared = meta.modes?.find(mode => mode.name === name)
-    const fromFile = files.includes(name) ? modeFrom(readJson(join(modesDir, `${name}.json`), sources)) : {}
-
+  for (const [name, mode] of Object.entries((theme.modes ?? {}) as Readonly<Record<string, SourceMode>>)) {
+    // Фолбэки производных считает `defineTheme` по значениям темы: записанные руками устарели бы на первой правке цвета.
+    if (mode.fallbacks !== undefined)
+      throw new GrThemeDefinitionError('unknown-token', `${root}: режим "${name}" несёт fallbacks — их считает сборка темы, уберите их из theme.json`)
     modes[name] = {
-      ...fromFile,
-      ...(declared?.title !== undefined ? { title: declared.title } : {}),
-      ...(declared?.colorScheme !== undefined ? { colorScheme: declared.colorScheme } : {}),
+      ...(mode.title !== undefined ? { title: mode.title } : {}),
+      ...(mode.colorScheme !== undefined ? { colorScheme: mode.colorScheme } : {}),
+      ...(mode.extends !== undefined ? { extends: mode.extends } : {}),
+      ...(mode.tokens !== undefined ? { tokens: mode.tokens } : {}),
     }
   }
 
+  const { granularity, ...otherExtensions } = (theme.extensions ?? {}) as { granularity?: { componentDefaults?: DefineThemeInput['componentDefaults'] } }
   return {
     input: {
-      id: meta.id,
-      title: meta.title,
-      ...(meta.description !== undefined ? { description: meta.description } : {}),
-      ...(meta.docs !== undefined ? { docs: meta.docs } : {}),
-      ...(meta.extends !== undefined ? { extends: meta.extends } : {}),
-      ...(meta.defaultMode !== undefined ? { defaultMode: meta.defaultMode } : {}),
-      ...(rootTokens !== undefined ? { root: rootTokens } : {}),
+      id: theme.id,
+      title: theme.title,
+      ...(theme.description !== undefined ? { description: theme.description } : {}),
+      ...(theme.docs !== undefined ? { docs: theme.docs } : {}),
+      ...(theme.version !== undefined ? { version: theme.version } : {}),
+      ...(theme.targets !== undefined ? { targets: theme.targets } : {}),
+      ...(base !== undefined ? { extends: base } : {}),
+      ...(theme.defaultMode !== undefined ? { defaultMode: theme.defaultMode } : {}),
+      ...(theme.root !== undefined ? { root: theme.root } : {}),
       modes,
-      ...(meta.componentDefaults !== undefined ? { componentDefaults: meta.componentDefaults } : {}),
+      ...(theme.baseCss !== undefined ? { baseCss: theme.baseCss } : {}),
+      ...(theme.components !== undefined ? { components: theme.components } : {}),
+      ...(granularity?.componentDefaults !== undefined ? { componentDefaults: granularity.componentDefaults } : {}),
+      ...(Object.keys(otherExtensions).length > 0 ? { extensions: otherExtensions } : {}),
     },
-    ...(meta.extends !== undefined ? { extends: meta.extends } : {}),
-    sources,
+    ...(base !== undefined ? { extends: base } : {}),
+    sources: [...(sources ?? [])],
   }
 }
 

@@ -34,22 +34,22 @@ export const valueTextSizes: Record<GrProgressBarSize, string> = {
  * нейтральный слой между треком и заливкой читается и без цвета тона.
  */
 // Не `--gr-brd`: на тёмной теме он совпадает с дорожкой, и загруженное не видно.
-export const bufferClass = 'bg-[var(--gr-progress-buffer-bg,color-mix(in_srgb,var(--gr-muted-fg)_40%,var(--gr-muted)))]'
+export const bufferClass = 'bg-[var(--gr-progress-buffer-bg)]'
 
 function withVar(token: string): string {
   return `[${token}]`
 }
 
 const toneVars: Record<GrProgressBarTone, string> = {
-  primary: 'var(--gr-progress-bg,var(--gr-primary))',
+  primary: 'var(--gr-progress-bg)',
   // Не `--gr-secondary`: на тёмной теме он совпадает с дорожкой `--gr-muted`.
-  neutral: 'var(--gr-progress-neutral-bg,var(--gr-muted-fg))',
-  success: 'var(--gr-progress-success-bg,var(--gr-success))',
-  warning: 'var(--gr-progress-warning-bg,var(--gr-warning))',
-  danger: 'var(--gr-progress-danger-bg,var(--gr-danger))',
-  info: 'var(--gr-progress-info-bg,var(--gr-info))',
-  slate: 'var(--gr-progress-slate-bg,var(--gr-slate))',
-  azure: 'var(--gr-progress-azure-bg,var(--gr-azure))',
+  neutral: 'var(--gr-progress-neutral-bg)',
+  success: 'var(--gr-progress-success-bg)',
+  warning: 'var(--gr-progress-warning-bg)',
+  danger: 'var(--gr-progress-danger-bg)',
+  info: 'var(--gr-progress-info-bg)',
+  slate: 'var(--gr-progress-slate-bg)',
+  azure: 'var(--gr-progress-azure-bg)',
 }
 
 /**
@@ -61,7 +61,7 @@ const toneVars: Record<GrProgressBarTone, string> = {
  * поздний слой побеждает при любой специфичности. Вариант `motion-reduce:`
  * ставит заливку в тот же слой и после базовых утилит.
  */
-export const progressIndeterminateReducedClass = 'motion-reduce:bg-[var(--gr-progress-indeterminate-bg,var(--gr-muted-fg))]'
+export const progressIndeterminateReducedClass = 'motion-reduce:bg-[var(--gr-progress-indeterminate-bg)]'
 
 export function grProgressBarFillClass(tone: GrProgressBarTone): string {
   return `bg-${withVar(toneVars[tone])}`
