@@ -1,5 +1,8 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
+
+import { useTheme } from '@feugene/granularity'
 
 import IconLayoutGrid from '~icons/lucide/layout-grid'
 import IconLibrary from '~icons/lucide/library'
@@ -10,6 +13,7 @@ import themeManifest from 'virtual:granum/themes'
 import { catalog } from '../catalog'
 import { foundations } from '../foundations'
 import { plural } from '../plural'
+import { THEME_STORAGE_KEY } from '../theme'
 import { designThemes, THEME_BUILD_LABEL } from '../themes'
 
 defineProps<{ overlay: boolean }>()
@@ -17,6 +21,10 @@ defineProps<{ overlay: boolean }>()
 const open = defineModel<boolean>('open', { default: false })
 
 const route = useRoute()
+
+// Тему ссылкам задаём явно: панель видна и на «не найдено», где темы в адресе нет.
+const { theme: documentTheme } = useTheme({ storageKey: THEME_STORAGE_KEY })
+const theme = computed(() => (typeof route.params.theme === 'string' ? route.params.theme : documentTheme.value))
 
 const themes = designThemes(themeManifest)
 
@@ -47,7 +55,7 @@ const componentIcons: Record<string, typeof IconLayoutGrid> = {
         label="Обзор"
         :icon="IconLayoutGrid"
         :as="RouterLink"
-        to="/"
+        :to="{ name: 'overview', params: { theme } }"
         :active="route.name === 'overview'"
       />
 
@@ -58,7 +66,7 @@ const componentIcons: Record<string, typeof IconLayoutGrid> = {
           :label="foundation.title"
           :icon="foundation.icon"
           :as="RouterLink"
-          :to="`/foundations/${foundation.id}`"
+          :to="{ name: 'foundation', params: { theme, foundation: foundation.id } }"
           :active="route.name === 'foundation' && route.params.foundation === foundation.id"
         />
       </GrSidebarGroup>
@@ -68,18 +76,18 @@ const componentIcons: Record<string, typeof IconLayoutGrid> = {
           label="Каталог тем"
           :icon="IconLibrary"
           :as="RouterLink"
-          to="/themes"
+          :to="{ name: 'themes', params: { theme } }"
           :active="route.name === 'themes'"
         />
         <GrSidebarItem
-          v-for="theme in themes"
-          :key="theme.entry.id"
-          :label="theme.entry.title"
+          v-for="entry in themes"
+          :key="entry.entry.id"
+          :label="entry.entry.title"
           :icon="IconSwatchBook"
-          :badge="THEME_BUILD_LABEL[theme.build]"
+          :badge="THEME_BUILD_LABEL[entry.build]"
           :as="RouterLink"
-          :to="`/themes/${theme.entry.id}`"
-          :active="route.name === 'theme' && route.params.theme === theme.entry.id"
+          :to="{ name: 'theme', params: { theme, slug: entry.entry.id } }"
+          :active="route.name === 'theme' && route.params.slug === entry.entry.id"
         />
       </GrSidebarGroup>
 
@@ -91,7 +99,7 @@ const componentIcons: Record<string, typeof IconLayoutGrid> = {
           :icon="componentIcons[component.id]"
           :badge="plural(component.versions.length, ['версия', 'версии', 'версий'])"
           :as="RouterLink"
-          :to="`/components/${component.id}`"
+          :to="{ name: 'component', params: { theme, component: component.id } }"
           :active="route.name === 'component' && route.params.component === component.id"
         />
       </GrSidebarGroup>

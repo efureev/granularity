@@ -1,17 +1,29 @@
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import { useRoute } from 'vue-router'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 
 import { useTheme } from '@feugene/granularity'
+import themeManifest from 'virtual:granum/themes'
 import IconMenu from '~icons/lucide/menu'
 import IconMoon from '~icons/lucide/moon'
 import IconSun from '~icons/lucide/sun'
 
 import AppSidebar from './parts/AppSidebar.vue'
 import { THEME_STORAGE_KEY } from './theme'
+import { designThemes } from './themes'
 
 const route = useRoute()
+const router = useRouter()
 const { isDark, toggleMode } = useTheme({ storageKey: THEME_STORAGE_KEY })
+
+// Тема — в адресе: выбор в шапке — та же страница под другой темой.
+const themeOptions = designThemes(themeManifest)
+  .filter(theme => theme.build !== 'absent')
+  .map(theme => ({ value: theme.entry.id, label: theme.entry.title }))
+const viewedTheme = computed({
+  get: () => String(route.params.theme ?? ''),
+  set: (id: string) => void router.push({ params: { theme: id } }),
+})
 
 /**
  * Узкий экран решает приложение, а не панель: своих брейкпоинтов у пакета нет.
@@ -62,19 +74,28 @@ watch(() => route.fullPath, () => {
           <span class="text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)] text-[var(--gr-muted-fg)]">дизайн-система</span>
         </template>
 
-        <GrButton
-          class="ms-auto"
-          variant="ghost"
-          tone="neutral"
-          square
-          :aria-label="isDark ? 'Светлый режим' : 'Тёмный режим'"
-          @click="toggleMode"
-        >
-          <GrIcon>
-            <IconSun v-if="isDark" />
-            <IconMoon v-else />
-          </GrIcon>
-        </GrButton>
+        <div class="ms-auto flex items-center gap-2">
+          <GrSelect
+            v-if="viewedTheme"
+            v-model="viewedTheme"
+            :options="themeOptions"
+            size="sm"
+            aria-label="Тема"
+            class="w-36"
+          />
+          <GrButton
+            variant="ghost"
+            tone="neutral"
+            square
+            :aria-label="isDark ? 'Светлый режим' : 'Тёмный режим'"
+            @click="toggleMode"
+          >
+            <GrIcon>
+              <IconSun v-if="isDark" />
+              <IconMoon v-else />
+            </GrIcon>
+          </GrButton>
+        </div>
       </header>
 
       <main id="main" tabindex="-1" class="min-w-0 flex-1 outline-none">

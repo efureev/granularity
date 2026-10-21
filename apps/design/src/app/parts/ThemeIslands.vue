@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useRoute } from 'vue-router'
 
 import type { GrModeEntry } from '@feugene/granularity'
 import themeManifest from 'virtual:granum/themes'
@@ -9,13 +10,15 @@ import { themeModes } from '../themes'
 /**
  * Одно содержимое во всех режимах темы рядом. Режим — пара в атрибуте
  * поддерева, поэтому остров светлого режима честно светлый и внутри тёмной
- * страницы. Без `theme` — тема документа, с ним — эта тема сборки.
+ * страницы. Без `theme` — тема документа, она же тема адреса, с ним — эта тема
+ * сборки: режимы островов — всегда той темы, чьи значения они показывают.
  */
 const props = defineProps<{ theme?: string }>()
 
 defineSlots<{ default: (props: { mode: GrModeEntry }) => unknown }>()
 
-const modes = computed(() => themeModes(themeManifest, props.theme))
+const route = useRoute()
+const modes = computed(() => themeModes(themeManifest, props.theme ?? String(route.params.theme)))
 </script>
 
 <template>

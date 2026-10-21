@@ -1,6 +1,6 @@
 import AxeBuilder from '@axe-core/playwright'
 import { expect, test } from '@playwright/test'
-import { grThemeCatalog } from '@feugene/granularity-tokens'
+import { GR_DEFAULT_THEME_ID, grThemeCatalog } from '@feugene/granularity-tokens'
 
 /**
  * Страница каждой темы каталога: острова её режимов с настоящими компонентами.
@@ -12,7 +12,7 @@ import { grThemeCatalog } from '@feugene/granularity-tokens'
 for (const { id } of grThemeCatalog) {
   test.describe(`/themes/${id}`, () => {
     test.beforeEach(async ({ page }) => {
-      await page.goto(`/themes/${id}`)
+      await page.goto(`/${GR_DEFAULT_THEME_ID}/themes/${id}`)
       await page.locator('section', { hasText: 'Компоненты' }).locator('[data-gr-button]').first().waitFor()
     })
 

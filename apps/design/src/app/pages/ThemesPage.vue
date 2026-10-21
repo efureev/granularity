@@ -21,7 +21,7 @@ const themes = designThemes(themeManifest)
 
     <ul class="grid gap-4 md:grid-cols-2">
       <li v-for="theme in themes" :key="theme.entry.id">
-        <RouterLink :to="`/themes/${theme.entry.id}`" class="theme-card">
+        <RouterLink :to="{ name: 'theme', params: { slug: theme.entry.id } }" class="theme-card">
           <span class="flex items-center justify-between gap-3">
             <span class="text-[length:var(--gr-text-lg)] font-600 leading-[var(--gr-leading-lg)]">{{ theme.entry.title }}</span>
             <GrIcon class="text-[var(--gr-muted-fg)]"><IconArrowRight /></GrIcon>

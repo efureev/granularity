@@ -1,12 +1,14 @@
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 
 import DocSection from '../parts/DocSection.vue'
 import { foundationSection } from '../tokens'
+import { useViewedTheme } from '../viewedTheme'
 
-const motion = foundationSection('Motion')
-const durations = motion.filter(token => token.name.startsWith('--gr-duration-'))
-const easings = motion.filter(token => token.name.startsWith('--gr-ease-'))
+const theme = useViewedTheme()
+const motion = computed(() => foundationSection(theme.value, 'Motion'))
+const durations = computed(() => motion.value.filter(token => token.name.startsWith('--gr-duration-')))
+const easings = computed(() => motion.value.filter(token => token.name.startsWith('--gr-ease-')))
 
 const durationUse: Record<string, string> = {
   '--gr-duration-fast': 'наведение, цвет, нажатие',

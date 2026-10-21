@@ -9,9 +9,11 @@ import 'virtual:granum.css'
 import 'virtual:granum/themes.css'
 
 import App from './app/App.vue'
-import { router } from './app/router'
+import { followDocumentTheme, router } from './app/router'
 import { THEME_STORAGE_KEY } from './app/theme'
 
+// Пара сохранённого выбора — до первого кадра; тему адреса включает роутер до отрисовки страницы.
 initThemeEarly({ manifest: themeManifest, storageKey: THEME_STORAGE_KEY })
+followDocumentTheme()
 
 createApp(App).use(router).mount('#app')

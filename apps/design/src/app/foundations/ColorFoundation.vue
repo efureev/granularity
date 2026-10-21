@@ -1,15 +1,18 @@
 <script setup lang="ts">
 import { grDerivedTokens } from '@feugene/granularity-tokens'
+import { computed } from 'vue'
 
 import ColorSwatch from '../parts/ColorSwatch.vue'
 import DocSection from '../parts/DocSection.vue'
 import ThemeIslands from '../parts/ThemeIslands.vue'
-import { foundationSection, hasThemeToken, themeSection } from '../tokens'
+import { foundationSection, hasThemeToken, modeValue, themeSection } from '../tokens'
+import { useViewedTheme } from '../viewedTheme'
 
+const theme = useViewedTheme()
 const surfaces = themeSection('Surface roles')
 const states = themeSection('State roles')
 const charts = themeSection('Data visualization roles')
-const neutral = foundationSection('Foundations: neutral palette')
+const neutral = computed(() => foundationSection(theme.value, 'Foundations: neutral palette'))
 
 const roleGroups = [
   {
@@ -132,13 +135,14 @@ const derived = grDerivedTokens.filter(token => /^--gr-(?:primary|danger|success
       title="Состояния"
       lead="Недоступное гасится своими ролями, никогда не прозрачностью. Ошибка валидации — свои роли, а не danger: декоративный тон и вердикт формы — разные сообщения. Наведение и нажатие — тон с подмесом цвета текста темы."
     >
-      <ThemeIslands>
+      <ThemeIslands v-slot="{ mode }">
         <ul class="grid gap-3 sm:grid-cols-2">
           <li v-for="token in states" :key="token.name">
             <ColorSwatch :name="token.name" />
           </li>
+          <!-- Своё значение режима, если тема его задала, иначе формула -->
           <li v-for="token in derived" :key="token.name">
-            <ColorSwatch :name="token.name" :value="token.formula" />
+            <ColorSwatch :name="token.name" :value="modeValue(theme, mode.name, token.name) ?? token.formula" />
           </li>
         </ul>
       </ThemeIslands>

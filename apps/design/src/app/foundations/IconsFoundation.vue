@@ -8,13 +8,17 @@ import IconSearch from '~icons/lucide/search'
 import IconSend from '~icons/lucide/send'
 import IconTrash from '~icons/lucide/trash-2'
 
+import { computed } from 'vue'
+
 import DocSection from '../parts/DocSection.vue'
 import { foundationSection } from '../tokens'
+import { useViewedTheme } from '../viewedTheme'
 
-const sizes = foundationSection('Iconography: icon sizes').map(token => ({
+const theme = useViewedTheme()
+const sizes = computed(() => foundationSection(theme.value, 'Iconography: icon sizes').map(token => ({
   ...token,
   step: token.name.replace('--gr-icon-size-', '') as 'xs' | 'sm' | 'md' | 'lg',
-}))
+})))
 const sample = [IconPlus, IconSearch, IconSave, IconDownload, IconCopy, IconSend, IconTrash, IconArrowRight]
 
 const buttonSteps = [

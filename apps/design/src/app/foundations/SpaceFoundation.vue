@@ -1,12 +1,16 @@
 <script setup lang="ts">
+import { computed } from 'vue'
+
 import DocSection from '../parts/DocSection.vue'
 import ThemeIslands from '../parts/ThemeIslands.vue'
 import { foundationSection } from '../tokens'
+import { useViewedTheme } from '../viewedTheme'
 
-const spacing = foundationSection('Layout: spacing scale').filter(token => Number.parseInt(token.value) <= 96)
-const layers = foundationSection('Layering: z-index scale')
-const breakpoints = foundationSection('Layout: breakpoints')
-const containers = foundationSection('Layout: containers')
+const theme = useViewedTheme()
+const spacing = computed(() => foundationSection(theme.value, 'Layout: spacing scale').filter(token => Number.parseInt(token.value) <= 96))
+const layers = computed(() => foundationSection(theme.value, 'Layering: z-index scale'))
+const breakpoints = computed(() => foundationSection(theme.value, 'Layout: breakpoints'))
+const containers = computed(() => foundationSection(theme.value, 'Layout: containers'))
 
 const radii = [
   { name: '--gr-radius-sm', use: 'клавиши, мелкие плашки' },
@@ -16,7 +20,7 @@ const radii = [
   { name: '--gr-radius-xl', use: 'модальные окна' },
   { name: '--gr-radius-full', use: 'чипы, бейджи, аватары, переключатели' },
 ]
-const radiusValues = new Map(foundationSection('Shapes: radii and compatibility aliases').map(token => [token.name, token.value]))
+const radiusValues = computed(() => new Map(foundationSection(theme.value, 'Shapes: radii and compatibility aliases').map(token => [token.name, token.value])))
 
 const shadows = [
   { name: '--gr-shadow-1', use: 'кнопки с заливкой, карточки, клавиши, бегунки, подсказки' },

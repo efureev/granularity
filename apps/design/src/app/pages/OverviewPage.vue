@@ -76,7 +76,7 @@ const stats = [
     <DocSection title="Компоненты" lead="Страница компонента — его спецификация на настоящих компонентах пакета и макеты всех версий дизайна.">
       <ul class="grid gap-4 md:grid-cols-2">
         <li v-for="component in catalog" :key="component.id">
-          <RouterLink :to="`/components/${component.id}`" class="overview-card">
+          <RouterLink :to="{ name: 'component', params: { component: component.id } }" class="overview-card">
             <span class="flex items-center justify-between gap-3">
               <span class="text-[length:var(--gr-text-lg)] font-600 leading-[var(--gr-leading-lg)]">{{ component.name }}</span>
               <GrIcon class="text-[var(--gr-muted-fg)]"><IconArrowRight /></GrIcon>
@@ -96,7 +96,7 @@ const stats = [
     <DocSection title="Основы">
       <ul class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         <li v-for="foundation in foundations" :key="foundation.id">
-          <RouterLink :to="`/foundations/${foundation.id}`" class="overview-card">
+          <RouterLink :to="{ name: 'foundation', params: { foundation: foundation.id } }" class="overview-card">
             <span class="flex items-center gap-2">
               <GrIcon class="text-[var(--gr-primary-text)]"><component :is="foundation.icon" /></GrIcon>
               <span class="text-[length:var(--gr-text-base)] font-600 leading-[var(--gr-leading-base)]">{{ foundation.title }}</span>

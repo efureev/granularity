@@ -5,7 +5,10 @@ import IconCheck from '~icons/lucide/check'
 import IconX from '~icons/lucide/x'
 
 import DocSection from '../parts/DocSection.vue'
-import { contrastRatio, type ModeName, resolveColor, SLATE_MODES } from '../tokens'
+import { contrastRatio, type ModeName, resolveColor } from '../tokens'
+import { useViewedTheme } from '../viewedTheme'
+
+const theme = useViewedTheme()
 
 interface Pair {
   label: string
@@ -29,9 +32,13 @@ const pairs: Pair[] = [
   ...['primary', ...TONES].map(tone => ({ label: `${tone}: подпись на заливке`, fg: `--gr-${tone}-solid-fg`, bg: `--gr-${tone}-solid`, min: 4.5 })),
 ]
 
-function ratio(pair: Pair, theme: ModeName): number | undefined {
-  const fg = resolveColor(pair.fg, theme)
-  const bg = resolveColor(pair.bg, theme)
+function color(name: string, mode: ModeName): string | undefined {
+  return resolveColor(theme.value, name, mode)
+}
+
+function ratio(pair: Pair, mode: ModeName): number | undefined {
+  const fg = color(pair.fg, mode)
+  const bg = color(pair.bg, mode)
   return fg && bg ? contrastRatio(fg, bg) : undefined
 }
 
@@ -157,8 +164,8 @@ function save(): void {
               <th scope="col" class="px-4 py-3 text-start font-500">
                 Порог
               </th>
-              <th v-for="theme in SLATE_MODES" :key="theme.id" scope="col" class="px-4 py-3 text-start font-500">
-                {{ theme.label }}
+              <th v-for="mode in theme.modeList" :key="mode.id" scope="col" class="px-4 py-3 text-start font-500">
+                {{ mode.label }}
               </th>
             </tr>
           </thead>
@@ -171,17 +178,17 @@ function save(): void {
               <td class="px-4 py-2.5 font-[var(--gr-font-mono)] [font-variant-numeric:tabular-nums]">
                 {{ pair.min }}:1
               </td>
-              <td v-for="theme in SLATE_MODES" :key="theme.id" class="px-4 py-2.5">
-                <template v-if="ratio(pair, theme.id) !== undefined">
+              <td v-for="mode in theme.modeList" :key="mode.id" class="px-4 py-2.5">
+                <template v-if="ratio(pair, mode.id) !== undefined">
                   <span class="inline-flex items-center gap-2">
                     <span
                       class="inline-flex h-6 w-9 items-center justify-center rounded-[var(--gr-radius-sm)] text-[length:var(--gr-text-2xs)] font-600 leading-none"
-                      :style="{ background: resolveColor(pair.bg, theme.id), color: resolveColor(pair.fg, theme.id) }"
+                      :style="{ background: color(pair.bg, mode.id), color: color(pair.fg, mode.id) }"
                       aria-hidden="true"
                     >Aa</span>
-                    <span class="font-[var(--gr-font-mono)] [font-variant-numeric:tabular-nums]">{{ ratio(pair, theme.id)!.toFixed(2) }}</span>
-                    <GrBadge :tone="ratio(pair, theme.id)! >= pair.min ? 'success' : 'danger'" size="xs">
-                      {{ ratio(pair, theme.id)! >= pair.min ? 'проходит' : 'ниже порога' }}
+                    <span class="font-[var(--gr-font-mono)] [font-variant-numeric:tabular-nums]">{{ ratio(pair, mode.id)!.toFixed(2) }}</span>
+                    <GrBadge :tone="ratio(pair, mode.id)! >= pair.min ? 'success' : 'danger'" size="xs">
+                      {{ ratio(pair, mode.id)! >= pair.min ? 'проходит' : 'ниже порога' }}
                     </GrBadge>
                   </span>
                 </template>

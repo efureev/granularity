@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 
-import { useTheme } from '@feugene/granularity'
 import themeManifest from 'virtual:granum/themes'
 import IconCheck from '~icons/lucide/check'
 
@@ -10,21 +9,20 @@ import ColorSwatch from '../parts/ColorSwatch.vue'
 import DocSection from '../parts/DocSection.vue'
 import PageHeader from '../parts/PageHeader.vue'
 import ThemeIslands from '../parts/ThemeIslands.vue'
-import { THEME_STORAGE_KEY } from '../theme'
 import { findDesignTheme, islandTheme, THEME_BUILD_LABEL } from '../themes'
 import NotFoundPage from './NotFoundPage.vue'
 
 const route = useRoute()
+const router = useRouter()
 
-const theme = computed(() => findDesignTheme(themeManifest, String(route.params.theme)))
+const theme = computed(() => findDesignTheme(themeManifest, String(route.params.slug)))
 const islands = computed(() => (theme.value ? islandTheme(theme.value) : undefined))
 
-// Тема всего приложения — та же, что у оболочки: `setTheme` грузит лист
-// дополнительной темы и ставит пару на корень, выбор запоминается.
-const { theme: appTheme, setTheme } = useTheme({ storageKey: THEME_STORAGE_KEY })
+// Тема всего приложения живёт в адресе: применить — перейти на ту же страницу
+// под этой темой, а роутер включит её у документа.
 const applying = ref(false)
 const applyError = ref<string>()
-const applied = computed(() => theme.value?.entry.id === appTheme.value)
+const applied = computed(() => theme.value?.entry.id === route.params.theme)
 
 async function applyToApp(): Promise<void> {
   if (!theme.value)
@@ -32,7 +30,7 @@ async function applyToApp(): Promise<void> {
   applying.value = true
   applyError.value = undefined
   try {
-    await setTheme(theme.value.entry.id)
+    await router.push({ params: { theme: theme.value.entry.id } })
   }
   catch (error) {
     applyError.value = (error as Error).message

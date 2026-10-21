@@ -22,6 +22,7 @@ declare module 'vue' {
     GrKbd: typeof import('@feugene/granularity/components/GrKbd')['GrKbd']
     GrLink: typeof import('@feugene/granularity/components/GrLink')['GrLink']
     GrSegmented: typeof import('@feugene/granularity/components/GrSegmented')['GrSegmented']
+    GrSelect: typeof import('@feugene/granularity/components/GrSelect')['GrSelect']
     GrSidebar: typeof import('@feugene/granularity/components/GrSidebar')['GrSidebar']
     GrSidebarGroup: typeof import('@feugene/granularity/components/GrSidebar')['GrSidebarGroup']
     GrSidebarItem: typeof import('@feugene/granularity/components/GrSidebar')['GrSidebarItem']

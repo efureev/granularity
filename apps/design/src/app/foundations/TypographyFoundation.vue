@@ -1,13 +1,19 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 
 import DocSection from '../parts/DocSection.vue'
 import { foundationSection, foundationValue } from '../tokens'
+import { useViewedTheme } from '../viewedTheme'
 
-const families = foundationSection('Typography: font families')
-const contentSizes = foundationSection('Typography: font sizes')
-const controlSizes = foundationSection('Typography: control scale')
-const weights = foundationSection('Typography: font weights')
+const theme = useViewedTheme()
+const families = computed(() => foundationSection(theme.value, 'Typography: font families'))
+const contentSizes = computed(() => foundationSection(theme.value, 'Typography: font sizes'))
+const controlSizes = computed(() => foundationSection(theme.value, 'Typography: control scale'))
+const weights = computed(() => foundationSection(theme.value, 'Typography: font weights'))
+
+function value(name: string): string | undefined {
+  return foundationValue(theme.value, name)
+}
 
 function step(name: string, prefix: string): string {
   return name.replace(prefix, '')
@@ -16,12 +22,12 @@ function step(name: string, prefix: string): string {
 /** Межстрочный той же ступени, если он объявлен. */
 function contentLeading(name: string): string | undefined {
   const leading = `--gr-leading-${step(name, '--gr-text-')}`
-  return foundationValue(leading) ? leading : undefined
+  return value(leading) ? leading : undefined
 }
 
 function controlLeading(name: string): string | undefined {
   const leading = `--gr-control-leading-${step(name, '--gr-control-text-')}`
-  return foundationValue(leading) ? leading : undefined
+  return value(leading) ? leading : undefined
 }
 
 const controlUsers: Record<string, string> = {
@@ -88,7 +94,7 @@ const alignOptions = [
               <span class="flex flex-col">
                 <code class="font-[var(--gr-font-mono)] text-[length:var(--gr-text-xs)] leading-[var(--gr-leading-xs)]">{{ step(size.name, '--gr-text-') }}</code>
                 <span class="font-[var(--gr-font-mono)] text-[length:var(--gr-text-2xs)] leading-[var(--gr-leading-2xs)] text-[var(--gr-muted-fg)]">
-                  {{ size.value }}<template v-if="contentLeading(size.name)"> / {{ foundationValue(contentLeading(size.name)!) }}</template>
+                  {{ size.value }}<template v-if="contentLeading(size.name)"> / {{ value(contentLeading(size.name)!) }}</template>
                 </span>
               </span>
               <span
@@ -112,7 +118,7 @@ const alignOptions = [
               <span class="flex flex-col">
                 <code class="font-[var(--gr-font-mono)] text-[length:var(--gr-text-xs)] leading-[var(--gr-leading-xs)]">{{ step(size.name, '--gr-control-text-') }}</code>
                 <span class="font-[var(--gr-font-mono)] text-[length:var(--gr-text-2xs)] leading-[var(--gr-leading-2xs)] text-[var(--gr-muted-fg)]">
-                  {{ size.value }}<template v-if="controlLeading(size.name)"> / {{ foundationValue(controlLeading(size.name)!) }}</template>
+                  {{ size.value }}<template v-if="controlLeading(size.name)"> / {{ value(controlLeading(size.name)!) }}</template>
                 </span>
               </span>
               <span class="flex items-center justify-between gap-3">
