@@ -65,7 +65,7 @@ themes: [
 У каждой темы — своя `version` и `targets`: под какие версии пакетов компонентов она написана.
 
 ```json
-{ "id": "clay", "version": "1.0.0", "targets": { "@feugene/granularity": "^3.0.0" } }
+{ "id": "clay", "version": "1.1.0", "targets": { "@feugene/granularity": "^3.1.0" } }
 ```
 
 Пакет, чьи значения тема задаёт в `components`, обязан быть в `targets`. Сборка сверяет диапазон с

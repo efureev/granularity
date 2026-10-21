@@ -138,14 +138,14 @@ my-app/
     "typecheck": "vue-tsc --noEmit -p tsconfig.json"
   },
   "dependencies": {
-    "@feugene/granularity": "^3.0.0",
+    "@feugene/granularity": "^3.1.0",
     "@floating-ui/dom": "^1.8.0",
     "@unocss/reset": "^66.7.5",
     "vue": "^3.5.40"
   },
   "devDependencies": {
-    "@feugene/granum": "^3.9.0",
-    "@feugene/granum-engine-wind": "^3.9.0",
+    "@feugene/granum": "^3.10.0",
+    "@feugene/granum-engine-wind": "^3.10.0",
     "@vitejs/plugin-vue": "^6.0.8",
     "typescript": "^6.0.2",
     "vite": "^8.2.2",
@@ -757,7 +757,7 @@ export async function setupI18n() {
 <!-- ecosystem:generated:start -->
 | Пакет | Версия | Компоненты | Блок i18n | Резолвер |
 | --- | --- | --- | --- | --- |
-| `@feugene/granularity` | 3.0.0 | ядро, 106 subpath-экспортов `./components/Gr*` | `gr` | `GranularityResolver` (из `@feugene/unplugin-granularity`) |
+| `@feugene/granularity` | 3.1.0 | ядро, 106 subpath-экспортов `./components/Gr*` | `gr` | `GranularityResolver` (из `@feugene/unplugin-granularity`) |
 | `@feugene/granularity-charts` | 2.0.2 | `GrChartArea`, `GrChartBar`, `GrChartBullet`, `GrChartFunnel`, `GrChartHeatmap`, `GrChartLine`, `GrChartPie`, `GrChartRadar`, `GrChartWaterfall`, `GrSparkline` | `grCharts` | `GranularityChartsResolver` |
 | `@feugene/granularity-chrono` | 2.0.2 | `GrCalendar`, `GrDatePicker`, `GrDateRangePicker`, `GrDateTimePicker`, `GrDuration`, `GrRelativeTime`, `GrTimePicker` | `grChrono` | `GranularityChronoResolver` |
 | `@feugene/granularity-code` | 2.0.2 | `GrCodeBlock`, `GrCodeEditor`, `GrDiff` | `grCode` | `GranularityCodeResolver` |
@@ -771,7 +771,7 @@ export async function setupI18n() {
 - [`@feugene/granularity-datasource`](../../granularity-datasource) `0.1.2`
 - [`@feugene/granularity-devtools`](../../granularity-devtools) `2.1.1`
 - [`@feugene/granularity-test-kit`](../../granularity-test-kit) `2.2.0`
-- [`@feugene/granularity-tokens`](../../granularity-tokens) `2.0.0`
+- [`@feugene/granularity-tokens`](../../granularity-tokens) `2.1.0`
 - [`@feugene/unplugin-granularity`](../../unplugin-granularity) `1.2.1`
 <!-- ecosystem:generated:end -->
 

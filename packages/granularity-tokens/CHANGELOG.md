@@ -7,6 +7,10 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v2.1.0] 2026-10-21
+
+Темы каталога написаны под ядро 3.1: `targets` — `{ "@feugene/granularity": "^3.1.0" }`.
+
 ### Added
 
 - **Тема «Тактильная» (`tactile`)** — наследник `slate`: кнопка-предмет со светом сверху, тенью

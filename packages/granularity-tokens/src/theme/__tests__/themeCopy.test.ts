@@ -36,7 +36,8 @@ describe('theme:copy — копия темы для granularity', () => {
   })
 
   it('копия независима: без extends, со своими id и версией', () => {
-    expect(theme).toMatchObject({ id: 'stone', title: 'Камень', version: '1.0.0', targets: { '@feugene/granularity': '^3.0.0' } })
+    const source = JSON.parse(readFileSync(join(slateDir, 'theme.json'), 'utf8')) as { targets: Record<string, string> }
+    expect(theme).toMatchObject({ id: 'stone', title: 'Камень', version: '1.0.0', targets: source.targets })
     expect(theme.extends).toBeUndefined()
   })
 

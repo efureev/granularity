@@ -5,7 +5,7 @@
   "docs": "https://granularity.tech/themes/blueprint",
   "version": "1.0.0",
   "targets": {
-    "@feugene/granularity": "^3.0.0"
+    "@feugene/granularity": "^3.1.0"
   },
   "defaultMode": "light",
   "modes": {

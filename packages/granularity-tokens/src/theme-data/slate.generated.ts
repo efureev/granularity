@@ -10,7 +10,7 @@ const data: GrThemeData = {
   "docs": "https://granularity.tech/themes/slate",
   "version": "1.1.0",
   "targets": {
-    "@feugene/granularity": "^3.0.0"
+    "@feugene/granularity": "^3.1.0"
   },
   "root": {
     "gr-slate-0": "#ffffff",

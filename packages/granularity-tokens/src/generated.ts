@@ -1156,7 +1156,7 @@ export const grThemeCatalog: GrThemeCatalogEntry[] = [
     "docs": "https://granularity.tech/themes/blueprint",
     "version": "1.0.0",
     "targets": {
-      "@feugene/granularity": "^3.0.0"
+      "@feugene/granularity": "^3.1.0"
     },
     "defaultMode": "light",
     "modes": [
@@ -1179,7 +1179,7 @@ export const grThemeCatalog: GrThemeCatalogEntry[] = [
     "docs": "https://granularity.tech/themes/clay",
     "version": "1.1.0",
     "targets": {
-      "@feugene/granularity": "^3.0.0"
+      "@feugene/granularity": "^3.1.0"
     },
     "defaultMode": "light",
     "modes": [
@@ -1202,7 +1202,7 @@ export const grThemeCatalog: GrThemeCatalogEntry[] = [
     "docs": "https://granularity.tech/themes/slate",
     "version": "1.1.0",
     "targets": {
-      "@feugene/granularity": "^3.0.0"
+      "@feugene/granularity": "^3.1.0"
     },
     "defaultMode": "light",
     "modes": [
@@ -1225,7 +1225,7 @@ export const grThemeCatalog: GrThemeCatalogEntry[] = [
     "docs": "https://granularity.tech/themes/tactile",
     "version": "1.0.0",
     "targets": {
-      "@feugene/granularity": "^3.0.0"
+      "@feugene/granularity": "^3.1.0"
     },
     "extends": "slate",
     "defaultMode": "light",
