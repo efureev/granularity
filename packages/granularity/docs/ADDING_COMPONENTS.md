@@ -7,7 +7,7 @@
 - код нового компонента живёт внутри `packages/granularity/src/components/<ComponentName>`;
 - источником правды для подключения компонента в granular-механизмы является `config.ts`;
 - набор файлов внутри папки компонента **не обязан быть одинаковым** для всех компонентов: добавляйте только то, что действительно нужно;
-- общий пакетный API и registry обновляются вручную, а производные вещи вроде safelist-агрегации и CSS asset generation строятся уже из зарегистрированных конфигов.
+- реестры пакета — `src/index.ts`, `package.json#exports`, entry в `vite.config.ts`, провайдер — раскладывает генератор `generate:registry` по файловой системе; руками их не правят.
 
 ## Когда компонент нужно добавлять сюда
 
@@ -19,29 +19,47 @@
   импортируется чанком компонента — отдельного subpath на него нет;
 - иметь зависимые granular-компоненты, safelist или локальные CSS-файлы, которые учитывает сборка granum.
 
-## Минимальная структура компонента
-
-Обязательный минимум для нового компонента такой:
+## Структура папки компонента
 
 ```text
-src/components/<ComponentName>/
-  <ComponentName>.vue
-  config.ts
-  index.ts
+src/components/GrButton/
+  GrButton.vue        компонент
+  index.ts            публичные экспорты
+  config.ts           дескриптор granum
+  defaults.ts         пропы, которые задают GrConfigProvider и тема
+  grButtonStyles.ts   классы по size, variant, tone
+  safelist.ts         классы, собираемые в рантайме
+  tokens.json         реестр токенов компонента
+  __tests__/
 ```
 
-Дальше структура зависит от компонента. В текущем коде дополнительно встречаются:
+| Файл | Когда | Что в нём |
+| --- | --- | --- |
+| `<Name>.vue` | всегда | SFC. Свой CSS — блоком `<style>`: сборка кладёт его в `dist/components/<Name>/styles.css`, и чанк компонента импортирует его сам |
+| `index.ts` | всегда | компонент, `config`, типы, safelist — образец ниже, в шаге 5 |
+| `config.ts` | всегда | дескриптор granum (`defineGranumComponent`): `name`, `safelist`, `dependencies`, `dynamicTokens`, `hookTokens` — только хуки чужого реестра, `group` — общий SFC нескольких компонентов |
+| `defaults.ts` | у компонента с настраиваемым оформлением | пропы, которые задают глобально `GrConfigProvider` и тема (`componentDefaults`); регистрирует их в `GrComponentDefaultsRegistry` |
+| `gr<Name>Styles.ts` | при вычисляемых классах | мапы классов по size, variant, tone и style-функции |
+| `safelist.ts` | если классы собираются в рантайме из частей | перечень семейства — той же функцией, что строит класс (см. «Что обязано попасть в safelist») |
+| `tokens.json` | если у компонента свои `--gr-*` | реестр токенов: `name`, `kind`, `default`, `description`; у хука с литералом по умолчанию — `literal` |
+| `__tests__/` | всегда | тесты компонента; сквозные гейты пакета находят его сами |
 
-- `ds<ComponentName>Styles.ts` — helper с utility-классами, вариантами, размерами и safelist;
-- `safelist.ts` — если safelist удобно держать отдельно;
-- `styles.css` — если у компонента есть собственные глобальные CSS-правила;
-- `tokens.css` — если у компонента есть собственные CSS custom properties;
-- другие локальные helper-файлы — только внутри папки компонента.
+**`tokens.json` — имена токенов как контракт компонента.** Каждая своя переменная `--gr-<name>-*`
+объявлена здесь, и `kind` говорит, кто задаёт её значение:
 
-Важно: эти файлы **не обязательны сами по себе**. Например, сейчас:
+| `kind` | Кто задаёт значение | Как компонент читает |
+| --- | --- | --- |
+| `theme` | каждая тема каталога — раздел `themes/<тема>/components/@feugene/granularity/<Name>/` пакета токенов | `var(--gr-x)` без запасного значения |
+| `hook` | приложение в своём CSS или соседний компонент (`GrButtonGroup` гасит хуками углы звеньев); тема — никогда | `var(--gr-x, запасное)`; запасное — токен или литерал механики с причиной `literal` |
+| `css` / `inline` | сам компонент — своим CSS или инлайн-стилем | — |
 
-- у `GrDialog`, `GrFormField` и `GrInput` нет отдельного `safelist.ts`, safelist экспортируется из style-helper;
-- только `GrIcon` использует `cssFiles` в `config.ts` и хранит локальные `tokens.css` / `styles.css`.
+Хуки из `tokens.json` в `config.ts` не дублируются: сборка сама кладёт их в манифест (шаг 4,
+«`hookTokens` — свои из `tokens.json`, чужие руками»). Из реестра генерируются
+[`tokens.md`](./tokens.md) (`yarn generate:tokens`) и `grComponentTokens` — подпуть
+`@feugene/granularity/tokens`.
+
+Вне папки компонента: страница [`docs/components/<Name>.md`](./components.md) и значения токенов
+вида `theme` во всех темах каталога — той же правкой.
 
 ## Пошаговый чеклист
 
@@ -49,11 +67,8 @@ src/components/<ComponentName>/
 
 Создайте `src/components/<ComponentName>/` и добавьте в неё файлы нового компонента, которые действительно относятся к granular-пакету.
 
-Минимум нужен такой:
-
-- `<ComponentName>.vue`;
-- `index.ts`;
-- `config.ts`.
+Минимум — `<ComponentName>.vue`, `index.ts`, `config.ts` и `__tests__/`; остальное — по
+таблице «Структура папки компонента».
 
 ### 2. Вынести локальную utility/style-логику при необходимости
 
@@ -73,24 +88,19 @@ src/components/<ComponentName>/
 - safelist компонента;
 - вспомогательные style-функции.
 
-### 3. Определить, нужен ли компоненту отдельный CSS
+### 3. Определить, нужен ли компоненту свой CSS
 
-Сейчас в пакете есть два разных механизма CSS:
+Утилиты покрывают почти всё. Свой CSS нужен там, где утилитой не выразить: псевдоэлементы
+(`::before` отклика кнопки, `::after` зоны касания), `@media (pointer: coarse)`,
+`prefers-reduced-motion`, ключевые кадры. Он пишется блоком `<style>` в SFC: сборка кладёт его в
+`dist/components/<ComponentName>/styles.css`, а чанк компонента импортирует файл сам —
+подключать его отдельно некому и незачем.
 
-1. **Сгенерированный component style asset** `dist/components/<ComponentName>/styles.css` —
-   внутренний: его импортирует чанк компонента, наружу он не объявляется.
-   - Он создаётся автоматически из registry через `granularityStyleAssets`.
-   - По умолчанию он есть у каждого компонента, если в `config.ts` не отключать `emitStyleAsset`.
+Значения в этом CSS — токены, а не литералы. Дизайн-решение — цвет, тень, радиус, длительность —
+токен вида `theme` в `tokens.json` со значениями в темах; CSS компонента его только читает.
 
-2. **Локальные сырьевые CSS-файлы**, перечисленные в `config.ts` через `cssFiles`.
-   - Они нужны только если у компонента реально есть собственные `styles.css`, `tokens.css` или другие локальные CSS-файлы.
-   - Сейчас такой сценарий есть, например, у `GrIcon`.
-
-Практическое правило:
-
-- если CSS нужен только этому компоненту и это обычный CSS-файл, положите его в папку компонента;
-- если это component-specific custom properties, используйте локальный `tokens.css`;
-- если ничего такого нет, не добавляйте лишние `styles.css` и `tokens.css`.
+`cssFiles` в `config.ts` — для CSS-файла рядом с `config.ts`, который склеивается с `<style>`
+компонента (первым — объявленный). У компонентов ядра его сейчас нет.
 
 ### 4. Создать `config.ts`
 
@@ -210,17 +220,14 @@ export const grDialogConfig = defineGranumComponent(import.meta.url, {
 чанк). Нормативное определение — `docs/SPEC.md` §4.1 в
 `@feugene/granum`.
 
-Пример для компонента с локальными CSS-файлами:
+Пример с CSS-файлом рядом с `config.ts` — у компонентов ядра такого сейчас нет, свой CSS
+пишется блоком `<style>` (шаг 3):
 
 ```ts
-import { defineGranumComponent } from '@feugene/granum/contract'
-
-import { grIconSafelist } from './safelist'
-
-export const grIconConfig = defineGranumComponent(import.meta.url, {
-  name: 'GrIcon',
-  safelist: grIconSafelist,
-  cssFiles: ['./tokens.css', './styles.css'],
+export const grXConfig = defineGranumComponent(import.meta.url, {
+  name: 'GrX',
+  safelist: grXSafelist,
+  cssFiles: ['./styles.css'],
 })
 ```
 
@@ -239,17 +246,14 @@ export { default as GrIcon } from './GrIcon.vue'
 
 ### 6. Убедиться, что utility-классы компонента видны экстрактору granum
 
-Полный пакетный `styles.css` больше не собирается через `src/styles.css.ts`.
-
-Теперь классы компонента извлекает сборка пакета: плагин granum прогоняет экстрактор движка по собранным чанкам и кладёт результат в манифест.
+Классы компонента извлекает сборка пакета: плагин granum прогоняет экстрактор движка по собранным чанкам и кладёт результат в манифест.
 
 Движок сборке задаётся явно — `granumProvider({ provider, engine: windEngine() })` в `vite.config.ts` пакета, — и им же список отфильтрован: токен, для которого у движка правила нет, классом не считается и в манифест не попадает. Отсюда и диалект словаря в манифесте: список классов — факт о конкретной реализации, а не о пакете (см. [`granum.md`](./granum.md#словарь-утилит-диалект-и-отпечаток)).
 
 Практическое правило:
 
-- держите реальные классы утилит в component source или в локальных helper-файлах рядом с компонентом;
-- если нужны обычные CSS-файлы, перечисляйте их через `cssFiles` в `config.ts`;
-- не добавляйте отдельные `styles.css.ts`-entrypoint'ы ради package bundle.
+- держите классы утилит в коде компонента или в его `gr<Name>Styles.ts`;
+- CSS, который утилитой не выразить, — блоком `<style>` в SFC (шаг 3).
 
 ## Что обязательно обновить вне папки компонента
 
@@ -297,9 +301,9 @@ yarn workspace @feugene/granularity generate:registry
   компонентом. Отдельного subpath на него пакет не публикует — файл без токенов
   и тем подключать нечем.
 
-Из реестра провайдера дальше строятся `resolveGranularityComponentNames(...)`,
-зависимости между компонентами, `granularityComponents` и общий safelist,
-`granularityStyleAssets` и extra CSS assets в `vite.config.ts`.
+Из реестра провайдера (`granularityComponentConfigs` в `src/granular-provider/shared.ts`)
+`createGranularityProvider()` собирает granum-провайдер пакета: дескрипторы всех компонентов с
+их зависимостями, safelist и токенами — из него сборка пишет манифест.
 
 ### Страница компонента — той же правкой, не потом
 
@@ -351,19 +355,20 @@ Foundation публикуется одним файлом — `@feugene/granular
 
 Поэтому отдельно править общий source-entrypoint для CSS не нужно: foundation собирает сборка пакета, утилиты — движок приложения.
 
-## Как понять, нужны ли `styles.css`, `tokens.css` и `safelist.ts`
+## Как понять, нужны ли `<style>`, `tokens.json` и `safelist.ts`
 
-### Нужен `styles.css`, если:
+### Нужен `<style>` в SFC, если:
 
-- у компонента есть собственные глобальные селекторы;
-- есть CSS, который не выражается только через utility-классы;
-- этот CSS не должен жить в общих `src/styles/base.css` или theme-файлах.
+- есть правило, которое утилитой не выразить: псевдоэлемент, медиазапрос по указателю или
+  движению, ключевые кадры;
+- это правило касается только этого компонента — общее живёт в `src/styles/base.css`.
 
-### Нужен `tokens.css`, если:
+### Нужен `tokens.json`, если:
 
-- у компонента есть локальные CSS custom properties;
-- это не общие системные токены пакета;
-- переменные относятся только к этому компоненту.
+- компонент читает или ставит свою переменную `--gr-<name>-*` — каждая обязана быть в реестре,
+  иначе красный `componentTokens.test.ts`;
+- у переменной верная природа (`kind`): значение темы — `theme`, ручка приложения — `hook`,
+  механика самого компонента — `css` или `inline`.
 
 ### Нужен `safelist.ts`, если:
 
@@ -428,7 +433,8 @@ safelist, модуль лежит в чанке компонента, и экс�
    строится scan-glob `dist/components/<name>/**`. Расхождение = классы
    компонента молча не попадают в CSS; ловится `granular doctor --strict`.
 4. При необходимости обновлён `packages/granularity/package.json`.
-5. Локальные CSS-файлы добавлены в `config.ts` только если они реально есть.
+5. Свои переменные `--gr-<name>-*` — в `tokens.json` с верным `kind`; у вида `theme` значения
+   лежат во всех темах каталога (`catalogThemes.test.ts`).
 5.1. Если компонент собирает имя токена в рантайме (`var(${…})`, свой
    `zIndexVar`) — оно объявлено в `dynamicTokens`. Иначе обрезка токенов у
    потребителя снесёт объявление молча; ловит `src/__tests__/dynamicTokens.test.ts`.
@@ -464,8 +470,8 @@ safelist, модуль лежит в чанке компонента, и экс�
 
 1. Создать `src/components/<ComponentName>/`.
 2. Добавить `<ComponentName>.vue`, `config.ts` и `index.ts`.
-3. При необходимости вынести style/helper-логику в локальные `ds*.ts` и/или `safelist.ts`.
-4. При необходимости добавить `styles.css`, `tokens.css` и перечислить нужные файлы в `config.ts`.
+3. При необходимости вынести классы в `gr<ComponentName>Styles.ts` и семейства, собираемые в рантайме, — в `safelist.ts`.
+4. Свои переменные — в `tokens.json`; значения вида `theme` — во все темы каталога той же правкой. CSS, который утилитой не выразить, — блоком `<style>` в SFC.
 5. Прогнать `yarn generate:registry` — он обновит `src/index.ts`, `package.json#exports`, `vite.config.ts` и реестр провайдера. Руками компонент никуда не вписывают.
 6. Прогнать `yarn test:granularity` и дописать то, что потребуют гейты: стенд в `componentSize.test.ts`, доменное имя слота в `slotContract.test.ts`, тесты самого компонента.
 7. Написать `docs/components/<ComponentName>.md`, сделать имя в `components.md` ссылкой, поставить компонент в развилку `docs/COMPONENT-MAP.md`.
