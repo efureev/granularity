@@ -119,7 +119,7 @@ test('«Применить ко всему приложению» — перех
 
   await expect(page).toHaveURL(/\/clay\/themes\/clay$/)
   await expect(html(page)).toHaveAttribute('data-theme', 'clay-light')
-  await expect(page.getByText('Тема всего приложения')).toBeVisible()
+  await expect(page.getByText('Включена у всего приложения')).toBeVisible()
   expect(errors).toEqual([])
 })
 

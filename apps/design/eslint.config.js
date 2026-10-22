@@ -68,20 +68,4 @@ export default antfu(
       },
     },
   },
-  {
-    /**
-     * Макеты — плотная разметка-документ: подписи, таблицы, аннотации в одну
-     * строку. Перенос каждого атрибута и каждого текстового узла на свою
-     * строку утроил бы файлы, не прибавив читаемости.
-     */
-    files: ['src/designs/**/*.vue'],
-    rules: {
-      'vue/singleline-html-element-content-newline': 'off',
-      'vue/multiline-html-element-content-newline': 'off',
-      'vue/max-attributes-per-line': 'off',
-      'vue/first-attribute-linebreak': 'off',
-      'vue/html-closing-bracket-newline': 'off',
-      'vue/html-self-closing': 'off',
-    },
-  },
 )

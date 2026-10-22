@@ -22,8 +22,8 @@ export const router = createRouter({
     notFound: () => import('./pages/NotFoundPage.vue'),
   }),
   scrollBehavior(to, from) {
-    // Вкладка макета и выбор версии живут в адресе той же страницы, смена темы —
-    // в его префиксе: прокрутку при них не сбрасываем.
+    // Вкладка компонента живёт в адресе той же страницы, тема — в его префиксе:
+    // смена любой из них — та же страница, прокрутку не сбрасываем.
     if (to.name === 'component' && from.name === 'component' && to.params.component === from.params.component)
       return false
     if (themeOnlyChange(to, from))

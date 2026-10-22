@@ -26,7 +26,16 @@ export function buildRoutes(themes: readonly string[], currentTheme: () => strin
     { path: `/${theme}/foundations/:foundation`, name: 'foundation', component: pages.foundation },
     { path: `/${theme}/themes`, name: 'themes', component: pages.themes },
     { path: `/${theme}/themes/:slug`, name: 'theme', component: pages.theme },
-    { path: `/${theme}/components/:component/:version?`, name: 'component', component: pages.component },
+    { path: `/${theme}/components/:component`, name: 'component', component: pages.component },
+    // Сегмент после компонента — id темы: адрес ведёт на страницу компонента в этой теме, чужое слово — в тему адреса.
+    {
+      path: `/${theme}/components/:component/:version`,
+      redirect: to => ({
+        name: 'component',
+        params: { theme: themes.includes(String(to.params.version)) ? String(to.params.version) : String(to.params.theme), component: String(to.params.component) },
+        query: to.query,
+      }),
+    },
     { path: '/foundations/:rest(.*)*', redirect: toCurrent },
     { path: '/themes/:rest(.*)*', redirect: toCurrent },
     { path: '/components/:rest(.*)*', redirect: toCurrent },

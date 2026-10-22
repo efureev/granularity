@@ -2,6 +2,8 @@
 defineProps<{
   title: string
   lead?: string
+  /** Подзаголовок в одну строку на всю ширину, без колонки для чтения. */
+  wideLead?: boolean
 }>()
 </script>
 
@@ -11,7 +13,7 @@ defineProps<{
       <h2 class="text-[length:var(--gr-text-xl)] font-600 leading-[var(--gr-leading-xl)] tracking-[-0.01em]">
         {{ title }}
       </h2>
-      <p v-if="lead" class="max-w-[76ch] text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-base)] text-[var(--gr-muted-fg)]">
+      <p v-if="lead" class="text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-base)] text-[var(--gr-muted-fg)]" :class="wideLead ? '' : 'max-w-[76ch]'">
         {{ lead }}
       </p>
     </div>

@@ -5,8 +5,8 @@ import buttonDesign from '../../../../packages/granularity/docs/design/GrButton.
 
 /**
  * Тексты берутся из документации пакета сборкой, а не копируются: документ в
- * репозитории и страница приложения не могут разойтись. Дизайн версий —
- * `docs/design/*.md`, поведение компонента — `docs/components/*.md`.
+ * репозитории и страница приложения не могут разойтись. Компонент в темах
+ * каталога — `docs/design/*.md`, поведение компонента — `docs/components/*.md`.
  */
 const designDocs: Record<string, string> = {
   button: buttonDesign,
@@ -16,8 +16,8 @@ const componentDocs: Record<string, string> = {
   button: buttonComponent,
 }
 
-/** «Четыре версии рядом», «Три версии рядом» — число зависит от компонента. */
-const COMPARISON_HEADING = /версии рядом$/i
+/** «Четыре темы рядом» — число растёт вместе с каталогом. */
+const COMPARISON_HEADING = /темы рядом$/i
 
 export interface DesignDoc {
   intro: string
@@ -51,7 +51,16 @@ export interface ComparisonTable {
   rows: { label: string, cells: string[] }[]
 }
 
-/** Таблица сравнения версий как данные: столбец выбранной версии подсвечивается. */
+/**
+ * Раздел темы в документе дизайна: заголовок кончается её id — «Чертёж — тема
+ * `blueprint`». По id, а не по названию: название темы переводится и правится.
+ */
+export function themeDocSection(doc: DesignDoc, themeId: string): string | undefined {
+  const suffix = `тема \`${themeId}\``
+  return [...doc.sections].find(([heading]) => heading.endsWith(suffix))?.[1]
+}
+
+/** Таблица сравнения тем как данные: столбец выбранной темы подсвечивается. */
 export function comparisonTable(doc: DesignDoc): ComparisonTable | undefined {
   const section = [...doc.sections].find(([heading]) => COMPARISON_HEADING.test(heading))?.[1]
   if (!section)
@@ -85,4 +94,10 @@ export function renderMarkdown(markdown: string): string {
 
 export function renderInline(markdown: string): string {
   return marked.parseInline(markdown, { async: false, renderer })
+}
+
+/** Строка таблицы сравнения по столбцам: название темы → ячейка. */
+export function comparisonRow(table: ComparisonTable, label: string): ReadonlyMap<string, string> | undefined {
+  const row = table.rows.find(item => item.label === label)
+  return row ? new Map(table.columns.map((column, index) => [column, row.cells[index] ?? ''])) : undefined
 }

@@ -35,6 +35,22 @@ export function designThemes(manifest: GranumThemeManifest): DesignTheme[] {
   })
 }
 
+/** Колонки режимов темы для таблиц значений: имя, подпись и пара, под которой считать образец. */
+export function modeColumns(manifest: GranumThemeManifest, theme: string): { name: string, title: string, pair: string }[] {
+  return themeModes(manifest, theme).map(mode => ({ name: mode.name, title: mode.title ?? mode.name, pair: mode.value }))
+}
+
+/** Темы каталога в порядке показа: основная первой — с неё приложение начинает, остальные — в порядке каталога. */
+export function orderedThemes(manifest: GranumThemeManifest): DesignTheme[] {
+  const themes = designThemes(manifest)
+  return [...themes.filter(theme => theme.build === 'default'), ...themes.filter(theme => theme.build !== 'default')]
+}
+
+/** Темы, у которых есть CSS в сборке, в порядке показа. */
+export function builtThemes(manifest: GranumThemeManifest): DesignTheme[] {
+  return orderedThemes(manifest).filter(theme => theme.build !== 'absent')
+}
+
 export function findDesignTheme(manifest: GranumThemeManifest, id: string): DesignTheme | undefined {
   return designThemes(manifest).find(theme => theme.entry.id === id)
 }
@@ -57,6 +73,19 @@ export function themeLineage(entry: GrThemeCatalogEntry): string {
     return 'независимая: все значения свои'
   const parent = grThemeCatalog.find(theme => theme.id === entry.extends)
   return `наследует «${parent?.title ?? entry.extends}»`
+}
+
+/** Происхождение для паспорта темы: суть — отдельно, следствие — отдельно. */
+export function themeOrigin(entry: GrThemeCatalogEntry): { title: string, hint: string } {
+  if (entry.extends === undefined)
+    return { title: 'Независимая', hint: 'все значения свои' }
+  const parent = grThemeCatalog.find(theme => theme.id === entry.extends)
+  return { title: `Наследует «${parent?.title ?? entry.extends}»`, hint: 'идёт за правками родителя' }
+}
+
+/** Пакеты компонентов, под версии которых тема написана: пакет и диапазон отдельно. */
+export function themeTargetList(entry: GrThemeCatalogEntry): { packageId: string, range: string }[] {
+  return Object.entries(entry.targets ?? {}).map(([packageId, range]) => ({ packageId, range }))
 }
 
 /** Пакеты компонентов, под версии которых тема написана: `пакет диапазон`. */

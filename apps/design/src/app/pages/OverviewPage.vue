@@ -2,9 +2,10 @@
 import { RouterLink } from 'vue-router'
 
 import { grFoundationTokens, grRoleTokens, grThemeCatalog } from '@feugene/granularity-tokens'
+import { grComponentTokens } from '@feugene/granularity/tokens'
 import IconArrowRight from '~icons/lucide/arrow-right'
 
-import { catalog, conceptVersions } from '../catalog'
+import { catalog } from '../catalog'
 import { foundations } from '../foundations'
 import DocSection from '../parts/DocSection.vue'
 import PageHeader from '../parts/PageHeader.vue'
@@ -33,7 +34,7 @@ const stats = [
   { value: grRoleTokens.length, label: 'ролей темы' },
   { value: grFoundationTokens.length, label: 'примитивов' },
   { value: grThemeCatalog.length, label: plural(grThemeCatalog.length, ['тема', 'темы', 'тем']).replace(/^\d+ /, '') },
-  { value: catalog.reduce((sum, item) => sum + item.versions.length, 0), label: 'версий макетов' },
+  { value: grComponentTokens.length, label: 'токенов компонентов' },
 ]
 </script>
 
@@ -42,7 +43,7 @@ const stats = [
     <PageHeader
       eyebrow="@feugene/granularity"
       title="Дизайн-система"
-      lead="Правила, по которым собраны компоненты пакета: роли цвета, шкалы, движение и доступность. У компонента — живая спецификация реализованной версии и макеты экспериментальных."
+      lead="Правила, по которым собраны компоненты пакета: роли цвета, шкалы, движение и доступность. У компонента — песочница, его вид в каждой теме каталога и значения токенов темы."
     >
       <dl class="mt-2 grid max-w-[720px] grid-cols-2 gap-4 sm:grid-cols-4">
         <div v-for="stat in stats" :key="stat.label" class="flex flex-col gap-0.5">
@@ -73,7 +74,7 @@ const stats = [
       </ul>
     </DocSection>
 
-    <DocSection title="Компоненты" lead="Страница компонента — его спецификация на настоящих компонентах пакета и макеты всех версий дизайна.">
+    <DocSection title="Компоненты" lead="Страница компонента — песочница и спецификация на настоящих компонентах пакета, он же в каждой теме каталога и значения его токенов по режимам.">
       <ul class="grid gap-4 md:grid-cols-2">
         <li v-for="component in catalog" :key="component.id">
           <RouterLink :to="{ name: 'component', params: { component: component.id } }" class="overview-card">
@@ -83,9 +84,11 @@ const stats = [
             </span>
             <span class="text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-base)] text-[var(--gr-muted-fg)]">{{ component.summary }}</span>
             <span class="flex flex-wrap gap-1.5">
-              <GrBadge tone="success" size="sm">в пакете</GrBadge>
-              <GrBadge tone="warning" size="sm">
-                {{ plural(conceptVersions(component).length, ['концепт', 'концепта', 'концептов']) }}
+              <GrBadge tone="neutral" size="sm">
+                {{ component.exports.join(' · ') }}
+              </GrBadge>
+              <GrBadge tone="neutral" size="sm">
+                {{ plural(grThemeCatalog.length, ['тема', 'темы', 'тем']) }}
               </GrBadge>
             </span>
           </RouterLink>

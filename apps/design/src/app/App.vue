@@ -1,29 +1,37 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { RouterLink, useRoute, useRouter } from 'vue-router'
 
 import { useTheme } from '@feugene/granularity'
+import { grThemeCatalog } from '@feugene/granularity-tokens'
 import themeManifest from 'virtual:granum/themes'
 import IconMenu from '~icons/lucide/menu'
 import IconMoon from '~icons/lucide/moon'
 import IconSun from '~icons/lucide/sun'
 
+import { breadcrumbs } from './breadcrumbs'
+import { findComponent } from './catalog'
+import { foundations } from './foundations'
 import AppSidebar from './parts/AppSidebar.vue'
 import { THEME_STORAGE_KEY } from './theme'
-import { designThemes } from './themes'
+import { builtThemes } from './themes'
 
 const route = useRoute()
 const router = useRouter()
-const { isDark, toggleMode } = useTheme({ storageKey: THEME_STORAGE_KEY })
+const { theme: documentTheme, isDark, toggleMode } = useTheme({ storageKey: THEME_STORAGE_KEY })
 
 // Тема — в адресе: выбор в шапке — та же страница под другой темой.
-const themeOptions = designThemes(themeManifest)
-  .filter(theme => theme.build !== 'absent')
-  .map(theme => ({ value: theme.entry.id, label: theme.entry.title }))
+const themeOptions = builtThemes(themeManifest).map(theme => ({ value: theme.entry.id, label: theme.entry.title }))
 const viewedTheme = computed({
   get: () => String(route.params.theme ?? ''),
   set: (id: string) => void router.push({ params: { theme: id } }),
 })
+
+const crumbs = computed(() => breadcrumbs(route.name, route.params, typeof route.params.theme === 'string' ? route.params.theme : documentTheme.value, {
+  foundation: id => foundations.find(item => item.id === id)?.title,
+  theme: id => grThemeCatalog.find(item => item.id === id)?.title,
+  component: id => findComponent(id)?.name,
+}))
 
 /**
  * Узкий экран решает приложение, а не панель: своих брейкпоинтов у пакета нет.
@@ -69,10 +77,14 @@ watch(() => route.fullPath, () => {
         >
           <GrIcon><IconMenu /></GrIcon>
         </GrButton>
-        <template v-if="narrow">
-          <span class="text-[length:var(--gr-text-sm)] font-600 leading-[var(--gr-leading-sm)]">granularity</span>
-          <span class="text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)] text-[var(--gr-muted-fg)]">дизайн-система</span>
-        </template>
+        <!-- На узком экране середина пути сворачивается: место делят выбор темы и режим. -->
+        <GrBreadcrumbs
+          class="min-w-0"
+          :items="crumbs"
+          :as="RouterLink"
+          size="sm"
+          :max-items="narrow ? 2 : undefined"
+        />
 
         <div class="ms-auto flex items-center gap-2">
           <GrSelect

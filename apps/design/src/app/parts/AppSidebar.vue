@@ -12,9 +12,8 @@ import themeManifest from 'virtual:granum/themes'
 
 import { catalog } from '../catalog'
 import { foundations } from '../foundations'
-import { plural } from '../plural'
 import { THEME_STORAGE_KEY } from '../theme'
-import { designThemes, THEME_BUILD_LABEL } from '../themes'
+import { orderedThemes, THEME_BUILD_LABEL } from '../themes'
 
 defineProps<{ overlay: boolean }>()
 
@@ -26,7 +25,7 @@ const route = useRoute()
 const { theme: documentTheme } = useTheme({ storageKey: THEME_STORAGE_KEY })
 const theme = computed(() => (typeof route.params.theme === 'string' ? route.params.theme : documentTheme.value))
 
-const themes = designThemes(themeManifest)
+const themes = orderedThemes(themeManifest)
 
 const componentIcons: Record<string, typeof IconLayoutGrid> = {
   button: IconMousePointerClick,
@@ -85,6 +84,7 @@ const componentIcons: Record<string, typeof IconLayoutGrid> = {
           :label="entry.entry.title"
           :icon="IconSwatchBook"
           :badge="THEME_BUILD_LABEL[entry.build]"
+          :data-theme-build="entry.build"
           :as="RouterLink"
           :to="{ name: 'theme', params: { theme, slug: entry.entry.id } }"
           :active="route.name === 'theme' && route.params.slug === entry.entry.id"
@@ -97,7 +97,6 @@ const componentIcons: Record<string, typeof IconLayoutGrid> = {
           :key="component.id"
           :label="component.name"
           :icon="componentIcons[component.id]"
-          :badge="plural(component.versions.length, ['версия', 'версии', 'версий'])"
           :as="RouterLink"
           :to="{ name: 'component', params: { theme, component: component.id } }"
           :active="route.name === 'component' && route.params.component === component.id"
@@ -106,3 +105,15 @@ const componentIcons: Record<string, typeof IconLayoutGrid> = {
     </div>
   </GrSidebar>
 </template>
+
+<style scoped>
+/*
+ * Метка основной темы — заливкой: от «дополнительных» она отличается с первого
+ * взгляда, и на подложке активного пункта не теряется. У пункта нет своего тона
+ * метки, поэтому — по атрибуту, который пункт получает от панели.
+ */
+:deep([data-gr-sidebar-item][data-theme-build='default'] > span:last-child) {
+  background: var(--gr-primary-solid);
+  color: var(--gr-primary-solid-fg);
+}
+</style>

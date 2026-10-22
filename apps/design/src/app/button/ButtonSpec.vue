@@ -1,49 +1,27 @@
 <script setup lang="ts">
-import { computed, reactive } from 'vue'
+import { type ComponentPublicInstance, computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 
-import { grComponentTokens } from '@feugene/granularity/tokens'
+import type { GrButtonLoadingIndicator, GrButtonSize } from '@feugene/granularity/components/GrButton'
 import IconChevronDown from '~icons/lucide/chevron-down'
 import IconDownload from '~icons/lucide/download'
 import IconPlus from '~icons/lucide/plus'
 import IconTrash from '~icons/lucide/trash-2'
 
+import { componentDefaultsOf } from '../componentTokens'
 import { componentDoc } from '../docs'
 import DocSection from '../parts/DocSection.vue'
 import MarkdownBlock from '../parts/MarkdownBlock.vue'
-
-type Variant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'ghost-border'
-type Tone = 'primary' | 'neutral' | 'success' | 'warning' | 'danger' | 'info' | 'slate' | 'azure'
-type Size = 'xs' | 'sm' | 'md' | 'lg'
+import { useViewedTheme } from '../viewedTheme'
+import { COMPONENT_LOADING_INDICATOR, loadingIndicators, sizes, tones, variants } from './model'
 
 const doc = componentDoc('button')
 const whenToUse = doc?.sections.get('Когда брать')
 const whenOther = doc?.sections.get('Когда взять другое')
 
-const variants: { id: Variant, look: string, when: string }[] = [
-  { id: 'primary', look: 'заливка тона, блик и тень', when: 'главное действие области — одно' },
-  { id: 'secondary', look: 'подложка тона, рамка 38 % тона', when: 'сопутствующее; с neutral — обычная кнопка формы' },
-  { id: 'outline', look: 'рамка 70 % тона', when: 'равноправные альтернативы' },
-  { id: 'ghost', look: 'только подпись, прозрачная рамка', when: 'строки таблиц, плотные панели' },
-  { id: 'ghost-border', look: 'рамка проявляется под указателем', when: 'тулбары' },
-]
+const theme = useViewedTheme()
 
-const tones: { id: Tone, verb: string }[] = [
-  { id: 'primary', verb: 'Сохранить' },
-  { id: 'neutral', verb: 'Продолжить' },
-  { id: 'success', verb: 'Принять' },
-  { id: 'warning', verb: 'Продолжить' },
-  { id: 'danger', verb: 'Удалить' },
-  { id: 'info', verb: 'Подробнее' },
-  { id: 'slate', verb: 'В архив' },
-  { id: 'azure', verb: 'Открыть' },
-]
-
-const steps: { size: Size, height: string, font: string, icon: string, gap: string }[] = [
-  { size: 'xs', height: '28px', font: '12px', icon: '14px', gap: '4px' },
-  { size: 'sm', height: '32px', font: '14px', icon: '16px', gap: '6px' },
-  { size: 'md', height: '40px', font: '14px', icon: '16px', gap: '8px' },
-  { size: 'lg', height: '44px', font: '16px', icon: '20px', gap: '8px' },
-]
+const indicator = computed(() => (componentDefaultsOf(theme.value.data, 'GrButton').loadingIndicator as GrButtonLoadingIndicator | undefined) ?? COMPONENT_LOADING_INDICATOR)
+const loading = computed(() => loadingIndicators.find(item => item.id === indicator.value)!)
 
 const busy = reactive({ saving: false, deleting: false })
 
@@ -54,28 +32,69 @@ function run(key: keyof typeof busy): void {
   }, 1800)
 }
 
-const buttonTokens = grComponentTokens.filter(token => token.owner === 'GrButton')
-const hooks = buttonTokens.filter(token => token.kind === 'hook')
-
-const TONE_NAMES = /\b(primary|success|warning|danger|info|slate|azure)\b/g
-
-function toTone(text: string): string {
-  return text.replace(TONE_NAMES, '{tone}')
+interface StepMetrics {
+  height: string
+  font: string
+  icon: string
+  radius: string
 }
 
-/** Токены темы сворачиваются по тону: восемь одинаковых строк читать незачем. */
-const themePatterns = computed(() => {
-  const patterns = new Map<string, { pattern: string, default: string, description: string, count: number }>()
-  for (const token of buttonTokens.filter(item => item.kind !== 'hook')) {
-    const pattern = token.name.replace(/--gr-button-(primary|success|warning|danger|info|slate|azure)-/, '--gr-button-{tone}-')
-    const entry = patterns.get(pattern)
-    if (entry)
-      entry.count += 1
+/**
+ * Ступени снимаются с настоящей кнопки, а не пишутся таблицей: кегль, угол и
+ * иконка — у темы, и под «Чертежом» таблица «Сланца» врала бы.
+ */
+const stepButtons = new Map<GrButtonSize, HTMLElement>()
+const metrics = ref<Partial<Record<GrButtonSize, StepMetrics>>>({})
+
+function bindStep(size: GrButtonSize) {
+  return (instance: Element | ComponentPublicInstance | null): void => {
+    const element = instance && '$el' in instance ? instance.$el as HTMLElement : instance as HTMLElement | null
+    if (element)
+      stepButtons.set(size, element)
     else
-      patterns.set(pattern, { pattern, default: toTone(token.default), description: toTone(token.description), count: 1 })
+      stepButtons.delete(size)
   }
-  return [...patterns.values()]
+}
+
+const px = (value: number): string => `${Math.round(value * 10) / 10}px`
+
+function measure(): void {
+  const elements = [...stepButtons.values()]
+  // Вкладка скрыта: снимать нечего. Наблюдатель размера снимет, когда её откроют.
+  if (elements.length === 0 || elements.some(element => element.getBoundingClientRect().height === 0))
+    return
+  const next: Partial<Record<GrButtonSize, StepMetrics>> = {}
+  for (const [size, element] of stepButtons) {
+    const style = getComputedStyle(element)
+    const icon = element.querySelector('svg')?.getBoundingClientRect().width
+    next[size] = {
+      height: px(element.getBoundingClientRect().height),
+      font: style.fontSize,
+      icon: icon === undefined ? '—' : px(icon),
+      radius: style.borderTopLeftRadius,
+    }
+  }
+  metrics.value = next
+}
+
+/** Лист темы уже применён, когда сменился адрес; кадр — чтобы стили легли. */
+function remeasure(): void {
+  void nextTick(() => requestAnimationFrame(measure))
+}
+
+/**
+ * Размер меняют кегль темы и открытие вкладки — их ловит наблюдатель. Угол
+ * размера не меняет, поэтому смена темы снимает значения ещё и сама.
+ */
+let resizes: ResizeObserver | undefined
+onMounted(() => {
+  resizes = new ResizeObserver(remeasure)
+  for (const element of stepButtons.values())
+    resizes.observe(element)
+  remeasure()
 })
+onBeforeUnmount(() => resizes?.disconnect())
+watch(() => theme.value.id, remeasure)
 </script>
 
 <template>
@@ -125,7 +144,7 @@ const themePatterns = computed(() => {
       </ul>
     </DocSection>
 
-    <DocSection title="Ступени" lead="Высоты общие со шкалой контролов: кнопка и поле одной ступени стоят вровень. На тач-экране кнопка ниже 44px добирает зону касания невидимо.">
+    <DocSection title="Ступени" lead="Высоты общие со шкалой контролов: кнопка и поле одной ступени стоят вровень. Кегль, угол и иконку задаёт тема — значения сняты с кнопки на этой странице.">
       <div class="overflow-x-auto rounded-[var(--gr-radius-lg)] border border-[var(--gr-brd)] bg-[var(--gr-card)]" tabindex="0" role="region" aria-label="Ступени кнопки">
         <table class="w-full min-w-[720px] border-collapse text-[length:var(--gr-text-xs)] leading-[var(--gr-leading-xs)]">
           <thead>
@@ -146,39 +165,39 @@ const themePatterns = computed(() => {
                 иконка
               </th>
               <th scope="col" class="px-4 py-3 text-start font-500">
-                зазор
+                угол
               </th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="step in steps" :key="step.size" class="border-t border-[var(--gr-brd)] font-[var(--gr-font-mono)] [font-variant-numeric:tabular-nums]">
+            <tr v-for="size in sizes" :key="size" class="border-t border-[var(--gr-brd)] font-[var(--gr-font-mono)] [font-variant-numeric:tabular-nums]">
               <th scope="row" class="px-4 py-3 text-start font-500">
-                {{ step.size }}
+                {{ size }}
               </th>
               <td class="px-4 py-3 font-[var(--gr-font-ui)]">
                 <span class="flex items-center gap-2">
-                  <GrButton :size="step.size">
+                  <GrButton :ref="bindStep(size)" :size="size">
                     <template #prefix>
                       <GrIcon><IconPlus /></GrIcon>
                     </template>
                     Добавить
                   </GrButton>
-                  <GrButton :size="step.size" variant="secondary" tone="neutral" square aria-label="Скачать">
+                  <GrButton :size="size" variant="secondary" tone="neutral" square aria-label="Скачать">
                     <GrIcon><IconDownload /></GrIcon>
                   </GrButton>
                 </span>
               </td>
               <td class="px-4 py-3">
-                {{ step.height }}
+                {{ metrics[size]?.height ?? '—' }}
               </td>
               <td class="px-4 py-3">
-                {{ step.font }}
+                {{ metrics[size]?.font ?? '—' }}
               </td>
               <td class="px-4 py-3">
-                {{ step.icon }}
+                {{ metrics[size]?.icon ?? '—' }}
               </td>
               <td class="px-4 py-3">
-                {{ step.gap }}
+                {{ metrics[size]?.radius ?? '—' }}
               </td>
             </tr>
           </tbody>
@@ -187,30 +206,24 @@ const themePatterns = computed(() => {
     </DocSection>
 
     <DocSection title="Состояния" lead="Наведение, нажатие и фокус — у каждой кнопки на этой странице. Здесь — то, что задаёт потребитель.">
-      <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <div class="grid gap-4 md:grid-cols-3">
         <div class="flex flex-col gap-3 rounded-[var(--gr-radius-lg)] border border-[var(--gr-brd)] bg-[var(--gr-card)] p-5">
           <h3 class="text-[length:var(--gr-text-sm)] font-600 leading-[var(--gr-leading-sm)]">
-            Загрузка без префикса
+            Загрузка — {{ loading.title }}
           </h3>
-          <GrButton class="self-start" :loading="busy.saving" loading-text="Сохраняем отчёт" @click="run('saving')">
-            Сохранить отчёт
-          </GrButton>
+          <div class="flex flex-wrap gap-2">
+            <GrButton :loading="busy.saving" loading-text="Сохраняем отчёт" @click="run('saving')">
+              Сохранить отчёт
+            </GrButton>
+            <GrButton variant="secondary" tone="danger" :loading="busy.deleting" @click="run('deleting')">
+              <template #prefix>
+                <GrIcon><IconTrash /></GrIcon>
+              </template>
+              Удалить
+            </GrButton>
+          </div>
           <p class="text-[length:var(--gr-text-xs)] leading-[var(--gr-leading-xs)] text-[var(--gr-muted-fg)]">
-            Спиннер ложится поверх подписи — ширина та же, соседи не едут. Фокус остаётся, курсор — progress.
-          </p>
-        </div>
-        <div class="flex flex-col gap-3 rounded-[var(--gr-radius-lg)] border border-[var(--gr-brd)] bg-[var(--gr-card)] p-5">
-          <h3 class="text-[length:var(--gr-text-sm)] font-600 leading-[var(--gr-leading-sm)]">
-            Загрузка с префиксом
-          </h3>
-          <GrButton class="self-start" variant="secondary" tone="danger" :loading="busy.deleting" @click="run('deleting')">
-            <template #prefix>
-              <GrIcon><IconTrash /></GrIcon>
-            </template>
-            Удалить
-          </GrButton>
-          <p class="text-[length:var(--gr-text-xs)] leading-[var(--gr-leading-xs)] text-[var(--gr-muted-fg)]">
-            Спиннер встаёт на место иконки: две иконки рядом читались бы ошибкой вёрстки.
+            {{ loading.note }} Нажмите — загрузка на 1.8 с; фокус остаётся, курсор — progress.
           </p>
         </div>
         <div class="flex flex-col gap-3 rounded-[var(--gr-radius-lg)] border border-[var(--gr-brd)] bg-[var(--gr-card)] p-5">
@@ -226,7 +239,7 @@ const themePatterns = computed(() => {
             </GrButton>
           </div>
           <p class="text-[length:var(--gr-text-xs)] leading-[var(--gr-leading-xs)] text-[var(--gr-muted-fg)]">
-            Свои роли вместо прозрачности; объём уходит вместе с вариантом.
+            Свои роли вместо прозрачности; штриховку или пунктир, читаемые без цвета, добавляет тема.
           </p>
         </div>
         <div class="flex flex-col gap-3 rounded-[var(--gr-radius-lg)] border border-[var(--gr-brd)] bg-[var(--gr-card)] p-5">
@@ -292,7 +305,7 @@ const themePatterns = computed(() => {
             </GrButtonGroup>
           </div>
           <p class="text-[length:var(--gr-text-xs)] leading-[var(--gr-leading-xs)] text-[var(--gr-muted-fg)]">
-            Длинная подпись режется многоточием, полный текст — в подсказке. Между звеньями с заливкой — светлый шов.
+            Длинная подпись режется многоточием, полный текст — в подсказке. Как склеены звенья группы — шов, рамки внахлёст или лоток, — решает тема.
           </p>
         </div>
       </div>
@@ -331,48 +344,6 @@ const themePatterns = computed(() => {
         <li>Так: у квадратной кнопки есть aria-label. Не так: кнопка из одной иконки без имени.</li>
         <li>Так: loadingText называет, что грузится. Не так: общее «Загрузка…», когда на экране три кнопки.</li>
       </ul>
-    </DocSection>
-
-    <DocSection title="Токены кнопки" lead="Хуки не присвоены нигде и работают дефолтом — их задают в своём CSS. Токены темы объявлены по тону; ниже они свёрнуты по шаблону.">
-      <div class="grid gap-4 xl:grid-cols-2">
-        <div class="overflow-x-auto rounded-[var(--gr-radius-lg)] border border-[var(--gr-brd)] bg-[var(--gr-card)]" tabindex="0" role="region" aria-label="Хуки кнопки">
-          <table class="w-full border-collapse text-[length:var(--gr-text-xs)] leading-[var(--gr-leading-xs)]">
-            <caption class="px-4 pt-3 text-start text-[length:var(--gr-text-sm)] font-600 leading-[var(--gr-leading-sm)]">
-              Хуки · {{ hooks.length }}
-            </caption>
-            <tbody>
-              <tr v-for="token in hooks" :key="token.name" class="border-b border-[var(--gr-brd)] last:border-b-0">
-                <th scope="row" class="px-4 py-2.5 text-start align-top font-400">
-                  <code class="block font-[var(--gr-font-mono)]">{{ token.name }}</code>
-                  <code class="font-[var(--gr-font-mono)] text-[length:var(--gr-text-2xs)] leading-[var(--gr-leading-2xs)] text-[var(--gr-muted-fg)]">{{ token.default }}</code>
-                </th>
-                <td class="px-4 py-2.5 align-top text-[var(--gr-muted-fg)]">
-                  {{ token.description }}
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="overflow-x-auto rounded-[var(--gr-radius-lg)] border border-[var(--gr-brd)] bg-[var(--gr-card)]" tabindex="0" role="region" aria-label="Токены темы кнопки">
-          <table class="w-full border-collapse text-[length:var(--gr-text-xs)] leading-[var(--gr-leading-xs)]">
-            <caption class="px-4 pt-3 text-start text-[length:var(--gr-text-sm)] font-600 leading-[var(--gr-leading-sm)]">
-              Тема · {{ buttonTokens.length - hooks.length }}
-            </caption>
-            <tbody>
-              <tr v-for="entry in themePatterns" :key="entry.pattern" class="border-b border-[var(--gr-brd)] last:border-b-0">
-                <th scope="row" class="px-4 py-2.5 text-start align-top font-400">
-                  <code class="block font-[var(--gr-font-mono)]">{{ entry.pattern }}</code>
-                  <code class="font-[var(--gr-font-mono)] text-[length:var(--gr-text-2xs)] leading-[var(--gr-leading-2xs)] text-[var(--gr-muted-fg)]">{{ entry.default }}</code>
-                </th>
-                <td class="px-4 py-2.5 align-top text-[var(--gr-muted-fg)]">
-                  {{ entry.description }}
-                  <span v-if="entry.count > 1" class="whitespace-nowrap"> · ×{{ entry.count }}</span>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
     </DocSection>
   </div>
 </template>

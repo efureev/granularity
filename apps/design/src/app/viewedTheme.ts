@@ -1,5 +1,5 @@
 import { loadThemeData } from '@feugene/granularity-tokens'
-import { computed, type ComputedRef, shallowReactive } from 'vue'
+import { computed, type ComputedRef, type Ref, ref, shallowReactive, watch } from 'vue'
 import { useRoute } from 'vue-router'
 
 import { type ThemeView, themeView } from './tokens'
@@ -22,4 +22,27 @@ export function useViewedTheme(): ComputedRef<ThemeView> {
       throw new Error(`[design] данные темы «${id}» не загружены: адрес темы открывается только через роутер`)
     return view
   })
+}
+
+const message = (reason: unknown): string => (reason instanceof Error ? reason.message : String(reason))
+
+/** Данные темы каталога, не обязательно темы адреса: грузятся по требованию, до загрузки — `undefined`. */
+export function useThemeView(id: () => string): { view: ComputedRef<ThemeView | undefined>, error: Ref<string | undefined> } {
+  const error = ref<string>()
+  watch(id, (next) => {
+    error.value = undefined
+    ensureThemeData(next).catch((reason: unknown) => {
+      error.value = message(reason)
+    })
+  }, { immediate: true })
+  return { view: computed(() => views.get(id())), error }
+}
+
+/** Данные нескольких тем разом — для сравнения: карта заполняется по мере загрузки. */
+export function useThemeViews(ids: readonly string[]): { views: ComputedRef<ReadonlyMap<string, ThemeView>>, error: Ref<string | undefined> } {
+  const error = ref<string>()
+  Promise.all(ids.map(ensureThemeData)).catch((reason: unknown) => {
+    error.value = message(reason)
+  })
+  return { views: computed(() => new Map(ids.flatMap(id => (views.has(id) ? [[id, views.get(id)!] as const] : [])))), error }
 }

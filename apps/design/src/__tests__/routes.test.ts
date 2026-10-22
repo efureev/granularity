@@ -30,7 +30,7 @@ describe('маршруты: тема — первый сегмент пути', 
     expect(route.name).toBe('foundation')
     expect(route.params).toEqual({ theme: 'clay', foundation: 'color' })
     expect(router.resolve('/slate/themes/clay').params).toEqual({ theme: 'slate', slug: 'clay' })
-    expect(router.resolve('/clay/components/button/2').params).toEqual({ theme: 'clay', component: 'button', version: '2' })
+    expect(router.resolve('/clay/components/button').params).toEqual({ theme: 'clay', component: 'button' })
   })
 
   it('префикс — только темы сборки: чужое слово — «не найдено»', () => {
@@ -55,7 +55,14 @@ describe('маршруты: тема — первый сегмент пути', 
     expect(await land(router, '/foundations/color')).toBe('/clay/foundations/color')
     expect(await land(router, '/themes')).toBe('/clay/themes')
     expect(await land(router, '/themes/slate')).toBe('/clay/themes/slate')
-    expect(await land(router, '/components/button/2?tab=spec')).toBe('/clay/components/button/2?tab=spec')
+    expect(await land(router, '/components/button?tab=tokens')).toBe('/clay/components/button?tab=tokens')
+  })
+
+  it('id темы после компонента ведёт в эту тему, чужое слово — в тему адреса', async () => {
+    const { router } = setup()
+
+    expect(await land(router, '/slate/components/button/clay?tab=tokens')).toBe('/clay/components/button?tab=tokens')
+    expect(await land(router, '/clay/components/button/evolution')).toBe('/clay/components/button')
   })
 
   it('именованная ссылка без темы берёт её из текущего адреса; смена темы — та же страница', async () => {

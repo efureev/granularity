@@ -9,10 +9,7 @@
       ставит скрипт, объявляет слои granum, а в dev сброс приходит из JS уже после него.
     -->
     <style>@layer reset, granum;</style>
-    <!--
-      Шрифты подключаются документом, а не макетом: @font-face из shadow DOM
-      Chrome не применяет, а объявленные здесь семейства видны и внутри него.
-    -->
+    <!-- Семейства «Сланца»: --gr-font-ui (Inter) и --gr-font-mono (JetBrains Mono). -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400..700&family=JetBrains+Mono:wght@400..600&display=swap" />

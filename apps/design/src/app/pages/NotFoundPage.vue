@@ -11,7 +11,7 @@ import { RouterLink } from 'vue-router'
       Такой страницы нет
     </h1>
     <p class="text-[length:var(--gr-text-base)] leading-[var(--gr-leading-lg)] text-[var(--gr-muted-fg)]">
-      Раздел мог переехать, а у компонента может не быть макета. Всё, что есть, — в навигации слева.
+      Раздел мог переехать, а у компонента может не быть страницы. Всё, что есть, — в навигации слева.
     </p>
     <GrButton :as="RouterLink" to="/" variant="secondary" tone="neutral">
       На обзор

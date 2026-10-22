@@ -2,21 +2,46 @@
 import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
+import { grComponentTokens } from '@feugene/granularity/tokens'
 import themeManifest from 'virtual:granum/themes'
-import IconCheck from '~icons/lucide/check'
 
 import ColorSwatch from '../parts/ColorSwatch.vue'
 import DocSection from '../parts/DocSection.vue'
-import PageHeader from '../parts/PageHeader.vue'
+import HooksPanel from '../parts/HooksPanel.vue'
 import ThemeIslands from '../parts/ThemeIslands.vue'
-import { findDesignTheme, islandTheme, THEME_BUILD_LABEL, themeLineage, themeTargets } from '../themes'
+import ThemeComponentValues from '../theme/ThemeComponentValues.vue'
+import ThemeHero from '../theme/ThemeHero.vue'
+import ThemeTokensPanel from '../theme/ThemeTokensPanel.vue'
+import { findDesignTheme, islandTheme, modeColumns } from '../themes'
+import { useThemeView } from '../viewedTheme'
 import NotFoundPage from './NotFoundPage.vue'
 
 const route = useRoute()
 const router = useRouter()
 
-const theme = computed(() => findDesignTheme(themeManifest, String(route.params.slug)))
+const slug = computed(() => String(route.params.slug))
+const theme = computed(() => findDesignTheme(themeManifest, slug.value))
 const islands = computed(() => (theme.value ? islandTheme(theme.value) : undefined))
+const { view, error: dataError } = useThemeView(() => slug.value)
+const modes = computed(() => modeColumns(themeManifest, slug.value))
+const hookOwners = [...new Set(grComponentTokens.filter(token => token.kind === 'hook').map(token => token.owner))]
+
+const tabs = [
+  { value: 'overview', label: 'Обзор' },
+  { value: 'tokens', label: 'Токены' },
+  { value: 'hooks', label: 'Хуки' },
+]
+
+/** Вкладка — в адресе (`?tab=`): ссылку на токены темы можно отдать. */
+const activeTab = computed({
+  get: () => {
+    const tab = route.query.tab
+    return typeof tab === 'string' && tabs.some(item => item.value === tab) ? tab : 'overview'
+  },
+  set: (next: string) => {
+    void router.replace({ query: next === 'overview' ? {} : { tab: next } })
+  },
+})
 
 // Тема всего приложения живёт в адресе: применить — перейти на ту же страницу
 // под этой темой, а роутер включит её у документа.
@@ -62,40 +87,8 @@ const periods = [
 <template>
   <NotFoundPage v-if="!theme" />
 
-  <div v-else class="mx-auto flex max-w-[1360px] flex-col gap-12 px-4 py-10 lg:px-10">
-    <PageHeader eyebrow="Темы" :title="theme.entry.title" :lead="theme.entry.description">
-      <div class="flex flex-wrap items-center gap-1.5">
-        <GrBadge :tone="theme.build === 'absent' ? 'warning' : 'success'" size="sm">
-          {{ THEME_BUILD_LABEL[theme.build] }}
-        </GrBadge>
-        <GrBadge tone="neutral" size="sm">
-          <code class="font-[var(--gr-font-mono)]">{ theme: '{{ theme.entry.id }}' }</code>
-        </GrBadge>
-        <GrBadge v-if="theme.entry.version" tone="neutral" size="sm">
-          версия {{ theme.entry.version }}
-        </GrBadge>
-        <GrBadge tone="neutral" size="sm">
-          {{ themeLineage(theme.entry) }}
-        </GrBadge>
-        <GrBadge v-for="target in themeTargets(theme.entry)" :key="target" tone="neutral" size="sm">
-          для <code class="font-[var(--gr-font-mono)]">{{ target }}</code>
-        </GrBadge>
-        <GrLink v-if="theme.entry.docs" :href="theme.entry.docs" class="ms-1 text-[length:var(--gr-text-sm)]">
-          {{ theme.entry.docs }}
-        </GrLink>
-      </div>
-      <div v-if="theme.build !== 'absent'" class="flex flex-wrap items-center gap-3">
-        <p v-if="applied" class="flex items-center gap-1.5 text-[length:var(--gr-text-sm)] font-500 leading-[var(--gr-leading-sm)] text-[var(--gr-success-text)]">
-          <GrIcon size="sm">
-            <IconCheck />
-          </GrIcon>
-          Тема всего приложения
-        </p>
-        <GrButton v-else :loading="applying" @click="applyToApp">
-          Применить ко всему приложению
-        </GrButton>
-      </div>
-    </PageHeader>
+  <div v-else class="mx-auto flex max-w-[1360px] flex-col gap-8 px-4 py-10 lg:px-10">
+    <ThemeHero :theme="theme" :applied="applied" :applying="applying" @apply="applyToApp" />
 
     <GrAlert v-if="applyError" tone="danger" title="Тему не удалось применить">
       {{ applyError }}
@@ -106,8 +99,19 @@ const periods = [
       <code>themes</code> конфига granum.
     </GrAlert>
 
-    <template v-else>
-      <DocSection title="Режимы" lead="Режим включается парой в атрибуте корня или поддерева; режим по умолчанию у основной темы действует и без атрибута.">
+    <GrAlert v-if="dataError" tone="danger" title="Данные темы не загрузились">
+      {{ dataError }}
+    </GrAlert>
+
+    <div class="flex flex-col gap-8">
+      <div class="theme-tabs">
+        <GrTabs v-model="activeTab" variant="line" :tabs="tabs" id-base="theme-tabs" />
+      </div>
+
+      <GrTabPanels v-model="activeTab" id-base="theme-tabs">
+        <GrTabPanel value="overview" keep-alive lazy>
+          <div v-if="theme.build !== 'absent'" class="flex flex-col gap-12">
+      <DocSection title="Режимы" wide-lead lead="Режим включается парой в атрибуте корня или поддерева; режим по умолчанию у основной темы действует и без атрибута.">
         <div class="overflow-x-auto" tabindex="0" role="region" aria-label="Режимы темы">
           <table class="w-full min-w-[480px] border-collapse text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-base)]">
             <thead>
@@ -143,7 +147,7 @@ const periods = [
         </div>
       </DocSection>
 
-      <DocSection title="Основы" lead="Роли и форма — значения этой темы в каждом её режиме.">
+      <DocSection title="Основы" wide-lead lead="Роли и форма — значения этой темы в каждом её режиме.">
         <ThemeIslands :theme="islands">
           <div class="flex flex-col gap-5">
             <div v-for="group in roles" :key="group.title" class="flex flex-col gap-2">
@@ -175,7 +179,7 @@ const periods = [
         </ThemeIslands>
       </DocSection>
 
-      <DocSection title="Компоненты" lead="Настоящие компоненты пакета под парой темы: токены компонентов и пропсы по умолчанию — её.">
+      <DocSection title="Компоненты" wide-lead lead="Настоящие компоненты пакета под парой темы: токены компонентов и пропсы по умолчанию — её.">
         <ThemeIslands :theme="islands">
           <div class="flex flex-col gap-4">
             <div class="flex flex-wrap items-center gap-2">
@@ -226,6 +230,41 @@ const periods = [
           </div>
         </ThemeIslands>
       </DocSection>
-    </template>
+
+      <ThemeComponentValues v-if="view" :view="view" />
+          </div>
+        </GrTabPanel>
+
+        <GrTabPanel value="tokens" keep-alive lazy>
+          <ThemeTokensPanel v-if="view" :view="view" :modes="modes" :previews="theme.build !== 'absent'" />
+          <GrSkeleton v-else :rows="6" />
+        </GrTabPanel>
+
+        <GrTabPanel value="hooks" keep-alive lazy>
+          <HooksPanel :owners="hookOwners" filters />
+        </GrTabPanel>
+      </GrTabPanels>
+    </div>
   </div>
 </template>
+
+<style scoped>
+/* Вкладки под шапкой приложения (`h-14`): длинная вкладка не уводит их из виду. */
+.theme-tabs {
+  position: sticky;
+  top: 3.5rem;
+  z-index: 1;
+  margin-inline: calc(-1 * var(--gr-space-4));
+  padding-inline: var(--gr-space-4);
+  border-bottom: 1px solid var(--gr-brd);
+  background: color-mix(in srgb, var(--gr-bg) 92%, transparent);
+  backdrop-filter: blur(8px);
+}
+
+@media (min-width: 1024px) {
+  .theme-tabs {
+    margin-inline: calc(-1 * var(--gr-space-10));
+    padding-inline: var(--gr-space-10);
+  }
+}
+</style>
