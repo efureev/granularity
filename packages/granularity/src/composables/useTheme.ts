@@ -1,6 +1,6 @@
-import type { GranumThemeStorage, GranumThemeTarget } from '@feugene/granum/runtime'
+import type { GranumThemeSelection, GranumThemeStorage, GranumThemeTarget } from '@feugene/granum/runtime'
 import type { App, ComputedRef } from 'vue'
-import { carryThemeMode, createThemeController, findTheme, isSelectableTheme, loadThemeSheet, readThemeSelection } from '@feugene/granum/runtime'
+import { carryThemeMode, createThemeController, findTheme, isSelectableTheme, loadThemeSheet, readThemeSelection, resolveThemeActivation } from '@feugene/granum/runtime'
 import { computed, hasInjectionContext, inject, ref, shallowReactive } from 'vue'
 
 import {
@@ -212,8 +212,8 @@ function applySilently(state: ThemeState, mode: GrModeName): void {
  * нескольких Vue-приложений на одной странице, которым нужны независимые режимы.
  *
  * Для (б) обязателен и `target` — корень, получающий `data-theme`: без него
- * изолировано только состояние, а атрибут все приложения пишут в один `<html>`,
- * и побеждает последний.
+ * атрибут все приложения пишут в один `<html>`, а их состояния идут за ним —
+ * выбор одного доходит до остальных.
  *
  * ```ts
  * import manifest from 'virtual:granum/themes'
@@ -301,12 +301,8 @@ function bindListeners(state: ThemeState) {
     if (!state.persist || state.storage || event.key !== state.storageKey)
       return
     const next = readThemeSelection(state.manifest, event.newValue, selectable(state))
-    if (!next)
-      return
-    if (next.theme.id === state.theme.value)
-      applySilently(state, next.mode.name)
-    else
-      void state.controller?.setTheme(next.theme.id, { mode: next.mode.name, persist: false }).catch(() => {})
+    if (next)
+      followSelection(state, next)
   }
   window.addEventListener?.('storage', onStorage)
 
@@ -326,9 +322,48 @@ function bindListeners(state: ThemeState) {
   state.teardownListeners = () => {
     window.removeEventListener?.('storage', onStorage)
     mql?.removeEventListener?.('change', onSchemeChange)
+    state.rootObserver?.observer.disconnect()
+    state.rootObserver = undefined
     state.listenersBound = false
     state.teardownListeners = undefined
   }
+}
+
+/** Выбор, сделанный не этим состоянием, — без записи в хранилище. */
+function followSelection(state: ThemeState, next: GranumThemeSelection): void {
+  if (next.theme.id === state.theme.value)
+    applySilently(state, next.mode.name)
+  else
+    void state.controller?.setTheme(next.theme.id, { mode: next.mode.name, persist: false }).catch(() => {})
+}
+
+/**
+ * Пару на корне ставит не только это состояние: переключатель на своём
+ * контроллере granum, скрипт до первого кадра после подмены документа
+ * (`astro:after-swap`). Состояние идёт за корнем — иначе следующий `useTheme()`
+ * вернул бы на корень устаревший выбор. Корень берётся на каждый `useTheme()`:
+ * `target` приложения может появиться или смениться позже привязки слушателей.
+ */
+function observeRoot(state: ThemeState): void {
+  if (!state.listenersBound || typeof MutationObserver === 'undefined')
+    return
+  const root = rootOf(state)
+  if (state.rootObserver?.root === root)
+    return
+  state.rootObserver?.observer.disconnect()
+  state.rootObserver = undefined
+  if (!root)
+    return
+  const attribute = state.manifest.activation.attribute
+  const observer = new MutationObserver(() => {
+    const next = resolveThemeActivation(state.manifest, root.getAttribute(attribute))
+    if (!next || !isSelectableTheme(state.manifest, next.theme))
+      return
+    if (next.theme.id !== state.theme.value || next.mode.name !== state.mode.value)
+      followSelection(state, next)
+  })
+  observer.observe(root, { attributes: true, attributeFilter: [attribute] })
+  state.rootObserver = { root, observer }
 }
 
 /**
@@ -413,6 +448,7 @@ export function useTheme(options: UseThemeOptions = {}): UseThemeReturn {
     state.target = options.target
 
   bindListeners(state)
+  observeRoot(state)
   if (state.controller)
     applyToRoot(state)
 

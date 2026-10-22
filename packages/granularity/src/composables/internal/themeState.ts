@@ -57,6 +57,8 @@ export interface ThemeState {
    * страницей, и снимать его незачем.
    */
   teardownListeners?: () => void
+  /** Наблюдатель за парой на корне и корень, за которым он следит. */
+  rootObserver?: { root: HTMLElement, observer: MutationObserver }
   /** Разрешена ли мутация — см. `resolveThemeState` в `useTheme.ts`. */
   writable: boolean
 }

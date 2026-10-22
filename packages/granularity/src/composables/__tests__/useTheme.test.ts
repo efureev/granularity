@@ -284,6 +284,46 @@ describe('useTheme — режимы манифеста', () => {
     wrapper.unmount()
   })
 
+  // Переключатель на своём контроллере granum или скрипт после подмены
+  // документа меняет пару мимо состояния.
+  it('пару сменил другой писатель — состояние идёт за корнем и не перебивает её', async () => {
+    document.head.innerHTML = ''
+    initThemeEarly({ manifest: OCEAN_MANIFEST })
+    let api: ReturnType<typeof useTheme> | null = null
+    const island = () => mount(defineComponent({
+      setup() {
+        api = useTheme()
+        return () => null
+      },
+    }))
+    const first = island()
+    expect(api!.mode.value).toBe('light')
+
+    document.documentElement.setAttribute('data-look', 'clay-dark')
+    await Promise.resolve()
+    expect(api!.mode.value).toBe('dark')
+
+    const late = island()
+    expect(document.documentElement.getAttribute('data-look')).toBe('clay-dark')
+    // Чужая пара состоянию ничего не говорит.
+    document.documentElement.setAttribute('data-look', 'nope')
+    await Promise.resolve()
+    expect(api!.mode.value).toBe('dark')
+
+    late.unmount()
+    first.unmount()
+  })
+
+  it('пара темы без листа состояние не переключает: её значения были бы чужими', async () => {
+    const { href: _, ...paper } = TWO_THEMES.themes[1]
+    const { wrapper, api } = mountWith({ manifest: { ...TWO_THEMES, themes: [TWO_THEMES.themes[0], paper] } })
+
+    document.documentElement.setAttribute('data-look', 'paper-dark')
+    await Promise.resolve()
+    expect(api.theme.value).toBe('clay')
+    wrapper.unmount()
+  })
+
   it('toggleMode — между первым светлым и первым тёмным режимом', () => {
     const { wrapper, api } = mountWith({ manifest: OCEAN_MANIFEST })
 
@@ -426,6 +466,22 @@ describe('useTheme — состояние приложения', () => {
     second.wrapper.unmount()
     rootA.remove()
     rootB.remove()
+  })
+
+  it('app-scoped состояние идёт за парой своего `target`, а после unmount — нет', async () => {
+    const root = document.createElement('div')
+    document.body.append(root)
+    const { wrapper, api } = mountWithTheme([granularityThemePlugin, { target: () => root, persist: false }])
+
+    root.dataset.theme = 'slate-dark'
+    await Promise.resolve()
+    expect(api.mode.value).toBe('dark')
+
+    wrapper.unmount()
+    root.dataset.theme = 'slate-light'
+    await Promise.resolve()
+    expect(api.mode.value).toBe('dark')
+    root.remove()
   })
 
   it('unmount приложения снимает window-слушатели app-scoped состояния', () => {
