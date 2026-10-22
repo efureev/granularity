@@ -1,7 +1,7 @@
 {
   "name": "@feugene/granularity-media",
   "description": "Media components for @feugene/granularity: image cropping, camera capture, code scanning and video playback.",
-  "version": "2.0.2",
+  "version": "3.0.0",
   "license": "LicenseRef-Granularity-EUC-1.1",
   "author": {
     "name": "Evgeniy Fureev",
@@ -88,8 +88,9 @@
   },
   "peerDependencies": {
     "@feugene/fint-i18n": ">=0.9.0 <1.0.0",
-    "@feugene/granularity": ">=2.0.0 <4.0.0",
-    "@feugene/granum": ">=3.0.0 <4.0.0",
+    "@feugene/granularity": ">=3.1.0 <4.0.0",
+    "@feugene/granularity-tokens": ">=2.2.0 <3.0.0",
+    "@feugene/granum": ">=3.10.0 <4.0.0",
     "@feugene/unplugin-granularity": ">=1.0.0 <2.0.0",
     "unplugin-vue-components": ">=0.26.0",
     "vue": "^3.5.0"
@@ -125,8 +126,8 @@
     "@feugene/granularity": "^3.0.0",
     "@feugene/granularity-test-kit": "^2.0.0",
     "@feugene/granularity-tokens": "^2.0.0",
-    "@feugene/granum": "^3.10.0",
-    "@feugene/granum-engine-wind": "^3.10.0",
+    "@feugene/granum": "^3.11.0",
+    "@feugene/granum-engine-wind": "^3.11.0",
     "@feugene/unplugin-granularity": "^1.0.0",
     "@types/node": "^26.4.0",
     "@vitejs/plugin-vue": "^6.0.8",

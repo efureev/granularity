@@ -7,6 +7,8 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v2.2.0] 2026-10-22
+
 ### Added
 
 - **Значения графиков и медиа в темах каталога.** Раздел `components/@feugene/granularity-charts/`

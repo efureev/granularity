@@ -19,8 +19,8 @@
     "build": "vite build"
   },
   "devDependencies": {
-    "@feugene/granum": "^3.10.0",
-    "@feugene/granum-engine-wind": "^3.10.0",
+    "@feugene/granum": "^3.11.0",
+    "@feugene/granum-engine-wind": "^3.11.0",
     "@iconify-json/lucide": "^1.2.126"
   }
 }

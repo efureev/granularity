@@ -7,6 +7,8 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v2.0.3] 2026-10-22
+
 ### Fixed
 
 - `GrMarkdown` и `GrRichText` читают глобальные токены темы (`--gr-font-mono`, `--gr-leading-tight`,
