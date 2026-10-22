@@ -7,6 +7,8 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v3.1.1] 2026-10-22
+
 ### Fixed
 
 - **`useTheme` идёт за парой на корне.** Пару вправе сменить и другой писатель — переключатель на
