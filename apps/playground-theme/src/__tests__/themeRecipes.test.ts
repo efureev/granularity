@@ -34,6 +34,9 @@ const base = {
   providers: ['@feugene/granularity'],
   components: [] as string[],
   appSources: { dirs: [] as string[] },
+  // Пустая селекция `--gr-primary` не читает: обрезка (по умолчанию она
+  // включена) сняла бы значение, место которого рецепты и проверяют.
+  pruneTokens: { mode: 'off' as const },
 }
 
 async function themesLayer(modes: Record<string, unknown>, theme: unknown = 'slate'): Promise<string> {

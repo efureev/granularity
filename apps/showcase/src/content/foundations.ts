@@ -211,9 +211,10 @@ export default defineGranumConfig({
   ],
   themes: [{ theme: 'slate', modes: ['light', 'dark'] }],
   appSources: { dirs: ['src'] },
-  // Токены, которых не берёт ни компонент селекции, ни разметка приложения,
-  // из CSS вырезаются. Порядок внедрения: 'report' → план в отчёте → 'on'.
-  pruneTokens: { mode: 'on' },
+  // Обрезка включена по умолчанию: токены, которых не берёт ни компонент
+  // селекции, ни разметка приложения, из CSS вырезаются. Имя, собранное
+  // в рантайме, скан не видит — такие токены перечисляются в keep.
+  pruneTokens: { keep: ['gr-danger-*'] },
 })`
 
 const granumGuardSnippet = `// granum.config.ts
@@ -383,10 +384,10 @@ export const showcaseQuickStartCards: ShowcaseQuickStartCard[] = [
   {
     id: 'quick-start-granum-prune',
     title: 'Шаг 4. Обрезаем неиспользуемые токены',
-    description: 'Пакет объявляет больше двух сотен токенов, а приложению с двумя компонентами нужна их малая часть. `pruneTokens` вырезает из CSS то, чего не берёт ни компонент селекции, ни разметка приложения.',
+    description: 'Пакет объявляет больше двух сотен токенов, а приложению с двумя компонентами нужна их малая часть. granum вырезает из CSS то, чего не берёт ни компонент селекции, ни разметка приложения, — по умолчанию, без строки в конфиге.',
     code: granumPruneSnippet,
     language: 'ts',
-    note: 'Внедряется в два шага: `mode: \'report\'` — посмотреть план в `dist/granum-report.json`, затем `\'on\'`. `appSources` при этом обязателен: токен, который приложение взяло само, иначе уедет из CSS при зелёной сборке.',
+    note: 'Имя токена, собранное в рантайме, скан не видит — такие токены перечисляются в `keep`. Что снято и почему — в `dist/granum-report.json`; прежний CSS целиком — `mode: \'off\'`. `appSources` обязателен: токен, который приложение взяло само, иначе уедет из CSS при зелёной сборке.',
   },
   {
     id: 'quick-start-granum-guard',
@@ -434,7 +435,7 @@ export const showcaseFoundationGuides: ShowcaseFoundationGuide[] = [
     ],
     recommendations: [
       'Подключайте CSS одним `virtual:granum.css` через плагин `granum()`, а не ручными импортами слоёв.',
-      'Минимальный CSS даёт селекция granum: `components`, `themes.names` и `pruneTokens`. Подпутей `components/<Name>/styles.css` пакет не публикует — CSS компонента granum берёт из манифеста.',
+      'Минимальный CSS даёт селекция granum: `components`, `themes` и обрезка токенов — она включена по умолчанию. Подпутей `components/<Name>/styles.css` пакет не публикует — CSS компонента granum берёт из манифеста.',
       'Для кастомной темы оставляйте foundation layers пакета и подменяйте только semantic theme layer.',
     ],
     codeSamples: [

@@ -100,7 +100,7 @@ describe('showcase foundations content', () => {
     expect(showcaseQuickStartCards.find(card => card.id === 'quick-start-granum-basic')?.code).not.toContain('components:')
     expect(showcaseQuickStartCards.find(card => card.id === 'quick-start-granum-components')?.code).toContain('names: [\'GrButton\', \'GrCard\']')
     expect(showcaseQuickStartCards.find(card => card.id === 'quick-start-granum-themes')?.code).toContain('themes: [{ theme: \'slate\', modes: [\'light\', \'dark\'] }]')
-    expect(showcaseQuickStartCards.find(card => card.id === 'quick-start-granum-prune')?.code).toContain('pruneTokens: { mode: \'on\' }')
+    expect(showcaseQuickStartCards.find(card => card.id === 'quick-start-granum-prune')?.code).toContain('pruneTokens: { keep: [\'gr-danger-*\'] }')
     expect(showcaseQuickStartCards.find(card => card.id === 'quick-start-granum-guard')?.code).toContain('js: { guard: \'error\' }')
     expect(showcaseInstallationNarrative).toContain('granum(granumConfig)')
     expect(showcaseInstallationNarrative).toContain('virtual:granum.css')

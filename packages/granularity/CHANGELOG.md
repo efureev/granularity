@@ -7,6 +7,15 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Documentation
+
+- **Обрезка токенов — по умолчанию.** `installation.md`, `granum.md`, `ADDING_COMPONENTS.md`: с
+  granum 3.12 конфиг без `pruneTokens` получает в CSS только токены, которые читают компоненты
+  селекции и исходники `appSources`; опция нужна для `keep` (имя, собранное в рантайме или
+  пришедшее из данных) и явного `mode: 'off'`. До granum 3.12 обрезку включают явно.
+  Пакет собирается на granum `^3.12.0`. `installation.md`: peer granum — `≥ 3.10 < 4`, как в
+  `package.json`.
+
 ## [v3.1.1] 2026-10-22
 
 ### Fixed

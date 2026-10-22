@@ -9,8 +9,8 @@
     "vue": "^3.5.42"
   },
   "devDependencies": {
-    "@feugene/granum": "^3.11.0",
-    "@feugene/granum-engine-wind": "^3.11.0",
+    "@feugene/granum": "^3.12.0",
+    "@feugene/granum-engine-wind": "^3.12.0",
     "@vitejs/plugin-vue": "^6.0.8",
     "typescript": "^6.0.3",
     "vite": "^8.2.2",
