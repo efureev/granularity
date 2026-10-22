@@ -2,6 +2,9 @@ import { basename } from 'node:path'
 
 import { describe, expect, it } from 'vitest'
 
+import { packageSrcDir } from '../sources'
+import { readTokenRegistries } from './componentTokens'
+
 /** Токен компонента из реестра целевого пакета — `grComponentTokens`. */
 export interface ThemeGateToken {
   readonly owner: string
@@ -31,6 +34,21 @@ export interface ThemeGateOptions {
    * исключение с перечнем.
    */
   loadTheme: (dir: string) => ThemeGateData
+  /**
+   * Сверять только разделы пакетов из `targets`. Тема каталога несёт разделы
+   * многих пакетов, и каждый сверяет свой: ядро не знает реестров спутников.
+   * Пакет темы оставляет флаг выключенным — раздел пакета, которого нет в
+   * `targets`, для него опечатка.
+   */
+  onlyTargets?: boolean
+}
+
+/**
+ * Реестр токенов пакета из его `tokens.json` — цель `targets` гейта для пакета,
+ * который не экспортирует реестр (`grComponentTokens` есть только у ядра).
+ */
+export function packageComponentTokens(srcDir: string = packageSrcDir()): ThemeGateToken[] {
+  return readTokenRegistries(srcDir).flatMap(registry => registry.tokens.map(token => ({ owner: registry.owner, name: token.name, kind: token.kind })))
 }
 
 function modeChain(data: ThemeGateData, mode: string): string[] {
@@ -62,11 +80,11 @@ export function collectMissingComponentValues(data: ThemeGateData, targets: Them
 }
 
 /** В разделе — пакет вне целей, компонент без токенов в реестре или токен не вида `theme` своего компонента. */
-export function collectUnknownComponentValues(data: ThemeGateData, targets: ThemeGateOptions['targets']): string[] {
+export function collectUnknownComponentValues(data: ThemeGateData, targets: ThemeGateOptions['targets'], onlyTargets = false): string[] {
   return Object.entries(data.components ?? {}).flatMap(([packageId, byComponent]) => {
     const tokens = targets[packageId]
     if (tokens === undefined)
-      return [`${packageId}: пакет не назван в targets гейта — значения не с чем сверить`]
+      return onlyTargets ? [] : [`${packageId}: пакет не назван в targets гейта — значения не с чем сверить`]
     return Object.entries(byComponent).flatMap(([owner, values]) => {
       const own = tokens.filter(token => token.owner === owner)
       if (own.length === 0)
@@ -106,7 +124,7 @@ export function defineThemeGate(options: ThemeGateOptions): void {
         })
 
         it('в разделах — только токены вида theme своих компонентов', () => {
-          expect(collectUnknownComponentValues(data(), options.targets), 'хук и свои токены компонента тема не задаёт; опечатку — исправь').toEqual([])
+          expect(collectUnknownComponentValues(data(), options.targets, options.onlyTargets), 'хук и свои токены компонента тема не задаёт; опечатку — исправь').toEqual([])
         })
       })
     }

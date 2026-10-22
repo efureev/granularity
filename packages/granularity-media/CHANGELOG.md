@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+Мажор: значения у темы.
+
+### Changed
+
+- **`--gr-image-crop-mask` — токен вида `theme`**: затемнение вне круглого кадра `GrImageCrop`
+  компонент читает без запасного значения, значение — в темах `@feugene/granularity-tokens` 2.2.0
+  (прежнее `rgb(0 0 0 / 0.55)`). Приложение по-прежнему переопределяет его своим CSS.
+- **Требования**: `@feugene/granularity` `>=3.1.0`, `@feugene/granum` `>=3.10.0`,
+  `@feugene/granularity-tokens` `>=2.2.0` — темы со значением маски.
+- Своей теме без `extends` нужно значение маски — `granum doctor` называет его поимённо
+  (`theme-incomplete`).
+
 ## [v2.0.2] 2026-10-21
 
 ### Changed

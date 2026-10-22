@@ -20,7 +20,7 @@ export const imageClass = 'pointer-events-none absolute left-1/2 top-1/2 max-w-n
  * поверх почти чёрного фона не читается вовсе, и пользователь не видит, что
  * попадёт в кадр. Линия работает в обеих темах.
  */
-export const circleMaskClass = 'pointer-events-none absolute inset-0 m-auto aspect-square rounded-[var(--gr-radius-full)] border border-[var(--gr-image-crop-guide,var(--gr-brd))] shadow-[0_0_0_9999px_var(--gr-image-crop-mask,rgb(0_0_0/0.55))]'
+export const circleMaskClass = 'pointer-events-none absolute inset-0 m-auto aspect-square rounded-[var(--gr-radius-full)] border border-[var(--gr-image-crop-guide,var(--gr-brd))] shadow-[0_0_0_9999px_var(--gr-image-crop-mask)]'
 
 export const rectGuideClass = 'pointer-events-none absolute inset-0 border border-[var(--gr-image-crop-guide,var(--gr-brd))]'
 

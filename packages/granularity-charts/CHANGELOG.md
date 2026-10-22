@@ -7,6 +7,27 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+Мажор: значения у темы. Дизайн-решения графиков — токены вида `theme`, их значения дают темы
+каталога пакета токенов; вид не меняется.
+
+### Changed
+
+- **20 хуков — вид `theme`**, компонент читает их без запасного значения: толщины линий
+  (`--gr-chart-line-width`, `-area-line-width`, `-radar-width`, `-frame-grid-width`, `-bar-gap`,
+  `-pie-gap`, `-waterfall-connector-width`, `-waterfall-zero-step`, `--gr-sparkline-width`) и
+  прозрачности (`--gr-chart-area-fill-opacity`, `-area-stack-opacity`, `-area-fill-fade`, `-bar-dim`,
+  `-funnel-dim`, `-pie-dim`, `-line-gap-opacity`, `-radar-fill`, `-frame-brush-fill-opacity`,
+  `-frame-reference-band-opacity`, `--gr-sparkline-fill-opacity`). Значения — в темах
+  `@feugene/granularity-tokens` 2.2.0; приложение по-прежнему переопределяет их своим CSS.
+- **Требования**: `@feugene/granularity` `>=3.1.0`, `@feugene/granularity-tokens` `>=2.2.0` —
+  темы со значениями графиков, `@feugene/granum` `>=3.11.0` — значения рамки лежат в разделе
+  группы `GrChartFrame`: токены общей рамки требует каждый график, владельца среди них нет.
+- Своей теме без `extends` нужны значения этих токенов — `granum doctor` называет их поимённо
+  (`theme-incomplete`); начать с копии — `gr-theme-copy slate <id>`.
+- Хуки-геометрия (`--gr-sparkline-height`, `-inset`, `--gr-chart-bullet-value-width`,
+  `-frame-empty-height`, `-frame-legend-gap`) и нейтральная заливка пустой ячейки тепловой карты
+  остаются хуками — с причиной `literal` в реестре.
+
 ## [v2.0.2] 2026-10-21
 
 ### Changed

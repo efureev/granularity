@@ -550,15 +550,64 @@ defineStyleTokensGate()
 
 ```ts
 // src/__tests__/componentTokens.test.ts
+import { createRequire } from 'node:module'
+import { dirname, join } from 'node:path'
+
 import { grComponentTokens } from '@feugene/granularity/tokens'
 import { defineComponentTokensGate } from '@feugene/granularity-test-kit/gates'
 import { grDerivedTokens, grFoundationTokens, grRoleTokens } from '@feugene/granularity-tokens'
 
+// Исходники тем каталога — папка `themes` пакета токенов.
+const themesDir = join(dirname(createRequire(join(process.cwd(), 'package.json')).resolve('@feugene/granularity-tokens/package.json')), 'themes')
+
 // Всё, что объявили ядро и пакет токенов, легально как употребление — но не как объявление.
 defineComponentTokensGate({
   globalTokens: [...grFoundationTokens, ...grDerivedTokens, ...grRoleTokens, ...grComponentTokens],
+  // Инлайновые и хуки ядра (`--gr-affix-offset`) читаются с фолбэком законно.
+  globalThemeTokens: [...grFoundationTokens, ...grDerivedTokens, ...grRoleTokens, ...grComponentTokens.filter(token => token.kind === 'theme')],
+  themeTokenFallback: true,
+  hookLiterals: true,
+  themesDirAbsent: true,
+  themeKindOnly: true,
+  // Только у пакета со своими токенами вида `theme`: разделы тем каталога.
+  themeSources: { themesDir, packageId: '@feugene/granularity-my-package' },
 })
 ```
+
+Токен вида `theme` спутник читает **без запасного значения**, хук с литералом по умолчанию несёт в
+`tokens.json` причину `literal`: геометрия, ступень `size`, нейтральное значение. Дизайн-решение —
+цвет, тень, радиус, толщина линии, прозрачность, длительность, кегль — вид `theme`, и его значение
+лежит в **каждой** теме каталога, разделом `components/@feugene/granularity-my-package/<GrX>/`;
+пакет спутника — в `targets` этих тем. Токены общего SFC группы (`group`, их реестр —
+`components/<Group>/tokens.json`) — раздел группы `components/@feugene/granularity-my-package/<Group>/`:
+владельца среди компонентов у них нет, и granum (с 3.11) судит такой раздел по всем компонентам
+группы. Признаки и границы таких токенов — [«Токены группы»](../../granularity-tokens/docs/concepts.md#токены-группы)
+пакета токенов. Полноту держит гейт тем каталога:
+
+```ts
+// src/__tests__/catalogThemes.test.ts
+import { createRequire } from 'node:module'
+import { dirname, join } from 'node:path'
+
+import { defineThemeGate, packageComponentTokens } from '@feugene/granularity-test-kit/gates'
+import { grThemeCatalog } from '@feugene/granularity-tokens'
+import { loadTheme } from '@feugene/granularity-tokens/theme/node'
+
+const themesDir = join(dirname(createRequire(join(process.cwd(), 'package.json')).resolve('@feugene/granularity-tokens/package.json')), 'themes')
+
+defineThemeGate({
+  themeDirs: grThemeCatalog.map(theme => join(themesDir, theme.id)),
+  targets: { '@feugene/granularity-my-package': packageComponentTokens() },
+  loadTheme: dir => loadTheme(dir),
+  // Тема каталога несёт разделы многих пакетов; чужие сверяют их гейты.
+  onlyTargets: true,
+})
+```
+
+Такой спутник требует темы со своими значениями явно — `peerDependencies`:
+`"@feugene/granularity-tokens": ">=<минор, где появились значения> <3.0.0"`. Перевод хука в вид
+`theme` — мажор спутника: своя тема без `extends` обязана дать значение, иначе `doctor` назовёт его
+находкой `theme-incomplete`.
 
 ```ts
 // src/__tests__/registry.generated.test.ts

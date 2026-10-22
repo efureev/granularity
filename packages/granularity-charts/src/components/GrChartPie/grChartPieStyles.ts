@@ -12,7 +12,7 @@ export type { GrChartSize as GrChartPieSize }
 
 /** Разделитель между долями: цветом фона, а не тёмной линией — иначе круг выглядит расчерченным. */
 export const pieGapStroke = 'var(--gr-chart-pie-gap-color,var(--gr-bg))'
-export const pieGapWidth = 'var(--gr-chart-pie-gap,2px)'
+export const pieGapWidth = 'var(--gr-chart-pie-gap)'
 
 /**
  * Приглушение неактивных долей — вторая половина выделения.
@@ -21,7 +21,7 @@ export const pieGapWidth = 'var(--gr-chart-pie-gap,2px)'
  * работают выступ активной доли (`ACTIVE_GROW`) и приглушение соседей. По
  * отдельности каждое читается вяло, вместе — однозначно.
  */
-export const pieDimOpacity = 'var(--gr-chart-pie-dim,0.45)'
+export const pieDimOpacity = 'var(--gr-chart-pie-dim)'
 
 /**
  * Подпись доли и её выноска.

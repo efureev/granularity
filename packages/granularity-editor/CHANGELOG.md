@@ -7,6 +7,11 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+
+- `GrMarkdown` и `GrRichText` читают глобальные токены темы (`--gr-font-mono`, `--gr-leading-tight`,
+  `--gr-leading-relaxed`) без запасного значения: значение даёт тема, нехватку называет `doctor`.
+
 ## [v2.0.2] 2026-10-21
 
 ### Changed

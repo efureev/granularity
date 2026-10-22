@@ -39,6 +39,7 @@ export {
   collectMissingComponentValues,
   collectUnknownComponentValues,
   defineThemeGate,
+  packageComponentTokens,
   type ThemeGateData,
   type ThemeGateOptions,
   type ThemeGateToken,

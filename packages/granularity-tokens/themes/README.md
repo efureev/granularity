@@ -7,10 +7,10 @@
 
 | Тема | Название | Версия | Режимы | Характер | Как устроена | Дизайн-система |
 | --- | --- | --- | --- | --- | --- | --- |
-| `slate` | Сланец | 1.1.0 | `light`, `dark` | холодные нейтрали, индиго-акцент, контраст по AA | базовая тема пакета | [granularity.tech/themes/slate](https://granularity.tech/themes/slate) |
-| `clay` | Глина | 1.1.0 | `light`, `dark` | тёплая бумага, графитовые чернила, один глиняный акцент | копия `slate` | [granularity.tech/themes/clay](https://granularity.tech/themes/clay) |
-| `tactile` | Тактильная | 1.0.0 | `light`, `dark` | кнопка-предмет: свет сверху, тень цвета тона, подъём и пружина | наследник `slate` | [granularity.tech/themes/tactile](https://granularity.tech/themes/tactile) |
-| `blueprint` | Чертёж | 1.0.0 | `light`, `dark` | плоская точность: без теней, линия хода, ячейка иконки | копия `slate` | [granularity.tech/themes/blueprint](https://granularity.tech/themes/blueprint) |
+| `slate` | Сланец | 1.2.0 | `light`, `dark` | холодные нейтрали, индиго-акцент, контраст по AA | базовая тема пакета | [granularity.tech/themes/slate](https://granularity.tech/themes/slate) |
+| `clay` | Глина | 1.2.0 | `light`, `dark` | тёплая бумага, графитовые чернила, один глиняный акцент | копия `slate` | [granularity.tech/themes/clay](https://granularity.tech/themes/clay) |
+| `tactile` | Тактильная | 1.1.0 | `light`, `dark` | кнопка-предмет: свет сверху, тень цвета тона, подъём и пружина | наследник `slate` | [granularity.tech/themes/tactile](https://granularity.tech/themes/tactile) |
+| `blueprint` | Чертёж | 1.1.0 | `light`, `dark` | плоская точность: без теней, линия хода, ячейка иконки | копия `slate` | [granularity.tech/themes/blueprint](https://granularity.tech/themes/blueprint) |
 
 Каждая тема — папка с `README.md`: для чего она, правила использования, которых нет в токенах, и
 ссылка на её дизайн-систему. Темы каталога выходят связкой с ядром: компонент с новым токеном вида
@@ -40,6 +40,7 @@ themes/<slug>/
   components/@feugene/granularity/<GrX>/root.json         # значения компонента вне режимов
   components/@feugene/granularity/<GrX>/modes/<режим>.json
   components/@feugene/granularity/<GrX>/README.md         # почему значения такие
+  components/@feugene/granularity-charts/GrChartFrame/root.json   # раздел группы: токены общего кода
 ```
 
 - Имя папки — slug темы `^[a-z][a-z0-9-]*$`, оно же `id` в `theme.json`. Имя режима — без дефиса:
@@ -48,6 +49,8 @@ themes/<slug>/
   ключей задаёт порядок режимов. Режим с `extends` хранит в своём файле только отличия.
 - Файлы значений — `{ "<токен без -->": "<значение>" }`, без селекторов: их назначает сборка
   приложения. Ключ с `$` — пояснение, не значение.
+- Раздел называет компонент, а у токенов общего кода нескольких компонентов — группу
+  (`GrChartFrame` графиков): признаки и границы — [«Токены группы»](../docs/concepts.md#токены-группы).
 - В разделе компонента — только токены вида `theme` этого компонента (`tokens.json` у компонента
   в ядре); у значения одно место — раздел одного компонента, `root` или режимы.
 - `version` — версия темы, `targets` — пакеты компонентов и диапазоны их версий; пакет раздела

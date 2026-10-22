@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **`defineThemeGate({ onlyTargets })`** — сверять только разделы пакетов из `targets`: тема каталога
+  несёт разделы многих пакетов, и каждый пакет сверяет свой. Пакет темы флаг не включает — раздел
+  пакета вне `targets` для него опечатка.
+- **`packageComponentTokens()`** — реестр токенов пакета из его `tokens.json` в форме `targets`
+  гейта тем: для спутника, который не экспортирует реестр.
+
 ## [v2.2.0] 2026-10-21
 
 ### Added

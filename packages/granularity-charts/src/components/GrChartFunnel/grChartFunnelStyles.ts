@@ -11,7 +11,7 @@ export type { GrChartSize as GrChartFunnelSize } from '../GrChartFrame/chartFram
 export const funnelLabelFill = 'var(--gr-chart-funnel-label,var(--gr-bg))'
 
 /** Приглушение неактивных ступеней, пока одна выделена. */
-export const funnelDimOpacity = 'var(--gr-chart-funnel-dim,0.45)'
+export const funnelDimOpacity = 'var(--gr-chart-funnel-dim)'
 
 /** Зазор между ступенями. Числом: он идёт в геометрию, а не в CSS. */
 export const DEFAULT_FUNNEL_GAP = 4

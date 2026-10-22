@@ -105,13 +105,13 @@ export const frameTableCellClass = 'border border-[var(--gr-brd)] px-2 py-1'
 
 /** Толщина сетки и оси задаётся атрибутом, а не классом: SVG слушает `stroke-width`. */
 export const gridStroke = 'var(--gr-chart-frame-grid,var(--gr-brd))'
-export const gridStrokeWidth = 'var(--gr-chart-frame-grid-width,1px)'
+export const gridStrokeWidth = 'var(--gr-chart-frame-grid-width)'
 export const axisStroke = 'var(--gr-chart-frame-axis,var(--gr-brd))'
 export const labelFill = 'var(--gr-chart-frame-label,var(--gr-muted-fg))'
 export const crosshairStroke = 'var(--gr-chart-frame-crosshair,var(--gr-brd))'
 export const brushFill = 'var(--gr-chart-frame-brush-fill,var(--gr-primary))'
 export const brushStroke = 'var(--gr-chart-frame-brush-stroke,var(--gr-primary))'
-export const brushFillOpacity = 'var(--gr-chart-frame-brush-fill-opacity,0.12)'
+export const brushFillOpacity = 'var(--gr-chart-frame-brush-fill-opacity)'
 
 /**
  * Опора красится приглушённой ролью, а не цветом серии.
@@ -124,7 +124,7 @@ export const referenceStroke = 'var(--gr-chart-frame-reference,var(--gr-muted-fg
 export const referenceLabelFill = 'var(--gr-chart-frame-reference-label,var(--gr-muted-fg))'
 
 /** Полоса заливается едва заметно: коридор допустимого не должен спорить с данными. */
-export const referenceBandOpacity = 'var(--gr-chart-frame-reference-band-opacity,0.12)'
+export const referenceBandOpacity = 'var(--gr-chart-frame-reference-band-opacity)'
 
 /** Толщина линии опоры — числом: она же идёт в `dashArrayFor`, а тот считает в JS. */
 export const REFERENCE_STROKE_WIDTH = 1.5

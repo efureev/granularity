@@ -1,6 +1,10 @@
+import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
+
 import { describe, expect, it } from 'vitest'
 
-import { collectMissingComponentValues, collectUnknownComponentValues, type ThemeGateData } from '../gates/themeGate'
+import { collectMissingComponentValues, collectUnknownComponentValues, packageComponentTokens, type ThemeGateData } from '../gates/themeGate'
 
 const TOKENS = [
   { owner: 'GrCard', name: '--gr-card-bg', kind: 'theme' },
@@ -48,6 +52,32 @@ describe('defineThemeGate: значения компонентов', () => {
       '@acme/ui:GrCard: --gr-card-typo — не токен вида theme этого компонента',
       '@acme/ui:GrGhost: у пакета нет такого компонента с токенами',
       '@acme/other: пакет не назван в targets гейта — значения не с чем сверить',
+    ])
+  })
+
+  it('onlyTargets: раздел чужого пакета — не дело этого гейта, свой сверяется как прежде', () => {
+    const shared = theme({
+      '@acme/ui': { GrCard: { root: { 'gr-card-gap': '2px' } } },
+      '@acme/other': { GrX: { root: { 'gr-x': '1' } } },
+    })
+    expect(collectUnknownComponentValues(shared, { '@acme/ui': TOKENS }, true)).toEqual([
+      '@acme/ui:GrCard: --gr-card-gap — не токен вида theme этого компонента',
+    ])
+  })
+})
+
+describe('packageComponentTokens', () => {
+  it('реестр пакета из `tokens.json` компонентов — владелец, имя и вид', () => {
+    const src = join(mkdtempSync(join(tmpdir(), 'gr-theme-gate-')), 'src')
+    mkdirSync(join(src, 'components', 'GrCard'), { recursive: true })
+    writeFileSync(join(src, 'components', 'GrCard', 'tokens.json'), JSON.stringify({ tokens: [
+      { name: '--gr-card-bg', kind: 'theme', default: '#fff', description: 'фон' },
+      { name: '--gr-card-gap', kind: 'hook', default: '4px', description: 'зазор', literal: 'геометрия' },
+    ] }))
+
+    expect(packageComponentTokens(src)).toEqual([
+      { owner: 'GrCard', name: '--gr-card-bg', kind: 'theme' },
+      { owner: 'GrCard', name: '--gr-card-gap', kind: 'hook' },
     ])
   })
 })

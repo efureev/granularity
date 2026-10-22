@@ -10,7 +10,7 @@ export type { GrChartSize as GrChartLineSize }
  * утилита вида `text-[var(--x)]` на нём не даёт ничего. Гейт
  * `svgPaint.test.ts` держит это правило.
  */
-export const lineStrokeWidth = 'var(--gr-chart-line-width,2px)'
+export const lineStrokeWidth = 'var(--gr-chart-line-width)'
 
 /** Обводка маркера цветом фона: без неё точка теряется на собственной линии. */
 export const pointHaloStroke = 'var(--gr-chart-line-point-halo,var(--gr-bg))'
@@ -23,7 +23,7 @@ export const pointHaloStroke = 'var(--gr-chart-line-point-halo,var(--gr-bg))'
  * «здесь ничего не мерили» яркостью, штрих — рисунком. Сплошная линия того же
  * цвета сказала бы «мерили и вот столько», что неправда.
  */
-export const gapStrokeOpacity = 'var(--gr-chart-line-gap-opacity,0.3)'
+export const gapStrokeOpacity = 'var(--gr-chart-line-gap-opacity)'
 
 /** Узор перемычки в режиме `dashed`. Считается от толщины линии, как и у серий. */
 export const GAP_DASH: GrChartDashPattern = 'dash'

@@ -10,8 +10,8 @@ import { grComponentTokens } from '../tokens'
 /**
  * Темы каталога — то же, что пакет темы для ядра: каждая выходит связкой с ним
  * и обязана задать каждый токен вида `theme` каждого компонента, а задавать
- * только их. Тема собирается из исходника сборкой дизайн-системы — полнота
- * глобальных токенов, контраст, ΔE.
+ * только их; разделы спутников сверяют их собственные гейты. Тема собирается
+ * из исходника сборкой дизайн-системы — полнота глобальных токенов, контраст, ΔE.
  */
 const themesDir = join(dirname(createRequire(join(process.cwd(), 'package.json')).resolve('@feugene/granularity-tokens/package.json')), 'themes')
 
@@ -19,4 +19,5 @@ defineThemeGate({
   themeDirs: grThemeCatalog.map(theme => join(themesDir, theme.id)),
   targets: { '@feugene/granularity': grComponentTokens },
   loadTheme: dir => loadTheme(dir),
+  onlyTargets: true,
 })

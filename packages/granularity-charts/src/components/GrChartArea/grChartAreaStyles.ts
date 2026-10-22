@@ -8,7 +8,7 @@ export type { GrChartSize as GrChartAreaSize } from '../GrChartFrame/chartFrameS
  * держит это правило.
  */
 
-export const areaStrokeWidth = 'var(--gr-chart-area-line-width,2px)'
+export const areaStrokeWidth = 'var(--gr-chart-area-line-width)'
 
 /** Обводка марки цветом фона: без неё точка теряется на собственной заливке. */
 export const areaPointHalo = 'var(--gr-chart-area-point-halo,var(--gr-bg))'
@@ -20,8 +20,8 @@ export const areaPointHalo = 'var(--gr-chart-area-point-halo,var(--gr-bg))'
  * должен видеть оба. Полосы стека не пересекаются вовсе — им нужна плотность,
  * иначе стек выглядит выцветшим и его полосы не отличить от фона сетки.
  */
-export const areaFillOpacity = 'var(--gr-chart-area-fill-opacity,0.28)'
-export const areaStackOpacity = 'var(--gr-chart-area-stack-opacity,0.85)'
+export const areaFillOpacity = 'var(--gr-chart-area-fill-opacity)'
+export const areaStackOpacity = 'var(--gr-chart-area-stack-opacity)'
 
 /**
  * Низ градиента.
@@ -29,4 +29,4 @@ export const areaStackOpacity = 'var(--gr-chart-area-stack-opacity,0.85)'
  * Заливка гаснет к базовой линии, а не обрывается ровным краем: сплошная
  * плашка спорит с сеткой и утяжеляет низ графика, где смотреть не на что.
  */
-export const areaFillFade = 'var(--gr-chart-area-fill-fade,0.02)'
+export const areaFillFade = 'var(--gr-chart-area-fill-fade)'

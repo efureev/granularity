@@ -7,6 +7,14 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- **Значения графиков и медиа в темах каталога.** Раздел `components/@feugene/granularity-charts/`
+  — 20 токенов вида `theme` (толщины линий и прозрачности), `components/@feugene/granularity-media/`
+  — маска кадра `GrImageCrop`. Значения — прежние литералы компонентов: вид не меняется.
+- Темы: «Сланец» и «Глина» 1.2.0, «Тактильная» и «Чертёж» 1.1.0; `targets` называют
+  `@feugene/granularity-charts` и `@feugene/granularity-media` `^3.0.0`.
+
 ## [v2.1.0] 2026-10-21
 
 Темы каталога написаны под ядро 3.1: `targets` — `{ "@feugene/granularity": "^3.1.0" }`.

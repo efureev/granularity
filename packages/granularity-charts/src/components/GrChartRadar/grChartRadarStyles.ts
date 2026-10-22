@@ -18,10 +18,10 @@ export type { GrChartSize as GrChartRadarSize }
  * берут ради сравнения профилей, а непрозрачная заливка верхней серии просто
  * прячет нижнюю.
  */
-export const radarFillOpacity = 'var(--gr-chart-radar-fill,0.18)'
+export const radarFillOpacity = 'var(--gr-chart-radar-fill)'
 
 /** Толщина контура. Контур — главный различитель: заливки перекрываются, линии нет. */
-export const radarStrokeWidth = 'var(--gr-chart-radar-width,2px)'
+export const radarStrokeWidth = 'var(--gr-chart-radar-width)'
 
 /** Обводка марки: на пересечении двух контуров она иначе сливается с чужой линией. */
 export const radarMarkerHalo = 'var(--gr-chart-radar-marker-halo,var(--gr-bg))'

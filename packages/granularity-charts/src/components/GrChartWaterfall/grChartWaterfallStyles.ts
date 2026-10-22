@@ -25,10 +25,10 @@ export const waterfallTotalFill = 'var(--gr-chart-1)'
 export const waterfallZeroFill = 'var(--gr-muted-fg)'
 
 export const waterfallConnectorStroke = 'var(--gr-chart-waterfall-connector,var(--gr-brd))'
-export const waterfallConnectorWidth = 'var(--gr-chart-waterfall-connector-width,1px)'
+export const waterfallConnectorWidth = 'var(--gr-chart-waterfall-connector-width)'
 
 /** Толщина черты нулевого шага: «движения не было» — факт, и он обязан быть виден. */
-export const waterfallZeroStepWidth = 'var(--gr-chart-waterfall-zero-step,2px)'
+export const waterfallZeroStepWidth = 'var(--gr-chart-waterfall-zero-step)'
 
 /**
  * Скругление дальнего конца столбца.

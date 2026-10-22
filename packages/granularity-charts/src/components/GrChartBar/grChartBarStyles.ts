@@ -17,11 +17,11 @@ export type { GrChartSize as GrChartBarSize } from '../GrChartFrame/chartFrameSt
  * Выделение работает наоборот: активная категория остаётся как есть, остальные
  * гаснут. Тот же приём, что у долей круга.
  */
-export const barDimOpacity = 'var(--gr-chart-bar-dim,0.35)'
+export const barDimOpacity = 'var(--gr-chart-bar-dim)'
 
 /** Волосяной разделитель между сегментами стека: без него полосы сливаются в одну. */
 export const barGapStroke = 'var(--gr-chart-bar-gap-color,var(--gr-bg))'
-export const barGapWidth = 'var(--gr-chart-bar-gap,1px)'
+export const barGapWidth = 'var(--gr-chart-bar-gap)'
 
 /**
  * Скругление дальнего от базовой линии конца полосы.

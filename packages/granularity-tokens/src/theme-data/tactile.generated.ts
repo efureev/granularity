@@ -8,9 +8,11 @@ const data: GrThemeData = {
   "title": "Тактильная",
   "description": "Кнопка как предмет: свет сверху, тень цвета тона снизу, подъём под указателем и пружина в отклике.",
   "docs": "https://granularity.tech/themes/tactile",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "targets": {
-    "@feugene/granularity": "^3.1.0"
+    "@feugene/granularity": "^3.1.0",
+    "@feugene/granularity-charts": "^3.0.0",
+    "@feugene/granularity-media": "^3.0.0"
   },
   "root": {
     "gr-slate-0": "#ffffff",
@@ -693,6 +695,71 @@ const data: GrThemeData = {
           "gr-transfer-drop-bg": "color-mix(in srgb, var(--gr-primary) 6%, transparent)",
           "gr-transfer-indicator-width": "3px",
           "gr-transfer-selected-bg": "color-mix(in srgb, var(--gr-primary) 12%, transparent)"
+        }
+      }
+    },
+    "@feugene/granularity-charts": {
+      "GrChartArea": {
+        "root": {
+          "gr-chart-area-fill-fade": "0.02",
+          "gr-chart-area-fill-opacity": "0.28",
+          "gr-chart-area-line-width": "2px",
+          "gr-chart-area-stack-opacity": "0.85"
+        }
+      },
+      "GrChartBar": {
+        "root": {
+          "gr-chart-bar-dim": "0.35",
+          "gr-chart-bar-gap": "1px"
+        }
+      },
+      "GrChartFrame": {
+        "root": {
+          "gr-chart-frame-brush-fill-opacity": "0.12",
+          "gr-chart-frame-grid-width": "1px",
+          "gr-chart-frame-reference-band-opacity": "0.12"
+        }
+      },
+      "GrChartFunnel": {
+        "root": {
+          "gr-chart-funnel-dim": "0.45"
+        }
+      },
+      "GrChartLine": {
+        "root": {
+          "gr-chart-line-gap-opacity": "0.3",
+          "gr-chart-line-width": "2px"
+        }
+      },
+      "GrChartPie": {
+        "root": {
+          "gr-chart-pie-dim": "0.45",
+          "gr-chart-pie-gap": "2px"
+        }
+      },
+      "GrChartRadar": {
+        "root": {
+          "gr-chart-radar-fill": "0.18",
+          "gr-chart-radar-width": "2px"
+        }
+      },
+      "GrChartWaterfall": {
+        "root": {
+          "gr-chart-waterfall-connector-width": "1px",
+          "gr-chart-waterfall-zero-step": "2px"
+        }
+      },
+      "GrSparkline": {
+        "root": {
+          "gr-sparkline-fill-opacity": "0.15",
+          "gr-sparkline-width": "1.5px"
+        }
+      }
+    },
+    "@feugene/granularity-media": {
+      "GrImageCrop": {
+        "root": {
+          "gr-image-crop-mask": "rgb(0 0 0 / 0.55)"
         }
       }
     }
