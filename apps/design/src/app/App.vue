@@ -10,7 +10,7 @@ import IconMoon from '~icons/lucide/moon'
 import IconSun from '~icons/lucide/sun'
 
 import { breadcrumbs } from './breadcrumbs'
-import { findComponent } from './catalog'
+import { findComponent, findGroup } from './catalog'
 import { foundations } from './foundations'
 import AppSidebar from './parts/AppSidebar.vue'
 import { THEME_STORAGE_KEY } from './theme'
@@ -31,6 +31,10 @@ const crumbs = computed(() => breadcrumbs(route.name, route.params, typeof route
   foundation: id => foundations.find(item => item.id === id)?.title,
   theme: id => grThemeCatalog.find(item => item.id === id)?.title,
   component: id => findComponent(id)?.name,
+  componentGroup: (id) => {
+    const group = findGroup(findComponent(id)?.group ?? '')
+    return group ? { id: group.id, title: group.title } : undefined
+  },
 }))
 
 /**

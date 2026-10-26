@@ -14,7 +14,7 @@ import MarkdownBlock from '../parts/MarkdownBlock.vue'
 import { useViewedTheme } from '../viewedTheme'
 import { COMPONENT_LOADING_INDICATOR, loadingIndicators, sizes, tones, variants } from './model'
 
-const doc = componentDoc('button')
+const doc = componentDoc('GrButton')
 const whenToUse = doc?.sections.get('Когда брать')
 const whenOther = doc?.sections.get('Когда взять другое')
 

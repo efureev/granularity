@@ -4,7 +4,7 @@ import { createMemoryHistory, createRouter, type Router } from 'vue-router'
 import { buildRoutes, type DesignPages, themeOnlyChange } from '../app/routes'
 
 const page = () => Promise.resolve({ render: () => null })
-const pages: DesignPages = { overview: page, foundation: page, themes: page, theme: page, component: page, notFound: page }
+const pages: DesignPages = { overview: page, foundation: page, themes: page, theme: page, components: page, component: page, notFound: page }
 
 function setup(current = 'slate'): { router: Router, setCurrent: (id: string) => void } {
   let theme = current
@@ -30,6 +30,7 @@ describe('маршруты: тема — первый сегмент пути', 
     expect(route.name).toBe('foundation')
     expect(route.params).toEqual({ theme: 'clay', foundation: 'color' })
     expect(router.resolve('/slate/themes/clay').params).toEqual({ theme: 'slate', slug: 'clay' })
+    expect(router.resolve('/clay/components').name).toBe('components')
     expect(router.resolve('/clay/components/button').params).toEqual({ theme: 'clay', component: 'button' })
   })
 

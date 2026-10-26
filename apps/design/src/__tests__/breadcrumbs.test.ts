@@ -6,6 +6,7 @@ const titles: CrumbTitles = {
   foundation: id => ({ color: 'Цвет' } as Record<string, string>)[id],
   theme: id => ({ clay: 'Глина' } as Record<string, string>)[id],
   component: id => ({ button: 'Button' } as Record<string, string>)[id],
+  componentGroup: id => (id === 'button' ? { id: 'buttons', title: 'Кнопки' } : undefined),
 }
 
 describe('хлебные крошки шапки', () => {
@@ -17,12 +18,17 @@ describe('хлебные крошки шапки', () => {
     ])
   })
 
-  it('раздел без своей страницы — без ссылки', () => {
-    expect(breadcrumbs('component', { component: 'button' }, 'slate', titles).map(crumb => [crumb.label, crumb.to !== undefined])).toEqual([
-      ['Обзор', true],
-      ['Компоненты', false],
-      ['Button', false],
+  it('компонент: каталог и группа — ссылки, группа — якорем каталога', () => {
+    expect(breadcrumbs('component', { component: 'button' }, 'slate', titles)).toEqual([
+      { label: 'Обзор', to: { name: 'overview', params: { theme: 'slate' } } },
+      { label: 'Компоненты', to: { name: 'components', params: { theme: 'slate' } } },
+      { label: 'Кнопки', to: { name: 'components', params: { theme: 'slate' }, hash: '#group-buttons' } },
+      { label: 'Button' },
     ])
+    expect(breadcrumbs('components', {}, 'slate', titles).at(-1)).toEqual({ label: 'Компоненты' })
+  })
+
+  it('раздел без своей страницы — без ссылки', () => {
     expect(breadcrumbs('foundation', { foundation: 'color' }, 'slate', titles).at(-1)).toEqual({ label: 'Цвет' })
   })
 

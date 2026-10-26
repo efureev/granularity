@@ -1,16 +1,28 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, reactive, watch } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 
 import { useTheme } from '@feugene/granularity'
 
+import IconAppWindow from '~icons/lucide/app-window'
+import IconBell from '~icons/lucide/bell'
+import IconBlocks from '~icons/lucide/blocks'
+import IconCompass from '~icons/lucide/compass'
 import IconLayoutGrid from '~icons/lucide/layout-grid'
 import IconLibrary from '~icons/lucide/library'
+import IconListCollapse from '~icons/lucide/list-collapse'
+import IconLoader from '~icons/lucide/loader'
 import IconMousePointerClick from '~icons/lucide/mouse-pointer-click'
+import IconPanelTop from '~icons/lucide/panel-top'
+import IconShapes from '~icons/lucide/shapes'
+import IconSquare from '~icons/lucide/square'
+import IconSquareCheck from '~icons/lucide/square-check'
 import IconSwatchBook from '~icons/lucide/swatch-book'
+import IconTable from '~icons/lucide/table'
+import IconTextCursorInput from '~icons/lucide/text-cursor-input'
 import themeManifest from 'virtual:granum/themes'
 
-import { catalog } from '../catalog'
+import { catalog, catalogGroups, findComponent } from '../catalog'
 import { foundations } from '../foundations'
 import { THEME_STORAGE_KEY } from '../theme'
 import { orderedThemes, THEME_BUILD_LABEL } from '../themes'
@@ -27,8 +39,35 @@ const theme = computed(() => (typeof route.params.theme === 'string' ? route.par
 
 const themes = orderedThemes(themeManifest)
 
-const componentIcons: Record<string, typeof IconLayoutGrid> = {
-  button: IconMousePointerClick,
+const groupIcons: Record<string, typeof IconLayoutGrid> = {
+  buttons: IconMousePointerClick,
+  fields: IconTextCursorInput,
+  choice: IconSquareCheck,
+  overlays: IconPanelTop,
+  tabs: IconListCollapse,
+  status: IconBell,
+  surfaces: IconSquare,
+  modals: IconAppWindow,
+  data: IconTable,
+  navigation: IconCompass,
+  waiting: IconLoader,
+  misc: IconShapes,
+}
+
+const navGroups = catalogGroups.map(group => ({ ...group, items: catalog.filter(component => component.group === group.id) }))
+
+// Группа текущего компонента раскрыта: путь к странице виден в меню, а не только в шапке.
+const expanded = reactive(new Set<string>())
+watch(() => (route.name === 'component' ? findComponent(String(route.params.component))?.group : undefined), (group) => {
+  if (group)
+    expanded.add(group)
+}, { immediate: true })
+
+function toggle(group: string, open: boolean): void {
+  if (open)
+    expanded.add(group)
+  else
+    expanded.delete(group)
 }
 </script>
 
@@ -93,14 +132,30 @@ const componentIcons: Record<string, typeof IconLayoutGrid> = {
 
       <GrSidebarGroup label="Компоненты">
         <GrSidebarItem
-          v-for="component in catalog"
-          :key="component.id"
-          :label="component.name"
-          :icon="componentIcons[component.id]"
+          label="Все компоненты"
+          :icon="IconBlocks"
+          :badge="catalog.length"
           :as="RouterLink"
-          :to="{ name: 'component', params: { theme, component: component.id } }"
-          :active="route.name === 'component' && route.params.component === component.id"
+          :to="{ name: 'components', params: { theme } }"
+          :active="route.name === 'components'"
         />
+        <GrSidebarItem
+          v-for="group in navGroups"
+          :key="group.id"
+          :label="group.title"
+          :icon="groupIcons[group.id]"
+          :expanded="expanded.has(group.id)"
+          @update:expanded="toggle(group.id, $event)"
+        >
+          <GrSidebarItem
+            v-for="component in group.items"
+            :key="component.id"
+            :label="component.name"
+            :as="RouterLink"
+            :to="{ name: 'component', params: { theme, component: component.id } }"
+            :active="route.name === 'component' && route.params.component === component.id"
+          />
+        </GrSidebarItem>
       </GrSidebarGroup>
     </div>
   </GrSidebar>

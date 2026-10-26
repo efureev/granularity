@@ -1,20 +1,17 @@
 import { marked, type Tokens } from 'marked'
 
-import buttonComponent from '../../../../packages/granularity/docs/components/GrButton.md?raw'
-import buttonDesign from '../../../../packages/granularity/docs/design/GrButton.md?raw'
-
 /**
  * Тексты берутся из документации пакета сборкой, а не копируются: документ в
  * репозитории и страница приложения не могут разойтись. Компонент в темах
- * каталога — `docs/design/*.md`, поведение компонента — `docs/components/*.md`.
+ * каталога — `docs/design/*.md`, поведение компонента — `docs/components/*.md`;
+ * ключ — имя компонента пакета (`GrButton`).
  */
-const designDocs: Record<string, string> = {
-  button: buttonDesign,
+function byComponent(sources: Record<string, string>): Record<string, string> {
+  return Object.fromEntries(Object.entries(sources).map(([path, source]) => [path.slice(path.lastIndexOf('/') + 1, -'.md'.length), source]))
 }
 
-const componentDocs: Record<string, string> = {
-  button: buttonComponent,
-}
+const designDocs = byComponent(import.meta.glob<string>('../../../../packages/granularity/docs/design/Gr*.md', { query: '?raw', import: 'default', eager: true }))
+const componentDocs = byComponent(import.meta.glob<string>('../../../../packages/granularity/docs/components/Gr*.md', { query: '?raw', import: 'default', eager: true }))
 
 /** «Четыре темы рядом» — число растёт вместе с каталогом. */
 const COMPARISON_HEADING = /темы рядом$/i
@@ -36,14 +33,24 @@ export function splitSections(markdown: string): DesignDoc {
   return { intro: head.replace(/^# .*$/m, '').trim(), sections }
 }
 
-export function designDoc(componentId: string): DesignDoc | undefined {
-  const markdown = designDocs[componentId]
+export function designDoc(name: string): DesignDoc | undefined {
+  const markdown = designDocs[name]
   return markdown ? splitSections(markdown) : undefined
 }
 
-export function componentDoc(componentId: string): DesignDoc | undefined {
-  const markdown = componentDocs[componentId]
+export function componentDoc(name: string): DesignDoc | undefined {
+  const markdown = componentDocs[name]
   return markdown ? splitSections(markdown) : undefined
+}
+
+/** Строка документа без разметки: код — как текст, ссылка — её текст. */
+export function plainText(markdown: string): string {
+  return markdown
+    .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1')
+    .replace(/`([^`]+)`/g, '$1')
+    .replace(/\*\*([^*]+)\*\*/g, '$1')
+    .replace(/\s+/g, ' ')
+    .trim()
 }
 
 export interface ComparisonTable {

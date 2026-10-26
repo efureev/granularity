@@ -2,13 +2,13 @@
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
-import { findComponent } from '../catalog'
+import { findComponent, findGroup } from '../catalog'
+import { viewsOf } from '../component/views'
 import { comparisonRow, comparisonTable, designDoc } from '../docs'
 import CopyButton from '../parts/CopyButton.vue'
 import HooksPanel from '../parts/HooksPanel.vue'
 import PageHeader from '../parts/PageHeader.vue'
 import ThemePicker from '../parts/ThemePicker.vue'
-import { componentViews } from '../specs'
 import { useViewedTheme } from '../viewedTheme'
 import NotFoundPage from './NotFoundPage.vue'
 
@@ -17,19 +17,19 @@ const router = useRouter()
 const theme = useViewedTheme()
 
 const component = computed(() => findComponent(String(route.params.component)))
-const views = computed(() => (component.value ? componentViews[component.value.id] : undefined))
+const views = computed(() => (component.value ? viewsOf(component.value) : undefined))
 
 const importLine = computed(() => (component.value ? `import { ${component.value.exports.join(', ')} } from '${component.value.importPath}'` : ''))
 
 const traits = computed(() => {
-  const doc = component.value ? designDoc(component.value.id) : undefined
+  const doc = component.value ? designDoc(component.value.exports[0]!) : undefined
   const table = doc ? comparisonTable(doc) : undefined
   return table ? comparisonRow(table, 'Характер') : undefined
 })
 
 const tabs = computed(() => [
   { value: 'overview', label: 'Обзор' },
-  { value: 'style', label: `Стиль темы «${theme.value.data.title}»` },
+  ...(views.value?.style ? [{ value: 'style', label: `Стиль темы «${theme.value.data.title}»` }] : []),
   { value: 'themes', label: 'Темы рядом' },
   { value: 'tokens', label: 'Токены' },
   { value: 'hooks', label: 'Хуки' },
@@ -50,8 +50,9 @@ const activeTab = computed({
 <template>
   <NotFoundPage v-if="!component || !views" />
 
-  <div v-else class="mx-auto flex max-w-[1360px] flex-col gap-8 px-4 py-10 lg:px-10">
-    <PageHeader eyebrow="Компонент" :title="component.name" :lead="component.summary">
+  <!-- Ключ — компонент: страница переиспользуется маршрутом, и без него вкладки (`keep-alive`) показали бы прежний компонент. -->
+  <div v-else :key="component.id" class="mx-auto flex max-w-[1360px] flex-col gap-8 px-4 py-10 lg:px-10">
+    <PageHeader :eyebrow="`Компонент · ${findGroup(component.group)?.title}`" :title="component.name" :lead="component.summary">
       <div class="mt-1 flex min-w-0 max-w-full items-center gap-1 self-start rounded-[var(--gr-radius-md)] border border-[var(--gr-brd)] bg-[var(--gr-muted)] py-1 pe-1 ps-3">
         <code class="min-w-0 truncate font-[var(--gr-font-mono)] text-[length:var(--gr-text-xs)] leading-[var(--gr-leading-xs)]">{{ importLine }}</code>
         <CopyButton :text="importLine" label="Скопировать импорт" />
@@ -83,7 +84,7 @@ const activeTab = computed({
         <GrTabPanel value="overview" keep-alive lazy>
           <component :is="views.overview" />
         </GrTabPanel>
-        <GrTabPanel value="style" keep-alive lazy>
+        <GrTabPanel v-if="views.style" value="style" keep-alive lazy>
           <component :is="views.style" />
         </GrTabPanel>
         <GrTabPanel value="themes" keep-alive lazy>

@@ -18,6 +18,7 @@ export const router = createRouter({
     foundation: () => import('./pages/FoundationPage.vue'),
     themes: () => import('./pages/ThemesPage.vue'),
     theme: () => import('./pages/ThemePage.vue'),
+    components: () => import('./pages/ComponentsPage.vue'),
     component: () => import('./pages/ComponentPage.vue'),
     notFound: () => import('./pages/NotFoundPage.vue'),
   }),

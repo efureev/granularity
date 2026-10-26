@@ -19,7 +19,7 @@ const OWNERS = ['GrButton', 'GrButtonGroup']
 
 const theme = useViewedTheme()
 const entry = computed(() => grThemeCatalog.find(item => item.id === theme.value.id)!)
-const doc = designDoc('button')
+const doc = designDoc('GrButton')
 const section = computed(() => (doc ? themeDocSection(doc, theme.value.id) : undefined))
 
 const literal = (value: unknown): string => (typeof value === 'string' ? `'${value}'` : String(value))

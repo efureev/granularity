@@ -15,7 +15,7 @@ const route = useRoute()
 const current = computed(() => String(route.params.theme))
 const themes = builtThemes(themeManifest)
 
-const doc = designDoc('button')
+const doc = designDoc('GrButton')
 const comparison = doc ? comparisonTable(doc) : undefined
 </script>
 

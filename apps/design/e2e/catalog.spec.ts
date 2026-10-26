@@ -45,3 +45,16 @@ test('страница темы: вид токенов переключаетс�
   await page.getByRole('link', { name: 'Каталог тем' }).first().click()
   await expect(page).toHaveURL(new RegExp(`/${GR_BASE_THEME_ID}/themes$`))
 })
+
+test('переход между темами: вкладки показывают новую тему, а не прежнюю', async ({ page }) => {
+  await page.goto(`/${GR_BASE_THEME_ID}/themes/clay?tab=tokens`)
+  await expect(page.getByRole('heading', { name: 'Токены темы «Глина»' })).toBeVisible()
+
+  // С темы на тему — меню: страница темы переиспользуется маршрутом.
+  await page.getByRole('navigation', { name: 'Разделы дизайн-системы' }).getByRole('link', { name: /^Чертёж/ }).click()
+  await expect(page).toHaveURL(new RegExp(`/${GR_BASE_THEME_ID}/themes/blueprint$`))
+  await page.getByRole('tab', { name: 'Токены' }).click()
+
+  await expect(page.getByRole('heading', { name: 'Токены темы «Чертёж»' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Токены темы «Глина»' })).toHaveCount(0)
+})

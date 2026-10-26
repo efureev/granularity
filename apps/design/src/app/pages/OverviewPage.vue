@@ -3,9 +3,8 @@ import { RouterLink } from 'vue-router'
 
 import { grFoundationTokens, grRoleTokens, grThemeCatalog } from '@feugene/granularity-tokens'
 import { grComponentTokens } from '@feugene/granularity/tokens'
-import IconArrowRight from '~icons/lucide/arrow-right'
 
-import { catalog } from '../catalog'
+import { catalog, catalogGroups } from '../catalog'
 import { foundations } from '../foundations'
 import DocSection from '../parts/DocSection.vue'
 import PageHeader from '../parts/PageHeader.vue'
@@ -74,23 +73,17 @@ const stats = [
       </ul>
     </DocSection>
 
-    <DocSection title="Компоненты" lead="Страница компонента — песочница и спецификация на настоящих компонентах пакета, он же в каждой теме каталога и значения его токенов по режимам.">
-      <ul class="grid gap-4 md:grid-cols-2">
-        <li v-for="component in catalog" :key="component.id">
-          <RouterLink :to="{ name: 'component', params: { component: component.id } }" class="overview-card">
+    <DocSection title="Компоненты" :lead="`${plural(catalog.length, ['компонент', 'компонента', 'компонентов'])} в двенадцати группах. Страница компонента — все состояния и поведение на настоящих компонентах пакета, он же в каждой теме каталога и значения его токенов.`">
+      <ul class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <li v-for="group in catalogGroups" :key="group.id">
+          <RouterLink :to="{ name: 'components', hash: `#group-${group.id}` }" class="overview-card">
             <span class="flex items-center justify-between gap-3">
-              <span class="text-[length:var(--gr-text-lg)] font-600 leading-[var(--gr-leading-lg)]">{{ component.name }}</span>
-              <GrIcon class="text-[var(--gr-muted-fg)]"><IconArrowRight /></GrIcon>
-            </span>
-            <span class="text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-base)] text-[var(--gr-muted-fg)]">{{ component.summary }}</span>
-            <span class="flex flex-wrap gap-1.5">
+              <span class="text-[length:var(--gr-text-base)] font-600 leading-[var(--gr-leading-base)]">{{ group.title }}</span>
               <GrBadge tone="neutral" size="sm">
-                {{ component.exports.join(' · ') }}
-              </GrBadge>
-              <GrBadge tone="neutral" size="sm">
-                {{ plural(grThemeCatalog.length, ['тема', 'темы', 'тем']) }}
+                {{ catalog.filter(component => component.group === group.id).length }}
               </GrBadge>
             </span>
+            <span class="text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-base)] text-[var(--gr-muted-fg)]">{{ group.lead }}</span>
           </RouterLink>
         </li>
       </ul>

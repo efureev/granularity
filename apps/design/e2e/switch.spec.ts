@@ -21,15 +21,16 @@ async function pickTheme(page: Page, title: string): Promise<void> {
 }
 
 /**
- * Как выглядит primary-кнопка и как обязана по токенам темы. Эталон — инлайн-проба:
+ * Как выглядит залитая кнопка и как обязана по токенам темы. Эталон — инлайн-проба:
  * она слоям не подчиняется. Утилиты кнопки живут в слое granum и проигрывают
  * сбросу, если granum объявлен раньше него: `tailwind-compat` фон кнопок не трогает,
- * но обнуляет `padding` и наследует `font-weight`.
+ * но обнуляет `padding` и наследует `font-weight`. Тон берётся у самой кнопки: тон
+ * по умолчанию — пропс темы, у «Глины» это `neutral`.
  */
 function buttonLook(page: Page, name: string): Promise<{ fill: string, weight: string, padding: string, token: { fill: string, weight: string } }> {
   return page.getByRole('button', { name, exact: true }).evaluate((button) => {
     const probe = document.createElement('span')
-    probe.style.backgroundColor = 'var(--gr-button-primary-bg, var(--gr-primary))'
+    probe.style.backgroundColor = `var(--gr-button-${button.getAttribute('data-gr-tone')}-bg)`
     probe.style.fontWeight = 'var(--gr-button-font-weight, var(--gr-font-medium))'
     button.after(probe)
     const token = { fill: getComputedStyle(probe).backgroundColor, weight: getComputedStyle(probe).fontWeight }

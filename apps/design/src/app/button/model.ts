@@ -41,9 +41,9 @@ const TONE_TOKEN = /^--gr-button-(primary|success|warning|danger|info|slate|azur
 export const buttonTokenGroups: TokenGroup[] = [
   { id: 'tone', title: 'Цвет тона', match: TONE_TOKEN },
   { id: 'neutral', title: 'Нейтральная, прозрачные веса и недоступная', match: /^--gr-button-(?:neutral|ghost|disabled)-/ },
-  { id: 'shape', title: 'Форма и подпись', match: /^--gr-button-(?:radius-|square-size|touch-size|font-weight)/ },
+  { id: 'shape', title: 'Форма и подпись', match: /^--gr-button-(?:radius-|square-size|touch-size|font-weight|group-tray-)/ },
   { id: 'surface', title: 'Объём и свет', match: /^--gr-button-(?:shadow|surface-shadow|solid-image|glow|divider)/ },
-  { id: 'motion', title: 'Движение и отклик', match: /^--gr-button-(?:motion|lift|response|shimmer|track|focus-offset)/ },
+  { id: 'motion', title: 'Движение и отклик', match: /^--gr-button-(?:motion|lift|press|response|shimmer|track|focus-offset)/ },
 ]
 
 export function tokenTone(name: string): string | undefined {

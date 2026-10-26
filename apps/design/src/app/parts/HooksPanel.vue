@@ -24,36 +24,39 @@ const props = defineProps<{
 
 const ALL = '*'
 
-const hooks = grComponentTokens.filter(token => token.kind === 'hook' && props.owners.includes(token.owner))
-const owners = props.owners.filter(owner => hooks.some(hook => hook.owner === owner))
+const hooks = computed(() => grComponentTokens.filter(token => token.kind === 'hook' && props.owners.includes(token.owner)))
+const owners = computed(() => props.owners.filter(owner => hooks.value.some(hook => hook.owner === owner)))
 
 const search = ref('')
 const owner = ref(ALL)
-const ownerOptions = [{ value: ALL, label: 'все компоненты' }, ...owners.map(item => ({ value: item, label: item }))]
+const ownerOptions = computed(() => [{ value: ALL, label: 'все компоненты' }, ...owners.value.map(item => ({ value: item, label: item }))])
 
 const query = computed(() => search.value.trim().toLowerCase())
-const groups = computed(() => owners
+const groups = computed(() => owners.value
   .filter(item => owner.value === ALL || owner.value === item)
   .map(item => ({
     owner: item,
-    hooks: hooks.filter(hook => hook.owner === item && (query.value === ''
+    hooks: hooks.value.filter(hook => hook.owner === item && (query.value === ''
       || hook.name.includes(query.value)
       || hook.description.toLowerCase().includes(query.value))),
   }))
   .filter(group => group.hooks.length > 0))
 
 /** Хук ставится в CSS приложения и действует на элемент и всё под ним. */
-const example = hooks[0] ? `.toolbar { ${hooks[0].name}: …; }` : undefined
+const example = computed(() => (hooks.value[0] ? `.toolbar { ${hooks.value[0].name}: …; }` : undefined))
 
-const summary = `${plural(hooks.length, ['хук', 'хука', 'хуков'])} у ${plural(owners.length, ['компонента', 'компонентов', 'компонентов'])}`
+const summary = computed(() => `${plural(hooks.value.length, ['хук', 'хука', 'хуков'])} у ${plural(owners.value.length, ['компонента', 'компонентов', 'компонентов'])}`)
 </script>
 
 <template>
   <div class="flex flex-col gap-10">
     <div class="flex flex-col gap-3 rounded-[var(--gr-radius-lg)] border border-[var(--gr-brd)] bg-[var(--gr-card)] p-5">
       <h2 class="text-[length:var(--gr-text-base)] font-600 leading-[var(--gr-leading-base)]">
-        Хуки · {{ summary }}
+        {{ hooks.length > 0 ? `Хуки · ${summary}` : 'Хуков нет' }}
       </h2>
+      <p v-if="hooks.length === 0" class="text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-base)] text-[var(--gr-muted-fg)]">
+        Ручек приложения у компонента нет: его вид задают тема — роли и токены — и пропсы.
+      </p>
       <dl class="grid grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-2 text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-base)]">
         <dt class="font-600">
           Токен

@@ -11,9 +11,21 @@ import { GR_BASE_THEME_ID, grThemeCatalog } from '@feugene/granularity-tokens'
  */
 for (const { id } of grThemeCatalog) {
   test.describe(`/themes/${id}`, () => {
+    // Эталон — про цвета и токены, не про движение. Бегущий индикатор загрузки
+    // выносит остров в композитный слой, и сглаживание текста зависело от того,
+    // первым ли идёт тест: без движения снимок от порядка не зависит.
+    test.use({ contextOptions: { reducedMotion: 'reduce' } })
+
     test.beforeEach(async ({ page }) => {
       await page.goto(`/${GR_BASE_THEME_ID}/themes/${id}`)
       await page.locator('section', { hasText: 'Компоненты' }).locator('[data-gr-button]').first().waitFor()
+      // Inter приходит с Google Fonts подмножествами по `unicode-range`: в холодном
+      // браузере кириллица не успевала к снимку и рисовалась запасным шрифтом.
+      // `load` с образцом текста запускает загрузку обоих подмножеств и ждёт их.
+      await page.evaluate(async () => {
+        await Promise.all(['400', '500', '600'].map(weight => document.fonts.load(`${weight} 14px Inter`, 'Светлый Latin')))
+        await document.fonts.ready
+      })
     })
 
     test('axe: острова режимов без нарушений', async ({ page }) => {

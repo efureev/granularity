@@ -1,14 +1,17 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { RouterLink, useRoute, useRouter } from 'vue-router'
 
 import { grComponentTokens } from '@feugene/granularity/tokens'
 import themeManifest from 'virtual:granum/themes'
+import IconArrowRight from '~icons/lucide/arrow-right'
 
+import { catalog } from '../catalog'
 import ColorSwatch from '../parts/ColorSwatch.vue'
 import DocSection from '../parts/DocSection.vue'
 import HooksPanel from '../parts/HooksPanel.vue'
 import ThemeIslands from '../parts/ThemeIslands.vue'
+import { plural } from '../plural'
 import ThemeComponentValues from '../theme/ThemeComponentValues.vue'
 import ThemeHero from '../theme/ThemeHero.vue'
 import ThemeTokensPanel from '../theme/ThemeTokensPanel.vue'
@@ -87,7 +90,8 @@ const periods = [
 <template>
   <NotFoundPage v-if="!theme" />
 
-  <div v-else class="mx-auto flex max-w-[1360px] flex-col gap-8 px-4 py-10 lg:px-10">
+  <!-- Ключ — тема: страница переиспользуется маршрутом, и вкладки (`keep-alive`) не должны держать прежнюю. -->
+  <div v-else :key="theme.entry.id" class="mx-auto flex max-w-[1360px] flex-col gap-8 px-4 py-10 lg:px-10">
     <ThemeHero :theme="theme" :applied="applied" :applying="applying" @apply="applyToApp" />
 
     <GrAlert v-if="applyError" tone="danger" title="Тему не удалось применить">
@@ -180,6 +184,10 @@ const periods = [
       </DocSection>
 
       <DocSection title="Компоненты" wide-lead lead="Настоящие компоненты пакета под парой темы: токены компонентов и пропсы по умолчанию — её.">
+        <RouterLink class="theme-components-link" :to="{ name: 'components', params: { theme: theme.entry.id } }">
+          Все {{ plural(catalog.length, ['компонент', 'компонента', 'компонентов']) }} в теме «{{ theme.entry.title }}»
+          <GrIcon><IconArrowRight /></GrIcon>
+        </RouterLink>
         <ThemeIslands :theme="islands">
           <div class="flex flex-col gap-4">
             <div class="flex flex-wrap items-center gap-2">
@@ -249,6 +257,29 @@ const periods = [
 </template>
 
 <style scoped>
+.theme-components-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--gr-space-1);
+  align-self: flex-start;
+  border-radius: var(--gr-radius-xs);
+  color: var(--gr-fg);
+  font-size: var(--gr-text-sm);
+  font-weight: var(--gr-font-semibold);
+  line-height: var(--gr-leading-sm);
+  text-decoration: none;
+}
+
+.theme-components-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.theme-components-link:focus-visible {
+  outline: 2px solid var(--gr-ring);
+  outline-offset: 2px;
+}
+
 /* Вкладки под шапкой приложения (`h-14`): длинная вкладка не уводит их из виду. */
 .theme-tabs {
   position: sticky;
