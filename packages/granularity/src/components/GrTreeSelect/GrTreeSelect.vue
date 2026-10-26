@@ -389,6 +389,7 @@ const className = computed(() => {
     state: props.state,
     invalid: isInvalid.value,
     disabled: isDisabled.value,
+    readonly: isReadonly.value,
   })
 })
 
@@ -719,7 +720,7 @@ const themeAttrs = useGrThemeAttrs()
         :aria-errormessage="aria.errorMessage()"
         :aria-labelledby="aria.labelledBy()"
         :aria-label="ariaLabel"
-        class="w-full border placeholder:text-[var(--gr-muted-fg)] transition-colors duration-[var(--gr-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]"
+        class="w-full border placeholder:text-[var(--gr-muted-fg)] transition-colors duration-[var(--gr-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[calc(var(--gr-input-focus-ring-width))] focus-visible:ring-[var(--gr-ring)]"
         :class="[className, $slots.value || hasTags ? 'text-transparent placeholder:text-transparent' : '']"
         :style="triggerStyle"
         @pointerdown="onTriggerPointerDown"

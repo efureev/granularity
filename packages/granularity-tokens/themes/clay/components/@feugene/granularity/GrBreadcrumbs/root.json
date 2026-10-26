@@ -1,0 +1,4 @@
+{
+  "gr-breadcrumbs-separator-fg": "var(--gr-brd-strong)",
+  "gr-breadcrumbs-current-weight": "var(--gr-font-medium)"
+}

@@ -128,6 +128,9 @@ const resolvedSize = useGrComponentSize(() => props.size ?? group?.size.value, {
 const inTray = computed(() => group?.appearance?.value === 'tray')
 const attrs = useAttrs()
 const pressedInTray = computed(() => inTray.value && ['true', 'page', 'step', 'location', 'date', 'time'].includes(String(attrs['aria-pressed'] ?? attrs['aria-current'] ?? '')))
+// Вне лотка вид нажатия — только у переключателя: `aria-current` у ссылки — это
+// навигация, и её вид решает раскладка, а не кнопка.
+const isToggledOn = computed(() => String(attrs['aria-pressed'] ?? '') === 'true')
 const resolvedVariant = useGrComponentProp('GrButton', 'variant', () => props.variant ?? (inTray.value ? (pressedInTray.value ? 'secondary' : 'ghost') : group?.variant.value), 'primary')
 const resolvedTone = useGrComponentProp('GrButton', 'tone', () => props.tone ?? group?.tone.value ?? (inTray.value ? 'neutral' : undefined), 'primary')
 const isSquare = useGrComponentProp('GrButton', 'square', () => props.square, false)
@@ -336,6 +339,7 @@ defineSlots<{
     data-gr-button
     :data-gr-variant="resolvedVariant"
     :data-gr-tone="resolvedTone"
+    :data-gr-pressed="isToggledOn && !inTray && !isDisabled ? '' : undefined"
     :data-gr-busy-overlay="spinnerOverContent() ? '' : undefined"
     :data-gr-busy-shimmer="shimmerLabel() ? '' : undefined"
     :data-gr-busy-track="trackLoading() ? '' : undefined"

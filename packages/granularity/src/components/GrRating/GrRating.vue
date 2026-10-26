@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, type Component } from 'vue'
 
-import { useGrComponentSize } from '../shared/configContext'
+import { useGrComponentProp, useGrComponentSize } from '../shared/configContext'
 
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 import { useGrFormFieldContext } from '../shared/formFieldContext'
@@ -10,10 +10,12 @@ import { iconClass, iconTag } from '../shared/icon'
 
 import {
   ratingFillClassByTone,
+  ratingFillSvgClass,
   ratingRootClass,
   ratingSymbolClass,
   ratingTextSizeBySize,
   ratingVoidClass,
+  ratingVoidSvgClass,
   ratingVoidInvalidClass,
   type GrRatingSize,
   type GrRatingTone,
@@ -44,7 +46,10 @@ export interface GrRatingProps {
   max?: number
   /** Размер символов и подписи. Не задан — из `GrConfigProvider`, иначе `md`. */
   size?: GrRatingSize
-  /** Тон заливки; точечно перекрывается переменной `--gr-rating-color`. */
+  /**
+   * Тон заливки; точечно перекрывается переменной `--gr-rating-color`. Не задан —
+   * из `GrConfigProvider`, иначе `warning`.
+   */
   tone?: GrRatingTone
   /** Половинчатые оценки: клик по левой половине символа даёт `.5`. */
   allowHalf?: boolean
@@ -108,7 +113,7 @@ const props = withDefaults(
   {
     max: 5,
     size: undefined,
-    tone: 'warning',
+    tone: undefined,
     allowHalf: false,
     readonly: false,
     disabled: false,
@@ -130,6 +135,7 @@ const resolvedSize = useGrComponentSize(() => props.size, {
   component: 'GrRating',
   supported: ['xs', 'sm', 'md', 'lg'],
 })
+const resolvedTone = useGrComponentProp('GrRating', 'tone', () => props.tone, 'warning')
 
 const emit = defineEmits<GrRatingEmits>()
 defineSlots<{
@@ -365,7 +371,7 @@ function onKeydown(event: KeyboardEvent): void {
         <span class="block h-full w-full" :class="isInvalid && !disabled ? ratingVoidInvalidClass : ratingVoidClass" aria-hidden="true">
           <slot name="symbol" :index="index" :filled="false">
             <component :is="iconTag(icon)" v-if="icon" class="block h-full w-full" :class="iconClass(icon)" />
-            <svg v-else viewBox="0 0 24 24" fill="currentColor" class="block h-full w-full">
+            <svg v-else viewBox="0 0 24 24" fill="currentColor" class="block h-full w-full" :class="ratingVoidSvgClass">
               <path d="M12 2.5l2.9 6.1 6.6.9-4.8 4.7 1.2 6.6L12 17.7 6.1 20.8l1.2-6.6L2.5 9.5l6.6-.9z" />
             </svg>
           </slot>
@@ -374,14 +380,14 @@ function onKeydown(event: KeyboardEvent): void {
         <span
           data-gr-rating-fill
           class="pointer-events-none absolute inset-y-0 left-0 overflow-hidden"
-          :class="ratingFillClassByTone[tone]"
+          :class="ratingFillClassByTone[resolvedTone]"
           :style="{ width: `${fillRatio(index) * 100}%` }"
           aria-hidden="true"
         >
           <span :class="ratingSymbolClass(resolvedSize)">
             <slot name="symbol" :index="index" :filled="true">
               <component :is="iconTag(icon)" v-if="icon" class="block h-full w-full" :class="iconClass(icon)" />
-              <svg v-else viewBox="0 0 24 24" fill="currentColor" class="block h-full w-full">
+              <svg v-else viewBox="0 0 24 24" fill="currentColor" class="block h-full w-full" :class="ratingFillSvgClass">
                 <path d="M12 2.5l2.9 6.1 6.6.9-4.8 4.7 1.2 6.6L12 17.7 6.1 20.8l1.2-6.6L2.5 9.5l6.6-.9z" />
               </svg>
             </slot>

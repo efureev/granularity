@@ -1,0 +1,3 @@
+{
+  "gr-select-option-active-bg": "color-mix(in srgb, var(--gr-muted) 30%, transparent)"
+}

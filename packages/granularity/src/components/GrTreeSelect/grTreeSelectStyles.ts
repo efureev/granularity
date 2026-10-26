@@ -1,5 +1,5 @@
 import type { GrControlShape } from '../shared/controlShape'
-import { controlPillPaddingX, controlPillPaddingXClass, controlShapeRadiusClass } from '../shared/controlShape'
+import { controlPillPaddingX, controlPillPaddingXClass, controlShapeRadiusClass, fieldBorderClass, fieldBorderResponseClass, fieldBorderStateClass, fieldReadonlySurfaceClass } from '../shared/controlShape'
 
 import type { GrControlState } from '../shared/sizes'
 import { overlayListPanelClass } from '../shared/overlayListPanel'
@@ -45,7 +45,7 @@ export const paddingX: Record<GrControlShape, Record<GrInputSize, string>> = {
 export const trailingZoneWidth = '2.25rem'
 
 export const borderClassByState: Record<GrTreeSelectState, string> = {
-  default: 'border-[var(--gr-brd)]',
+  default: fieldBorderClass,
   success: 'border-[var(--gr-success)] focus-visible:ring-[var(--gr-success)]',
   warning: 'border-[var(--gr-warning)] focus-visible:ring-[var(--gr-warning)]',
   danger: 'border-[var(--gr-danger)] focus-visible:ring-[var(--gr-danger)]',
@@ -70,16 +70,18 @@ export function grTreeSelectClass(options: {
   state: GrTreeSelectState
   invalid: boolean
   disabled?: boolean
+  readonly?: boolean
   shape: GrControlShape
 }): string {
   return [
     sizeClassBySize[options.size],
     paddingXClass[options.shape][options.size],
-    controlShapeRadiusClass[options.shape],
+    controlShapeRadiusClass[options.shape][options.size],
     'pr-9',
-    options.disabled ? shellDisabledClass : shellEnabledClass,
-    options.invalid ? invalidBorderClass : borderClassByState[options.state],
-  ].join(' ')
+    options.disabled ? shellDisabledClass : options.readonly ? `${fieldReadonlySurfaceClass} text-[var(--gr-fg)]` : shellEnabledClass,
+    fieldBorderStateClass(options, invalidBorderClass, borderClassByState),
+    fieldBorderResponseClass(options),
+  ].filter(Boolean).join(' ')
 }
 
 export const grTreeSelectPanelClass = `${overlayPanelSurfaceClass} ${overlayListPanelClass} overflow-hidden`

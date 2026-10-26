@@ -137,12 +137,12 @@ describe('GrEmptyState — размер', () => {
     const small = mount(GrEmptyState, { props: { title: 'No data', size: 'sm' } })
     expect(small.get('[data-gr-empty-state]').classes()).toContain('p-4')
     expect(small.get('[data-gr-empty-state-icon]').classes()).toContain('h-10')
-    expect(small.get('[data-gr-empty-state-title]').classes()).toContain('text-[length:var(--gr-text-sm)]')
+    expect(small.get('[data-gr-empty-state-title]').classes()).toContain('text-[length:var(--gr-empty-state-title-size-sm)]')
 
     const large = mount(GrEmptyState, { props: { title: 'No data', size: 'lg' } })
     expect(large.get('[data-gr-empty-state]').classes()).toContain('p-8')
     expect(large.get('[data-gr-empty-state-icon]').classes()).toContain('h-14')
-    expect(large.get('[data-gr-empty-state-title]').classes()).toContain('text-[length:var(--gr-text-base)]')
+    expect(large.get('[data-gr-empty-state-title]').classes()).toContain('text-[length:var(--gr-empty-state-title-size-lg)]')
   })
 
   it('шкала не усечена: xs — своя ступень, а не откат к md', () => {

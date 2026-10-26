@@ -1,5 +1,10 @@
 {
   "gr-timeline-axis-width": "2px",
   "gr-timeline-dash": "4px",
-  "gr-timeline-marker-ring": "2px"
+  "gr-timeline-marker-ring": "2px",
+  "gr-timeline-neutral-marker": "var(--gr-muted-fg)",
+  "gr-timeline-neutral-outline": "var(--gr-muted-fg)",
+  "gr-timeline-title-weight": "var(--gr-font-semibold)",
+  "gr-timeline-group-title-transform": "uppercase",
+  "gr-timeline-group-title-tracking": "0.025em"
 }

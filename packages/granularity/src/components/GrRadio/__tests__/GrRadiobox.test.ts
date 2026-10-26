@@ -15,7 +15,7 @@ describe('GrRadio (radiobox)', () => {
     expect(grRadioSafelist).not.toContain('rounded-[var(--gr-radius-full)]')
   })
 
-  it('использует primary-цвет для кружочка (dot)', () => {
+  it('точка выбранного — токен темы `--gr-radio-dot`', () => {
     const wrapper = mount(GrRadio, {
       props: {
         modelValue: 'a',
@@ -30,7 +30,7 @@ describe('GrRadio (radiobox)', () => {
     expect(root.attributes('aria-checked')).toBe('true')
 
     const dot = wrapper.get('[data-gr-radio-dot]')
-    expect(dot.attributes('class')).toContain('bg-[var(--gr-primary)]')
+    expect(dot.attributes('class')).toContain('bg-[var(--gr-radio-dot)]')
   })
 
   it('скрывает dot когда не выбрано', () => {

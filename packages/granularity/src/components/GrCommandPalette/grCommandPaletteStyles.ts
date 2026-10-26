@@ -22,7 +22,7 @@ export const commandPaletteModalSizeBySize: Record<GrCommandPaletteSize, GrOverl
 export const commandSearchRowClass = 'flex items-center gap-2 border-b border-[var(--gr-brd)] px-4'
 export const commandSearchInputClass = 'min-w-0 flex-1 bg-transparent py-3.5 text-[length:var(--gr-command-input-font-size)] text-[var(--gr-fg)] placeholder:text-[var(--gr-muted-fg)] focus:outline-none'
 
-export const commandGroupLabelClass = 'px-3 pb-1 pt-3 text-[length:var(--gr-control-text-2xs)] leading-[var(--gr-control-leading-2xs)] font-medium uppercase tracking-wide text-[var(--gr-muted-fg)]'
+export const commandGroupLabelClass = 'px-3 pb-1 pt-3 text-[length:var(--gr-control-text-2xs)] leading-[var(--gr-control-leading-2xs)] font-medium [text-transform:var(--gr-command-group-label-transform)] [letter-spacing:var(--gr-command-group-label-tracking)] text-[var(--gr-muted-fg)]'
 
 /** Описание под меткой команды. Цвет приходит из `commandItemMutedClass`. */
 export const commandItemDescriptionClass = 'block truncate text-[length:var(--gr-text-xs)] leading-[var(--gr-leading-xs)]'
@@ -41,7 +41,7 @@ export function commandItemMutedClass(disabled: boolean): string {
 }
 
 /** Совпавший с запросом фрагмент. Фон — тот же токен подсветки, что у активной строки. */
-export const commandMatchClass = 'rounded-[var(--gr-radius-xs)] bg-[var(--gr-command-match-bg)] text-[var(--gr-fg)]'
+export const commandMatchClass = 'rounded-[var(--gr-radius-xs)] bg-[var(--gr-command-match-bg)] [font-weight:var(--gr-command-match-weight)] text-[var(--gr-fg)]'
 
 /**
  * Цвета текста в базе нет намеренно: два `text-[…]` в одном списке классов
@@ -83,4 +83,4 @@ export const commandListClass = 'overflow-y-auto p-2'
 export const commandListEmptyClass = 'overflow-hidden'
 
 export const commandEmptyClass = 'flex flex-1 flex-col justify-center px-4 py-10 text-center text-[length:var(--gr-control-text-sm)] leading-[var(--gr-control-leading-sm)] text-[var(--gr-muted-fg)]'
-export const commandFooterClass = 'flex items-center gap-3 border-t border-[var(--gr-brd)] px-4 py-2 text-[length:var(--gr-control-text-2xs)] leading-[var(--gr-control-leading-2xs)] text-[var(--gr-muted-fg)]'
+export const commandFooterClass = 'flex items-center gap-3 border-t border-[var(--gr-brd)] bg-[var(--gr-command-footer-bg)] px-4 py-2 text-[length:var(--gr-control-text-2xs)] leading-[var(--gr-control-leading-2xs)] text-[var(--gr-muted-fg)]'

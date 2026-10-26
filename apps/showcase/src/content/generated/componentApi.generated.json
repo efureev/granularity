@@ -3035,6 +3035,13 @@
             "default": "undefined"
           },
           {
+            "name": "cancelVariant",
+            "description": "Вес кнопки отмены. Не задан — из `GrConfigProvider`, иначе `outline`. Тема, где отмена — тихое действие рядом с главным, ставит `ghost`.",
+            "type": "GrButtonVariant | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "confirmVariant",
             "description": "Вес кнопки подтверждения. По умолчанию `primary`.",
             "type": "GrButtonVariant | undefined",
@@ -5454,7 +5461,7 @@
           },
           {
             "name": "hint",
-            "description": "Подсказка под лейблом/над контролом (можно также через слот `#hint`).",
+            "description": "Подсказка к полю (можно также через слот `#hint`). Где она стоит — `hintPosition`.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
@@ -5465,6 +5472,13 @@
             "type": "boolean | undefined",
             "required": false,
             "default": "true"
+          },
+          {
+            "name": "hintPosition",
+            "description": "Подсказка над контролом (по умолчанию) или под ним. При подписи сбоку она под контролом всегда. Не задано — из `GrConfigProvider`.",
+            "type": "\"top\" | \"bottom\" | undefined",
+            "required": false,
+            "default": "undefined"
           },
           {
             "name": "labelClass",
@@ -8930,6 +8944,13 @@
             "default": "undefined"
           },
           {
+            "name": "cancelVariant",
+            "description": "Вес кнопки отмены. Не задан — из `GrConfigProvider`, иначе `outline`. Тема, где отмена — тихое действие рядом с главным, ставит `ghost`.",
+            "type": "GrButtonVariant | undefined",
+            "required": false,
+            "default": "undefined"
+          },
+          {
             "name": "confirmVariant",
             "description": "Вес кнопки подтверждения. По умолчанию `primary`.",
             "type": "GrButtonVariant | undefined",
@@ -9464,10 +9485,10 @@
           },
           {
             "name": "tone",
-            "description": "Тон заливки; точечно перекрывается переменной `--gr-rating-color`.",
+            "description": "Тон заливки; точечно перекрывается переменной `--gr-rating-color`. Не задан — из `GrConfigProvider`, иначе `warning`.",
             "type": "\"primary\" | \"neutral\" | \"success\" | \"warning\" | \"danger\" | \"info\" | \"slate\" | \"azure\" | undefined",
             "required": false,
-            "default": "\"warning\""
+            "default": "undefined"
           },
           {
             "name": "icon",
@@ -11653,7 +11674,7 @@
           },
           {
             "name": "activeBackgroundColor",
-            "description": "Кастомный цвет фона в активном состоянии. Если не задан — `var(--gr-primary)`.",
+            "description": "Кастомный цвет фона в активном состоянии. Если не задан — `var(--gr-selected)`.",
             "type": "string | undefined",
             "required": false,
             "default": "undefined"
@@ -12635,10 +12656,10 @@
         "items": [
           {
             "name": "placement",
-            "description": "Угол экрана для стека уведомлений.",
+            "description": "Угол экрана для стека уведомлений. Не задан — из `GrConfigProvider`, иначе `top-right`.",
             "type": "GrToasterPlacement | undefined",
             "required": false,
-            "default": "\"top-right\""
+            "default": "undefined"
           },
           {
             "name": "regionLabel",

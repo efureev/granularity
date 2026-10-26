@@ -41,9 +41,9 @@ describe('GrCard', () => {
 
 describe('GrCard — padding и variant', () => {
   it.each([
-    ['sm', 'p-3'],
-    ['md', 'p-4'],
-    ['lg', 'p-6'],
+    ['sm', 'p-[var(--gr-card-padding-sm)]'],
+    ['md', 'p-[var(--gr-card-padding-md)]'],
+    ['lg', 'p-[var(--gr-card-padding-lg)]'],
   ] as const)('padding=%s кладёт отступ на саму поверхность', (padding, expected) => {
     const wrapper = mount(GrCard, { props: { padding }, slots: { default: 'x' } })
 
@@ -74,7 +74,7 @@ describe('GrCard — padding и variant', () => {
     })
 
     const card = mount(Harness).get('[data-gr-card]')
-    expect(card.classes()).toContain('p-6')
+    expect(card.classes()).toContain('p-[var(--gr-card-padding-lg)]')
     expect(card.classes()).not.toContain('shadow-[var(--gr-shadow-1)]')
   })
 })
@@ -98,10 +98,10 @@ describe('GrCard — секции', () => {
   it('с секциями отступ принадлежит секциям, а не корню', () => {
     const wrapper = mount(GrCard, { props: { padding: 'md' }, slots })
 
-    expect(wrapper.classes()).not.toContain('p-4')
-    expect(wrapper.get('[data-gr-card-header]').classes()).toContain('p-4')
-    expect(wrapper.get('[data-gr-card-body]').classes()).toContain('p-4')
-    expect(wrapper.get('[data-gr-card-footer]').classes()).toContain('p-4')
+    expect(wrapper.classes()).not.toContain('p-[var(--gr-card-padding-md)]')
+    expect(wrapper.get('[data-gr-card-header]').classes()).toContain('p-[var(--gr-card-padding-md)]')
+    expect(wrapper.get('[data-gr-card-body]').classes()).toContain('p-[var(--gr-card-padding-md)]')
+    expect(wrapper.get('[data-gr-card-footer]').classes()).toContain('p-[var(--gr-card-padding-md)]')
   })
 
   it('секции необязательны по отдельности', () => {
@@ -173,8 +173,8 @@ describe('GrCard — заголовок секции', () => {
   it('title включает секции, и отступ переезжает на них', () => {
     const wrapper = mount(GrCard, { props: { title: 'Секция', padding: 'md' }, slots: { default: 'тело' } })
 
-    expect(wrapper.classes()).not.toContain('p-4')
-    expect(wrapper.get('[data-gr-card-body]').classes()).toContain('p-4')
+    expect(wrapper.classes()).not.toContain('p-[var(--gr-card-padding-md)]')
+    expect(wrapper.get('[data-gr-card-body]').classes()).toContain('p-[var(--gr-card-padding-md)]')
   })
 
   // Заголовок рисует сама карточка, и прижатым к рамке он выглядеть не должен
@@ -219,14 +219,14 @@ describe('GrCard — заголовок секции', () => {
       slots: { header: '<h3>H</h3>', default: 'тело' },
     })
 
-    expect(wrapper.get('[data-gr-card-header]').classes()).toContain('p-4')
+    expect(wrapper.get('[data-gr-card-header]').classes()).toContain('p-[var(--gr-card-padding-md)]')
   })
 
   it('без title карточка остаётся ровно тем, чем была', () => {
     const wrapper = mount(GrCard, { props: { padding: 'md' }, slots: { default: 'тело' } })
 
     expect(wrapper.element.tagName).toBe('DIV')
-    expect(wrapper.classes()).toContain('p-4')
+    expect(wrapper.classes()).toContain('p-[var(--gr-card-padding-md)]')
     expect(wrapper.find('[data-gr-card-header]').exists()).toBe(false)
     expect(wrapper.find('[data-gr-card-body]').exists()).toBe(false)
   })
@@ -308,7 +308,7 @@ describe('GrCard — интерактивность', () => {
     const wrapper = mount(GrCard, { props: { hoverable: true }, slots: { default: 'x' } })
 
     expect(wrapper.element.tagName).toBe('DIV')
-    expect(wrapper.classes()).toContain('hover:bg-[var(--gr-muted)]')
+    expect(wrapper.classes()).toContain('hover:bg-[var(--gr-card-hover-bg)]')
     expect(wrapper.classes()).not.toContain('focus-visible:ring-2')
   })
 
@@ -384,7 +384,7 @@ describe('GrCard — семантический тег', () => {
 
     expect(wrapper.classes()).not.toContain('focus-visible:ring-2')
     expect(wrapper.classes()).not.toContain('cursor-pointer')
-    expect(wrapper.classes()).not.toContain('hover:bg-[var(--gr-muted)]')
+    expect(wrapper.classes()).not.toContain('hover:bg-[var(--gr-card-hover-bg)]')
     expect(wrapper.classes()).not.toContain('w-full')
   })
 

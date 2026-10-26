@@ -47,7 +47,7 @@ export const tablistLineSizes: Record<GrTabsSize, string> = {
 export const tablistBase = 'inline-flex max-w-full'
 
 export const tablistVariants: Record<GrTabsVariant, string> = {
-  pills: 'rounded-[var(--gr-radius-lg)] border border-[var(--gr-brd)] bg-[var(--gr-muted)]',
+  pills: 'rounded-[var(--gr-radius-lg)] border border-[var(--gr-tabs-pills-list-brd)] bg-[var(--gr-tabs-pills-list-bg)]',
   line: 'border-b border-[var(--gr-brd)]',
 }
 
@@ -70,25 +70,25 @@ export const tablistScrollClass = 'overflow-x-auto [scrollbar-width:none] [&::-w
 /** Вертикальный ряд — колонка; прокрутки ему не нужно: он растёт вниз. */
 export const tablistColumnClass = 'flex-col'
 
-export const tabBase = 'shrink-0 font-600 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]'
+export const tabBase = 'shrink-0 [font-weight:var(--gr-tabs-font-weight)] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]'
 
 // Цвет подчёркивания задаёт только состояние: `border-transparent` в базе имеет
 // ту же специфичность, что и цвет активной вкладки, и побеждал бы через раз —
 // по порядку правил в сгенерированном CSS, а не по порядку классов в атрибуте.
 export const tabVariantBase: Record<GrTabsVariant, string> = {
-  pills: 'rounded-[var(--gr-radius-md)]',
+  pills: 'rounded-[var(--gr-tabs-pills-radius)]',
   line: 'rounded-[var(--gr-radius-md)] rounded-b-[var(--gr-radius-none)] border-b-2 -mb-px',
 }
 
 export const tabStateClasses: Record<GrTabsVariant, { active: string, idle: string, disabled: string }> = {
   pills: {
-    active: 'bg-[var(--gr-card)] text-[var(--gr-fg)] border border-[var(--gr-brd)]',
-    idle: 'text-[var(--gr-muted-fg)] hover:text-[var(--gr-fg)] hover:bg-[color-mix(in_srgb,var(--gr-card)_70%,transparent)]',
+    active: 'bg-[var(--gr-tabs-pills-active-bg)] text-[var(--gr-tabs-pills-active-fg)] border border-[var(--gr-tabs-pills-active-brd)]',
+    idle: 'text-[var(--gr-muted-fg)] hover:text-[var(--gr-fg)] hover:bg-[var(--gr-tabs-pills-hover-bg)]',
     disabled: 'cursor-not-allowed text-[var(--gr-disabled-fg)]',
   },
   line: {
-    active: 'border-[var(--gr-primary)] text-[var(--gr-fg)]',
-    idle: 'border-transparent text-[var(--gr-muted-fg)] hover:text-[var(--gr-fg)] hover:border-[var(--gr-brd)]',
+    active: 'border-[var(--gr-selected)] text-[var(--gr-fg)]',
+    idle: 'border-transparent text-[var(--gr-muted-fg)] hover:text-[var(--gr-fg)] hover:border-[var(--gr-brd-strong)]',
     disabled: 'border-transparent cursor-not-allowed text-[var(--gr-disabled-fg)]',
   },
 }

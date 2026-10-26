@@ -1,0 +1,5 @@
+{
+  "gr-pagination-page-fg": "var(--gr-fg)",
+  "gr-pagination-page-hover-fg": "var(--gr-fg)",
+  "gr-pagination-page-weight": "var(--gr-font-medium)"
+}

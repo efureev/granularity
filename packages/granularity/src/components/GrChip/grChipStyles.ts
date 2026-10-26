@@ -59,6 +59,13 @@ export const chipDisabledClass = 'cursor-not-allowed bg-[var(--gr-chip-disabled-
  * каналом** (WCAG 1.4.1). Он же вытягивает случай, когда потребитель поставил
  * `dark` всему набору и заливка у выбранного и невыбранного совпадает.
  */
+/**
+ * Нажимаемый нейтральный чип — не нейтральная метка: тема может поставить его
+ * на бумагу с рамкой поля, когда метка и тег в поле остаются серой плашкой.
+ */
+export const chipNeutralClass = 'bg-[var(--gr-chip-neutral-bg)] text-[var(--gr-chip-neutral-fg)] border-[var(--gr-chip-neutral-brd)]'
+export const chipNeutralInteractiveClass = 'hover:bg-[var(--gr-chip-neutral-hover-bg)] hover:border-[var(--gr-chip-neutral-hover-brd)]'
+
 export const chipSelectedClass = 'font-600'
 
 /** Крестик наследует цвет тона: своей роли у него нет, он часть плитки. */
@@ -81,13 +88,18 @@ export function grChipClass(options: {
   selected: boolean
   disabled: boolean
 }): string {
+  const isNeutralLight = options.interactive && options.tone === 'neutral' && !options.dark && !options.selected
+
   return [
     chipRootClass,
     radiusClass(options.radius, options.size),
     chipSizeClassBySize[options.size],
     // Выбор поднимает вес заливки до плотного варианта того же тона.
-    options.disabled ? chipDisabledClass : toneClass(options.tone, options.dark || options.selected),
+    options.disabled
+      ? chipDisabledClass
+      : isNeutralLight ? chipNeutralClass : toneClass(options.tone, options.dark || options.selected),
     options.interactive && !options.disabled ? chipInteractiveClass : '',
+    isNeutralLight && !options.disabled ? chipNeutralInteractiveClass : '',
     options.selected ? chipSelectedClass : '',
   ].filter(Boolean).join(' ')
 }

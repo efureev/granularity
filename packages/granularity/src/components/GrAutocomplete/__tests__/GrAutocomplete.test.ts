@@ -116,7 +116,7 @@ describe('GrAutocomplete', () => {
     // Soft-бейдж несёт сплошную подложку И рамку — именно рамка делает чип
     // различимым на фоне поля (`--gr-muted` против `--gr-bg` — 7 единиц из 255).
     expect(chip.classes()).toContain('bg-[var(--gr-muted)]')
-    expect(chip.classes()).toContain('border-[var(--gr-brd)]')
+    expect(chip.classes()).toContain('border-[color-mix(in_srgb,var(--gr-brd)_var(--gr-badge-light-brd),var(--gr-muted))]')
 
     const toned = mount(GrAutocomplete, {
       props: { modelValue: ['vue'], multiple: true, options: OPTIONS, ariaLabel: 'Stack', tagTone: 'success' },

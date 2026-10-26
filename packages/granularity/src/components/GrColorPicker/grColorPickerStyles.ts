@@ -1,5 +1,5 @@
 import type { GrControlShape } from '../shared/controlShape'
-import { controlPillPaddingXClass, controlShapeRadiusClass } from '../shared/controlShape'
+import { controlPillPaddingXClass, controlShapeRadiusClass, fieldBorderClass, fieldBorderStateClass } from '../shared/controlShape'
 
 import type { GrComponentSize } from '../shared/sizes'
 
@@ -46,12 +46,18 @@ export const panelSizeClassBySize: Record<GrColorPickerSize, string> = {
   lg: 'w-72 gap-3 text-[length:var(--gr-control-text-lg)] leading-[var(--gr-control-leading-lg)]',
 }
 
-/** Скругление приходит формой, поэтому здесь его нет. */
-export const triggerBaseClass = 'inline-flex w-full min-w-0 items-center border border-[var(--gr-brd)] bg-[var(--gr-bg)] text-[var(--gr-fg)] transition-colors duration-[var(--gr-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]'
+/**
+ * Скругление приходит формой, поэтому здесь его нет. Цвет рамки и заливки —
+ * только у состояний: два `border-*` одной специфичности в одном атрибуте
+ * разрулил бы порядок правил в CSS, а не разметка.
+ */
+export const triggerBaseClass = 'inline-flex w-full min-w-0 items-center border text-[var(--gr-fg)] transition-colors duration-[var(--gr-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[calc(var(--gr-input-focus-ring-width))] focus-visible:ring-[var(--gr-ring)]'
 
 /** Недоступное поле гасится токенами, а не `opacity`: прозрачность роняет контраст подписи. */
-export const triggerDisabledClass = 'cursor-not-allowed border-[var(--gr-brd)] bg-[var(--gr-muted)] text-[var(--gr-disabled-fg)]'
-export const triggerEnabledClass = 'cursor-pointer hover:border-[var(--gr-primary)]'
+export const triggerDisabledClass = 'cursor-not-allowed bg-[var(--gr-muted)] text-[var(--gr-disabled-fg)]'
+/** Только для чтения: панель открывается посмотреть, но рамка не зовёт править. */
+export const triggerReadonlyClass = 'cursor-pointer bg-[var(--gr-input-readonly-bg)]'
+export const triggerEnabledClass = 'cursor-pointer bg-[var(--gr-bg)] hover:border-[var(--gr-color-picker-trigger-hover-brd)]'
 export const triggerInvalidClass = 'border-[var(--gr-invalid-brd)] focus-visible:ring-[var(--gr-invalid-ring)]'
 
 export const triggerValueClass = 'min-w-0 flex-1 truncate text-left tabular-nums'
@@ -134,21 +140,22 @@ export const rowValueClass = 'text-right text-[var(--gr-muted-fg)] tabular-nums'
 
 export const presetsGridClass = 'flex flex-wrap gap-1.5'
 export const presetBaseClass = 'relative h-5 w-5 shrink-0 overflow-hidden rounded-[var(--gr-radius-sm)] border border-[color-mix(in_srgb,var(--gr-fg)_18%,transparent)] transition-shadow duration-[var(--gr-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]'
-export const presetSelectedClass = 'ring-2 ring-[var(--gr-primary)] ring-offset-1 ring-offset-[var(--gr-popover)]'
+export const presetSelectedClass = 'ring-2 ring-[var(--gr-selected)] ring-offset-1 ring-offset-[var(--gr-popover)]'
 
 export function grColorPickerTriggerClass(options: {
   size: GrColorPickerSize
   disabled: boolean
   invalid: boolean
+  readonly?: boolean
   shape: GrControlShape
 }): string {
   return [
     triggerBaseClass,
     triggerSizeClassBySize[options.size],
     triggerPaddingXClass[options.shape][options.size],
-    controlShapeRadiusClass[options.shape],
-    options.disabled ? triggerDisabledClass : triggerEnabledClass,
-    options.invalid ? triggerInvalidClass : '',
+    controlShapeRadiusClass[options.shape][options.size],
+    options.disabled ? triggerDisabledClass : options.readonly ? triggerReadonlyClass : triggerEnabledClass,
+    fieldBorderStateClass(options, triggerInvalidClass, { default: fieldBorderClass }),
   ].filter(Boolean).join(' ')
 }
 

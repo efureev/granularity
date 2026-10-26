@@ -66,18 +66,18 @@ interface ToneMeta {
 // Единый маппинг по tone'у: иконка, цвет, a11y-роль. На уровне модуля —
 // чтобы не пересоздавать объект на каждый рендер.
 const TONE_META: Record<GrToastTone, ToneMeta> = {
-  primary: { icon: IconInfo, color: 'var(--gr-primary)', role: 'status' },
+  primary: { icon: IconInfo, color: 'color-mix(in srgb, var(--gr-primary) var(--gr-toaster-icon-tone), var(--gr-primary-text))', role: 'status' },
   neutral: { icon: IconInfo, color: 'var(--gr-muted-fg)', role: 'status' },
-  info: { icon: IconInfo, color: 'var(--gr-info)', role: 'status' },
-  success: { icon: IconCheck, color: 'var(--gr-success)', role: 'status' },
-  warning: { icon: IconWarning, color: 'var(--gr-warning)', role: 'alert' },
-  danger: { icon: IconError, color: 'var(--gr-danger)', role: 'alert' },
-  slate: { icon: IconInfo, color: 'var(--gr-slate)', role: 'status' },
-  azure: { icon: IconInfo, color: 'var(--gr-azure)', role: 'status' },
+  info: { icon: IconInfo, color: 'color-mix(in srgb, var(--gr-info) var(--gr-toaster-icon-tone), var(--gr-info-text))', role: 'status' },
+  success: { icon: IconCheck, color: 'color-mix(in srgb, var(--gr-success) var(--gr-toaster-icon-tone), var(--gr-success-text))', role: 'status' },
+  warning: { icon: IconWarning, color: 'color-mix(in srgb, var(--gr-warning) var(--gr-toaster-icon-tone), var(--gr-warning-text))', role: 'alert' },
+  danger: { icon: IconError, color: 'color-mix(in srgb, var(--gr-danger) var(--gr-toaster-icon-tone), var(--gr-danger-text))', role: 'alert' },
+  slate: { icon: IconInfo, color: 'color-mix(in srgb, var(--gr-slate) var(--gr-toaster-icon-tone), var(--gr-slate-text))', role: 'status' },
+  azure: { icon: IconInfo, color: 'color-mix(in srgb, var(--gr-azure) var(--gr-toaster-icon-tone), var(--gr-azure-text))', role: 'status' },
 }
 
 export interface GrToasterProps {
-  /** Угол экрана для стека уведомлений. */
+  /** Угол экрана для стека уведомлений. Не задан — из `GrConfigProvider`, иначе `top-right`. */
   placement?: GrToasterPlacement
   /** Максимум одновременно видимых тостов; остальные ждут в очереди. По умолчанию `4`. */
   maxVisible?: number
@@ -111,10 +111,11 @@ export interface GrToasterProps {
   collapse?: number | false
 }
 
-import { useGrThemeAttrs } from '../shared/configContext'
+import { useGrComponentProp, useGrThemeAttrs } from '../shared/configContext'
+import './defaults'
 
 const props = withDefaults(defineProps<GrToasterProps>(), {
-  placement: 'top-right',
+  placement: undefined,
   maxVisible: 4,
   dismissLabel: undefined,
   regionLabel: undefined,
@@ -123,6 +124,8 @@ const props = withDefaults(defineProps<GrToasterProps>(), {
   swipeDismiss: true,
   collapse: 3,
 })
+
+const resolvedPlacement = useGrComponentProp('GrToaster', 'placement', () => props.placement, 'top-right')
 
 defineSlots<{
   /**
@@ -256,13 +259,13 @@ function expandedOffset(index: number): number {
 }
 
 function depthOf(index: number): number {
-  return stackDepth(index, visibleToasts.value.length, props.placement)
+  return stackDepth(index, visibleToasts.value.length, resolvedPlacement.value)
 }
 
 /** Высота передней карточки — по ней живёт вся свёрнутая стопка. */
 const frontHeight = computed(() => {
   const heights = visibleToasts.value.map(toast => toastHeights.value[toast.id] ?? 0)
-  return props.placement.startsWith('top') ? heights[0] : heights[heights.length - 1]
+  return resolvedPlacement.value.startsWith('top') ? heights[0] : heights[heights.length - 1]
 })
 
 const stackHeight = computed(() => {
@@ -331,7 +334,7 @@ async function releaseSwiped(id: string): Promise<void> {
   swipeReleased.value = true
   await nextTick()
 
-  swipeOffset.value = SWIPE_DIRECTION[props.placement] * SWIPE_FLY_OUT_PX
+  swipeOffset.value = SWIPE_DIRECTION[resolvedPlacement.value] * SWIPE_FLY_OUT_PX
   await nextTick()
 
   dismiss(id)
@@ -343,7 +346,7 @@ async function releaseSwiped(id: string): Promise<void> {
  * сопротивлением: тост едет за пальцем, но закрыть его «наоборот» нельзя.
  */
 function resistOffset(delta: number): number {
-  const toEdge = SWIPE_DIRECTION[props.placement]
+  const toEdge = SWIPE_DIRECTION[resolvedPlacement.value]
 
   return Math.sign(delta) === toEdge ? delta : delta / SWIPE_RESISTANCE
 }
@@ -375,7 +378,7 @@ const swipe = useDragGesture({
   onEnd: () => {
     const id = swipingId.value
     const passed = id !== null
-      && Math.sign(swipeOffset.value) === SWIPE_DIRECTION[props.placement]
+      && Math.sign(swipeOffset.value) === SWIPE_DIRECTION[resolvedPlacement.value]
       && Math.abs(swipeOffset.value) >= swipeThreshold
 
     if (passed)
@@ -412,7 +415,7 @@ function toastStyle(toast: Toast, index: number): Record<string, string> | undef
     const depth = depthOf(index)
 
     transforms.push(collapsed.value
-      ? collapsedTransform(depth, props.placement)
+      ? collapsedTransform(depth, resolvedPlacement.value)
       : `translateY(${expandedOffset(index)}px)`)
 
     style.zIndex = String(visibleToasts.value.length - depth)
@@ -422,7 +425,7 @@ function toastStyle(toast: Toast, index: number): Record<string, string> | undef
      * (умолчание) карточка теряет высоту с обеих сторон, и соседи разной высоты
      * выглядывают на разное расстояние — колода получается рваной.
      */
-    style.transformOrigin = props.placement.startsWith('top') ? 'top center' : 'bottom center'
+    style.transformOrigin = resolvedPlacement.value.startsWith('top') ? 'top center' : 'bottom center'
 
     /*
      * Высота карточек за передней приравнивается к её собственной: иначе более
@@ -521,7 +524,7 @@ function metaFor(tone: GrToastTone): ToneMeta {
   return TONE_META[tone] ?? TONE_META.info
 }
 
-const containerClass = computed(() => PLACEMENT_CLASS[props.placement])
+const containerClass = computed(() => PLACEMENT_CLASS[resolvedPlacement.value])
 
 const listClass = computed(() => (positioned.value
   ? 'relative transition-[height] duration-[var(--gr-duration-base)] ease-[var(--gr-ease-out)]'
@@ -639,7 +642,7 @@ defineExpose({
             :role="metaFor(toast.tone).role"
             aria-atomic="true"
             tabindex="-1"
-            class="overflow-hidden rounded-[var(--gr-radius-lg)] border border-[var(--gr-brd)] bg-[var(--gr-card)] px-4 py-3 shadow-[var(--gr-shadow-2)] focus-visible:outline-none focus-visible:shadow-[var(--gr-shadow-2),0_0_0_2px_var(--gr-ring)]"
+            class="overflow-hidden rounded-[var(--gr-radius-lg)] border border-[var(--gr-toaster-brd)] bg-[var(--gr-card)] px-4 py-3 shadow-[var(--gr-toaster-shadow)] focus-visible:outline-none focus-visible:shadow-[var(--gr-toaster-shadow),0_0_0_2px_var(--gr-ring)]"
             :class="[swipeDismiss ? '[touch-action:pan-y]' : '', toastLayoutClass]"
             :style="toastStyle(toast, index)"
             @pointerdown="swipe.start"
@@ -653,7 +656,7 @@ defineExpose({
               <component :is="metaFor(toast.tone).icon" />
             </GrIcon>
             <div class="min-w-0 flex-1">
-              <div class="text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)] font-700">
+              <div data-gr-toast-title class="text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)] [font-weight:var(--gr-toaster-title-weight)]">
                 {{ toast.title }}
               </div>
               <div v-if="toast.message" class="mt-0.5 text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)] text-[var(--gr-muted-fg)]">

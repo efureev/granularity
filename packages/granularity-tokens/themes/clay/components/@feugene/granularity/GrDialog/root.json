@@ -1,0 +1,6 @@
+{
+  "gr-dialog-title-size": "22px",
+  "gr-dialog-title-leading": "var(--gr-leading-xl)",
+  "gr-dialog-title-weight": "var(--gr-font-medium)",
+  "gr-dialog-divider": "transparent"
+}

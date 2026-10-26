@@ -2,5 +2,9 @@
   "gr-command-active-bg": "color-mix(in srgb, var(--gr-muted) 45%, transparent)",
   "gr-command-input-font-size": "15px",
   "gr-command-item-radius": "10px",
-  "gr-command-match-bg": "color-mix(in srgb, var(--gr-primary) 22%, transparent)"
+  "gr-command-match-bg": "color-mix(in srgb, var(--gr-primary) 22%, transparent)",
+  "gr-command-group-label-transform": "uppercase",
+  "gr-command-group-label-tracking": "0.025em",
+  "gr-command-match-weight": "var(--gr-font-regular)",
+  "gr-command-footer-bg": "transparent"
 }

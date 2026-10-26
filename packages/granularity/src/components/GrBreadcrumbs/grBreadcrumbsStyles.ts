@@ -55,10 +55,10 @@ export const breadcrumbsSizeClassBySize: Record<GrBreadcrumbsSize, string> = {
   lg: 'text-[length:var(--gr-text-base)] leading-[var(--gr-leading-base)]',
 }
 
-export const breadcrumbsSeparatorClass = 'select-none text-[var(--gr-muted-fg)]'
+export const breadcrumbsSeparatorClass = 'select-none text-[var(--gr-breadcrumbs-separator-fg)]'
 
 /** Текущая страница: не ссылка, но и не «выключенный» текст — обычный акцент подписи. */
-export const breadcrumbsCurrentClass = 'inline-flex items-center gap-1 min-w-0 font-600 text-[var(--gr-fg)]'
+export const breadcrumbsCurrentClass = 'inline-flex items-center gap-1 min-w-0 [font-weight:var(--gr-breadcrumbs-current-weight)] text-[var(--gr-fg)]'
 
 /**
  * Пункт-текст, который не текущая страница: выключенный или без адреса. Цвет и

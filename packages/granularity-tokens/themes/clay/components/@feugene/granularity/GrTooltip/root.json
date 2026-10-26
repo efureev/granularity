@@ -1,0 +1,7 @@
+{
+  "gr-tooltip-bg": "var(--gr-fg)",
+  "gr-tooltip-fg": "var(--gr-bg)",
+  "gr-tooltip-brd": "var(--gr-fg)",
+  "gr-tooltip-radius": "8px",
+  "gr-tooltip-shadow": "none"
+}

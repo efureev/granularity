@@ -1,3 +1,8 @@
 {
-  "gr-table-sticky-column-shadow": "4px 0 6px -4px rgba(0, 0, 0, 0.25)"
+  "gr-table-sticky-column-shadow": "4px 0 6px -4px rgba(0, 0, 0, 0.25)",
+  "gr-table-head-bg": "var(--gr-muted)",
+  "gr-table-hover-share": "45%",
+  "gr-table-stripe-share": "35%",
+  "gr-table-head-line": "transparent",
+  "gr-table-head-line-width": "0px"
 }

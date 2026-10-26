@@ -1,5 +1,5 @@
 import type { GrControlShape } from '../shared/controlShape'
-import { controlPillPaddingX, controlPillPaddingXClass, controlShapeRadiusClass } from '../shared/controlShape'
+import { controlPillPaddingX, controlPillPaddingXClass, controlShapeRadiusClass, fieldBorderClass, fieldBorderResponseClass, fieldBorderStateClass, fieldReadonlySurfaceClass } from '../shared/controlShape'
 
 /**
  * Классы `GrInput`.
@@ -73,7 +73,7 @@ export const textAlign = {
 } as const
 
 export const states = {
-  default: 'border-[var(--gr-brd)]',
+  default: fieldBorderClass,
   success: 'border-[var(--gr-success)] focus-within:ring-[var(--gr-success)]',
   warning: 'border-[var(--gr-warning)] focus-within:ring-[var(--gr-warning)]',
   danger: 'border-[var(--gr-danger)] focus-within:ring-[var(--gr-danger)]',
@@ -93,7 +93,7 @@ export type GrInputState = keyof typeof states
  * месте: он обрезает отсек аддона и степперы по внешней дуге, и «скруглять
  * только внешние углы» получается само.
  */
-export const shellBaseClass = 'relative w-full overflow-hidden border transition-colors duration-[var(--gr-duration-fast)] focus-within:ring-2 focus-within:ring-[var(--gr-ring)]'
+export const shellBaseClass = 'relative w-full overflow-hidden border transition-colors duration-[var(--gr-duration-fast)] focus-within:ring-2 focus-within:ring-[calc(var(--gr-input-focus-ring-width))] focus-within:ring-[var(--gr-ring)]'
 
 export const shellEnabledClass = 'bg-[var(--gr-bg)]'
 
@@ -109,16 +109,18 @@ export function grInputShellClass(options: {
   state: GrInputState
   invalid: boolean
   disabled: boolean
+  readonly?: boolean
   shape: GrControlShape
   size: GrInputSize
 }): string {
   return [
     shellBaseClass,
     shellHeightClass[options.size],
-    controlShapeRadiusClass[options.shape],
-    options.invalid ? invalidClass : states[options.state],
-    options.disabled ? shellDisabledClass : shellEnabledClass,
-  ].join(' ')
+    controlShapeRadiusClass[options.shape][options.size],
+    fieldBorderStateClass(options, invalidClass, states),
+    fieldBorderResponseClass(options),
+    options.disabled ? shellDisabledClass : options.readonly ? fieldReadonlySurfaceClass : shellEnabledClass,
+  ].filter(Boolean).join(' ')
 }
 
 export function grInputFieldClass(options: {

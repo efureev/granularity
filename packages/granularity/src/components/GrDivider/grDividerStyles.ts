@@ -10,18 +10,21 @@ export type GrDividerSpacing = 'none' | GrComponentSize
  * Линия рисуется бордюром, а не фоном: `dashed` и `dotted` фоном не выразить,
  * а два разных механизма на три варианта одного и того же — путь к расхождению.
  * Толщину задаёт `--gr-divider-thickness`, поэтому классы про неё не знают.
+ *
+ * Цвет — у варианта: в штрихе и точках краски вдвое меньше, чем в сплошной
+ * линии, и на цвете разделителя они пропадают. Им — `--gr-brd-strong`.
  */
 export const lineVariantClass: Record<GrDividerVariant, string> = {
-  solid: 'border-solid',
-  dashed: 'border-dashed',
-  dotted: 'border-dotted',
+  solid: 'border-solid border-[var(--gr-brd)]',
+  dashed: 'border-dashed border-[var(--gr-brd-strong)]',
+  dotted: 'border-dotted border-[var(--gr-brd-strong)]',
 }
 
 export const horizontalLineClass
-  = 'border-0 border-t-[length:var(--gr-divider-thickness)] border-[var(--gr-brd)]'
+  = 'border-0 border-t-[length:var(--gr-divider-thickness)]'
 
 export const verticalLineClass
-  = 'border-0 border-l-[length:var(--gr-divider-thickness)] border-[var(--gr-brd)]'
+  = 'border-0 border-l-[length:var(--gr-divider-thickness)]'
 
 export const horizontalSpacingClass: Record<GrDividerSpacing, string> = {
   none: '',

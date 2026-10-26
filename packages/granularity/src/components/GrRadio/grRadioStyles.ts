@@ -24,17 +24,20 @@ export const grRadioButtonDisabledCheckedClass = 'cursor-not-allowed bg-[var(--g
  * разбавляет выверенные на AA цвета текста.
  */
 export const grRadioRootDisabledClass = 'cursor-not-allowed text-[var(--gr-muted-fg)]'
-export const grRadioRootEnabledClass = 'cursor-pointer'
+export const grRadioRootEnabledClass = 'group/radio cursor-pointer'
 /** Только для чтения: значение видно и читается, но курсор не обещает клика. */
 export const grRadioRootReadonlyClass = 'cursor-default'
 
-export const grRadioControlCheckedClass = 'border-[var(--gr-primary)] bg-[color-mix(in_srgb,var(--gr-primary)_10%,var(--gr-bg))]'
+export const grRadioControlCheckedClass = 'border-[var(--gr-selected)] bg-[var(--gr-radio-checked-bg)]'
 /** Рамка невыбранного радио — `--gr-control-brd` с 3:1 к фону: другого признака у него нет. */
+/** Отклик на указатель над всей подписью; только у рабочего радио, см. `grRadioRootEnabledClass`. */
+export const grRadioControlCheckedHoverClass = 'group-hover/radio:border-[var(--gr-selected-hover)] group-hover/radio:bg-[var(--gr-radio-checked-hover-bg)]'
+export const grRadioControlUncheckedHoverClass = 'group-hover/radio:border-[var(--gr-control-brd-hover)]'
 export const grRadioControlUncheckedClass = 'border-[var(--gr-control-brd)] bg-[var(--gr-bg)]'
 export const grRadioControlDisabledClass = 'border-[var(--gr-brd)] bg-[var(--gr-muted)]'
 export const grRadioControlInvalidClass = 'border-[var(--gr-danger)] bg-[var(--gr-bg)]'
 
-export const grRadioDotCheckedClass = 'bg-[var(--gr-primary)] opacity-100 scale-100'
+export const grRadioDotCheckedClass = 'bg-[var(--gr-radio-dot)] opacity-100 scale-100'
 export const grRadioDotUncheckedClass = 'bg-transparent opacity-0 scale-75'
 export const grRadioDotDisabledClass = 'bg-[var(--gr-muted-fg)] opacity-100 scale-100'
 // Базовые классы «точки» внутри radiobox — нестандартный transition.
@@ -140,7 +143,11 @@ export function grRadioControlClass(options: {
       ? grRadioControlInvalidClass
       : options.checked ? grRadioControlCheckedClass : grRadioControlUncheckedClass
 
-  return [grRadioControlSizes[options.size], state].join(' ')
+  const hover = options.disabled || options.invalid
+    ? ''
+    : options.checked ? grRadioControlCheckedHoverClass : grRadioControlUncheckedHoverClass
+
+  return [grRadioControlSizes[options.size], state, hover].filter(Boolean).join(' ')
 }
 
 export function grRadioDotClass(options: { checked: boolean, disabled: boolean }): string {

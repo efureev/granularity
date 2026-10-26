@@ -27,7 +27,7 @@ export const scrollSpyItemIdleClass = 'border-s-[var(--gr-scroll-spy-rail,var(--
  */
 export const scrollSpyItemAncestorClass = 'border-s-[var(--gr-scroll-spy-rail,var(--gr-brd))] text-[var(--gr-fg)]'
 
-export const scrollSpyItemActiveClass = 'border-s-[var(--gr-scroll-spy-marker,var(--gr-primary))] font-600 text-[var(--gr-primary-text)]'
+export const scrollSpyItemActiveClass = 'border-s-[var(--gr-scroll-spy-marker,var(--gr-selected))] font-600 text-[var(--gr-primary-text)]'
 
 export function grScrollSpyItemClass(state: 'active' | 'ancestor' | 'idle'): string {
   const stateClass = state === 'active'

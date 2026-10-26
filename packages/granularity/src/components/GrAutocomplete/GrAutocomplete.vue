@@ -751,7 +751,7 @@ const themeAttrs = useGrThemeAttrs()
   >
     <div
       data-gr-autocomplete-shell
-      :class="autocompleteShellClass({ size: resolvedSize, disabled: isDisabled, invalid: isInvalid })"
+      :class="autocompleteShellClass({ size: resolvedSize, disabled: isDisabled, invalid: isInvalid, readonly: isReadonly })"
       @mousedown.self.prevent="focusInput"
     >
       <span

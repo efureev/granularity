@@ -10,7 +10,6 @@ import {
   SWITCH_THUMB_GAP,
   stateTextAutoPaddings,
   stateTextPaddings,
-  stateTextRoom,
   stateTextSizes,
   thumbContentColorClass,
   thumbContentSizes,
@@ -18,21 +17,48 @@ import {
   thumbSizes,
   trackAutoSizes,
   trackSizes,
+  trackTextSizes,
 } from '../grSwitchStyles'
+import { readComponentThemeVars } from '../../../__tests__/cssContrast'
+import { THEME_MODES } from '../../../__tests__/themeCss'
 
-/** `h-6` → 24, `w-11` → 44, `min-w-11` → 44, `pr-[21px]` → 21. */
-function pixels(className: string, prefix: 'h-' | 'w-' | 'min-w-' | 'pl-' | 'pr-'): number {
+/** Значения токенов переключателя в каждой теме каталога; первая — базовая. */
+const THEME_GEOMETRY = THEME_MODES.map(mode => ({ key: mode.key, vars: readComponentThemeVars('GrSwitch', mode.key) }))
+const BASE = THEME_GEOMETRY[0]
+
+function toPixels(value: string): number {
+  if (value.endsWith('rem'))
+    return Number.parseFloat(value) * 16
+  if (value.endsWith('px'))
+    return Number.parseFloat(value)
+  throw new Error(`не длина: «${value}»`)
+}
+
+/**
+ * Длина класса в пикселях при значениях темы: `h-[var(--x)]`,
+ * `h-[calc(var(--x)_-_4px)]`, `pl-[8px]`; шкала uno (`h-3` → 12) — тоже.
+ */
+function pixels(className: string, prefix: 'h-' | 'w-' | 'min-w-' | 'pl-' | 'pr-', vars: Record<string, string> = BASE.vars): number {
   const token = className.split(' ').find(part => part.startsWith(prefix))
   if (!token)
     throw new Error(`нет класса ${prefix}* в «${className}»`)
 
   const value = token.slice(prefix.length)
-  const arbitrary = value.match(/^\[(\d+(?:\.\d+)?)px\]$/)
-  if (arbitrary)
-    return Number.parseFloat(arbitrary[1])
+  const bracket = value.match(/^\[(.+)\]$/)
+  if (!bracket)
+    return Number.parseFloat(value) * 4
 
-  // Шкала Uno: 1 = 0.25rem = 4px.
-  return Number.parseFloat(value) * 4
+  const expression = bracket[1].replaceAll('_', ' ').replace(/var\((--[\w-]+)\)/g, (_, name: string) => {
+    if (!vars[name])
+      throw new Error(`нет значения ${name} в теме`)
+    return vars[name]
+  })
+  const [first, ...rest] = expression.replace(/^calc\((.*)\)$/, '$1').split(/\s+([+-])\s+/)
+  let total = toPixels(first)
+  for (let index = 0; index < rest.length; index += 2)
+    total += (rest[index] === '+' ? 1 : -1) * toPixels(rest[index + 1])
+
+  return total
 }
 
 describe('GrSwitch', () => {
@@ -53,8 +79,8 @@ describe('GrSwitch', () => {
     expect(button.attributes('aria-label')).toBe('Notifications')
 
     const track = wrapper.get('[data-testid="gr-switch-track"]')
-    expect(track.attributes('class')).toContain('h-6')
-    expect(track.attributes('class')).toContain('w-11')
+    expect(track.attributes('class')).toContain('h-[var(--gr-switch-track-height-md)]')
+    expect(track.attributes('class')).toContain('w-[var(--gr-switch-track-width-md)]')
     expect(track.attributes('style')).toContain('--gr-switch-track-bg: #10b981')
     expect(track.attributes('style')).toContain('--gr-switch-track-brd: #10b981')
 
@@ -91,12 +117,12 @@ describe('GrSwitch', () => {
     await wrapper.get('[role="switch"]').trigger('click')
 
     const track = wrapper.get('[data-testid="gr-switch-track"]')
-    expect(track.attributes('class')).toContain('h-7')
-    expect(track.attributes('class')).toContain('w-14')
+    expect(track.attributes('class')).toContain('h-[var(--gr-switch-track-height-lg)]')
+    expect(track.attributes('class')).toContain('w-[var(--gr-switch-track-width-lg)]')
 
     const thumb = wrapper.get('[data-testid="gr-switch-thumb"]')
-    expect(thumb.attributes('class')).toContain('h-6')
-    expect(thumb.attributes('class')).toContain('w-6')
+    expect(thumb.attributes('class')).toContain('h-[calc(var(--gr-switch-track-height-lg)_-_4px)]')
+    expect(thumb.attributes('class')).toContain('w-[calc(var(--gr-switch-track-height-lg)_-_4px)]')
     expect(thumb.attributes('class')).toContain('-translate-x-full')
 
     const label = wrapper.get('[data-gr-switch-label]')
@@ -221,8 +247,8 @@ describe('GrSwitch — состояния и события', () => {
     })
 
     const track = mount(Harness).get('[data-testid="gr-switch-track"]')
-    expect(track.classes()).toContain('h-4')
-    expect(track.classes()).toContain('w-7')
+    expect(track.classes()).toContain('h-[var(--gr-switch-track-height-xs)]')
+    expect(track.classes()).toContain('w-[var(--gr-switch-track-width-xs)]')
   })
 
   it('клавиатура остаётся нативной: это button без своих keydown-перехватов', () => {
@@ -247,13 +273,15 @@ describe('GrSwitch — состояния и события', () => {
  * классы действительно выражают этот механизм, а не вернулись к числам.
  */
 describe('GrSwitch — геометрия бегунка', () => {
-  it('вертикальный зазор равен константе на каждой ступени', () => {
-    for (const size of GR_COMPONENT_SIZES) {
-      // Дорожка — `border-box` с рамкой 1px, бегунок центруется в content-box.
-      const trackHeight = pixels(trackSizes[size], 'h-') - 2
-      const gap = (trackHeight - pixels(thumbSizes[size], 'h-')) / 2
+  it('бегунок выведен из высоты дорожки: зазор сходится в каждой теме и на каждой ступени', () => {
+    for (const { key, vars } of THEME_GEOMETRY) {
+      for (const size of GR_COMPONENT_SIZES) {
+        // Дорожка — `border-box` с рамкой 1px, бегунок центруется в content-box.
+        const trackHeight = pixels(trackSizes[size], 'h-', vars) - 2
+        const gap = (trackHeight - pixels(thumbSizes[size], 'h-', vars)) / 2
 
-      expect(gap, `${size}: вертикальный зазор`).toBe(SWITCH_THUMB_GAP)
+        expect(gap, `${key} ${size}: вертикальный зазор`).toBe(SWITCH_THUMB_GAP)
+      }
     }
   })
 
@@ -265,18 +293,32 @@ describe('GrSwitch — геометрия бегунка', () => {
     expect(JSON.stringify(thumbPositions)).not.toMatch(/translate-x-\[\d/)
   })
 
-  it('бегунок с зазорами укладывается в дорожку на каждой ступени', () => {
-    for (const size of GR_COMPONENT_SIZES) {
-      const trackWidth = pixels(trackSizes[size], 'w-') - 2
+  it('бегунок с зазорами укладывается в дорожку в каждой теме', () => {
+    for (const { key, vars } of THEME_GEOMETRY) {
+      for (const size of GR_COMPONENT_SIZES) {
+        const trackWidth = pixels(trackSizes[size], 'w-', vars) - 2
 
-      expect(pixels(thumbSizes[size], 'w-') + SWITCH_THUMB_GAP * 2, size)
-        .toBeLessThanOrEqual(trackWidth)
+        expect(pixels(thumbSizes[size], 'w-', vars) + SWITCH_THUMB_GAP * 2, `${key} ${size}`)
+          .toBeLessThanOrEqual(trackWidth)
+      }
     }
   })
 
-  it('растущая дорожка берёт ту же ступень нижней границей', () => {
-    for (const size of GR_COMPONENT_SIZES) {
-      expect(pixels(trackAutoSizes[size], 'min-w-'), size).toBe(pixels(trackSizes[size], 'w-'))
+  it('знак на бегунке меньше бегунка в каждой теме', () => {
+    for (const { key, vars } of THEME_GEOMETRY) {
+      for (const size of GR_COMPONENT_SIZES) {
+        const thumb = pixels(thumbSizes[size], 'h-', vars)
+        const cap = thumb - 4
+
+        expect(Math.min(pixels(thumbContentSizes[size], 'h-', vars), cap), `${key} ${size}`).toBeLessThan(thumb)
+        expect(thumbContentSizes[size]).toContain(`max-h-[calc(var(--gr-switch-track-height-${size})_-_8px)]`)
+      }
+    }
+  })
+
+  it('растущая дорожка берёт ширину дорожки с подписью нижней границей', () => {
+    for (const size of GR_SWITCH_STATE_TEXT_SIZES) {
+      expect(pixels(trackAutoSizes[size], 'min-w-'), size).toBe(pixels(trackTextSizes[size], 'w-'))
       // Тянется только строка: высота остаётся ступенью.
       expect(pixels(trackAutoSizes[size], 'h-'), size).toBe(pixels(trackSizes[size], 'h-'))
     }
@@ -300,11 +342,11 @@ describe('GrSwitch — подпись состояния в дорожке', () 
 
     // Бегунок слева — подпись отступает от него слева и стоит справа.
     expect(stateText().text()).toBe('OFF')
-    expect(stateText().classes()).toContain('pl-[21px]')
+    expect(stateText().classes()).toContain('pl-[calc(var(--gr-switch-track-height-md)_-_3px)]')
 
     await wrapper.setProps({ modelValue: true })
     expect(stateText().text()).toBe('ON')
-    expect(stateText().classes()).toContain('pr-[21px]')
+    expect(stateText().classes()).toContain('pr-[calc(var(--gr-switch-track-height-md)_-_3px)]')
   })
 
   it('подпись скрыта от диктора: состояние уже объявлено через aria-checked', () => {
@@ -344,9 +386,11 @@ describe('GrSwitch — подпись состояния в дорожке', () 
 
     expect(wrapper.find('[data-testid="gr-switch-state-text"]').exists()).toBe(false)
     expect(warn).toHaveBeenCalledTimes(1)
-    // В предупреждении числа, а не «не поддерживается»: иначе проп выглядит сломанным.
-    expect(warn.mock.calls[0][0]).toContain('17px')
-    expect(warn.mock.calls[0][0]).toContain('21px')
+    // В предупреждении причина, а не «не поддерживается»: иначе проп выглядит сломанным.
+    // Чисел нет: место рядом с бегунком у каждой темы своё.
+    expect(warn.mock.calls[0][0]).toContain('меньше места')
+    expect(warn.mock.calls[0][0]).toContain('`sm`')
+    expect(warn.mock.calls[0][0]).toContain('`md` и `lg`')
   })
 
   it('на поддержанной ступени предупреждения нет', () => {
@@ -363,7 +407,7 @@ describe('GrSwitch — подпись состояния в дорожке', () 
 
     // Инлайн победил бы CSS потребителя, и переопределить токен было бы нечем.
     expect(stateText().attributes('style')).toBeUndefined()
-    expect(stateText().classes()).toContain('text-[var(--gr-switch-state-text-fg,var(--gr-primary-fg))]')
+    expect(stateText().classes()).toContain('text-[var(--gr-switch-state-text-fg,var(--gr-selected-fg))]')
 
     await wrapper.setProps({ modelValue: false })
     expect(stateText().classes()).toContain('text-[var(--gr-switch-state-text-fg,var(--gr-muted-fg))]')
@@ -397,37 +441,43 @@ describe('GrSwitch — подпись состояния в дорожке', () 
 
 /**
  * Место под подпись — тот же расчёт, что и у бегунка: отступ со стороны бегунка
- * равен `бегунок + зазор`, а остаток и есть свободная ширина. Считаем заново из
- * `trackSizes`/`thumbSizes`, чтобы смена ступени размера сразу показала, что
- * подпись поехала на бегунок.
+ * равен `бегунок + зазор`, а остаток и есть свободная ширина. Считаем из
+ * значений каждой темы каталога: тема с компактным переключателем обязана
+ * отдать подписи место шириной дорожки с подписью, а не урезать его.
  */
 describe('GrSwitch — геометрия подписи', () => {
-  function room(size: typeof GR_COMPONENT_SIZES[number]): { padding: number, free: number } {
-    const trackWidth = pixels(trackSizes[size], 'w-') - 2
-    const padding = pixels(thumbSizes[size], 'w-') + SWITCH_THUMB_GAP
+  function room(className: string, size: typeof GR_COMPONENT_SIZES[number], vars: Record<string, string>): { padding: number, free: number } {
+    const trackWidth = pixels(className, 'w-', vars) - 2
+    const padding = pixels(thumbSizes[size], 'w-', vars) + SWITCH_THUMB_GAP
 
     return { padding, free: trackWidth - padding }
   }
 
-  it('отступ равен бегунку с зазором на каждой поддержанной ступени', () => {
-    for (const size of GR_SWITCH_STATE_TEXT_SIZES) {
-      const { padding } = room(size)
+  it('отступ равен бегунку с зазором в каждой теме', () => {
+    for (const { key, vars } of THEME_GEOMETRY) {
+      for (const size of GR_SWITCH_STATE_TEXT_SIZES) {
+        const { padding } = room(trackTextSizes[size], size, vars)
 
-      expect(pixels(stateTextPaddings[size].checked, 'pr-'), size).toBe(padding)
-      expect(pixels(stateTextPaddings[size].unchecked, 'pl-'), size).toBe(padding)
+        expect(pixels(stateTextPaddings[size].checked, 'pr-', vars), `${key} ${size}`).toBe(padding)
+        expect(pixels(stateTextPaddings[size].unchecked, 'pl-', vars), `${key} ${size}`).toBe(padding)
+      }
     }
   })
 
-  it('таблица свободного места сходится с геометрией дорожки', () => {
+  it('в базовой теме места 13 / 17 / 21 / 29px, и подпись живёт ровно там, где хватает', () => {
+    const free = Object.fromEntries(GR_COMPONENT_SIZES.map(size => [size, room(trackSizes[size], size, BASE.vars).free]))
+
+    expect(free).toEqual({ xs: 13, sm: 17, md: 21, lg: 29 })
     for (const size of GR_COMPONENT_SIZES)
-      expect(stateTextRoom[size], size).toBe(room(size).free)
+      expect(free[size] >= free.md, size).toBe((GR_SWITCH_STATE_TEXT_SIZES as readonly string[]).includes(size))
   })
 
-  it('подпись живёт ровно там, где места хватает', () => {
-    for (const size of GR_COMPONENT_SIZES) {
-      const supported = (GR_SWITCH_STATE_TEXT_SIZES as readonly string[]).includes(size)
+  it('в каждой теме места под подпись не меньше, чем в базовой', () => {
+    for (const size of GR_SWITCH_STATE_TEXT_SIZES) {
+      const base = room(trackTextSizes[size], size, BASE.vars).free
 
-      expect(stateTextRoom[size] >= stateTextRoom.md, size).toBe(supported)
+      for (const { key, vars } of THEME_GEOMETRY)
+        expect(room(trackTextSizes[size], size, vars).free, `${key} ${size}`).toBeGreaterThanOrEqual(base)
     }
   })
 })
@@ -441,8 +491,8 @@ describe('GrSwitch — растущая дорожка', () => {
     const wrapper = mount(GrSwitch, { props: { modelValue: true, showStateText: true } })
     const track = wrapper.get('[data-testid="gr-switch-track"]')
 
-    expect(track.classes()).toContain('w-11')
-    expect(track.classes()).not.toContain('min-w-11')
+    expect(track.classes()).toContain('w-[var(--gr-switch-text-track-width-md)]')
+    expect(track.classes()).not.toContain('min-w-[var(--gr-switch-text-track-width-md)]')
     // Подпись накрывает дорожку и на её размер не влияет.
     expect(wrapper.get('[data-testid="gr-switch-state-text"]').classes()).toContain('absolute')
   })
@@ -453,14 +503,14 @@ describe('GrSwitch — растущая дорожка', () => {
     })
     const track = wrapper.get('[data-testid="gr-switch-track"]')
 
-    expect(track.classes()).toContain('min-w-11')
-    expect(track.classes()).not.toContain('w-11')
+    expect(track.classes()).toContain('min-w-[var(--gr-switch-text-track-width-md)]')
+    expect(track.classes()).not.toContain('w-[var(--gr-switch-text-track-width-md)]')
 
     const stateText = wrapper.get('[data-testid="gr-switch-state-text"]')
     expect(stateText.classes()).not.toContain('absolute')
     // Со свободной стороны появляется отступ: центровать текст больше нечем.
     expect(stateText.classes()).toContain('pl-[8px]')
-    expect(stateText.classes()).toContain('pr-[29px]')
+    expect(stateText.classes()).toContain('pr-[calc(var(--gr-switch-track-height-md)_+_5px)]')
   })
 
   it('невидимый дубль держит ширину при переключении', async () => {
@@ -489,7 +539,7 @@ describe('GrSwitch — растущая дорожка', () => {
 
     const wrapper = mount(GrSwitch, { props: { modelValue: true, autoWidth: true } })
 
-    expect(wrapper.get('[data-testid="gr-switch-track"]').classes()).toContain('w-11')
+    expect(wrapper.get('[data-testid="gr-switch-track"]').classes()).toContain('w-[var(--gr-switch-track-width-md)]')
     expect(warn).toHaveBeenCalledTimes(1)
     expect(warn.mock.calls[0][0]).toContain('showStateText')
   })
@@ -504,7 +554,7 @@ describe('GrSwitch — растущая дорожка', () => {
       `,
     })
 
-    expect(mount(Harness).get('[data-testid="gr-switch-track"]').classes()).toContain('min-w-11')
+    expect(mount(Harness).get('[data-testid="gr-switch-track"]').classes()).toContain('min-w-[var(--gr-switch-text-track-width-md)]')
   })
 })
 

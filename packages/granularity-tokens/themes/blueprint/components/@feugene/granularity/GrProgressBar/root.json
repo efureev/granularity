@@ -9,5 +9,10 @@
   "gr-progress-neutral-bg": "var(--gr-muted-fg)",
   "gr-progress-slate-bg": "var(--gr-slate)",
   "gr-progress-success-bg": "var(--gr-success)",
-  "gr-progress-warning-bg": "var(--gr-warning)"
+  "gr-progress-warning-bg": "var(--gr-warning)",
+  "gr-progress-track-bg": "var(--gr-muted)",
+  "gr-progress-height-xs": "0.25rem",
+  "gr-progress-height-sm": "0.375rem",
+  "gr-progress-height-md": "0.5rem",
+  "gr-progress-height-lg": "0.75rem"
 }

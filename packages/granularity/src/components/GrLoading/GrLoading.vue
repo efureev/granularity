@@ -131,7 +131,7 @@ onBeforeUnmount(() => {
   >
     <div
       data-gr-loading-panel
-      class="flex flex-col items-center justify-center gap-2 text-center rounded-[var(--gr-radius-md)] bg-[var(--gr-bg)]/55 px-5 py-4 shadow-[var(--gr-shadow-2)]"
+      class="flex flex-col items-center justify-center gap-2 text-center rounded-[var(--gr-loading-panel-radius)] bg-[var(--gr-loading-panel-bg)] px-5 py-4 shadow-[var(--gr-loading-panel-shadow)]"
     >
       <slot>
         <GrIcon

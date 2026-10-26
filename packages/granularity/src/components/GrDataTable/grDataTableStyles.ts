@@ -65,7 +65,7 @@ export const columnDropAfterClass = 'after:absolute after:inset-y-0 after:right-
  * приходится повторять: у ячейки свой непрозрачный фон, и подсветка строки
  * сквозь него не видна.
  */
-export const rowSelectedClass = 'bg-[color-mix(in_srgb,var(--gr-primary)_8%,transparent)]'
+export const rowSelectedClass = 'bg-[color-mix(in_srgb,var(--gr-selected)_8%,transparent)]'
 
 /**
  * Итоговая строка. Отбивка та же, что между строками тела, плюс вес: итог —
@@ -95,11 +95,19 @@ export const columnResizerHoverClass = 'hover:bg-[var(--gr-datatable-resizer,var
 export const columnPinnedClass = 'sticky z-[2] bg-[var(--gr-card)]'
 
 /**
+ * Закреплённая ячейка выбранной строки: подсветка выбора, но непрозрачная. Два
+ * `bg-*` в одном атрибуте разрулил бы порядок правил, и победивший прозрачный
+ * пропускал под ячейку уезжающие строки, а поверх подсветки строки ложился
+ * второй слой выбора.
+ */
+export const columnPinnedSelectedClass = 'sticky z-[2] bg-[color-mix(in_srgb,var(--gr-selected)_8%,var(--gr-card))]'
+
+/**
  * То же для ячейки шапки: фон — тон шапки, а не карточка. Шапке он задан на
  * `<thead>`, но уезжает вместе с ней, и липкой ячейке нужен свой; карточный
  * выбивался из шапки белым пятном над закреплённой колонкой.
  */
-export const columnPinnedHeadClass = 'sticky z-[2] bg-[var(--gr-muted)]'
+export const columnPinnedHeadClass = 'sticky z-[2] bg-[var(--gr-table-head-bg)]'
 
 /** Граница группы закреплённых колонок — тень, а не рамка: рамка сдвигает сетку. */
 export const columnPinnedLeftEdgeClass = 'shadow-[var(--gr-datatable-pinned-shadow)]'

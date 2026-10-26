@@ -1,0 +1,17 @@
+{
+  "gr-empty-state-title-size-xs": "var(--gr-text-sm)",
+  "gr-empty-state-title-leading-xs": "var(--gr-leading-sm)",
+  "gr-empty-state-title-size-sm": "var(--gr-text-base)",
+  "gr-empty-state-title-leading-sm": "var(--gr-leading-base)",
+  "gr-empty-state-title-size-md": "var(--gr-text-xl)",
+  "gr-empty-state-title-leading-md": "var(--gr-leading-lg)",
+  "gr-empty-state-title-size-lg": "var(--gr-text-2xl)",
+  "gr-empty-state-title-leading-lg": "var(--gr-leading-xl)",
+  "gr-empty-state-title-weight": "var(--gr-font-medium)",
+  "gr-empty-state-icon-brd": "transparent",
+  "gr-empty-state-icon-fg": "var(--gr-secondary-fg)",
+  "gr-empty-state-icon-radius-xs": "var(--gr-radius-full)",
+  "gr-empty-state-icon-radius-sm": "var(--gr-radius-full)",
+  "gr-empty-state-icon-radius-md": "var(--gr-radius-full)",
+  "gr-empty-state-icon-radius-lg": "var(--gr-radius-full)"
+}

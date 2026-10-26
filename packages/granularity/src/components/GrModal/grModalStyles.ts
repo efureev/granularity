@@ -68,7 +68,7 @@ export const panelTransition = {
 } as const
 
 export const panelBase
-  = 'w-full relative z-10 border border-[var(--gr-brd)] bg-[var(--gr-card)] text-[var(--gr-card-fg)] shadow-[var(--gr-shadow-2)] outline-none'
+  = 'w-full relative z-10 border border-[var(--gr-brd)] bg-[var(--gr-card)] text-[var(--gr-card-fg)] shadow-[var(--gr-modal-shadow)] outline-none'
 
 // `overflow-hidden` панели нужен, чтобы её содержимое обрезалось по радиусу.
 // При `inside` панель становится колонкой: заголовок остаётся на месте, а
@@ -85,10 +85,10 @@ export const panelBodyScrollClass = 'min-h-0 overflow-y-auto'
 export const panelSectionClass = 'shrink-0'
 
 export const panelWidthBySize: Record<GrModalSize, string> = {
-  sm: 'max-w-[420px]',
-  md: 'max-w-[560px]',
-  lg: 'max-w-[720px]',
-  xl: 'max-w-[920px]',
+  sm: 'max-w-[var(--gr-modal-width-sm)]',
+  md: 'max-w-[var(--gr-modal-width-md)]',
+  lg: 'max-w-[var(--gr-modal-width-lg)]',
+  xl: 'max-w-[var(--gr-modal-width-xl)]',
   full: 'max-w-none',
 }
 

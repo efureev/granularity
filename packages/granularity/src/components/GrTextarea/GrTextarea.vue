@@ -24,6 +24,7 @@ import IconX from '~icons/lucide/x'
 import IconCheckCircle from '~icons/lucide/check-circle'
 import IconAlertTriangle from '~icons/lucide/alert-triangle'
 import { vAutosize } from '../../directives'
+import { controlShapeRadiusClass, fieldReadonlySurfaceClass } from '../shared/controlShape'
 import { useGrComponentProp, useGrComponentSize } from '../shared/configContext'
 import { useGrFormFieldContext } from '../shared/formFieldContext'
 import { useGrFormControl } from '../../composables/useGrFormControl'
@@ -269,15 +270,18 @@ function clear(): void {
   focus()
 }
 
-const baseClass = 'rounded-[var(--gr-radius-control)] border text-[var(--gr-fg)] placeholder:text-[var(--gr-muted-fg)] transition-colors duration-[var(--gr-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] disabled:cursor-not-allowed'
+const baseClass = 'border text-[var(--gr-fg)] placeholder:text-[var(--gr-muted-fg)] transition-colors duration-[var(--gr-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[calc(var(--gr-input-focus-ring-width))] focus-visible:ring-[var(--gr-ring)] disabled:cursor-not-allowed'
 
 const className = computed(() => [
   sizes[resolvedSize.value],
+  controlShapeRadiusClass.box[resolvedSize.value],
   resizeClass[props.resize],
-  isDisabled.value ? disabledSurfaceClass : enabledSurfaceClass,
+  isDisabled.value ? disabledSurfaceClass : isReadonly.value ? fieldReadonlySurfaceClass : enabledSurfaceClass,
   grTextareaClass({
     state: props.state,
     invalid: isInvalid.value,
+    disabled: isDisabled.value,
+    readonly: isReadonly.value,
   }),
 ].join(' '))
 

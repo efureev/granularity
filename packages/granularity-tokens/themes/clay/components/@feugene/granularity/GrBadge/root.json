@@ -1,8 +1,9 @@
 {
   "gr-badge-neutral-bg": "var(--gr-fg)",
   "gr-badge-neutral-fg": "var(--gr-bg)",
-  "gr-badge-semi-radius-lg": "7px",
-  "gr-badge-semi-radius-md": "5px",
-  "gr-badge-semi-radius-sm": "3px",
-  "gr-badge-semi-radius-xs": "3px"
+  "gr-badge-semi-radius-lg": "6px",
+  "gr-badge-semi-radius-md": "6px",
+  "gr-badge-semi-radius-sm": "6px",
+  "gr-badge-semi-radius-xs": "5px",
+  "gr-badge-light-brd": "0%"
 }

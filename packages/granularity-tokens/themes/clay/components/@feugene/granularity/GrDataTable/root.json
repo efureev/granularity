@@ -1,7 +1,9 @@
 {
-  "gr-datatable-detail-accent": "var(--gr-primary)",
-  "gr-datatable-detail-bg": "color-mix(in srgb, var(--gr-muted) 45%, transparent)",
+  "gr-datatable-detail-accent": "transparent",
+  "gr-datatable-detail-bg": "var(--gr-bg)",
   "gr-datatable-drag-indicator-width": "2px",
-  "gr-datatable-pinned-shadow": "4px 0 6px -4px rgba(0, 0, 0, 0.25)",
-  "gr-datatable-pinned-shadow-end": "-4px 0 6px -4px rgba(0, 0, 0, 0.25)"
+  "gr-datatable-pinned-shadow": "inset -1px 0 0 color-mix(in srgb, var(--gr-fg) 30%, transparent)",
+  "gr-datatable-pinned-shadow-end": "inset 1px 0 0 color-mix(in srgb, var(--gr-fg) 30%, transparent)",
+  "gr-datatable-head-weight": "var(--gr-font-medium)",
+  "gr-datatable-first-row-brd": "transparent"
 }

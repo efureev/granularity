@@ -1,5 +1,5 @@
 import type { GrControlShape } from '../shared/controlShape'
-import { controlPillPaddingX, controlPillPaddingXClass, controlShapeRadiusClass } from '../shared/controlShape'
+import { controlPillPaddingX, controlPillPaddingXClass, controlShapeRadiusClass, fieldBorderClass, fieldBorderResponseClass, fieldBorderStateClass, fieldReadonlySurfaceClass } from '../shared/controlShape'
 
 import type { GrComponentSize, GrControlState } from '../shared/sizes'
 
@@ -59,7 +59,7 @@ export const textAlignClassByAlign: Record<GrNumberInputTextAlign, string> = {
 }
 
 export const borderClassByState: Record<GrNumberInputState, string> = {
-  default: 'border-[var(--gr-brd)]',
+  default: fieldBorderClass,
   success: 'border-[var(--gr-success)] focus-within:ring-[var(--gr-success)]',
   warning: 'border-[var(--gr-warning)] focus-within:ring-[var(--gr-warning)]',
   danger: 'border-[var(--gr-danger)] focus-within:ring-[var(--gr-danger)]',
@@ -88,10 +88,11 @@ export const stepperWideClass = `h-full w-full ${stepperBaseClass}`
 
 export const clearButtonClass = 'absolute top-1/2 -translate-y-1/2 inline-flex h-5 w-5 items-center justify-center rounded-[var(--gr-radius-full)] text-[var(--gr-muted-fg)] hover:bg-[var(--gr-muted)] hover:text-[var(--gr-fg)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]'
 
-export function grNumberInputShellClass(options: { disabled: boolean, state: GrNumberInputState, invalid: boolean }): string {
+export function grNumberInputShellClass(options: { disabled: boolean, state: GrNumberInputState, invalid: boolean, readonly?: boolean }): string {
   return [
-    options.disabled ? disabledShellClass : '',
-    options.invalid ? invalidBorderClass : borderClassByState[options.state],
+    options.disabled ? disabledShellClass : options.readonly ? fieldReadonlySurfaceClass : 'bg-[var(--gr-bg)]',
+    fieldBorderStateClass(options, invalidBorderClass, borderClassByState),
+    fieldBorderResponseClass(options),
   ]
     .filter(Boolean)
     .join(' ')

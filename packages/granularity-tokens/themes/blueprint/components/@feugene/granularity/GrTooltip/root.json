@@ -1,0 +1,7 @@
+{
+  "gr-tooltip-bg": "var(--gr-popover)",
+  "gr-tooltip-fg": "var(--gr-popover-fg)",
+  "gr-tooltip-brd": "var(--gr-brd)",
+  "gr-tooltip-radius": "var(--gr-radius-control)",
+  "gr-tooltip-shadow": "var(--gr-shadow-1)"
+}

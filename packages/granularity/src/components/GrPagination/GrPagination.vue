@@ -351,16 +351,14 @@ if (__GR_DEV__) {
             :disabled="disabled"
             :aria-current="item === currentPage ? 'page' : undefined"
             :aria-label="t('gr.pagination.page', 'Page {n}', { n: item })"
-            class="rounded-[var(--gr-radius-control)] font-600 transition-colors duration-[var(--gr-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] disabled:cursor-not-allowed"
+            class="rounded-[var(--gr-radius-control)] [font-weight:var(--gr-pagination-page-weight)] transition-colors duration-[var(--gr-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] disabled:cursor-not-allowed"
             :class="[
               pageClass,
               item === currentPage
-                ? 'bg-[var(--gr-primary)] text-[var(--gr-primary-fg)]'
-                // Подложка тональная, а не `--gr-muted`: серый на белом фоне даёт
-                // 1.10:1 и на светлой теме hover был практически не виден, хотя у
-                // соседних «назад/вперёд» (ghost-кнопки) он тонирован. Ряд обязан
-                // читаться одним контролом.
-                : 'text-[var(--gr-muted-fg)] hover:bg-[var(--gr-accent)] hover:text-[var(--gr-accent-fg)]',
+                ? 'bg-[var(--gr-selected)] text-[var(--gr-selected-fg)]'
+                // Подсветка — та же, что у соседних «назад/вперёд» (ghost-кнопки):
+                // ряд обязан читаться одним контролом.
+                : 'text-[var(--gr-pagination-page-fg)] hover:bg-[var(--gr-pagination-page-hover-bg)] hover:text-[var(--gr-pagination-page-hover-fg)]',
             ]"
             @click="goTo(item)"
           >

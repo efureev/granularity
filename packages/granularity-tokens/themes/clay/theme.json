@@ -3,7 +3,7 @@
   "title": "Глина",
   "description": "Тёплая бумага, графитовые чернила и одна глиняная точка на экран.",
   "docs": "https://granularity.tech/themes/clay",
-  "version": "1.2.0",
+  "version": "2.0.0",
   "targets": {
     "@feugene/granularity": "^3.1.0",
     "@feugene/granularity-charts": "^3.0.0",
@@ -23,11 +23,51 @@
   "extensions": {
     "granularity": {
       "componentDefaults": {
+        "GrAvatar": {
+          "autoColor": false
+        },
+        "GrBadge": {
+          "radius": "semi"
+        },
+        "GrBreadcrumbs": {
+          "separator": "/"
+        },
         "GrButton": {
-          "loadingIndicator": "shimmer"
+          "loadingIndicator": "shimmer",
+          "tone": "neutral"
         },
         "GrButtonGroup": {
           "appearance": "tray"
+        },
+        "GrConfirmDialog": {
+          "cancelVariant": "ghost"
+        },
+        "GrDescriptionList": {
+          "labelWidth": "160px"
+        },
+        "GrFormField": {
+          "hintPosition": "bottom"
+        },
+        "GrPagination": {
+          "size": "sm"
+        },
+        "GrProgressBar": {
+          "borderless": true
+        },
+        "GrPromptDialog": {
+          "cancelVariant": "ghost"
+        },
+        "GrRating": {
+          "tone": "neutral"
+        },
+        "GrSteps": {
+          "size": "sm"
+        },
+        "GrTabs": {
+          "variant": "line"
+        },
+        "GrToaster": {
+          "placement": "bottom-right"
         }
       }
     }

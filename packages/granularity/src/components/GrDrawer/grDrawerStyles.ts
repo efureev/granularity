@@ -94,10 +94,10 @@ export const panelSizeByAxis: Record<GrDrawerAxis, Record<GrDrawerSize, string>>
  * значило бы иметь в шаблоне половину стороны.
  */
 export const panelSideClass: Record<GrDrawerSide, string> = {
-  left: 'inset-y-0 left-0 border-r',
-  right: 'inset-y-0 right-0 border-l',
-  top: 'inset-x-0 top-0 border-b',
-  bottom: 'inset-x-0 bottom-0 border-t',
+  left: 'inset-y-0 left-0 border-r rounded-r-[var(--gr-drawer-radius)]',
+  right: 'inset-y-0 right-0 border-l rounded-l-[var(--gr-drawer-radius)]',
+  top: 'inset-x-0 top-0 border-b rounded-b-[var(--gr-drawer-radius)]',
+  bottom: 'inset-x-0 bottom-0 border-t rounded-t-[var(--gr-drawer-radius)]',
 }
 
 export const panelTransitionClass: Record<GrDrawerSide, string> = {
@@ -107,11 +107,11 @@ export const panelTransitionClass: Record<GrDrawerSide, string> = {
   bottom: 'translate-y-full',
 }
 
-export const panelBaseClass = 'fixed flex flex-col border-[var(--gr-brd)] bg-[var(--gr-card)] text-[var(--gr-card-fg)] shadow-[var(--gr-shadow-2)] outline-none'
+export const panelBaseClass = 'fixed flex flex-col border-[var(--gr-brd)] bg-[var(--gr-card)] text-[var(--gr-card-fg)] shadow-[var(--gr-drawer-shadow)] outline-none'
 
 export const headerBorderClass = 'border-b border-[var(--gr-brd)]'
 export const footerBorderClass = 'border-t border-[var(--gr-brd)]'
-export const titleClass = 'text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)] font-700 min-w-0 truncate'
+export const titleClass = 'font-[var(--gr-font-display)] text-[length:var(--gr-drawer-title-size)] leading-[var(--gr-drawer-title-leading)] [font-weight:var(--gr-drawer-title-weight)] min-w-0 truncate'
 
 /** Скрытый заголовок: имя слоя есть даже там, где шапки на экране нет. */
 export const srOnlyTitleClass = 'sr-only'

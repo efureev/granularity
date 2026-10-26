@@ -37,14 +37,30 @@
 
 | Токен | Откуда | По умолчанию | Назначение |
 | --- | --- | --- | --- |
-| `--gr-alert-bg` | инлайн-стиль | подложка тона (`--gr-<tone>-light`); у `outline` — прозрачный | Фон полосы уведомления. |
-| `--gr-alert-brd` | инлайн-стиль | подмес тона к подложке | Цвет рамки уведомления. |
-| `--gr-alert-text-color` | инлайн-стиль | `--gr-<tone>-text` | Цвет основного текста уведомления. |
-| `--gr-alert-title-color` | инлайн-стиль | `--gr-<tone>-text` | Цвет заголовка уведомления. |
+| `--gr-alert-bg` | инлайн-стиль | подложка тона (`--gr-<tone>-light`); у `outline` — `--gr-alert-outline-bg` | Фон полосы уведомления. |
+| `--gr-alert-brd` | инлайн-стиль | тон в смеси с `--gr-alert-soft-brd` (у `outline` — с `--gr-alert-outline-brd`) в доле темы | Цвет рамки уведомления. |
+| `--gr-alert-text-color` | инлайн-стиль | `--gr-<tone>-text` в смеси с `--gr-alert-body-fg` в доле `--gr-alert-soft-text-tone`; у `outline` — `--gr-alert-body-fg` | Цвет основного текста уведомления. |
+| `--gr-alert-title-color` | инлайн-стиль | `--gr-<tone>-text` в смеси с `--gr-fg` в доле `--gr-alert-soft-title-tone`; у `outline` — `--gr-fg` | Цвет заголовка уведомления. |
 | `--gr-alert-icon-color` | инлайн-стиль | насыщенный тон (`--gr-<tone>`) | Цвет иконки тона слева от текста. |
 | `--gr-alert-close-color` | инлайн-стиль | `--gr-<tone>-text` | Цвет кнопки закрытия в покое. |
 | `--gr-alert-close-hover-color` | инлайн-стиль | `--gr-<tone>-text` | Цвет кнопки закрытия под курсором. |
 | `--gr-alert-close-hover-bg` | инлайн-стиль | подмес тона к подложке | Фон кнопки закрытия под курсором. |
+| `--gr-alert-radius` | тема компонента | var(--gr-radius-lg) | Скругление сообщения. |
+| `--gr-alert-title-weight` | тема компонента | var(--gr-font-semibold) | Вес заголовка сообщения. |
+| `--gr-alert-body-fg` | тема компонента | var(--gr-muted-fg) | Нейтральный цвет текста сообщения: текст `outline` и основа смеси для текста `soft`. |
+| `--gr-alert-soft-brd` | тема компонента | var(--gr-brd) | Нейтральная основа рамки `soft`. Тема без рамки ставит `transparent` вместе с долей тона 0%. |
+| `--gr-alert-soft-brd-tone` | тема компонента | 35% | Доля тона в рамке `soft`. |
+| `--gr-alert-soft-title-tone` | тема компонента | 100% | Доля тона в заголовке `soft`: 100% — цветом тона (`-text`), 0% — чернилами `--gr-fg`. |
+| `--gr-alert-soft-text-tone` | тема компонента | 100% | Доля тона в тексте `soft`: 100% — цветом тона (`-text`), 0% — `--gr-alert-body-fg`. |
+| `--gr-alert-outline-bg` | тема компонента | transparent | Подложка `outline`: прозрачная или поверхность карточки. |
+| `--gr-alert-outline-brd` | тема компонента | var(--gr-brd) | Нейтральная основа рамки `outline`. |
+| `--gr-alert-outline-brd-tone` | тема компонента | 45% | Доля тона в рамке `outline`. |
+
+### GrAutocomplete
+
+| Токен | Откуда | По умолчанию | Назначение |
+| --- | --- | --- | --- |
+| `--gr-autocomplete-option-active-bg` | тема компонента | color-mix(in srgb, var(--gr-muted) 30%, transparent) | Подсветка опции под указателем и активной с клавиатуры. |
 
 ### GrAvatar
 
@@ -63,6 +79,9 @@
 | `--gr-avatar-5-fg` | тема компонента | var(--gr-azure-text) | Инициалы на подложке слота 5. Роль `-text`, а не насыщенный тон: тот в роли текста не добирает AA. |
 | `--gr-avatar-6-bg` | тема компонента | var(--gr-slate-light) | Подложка слота 6 автоцвета (`autoColor`). Живёт в теме компонента, а не в глобальной: палитра нужна одному компоненту. |
 | `--gr-avatar-6-fg` | тема компонента | var(--gr-slate-text) | Инициалы на подложке слота 6. Роль `-text`, а не насыщенный тон: тот в роли текста не добирает AA. |
+| `--gr-avatar-brd` | тема компонента | var(--gr-brd) | Рамка аватара. Тема, где аватар держится заливкой, ставит `transparent`. |
+| `--gr-avatar-weight` | тема компонента | var(--gr-font-bold) | Вес инициалов и счётчика «+N». |
+| `--gr-avatar-neutral-fg` | тема компонента | var(--gr-muted-fg) | Инициалы на нейтральной заливке и счётчик «+N». |
 
 ### GrBadge
 
@@ -88,6 +107,7 @@
 | `--gr-badge-slate-fg` | тема компонента | var(--gr-slate-solid-fg) | Текст filled-бейджа тона `slate`: полярность задаётся темой, а не заливкой. |
 | `--gr-badge-azure-bg` | тема компонента | var(--gr-azure-solid) | Заливка filled-бейджа тона `azure`. В светлой теме — вес solid-кнопки, в тёмной — роль тона. |
 | `--gr-badge-azure-fg` | тема компонента | var(--gr-azure-solid-fg) | Текст filled-бейджа тона `azure`: полярность задаётся темой, а не заливкой. |
+| `--gr-badge-light-brd` | тема компонента | 100% | Сила рамки мягкой метки и чипа: 100% — рамка тона, 0% — рамки не видно. |
 
 ### GrBadgeWrap
 
@@ -95,6 +115,13 @@
 | --- | --- | --- | --- |
 | `--gr-badge-wrap-offset-x` | только хук | -0.5rem (для `dot` — 0) | Горизонтальный сдвиг метки относительно угла обёртки. Литерал по умолчанию — механика: Смещение зависит от варианта (`dot` — 0): геометрия компонента. |
 | `--gr-badge-wrap-offset-y` | только хук | -0.5rem (для `dot` — 0) | Вертикальный сдвиг метки относительно угла обёртки. Литерал по умолчанию — механика: Смещение зависит от варианта (`dot` — 0): геометрия компонента. |
+
+### GrBreadcrumbs
+
+| Токен | Откуда | По умолчанию | Назначение |
+| --- | --- | --- | --- |
+| `--gr-breadcrumbs-separator-fg` | тема компонента | var(--gr-muted-fg) | Цвет разделителя пути. Разделитель — графика, а не текст: тема может держать его тише ссылок. |
+| `--gr-breadcrumbs-current-weight` | тема компонента | var(--gr-font-semibold) | Вес текущего пункта пути. |
 
 ### GrButton
 
@@ -182,6 +209,7 @@
 | `--gr-button-neutral-soft-bg-hover` | тема компонента | color-mix(in srgb, var(--gr-fg) 6%, var(--gr-card)) | Заливка нейтральной soft-кнопки под курсором. Подмешивается цвет текста: своего цвета у нейтрального тона нет. |
 | `--gr-button-neutral-soft-bg-active` | тема компонента | color-mix(in srgb, var(--gr-fg) 11%, var(--gr-card)) | Заливка нейтральной soft-кнопки в момент нажатия. |
 | `--gr-button-neutral-border` | тема компонента | color-mix(in srgb, var(--gr-brd) 50%, var(--gr-brd-hover)) | Рамка нейтральных secondary и outline: заметнее `--gr-brd`, чтобы белая кнопка не терялась на светлом фоне. |
+| `--gr-button-neutral-border-soft` | тема компонента | var(--gr-button-neutral-border) | Рамка нейтральной `secondary` в покое. Отдельно от рамки `outline`: у плашки рамка тише, чем у контурной кнопки. |
 | `--gr-button-shadow` | тема компонента | inset 0 1px 0 color-mix(in srgb, var(--gr-slate-0) 16%, transparent), var(--gr-shadow-1) | Объём solid-кнопки: блик по верхней кромке и мелкая тень. В тёмной теме блик тише. |
 | `--gr-button-shadow-active` | тема компонента | inset 0 1px 2px color-mix(in srgb, var(--gr-slate-900) 24%, transparent) | Тень solid-кнопки в момент нажатия: уходит внутрь, кнопка выглядит вдавленной. |
 | `--gr-button-surface-shadow` | тема компонента | var(--gr-shadow-1) | Тень нейтральной `secondary` — плашки, лежащей на поверхности карточки. У «Чертежа» — без тени. |
@@ -240,6 +268,32 @@
 | `--gr-button-disabled-border-style` | тема компонента | solid | Стиль рамки недоступной кнопки: пунктир читается и без цвета. |
 | `--gr-button-disabled-image` | тема компонента | none | Слой поверх заливки недоступной кнопки: у «Тактильной» — штриховка. |
 | `--gr-button-track-duration` | тема компонента | 1.1s | Период бегущего отрезка загрузки (`loadingIndicator: "track"`); с reduced-motion — медленнее, но не выключается: другого сигнала у загрузки нет. |
+| `--gr-button-primary-border-hover` | тема компонента | var(--gr-primary) | Рамка `outline` и `ghost-border` тона `primary` под указателем; у `secondary` — в нажатии. |
+| `--gr-button-primary-border-active` | тема компонента | var(--gr-primary-active) | Рамка `outline` и `ghost-border` тона `primary` в нажатии. |
+| `--gr-button-primary-border-soft-hover` | тема компонента | var(--gr-button-primary-border) | Рамка `secondary` тона `primary` под указателем. |
+| `--gr-button-neutral-border-hover` | тема компонента | var(--gr-brd-hover) | Рамка `outline` и `ghost-border` тона `neutral` под указателем; у `secondary` — в нажатии. |
+| `--gr-button-neutral-border-active` | тема компонента | var(--gr-brd-active) | Рамка `outline` и `ghost-border` тона `neutral` в нажатии. |
+| `--gr-button-neutral-border-soft-hover` | тема компонента | var(--gr-button-neutral-border) | Рамка `secondary` тона `neutral` под указателем. |
+| `--gr-button-success-border-hover` | тема компонента | var(--gr-success) | Рамка `outline` и `ghost-border` тона `success` под указателем; у `secondary` — в нажатии. |
+| `--gr-button-success-border-active` | тема компонента | var(--gr-success-active) | Рамка `outline` и `ghost-border` тона `success` в нажатии. |
+| `--gr-button-success-border-soft-hover` | тема компонента | var(--gr-button-success-border) | Рамка `secondary` тона `success` под указателем. |
+| `--gr-button-warning-border-hover` | тема компонента | var(--gr-warning) | Рамка `outline` и `ghost-border` тона `warning` под указателем; у `secondary` — в нажатии. |
+| `--gr-button-warning-border-active` | тема компонента | var(--gr-warning-active) | Рамка `outline` и `ghost-border` тона `warning` в нажатии. |
+| `--gr-button-warning-border-soft-hover` | тема компонента | var(--gr-button-warning-border) | Рамка `secondary` тона `warning` под указателем. |
+| `--gr-button-danger-border-hover` | тема компонента | var(--gr-danger) | Рамка `outline` и `ghost-border` тона `danger` под указателем; у `secondary` — в нажатии. |
+| `--gr-button-danger-border-active` | тема компонента | var(--gr-danger-active) | Рамка `outline` и `ghost-border` тона `danger` в нажатии. |
+| `--gr-button-danger-border-soft-hover` | тема компонента | var(--gr-button-danger-border) | Рамка `secondary` тона `danger` под указателем. |
+| `--gr-button-info-border-hover` | тема компонента | var(--gr-info) | Рамка `outline` и `ghost-border` тона `info` под указателем; у `secondary` — в нажатии. |
+| `--gr-button-info-border-active` | тема компонента | var(--gr-info-active) | Рамка `outline` и `ghost-border` тона `info` в нажатии. |
+| `--gr-button-info-border-soft-hover` | тема компонента | var(--gr-button-info-border) | Рамка `secondary` тона `info` под указателем. |
+| `--gr-button-slate-border-hover` | тема компонента | var(--gr-slate) | Рамка `outline` и `ghost-border` тона `slate` под указателем; у `secondary` — в нажатии. |
+| `--gr-button-slate-border-active` | тема компонента | var(--gr-slate-active) | Рамка `outline` и `ghost-border` тона `slate` в нажатии. |
+| `--gr-button-slate-border-soft-hover` | тема компонента | var(--gr-button-slate-border) | Рамка `secondary` тона `slate` под указателем. |
+| `--gr-button-azure-border-hover` | тема компонента | var(--gr-azure) | Рамка `outline` и `ghost-border` тона `azure` под указателем; у `secondary` — в нажатии. |
+| `--gr-button-azure-border-active` | тема компонента | var(--gr-azure-active) | Рамка `outline` и `ghost-border` тона `azure` в нажатии. |
+| `--gr-button-azure-border-soft-hover` | тема компонента | var(--gr-button-azure-border) | Рамка `secondary` тона `azure` под указателем. |
+| `--gr-button-disabled-outline-brd` | тема компонента | var(--gr-button-disabled-brd) | Рамка недоступной `outline`: у неё нет заливки, и рамка — единственный контур, когда у залитых весов рамки уже нет. |
+| `--gr-button-press-scale` | тема компонента | 0.98 | Масштаб кнопки в нажатии; 1 — без сжатия. С `prefers-reduced-motion` не действует. |
 
 ### GrButtonGroup
 
@@ -247,6 +301,20 @@
 | --- | --- | --- | --- |
 | `--gr-button-group-radius` | только хук | радиус кнопки `--gr-button-corner-radius` | Скругление внешних углов склеенной группы — ручка приложения. Без неё звенья берут свой радиус (`--gr-button-corner-radius`), внутренние углы группа гасит сама. Читает её лист `GrButton`. |
 | `--gr-button-group-tray-bg` | только хук | var(--gr-muted) | Подложка лотка (`appearance="tray"`), на которой лежат звенья группы. |
+| `--gr-button-group-tray-radius` | тема компонента | var(--gr-radius-md) | Скругление лотка `appearance="tray"`. Звено внутри скругляется своей ступенью кнопки: лотку нужен радиус на поле (2px) больше. |
+
+### GrCard
+
+| Токен | Откуда | По умолчанию | Назначение |
+| --- | --- | --- | --- |
+| `--gr-card-title-size` | тема компонента | var(--gr-text-sm) | Кегль заголовка карточки из `title`. |
+| `--gr-card-title-leading` | тема компонента | var(--gr-leading-sm) | Интерлиньяж заголовка карточки. |
+| `--gr-card-title-weight` | тема компонента | var(--gr-font-semibold) | Вес заголовка карточки. Антикве заголовков (`--gr-font-display`) обычно нужен вес легче, чем гротеску. |
+| `--gr-card-padding-sm` | тема компонента | 0.75rem | Поле карточки `padding="sm"`. |
+| `--gr-card-padding-md` | тема компонента | 1rem | Поле карточки `padding="md"`. |
+| `--gr-card-padding-lg` | тема компонента | 1.5rem | Поле карточки `padding="lg"`. |
+| `--gr-card-hover-bg` | тема компонента | var(--gr-muted) | Заливка нажимаемой карточки под указателем. |
+| `--gr-card-hover-brd` | тема компонента | var(--gr-brd) | Рамка нажимаемой карточки под указателем. У `ghost` рамки нет, и наведение её не рисует. |
 
 ### GrCarousel
 
@@ -275,6 +343,11 @@
 | `--gr-chip-disabled-bg` | только хук | var(--gr-muted) | Заливка выключенного чипа. Гасить прозрачностью нельзя: она разбавляет выверенные на AA токены текста и роняет контраст. |
 | `--gr-chip-disabled-fg` | только хук | var(--gr-disabled-fg) | Текст выключенного чипа. |
 | `--gr-chip-disabled-brd` | только хук | var(--gr-brd) | Рамка выключенного чипа. |
+| `--gr-chip-neutral-bg` | тема компонента | var(--gr-muted) | Заливка нейтрального чипа. |
+| `--gr-chip-neutral-fg` | тема компонента | var(--gr-fg) | Текст нейтрального чипа. |
+| `--gr-chip-neutral-brd` | тема компонента | var(--gr-brd) | Рамка нейтрального чипа. |
+| `--gr-chip-neutral-hover-bg` | тема компонента | var(--gr-muted) | Заливка нажимаемого нейтрального чипа под указателем. |
+| `--gr-chip-neutral-hover-brd` | тема компонента | var(--gr-brd) | Рамка нажимаемого нейтрального чипа под указателем. |
 
 ### GrColorPicker
 
@@ -291,6 +364,7 @@
 | `--gr-color-picker-area-thumb-border` | тема компонента | #fff | Внешний обвод ручки области. От темы не зависит намеренно: под ручкой лежит выбираемый цвет, а не подложка компонента. |
 | `--gr-color-picker-area-thumb-ring` | тема компонента | rgba(0, 0, 0, 0.45) | Внутренний обвод ручки области: держит её видимой в светлом углу, где белого внешнего обвода не видно. |
 | `--gr-color-picker-area-saturation` | инлайн-стиль | none | Заливка области по горизонтали: серый → чистый тон при светлоте 50%. Ставится компонентом при каждом изменении оттенка. |
+| `--gr-color-picker-trigger-hover-brd` | тема компонента | var(--gr-primary) | Рамка триггера под указателем. Тема, где триггер — такое же поле, как остальные, ставит `--gr-input-hover`. |
 
 ### GrCommandPalette
 
@@ -302,6 +376,10 @@
 | `--gr-command-input-font-size` | тема компонента | 15px | Кегль строки поиска: крупнее пунктов списка, потому что это единственное поле ввода в оверлее. |
 | `--gr-command-list-max-height` | только хук | значение пропа `maxHeight` в пикселях | Максимальная высота списка; дальше список скроллится. Литерал по умолчанию — механика: Значение пропа `maxHeight`. |
 | `--gr-command-results-min-height` | только хук | 0px | Резерв высоты области результатов — чтобы окно не схлопывалось между «ищем» и «нашлось». Состояние «Ничего не найдено» и загрузка встают по центру резерва. Литерал по умолчанию — механика: Нейтральное значение: без минимума. |
+| `--gr-command-group-label-transform` | тема компонента | uppercase | Регистр заголовка группы: `uppercase` или `none`. |
+| `--gr-command-group-label-tracking` | тема компонента | 0.025em | Разрядка заголовка группы. Капсу она нужна, строчным — нет. |
+| `--gr-command-match-weight` | тема компонента | var(--gr-font-regular) | Вес совпавшей с запросом части. Тема без подложки совпадения выделяет его весом. |
+| `--gr-command-footer-bg` | тема компонента | transparent | Заливка подвала с подсказками клавиш. |
 
 ### GrDataTable
 
@@ -316,6 +394,8 @@
 | `--gr-datatable-pinned-shadow-end` | тема компонента | -4px 0 6px -4px rgba(0, 0, 0, 0.25) | Тень на границе группы колонок, закреплённых справа. |
 | `--gr-datatable-detail-bg` | тема компонента | color-mix(in srgb, var(--gr-muted) 45%, transparent) | Фон строки с подробностями. Мягче строки набора: второй ярус читается как вложенное, а не как следующая строка. |
 | `--gr-datatable-detail-accent` | тема компонента | var(--gr-primary) | Полоса слева у строки подробностей. Связывает её со своей строкой, когда между ними прокрутили. |
+| `--gr-datatable-head-weight` | тема компонента | var(--gr-font-bold) | Вес подписи колонки в шапке. |
+| `--gr-datatable-first-row-brd` | тема компонента | var(--gr-brd) | Рамка над первой строкой — граница с шапкой. Тема с линией шапки (`--gr-table-head-line`) ставит `transparent`, иначе граница двоится. |
 
 ### GrDelta
 
@@ -333,14 +413,69 @@
 | `--gr-description-list-column-min` | только хук | 12rem | Минимальная ширина колонки. Ниже неё сетка отдаёт колонку целиком, а не делит её: в тесной колонке значение переносится посимвольно, и число «30» читается как «3» и «0». Порог считается от ширины контейнера, а не вьюпорта. Литерал по умолчанию — механика: Геометрия раскладки колонок. |
 | `--gr-description-list-value-min` | только хук | 5rem | Сколько места остаётся значению рядом с подписью при `inline`. Складывается с `labelWidth` в минимальную ширину колонки: колонка шириной с одну подпись выжимает значение в букву на строку. Литерал по умолчанию — механика: Геометрия раскладки колонок. |
 | `--gr-description-list-label-color` | только хук | var(--gr-muted-fg) | Цвет подписи (`<dt>`). Тон задаётся только значению, поэтому подпись перекрашивается отдельно. |
-| `--gr-description-list-row-gap` | только хук | 0.375rem (`density="compact"` — 0.125rem) | Зазор между парами. Не ступень общей шкалы: плотность списка характеристик настраивается отдельно от отступов раскладки. Литерал по умолчанию — механика: Шаг по плотности (`density`) из карты компонента. |
+| `--gr-description-list-row-gap` | только хук | var(--gr-description-list-row-space) (`density="compact"` — 0.125rem) | Зазор между парами. Не ступень общей шкалы: плотность списка характеристик настраивается отдельно от отступов раскладки. Литерал по умолчанию — механика: Шаг по плотности (`density`) из карты компонента. |
 | `--gr-description-list-divider` | только хук | var(--gr-brd) | Цвет линии между парами при `divided`. |
+| `--gr-description-list-row-space` | тема компонента | 0.375rem | Расстояние между строками списка в теме. Хук `--gr-description-list-row-gap` сильнее. |
+| `--gr-description-list-divided-space` | тема компонента | 0.25rem | Отступ строки от разделительной линии при `divided`. |
+
+### GrDialog
+
+| Токен | Откуда | По умолчанию | Назначение |
+| --- | --- | --- | --- |
+| `--gr-dialog-title-size` | тема компонента | var(--gr-control-text-md) | Кегль заголовка окна в шапке `GrDialogHeader`. |
+| `--gr-dialog-title-leading` | тема компонента | var(--gr-control-leading-md) | Интерлиньяж заголовка окна. |
+| `--gr-dialog-title-weight` | тема компонента | var(--gr-font-bold) | Вес заголовка окна. |
+| `--gr-dialog-divider` | тема компонента | var(--gr-brd) | Линия под шапкой и над подвалом окна (`bordered`). Тема, где окно держится полями, а не линиями, ставит `transparent`: место под линию остаётся, раскладка не прыгает. |
 
 ### GrDivider
 
 | Токен | Откуда | По умолчанию | Назначение |
 | --- | --- | --- | --- |
 | `--gr-divider-thickness` | тема компонента | 1px | Толщина разделителя — общая для горизонтального и вертикального. |
+
+### GrDrawer
+
+| Токен | Откуда | По умолчанию | Назначение |
+| --- | --- | --- | --- |
+| `--gr-drawer-title-size` | тема компонента | var(--gr-text-sm) | Кегль заголовка шторки. |
+| `--gr-drawer-title-leading` | тема компонента | var(--gr-leading-sm) | Интерлиньяж заголовка шторки. |
+| `--gr-drawer-title-weight` | тема компонента | var(--gr-font-bold) | Вес заголовка шторки. |
+| `--gr-drawer-shadow` | тема компонента | var(--gr-shadow-2) | Тень шторки. |
+| `--gr-drawer-radius` | тема компонента | var(--gr-radius-none) | Скругление внутреннего края шторки — того, что смотрит в страницу. |
+
+### GrDropdownMenu
+
+| Токен | Откуда | По умолчанию | Назначение |
+| --- | --- | --- | --- |
+| `--gr-dropdown-menu-item-height` | тема компонента | 2.5rem | Минимальная высота пункта меню. |
+| `--gr-dropdown-menu-item-px` | тема компонента | 1rem | Поле пункта по горизонтали. |
+| `--gr-dropdown-menu-item-py` | тема компонента | 0.625rem | Поле пункта по вертикали. Вместе с интерлиньяжем не должно превышать высоту пункта, иначе пункт вырастет. |
+| `--gr-dropdown-menu-item-hover-bg` | тема компонента | var(--gr-accent) | Подсветка пункта под указателем и раскрытого пункта-подменю. |
+| `--gr-dropdown-menu-item-hover-fg` | тема компонента | var(--gr-accent-fg) | Текст подсвеченного пункта. |
+| `--gr-dropdown-menu-item-danger-hover-bg` | тема компонента | var(--gr-accent) | Подсветка опасного пункта под указателем. |
+| `--gr-dropdown-menu-item-danger-hover-fg` | тема компонента | var(--gr-accent-fg) | Текст подсвеченного опасного пункта. |
+| `--gr-dropdown-menu-item-disabled-bg` | тема компонента | var(--gr-muted) | Заливка недоступного пункта. |
+| `--gr-dropdown-menu-item-disabled-fg` | тема компонента | var(--gr-muted-fg) | Текст недоступного пункта. |
+
+### GrEmptyState
+
+| Токен | Откуда | По умолчанию | Назначение |
+| --- | --- | --- | --- |
+| `--gr-empty-state-title-size-xs` | тема компонента | var(--gr-text-xs) | Кегль заголовка пустого состояния на ступени `xs`. |
+| `--gr-empty-state-title-leading-xs` | тема компонента | var(--gr-leading-xs) | Интерлиньяж заголовка пустого состояния на ступени `xs`. |
+| `--gr-empty-state-title-size-sm` | тема компонента | var(--gr-text-sm) | Кегль заголовка пустого состояния на ступени `sm`. |
+| `--gr-empty-state-title-leading-sm` | тема компонента | var(--gr-leading-sm) | Интерлиньяж заголовка пустого состояния на ступени `sm`. |
+| `--gr-empty-state-title-size-md` | тема компонента | var(--gr-text-sm) | Кегль заголовка пустого состояния на ступени `md`. |
+| `--gr-empty-state-title-leading-md` | тема компонента | var(--gr-leading-sm) | Интерлиньяж заголовка пустого состояния на ступени `md`. |
+| `--gr-empty-state-title-size-lg` | тема компонента | var(--gr-text-base) | Кегль заголовка пустого состояния на ступени `lg`. |
+| `--gr-empty-state-title-leading-lg` | тема компонента | var(--gr-leading-base) | Интерлиньяж заголовка пустого состояния на ступени `lg`. |
+| `--gr-empty-state-title-weight` | тема компонента | var(--gr-font-bold) | Вес заголовка пустого состояния. |
+| `--gr-empty-state-icon-brd` | тема компонента | var(--gr-brd) | Рамка плашки значка пустого состояния. |
+| `--gr-empty-state-icon-fg` | тема компонента | var(--gr-muted-fg) | Цвет значка пустого состояния. |
+| `--gr-empty-state-icon-radius-xs` | тема компонента | var(--gr-radius-md) | Скругление плашки значка на ступени `xs`. Круг — `var(--gr-radius-full)`. |
+| `--gr-empty-state-icon-radius-sm` | тема компонента | var(--gr-radius-md) | Скругление плашки значка на ступени `sm`. Круг — `var(--gr-radius-full)`. |
+| `--gr-empty-state-icon-radius-md` | тема компонента | var(--gr-radius-lg) | Скругление плашки значка на ступени `md`. Круг — `var(--gr-radius-full)`. |
+| `--gr-empty-state-icon-radius-lg` | тема компонента | var(--gr-radius-lg) | Скругление плашки значка на ступени `lg`. Круг — `var(--gr-radius-full)`. |
 
 ### GrFilePreview
 
@@ -349,6 +484,35 @@
 | `--gr-file-preview-bg` | только хук | var(--gr-muted) | Фон плитки. Виден у заглушки целиком, а у картинки — по краям при несовпадении пропорций; на время загрузки место занимает скелет. |
 | `--gr-file-preview-icon` | только хук | var(--gr-muted-fg) | Цвет иконки вида файла и подписи под ней. |
 | `--gr-file-preview-radius` | только хук | var(--gr-radius-md) | Скругление плитки. Отдельный хук, а не ступень общей шкалы: плитка в ленте документов и плитка в строке списка скругляются по-разному. |
+
+### GrFileUpload
+
+| Токен | Откуда | По умолчанию | Назначение |
+| --- | --- | --- | --- |
+| `--gr-file-upload-zone-bg` | тема компонента | var(--gr-card) | Заливка зоны сброса. |
+| `--gr-file-upload-zone-brd` | тема компонента | var(--gr-brd) | Пунктир зоны сброса. |
+| `--gr-file-upload-zone-hover-bg` | тема компонента | var(--gr-muted) | Заливка зоны под указателем. |
+| `--gr-file-upload-zone-over-bg` | тема компонента | var(--gr-muted) | Заливка зоны, когда над ней файл. |
+| `--gr-file-upload-zone-over-brd` | тема компонента | var(--gr-ring) | Рамка зоны, когда над ней файл. |
+| `--gr-file-upload-icon-brd` | тема компонента | var(--gr-brd) | Рамка плитки значка в зоне. |
+| `--gr-file-upload-icon-fg` | тема компонента | var(--gr-muted-fg) | Цвет значка в зоне. |
+| `--gr-file-upload-icon-radius-xs` | тема компонента | var(--gr-radius-md) | Скругление плитки значка на ступени `xs`. Круг — `var(--gr-radius-full)`. |
+| `--gr-file-upload-icon-radius-sm` | тема компонента | var(--gr-radius-md) | Скругление плитки значка на ступени `sm`. Круг — `var(--gr-radius-full)`. |
+| `--gr-file-upload-icon-radius-md` | тема компонента | var(--gr-radius-lg) | Скругление плитки значка на ступени `md`. Круг — `var(--gr-radius-full)`. |
+| `--gr-file-upload-icon-radius-lg` | тема компонента | var(--gr-radius-lg) | Скругление плитки значка на ступени `lg`. Круг — `var(--gr-radius-full)`. |
+| `--gr-file-upload-list-gap` | тема компонента | 0.25rem | Зазор между строками выбранных файлов. |
+| `--gr-file-upload-item-bg` | тема компонента | transparent | Подложка строки файла. Тема, где файл — плашка, ставит поверхность карточки. |
+| `--gr-file-upload-item-brd` | тема компонента | transparent | Контур строки файла. Рисуется тенью внутрь: строка не меняет размер. |
+| `--gr-file-upload-item-radius` | тема компонента | 0px | Скругление строки файла. |
+| `--gr-file-upload-item-padding` | тема компонента | 0px | Поле строки файла. |
+
+### GrFormField
+
+| Токен | Откуда | По умолчанию | Назначение |
+| --- | --- | --- | --- |
+| `--gr-form-field-label-fg` | тема компонента | var(--gr-muted-fg) | Цвет подписи поля. |
+| `--gr-form-field-label-weight` | тема компонента | var(--gr-font-regular) | Вес подписи поля. |
+| `--gr-form-field-required-fg` | тема компонента | var(--gr-invalid-text) | Цвет звёздочки обязательного поля. Тема, где звёздочка — пометка, а не тревога, ставит приглушённый цвет. |
 
 ### GrIcon
 
@@ -389,6 +553,24 @@
 | `--gr-link-color-hover` | инлайн-стиль | подмес `--gr-fg` 8% к базовому цвету | Цвет ссылки под курсором. |
 | `--gr-link-color-active` | инлайн-стиль | подмес `--gr-fg` 16% к базовому цвету | Цвет ссылки в момент нажатия. |
 
+### GrLoading
+
+| Токен | Откуда | По умолчанию | Назначение |
+| --- | --- | --- | --- |
+| `--gr-loading-panel-bg` | тема компонента | var(--gr-card) | Заливка панели с индикатором. Непрозрачная: подпись лежит поверх произвольного содержимого, и полупрозрачная панель не держала бы контраст текста. |
+| `--gr-loading-panel-radius` | тема компонента | var(--gr-radius-md) | Скругление панели с индикатором. |
+| `--gr-loading-panel-shadow` | тема компонента | var(--gr-shadow-2) | Тень панели с индикатором. |
+
+### GrModal
+
+| Токен | Откуда | По умолчанию | Назначение |
+| --- | --- | --- | --- |
+| `--gr-modal-shadow` | тема компонента | var(--gr-shadow-2) | Тень окна. |
+| `--gr-modal-width-sm` | тема компонента | 420px | Наибольшая ширина окна размера `sm`. |
+| `--gr-modal-width-md` | тема компонента | 560px | Наибольшая ширина окна размера `md`. |
+| `--gr-modal-width-lg` | тема компонента | 720px | Наибольшая ширина окна размера `lg`. |
+| `--gr-modal-width-xl` | тема компонента | 920px | Наибольшая ширина окна размера `xl`. |
+
 ### GrNavbar
 
 | Токен | Откуда | По умолчанию | Назначение |
@@ -400,8 +582,19 @@
 | Токен | Откуда | По умолчанию | Назначение |
 | --- | --- | --- | --- |
 | `--gr-otp-input-cell-size` | только хук | 1.75rem / 2rem / 2.5rem / 2.75rem по ступеням xs…lg | Сторона ячейки. Повторяет высоту GrInput на той же ступени: код стоит в форме рядом с полями и обязан садиться с ними в одну линию. Через хук — квадратная ячейка это решение оформления, и макет вправе сделать её шире. Литерал по умолчанию — механика: Сторона ячейки по ступени `size` из карты компонента. |
-| `--gr-otp-input-active-brd` | только хук | var(--gr-primary) | Цвет рамки активной ячейки — той, в которой стоит каретка. |
-| `--gr-otp-input-caret` | только хук | var(--gr-primary) | Цвет каретки. Она рисуется своей: настоящая скрыта вместе с текстом поля. |
+| `--gr-otp-input-active-brd` | только хук | var(--gr-otp-input-focus-brd) | Цвет рамки активной ячейки — той, в которой стоит каретка. |
+| `--gr-otp-input-caret` | только хук | var(--gr-otp-input-caret-color) | Цвет каретки. Она рисуется своей: настоящая скрыта вместе с текстом поля. |
+| `--gr-otp-input-focus-brd` | тема компонента | var(--gr-primary) | Рамка ячейки, в которую идёт ввод, в теме. Хук `--gr-otp-input-active-brd` сильнее. |
+| `--gr-otp-input-caret-color` | тема компонента | var(--gr-primary) | Цвет каретки в теме. Хук `--gr-otp-input-caret` сильнее. |
+
+### GrPagination
+
+| Токен | Откуда | По умолчанию | Назначение |
+| --- | --- | --- | --- |
+| `--gr-pagination-page-fg` | тема компонента | var(--gr-muted-fg) | Номер невыбранной страницы. |
+| `--gr-pagination-page-hover-bg` | тема компонента | var(--gr-accent) | Подложка номера под указателем — в паре с подсветкой ghost-кнопок «назад/вперёд». |
+| `--gr-pagination-page-hover-fg` | тема компонента | var(--gr-accent-fg) | Номер под указателем. |
+| `--gr-pagination-page-weight` | тема компонента | var(--gr-font-semibold) | Вес номеров страниц. |
 
 ### GrPopover
 
@@ -425,15 +618,29 @@
 | `--gr-progress-buffer-bg` | тема компонента | color-mix(in srgb, var(--gr-muted-fg) 40%, var(--gr-muted)) | Слой буфера позади заливки. Тон не наследует: нейтральный слой между треком и заливкой читается у всех восьми тонов. |
 | `--gr-progress-indeterminate-bg` | тема компонента | var(--gr-muted-fg) | Заливка неопределённого режима под `prefers-reduced-motion: reduce`, когда бегущая полоса остановлена. |
 | `--gr-progress-indeterminate-duration` | тема компонента | 1.4s | Период пробега полосы в неопределённом режиме. |
+| `--gr-progress-track-bg` | тема компонента | var(--gr-muted) | Заливка дорожки. |
+| `--gr-progress-height-xs` | тема компонента | 0.25rem | Толщина полосы на ступени `xs`. |
+| `--gr-progress-height-sm` | тема компонента | 0.375rem | Толщина полосы на ступени `sm`. |
+| `--gr-progress-height-md` | тема компонента | 0.5rem | Толщина полосы на ступени `md`. |
+| `--gr-progress-height-lg` | тема компонента | 0.75rem | Толщина полосы на ступени `lg`. |
 
 ### GrProgressCircle
 
 | Токен | Откуда | По умолчанию | Назначение |
 | --- | --- | --- | --- |
 | `--gr-progress-circle-size` | только хук | 2rem / 3rem / 4rem / 6rem по ступеням `xs…lg` | Диаметр кольца. Геометрия дуги считается в единицах `viewBox`, поэтому масштаб можно менять свободно. Литерал по умолчанию — механика: Диаметр по ступени `size` из карты компонента. |
-| `--gr-progress-circle-track` | только хук | var(--gr-muted) | Цвет дорожки — непройденной части кольца. |
+| `--gr-progress-circle-track` | только хук | var(--gr-progress-circle-track-bg) | Цвет дорожки — непройденной части кольца. |
 | `--gr-progress-circle-cap` | тема компонента | round | Торец дуги значения: `round` или `butt` для строгой шкалы. |
 | `--gr-progress-circle-value-size` | только хук | кегль по ступени `size` | Кегль содержимого в центре кольца: свой формат значения может не влезть в дефолтный. Литерал по умолчанию — механика: Кегль по ступени `size` из карты компонента. |
+| `--gr-progress-circle-track-bg` | тема компонента | var(--gr-muted) | Цвет дорожки кольца в теме. Хук `--gr-progress-circle-track` сильнее. |
+
+### GrRadio
+
+| Токен | Откуда | По умолчанию | Назначение |
+| --- | --- | --- | --- |
+| `--gr-radio-checked-bg` | тема компонента | color-mix(in srgb, var(--gr-selected) 10%, var(--gr-bg)) | Заливка кружка выбранного радио. Рамка у выбранного — всегда `--gr-selected`; заливка решает, контур это с точкой или сплошной кружок. |
+| `--gr-radio-checked-hover-bg` | тема компонента | color-mix(in srgb, var(--gr-selected) 10%, var(--gr-bg)) | Заливка кружка выбранного радио под указателем. У контурного радио совпадает с `--gr-radio-checked-bg`. |
+| `--gr-radio-dot` | тема компонента | var(--gr-selected) | Точка выбранного радио. На сплошной заливке `--gr-selected` тема ставит сюда `--gr-selected-fg`, иначе точка сольётся с кружком. |
 
 ### GrRating
 
@@ -443,13 +650,16 @@
 | `--gr-rating-void-color` | тема компонента | color-mix(in srgb, var(--gr-muted-fg) 35%, transparent) | Цвет незаполненного символа: шкала обязана читаться целиком, а не только заполненной частью. |
 | `--gr-rating-symbol-size` | только хук | 0.875rem / 1rem / 1.25rem / 1.5rem по ступеням `xs…lg` | Размер символа шкалы. Литерал по умолчанию — механика: Размер символа по ступени `size` из карты компонента. |
 | `--gr-rating-font-size-lg` | только хук | 15px | Кегль подписи на ступени `lg`: между `md` и `lg` шкалы контролов. Литерал по умолчанию — механика: Кегль ступени `lg` из карты компонента. |
+| `--gr-rating-void-fill` | тема компонента | currentColor | Заливка пустой звезды: `currentColor` — цветом `--gr-rating-void-color`, `transparent` — контур. |
+| `--gr-rating-void-stroke` | тема компонента | transparent | Обводка пустой звезды: `currentColor` — цветом `--gr-rating-void-color`. |
+| `--gr-rating-stroke-width` | тема компонента | 0 | Толщина обводки звезды в единицах её сетки 24×24. Заполненная обводится своим цветом той же толщины. |
 
 ### GrScrollSpy
 
 | Токен | Откуда | По умолчанию | Назначение |
 | --- | --- | --- | --- |
 | `--gr-scroll-spy-offset` | инлайн-стиль | 0px | Отступ линии активации от верха скроллпорта. Пишется инлайн из пропа `offset`; заданный в каскаде работает общим дефолтом и подхватывается замером. Почти всегда равен `--gr-affix-offset` липкой шапки. |
-| `--gr-scroll-spy-marker` | только хук | var(--gr-primary) | Цвет рельса у активного пункта. Один из трёх признаков активности — рядом с ним меняются вес и цвет текста. |
+| `--gr-scroll-spy-marker` | только хук | var(--gr-selected) | Цвет рельса у активного пункта. Один из трёх признаков активности — рядом с ним меняются вес и цвет текста. |
 | `--gr-scroll-spy-rail` | только хук | var(--gr-brd) | Цвет рельса у остальных пунктов. |
 | `--gr-scroll-spy-indent` | только хук | 0.75rem | Шаг отступа для вложенного уровня оглавления. Литерал по умолчанию — механика: Геометрия раскладки вложенных пунктов. |
 
@@ -457,43 +667,66 @@
 
 | Токен | Откуда | По умолчанию | Назначение |
 | --- | --- | --- | --- |
-| `--gr-segmented-track-bg` | инлайн-стиль | var(--gr-muted); в варианте `solid` — var(--gr-card) | Фон дорожки переключателя. |
+| `--gr-segmented-track-bg` | инлайн-стиль | var(--gr-muted); в варианте `button` — var(--gr-card) | Фон дорожки переключателя. |
 | `--gr-segmented-track-brd` | инлайн-стиль | var(--gr-brd) | Цвет рамки дорожки. |
 | `--gr-segmented-invalid-brd` | только хук | var(--gr-invalid-brd) | Рамка дорожки при `invalid` — вердикт валидации. |
-| `--gr-segmented-track-shadow` | инлайн-стиль | none; в варианте `solid` — var(--gr-shadow-1) | Тень дорожки. |
-| `--gr-segmented-indicator-bg` | инлайн-стиль | var(--gr-card); в варианте `primary` — var(--gr-primary) | Заливка бегунка под выбранным пунктом. |
+| `--gr-segmented-track-shadow` | инлайн-стиль | none; в варианте `button` — var(--gr-shadow-1) | Тень дорожки. |
+| `--gr-segmented-indicator-bg` | инлайн-стиль | var(--gr-card); в варианте `button` — var(--gr-selected) | Заливка бегунка под выбранным пунктом. |
 | `--gr-segmented-indicator-brd` | инлайн-стиль | подмес `--gr-fg` к фону дорожки | Цвет рамки бегунка. |
-| `--gr-segmented-indicator-shadow` | инлайн-стиль | var(--gr-shadow-1); в варианте `solid` — var(--gr-shadow-2) | Тень бегунка — она отделяет его от дорожки. |
+| `--gr-segmented-indicator-shadow` | инлайн-стиль | var(--gr-shadow-1); в варианте `button` — var(--gr-shadow-2) | Тень бегунка — она отделяет его от дорожки. |
 | `--gr-segmented-indicator-highlight-shadow` | тема компонента | 0 0 0 0 transparent | Дополнительная подсветка бегунка поверх основной тени: в светлом режиме выключена, в тёмном — тонкое светлое кольцо. |
 | `--gr-segmented-item-color` | инлайн-стиль | var(--gr-muted-fg) | Цвет невыбранного пункта. |
 | `--gr-segmented-item-hover-color` | инлайн-стиль | var(--gr-fg) | Цвет пункта под курсором. |
-| `--gr-segmented-item-selected-color` | инлайн-стиль | var(--gr-fg); в варианте `primary` — var(--gr-primary-fg) | Цвет выбранного пункта. |
+| `--gr-segmented-item-selected-color` | инлайн-стиль | var(--gr-fg); в варианте `button` — var(--gr-selected-fg) | Цвет выбранного пункта. |
 | `--gr-segmented-item-px` | инлайн-стиль | 10px / 12px / 14px / 16px по ступеням `xs…lg` | Горизонтальные поля пункта. |
 | `--gr-segmented-item-py` | инлайн-стиль | 2px / 4px / 6px / 8px по ступеням `xs…lg` | Вертикальные поля пункта. |
 | `--gr-segmented-min-height` | инлайн-стиль | 20px / 24px / 32px / 36px по ступеням `xs…lg` | Минимальная высота дорожки: переключатель обязан вставать в строку с контролами той же ступени. |
 | `--gr-segmented-padding` | инлайн-стиль | 4px | Внутренний отступ дорожки вокруг бегунка. |
 | `--gr-segmented-radius` | инлайн-стиль | 9999px | Скругление дорожки и бегунка. |
 | `--gr-segmented-font-size` | инлайн-стиль | 0.75rem / 0.875rem / 0.9375rem по ступеням | Кегль подписи пункта. |
-| `--gr-segmented-font-weight` | инлайн-стиль | 600 | Начертание подписи пункта. |
+| `--gr-segmented-font-weight` | инлайн-стиль | var(--gr-segmented-label-weight) | Начертание подписи пункта. |
 | `--gr-segmented-line-height` | инлайн-стиль | 1rem / 1.25rem по ступеням | Межстрочный интервал подписи пункта. |
+| `--gr-segmented-label-weight` | тема компонента | var(--gr-font-semibold) | Вес подписи сегмента. |
+
+### GrSelect
+
+| Токен | Откуда | По умолчанию | Назначение |
+| --- | --- | --- | --- |
+| `--gr-select-option-active-bg` | тема компонента | color-mix(in srgb, var(--gr-muted) 30%, transparent) | Подсветка опции под указателем и активной с клавиатуры. |
 
 ### GrSidebar
 
 | Токен | Откуда | По умолчанию | Назначение |
 | --- | --- | --- | --- |
 | `--gr-sidebar-nest-indent` | только хук | 1rem | Отступ одного уровня вложенности у подпунктов. Отодвигается вся строка вместе с подсветкой, а не только текст. Литерал по умолчанию — механика: Геометрия раскладки вложенных пунктов. |
+| `--gr-sidebar-item-active-bg` | тема компонента | var(--gr-muted) | Заливка текущего пункта. |
+| `--gr-sidebar-item-active-weight` | тема компонента | var(--gr-font-semibold) | Вес подписи текущего пункта. |
+| `--gr-sidebar-group-label-size` | тема компонента | var(--gr-text-2xs) | Кегль заголовка группы. |
+| `--gr-sidebar-group-label-leading` | тема компонента | var(--gr-leading-2xs) | Интерлиньяж заголовка группы. |
+| `--gr-sidebar-group-label-weight` | тема компонента | var(--gr-font-bold) | Вес заголовка группы. |
+| `--gr-sidebar-group-label-transform` | тема компонента | uppercase | Регистр заголовка группы: `uppercase` или `none`. |
+| `--gr-sidebar-group-label-tracking` | тема компонента | 0.025em | Разрядка заголовка группы. Капсу она нужна, строчным — нет. |
+
+### GrSkeleton
+
+| Токен | Откуда | По умолчанию | Назначение |
+| --- | --- | --- | --- |
+| `--gr-skeleton-bg` | тема компонента | var(--gr-muted) | Заливка заглушки. |
+| `--gr-skeleton-brd` | тема компонента | var(--gr-brd) | Рамка заглушки. |
+| `--gr-skeleton-pulse-opacity` | тема компонента | 0.5 | Нижняя точка пульса: 1 — пульса нет. |
+| `--gr-skeleton-shine` | тема компонента | transparent | Цвет бегущего блика: `transparent` — блика нет. |
 
 ### GrSlider
 
 | Токен | Откуда | По умолчанию | Назначение |
 | --- | --- | --- | --- |
 | `--gr-slider-mark-offset` | инлайн-стиль | выступ бегунка за дорожку + 0.25rem, не меньше 0.625rem | Отступ подписей меток от дорожки. Считается от `--gr-slider-thumb-size`: крупная ручка не закрывает подписи. |
-| `--gr-slider-fill` | только хук | var(--gr-primary) | Цвет пройденной части трека. |
+| `--gr-slider-fill` | только хук | var(--gr-selected) | Цвет пройденной части трека. |
 | `--gr-slider-rail` | только хук | var(--gr-brd) | Цвет непройденной части трека. |
 | `--gr-slider-track-height` | только хук | 0.1875rem / 0.25rem / 0.375rem / 0.5rem по ступеням `xs…lg` | Толщина трека. Литерал по умолчанию — механика: Толщина дорожки по ступени `size` из карты компонента. |
 | `--gr-slider-thumb-size` | только хук | 0.75rem / 0.875rem / 1rem / 1.25rem по ступеням `xs…lg` | Диаметр ползунка. Литерал по умолчанию — механика: Размер бегунка по ступени `size` из карты компонента. |
 | `--gr-slider-thumb-bg` | только хук | var(--gr-bg) | Заливка ползунка. |
-| `--gr-slider-thumb-border` | только хук | var(--gr-slider-fill, var(--gr-primary)) | Цвет рамки ползунка. По умолчанию совпадает с заливкой трека. |
+| `--gr-slider-thumb-border` | только хук | var(--gr-slider-fill, var(--gr-selected)) | Цвет рамки ползунка. По умолчанию совпадает с заливкой трека. |
 | `--gr-slider-length` | только хук | 10rem | Длина вертикального слайдера: горизонтальный тянется по ширине контейнера, вертикальному нужна явная высота. Литерал по умолчанию — механика: Геометрия раскладки вертикальной шкалы. |
 
 ### GrSortableList
@@ -530,24 +763,45 @@
 | --- | --- | --- | --- |
 | `--gr-steps-marker-size` | инлайн-стиль | 1.25rem / 1.5rem / 1.75rem / 2rem по ступеням `xs…lg` | Диаметр маркера шага. Задаётся ступенью размера и служит опорой для соединителя: линия центруется по этому значению. |
 | `--gr-steps-connector-size` | тема компонента | 2px | Толщина линии между шагами. |
-| `--gr-steps-connector-done` | только хук | var(--gr-primary-solid) | Цвет пройденного участка линии. |
+| `--gr-steps-connector-done` | только хук | var(--gr-steps-done-bg) | Цвет пройденного участка линии. |
 | `--gr-steps-connector-pending` | только хук | var(--gr-brd) | Цвет непройденного участка линии. |
+| `--gr-steps-done-bg` | тема компонента | var(--gr-primary-solid) | Заливка пройденного шага и обводка текущего: одна ось прогресса. |
+| `--gr-steps-done-fg` | тема компонента | var(--gr-primary-solid-fg) | Знак на заливке пройденного шага. |
+| `--gr-steps-current-fg` | тема компонента | var(--gr-primary-text) | Номер текущего шага в обводке. |
 
 ### GrSwitch
 
 | Токен | Откуда | По умолчанию | Назначение |
 | --- | --- | --- | --- |
-| `--gr-switch-track-bg` | инлайн-стиль | var(--gr-primary) во включённом состоянии, var(--gr-muted) в выключенном, var(--gr-disabled-bg) в недоступном | Заливка дорожки переключателя. |
-| `--gr-switch-track-brd` | инлайн-стиль | var(--gr-primary) / var(--gr-control-brd) / var(--gr-disabled-brd) | Цвет рамки дорожки переключателя. |
-| `--gr-switch-state-text-fg` | только хук | var(--gr-primary-fg) во включённом состоянии, var(--gr-muted-fg) в выключенном, var(--gr-disabled-fg) в недоступном | Цвет подписи состояния внутри дорожки. Задан для того, кто красит дорожку своим цветом: контраст текста на произвольной заливке библиотека не вычислит. |
+| `--gr-switch-track-bg` | инлайн-стиль | var(--gr-selected) во включённом состоянии, var(--gr-switch-off-bg) в выключенном, var(--gr-disabled-bg) в недоступном | Заливка дорожки переключателя. |
+| `--gr-switch-track-brd` | инлайн-стиль | var(--gr-selected) / var(--gr-control-brd) / var(--gr-disabled-brd) | Цвет рамки дорожки переключателя. |
+| `--gr-switch-state-text-fg` | только хук | var(--gr-selected-fg) во включённом состоянии, var(--gr-muted-fg) в выключенном, var(--gr-disabled-fg) в недоступном | Цвет подписи состояния внутри дорожки. Задан для того, кто красит дорожку своим цветом: контраст текста на произвольной заливке библиотека не вычислит. |
 | `--gr-switch-state-text-size` | только хук | 9px на md, 11px на lg | Кегль подписи состояния. Собственный, а не ступень шкалы: минимальный --gr-text-xs (12px) в дорожку не помещается. Один токен на обе ступени. Литерал по умолчанию — механика: Кегль подписи состояния по ступени `size` из карты компонента. |
-| `--gr-switch-thumb-fg` | только хук | var(--gr-muted-fg) | Цвет содержимого бегунка — один на спиннер загрузки и иконку действия. По состоянию не ветвится: бегунок остаётся var(--gr-card) в любом из них. |
+| `--gr-switch-thumb-fg` | только хук | var(--gr-muted-fg) | Цвет содержимого бегунка — один на спиннер загрузки и иконку действия. По состоянию не ветвится: заливка бегунка — `--gr-switch-thumb-bg` в любом из них. |
+| `--gr-switch-off-bg` | тема компонента | var(--gr-muted) | Заливка выключенной дорожки. |
+| `--gr-switch-thumb-bg` | тема компонента | var(--gr-card) | Заливка бегунка. |
+| `--gr-switch-thumb-shadow` | тема компонента | var(--gr-shadow-1) | Тень бегунка. |
+| `--gr-switch-track-height-xs` | тема компонента | 1rem | Высота дорожки на ступени `xs`. Бегунок и отступ подписи выводятся из неё: бегунок — высота минус 4px (рамка и зазор с обеих сторон). |
+| `--gr-switch-track-width-xs` | тема компонента | 1.75rem | Ширина дорожки на ступени `xs` без подписи состояния. |
+| `--gr-switch-track-height-sm` | тема компонента | 1.25rem | Высота дорожки на ступени `sm`. Бегунок и отступ подписи выводятся из неё: бегунок — высота минус 4px (рамка и зазор с обеих сторон). |
+| `--gr-switch-track-width-sm` | тема компонента | 2.25rem | Ширина дорожки на ступени `sm` без подписи состояния. |
+| `--gr-switch-track-height-md` | тема компонента | 1.5rem | Высота дорожки на ступени `md`. Бегунок и отступ подписи выводятся из неё: бегунок — высота минус 4px (рамка и зазор с обеих сторон). |
+| `--gr-switch-track-width-md` | тема компонента | 2.75rem | Ширина дорожки на ступени `md` без подписи состояния. |
+| `--gr-switch-track-height-lg` | тема компонента | 1.75rem | Высота дорожки на ступени `lg`. Бегунок и отступ подписи выводятся из неё: бегунок — высота минус 4px (рамка и зазор с обеих сторон). |
+| `--gr-switch-track-width-lg` | тема компонента | 3.5rem | Ширина дорожки на ступени `lg` без подписи состояния. |
+| `--gr-switch-text-track-width-md` | тема компонента | 2.75rem | Ширина дорожки с подписью состояния на ступени `md`; в `autoWidth` — нижняя граница. Места под подпись — не меньше, чем в базовой теме: держит гейт. |
+| `--gr-switch-text-track-width-lg` | тема компонента | 3.5rem | Ширина дорожки с подписью состояния на ступени `lg`; в `autoWidth` — нижняя граница. Места под подпись — не меньше, чем в базовой теме: держит гейт. |
 
 ### GrTable
 
 | Токен | Откуда | По умолчанию | Назначение |
 | --- | --- | --- | --- |
 | `--gr-table-sticky-column-shadow` | тема компонента | 4px 0 6px -4px rgba(0, 0, 0, 0.25) | Тень справа у прилипающей первой колонки (`stickyColumn`). Признак того, что под ней уезжает содержимое. Тень, а не рамка: рамка сдвинула бы сетку таблицы. |
+| `--gr-table-head-bg` | тема компонента | var(--gr-muted) | Заливка шапки таблицы. Липкой шапке и закреплённой колонке она нужна непрозрачной. |
+| `--gr-table-hover-share` | тема компонента | 45% | Доля `--gr-muted` в подсветке строки под указателем. |
+| `--gr-table-stripe-share` | тема компонента | 35% | Доля `--gr-muted` в чётной строке зебры. |
+| `--gr-table-head-line` | тема компонента | transparent | Цвет линии под шапкой. Линия — фоновым слоем по низу ячеек шапки и не зависит от рамок строк: видна и в пустой таблице, и под липкой шапкой. |
+| `--gr-table-head-line-width` | тема компонента | 0px | Толщина линии под шапкой; 0 — линии нет. |
 
 ### GrTabs
 
@@ -555,6 +809,14 @@
 | --- | --- | --- | --- |
 | `--gr-tabs-scroll-fade` | только хук | 1.5rem | Ширина затухания у края горизонтального ряда вкладок — того края, за которым ряд продолжается. Тем же значением задан `scroll-padding` ряда, поэтому вкладка, подтянутая в видимую часть, не встаёт под затухание. Литерал по умолчанию — механика: Размер затухания у края прокрутки — механика ленты. |
 | `--gr-tabs-mask` | CSS компонента | не задана, пока ряд влезает целиком | Маска затухания. Задаётся собственным CSS компонента по `data-overflow`: у какого края есть продолжение, тот и гаснет. Вертикальный ряд не прокручивается, и маски у него нет. |
+| `--gr-tabs-font-weight` | тема компонента | var(--gr-font-semibold) | Вес подписи вкладки. |
+| `--gr-tabs-pills-list-bg` | тема компонента | var(--gr-muted) | Заливка ряда вкладок `pills`. Тема без лотка ставит `transparent`. |
+| `--gr-tabs-pills-list-brd` | тема компонента | var(--gr-brd) | Рамка ряда вкладок `pills`. |
+| `--gr-tabs-pills-radius` | тема компонента | var(--gr-radius-md) | Скругление вкладки `pills`. |
+| `--gr-tabs-pills-active-bg` | тема компонента | var(--gr-card) | Заливка выбранной вкладки `pills`. |
+| `--gr-tabs-pills-active-fg` | тема компонента | var(--gr-fg) | Текст выбранной вкладки `pills`. |
+| `--gr-tabs-pills-active-brd` | тема компонента | var(--gr-brd) | Рамка выбранной вкладки `pills`. |
+| `--gr-tabs-pills-hover-bg` | тема компонента | color-mix(in srgb, var(--gr-card) 70%, transparent) | Подсветка невыбранной вкладки `pills` под указателем. |
 
 ### GrTimeline
 
@@ -571,6 +833,11 @@
 | `--gr-timeline-dash` | тема компонента | 4px | Шаг пунктира на отрезке оси после незавершённого события. |
 | `--gr-timeline-item-min-width` | только хук | 12rem | Ширина колонки события в горизонтальной ленте. Литерал по умолчанию — механика: Геометрия раскладки. |
 | `--gr-timeline-columns` | CSS компонента | `auto minmax(0, 1fr)`, а по раскладкам — с колонкой времени либо симметричная | Сетка колонок ленты. Задаётся собственным CSS компонента по `layout`; строка события и заголовок группы делят её, чтобы ось у них совпадала. Гибкие треки объявлены `minmax(0, 1fr)`, а не `1fr`: голый `1fr` держит минимум по содержимому, и лента не сжималась бы в узкой колонке. |
+| `--gr-timeline-neutral-marker` | тема компонента | var(--gr-muted-fg) | Заливка точки тона `neutral`. |
+| `--gr-timeline-neutral-outline` | тема компонента | var(--gr-muted-fg) | Обводка полой точки тона `neutral`. |
+| `--gr-timeline-title-weight` | тема компонента | var(--gr-font-semibold) | Вес заголовка события. |
+| `--gr-timeline-group-title-transform` | тема компонента | uppercase | Регистр заголовка группы событий: `uppercase` или `none`. |
+| `--gr-timeline-group-title-tracking` | тема компонента | 0.025em | Разрядка заголовка группы. Капсу она нужна, строчным — нет. |
 
 ### GrToaster
 
@@ -579,6 +846,20 @@
 | `--gr-toaster-width` | CSS компонента | 360px | Ширина стека тостов. Проп `width` задаёт её же, поэтому одно и то же настраивается и разметкой, и темой. |
 | `--gr-toaster-stack-peek` | только хук | 12px | Насколько выглядывает из-под передней карточки каждая следующая в свёрнутой стопке. Литерал по умолчанию — механика: Геометрия стопки уведомлений — механика стопки. |
 | `--gr-toaster-stack-scale` | только хук | 0.05 | На сколько уменьшается каждая следующая карточка стопки: глубина читается размером, а не только смещением. Литерал по умолчанию — механика: Масштаб карточек в стопке — механика стопки. |
+| `--gr-toaster-brd` | тема компонента | var(--gr-brd) | Рамка уведомления. Тема, у которой уведомление держится тенью, ставит `transparent`. |
+| `--gr-toaster-shadow` | тема компонента | var(--gr-shadow-2) | Тень уведомления. |
+| `--gr-toaster-title-weight` | тема компонента | var(--gr-font-bold) | Вес заголовка уведомления. |
+| `--gr-toaster-icon-tone` | тема компонента | 100% | Доля насыщенного тона в значке и полосе времени: 100% — насыщенный тон, 0% — `-text` тона, который держит 3:1 к карточке у любого тона. |
+
+### GrTooltip
+
+| Токен | Откуда | По умолчанию | Назначение |
+| --- | --- | --- | --- |
+| `--gr-tooltip-bg` | тема компонента | var(--gr-popover) | Заливка подсказки. |
+| `--gr-tooltip-fg` | тема компонента | var(--gr-popover-fg) | Текст подсказки. |
+| `--gr-tooltip-brd` | тема компонента | var(--gr-brd) | Рамка подсказки. Тема с пузырём без рамки ставит сюда цвет заливки. |
+| `--gr-tooltip-radius` | тема компонента | var(--gr-radius-control) | Скругление подсказки. |
+| `--gr-tooltip-shadow` | тема компонента | var(--gr-shadow-1) | Тень подсказки. |
 
 ### GrTransfer
 
@@ -610,14 +891,14 @@
 | `--gr-tree-row-pr` | CSS компонента | var(--gr-tree-row-px) | Правое поле строки — отдельно от левого: справа часто стоят действия узла. |
 | `--gr-tree-row-radius` | CSS компонента | 8px | Скругление подсветки строки. |
 | `--gr-tree-row-color` | CSS компонента | var(--gr-fg) | Цвет текста строки. |
-| `--gr-tree-row-hover-bg` | CSS компонента | color-mix(in srgb, var(--gr-primary) 10%, transparent) | Фон строки под курсором. |
-| `--gr-tree-row-current-bg` | CSS компонента | color-mix(in srgb, var(--gr-primary) 14%, transparent) | Фон текущей (выбранной) строки. |
-| `--gr-tree-row-current-hover-bg` | CSS компонента | color-mix(in srgb, var(--gr-primary) 16%, transparent) | Фон текущей строки под курсором. |
+| `--gr-tree-row-hover-bg` | CSS компонента | color-mix(in srgb, var(--gr-selected) 10%, transparent) | Фон строки под курсором. |
+| `--gr-tree-row-current-bg` | CSS компонента | color-mix(in srgb, var(--gr-selected) 14%, transparent) | Фон текущей (выбранной) строки. |
+| `--gr-tree-row-current-hover-bg` | CSS компонента | color-mix(in srgb, var(--gr-selected) 16%, transparent) | Фон текущей строки под курсором. |
 | `--gr-tree-row-current-color` | CSS компонента | var(--gr-tree-row-color) | Цвет текста выбранной строки. Отдельно от --gr-tree-row-color, потому что насыщенная подложка выбора требует своего текста: без этого сплошную плашку выбора нельзя сделать читаемой. |
 | `--gr-tree-row-current-bar-width` | CSS компонента | 0px | Ширина полосы у левого края выбранной строки. По умолчанию полосы нет; вид, отмечающий выбор без подложки, включает её одной строкой. Рисуется на самой строке, поэтому стоит у края списка, а не уезжает вправо с отступом уровня. |
-| `--gr-tree-row-current-bar-color` | CSS компонента | var(--gr-primary) | Цвет полосы у выбранной строки. |
+| `--gr-tree-row-current-bar-color` | CSS компонента | var(--gr-selected) | Цвет полосы у выбранной строки. |
 | `--gr-tree-checkbox-brd-width` | CSS компонента | 1px | Толщина рамки квадрата отметки. Вынесена отдельно от размера: на увеличенном квадрате волосяная рамка перестаёт читаться как рамка. |
-| `--gr-tree-branch-font-weight` | CSS компонента | 600 | Начертание подписи ветки. Плотнее листа, чтобы ветка и лист не выглядели одинаково. Гасится там, где вес несёт уровень, а не ветвистость. |
+| `--gr-tree-branch-font-weight` | CSS компонента | var(--gr-tree-branch-weight) | Начертание подписи ветки. Плотнее листа, чтобы ветка и лист не выглядели одинаково. Гасится там, где вес несёт уровень, а не ветвистость. |
 | `--gr-tree-font-size` | инлайн-стиль | 12px / 13px / inherit / 15px по ступеням `xs…lg` | Кегль подписи узла. |
 | `--gr-tree-content-gap` | инлайн-стиль | 4px / 6px / 8px / 10px по ступеням `xs…lg` | Просвет между иконкой и подписью узла. |
 | `--gr-tree-icon-size` | инлайн-стиль | 12px / 14px / 16px / 20px по ступеням `xs…lg` | Размер иконки узла. |
@@ -641,13 +922,14 @@
 | `--gr-tree-checkbox-mr` | CSS компонента | 4px | Отступ чекбокса от содержимого узла. |
 | `--gr-tree-checkbox-bg` | CSS компонента | transparent | Фон невыбранного чекбокса. |
 | `--gr-tree-checkbox-brd` | CSS компонента | var(--gr-brd) | Цвет рамки чекбокса. |
-| `--gr-tree-checkbox-checked-bg` | CSS компонента | var(--gr-primary) | Фон отмеченного чекбокса. |
-| `--gr-tree-checkbox-checked-fg` | CSS компонента | var(--gr-primary-fg) | Цвет галочки в отмеченном чекбоксе. |
+| `--gr-tree-checkbox-checked-bg` | CSS компонента | var(--gr-selected) | Фон отмеченного чекбокса. |
+| `--gr-tree-checkbox-checked-fg` | CSS компонента | var(--gr-selected-fg) | Цвет галочки в отмеченном чекбоксе. |
 | `--gr-tree-branch-line-width` | CSS компонента | 2px | Толщина направляющей линии уровня. |
 | `--gr-tree-branch-elbow-width` | CSS компонента | 8px | Длина горизонтального колена от направляющей к строке при branchLine="elbow". Колено соединяет узлы, а не только отмечает уровень. |
 | `--gr-tree-branch-line-offset` | CSS компонента | 12px | Сдвиг направляющей от левого края строки. |
 | `--gr-tree-branch-line-default-color` | CSS компонента | var(--gr-tree-row-current-bg) | Цвет направляющей по умолчанию. |
 | `--gr-tree-branch-line-color` | инлайн-стиль | var(--gr-tree-branch-line-default-color) | Цвет направляющей конкретной ветки — им подсвечивается путь до текущего узла. |
+| `--gr-tree-branch-weight` | тема компонента | var(--gr-font-semibold) | Вес подписи ветки в теме. Виды дерева (`compact`, `outline`) ставят свой вес поверх. |
 
 ### GrValue
 

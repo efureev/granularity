@@ -1,0 +1,5 @@
+{
+  "gr-radio-checked-bg": "color-mix(in srgb, var(--gr-selected) 10%, var(--gr-bg))",
+  "gr-radio-checked-hover-bg": "color-mix(in srgb, var(--gr-selected) 10%, var(--gr-bg))",
+  "gr-radio-dot": "var(--gr-selected)"
+}

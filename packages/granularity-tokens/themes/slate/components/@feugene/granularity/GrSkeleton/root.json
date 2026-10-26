@@ -1,0 +1,6 @@
+{
+  "gr-skeleton-bg": "var(--gr-muted)",
+  "gr-skeleton-brd": "var(--gr-brd)",
+  "gr-skeleton-pulse-opacity": "0.5",
+  "gr-skeleton-shine": "transparent"
+}

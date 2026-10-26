@@ -1,7 +1,8 @@
 import { mount } from '@vue/test-utils'
-import { computed, inject, nextTick, ref } from 'vue'
+import { computed, defineComponent, inject, nextTick, ref } from 'vue'
 import { describe, expect, it, vi } from 'vitest'
 
+import GrConfigProvider from '../../GrConfigProvider/GrConfigProvider.vue'
 import GrFormField from '../GrFormField.vue'
 import { GR_FORM_FIELD_KEY } from '../../shared/formFieldContext'
 import { GR_FORM_KEY } from '../../shared/formContext'
@@ -27,7 +28,7 @@ describe('granularity/GrFormField (unit)', () => {
     const label = wrapper.get('label')
     expect(label.text()).toBe('Email')
     expect(label.attributes('for')).toBe('email')
-    expect(label.attributes('class')).toContain('text-[var(--gr-muted-fg)]')
+    expect(label.attributes('class')).toContain('text-[var(--gr-form-field-label-fg)]')
     expect(label.attributes('class')).toContain('font-medium')
 
     const errorEl = wrapper.get('[data-gr-form-field-error]')
@@ -59,7 +60,7 @@ describe('GrFormField — токены', () => {
       slots: { default: '<input>' },
     })
 
-    expect(wrapper.get('[data-gr-form-field-required]').classes()).toContain('text-[var(--gr-invalid-text)]')
+    expect(wrapper.get('[data-gr-form-field-required]').classes()).toContain('text-[var(--gr-form-field-required-fg)]')
     expect(wrapper.get('[data-gr-form-field-error]').classes()).toContain('text-[var(--gr-invalid-text)]')
   })
 })
@@ -433,6 +434,26 @@ describe('GrFormField — раскладка без сдвигов', () => {
     const column = wrapper.get('[data-gr-form-field-control]').element
 
     expect(column.firstElementChild?.hasAttribute('data-gr-form-field-hint')).toBe(true)
+  })
+
+  it('`hintPosition="bottom"` ставит подсказку под контролом — пропом и из GrConfigProvider', () => {
+    const orderOf = (wrapper: ReturnType<typeof mount>) => [...wrapper.get('[data-gr-form-field-control]').element.children]
+      .map(child => child.hasAttribute('data-control') ? 'control' : child.hasAttribute('data-gr-form-field-hint') ? 'hint' : 'error')
+    const byProp = mount(GrFormField, {
+      props: { label: 'Number prefix', hint: 'Next invoice: INV-0419', hintPosition: 'bottom' },
+      slots: { default: '<input data-control>' },
+    })
+    const byConfig = mount(defineComponent({
+      components: { GrConfigProvider, GrFormField },
+      template: `
+        <GrConfigProvider :component-defaults="{ GrFormField: { hintPosition: 'bottom' } }">
+          <GrFormField label="Number prefix" hint="Next invoice: INV-0419"><input data-control></GrFormField>
+        </GrConfigProvider>
+      `,
+    }))
+
+    expect(orderOf(byProp)).toEqual(['control', 'hint', 'error'])
+    expect(orderOf(byConfig)).toEqual(['control', 'hint', 'error'])
   })
 
   it('подпись сбоку высотой с однострочный контрол и по центру', () => {

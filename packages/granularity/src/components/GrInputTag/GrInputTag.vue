@@ -897,6 +897,7 @@ const wrapperClassName = computed(() => {
     state: props.state,
     invalid: isInvalid.value,
     disabled: isDisabled.value,
+    readonly: isReadonly.value,
   })
 })
 

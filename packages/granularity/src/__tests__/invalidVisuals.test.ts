@@ -52,11 +52,11 @@ describe('invalid виден глазом', () => {
       expect(wrapper.get('[data-gr-slider-tooltip]').classes()).toContain('bg-[var(--gr-disabled-bg)]')
     })
 
-    it('обычный слайдер — акцентом, как раньше', () => {
+    it('обычный слайдер — цветом выбранного', () => {
       const wrapper = mountSlider({})
 
-      expect(wrapper.get('[data-gr-slider-fill]').classes()).toContain('bg-[var(--gr-slider-fill,var(--gr-primary))]')
-      expect(wrapper.get('[role="slider"]').classes()).toContain('border-[var(--gr-slider-thumb-border,var(--gr-slider-fill,var(--gr-primary)))]')
+      expect(wrapper.get('[data-gr-slider-fill]').classes()).toContain('bg-[var(--gr-slider-fill,var(--gr-selected))]')
+      expect(wrapper.get('[role="slider"]').classes()).toContain('border-[var(--gr-slider-thumb-border,var(--gr-slider-fill,var(--gr-selected)))]')
     })
   })
 
@@ -71,7 +71,7 @@ describe('invalid виден глазом', () => {
     const zone = wrapper.get('[data-gr-file-upload]').classes()
 
     expect(zone).toContain('border-[var(--gr-invalid-brd)]')
-    expect(zone).not.toContain('border-[var(--gr-brd)]')
+    expect(zone).not.toContain('border-[var(--gr-file-upload-zone-brd)]')
   })
 
   it('GrRating: пустые символы', () => {

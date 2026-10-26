@@ -1,0 +1,5 @@
+{
+  "gr-form-field-label-fg": "var(--gr-fg)",
+  "gr-form-field-label-weight": "var(--gr-font-medium)",
+  "gr-form-field-required-fg": "var(--gr-muted-fg)"
+}

@@ -39,13 +39,13 @@ export const rootPaddingBySize: Record<GrEmptyStateSize, string> = {
   lg: 'p-8',
 }
 
-export const iconBoxBaseClass = 'flex items-center justify-center border border-[var(--gr-brd)] bg-[var(--gr-muted)] text-[var(--gr-muted-fg)]'
+export const iconBoxBaseClass = 'flex items-center justify-center border border-[var(--gr-empty-state-icon-brd)] bg-[var(--gr-muted)] text-[var(--gr-empty-state-icon-fg)]'
 
 export const iconBoxBySize: Record<GrEmptyStateSize, string> = {
-  xs: 'h-8 w-8 rounded-[var(--gr-radius-md)]',
-  sm: 'h-10 w-10 rounded-[var(--gr-radius-md)]',
-  md: 'h-12 w-12 rounded-[var(--gr-radius-lg)]',
-  lg: 'h-14 w-14 rounded-[var(--gr-radius-lg)]',
+  xs: 'h-8 w-8 rounded-[var(--gr-empty-state-icon-radius-xs)]',
+  sm: 'h-10 w-10 rounded-[var(--gr-empty-state-icon-radius-sm)]',
+  md: 'h-12 w-12 rounded-[var(--gr-empty-state-icon-radius-md)]',
+  lg: 'h-14 w-14 rounded-[var(--gr-empty-state-icon-radius-lg)]',
 }
 
 /** Размер самой иконки в пикселях — `GrIcon` принимает число. */
@@ -60,13 +60,13 @@ export const iconSizeBySize: Record<GrEmptyStateSize, number> = {
  * `mb-0` гасит браузерный отступ снизу у настоящего заголовка: без сброса
  * карточка разъезжается по вертикали.
  */
-export const titleBaseClass = 'mb-0 font-700'
+export const titleBaseClass = 'mb-0 font-[var(--gr-font-display)] [font-weight:var(--gr-empty-state-title-weight)]'
 
 export const titleBySize: Record<GrEmptyStateSize, string> = {
-  xs: 'mt-2 text-[length:var(--gr-text-xs)] leading-[var(--gr-leading-xs)]',
-  sm: 'mt-3 text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)]',
-  md: 'mt-4 text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)]',
-  lg: 'mt-5 text-[length:var(--gr-text-base)] leading-[var(--gr-leading-base)]',
+  xs: 'mt-2 text-[length:var(--gr-empty-state-title-size-xs)] leading-[var(--gr-empty-state-title-leading-xs)]',
+  sm: 'mt-3 text-[length:var(--gr-empty-state-title-size-sm)] leading-[var(--gr-empty-state-title-leading-sm)]',
+  md: 'mt-4 text-[length:var(--gr-empty-state-title-size-md)] leading-[var(--gr-empty-state-title-leading-md)]',
+  lg: 'mt-5 text-[length:var(--gr-empty-state-title-size-lg)] leading-[var(--gr-empty-state-title-leading-lg)]',
 }
 
 export const descriptionBaseClass = 'text-[var(--gr-muted-fg)]'

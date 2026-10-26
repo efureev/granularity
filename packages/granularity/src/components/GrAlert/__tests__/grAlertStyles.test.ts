@@ -16,9 +16,7 @@ describe('grAlertStyles', () => {
 
         for (const [key, value] of Object.entries(colors)) {
           expect(value, `${tone}/${variant}.${key}`).not.toMatch(/#[0-9a-f]{3,8}\b/i)
-          // `transparent` — отсутствие цвета, а не выбор его: фон `outline`.
-          if (value !== 'transparent')
-            expect(value, `${tone}/${variant}.${key}`).toMatch(/var\(--gr-/)
+          expect(value, `${tone}/${variant}.${key}`).toMatch(/var\(--gr-/)
         }
       }
     }
@@ -29,8 +27,9 @@ describe('grAlertStyles', () => {
 
     // --gr-success (#10b981) на --gr-success-light даёт 2.24:1 — ниже 3:1
     // даже для нетекстовой графики; --gr-success-text даёт 6.78:1.
-    expect(colors.text).toBe('var(--gr-success-text)')
-    expect(colors.title).toBe('var(--gr-success-text)')
+    // Долю тона в тексте и заголовке задаёт тема, но тон в смеси — `-text`.
+    expect(colors.text).toBe('color-mix(in srgb, var(--gr-success-text) var(--gr-alert-soft-text-tone), var(--gr-alert-body-fg))')
+    expect(colors.title).toBe('color-mix(in srgb, var(--gr-success-text) var(--gr-alert-soft-title-tone), var(--gr-fg))')
     expect(colors.icon).toBe('var(--gr-success-text)')
     expect(colors.bg).toBe('var(--gr-success-light)')
   })
@@ -40,21 +39,21 @@ describe('grAlertStyles', () => {
 
     // Только рамка: фон страницы внутри карточки читался дырой — тёмной на
     // тёмной теме, серой плашкой на светлой.
-    expect(colors.bg).toBe('transparent')
+    expect(colors.bg).toBe('var(--gr-alert-outline-bg)')
     expect(colors.icon).toBe('var(--gr-danger-text)')
     expect(colors.title).toBe('var(--gr-fg)')
-    expect(colors.text).toBe('var(--gr-muted-fg)')
-    expect(colors.border).toContain('var(--gr-danger) 45%')
+    expect(colors.text).toBe('var(--gr-alert-body-fg)')
+    expect(colors.border).toBe('color-mix(in srgb, var(--gr-danger) var(--gr-alert-outline-brd-tone), var(--gr-alert-outline-brd))')
   })
 
   it('primary и neutral отображаются на семантические роли без -light/-text', () => {
     expect(resolveGrAlertColors('primary', 'soft')).toMatchObject({
       bg: 'var(--gr-accent)',
-      text: 'var(--gr-accent-fg)',
+      icon: 'var(--gr-accent-fg)',
     })
     expect(resolveGrAlertColors('neutral', 'soft')).toMatchObject({
       bg: 'var(--gr-muted)',
-      text: 'var(--gr-fg)',
+      icon: 'var(--gr-fg)',
     })
   })
 

@@ -212,17 +212,17 @@ describe('GrTabs — вид и содержимое вкладки', () => {
 
   it('pills — обойма с рамкой, line — ряд с подчёркиванием активной', () => {
     const pills = mount(GrTabs, { props: baseProps })
-    expect(pills.get('[role="tablist"]').classes()).toContain('bg-[var(--gr-muted)]')
-    expect(pills.get('[data-gr-tab]').classes()).toContain('bg-[var(--gr-card)]')
+    expect(pills.get('[role="tablist"]').classes()).toContain('bg-[var(--gr-tabs-pills-list-bg)]')
+    expect(pills.get('[data-gr-tab]').classes()).toContain('bg-[var(--gr-tabs-pills-active-bg)]')
 
     const line = mount(GrTabs, { props: { ...baseProps, variant: 'line' } })
     const list = line.get('[role="tablist"]')
     expect(list.classes()).toContain('border-b')
-    expect(list.classes()).not.toContain('bg-[var(--gr-muted)]')
+    expect(list.classes()).not.toContain('bg-[var(--gr-tabs-pills-list-bg)]')
 
     const active = line.get('[data-gr-tab]')
-    expect(active.classes()).toContain('border-[var(--gr-primary)]')
-    expect(active.classes()).not.toContain('bg-[var(--gr-card)]')
+    expect(active.classes()).toContain('border-[var(--gr-selected)]')
+    expect(active.classes()).not.toContain('bg-[var(--gr-tabs-pills-active-bg)]')
   })
 
   it('вариант читается из GrConfigProvider, локальный проп сильнее', () => {
@@ -239,7 +239,7 @@ describe('GrTabs — вид и содержимое вкладки', () => {
 
     expect(mount(Harness).get('[role="tablist"]').classes()).toContain('border-b')
     expect(mount(Harness, { props: { variant: 'pills' } }).get('[role="tablist"]').classes())
-      .toContain('bg-[var(--gr-muted)]')
+      .toContain('bg-[var(--gr-tabs-pills-list-bg)]')
   })
 
   it('иконка вкладки рендерится декоративной', () => {

@@ -9,10 +9,10 @@ export const shapes: Record<GrAvatarShape, string> = {
   square: 'rounded-[var(--gr-avatar-square-radius)]',
 }
 
-export const rootBaseClass = 'relative inline-flex shrink-0 items-center justify-center overflow-hidden border border-[var(--gr-brd)] font-700'
+export const rootBaseClass = 'relative inline-flex shrink-0 items-center justify-center overflow-hidden border border-[var(--gr-avatar-brd)] [font-weight:var(--gr-avatar-weight)]'
 
 /** Цвет по умолчанию. Отделён от базы, иначе он спорил бы с автоцветом порядком правил. */
-export const rootNeutralClass = 'bg-[var(--gr-muted)] text-[var(--gr-muted-fg)]'
+export const rootNeutralClass = 'bg-[var(--gr-muted)] text-[var(--gr-avatar-neutral-fg)]'
 
 /**
  * Палитра автоцвета: подложка и инициалы одним классом на слот.
@@ -95,7 +95,7 @@ export const groupBaseClass = 'inline-flex items-center'
 /** Перекрытие соседей: кольцо цветом фона отделяет аватары друг от друга. */
 export const groupItemClass = '-ml-2 first:ml-0 ring-2 ring-[var(--gr-bg)]'
 
-export const groupOverflowClass = 'inline-flex items-center justify-center bg-[var(--gr-muted)] text-[var(--gr-muted-fg)] font-700'
+export const groupOverflowClass = 'inline-flex items-center justify-center bg-[var(--gr-muted)] text-[var(--gr-avatar-neutral-fg)] [font-weight:var(--gr-avatar-weight)]'
 
 export function grAvatarClass(shape: GrAvatarShape): string {
   return [shapes[shape]].join(' ')

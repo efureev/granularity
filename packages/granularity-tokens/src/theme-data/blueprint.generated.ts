@@ -8,7 +8,7 @@ const data: GrThemeData = {
   "title": "Чертёж",
   "description": "Плоская точность: заливка, линия и шрифт. Без теней и бликов; главный сигнал — линия хода по нижней кромке.",
   "docs": "https://granularity.tech/themes/blueprint",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "targets": {
     "@feugene/granularity": "^3.1.0",
     "@feugene/granularity-charts": "^3.0.0",
@@ -27,6 +27,7 @@ const data: GrThemeData = {
     "gr-slate-800": "#1e293b",
     "gr-slate-900": "#0f172a",
     "gr-font-ui": "Inter, Roboto, system-ui, -apple-system, Segoe UI, Arial, sans-serif",
+    "gr-font-display": "var(--gr-font-ui)",
     "gr-font-mono": "'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace",
     "gr-text-2xs": "10px",
     "gr-text-xs": "12px",
@@ -99,9 +100,15 @@ const data: GrThemeData = {
     "gr-radius-xs": "3px",
     "gr-radius-sm": "4px",
     "gr-radius-control": "6px",
+    "gr-radius-control-xs": "var(--gr-radius-control)",
+    "gr-radius-control-sm": "var(--gr-radius-control)",
+    "gr-radius-control-md": "var(--gr-radius-control)",
+    "gr-radius-control-lg": "var(--gr-radius-control)",
+    "gr-input-focus-ring-width": "2px",
     "gr-radius-md": "8px",
     "gr-radius-lg": "12px",
     "gr-radius-xl": "16px",
+    "gr-radius-overlay": "var(--gr-radius-xl)",
     "gr-radius-full": "9999px",
     "gr-shadow-0": "none",
     "gr-duration-fast": "150ms",
@@ -134,8 +141,14 @@ const data: GrThemeData = {
         "gr-secondary-fg": "#1e293b",
         "gr-overlay-bg": "rgb(15 23 42 / 0.45)",
         "gr-brd": "#e2e8f0",
+        "gr-brd-strong": "var(--gr-brd)",
         "gr-input": "#e2e8f0",
+        "gr-input-hover": "var(--gr-input)",
+        "gr-input-focus-brd": "var(--gr-input)",
+        "gr-input-readonly-bg": "var(--gr-bg)",
+        "gr-input-readonly-brd": "var(--gr-input)",
         "gr-control-brd": "#64748b",
+        "gr-control-brd-hover": "var(--gr-control-brd)",
         "gr-ring": "#6366f1",
         "gr-disabled-bg": "#f1f5f9",
         "gr-disabled-fg": "#94a3b8",
@@ -147,6 +160,9 @@ const data: GrThemeData = {
         "gr-primary-fg": "#ffffff",
         "gr-accent": "#eef2ff",
         "gr-accent-fg": "#3730a3",
+        "gr-selected": "var(--gr-primary)",
+        "gr-selected-fg": "var(--gr-primary-fg)",
+        "gr-selected-hover": "var(--gr-selected)",
         "gr-success": "#10b981",
         "gr-success-light": "#d1fae5",
         "gr-success-fg": "#0f172a",
@@ -259,8 +275,14 @@ const data: GrThemeData = {
         "gr-secondary-fg": "#f1f5f9",
         "gr-overlay-bg": "rgb(2 6 23 / 0.65)",
         "gr-brd": "#334155",
+        "gr-brd-strong": "var(--gr-brd)",
         "gr-input": "#334155",
+        "gr-input-hover": "var(--gr-input)",
+        "gr-input-focus-brd": "var(--gr-input)",
+        "gr-input-readonly-bg": "var(--gr-bg)",
+        "gr-input-readonly-brd": "var(--gr-input)",
         "gr-control-brd": "#94a3b8",
+        "gr-control-brd-hover": "var(--gr-control-brd)",
         "gr-ring": "#818cf8",
         "gr-disabled-bg": "#273548",
         "gr-disabled-fg": "#64748b",
@@ -272,6 +294,9 @@ const data: GrThemeData = {
         "gr-primary-fg": "#0f172a",
         "gr-accent": "#1e1b4b",
         "gr-accent-fg": "#c7d2fe",
+        "gr-selected": "var(--gr-primary)",
+        "gr-selected-fg": "var(--gr-primary-fg)",
+        "gr-selected-hover": "var(--gr-selected)",
         "gr-success": "#34d399",
         "gr-success-light": "#194536",
         "gr-success-fg": "#0f172a",
@@ -377,6 +402,25 @@ const data: GrThemeData = {
           "gr-affix-shadow-bottom": "0 -8px 24px -12px color-mix(in srgb, var(--gr-fg) 45%, transparent)"
         }
       },
+      "GrAlert": {
+        "root": {
+          "gr-alert-radius": "var(--gr-radius-lg)",
+          "gr-alert-title-weight": "var(--gr-font-semibold)",
+          "gr-alert-body-fg": "var(--gr-muted-fg)",
+          "gr-alert-soft-brd": "var(--gr-brd)",
+          "gr-alert-soft-brd-tone": "35%",
+          "gr-alert-soft-title-tone": "100%",
+          "gr-alert-soft-text-tone": "100%",
+          "gr-alert-outline-bg": "transparent",
+          "gr-alert-outline-brd": "var(--gr-brd)",
+          "gr-alert-outline-brd-tone": "45%"
+        }
+      },
+      "GrAutocomplete": {
+        "root": {
+          "gr-autocomplete-option-active-bg": "color-mix(in srgb, var(--gr-muted) 30%, transparent)"
+        }
+      },
       "GrAvatar": {
         "root": {
           "gr-avatar-1-bg": "var(--gr-info-light)",
@@ -391,7 +435,10 @@ const data: GrThemeData = {
           "gr-avatar-5-fg": "var(--gr-azure-text)",
           "gr-avatar-6-bg": "var(--gr-slate-light)",
           "gr-avatar-6-fg": "var(--gr-slate-text)",
-          "gr-avatar-square-radius": "10px"
+          "gr-avatar-square-radius": "10px",
+          "gr-avatar-brd": "var(--gr-brd)",
+          "gr-avatar-weight": "var(--gr-font-bold)",
+          "gr-avatar-neutral-fg": "var(--gr-muted-fg)"
         }
       },
       "GrBadge": {
@@ -401,7 +448,8 @@ const data: GrThemeData = {
           "gr-badge-semi-radius-lg": "7px",
           "gr-badge-semi-radius-md": "5px",
           "gr-badge-semi-radius-sm": "3px",
-          "gr-badge-semi-radius-xs": "3px"
+          "gr-badge-semi-radius-xs": "3px",
+          "gr-badge-light-brd": "100%"
         },
         "modes": {
           "dark": {
@@ -436,6 +484,12 @@ const data: GrThemeData = {
             "gr-badge-warning-bg": "var(--gr-warning-solid)",
             "gr-badge-warning-fg": "var(--gr-warning-solid-fg)"
           }
+        }
+      },
+      "GrBreadcrumbs": {
+        "root": {
+          "gr-breadcrumbs-separator-fg": "var(--gr-muted-fg)",
+          "gr-breadcrumbs-current-weight": "var(--gr-font-semibold)"
         }
       },
       "GrButton": {
@@ -565,7 +619,34 @@ const data: GrThemeData = {
           "gr-button-warning-glow": "transparent",
           "gr-button-warning-soft-bg": "var(--gr-warning-light)",
           "gr-button-warning-soft-bg-active": "color-mix(in srgb, var(--gr-warning) 16%, var(--gr-button-warning-soft-bg))",
-          "gr-button-warning-soft-bg-hover": "color-mix(in srgb, var(--gr-warning) 10%, var(--gr-button-warning-soft-bg))"
+          "gr-button-warning-soft-bg-hover": "color-mix(in srgb, var(--gr-warning) 10%, var(--gr-button-warning-soft-bg))",
+          "gr-button-primary-border-hover": "var(--gr-primary)",
+          "gr-button-primary-border-active": "var(--gr-primary-active)",
+          "gr-button-primary-border-soft-hover": "var(--gr-button-primary-border)",
+          "gr-button-neutral-border-hover": "var(--gr-brd-hover)",
+          "gr-button-neutral-border-active": "var(--gr-brd-active)",
+          "gr-button-neutral-border-soft-hover": "var(--gr-button-neutral-border)",
+          "gr-button-success-border-hover": "var(--gr-success)",
+          "gr-button-success-border-active": "var(--gr-success-active)",
+          "gr-button-success-border-soft-hover": "var(--gr-button-success-border)",
+          "gr-button-warning-border-hover": "var(--gr-warning)",
+          "gr-button-warning-border-active": "var(--gr-warning-active)",
+          "gr-button-warning-border-soft-hover": "var(--gr-button-warning-border)",
+          "gr-button-danger-border-hover": "var(--gr-danger)",
+          "gr-button-danger-border-active": "var(--gr-danger-active)",
+          "gr-button-danger-border-soft-hover": "var(--gr-button-danger-border)",
+          "gr-button-info-border-hover": "var(--gr-info)",
+          "gr-button-info-border-active": "var(--gr-info-active)",
+          "gr-button-info-border-soft-hover": "var(--gr-button-info-border)",
+          "gr-button-slate-border-hover": "var(--gr-slate)",
+          "gr-button-slate-border-active": "var(--gr-slate-active)",
+          "gr-button-slate-border-soft-hover": "var(--gr-button-slate-border)",
+          "gr-button-azure-border-hover": "var(--gr-azure)",
+          "gr-button-azure-border-active": "var(--gr-azure-active)",
+          "gr-button-azure-border-soft-hover": "var(--gr-button-azure-border)",
+          "gr-button-disabled-outline-brd": "var(--gr-button-disabled-brd)",
+          "gr-button-press-scale": "0.98",
+          "gr-button-neutral-border-soft": "var(--gr-button-neutral-border)"
         },
         "modes": {
           "dark": {
@@ -578,16 +659,43 @@ const data: GrThemeData = {
           }
         }
       },
+      "GrButtonGroup": {
+        "root": {
+          "gr-button-group-tray-radius": "var(--gr-radius-md)"
+        }
+      },
+      "GrCard": {
+        "root": {
+          "gr-card-title-size": "var(--gr-text-sm)",
+          "gr-card-title-leading": "var(--gr-leading-sm)",
+          "gr-card-title-weight": "var(--gr-font-semibold)",
+          "gr-card-padding-sm": "0.75rem",
+          "gr-card-padding-md": "1rem",
+          "gr-card-padding-lg": "1.5rem",
+          "gr-card-hover-bg": "var(--gr-muted)",
+          "gr-card-hover-brd": "var(--gr-brd)"
+        }
+      },
       "GrCarousel": {
         "root": {
           "gr-carousel-dot-ring-offset": "2px",
           "gr-carousel-dot-ring-width": "2px"
         }
       },
+      "GrChip": {
+        "root": {
+          "gr-chip-neutral-bg": "var(--gr-muted)",
+          "gr-chip-neutral-fg": "var(--gr-fg)",
+          "gr-chip-neutral-brd": "var(--gr-brd)",
+          "gr-chip-neutral-hover-bg": "var(--gr-muted)",
+          "gr-chip-neutral-hover-brd": "var(--gr-brd)"
+        }
+      },
       "GrColorPicker": {
         "root": {
           "gr-color-picker-area-thumb-border": "#fff",
-          "gr-color-picker-area-thumb-ring": "rgba(0, 0, 0, 0.45)"
+          "gr-color-picker-area-thumb-ring": "rgba(0, 0, 0, 0.45)",
+          "gr-color-picker-trigger-hover-brd": "var(--gr-primary)"
         }
       },
       "GrCommandPalette": {
@@ -595,7 +703,11 @@ const data: GrThemeData = {
           "gr-command-active-bg": "color-mix(in srgb, var(--gr-muted) 45%, transparent)",
           "gr-command-input-font-size": "15px",
           "gr-command-item-radius": "10px",
-          "gr-command-match-bg": "color-mix(in srgb, var(--gr-primary) 22%, transparent)"
+          "gr-command-match-bg": "color-mix(in srgb, var(--gr-primary) 22%, transparent)",
+          "gr-command-group-label-transform": "uppercase",
+          "gr-command-group-label-tracking": "0.025em",
+          "gr-command-match-weight": "var(--gr-font-regular)",
+          "gr-command-footer-bg": "transparent"
         }
       },
       "GrDataTable": {
@@ -604,12 +716,96 @@ const data: GrThemeData = {
           "gr-datatable-detail-bg": "color-mix(in srgb, var(--gr-muted) 45%, transparent)",
           "gr-datatable-drag-indicator-width": "2px",
           "gr-datatable-pinned-shadow": "4px 0 6px -4px rgba(0, 0, 0, 0.25)",
-          "gr-datatable-pinned-shadow-end": "-4px 0 6px -4px rgba(0, 0, 0, 0.25)"
+          "gr-datatable-pinned-shadow-end": "-4px 0 6px -4px rgba(0, 0, 0, 0.25)",
+          "gr-datatable-head-weight": "var(--gr-font-bold)",
+          "gr-datatable-first-row-brd": "var(--gr-brd)"
+        }
+      },
+      "GrDescriptionList": {
+        "root": {
+          "gr-description-list-row-space": "0.375rem",
+          "gr-description-list-divided-space": "0.25rem"
+        }
+      },
+      "GrDialog": {
+        "root": {
+          "gr-dialog-title-size": "var(--gr-control-text-md)",
+          "gr-dialog-title-leading": "var(--gr-control-leading-md)",
+          "gr-dialog-title-weight": "var(--gr-font-bold)",
+          "gr-dialog-divider": "var(--gr-brd)"
         }
       },
       "GrDivider": {
         "root": {
           "gr-divider-thickness": "1px"
+        }
+      },
+      "GrDrawer": {
+        "root": {
+          "gr-drawer-title-size": "var(--gr-text-sm)",
+          "gr-drawer-title-leading": "var(--gr-leading-sm)",
+          "gr-drawer-title-weight": "var(--gr-font-bold)",
+          "gr-drawer-shadow": "var(--gr-shadow-2)",
+          "gr-drawer-radius": "var(--gr-radius-none)"
+        }
+      },
+      "GrDropdownMenu": {
+        "root": {
+          "gr-dropdown-menu-item-height": "2.5rem",
+          "gr-dropdown-menu-item-px": "1rem",
+          "gr-dropdown-menu-item-py": "0.625rem",
+          "gr-dropdown-menu-item-hover-bg": "var(--gr-accent)",
+          "gr-dropdown-menu-item-hover-fg": "var(--gr-accent-fg)",
+          "gr-dropdown-menu-item-danger-hover-bg": "var(--gr-accent)",
+          "gr-dropdown-menu-item-danger-hover-fg": "var(--gr-accent-fg)",
+          "gr-dropdown-menu-item-disabled-bg": "var(--gr-muted)",
+          "gr-dropdown-menu-item-disabled-fg": "var(--gr-muted-fg)"
+        }
+      },
+      "GrEmptyState": {
+        "root": {
+          "gr-empty-state-title-size-xs": "var(--gr-text-xs)",
+          "gr-empty-state-title-leading-xs": "var(--gr-leading-xs)",
+          "gr-empty-state-title-size-sm": "var(--gr-text-sm)",
+          "gr-empty-state-title-leading-sm": "var(--gr-leading-sm)",
+          "gr-empty-state-title-size-md": "var(--gr-text-sm)",
+          "gr-empty-state-title-leading-md": "var(--gr-leading-sm)",
+          "gr-empty-state-title-size-lg": "var(--gr-text-base)",
+          "gr-empty-state-title-leading-lg": "var(--gr-leading-base)",
+          "gr-empty-state-title-weight": "var(--gr-font-bold)",
+          "gr-empty-state-icon-brd": "var(--gr-brd)",
+          "gr-empty-state-icon-fg": "var(--gr-muted-fg)",
+          "gr-empty-state-icon-radius-xs": "var(--gr-radius-md)",
+          "gr-empty-state-icon-radius-sm": "var(--gr-radius-md)",
+          "gr-empty-state-icon-radius-md": "var(--gr-radius-lg)",
+          "gr-empty-state-icon-radius-lg": "var(--gr-radius-lg)"
+        }
+      },
+      "GrFileUpload": {
+        "root": {
+          "gr-file-upload-zone-bg": "var(--gr-card)",
+          "gr-file-upload-zone-brd": "var(--gr-brd)",
+          "gr-file-upload-zone-hover-bg": "var(--gr-muted)",
+          "gr-file-upload-zone-over-bg": "var(--gr-muted)",
+          "gr-file-upload-zone-over-brd": "var(--gr-ring)",
+          "gr-file-upload-icon-brd": "var(--gr-brd)",
+          "gr-file-upload-icon-fg": "var(--gr-muted-fg)",
+          "gr-file-upload-icon-radius-xs": "var(--gr-radius-md)",
+          "gr-file-upload-icon-radius-sm": "var(--gr-radius-md)",
+          "gr-file-upload-icon-radius-md": "var(--gr-radius-lg)",
+          "gr-file-upload-icon-radius-lg": "var(--gr-radius-lg)",
+          "gr-file-upload-list-gap": "0.25rem",
+          "gr-file-upload-item-bg": "transparent",
+          "gr-file-upload-item-brd": "transparent",
+          "gr-file-upload-item-radius": "0px",
+          "gr-file-upload-item-padding": "0px"
+        }
+      },
+      "GrFormField": {
+        "root": {
+          "gr-form-field-label-fg": "var(--gr-muted-fg)",
+          "gr-form-field-label-weight": "var(--gr-font-regular)",
+          "gr-form-field-required-fg": "var(--gr-invalid-text)"
         }
       },
       "GrImageViewer": {
@@ -624,6 +820,36 @@ const data: GrThemeData = {
           "gr-image-viewer-scrim": "rgb(0 0 0 / 0.6)"
         }
       },
+      "GrLoading": {
+        "root": {
+          "gr-loading-panel-bg": "var(--gr-card)",
+          "gr-loading-panel-radius": "var(--gr-radius-md)",
+          "gr-loading-panel-shadow": "var(--gr-shadow-2)"
+        }
+      },
+      "GrModal": {
+        "root": {
+          "gr-modal-shadow": "var(--gr-shadow-2)",
+          "gr-modal-width-sm": "420px",
+          "gr-modal-width-md": "560px",
+          "gr-modal-width-lg": "720px",
+          "gr-modal-width-xl": "920px"
+        }
+      },
+      "GrOtpInput": {
+        "root": {
+          "gr-otp-input-focus-brd": "var(--gr-primary)",
+          "gr-otp-input-caret-color": "var(--gr-primary)"
+        }
+      },
+      "GrPagination": {
+        "root": {
+          "gr-pagination-page-fg": "var(--gr-muted-fg)",
+          "gr-pagination-page-hover-bg": "var(--gr-accent)",
+          "gr-pagination-page-hover-fg": "var(--gr-accent-fg)",
+          "gr-pagination-page-weight": "var(--gr-font-semibold)"
+        }
+      },
       "GrProgressBar": {
         "root": {
           "gr-progress-azure-bg": "var(--gr-azure)",
@@ -636,20 +862,39 @@ const data: GrThemeData = {
           "gr-progress-neutral-bg": "var(--gr-muted-fg)",
           "gr-progress-slate-bg": "var(--gr-slate)",
           "gr-progress-success-bg": "var(--gr-success)",
-          "gr-progress-warning-bg": "var(--gr-warning)"
+          "gr-progress-warning-bg": "var(--gr-warning)",
+          "gr-progress-track-bg": "var(--gr-muted)",
+          "gr-progress-height-xs": "0.25rem",
+          "gr-progress-height-sm": "0.375rem",
+          "gr-progress-height-md": "0.5rem",
+          "gr-progress-height-lg": "0.75rem"
         }
       },
       "GrProgressCircle": {
         "root": {
-          "gr-progress-circle-cap": "round"
+          "gr-progress-circle-cap": "round",
+          "gr-progress-circle-track-bg": "var(--gr-muted)"
+        }
+      },
+      "GrRadio": {
+        "root": {
+          "gr-radio-checked-bg": "color-mix(in srgb, var(--gr-selected) 10%, var(--gr-bg))",
+          "gr-radio-checked-hover-bg": "color-mix(in srgb, var(--gr-selected) 10%, var(--gr-bg))",
+          "gr-radio-dot": "var(--gr-selected)"
         }
       },
       "GrRating": {
         "root": {
-          "gr-rating-void-color": "color-mix(in srgb, var(--gr-muted-fg) 35%, transparent)"
+          "gr-rating-void-color": "color-mix(in srgb, var(--gr-muted-fg) 35%, transparent)",
+          "gr-rating-void-fill": "currentColor",
+          "gr-rating-void-stroke": "transparent",
+          "gr-rating-stroke-width": "0"
         }
       },
       "GrSegmented": {
+        "root": {
+          "gr-segmented-label-weight": "var(--gr-font-semibold)"
+        },
         "modes": {
           "dark": {
             "gr-segmented-indicator-highlight-shadow": "0 0 0 1px rgba(248, 250, 252, 0.08)"
@@ -659,6 +904,30 @@ const data: GrThemeData = {
           }
         }
       },
+      "GrSelect": {
+        "root": {
+          "gr-select-option-active-bg": "color-mix(in srgb, var(--gr-muted) 30%, transparent)"
+        }
+      },
+      "GrSidebar": {
+        "root": {
+          "gr-sidebar-item-active-bg": "var(--gr-muted)",
+          "gr-sidebar-item-active-weight": "var(--gr-font-semibold)",
+          "gr-sidebar-group-label-size": "var(--gr-text-2xs)",
+          "gr-sidebar-group-label-leading": "var(--gr-leading-2xs)",
+          "gr-sidebar-group-label-weight": "var(--gr-font-bold)",
+          "gr-sidebar-group-label-transform": "uppercase",
+          "gr-sidebar-group-label-tracking": "0.025em"
+        }
+      },
+      "GrSkeleton": {
+        "root": {
+          "gr-skeleton-bg": "var(--gr-muted)",
+          "gr-skeleton-brd": "var(--gr-brd)",
+          "gr-skeleton-pulse-opacity": "0.5",
+          "gr-skeleton-shine": "transparent"
+        }
+      },
       "GrSortableList": {
         "root": {
           "gr-sortable-indicator-width": "2px"
@@ -666,19 +935,78 @@ const data: GrThemeData = {
       },
       "GrSteps": {
         "root": {
-          "gr-steps-connector-size": "2px"
+          "gr-steps-connector-size": "2px",
+          "gr-steps-done-bg": "var(--gr-primary-solid)",
+          "gr-steps-done-fg": "var(--gr-primary-solid-fg)",
+          "gr-steps-current-fg": "var(--gr-primary-text)"
+        }
+      },
+      "GrSwitch": {
+        "root": {
+          "gr-switch-off-bg": "var(--gr-muted)",
+          "gr-switch-thumb-bg": "var(--gr-card)",
+          "gr-switch-thumb-shadow": "var(--gr-shadow-1)",
+          "gr-switch-track-height-xs": "1rem",
+          "gr-switch-track-width-xs": "1.75rem",
+          "gr-switch-track-height-sm": "1.25rem",
+          "gr-switch-track-width-sm": "2.25rem",
+          "gr-switch-track-height-md": "1.5rem",
+          "gr-switch-track-width-md": "2.75rem",
+          "gr-switch-track-height-lg": "1.75rem",
+          "gr-switch-track-width-lg": "3.5rem",
+          "gr-switch-text-track-width-md": "2.75rem",
+          "gr-switch-text-track-width-lg": "3.5rem"
         }
       },
       "GrTable": {
         "root": {
-          "gr-table-sticky-column-shadow": "4px 0 6px -4px rgba(0, 0, 0, 0.25)"
+          "gr-table-sticky-column-shadow": "4px 0 6px -4px rgba(0, 0, 0, 0.25)",
+          "gr-table-head-bg": "var(--gr-muted)",
+          "gr-table-hover-share": "45%",
+          "gr-table-stripe-share": "35%",
+          "gr-table-head-line": "transparent",
+          "gr-table-head-line-width": "0px"
+        }
+      },
+      "GrTabs": {
+        "root": {
+          "gr-tabs-font-weight": "var(--gr-font-semibold)",
+          "gr-tabs-pills-list-bg": "var(--gr-muted)",
+          "gr-tabs-pills-list-brd": "var(--gr-brd)",
+          "gr-tabs-pills-radius": "var(--gr-radius-md)",
+          "gr-tabs-pills-active-bg": "var(--gr-card)",
+          "gr-tabs-pills-active-fg": "var(--gr-fg)",
+          "gr-tabs-pills-active-brd": "var(--gr-brd)",
+          "gr-tabs-pills-hover-bg": "color-mix(in srgb, var(--gr-card) 70%, transparent)"
         }
       },
       "GrTimeline": {
         "root": {
           "gr-timeline-axis-width": "2px",
           "gr-timeline-dash": "4px",
-          "gr-timeline-marker-ring": "2px"
+          "gr-timeline-marker-ring": "2px",
+          "gr-timeline-neutral-marker": "var(--gr-muted-fg)",
+          "gr-timeline-neutral-outline": "var(--gr-muted-fg)",
+          "gr-timeline-title-weight": "var(--gr-font-semibold)",
+          "gr-timeline-group-title-transform": "uppercase",
+          "gr-timeline-group-title-tracking": "0.025em"
+        }
+      },
+      "GrToaster": {
+        "root": {
+          "gr-toaster-brd": "var(--gr-brd)",
+          "gr-toaster-shadow": "var(--gr-shadow-2)",
+          "gr-toaster-title-weight": "var(--gr-font-bold)",
+          "gr-toaster-icon-tone": "100%"
+        }
+      },
+      "GrTooltip": {
+        "root": {
+          "gr-tooltip-bg": "var(--gr-popover)",
+          "gr-tooltip-fg": "var(--gr-popover-fg)",
+          "gr-tooltip-brd": "var(--gr-brd)",
+          "gr-tooltip-radius": "var(--gr-radius-control)",
+          "gr-tooltip-shadow": "var(--gr-shadow-1)"
         }
       },
       "GrTransfer": {
@@ -687,6 +1015,11 @@ const data: GrThemeData = {
           "gr-transfer-drop-bg": "color-mix(in srgb, var(--gr-primary) 6%, transparent)",
           "gr-transfer-indicator-width": "3px",
           "gr-transfer-selected-bg": "color-mix(in srgb, var(--gr-primary) 12%, transparent)"
+        }
+      },
+      "GrTree": {
+        "root": {
+          "gr-tree-branch-weight": "var(--gr-font-semibold)"
         }
       }
     },

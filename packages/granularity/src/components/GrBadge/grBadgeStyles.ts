@@ -54,19 +54,24 @@ export const semiRadiusClassBySize: Record<GrBadgeSize, string> = {
   md: 'rounded-[var(--gr-badge-semi-radius-md)]',
   lg: 'rounded-[var(--gr-badge-semi-radius-lg)]',
 }
+/**
+ * Силу рамки мягкого вида задаёт тема (`--gr-badge-light-brd`): 100% — рамка
+ * тона, 0% — рамка цвета подложки, то есть её нет. Сама рамка остаётся, и метка
+ * не меняет размер.
+ */
 export const lightToneClassByTone: Record<GrBadgeTone, string> = {
-  neutral: 'bg-[var(--gr-muted)] text-[var(--gr-fg)] border-[var(--gr-brd)]',
+  neutral: 'bg-[var(--gr-muted)] text-[var(--gr-fg)] border-[color-mix(in_srgb,var(--gr-brd)_var(--gr-badge-light-brd),var(--gr-muted))]',
   primary:
-    'bg-[var(--gr-accent)] text-[var(--gr-accent-fg)] border-[color-mix(in_srgb,var(--gr-primary)_30%,var(--gr-accent))]',
+    'bg-[var(--gr-accent)] text-[var(--gr-accent-fg)] border-[color-mix(in_srgb,color-mix(in_srgb,var(--gr-primary)_30%,var(--gr-accent))_var(--gr-badge-light-brd),var(--gr-accent))]',
   // Текст на тонированной подложке — только `-text`, никогда не насыщенный тон:
   // `--gr-success` на `--gr-success-light` даёт 2.24:1, `-text` — 6.78:1.
   // slate/azure ниже уже были сделаны правильно.
-  success: 'bg-[var(--gr-success-light)] text-[var(--gr-success-text)] border-[color-mix(in_srgb,var(--gr-success)_30%,var(--gr-success-light))]',
-  warning: 'bg-[var(--gr-warning-light)] text-[var(--gr-warning-text)] border-[color-mix(in_srgb,var(--gr-warning)_30%,var(--gr-warning-light))]',
-  danger: 'bg-[var(--gr-danger-light)] text-[var(--gr-danger-text)] border-[color-mix(in_srgb,var(--gr-danger)_30%,var(--gr-danger-light))]',
-  info: 'bg-[var(--gr-info-light)] text-[var(--gr-info-text)] border-[color-mix(in_srgb,var(--gr-info)_30%,var(--gr-info-light))]',
-  slate: 'bg-[var(--gr-slate-light)] text-[var(--gr-slate-text)] border-[color-mix(in_srgb,var(--gr-slate)_30%,var(--gr-slate-light))]',
-  azure: 'bg-[var(--gr-azure-light)] text-[var(--gr-azure-text)] border-[color-mix(in_srgb,var(--gr-azure)_30%,var(--gr-azure-light))]',
+  success: 'bg-[var(--gr-success-light)] text-[var(--gr-success-text)] border-[color-mix(in_srgb,color-mix(in_srgb,var(--gr-success)_30%,var(--gr-success-light))_var(--gr-badge-light-brd),var(--gr-success-light))]',
+  warning: 'bg-[var(--gr-warning-light)] text-[var(--gr-warning-text)] border-[color-mix(in_srgb,color-mix(in_srgb,var(--gr-warning)_30%,var(--gr-warning-light))_var(--gr-badge-light-brd),var(--gr-warning-light))]',
+  danger: 'bg-[var(--gr-danger-light)] text-[var(--gr-danger-text)] border-[color-mix(in_srgb,color-mix(in_srgb,var(--gr-danger)_30%,var(--gr-danger-light))_var(--gr-badge-light-brd),var(--gr-danger-light))]',
+  info: 'bg-[var(--gr-info-light)] text-[var(--gr-info-text)] border-[color-mix(in_srgb,color-mix(in_srgb,var(--gr-info)_30%,var(--gr-info-light))_var(--gr-badge-light-brd),var(--gr-info-light))]',
+  slate: 'bg-[var(--gr-slate-light)] text-[var(--gr-slate-text)] border-[color-mix(in_srgb,color-mix(in_srgb,var(--gr-slate)_30%,var(--gr-slate-light))_var(--gr-badge-light-brd),var(--gr-slate-light))]',
+  azure: 'bg-[var(--gr-azure-light)] text-[var(--gr-azure-text)] border-[color-mix(in_srgb,color-mix(in_srgb,var(--gr-azure)_30%,var(--gr-azure-light))_var(--gr-badge-light-brd),var(--gr-azure-light))]',
 }
 /**
  * Заливка filled-бейджа идёт через покомпонентный слой `--gr-badge-{tone}-*`, а

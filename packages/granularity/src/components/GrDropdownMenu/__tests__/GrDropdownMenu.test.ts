@@ -157,7 +157,7 @@ describe('GrDropdownMenuItem — переключатели, иконка и ш�
       slots: { default: 'Недоступно' },
     })
 
-    expect(wrapper.classes()).toContain('bg-[var(--gr-muted)]')
+    expect(wrapper.classes()).toContain('bg-[var(--gr-dropdown-menu-item-disabled-bg)]')
     expect(wrapper.classes().some(cls => cls.startsWith('opacity-'))).toBe(false)
   })
 
@@ -394,7 +394,7 @@ describe('GrDropdownMenu — геометрия подсветки', () => {
     const wrapper = mount(GrDropdownMenuItem, { props: { disabled: true }, slots: { default: 'Открыть' } })
 
     expect(wrapper.classes()).toContain('rounded-[var(--gr-radius-md)]')
-    expect(wrapper.classes()).toContain('bg-[var(--gr-muted)]')
+    expect(wrapper.classes()).toContain('bg-[var(--gr-dropdown-menu-item-disabled-bg)]')
   })
 
   /**

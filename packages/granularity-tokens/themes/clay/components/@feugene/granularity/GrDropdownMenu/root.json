@@ -1,0 +1,10 @@
+{
+  "gr-dropdown-menu-item-height": "2.25rem",
+  "gr-dropdown-menu-item-px": "0.625rem",
+  "gr-dropdown-menu-item-py": "0.5rem",
+  "gr-dropdown-menu-item-hover-fg": "var(--gr-fg)",
+  "gr-dropdown-menu-item-danger-hover-bg": "color-mix(in srgb, var(--gr-danger) 10%, transparent)",
+  "gr-dropdown-menu-item-danger-hover-fg": "var(--gr-danger-text)",
+  "gr-dropdown-menu-item-disabled-bg": "transparent",
+  "gr-dropdown-menu-item-disabled-fg": "var(--gr-disabled-fg)"
+}

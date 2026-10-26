@@ -43,6 +43,7 @@ import {
   columnHandleClass,
   columnMenuTriggerClass,
   columnPinnedClass,
+  columnPinnedSelectedClass,
   columnPinnedHeadClass,
   columnResizerClass,
   columnResizerHoverClass,
@@ -1080,7 +1081,7 @@ defineSlots<{
           v-for="(col, colIndex) in orderedColumns"
           :key="col.key"
           :ref="(el) => { registerEl(headerCellEls, String(col.key), el); registerCell(HEADER_ROW_INDEX, dataColumnIndex(colIndex), el) }"
-          class="font-700"
+          class="[font-weight:var(--gr-datatable-head-weight)]"
           :tabindex="cellNavigation ? grid.tabindexFor(HEADER_ROW_INDEX, dataColumnIndex(colIndex)) : undefined"
           :data-column-key="col.key"
           :class="[
@@ -1258,8 +1259,11 @@ defineSlots<{
         data-gr-datatable-row-group
       >
       <tr
-        class="border-t border-[var(--gr-brd)]"
+        class="border-t"
         :class="[
+          // Над первой строкой — граница с шапкой: тема, которая рисует линию
+          // шапки (`--gr-table-head-line`), гасит её, чтобы линия не двоилась.
+          index === 0 ? 'border-[var(--gr-datatable-first-row-brd)]' : 'border-[var(--gr-brd)]',
           isRowSelected(row) ? rowSelectedClass : '',
           rowClassName(row, index),
         ]"
@@ -1308,8 +1312,7 @@ defineSlots<{
         :class="[
           selectColumnClass,
           cellClass,
-          hasPinnedLeft ? columnPinnedClass : '',
-          hasPinnedLeft && isRowSelected(row) ? rowSelectedClass : '',
+          hasPinnedLeft ? (isRowSelected(row) ? columnPinnedSelectedClass : columnPinnedClass) : '',
         ]"
         :style="hasPinnedLeft ? { left: '0px' } : undefined"
         :tabindex="cellNavigation ? grid.tabindexFor(index, selectColumnIndex) : undefined"
@@ -1336,8 +1339,7 @@ defineSlots<{
         :class="[
           cellClass,
           cellAlign(col),
-          ...pinnedCellClass(col, colIndex),
-          col.pinned && isRowSelected(row) ? rowSelectedClass : '',
+          ...pinnedCellClass(col, colIndex, false, isRowSelected(row)),
         ]"
         :style="{ ...columnWidthStyle(widthOf(col)), ...pinnedStyleOf(col) }"
         :tabindex="cellNavigation ? grid.tabindexFor(index, dataColumnIndex(colIndex)) : undefined"

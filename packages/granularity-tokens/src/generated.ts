@@ -64,6 +64,11 @@ export const grFoundationTokens: GrFoundationToken[] = [
     "description": "Основной стек шрифта для интерфейсного текста и большинства компонентных подписей."
   },
   {
+    "name": "--gr-font-display",
+    "section": "Typography: font families",
+    "description": "Стек шрифта заголовков компонентов: заголовок карточки, окна, шторки и пустого состояния. Тема без своей гарнитуры заголовков ставит сюда `var(--gr-font-ui)`."
+  },
+  {
     "name": "--gr-font-mono",
     "section": "Typography: font families",
     "description": "Моноширинный стек для кода, числовых значений и технических подписей."
@@ -424,6 +429,31 @@ export const grFoundationTokens: GrFoundationToken[] = [
     "description": "Радиус контрола и мелкой интерактивной детали внутри него: оболочка поля, чип, кнопка-крестик, фокус-кольцо ссылки, тултип слайдера."
   },
   {
+    "name": "--gr-radius-control-xs",
+    "section": "Shapes: radii and compatibility aliases",
+    "description": "Скругление поля-коробки на ступени `xs`: `GrInput`, `GrSelect`, `GrTextarea` и остальные поля. Тема без лестницы ставит `var(--gr-radius-control)`."
+  },
+  {
+    "name": "--gr-radius-control-sm",
+    "section": "Shapes: radii and compatibility aliases",
+    "description": "Скругление поля-коробки на ступени `sm`: `GrInput`, `GrSelect`, `GrTextarea` и остальные поля. Тема без лестницы ставит `var(--gr-radius-control)`."
+  },
+  {
+    "name": "--gr-radius-control-md",
+    "section": "Shapes: radii and compatibility aliases",
+    "description": "Скругление поля-коробки на ступени `md`: `GrInput`, `GrSelect`, `GrTextarea` и остальные поля. Тема без лестницы ставит `var(--gr-radius-control)`."
+  },
+  {
+    "name": "--gr-radius-control-lg",
+    "section": "Shapes: radii and compatibility aliases",
+    "description": "Скругление поля-коробки на ступени `lg`: `GrInput`, `GrSelect`, `GrTextarea` и остальные поля. Тема без лестницы ставит `var(--gr-radius-control)`."
+  },
+  {
+    "name": "--gr-input-focus-ring-width",
+    "section": "Shapes: radii and compatibility aliases",
+    "description": "Толщина кольца фокуса вокруг поля ввода и выбора. Цвет — `--gr-ring`, у ошибки — `--gr-invalid-ring`."
+  },
+  {
     "name": "--gr-radius-md",
     "section": "Shapes: radii and compatibility aliases",
     "description": "Радиус скругления `md` для углов компонентов и поверхностей."
@@ -437,6 +467,11 @@ export const grFoundationTokens: GrFoundationToken[] = [
     "name": "--gr-radius-xl",
     "section": "Shapes: radii and compatibility aliases",
     "description": "Радиус скругления `xl` для углов компонентов и поверхностей."
+  },
+  {
+    "name": "--gr-radius-overlay",
+    "section": "Shapes: radii and compatibility aliases",
+    "description": "Скругление всплывающей панели у поля: список `GrSelect`, `GrTreeSelect`, `GrAutocomplete`, панель `GrPopover`. Окно и палитра команд скругляются своими токенами."
   },
   {
     "name": "--gr-radius-full",
@@ -572,14 +607,44 @@ export const grRoleTokens: GrRoleToken[] = [
     "description": "Базовый цвет бордеров и разделителей текущей темы."
   },
   {
+    "name": "--gr-brd-strong",
+    "section": "Surface roles",
+    "description": "Граница плотнее разделителя: пунктир и точки `GrDivider`, черта невыбранной вкладки под указателем. Тема ставит её и в токены компонентов — рамку `outline`-сообщения, разделитель пути. Тема без второй ступени границы ставит сюда `--gr-brd`."
+  },
+  {
     "name": "--gr-input",
     "section": "Surface roles",
-    "description": "Цвет рамки и фона input-like контролов в состоянии покоя."
+    "description": "Рамка поля ввода в покое — у `GrInput`, `GrTextarea`, `GrNumberInput`, `GrInputTag`, `GrAutocomplete`, `GrOtpInput` и триггеров `GrSelect`, `GrTreeSelect`, `GrColorPicker`. Тема, у которой рамка поля темнее разделителя, разводит её с `--gr-brd`."
+  },
+  {
+    "name": "--gr-input-hover",
+    "section": "Surface roles",
+    "description": "Рамка поля ввода под указателем. Тема без отклика рамки ставит сюда `--gr-input`."
+  },
+  {
+    "name": "--gr-input-focus-brd",
+    "section": "Surface roles",
+    "description": "Рамка поля в фокусе, вместе с кольцом `--gr-ring`. Тема без своего решения ставит `--gr-input`: рамка в фокусе не меняется."
+  },
+  {
+    "name": "--gr-input-readonly-bg",
+    "section": "Surface roles",
+    "description": "Подложка поля только для чтения. Тема, у которой такое поле читается текстом на поверхности, ставит `transparent`; без своего решения — `--gr-bg`, как у рабочего поля."
+  },
+  {
+    "name": "--gr-input-readonly-brd",
+    "section": "Surface roles",
+    "description": "Рамка поля только для чтения. Без своего решения — `--gr-input`, как у рабочего поля."
   },
   {
     "name": "--gr-control-brd",
     "section": "Surface roles",
     "description": "Граница переключаемого контрола в покое — коробки чекбокса, кружка радио, дорожки выключенного переключателя. Держит 3:1 к странице, карточке и `--gr-muted` (WCAG 1.4.11): у такого контрола граница — единственное, по чему его видно."
+  },
+  {
+    "name": "--gr-control-brd-hover",
+    "section": "Surface roles",
+    "description": "Граница переключаемого контрола под указателем: коробка отметки, кружок радио. Тема без отклика ставит сюда `--gr-control-brd`."
   },
   {
     "name": "--gr-ring",
@@ -635,6 +700,21 @@ export const grRoleTokens: GrRoleToken[] = [
     "name": "--gr-accent-fg",
     "section": "Action roles",
     "description": "Цвет текста поверх accent-подложек."
+  },
+  {
+    "name": "--gr-selected",
+    "section": "Action roles",
+    "description": "Цвет выбранного: заливка и рамка отметки и радио, дорожка включённого переключателя, черта вкладки, заливка слайдера, текущая страница пагинации, кольцо выбранного цвета; подмесом — подсветка выбранной строки и узла дерева. Тема, где выбор — бренд, ставит сюда `--gr-primary`."
+  },
+  {
+    "name": "--gr-selected-fg",
+    "section": "Action roles",
+    "description": "Знак на заливке `--gr-selected`: галочка отметки, точка радио, номер текущей страницы."
+  },
+  {
+    "name": "--gr-selected-hover",
+    "section": "Action roles",
+    "description": "Выбранное под указателем: заливка отмеченной коробки и выбранного радио. Тема без отклика ставит сюда `--gr-selected`."
   },
   {
     "name": "--gr-success",
@@ -1154,7 +1234,7 @@ export const grThemeCatalog: GrThemeCatalogEntry[] = [
     "title": "Чертёж",
     "description": "Плоская точность: заливка, линия и шрифт. Без теней и бликов; главный сигнал — линия хода по нижней кромке.",
     "docs": "https://granularity.tech/themes/blueprint",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "targets": {
       "@feugene/granularity": "^3.1.0",
       "@feugene/granularity-charts": "^3.0.0",
@@ -1179,7 +1259,7 @@ export const grThemeCatalog: GrThemeCatalogEntry[] = [
     "title": "Глина",
     "description": "Тёплая бумага, графитовые чернила и одна глиняная точка на экран.",
     "docs": "https://granularity.tech/themes/clay",
-    "version": "1.2.0",
+    "version": "2.0.0",
     "targets": {
       "@feugene/granularity": "^3.1.0",
       "@feugene/granularity-charts": "^3.0.0",
@@ -1204,7 +1284,7 @@ export const grThemeCatalog: GrThemeCatalogEntry[] = [
     "title": "Сланец",
     "description": "Холодные нейтрали шкалы slate, индиго-акцент и контраст, выверенный по AA в обоих режимах.",
     "docs": "https://granularity.tech/themes/slate",
-    "version": "1.2.0",
+    "version": "1.3.0",
     "targets": {
       "@feugene/granularity": "^3.1.0",
       "@feugene/granularity-charts": "^3.0.0",
@@ -1229,7 +1309,7 @@ export const grThemeCatalog: GrThemeCatalogEntry[] = [
     "title": "Тактильная",
     "description": "Кнопка как предмет: свет сверху, тень цвета тона снизу, подъём под указателем и пружина в отклике.",
     "docs": "https://granularity.tech/themes/tactile",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "targets": {
       "@feugene/granularity": "^3.1.0",
       "@feugene/granularity-charts": "^3.0.0",

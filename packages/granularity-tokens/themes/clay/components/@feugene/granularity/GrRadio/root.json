@@ -1,0 +1,5 @@
+{
+  "gr-radio-checked-bg": "var(--gr-selected)",
+  "gr-radio-checked-hover-bg": "var(--gr-selected-hover)",
+  "gr-radio-dot": "var(--gr-selected-fg)"
+}

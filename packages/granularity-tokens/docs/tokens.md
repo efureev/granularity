@@ -33,6 +33,7 @@
 | Токен | blueprint | clay | slate | tactile | Назначение |
 | --- | --- | --- | --- | --- | --- |
 | `--gr-font-ui` | `Inter, Roboto, system-ui, -apple-system, Segoe UI, Arial, sans-serif` | `system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif` | `Inter, Roboto, system-ui, -apple-system, Segoe UI, Arial, sans-serif` | `Inter, Roboto, system-ui, -apple-system, Segoe UI, Arial, sans-serif` | Основной стек шрифта для интерфейсного текста и большинства компонентных подписей. |
+| `--gr-font-display` | `var(--gr-font-ui)` | `Georgia, 'Times New Roman', Times, serif` | `var(--gr-font-ui)` | `var(--gr-font-ui)` | Стек шрифта заголовков компонентов: заголовок карточки, окна, шторки и пустого состояния. Тема без своей гарнитуры заголовков ставит сюда `var(--gr-font-ui)`. |
 | `--gr-font-mono` | `'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace` | `'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace` | `'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace` | `'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace` | Моноширинный стек для кода, числовых значений и технических подписей. |
 
 ### Typography: font sizes
@@ -178,10 +179,16 @@
 | `--gr-radius-none` | `0px` | `0px` | `0px` | `0px` | Радиус скругления `none` для углов компонентов и поверхностей. |
 | `--gr-radius-xs` | `3px` | `3px` | `3px` | `3px` | Радиус скругления `xs` — микроэлементы: подсветка совпадения в поиске, кнопка очистки внутри контрола. |
 | `--gr-radius-sm` | `4px` | `4px` | `4px` | `4px` | Радиус скругления `sm` для углов компонентов и поверхностей. |
-| `--gr-radius-control` | `6px` | `6px` | `6px` | `6px` | Радиус контрола и мелкой интерактивной детали внутри него: оболочка поля, чип, кнопка-крестик, фокус-кольцо ссылки, тултип слайдера. |
+| `--gr-radius-control` | `6px` | `8px` | `6px` | `6px` | Радиус контрола и мелкой интерактивной детали внутри него: оболочка поля, чип, кнопка-крестик, фокус-кольцо ссылки, тултип слайдера. |
+| `--gr-radius-control-xs` | `var(--gr-radius-control)` | `6px` | `var(--gr-radius-control)` | `var(--gr-radius-control)` | Скругление поля-коробки на ступени `xs`: `GrInput`, `GrSelect`, `GrTextarea` и остальные поля. Тема без лестницы ставит `var(--gr-radius-control)`. |
+| `--gr-radius-control-sm` | `var(--gr-radius-control)` | `8px` | `var(--gr-radius-control)` | `var(--gr-radius-control)` | Скругление поля-коробки на ступени `sm`: `GrInput`, `GrSelect`, `GrTextarea` и остальные поля. Тема без лестницы ставит `var(--gr-radius-control)`. |
+| `--gr-radius-control-md` | `var(--gr-radius-control)` | `8px` | `var(--gr-radius-control)` | `var(--gr-radius-control)` | Скругление поля-коробки на ступени `md`: `GrInput`, `GrSelect`, `GrTextarea` и остальные поля. Тема без лестницы ставит `var(--gr-radius-control)`. |
+| `--gr-radius-control-lg` | `var(--gr-radius-control)` | `10px` | `var(--gr-radius-control)` | `var(--gr-radius-control)` | Скругление поля-коробки на ступени `lg`: `GrInput`, `GrSelect`, `GrTextarea` и остальные поля. Тема без лестницы ставит `var(--gr-radius-control)`. |
+| `--gr-input-focus-ring-width` | `2px` | `1px` | `2px` | `2px` | Толщина кольца фокуса вокруг поля ввода и выбора. Цвет — `--gr-ring`, у ошибки — `--gr-invalid-ring`. |
 | `--gr-radius-md` | `8px` | `8px` | `8px` | `8px` | Радиус скругления `md` для углов компонентов и поверхностей. |
 | `--gr-radius-lg` | `12px` | `12px` | `12px` | `12px` | Радиус скругления `lg` для углов компонентов и поверхностей. |
 | `--gr-radius-xl` | `16px` | `16px` | `16px` | `16px` | Радиус скругления `xl` для углов компонентов и поверхностей. |
+| `--gr-radius-overlay` | `var(--gr-radius-xl)` | `12px` | `var(--gr-radius-xl)` | `var(--gr-radius-xl)` | Скругление всплывающей панели у поля: список `GrSelect`, `GrTreeSelect`, `GrAutocomplete`, панель `GrPopover`. Окно и палитра команд скругляются своими токенами. |
 | `--gr-radius-full` | `9999px` | `9999px` | `9999px` | `9999px` | Радиус скругления `full` для углов компонентов и поверхностей. |
 
 ### Elevation
@@ -244,21 +251,27 @@ floating-компоненты не выходят по построению (v-c
 
 | Токен | blueprint-light | blueprint-dark | clay-light | clay-dark | slate-light | slate-dark | tactile-light | tactile-dark | Назначение |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| `--gr-bg` | `#f8fafc` | `#0f172a` | `#f5f2ea` | `#242320` | `#f8fafc` | `#0f172a` | `#f8fafc` | `#0f172a` | Базовый фон приложения и крупных layout-поверхностей текущей темы. |
-| `--gr-fg` | `#0f172a` | `#f8fafc` | `#1c1b18` | `#f2efe7` | `#0f172a` | `#f8fafc` | `#0f172a` | `#f8fafc` | Основной цвет текста и иконок поверх базового фона текущей темы. |
-| `--gr-card` | `#ffffff` | `#1e293b` | `#fdfbf6` | `#2e2d29` | `#ffffff` | `#1e293b` | `#ffffff` | `#1e293b` | Фон карточек, панелей и других поднятых поверхностей. |
-| `--gr-card-fg` | `#0f172a` | `#f8fafc` | `#1c1b18` | `#f2efe7` | `#0f172a` | `#f8fafc` | `#0f172a` | `#f8fafc` | Цвет контента внутри карточек и raised surface-блоков. |
-| `--gr-popover` | `#ffffff` | `#1e293b` | `#fdfbf6` | `#2e2d29` | `#ffffff` | `#1e293b` | `#ffffff` | `#1e293b` | Фон popover-, dropdown- и overlay-поверхностей. |
-| `--gr-popover-fg` | `#0f172a` | `#f8fafc` | `#1c1b18` | `#f2efe7` | `#0f172a` | `#f8fafc` | `#0f172a` | `#f8fafc` | Цвет текста и иконок внутри popover-слоёв. |
-| `--gr-muted` | `#f1f5f9` | `#334155` | `#ece8de` | `#3a3934` | `#f1f5f9` | `#334155` | `#f1f5f9` | `#334155` | Приглушённая поверхность для вторичных блоков, плашек и заполнений. |
-| `--gr-muted-fg` | `#556275` | `#aab6c7` | `#5b5850` | `#b6b2a8` | `#556275` | `#aab6c7` | `#556275` | `#aab6c7` | Вторичный текстовый цвет для helper-копии и менее важных подписей. |
-| `--gr-secondary` | `#e2e8f0` | `#334155` | `#e4dfd3` | `#3a3934` | `#e2e8f0` | `#334155` | `#e2e8f0` | `#334155` | Нейтральная secondary action/surface-подложка без сильного бренд-акцента. |
-| `--gr-secondary-fg` | `#1e293b` | `#f1f5f9` | `#26241f` | `#ece8de` | `#1e293b` | `#f1f5f9` | `#1e293b` | `#f1f5f9` | Контрастный текст для secondary-кнопок и поверхностей. |
-| `--gr-overlay-bg` | `rgb(15 23 42 / 0.45)` | `rgb(2 6 23 / 0.65)` | `rgb(28 27 24 / 0.45)` | `rgb(10 10 9 / 0.65)` | `rgb(15 23 42 / 0.45)` | `rgb(2 6 23 / 0.65)` | `rgb(15 23 42 / 0.45)` | `rgb(2 6 23 / 0.65)` | Подложка модальных слоёв (модалка, drawer): затемняет страницу, оставляя её узнаваемой. |
-| `--gr-brd` | `#e2e8f0` | `#334155` | `#dfd9cc` | `#45433d` | `#e2e8f0` | `#334155` | `#e2e8f0` | `#334155` | Базовый цвет бордеров и разделителей текущей темы. |
-| `--gr-input` | `#e2e8f0` | `#334155` | `#dfd9cc` | `#45433d` | `#e2e8f0` | `#334155` | `#e2e8f0` | `#334155` | Цвет рамки и фона input-like контролов в состоянии покоя. |
-| `--gr-control-brd` | `#64748b` | `#94a3b8` | `#7a756a` | `#8f8b80` | `#64748b` | `#94a3b8` | `#64748b` | `#94a3b8` | Граница переключаемого контрола в покое — коробки чекбокса, кружка радио, дорожки выключенного переключателя. Держит 3:1 к странице, карточке и `--gr-muted` (WCAG 1.4.11): у такого контрола граница — единственное, по чему его видно. |
-| `--gr-ring` | `#6366f1` | `#818cf8` | `#2d6cc8` | `#6fa2e2` | `#6366f1` | `#818cf8` | `#6366f1` | `#818cf8` | Цвет focus-ring и акцентного outline для интерактивных компонентов. |
+| `--gr-bg` | `#f8fafc` | `#0f172a` | `#faf9f5` | `#262624` | `#f8fafc` | `#0f172a` | `#f8fafc` | `#0f172a` | Базовый фон приложения и крупных layout-поверхностей текущей темы. |
+| `--gr-fg` | `#0f172a` | `#f8fafc` | `#141413` | `#faf9f5` | `#0f172a` | `#f8fafc` | `#0f172a` | `#f8fafc` | Основной цвет текста и иконок поверх базового фона текущей темы. |
+| `--gr-card` | `#ffffff` | `#1e293b` | `#ffffff` | `#30302e` | `#ffffff` | `#1e293b` | `#ffffff` | `#1e293b` | Фон карточек, панелей и других поднятых поверхностей. |
+| `--gr-card-fg` | `#0f172a` | `#f8fafc` | `#141413` | `#faf9f5` | `#0f172a` | `#f8fafc` | `#0f172a` | `#f8fafc` | Цвет контента внутри карточек и raised surface-блоков. |
+| `--gr-popover` | `#ffffff` | `#1e293b` | `#ffffff` | `#30302e` | `#ffffff` | `#1e293b` | `#ffffff` | `#1e293b` | Фон popover-, dropdown- и overlay-поверхностей. |
+| `--gr-popover-fg` | `#0f172a` | `#f8fafc` | `#141413` | `#faf9f5` | `#0f172a` | `#f8fafc` | `#0f172a` | `#f8fafc` | Цвет текста и иконок внутри popover-слоёв. |
+| `--gr-muted` | `#f1f5f9` | `#334155` | `#f0eee6` | `#3a3a37` | `#f1f5f9` | `#334155` | `#f1f5f9` | `#334155` | Приглушённая поверхность для вторичных блоков, плашек и заполнений. |
+| `--gr-muted-fg` | `#556275` | `#aab6c7` | `#5e5d59` | `#b0aea5` | `#556275` | `#aab6c7` | `#556275` | `#aab6c7` | Вторичный текстовый цвет для helper-копии и менее важных подписей. |
+| `--gr-secondary` | `#e2e8f0` | `#334155` | `#e8e6dc` | `#3a3a37` | `#e2e8f0` | `#334155` | `#e2e8f0` | `#334155` | Нейтральная secondary action/surface-подложка без сильного бренд-акцента. |
+| `--gr-secondary-fg` | `#1e293b` | `#f1f5f9` | `#3d3d3a` | `#d1cfc5` | `#1e293b` | `#f1f5f9` | `#1e293b` | `#f1f5f9` | Контрастный текст для secondary-кнопок и поверхностей. |
+| `--gr-overlay-bg` | `rgb(15 23 42 / 0.45)` | `rgb(2 6 23 / 0.65)` | `rgb(28 27 24 / 0.45)` | `rgb(10 10 9 / 0.6)` | `rgb(15 23 42 / 0.45)` | `rgb(2 6 23 / 0.65)` | `rgb(15 23 42 / 0.45)` | `rgb(2 6 23 / 0.65)` | Подложка модальных слоёв (модалка, drawer): затемняет страницу, оставляя её узнаваемой. |
+| `--gr-brd` | `#e2e8f0` | `#334155` | `#d9d8d5` | `#42423f` | `#e2e8f0` | `#334155` | `#e2e8f0` | `#334155` | Базовый цвет бордеров и разделителей текущей темы. |
+| `--gr-brd-strong` | `var(--gr-brd)` | `var(--gr-brd)` | `#b8b7b4` | `#5f5e5a` | `var(--gr-brd)` | `var(--gr-brd)` | `var(--gr-brd)` | `var(--gr-brd)` | Граница плотнее разделителя: пунктир и точки `GrDivider`, черта невыбранной вкладки под указателем. Тема ставит её и в токены компонентов — рамку `outline`-сообщения, разделитель пути. Тема без второй ступени границы ставит сюда `--gr-brd`. |
+| `--gr-input` | `#e2e8f0` | `#334155` | `#82817e` | `#878681` | `#e2e8f0` | `#334155` | `#e2e8f0` | `#334155` | Рамка поля ввода в покое — у `GrInput`, `GrTextarea`, `GrNumberInput`, `GrInputTag`, `GrAutocomplete`, `GrOtpInput` и триггеров `GrSelect`, `GrTreeSelect`, `GrColorPicker`. Тема, у которой рамка поля темнее разделителя, разводит её с `--gr-brd`. |
+| `--gr-input-hover` | `var(--gr-input)` | `var(--gr-input)` | `#565553` | `#afaea8` | `var(--gr-input)` | `var(--gr-input)` | `var(--gr-input)` | `var(--gr-input)` | Рамка поля ввода под указателем. Тема без отклика рамки ставит сюда `--gr-input`. |
+| `--gr-input-focus-brd` | `var(--gr-input)` | `var(--gr-input)` | `var(--gr-ring)` | `var(--gr-ring)` | `var(--gr-input)` | `var(--gr-input)` | `var(--gr-input)` | `var(--gr-input)` | Рамка поля в фокусе, вместе с кольцом `--gr-ring`. Тема без своего решения ставит `--gr-input`: рамка в фокусе не меняется. |
+| `--gr-input-readonly-bg` | `var(--gr-bg)` | `var(--gr-bg)` | `transparent` | `transparent` | `var(--gr-bg)` | `var(--gr-bg)` | `var(--gr-bg)` | `var(--gr-bg)` | Подложка поля только для чтения. Тема, у которой такое поле читается текстом на поверхности, ставит `transparent`; без своего решения — `--gr-bg`, как у рабочего поля. |
+| `--gr-input-readonly-brd` | `var(--gr-input)` | `var(--gr-input)` | `var(--gr-brd)` | `var(--gr-brd)` | `var(--gr-input)` | `var(--gr-input)` | `var(--gr-input)` | `var(--gr-input)` | Рамка поля только для чтения. Без своего решения — `--gr-input`, как у рабочего поля. |
+| `--gr-control-brd` | `#64748b` | `#94a3b8` | `#82817e` | `#878681` | `#64748b` | `#94a3b8` | `#64748b` | `#94a3b8` | Граница переключаемого контрола в покое — коробки чекбокса, кружка радио, дорожки выключенного переключателя. Держит 3:1 к странице, карточке и `--gr-muted` (WCAG 1.4.11): у такого контрола граница — единственное, по чему его видно. |
+| `--gr-control-brd-hover` | `var(--gr-control-brd)` | `var(--gr-control-brd)` | `#565553` | `#afaea8` | `var(--gr-control-brd)` | `var(--gr-control-brd)` | `var(--gr-control-brd)` | `var(--gr-control-brd)` | Граница переключаемого контрола под указателем: коробка отметки, кружок радио. Тема без отклика ставит сюда `--gr-control-brd`. |
+| `--gr-ring` | `#6366f1` | `#818cf8` | `#2a78d6` | `#6aa3e8` | `#6366f1` | `#818cf8` | `#6366f1` | `#818cf8` | Цвет focus-ring и акцентного outline для интерактивных компонентов. |
 
 > **`--gr-muted-fg` (slate-light).** Вторичный текст обязан проходить AA на САМОМ ТЁМНОМ из фонов, на которых он появляется, а это не страница, а `--gr-secondary` (#e2e8f0). Прежний #64748b держался только на `--gr-bg` (4.55) и `--gr-card` (4.76), но проваливался на `--gr-muted` (4.34) и `--gr-secondary` (3.86) — то есть ровно там, где вторичный текст и живёт: чипы, таблицы, подписи в панелях. #556275 даёт минимум 5.02 по всем четырём фонам.
 
@@ -268,9 +281,9 @@ floating-компоненты не выходят по построению (v-c
 
 | Токен | blueprint-light | blueprint-dark | clay-light | clay-dark | slate-light | slate-dark | tactile-light | tactile-dark | Назначение |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| `--gr-disabled-bg` | `#f1f5f9` | `#273548` | `#edeae2` | `#33322d` | `#f1f5f9` | `#273548` | `#f1f5f9` | `#273548` | Фон недоступного контрола: гасит его поверхностью, а не прозрачностью — `opacity` разбавляет выверенные на AA токены текста. |
-| `--gr-disabled-fg` | `#94a3b8` | `#64748b` | `#a19d93` | `#77746b` | `#94a3b8` | `#64748b` | `#94a3b8` | `#64748b` | Цвет текста и иконок недоступного контрола. |
-| `--gr-disabled-brd` | `#e2e8f0` | `#334155` | `#e2ddd1` | `#45433d` | `#e2e8f0` | `#334155` | `#e2e8f0` | `#334155` | Цвет рамки недоступного контрола. |
+| `--gr-disabled-bg` | `#f1f5f9` | `#273548` | `#f0eee6` | `#353532` | `#f1f5f9` | `#273548` | `#f1f5f9` | `#273548` | Фон недоступного контрола: гасит его поверхностью, а не прозрачностью — `opacity` разбавляет выверенные на AA токены текста. |
+| `--gr-disabled-fg` | `#94a3b8` | `#64748b` | `#9c9a92` | `#73726c` | `#94a3b8` | `#64748b` | `#94a3b8` | `#64748b` | Цвет текста и иконок недоступного контрола. |
+| `--gr-disabled-brd` | `#e2e8f0` | `#334155` | `var(--gr-disabled-bg)` | `var(--gr-disabled-bg)` | `#e2e8f0` | `#334155` | `#e2e8f0` | `#334155` | Цвет рамки недоступного контрола. |
 | `--gr-invalid-brd` | `var(--gr-danger)` | `var(--gr-danger)` | `var(--gr-danger)` | `var(--gr-danger)` | `var(--gr-danger)` | `var(--gr-danger)` | `var(--gr-danger)` | `var(--gr-danger)` | Цвет рамки контрола, не прошедшего валидацию. |
 | `--gr-invalid-ring` | `var(--gr-danger)` | `var(--gr-danger)` | `var(--gr-danger)` | `var(--gr-danger)` | `var(--gr-danger)` | `var(--gr-danger)` | `var(--gr-danger)` | `var(--gr-danger)` | Цвет focus-ring контрола, не прошедшего валидацию. |
 | `--gr-invalid-text` | `var(--gr-danger-text)` | `var(--gr-danger-text)` | `var(--gr-danger-text)` | `var(--gr-danger-text)` | `var(--gr-danger-text)` | `var(--gr-danger-text)` | `var(--gr-danger-text)` | `var(--gr-danger-text)` | Цвет текста ошибки и метки обязательного поля. |
@@ -283,10 +296,13 @@ floating-компоненты не выходят по построению (v-c
 
 | Токен | blueprint-light | blueprint-dark | clay-light | clay-dark | slate-light | slate-dark | tactile-light | tactile-dark | Назначение |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| `--gr-primary` | `#4f46e5` | `#9d8bfa` | `#d27a55` | `#d98a66` | `#4f46e5` | `#9d8bfa` | `#4f46e5` | `#9d8bfa` | Главный brand/action цвет темы для primary CTA и ключевых акцентов. |
-| `--gr-primary-fg` | `#ffffff` | `#0f172a` | `#1c1b18` | `#1c1b18` | `#ffffff` | `#0f172a` | `#ffffff` | `#0f172a` | Контрастный текст и иконки поверх primary-заливки. |
-| `--gr-accent` | `#eef2ff` | `#1e1b4b` | `#f6e5db` | `#4a2f23` | `#eef2ff` | `#1e1b4b` | `#eef2ff` | `#1e1b4b` | Мягкая акцентная поверхность для selected/hovered областей и подсветок. |
-| `--gr-accent-fg` | `#3730a3` | `#c7d2fe` | `#8a3b1c` | `#f1c4ae` | `#3730a3` | `#c7d2fe` | `#3730a3` | `#c7d2fe` | Цвет текста поверх accent-подложек. |
+| `--gr-primary` | `#4f46e5` | `#9d8bfa` | `#d97757` | `#d97757` | `#4f46e5` | `#9d8bfa` | `#4f46e5` | `#9d8bfa` | Главный brand/action цвет темы для primary CTA и ключевых акцентов. |
+| `--gr-primary-fg` | `#ffffff` | `#0f172a` | `#141413` | `#141413` | `#ffffff` | `#0f172a` | `#ffffff` | `#0f172a` | Контрастный текст и иконки поверх primary-заливки. |
+| `--gr-accent` | `#eef2ff` | `#1e1b4b` | `#f6e8e0` | `#46352d` | `#eef2ff` | `#1e1b4b` | `#eef2ff` | `#1e1b4b` | Мягкая акцентная поверхность для selected/hovered областей и подсветок. |
+| `--gr-accent-fg` | `#3730a3` | `#c7d2fe` | `#973f22` | `#e6a37f` | `#3730a3` | `#c7d2fe` | `#3730a3` | `#c7d2fe` | Цвет текста поверх accent-подложек. |
+| `--gr-selected` | `var(--gr-primary)` | `var(--gr-primary)` | `var(--gr-fg)` | `var(--gr-fg)` | `var(--gr-primary)` | `var(--gr-primary)` | `var(--gr-primary)` | `var(--gr-primary)` | Цвет выбранного: заливка и рамка отметки и радио, дорожка включённого переключателя, черта вкладки, заливка слайдера, текущая страница пагинации, кольцо выбранного цвета; подмесом — подсветка выбранной строки и узла дерева. Тема, где выбор — бренд, ставит сюда `--gr-primary`. |
+| `--gr-selected-fg` | `var(--gr-primary-fg)` | `var(--gr-primary-fg)` | `var(--gr-bg)` | `var(--gr-bg)` | `var(--gr-primary-fg)` | `var(--gr-primary-fg)` | `var(--gr-primary-fg)` | `var(--gr-primary-fg)` | Знак на заливке `--gr-selected`: галочка отметки, точка радио, номер текущей страницы. |
+| `--gr-selected-hover` | `var(--gr-selected)` | `var(--gr-selected)` | `#3d3d3a` | `#d1cfc5` | `var(--gr-selected)` | `var(--gr-selected)` | `var(--gr-selected)` | `var(--gr-selected)` | Выбранное под указателем: заливка отмеченной коробки и выбранного радио. Тема без отклика ставит сюда `--gr-selected`. |
 
 > **`--gr-primary` (slate-dark).** Primary был единственным тоном, выпадавшим из конвенции тёмной темы (светлая заливка + тёмный текст, как у success/warning/danger/info/azure): оставался светло-тёмным индиго #6366f1 с белым текстом и проваливал сразу все три роли — текст на фоне 4.00, текст на карточке 3.27, белый на заливке 4.47. Светлый индиго с тёмным `-fg` даёт 6.38 / 5.23 / 6.38. Не indigo-400 (#818cf8): в ту сторону лежит `--gr-info`, и увести primary туда значило бы вернуть слияние двух тонов, ради разведения которого info и перекрашен в синий. Кнопок не касается: GrButton задаёт свой `--gr-button-primary-bg`.
 
@@ -294,31 +310,31 @@ floating-компоненты не выходят по построению (v-c
 
 | Токен | blueprint-light | blueprint-dark | clay-light | clay-dark | slate-light | slate-dark | tactile-light | tactile-dark | Назначение |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| `--gr-success` | `#10b981` | `#34d399` | `#7f9a5c` | `#98ae73` | `#10b981` | `#34d399` | `#10b981` | `#34d399` | Основной semantic success-цвет для статусов, бейджей и уведомлений. |
-| `--gr-success-light` | `#d1fae5` | `#194536` | `#e4ead8` | `#333c27` | `#d1fae5` | `#194536` | `#d1fae5` | `#194536` | Облегчённая success-подложка для мягких статусов и подсветок. |
-| `--gr-success-fg` | `#0f172a` | `#0f172a` | `#1c1b18` | `#1c1b18` | `#0f172a` | `#0f172a` | `#0f172a` | `#0f172a` | Контрастный текст и иконки поверх success-заливки. |
-| `--gr-primary-text` | `#3730a3` | `#c7d2fe` | `#8a3b1c` | `#f2b07c` | `#3730a3` | `#c7d2fe` | `#3730a3` | `#c7d2fe` | Основной тон как ЦВЕТ ТЕКСТА на фоне страницы: насыщенный `--gr-primary` под текст не рассчитан и не проходит по контрасту. |
-| `--gr-success-text` | `#065f46` | `#6ee7b7` | `#3e5426` | `#c2d2a2` | `#065f46` | `#6ee7b7` | `#065f46` | `#6ee7b7` | Текстовый оттенок для success-сообщений на светлой подложке. |
-| `--gr-warning` | `#f97316` | `#fb923c` | `#d1a43c` | `#dbb44f` | `#f97316` | `#fb923c` | `#f97316` | `#fb923c` | Основной semantic warning-цвет для предупреждений и промежуточных статусов. |
-| `--gr-warning-light` | `#ffedd5` | `#672e1c` | `#f4e9cc` | `#443817` | `#ffedd5` | `#672e1c` | `#ffedd5` | `#672e1c` | Облегчённая warning-подложка для мягких warning-состояний. |
-| `--gr-warning-fg` | `#0f172a` | `#0f172a` | `#1c1b18` | `#1c1b18` | `#0f172a` | `#0f172a` | `#0f172a` | `#0f172a` | Контрастный текст и иконки поверх warning-заливки. |
-| `--gr-warning-text` | `#7c2d12` | `#fdba74` | `#6a4c0b` | `#e9d08c` | `#7c2d12` | `#fdba74` | `#7c2d12` | `#fdba74` | Текстовый оттенок для warning-сообщений на мягкой warning-подложке. |
-| `--gr-danger` | `#dc2626` | `#f87171` | `#b2443a` | `#b7473c` | `#dc2626` | `#f87171` | `#dc2626` | `#f87171` | Semantic danger-цвет для ошибок, рисков и критических сообщений. |
-| `--gr-danger-light` | `#fee2e2` | `#6a2522` | `#f6ddd8` | `#4b2622` | `#fee2e2` | `#6a2522` | `#fee2e2` | `#6a2522` | Облегчённая danger-подложка для мягких error-состояний. |
-| `--gr-danger-fg` | `#ffffff` | `#0f172a` | `#fdfbf6` | `#f2efe7` | `#ffffff` | `#0f172a` | `#ffffff` | `#0f172a` | Контрастный текст и иконки поверх danger-заливки. |
-| `--gr-danger-text` | `#991b1b` | `#fca5a5` | `#972821` | `#f59cb0` | `#991b1b` | `#fca5a5` | `#991b1b` | `#fca5a5` | Текстовый оттенок для error-сообщений на мягкой danger-подложке. |
-| `--gr-info` | `#2563eb` | `#60a5fa` | `#2f69ba` | `#3368b5` | `#2563eb` | `#60a5fa` | `#2563eb` | `#60a5fa` | Semantic info-цвет для нейтральных уведомлений и информационных акцентов. |
-| `--gr-info-light` | `#dbeafe` | `#213771` | `#dfe3f6` | `#233650` | `#dbeafe` | `#213771` | `#dbeafe` | `#213771` | Облегчённая info-подложка для спокойных информационных блоков. |
-| `--gr-info-fg` | `#ffffff` | `#0f172a` | `#fdfbf6` | `#f2efe7` | `#ffffff` | `#0f172a` | `#ffffff` | `#0f172a` | Контрастный текст и иконки поверх info-заливки. |
-| `--gr-info-text` | `#1e40af` | `#bfdbfe` | `#1e4985` | `#a8c7ef` | `#1e40af` | `#bfdbfe` | `#1e40af` | `#bfdbfe` | Текстовый оттенок для спокойных info-сообщений и подсказок. |
-| `--gr-slate` | `#475569` | `#94a3b8` | `#585650` | `#a5a299` | `#475569` | `#94a3b8` | `#475569` | `#94a3b8` | Нейтральный semantic slate-цвет для subdued индикаторов и secondary статусов. |
-| `--gr-slate-light` | `#e2e8f0` | `#313b4a` | `#e7e4dd` | `#3b3a35` | `#e2e8f0` | `#313b4a` | `#e2e8f0` | `#313b4a` | Облегчённая slate-подложка для мягких нейтральных состояний. |
-| `--gr-slate-fg` | `#ffffff` | `#0f172a` | `#fdfbf6` | `#1c1b18` | `#ffffff` | `#0f172a` | `#ffffff` | `#0f172a` | Контрастный текст и иконки поверх slate-заливки. |
-| `--gr-slate-text` | `#334155` | `#cbd5e1` | `#3d3b36` | `#d8d5cd` | `#334155` | `#cbd5e1` | `#334155` | `#cbd5e1` | Текстовый оттенок для нейтральных slate-сообщений и плашек. |
-| `--gr-azure` | `#0077b6` | `#38bdf8` | `#6e9fcd` | `#82afd9` | `#0077b6` | `#38bdf8` | `#0077b6` | `#38bdf8` | Semantic azure-цвет для информационных акцентов и вспомогательных статусов. |
-| `--gr-azure-light` | `#e0f2fe` | `#1b425c` | `#d9eef2` | `#253a4c` | `#e0f2fe` | `#1b425c` | `#e0f2fe` | `#1b425c` | Облегчённая azure-подложка для мягких informational поверхностей. |
-| `--gr-azure-fg` | `#ffffff` | `#0f172a` | `#1c1b18` | `#1c1b18` | `#ffffff` | `#0f172a` | `#ffffff` | `#0f172a` | Контрастный текст и иконки поверх azure-заливки. |
-| `--gr-azure-text` | `#075985` | `#bae6fd` | `#2b5880` | `#bad4ec` | `#075985` | `#bae6fd` | `#075985` | `#bae6fd` | Текстовый оттенок для azure-плашек и спокойных informational блоков. |
+| `--gr-success` | `#10b981` | `#34d399` | `#788c5d` | `#8a9e6d` | `#10b981` | `#34d399` | `#10b981` | `#34d399` | Основной semantic success-цвет для статусов, бейджей и уведомлений. |
+| `--gr-success-light` | `#d1fae5` | `#194536` | `#e9ebe1` | `#35382e` | `#d1fae5` | `#194536` | `#d1fae5` | `#194536` | Облегчённая success-подложка для мягких статусов и подсветок. |
+| `--gr-success-fg` | `#0f172a` | `#0f172a` | `#141413` | `#141413` | `#0f172a` | `#0f172a` | `#0f172a` | `#0f172a` | Контрастный текст и иконки поверх success-заливки. |
+| `--gr-primary-text` | `#3730a3` | `#c7d2fe` | `#973f22` | `#e6a37f` | `#3730a3` | `#c7d2fe` | `#3730a3` | `#c7d2fe` | Основной тон как ЦВЕТ ТЕКСТА на фоне страницы: насыщенный `--gr-primary` под текст не рассчитан и не проходит по контрасту. |
+| `--gr-success-text` | `#065f46` | `#6ee7b7` | `#4f5e3b` | `#b2c09a` | `#065f46` | `#6ee7b7` | `#065f46` | `#6ee7b7` | Текстовый оттенок для success-сообщений на светлой подложке. |
+| `--gr-warning` | `#f97316` | `#fb923c` | `#c9a82d` | `#c9a82d` | `#f97316` | `#fb923c` | `#f97316` | `#fb923c` | Основной semantic warning-цвет для предупреждений и промежуточных статусов. |
+| `--gr-warning-light` | `#ffedd5` | `#672e1c` | `#f4eedb` | `#433d26` | `#ffedd5` | `#672e1c` | `#ffedd5` | `#672e1c` | Облегчённая warning-подложка для мягких warning-состояний. |
+| `--gr-warning-fg` | `#0f172a` | `#0f172a` | `#141413` | `#141413` | `#0f172a` | `#0f172a` | `#0f172a` | `#0f172a` | Контрастный текст и иконки поверх warning-заливки. |
+| `--gr-warning-text` | `#7c2d12` | `#fdba74` | `#6f5a14` | `#dcc067` | `#7c2d12` | `#fdba74` | `#7c2d12` | `#fdba74` | Текстовый оттенок для warning-сообщений на мягкой warning-подложке. |
+| `--gr-danger` | `#dc2626` | `#f87171` | `#b8433a` | `#e3585a` | `#dc2626` | `#f87171` | `#dc2626` | `#f87171` | Semantic danger-цвет для ошибок, рисков и критических сообщений. |
+| `--gr-danger-light` | `#fee2e2` | `#6a2522` | `#f1e1dd` | `#482f2e` | `#fee2e2` | `#6a2522` | `#fee2e2` | `#6a2522` | Облегчённая danger-подложка для мягких error-состояний. |
+| `--gr-danger-fg` | `#ffffff` | `#0f172a` | `#faf9f5` | `#141413` | `#ffffff` | `#0f172a` | `#ffffff` | `#0f172a` | Контрастный текст и иконки поверх danger-заливки. |
+| `--gr-danger-text` | `#991b1b` | `#fca5a5` | `#963630` | `#f5a097` | `#991b1b` | `#fca5a5` | `#991b1b` | `#fca5a5` | Текстовый оттенок для error-сообщений на мягкой danger-подложке. |
+| `--gr-info` | `#2563eb` | `#60a5fa` | `#2268bf` | `#6aa3e8` | `#2563eb` | `#60a5fa` | `#2563eb` | `#60a5fa` | Semantic info-цвет для нейтральных уведомлений и информационных акцентов. |
+| `--gr-info-light` | `#dbeafe` | `#213771` | `#dfe8f1` | `#323c47` | `#dbeafe` | `#213771` | `#dbeafe` | `#213771` | Облегчённая info-подложка для спокойных информационных блоков. |
+| `--gr-info-fg` | `#ffffff` | `#0f172a` | `#faf9f5` | `#141413` | `#ffffff` | `#0f172a` | `#ffffff` | `#0f172a` | Контрастный текст и иконки поверх info-заливки. |
+| `--gr-info-text` | `#1e40af` | `#bfdbfe` | `#1c57a0` | `#a1c1ec` | `#1e40af` | `#bfdbfe` | `#1e40af` | `#bfdbfe` | Текстовый оттенок для спокойных info-сообщений и подсказок. |
+| `--gr-slate` | `#475569` | `#94a3b8` | `#4d4c48` | `#9c9a92` | `#475569` | `#94a3b8` | `#475569` | `#94a3b8` | Нейтральный semantic slate-цвет для subdued индикаторов и secondary статусов. |
+| `--gr-slate-light` | `#e2e8f0` | `#313b4a` | `#e4e3df` | `#3b3b38` | `#e2e8f0` | `#313b4a` | `#e2e8f0` | `#313b4a` | Облегчённая slate-подложка для мягких нейтральных состояний. |
+| `--gr-slate-fg` | `#ffffff` | `#0f172a` | `#faf9f5` | `#141413` | `#ffffff` | `#0f172a` | `#ffffff` | `#0f172a` | Контрастный текст и иконки поверх slate-заливки. |
+| `--gr-slate-text` | `#334155` | `#cbd5e1` | `#4d4c48` | `#c2c0b6` | `#334155` | `#cbd5e1` | `#334155` | `#cbd5e1` | Текстовый оттенок для нейтральных slate-сообщений и плашек. |
+| `--gr-azure` | `#0077b6` | `#38bdf8` | `#5b9fb6` | `#5b9fb6` | `#0077b6` | `#38bdf8` | `#0077b6` | `#38bdf8` | Semantic azure-цвет для информационных акцентов и вспомогательных статусов. |
+| `--gr-azure-light` | `#e0f2fe` | `#1b425c` | `#e5eded` | `#303c3e` | `#e0f2fe` | `#1b425c` | `#e0f2fe` | `#1b425c` | Облегчённая azure-подложка для мягких informational поверхностей. |
+| `--gr-azure-fg` | `#ffffff` | `#0f172a` | `#141413` | `#141413` | `#ffffff` | `#0f172a` | `#ffffff` | `#0f172a` | Контрастный текст и иконки поверх azure-заливки. |
+| `--gr-azure-text` | `#075985` | `#bae6fd` | `#2e6270` | `#a3cbd8` | `#075985` | `#bae6fd` | `#075985` | `#bae6fd` | Текстовый оттенок для azure-плашек и спокойных informational блоков. |
 
 > **`--gr-success` (slate-light).** `-fg` — цвет текста НА сплошной заливке тоном. У светлых заливок он обязан быть тёмным: белый на `--gr-success` даёт 2.54:1, на `--gr-warning` 2.80:1 при пороге AA 4.5 — а это solid-кнопки и бейджи (`grButtonStyles.ts`, `grBadgeStyles.ts`). С `--gr-fg` получаем 7.04 и 6.37, и hover/active, которые уводят заливку в тёмную сторону, остаются выше порога (5.30 / 4.79). В тёмной теме эти токены уже тёмные — там заливки светлее фона.
 
@@ -334,26 +350,26 @@ floating-компоненты не выходят по построению (v-c
 | `--gr-primary-solid-hover` | `var(--gr-primary-hover)` | `#5053dd` | `var(--gr-primary-hover)` | `var(--gr-primary-hover)` | `var(--gr-primary-hover)` | `#5053dd` | `var(--gr-primary-hover)` | `#5053dd` | Заливка `--gr-primary-solid` под курсором. |
 | `--gr-primary-solid-active` | `var(--gr-primary-active)` | `#474acf` | `var(--gr-primary-active)` | `var(--gr-primary-active)` | `var(--gr-primary-active)` | `#474acf` | `var(--gr-primary-active)` | `#474acf` | Заливка `--gr-primary-solid` в момент нажатия. |
 | `--gr-primary-solid-fg` | `var(--gr-primary-fg)` | `var(--gr-slate-0)` | `var(--gr-primary-fg)` | `var(--gr-primary-fg)` | `var(--gr-primary-fg)` | `var(--gr-slate-0)` | `var(--gr-primary-fg)` | `var(--gr-slate-0)` | Текст и иконки на заливке `--gr-primary-solid`. |
-| `--gr-success-solid` | `#047857` | `#047857` | `var(--gr-success)` | `var(--gr-success)` | `#047857` | `#047857` | `#047857` | `#047857` | Сплошная заливка кнопочного веса тона `success`. |
-| `--gr-success-solid-hover` | `#036c4d` | `#036c4d` | `var(--gr-success-hover)` | `var(--gr-success-hover)` | `#036c4d` | `#036c4d` | `#036c4d` | `#036c4d` | Заливка `--gr-success-solid` под курсором. |
-| `--gr-success-solid-active` | `#025f44` | `#025f44` | `var(--gr-success-active)` | `var(--gr-success-active)` | `#025f44` | `#025f44` | `#025f44` | `#025f44` | Заливка `--gr-success-solid` в момент нажатия. |
+| `--gr-success-solid` | `#047857` | `#047857` | `var(--gr-success)` | `#8a9e6d` | `#047857` | `#047857` | `#047857` | `#047857` | Сплошная заливка кнопочного веса тона `success`. |
+| `--gr-success-solid-hover` | `#036c4d` | `#036c4d` | `var(--gr-success-hover)` | `#97aa7a` | `#036c4d` | `#036c4d` | `#036c4d` | `#036c4d` | Заливка `--gr-success-solid` под курсором. |
+| `--gr-success-solid-active` | `#025f44` | `#025f44` | `var(--gr-success-active)` | `#a3b587` | `#025f44` | `#025f44` | `#025f44` | `#025f44` | Заливка `--gr-success-solid` в момент нажатия. |
 | `--gr-success-solid-fg` | `var(--gr-slate-0)` | `var(--gr-slate-50)` | `var(--gr-success-fg)` | `var(--gr-success-fg)` | `var(--gr-slate-0)` | `var(--gr-slate-50)` | `var(--gr-slate-0)` | `var(--gr-slate-50)` | Текст и иконки на заливке `--gr-success-solid`. |
 | `--gr-warning-solid` | `#c2410c` | `#c2410c` | `var(--gr-warning)` | `var(--gr-warning)` | `#c2410c` | `#c2410c` | `#c2410c` | `#c2410c` | Сплошная заливка кнопочного веса тона `warning`. |
 | `--gr-warning-solid-hover` | `#b53b0a` | `#b53b0a` | `var(--gr-warning-hover)` | `var(--gr-warning-hover)` | `#b53b0a` | `#b53b0a` | `#b53b0a` | `#b53b0a` | Заливка `--gr-warning-solid` под курсором. |
 | `--gr-warning-solid-active` | `#9f3307` | `#9f3307` | `var(--gr-warning-active)` | `var(--gr-warning-active)` | `#9f3307` | `#9f3307` | `#9f3307` | `#9f3307` | Заливка `--gr-warning-solid` в момент нажатия. |
 | `--gr-warning-solid-fg` | `var(--gr-slate-0)` | `var(--gr-slate-50)` | `var(--gr-warning-fg)` | `var(--gr-warning-fg)` | `var(--gr-slate-0)` | `var(--gr-slate-50)` | `var(--gr-slate-0)` | `var(--gr-slate-50)` | Текст и иконки на заливке `--gr-warning-solid`. |
-| `--gr-danger-solid` | `var(--gr-danger)` | `#b91c1c` | `var(--gr-danger)` | `var(--gr-danger)` | `var(--gr-danger)` | `#b91c1c` | `var(--gr-danger)` | `#b91c1c` | Сплошная заливка кнопочного веса тона `danger`. |
-| `--gr-danger-solid-hover` | `var(--gr-danger-hover)` | `#a91919` | `var(--gr-danger-hover)` | `var(--gr-danger-hover)` | `var(--gr-danger-hover)` | `#a91919` | `var(--gr-danger-hover)` | `#a91919` | Заливка `--gr-danger-solid` под курсором. |
-| `--gr-danger-solid-active` | `var(--gr-danger-active)` | `#931515` | `var(--gr-danger-active)` | `var(--gr-danger-active)` | `var(--gr-danger-active)` | `#931515` | `var(--gr-danger-active)` | `#931515` | Заливка `--gr-danger-solid` в момент нажатия. |
-| `--gr-danger-solid-fg` | `var(--gr-danger-fg)` | `var(--gr-slate-50)` | `var(--gr-danger-fg)` | `var(--gr-danger-fg)` | `var(--gr-danger-fg)` | `var(--gr-slate-50)` | `var(--gr-danger-fg)` | `var(--gr-slate-50)` | Текст и иконки на заливке `--gr-danger-solid`. |
-| `--gr-info-solid` | `var(--gr-info)` | `#1d4ed8` | `var(--gr-info)` | `var(--gr-info)` | `var(--gr-info)` | `#1d4ed8` | `var(--gr-info)` | `#1d4ed8` | Сплошная заливка кнопочного веса тона `info`. |
-| `--gr-info-solid-hover` | `var(--gr-info-hover)` | `#1e40af` | `var(--gr-info-hover)` | `var(--gr-info-hover)` | `var(--gr-info-hover)` | `#1e40af` | `var(--gr-info-hover)` | `#1e40af` | Заливка `--gr-info-solid` под курсором. |
-| `--gr-info-solid-active` | `var(--gr-info-active)` | `#1e3a8a` | `var(--gr-info-active)` | `var(--gr-info-active)` | `var(--gr-info-active)` | `#1e3a8a` | `var(--gr-info-active)` | `#1e3a8a` | Заливка `--gr-info-solid` в момент нажатия. |
-| `--gr-info-solid-fg` | `var(--gr-info-fg)` | `var(--gr-slate-50)` | `var(--gr-info-fg)` | `var(--gr-info-fg)` | `var(--gr-info-fg)` | `var(--gr-slate-50)` | `var(--gr-info-fg)` | `var(--gr-slate-50)` | Текст и иконки на заливке `--gr-info-solid`. |
-| `--gr-slate-solid` | `var(--gr-slate)` | `var(--gr-slate-600)` | `var(--gr-slate)` | `var(--gr-slate)` | `var(--gr-slate)` | `var(--gr-slate-600)` | `var(--gr-slate)` | `var(--gr-slate-600)` | Сплошная заливка кнопочного веса тона `slate`. |
-| `--gr-slate-solid-hover` | `var(--gr-slate-hover)` | `var(--gr-slate-700)` | `var(--gr-slate-hover)` | `var(--gr-slate-hover)` | `var(--gr-slate-hover)` | `var(--gr-slate-700)` | `var(--gr-slate-hover)` | `var(--gr-slate-700)` | Заливка `--gr-slate-solid` под курсором. |
-| `--gr-slate-solid-active` | `var(--gr-slate-active)` | `var(--gr-slate-800)` | `var(--gr-slate-active)` | `var(--gr-slate-active)` | `var(--gr-slate-active)` | `var(--gr-slate-800)` | `var(--gr-slate-active)` | `var(--gr-slate-800)` | Заливка `--gr-slate-solid` в момент нажатия. |
-| `--gr-slate-solid-fg` | `var(--gr-slate-fg)` | `var(--gr-slate-50)` | `var(--gr-slate-fg)` | `var(--gr-slate-fg)` | `var(--gr-slate-fg)` | `var(--gr-slate-50)` | `var(--gr-slate-fg)` | `var(--gr-slate-50)` | Текст и иконки на заливке `--gr-slate-solid`. |
+| `--gr-danger-solid` | `var(--gr-danger)` | `#b91c1c` | `var(--gr-danger)` | `#b8433a` | `var(--gr-danger)` | `#b91c1c` | `var(--gr-danger)` | `#b91c1c` | Сплошная заливка кнопочного веса тона `danger`. |
+| `--gr-danger-solid-hover` | `var(--gr-danger-hover)` | `#a91919` | `var(--gr-danger-hover)` | `#a93c34` | `var(--gr-danger-hover)` | `#a91919` | `var(--gr-danger-hover)` | `#a91919` | Заливка `--gr-danger-solid` под курсором. |
+| `--gr-danger-solid-active` | `var(--gr-danger-active)` | `#931515` | `var(--gr-danger-active)` | `#99352e` | `var(--gr-danger-active)` | `#931515` | `var(--gr-danger-active)` | `#931515` | Заливка `--gr-danger-solid` в момент нажатия. |
+| `--gr-danger-solid-fg` | `var(--gr-danger-fg)` | `var(--gr-slate-50)` | `var(--gr-danger-fg)` | `#faf9f5` | `var(--gr-danger-fg)` | `var(--gr-slate-50)` | `var(--gr-danger-fg)` | `var(--gr-slate-50)` | Текст и иконки на заливке `--gr-danger-solid`. |
+| `--gr-info-solid` | `var(--gr-info)` | `#1d4ed8` | `var(--gr-info)` | `#2268bf` | `var(--gr-info)` | `#1d4ed8` | `var(--gr-info)` | `#1d4ed8` | Сплошная заливка кнопочного веса тона `info`. |
+| `--gr-info-solid-hover` | `var(--gr-info-hover)` | `#1e40af` | `var(--gr-info-hover)` | `#1f5fae` | `var(--gr-info-hover)` | `#1e40af` | `var(--gr-info-hover)` | `#1e40af` | Заливка `--gr-info-solid` под курсором. |
+| `--gr-info-solid-active` | `var(--gr-info-active)` | `#1e3a8a` | `var(--gr-info-active)` | `#1b559c` | `var(--gr-info-active)` | `#1e3a8a` | `var(--gr-info-active)` | `#1e3a8a` | Заливка `--gr-info-solid` в момент нажатия. |
+| `--gr-info-solid-fg` | `var(--gr-info-fg)` | `var(--gr-slate-50)` | `var(--gr-info-fg)` | `#faf9f5` | `var(--gr-info-fg)` | `var(--gr-slate-50)` | `var(--gr-info-fg)` | `var(--gr-slate-50)` | Текст и иконки на заливке `--gr-info-solid`. |
+| `--gr-slate-solid` | `var(--gr-slate)` | `var(--gr-slate-600)` | `var(--gr-slate)` | `#5e5d59` | `var(--gr-slate)` | `var(--gr-slate-600)` | `var(--gr-slate)` | `var(--gr-slate-600)` | Сплошная заливка кнопочного веса тона `slate`. |
+| `--gr-slate-solid-hover` | `var(--gr-slate-hover)` | `var(--gr-slate-700)` | `var(--gr-slate-hover)` | `color-mix(in srgb, var(--gr-slate-solid) 88%, var(--gr-bg))` | `var(--gr-slate-hover)` | `var(--gr-slate-700)` | `var(--gr-slate-hover)` | `var(--gr-slate-700)` | Заливка `--gr-slate-solid` под курсором. |
+| `--gr-slate-solid-active` | `var(--gr-slate-active)` | `var(--gr-slate-800)` | `var(--gr-slate-active)` | `color-mix(in srgb, var(--gr-slate-solid) 80%, var(--gr-bg))` | `var(--gr-slate-active)` | `var(--gr-slate-800)` | `var(--gr-slate-active)` | `var(--gr-slate-800)` | Заливка `--gr-slate-solid` в момент нажатия. |
+| `--gr-slate-solid-fg` | `var(--gr-slate-fg)` | `var(--gr-slate-50)` | `var(--gr-slate-fg)` | `#faf9f5` | `var(--gr-slate-fg)` | `var(--gr-slate-50)` | `var(--gr-slate-fg)` | `var(--gr-slate-50)` | Текст и иконки на заливке `--gr-slate-solid`. |
 | `--gr-azure-solid` | `#0369a1` | `#0369a1` | `var(--gr-azure)` | `var(--gr-azure)` | `#0369a1` | `#0369a1` | `#0369a1` | `#0369a1` | Сплошная заливка кнопочного веса тона `azure`. |
 | `--gr-azure-solid-hover` | `#075985` | `#075985` | `var(--gr-azure-hover)` | `var(--gr-azure-hover)` | `#075985` | `#075985` | `#075985` | `#075985` | Заливка `--gr-azure-solid` под курсором. |
 | `--gr-azure-solid-active` | `#0c4a6e` | `#0c4a6e` | `var(--gr-azure-active)` | `var(--gr-azure-active)` | `#0c4a6e` | `#0c4a6e` | `#0c4a6e` | `#0c4a6e` | Заливка `--gr-azure-solid` в момент нажатия. |
@@ -373,14 +389,14 @@ floating-компоненты не выходят по построению (v-c
 
 | Токен | blueprint-light | blueprint-dark | clay-light | clay-dark | slate-light | slate-dark | tactile-light | tactile-dark | Назначение |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| `--gr-sidebar` | `#ffffff` | `#1e293b` | `#efebe2` | `#2a2925` | `#ffffff` | `#1e293b` | `#ffffff` | `#1e293b` | Фон sidebar/navigation rail области текущей темы. |
-| `--gr-sidebar-fg` | `#0f172a` | `#f8fafc` | `#1c1b18` | `#f2efe7` | `#0f172a` | `#f8fafc` | `#0f172a` | `#f8fafc` | Основной текст и иконки внутри sidebar. |
-| `--gr-sidebar-primary` | `#4f46e5` | `#6365f0` | `#26241f` | `#f2efe7` | `#4f46e5` | `#6365f0` | `#4f46e5` | `#6365f0` | Акцентный цвет активных/ключевых элементов внутри sidebar. |
-| `--gr-sidebar-primary-fg` | `#ffffff` | `#ffffff` | `#fdfbf6` | `#1c1b18` | `#ffffff` | `#ffffff` | `#ffffff` | `#ffffff` | Контрастный текст поверх sidebar primary-акцентов. |
-| `--gr-sidebar-accent` | `#f1f5f9` | `#334155` | `#e4dfd3` | `#3a3934` | `#f1f5f9` | `#334155` | `#f1f5f9` | `#334155` | Мягкий accent-фон для hover/selected состояний в sidebar. |
-| `--gr-sidebar-accent-fg` | `#1e293b` | `#f1f5f9` | `#26241f` | `#ece8de` | `#1e293b` | `#f1f5f9` | `#1e293b` | `#f1f5f9` | Цвет текста поверх sidebar accent-подложек. |
-| `--gr-sidebar-brd` | `#e2e8f0` | `#334155` | `#dfd9cc` | `#45433d` | `#e2e8f0` | `#334155` | `#e2e8f0` | `#334155` | Бордеры и разделители sidebar-области. |
-| `--gr-sidebar-ring` | `#6366f1` | `#818cf8` | `#2d6cc8` | `#6fa2e2` | `#6366f1` | `#818cf8` | `#6366f1` | `#818cf8` | Focus-ring для интерактивных элементов внутри sidebar. |
+| `--gr-sidebar` | `#ffffff` | `#1e293b` | `#f0eee6` | `#1f1e1d` | `#ffffff` | `#1e293b` | `#ffffff` | `#1e293b` | Фон sidebar/navigation rail области текущей темы. |
+| `--gr-sidebar-fg` | `#0f172a` | `#f8fafc` | `#141413` | `#faf9f5` | `#0f172a` | `#f8fafc` | `#0f172a` | `#f8fafc` | Основной текст и иконки внутри sidebar. |
+| `--gr-sidebar-primary` | `#4f46e5` | `#6365f0` | `#141413` | `#faf9f5` | `#4f46e5` | `#6365f0` | `#4f46e5` | `#6365f0` | Акцентный цвет активных/ключевых элементов внутри sidebar. |
+| `--gr-sidebar-primary-fg` | `#ffffff` | `#ffffff` | `#faf9f5` | `#141413` | `#ffffff` | `#ffffff` | `#ffffff` | `#ffffff` | Контрастный текст поверх sidebar primary-акцентов. |
+| `--gr-sidebar-accent` | `#f1f5f9` | `#334155` | `#dad8d0` | `#3c3b39` | `#f1f5f9` | `#334155` | `#f1f5f9` | `#334155` | Мягкий accent-фон для hover/selected состояний в sidebar. |
+| `--gr-sidebar-accent-fg` | `#1e293b` | `#f1f5f9` | `#141413` | `#faf9f5` | `#1e293b` | `#f1f5f9` | `#1e293b` | `#f1f5f9` | Цвет текста поверх sidebar accent-подложек. |
+| `--gr-sidebar-brd` | `#e2e8f0` | `#334155` | `#d1cfc8` | `#3c3b39` | `#e2e8f0` | `#334155` | `#e2e8f0` | `#334155` | Бордеры и разделители sidebar-области. |
+| `--gr-sidebar-ring` | `#6366f1` | `#818cf8` | `#2a78d6` | `#6aa3e8` | `#6366f1` | `#818cf8` | `#6366f1` | `#818cf8` | Focus-ring для интерактивных элементов внутри sidebar. |
 
 > **`--gr-sidebar-primary` (slate-dark).** Белый текст на #6366f1 даёт 4.47:1 — тот же недолёт AA, из-за которого перекрашен `--gr-primary` (заметка выше). Здесь взят минимальный шаг, снимающий недолёт без смены вида: 4.52:1 при ΔE 0.42 к прежнему цвету.
 
@@ -399,21 +415,21 @@ floating-компоненты не выходят по построению (v-c
 
 | Токен | Формула | blueprint-light (fallback) | blueprint-dark (fallback) | clay-light (fallback) | clay-dark (fallback) | slate-light (fallback) | slate-dark (fallback) | tactile-light (fallback) | tactile-dark (fallback) | Назначение |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| `--gr-primary-hover` | `92% --gr-primary` + `--gr-fg` | `#4a42d6` | `#a494fa` | `#d78968` | `#db9270` | `#4a42d6` | `#a494fa` | `#4a42d6` | `#a494fa` | Hover-состояние primary action: подмес `--gr-fg` 8% в `--gr-primary`. |
-| `--gr-primary-active` | `84% --gr-primary` + `--gr-fg` | `#453ec7` | `#ac9dfa` | `#db9475` | `#dd9a7b` | `#453ec7` | `#ac9dfa` | `#453ec7` | `#ac9dfa` | Active-состояние primary action: подмес `--gr-fg` 16% в `--gr-primary`. |
-| `--gr-secondary-hover` | `92% --gr-secondary` + `--gr-fg` | `#d1d7e0` | `#435062` | `#d4cfc4` | `#494842` | `#d1d7e0` | `#435062` | `#d1d7e0` | `#435062` | Hover-состояние secondary action: подмес `--gr-fg` 8% в `--gr-secondary`. |
-| `--gr-secondary-active` | `84% --gr-secondary` + `--gr-fg` | `#c0c7d0` | `#535f70` | `#c4c0b5` | `#575651` | `#c0c7d0` | `#535f70` | `#c0c7d0` | `#535f70` | Active-состояние secondary action: подмес `--gr-fg` 16% в `--gr-secondary`. |
-| `--gr-brd-hover` | `70% --gr-brd` + `--gr-fg` | `#a3a9b5` | `#6e7987` | `#a5a096` | `#797770` | `#a3a9b5` | `#6e7987` | `#a3a9b5` | `#6e7987` | Hover-состояние бордеров и outline-элементов: подмес `--gr-fg` 30% в `--gr-brd`. |
-| `--gr-brd-active` | `55% --gr-brd` + `--gr-fg` | `#838a97` | `#8c94a0` | `#87847b` | `#93908a` | `#838a97` | `#8c94a0` | `#838a97` | `#8c94a0` | Active-состояние бордеров и outline-элементов: подмес `--gr-fg` 45% в `--gr-brd`. |
-| `--gr-success-hover` | `92% --gr-success` + `--gr-fg` | `#10ac7a` | `#44d6a1` | `#8ea66e` | `#9fb37c` | `#10ac7a` | `#44d6a1` | `#10ac7a` | `#44d6a1` | Hover-состояние success-ролей: подмес `--gr-fg` 8% в `--gr-success`. |
-| `--gr-success-active` | `84% --gr-success` + `--gr-fg` | `#109f73` | `#53d9a9` | `#98ad7b` | `#a6b886` | `#109f73` | `#53d9a9` | `#109f73` | `#53d9a9` | Active-состояние success-ролей: подмес `--gr-fg` 16% в `--gr-success`. |
-| `--gr-warning-hover` | `92% --gr-warning` + `--gr-fg` | `#e66c18` | `#fb9a4b` | `#d6ae52` | `#ddb95b` | `#e66c18` | `#fb9a4b` | `#e66c18` | `#fb9a4b` | Hover-состояние warning-ролей: подмес `--gr-fg` 8% в `--gr-warning`. |
-| `--gr-warning-active` | `84% --gr-warning` + `--gr-fg` | `#d46419` | `#fba35b` | `#dab561` | `#dfbd67` | `#d46419` | `#fba35b` | `#d46419` | `#fba35b` | Active-состояние warning-ролей: подмес `--gr-fg` 16% в `--gr-warning`. |
-| `--gr-danger-hover` | `92% --gr-danger` + `--gr-fg` | `#cc2526` | `#f87c7c` | `#a64137` | `#a54339` | `#cc2526` | `#f87c7c` | `#cc2526` | `#f87c7c` | Hover-состояние danger-ролей: подмес `--gr-fg` 8% в `--gr-danger`. |
-| `--gr-danger-active` | `84% --gr-danger` + `--gr-fg` | `#bb2427` | `#f88787` | `#9a3d35` | `#9a4036` | `#bb2427` | `#f88787` | `#bb2427` | `#f88787` | Active-состояние danger-ролей: подмес `--gr-fg` 16% в `--gr-danger`. |
-| `--gr-info-hover` | `92% --gr-info` + `--gr-fg` | `#235ddc` | `#6cacfa` | `#2d63ad` | `#3160a3` | `#235ddc` | `#6cacfa` | `#235ddc` | `#6cacfa` | Hover-состояние info-ролей: подмес `--gr-fg` 8% в `--gr-info`. |
-| `--gr-info-active` | `84% --gr-info` + `--gr-fg` | `#2157cc` | `#78b3fa` | `#2c5da0` | `#305a97` | `#2157cc` | `#78b3fa` | `#2157cc` | `#78b3fa` | Active-состояние info-ролей: подмес `--gr-fg` 16% в `--gr-info`. |
-| `--gr-slate-hover` | `92% --gr-slate` + `--gr-fg` | `#435064` | `#9caabd` | `#53514c` | `#aba89f` | `#435064` | `#9caabd` | `#435064` | `#9caabd` | Hover-состояние slate-ролей: подмес `--gr-fg` 8% в `--gr-slate`. |
-| `--gr-slate-active` | `84% --gr-slate` + `--gr-fg` | `#3e4b5f` | `#a4b1c3` | `#4e4d47` | `#b1aea5` | `#3e4b5f` | `#a4b1c3` | `#3e4b5f` | `#a4b1c3` | Active-состояние slate-ролей: подмес `--gr-fg` 16% в `--gr-slate`. |
-| `--gr-azure-hover` | `92% --gr-azure` + `--gr-fg` | `#016fab` | `#47c2f8` | `#7faad2` | `#8bb4da` | `#016fab` | `#47c2f8` | `#016fab` | `#47c2f8` | Hover-состояние azure-ролей: подмес `--gr-fg` 8% в `--gr-azure`. |
-| `--gr-azure-active` | `84% --gr-azure` + `--gr-fg` | `#0268a0` | `#57c7f9` | `#8bb1d5` | `#94b9db` | `#0268a0` | `#57c7f9` | `#0268a0` | `#57c7f9` | Active-состояние azure-ролей: подмес `--gr-fg` 16% в `--gr-azure`. |
+| `--gr-primary-hover` | `92% --gr-primary` + `--gr-fg` | `#4a42d6` | `#a494fa` | `#de876b` | `#dc8164` | `#4a42d6` | `#a494fa` | `#4a42d6` | `#a494fa` | Hover-состояние primary action: подмес `--gr-fg` 8% в `--gr-primary`. |
+| `--gr-primary-active` | `84% --gr-primary` + `--gr-fg` | `#453ec7` | `#ac9dfa` | `#e19279` | `#de8c70` | `#453ec7` | `#ac9dfa` | `#453ec7` | `#ac9dfa` | Active-состояние primary action: подмес `--gr-fg` 16% в `--gr-primary`. |
+| `--gr-secondary-hover` | `92% --gr-secondary` + `--gr-fg` | `#d1d7e0` | `#435062` | `#d7d5cc` | `#494946` | `#d1d7e0` | `#435062` | `#d1d7e0` | `#435062` | Hover-состояние secondary action: подмес `--gr-fg` 8% в `--gr-secondary`. |
+| `--gr-secondary-active` | `84% --gr-secondary` + `--gr-fg` | `#c0c7d0` | `#535f70` | `#c6c4bc` | `#595955` | `#c0c7d0` | `#535f70` | `#c0c7d0` | `#535f70` | Active-состояние secondary action: подмес `--gr-fg` 16% в `--gr-secondary`. |
+| `--gr-brd-hover` | `70% --gr-brd` + `--gr-fg` | `#a3a9b5` | `#6e7987` | `#9e9d9b` | `#797976` | `#a3a9b5` | `#6e7987` | `#a3a9b5` | `#6e7987` | Hover-состояние бордеров и outline-элементов: подмес `--gr-fg` 30% в `--gr-brd`. |
+| `--gr-brd-active` | `55% --gr-brd` + `--gr-fg` | `#838a97` | `#8c94a0` | `#80807e` | `#959491` | `#838a97` | `#8c94a0` | `#838a97` | `#8c94a0` | Active-состояние бордеров и outline-элементов: подмес `--gr-fg` 45% в `--gr-brd`. |
+| `--gr-success-hover` | `92% --gr-success` + `--gr-fg` | `#10ac7a` | `#44d6a1` | `#889a70` | `#93a578` | `#10ac7a` | `#44d6a1` | `#10ac7a` | `#44d6a1` | Hover-состояние success-ролей: подмес `--gr-fg` 8% в `--gr-success`. |
+| `--gr-success-active` | `84% --gr-success` + `--gr-fg` | `#109f73` | `#53d9a9` | `#93a37d` | `#9cad83` | `#109f73` | `#53d9a9` | `#109f73` | `#53d9a9` | Active-состояние success-ролей: подмес `--gr-fg` 16% в `--gr-success`. |
+| `--gr-warning-hover` | `92% --gr-warning` + `--gr-fg` | `#e66c18` | `#fb9a4b` | `#cfb246` | `#cdae3d` | `#e66c18` | `#fb9a4b` | `#e66c18` | `#fb9a4b` | Hover-состояние warning-ролей: подмес `--gr-fg` 8% в `--gr-warning`. |
+| `--gr-warning-active` | `84% --gr-warning` + `--gr-fg` | `#d46419` | `#fba35b` | `#d4b957` | `#d1b54d` | `#d46419` | `#fba35b` | `#d46419` | `#fba35b` | Active-состояние warning-ролей: подмес `--gr-fg` 16% в `--gr-warning`. |
+| `--gr-danger-hover` | `92% --gr-danger` + `--gr-fg` | `#cc2526` | `#f87c7c` | `#ab3f37` | `#e56566` | `#cc2526` | `#f87c7c` | `#cc2526` | `#f87c7c` | Hover-состояние danger-ролей: подмес `--gr-fg` 8% в `--gr-danger`. |
+| `--gr-danger-active` | `84% --gr-danger` + `--gr-fg` | `#bb2427` | `#f88787` | `#9e3b34` | `#e77273` | `#bb2427` | `#f88787` | `#bb2427` | `#f88787` | Active-состояние danger-ролей: подмес `--gr-fg` 16% в `--gr-danger`. |
+| `--gr-info-hover` | `92% --gr-info` + `--gr-fg` | `#235ddc` | `#6cacfa` | `#2161b1` | `#76aae9` | `#235ddc` | `#6cacfa` | `#235ddc` | `#6cacfa` | Hover-состояние info-ролей: подмес `--gr-fg` 8% в `--gr-info`. |
+| `--gr-info-active` | `84% --gr-info` + `--gr-fg` | `#2157cc` | `#78b3fa` | `#205ba3` | `#81b1ea` | `#2157cc` | `#78b3fa` | `#2157cc` | `#78b3fa` | Active-состояние info-ролей: подмес `--gr-fg` 16% в `--gr-info`. |
+| `--gr-slate-hover` | `92% --gr-slate` + `--gr-fg` | `#435064` | `#9caabd` | `#484844` | `#a4a29a` | `#435064` | `#9caabd` | `#435064` | `#9caabd` | Hover-состояние slate-ролей: подмес `--gr-fg` 8% в `--gr-slate`. |
+| `--gr-slate-active` | `84% --gr-slate` + `--gr-fg` | `#3e4b5f` | `#a4b1c3` | `#444340` | `#aba9a2` | `#3e4b5f` | `#a4b1c3` | `#3e4b5f` | `#a4b1c3` | Active-состояние slate-ролей: подмес `--gr-fg` 16% в `--gr-slate`. |
+| `--gr-azure-hover` | `92% --gr-azure` + `--gr-fg` | `#016fab` | `#47c2f8` | `#6fabbf` | `#68a6bb` | `#016fab` | `#47c2f8` | `#016fab` | `#47c2f8` | Hover-состояние azure-ролей: подмес `--gr-fg` 8% в `--gr-azure`. |
+| `--gr-azure-active` | `84% --gr-azure` + `--gr-fg` | `#0268a0` | `#57c7f9` | `#7cb2c5` | `#74adc0` | `#0268a0` | `#57c7f9` | `#0268a0` | `#57c7f9` | Active-состояние azure-ролей: подмес `--gr-fg` 16% в `--gr-azure`. |

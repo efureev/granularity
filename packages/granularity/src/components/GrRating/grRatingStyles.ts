@@ -50,6 +50,13 @@ export const ratingFillClassByTone: Record<GrRatingTone, string> = {
 // «Пустой» символ: приглушённая заливка, чтобы шкала читалась целиком.
 export const ratingVoidClass = 'text-[var(--gr-rating-void-color)]'
 
+/**
+ * Пустая звезда — заливка или контур по выбору темы. Заполненная обводится тем
+ * же цветом и той же толщиной: иначе контур пустой выглядывал бы по её краю.
+ */
+export const ratingVoidSvgClass = '[fill:var(--gr-rating-void-fill)] [stroke:var(--gr-rating-void-stroke)] [stroke-width:var(--gr-rating-stroke-width)] [stroke-linejoin:round]'
+export const ratingFillSvgClass = '[stroke:currentColor] [stroke-width:var(--gr-rating-stroke-width)] [stroke-linejoin:round]'
+
 // В ошибке пустые символы берут рамку недопустимого значения: токен темы при этом не перезаписывается.
 export const ratingVoidInvalidClass = 'text-[var(--gr-invalid-brd)]'
 

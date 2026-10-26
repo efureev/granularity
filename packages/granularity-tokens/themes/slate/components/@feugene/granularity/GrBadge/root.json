@@ -4,5 +4,6 @@
   "gr-badge-semi-radius-lg": "7px",
   "gr-badge-semi-radius-md": "5px",
   "gr-badge-semi-radius-sm": "3px",
-  "gr-badge-semi-radius-xs": "3px"
+  "gr-badge-semi-radius-xs": "3px",
+  "gr-badge-light-brd": "100%"
 }

@@ -82,6 +82,11 @@ export interface GrPromptDialogProps {
   confirmText?: string
   /** Подпись кнопки отмены. Не задана — берётся из локали. */
   cancelText?: string
+  /**
+   * Вес кнопки отмены. Не задан — из `GrConfigProvider`, иначе `outline`. Тема,
+   * где отмена — тихое действие рядом с главным, ставит `ghost`.
+   */
+  cancelVariant?: GrButtonVariant
   /** Текст ошибки для пустого значения при `required=true` (i18n). */
   requiredErrorText?: string
   /** Вес кнопки подтверждения. По умолчанию `primary`. */
@@ -197,6 +202,7 @@ const props = withDefaults(defineProps<GrPromptDialogProps>(), {
   buttonSize: undefined,
   confirmText: undefined,
   cancelText: undefined,
+  cancelVariant: undefined,
   requiredErrorText: undefined,
   confirmVariant: 'primary',
   confirmTone: 'primary',
@@ -223,6 +229,7 @@ const props = withDefaults(defineProps<GrPromptDialogProps>(), {
 
 // Эффективный размер: локальный проп → `GrConfigProvider` → дефолт компонента.
 const resolvedSize = useGrComponentProp('GrPromptDialog', 'size', () => props.size, 'md')
+const resolvedCancelVariant = useGrComponentProp('GrPromptDialog', 'cancelVariant', () => props.cancelVariant, 'outline')
 
 const emit = defineEmits<GrPromptDialogEmits>()
 
@@ -471,7 +478,7 @@ defineSlots<{
     <template #footer>
       <slot name="footer">
         <div class="flex items-center justify-end gap-3">
-          <GrButton data-testid="gr-prompt-cancel" variant="outline" :size="buttonSize" @click="onCancel">
+          <GrButton data-testid="gr-prompt-cancel" :variant="resolvedCancelVariant" :size="buttonSize" @click="onCancel">
             {{ resolvedCancelText }}
           </GrButton>
           <GrButton

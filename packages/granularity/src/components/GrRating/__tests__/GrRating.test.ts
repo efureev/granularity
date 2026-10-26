@@ -241,6 +241,23 @@ describe('GrRating — оформление и размеры', () => {
     const symbol = mount(Harness).get('[data-gr-rating-symbol]')
     expect(symbol.classes().join(' ')).toContain('0.875rem')
   })
+
+  it('тон — `warning`, из GrConfigProvider приходит свой, локальный проп сильнее', () => {
+    const Harness = defineComponent({
+      components: { GrConfigProvider, GrRating },
+      props: { tone: { type: String, default: undefined } },
+      template: `
+        <GrConfigProvider :component-defaults="{ GrRating: { tone: 'neutral' } }">
+          <GrRating :model-value="3" :tone="tone" />
+        </GrConfigProvider>
+      `,
+    })
+    const fillOf = (wrapper: ReturnType<typeof mount>) => wrapper.get('[data-gr-rating-fill]').classes()
+
+    expect(fillOf(mount(GrRating, { props: { modelValue: 3 } }))).toContain('text-[var(--gr-rating-color,var(--gr-warning))]')
+    expect(fillOf(mount(Harness))).toContain('text-[var(--gr-rating-color,var(--gr-fg))]')
+    expect(fillOf(mount(Harness, { props: { tone: 'success' } }))).toContain('text-[var(--gr-rating-color,var(--gr-success))]')
+  })
 })
 
 describe('GrRating — name (нативная форма)', () => {

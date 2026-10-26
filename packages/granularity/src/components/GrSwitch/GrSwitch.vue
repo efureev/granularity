@@ -18,7 +18,6 @@ import {
   grSwitchTrackClass,
   isGrSwitchStateTextSize,
   stateTextGhostClass,
-  stateTextRoom,
   stateTextStackClass,
   type GrSwitchLabelPosition,
   type GrSwitchSize,
@@ -66,7 +65,7 @@ export interface GrSwitchProps {
   value?: string
   /** `id` формы, если переключатель лежит вне неё. */
   form?: string
-  /** Кастомный цвет фона в активном состоянии. Если не задан — `var(--gr-primary)`. */
+  /** Кастомный цвет фона в активном состоянии. Если не задан — `var(--gr-selected)`. */
   activeBackgroundColor?: string
   /** Кастомный цвет фона в неактивном состоянии. Если не задан — `var(--gr-muted)`. */
   inactiveBackgroundColor?: string
@@ -211,15 +210,16 @@ const stateTextSize = computed<GrSwitchStateTextSize | undefined>(() => {
   return isGrSwitchStateTextSize(resolvedSize.value) ? resolvedSize.value : undefined
 })
 
-const hasStateText = computed(() => stateTextSize.value !== undefined)
-
 const rootClass = computed(() => grSwitchRootClass(props.labelPosition))
 
-const trackClass = computed(() => grSwitchTrackClass(resolvedSize.value, hasStateText.value && resolvedAutoWidth.value))
+const trackClass = computed(() => grSwitchTrackClass(
+  resolvedSize.value,
+  stateTextSize.value ? { size: stateTextSize.value, autoWidth: resolvedAutoWidth.value } : undefined,
+))
 
 const trackStyle = computed(() => {
   const isChecked = props.modelValue
-  const defaultBackgroundColor = isChecked ? 'var(--gr-primary)' : 'var(--gr-muted)'
+  const defaultBackgroundColor = isChecked ? 'var(--gr-selected)' : 'var(--gr-switch-off-bg)'
   const customBackgroundColor = getCustomColor(
     isChecked ? props.activeBackgroundColor : props.inactiveBackgroundColor,
   )
@@ -240,7 +240,7 @@ const trackStyle = computed(() => {
         : customBackgroundColor
           ? backgroundColor
           : isChecked
-            ? 'var(--gr-primary)'
+            ? 'var(--gr-selected)'
           // Выключенная дорожка светлая, как поверхность вокруг: видна она
           // только рамкой, и рамке нужна роль с 3:1 к фону.
             : 'var(--gr-control-brd)',
@@ -300,8 +300,7 @@ if (__GR_DEV__) {
 
     console.warn(
       `[granularity] GrSwitch: подпись состояния не нарисована на ступени \`${resolvedSize.value}\`: `
-      + `рядом с бегунком ${stateTextRoom[resolvedSize.value]}px, а минимально читаемой подписи нужен `
-      + `${stateTextRoom.md}px. Подписи живут на \`md\` и \`lg\`.`,
+      + 'рядом с бегунком меньше места, чем нужно читаемой подписи. Подписи живут на `md` и `lg`.',
     )
   })
 }

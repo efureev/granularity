@@ -1,0 +1,4 @@
+{
+  "gr-otp-input-focus-brd": "var(--gr-primary)",
+  "gr-otp-input-caret-color": "var(--gr-primary)"
+}

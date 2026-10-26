@@ -1104,9 +1104,9 @@ defineExpose<GrTreeInstance<T>>({
     --gr-tree-row-pr: var(--gr-tree-row-px);
     --gr-tree-font-size: inherit;
     --gr-tree-row-color: var(--gr-fg);
-    --gr-tree-row-hover-bg: color-mix(in srgb, var(--gr-primary) 10%, transparent);
-    --gr-tree-row-current-bg: color-mix(in srgb, var(--gr-primary) 14%, transparent);
-    --gr-tree-row-current-hover-bg: color-mix(in srgb, var(--gr-primary) 16%, transparent);
+    --gr-tree-row-hover-bg: color-mix(in srgb, var(--gr-selected) 10%, transparent);
+    --gr-tree-row-current-bg: color-mix(in srgb, var(--gr-selected) 14%, transparent);
+    --gr-tree-row-current-hover-bg: color-mix(in srgb, var(--gr-selected) 16%, transparent);
     --gr-tree-drag-handle-size: 24px;
     --gr-tree-drag-handle-mr: 0;
     --gr-tree-drag-handle-radius: 6px;
@@ -1131,8 +1131,8 @@ defineExpose<GrTreeInstance<T>>({
     --gr-tree-indent-step: calc(12px + var(--gr-tree-children-pl) + var(--gr-tree-branch-line-width));
     --gr-tree-row-current-color: var(--gr-tree-row-color);
     --gr-tree-row-current-bar-width: 0px;
-    --gr-tree-row-current-bar-color: var(--gr-primary);
-    --gr-tree-branch-font-weight: 600;
+    --gr-tree-row-current-bar-color: var(--gr-selected);
+    --gr-tree-branch-font-weight: var(--gr-tree-branch-weight);
     --gr-tree-branch-elbow-width: 8px;
     --gr-tree-branch-line-offset: 12px;
     --gr-tree-checkbox-size: 16px;
@@ -1140,8 +1140,8 @@ defineExpose<GrTreeInstance<T>>({
     --gr-tree-checkbox-brd-width: 1px;
     --gr-tree-checkbox-brd: var(--gr-brd);
     --gr-tree-checkbox-bg: transparent;
-    --gr-tree-checkbox-checked-bg: var(--gr-primary);
-    --gr-tree-checkbox-checked-fg: var(--gr-primary-fg);
+    --gr-tree-checkbox-checked-bg: var(--gr-selected);
+    --gr-tree-checkbox-checked-fg: var(--gr-selected-fg);
     --gr-tree-checkbox-mr: 4px;
     display: flex;
     flex-direction: column;

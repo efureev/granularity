@@ -531,7 +531,7 @@ describe('GrInput — форма рамки', () => {
   it('по умолчанию коробка: скругление шкалы контролов', () => {
     const wrapper = mount(GrInput, { props: { modelValue: '' } })
 
-    expect(shell(wrapper).classes()).toContain('rounded-[var(--gr-radius-control)]')
+    expect(shell(wrapper).classes()).toContain('rounded-[var(--gr-radius-control-md)]')
     expect(wrapper.get('input').classes()).toContain('px-3')
   })
 
@@ -556,7 +556,7 @@ describe('GrInput — форма рамки', () => {
       props: { modelValue: '', shape: 'box' },
       global: granularityGlobal({ componentDefaults: { GrInput: { shape: 'pill' } } }),
     })
-    expect(shell(overridden).classes()).toContain('rounded-[var(--gr-radius-control)]')
+    expect(shell(overridden).classes()).toContain('rounded-[var(--gr-radius-control-md)]')
   })
 
   it('аддон-отсек в пилюле отодвигает поле на увеличенный отступ', () => {

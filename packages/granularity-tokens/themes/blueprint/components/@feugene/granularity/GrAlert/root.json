@@ -1,0 +1,12 @@
+{
+  "gr-alert-radius": "var(--gr-radius-lg)",
+  "gr-alert-title-weight": "var(--gr-font-semibold)",
+  "gr-alert-body-fg": "var(--gr-muted-fg)",
+  "gr-alert-soft-brd": "var(--gr-brd)",
+  "gr-alert-soft-brd-tone": "35%",
+  "gr-alert-soft-title-tone": "100%",
+  "gr-alert-soft-text-tone": "100%",
+  "gr-alert-outline-bg": "transparent",
+  "gr-alert-outline-brd": "var(--gr-brd)",
+  "gr-alert-outline-brd-tone": "45%"
+}

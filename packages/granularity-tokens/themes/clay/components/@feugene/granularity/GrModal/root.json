@@ -1,0 +1,7 @@
+{
+  "gr-modal-shadow": "var(--gr-shadow-3)",
+  "gr-modal-width-sm": "400px",
+  "gr-modal-width-md": "480px",
+  "gr-modal-width-lg": "640px",
+  "gr-modal-width-xl": "920px"
+}

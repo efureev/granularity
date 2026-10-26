@@ -4,6 +4,7 @@ import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import type { GrDataColumn } from '../GrDataTable.vue'
 import {
   columnPinnedClass,
+  columnPinnedSelectedClass,
   columnPinnedHeadClass,
   columnPinnedLeftEdgeClass,
   columnPinnedRightEdgeClass,
@@ -34,7 +35,7 @@ export interface UseDataTableLayoutOptions<TRow extends Record<string, unknown>>
 export interface DataTableLayout<TRow extends Record<string, unknown>> {
   hasPinnedLeft: ComputedRef<boolean>
   pinnedStyleOf: (col: GrDataColumn<TRow>) => Record<string, string> | undefined
-  pinnedCellClass: (col: GrDataColumn<TRow>, index: number, head?: boolean) => string[]
+  pinnedCellClass: (col: GrDataColumn<TRow>, index: number, head?: boolean, selected?: boolean) => string[]
   measureLayout: () => void
 }
 
@@ -120,12 +121,14 @@ export function useDataTableLayout<TRow extends Record<string, unknown>>(
     return ''
   }
 
-  /** `head` — ячейка шапки: у неё фон шапки, а не карточки. */
-  function pinnedCellClass(col: GrDataColumn<TRow>, index: number, head = false): string[] {
+  /** `head` — ячейка шапки: у неё фон шапки, а не карточки; `selected` — ячейка выбранной строки. */
+  function pinnedCellClass(col: GrDataColumn<TRow>, index: number, head = false, selected = false): string[] {
     if (!col.pinned)
       return []
 
-    return [head ? columnPinnedHeadClass : columnPinnedClass, pinnedEdgeClass(col, index)]
+    const surface = head ? columnPinnedHeadClass : selected ? columnPinnedSelectedClass : columnPinnedClass
+
+    return [surface, pinnedEdgeClass(col, index)]
   }
 
   /**

@@ -71,9 +71,10 @@
 | Точка | Что задаёт |
 | --- | --- |
 | `size` | `xs`…`lg`, читается из `GrConfigProvider` |
-| `tone` | цвет заливки из шкалы тонов |
+| `tone` | цвет заливки из шкалы тонов, читается из `GrConfigProvider`, иначе `warning` |
 | `--gr-rating-color` | цвет заливки точечно, сильнее `tone` |
 | `--gr-rating-void-color` | цвет незаполненного символа |
+| `--gr-rating-void-fill`, `--gr-rating-void-stroke`, `--gr-rating-stroke-width` | пустая звезда залитая или контуром — решение темы |
 | `icon` / слот `#symbol` | свой символ вместо встроенной звезды |
 
 Символ по умолчанию — инлайновый SVG: иконочные маски `i-lucide-star` дают

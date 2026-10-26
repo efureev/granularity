@@ -1,0 +1,15 @@
+{
+  "gr-switch-off-bg": "var(--gr-muted)",
+  "gr-switch-thumb-bg": "var(--gr-card)",
+  "gr-switch-thumb-shadow": "var(--gr-shadow-1)",
+  "gr-switch-track-height-xs": "1rem",
+  "gr-switch-track-width-xs": "1.75rem",
+  "gr-switch-track-height-sm": "1.25rem",
+  "gr-switch-track-width-sm": "2.25rem",
+  "gr-switch-track-height-md": "1.5rem",
+  "gr-switch-track-width-md": "2.75rem",
+  "gr-switch-track-height-lg": "1.75rem",
+  "gr-switch-track-width-lg": "3.5rem",
+  "gr-switch-text-track-width-md": "2.75rem",
+  "gr-switch-text-track-width-lg": "3.5rem"
+}

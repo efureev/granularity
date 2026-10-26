@@ -12,10 +12,10 @@ export const zonePaddings: Record<GrFileUploadSize, string> = {
 
 /** Плитка с иконкой слева от подписи. */
 export const iconTileSizes: Record<GrFileUploadSize, string> = {
-  xs: 'h-8 w-8 rounded-[var(--gr-radius-md)]',
-  sm: 'h-10 w-10 rounded-[var(--gr-radius-md)]',
-  md: 'h-12 w-12 rounded-[var(--gr-radius-lg)]',
-  lg: 'h-14 w-14 rounded-[var(--gr-radius-lg)]',
+  xs: 'h-8 w-8 rounded-[var(--gr-file-upload-icon-radius-xs)]',
+  sm: 'h-10 w-10 rounded-[var(--gr-file-upload-icon-radius-sm)]',
+  md: 'h-12 w-12 rounded-[var(--gr-file-upload-icon-radius-md)]',
+  lg: 'h-14 w-14 rounded-[var(--gr-file-upload-icon-radius-lg)]',
 }
 
 /**
@@ -85,19 +85,25 @@ export const zoneDisabledClass = 'bg-[var(--gr-muted)] cursor-not-allowed'
  * `readonly` — не `disabled`: набор виден и уходит в форму, поэтому контраст
  * остаётся обычным. Меняется только приглашение к вводу — курсор и ховер.
  */
-export const zoneReadonlyClass = 'bg-[var(--gr-card)] cursor-default focus-within:ring-2 focus-within:ring-[var(--gr-ring)] focus-within:ring-offset-2 focus-within:ring-offset-[var(--gr-bg)]'
+export const zoneReadonlyClass = 'cursor-default focus-within:ring-2 focus-within:ring-[var(--gr-ring)] focus-within:ring-offset-2 focus-within:ring-offset-[var(--gr-bg)]'
 
-export const zoneIdleClass = 'bg-[var(--gr-card)] cursor-pointer hover:bg-[var(--gr-muted)] focus-within:ring-2 focus-within:ring-[var(--gr-ring)] focus-within:ring-offset-2 focus-within:ring-offset-[var(--gr-bg)]'
+export const zoneIdleClass = 'cursor-pointer hover:bg-[var(--gr-file-upload-zone-hover-bg)] focus-within:ring-2 focus-within:ring-[var(--gr-ring)] focus-within:ring-offset-2 focus-within:ring-offset-[var(--gr-bg)]'
+
+/**
+ * Заливка — одна на состояние, как и рамка ниже: два `bg-*` на узле решались
+ * бы порядком утилит в листе.
+ */
+export const zoneSurfaceClass = 'bg-[var(--gr-file-upload-zone-bg)]'
 
 /** Файл над зоной: подсветка появляется только там, где drop реально примут. */
-export const zoneOverClass = 'border-[var(--gr-ring)] bg-[var(--gr-muted)]'
+export const zoneOverClass = 'border-[var(--gr-file-upload-zone-over-brd)] bg-[var(--gr-file-upload-zone-over-bg)]'
 
 /*
  * Цвет рамки — один класс на состояние: два `border-[…]` на узле решаются
  * порядком утилит в листе. Сброс поверх (`over`) сильнее ошибки — это ответ на
  * жест, — ошибка сильнее обычной рамки: раньше `invalid` её не красил вовсе.
  */
-export const zoneBorderIdleClass = 'border-[var(--gr-brd)]'
+export const zoneBorderIdleClass = 'border-[var(--gr-file-upload-zone-brd)]'
 export const zoneBorderInvalidClass = 'border-[var(--gr-invalid-brd)]'
 
 export function grFileUploadZoneClass(options: {
@@ -116,6 +122,7 @@ export function grFileUploadZoneClass(options: {
     zoneBaseClass,
     zonePaddings[options.size],
     state,
+    options.disabled || over ? '' : zoneSurfaceClass,
     over ? zoneOverClass : options.invalid && !options.disabled ? zoneBorderInvalidClass : zoneBorderIdleClass,
   ].filter(Boolean).join(' ')
 }

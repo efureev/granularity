@@ -2,6 +2,7 @@ import { mount } from '@vue/test-utils'
 import { defineComponent, nextTick, ref } from 'vue'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
+import GrConfigProvider from '../../GrConfigProvider/GrConfigProvider.vue'
 import GrConfirmDialog from '../GrConfirmDialog.vue'
 
 afterEach(() => {
@@ -9,6 +10,27 @@ afterEach(() => {
 })
 
 describe('GrConfirmDialog', () => {
+  it('вес отмены — `outline`, пропом и из GrConfigProvider меняется', async () => {
+    const Harness = defineComponent({
+      components: { GrConfigProvider, GrConfirmDialog },
+      props: { cancelVariant: { type: String, default: undefined }, configured: { type: Boolean, default: false } },
+      template: `
+        <GrConfigProvider :component-defaults="configured ? { GrConfirmDialog: { cancelVariant: 'ghost' } } : {}">
+          <GrConfirmDialog :model-value="true" description="Delete?" :cancel-variant="cancelVariant" />
+        </GrConfigProvider>
+      `,
+    })
+    const variantOf = async (props: Record<string, unknown>) => {
+      const wrapper = mount(Harness, { props, global: { stubs: { teleport: true } } })
+      await nextTick()
+      return wrapper.get('[data-testid="gr-confirm-cancel"]').attributes('data-gr-variant')
+    }
+
+    expect(await variantOf({})).toBe('outline')
+    expect(await variantOf({ configured: true })).toBe('ghost')
+    expect(await variantOf({ configured: true, cancelVariant: 'secondary' })).toBe('secondary')
+  })
+
   it('рендерит описание и дефолтные тексты, а confirm/cancel закрывают диалог', async () => {
     const Harness = defineComponent({
       name: 'HarnessConfirmDialogActions',

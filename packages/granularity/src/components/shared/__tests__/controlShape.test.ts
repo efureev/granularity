@@ -16,16 +16,24 @@ function utilityToPx(utility: string): number {
 }
 
 describe('форма контрола', () => {
-  it('обе формы объявлены и у каждой свой радиус', () => {
+  it('обе формы объявлены и на каждой ступени у них свой радиус', () => {
     expect([...GR_CONTROL_SHAPES]).toEqual(['box', 'pill'])
-    expect(new Set(Object.values(controlShapeRadiusClass)).size).toBe(GR_CONTROL_SHAPES.length)
+    for (const size of GR_COMPONENT_SIZES)
+      expect(new Set(GR_CONTROL_SHAPES.map(shape => controlShapeRadiusClass[shape][size])).size, `ступень ${size}`).toBe(GR_CONTROL_SHAPES.length)
   })
 
   it('радиусы берутся из токенов, а не из шкалы uno', () => {
     // `rounded-md` это 6px, то есть уже не та ступень: шаги uno сдвинуты
     // относительно шкалы пакета.
-    for (const value of Object.values(controlShapeRadiusClass))
-      expect(value).toMatch(/^rounded-\[var\(--gr-radius-[a-z]+\)\]$/)
+    for (const bySize of Object.values(controlShapeRadiusClass)) {
+      for (const value of Object.values(bySize))
+        expect(value).toMatch(/^rounded-\[var\(--gr-radius-[a-z-]+\)\]$/)
+    }
+  })
+
+  it('коробка скругляется токеном своей ступени', () => {
+    for (const size of GR_COMPONENT_SIZES)
+      expect(controlShapeRadiusClass.box[size]).toBe(`rounded-[var(--gr-radius-control-${size})]`)
   })
 
   it('класс и число отступа пилюли — одно значение', () => {

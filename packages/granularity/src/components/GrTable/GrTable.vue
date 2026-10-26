@@ -7,6 +7,7 @@ import { hasMeaningfulSlotContent } from '../shared/slotNodes'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 import {
   emptyCellClass,
+  headLineClass,
   hoverableClass,
   loadingRowCellClass,
   stickyColumnHoverableClass,
@@ -218,7 +219,7 @@ const stickyColumnClass = computed(() => {
     '[&>tfoot>tr>*:first-child]:bg-[var(--gr-card)]',
     // Шапке фон уже задан на `<thead>`, но он скроллится вместе с ней:
     // липкой ячейке нужен свой.
-    '[&>thead>tr>*:first-child]:bg-[var(--gr-muted)]',
+    '[&>thead>tr>*:first-child]:bg-[var(--gr-table-head-bg)]',
     props.striped && showRows.value ? stickyColumnStripedClass : '',
     props.hoverable && showRows.value ? stickyColumnHoverableClass : '',
   ].filter(Boolean).join(' ')
@@ -241,7 +242,7 @@ const scrollStyle = computed(() => {
 // Прилипающий заголовок: `<thead>` на `position: sticky`; фон обязателен, иначе
 // сквозь него будут просвечивать строки при скролле.
 const theadClass = computed(() => [
-  'bg-[var(--gr-muted)] text-[var(--gr-muted-fg)]',
+  'bg-[var(--gr-table-head-bg)] text-[var(--gr-muted-fg)]',
   props.stickyHeader ? 'sticky top-0 z-[1]' : '',
 ].filter(Boolean).join(' '))
 
@@ -331,7 +332,7 @@ defineSlots<{
     <table
       data-gr-table
       :role="role === 'grid' ? 'grid' : undefined"
-      class="min-w-full" :class="[tableTextClass, bodyClass, stickyColumnClass, fixedLayout ? 'table-fixed' : '']"
+      class="min-w-full" :class="[tableTextClass, bodyClass, headLineClass, stickyColumnClass, fixedLayout ? 'table-fixed' : '']"
       :style="tableStyle"
       :aria-label="ariaLabelledby ? undefined : ariaLabel"
       :aria-labelledby="ariaLabelledby"

@@ -34,8 +34,10 @@ export const DETAIL_ROW_ATTR = 'data-gr-table-off-grid'
  * строкой из атрибута служебной строки и оттенка, экстрактор их не видит, и
  * поэтому они объявлены в `GrTable/safelist.ts`.
  */
-const STRIPE_TINT = 'color-mix(in_srgb,var(--gr-muted)_35%,transparent)'
-const HOVER_TINT = 'color-mix(in_srgb,var(--gr-muted)_45%,transparent)'
+// Доля `--gr-muted` — у темы, а не готовый цвет: та же доля даёт и прозрачную
+// подсветку строки, и непрозрачную у закреплённой колонки, и они не расходятся.
+const STRIPE_TINT = 'color-mix(in_srgb,var(--gr-muted)_var(--gr-table-stripe-share),transparent)'
+const HOVER_TINT = 'color-mix(in_srgb,var(--gr-muted)_var(--gr-table-hover-share),transparent)'
 
 /**
  * Чередование строк и подсветка под курсором — на таблице, а не на ячейках.
@@ -68,12 +70,27 @@ export const hoverableClass = `[&>tbody>tr:not([${DETAIL_ROW_ATTR}]):hover]:bg-[
  * оттенки собираются заново поверх непрозрачной карточки: визуально это тот же
  * цвет, но без дыры.
  */
-const STRIPE_OPAQUE = 'color-mix(in_srgb,var(--gr-muted)_35%,var(--gr-card))'
-const HOVER_OPAQUE = 'color-mix(in_srgb,var(--gr-muted)_45%,var(--gr-card))'
+const STRIPE_OPAQUE = 'color-mix(in_srgb,var(--gr-muted)_var(--gr-table-stripe-share),var(--gr-card))'
+const HOVER_OPAQUE = 'color-mix(in_srgb,var(--gr-muted)_var(--gr-table-hover-share),var(--gr-card))'
 
 export const stickyColumnStripedClass = `[&>tbody>tr:nth-child(even_of_:not([${DETAIL_ROW_ATTR}]))>*:first-child]:bg-[${STRIPE_OPAQUE}]`
 
 export const stickyColumnHoverableClass = `[&>tbody>tr:not([${DETAIL_ROW_ATTR}]):hover>*:first-child]:bg-[${HOVER_OPAQUE}]`
+
+/**
+ * Линия под шапкой — фоновым слоем по нижнему краю ячеек шапки, а не рамкой.
+ * Таблица — в схлопнутых рамках, и рамка ячейки шапки побеждала бы рамку
+ * первой строки: тема без линии теряла бы границу под шапкой, тема с линией
+ * получала бы её и в пустой таблице. Слой не занимает места, не спорит с
+ * заливкой шапки и липкой колонки и едет вместе с липкой шапкой. Толщина 0 —
+ * линии нет.
+ */
+export const headLineClass = [
+  '[&>thead>tr>*]:[background-image:linear-gradient(var(--gr-table-head-line),var(--gr-table-head-line))]',
+  '[&>thead>tr>*]:[background-size:100%_var(--gr-table-head-line-width)]',
+  '[&>thead>tr>*]:[background-position:bottom]',
+  '[&>thead>tr>*]:bg-no-repeat',
+].join(' ')
 
 export const emptyCellClass = 'px-4 py-8 text-center text-[var(--gr-muted-fg)]'
 export const loadingRowCellClass = 'px-4 py-3'

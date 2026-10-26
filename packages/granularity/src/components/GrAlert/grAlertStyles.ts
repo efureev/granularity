@@ -78,13 +78,12 @@ export function grAlertIconKey(tone: GrTone): GrAlertIconKey {
 }
 
 /**
- * Рамка выводится из тона формулой, а не задаётся отдельным токеном на каждый
- * тон: доля тона в смеси с `--gr-brd` — единственное, что отличает рамки между
- * собой. 22% (как было) давало 1.27–1.51:1 к собственной подложке — край
- * практически не читался; 35/45% поднимают его до 1.42–2.07:1.
+ * Цвет слоя — смесь тона с нейтральной основой, а долю тона задаёт тема
+ * (`--gr-alert-*-tone`): одна ручка на все восемь тонов. 100% — слой цветом
+ * тона, 0% — основой.
  */
-function border(accent: string, ratio: number): string {
-  return `color-mix(in srgb, ${accent} ${ratio}%, var(--gr-brd))`
+function mix(color: string, share: string, base: string): string {
+  return `color-mix(in srgb, ${color} ${share}, ${base})`
 }
 
 export function resolveGrAlertColors(tone: GrTone, variant: GrAlertVariant): GrAlertColors {
@@ -92,14 +91,14 @@ export function resolveGrAlertColors(tone: GrTone, variant: GrAlertVariant): GrA
 
   if (variant === 'outline') {
     return {
-      // Прозрачный, а не фон страницы: `outline` — только рамка, и сообщение
-      // стоит на той поверхности, где его поставили. `var(--gr-bg)` внутри
-      // карточки читался дырой — тёмной на тёмной теме, серой на светлой.
-      bg: 'transparent',
-      border: border(t.accent, 45),
+      // Фон страницы `var(--gr-bg)` внутри карточки читался дырой — тёмной на
+      // тёмной теме, серой на светлой, поэтому тема ставит прозрачный или
+      // поверхность карточки.
+      bg: 'var(--gr-alert-outline-bg)',
+      border: mix(t.accent, 'var(--gr-alert-outline-brd-tone)', 'var(--gr-alert-outline-brd)'),
       icon: t.text,
       title: 'var(--gr-fg)',
-      text: 'var(--gr-muted-fg)',
+      text: 'var(--gr-alert-body-fg)',
       close: 'var(--gr-muted-fg)',
       closeHover: 'var(--gr-fg)',
       closeHoverBg: 'var(--gr-muted)',
@@ -108,13 +107,13 @@ export function resolveGrAlertColors(tone: GrTone, variant: GrAlertVariant): GrA
 
   return {
     bg: t.surface,
-    border: border(t.accent, 35),
-    // Иерархия «заголовок / текст» держится на размере и насыщении шрифта, а не
-    // на цвете: приглушать тональный текст подмешиванием подложки нельзя —
-    // на тёмной теме warning и danger проваливают 4.5:1 уже при 15% подмеса.
+    border: mix(t.accent, 'var(--gr-alert-soft-brd-tone)', 'var(--gr-alert-soft-brd)'),
+    // Приглушать тональный текст подмешиванием подложки нельзя — на тёмной
+    // теме warning и danger проваливают 4.5:1 уже при 15% подмеса. Тема
+    // выбирает между тоном и нейтральной основой целиком, а не серединой.
     icon: t.text,
-    title: t.text,
-    text: t.text,
+    title: mix(t.text, 'var(--gr-alert-soft-title-tone)', 'var(--gr-fg)'),
+    text: mix(t.text, 'var(--gr-alert-soft-text-tone)', 'var(--gr-alert-body-fg)'),
     close: t.text,
     closeHover: t.text,
     closeHoverBg: `color-mix(in srgb, ${t.accent} 16%, transparent)`,

@@ -1,0 +1,6 @@
+{
+  "gr-chip-neutral-bg": "var(--gr-bg)",
+  "gr-chip-neutral-fg": "var(--gr-fg)",
+  "gr-chip-neutral-brd": "var(--gr-control-brd)",
+  "gr-chip-neutral-hover-brd": "var(--gr-control-brd-hover)"
+}

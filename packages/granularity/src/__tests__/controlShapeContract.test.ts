@@ -45,14 +45,14 @@ describe('контракт формы рамки', () => {
       it('по умолчанию — коробка со скруглением шкалы контролов', () => {
         const wrapper = mount({ render: () => control.render() })
 
-        expect(markup(wrapper)).toContain(controlShapeRadiusClass.box)
+        expect(markup(wrapper)).toContain(controlShapeRadiusClass.box.md)
       })
 
       it('shape="pill" меняет скругление коробки', () => {
         const box = mount({ render: () => control.render('box') })
         const pill = mount({ render: () => control.render('pill') })
 
-        expect(markup(pill)).toContain(controlShapeRadiusClass.pill)
+        expect(markup(pill)).toContain(controlShapeRadiusClass.pill.md)
         expect(markup(pill), 'коробка и пилюля отрисовались одинаково').not.toBe(markup(box))
       })
 
@@ -62,7 +62,7 @@ describe('контракт формы рамки', () => {
           { global: granularityGlobal({ componentDefaults: { [control.name]: { shape: 'pill' } } }) },
         )
 
-        expect(markup(wrapper)).toContain(controlShapeRadiusClass.pill)
+        expect(markup(wrapper)).toContain(controlShapeRadiusClass.pill.md)
       })
     })
   }

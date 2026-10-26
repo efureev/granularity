@@ -1,0 +1,6 @@
+{
+  "gr-toaster-brd": "var(--gr-brd)",
+  "gr-toaster-shadow": "var(--gr-shadow-2)",
+  "gr-toaster-title-weight": "var(--gr-font-bold)",
+  "gr-toaster-icon-tone": "100%"
+}

@@ -1,0 +1,16 @@
+{
+  "gr-file-upload-zone-bg": "var(--gr-bg)",
+  "gr-file-upload-zone-brd": "var(--gr-control-brd)",
+  "gr-file-upload-zone-over-brd": "var(--gr-fg)",
+  "gr-file-upload-icon-brd": "transparent",
+  "gr-file-upload-icon-fg": "var(--gr-secondary-fg)",
+  "gr-file-upload-icon-radius-xs": "var(--gr-radius-full)",
+  "gr-file-upload-icon-radius-sm": "var(--gr-radius-full)",
+  "gr-file-upload-icon-radius-md": "var(--gr-radius-full)",
+  "gr-file-upload-icon-radius-lg": "var(--gr-radius-full)",
+  "gr-file-upload-list-gap": "0.5rem",
+  "gr-file-upload-item-bg": "var(--gr-card)",
+  "gr-file-upload-item-brd": "var(--gr-brd)",
+  "gr-file-upload-item-radius": "10px",
+  "gr-file-upload-item-padding": "0.625rem"
+}

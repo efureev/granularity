@@ -1,0 +1,6 @@
+{
+  "gr-pagination-page-fg": "var(--gr-muted-fg)",
+  "gr-pagination-page-hover-bg": "var(--gr-accent)",
+  "gr-pagination-page-hover-fg": "var(--gr-accent-fg)",
+  "gr-pagination-page-weight": "var(--gr-font-semibold)"
+}

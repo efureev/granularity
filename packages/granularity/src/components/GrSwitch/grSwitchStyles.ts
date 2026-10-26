@@ -6,6 +6,13 @@ export type GrSwitchSize = GrComponentSize
 export const GR_SWITCH_LABEL_POSITIONS = ['start', 'end'] as const
 export type GrSwitchLabelPosition = typeof GR_SWITCH_LABEL_POSITIONS[number]
 
+/**
+ * Ступени, на которых подпись состояния помещается внутрь дорожки; расчёт места —
+ * `docs/components/GrSwitch.md`, §«Подпись состояния живёт не на всех ступенях».
+ */
+export const GR_SWITCH_STATE_TEXT_SIZES = ['md', 'lg'] as const
+export type GrSwitchStateTextSize = typeof GR_SWITCH_STATE_TEXT_SIZES[number]
+
 type GrSwitchThumbClassOptions = {
   checked: boolean
   size: GrSwitchSize
@@ -22,43 +29,61 @@ export const rootLabelPositions: Record<GrSwitchLabelPosition, string> = {
 export const trackBase
   = 'relative inline-flex shrink-0 items-center rounded-[var(--gr-radius-full)] border border-[var(--gr-switch-track-brd)] transition-colors duration-[var(--gr-duration-fast)]'
 
+/**
+ * Геометрия — из темы: у каждой ступени высота и ширина дорожки
+ * (`--gr-switch-track-height-<ступень>`, `--gr-switch-track-width-<ступень>`).
+ * Всё остальное выводится из высоты формулой, поэтому зазоры сходятся в любой
+ * теме сами: бегунок — высота минус рамка и зазор с обеих сторон, отступ подписи
+ * — бегунок плюс зазор. Число, которое тема могла бы рассогласовать, — одно.
+ */
 export const trackSizes: Record<GrSwitchSize, string> = {
-  xs: 'h-4 w-7',
-  sm: 'h-5 w-9',
-  md: 'h-6 w-11',
-  lg: 'h-7 w-14',
+  xs: 'h-[var(--gr-switch-track-height-xs)] w-[var(--gr-switch-track-width-xs)]',
+  sm: 'h-[var(--gr-switch-track-height-sm)] w-[var(--gr-switch-track-width-sm)]',
+  md: 'h-[var(--gr-switch-track-height-md)] w-[var(--gr-switch-track-width-md)]',
+  lg: 'h-[var(--gr-switch-track-height-lg)] w-[var(--gr-switch-track-width-lg)]',
 }
 
 /**
- * Дорожка в режиме `autoWidth`: та же ступень становится **нижней границей**,
- * а ширину берёт подпись. Высота остаётся фиксированной — тянется только строка.
+ * Дорожка с подписью состояния — своей ширины. Подпись — часть дорожки, и тема
+ * с компактным переключателем отдаёт ей место шириной, а не мельчит кегль:
+ * гейт держит, что места в каждой теме не меньше, чем в базовой.
  */
-export const trackAutoSizes: Record<GrSwitchSize, string> = {
-  xs: 'h-4 min-w-7',
-  sm: 'h-5 min-w-9',
-  md: 'h-6 min-w-11',
-  lg: 'h-7 min-w-14',
+export const trackTextSizes: Record<GrSwitchStateTextSize, string> = {
+  md: 'h-[var(--gr-switch-track-height-md)] w-[var(--gr-switch-text-track-width-md)]',
+  lg: 'h-[var(--gr-switch-track-height-lg)] w-[var(--gr-switch-text-track-width-lg)]',
+}
+
+/**
+ * Дорожка с подписью в режиме `autoWidth`: та же ширина становится **нижней
+ * границей**, а ширину берёт подпись. Высота остаётся ступенью — тянется только
+ * строка.
+ */
+export const trackAutoSizes: Record<GrSwitchStateTextSize, string> = {
+  md: 'h-[var(--gr-switch-track-height-md)] min-w-[var(--gr-switch-text-track-width-md)]',
+  lg: 'h-[var(--gr-switch-track-height-lg)] min-w-[var(--gr-switch-text-track-width-lg)]',
 }
 
 export const thumbBase
-  = 'absolute top-[1px] inline-flex shrink-0 items-center justify-center rounded-[var(--gr-radius-full)] bg-[var(--gr-card)] shadow-[var(--gr-shadow-1)] transition-[left,transform] duration-[var(--gr-duration-fast)]'
+  = 'absolute top-[1px] inline-flex shrink-0 items-center justify-center rounded-[var(--gr-radius-full)] bg-[var(--gr-switch-thumb-bg)] shadow-[var(--gr-switch-thumb-shadow)] transition-[left,transform] duration-[var(--gr-duration-fast)]'
 
+/** Бегунок — высота дорожки минус рамка и зазор с обеих сторон: `h − 2 · (1 + 1)`. */
 export const thumbSizes: Record<GrSwitchSize, string> = {
-  xs: 'h-3 w-3',
-  sm: 'h-4 w-4',
-  md: 'h-5 w-5',
-  lg: 'h-6 w-6',
+  xs: 'h-[calc(var(--gr-switch-track-height-xs)_-_4px)] w-[calc(var(--gr-switch-track-height-xs)_-_4px)]',
+  sm: 'h-[calc(var(--gr-switch-track-height-sm)_-_4px)] w-[calc(var(--gr-switch-track-height-sm)_-_4px)]',
+  md: 'h-[calc(var(--gr-switch-track-height-md)_-_4px)] w-[calc(var(--gr-switch-track-height-md)_-_4px)]',
+  lg: 'h-[calc(var(--gr-switch-track-height-lg)_-_4px)] w-[calc(var(--gr-switch-track-height-lg)_-_4px)]',
 }
 
 /**
  * Содержимое бегунка — спиннер загрузки или иконка действия — мельче его на
- * ступень: иначе знак упирается в края круга и теряет форму.
+ * ступень: иначе знак упирается в края круга и теряет форму. Потолок — бегунок
+ * минус 4px: у темы с бегунком мельче базового знак уменьшается вместе с ним.
  */
 export const thumbContentSizes: Record<GrSwitchSize, string> = {
-  xs: 'h-2 w-2',
-  sm: 'h-2.5 w-2.5',
-  md: 'h-3 w-3',
-  lg: 'h-4 w-4',
+  xs: 'h-2 w-2 max-h-[calc(var(--gr-switch-track-height-xs)_-_8px)] max-w-[calc(var(--gr-switch-track-height-xs)_-_8px)]',
+  sm: 'h-2.5 w-2.5 max-h-[calc(var(--gr-switch-track-height-sm)_-_8px)] max-w-[calc(var(--gr-switch-track-height-sm)_-_8px)]',
+  md: 'h-3 w-3 max-h-[calc(var(--gr-switch-track-height-md)_-_8px)] max-w-[calc(var(--gr-switch-track-height-md)_-_8px)]',
+  lg: 'h-4 w-4 max-h-[calc(var(--gr-switch-track-height-lg)_-_8px)] max-w-[calc(var(--gr-switch-track-height-lg)_-_8px)]',
 }
 
 /**
@@ -68,7 +93,7 @@ export const thumbContentSizes: Record<GrSwitchSize, string> = {
  * потребителя, и переопределить цвет было бы нечем.
  *
  * По состоянию цвет не ветвится и в `disabled` не тускнеет: гасится дорожка, а
- * бегунок остаётся `--gr-card` в любом состоянии — содержимое, меняющее цвет,
+ * бегунок остаётся `--gr-switch-thumb-bg` в любом состоянии — содержимое, меняющее цвет,
  * разошлось бы со своей же подложкой.
  */
 export const thumbContentColorClass = 'text-[var(--gr-switch-thumb-fg,var(--gr-muted-fg))]'
@@ -87,9 +112,9 @@ export const thumbIconBase = `inline-flex shrink-0 items-center justify-center $
  * внутрь, а в крайнем положении прижатым к краю — именно так и было, зазоры
  * расходились на 1–2px у `xs`, `sm` и `lg`.
  *
- * Гейт живёт в `__tests__/GrSwitch.test.ts` и считает вертикаль заново из
- * `trackSizes`/`thumbSizes`, поэтому смена любой ступени размера сразу покажет
- * разъехавшийся зазор.
+ * Бегунок выведен из высоты дорожки формулой (`thumbSizes`), поэтому зазор
+ * сходится в любой теме; гейт `__tests__/GrSwitch.test.ts` держит формулу и
+ * место под подпись в каждой теме каталога.
  */
 export const SWITCH_THUMB_GAP = 1
 
@@ -129,8 +154,11 @@ export function grSwitchRootClass(labelPosition: GrSwitchLabelPosition): string 
   return [rootBase, rootLabelPositions[labelPosition]].filter(Boolean).join(' ')
 }
 
-export function grSwitchTrackClass(size: GrSwitchSize, autoWidth = false): string {
-  return [trackBase, (autoWidth ? trackAutoSizes : trackSizes)[size]].join(' ')
+export function grSwitchTrackClass(size: GrSwitchSize, stateText?: { size: GrSwitchStateTextSize, autoWidth: boolean }): string {
+  if (!stateText)
+    return [trackBase, trackSizes[size]].join(' ')
+
+  return [trackBase, (stateText.autoWidth ? trackAutoSizes : trackTextSizes)[stateText.size]].join(' ')
 }
 
 export function grSwitchThumbClass(options: GrSwitchThumbClassOptions): string {
@@ -151,26 +179,6 @@ export function grSwitchThumbIconClass(size: GrSwitchSize): string {
 
 export function grSwitchLabelClass(size: GrSwitchSize, disabled = false): string {
   return [disabled ? labelDisabledClass : labelBase, labelSizes[size]].join(' ')
-}
-
-/**
- * Ступени, на которых подпись состояния помещается внутрь дорожки.
- *
- * Свободное место рядом с бегунком — `content − (бегунок + зазор)`, то есть
- * 13 / 17 / 21 / 29px на `xs` / `sm` / `md` / `lg`. Минимальная ступень
- * типографики пакета — `--gr-text-xs` (12px), и «OFF» на ней занимает ~25px;
- * собственные 10px дают ~20px. В 13 и 17 не встаёт и это, а ужимать шрифт
- * дальше значит сделать подпись нечитаемой ради того, чтобы она была.
- */
-export const GR_SWITCH_STATE_TEXT_SIZES = ['md', 'lg'] as const
-export type GrSwitchStateTextSize = typeof GR_SWITCH_STATE_TEXT_SIZES[number]
-
-/** Свободное место в дорожке рядом с бегунком, px. Считается гейтом заново. */
-export const stateTextRoom: Record<GrSwitchSize, number> = {
-  xs: 13,
-  sm: 17,
-  md: 21,
-  lg: 29,
 }
 
 export function isGrSwitchStateTextSize(size: GrSwitchSize): size is GrSwitchStateTextSize {
@@ -218,15 +226,15 @@ export const stateTextSizes: Record<GrSwitchStateTextSize, string> = {
   lg: 'text-[length:var(--gr-switch-state-text-size,11px)]',
 }
 
-/** Отступ со стороны бегунка — `бегунок + зазор`; остаток и есть место подписи. */
+/** Отступ со стороны бегунка — `бегунок + зазор`, то есть `h − 3px`; остаток и есть место подписи. */
 export const stateTextPaddings: Record<GrSwitchStateTextSize, { checked: string, unchecked: string }> = {
   md: {
-    checked: 'pr-[21px]',
-    unchecked: 'pl-[21px]',
+    checked: 'pr-[calc(var(--gr-switch-track-height-md)_-_3px)]',
+    unchecked: 'pl-[calc(var(--gr-switch-track-height-md)_-_3px)]',
   },
   lg: {
-    checked: 'pr-[25px]',
-    unchecked: 'pl-[25px]',
+    checked: 'pr-[calc(var(--gr-switch-track-height-lg)_-_3px)]',
+    unchecked: 'pl-[calc(var(--gr-switch-track-height-lg)_-_3px)]',
   },
 }
 
@@ -243,12 +251,12 @@ export const stateTextPaddings: Record<GrSwitchStateTextSize, { checked: string,
  */
 export const stateTextAutoPaddings: Record<GrSwitchStateTextSize, { checked: string, unchecked: string }> = {
   md: {
-    checked: 'pl-[8px] pr-[29px]',
-    unchecked: 'pl-[29px] pr-[8px]',
+    checked: 'pl-[8px] pr-[calc(var(--gr-switch-track-height-md)_+_5px)]',
+    unchecked: 'pl-[calc(var(--gr-switch-track-height-md)_+_5px)] pr-[8px]',
   },
   lg: {
-    checked: 'pl-[10px] pr-[35px]',
-    unchecked: 'pl-[35px] pr-[10px]',
+    checked: 'pl-[10px] pr-[calc(var(--gr-switch-track-height-lg)_+_7px)]',
+    unchecked: 'pl-[calc(var(--gr-switch-track-height-lg)_+_7px)] pr-[10px]',
   },
 }
 
@@ -261,7 +269,7 @@ export const stateTextAutoPaddings: Record<GrSwitchStateTextSize, { checked: str
  * ней библиотека не вычислит — его называет тот же, кто задал фон.
  */
 export const stateTextColors = {
-  checked: 'text-[var(--gr-switch-state-text-fg,var(--gr-primary-fg))]',
+  checked: 'text-[var(--gr-switch-state-text-fg,var(--gr-selected-fg))]',
   unchecked: 'text-[var(--gr-switch-state-text-fg,var(--gr-muted-fg))]',
   disabled: 'text-[var(--gr-switch-state-text-fg,var(--gr-disabled-fg))]',
 } as const

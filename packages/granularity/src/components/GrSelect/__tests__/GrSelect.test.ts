@@ -109,7 +109,7 @@ describe('GrSelect', () => {
     })
 
     const defaultSelect = defaultWrapper.get('select')
-    expect(defaultSelect.attributes('class')).toContain('border-[var(--gr-brd)]')
+    expect(defaultSelect.attributes('class')).toContain('border-[var(--gr-input)]')
   })
 
   it('в native-режиме добавляет option для modelValue, которого нет в options, когда allowCustomValue=true', () => {
@@ -928,7 +928,7 @@ describe('GrSelect — теги', () => {
     // Своя плашка красилась `--gr-muted` без рамки: на светлой теме это 1.05:1
     // к фону поля, то есть тег было не видно.
     expect(tag.classes()).toContain('bg-[var(--gr-muted)]')
-    expect(tag.classes()).toContain('border-[var(--gr-brd)]')
+    expect(tag.classes()).toContain('border-[color-mix(in_srgb,var(--gr-brd)_var(--gr-badge-light-brd),var(--gr-muted))]')
 
     const toned = mount(GrSelect, { props: { ...tagProps, tagTone: 'info' } })
     expect(toned.get('[data-gr-select-tag]').classes()).toContain('bg-[var(--gr-info-light)]')
@@ -1046,7 +1046,7 @@ describe('GrSelect — визуальное состояние', () => {
 
   it('invalid красит рамку, а не только объявляет ошибку', () => {
     const plain = mount(GrSelect, { props: { modelValue: 'a', options } })
-    expect(plain.get('select').classes()).toContain('border-[var(--gr-brd)]')
+    expect(plain.get('select').classes()).toContain('border-[var(--gr-input)]')
 
     const invalid = mount(GrSelect, { props: { modelValue: 'a', options, invalid: true } })
     const select = invalid.get('select')

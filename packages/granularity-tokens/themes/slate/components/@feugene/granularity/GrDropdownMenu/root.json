@@ -1,0 +1,11 @@
+{
+  "gr-dropdown-menu-item-height": "2.5rem",
+  "gr-dropdown-menu-item-px": "1rem",
+  "gr-dropdown-menu-item-py": "0.625rem",
+  "gr-dropdown-menu-item-hover-bg": "var(--gr-accent)",
+  "gr-dropdown-menu-item-hover-fg": "var(--gr-accent-fg)",
+  "gr-dropdown-menu-item-danger-hover-bg": "var(--gr-accent)",
+  "gr-dropdown-menu-item-danger-hover-fg": "var(--gr-accent-fg)",
+  "gr-dropdown-menu-item-disabled-bg": "var(--gr-muted)",
+  "gr-dropdown-menu-item-disabled-fg": "var(--gr-muted-fg)"
+}

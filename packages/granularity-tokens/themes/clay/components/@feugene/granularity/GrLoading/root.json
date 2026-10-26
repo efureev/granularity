@@ -1,0 +1,5 @@
+{
+  "gr-loading-panel-bg": "var(--gr-card)",
+  "gr-loading-panel-radius": "12px",
+  "gr-loading-panel-shadow": "var(--gr-shadow-2)"
+}

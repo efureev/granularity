@@ -1,0 +1,6 @@
+{
+  "gr-skeleton-bg": "var(--gr-muted)",
+  "gr-skeleton-brd": "transparent",
+  "gr-skeleton-pulse-opacity": "1",
+  "gr-skeleton-shine": "color-mix(in srgb, var(--gr-muted) 35%, var(--gr-card))"
+}

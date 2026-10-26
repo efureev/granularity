@@ -9,5 +9,10 @@
   "gr-progress-azure-bg": "var(--gr-azure)",
   "gr-progress-buffer-bg": "color-mix(in srgb, var(--gr-muted-fg) 40%, var(--gr-muted))",
   "gr-progress-indeterminate-bg": "var(--gr-muted-fg)",
-  "gr-progress-indeterminate-duration": "1.4s"
+  "gr-progress-indeterminate-duration": "1.4s",
+  "gr-progress-track-bg": "var(--gr-muted)",
+  "gr-progress-height-xs": "0.25rem",
+  "gr-progress-height-sm": "0.375rem",
+  "gr-progress-height-md": "0.5rem",
+  "gr-progress-height-lg": "0.75rem"
 }

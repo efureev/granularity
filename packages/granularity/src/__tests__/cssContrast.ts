@@ -128,16 +128,21 @@ export function resolveColorExpression(
 
   if (value.startsWith('color-mix(')) {
     const [space, left, right] = splitTopLevel(value.slice('color-mix('.length, -1))
-    const leftMatch = left.match(/^(.+?)\s+(\d+)%$/)
+    // Доля — число или токен темы с числом (`var(--gr-badge-light-brd)`): тема
+    // задаёт, сколько тона идёт в слой, одной ручкой на все тона.
+    const leftMatch = left.match(/^(.+?)\s+(\d+%|var\(--[\w-]+\))$/)
+    const share = leftMatch?.[2].startsWith('var(')
+      ? vars[leftMatch[2].slice(4, -1)] ?? derivedVars[leftMatch[2].slice(4, -1)]
+      : leftMatch?.[2]
 
-    if (space !== 'in srgb' || !leftMatch) {
+    if (space !== 'in srgb' || !leftMatch || !share || !/^\d+%$/.test(share)) {
       throw new Error(`Unsupported color-mix() expression: ${value}`)
     }
 
     return mixColors(
       resolveColorExpression(leftMatch[1], vars, derivedVars, stack),
       resolveColorExpression(right, vars, derivedVars, stack),
-      Number.parseInt(leftMatch[2], 10) / 100,
+      Number.parseInt(share, 10) / 100,
     )
   }
 

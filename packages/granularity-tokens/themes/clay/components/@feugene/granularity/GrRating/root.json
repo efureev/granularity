@@ -1,3 +1,6 @@
 {
-  "gr-rating-void-color": "color-mix(in srgb, var(--gr-muted-fg) 35%, transparent)"
+  "gr-rating-void-color": "var(--gr-control-brd)",
+  "gr-rating-void-fill": "transparent",
+  "gr-rating-void-stroke": "currentColor",
+  "gr-rating-stroke-width": "1.5"
 }

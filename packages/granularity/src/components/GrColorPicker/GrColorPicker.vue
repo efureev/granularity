@@ -303,6 +303,7 @@ const triggerClass = computed(() => grColorPickerTriggerClass({
   shape: resolvedShape.value,
   disabled: isDisabled.value,
   invalid: isInvalid.value,
+  readonly: isReadonly.value,
 }))
 
 const panelClass = computed(() => grColorPickerPanelClass(resolvedSize.value))

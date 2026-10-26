@@ -23,7 +23,7 @@ export type GrDescriptionColumns = 1 | 2 | 3 | 4
 // `m-0` — у нативного `<dl>` есть браузерные отступы, и без сброса список
 // разъезжается по вертикали. Ряды разводит `--gr-description-list-row-gap`,
 // потому что зазор здесь — точка кастомизации, а не ступень шкалы.
-export const descriptionRootClass = 'm-0 gap-x-4 [row-gap:var(--gr-description-list-row-gap,0.375rem)]'
+export const descriptionRootClass = 'm-0 gap-x-4 [row-gap:var(--gr-description-list-row-gap,var(--gr-description-list-row-space))]'
 
 /** Сетка колонок — раскладки `inline` и `stacked`. */
 export const descriptionRootGridClass = 'grid'
@@ -81,7 +81,7 @@ export const descriptionPairStackedClass = 'min-w-0'
 // а пары друг от друга отбивает `gap-x-4` корня.
 export const descriptionPairFlowClass = 'flex min-w-0 items-baseline gap-1'
 
-export const descriptionDividedClass = 'border-b border-[var(--gr-description-list-divider,var(--gr-brd))] pb-1 last:border-b-0 last:pb-0'
+export const descriptionDividedClass = 'border-b border-[var(--gr-description-list-divider,var(--gr-brd))] pb-[var(--gr-description-list-divided-space)] last:border-b-0 last:pb-0'
 
 // `shrink-0` держит колонку подписей ровной: иначе длинное значение сжимало бы
 // подпись, и значения переставали бы стоять в колонку — ровно то, ради чего

@@ -31,7 +31,7 @@ export const colsClass: Record<GrDropdownMenuColumnsCount, string> = {
  * достаёт. Радиус в базовом классе, а не отдельной константой: hover, disabled и
  * кольцо фокуса висят на одном элементе.
  */
-export const itemBaseClass = 'w-full min-h-10 px-4 py-2.5 rounded-[var(--gr-radius-md)] flex items-center gap-2 text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)] transition-colors duration-[var(--gr-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]'
+export const itemBaseClass = 'w-full min-h-[var(--gr-dropdown-menu-item-height)] px-[var(--gr-dropdown-menu-item-px)] py-[var(--gr-dropdown-menu-item-py)] rounded-[var(--gr-radius-md)] flex items-center gap-2 text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)] transition-colors duration-[var(--gr-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]'
 
 // Насыщенный тон как цвет текста запрещён — для текста есть `-text`-роль.
 export const itemVariantClass: Record<GrDropdownMenuItemVariant, string> = {
@@ -39,18 +39,21 @@ export const itemVariantClass: Record<GrDropdownMenuItemVariant, string> = {
   danger: 'text-[var(--gr-danger-text)]',
 }
 
-export const itemInteractiveClass = 'cursor-pointer hover:bg-[var(--gr-accent)] hover:text-[var(--gr-accent-fg)]'
+export const itemInteractiveClass: Record<GrDropdownMenuItemVariant, string> = {
+  default: 'cursor-pointer hover:bg-[var(--gr-dropdown-menu-item-hover-bg)] hover:text-[var(--gr-dropdown-menu-item-hover-fg)]',
+  danger: 'cursor-pointer hover:bg-[var(--gr-dropdown-menu-item-danger-hover-bg)] hover:text-[var(--gr-dropdown-menu-item-danger-hover-fg)]',
+}
 
 // Disabled гасится фоном, а не `opacity`: прозрачность разбавляет выверенные на
 // AA токены текста. `pointer-events-none` оставлен — он же гасит hover.
-export const itemDisabledClass = 'cursor-not-allowed pointer-events-none bg-[var(--gr-muted)] text-[var(--gr-muted-fg)]'
+export const itemDisabledClass = 'cursor-not-allowed pointer-events-none bg-[var(--gr-dropdown-menu-item-disabled-bg)] text-[var(--gr-dropdown-menu-item-disabled-fg)]'
 
 /**
  * Раскрытый пункт-подменю подсвечен так же, как наведённый: панель второго
  * уровня висит рядом, и пункт, из которого она растёт, обязан оставаться
  * видимой точкой отсчёта, даже когда курсор и фокус уже в ней.
  */
-export const itemExpandedClass = 'bg-[var(--gr-accent)] text-[var(--gr-accent-fg)]'
+export const itemExpandedClass = 'bg-[var(--gr-dropdown-menu-item-hover-bg)] text-[var(--gr-dropdown-menu-item-hover-fg)]'
 
 export const itemIndicatorClass = 'h-3.5 w-3.5 shrink-0'
 export const subIndicatorClass = 'ml-auto pl-4 h-3.5 w-3.5 box-content shrink-0'
@@ -102,7 +105,7 @@ export function grDropdownMenuItemClass(options: {
     options.disabled
       ? itemDisabledClass
       : options.expanded ? itemExpandedClass : itemVariantClass[options.variant],
-    options.disabled ? '' : itemInteractiveClass,
+    options.disabled ? '' : itemInteractiveClass[options.variant],
   ].filter(Boolean).join(' ')
 }
 

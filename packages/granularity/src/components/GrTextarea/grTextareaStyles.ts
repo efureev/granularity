@@ -1,10 +1,11 @@
 import type { GrComponentSize, GrControlState } from '../shared/sizes'
+import { fieldBorderClass, fieldBorderResponseClass, fieldBorderStateClass } from '../shared/controlShape'
 
 export type GrTextareaState = GrControlState
 export type GrTextareaSize = GrComponentSize
 
 export const borderClassByState: Record<GrTextareaState, string> = {
-  default: 'border-[var(--gr-brd)]',
+  default: fieldBorderClass,
   success: 'border-[var(--gr-success)] focus-visible:ring-[var(--gr-success)]',
   warning: 'border-[var(--gr-warning)] focus-visible:ring-[var(--gr-warning)]',
   danger: 'border-[var(--gr-danger)] focus-visible:ring-[var(--gr-danger)]',
@@ -58,6 +59,9 @@ export const lineCountClass = 'text-[length:var(--gr-control-text-xs)] leading-[
 
 export const countClass = 'mt-1 text-right text-[length:var(--gr-control-text-xs)] leading-[var(--gr-leading-xs)] text-[var(--gr-muted-fg)] tabular-nums'
 
-export function grTextareaClass(options: { state: GrTextareaState, invalid: boolean }): string {
-  return options.invalid ? invalidBorderClass : borderClassByState[options.state]
+export function grTextareaClass(options: { state: GrTextareaState, invalid: boolean, disabled: boolean, readonly?: boolean }): string {
+  return [
+    fieldBorderStateClass(options, invalidBorderClass, borderClassByState),
+    fieldBorderResponseClass(options),
+  ].filter(Boolean).join(' ')
 }

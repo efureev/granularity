@@ -1,0 +1,10 @@
+{
+  "gr-card-title-size": "var(--gr-text-sm)",
+  "gr-card-title-leading": "var(--gr-leading-sm)",
+  "gr-card-title-weight": "var(--gr-font-semibold)",
+  "gr-card-padding-sm": "0.75rem",
+  "gr-card-padding-md": "1rem",
+  "gr-card-padding-lg": "1.5rem",
+  "gr-card-hover-bg": "var(--gr-muted)",
+  "gr-card-hover-brd": "var(--gr-brd)"
+}

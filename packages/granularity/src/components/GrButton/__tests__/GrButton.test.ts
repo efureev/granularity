@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from 'vitest'
 
 import GrConfigProvider from '../../GrConfigProvider/GrConfigProvider.vue'
 import GrIcon from '../../GrIcon/GrIcon.vue'
+import GrButtonGroup from '../../GrButtonGroup/GrButtonGroup.vue'
 import GrButton from '../GrButton.vue'
 import { grButtonClass, type GrButtonTone, type GrButtonVariant } from '../grButtonStyles'
 import {
@@ -114,7 +115,7 @@ describe('GrButton', () => {
     expect(button.attributes('data-gr-tone')).toBe('warning')
     expect(button.classes()).toContain('text-[var(--gr-warning-text)]')
     expect(button.classes()).toContain('border-[var(--gr-button-warning-border)]')
-    expect(className).toContain('hover:border-[var(--gr-warning)]')
+    expect(className).toContain('hover:border-[var(--gr-button-warning-border-hover)]')
     expect(className).toContain('hover:bg-[var(--gr-button-ghost-bg-hover,var(--gr-button-warning-ghost-bg-hover))]')
     expect(className).toContain('active:bg-[var(--gr-button-ghost-bg-active,var(--gr-button-warning-ghost-bg-active))]')
     expect(className).toContain('hover:active:bg-[var(--gr-button-ghost-bg-active,var(--gr-button-warning-ghost-bg-active))]')
@@ -150,7 +151,7 @@ describe('GrButton', () => {
     expect(azure.attributes('data-gr-tone')).toBe('azure')
     expect(azure.classes()).toContain('text-[var(--gr-azure-text)]')
     expect(azureClassName).toContain('hover:bg-[var(--gr-button-ghost-bg-hover,var(--gr-button-azure-ghost-bg-hover))]')
-    expect(azureClassName).toContain('hover:active:border-[var(--gr-azure-active)]')
+    expect(azureClassName).toContain('hover:active:border-[var(--gr-button-azure-border-active)]')
   })
 
   it('добавляет hover:active правила, чтобы pressed-состояние не терялось под hover', () => {
@@ -181,7 +182,7 @@ describe('GrButton', () => {
     expect(ghost).toContain('hover:active:bg-[var(--gr-button-ghost-bg-active,var(--gr-button-info-ghost-bg-active))]')
 
     expect(ghostBorder).toContain('hover:active:bg-[var(--gr-button-ghost-bg-active,var(--gr-button-success-ghost-bg-active))]')
-    expect(ghostBorder).toContain('hover:active:border-[var(--gr-success-active)]')
+    expect(ghostBorder).toContain('hover:active:border-[var(--gr-button-success-border-active)]')
   })
 
   // Светлая подпись на заливке — выбор «Сланца», а не свойство кнопки: у «Глины»
@@ -230,6 +231,9 @@ describe('GrButton', () => {
 
   // Правило «Глины»: залитая кнопка под указателем уходит прочь от цвета подписи —
   // под графитовой светлеет, под светлой темнеет, — и контраст только растёт.
+  // Исключение — главная кнопка `neutral`: её заливка — край шкалы (графит в
+  // светлом режиме, бумага в тёмном), дальше от подписи заметного шага нет, и она
+  // уходит к середине, держа подпись не ниже AAA.
   it('у «Глины» наведение и нажатие filled-кнопки не снижают контраст подписи', () => {
     const failures: string[] = []
 
@@ -242,10 +246,10 @@ describe('GrButton', () => {
             resolveColorExpression(colors.background, buttonVarsOf(key), derivedThemeVars),
           )
         }
-        const rest = ratioOf('rest')
+        const floor = tone === 'neutral' ? 7 : ratioOf('rest')
         for (const state of ['hover', 'active'] as const) {
-          if (ratioOf(state) < rest)
-            failures.push(`${key}:${tone}:${state}: ${ratioOf(state).toFixed(2)} < ${rest.toFixed(2)}`)
+          if (ratioOf(state) < floor)
+            failures.push(`${key}:${tone}:${state}: ${ratioOf(state).toFixed(2)} < ${floor.toFixed(2)}`)
         }
       }
     }
@@ -445,7 +449,7 @@ describe('GrButton — отключённое состояние', () => {
 
     const outline = mount(GrButton, { props: { disabled: true, variant: 'outline' }, slots: { default: 'Next' } })
     expect(outline.get('[data-gr-button]').classes()).toContain('bg-transparent')
-    expect(outline.get('[data-gr-button]').classes()).toContain('border-[var(--gr-button-disabled-brd)]')
+    expect(outline.get('[data-gr-button]').classes()).toContain('border-[var(--gr-button-disabled-outline-brd)]')
   })
 
   it('loading отключённым не выглядит — у него свой спиннер', () => {
@@ -532,20 +536,41 @@ describe('GrButton — императивный API', () => {
   })
 })
 
+describe('GrButton — нажатый переключатель', () => {
+  it('`aria-pressed="true"` держит вид нажатия своего веса, выключенный — нет', () => {
+    const on = mount(GrButton, { props: { variant: 'outline', tone: 'neutral' }, attrs: { 'aria-pressed': 'true' }, slots: { default: 'B' } })
+    const off = mount(GrButton, { props: { variant: 'outline', tone: 'neutral' }, attrs: { 'aria-pressed': 'false' }, slots: { default: 'B' } })
+
+    expect(on.get('[data-gr-button]').attributes('data-gr-pressed')).toBe('')
+    expect(on.get('[data-gr-button]').classes()).toContain('data-[gr-pressed]:bg-[var(--gr-button-ghost-bg-active,var(--gr-button-neutral-ghost-bg-active))]')
+    expect(off.get('[data-gr-button]').attributes('data-gr-pressed')).toBeUndefined()
+  })
+
+  it('в лотке и у недоступной кнопки атрибута нажатия нет', () => {
+    const tray = mount({
+      render: () => h(GrButtonGroup, { appearance: 'tray', ariaLabel: 'Вид' }, () => h(GrButton, { 'aria-pressed': 'true' }, () => 'B')),
+    })
+    const disabled = mount(GrButton, { props: { disabled: true }, attrs: { 'aria-pressed': 'true' }, slots: { default: 'B' } })
+
+    expect(tray.get('[data-gr-button]').attributes('data-gr-pressed')).toBeUndefined()
+    expect(disabled.get('[data-gr-button]').attributes('data-gr-pressed')).toBeUndefined()
+  })
+})
+
 describe('GrButton — вес, рамки и объём', () => {
-  it('secondary приглушает рамку в покое и доводит её до тона к нажатию', () => {
+  it('рамка secondary в покое, под указателем и в нажатии — токены темы тона', () => {
     const className = grButtonClass({ variant: 'secondary', tone: 'primary', size: 'md', square: false })
 
     expect(className).toContain('border-[var(--gr-button-primary-border-soft)]')
-    expect(className).toContain('hover:border-[var(--gr-button-primary-border)]')
-    expect(className).toContain('active:border-[var(--gr-primary)]')
+    expect(className).toContain('hover:border-[var(--gr-button-primary-border-soft-hover)]')
+    expect(className).toContain('active:border-[var(--gr-button-primary-border-hover)]')
   })
 
   it('нейтральная secondary лежит на поверхности карточки и приподнята тенью', () => {
     const className = grButtonClass({ variant: 'secondary', tone: 'neutral', size: 'md', square: false })
 
     expect(className).toContain('bg-[var(--gr-button-neutral-soft-bg)]')
-    expect(className).toContain('border-[var(--gr-button-neutral-border)]')
+    expect(className).toContain('border-[var(--gr-button-neutral-border-soft)]')
     expect(className).toContain('shadow-[var(--gr-button-surface-shadow)]')
   })
 
@@ -614,7 +639,7 @@ describe('GrButton — нажатие и курсор', () => {
     const disabled = mount(GrButton, { props: { disabled: true }, slots: { default: 'Save' } }).get('[data-gr-button]').classes()
     const loading = mount(GrButton, { props: { loading: true }, slots: { default: 'Save' } }).get('[data-gr-button]').classes()
 
-    expect(live).toEqual(expect.arrayContaining(['motion-safe:active:scale-98', 'motion-safe:hover:translate-y-[var(--gr-button-lift)]']))
+    expect(live).toEqual(expect.arrayContaining(['motion-safe:active:scale-[var(--gr-button-press-scale)]', 'motion-safe:hover:translate-y-[var(--gr-button-lift)]']))
     expect(disabled.some(cls => cls.startsWith('motion-safe:'))).toBe(false)
     expect(loading.some(cls => cls.startsWith('motion-safe:'))).toBe(false)
   })

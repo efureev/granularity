@@ -1,3 +1,4 @@
 {
-  "gr-progress-circle-cap": "round"
+  "gr-progress-circle-cap": "round",
+  "gr-progress-circle-track-bg": "var(--gr-brd)"
 }

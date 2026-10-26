@@ -294,10 +294,24 @@ describe('закреплённые колонки', () => {
     const bodyCell = wrapper.findAll('tbody tr')[0].findAll('td')[1]
 
     for (const cell of headerCells) {
-      expect(cell.classes()).toContain('bg-[var(--gr-muted)]')
+      expect(cell.classes()).toContain('bg-[var(--gr-table-head-bg)]')
       expect(cell.classes()).not.toContain('bg-[var(--gr-card)]')
     }
     expect(bodyCell.classes()).toContain('bg-[var(--gr-card)]')
+
+    wrapper.unmount()
+  })
+
+  it('закреплённая ячейка выбранной строки — одна непрозрачная подсветка', () => {
+    const wrapper = mountTable({ columns: pinnedColumns, selectable: true, selected: [rows[0].id] })
+    const pinnedCells = wrapper.findAll('tbody tr')[0].findAll('td').filter(cell => cell.classes().includes('sticky'))
+
+    // Прозрачная подсветка поверх `bg-card` в одном атрибуте пропускала под ячейку
+    // уезжающие строки и ложилась вторым слоем поверх подсветки строки.
+    expect(pinnedCells.length).toBeGreaterThan(0)
+    for (const cell of pinnedCells) {
+      expect(cell.classes().filter(name => name.startsWith('bg-'))).toEqual(['bg-[color-mix(in_srgb,var(--gr-selected)_8%,var(--gr-card))]'])
+    }
 
     wrapper.unmount()
   })
@@ -438,6 +452,18 @@ describe('GrDataTable — закрепление колонки пользова
 
     expect(wrapper.emitted('update:pinnedColumns')).toBeUndefined()
 
+    wrapper.unmount()
+  })
+})
+
+describe('граница шапки и первой строки', () => {
+  it('рамка над первой строкой — токен темы, над остальными — разделитель', () => {
+    const wrapper = mountTable()
+    const rows = wrapper.findAll('[data-gr-datatable-row]')
+
+    expect(rows[0].classes()).toContain('border-[var(--gr-datatable-first-row-brd)]')
+    expect(rows[1].classes()).toContain('border-[var(--gr-brd)]')
+    expect(rows[1].classes()).not.toContain('border-[var(--gr-datatable-first-row-brd)]')
     wrapper.unmount()
   })
 })

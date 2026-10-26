@@ -1,0 +1,8 @@
+{
+  "gr-sidebar-item-active-weight": "var(--gr-font-medium)",
+  "gr-sidebar-group-label-size": "var(--gr-text-xs)",
+  "gr-sidebar-group-label-leading": "var(--gr-leading-xs)",
+  "gr-sidebar-group-label-weight": "var(--gr-font-regular)",
+  "gr-sidebar-group-label-transform": "none",
+  "gr-sidebar-group-label-tracking": "0"
+}

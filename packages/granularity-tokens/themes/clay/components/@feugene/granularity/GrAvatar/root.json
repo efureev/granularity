@@ -11,5 +11,8 @@
   "gr-avatar-5-fg": "var(--gr-azure-text)",
   "gr-avatar-6-bg": "var(--gr-slate-light)",
   "gr-avatar-6-fg": "var(--gr-slate-text)",
-  "gr-avatar-square-radius": "10px"
+  "gr-avatar-square-radius": "10px",
+  "gr-avatar-brd": "transparent",
+  "gr-avatar-weight": "var(--gr-font-medium)",
+  "gr-avatar-neutral-fg": "var(--gr-secondary-fg)"
 }

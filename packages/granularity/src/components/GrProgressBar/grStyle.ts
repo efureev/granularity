@@ -8,10 +8,10 @@ export type GrProgressBarSize = GrComponentSize
  * Размер линейного индикатора — это толщина трека: ширину задаёт контейнер.
  */
 export const trackSizes: Record<GrProgressBarSize, string> = {
-  xs: 'h-1',
-  sm: 'h-1.5',
-  md: 'h-2',
-  lg: 'h-3',
+  xs: 'h-[var(--gr-progress-height-xs)]',
+  sm: 'h-[var(--gr-progress-height-sm)]',
+  md: 'h-[var(--gr-progress-height-md)]',
+  lg: 'h-[var(--gr-progress-height-lg)]',
 }
 
 /** Зазор между треком и подписью значения. */

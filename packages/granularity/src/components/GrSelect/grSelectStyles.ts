@@ -1,5 +1,5 @@
 import type { GrControlShape } from '../shared/controlShape'
-import { controlPillPaddingXClass, controlShapeRadiusClass } from '../shared/controlShape'
+import { controlPillPaddingXClass, controlShapeRadiusClass, fieldBorderClass, fieldBorderResponseClass, fieldBorderStateClass, fieldReadonlySurfaceClass } from '../shared/controlShape'
 
 import type { GrComponentSize, GrControlState } from '../shared/sizes'
 import { overlayListPanelClass } from '../shared/overlayListPanel'
@@ -53,14 +53,14 @@ export type GrSelectOptionOrGroup<TValue extends GrSelectValue = string>
 export type GrSelectModelValue<TValue extends GrSelectValue = string> = TValue | TValue[]
 
 /** Скругление приходит формой, поэтому здесь его нет. */
-export const defaultBaseClass = 'w-full border bg-[var(--gr-bg)] text-[var(--gr-fg)] transition-colors duration-[var(--gr-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]'
+export const defaultBaseClass = 'w-full border text-[var(--gr-fg)] transition-colors duration-[var(--gr-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[calc(var(--gr-input-focus-ring-width))] focus-visible:ring-[var(--gr-ring)]'
 
 /**
  * Цвет рамки по состоянию — та же карта, что у `GrInput` и `GrTextarea`: поля
  * одной формы обязаны показывать ошибку одинаково.
  */
 export const borderClassByState: Record<GrSelectState, string> = {
-  default: 'border-[var(--gr-brd)]',
+  default: fieldBorderClass,
   success: 'border-[var(--gr-success)] focus-visible:ring-[var(--gr-success)]',
   warning: 'border-[var(--gr-warning)] focus-visible:ring-[var(--gr-warning)]',
   danger: 'border-[var(--gr-danger)] focus-visible:ring-[var(--gr-danger)]',
@@ -218,6 +218,7 @@ export function grSelectClass(options: {
   underline: GrSelectUnderline
   state?: GrSelectState
   invalid?: boolean
+  readonly?: boolean
   shape: GrControlShape
   /** Поле растёт с рядами чипов: высоту задаёт корень, а не размер. */
   grows?: boolean
@@ -234,13 +235,17 @@ export function grSelectClass(options: {
   return [
     (options.grows ? selectGrowSizeClassBySize : selectSizeClassBySize)[options.size],
     selectPaddingXClass[options.shape][options.size],
-    controlShapeRadiusClass[options.shape],
+    controlShapeRadiusClass[options.shape][options.size],
     // `invalid` сильнее `state`: ошибка перекрывает любую другую подсветку.
-    options.invalid ? invalidBorderClass : borderClassByState[options.state ?? 'default'],
+    fieldBorderStateClass(options, invalidBorderClass, borderClassByState),
+    fieldBorderResponseClass(options),
+    // Заливка — здесь, а не в базовом классе: у поля только для чтения она своя,
+    // а два `bg-*` одной специфичности разрулил бы порядок правил.
+    options.readonly ? fieldReadonlySurfaceClass : 'bg-[var(--gr-bg)]',
     // Заблокированный контрол гасится фоном и цветом текста, а не `opacity`:
     // прозрачность разбавляет выверенные на AA токены и роняет контраст.
     'disabled:cursor-not-allowed disabled:bg-[var(--gr-muted)] disabled:text-[var(--gr-muted-fg)]',
-  ].join(' ')
+  ].filter(Boolean).join(' ')
 }
 
 export function grSelectNativeClass(options: {
@@ -252,6 +257,7 @@ export function grSelectNativeClass(options: {
   showNativeChevron: boolean
   state?: GrSelectState
   invalid?: boolean
+  readonly?: boolean
   shape: GrControlShape
 }): string {
   return [
@@ -271,6 +277,7 @@ export function grSelectTriggerClass(options: {
   underline: GrSelectUnderline
   state?: GrSelectState
   invalid?: boolean
+  readonly?: boolean
   shape: GrControlShape
   grows?: boolean
 }): string {
@@ -295,7 +302,7 @@ export function grSelectTriggerClass(options: {
 export const grSelectPanelClasses = `${overlayPanelSurfaceClass} ${overlayListPanelClass} overflow-hidden`
 
 /** Общая подсветка наведения и активной опции панели. */
-const selectOptionHighlight = 'bg-[color-mix(in_srgb,var(--gr-muted)_30%,transparent)]'
+const selectOptionHighlight = 'bg-[var(--gr-select-option-active-bg)]'
 
 export const selectOptionBaseClass = 'rounded-[var(--gr-radius-md)] px-3 py-2 text-left text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)]'
 export const selectOptionLinkWidthClass = 'block min-w-full w-max whitespace-nowrap'

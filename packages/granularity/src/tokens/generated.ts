@@ -43,28 +43,28 @@ export const grComponentTokens: GrComponentToken[] = [
     "owner": "GrAlert",
     "name": "--gr-alert-bg",
     "kind": "inline",
-    "default": "подложка тона (`--gr-<tone>-light`); у `outline` — прозрачный",
+    "default": "подложка тона (`--gr-<tone>-light`); у `outline` — `--gr-alert-outline-bg`",
     "description": "Фон полосы уведомления."
   },
   {
     "owner": "GrAlert",
     "name": "--gr-alert-brd",
     "kind": "inline",
-    "default": "подмес тона к подложке",
+    "default": "тон в смеси с `--gr-alert-soft-brd` (у `outline` — с `--gr-alert-outline-brd`) в доле темы",
     "description": "Цвет рамки уведомления."
   },
   {
     "owner": "GrAlert",
     "name": "--gr-alert-text-color",
     "kind": "inline",
-    "default": "`--gr-<tone>-text`",
+    "default": "`--gr-<tone>-text` в смеси с `--gr-alert-body-fg` в доле `--gr-alert-soft-text-tone`; у `outline` — `--gr-alert-body-fg`",
     "description": "Цвет основного текста уведомления."
   },
   {
     "owner": "GrAlert",
     "name": "--gr-alert-title-color",
     "kind": "inline",
-    "default": "`--gr-<tone>-text`",
+    "default": "`--gr-<tone>-text` в смеси с `--gr-fg` в доле `--gr-alert-soft-title-tone`; у `outline` — `--gr-fg`",
     "description": "Цвет заголовка уведомления."
   },
   {
@@ -94,6 +94,83 @@ export const grComponentTokens: GrComponentToken[] = [
     "kind": "inline",
     "default": "подмес тона к подложке",
     "description": "Фон кнопки закрытия под курсором."
+  },
+  {
+    "owner": "GrAlert",
+    "name": "--gr-alert-radius",
+    "kind": "theme",
+    "default": "var(--gr-radius-lg)",
+    "description": "Скругление сообщения."
+  },
+  {
+    "owner": "GrAlert",
+    "name": "--gr-alert-title-weight",
+    "kind": "theme",
+    "default": "var(--gr-font-semibold)",
+    "description": "Вес заголовка сообщения."
+  },
+  {
+    "owner": "GrAlert",
+    "name": "--gr-alert-body-fg",
+    "kind": "theme",
+    "default": "var(--gr-muted-fg)",
+    "description": "Нейтральный цвет текста сообщения: текст `outline` и основа смеси для текста `soft`."
+  },
+  {
+    "owner": "GrAlert",
+    "name": "--gr-alert-soft-brd",
+    "kind": "theme",
+    "default": "var(--gr-brd)",
+    "description": "Нейтральная основа рамки `soft`. Тема без рамки ставит `transparent` вместе с долей тона 0%."
+  },
+  {
+    "owner": "GrAlert",
+    "name": "--gr-alert-soft-brd-tone",
+    "kind": "theme",
+    "default": "35%",
+    "description": "Доля тона в рамке `soft`."
+  },
+  {
+    "owner": "GrAlert",
+    "name": "--gr-alert-soft-title-tone",
+    "kind": "theme",
+    "default": "100%",
+    "description": "Доля тона в заголовке `soft`: 100% — цветом тона (`-text`), 0% — чернилами `--gr-fg`."
+  },
+  {
+    "owner": "GrAlert",
+    "name": "--gr-alert-soft-text-tone",
+    "kind": "theme",
+    "default": "100%",
+    "description": "Доля тона в тексте `soft`: 100% — цветом тона (`-text`), 0% — `--gr-alert-body-fg`."
+  },
+  {
+    "owner": "GrAlert",
+    "name": "--gr-alert-outline-bg",
+    "kind": "theme",
+    "default": "transparent",
+    "description": "Подложка `outline`: прозрачная или поверхность карточки."
+  },
+  {
+    "owner": "GrAlert",
+    "name": "--gr-alert-outline-brd",
+    "kind": "theme",
+    "default": "var(--gr-brd)",
+    "description": "Нейтральная основа рамки `outline`."
+  },
+  {
+    "owner": "GrAlert",
+    "name": "--gr-alert-outline-brd-tone",
+    "kind": "theme",
+    "default": "45%",
+    "description": "Доля тона в рамке `outline`."
+  },
+  {
+    "owner": "GrAutocomplete",
+    "name": "--gr-autocomplete-option-active-bg",
+    "kind": "theme",
+    "default": "color-mix(in srgb, var(--gr-muted) 30%, transparent)",
+    "description": "Подсветка опции под указателем и активной с клавиатуры."
   },
   {
     "owner": "GrAvatar",
@@ -185,6 +262,27 @@ export const grComponentTokens: GrComponentToken[] = [
     "kind": "theme",
     "default": "var(--gr-slate-text)",
     "description": "Инициалы на подложке слота 6. Роль `-text`, а не насыщенный тон: тот в роли текста не добирает AA."
+  },
+  {
+    "owner": "GrAvatar",
+    "name": "--gr-avatar-brd",
+    "kind": "theme",
+    "default": "var(--gr-brd)",
+    "description": "Рамка аватара. Тема, где аватар держится заливкой, ставит `transparent`."
+  },
+  {
+    "owner": "GrAvatar",
+    "name": "--gr-avatar-weight",
+    "kind": "theme",
+    "default": "var(--gr-font-bold)",
+    "description": "Вес инициалов и счётчика «+N»."
+  },
+  {
+    "owner": "GrAvatar",
+    "name": "--gr-avatar-neutral-fg",
+    "kind": "theme",
+    "default": "var(--gr-muted-fg)",
+    "description": "Инициалы на нейтральной заливке и счётчик «+N»."
   },
   {
     "owner": "GrBadge",
@@ -327,6 +425,13 @@ export const grComponentTokens: GrComponentToken[] = [
     "description": "Текст filled-бейджа тона `azure`: полярность задаётся темой, а не заливкой."
   },
   {
+    "owner": "GrBadge",
+    "name": "--gr-badge-light-brd",
+    "kind": "theme",
+    "default": "100%",
+    "description": "Сила рамки мягкой метки и чипа: 100% — рамка тона, 0% — рамки не видно."
+  },
+  {
     "owner": "GrBadgeWrap",
     "name": "--gr-badge-wrap-offset-x",
     "kind": "hook",
@@ -341,6 +446,20 @@ export const grComponentTokens: GrComponentToken[] = [
     "default": "-0.5rem (для `dot` — 0)",
     "description": "Вертикальный сдвиг метки относительно угла обёртки.",
     "literal": "Смещение зависит от варианта (`dot` — 0): геометрия компонента."
+  },
+  {
+    "owner": "GrBreadcrumbs",
+    "name": "--gr-breadcrumbs-separator-fg",
+    "kind": "theme",
+    "default": "var(--gr-muted-fg)",
+    "description": "Цвет разделителя пути. Разделитель — графика, а не текст: тема может держать его тише ссылок."
+  },
+  {
+    "owner": "GrBreadcrumbs",
+    "name": "--gr-breadcrumbs-current-weight",
+    "kind": "theme",
+    "default": "var(--gr-font-semibold)",
+    "description": "Вес текущего пункта пути."
   },
   {
     "owner": "GrButton",
@@ -921,6 +1040,13 @@ export const grComponentTokens: GrComponentToken[] = [
   },
   {
     "owner": "GrButton",
+    "name": "--gr-button-neutral-border-soft",
+    "kind": "theme",
+    "default": "var(--gr-button-neutral-border)",
+    "description": "Рамка нейтральной `secondary` в покое. Отдельно от рамки `outline`: у плашки рамка тише, чем у контурной кнопки."
+  },
+  {
+    "owner": "GrButton",
     "name": "--gr-button-shadow",
     "kind": "theme",
     "default": "inset 0 1px 0 color-mix(in srgb, var(--gr-slate-0) 16%, transparent), var(--gr-shadow-1)",
@@ -1326,6 +1452,188 @@ export const grComponentTokens: GrComponentToken[] = [
     "description": "Период бегущего отрезка загрузки (`loadingIndicator: \"track\"`); с reduced-motion — медленнее, но не выключается: другого сигнала у загрузки нет."
   },
   {
+    "owner": "GrButton",
+    "name": "--gr-button-primary-border-hover",
+    "kind": "theme",
+    "default": "var(--gr-primary)",
+    "description": "Рамка `outline` и `ghost-border` тона `primary` под указателем; у `secondary` — в нажатии."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-primary-border-active",
+    "kind": "theme",
+    "default": "var(--gr-primary-active)",
+    "description": "Рамка `outline` и `ghost-border` тона `primary` в нажатии."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-primary-border-soft-hover",
+    "kind": "theme",
+    "default": "var(--gr-button-primary-border)",
+    "description": "Рамка `secondary` тона `primary` под указателем."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-neutral-border-hover",
+    "kind": "theme",
+    "default": "var(--gr-brd-hover)",
+    "description": "Рамка `outline` и `ghost-border` тона `neutral` под указателем; у `secondary` — в нажатии."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-neutral-border-active",
+    "kind": "theme",
+    "default": "var(--gr-brd-active)",
+    "description": "Рамка `outline` и `ghost-border` тона `neutral` в нажатии."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-neutral-border-soft-hover",
+    "kind": "theme",
+    "default": "var(--gr-button-neutral-border)",
+    "description": "Рамка `secondary` тона `neutral` под указателем."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-success-border-hover",
+    "kind": "theme",
+    "default": "var(--gr-success)",
+    "description": "Рамка `outline` и `ghost-border` тона `success` под указателем; у `secondary` — в нажатии."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-success-border-active",
+    "kind": "theme",
+    "default": "var(--gr-success-active)",
+    "description": "Рамка `outline` и `ghost-border` тона `success` в нажатии."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-success-border-soft-hover",
+    "kind": "theme",
+    "default": "var(--gr-button-success-border)",
+    "description": "Рамка `secondary` тона `success` под указателем."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-warning-border-hover",
+    "kind": "theme",
+    "default": "var(--gr-warning)",
+    "description": "Рамка `outline` и `ghost-border` тона `warning` под указателем; у `secondary` — в нажатии."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-warning-border-active",
+    "kind": "theme",
+    "default": "var(--gr-warning-active)",
+    "description": "Рамка `outline` и `ghost-border` тона `warning` в нажатии."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-warning-border-soft-hover",
+    "kind": "theme",
+    "default": "var(--gr-button-warning-border)",
+    "description": "Рамка `secondary` тона `warning` под указателем."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-danger-border-hover",
+    "kind": "theme",
+    "default": "var(--gr-danger)",
+    "description": "Рамка `outline` и `ghost-border` тона `danger` под указателем; у `secondary` — в нажатии."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-danger-border-active",
+    "kind": "theme",
+    "default": "var(--gr-danger-active)",
+    "description": "Рамка `outline` и `ghost-border` тона `danger` в нажатии."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-danger-border-soft-hover",
+    "kind": "theme",
+    "default": "var(--gr-button-danger-border)",
+    "description": "Рамка `secondary` тона `danger` под указателем."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-info-border-hover",
+    "kind": "theme",
+    "default": "var(--gr-info)",
+    "description": "Рамка `outline` и `ghost-border` тона `info` под указателем; у `secondary` — в нажатии."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-info-border-active",
+    "kind": "theme",
+    "default": "var(--gr-info-active)",
+    "description": "Рамка `outline` и `ghost-border` тона `info` в нажатии."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-info-border-soft-hover",
+    "kind": "theme",
+    "default": "var(--gr-button-info-border)",
+    "description": "Рамка `secondary` тона `info` под указателем."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-slate-border-hover",
+    "kind": "theme",
+    "default": "var(--gr-slate)",
+    "description": "Рамка `outline` и `ghost-border` тона `slate` под указателем; у `secondary` — в нажатии."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-slate-border-active",
+    "kind": "theme",
+    "default": "var(--gr-slate-active)",
+    "description": "Рамка `outline` и `ghost-border` тона `slate` в нажатии."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-slate-border-soft-hover",
+    "kind": "theme",
+    "default": "var(--gr-button-slate-border)",
+    "description": "Рамка `secondary` тона `slate` под указателем."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-azure-border-hover",
+    "kind": "theme",
+    "default": "var(--gr-azure)",
+    "description": "Рамка `outline` и `ghost-border` тона `azure` под указателем; у `secondary` — в нажатии."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-azure-border-active",
+    "kind": "theme",
+    "default": "var(--gr-azure-active)",
+    "description": "Рамка `outline` и `ghost-border` тона `azure` в нажатии."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-azure-border-soft-hover",
+    "kind": "theme",
+    "default": "var(--gr-button-azure-border)",
+    "description": "Рамка `secondary` тона `azure` под указателем."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-disabled-outline-brd",
+    "kind": "theme",
+    "default": "var(--gr-button-disabled-brd)",
+    "description": "Рамка недоступной `outline`: у неё нет заливки, и рамка — единственный контур, когда у залитых весов рамки уже нет."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-press-scale",
+    "kind": "theme",
+    "default": "0.98",
+    "description": "Масштаб кнопки в нажатии; 1 — без сжатия. С `prefers-reduced-motion` не действует."
+  },
+  {
     "owner": "GrButtonGroup",
     "name": "--gr-button-group-radius",
     "kind": "hook",
@@ -1338,6 +1646,69 @@ export const grComponentTokens: GrComponentToken[] = [
     "kind": "hook",
     "default": "var(--gr-muted)",
     "description": "Подложка лотка (`appearance=\"tray\"`), на которой лежат звенья группы."
+  },
+  {
+    "owner": "GrButtonGroup",
+    "name": "--gr-button-group-tray-radius",
+    "kind": "theme",
+    "default": "var(--gr-radius-md)",
+    "description": "Скругление лотка `appearance=\"tray\"`. Звено внутри скругляется своей ступенью кнопки: лотку нужен радиус на поле (2px) больше."
+  },
+  {
+    "owner": "GrCard",
+    "name": "--gr-card-title-size",
+    "kind": "theme",
+    "default": "var(--gr-text-sm)",
+    "description": "Кегль заголовка карточки из `title`."
+  },
+  {
+    "owner": "GrCard",
+    "name": "--gr-card-title-leading",
+    "kind": "theme",
+    "default": "var(--gr-leading-sm)",
+    "description": "Интерлиньяж заголовка карточки."
+  },
+  {
+    "owner": "GrCard",
+    "name": "--gr-card-title-weight",
+    "kind": "theme",
+    "default": "var(--gr-font-semibold)",
+    "description": "Вес заголовка карточки. Антикве заголовков (`--gr-font-display`) обычно нужен вес легче, чем гротеску."
+  },
+  {
+    "owner": "GrCard",
+    "name": "--gr-card-padding-sm",
+    "kind": "theme",
+    "default": "0.75rem",
+    "description": "Поле карточки `padding=\"sm\"`."
+  },
+  {
+    "owner": "GrCard",
+    "name": "--gr-card-padding-md",
+    "kind": "theme",
+    "default": "1rem",
+    "description": "Поле карточки `padding=\"md\"`."
+  },
+  {
+    "owner": "GrCard",
+    "name": "--gr-card-padding-lg",
+    "kind": "theme",
+    "default": "1.5rem",
+    "description": "Поле карточки `padding=\"lg\"`."
+  },
+  {
+    "owner": "GrCard",
+    "name": "--gr-card-hover-bg",
+    "kind": "theme",
+    "default": "var(--gr-muted)",
+    "description": "Заливка нажимаемой карточки под указателем."
+  },
+  {
+    "owner": "GrCard",
+    "name": "--gr-card-hover-brd",
+    "kind": "theme",
+    "default": "var(--gr-brd)",
+    "description": "Рамка нажимаемой карточки под указателем. У `ghost` рамки нет, и наведение её не рисует."
   },
   {
     "owner": "GrCarousel",
@@ -1471,6 +1842,41 @@ export const grComponentTokens: GrComponentToken[] = [
     "description": "Рамка выключенного чипа."
   },
   {
+    "owner": "GrChip",
+    "name": "--gr-chip-neutral-bg",
+    "kind": "theme",
+    "default": "var(--gr-muted)",
+    "description": "Заливка нейтрального чипа."
+  },
+  {
+    "owner": "GrChip",
+    "name": "--gr-chip-neutral-fg",
+    "kind": "theme",
+    "default": "var(--gr-fg)",
+    "description": "Текст нейтрального чипа."
+  },
+  {
+    "owner": "GrChip",
+    "name": "--gr-chip-neutral-brd",
+    "kind": "theme",
+    "default": "var(--gr-brd)",
+    "description": "Рамка нейтрального чипа."
+  },
+  {
+    "owner": "GrChip",
+    "name": "--gr-chip-neutral-hover-bg",
+    "kind": "theme",
+    "default": "var(--gr-muted)",
+    "description": "Заливка нажимаемого нейтрального чипа под указателем."
+  },
+  {
+    "owner": "GrChip",
+    "name": "--gr-chip-neutral-hover-brd",
+    "kind": "theme",
+    "default": "var(--gr-brd)",
+    "description": "Рамка нажимаемого нейтрального чипа под указателем."
+  },
+  {
     "owner": "GrColorPicker",
     "name": "--gr-color-picker-checker-size",
     "kind": "hook",
@@ -1550,6 +1956,13 @@ export const grComponentTokens: GrComponentToken[] = [
     "description": "Заливка области по горизонтали: серый → чистый тон при светлоте 50%. Ставится компонентом при каждом изменении оттенка."
   },
   {
+    "owner": "GrColorPicker",
+    "name": "--gr-color-picker-trigger-hover-brd",
+    "kind": "theme",
+    "default": "var(--gr-primary)",
+    "description": "Рамка триггера под указателем. Тема, где триггер — такое же поле, как остальные, ставит `--gr-input-hover`."
+  },
+  {
     "owner": "GrCommandPalette",
     "name": "--gr-command-active-bg",
     "kind": "theme",
@@ -1592,6 +2005,34 @@ export const grComponentTokens: GrComponentToken[] = [
     "default": "0px",
     "description": "Резерв высоты области результатов — чтобы окно не схлопывалось между «ищем» и «нашлось». Состояние «Ничего не найдено» и загрузка встают по центру резерва.",
     "literal": "Нейтральное значение: без минимума."
+  },
+  {
+    "owner": "GrCommandPalette",
+    "name": "--gr-command-group-label-transform",
+    "kind": "theme",
+    "default": "uppercase",
+    "description": "Регистр заголовка группы: `uppercase` или `none`."
+  },
+  {
+    "owner": "GrCommandPalette",
+    "name": "--gr-command-group-label-tracking",
+    "kind": "theme",
+    "default": "0.025em",
+    "description": "Разрядка заголовка группы. Капсу она нужна, строчным — нет."
+  },
+  {
+    "owner": "GrCommandPalette",
+    "name": "--gr-command-match-weight",
+    "kind": "theme",
+    "default": "var(--gr-font-regular)",
+    "description": "Вес совпавшей с запросом части. Тема без подложки совпадения выделяет его весом."
+  },
+  {
+    "owner": "GrCommandPalette",
+    "name": "--gr-command-footer-bg",
+    "kind": "theme",
+    "default": "transparent",
+    "description": "Заливка подвала с подсказками клавиш."
   },
   {
     "owner": "GrDataTable",
@@ -1658,6 +2099,20 @@ export const grComponentTokens: GrComponentToken[] = [
     "description": "Полоса слева у строки подробностей. Связывает её со своей строкой, когда между ними прокрутили."
   },
   {
+    "owner": "GrDataTable",
+    "name": "--gr-datatable-head-weight",
+    "kind": "theme",
+    "default": "var(--gr-font-bold)",
+    "description": "Вес подписи колонки в шапке."
+  },
+  {
+    "owner": "GrDataTable",
+    "name": "--gr-datatable-first-row-brd",
+    "kind": "theme",
+    "default": "var(--gr-brd)",
+    "description": "Рамка над первой строкой — граница с шапкой. Тема с линией шапки (`--gr-table-head-line`) ставит `transparent`, иначе граница двоится."
+  },
+  {
     "owner": "GrDelta",
     "name": "--gr-delta-arrow-size",
     "kind": "hook",
@@ -1716,7 +2171,7 @@ export const grComponentTokens: GrComponentToken[] = [
     "owner": "GrDescriptionList",
     "name": "--gr-description-list-row-gap",
     "kind": "hook",
-    "default": "0.375rem (`density=\"compact\"` — 0.125rem)",
+    "default": "var(--gr-description-list-row-space) (`density=\"compact\"` — 0.125rem)",
     "description": "Зазор между парами. Не ступень общей шкалы: плотность списка характеристик настраивается отдельно от отступов раскладки.",
     "literal": "Шаг по плотности (`density`) из карты компонента."
   },
@@ -1728,11 +2183,256 @@ export const grComponentTokens: GrComponentToken[] = [
     "description": "Цвет линии между парами при `divided`."
   },
   {
+    "owner": "GrDescriptionList",
+    "name": "--gr-description-list-row-space",
+    "kind": "theme",
+    "default": "0.375rem",
+    "description": "Расстояние между строками списка в теме. Хук `--gr-description-list-row-gap` сильнее."
+  },
+  {
+    "owner": "GrDescriptionList",
+    "name": "--gr-description-list-divided-space",
+    "kind": "theme",
+    "default": "0.25rem",
+    "description": "Отступ строки от разделительной линии при `divided`."
+  },
+  {
+    "owner": "GrDialog",
+    "name": "--gr-dialog-title-size",
+    "kind": "theme",
+    "default": "var(--gr-control-text-md)",
+    "description": "Кегль заголовка окна в шапке `GrDialogHeader`."
+  },
+  {
+    "owner": "GrDialog",
+    "name": "--gr-dialog-title-leading",
+    "kind": "theme",
+    "default": "var(--gr-control-leading-md)",
+    "description": "Интерлиньяж заголовка окна."
+  },
+  {
+    "owner": "GrDialog",
+    "name": "--gr-dialog-title-weight",
+    "kind": "theme",
+    "default": "var(--gr-font-bold)",
+    "description": "Вес заголовка окна."
+  },
+  {
+    "owner": "GrDialog",
+    "name": "--gr-dialog-divider",
+    "kind": "theme",
+    "default": "var(--gr-brd)",
+    "description": "Линия под шапкой и над подвалом окна (`bordered`). Тема, где окно держится полями, а не линиями, ставит `transparent`: место под линию остаётся, раскладка не прыгает."
+  },
+  {
     "owner": "GrDivider",
     "name": "--gr-divider-thickness",
     "kind": "theme",
     "default": "1px",
     "description": "Толщина разделителя — общая для горизонтального и вертикального."
+  },
+  {
+    "owner": "GrDrawer",
+    "name": "--gr-drawer-title-size",
+    "kind": "theme",
+    "default": "var(--gr-text-sm)",
+    "description": "Кегль заголовка шторки."
+  },
+  {
+    "owner": "GrDrawer",
+    "name": "--gr-drawer-title-leading",
+    "kind": "theme",
+    "default": "var(--gr-leading-sm)",
+    "description": "Интерлиньяж заголовка шторки."
+  },
+  {
+    "owner": "GrDrawer",
+    "name": "--gr-drawer-title-weight",
+    "kind": "theme",
+    "default": "var(--gr-font-bold)",
+    "description": "Вес заголовка шторки."
+  },
+  {
+    "owner": "GrDrawer",
+    "name": "--gr-drawer-shadow",
+    "kind": "theme",
+    "default": "var(--gr-shadow-2)",
+    "description": "Тень шторки."
+  },
+  {
+    "owner": "GrDrawer",
+    "name": "--gr-drawer-radius",
+    "kind": "theme",
+    "default": "var(--gr-radius-none)",
+    "description": "Скругление внутреннего края шторки — того, что смотрит в страницу."
+  },
+  {
+    "owner": "GrDropdownMenu",
+    "name": "--gr-dropdown-menu-item-height",
+    "kind": "theme",
+    "default": "2.5rem",
+    "description": "Минимальная высота пункта меню."
+  },
+  {
+    "owner": "GrDropdownMenu",
+    "name": "--gr-dropdown-menu-item-px",
+    "kind": "theme",
+    "default": "1rem",
+    "description": "Поле пункта по горизонтали."
+  },
+  {
+    "owner": "GrDropdownMenu",
+    "name": "--gr-dropdown-menu-item-py",
+    "kind": "theme",
+    "default": "0.625rem",
+    "description": "Поле пункта по вертикали. Вместе с интерлиньяжем не должно превышать высоту пункта, иначе пункт вырастет."
+  },
+  {
+    "owner": "GrDropdownMenu",
+    "name": "--gr-dropdown-menu-item-hover-bg",
+    "kind": "theme",
+    "default": "var(--gr-accent)",
+    "description": "Подсветка пункта под указателем и раскрытого пункта-подменю."
+  },
+  {
+    "owner": "GrDropdownMenu",
+    "name": "--gr-dropdown-menu-item-hover-fg",
+    "kind": "theme",
+    "default": "var(--gr-accent-fg)",
+    "description": "Текст подсвеченного пункта."
+  },
+  {
+    "owner": "GrDropdownMenu",
+    "name": "--gr-dropdown-menu-item-danger-hover-bg",
+    "kind": "theme",
+    "default": "var(--gr-accent)",
+    "description": "Подсветка опасного пункта под указателем."
+  },
+  {
+    "owner": "GrDropdownMenu",
+    "name": "--gr-dropdown-menu-item-danger-hover-fg",
+    "kind": "theme",
+    "default": "var(--gr-accent-fg)",
+    "description": "Текст подсвеченного опасного пункта."
+  },
+  {
+    "owner": "GrDropdownMenu",
+    "name": "--gr-dropdown-menu-item-disabled-bg",
+    "kind": "theme",
+    "default": "var(--gr-muted)",
+    "description": "Заливка недоступного пункта."
+  },
+  {
+    "owner": "GrDropdownMenu",
+    "name": "--gr-dropdown-menu-item-disabled-fg",
+    "kind": "theme",
+    "default": "var(--gr-muted-fg)",
+    "description": "Текст недоступного пункта."
+  },
+  {
+    "owner": "GrEmptyState",
+    "name": "--gr-empty-state-title-size-xs",
+    "kind": "theme",
+    "default": "var(--gr-text-xs)",
+    "description": "Кегль заголовка пустого состояния на ступени `xs`."
+  },
+  {
+    "owner": "GrEmptyState",
+    "name": "--gr-empty-state-title-leading-xs",
+    "kind": "theme",
+    "default": "var(--gr-leading-xs)",
+    "description": "Интерлиньяж заголовка пустого состояния на ступени `xs`."
+  },
+  {
+    "owner": "GrEmptyState",
+    "name": "--gr-empty-state-title-size-sm",
+    "kind": "theme",
+    "default": "var(--gr-text-sm)",
+    "description": "Кегль заголовка пустого состояния на ступени `sm`."
+  },
+  {
+    "owner": "GrEmptyState",
+    "name": "--gr-empty-state-title-leading-sm",
+    "kind": "theme",
+    "default": "var(--gr-leading-sm)",
+    "description": "Интерлиньяж заголовка пустого состояния на ступени `sm`."
+  },
+  {
+    "owner": "GrEmptyState",
+    "name": "--gr-empty-state-title-size-md",
+    "kind": "theme",
+    "default": "var(--gr-text-sm)",
+    "description": "Кегль заголовка пустого состояния на ступени `md`."
+  },
+  {
+    "owner": "GrEmptyState",
+    "name": "--gr-empty-state-title-leading-md",
+    "kind": "theme",
+    "default": "var(--gr-leading-sm)",
+    "description": "Интерлиньяж заголовка пустого состояния на ступени `md`."
+  },
+  {
+    "owner": "GrEmptyState",
+    "name": "--gr-empty-state-title-size-lg",
+    "kind": "theme",
+    "default": "var(--gr-text-base)",
+    "description": "Кегль заголовка пустого состояния на ступени `lg`."
+  },
+  {
+    "owner": "GrEmptyState",
+    "name": "--gr-empty-state-title-leading-lg",
+    "kind": "theme",
+    "default": "var(--gr-leading-base)",
+    "description": "Интерлиньяж заголовка пустого состояния на ступени `lg`."
+  },
+  {
+    "owner": "GrEmptyState",
+    "name": "--gr-empty-state-title-weight",
+    "kind": "theme",
+    "default": "var(--gr-font-bold)",
+    "description": "Вес заголовка пустого состояния."
+  },
+  {
+    "owner": "GrEmptyState",
+    "name": "--gr-empty-state-icon-brd",
+    "kind": "theme",
+    "default": "var(--gr-brd)",
+    "description": "Рамка плашки значка пустого состояния."
+  },
+  {
+    "owner": "GrEmptyState",
+    "name": "--gr-empty-state-icon-fg",
+    "kind": "theme",
+    "default": "var(--gr-muted-fg)",
+    "description": "Цвет значка пустого состояния."
+  },
+  {
+    "owner": "GrEmptyState",
+    "name": "--gr-empty-state-icon-radius-xs",
+    "kind": "theme",
+    "default": "var(--gr-radius-md)",
+    "description": "Скругление плашки значка на ступени `xs`. Круг — `var(--gr-radius-full)`."
+  },
+  {
+    "owner": "GrEmptyState",
+    "name": "--gr-empty-state-icon-radius-sm",
+    "kind": "theme",
+    "default": "var(--gr-radius-md)",
+    "description": "Скругление плашки значка на ступени `sm`. Круг — `var(--gr-radius-full)`."
+  },
+  {
+    "owner": "GrEmptyState",
+    "name": "--gr-empty-state-icon-radius-md",
+    "kind": "theme",
+    "default": "var(--gr-radius-lg)",
+    "description": "Скругление плашки значка на ступени `md`. Круг — `var(--gr-radius-full)`."
+  },
+  {
+    "owner": "GrEmptyState",
+    "name": "--gr-empty-state-icon-radius-lg",
+    "kind": "theme",
+    "default": "var(--gr-radius-lg)",
+    "description": "Скругление плашки значка на ступени `lg`. Круг — `var(--gr-radius-full)`."
   },
   {
     "owner": "GrFilePreview",
@@ -1754,6 +2454,139 @@ export const grComponentTokens: GrComponentToken[] = [
     "kind": "hook",
     "default": "var(--gr-radius-md)",
     "description": "Скругление плитки. Отдельный хук, а не ступень общей шкалы: плитка в ленте документов и плитка в строке списка скругляются по-разному."
+  },
+  {
+    "owner": "GrFileUpload",
+    "name": "--gr-file-upload-zone-bg",
+    "kind": "theme",
+    "default": "var(--gr-card)",
+    "description": "Заливка зоны сброса."
+  },
+  {
+    "owner": "GrFileUpload",
+    "name": "--gr-file-upload-zone-brd",
+    "kind": "theme",
+    "default": "var(--gr-brd)",
+    "description": "Пунктир зоны сброса."
+  },
+  {
+    "owner": "GrFileUpload",
+    "name": "--gr-file-upload-zone-hover-bg",
+    "kind": "theme",
+    "default": "var(--gr-muted)",
+    "description": "Заливка зоны под указателем."
+  },
+  {
+    "owner": "GrFileUpload",
+    "name": "--gr-file-upload-zone-over-bg",
+    "kind": "theme",
+    "default": "var(--gr-muted)",
+    "description": "Заливка зоны, когда над ней файл."
+  },
+  {
+    "owner": "GrFileUpload",
+    "name": "--gr-file-upload-zone-over-brd",
+    "kind": "theme",
+    "default": "var(--gr-ring)",
+    "description": "Рамка зоны, когда над ней файл."
+  },
+  {
+    "owner": "GrFileUpload",
+    "name": "--gr-file-upload-icon-brd",
+    "kind": "theme",
+    "default": "var(--gr-brd)",
+    "description": "Рамка плитки значка в зоне."
+  },
+  {
+    "owner": "GrFileUpload",
+    "name": "--gr-file-upload-icon-fg",
+    "kind": "theme",
+    "default": "var(--gr-muted-fg)",
+    "description": "Цвет значка в зоне."
+  },
+  {
+    "owner": "GrFileUpload",
+    "name": "--gr-file-upload-icon-radius-xs",
+    "kind": "theme",
+    "default": "var(--gr-radius-md)",
+    "description": "Скругление плитки значка на ступени `xs`. Круг — `var(--gr-radius-full)`."
+  },
+  {
+    "owner": "GrFileUpload",
+    "name": "--gr-file-upload-icon-radius-sm",
+    "kind": "theme",
+    "default": "var(--gr-radius-md)",
+    "description": "Скругление плитки значка на ступени `sm`. Круг — `var(--gr-radius-full)`."
+  },
+  {
+    "owner": "GrFileUpload",
+    "name": "--gr-file-upload-icon-radius-md",
+    "kind": "theme",
+    "default": "var(--gr-radius-lg)",
+    "description": "Скругление плитки значка на ступени `md`. Круг — `var(--gr-radius-full)`."
+  },
+  {
+    "owner": "GrFileUpload",
+    "name": "--gr-file-upload-icon-radius-lg",
+    "kind": "theme",
+    "default": "var(--gr-radius-lg)",
+    "description": "Скругление плитки значка на ступени `lg`. Круг — `var(--gr-radius-full)`."
+  },
+  {
+    "owner": "GrFileUpload",
+    "name": "--gr-file-upload-list-gap",
+    "kind": "theme",
+    "default": "0.25rem",
+    "description": "Зазор между строками выбранных файлов."
+  },
+  {
+    "owner": "GrFileUpload",
+    "name": "--gr-file-upload-item-bg",
+    "kind": "theme",
+    "default": "transparent",
+    "description": "Подложка строки файла. Тема, где файл — плашка, ставит поверхность карточки."
+  },
+  {
+    "owner": "GrFileUpload",
+    "name": "--gr-file-upload-item-brd",
+    "kind": "theme",
+    "default": "transparent",
+    "description": "Контур строки файла. Рисуется тенью внутрь: строка не меняет размер."
+  },
+  {
+    "owner": "GrFileUpload",
+    "name": "--gr-file-upload-item-radius",
+    "kind": "theme",
+    "default": "0px",
+    "description": "Скругление строки файла."
+  },
+  {
+    "owner": "GrFileUpload",
+    "name": "--gr-file-upload-item-padding",
+    "kind": "theme",
+    "default": "0px",
+    "description": "Поле строки файла."
+  },
+  {
+    "owner": "GrFormField",
+    "name": "--gr-form-field-label-fg",
+    "kind": "theme",
+    "default": "var(--gr-muted-fg)",
+    "description": "Цвет подписи поля."
+  },
+  {
+    "owner": "GrFormField",
+    "name": "--gr-form-field-label-weight",
+    "kind": "theme",
+    "default": "var(--gr-font-regular)",
+    "description": "Вес подписи поля."
+  },
+  {
+    "owner": "GrFormField",
+    "name": "--gr-form-field-required-fg",
+    "kind": "theme",
+    "default": "var(--gr-invalid-text)",
+    "description": "Цвет звёздочки обязательного поля. Тема, где звёздочка — пометка, а не тревога, ставит приглушённый цвет."
   },
   {
     "owner": "GrIcon",
@@ -1889,6 +2722,62 @@ export const grComponentTokens: GrComponentToken[] = [
     "description": "Цвет ссылки в момент нажатия."
   },
   {
+    "owner": "GrLoading",
+    "name": "--gr-loading-panel-bg",
+    "kind": "theme",
+    "default": "var(--gr-card)",
+    "description": "Заливка панели с индикатором. Непрозрачная: подпись лежит поверх произвольного содержимого, и полупрозрачная панель не держала бы контраст текста."
+  },
+  {
+    "owner": "GrLoading",
+    "name": "--gr-loading-panel-radius",
+    "kind": "theme",
+    "default": "var(--gr-radius-md)",
+    "description": "Скругление панели с индикатором."
+  },
+  {
+    "owner": "GrLoading",
+    "name": "--gr-loading-panel-shadow",
+    "kind": "theme",
+    "default": "var(--gr-shadow-2)",
+    "description": "Тень панели с индикатором."
+  },
+  {
+    "owner": "GrModal",
+    "name": "--gr-modal-shadow",
+    "kind": "theme",
+    "default": "var(--gr-shadow-2)",
+    "description": "Тень окна."
+  },
+  {
+    "owner": "GrModal",
+    "name": "--gr-modal-width-sm",
+    "kind": "theme",
+    "default": "420px",
+    "description": "Наибольшая ширина окна размера `sm`."
+  },
+  {
+    "owner": "GrModal",
+    "name": "--gr-modal-width-md",
+    "kind": "theme",
+    "default": "560px",
+    "description": "Наибольшая ширина окна размера `md`."
+  },
+  {
+    "owner": "GrModal",
+    "name": "--gr-modal-width-lg",
+    "kind": "theme",
+    "default": "720px",
+    "description": "Наибольшая ширина окна размера `lg`."
+  },
+  {
+    "owner": "GrModal",
+    "name": "--gr-modal-width-xl",
+    "kind": "theme",
+    "default": "920px",
+    "description": "Наибольшая ширина окна размера `xl`."
+  },
+  {
     "owner": "GrNavbar",
     "name": "--gr-navbar-height",
     "kind": "hook",
@@ -1908,15 +2797,57 @@ export const grComponentTokens: GrComponentToken[] = [
     "owner": "GrOtpInput",
     "name": "--gr-otp-input-active-brd",
     "kind": "hook",
-    "default": "var(--gr-primary)",
+    "default": "var(--gr-otp-input-focus-brd)",
     "description": "Цвет рамки активной ячейки — той, в которой стоит каретка."
   },
   {
     "owner": "GrOtpInput",
     "name": "--gr-otp-input-caret",
     "kind": "hook",
-    "default": "var(--gr-primary)",
+    "default": "var(--gr-otp-input-caret-color)",
     "description": "Цвет каретки. Она рисуется своей: настоящая скрыта вместе с текстом поля."
+  },
+  {
+    "owner": "GrOtpInput",
+    "name": "--gr-otp-input-focus-brd",
+    "kind": "theme",
+    "default": "var(--gr-primary)",
+    "description": "Рамка ячейки, в которую идёт ввод, в теме. Хук `--gr-otp-input-active-brd` сильнее."
+  },
+  {
+    "owner": "GrOtpInput",
+    "name": "--gr-otp-input-caret-color",
+    "kind": "theme",
+    "default": "var(--gr-primary)",
+    "description": "Цвет каретки в теме. Хук `--gr-otp-input-caret` сильнее."
+  },
+  {
+    "owner": "GrPagination",
+    "name": "--gr-pagination-page-fg",
+    "kind": "theme",
+    "default": "var(--gr-muted-fg)",
+    "description": "Номер невыбранной страницы."
+  },
+  {
+    "owner": "GrPagination",
+    "name": "--gr-pagination-page-hover-bg",
+    "kind": "theme",
+    "default": "var(--gr-accent)",
+    "description": "Подложка номера под указателем — в паре с подсветкой ghost-кнопок «назад/вперёд»."
+  },
+  {
+    "owner": "GrPagination",
+    "name": "--gr-pagination-page-hover-fg",
+    "kind": "theme",
+    "default": "var(--gr-accent-fg)",
+    "description": "Номер под указателем."
+  },
+  {
+    "owner": "GrPagination",
+    "name": "--gr-pagination-page-weight",
+    "kind": "theme",
+    "default": "var(--gr-font-semibold)",
+    "description": "Вес номеров страниц."
   },
   {
     "owner": "GrPopover",
@@ -2012,6 +2943,41 @@ export const grComponentTokens: GrComponentToken[] = [
     "description": "Период пробега полосы в неопределённом режиме."
   },
   {
+    "owner": "GrProgressBar",
+    "name": "--gr-progress-track-bg",
+    "kind": "theme",
+    "default": "var(--gr-muted)",
+    "description": "Заливка дорожки."
+  },
+  {
+    "owner": "GrProgressBar",
+    "name": "--gr-progress-height-xs",
+    "kind": "theme",
+    "default": "0.25rem",
+    "description": "Толщина полосы на ступени `xs`."
+  },
+  {
+    "owner": "GrProgressBar",
+    "name": "--gr-progress-height-sm",
+    "kind": "theme",
+    "default": "0.375rem",
+    "description": "Толщина полосы на ступени `sm`."
+  },
+  {
+    "owner": "GrProgressBar",
+    "name": "--gr-progress-height-md",
+    "kind": "theme",
+    "default": "0.5rem",
+    "description": "Толщина полосы на ступени `md`."
+  },
+  {
+    "owner": "GrProgressBar",
+    "name": "--gr-progress-height-lg",
+    "kind": "theme",
+    "default": "0.75rem",
+    "description": "Толщина полосы на ступени `lg`."
+  },
+  {
     "owner": "GrProgressCircle",
     "name": "--gr-progress-circle-size",
     "kind": "hook",
@@ -2023,7 +2989,7 @@ export const grComponentTokens: GrComponentToken[] = [
     "owner": "GrProgressCircle",
     "name": "--gr-progress-circle-track",
     "kind": "hook",
-    "default": "var(--gr-muted)",
+    "default": "var(--gr-progress-circle-track-bg)",
     "description": "Цвет дорожки — непройденной части кольца."
   },
   {
@@ -2040,6 +3006,34 @@ export const grComponentTokens: GrComponentToken[] = [
     "default": "кегль по ступени `size`",
     "description": "Кегль содержимого в центре кольца: свой формат значения может не влезть в дефолтный.",
     "literal": "Кегль по ступени `size` из карты компонента."
+  },
+  {
+    "owner": "GrProgressCircle",
+    "name": "--gr-progress-circle-track-bg",
+    "kind": "theme",
+    "default": "var(--gr-muted)",
+    "description": "Цвет дорожки кольца в теме. Хук `--gr-progress-circle-track` сильнее."
+  },
+  {
+    "owner": "GrRadio",
+    "name": "--gr-radio-checked-bg",
+    "kind": "theme",
+    "default": "color-mix(in srgb, var(--gr-selected) 10%, var(--gr-bg))",
+    "description": "Заливка кружка выбранного радио. Рамка у выбранного — всегда `--gr-selected`; заливка решает, контур это с точкой или сплошной кружок."
+  },
+  {
+    "owner": "GrRadio",
+    "name": "--gr-radio-checked-hover-bg",
+    "kind": "theme",
+    "default": "color-mix(in srgb, var(--gr-selected) 10%, var(--gr-bg))",
+    "description": "Заливка кружка выбранного радио под указателем. У контурного радио совпадает с `--gr-radio-checked-bg`."
+  },
+  {
+    "owner": "GrRadio",
+    "name": "--gr-radio-dot",
+    "kind": "theme",
+    "default": "var(--gr-selected)",
+    "description": "Точка выбранного радио. На сплошной заливке `--gr-selected` тема ставит сюда `--gr-selected-fg`, иначе точка сольётся с кружком."
   },
   {
     "owner": "GrRating",
@@ -2072,6 +3066,27 @@ export const grComponentTokens: GrComponentToken[] = [
     "literal": "Кегль ступени `lg` из карты компонента."
   },
   {
+    "owner": "GrRating",
+    "name": "--gr-rating-void-fill",
+    "kind": "theme",
+    "default": "currentColor",
+    "description": "Заливка пустой звезды: `currentColor` — цветом `--gr-rating-void-color`, `transparent` — контур."
+  },
+  {
+    "owner": "GrRating",
+    "name": "--gr-rating-void-stroke",
+    "kind": "theme",
+    "default": "transparent",
+    "description": "Обводка пустой звезды: `currentColor` — цветом `--gr-rating-void-color`."
+  },
+  {
+    "owner": "GrRating",
+    "name": "--gr-rating-stroke-width",
+    "kind": "theme",
+    "default": "0",
+    "description": "Толщина обводки звезды в единицах её сетки 24×24. Заполненная обводится своим цветом той же толщины."
+  },
+  {
     "owner": "GrScrollSpy",
     "name": "--gr-scroll-spy-offset",
     "kind": "inline",
@@ -2082,7 +3097,7 @@ export const grComponentTokens: GrComponentToken[] = [
     "owner": "GrScrollSpy",
     "name": "--gr-scroll-spy-marker",
     "kind": "hook",
-    "default": "var(--gr-primary)",
+    "default": "var(--gr-selected)",
     "description": "Цвет рельса у активного пункта. Один из трёх признаков активности — рядом с ним меняются вес и цвет текста."
   },
   {
@@ -2104,7 +3119,7 @@ export const grComponentTokens: GrComponentToken[] = [
     "owner": "GrSegmented",
     "name": "--gr-segmented-track-bg",
     "kind": "inline",
-    "default": "var(--gr-muted); в варианте `solid` — var(--gr-card)",
+    "default": "var(--gr-muted); в варианте `button` — var(--gr-card)",
     "description": "Фон дорожки переключателя."
   },
   {
@@ -2125,14 +3140,14 @@ export const grComponentTokens: GrComponentToken[] = [
     "owner": "GrSegmented",
     "name": "--gr-segmented-track-shadow",
     "kind": "inline",
-    "default": "none; в варианте `solid` — var(--gr-shadow-1)",
+    "default": "none; в варианте `button` — var(--gr-shadow-1)",
     "description": "Тень дорожки."
   },
   {
     "owner": "GrSegmented",
     "name": "--gr-segmented-indicator-bg",
     "kind": "inline",
-    "default": "var(--gr-card); в варианте `primary` — var(--gr-primary)",
+    "default": "var(--gr-card); в варианте `button` — var(--gr-selected)",
     "description": "Заливка бегунка под выбранным пунктом."
   },
   {
@@ -2146,7 +3161,7 @@ export const grComponentTokens: GrComponentToken[] = [
     "owner": "GrSegmented",
     "name": "--gr-segmented-indicator-shadow",
     "kind": "inline",
-    "default": "var(--gr-shadow-1); в варианте `solid` — var(--gr-shadow-2)",
+    "default": "var(--gr-shadow-1); в варианте `button` — var(--gr-shadow-2)",
     "description": "Тень бегунка — она отделяет его от дорожки."
   },
   {
@@ -2174,7 +3189,7 @@ export const grComponentTokens: GrComponentToken[] = [
     "owner": "GrSegmented",
     "name": "--gr-segmented-item-selected-color",
     "kind": "inline",
-    "default": "var(--gr-fg); в варианте `primary` — var(--gr-primary-fg)",
+    "default": "var(--gr-fg); в варианте `button` — var(--gr-selected-fg)",
     "description": "Цвет выбранного пункта."
   },
   {
@@ -2223,7 +3238,7 @@ export const grComponentTokens: GrComponentToken[] = [
     "owner": "GrSegmented",
     "name": "--gr-segmented-font-weight",
     "kind": "inline",
-    "default": "600",
+    "default": "var(--gr-segmented-label-weight)",
     "description": "Начертание подписи пункта."
   },
   {
@@ -2234,12 +3249,103 @@ export const grComponentTokens: GrComponentToken[] = [
     "description": "Межстрочный интервал подписи пункта."
   },
   {
+    "owner": "GrSegmented",
+    "name": "--gr-segmented-label-weight",
+    "kind": "theme",
+    "default": "var(--gr-font-semibold)",
+    "description": "Вес подписи сегмента."
+  },
+  {
+    "owner": "GrSelect",
+    "name": "--gr-select-option-active-bg",
+    "kind": "theme",
+    "default": "color-mix(in srgb, var(--gr-muted) 30%, transparent)",
+    "description": "Подсветка опции под указателем и активной с клавиатуры."
+  },
+  {
     "owner": "GrSidebar",
     "name": "--gr-sidebar-nest-indent",
     "kind": "hook",
     "default": "1rem",
     "description": "Отступ одного уровня вложенности у подпунктов. Отодвигается вся строка вместе с подсветкой, а не только текст.",
     "literal": "Геометрия раскладки вложенных пунктов."
+  },
+  {
+    "owner": "GrSidebar",
+    "name": "--gr-sidebar-item-active-bg",
+    "kind": "theme",
+    "default": "var(--gr-muted)",
+    "description": "Заливка текущего пункта."
+  },
+  {
+    "owner": "GrSidebar",
+    "name": "--gr-sidebar-item-active-weight",
+    "kind": "theme",
+    "default": "var(--gr-font-semibold)",
+    "description": "Вес подписи текущего пункта."
+  },
+  {
+    "owner": "GrSidebar",
+    "name": "--gr-sidebar-group-label-size",
+    "kind": "theme",
+    "default": "var(--gr-text-2xs)",
+    "description": "Кегль заголовка группы."
+  },
+  {
+    "owner": "GrSidebar",
+    "name": "--gr-sidebar-group-label-leading",
+    "kind": "theme",
+    "default": "var(--gr-leading-2xs)",
+    "description": "Интерлиньяж заголовка группы."
+  },
+  {
+    "owner": "GrSidebar",
+    "name": "--gr-sidebar-group-label-weight",
+    "kind": "theme",
+    "default": "var(--gr-font-bold)",
+    "description": "Вес заголовка группы."
+  },
+  {
+    "owner": "GrSidebar",
+    "name": "--gr-sidebar-group-label-transform",
+    "kind": "theme",
+    "default": "uppercase",
+    "description": "Регистр заголовка группы: `uppercase` или `none`."
+  },
+  {
+    "owner": "GrSidebar",
+    "name": "--gr-sidebar-group-label-tracking",
+    "kind": "theme",
+    "default": "0.025em",
+    "description": "Разрядка заголовка группы. Капсу она нужна, строчным — нет."
+  },
+  {
+    "owner": "GrSkeleton",
+    "name": "--gr-skeleton-bg",
+    "kind": "theme",
+    "default": "var(--gr-muted)",
+    "description": "Заливка заглушки."
+  },
+  {
+    "owner": "GrSkeleton",
+    "name": "--gr-skeleton-brd",
+    "kind": "theme",
+    "default": "var(--gr-brd)",
+    "description": "Рамка заглушки."
+  },
+  {
+    "owner": "GrSkeleton",
+    "name": "--gr-skeleton-pulse-opacity",
+    "kind": "theme",
+    "default": "0.5",
+    "description": "Нижняя точка пульса: 1 — пульса нет."
+  },
+  {
+    "owner": "GrSkeleton",
+    "name": "--gr-skeleton-shine",
+    "kind": "theme",
+    "default": "transparent",
+    "description": "Цвет бегущего блика: `transparent` — блика нет."
   },
   {
     "owner": "GrSlider",
@@ -2252,7 +3358,7 @@ export const grComponentTokens: GrComponentToken[] = [
     "owner": "GrSlider",
     "name": "--gr-slider-fill",
     "kind": "hook",
-    "default": "var(--gr-primary)",
+    "default": "var(--gr-selected)",
     "description": "Цвет пройденной части трека."
   },
   {
@@ -2289,7 +3395,7 @@ export const grComponentTokens: GrComponentToken[] = [
     "owner": "GrSlider",
     "name": "--gr-slider-thumb-border",
     "kind": "hook",
-    "default": "var(--gr-slider-fill, var(--gr-primary))",
+    "default": "var(--gr-slider-fill, var(--gr-selected))",
     "description": "Цвет рамки ползунка. По умолчанию совпадает с заливкой трека."
   },
   {
@@ -2413,7 +3519,7 @@ export const grComponentTokens: GrComponentToken[] = [
     "owner": "GrSteps",
     "name": "--gr-steps-connector-done",
     "kind": "hook",
-    "default": "var(--gr-primary-solid)",
+    "default": "var(--gr-steps-done-bg)",
     "description": "Цвет пройденного участка линии."
   },
   {
@@ -2424,24 +3530,45 @@ export const grComponentTokens: GrComponentToken[] = [
     "description": "Цвет непройденного участка линии."
   },
   {
+    "owner": "GrSteps",
+    "name": "--gr-steps-done-bg",
+    "kind": "theme",
+    "default": "var(--gr-primary-solid)",
+    "description": "Заливка пройденного шага и обводка текущего: одна ось прогресса."
+  },
+  {
+    "owner": "GrSteps",
+    "name": "--gr-steps-done-fg",
+    "kind": "theme",
+    "default": "var(--gr-primary-solid-fg)",
+    "description": "Знак на заливке пройденного шага."
+  },
+  {
+    "owner": "GrSteps",
+    "name": "--gr-steps-current-fg",
+    "kind": "theme",
+    "default": "var(--gr-primary-text)",
+    "description": "Номер текущего шага в обводке."
+  },
+  {
     "owner": "GrSwitch",
     "name": "--gr-switch-track-bg",
     "kind": "inline",
-    "default": "var(--gr-primary) во включённом состоянии, var(--gr-muted) в выключенном, var(--gr-disabled-bg) в недоступном",
+    "default": "var(--gr-selected) во включённом состоянии, var(--gr-switch-off-bg) в выключенном, var(--gr-disabled-bg) в недоступном",
     "description": "Заливка дорожки переключателя."
   },
   {
     "owner": "GrSwitch",
     "name": "--gr-switch-track-brd",
     "kind": "inline",
-    "default": "var(--gr-primary) / var(--gr-control-brd) / var(--gr-disabled-brd)",
+    "default": "var(--gr-selected) / var(--gr-control-brd) / var(--gr-disabled-brd)",
     "description": "Цвет рамки дорожки переключателя."
   },
   {
     "owner": "GrSwitch",
     "name": "--gr-switch-state-text-fg",
     "kind": "hook",
-    "default": "var(--gr-primary-fg) во включённом состоянии, var(--gr-muted-fg) в выключенном, var(--gr-disabled-fg) в недоступном",
+    "default": "var(--gr-selected-fg) во включённом состоянии, var(--gr-muted-fg) в выключенном, var(--gr-disabled-fg) в недоступном",
     "description": "Цвет подписи состояния внутри дорожки. Задан для того, кто красит дорожку своим цветом: контраст текста на произвольной заливке библиотека не вычислит."
   },
   {
@@ -2457,7 +3584,98 @@ export const grComponentTokens: GrComponentToken[] = [
     "name": "--gr-switch-thumb-fg",
     "kind": "hook",
     "default": "var(--gr-muted-fg)",
-    "description": "Цвет содержимого бегунка — один на спиннер загрузки и иконку действия. По состоянию не ветвится: бегунок остаётся var(--gr-card) в любом из них."
+    "description": "Цвет содержимого бегунка — один на спиннер загрузки и иконку действия. По состоянию не ветвится: заливка бегунка — `--gr-switch-thumb-bg` в любом из них."
+  },
+  {
+    "owner": "GrSwitch",
+    "name": "--gr-switch-off-bg",
+    "kind": "theme",
+    "default": "var(--gr-muted)",
+    "description": "Заливка выключенной дорожки."
+  },
+  {
+    "owner": "GrSwitch",
+    "name": "--gr-switch-thumb-bg",
+    "kind": "theme",
+    "default": "var(--gr-card)",
+    "description": "Заливка бегунка."
+  },
+  {
+    "owner": "GrSwitch",
+    "name": "--gr-switch-thumb-shadow",
+    "kind": "theme",
+    "default": "var(--gr-shadow-1)",
+    "description": "Тень бегунка."
+  },
+  {
+    "owner": "GrSwitch",
+    "name": "--gr-switch-track-height-xs",
+    "kind": "theme",
+    "default": "1rem",
+    "description": "Высота дорожки на ступени `xs`. Бегунок и отступ подписи выводятся из неё: бегунок — высота минус 4px (рамка и зазор с обеих сторон)."
+  },
+  {
+    "owner": "GrSwitch",
+    "name": "--gr-switch-track-width-xs",
+    "kind": "theme",
+    "default": "1.75rem",
+    "description": "Ширина дорожки на ступени `xs` без подписи состояния."
+  },
+  {
+    "owner": "GrSwitch",
+    "name": "--gr-switch-track-height-sm",
+    "kind": "theme",
+    "default": "1.25rem",
+    "description": "Высота дорожки на ступени `sm`. Бегунок и отступ подписи выводятся из неё: бегунок — высота минус 4px (рамка и зазор с обеих сторон)."
+  },
+  {
+    "owner": "GrSwitch",
+    "name": "--gr-switch-track-width-sm",
+    "kind": "theme",
+    "default": "2.25rem",
+    "description": "Ширина дорожки на ступени `sm` без подписи состояния."
+  },
+  {
+    "owner": "GrSwitch",
+    "name": "--gr-switch-track-height-md",
+    "kind": "theme",
+    "default": "1.5rem",
+    "description": "Высота дорожки на ступени `md`. Бегунок и отступ подписи выводятся из неё: бегунок — высота минус 4px (рамка и зазор с обеих сторон)."
+  },
+  {
+    "owner": "GrSwitch",
+    "name": "--gr-switch-track-width-md",
+    "kind": "theme",
+    "default": "2.75rem",
+    "description": "Ширина дорожки на ступени `md` без подписи состояния."
+  },
+  {
+    "owner": "GrSwitch",
+    "name": "--gr-switch-track-height-lg",
+    "kind": "theme",
+    "default": "1.75rem",
+    "description": "Высота дорожки на ступени `lg`. Бегунок и отступ подписи выводятся из неё: бегунок — высота минус 4px (рамка и зазор с обеих сторон)."
+  },
+  {
+    "owner": "GrSwitch",
+    "name": "--gr-switch-track-width-lg",
+    "kind": "theme",
+    "default": "3.5rem",
+    "description": "Ширина дорожки на ступени `lg` без подписи состояния."
+  },
+  {
+    "owner": "GrSwitch",
+    "name": "--gr-switch-text-track-width-md",
+    "kind": "theme",
+    "default": "2.75rem",
+    "description": "Ширина дорожки с подписью состояния на ступени `md`; в `autoWidth` — нижняя граница. Места под подпись — не меньше, чем в базовой теме: держит гейт."
+  },
+  {
+    "owner": "GrSwitch",
+    "name": "--gr-switch-text-track-width-lg",
+    "kind": "theme",
+    "default": "3.5rem",
+    "description": "Ширина дорожки с подписью состояния на ступени `lg`; в `autoWidth` — нижняя граница. Места под подпись — не меньше, чем в базовой теме: держит гейт."
   },
   {
     "owner": "GrTable",
@@ -2465,6 +3683,41 @@ export const grComponentTokens: GrComponentToken[] = [
     "kind": "theme",
     "default": "4px 0 6px -4px rgba(0, 0, 0, 0.25)",
     "description": "Тень справа у прилипающей первой колонки (`stickyColumn`). Признак того, что под ней уезжает содержимое. Тень, а не рамка: рамка сдвинула бы сетку таблицы."
+  },
+  {
+    "owner": "GrTable",
+    "name": "--gr-table-head-bg",
+    "kind": "theme",
+    "default": "var(--gr-muted)",
+    "description": "Заливка шапки таблицы. Липкой шапке и закреплённой колонке она нужна непрозрачной."
+  },
+  {
+    "owner": "GrTable",
+    "name": "--gr-table-hover-share",
+    "kind": "theme",
+    "default": "45%",
+    "description": "Доля `--gr-muted` в подсветке строки под указателем."
+  },
+  {
+    "owner": "GrTable",
+    "name": "--gr-table-stripe-share",
+    "kind": "theme",
+    "default": "35%",
+    "description": "Доля `--gr-muted` в чётной строке зебры."
+  },
+  {
+    "owner": "GrTable",
+    "name": "--gr-table-head-line",
+    "kind": "theme",
+    "default": "transparent",
+    "description": "Цвет линии под шапкой. Линия — фоновым слоем по низу ячеек шапки и не зависит от рамок строк: видна и в пустой таблице, и под липкой шапкой."
+  },
+  {
+    "owner": "GrTable",
+    "name": "--gr-table-head-line-width",
+    "kind": "theme",
+    "default": "0px",
+    "description": "Толщина линии под шапкой; 0 — линии нет."
   },
   {
     "owner": "GrTabs",
@@ -2480,6 +3733,62 @@ export const grComponentTokens: GrComponentToken[] = [
     "kind": "css",
     "default": "не задана, пока ряд влезает целиком",
     "description": "Маска затухания. Задаётся собственным CSS компонента по `data-overflow`: у какого края есть продолжение, тот и гаснет. Вертикальный ряд не прокручивается, и маски у него нет."
+  },
+  {
+    "owner": "GrTabs",
+    "name": "--gr-tabs-font-weight",
+    "kind": "theme",
+    "default": "var(--gr-font-semibold)",
+    "description": "Вес подписи вкладки."
+  },
+  {
+    "owner": "GrTabs",
+    "name": "--gr-tabs-pills-list-bg",
+    "kind": "theme",
+    "default": "var(--gr-muted)",
+    "description": "Заливка ряда вкладок `pills`. Тема без лотка ставит `transparent`."
+  },
+  {
+    "owner": "GrTabs",
+    "name": "--gr-tabs-pills-list-brd",
+    "kind": "theme",
+    "default": "var(--gr-brd)",
+    "description": "Рамка ряда вкладок `pills`."
+  },
+  {
+    "owner": "GrTabs",
+    "name": "--gr-tabs-pills-radius",
+    "kind": "theme",
+    "default": "var(--gr-radius-md)",
+    "description": "Скругление вкладки `pills`."
+  },
+  {
+    "owner": "GrTabs",
+    "name": "--gr-tabs-pills-active-bg",
+    "kind": "theme",
+    "default": "var(--gr-card)",
+    "description": "Заливка выбранной вкладки `pills`."
+  },
+  {
+    "owner": "GrTabs",
+    "name": "--gr-tabs-pills-active-fg",
+    "kind": "theme",
+    "default": "var(--gr-fg)",
+    "description": "Текст выбранной вкладки `pills`."
+  },
+  {
+    "owner": "GrTabs",
+    "name": "--gr-tabs-pills-active-brd",
+    "kind": "theme",
+    "default": "var(--gr-brd)",
+    "description": "Рамка выбранной вкладки `pills`."
+  },
+  {
+    "owner": "GrTabs",
+    "name": "--gr-tabs-pills-hover-bg",
+    "kind": "theme",
+    "default": "color-mix(in srgb, var(--gr-card) 70%, transparent)",
+    "description": "Подсветка невыбранной вкладки `pills` под указателем."
   },
   {
     "owner": "GrTimeline",
@@ -2565,6 +3874,41 @@ export const grComponentTokens: GrComponentToken[] = [
     "description": "Сетка колонок ленты. Задаётся собственным CSS компонента по `layout`; строка события и заголовок группы делят её, чтобы ось у них совпадала. Гибкие треки объявлены `minmax(0, 1fr)`, а не `1fr`: голый `1fr` держит минимум по содержимому, и лента не сжималась бы в узкой колонке."
   },
   {
+    "owner": "GrTimeline",
+    "name": "--gr-timeline-neutral-marker",
+    "kind": "theme",
+    "default": "var(--gr-muted-fg)",
+    "description": "Заливка точки тона `neutral`."
+  },
+  {
+    "owner": "GrTimeline",
+    "name": "--gr-timeline-neutral-outline",
+    "kind": "theme",
+    "default": "var(--gr-muted-fg)",
+    "description": "Обводка полой точки тона `neutral`."
+  },
+  {
+    "owner": "GrTimeline",
+    "name": "--gr-timeline-title-weight",
+    "kind": "theme",
+    "default": "var(--gr-font-semibold)",
+    "description": "Вес заголовка события."
+  },
+  {
+    "owner": "GrTimeline",
+    "name": "--gr-timeline-group-title-transform",
+    "kind": "theme",
+    "default": "uppercase",
+    "description": "Регистр заголовка группы событий: `uppercase` или `none`."
+  },
+  {
+    "owner": "GrTimeline",
+    "name": "--gr-timeline-group-title-tracking",
+    "kind": "theme",
+    "default": "0.025em",
+    "description": "Разрядка заголовка группы. Капсу она нужна, строчным — нет."
+  },
+  {
     "owner": "GrToaster",
     "name": "--gr-toaster-width",
     "kind": "css",
@@ -2586,6 +3930,69 @@ export const grComponentTokens: GrComponentToken[] = [
     "default": "0.05",
     "description": "На сколько уменьшается каждая следующая карточка стопки: глубина читается размером, а не только смещением.",
     "literal": "Масштаб карточек в стопке — механика стопки."
+  },
+  {
+    "owner": "GrToaster",
+    "name": "--gr-toaster-brd",
+    "kind": "theme",
+    "default": "var(--gr-brd)",
+    "description": "Рамка уведомления. Тема, у которой уведомление держится тенью, ставит `transparent`."
+  },
+  {
+    "owner": "GrToaster",
+    "name": "--gr-toaster-shadow",
+    "kind": "theme",
+    "default": "var(--gr-shadow-2)",
+    "description": "Тень уведомления."
+  },
+  {
+    "owner": "GrToaster",
+    "name": "--gr-toaster-title-weight",
+    "kind": "theme",
+    "default": "var(--gr-font-bold)",
+    "description": "Вес заголовка уведомления."
+  },
+  {
+    "owner": "GrToaster",
+    "name": "--gr-toaster-icon-tone",
+    "kind": "theme",
+    "default": "100%",
+    "description": "Доля насыщенного тона в значке и полосе времени: 100% — насыщенный тон, 0% — `-text` тона, который держит 3:1 к карточке у любого тона."
+  },
+  {
+    "owner": "GrTooltip",
+    "name": "--gr-tooltip-bg",
+    "kind": "theme",
+    "default": "var(--gr-popover)",
+    "description": "Заливка подсказки."
+  },
+  {
+    "owner": "GrTooltip",
+    "name": "--gr-tooltip-fg",
+    "kind": "theme",
+    "default": "var(--gr-popover-fg)",
+    "description": "Текст подсказки."
+  },
+  {
+    "owner": "GrTooltip",
+    "name": "--gr-tooltip-brd",
+    "kind": "theme",
+    "default": "var(--gr-brd)",
+    "description": "Рамка подсказки. Тема с пузырём без рамки ставит сюда цвет заливки."
+  },
+  {
+    "owner": "GrTooltip",
+    "name": "--gr-tooltip-radius",
+    "kind": "theme",
+    "default": "var(--gr-radius-control)",
+    "description": "Скругление подсказки."
+  },
+  {
+    "owner": "GrTooltip",
+    "name": "--gr-tooltip-shadow",
+    "kind": "theme",
+    "default": "var(--gr-shadow-1)",
+    "description": "Тень подсказки."
   },
   {
     "owner": "GrTransfer",
@@ -2740,21 +4147,21 @@ export const grComponentTokens: GrComponentToken[] = [
     "owner": "GrTree",
     "name": "--gr-tree-row-hover-bg",
     "kind": "css",
-    "default": "color-mix(in srgb, var(--gr-primary) 10%, transparent)",
+    "default": "color-mix(in srgb, var(--gr-selected) 10%, transparent)",
     "description": "Фон строки под курсором."
   },
   {
     "owner": "GrTree",
     "name": "--gr-tree-row-current-bg",
     "kind": "css",
-    "default": "color-mix(in srgb, var(--gr-primary) 14%, transparent)",
+    "default": "color-mix(in srgb, var(--gr-selected) 14%, transparent)",
     "description": "Фон текущей (выбранной) строки."
   },
   {
     "owner": "GrTree",
     "name": "--gr-tree-row-current-hover-bg",
     "kind": "css",
-    "default": "color-mix(in srgb, var(--gr-primary) 16%, transparent)",
+    "default": "color-mix(in srgb, var(--gr-selected) 16%, transparent)",
     "description": "Фон текущей строки под курсором."
   },
   {
@@ -2775,7 +4182,7 @@ export const grComponentTokens: GrComponentToken[] = [
     "owner": "GrTree",
     "name": "--gr-tree-row-current-bar-color",
     "kind": "css",
-    "default": "var(--gr-primary)",
+    "default": "var(--gr-selected)",
     "description": "Цвет полосы у выбранной строки."
   },
   {
@@ -2789,7 +4196,7 @@ export const grComponentTokens: GrComponentToken[] = [
     "owner": "GrTree",
     "name": "--gr-tree-branch-font-weight",
     "kind": "css",
-    "default": "600",
+    "default": "var(--gr-tree-branch-weight)",
     "description": "Начертание подписи ветки. Плотнее листа, чтобы ветка и лист не выглядели одинаково. Гасится там, где вес несёт уровень, а не ветвистость."
   },
   {
@@ -2957,14 +4364,14 @@ export const grComponentTokens: GrComponentToken[] = [
     "owner": "GrTree",
     "name": "--gr-tree-checkbox-checked-bg",
     "kind": "css",
-    "default": "var(--gr-primary)",
+    "default": "var(--gr-selected)",
     "description": "Фон отмеченного чекбокса."
   },
   {
     "owner": "GrTree",
     "name": "--gr-tree-checkbox-checked-fg",
     "kind": "css",
-    "default": "var(--gr-primary-fg)",
+    "default": "var(--gr-selected-fg)",
     "description": "Цвет галочки в отмеченном чекбоксе."
   },
   {
@@ -3001,6 +4408,13 @@ export const grComponentTokens: GrComponentToken[] = [
     "kind": "inline",
     "default": "var(--gr-tree-branch-line-default-color)",
     "description": "Цвет направляющей конкретной ветки — им подсвечивается путь до текущего узла."
+  },
+  {
+    "owner": "GrTree",
+    "name": "--gr-tree-branch-weight",
+    "kind": "theme",
+    "default": "var(--gr-font-semibold)",
+    "description": "Вес подписи ветки в теме. Виды дерева (`compact`, `outline`) ставят свой вес поверх."
   },
   {
     "owner": "GrValue",

@@ -44,7 +44,7 @@ const props = withDefaults(defineProps<GrButtonGroupProps>(), {
 })
 
 /** Лоток: подложка цвета бумаги с полями и зазором 2px вокруг звеньев. */
-const trayClass = 'gap-0.5 p-0.5 rounded-[var(--gr-radius-md)] bg-[var(--gr-button-group-tray-bg,var(--gr-muted))]'
+const trayClass = 'gap-0.5 p-0.5 rounded-[var(--gr-button-group-tray-radius)] bg-[var(--gr-button-group-tray-bg,var(--gr-muted))]'
 
 const resolvedAppearance = useGrComponentProp('GrButtonGroup', 'appearance', () => props.appearance, 'default')
 const tray = computed(() => resolvedAppearance.value === 'tray')

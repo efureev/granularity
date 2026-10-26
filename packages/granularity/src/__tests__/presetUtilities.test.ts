@@ -56,7 +56,7 @@ const UTILITIES_THE_PACKAGE_RELIES_ON = [
   'outline-solid',
   'outline-2',
   'outline-offset-2',
-  'motion-safe:active:scale-98',
+  'motion-safe:active:scale-[var(--gr-button-press-scale)]',
   'cursor-progress',
   'ps-4.5',
   'pe-3.5',

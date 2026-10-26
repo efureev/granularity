@@ -911,11 +911,11 @@ defineExpose({
     <div v-else class="flex items-start" :class="zoneGapClass">
       <div
         data-gr-file-upload-icon
-        class="shrink-0 bg-[var(--gr-muted)] border border-[var(--gr-brd)] flex items-center justify-center"
+        class="shrink-0 bg-[var(--gr-muted)] border border-[var(--gr-file-upload-icon-brd)] flex items-center justify-center"
         :class="iconTileClass"
         aria-hidden="true"
       >
-        <GrIcon class="text-[var(--gr-muted-fg)]" :size="iconGlyphSize">
+        <GrIcon class="text-[var(--gr-file-upload-icon-fg)]" :size="iconGlyphSize">
           <IconArrowUp />
         </GrIcon>
       </div>
@@ -939,12 +939,12 @@ defineExpose({
           кнопки — у общего правого края. Иначе крестики шли сразу за текстом,
           и столбец действий был рваным на строках разной длины.
         -->
-        <ul v-if="showFileList && lastFiles.length" data-gr-file-upload-list class="mt-3 w-full space-y-1 text-start">
+        <ul v-if="showFileList && lastFiles.length" data-gr-file-upload-list class="mt-3 flex w-full flex-col gap-[var(--gr-file-upload-list-gap)] text-start">
           <li
             v-for="file in lastFiles"
             :key="fileKey(file)"
             data-gr-file-upload-item
-            class="flex w-full min-w-0 items-center gap-2"
+            class="flex w-full min-w-0 items-center gap-2 rounded-[var(--gr-file-upload-item-radius)] bg-[var(--gr-file-upload-item-bg)] p-[var(--gr-file-upload-item-padding)] shadow-[inset_0_0_0_1px_var(--gr-file-upload-item-brd)]"
             :class="hintClass"
           >
             <img

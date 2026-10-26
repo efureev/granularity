@@ -7,7 +7,9 @@ export type GrCheckboxSize = GrButtonSize
 export const GR_CHECKBOX_LABEL_POSITIONS = ['start', 'end'] as const
 export type GrCheckboxLabelPosition = typeof GR_CHECKBOX_LABEL_POSITIONS[number]
 
-export const rootBase = 'inline-flex items-center select-none'
+// Группа именная: строка таблицы или узел дерева со своим `group` не должны
+// подсвечивать вложенную отметку, когда указатель на соседней ячейке.
+export const rootBase = 'group/checkbox inline-flex items-center select-none'
 
 export const rootGaps: Record<GrCheckboxSize, string> = {
   xs: 'gap-1.5',
@@ -33,11 +35,14 @@ export const controlSizes: Record<GrCheckboxSize, string> = {
   lg: 'h-5 w-5',
 }
 
-export const controlCheckedClass = 'border-[var(--gr-primary)] bg-[var(--gr-primary)]'
+export const controlCheckedClass = 'border-[var(--gr-selected)] bg-[var(--gr-selected)]'
 // Рамка — единственное, по чему виден невыбранный контрол: роль с 3:1 к фону
 // (`--gr-control-brd`), а не разделитель `--gr-brd`. Только для чтения — тоже она:
 // значение там передаёт состояние, а 1.4.11 освобождает лишь недоступный контрол.
 export const controlUncheckedClass = 'border-[var(--gr-control-brd)] bg-[var(--gr-bg)]'
+/** Отклик на указатель над всей подписью, а не только над коробкой. */
+export const controlCheckedHoverClass = 'group-hover/checkbox:border-[var(--gr-selected-hover)] group-hover/checkbox:bg-[var(--gr-selected-hover)]'
+export const controlUncheckedHoverClass = 'group-hover/checkbox:border-[var(--gr-control-brd-hover)]'
 export const controlInvalidCheckedClass = 'border-[var(--gr-danger)] bg-[var(--gr-danger)]'
 export const controlInvalidUncheckedClass = 'border-[var(--gr-danger)] bg-[var(--gr-bg)]'
 
@@ -46,11 +51,11 @@ export const controlInvalidUncheckedClass = 'border-[var(--gr-danger)] bg-[var(-
 export const controlDisabledCheckedClass = 'border-[var(--gr-muted-fg)] bg-[var(--gr-muted-fg)]'
 export const controlDisabledUncheckedClass = 'border-[var(--gr-brd)] bg-[var(--gr-muted)]'
 
-// Цвет задаётся состоянием, а не базой: `text-transparent` и `text-[var(--gr-primary-fg)]`
+// Цвет задаётся состоянием, а не базой: `text-transparent` и `text-[var(--gr-selected-fg)]`
 // генерируют одно и то же свойство, и победит не тот, кто правее в атрибуте, а тот,
 // кто ниже в сгенерированном CSS. Держим их взаимоисключающими.
 export const iconBase = 'gr-checkbox-icon'
-export const iconColorClass = 'text-[var(--gr-primary-fg)]'
+export const iconColorClass = 'text-[var(--gr-selected-fg)]'
 
 export const iconSizes: Record<GrCheckboxSize, string> = {
   xs: 'h-2.5 w-2.5',
@@ -61,7 +66,7 @@ export const iconSizes: Record<GrCheckboxSize, string> = {
 
 // Галочка «проявляется» анимацией, поэтому у неё есть состояние, а у тире — нет.
 export const iconCheckTransitionClass = 'transition-transform transition-opacity duration-[var(--gr-duration-fast)]'
-export const iconCheckVisibleClass = 'opacity-100 scale-100 text-[var(--gr-primary-fg)]'
+export const iconCheckVisibleClass = 'opacity-100 scale-100 text-[var(--gr-selected-fg)]'
 export const iconCheckHiddenClass = 'opacity-0 scale-75 text-transparent'
 
 export const labelBase = 'text-[var(--gr-muted-fg)]'
@@ -93,12 +98,16 @@ export function grCheckboxControlClass(options: {
   active: boolean
   disabled?: boolean
   invalid?: boolean
+  readonly?: boolean
 }): string {
   return [
     controlBase,
     controlSizes[options.size],
     grCheckboxControlStateClass(options),
-  ].join(' ')
+    options.disabled || options.invalid || options.readonly
+      ? ''
+      : options.active ? controlCheckedHoverClass : controlUncheckedHoverClass,
+  ].filter(Boolean).join(' ')
 }
 
 function grCheckboxControlStateClass(options: { active: boolean, disabled?: boolean, invalid?: boolean }): string {

@@ -1,4 +1,4 @@
-import type { GrRatingSize } from './grRatingStyles'
+import type { GrRatingSize, GrRatingTone } from './grRatingStyles'
 
 /**
  * Пропы `GrRating`, настраиваемые глобально через
@@ -7,6 +7,7 @@ import type { GrRatingSize } from './grRatingStyles'
  */
 export interface GrRatingConfigurableProps {
   size: GrRatingSize
+  tone: GrRatingTone
 }
 
 declare module '../../composables/useGrComponentConfig' {

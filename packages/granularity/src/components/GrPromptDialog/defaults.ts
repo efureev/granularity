@@ -1,3 +1,4 @@
+import type { GrButtonVariant } from '../GrButton/grButtonStyles'
 import type { GrDialogSize } from '../GrDialog/dialogShared'
 
 /**
@@ -7,6 +8,7 @@ import type { GrDialogSize } from '../GrDialog/dialogShared'
  */
 export interface GrPromptDialogConfigurableProps {
   size: GrDialogSize
+  cancelVariant: GrButtonVariant
 }
 
 declare module '../../composables/useGrComponentConfig' {

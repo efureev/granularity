@@ -40,6 +40,8 @@ export type GrButtonToneTokens = {
   softForeground: string
   /** Рамка secondary в покое: тон приглушён, чтобы второстепенный вес не спорил с primary. */
   borderSoft: string
+  /** Рамка secondary под указателем — токен темы: тема без рамки у мягкого веса держит её прозрачной. */
+  borderSoftHover: string
   border: string
   borderHover: string
   borderActive: string
@@ -61,7 +63,7 @@ export const base
  * Только у живой кнопки: отключённая и ждущая сервер на указатель не отвечают,
  * и движение соврало бы. С reduced-motion остаётся одна смена цвета.
  */
-export const pressClass = 'motion-safe:active:scale-98 motion-safe:hover:translate-y-[var(--gr-button-lift)]'
+export const pressClass = 'motion-safe:active:scale-[var(--gr-button-press-scale)] motion-safe:hover:translate-y-[var(--gr-button-lift)]'
 
 /** Кнопка на всю ширину контейнера. */
 export const blockClass = 'w-full'
@@ -80,7 +82,7 @@ export const blockClass = 'w-full'
 export const disabledClassByVariant: Record<GrButtonVariant, string> = {
   'primary': 'bg-[var(--gr-button-disabled-bg)] bg-[image:var(--gr-button-disabled-image)] text-[var(--gr-button-disabled-fg)] border border-[var(--gr-button-disabled-brd)] [border-style:var(--gr-button-disabled-border-style)] cursor-not-allowed',
   'secondary': 'bg-[var(--gr-button-disabled-bg)] bg-[image:var(--gr-button-disabled-image)] text-[var(--gr-button-disabled-fg)] border border-[var(--gr-button-disabled-brd)] [border-style:var(--gr-button-disabled-border-style)] cursor-not-allowed',
-  'outline': 'bg-transparent text-[var(--gr-button-disabled-fg)] border border-[var(--gr-button-disabled-brd)] [border-style:var(--gr-button-disabled-border-style)] cursor-not-allowed',
+  'outline': 'bg-transparent text-[var(--gr-button-disabled-fg)] border border-[var(--gr-button-disabled-outline-brd)] [border-style:var(--gr-button-disabled-border-style)] cursor-not-allowed',
   'ghost': 'bg-transparent text-[var(--gr-button-disabled-fg)] border border-transparent cursor-not-allowed',
   'ghost-border': 'bg-transparent text-[var(--gr-button-disabled-fg)] border border-transparent cursor-not-allowed',
 }
@@ -152,8 +154,9 @@ export const tones: Record<GrButtonTone, GrButtonToneTokens> = {
     softForeground: 'var(--gr-accent-fg)',
     borderSoft: 'var(--gr-button-primary-border-soft)',
     border: 'var(--gr-button-primary-border)',
-    borderHover: 'var(--gr-primary)',
-    borderActive: 'var(--gr-primary-active)',
+    borderSoftHover: 'var(--gr-button-primary-border-soft-hover)',
+    borderHover: 'var(--gr-button-primary-border-hover)',
+    borderActive: 'var(--gr-button-primary-border-active)',
     glow: 'var(--gr-button-primary-glow)',
   },
   neutral: {
@@ -168,10 +171,11 @@ export const tones: Record<GrButtonTone, GrButtonToneTokens> = {
     ghostBackgroundHover: 'var(--gr-button-neutral-ghost-bg-hover)',
     ghostBackgroundActive: 'var(--gr-button-neutral-ghost-bg-active)',
     softForeground: 'var(--gr-secondary-fg)',
-    borderSoft: 'var(--gr-button-neutral-border)',
+    borderSoft: 'var(--gr-button-neutral-border-soft)',
     border: 'var(--gr-button-neutral-border)',
-    borderHover: 'var(--gr-brd-hover)',
-    borderActive: 'var(--gr-brd-active)',
+    borderSoftHover: 'var(--gr-button-neutral-border-soft-hover)',
+    borderHover: 'var(--gr-button-neutral-border-hover)',
+    borderActive: 'var(--gr-button-neutral-border-active)',
     glow: 'var(--gr-button-neutral-glow)',
   },
   success: {
@@ -188,8 +192,9 @@ export const tones: Record<GrButtonTone, GrButtonToneTokens> = {
     softForeground: 'var(--gr-success-text)',
     borderSoft: 'var(--gr-button-success-border-soft)',
     border: 'var(--gr-button-success-border)',
-    borderHover: 'var(--gr-success)',
-    borderActive: 'var(--gr-success-active)',
+    borderSoftHover: 'var(--gr-button-success-border-soft-hover)',
+    borderHover: 'var(--gr-button-success-border-hover)',
+    borderActive: 'var(--gr-button-success-border-active)',
     glow: 'var(--gr-button-success-glow)',
   },
   warning: {
@@ -206,8 +211,9 @@ export const tones: Record<GrButtonTone, GrButtonToneTokens> = {
     softForeground: 'var(--gr-warning-text)',
     borderSoft: 'var(--gr-button-warning-border-soft)',
     border: 'var(--gr-button-warning-border)',
-    borderHover: 'var(--gr-warning)',
-    borderActive: 'var(--gr-warning-active)',
+    borderSoftHover: 'var(--gr-button-warning-border-soft-hover)',
+    borderHover: 'var(--gr-button-warning-border-hover)',
+    borderActive: 'var(--gr-button-warning-border-active)',
     glow: 'var(--gr-button-warning-glow)',
   },
   danger: {
@@ -224,8 +230,9 @@ export const tones: Record<GrButtonTone, GrButtonToneTokens> = {
     softForeground: 'var(--gr-danger-text)',
     borderSoft: 'var(--gr-button-danger-border-soft)',
     border: 'var(--gr-button-danger-border)',
-    borderHover: 'var(--gr-danger)',
-    borderActive: 'var(--gr-danger-active)',
+    borderSoftHover: 'var(--gr-button-danger-border-soft-hover)',
+    borderHover: 'var(--gr-button-danger-border-hover)',
+    borderActive: 'var(--gr-button-danger-border-active)',
     glow: 'var(--gr-button-danger-glow)',
   },
   info: {
@@ -242,8 +249,9 @@ export const tones: Record<GrButtonTone, GrButtonToneTokens> = {
     softForeground: 'var(--gr-info-text)',
     borderSoft: 'var(--gr-button-info-border-soft)',
     border: 'var(--gr-button-info-border)',
-    borderHover: 'var(--gr-info)',
-    borderActive: 'var(--gr-info-active)',
+    borderSoftHover: 'var(--gr-button-info-border-soft-hover)',
+    borderHover: 'var(--gr-button-info-border-hover)',
+    borderActive: 'var(--gr-button-info-border-active)',
     glow: 'var(--gr-button-info-glow)',
   },
   slate: {
@@ -260,8 +268,9 @@ export const tones: Record<GrButtonTone, GrButtonToneTokens> = {
     softForeground: 'var(--gr-slate-text)',
     borderSoft: 'var(--gr-button-slate-border-soft)',
     border: 'var(--gr-button-slate-border)',
-    borderHover: 'var(--gr-slate)',
-    borderActive: 'var(--gr-slate-active)',
+    borderSoftHover: 'var(--gr-button-slate-border-soft-hover)',
+    borderHover: 'var(--gr-button-slate-border-hover)',
+    borderActive: 'var(--gr-button-slate-border-active)',
     glow: 'var(--gr-button-slate-glow)',
   },
   azure: {
@@ -278,8 +287,9 @@ export const tones: Record<GrButtonTone, GrButtonToneTokens> = {
     softForeground: 'var(--gr-azure-text)',
     borderSoft: 'var(--gr-button-azure-border-soft)',
     border: 'var(--gr-button-azure-border)',
-    borderHover: 'var(--gr-azure)',
-    borderActive: 'var(--gr-azure-active)',
+    borderSoftHover: 'var(--gr-button-azure-border-soft-hover)',
+    borderHover: 'var(--gr-button-azure-border-hover)',
+    borderActive: 'var(--gr-button-azure-border-active)',
     glow: 'var(--gr-button-azure-glow)',
   },
 }
@@ -327,7 +337,23 @@ function transparentFill(tokens: GrButtonToneTokens): { hover: string, active: s
   }
 }
 
+/**
+ * Нажатая кнопка-переключатель (`aria-pressed="true"`, атрибут `data-gr-pressed`
+ * ставит компонент) держит вид своего нажатого состояния: иначе включённое и
+ * выключенное различались бы только для AT. Классы — зеркало `active:` того же
+ * веса, с `hover:` — чтобы наведение их не перебивало.
+ */
+function withPressed(classes: string): string {
+  const active = classes.split(' ').filter(token => token.startsWith('active:')).map(token => token.slice('active:'.length))
+
+  return [classes, ...active.flatMap(rest => [`data-[gr-pressed]:${rest}`, `data-[gr-pressed]:hover:${rest}`])].join(' ')
+}
+
 export function variantClass(variant: GrButtonVariant, tone: GrButtonTone): string {
+  return withPressed(variantClassOf(variant, tone))
+}
+
+function variantClassOf(variant: GrButtonVariant, tone: GrButtonTone): string {
   const tokens = tones[tone]
   const transparent = transparentFill(tokens)
 
@@ -353,7 +379,7 @@ export function variantClass(variant: GrButtonVariant, tone: GrButtonTone): stri
       `text-${withVar(tokens.softForeground)}`,
       `border border-${withVar(tokens.borderSoft)}`,
       `hover:bg-${withVar(tokens.softBackgroundHover)}`,
-      `hover:border-${withVar(tokens.border)}`,
+      `hover:border-${withVar(tokens.borderSoftHover)}`,
       `active:bg-${withVar(tokens.softBackgroundActive)}`,
       `hover:active:bg-${withVar(tokens.softBackgroundActive)}`,
       `active:border-${withVar(tokens.borderHover)}`,

@@ -1,0 +1,6 @@
+{
+  "gr-dialog-title-size": "var(--gr-control-text-md)",
+  "gr-dialog-title-leading": "var(--gr-control-leading-md)",
+  "gr-dialog-title-weight": "var(--gr-font-bold)",
+  "gr-dialog-divider": "var(--gr-brd)"
+}

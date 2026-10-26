@@ -212,6 +212,7 @@ const controlClassName = computed(() => grCheckboxControlClass({
   active: checked.value || props.indeterminate,
   disabled: resolvedDisabled.value,
   invalid: showsInvalid.value,
+  readonly: isReadonly.value,
 }))
 
 const indeterminateIconClassName = computed(() => grCheckboxIndeterminateIconClass(resolvedSize.value))

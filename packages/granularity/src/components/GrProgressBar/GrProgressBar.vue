@@ -107,7 +107,7 @@ const valueLabel = computed(() => valueText.value ?? `${Math.round(safe.value)}%
       :aria-valuetext="indeterminate ? undefined : valueText"
       aria-valuemin="0"
       aria-valuemax="100"
-      class="relative min-w-0 flex-1 rounded-[var(--gr-radius-full)] bg-[var(--gr-muted)] overflow-hidden"
+      class="relative min-w-0 flex-1 rounded-[var(--gr-radius-full)] bg-[var(--gr-progress-track-bg)] overflow-hidden"
       :class="[trackClassName, resolvedBorderless ? '' : 'border border-[var(--gr-brd)]']"
     >
       <div

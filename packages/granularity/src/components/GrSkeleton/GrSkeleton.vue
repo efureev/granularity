@@ -86,7 +86,7 @@ function styleOf(index: number): Record<string, string> {
       v-for="(_, index) in items"
       :key="index"
       data-gr-skeleton
-      class="bg-[var(--gr-muted)] border border-[var(--gr-brd)]"
+      class="bg-[var(--gr-skeleton-bg)] border border-[var(--gr-skeleton-brd)]"
       :style="styleOf(index)"
     />
   </div>
@@ -95,7 +95,7 @@ function styleOf(index: number): Record<string, string> {
     v-else
     data-gr-skeleton
     aria-hidden="true"
-    class="bg-[var(--gr-muted)] border border-[var(--gr-brd)]"
+    class="bg-[var(--gr-skeleton-bg)] border border-[var(--gr-skeleton-brd)]"
     :style="styleOf(0)"
   />
 </template>
@@ -106,12 +106,27 @@ function styleOf(index: number): Record<string, string> {
     opacity: 1;
   }
   50% {
-    opacity: 0.5;
+    opacity: var(--gr-skeleton-pulse-opacity);
   }
 }
 
+@keyframes gr-skeleton-shine {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: -150% 0;
+  }
+}
+
+/* Пульс и блик идут вместе, а какой из них виден — решает тема: блик цвета
+   `transparent` не рисуется, пульс до 1 не гаснет. */
 [data-gr-skeleton] {
-  animation: gr-skeleton-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  background-image: linear-gradient(90deg, transparent 35%, var(--gr-skeleton-shine) 50%, transparent 65%);
+  background-size: 250% 100%;
+  animation:
+    gr-skeleton-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite,
+    gr-skeleton-shine 1.8s linear infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {

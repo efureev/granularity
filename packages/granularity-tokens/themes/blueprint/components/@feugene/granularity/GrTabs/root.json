@@ -1,0 +1,10 @@
+{
+  "gr-tabs-font-weight": "var(--gr-font-semibold)",
+  "gr-tabs-pills-list-bg": "var(--gr-muted)",
+  "gr-tabs-pills-list-brd": "var(--gr-brd)",
+  "gr-tabs-pills-radius": "var(--gr-radius-md)",
+  "gr-tabs-pills-active-bg": "var(--gr-card)",
+  "gr-tabs-pills-active-fg": "var(--gr-fg)",
+  "gr-tabs-pills-active-brd": "var(--gr-brd)",
+  "gr-tabs-pills-hover-bg": "color-mix(in srgb, var(--gr-card) 70%, transparent)"
+}

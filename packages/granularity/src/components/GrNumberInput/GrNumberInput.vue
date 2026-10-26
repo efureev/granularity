@@ -338,6 +338,7 @@ const shellClassName = computed(() => {
     disabled: isDisabled.value,
     state: props.state,
     invalid: isInvalid.value,
+    readonly: isReadonly.value,
   })
 })
 
@@ -735,8 +736,8 @@ if (__GR_DEV__) {
   <div
     data-gr-number-input
     v-bind="aria.layoutAttrs()"
-    class="relative overflow-hidden border bg-[var(--gr-bg)] transition-colors duration-[var(--gr-duration-fast)] focus-within:ring-2 focus-within:ring-[var(--gr-ring)]"
-    :class="[aria.ownsWidth() ? '' : 'w-full', shellShapeClass[resolvedShape], shellHeightClass[resolvedSize], shellClassName]"
+    class="relative overflow-hidden border transition-colors duration-[var(--gr-duration-fast)] focus-within:ring-2 focus-within:ring-[calc(var(--gr-input-focus-ring-width))] focus-within:ring-[var(--gr-ring)]"
+    :class="[aria.ownsWidth() ? '' : 'w-full', shellShapeClass[resolvedShape][resolvedSize], shellHeightClass[resolvedSize], shellClassName]"
   >
     <div
       v-if="$slots.prefix"

@@ -121,7 +121,7 @@ const rootSizeStyles: Record<GrSegmentedSize, Record<string, string>> = {
     '--gr-segmented-item-py': '1px',
     '--gr-segmented-font-size': '0.75rem',
     '--gr-segmented-line-height': '1rem',
-    '--gr-segmented-font-weight': '600',
+    '--gr-segmented-font-weight': 'var(--gr-segmented-label-weight)',
     '--gr-segmented-min-height': '18px',
   },
   sm: {
@@ -130,7 +130,7 @@ const rootSizeStyles: Record<GrSegmentedSize, Record<string, string>> = {
     '--gr-segmented-item-py': '3px',
     '--gr-segmented-font-size': '0.75rem',
     '--gr-segmented-line-height': '1rem',
-    '--gr-segmented-font-weight': '600',
+    '--gr-segmented-font-weight': 'var(--gr-segmented-label-weight)',
     '--gr-segmented-min-height': '22px',
   },
   md: {
@@ -139,7 +139,7 @@ const rootSizeStyles: Record<GrSegmentedSize, Record<string, string>> = {
     '--gr-segmented-item-py': '5px',
     '--gr-segmented-font-size': '0.875rem',
     '--gr-segmented-line-height': '1.25rem',
-    '--gr-segmented-font-weight': '600',
+    '--gr-segmented-font-weight': 'var(--gr-segmented-label-weight)',
     '--gr-segmented-min-height': '30px',
   },
   lg: {
@@ -148,7 +148,7 @@ const rootSizeStyles: Record<GrSegmentedSize, Record<string, string>> = {
     '--gr-segmented-item-py': '7px',
     '--gr-segmented-font-size': '0.9375rem',
     '--gr-segmented-line-height': '1.25rem',
-    '--gr-segmented-font-weight': '600',
+    '--gr-segmented-font-weight': 'var(--gr-segmented-label-weight)',
     '--gr-segmented-min-height': '34px',
   },
 }
@@ -170,11 +170,11 @@ const rootVariantStyles: Record<GrSegmentedVariant, Record<string, string>> = {
     '--gr-segmented-track-bg': 'var(--gr-card)',
     '--gr-segmented-track-brd': 'var(--gr-brd)',
     '--gr-segmented-track-shadow': 'var(--gr-shadow-1)',
-    '--gr-segmented-indicator-bg': 'var(--gr-primary)',
-    '--gr-segmented-indicator-brd': 'color-mix(in srgb, var(--gr-primary) 88%, var(--gr-brd) 12%)',
+    '--gr-segmented-indicator-bg': 'var(--gr-selected)',
+    '--gr-segmented-indicator-brd': 'color-mix(in srgb, var(--gr-selected) 88%, var(--gr-brd) 12%)',
     '--gr-segmented-indicator-shadow': 'var(--gr-shadow-2)',
     '--gr-segmented-item-color': 'var(--gr-muted-fg)',
-    '--gr-segmented-item-selected-color': 'var(--gr-primary-fg)',
+    '--gr-segmented-item-selected-color': 'var(--gr-selected-fg)',
     '--gr-segmented-item-hover-color': 'var(--gr-fg)',
   },
 }

@@ -1,4 +1,4 @@
-import type { GrFormFieldLabelPosition, GrFormFieldSize } from './grFormFieldStyles'
+import type { GrFormFieldHintPosition, GrFormFieldLabelPosition, GrFormFieldSize } from './grFormFieldStyles'
 
 /**
  * Пропы `GrFormField`, настраиваемые глобально через
@@ -8,6 +8,7 @@ import type { GrFormFieldLabelPosition, GrFormFieldSize } from './grFormFieldSty
 export interface GrFormFieldConfigurableProps {
   size: GrFormFieldSize
   labelPosition: GrFormFieldLabelPosition
+  hintPosition: GrFormFieldHintPosition
   /** Держать место под строку сообщения — см. проп `reserveMessage`. */
   reserveMessage: boolean
 }

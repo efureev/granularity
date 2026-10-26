@@ -57,6 +57,10 @@
           "description": "Основной стек шрифта для интерфейсного текста и большинства компонентных подписей."
         },
         {
+          "name": "--gr-font-display",
+          "description": "Стек шрифта заголовков компонентов: заголовок карточки, окна, шторки и пустого состояния. Тема без своей гарнитуры заголовков ставит сюда `var(--gr-font-ui)`."
+        },
+        {
           "name": "--gr-font-mono",
           "description": "Моноширинный стек для кода, числовых значений и технических подписей."
         }
@@ -393,6 +397,26 @@
           "description": "Радиус контрола и мелкой интерактивной детали внутри него: оболочка поля, чип, кнопка-крестик, фокус-кольцо ссылки, тултип слайдера."
         },
         {
+          "name": "--gr-radius-control-xs",
+          "description": "Скругление поля-коробки на ступени `xs`: `GrInput`, `GrSelect`, `GrTextarea` и остальные поля. Тема без лестницы ставит `var(--gr-radius-control)`."
+        },
+        {
+          "name": "--gr-radius-control-sm",
+          "description": "Скругление поля-коробки на ступени `sm`: `GrInput`, `GrSelect`, `GrTextarea` и остальные поля. Тема без лестницы ставит `var(--gr-radius-control)`."
+        },
+        {
+          "name": "--gr-radius-control-md",
+          "description": "Скругление поля-коробки на ступени `md`: `GrInput`, `GrSelect`, `GrTextarea` и остальные поля. Тема без лестницы ставит `var(--gr-radius-control)`."
+        },
+        {
+          "name": "--gr-radius-control-lg",
+          "description": "Скругление поля-коробки на ступени `lg`: `GrInput`, `GrSelect`, `GrTextarea` и остальные поля. Тема без лестницы ставит `var(--gr-radius-control)`."
+        },
+        {
+          "name": "--gr-input-focus-ring-width",
+          "description": "Толщина кольца фокуса вокруг поля ввода и выбора. Цвет — `--gr-ring`, у ошибки — `--gr-invalid-ring`."
+        },
+        {
           "name": "--gr-radius-md",
           "description": "Радиус скругления `md` для углов компонентов и поверхностей."
         },
@@ -403,6 +427,10 @@
         {
           "name": "--gr-radius-xl",
           "description": "Радиус скругления `xl` для углов компонентов и поверхностей."
+        },
+        {
+          "name": "--gr-radius-overlay",
+          "description": "Скругление всплывающей панели у поля: список `GrSelect`, `GrTreeSelect`, `GrAutocomplete`, панель `GrPopover`. Окно и палитра команд скругляются своими токенами."
         },
         {
           "name": "--gr-radius-full",

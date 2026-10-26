@@ -25,9 +25,9 @@ export const variantClass: Record<GrCardVariant, string> = {
 
 export const paddingClass: Record<GrCardPadding, string> = {
   none: '',
-  sm: 'p-3',
-  md: 'p-4',
-  lg: 'p-6',
+  sm: 'p-[var(--gr-card-padding-sm)]',
+  md: 'p-[var(--gr-card-padding-md)]',
+  lg: 'p-[var(--gr-card-padding-lg)]',
 }
 
 /**
@@ -65,14 +65,14 @@ export type GrCardHeadingLevel = typeof GR_CARD_HEADING_LEVELS[number]
 
 // `m-0` — у нативного заголовка есть браузерные отступы, и без сброса шапка
 // разъезжается по вертикали.
-export const cardTitleClass = 'm-0 text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)] font-600'
+export const cardTitleClass = 'm-0 font-[var(--gr-font-display)] text-[length:var(--gr-card-title-size)] leading-[var(--gr-card-title-leading)] [font-weight:var(--gr-card-title-weight)]'
 
 export const cardDescriptionClass = 'mt-1 text-[length:var(--gr-text-xs)] leading-[var(--gr-leading-xs)] text-[var(--gr-muted-fg)]'
 
 /** Интерактивная карточка целиком: ссылка или кнопка во всю поверхность. */
 export const interactiveClass = 'block w-full text-left transition-colors duration-[var(--gr-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]'
 
-export const hoverClass = 'cursor-pointer hover:bg-[var(--gr-muted)]'
+export const hoverClass = 'cursor-pointer hover:bg-[var(--gr-card-hover-bg)] hover:border-[var(--gr-card-hover-brd)]'
 
 export function grCardRootClass(options: {
   variant: GrCardVariant

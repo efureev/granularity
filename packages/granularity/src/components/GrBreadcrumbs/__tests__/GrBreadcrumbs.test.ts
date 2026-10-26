@@ -92,12 +92,12 @@ describe('GrBreadcrumbs — структура и семантика', () => {
     })
     const [disabled, , current] = wrapper.findAll('[data-gr-breadcrumbs-item]')
 
-    expect(disabled.classes()).not.toContain('font-600')
+    expect(disabled.classes()).not.toContain('[font-weight:var(--gr-breadcrumbs-current-weight)]')
     expect(disabled.classes()).not.toContain('text-[var(--gr-fg)]')
     expect(disabled.classes()).toContain('text-[var(--gr-muted-fg)]')
     expect(disabled.attributes('aria-current')).toBeUndefined()
 
-    expect(current.classes()).toContain('font-600')
+    expect(current.classes()).toContain('[font-weight:var(--gr-breadcrumbs-current-weight)]')
     expect(current.classes()).toContain('text-[var(--gr-fg)]')
     expect(current.attributes('aria-current')).toBe('page')
 

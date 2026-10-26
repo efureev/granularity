@@ -190,7 +190,7 @@ const role = computed(() => {
     v-if="isVisible"
     :role="role"
     data-gr-alert
-    class="rounded-[var(--gr-radius-lg)] border px-4 py-3"
+    class="rounded-[var(--gr-alert-radius)] border px-4 py-3"
     :style="rootStyle"
   >
     <div class="flex items-start gap-3">
@@ -208,7 +208,7 @@ const role = computed(() => {
       <div class="min-w-0 flex-1">
         <div
           v-if="props.title"
-          class="text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)] font-600 text-[var(--gr-alert-title-color)]"
+          class="text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)] [font-weight:var(--gr-alert-title-weight)] text-[var(--gr-alert-title-color)]"
         >
           {{ props.title }}
         </div>

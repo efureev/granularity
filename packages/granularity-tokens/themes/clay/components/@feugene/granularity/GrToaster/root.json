@@ -1,0 +1,5 @@
+{
+  "gr-toaster-brd": "transparent",
+  "gr-toaster-title-weight": "var(--gr-font-medium)",
+  "gr-toaster-icon-tone": "0%"
+}

@@ -1,4 +1,5 @@
 import type { GrComponentSize } from '../shared/sizes'
+import { controlShapeRadiusClass, fieldBorderClass, fieldBorderResponseClass, fieldBorderStateClass, fieldReadonlySurfaceClass } from '../shared/controlShape'
 import { overlayListPanelClass } from '../shared/overlayListPanel'
 import { overlayPanelSurfaceClass } from '../shared/overlayPanelSurface'
 
@@ -45,7 +46,7 @@ export type GrAutocompleteModelValue<TValue extends GrAutocompleteValue = string
  * т.к. фокус живёт на вложенном `<input role="combobox">`. Flex-контейнер с
  * `flex-wrap` — чтобы chips в multiple-режиме переносились и коробка росла в высоту.
  */
-export const autocompleteShellBase = 'relative flex w-full flex-wrap items-center gap-1 rounded-[var(--gr-radius-control)] border text-[var(--gr-fg)] transition-colors duration-[var(--gr-duration-fast)] focus-within:ring-2 focus-within:ring-[var(--gr-ring)]'
+export const autocompleteShellBase = 'relative flex w-full flex-wrap items-center gap-1 border text-[var(--gr-fg)] transition-colors duration-[var(--gr-duration-fast)] focus-within:ring-2 focus-within:ring-[calc(var(--gr-input-focus-ring-width))] focus-within:ring-[var(--gr-ring)]'
 
 export const autocompleteShellEnabledClass = 'bg-[var(--gr-bg)]'
 
@@ -76,19 +77,22 @@ export function autocompleteShellClass(options: {
   size: GrAutocompleteSize
   disabled: boolean
   invalid: boolean
+  readonly?: boolean
 }): string {
   return [
     autocompleteShellBase,
     autocompleteSizeClassBySize[options.size],
-    options.invalid ? invalidShellClass : 'border-[var(--gr-brd)]',
-    options.disabled ? autocompleteShellDisabledClass : autocompleteShellEnabledClass,
+    controlShapeRadiusClass.box[options.size],
+    fieldBorderStateClass(options, invalidShellClass, { default: fieldBorderClass }),
+    fieldBorderResponseClass(options),
+    options.disabled ? autocompleteShellDisabledClass : options.readonly ? fieldReadonlySurfaceClass : autocompleteShellEnabledClass,
   ]
     .filter(Boolean)
     .join(' ')
 }
 
 /** Общая подсветка наведения и активной опции. */
-const autocompleteOptionHighlight = 'bg-[color-mix(in_srgb,var(--gr-muted)_30%,transparent)]'
+const autocompleteOptionHighlight = 'bg-[var(--gr-autocomplete-option-active-bg)]'
 
 export const autocompleteOptionBaseClass = 'w-full rounded-[var(--gr-radius-md)] px-3 py-2 text-left text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)]'
 export const autocompleteOptionActiveClass = autocompleteOptionHighlight

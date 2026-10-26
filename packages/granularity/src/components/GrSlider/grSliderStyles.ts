@@ -81,7 +81,7 @@ export const sliderFillOrientationClass: Record<GrSliderOrientation, string> = {
  * выверенные на AA токены и роняет контраст подписей меток.
  */
 export const sliderFillDisabledClass = 'bg-[var(--gr-disabled-fg)]'
-export const sliderFillEnabledClass = 'bg-[var(--gr-slider-fill,var(--gr-primary))]'
+export const sliderFillEnabledClass = 'bg-[var(--gr-slider-fill,var(--gr-selected))]'
 /**
  * Вердикт валидации — ролью ошибки, как рамка у полей ввода: раньше `invalid`
  * ставил только `aria-invalid`, и заливка оставалась цвета акцента.
@@ -133,7 +133,7 @@ export const sliderThumbOrientationClass: Record<GrSliderOrientation, string> = 
  * недоступный бегунок оставался с рамкой акцента.
  */
 export const sliderThumbDisabledClass = 'cursor-not-allowed border-[var(--gr-disabled-fg)] bg-[var(--gr-disabled-bg)]'
-export const sliderThumbEnabledClass = 'cursor-grab active:cursor-grabbing hover:scale-110 border-[var(--gr-slider-thumb-border,var(--gr-slider-fill,var(--gr-primary)))] bg-[var(--gr-slider-thumb-bg,var(--gr-bg))] focus-visible:ring-[var(--gr-ring)]'
+export const sliderThumbEnabledClass = 'cursor-grab active:cursor-grabbing hover:scale-110 border-[var(--gr-slider-thumb-border,var(--gr-slider-fill,var(--gr-selected)))] bg-[var(--gr-slider-thumb-bg,var(--gr-bg))] focus-visible:ring-[var(--gr-ring)]'
 export const sliderThumbInvalidClass = 'cursor-grab active:cursor-grabbing hover:scale-110 border-[var(--gr-invalid-brd)] bg-[var(--gr-slider-thumb-bg,var(--gr-bg))] focus-visible:ring-[var(--gr-invalid-ring)]'
 
 const sliderThumbToneClass: Record<GrSliderTone, string> = {

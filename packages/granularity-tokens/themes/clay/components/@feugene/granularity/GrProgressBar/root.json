@@ -1,13 +1,18 @@
 {
   "gr-progress-azure-bg": "var(--gr-azure)",
-  "gr-progress-bg": "var(--gr-primary)",
+  "gr-progress-bg": "var(--gr-fg)",
   "gr-progress-buffer-bg": "color-mix(in srgb, var(--gr-muted-fg) 40%, var(--gr-muted))",
   "gr-progress-danger-bg": "var(--gr-danger)",
-  "gr-progress-indeterminate-bg": "var(--gr-muted-fg)",
-  "gr-progress-indeterminate-duration": "1.4s",
+  "gr-progress-indeterminate-bg": "var(--gr-fg)",
+  "gr-progress-indeterminate-duration": "1.6s",
   "gr-progress-info-bg": "var(--gr-info)",
   "gr-progress-neutral-bg": "var(--gr-muted-fg)",
   "gr-progress-slate-bg": "var(--gr-slate)",
-  "gr-progress-success-bg": "var(--gr-success)",
-  "gr-progress-warning-bg": "var(--gr-warning)"
+  "gr-progress-success-bg": "var(--gr-success-text)",
+  "gr-progress-warning-bg": "var(--gr-warning)",
+  "gr-progress-track-bg": "var(--gr-brd)",
+  "gr-progress-height-xs": "2px",
+  "gr-progress-height-sm": "4px",
+  "gr-progress-height-md": "6px",
+  "gr-progress-height-lg": "8px"
 }

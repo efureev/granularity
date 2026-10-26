@@ -72,8 +72,8 @@ export const stepsMarkerClass = 'inline-flex shrink-0 items-center justify-cente
  * монохроме. `error` — единственный, кто меняет тон, и меняет его осмысленно.
  */
 export const stepsMarkerClassByStatus: Record<GrStepStatus, string> = {
-  complete: 'border-[var(--gr-primary-solid)] bg-[var(--gr-primary-solid)] text-[var(--gr-primary-solid-fg)]',
-  current: 'border-[var(--gr-primary-solid)] bg-[var(--gr-bg)] text-[var(--gr-primary-text)]',
+  complete: 'border-[var(--gr-steps-done-bg)] bg-[var(--gr-steps-done-bg)] text-[var(--gr-steps-done-fg)]',
+  current: 'border-[var(--gr-steps-done-bg)] bg-[var(--gr-bg)] text-[var(--gr-steps-current-fg)]',
   upcoming: 'border-[var(--gr-brd)] bg-[var(--gr-bg)] text-[var(--gr-muted-fg)]',
   error: 'border-[var(--gr-danger-solid)] bg-[var(--gr-danger-solid)] text-[var(--gr-danger-solid-fg)]',
 }
@@ -103,7 +103,7 @@ export const stepsConnectorClass: Record<GrStepsOrientation, string> = {
   vertical: 'absolute left-[calc(var(--gr-steps-marker-size)/2)] w-[var(--gr-steps-connector-size)] -translate-x-1/2 top-[calc(var(--gr-steps-marker-size)+0.375rem)] bottom-1',
 }
 
-export const stepsConnectorDoneClass = 'bg-[var(--gr-steps-connector-done,var(--gr-primary-solid))]'
+export const stepsConnectorDoneClass = 'bg-[var(--gr-steps-connector-done,var(--gr-steps-done-bg))]'
 export const stepsConnectorPendingClass = 'bg-[var(--gr-steps-connector-pending,var(--gr-brd))]'
 
 /** Компактный вариант: подпись и полоса вместо ленты. */

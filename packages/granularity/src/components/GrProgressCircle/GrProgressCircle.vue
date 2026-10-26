@@ -209,7 +209,7 @@ const hasCenter = computed(() => hasSlotContent.value || showStatusIcon.value ||
 
 <style>
 [data-gr-progress-circle-track] {
-  stroke: var(--gr-progress-circle-track, var(--gr-muted));
+  stroke: var(--gr-progress-circle-track, var(--gr-progress-circle-track-bg));
 }
 
 [data-gr-progress-circle-arc] {

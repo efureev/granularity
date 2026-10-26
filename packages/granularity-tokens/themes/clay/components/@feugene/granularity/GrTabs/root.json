@@ -1,0 +1,9 @@
+{
+  "gr-tabs-font-weight": "var(--gr-font-medium)",
+  "gr-tabs-pills-list-bg": "transparent",
+  "gr-tabs-pills-list-brd": "transparent",
+  "gr-tabs-pills-radius": "var(--gr-radius-full)",
+  "gr-tabs-pills-active-bg": "var(--gr-selected)",
+  "gr-tabs-pills-active-fg": "var(--gr-selected-fg)",
+  "gr-tabs-pills-active-brd": "var(--gr-selected)"
+}

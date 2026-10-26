@@ -30,11 +30,11 @@ export const densityPadding: Record<GrTimelineDensity, string> = {
 }
 
 /**
- * Заливка маркера. У тона `neutral` одноимённой роли в палитре нет — его вес
- * это приглушённый текст, поэтому точка красится `--gr-muted-fg`.
+ * Заливка маркера. У тона `neutral` одноимённой роли в палитре нет — его точку
+ * задаёт тема (`--gr-timeline-neutral-marker`): приглушённый текст или чернила.
  */
 export const markerFilledToneClass: Record<GrTimelineTone, string> = {
-  neutral: 'bg-[var(--gr-muted-fg)]',
+  neutral: 'bg-[var(--gr-timeline-neutral-marker)]',
   primary: 'bg-[var(--gr-primary)]',
   success: 'bg-[var(--gr-success)]',
   warning: 'bg-[var(--gr-warning)]',
@@ -46,7 +46,7 @@ export const markerFilledToneClass: Record<GrTimelineTone, string> = {
 
 /** Полая точка: обводка тоном, середина — фон страницы, чтобы ось не просвечивала. */
 export const markerOutlinedToneClass: Record<GrTimelineTone, string> = {
-  neutral: 'bg-[var(--gr-bg)] border-[var(--gr-muted-fg)]',
+  neutral: 'bg-[var(--gr-bg)] border-[var(--gr-timeline-neutral-outline)]',
   primary: 'bg-[var(--gr-bg)] border-[var(--gr-primary)]',
   success: 'bg-[var(--gr-bg)] border-[var(--gr-success)]',
   warning: 'bg-[var(--gr-bg)] border-[var(--gr-warning)]',
@@ -60,11 +60,11 @@ export const markerBaseClass = 'block shrink-0 rounded-[var(--gr-radius-full)]'
 
 export const timeClass = 'text-[length:var(--gr-text-xs)] leading-[var(--gr-leading-normal)] text-[var(--gr-muted-fg)] tabular-nums'
 
-export const titleClass = 'text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-normal)] font-600 text-[var(--gr-fg)]'
+export const titleClass = 'text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-normal)] [font-weight:var(--gr-timeline-title-weight)] text-[var(--gr-fg)]'
 
 export const descriptionClass = 'mt-0.5 text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-normal)] text-[var(--gr-muted-fg)]'
 
-export const groupTitleClass = 'text-[length:var(--gr-text-xs)] leading-[var(--gr-leading-normal)] font-600 uppercase tracking-wide text-[var(--gr-muted-fg)]'
+export const groupTitleClass = 'text-[length:var(--gr-text-xs)] leading-[var(--gr-leading-normal)] font-600 [text-transform:var(--gr-timeline-group-title-transform)] [letter-spacing:var(--gr-timeline-group-title-tracking)] text-[var(--gr-muted-fg)]'
 
 export const emptyClass = 'py-6 text-center text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-normal)] text-[var(--gr-muted-fg)]'
 

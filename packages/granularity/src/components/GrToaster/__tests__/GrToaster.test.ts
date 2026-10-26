@@ -34,7 +34,7 @@ vi.mock('~icons/lucide/x', () => ({
 }))
 
 import { granularityToastPlugin, useToast } from '../../../composables/useToast'
-import { cancelPointer, mockRect, move, press, release } from '../../../testing'
+import { cancelPointer, granularityGlobal, mockRect, move, press, release } from '../../../testing'
 import { resetGranularityDom } from '../../../testing/env'
 import GrToaster from '../GrToaster.vue'
 
@@ -61,7 +61,7 @@ describe('GrToaster', () => {
     // Цвет приходит через inline-style на обёртке `GrIcon`.
     const iconWrapper = icon?.closest('[data-gr-icon]') as HTMLElement | null
     expect(iconWrapper).not.toBeNull()
-    expect(iconWrapper?.getAttribute('style')).toContain('color: var(--gr-success)')
+    expect(iconWrapper?.getAttribute('style')).toContain('color: color-mix(in srgb, var(--gr-success) var(--gr-toaster-icon-tone), var(--gr-success-text))')
   })
 
   it('контейнер — a11y-регион с aria-label, кастомизируется regionLabel', () => {
@@ -164,6 +164,26 @@ describe('GrToaster', () => {
     expect(region.className).toContain('bottom-4')
     expect(region.className).not.toContain('right-4')
     expect(region.className).not.toContain('top-4')
+  })
+
+  it('угол приходит из componentDefaults, локальный проп сильнее', () => {
+    mount(GrToaster, {
+      attachTo: document.body,
+      global: granularityGlobal({ componentDefaults: { GrToaster: { placement: 'bottom-right' } } }),
+    })
+    const region = document.body.querySelector('[data-gr-toaster]') as HTMLElement
+    expect(region.className).toContain('bottom-4')
+    expect(region.className).toContain('right-4')
+    resetGranularityDom()
+
+    mount(GrToaster, {
+      attachTo: document.body,
+      props: { placement: 'top-left' },
+      global: granularityGlobal({ componentDefaults: { GrToaster: { placement: 'bottom-right' } } }),
+    })
+    const local = document.body.querySelector('[data-gr-toaster]') as HTMLElement
+    expect(local.className).toContain('top-4')
+    expect(local.className).toContain('left-4')
   })
 
   it('dismiss удаляет toast по клику на кнопку закрытия (i18n dismissLabel)', async () => {
@@ -309,7 +329,7 @@ describe('GrToaster — семантика очереди: видимые дож
     const hosts = document.querySelectorAll('[data-gr-toaster]')
     const host = hosts[hosts.length - 1]
     return [...host.querySelectorAll('[data-gr-toast]')]
-      .map(el => el.querySelector('.font-700')?.textContent?.trim() ?? '')
+      .map(el => el.querySelector('[data-gr-toast-title]')?.textContent?.trim() ?? '')
   }
 
   it('видимые — старейшие; новый тост ждёт, а не вытесняет', async () => {

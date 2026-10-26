@@ -299,7 +299,7 @@ const layoutClass = computed(() => (props.block ? 'flex w-full' : 'inline-flex')
           v-bind="themeAttrs"
           data-gr-tooltip-panel
           data-gr-overlay-root
-          class="pointer-events-none rounded-[var(--gr-radius-control)] border border-[var(--gr-brd)] bg-[var(--gr-popover)] text-[var(--gr-popover-fg)] shadow-[var(--gr-shadow-1)]"
+          class="pointer-events-none rounded-[var(--gr-tooltip-radius)] border border-[var(--gr-tooltip-brd)] bg-[var(--gr-tooltip-bg)] text-[var(--gr-tooltip-fg)] shadow-[var(--gr-tooltip-shadow)]"
           :class="panelClass"
           :style="floatingStyle"
         >

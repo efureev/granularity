@@ -3,5 +3,7 @@
   "gr-datatable-detail-bg": "color-mix(in srgb, var(--gr-muted) 45%, transparent)",
   "gr-datatable-drag-indicator-width": "2px",
   "gr-datatable-pinned-shadow": "4px 0 6px -4px rgba(0, 0, 0, 0.25)",
-  "gr-datatable-pinned-shadow-end": "-4px 0 6px -4px rgba(0, 0, 0, 0.25)"
+  "gr-datatable-pinned-shadow-end": "-4px 0 6px -4px rgba(0, 0, 0, 0.25)",
+  "gr-datatable-head-weight": "var(--gr-font-bold)",
+  "gr-datatable-first-row-brd": "var(--gr-brd)"
 }

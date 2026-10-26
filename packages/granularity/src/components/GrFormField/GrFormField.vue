@@ -22,6 +22,7 @@ import {
   rootRowClass,
   type GrFormFieldLabelPosition,
   type GrFormFieldSize,
+  type GrFormFieldHintPosition,
 } from './grFormFieldStyles'
 
 export interface GrFormFieldProps {
@@ -41,7 +42,7 @@ export interface GrFormFieldProps {
    * а претензий несколько: ответ сервера, валидация файла.
    */
   error?: string | string[]
-  /** Подсказка под лейблом/над контролом (можно также через слот `#hint`). */
+  /** Подсказка к полю (можно также через слот `#hint`). Где она стоит — `hintPosition`. */
   hint?: string
   /**
    * Помечает поле обязательным: маркер `*` в подписи и `aria-required` у контрола.
@@ -67,6 +68,11 @@ export interface GrFormFieldProps {
   labelPosition?: GrFormFieldLabelPosition
   /** Ширина колонки подписи при `labelPosition="start"`. Число — пиксели. */
   labelWidth?: string | number
+  /**
+   * Подсказка над контролом (по умолчанию) или под ним. При подписи сбоку она
+   * под контролом всегда. Не задано — из `GrConfigProvider`.
+   */
+  hintPosition?: GrFormFieldHintPosition
   /** Классы на `<label>` поверх встроенных — точечная правка подписи без своего слота. */
   labelClass?: LabelClass
   /**
@@ -96,6 +102,7 @@ const props = withDefaults(
     showMessage: true,
     size: undefined,
     labelPosition: undefined,
+    hintPosition: undefined,
     labelWidth: undefined,
     labelClass: undefined,
     // `undefined`, а не `false`: иначе булев каст Vue затёр бы значение формы.
@@ -108,6 +115,8 @@ const slots = useSlots()
 const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrFormField' })
 const labelPosition = useGrComponentProp('GrFormField', 'labelPosition', () => props.labelPosition, 'top')
 const isInlineLabel = computed(() => labelPosition.value === 'start')
+const hintPosition = useGrComponentProp('GrFormField', 'hintPosition', () => props.hintPosition, 'top')
+const hintBelow = computed(() => isInlineLabel.value || hintPosition.value === 'bottom')
 
 const rootClass = computed(() => [
   isInlineLabel.value ? rootRowClass : rootColumnClass,
@@ -325,7 +334,7 @@ defineSlots<{
          `aria-describedby`, а не DOM. -->
     <div data-gr-form-field-control :class="[controlColumnClass, fieldGaps[resolvedSize]]">
       <p
-        v-if="hasHint && !isInlineLabel"
+        v-if="hasHint && !hintBelow"
         :id="hintId"
         data-gr-form-field-hint
         :class="hintClassName"
@@ -338,7 +347,7 @@ defineSlots<{
       <slot />
 
       <p
-        v-if="hasHint && isInlineLabel"
+        v-if="hasHint && hintBelow"
         :id="hintId"
         data-gr-form-field-hint
         :class="hintClassName"

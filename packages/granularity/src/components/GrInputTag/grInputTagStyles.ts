@@ -1,4 +1,5 @@
 import type { GrControlState } from '../shared/sizes'
+import { controlShapeRadiusClass, fieldBorderClass, fieldBorderResponseClass, fieldBorderStateClass, fieldReadonlySurfaceClass } from '../shared/controlShape'
 
 import type { GrInputSize } from '../GrInput/GrInput.vue'
 
@@ -20,7 +21,7 @@ export const inputSizeClassBySize: Record<GrInputTagSize, string> = {
 }
 
 export const wrapperBorderClassByState: Record<GrInputTagState, string> = {
-  default: 'border-[var(--gr-brd)]',
+  default: fieldBorderClass,
   success: 'border-[var(--gr-success)] focus-within:ring-[var(--gr-success)]',
   warning: 'border-[var(--gr-warning)] focus-within:ring-[var(--gr-warning)]',
   danger: 'border-[var(--gr-danger)] focus-within:ring-[var(--gr-danger)]',
@@ -33,7 +34,7 @@ export const wrapperBorderClassByState: Record<GrInputTagState, string> = {
  */
 export const invalidWrapperBorderClass = 'border-[var(--gr-invalid-brd)] focus-within:ring-[var(--gr-invalid-ring)]'
 
-export const wrapperBaseClass = 'flex flex-wrap items-center rounded-[var(--gr-radius-control)] border text-[var(--gr-fg)] transition-colors duration-[var(--gr-duration-fast)] focus-within:ring-2 focus-within:ring-[var(--gr-ring)]'
+export const wrapperBaseClass = 'flex flex-wrap items-center border text-[var(--gr-fg)] transition-colors duration-[var(--gr-duration-fast)] focus-within:ring-2 focus-within:ring-[calc(var(--gr-input-focus-ring-width))] focus-within:ring-[var(--gr-ring)]'
 
 export const wrapperEnabledClass = 'bg-[var(--gr-bg)] cursor-text'
 
@@ -53,13 +54,16 @@ export function grInputTagWrapperClass(options: {
   state: GrInputTagState
   invalid: boolean
   disabled: boolean
+  readonly?: boolean
 }): string {
   return [
     wrapperBaseClass,
     wrapperSizeClassBySize[options.size],
-    options.invalid ? invalidWrapperBorderClass : wrapperBorderClassByState[options.state],
-    options.disabled ? wrapperDisabledClass : wrapperEnabledClass,
-  ].join(' ')
+    controlShapeRadiusClass.box[options.size],
+    fieldBorderStateClass(options, invalidWrapperBorderClass, wrapperBorderClassByState),
+    fieldBorderResponseClass(options),
+    options.disabled ? wrapperDisabledClass : options.readonly ? `${fieldReadonlySurfaceClass} cursor-text` : wrapperEnabledClass,
+  ].filter(Boolean).join(' ')
 }
 
 export function grInputTagInputClass(size: GrInputTagSize): string {

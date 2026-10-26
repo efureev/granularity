@@ -197,7 +197,7 @@ describe('granularity/GrModal (unit)', () => {
 
     expect(panel.className).toContain('relative')
     expect(panel.className).toContain('z-10')
-    expect(panel.className).toContain('max-w-[560px]')
+    expect(panel.className).toContain('max-w-[var(--gr-modal-width-md)]')
 
     wrapper.unmount()
   })

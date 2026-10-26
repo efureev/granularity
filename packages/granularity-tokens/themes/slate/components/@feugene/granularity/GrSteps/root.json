@@ -1,3 +1,6 @@
 {
-  "gr-steps-connector-size": "2px"
+  "gr-steps-connector-size": "2px",
+  "gr-steps-done-bg": "var(--gr-primary-solid)",
+  "gr-steps-done-fg": "var(--gr-primary-solid-fg)",
+  "gr-steps-current-fg": "var(--gr-primary-text)"
 }

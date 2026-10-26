@@ -19,4 +19,4 @@
  * Класс — целый литерал: granum извлекает его из общего чанка у каждого
  * потребителя сам, safelist ему не нужен.
  */
-export const overlayPanelSurfaceClass = 'rounded-[var(--gr-radius-xl)] border border-[var(--gr-brd)] bg-[var(--gr-popover)] text-[var(--gr-popover-fg)] shadow-[var(--gr-shadow-2)]'
+export const overlayPanelSurfaceClass = 'rounded-[var(--gr-radius-overlay)] border border-[var(--gr-brd)] bg-[var(--gr-popover)] text-[var(--gr-popover-fg)] shadow-[var(--gr-shadow-2)]'

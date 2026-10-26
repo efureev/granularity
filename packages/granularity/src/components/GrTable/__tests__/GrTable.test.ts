@@ -326,7 +326,7 @@ describe('GrTable — липкие шапка и колонка', () => {
     expect(thead).toContain('sticky')
     expect(thead).toContain('top-0')
     // Без фона сквозь шапку просвечивали бы уезжающие строки.
-    expect(thead.join(' ')).toContain('bg-[var(--gr-muted)]')
+    expect(thead.join(' ')).toContain('bg-[var(--gr-table-head-bg)]')
 
     wrapper.unmount()
   })
@@ -349,7 +349,7 @@ describe('GrTable — липкие шапка и колонка', () => {
 
     expect(table).toContain('[&>tbody>tr>*:first-child]:bg-[var(--gr-card)]')
     // Шапке фон задан на `<thead>`, но он скроллится вместе с ней.
-    expect(table).toContain('[&>thead>tr>*:first-child]:bg-[var(--gr-muted)]')
+    expect(table).toContain('[&>thead>tr>*:first-child]:bg-[var(--gr-table-head-bg)]')
 
     wrapper.unmount()
   })
@@ -364,10 +364,10 @@ describe('GrTable — липкие шапка и колонка', () => {
     const wrapper = mountTable({ stickyColumn: true, striped: true, hoverable: true })
     const table = wrapper.get('table').attributes('class') ?? ''
 
-    expect(table).toContain('nth-child(even_of_:not([data-gr-table-off-grid]))>*:first-child]:bg-[color-mix(in_srgb,var(--gr-muted)_35%,var(--gr-card))]')
-    expect(table).toContain(':hover>*:first-child]:bg-[color-mix(in_srgb,var(--gr-muted)_45%,var(--gr-card))]')
+    expect(table).toContain('nth-child(even_of_:not([data-gr-table-off-grid]))>*:first-child]:bg-[color-mix(in_srgb,var(--gr-muted)_var(--gr-table-stripe-share),var(--gr-card))]')
+    expect(table).toContain(':hover>*:first-child]:bg-[color-mix(in_srgb,var(--gr-muted)_var(--gr-table-hover-share),var(--gr-card))]')
     // Прозрачного `transparent` в правилах липкой ячейки быть не должно.
-    expect(table).not.toContain('>*:first-child]:bg-[color-mix(in_srgb,var(--gr-muted)_35%,transparent)]')
+    expect(table).not.toContain('>*:first-child]:bg-[color-mix(in_srgb,var(--gr-muted)_var(--gr-table-stripe-share),transparent)]')
 
     wrapper.unmount()
   })
@@ -379,5 +379,20 @@ describe('GrTable — липкие шапка и колонка', () => {
     expect(table).not.toContain('nth-child(even_of_')
 
     wrapper.unmount()
+  })
+})
+
+describe('GrTable — линия под шапкой', () => {
+  it('рисуется фоновым слоем ячеек шапки из токенов темы — и в пустой таблице тоже', () => {
+    const filled = mount(GrTable, { slots: { header: '<tr><th>Имя</th></tr>', default: '<tr><td>Анна</td></tr>' } })
+    const empty = mount(GrTable, { props: { empty: true }, slots: { header: '<tr><th>Имя</th></tr>' } })
+
+    for (const wrapper of [filled, empty]) {
+      const classes = wrapper.get('table').classes()
+      expect(classes).toContain('[&>thead>tr>*]:[background-image:linear-gradient(var(--gr-table-head-line),var(--gr-table-head-line))]')
+      expect(classes).toContain('[&>thead>tr>*]:[background-size:100%_var(--gr-table-head-line-width)]')
+      // Рамкой линия не рисуется: в схлопнутых рамках рамка шапки перебила бы рамку строки.
+      expect(classes.some(name => name.includes('border-b'))).toBe(false)
+    }
   })
 })

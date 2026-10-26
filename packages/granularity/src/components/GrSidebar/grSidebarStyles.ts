@@ -36,13 +36,13 @@ export const itemExpandedClass = 'gap-3 px-3 py-2'
  * выверенные на AA токены текста.
  */
 export const itemDisabledClass = 'cursor-not-allowed text-[var(--gr-disabled-fg)]'
-export const itemActiveClass = 'bg-[var(--gr-muted)] font-600 text-[var(--gr-fg)]'
+export const itemActiveClass = 'bg-[var(--gr-sidebar-item-active-bg)] [font-weight:var(--gr-sidebar-item-active-weight)] text-[var(--gr-fg)]'
 export const itemIdleClass = 'text-[var(--gr-sidebar-fg)] hover:bg-[color-mix(in_srgb,var(--gr-sidebar-fg)_8%,transparent)]'
 
 export const itemLetterClass = 'text-[length:var(--gr-text-xs)] font-700 leading-none'
 export const itemBadgeClass = 'shrink-0 rounded-[var(--gr-radius-full)] bg-[color-mix(in_srgb,var(--gr-sidebar-fg)_12%,transparent)] px-1.5 py-0.5 text-[length:var(--gr-text-2xs)] leading-[var(--gr-leading-2xs)] font-600'
 
-export const groupLabelClass = 'px-3 pb-1 pt-3 text-[length:var(--gr-text-2xs)] leading-[var(--gr-leading-2xs)] font-700 [text-transform:uppercase] tracking-wide text-[var(--gr-muted-fg)]'
+export const groupLabelClass = 'px-3 pb-1 pt-3 text-[length:var(--gr-sidebar-group-label-size)] leading-[var(--gr-sidebar-group-label-leading)] [font-weight:var(--gr-sidebar-group-label-weight)] [text-transform:var(--gr-sidebar-group-label-transform)] [letter-spacing:var(--gr-sidebar-group-label-tracking)] text-[var(--gr-muted-fg)]'
 
 /**
  * В свёрнутой панели заголовка секции нет — иначе он не помещается. Границы

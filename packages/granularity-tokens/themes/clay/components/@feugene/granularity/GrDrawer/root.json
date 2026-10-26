@@ -1,0 +1,7 @@
+{
+  "gr-drawer-title-size": "var(--gr-text-xl)",
+  "gr-drawer-title-leading": "var(--gr-leading-lg)",
+  "gr-drawer-title-weight": "var(--gr-font-medium)",
+  "gr-drawer-shadow": "var(--gr-shadow-3)",
+  "gr-drawer-radius": "var(--gr-radius-xl)"
+}

@@ -44,7 +44,7 @@ const resolvedConfig = computed(() =>
 const rootClass = computed(() => [
   resolvedConfig.value.paddingX,
   resolvedConfig.value.paddingY,
-  resolvedConfig.value.bordered ? 'border-b border-[var(--gr-brd)]' : '',
+  resolvedConfig.value.bordered ? 'border-b border-[var(--gr-dialog-divider)]' : '',
   'flex items-center justify-between gap-4',
 ])
 
@@ -70,7 +70,7 @@ const { titleId } = useGrModalTitle(() => showVisibleTitle.value)
       v-else-if="showVisibleTitle"
       :id="titleId"
       data-gr-dialog-title
-      class="flex-1 min-w-0 text-[length:var(--gr-control-text-md)] leading-[var(--gr-control-leading-md)] font-700"
+      class="flex-1 min-w-0 font-[var(--gr-font-display)] text-[length:var(--gr-dialog-title-size)] leading-[var(--gr-dialog-title-leading)] [font-weight:var(--gr-dialog-title-weight)]"
     >
       {{ resolvedTitle }}
     </div>

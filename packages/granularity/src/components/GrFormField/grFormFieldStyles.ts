@@ -58,7 +58,11 @@ export const rootRowClass = 'flex items-start'
 export const labelInlineClass = 'shrink-0 flex items-center'
 export const controlColumnClass = 'flex flex-col min-w-0 flex-1'
 
-export const labelBaseClass = 'text-[var(--gr-muted-fg)]'
+export const labelBaseClass = 'text-[var(--gr-form-field-label-fg)] [font-weight:var(--gr-form-field-label-weight)]'
 export const hintBaseClass = 'text-[var(--gr-muted-fg)]'
 export const errorBaseClass = 'text-[var(--gr-invalid-text)]'
-export const requiredMarkClass = 'text-[var(--gr-invalid-text)]'
+export const requiredMarkClass = 'text-[var(--gr-form-field-required-fg)]'
+
+/** Подсказка над контролом или под ним; при подписи сбоку — всегда под ним. */
+export const GR_FORM_FIELD_HINT_POSITIONS = ['top', 'bottom'] as const
+export type GrFormFieldHintPosition = typeof GR_FORM_FIELD_HINT_POSITIONS[number]

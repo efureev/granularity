@@ -1,4 +1,5 @@
 {
   "gr-color-picker-area-thumb-border": "#fff",
-  "gr-color-picker-area-thumb-ring": "rgba(0, 0, 0, 0.45)"
+  "gr-color-picker-area-thumb-ring": "rgba(0, 0, 0, 0.45)",
+  "gr-color-picker-trigger-hover-brd": "var(--gr-primary)"
 }

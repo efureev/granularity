@@ -1,0 +1,12 @@
+{
+  "gr-alert-radius": "10px",
+  "gr-alert-title-weight": "var(--gr-font-medium)",
+  "gr-alert-body-fg": "var(--gr-secondary-fg)",
+  "gr-alert-soft-brd": "transparent",
+  "gr-alert-soft-brd-tone": "0%",
+  "gr-alert-soft-title-tone": "0%",
+  "gr-alert-soft-text-tone": "0%",
+  "gr-alert-outline-bg": "var(--gr-card)",
+  "gr-alert-outline-brd": "var(--gr-brd-strong)",
+  "gr-alert-outline-brd-tone": "0%"
+}

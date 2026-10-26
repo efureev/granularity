@@ -155,7 +155,7 @@ describe('GrScrollSpy: состояние', () => {
     const active = wrapper.findAll('[data-gr-scroll-spy-item]')[1]
     expect(active.attributes('data-active')).toBe('true')
     expect(active.classes()).toContain('font-600')
-    expect(active.classes()).toContain('border-s-[var(--gr-scroll-spy-marker,var(--gr-primary))]')
+    expect(active.classes()).toContain('border-s-[var(--gr-scroll-spy-marker,var(--gr-selected))]')
   })
 
   it('предок активного помечен, но текущим не объявлен', async () => {
