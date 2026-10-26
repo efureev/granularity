@@ -33,7 +33,7 @@
   "gr-danger-solid-active": "var(--gr-danger-active)",
   "gr-danger-solid-fg": "var(--gr-danger-fg)",
   "gr-danger-solid-hover": "var(--gr-danger-hover)",
-  "gr-danger-text": "#963630",
+  "gr-danger-text": "#9c2a34",
   "gr-disabled-bg": "#f0eee6",
   "gr-disabled-brd": "var(--gr-disabled-bg)",
   "gr-disabled-fg": "#9c9a92",

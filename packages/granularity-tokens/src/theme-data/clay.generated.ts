@@ -175,7 +175,7 @@ const data: GrThemeData = {
         "gr-danger": "#b8433a",
         "gr-danger-light": "#f1e1dd",
         "gr-danger-fg": "#faf9f5",
-        "gr-danger-text": "#963630",
+        "gr-danger-text": "#9c2a34",
         "gr-info": "#2268bf",
         "gr-info-light": "#dfe8f1",
         "gr-info-fg": "#faf9f5",
