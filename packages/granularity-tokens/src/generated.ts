@@ -1259,7 +1259,7 @@ export const grThemeCatalog: GrThemeCatalogEntry[] = [
     "title": "Глина",
     "description": "Тёплая бумага, графитовые чернила и одна глиняная точка на экран.",
     "docs": "https://granularity.tech/themes/clay",
-    "version": "2.0.0",
+    "version": "2.0.1",
     "targets": {
       "@feugene/granularity": "^3.1.0",
       "@feugene/granularity-charts": "^3.0.0",

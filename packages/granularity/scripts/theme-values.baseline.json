@@ -25803,12 +25803,12 @@
             "color": "rgb(94, 93, 89)"
           },
           "--gr-button-slate-bg-active": {
-            "value": "color-mix(in srgb, #5e5d59 80%, #262624)",
-            "color": "color(srgb 0.324706 0.321569 0.307451)"
+            "value": "#53524e",
+            "color": "rgb(83, 82, 78)"
           },
           "--gr-button-slate-bg-hover": {
-            "value": "color-mix(in srgb, #5e5d59 88%, #262624)",
-            "color": "color(srgb 0.342275 0.338824 0.324078)"
+            "value": "#575653",
+            "color": "rgb(87, 86, 83)"
           },
           "--gr-button-slate-border": {
             "value": "color-mix(in srgb, #faf9f5 30%, #262624)",
@@ -27112,16 +27112,16 @@
             "color": "rgb(94, 93, 89)"
           },
           "--gr-slate-solid-active": {
-            "value": "color-mix(in srgb, #5e5d59 80%, #262624)",
-            "color": "color(srgb 0.324706 0.321569 0.307451)"
+            "value": "#53524e",
+            "color": "rgb(83, 82, 78)"
           },
           "--gr-slate-solid-fg": {
             "value": "#faf9f5",
             "color": "rgb(250, 249, 245)"
           },
           "--gr-slate-solid-hover": {
-            "value": "color-mix(in srgb, #5e5d59 88%, #262624)",
-            "color": "color(srgb 0.342275 0.338824 0.324078)"
+            "value": "#575653",
+            "color": "rgb(87, 86, 83)"
           },
           "--gr-slate-text": {
             "value": "#c2c0b6",
@@ -28255,10 +28255,10 @@
             "rgb(94, 93, 89)"
           ],
           "--gr-button-slate-bg-active": [
-            "color(srgb 0.324706 0.321569 0.307451)"
+            "rgb(83, 82, 78)"
           ],
           "--gr-button-slate-bg-hover": [
-            "color(srgb 0.342275 0.338824 0.324078)"
+            "rgb(87, 86, 83)"
           ],
           "--gr-button-slate-border": [
             "color(srgb 0.398431 0.397255 0.387059)"
@@ -29498,13 +29498,13 @@
             "rgb(94, 93, 89)"
           ],
           "--gr-slate-solid-active": [
-            "color(srgb 0.324706 0.321569 0.307451)"
+            "rgb(83, 82, 78)"
           ],
           "--gr-slate-solid-fg": [
             "rgb(250, 249, 245)"
           ],
           "--gr-slate-solid-hover": [
-            "color(srgb 0.342275 0.338824 0.324078)"
+            "rgb(87, 86, 83)"
           ],
           "--gr-slate-text": [
             "rgb(194, 192, 182)"
@@ -30811,12 +30811,12 @@
             "color": "rgb(94, 93, 89)"
           },
           "--gr-button-slate-bg-active": {
-            "value": "color-mix(in srgb, #5e5d59 80%, #262624)",
-            "color": "color(srgb 0.324706 0.321569 0.307451)"
+            "value": "#53524e",
+            "color": "rgb(83, 82, 78)"
           },
           "--gr-button-slate-bg-hover": {
-            "value": "color-mix(in srgb, #5e5d59 88%, #262624)",
-            "color": "color(srgb 0.342275 0.338824 0.324078)"
+            "value": "#575653",
+            "color": "rgb(87, 86, 83)"
           },
           "--gr-button-slate-border": {
             "value": "color-mix(in srgb, #faf9f5 30%, #262624)",
@@ -32120,16 +32120,16 @@
             "color": "rgb(94, 93, 89)"
           },
           "--gr-slate-solid-active": {
-            "value": "color-mix(in srgb, #5e5d59 80%, #262624)",
-            "color": "color(srgb 0.324706 0.321569 0.307451)"
+            "value": "#53524e",
+            "color": "rgb(83, 82, 78)"
           },
           "--gr-slate-solid-fg": {
             "value": "#faf9f5",
             "color": "rgb(250, 249, 245)"
           },
           "--gr-slate-solid-hover": {
-            "value": "color-mix(in srgb, #5e5d59 88%, #262624)",
-            "color": "color(srgb 0.342275 0.338824 0.324078)"
+            "value": "#575653",
+            "color": "rgb(87, 86, 83)"
           },
           "--gr-slate-text": {
             "value": "#c2c0b6",
@@ -33263,10 +33263,10 @@
             "rgb(94, 93, 89)"
           ],
           "--gr-button-slate-bg-active": [
-            "color(srgb 0.324706 0.321569 0.307451)"
+            "rgb(83, 82, 78)"
           ],
           "--gr-button-slate-bg-hover": [
-            "color(srgb 0.342275 0.338824 0.324078)"
+            "rgb(87, 86, 83)"
           ],
           "--gr-button-slate-border": [
             "color(srgb 0.398431 0.397255 0.387059)"
@@ -34506,13 +34506,13 @@
             "rgb(94, 93, 89)"
           ],
           "--gr-slate-solid-active": [
-            "color(srgb 0.324706 0.321569 0.307451)"
+            "rgb(83, 82, 78)"
           ],
           "--gr-slate-solid-fg": [
             "rgb(250, 249, 245)"
           ],
           "--gr-slate-solid-hover": [
-            "color(srgb 0.342275 0.338824 0.324078)"
+            "rgb(87, 86, 83)"
           ],
           "--gr-slate-text": [
             "rgb(194, 192, 182)"
