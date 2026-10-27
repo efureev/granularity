@@ -80,6 +80,10 @@ async function buildGranumCss(theme) {
     // Тема — основная и единственная: её режим по умолчанию лежит под `:root`, как у приложения.
     themes: [{ theme: theme.id, modes: theme.modes.map(mode => mode.name) }],
     appSources: { dirs: [] },
+    // Снимок — про значения темы, а не про обрезку: с обрезкой из сборки уходят
+    // токены, которых не читает ни один компонент, и CSS для подключения без
+    // granum, где они есть, сверять было бы не с чем.
+    pruneTokens: { mode: 'off' },
   }, ROOT)
   const { css, layers } = await emitCss(app)
 
