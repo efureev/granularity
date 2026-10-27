@@ -9,9 +9,10 @@ import { granularityTokensProvider } from './src/granum-provider'
  * генератор кладёт в `generated/` (`scripts/generate.mjs --dist`), плагин
  * проверяет тему по реестру и копирует их в `dist`.
  *
- * `theme/node` здесь нет: он читает файлы и собирается отдельно
- * (`vite.node.config.ts`), иначе проверка границы browser/node отвергла бы
- * сборку целиком.
+ * `theme/node` читает файлы — точка входа только для Node: проверка границы
+ * browser/node её не судит, а `node:*` в ней остаются импортами, а не
+ * заглушкой Vite. Entry лежит на той же глубине, что исходник: `theme/node`
+ * находит встроенные темы пакета путём `../../themes`.
  */
 export default defineConfig({
   plugins: [granumProvider({
@@ -21,6 +22,7 @@ export default defineConfig({
     entries: {
       'theme/index': 'src/theme/index.ts',
       'theme/apply': 'src/theme/apply.ts',
+      'theme/node': { path: 'src/theme/node.ts', env: 'node' },
     },
   })],
   build: {

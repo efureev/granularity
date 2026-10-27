@@ -61,13 +61,14 @@ describe('публикация точек входа', () => {
     const packageJson = JSON.parse(readFileSync(resolve(packageDir, 'package.json'), 'utf8')) as {
       exports: Record<string, unknown>
     }
-    // `theme/node` читает файлы и собирается отдельным конфигом — браузерная сборка провайдера granum его не примет.
-    const viteConfig = ['vite.config.ts', 'vite.node.config.ts'].map(file => readFileSync(resolve(packageDir, file), 'utf8')).join('\n')
+    const viteConfig = readFileSync(resolve(packageDir, 'vite.config.ts'), 'utf8')
 
-    for (const entry of ['index', 'node', 'apply']) {
+    for (const entry of ['index', 'node', 'apply'])
       expect(packageJson.exports[entry === 'index' ? './theme' : `./theme/${entry}`], entry).toBeDefined()
-      expect(viteConfig).toContain(`'theme/${entry}': 'src/theme/${entry}.ts'`)
-    }
+    expect(viteConfig).toContain(`'theme/index': 'src/theme/index.ts'`)
+    expect(viteConfig).toContain(`'theme/apply': 'src/theme/apply.ts'`)
+    // `theme/node` читает файлы: в браузерной сборке провайдера — только точкой входа для Node.
+    expect(viteConfig).toContain(`'theme/node': { path: 'src/theme/node.ts', env: 'node' }`)
   })
 
   /** Рантайм-часть не должна тянуть справочник токенов — ради этого она и отдельно. */
