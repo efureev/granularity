@@ -27,8 +27,8 @@ src/components/GrButton/
   index.ts            публичные экспорты
   config.ts           дескриптор granum
   defaults.ts         пропы, которые задают GrConfigProvider и тема
-  grButtonStyles.ts   классы по size, variant, tone
-  safelist.ts         классы, собираемые в рантайме
+  grButtonStyles.ts   типы веса, тона и ступени, атрибуты вида
+  safelist.ts         классы, собираемые в рантайме (у кнопки пуст)
   tokens.json         реестр токенов компонента
   __tests__/
 ```
@@ -76,7 +76,6 @@ src/components/GrButton/
 
 Текущие примеры из пакета:
 
-- `GrButton/grButtonStyles.ts`;
 - `GrDialog/grDialogStyles.ts`;
 - `GrFormField/grFormFieldStyles.ts`;
 - `GrInput/grInputStyles.ts`.
@@ -361,6 +360,11 @@ Foundation публикуется одним файлом — `@feugene/granular
 
 - есть правило, которое утилитой не выразить: псевдоэлемент, медиазапрос по указателю или
   движению, ключевые кадры;
+- вид, который утилитами весит в разметке больше, чем правилами: компонент, которого на
+  странице десятки, с десятками утилит на экземпляр. `GrButton` так рисует вес, тон и ступень
+  правилами по атрибутам `data-gr-*` — строка классов из полутора-двух тысяч символов на каждую
+  кнопку ушла в один лист. Лист лежит в слое `granum.components`, утилиты потребителя — в
+  `granum.utilities`, поэтому класс на экземпляре по-прежнему сильнее вида компонента;
 - это правило касается только этого компонента — общее живёт в `src/styles/base.css`.
 
 ### Нужен `tokens.json`, если:

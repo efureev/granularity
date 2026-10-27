@@ -1,6 +1,7 @@
 import { mount } from '@vue/test-utils'
 import { describe, expect, it } from 'vitest'
 
+import { look } from '../../GrButton/__tests__/buttonSheet'
 import GrRadio from '../GrRadio.vue'
 
 describe('GrRadio (button)', () => {
@@ -22,12 +23,12 @@ describe('GrRadio (button)', () => {
     expect(btn.attributes('role')).toBe('radio')
     expect(btn.attributes('aria-checked')).toBe('true')
 
-    expect(btn.attributes('class')).toContain('inline-flex')
-    expect(btn.attributes('class')).toContain('items-center')
-    expect(btn.attributes('class')).toContain('rounded-ss-[var(--gr-button-radius-ss,var(--gr-button-corner-radius))]')
-    expect(btn.attributes('class')).toContain('[--gr-button-step-radius:var(--gr-button-radius-lg)]')
-    expect(btn.attributes('class')).toContain('h-11')
-    expect(btn.attributes('class')).toContain('bg-[var(--gr-button-primary-bg)]')
+    // Вид кнопки — её лист по атрибутам: радио несёт те же атрибуты, что `GrButton`.
+    expect(btn.attributes('data-gr-size')).toBe('lg')
+    expect(btn.attributes('data-gr-variant')).toBe('primary')
+    expect(btn.attributes('data-gr-tone')).toBe('primary')
+    expect(look(btn.element)['background-color']).toBe('var(--gr-button-primary-bg)')
+    expect(look(btn.element)['--gr-button-step-radius']).toBe('var(--gr-button-radius-lg)')
   })
 
   // Слой отклика кнопки выбирает цвет по весу: выбранная solid-радио под

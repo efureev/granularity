@@ -1,6 +1,6 @@
 ### Задача
 
-Добавление нового `tone` в `GrButton` — это не одна правка, а цепочка из semantic token'ов, component token'ов, class mapping и тестов.
+Добавление нового `tone` в `GrButton` — это не одна правка, а цепочка из semantic token'ов, component token'ов, правила тона в листе компонента и тестов.
 
 Ниже перечислены только те точки, которые реально используются текущей реализацией `GrButton`.
 
@@ -25,28 +25,18 @@
      `modes/<режим>.json` того же раздела.
    - Зарегистрируй их в `GrButton/tokens.json` с `kind: "theme"`. Компонент читает их без
      запасного значения: полноту по темам проверяет `catalogThemes.test.ts`.
-5. `packages/granularity/src/components/GrButton/grButtonStyles.ts`
-   - Добавь новый `tone` в тип `GrButtonTone`.
-   - Добавь новую запись в объект `tones`.
-   - Убедись, что для нового tone заполнены все поля `GrButtonToneTokens`:
-     - `solidBackground`
-     - `solidBackgroundHover`
-     - `solidBackgroundActive`
-     - `solidForeground`
-     - `accentText`
-     - `softBackground`
-     - `softBackgroundHover`
-     - `softBackgroundActive`
-     - `ghostBackgroundHover`
-     - `ghostBackgroundActive`
-     - `softForeground`
-     - `borderSoft`
-     - `border`
-     - `borderHover`
-     - `borderActive`
-6. Тесты
+5. `packages/granularity/src/components/shared/tones.ts`
+   - Добавь тон в `GR_TONES`: из него выводится `GrTone`, а `GrButtonTone` — это он же.
+     Тон общий для пакета, поэтому его ждут и бейдж, и алерт, и остальные тонированные компоненты.
+6. `packages/granularity/src/components/GrButton/GrButton.vue`, `<style>`
+   - Добавь правило тона `[data-gr-button][data-gr-tone='<tone>']`: оно раскладывает
+     component token'ы тона по семнадцати переменным `--gr-button-tone-*` (полный список —
+     `GrButton/tokens.json`, `kind: "css"`). Правила весов (`primary`, `secondary`,
+     `outline`, `ghost`, `ghost-border`) читают только эти переменные, поэтому вес про
+     новый тон ничего знать не должен.
+7. Тесты
    - Обнови `packages/granularity/src/components/GrButton/__tests__/GrButton.test.ts`
-   - Обнови `packages/granularity/src/__tests__/presetUtilities.test.ts`
+   - Добавь тон в список `tones` контрастных проверок там же.
 
 ### Почему нужны все эти шаги
 
@@ -55,7 +45,8 @@
 - раздел `GrButton` каждой темы — слой component token'ов. Здесь можно:
   - просто пробросить semantic token;
   - либо зафиксировать отдельный button-specific цвет, если для кнопки нужен другой контраст.
-- `grButtonStyles.ts` связывает tone с конкретными utility-классами и одновременно формирует safelist через `tones`.
+- правило тона в `<style>` `GrButton.vue` связывает тон с его component token'ами. Вид кнопки —
+  лист компонента по атрибутам `data-gr-*`, а не utility-классы, поэтому safelist у тона нет.
 
 ### Минимальный шаблон для нового tone
 
@@ -111,51 +102,47 @@
 "gr-button-brand-alt-fg": "#ffffff"
 ```
 
-#### 4. Подключение в `grButtonStyles.ts`
+#### 4. Тон в пакете и правило тона в листе кнопки
 
 ```ts
-export type GrButtonTone
-  = | 'primary'
-    | 'neutral'
-    | 'success'
-    | 'warning'
-    | 'danger'
-    | 'info'
-    | 'slate'
-    | 'azure'
-    | 'brand-alt'
+// packages/granularity/src/components/shared/tones.ts
+export const GR_TONES = [
+  // …
+  'azure',
+  'brand-alt',
+] as const
 ```
 
-```ts
-const tones = {
-  'brand-alt': {
-    solidBackground: 'var(--gr-button-brand-alt-bg)',
-    solidBackgroundHover: 'var(--gr-button-brand-alt-bg-hover)',
-    solidBackgroundActive: 'var(--gr-button-brand-alt-bg-active)',
-    solidForeground: 'var(--gr-button-brand-alt-fg)',
-    accentText: 'var(--gr-brand-alt-text)',
-    softBackground: 'var(--gr-button-brand-alt-soft-bg)',
-    softBackgroundHover: 'var(--gr-button-brand-alt-soft-bg-hover)',
-    softBackgroundActive: 'var(--gr-button-brand-alt-soft-bg-active)',
-    ghostBackgroundHover: 'var(--gr-button-brand-alt-ghost-bg-hover)',
-    ghostBackgroundActive: 'var(--gr-button-brand-alt-ghost-bg-active)',
-    softForeground: 'var(--gr-brand-alt-text)',
-    borderSoft: 'var(--gr-button-brand-alt-border-soft)',
-    border: 'var(--gr-button-brand-alt-border)',
-    borderHover: 'var(--gr-brand-alt-hover)',
-    borderActive: 'var(--gr-brand-alt-active)',
-  },
+```css
+/* GrButton.vue, <style> — рядом с правилами остальных тонов */
+[data-gr-button][data-gr-tone='brand-alt'] {
+  --gr-button-tone-bg: var(--gr-button-brand-alt-bg);
+  --gr-button-tone-bg-hover: var(--gr-button-brand-alt-bg-hover);
+  --gr-button-tone-bg-active: var(--gr-button-brand-alt-bg-active);
+  --gr-button-tone-fg: var(--gr-button-brand-alt-fg);
+  --gr-button-tone-text: var(--gr-brand-alt-text);
+  --gr-button-tone-soft-bg: var(--gr-button-brand-alt-soft-bg);
+  --gr-button-tone-soft-bg-hover: var(--gr-button-brand-alt-soft-bg-hover);
+  --gr-button-tone-soft-bg-active: var(--gr-button-brand-alt-soft-bg-active);
+  --gr-button-tone-soft-fg: var(--gr-brand-alt-text);
+  --gr-button-tone-ghost-bg-hover: var(--gr-button-brand-alt-ghost-bg-hover);
+  --gr-button-tone-ghost-bg-active: var(--gr-button-brand-alt-ghost-bg-active);
+  --gr-button-tone-border: var(--gr-button-brand-alt-border);
+  --gr-button-tone-border-hover: var(--gr-button-brand-alt-border-hover);
+  --gr-button-tone-border-active: var(--gr-button-brand-alt-border-active);
+  --gr-button-tone-border-soft: var(--gr-button-brand-alt-border-soft);
+  --gr-button-tone-border-soft-hover: var(--gr-button-brand-alt-border-soft-hover);
+  --gr-button-tone-glow: var(--gr-button-brand-alt-glow);
 }
 ```
 
 ### Что обязательно проверить
 
 1. Новый tone доступен в пропсах кнопки и типах.
-2. Для `primary`, `secondary`, `outline`, `ghost`, `ghost-border` строятся корректные классы.
-3. Новый tone попадает в safelist через `tones`.
-4. `GrButton.test.ts` покрывает новый tone хотя бы на уровне class output / token usage.
-5. `presetUtilities.test.ts` подтверждает, что нужные утилиты реально генерируются движком.
-6. Filled variant проходит контраст для текста в каждом режиме каждой темы каталога.
+2. У тона есть правило в листе со всеми переменными `--gr-button-tone-*` — это держит
+   `GrButton.test.ts` («у каждого тона пакета…»).
+3. Каждый вес в каждом состоянии проходит контраст подписи в каждом режиме каждой темы
+   каталога: тест читает лист компонента тем же каскадом, что браузер.
 
 ### Практическое правило
 

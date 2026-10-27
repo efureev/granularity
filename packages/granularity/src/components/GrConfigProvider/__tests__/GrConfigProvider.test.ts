@@ -207,7 +207,7 @@ describe('componentDefaults: дефолтные пропсы по компоне
     })
 
     // Кнопке достался точечный xs, инпуту — глобальный lg.
-    expect(wrapper.get('[data-gr-button]').classes().join(' ')).toContain('h-7')
+    expect(wrapper.get('[data-gr-button]').attributes('data-gr-size')).toBe('xs')
     expect(wrapper.get('[data-gr-input] > div').classes().join(' ')).toContain('h-11')
   })
 

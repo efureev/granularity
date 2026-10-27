@@ -81,7 +81,7 @@ describe('GrButtonGroup — оформление кнопок', () => {
     const wrapper = mountGroup({ size: 'lg', variant: 'outline', tone: 'danger' })
     const button = wrapper.get('button')
 
-    expect(button.classes()).toContain('h-11')
+    expect(button.attributes('data-gr-size')).toBe('lg')
     expect(button.attributes('data-gr-variant')).toBe('outline')
     expect(button.attributes('data-gr-tone')).toBe('danger')
   })
@@ -90,8 +90,8 @@ describe('GrButtonGroup — оформление кнопок', () => {
     const wrapper = mountGroup({ size: 'lg' }, { size: 'xs' })
     const buttons = wrapper.findAll('button')
 
-    expect(buttons[0].classes()).toContain('h-7')
-    expect(buttons[1].classes()).toContain('h-11')
+    expect(buttons[0].attributes('data-gr-size')).toBe('xs')
+    expect(buttons[1].attributes('data-gr-size')).toBe('lg')
   })
 
   it('группа сильнее `GrConfigProvider`: она ближе к кнопке', () => {
@@ -110,8 +110,8 @@ describe('GrButtonGroup — оформление кнопок', () => {
     const wrapper = mount(Harness)
     const buttons = wrapper.findAll('button')
 
-    expect(buttons[0].classes()).toContain('h-11')
-    expect(buttons[1].classes()).toContain('h-7')
+    expect(buttons[0].attributes('data-gr-size')).toBe('lg')
+    expect(buttons[1].attributes('data-gr-size')).toBe('xs')
   })
 
   it('молчаливая группа не мешает провайдеру', () => {
@@ -126,7 +126,7 @@ describe('GrButtonGroup — оформление кнопок', () => {
       `,
     })
 
-    expect(mount(Harness).get('button').classes()).toContain('h-7')
+    expect(mount(Harness).get('button').attributes('data-gr-size')).toBe('xs')
   })
 })
 

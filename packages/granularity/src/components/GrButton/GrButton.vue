@@ -16,9 +16,7 @@ import { useGranularityTranslations } from '../../internal/granularityI18n'
 export type { GrButtonSize, GrButtonTone, GrButtonVariant } from './grButtonStyles'
 
 import {
-  glyphSizes,
-  grButtonBaseClass,
-  grButtonClass,
+  grButtonLookAttrs,
   type GrButtonLoadingIndicator,
   type GrButtonSize,
   type GrButtonTone,
@@ -303,27 +301,20 @@ defineExpose({
   blur,
 })
 
-function rootClass(): string[] {
-  const suffix = hasSlotContent('suffix') || (opensInNewTab.value && !isSquare.value)
+function lookAttrs(): Record<string, string | undefined> {
+  const square = isSquare.value
 
-  return [
-    grButtonBaseClass,
-    grButtonClass({
-      variant: resolvedVariant.value,
-      tone: resolvedTone.value,
-      size: resolvedSize.value,
-      square: isSquare.value,
-      disabled: looksDisabled.value,
-      block: props.block,
-      loading: props.loading,
-      prefix: hasSlotContent('prefix'),
-      prefixCell: prefixInCell(),
-      suffix,
-      pressed: isPressed.value,
-    }),
-    // Ждущая сервер кнопка не запрещена, а занята — курсор говорит именно это.
-    looksDisabled.value ? 'cursor-not-allowed' : props.loading ? 'cursor-progress' : '',
-  ]
+  return grButtonLookAttrs({
+    variant: resolvedVariant.value,
+    tone: resolvedTone.value,
+    size: resolvedSize.value,
+    square,
+    block: props.block,
+    off: looksDisabled.value,
+    prefix: !square && hasSlotContent('prefix'),
+    prefixCell: prefixInCell(),
+    suffix: !square && (hasSlotContent('suffix') || opensInNewTab.value),
+  })
 }
 
 defineSlots<{
@@ -341,44 +332,577 @@ defineSlots<{
     :is="renderAs"
     ref="rootEl"
     data-gr-button
-    :data-gr-variant="resolvedVariant"
-    :data-gr-tone="resolvedTone"
     :data-gr-pressed="isPressed ? '' : undefined"
     :data-gr-busy-overlay="spinnerOverContent() ? '' : undefined"
     :data-gr-busy-shimmer="shimmerLabel() ? '' : undefined"
     :data-gr-busy-track="trackLoading() ? '' : undefined"
-    v-bind="rootAttrs"
-    :class="rootClass()"
+    v-bind="{ ...lookAttrs(), ...rootAttrs }"
     @click.capture="onClickCapture"
   >
-    <span v-if="prefixInCell()" data-gr-button-cell class="flex aspect-square items-center justify-center self-stretch border-e border-[color-mix(in_srgb,currentColor_24%,transparent)]">
-      <IconLoader v-if="spinnerInPrefix()" class="animate-spin" :class="glyphSizes[resolvedSize]" aria-hidden="true" />
+    <span v-if="prefixInCell()" data-gr-button-cell>
+      <IconLoader v-if="spinnerInPrefix()" class="animate-spin" data-gr-button-glyph aria-hidden="true" />
       <slot v-else name="prefix" />
     </span>
-    <IconLoader v-else-if="spinnerInPrefix()" class="animate-spin" :class="glyphSizes[resolvedSize]" aria-hidden="true" />
+    <IconLoader v-else-if="spinnerInPrefix()" class="animate-spin" data-gr-button-glyph aria-hidden="true" />
     <slot v-else-if="!props.loading || shimmerLabel() || trackLoading()" name="prefix" />
 
-    <span v-if="labelIsText()" data-gr-button-label class="min-w-0 truncate" @mouseenter="titleWhenTruncated">
+    <span v-if="labelIsText()" data-gr-button-label @mouseenter="titleWhenTruncated">
       <slot />
     </span>
     <slot v-else />
 
     <slot name="suffix" />
 
-    <IconExternal v-if="opensInNewTab && !isSquare" :class="glyphSizes[resolvedSize]" aria-hidden="true" />
+    <!--
+      Необязательное — двумя группами: каждая ложная ветка `v-if` оставляет в разметке
+      комментарий-якорь, а кнопок на странице десятки. Загрузка идёт раньше стрелки: её
+      части лежат поверх (`position: absolute`) и в раскладку не встают, а скрытый текст
+      загрузки в имени кнопки звучит раньше подсказки о новой вкладке.
+    -->
+    <template v-if="props.loading">
+      <span v-if="spinnerOverContent()" data-gr-button-spinner aria-hidden="true">
+        <IconLoader class="animate-spin" data-gr-button-glyph />
+      </span>
+      <span v-else-if="trackLoading()" data-gr-button-track aria-hidden="true"><span /></span>
+      <span class="sr-only">{{ resolvedLoadingText }}</span>
+    </template>
 
-    <span v-if="spinnerOverContent()" data-gr-button-spinner class="absolute inset-0 flex items-center justify-center" aria-hidden="true">
-      <IconLoader class="animate-spin" :class="glyphSizes[resolvedSize]" />
-    </span>
-
-    <span v-if="trackLoading()" data-gr-button-track aria-hidden="true"><span /></span>
-
-    <span v-if="props.loading" class="sr-only">{{ resolvedLoadingText }}</span>
-    <span v-if="opensInNewTab && !props.ariaLabel" class="sr-only">({{ newTabHint }})</span>
+    <template v-if="opensInNewTab">
+      <IconExternal v-if="!isSquare" data-gr-button-glyph aria-hidden="true" />
+      <span v-if="!props.ariaLabel" class="sr-only">({{ newTabHint }})</span>
+    </template>
   </component>
 </template>
 
 <style>
+/*
+ * Вид кнопки — лист по атрибутам, а не утилиты: вес (`data-gr-variant`), тон
+ * (`data-gr-tone`), ступень (`data-gr-size`) и флаги ставит компонент. Кнопок на
+ * странице десятки, и вид, записанный в разметку каждой, умножался бы на них.
+ * Утилиты потребителя живут в слое `granum.utilities`, лист — в
+ * `granum.components`, поэтому класс на кнопке перекрывает её вид предсказуемо.
+ *
+ * Фокус — `outline` с отступом, а не кольцо: кольцо вплотную к заливке того же
+ * тона читалось утолщением кнопки, а `box-shadow` в forced-colors выключается
+ * целиком; `outline` там остаётся и перекрашивается в системный цвет.
+ *
+ * Радиус углов — ручка приложения `--gr-button-radius`, иначе радиус ступени.
+ */
+[data-gr-button] {
+  --gr-button-corner-radius: var(--gr-button-radius, var(--gr-button-step-radius));
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  max-width: 100%;
+  align-items: center;
+  justify-content: center;
+  -webkit-user-select: none;
+  user-select: none;
+  white-space: nowrap;
+  font-weight: var(--gr-button-font-weight);
+  border-start-start-radius: var(--gr-button-radius-ss, var(--gr-button-corner-radius));
+  border-start-end-radius: var(--gr-button-radius-se, var(--gr-button-corner-radius));
+  border-end-end-radius: var(--gr-button-radius-ee, var(--gr-button-corner-radius));
+  border-end-start-radius: var(--gr-button-radius-es, var(--gr-button-corner-radius));
+  transition-property: color, background-color, border-color, box-shadow, transform, outline-offset;
+  transition-timing-function: var(--gr-button-motion-ease);
+  transition-duration: var(--gr-button-motion-duration);
+  outline: 2px solid transparent;
+  outline-offset: var(--gr-button-focus-offset-from);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-gr-button] {
+    outline-offset: var(--gr-button-focus-offset);
+  }
+}
+
+[data-gr-button]:focus-visible {
+  outline-style: solid;
+  outline-width: 2px;
+  outline-offset: var(--gr-button-focus-offset);
+  outline-color: var(--gr-ring);
+}
+
+[data-gr-button]:disabled,
+[data-gr-button][data-gr-off] {
+  cursor: not-allowed;
+}
+
+/* Ждущая сервер кнопка не запрещена, а занята — курсор говорит именно это. */
+[data-gr-button][aria-busy='true']:not([data-gr-off]) {
+  cursor: progress;
+}
+
+[data-gr-button][data-gr-block] {
+  width: 100%;
+}
+
+[data-gr-button][data-gr-square] {
+  padding: 0;
+}
+
+/*
+ * Ступени: высота, кегль и зазор — без боковых отступов у квадрата. Квадрат —
+ * через `--gr-button-square-size` с размерным дефолтом: потребитель подгоняет
+ * кнопку под свою сетку переменной. Аддон сбоку снимает 2px отступа, чтобы глиф
+ * стоял оптически по центру. Свои глифы — спиннер и стрелка внешней ссылки —
+ * растут со ступенью, как иконка: 14 / 16 / 16 / 20.
+ */
+[data-gr-button][data-gr-size='xs'] {
+  --gr-button-step-radius: var(--gr-button-radius-xs);
+}
+
+[data-gr-button][data-gr-size='xs']:not([data-gr-square]) {
+  height: 1.75rem;
+  gap: .25rem;
+  padding-inline: .625rem;
+  font-size: var(--gr-text-xs);
+  line-height: var(--gr-leading-xs);
+}
+
+[data-gr-button][data-gr-size='xs'][data-gr-pre] {
+  padding-inline-start: .5rem;
+}
+
+[data-gr-button][data-gr-size='xs'][data-gr-post] {
+  padding-inline-end: .5rem;
+}
+
+[data-gr-button][data-gr-size='xs'][data-gr-square] {
+  width: var(--gr-button-square-size, 1.75rem);
+  min-width: var(--gr-button-square-size, 1.75rem);
+  height: var(--gr-button-square-size, 1.75rem);
+}
+
+[data-gr-button][data-gr-size='xs'] [data-gr-button-glyph] {
+  width: .875rem;
+  height: .875rem;
+}
+
+[data-gr-button][data-gr-size='sm'] {
+  --gr-button-step-radius: var(--gr-button-radius-sm);
+}
+
+[data-gr-button][data-gr-size='sm']:not([data-gr-square]) {
+  height: 2rem;
+  gap: .375rem;
+  padding-inline: .75rem;
+  font-size: var(--gr-text-sm);
+  line-height: var(--gr-leading-sm);
+}
+
+[data-gr-button][data-gr-size='sm'][data-gr-pre] {
+  padding-inline-start: .625rem;
+}
+
+[data-gr-button][data-gr-size='sm'][data-gr-post] {
+  padding-inline-end: .625rem;
+}
+
+[data-gr-button][data-gr-size='sm'][data-gr-square] {
+  width: var(--gr-button-square-size, 2rem);
+  min-width: var(--gr-button-square-size, 2rem);
+  height: var(--gr-button-square-size, 2rem);
+}
+
+[data-gr-button][data-gr-size='sm'] [data-gr-button-glyph] {
+  width: 1rem;
+  height: 1rem;
+}
+
+[data-gr-button][data-gr-size='md'] {
+  --gr-button-step-radius: var(--gr-button-radius-md);
+}
+
+[data-gr-button][data-gr-size='md']:not([data-gr-square]) {
+  height: 2.5rem;
+  gap: .5rem;
+  padding-inline: 1rem;
+  font-size: var(--gr-text-sm);
+  line-height: var(--gr-leading-sm);
+}
+
+[data-gr-button][data-gr-size='md'][data-gr-pre] {
+  padding-inline-start: .875rem;
+}
+
+[data-gr-button][data-gr-size='md'][data-gr-post] {
+  padding-inline-end: .875rem;
+}
+
+[data-gr-button][data-gr-size='md'][data-gr-square] {
+  width: var(--gr-button-square-size, 2.5rem);
+  min-width: var(--gr-button-square-size, 2.5rem);
+  height: var(--gr-button-square-size, 2.5rem);
+}
+
+[data-gr-button][data-gr-size='md'] [data-gr-button-glyph] {
+  width: 1rem;
+  height: 1rem;
+}
+
+[data-gr-button][data-gr-size='lg'] {
+  --gr-button-step-radius: var(--gr-button-radius-lg);
+}
+
+[data-gr-button][data-gr-size='lg']:not([data-gr-square]) {
+  height: 2.75rem;
+  gap: .5rem;
+  padding-inline: 1.25rem;
+  font-size: var(--gr-text-base);
+  line-height: var(--gr-leading-base);
+}
+
+[data-gr-button][data-gr-size='lg'][data-gr-pre] {
+  padding-inline-start: 1.125rem;
+}
+
+[data-gr-button][data-gr-size='lg'][data-gr-post] {
+  padding-inline-end: 1.125rem;
+}
+
+[data-gr-button][data-gr-size='lg'][data-gr-square] {
+  width: var(--gr-button-square-size, 2.75rem);
+  min-width: var(--gr-button-square-size, 2.75rem);
+  height: var(--gr-button-square-size, 2.75rem);
+}
+
+[data-gr-button][data-gr-size='lg'] [data-gr-button-glyph] {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+/* Префикс в ячейке: отступа с начала нет, его место — у ячейки. После ступеней — иначе их отступ перебил бы. */
+[data-gr-button][data-gr-size][data-gr-cell] {
+  padding-inline-start: 0;
+}
+
+/*
+ * Тон — переменные, которые читают веса: так весу не нужно правило на каждый
+ * тон. Значения — токены темы `--gr-button-<тон>-*` и роли текста тона.
+ */
+[data-gr-button][data-gr-tone='primary'] {
+  --gr-button-tone-bg: var(--gr-button-primary-bg);
+  --gr-button-tone-bg-hover: var(--gr-button-primary-bg-hover);
+  --gr-button-tone-bg-active: var(--gr-button-primary-bg-active);
+  --gr-button-tone-fg: var(--gr-button-primary-fg);
+  --gr-button-tone-text: var(--gr-accent-fg);
+  --gr-button-tone-soft-bg: var(--gr-button-primary-soft-bg);
+  --gr-button-tone-soft-bg-hover: var(--gr-button-primary-soft-bg-hover);
+  --gr-button-tone-soft-bg-active: var(--gr-button-primary-soft-bg-active);
+  --gr-button-tone-soft-fg: var(--gr-accent-fg);
+  --gr-button-tone-ghost-bg-hover: var(--gr-button-primary-ghost-bg-hover);
+  --gr-button-tone-ghost-bg-active: var(--gr-button-primary-ghost-bg-active);
+  --gr-button-tone-border: var(--gr-button-primary-border);
+  --gr-button-tone-border-hover: var(--gr-button-primary-border-hover);
+  --gr-button-tone-border-active: var(--gr-button-primary-border-active);
+  --gr-button-tone-border-soft: var(--gr-button-primary-border-soft);
+  --gr-button-tone-border-soft-hover: var(--gr-button-primary-border-soft-hover);
+  --gr-button-tone-glow: var(--gr-button-primary-glow);
+}
+
+[data-gr-button][data-gr-tone='neutral'] {
+  --gr-button-tone-bg: var(--gr-button-neutral-bg);
+  --gr-button-tone-bg-hover: var(--gr-button-neutral-bg-hover);
+  --gr-button-tone-bg-active: var(--gr-button-neutral-bg-active);
+  --gr-button-tone-fg: var(--gr-button-neutral-fg);
+  --gr-button-tone-text: var(--gr-fg);
+  --gr-button-tone-soft-bg: var(--gr-button-neutral-soft-bg);
+  --gr-button-tone-soft-bg-hover: var(--gr-button-neutral-soft-bg-hover);
+  --gr-button-tone-soft-bg-active: var(--gr-button-neutral-soft-bg-active);
+  --gr-button-tone-soft-fg: var(--gr-secondary-fg);
+  --gr-button-tone-ghost-bg-hover: var(--gr-button-neutral-ghost-bg-hover);
+  --gr-button-tone-ghost-bg-active: var(--gr-button-neutral-ghost-bg-active);
+  --gr-button-tone-border: var(--gr-button-neutral-border);
+  --gr-button-tone-border-hover: var(--gr-button-neutral-border-hover);
+  --gr-button-tone-border-active: var(--gr-button-neutral-border-active);
+  --gr-button-tone-border-soft: var(--gr-button-neutral-border-soft);
+  --gr-button-tone-border-soft-hover: var(--gr-button-neutral-border-soft-hover);
+  --gr-button-tone-glow: var(--gr-button-neutral-glow);
+}
+
+[data-gr-button][data-gr-tone='success'] {
+  --gr-button-tone-bg: var(--gr-button-success-bg);
+  --gr-button-tone-bg-hover: var(--gr-button-success-bg-hover);
+  --gr-button-tone-bg-active: var(--gr-button-success-bg-active);
+  --gr-button-tone-fg: var(--gr-button-success-fg);
+  --gr-button-tone-text: var(--gr-success-text);
+  --gr-button-tone-soft-bg: var(--gr-button-success-soft-bg);
+  --gr-button-tone-soft-bg-hover: var(--gr-button-success-soft-bg-hover);
+  --gr-button-tone-soft-bg-active: var(--gr-button-success-soft-bg-active);
+  --gr-button-tone-soft-fg: var(--gr-success-text);
+  --gr-button-tone-ghost-bg-hover: var(--gr-button-success-ghost-bg-hover);
+  --gr-button-tone-ghost-bg-active: var(--gr-button-success-ghost-bg-active);
+  --gr-button-tone-border: var(--gr-button-success-border);
+  --gr-button-tone-border-hover: var(--gr-button-success-border-hover);
+  --gr-button-tone-border-active: var(--gr-button-success-border-active);
+  --gr-button-tone-border-soft: var(--gr-button-success-border-soft);
+  --gr-button-tone-border-soft-hover: var(--gr-button-success-border-soft-hover);
+  --gr-button-tone-glow: var(--gr-button-success-glow);
+}
+
+[data-gr-button][data-gr-tone='warning'] {
+  --gr-button-tone-bg: var(--gr-button-warning-bg);
+  --gr-button-tone-bg-hover: var(--gr-button-warning-bg-hover);
+  --gr-button-tone-bg-active: var(--gr-button-warning-bg-active);
+  --gr-button-tone-fg: var(--gr-button-warning-fg);
+  --gr-button-tone-text: var(--gr-warning-text);
+  --gr-button-tone-soft-bg: var(--gr-button-warning-soft-bg);
+  --gr-button-tone-soft-bg-hover: var(--gr-button-warning-soft-bg-hover);
+  --gr-button-tone-soft-bg-active: var(--gr-button-warning-soft-bg-active);
+  --gr-button-tone-soft-fg: var(--gr-warning-text);
+  --gr-button-tone-ghost-bg-hover: var(--gr-button-warning-ghost-bg-hover);
+  --gr-button-tone-ghost-bg-active: var(--gr-button-warning-ghost-bg-active);
+  --gr-button-tone-border: var(--gr-button-warning-border);
+  --gr-button-tone-border-hover: var(--gr-button-warning-border-hover);
+  --gr-button-tone-border-active: var(--gr-button-warning-border-active);
+  --gr-button-tone-border-soft: var(--gr-button-warning-border-soft);
+  --gr-button-tone-border-soft-hover: var(--gr-button-warning-border-soft-hover);
+  --gr-button-tone-glow: var(--gr-button-warning-glow);
+}
+
+[data-gr-button][data-gr-tone='danger'] {
+  --gr-button-tone-bg: var(--gr-button-danger-bg);
+  --gr-button-tone-bg-hover: var(--gr-button-danger-bg-hover);
+  --gr-button-tone-bg-active: var(--gr-button-danger-bg-active);
+  --gr-button-tone-fg: var(--gr-button-danger-fg);
+  --gr-button-tone-text: var(--gr-danger-text);
+  --gr-button-tone-soft-bg: var(--gr-button-danger-soft-bg);
+  --gr-button-tone-soft-bg-hover: var(--gr-button-danger-soft-bg-hover);
+  --gr-button-tone-soft-bg-active: var(--gr-button-danger-soft-bg-active);
+  --gr-button-tone-soft-fg: var(--gr-danger-text);
+  --gr-button-tone-ghost-bg-hover: var(--gr-button-danger-ghost-bg-hover);
+  --gr-button-tone-ghost-bg-active: var(--gr-button-danger-ghost-bg-active);
+  --gr-button-tone-border: var(--gr-button-danger-border);
+  --gr-button-tone-border-hover: var(--gr-button-danger-border-hover);
+  --gr-button-tone-border-active: var(--gr-button-danger-border-active);
+  --gr-button-tone-border-soft: var(--gr-button-danger-border-soft);
+  --gr-button-tone-border-soft-hover: var(--gr-button-danger-border-soft-hover);
+  --gr-button-tone-glow: var(--gr-button-danger-glow);
+}
+
+[data-gr-button][data-gr-tone='info'] {
+  --gr-button-tone-bg: var(--gr-button-info-bg);
+  --gr-button-tone-bg-hover: var(--gr-button-info-bg-hover);
+  --gr-button-tone-bg-active: var(--gr-button-info-bg-active);
+  --gr-button-tone-fg: var(--gr-button-info-fg);
+  --gr-button-tone-text: var(--gr-info-text);
+  --gr-button-tone-soft-bg: var(--gr-button-info-soft-bg);
+  --gr-button-tone-soft-bg-hover: var(--gr-button-info-soft-bg-hover);
+  --gr-button-tone-soft-bg-active: var(--gr-button-info-soft-bg-active);
+  --gr-button-tone-soft-fg: var(--gr-info-text);
+  --gr-button-tone-ghost-bg-hover: var(--gr-button-info-ghost-bg-hover);
+  --gr-button-tone-ghost-bg-active: var(--gr-button-info-ghost-bg-active);
+  --gr-button-tone-border: var(--gr-button-info-border);
+  --gr-button-tone-border-hover: var(--gr-button-info-border-hover);
+  --gr-button-tone-border-active: var(--gr-button-info-border-active);
+  --gr-button-tone-border-soft: var(--gr-button-info-border-soft);
+  --gr-button-tone-border-soft-hover: var(--gr-button-info-border-soft-hover);
+  --gr-button-tone-glow: var(--gr-button-info-glow);
+}
+
+[data-gr-button][data-gr-tone='slate'] {
+  --gr-button-tone-bg: var(--gr-button-slate-bg);
+  --gr-button-tone-bg-hover: var(--gr-button-slate-bg-hover);
+  --gr-button-tone-bg-active: var(--gr-button-slate-bg-active);
+  --gr-button-tone-fg: var(--gr-button-slate-fg);
+  --gr-button-tone-text: var(--gr-slate-text);
+  --gr-button-tone-soft-bg: var(--gr-button-slate-soft-bg);
+  --gr-button-tone-soft-bg-hover: var(--gr-button-slate-soft-bg-hover);
+  --gr-button-tone-soft-bg-active: var(--gr-button-slate-soft-bg-active);
+  --gr-button-tone-soft-fg: var(--gr-slate-text);
+  --gr-button-tone-ghost-bg-hover: var(--gr-button-slate-ghost-bg-hover);
+  --gr-button-tone-ghost-bg-active: var(--gr-button-slate-ghost-bg-active);
+  --gr-button-tone-border: var(--gr-button-slate-border);
+  --gr-button-tone-border-hover: var(--gr-button-slate-border-hover);
+  --gr-button-tone-border-active: var(--gr-button-slate-border-active);
+  --gr-button-tone-border-soft: var(--gr-button-slate-border-soft);
+  --gr-button-tone-border-soft-hover: var(--gr-button-slate-border-soft-hover);
+  --gr-button-tone-glow: var(--gr-button-slate-glow);
+}
+
+[data-gr-button][data-gr-tone='azure'] {
+  --gr-button-tone-bg: var(--gr-button-azure-bg);
+  --gr-button-tone-bg-hover: var(--gr-button-azure-bg-hover);
+  --gr-button-tone-bg-active: var(--gr-button-azure-bg-active);
+  --gr-button-tone-fg: var(--gr-button-azure-fg);
+  --gr-button-tone-text: var(--gr-azure-text);
+  --gr-button-tone-soft-bg: var(--gr-button-azure-soft-bg);
+  --gr-button-tone-soft-bg-hover: var(--gr-button-azure-soft-bg-hover);
+  --gr-button-tone-soft-bg-active: var(--gr-button-azure-soft-bg-active);
+  --gr-button-tone-soft-fg: var(--gr-azure-text);
+  --gr-button-tone-ghost-bg-hover: var(--gr-button-azure-ghost-bg-hover);
+  --gr-button-tone-ghost-bg-active: var(--gr-button-azure-ghost-bg-active);
+  --gr-button-tone-border: var(--gr-button-azure-border);
+  --gr-button-tone-border-hover: var(--gr-button-azure-border-hover);
+  --gr-button-tone-border-active: var(--gr-button-azure-border-active);
+  --gr-button-tone-border-soft: var(--gr-button-azure-border-soft);
+  --gr-button-tone-border-soft-hover: var(--gr-button-azure-border-soft-hover);
+  --gr-button-tone-glow: var(--gr-button-azure-glow);
+}
+
+/*
+ * Веса. Нажатая кнопка-переключатель (`data-gr-pressed`) держит вид своего
+ * нажатого состояния: иначе включённое и выключенное различались бы только для
+ * AT. Без тона (недоступное радио-«кнопка») вес не включается.
+ *
+ * Объём solid: тень темы, под ней — тень цвета тона, в нажатии тень уходит
+ * внутрь. `--gr-button-divider` — шов между соседними solid-звеньями, его ставит
+ * `GrButtonGroup` переменной.
+ */
+[data-gr-button][data-gr-tone]:not([data-gr-off])[data-gr-variant='primary'] {
+  border-width: 1px;
+  border-color: var(--gr-button-tone-bg);
+  background-color: var(--gr-button-tone-bg);
+  background-image: var(--gr-button-solid-image);
+  color: var(--gr-button-tone-fg);
+  box-shadow: var(--gr-button-divider, 0 0 transparent), var(--gr-button-shadow), var(--gr-button-glow) var(--gr-button-tone-glow);
+}
+
+[data-gr-button][data-gr-tone]:not([data-gr-off])[data-gr-variant='primary']:hover {
+  border-color: var(--gr-button-tone-bg-hover);
+  background-color: var(--gr-button-tone-bg-hover);
+  box-shadow: var(--gr-button-divider, 0 0 transparent), var(--gr-button-shadow), var(--gr-button-glow-hover) var(--gr-button-tone-glow);
+}
+
+[data-gr-button][data-gr-tone]:not([data-gr-off])[data-gr-variant='primary']:active,
+[data-gr-button][data-gr-tone]:not([data-gr-off])[data-gr-variant='primary'][data-gr-pressed] {
+  border-color: var(--gr-button-tone-bg-active);
+  background-color: var(--gr-button-tone-bg-active);
+  box-shadow: var(--gr-button-divider, 0 0 transparent), var(--gr-button-shadow-active);
+}
+
+/* «Обычная» нейтральная кнопка лежит на поверхности карточки и чуть приподнята над ней. */
+[data-gr-button][data-gr-tone]:not([data-gr-off])[data-gr-variant='secondary'] {
+  border-width: 1px;
+  border-color: var(--gr-button-tone-border-soft);
+  background-color: var(--gr-button-tone-soft-bg);
+  color: var(--gr-button-tone-soft-fg);
+}
+
+[data-gr-button][data-gr-tone]:not([data-gr-off])[data-gr-variant='secondary'][data-gr-tone='neutral'] {
+  box-shadow: var(--gr-button-surface-shadow);
+}
+
+[data-gr-button][data-gr-tone]:not([data-gr-off])[data-gr-variant='secondary']:hover {
+  border-color: var(--gr-button-tone-border-soft-hover);
+  background-color: var(--gr-button-tone-soft-bg-hover);
+}
+
+[data-gr-button][data-gr-tone]:not([data-gr-off])[data-gr-variant='secondary']:active,
+[data-gr-button][data-gr-tone]:not([data-gr-off])[data-gr-variant='secondary'][data-gr-pressed] {
+  border-color: var(--gr-button-tone-border-hover);
+  background-color: var(--gr-button-tone-soft-bg-active);
+}
+
+/*
+ * Прозрачные веса под указателем берут подложку темы на тон; хук
+ * `--gr-button-ghost-bg-*` поверх — одна подложка на все тоны от приложения.
+ */
+[data-gr-button][data-gr-tone]:not([data-gr-off]):is([data-gr-variant='outline'], [data-gr-variant='ghost'], [data-gr-variant='ghost-border']) {
+  border-width: 1px;
+  border-color: transparent;
+  background-color: transparent;
+  color: var(--gr-button-tone-text);
+}
+
+[data-gr-button][data-gr-tone]:not([data-gr-off]):is([data-gr-variant='outline'], [data-gr-variant='ghost'], [data-gr-variant='ghost-border']):hover {
+  background-color: var(--gr-button-ghost-bg-hover, var(--gr-button-tone-ghost-bg-hover));
+}
+
+[data-gr-button][data-gr-tone]:not([data-gr-off]):is([data-gr-variant='outline'], [data-gr-variant='ghost'], [data-gr-variant='ghost-border']):is(:active, [data-gr-pressed]) {
+  background-color: var(--gr-button-ghost-bg-active, var(--gr-button-tone-ghost-bg-active));
+}
+
+[data-gr-button][data-gr-tone]:not([data-gr-off])[data-gr-variant='outline'] {
+  border-color: var(--gr-button-tone-border);
+}
+
+[data-gr-button][data-gr-tone]:not([data-gr-off])[data-gr-variant='outline']:hover {
+  border-color: var(--gr-button-tone-border-hover);
+}
+
+[data-gr-button][data-gr-tone]:not([data-gr-off])[data-gr-variant='ghost-border']:hover {
+  border-color: var(--gr-button-tone-border);
+}
+
+[data-gr-button][data-gr-tone]:not([data-gr-off]):is([data-gr-variant='outline'], [data-gr-variant='ghost-border']):is(:active, [data-gr-pressed]) {
+  border-color: var(--gr-button-tone-border-active);
+}
+
+/*
+ * Недоступная — токенами, а не `opacity`: прозрачность разбавляет выверенные на AA
+ * цвета. У прозрачных весов заливки нет и в недоступном виде — иначе стрелка
+ * пагинации превращалась бы в залитую плашку.
+ */
+[data-gr-button][data-gr-off] {
+  border-width: 1px;
+  border-color: transparent;
+  background-color: transparent;
+  color: var(--gr-button-disabled-fg);
+}
+
+[data-gr-button][data-gr-off]:is([data-gr-variant='primary'], [data-gr-variant='secondary']) {
+  border-color: var(--gr-button-disabled-brd);
+  border-style: var(--gr-button-disabled-border-style);
+  background-color: var(--gr-button-disabled-bg);
+  background-image: var(--gr-button-disabled-image);
+}
+
+[data-gr-button][data-gr-off][data-gr-variant='outline'] {
+  border-color: var(--gr-button-disabled-outline-brd);
+  border-style: var(--gr-button-disabled-border-style);
+}
+
+/*
+ * Нажатие — вдавливание темы (`--gr-button-press-scale`), наведение — подъём
+ * (`--gr-button-lift`). Только у живой кнопки: недоступная и ждущая сервер на
+ * указатель не отвечают, и движение соврало бы. С reduced-motion остаётся одна
+ * смена цвета.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  [data-gr-button]:not([data-gr-off], [aria-busy='true'], [aria-disabled='true']):hover {
+    transform: translateY(var(--gr-button-lift));
+  }
+
+  [data-gr-button]:not([data-gr-off], [aria-busy='true'], [aria-disabled='true']):active {
+    transform: scale(var(--gr-button-press-scale));
+  }
+
+  [data-gr-button]:not([data-gr-off], [aria-busy='true'], [aria-disabled='true']):hover:active {
+    transform: translateY(var(--gr-button-lift)) scale(var(--gr-button-press-scale));
+  }
+}
+
+/* Подпись из одного текста обрезается многоточием. */
+[data-gr-button-label] {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Префикс в квадратной ячейке высотой с кнопку, за перегородкой. */
+[data-gr-button-cell] {
+  display: flex;
+  aspect-ratio: 1;
+  align-items: center;
+  align-self: stretch;
+  justify-content: center;
+  border-inline-end-width: 1px;
+  border-color: color-mix(in srgb, currentColor 24%, transparent);
+}
+
+/* Спиннер без префикса лежит поверх содержимого: ширина кнопки не меняется. */
+[data-gr-button-spinner] {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 /*
  * Загрузка без префикса: спиннер лежит поверх содержимого, а содержимое гаснет.
  * Прозрачностью, а не `visibility` — иначе подпись выпала бы из доступного
@@ -476,15 +1000,10 @@ defineSlots<{
 }
 
 /*
- * Радиус углов кнопки: ручка приложения, иначе радиус ступени. В склеенной
- * `GrButtonGroup` впереди — её ручка `--gr-button-group-radius`; внутренние углы
- * группа гасит сама. Здесь, а не в листе группы: радиус ступени знает только
- * кнопка.
+ * В склеенной `GrButtonGroup` впереди — её ручка `--gr-button-group-radius`;
+ * внутренние углы группа гасит сама. Здесь, а не в листе группы: радиус ступени
+ * знает только кнопка.
  */
-[data-gr-button] {
-  --gr-button-corner-radius: var(--gr-button-radius, var(--gr-button-step-radius));
-}
-
 [data-gr-button-group][data-attached] [data-gr-button] {
   --gr-button-corner-radius: var(--gr-button-group-radius, var(--gr-button-radius, var(--gr-button-step-radius)));
 }

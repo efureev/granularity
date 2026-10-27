@@ -4,11 +4,8 @@
  * `grRadioStyles.ts` и шаблона — granum извлекает их из чанков компонента сам,
  * включая общие.
  *
- * Вид `button` строит `grRadioStyles.ts: grRadioButtonClass` через
- * `grButtonClass` из `GrButton/grButtonStyles.ts`: матрицу тон × вариант там
- * клеит `variantClass`, база и размеры лежат литералами. Модуль живёт в чанке
- * `GrButton`, обход от входа `GrRadio` на нём останавливается как на ребре, и
- * все эти классы приезжают зависимостью `GrButton`: литералы её чанка извлекаются
- * у неё, матрицу объявляет `grButtonSafelist`. Повторять их здесь незачем.
+ * Вид `button` — лист `GrButton` по атрибутам (`grRadioStyles.ts:
+ * grRadioButtonLook`): он приезжает зависимостью `GrButton`, классов у этого
+ * вида нет, кроме курсора и цветов недоступного — они лежат литералами.
  */
 export const grRadioSafelist: string[] = []

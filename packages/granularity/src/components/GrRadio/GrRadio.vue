@@ -7,6 +7,7 @@ import type { GrButtonSize, GrButtonTone, GrButtonVariant } from '../GrButton'
 
 import {
   grRadioButtonClass,
+  grRadioButtonLook,
   grRadioControlClass,
   grRadioDescriptionSizes,
   grRadioDotBaseClass,
@@ -149,18 +150,21 @@ const submitsValue = computed(
 const descriptionId = useId()
 const hasDescription = computed(() => Boolean(slots.description))
 
-const buttonClassName = computed(() => {
-  return grRadioButtonClass({
-    checked: checked.value,
-    disabled: resolvedDisabled.value,
-    readonly: resolvedReadonly.value,
-    size: resolvedSize.value,
-    buttonVariant: props.buttonVariant,
-    buttonTone: props.buttonTone,
-    selectedButtonVariant: props.selectedButtonVariant,
-    selectedButtonTone: props.selectedButtonTone,
-  })
-})
+const buttonClassName = computed(() => grRadioButtonClass({
+  checked: checked.value,
+  disabled: resolvedDisabled.value,
+  readonly: resolvedReadonly.value,
+}))
+
+const buttonLook = computed(() => grRadioButtonLook({
+  checked: checked.value,
+  disabled: resolvedDisabled.value,
+  size: resolvedSize.value,
+  buttonVariant: props.buttonVariant,
+  buttonTone: props.buttonTone,
+  selectedButtonVariant: props.selectedButtonVariant,
+  selectedButtonTone: props.selectedButtonTone,
+}))
 
 const rootClassName = computed(() => grRadioRootClass({
   disabled: resolvedDisabled.value,
@@ -239,7 +243,6 @@ defineSlots<{
     ref="rootEl"
     data-gr-button
     data-gr-radio
-    :data-gr-variant="checked ? props.selectedButtonVariant : props.buttonVariant"
     role="radio"
     :aria-checked="checked ? 'true' : 'false'"
     :aria-label="ariaLabel"
@@ -252,7 +255,7 @@ defineSlots<{
     :data-value="domValue"
     :tabindex="rovingTabindex"
     :class="buttonClassName"
-    v-bind="aria.rootAttrs()"
+    v-bind="{ ...buttonLook, ...aria.rootAttrs() }"
     @click="onButtonClick"
     @keydown.space.prevent="onButtonClick"
     @keydown.enter.prevent="onButtonClick"

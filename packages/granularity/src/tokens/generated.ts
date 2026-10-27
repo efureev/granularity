@@ -501,7 +501,7 @@ export const grComponentTokens: GrComponentToken[] = [
     "name": "--gr-button-step-radius",
     "kind": "css",
     "default": "`--gr-button-radius-<ступень>` текущей ступени",
-    "description": "Радиус текущей ступени: его ставит класс ступени, `--gr-button-corner-radius` берёт его, когда ручка `--gr-button-radius` не задана."
+    "description": "Радиус текущей ступени: его ставит правило ступени в листе компонента, `--gr-button-corner-radius` берёт его, когда ручка `--gr-button-radius` не задана."
   },
   {
     "owner": "GrButton",
@@ -1632,6 +1632,125 @@ export const grComponentTokens: GrComponentToken[] = [
     "kind": "theme",
     "default": "0.98",
     "description": "Масштаб кнопки в нажатии; 1 — без сжатия. С `prefers-reduced-motion` не действует."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-tone-bg",
+    "kind": "css",
+    "default": "`--gr-button-<тон>-bg`",
+    "description": "Заливка solid-кнопки тона. Ставит правило тона в листе компонента по `data-gr-tone`: правила весов читают одну переменную вместо копии на каждый тон."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-tone-bg-hover",
+    "kind": "css",
+    "default": "`--gr-button-<тон>-bg-hover`",
+    "description": "Заливка solid-кнопки тона под указателем. Ставит правило тона в листе компонента по `data-gr-tone`: правила весов читают одну переменную вместо копии на каждый тон."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-tone-bg-active",
+    "kind": "css",
+    "default": "`--gr-button-<тон>-bg-active`",
+    "description": "Заливка solid-кнопки тона в нажатии. Ставит правило тона в листе компонента по `data-gr-tone`: правила весов читают одну переменную вместо копии на каждый тон."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-tone-fg",
+    "kind": "css",
+    "default": "`--gr-button-<тон>-fg`",
+    "description": "Подпись на заливке solid-кнопки тона. Ставит правило тона в листе компонента по `data-gr-tone`: правила весов читают одну переменную вместо копии на каждый тон."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-tone-text",
+    "kind": "css",
+    "default": "роль текста тона: `--gr-<тон>-text`, у `primary` — `--gr-accent-fg`, у `neutral` — `--gr-fg`",
+    "description": "Подпись прозрачных весов (`outline`, `ghost`, `ghost-border`). Ставит правило тона в листе компонента по `data-gr-tone`: правила весов читают одну переменную вместо копии на каждый тон."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-tone-soft-bg",
+    "kind": "css",
+    "default": "`--gr-button-<тон>-soft-bg`",
+    "description": "Мягкая заливка `secondary`. Ставит правило тона в листе компонента по `data-gr-tone`: правила весов читают одну переменную вместо копии на каждый тон."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-tone-soft-bg-hover",
+    "kind": "css",
+    "default": "`--gr-button-<тон>-soft-bg-hover`",
+    "description": "Мягкая заливка `secondary` под указателем. Ставит правило тона в листе компонента по `data-gr-tone`: правила весов читают одну переменную вместо копии на каждый тон."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-tone-soft-bg-active",
+    "kind": "css",
+    "default": "`--gr-button-<тон>-soft-bg-active`",
+    "description": "Мягкая заливка `secondary` в нажатии. Ставит правило тона в листе компонента по `data-gr-tone`: правила весов читают одну переменную вместо копии на каждый тон."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-tone-soft-fg",
+    "kind": "css",
+    "default": "роль текста на мягкой подложке тона",
+    "description": "Подпись `secondary`. Ставит правило тона в листе компонента по `data-gr-tone`: правила весов читают одну переменную вместо копии на каждый тон."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-tone-ghost-bg-hover",
+    "kind": "css",
+    "default": "`--gr-button-<тон>-ghost-bg-hover`",
+    "description": "Подложка прозрачных весов под указателем; ручка `--gr-button-ghost-bg-hover` впереди. Ставит правило тона в листе компонента по `data-gr-tone`: правила весов читают одну переменную вместо копии на каждый тон."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-tone-ghost-bg-active",
+    "kind": "css",
+    "default": "`--gr-button-<тон>-ghost-bg-active`",
+    "description": "Подложка прозрачных весов в нажатии; ручка `--gr-button-ghost-bg-active` впереди. Ставит правило тона в листе компонента по `data-gr-tone`: правила весов читают одну переменную вместо копии на каждый тон."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-tone-border",
+    "kind": "css",
+    "default": "`--gr-button-<тон>-border`",
+    "description": "Рамка `outline` и `ghost-border` в покое. Ставит правило тона в листе компонента по `data-gr-tone`: правила весов читают одну переменную вместо копии на каждый тон."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-tone-border-hover",
+    "kind": "css",
+    "default": "`--gr-button-<тон>-border-hover`",
+    "description": "Рамка `outline` и `ghost-border` под указателем, рамка `secondary` в нажатии. Ставит правило тона в листе компонента по `data-gr-tone`: правила весов читают одну переменную вместо копии на каждый тон."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-tone-border-active",
+    "kind": "css",
+    "default": "`--gr-button-<тон>-border-active`",
+    "description": "Рамка `outline` и `ghost-border` в нажатии. Ставит правило тона в листе компонента по `data-gr-tone`: правила весов читают одну переменную вместо копии на каждый тон."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-tone-border-soft",
+    "kind": "css",
+    "default": "`--gr-button-<тон>-border-soft`",
+    "description": "Рамка `secondary` в покое. Ставит правило тона в листе компонента по `data-gr-tone`: правила весов читают одну переменную вместо копии на каждый тон."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-tone-border-soft-hover",
+    "kind": "css",
+    "default": "`--gr-button-<тон>-border-soft-hover`",
+    "description": "Рамка `secondary` под указателем. Ставит правило тона в листе компонента по `data-gr-tone`: правила весов читают одну переменную вместо копии на каждый тон."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-tone-glow",
+    "kind": "css",
+    "default": "`--gr-button-<тон>-glow`",
+    "description": "Цвет тени solid-кнопки. Ставит правило тона в листе компонента по `data-gr-tone`: правила весов читают одну переменную вместо копии на каждый тон."
   },
   {
     "owner": "GrButtonGroup",

@@ -33,8 +33,8 @@ async function clickConfirm(): Promise<void> {
 }
 
 /** Класс высоты кнопки — по нему видно применённый размер. */
-function confirmSizeClass(): string {
-  return confirmButton()?.className ?? ''
+function confirmSize(): string {
+  return confirmButton()?.getAttribute('data-gr-size') ?? ''
 }
 
 /**
@@ -69,7 +69,7 @@ describe('GrDialogService: мост конфига', () => {
     void service.value!.confirm('Delete?')
     await flush()
 
-    expect(confirmSizeClass()).toContain('h-8')
+    expect(confirmSize()).toBe('sm')
   })
 
   it('без провайдера остаётся дефолт компонента', async () => {
@@ -77,7 +77,7 @@ describe('GrDialogService: мост конфига', () => {
     void service.value!.confirm('Delete?')
     await flush()
 
-    expect(confirmSizeClass()).toContain('h-10')
+    expect(confirmSize()).toBe('md')
   })
 
   it('componentDefaults тоже доезжает', async () => {
@@ -85,21 +85,21 @@ describe('GrDialogService: мост конфига', () => {
     void service.value!.confirm('Delete?')
     await flush()
 
-    expect(confirmSizeClass()).toContain('h-11')
+    expect(confirmSize()).toBe('lg')
   })
 
   it('buttonSize сервиса перебивает конфиг, опции вызова — и то и другое', async () => {
     const { service } = mountCaller({ size: 'sm' }, { buttonSize: 'lg' })
     void service.value!.confirm('Delete?')
     await flush()
-    expect(confirmSizeClass()).toContain('h-11')
+    expect(confirmSize()).toBe('lg')
 
     await clickConfirm()
     await flush()
 
     void service.value!.confirm('Delete?', { buttonSize: 'xs' })
     await flush()
-    expect(confirmSizeClass()).toContain('h-7')
+    expect(confirmSize()).toBe('xs')
   })
 
   it('два поддерева с разными провайдерами не делят конфиг', async () => {
@@ -110,14 +110,14 @@ describe('GrDialogService: мост конфига', () => {
 
     void first.service.value!.confirm('First?')
     await flush()
-    expect(confirmSizeClass()).toContain('h-8')
+    expect(confirmSize()).toBe('sm')
 
     await clickConfirm()
     await flush()
 
     void second.service.value!.confirm('Second?')
     await flush()
-    expect(confirmSizeClass()).toContain('h-11')
+    expect(confirmSize()).toBe('lg')
   })
 
   it('реактивность жива: смена size на провайдере видна открытому диалогу', async () => {
@@ -139,11 +139,11 @@ describe('GrDialogService: мост конфига', () => {
 
     void service.value!.confirm('Delete?')
     await flush()
-    expect(confirmSizeClass()).toContain('h-8')
+    expect(confirmSize()).toBe('sm')
 
     size.value = 'lg'
     await flush()
-    expect(confirmSizeClass()).toContain('h-11')
+    expect(confirmSize()).toBe('lg')
   })
 
   it('i18n из провайдера доезжает до диалога', async () => {
@@ -221,7 +221,7 @@ describe('GrDialogService: готовый синглтон', () => {
     await flush()
 
     expect(confirmButton()?.textContent).toContain('ИЗ-ПРОВАЙДЕРА')
-    expect(confirmSizeClass()).toContain('h-11')
+    expect(confirmSize()).toBe('lg')
   })
 
   it('без единого вызова из setup ругается в dev и работает на дефолтах', async () => {

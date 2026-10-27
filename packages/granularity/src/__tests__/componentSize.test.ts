@@ -56,7 +56,7 @@ import GrOtpInput from '../components/GrOtpInput/GrOtpInput.vue'
 import GrSwitch from '../components/GrSwitch/GrSwitch.vue'
 import GrTable from '../components/GrTable/GrTable.vue'
 import GrTabs from '../components/GrTabs/GrTabs.vue'
-import { sizes as buttonSizes } from '../components/GrButton/grButtonStyles'
+import { look, lookElement } from '../components/GrButton/__tests__/buttonSheet'
 import { tabSizes } from '../components/GrTabs/grTabsStyles'
 import GrTextarea from '../components/GrTextarea/GrTextarea.vue'
 import GrTooltip from '../components/GrTooltip/GrTooltip.vue'
@@ -316,12 +316,16 @@ describe('контракт размера', () => {
    */
   it('шкала `GrTabs` совпадает со шкалой `GrButton` по высоте', () => {
     const mismatched = (['xs', 'sm', 'md', 'lg'] as const)
-      .map(size => ({ size, tab: heightUnit(tabSizes[size]), button: heightUnit(buttonSizes[size]) }))
+      .map(size => ({
+        size,
+        tab: Number(heightUnit(tabSizes[size])) / 4,
+        button: Number.parseFloat(look(lookElement({ variant: 'primary', tone: 'primary', size })).height ?? ''),
+      }))
       .filter(item => item.tab !== item.button)
 
     expect(
       mismatched,
-      mismatched.map(item => `${item.size}: вкладка h-${item.tab} против кнопки h-${item.button}`).join('; '),
+      mismatched.map(item => `${item.size}: вкладка ${item.tab}rem против кнопки ${item.button}rem`).join('; '),
     ).toEqual([])
   })
 

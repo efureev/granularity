@@ -1,7 +1,5 @@
 import {
-  grButtonBaseClass,
-  grButtonClass,
-  sizes as grButtonSizes,
+  grButtonLookAttrs,
   type GrButtonSize,
   type GrButtonTone,
   type GrButtonVariant,
@@ -92,37 +90,35 @@ export function grRadioLabelClassFor(size: GrButtonSize, checked: boolean): stri
 
 export const grRadioLabelSizes = grRadioLabelTexts
 
-export function grRadioButtonClass(options: {
+export interface GrRadioButtonLookOptions {
   checked: boolean
   disabled: boolean
-  readonly: boolean
   size: GrButtonSize
   buttonVariant: GrButtonVariant
   buttonTone: GrButtonTone
   selectedButtonVariant: GrButtonVariant
   selectedButtonTone: GrButtonTone
-}): string {
-  if (options.disabled) {
-    return [
-      grButtonBaseClass,
-      grButtonSizes[options.size],
-      options.checked ? grRadioButtonDisabledCheckedClass : grRadioButtonDisabledClass,
-    ].join(' ')
-  }
+}
 
-  const variant = options.checked ? options.selectedButtonVariant : options.buttonVariant
-  const tone = options.checked ? options.selectedButtonTone : options.buttonTone
+/**
+ * Вид `button` — вид кнопки по атрибутам её листа. Недоступный переключатель
+ * тона не получает: вес кнопки не включается, остаются основа и ступень, а цвета
+ * ставят классы радио.
+ */
+export function grRadioButtonLook(options: GrRadioButtonLookOptions): Record<string, string | undefined> {
+  return grButtonLookAttrs({
+    variant: options.checked ? options.selectedButtonVariant : options.buttonVariant,
+    tone: options.disabled ? undefined : options.checked ? options.selectedButtonTone : options.buttonTone,
+    size: options.size,
+  })
+}
 
-  return [
-    grButtonBaseClass,
-    grButtonClass({
-      variant,
-      tone,
-      size: options.size,
-      square: false,
-    }),
-    options.readonly ? grRadioRootReadonlyClass : grRadioEnabledClass,
-  ].join(' ')
+/** Классы радио поверх вида кнопки: курсор и цвета недоступного. */
+export function grRadioButtonClass(options: { checked: boolean, disabled: boolean, readonly: boolean }): string {
+  if (options.disabled)
+    return options.checked ? grRadioButtonDisabledCheckedClass : grRadioButtonDisabledClass
+
+  return options.readonly ? grRadioRootReadonlyClass : grRadioEnabledClass
 }
 
 export function grRadioRootClass(options: { disabled: boolean, readonly: boolean }): string {

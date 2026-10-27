@@ -103,9 +103,10 @@ describe('invalid виден глазом', () => {
 
   it('GrFormFile: кнопка выбора — контуром ошибки', () => {
     const wrapper = mount(GrFormFile, { props: { modelValue: null, invalid: true }, global: granularityGlobal() })
-    const button = wrapper.get('[data-gr-form-file-upload-btn]').classes().join(' ')
+    const button = wrapper.get('[data-gr-form-file-upload-btn]')
 
-    expect(button).toContain('danger')
+    expect(button.attributes('data-gr-tone')).toBe('danger')
+    expect(button.attributes('data-gr-variant')).toBe('outline')
   })
 })
 

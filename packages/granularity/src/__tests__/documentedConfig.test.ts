@@ -101,7 +101,7 @@ describe('документированный конфиг генерирует C
    */
   it('safelist каждого компонента генерируется', async () => {
     const tokens = candidates(safelistTokens())
-    expect(tokens.length).toBeGreaterThan(100)
+    expect(tokens.length).toBeGreaterThan(0)
 
     const dead = await ungeneratable(tokens)
 

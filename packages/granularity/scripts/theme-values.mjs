@@ -106,6 +106,39 @@ function declaredTokens(css) {
   return [...new Set([...css.matchAll(/(--gr-[\w-]+)\s*:/g)].map(match => match[1]))].sort()
 }
 
+/**
+ * Переменные-псевдонимы, которые компонент ставит себе сам по своим атрибутам: у кнопки
+ * `--gr-button-tone-bg: var(--gr-button-primary-bg)` по `data-gr-tone`. Пробник контекста их не
+ * видит — атрибутов элемента у него нет, и чтение через псевдоним дало бы пустоту. Псевдоним —
+ * переменная не из слоёв темы, каждое объявление которой — ровно одна ссылка `var(--gr-…)`.
+ */
+function elementAliases(css, themeTokens) {
+  const theme = new Set(themeTokens)
+  const values = new Map()
+  for (const [, token, value] of css.matchAll(/(--gr-[\w-]+)\s*:\s*([^;{}]+)/g)) {
+    if (!theme.has(token))
+      values.set(token, (values.get(token) ?? new Set()).add(value.trim()))
+  }
+
+  return new Map([...values].filter(([, set]) => [...set].every(value => /^var\(--gr-[\w-]+\)$/.test(value))))
+}
+
+/** Чтение через псевдоним — во все его значения: кнопка сверяется по каждому тону, как сверялся бы класс на тон. */
+function expandAliases(expressions, aliases) {
+  const out = new Set()
+  const visit = (expression) => {
+    const alias = [...expression.matchAll(/var\((--gr-[\w-]+)\)/g)].find(match => aliases.has(match[1]))
+    if (!alias)
+      return out.add(expression)
+    for (const value of aliases.get(alias[1]))
+      visit(expression.replace(alias[0], value))
+  }
+  for (const expression of expressions)
+    visit(expression)
+
+  return out
+}
+
 /** Каждое `var(--gr-…)` текста целиком, со вложенными; выражение с подстановкой шаблона не считается. */
 function varExpressions(text) {
   const found = new Set()
@@ -265,6 +298,9 @@ function differences(theme, baseline, current) {
     }
 
     for (const [token, now] of Object.entries(actual.tokens).filter(([token]) => !(token in expected.tokens))) {
+      // Пустое значение — токен объявляет только CSS компонента у себя внутри: темы он не касается.
+      if (now.value === '' && !now.color)
+        continue
       if (!sameAsUses(expected, token, now))
         found.push({ key: key(token), text: `новый токен ${now.color ?? now.value}; компонент видел ${JSON.stringify(expected.uses?.[token] ?? [])}` })
     }
@@ -327,7 +363,8 @@ const builds = {}
 for (const theme of grThemeCatalog) {
   const granum = await buildGranumCss(theme)
   builds[theme.id] = granum
-  current[theme.id] = normalizeSnapshot(await measure(granum.css, declaredTokens(granum.css), new Set([...varExpressions(granum.css), ...fromJs]), contextsOf(theme)))
+  const expressions = expandAliases([...varExpressions(granum.css), ...fromJs], elementAliases(granum.css, granum.themeTokens))
+  current[theme.id] = normalizeSnapshot(await measure(granum.css, declaredTokens(granum.css), expressions, contextsOf(theme)))
 }
 
 if (args.includes('--write')) {

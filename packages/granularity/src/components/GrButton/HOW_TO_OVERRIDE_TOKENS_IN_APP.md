@@ -101,27 +101,22 @@
 
 ### Какие token'ы у `GrButton` можно переопределять
 
-Для каждого `tone` компонент читает такие token'ы:
+Для каждого `tone` компонент читает такие token'ы (полный реестр с назначением —
+`GrButton/tokens.json`, раздел кнопки в `docs/tokens.md`):
 
-- `--gr-button-<tone>-background`
-- `--gr-button-<tone>-background-hover`
-- `--gr-button-<tone>-background-active`
-- `--gr-button-<tone>-foreground`
-- `--gr-button-<tone>-soft-background`
-- `--gr-button-<tone>-soft-background-hover`
-- `--gr-button-<tone>-soft-background-active`
+- `--gr-button-<tone>-bg`, `-bg-hover`, `-bg-active`, `-fg` — solid;
+- `--gr-button-<tone>-soft-bg`, `-soft-bg-hover`, `-soft-bg-active` — `secondary`;
+- `--gr-button-<tone>-ghost-bg-hover`, `-ghost-bg-active` — подложка прозрачных весов;
+- `--gr-button-<tone>-border`, `-border-hover`, `-border-active`, `-border-soft`,
+  `-border-soft-hover` — рамки;
+- `--gr-button-<tone>-glow` — цвет тени solid-кнопки.
 
-На сегодня в пакете уже есть такие tone:
+Тоны — `GR_TONES` пакета: `primary`, `neutral`, `success`, `warning`, `danger`, `info`,
+`slate`, `azure`. У `neutral` набор тот же, что у остальных.
 
-- `primary`
-- `success`
-- `warning`
-- `danger`
-- `info`
-- `slate`
-- `azure`
-
-Отдельно `neutral` в `GrButton` использует общие surface token'ы (`--gr-secondary`, `--gr-secondary-hover`, `--gr-secondary-active`, `--gr-secondary-fg`, `--gr-brd`).
+Переменные `--gr-button-tone-*` — не ручки: их ставит правило тона на самой кнопке, и
+значение, заданное снаружи, кнопка перекроет своим. Переопределяй токены тона
+`--gr-button-<tone>-*` — правило тона читает их по наследованию от контейнера.
 
 ### Когда override делать через semantic token, а когда через button token
 

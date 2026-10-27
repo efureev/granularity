@@ -685,9 +685,8 @@ describe('GrRichText — пузырьковый тулбар', () => {
 
       // Ступень кнопки пузырька одна на все размеры поля: панель сверху растёт
       // вместе с полем, а пузырёк висит над текстом и остаётся компактным.
-      // `data-size` у `GrButton` нет — ступень видна по дефолту квадрата.
       for (const button of buttons)
-        expect(button.className).toContain('--gr-button-square-size,1.75rem')
+        expect(button.getAttribute('data-gr-size')).toBe('xs')
 
       const row = document.body.querySelector('[data-gr-rich-text-bubble]')
       expect(row?.className).toContain('flex-wrap')
