@@ -7,6 +7,8 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v3.3.0] 2026-10-27
+
 ### Changed
 
 - **`GrButton` рисуется листом компонента, а не утилитами, — разметка кнопки стала в восемь раз
