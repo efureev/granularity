@@ -1,9 +1,10 @@
 <script setup lang="ts" generic="T = unknown">
-import { computed, provide, useSlots, watch } from 'vue'
+import { computed, provide, useId, useSlots, watch } from 'vue'
 
 import GrSkeleton from '../GrSkeleton/GrSkeleton.vue'
 import { useGrComponentProp } from '../shared/configContext'
 import { hasMeaningfulSlotContent } from '../shared/slotNodes'
+import { useNameAttrs } from '../../composables/internal/useControlAria'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 
 import { GR_TIMELINE_CONTEXT, type GrTimelineHeadingLevel } from './grTimelineContext'
@@ -84,6 +85,8 @@ defineSlots<{
   loading?: () => any
 }>()
 
+defineOptions({ inheritAttrs: false })
+
 const slots = useSlots()
 const { t } = useGranularityTranslations()
 
@@ -137,6 +140,42 @@ function keyOf(item: T, index: number): string | number {
   return index
 }
 
+/*
+ * Имя потребителя — списку событий. В группах списков несколько, каждый именует
+ * заголовок своей группы, а имя потребителя достаётся корню — уже группе.
+ * Горизонтальная лента — шаг табуляции, и без имени фокус пришёл бы в
+ * безымянный список.
+ */
+const { nameAttrs, restAttrs } = useNameAttrs()
+const groupIdBase = useId()
+
+function rootAttrs(): Record<string, unknown> {
+  const rest = restAttrs()
+  if (!grouped.value)
+    return rest
+
+  const name = nameAttrs()
+  // Роль потребителя сильнее: `group` — лишь то, что делает имя на корне законным.
+  return Object.keys(name).length > 0 ? { role: 'group', ...rest, ...name } : rest
+}
+
+function fallbackName(): Record<string, unknown> {
+  return orientation.value === 'horizontal' ? { 'aria-label': t('gr.timeline.label', 'Timeline') } : {}
+}
+
+function listName(): Record<string, unknown> {
+  const name = nameAttrs()
+  return Object.keys(name).length > 0 ? name : fallbackName()
+}
+
+function groupTitleId(index: number): string {
+  return `${groupIdBase}-group-${index}`
+}
+
+function groupListName(key: string, index: number): Record<string, unknown> {
+  return key ? { 'aria-labelledby': groupTitleId(index) } : fallbackName()
+}
+
 function itemsOf(group: { entries: { item: T }[] }): T[] {
   return group.entries.map(entry => entry.item)
 }
@@ -145,7 +184,7 @@ provide(GR_TIMELINE_CONTEXT, { layout, orientation, density })
 
 if (__GR_DEV__) {
   watch(
-    () => [dataMode.value, Boolean(slots.item)] as const,
+    () => [(props.items?.length ?? 0) > 0, Boolean(slots.item)] as const,
     ([hasItems, hasSlot]) => {
       if (hasItems && !hasSlot) {
         console.warn(
@@ -190,6 +229,7 @@ if (__GR_DEV__) {
     :data-layout="layout"
     :data-orientation="orientation"
     :aria-busy="loading ? 'true' : undefined"
+    v-bind="rootAttrs()"
   >
     <template v-if="loading">
       <slot name="loading">
@@ -221,7 +261,7 @@ if (__GR_DEV__) {
         `<li>` с датой попал бы в набор событий и был бы объявлен как одно из них.
       -->
       <section
-        v-for="group in groups"
+        v-for="(group, groupIndex) in groups"
         :key="group.key"
         data-gr-timeline-group
       >
@@ -235,6 +275,7 @@ if (__GR_DEV__) {
 
           <component
             :is="headingTag"
+            :id="groupTitleId(groupIndex)"
             data-gr-timeline-group-title
             :class="groupTitleClass"
           >
@@ -247,6 +288,7 @@ if (__GR_DEV__) {
         <ol
           data-gr-timeline-list
           :tabindex="orientation === 'horizontal' ? 0 : undefined"
+          v-bind="groupListName(group.key, groupIndex)"
         >
           <template
             v-for="entry in group.entries"
@@ -262,6 +304,7 @@ if (__GR_DEV__) {
       v-else
       data-gr-timeline-list
       :tabindex="orientation === 'horizontal' ? 0 : undefined"
+      v-bind="listName()"
     >
       <template v-if="dataMode">
         <template

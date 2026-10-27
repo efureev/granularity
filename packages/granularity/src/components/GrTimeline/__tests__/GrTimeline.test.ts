@@ -1,6 +1,6 @@
 import { mount } from '@vue/test-utils'
 import { h } from 'vue'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import GrConfigProvider from '../../GrConfigProvider/GrConfigProvider.vue'
 import GrTimeline from '../GrTimeline.vue'
@@ -230,5 +230,68 @@ describe('GrTimelineItem', () => {
     const wrapper = mount(GrTimelineItem, { props: { title: 'A' } })
 
     expect(wrapper.get('[data-gr-timeline-content]').classes()).toContain('pb-5')
+  })
+})
+
+describe('GrTimeline — имя ленты', () => {
+  function mountNamed(props: Record<string, unknown>, attrs: Record<string, unknown> = {}) {
+    return mount(GrTimeline, {
+      props: { items: events, itemKey: 'id', ...props },
+      attrs,
+      slots: {
+        item: ({ item }: { item: unknown }) => h(GrTimelineItem, { title: (item as Event).title }),
+        group: ({ group }: { group: string }) => group,
+      },
+      attachTo: document.body,
+    })
+  }
+
+  it('горизонтальная лента — шаг табуляции, и у неё есть имя', () => {
+    const wrapper = mountNamed({ orientation: 'horizontal' })
+
+    expect(wrapper.get('[data-gr-timeline-list]').attributes('aria-label')).toBe('Timeline')
+    wrapper.unmount()
+  })
+
+  it('вертикальная лента не в табуляции — имени по умолчанию у неё нет', () => {
+    const wrapper = mountNamed({})
+
+    expect(wrapper.get('[data-gr-timeline-list]').attributes('aria-label')).toBeUndefined()
+    wrapper.unmount()
+  })
+
+  it('имя потребителя уходит на список, а не на обёртку', () => {
+    // На `div` без роли `aria-label` запрещён и ничего не именует.
+    const wrapper = mountNamed({ orientation: 'horizontal' }, { 'aria-label': 'История заказа', 'class': 'mt-2' })
+    const root = wrapper.get('[data-gr-timeline]')
+
+    expect(wrapper.get('[data-gr-timeline-list]').attributes('aria-label')).toBe('История заказа')
+    expect(root.attributes('aria-label')).toBeUndefined()
+    expect(root.classes()).toContain('mt-2')
+    wrapper.unmount()
+  })
+
+  it('в группах список именует заголовок своей группы, а имя потребителя — группу целиком', () => {
+    const wrapper = mountNamed({ groupBy: 'day', orientation: 'horizontal' }, { 'aria-label': 'История заказа' })
+    const root = wrapper.get('[data-gr-timeline]')
+
+    expect(root.attributes('role')).toBe('group')
+    expect(root.attributes('aria-label')).toBe('История заказа')
+
+    const names = wrapper.findAll('[data-gr-timeline-list]')
+      .map(list => document.getElementById(list.attributes('aria-labelledby') ?? '')?.textContent?.trim())
+    expect(names).toEqual(['12 августа', '11 августа'])
+    wrapper.unmount()
+  })
+
+  it('пустые `items` без слота `#item` не предупреждают: рисовать нечего', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+
+    mount(GrTimeline, { props: { items: [] } })
+    expect(warn).not.toHaveBeenCalled()
+
+    mount(GrTimeline, { props: { items: events } })
+    expect(warn).toHaveBeenCalledOnce()
+    warn.mockRestore()
   })
 })

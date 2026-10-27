@@ -313,9 +313,11 @@ if (__GR_DEV__) {
       Навигация — один неразрывный кластер: «назад» не уезжает на другую строку
       от своих страниц. Переносится ряд только между группами — итог, размер
       страницы, навигация, переход, — и на узком экране кластер уходит на свою
-      строку целиком. Шире строки он не становится: прокручивается сам.
+      строку целиком. Шире строки он не становится: прокручивается сам. Пока
+      кнопки внутри доступны, ленту двигает фокус по ним; недоступную —
+      только её собственный шаг табуляции.
     -->
-    <div data-gr-pagination-nav :class="[navClusterClass, pageListClass]">
+    <div data-gr-pagination-nav :class="[navClusterClass, pageListClass]" :tabindex="disabled ? 0 : undefined">
     <GrButton variant="ghost" :size="navButtonSize" :disabled="disabled || currentPage <= 1" :aria-label="t('gr.pagination.first', 'First page')" data-gr-pagination-first @click="first">
       «
     </GrButton>

@@ -37,8 +37,11 @@ import GrTextarea from '../components/GrTextarea/GrTextarea.vue'
 const ERROR_TEXT = 'Поле обязательно'
 const LABEL_TEXT = 'Подпись поля'
 
+/** Элементы, которые `<label for>` именует (HTML, labelable elements). */
+const LABELABLE = new Set(['BUTTON', 'INPUT', 'METER', 'OUTPUT', 'PROGRESS', 'SELECT', 'TEXTAREA'])
+
 /** Контролы, у которых виджет — не labelable-элемент (span/div с ARIA-ролью). */
-const ARIA_LABELLED = new Set(['GrCheckbox', 'GrCheckboxGroup', 'GrRadioGroup', 'GrTransfer'])
+const ARIA_LABELLED = new Set(['GrCheckbox', 'GrCheckboxGroup', 'GrRadioGroup', 'GrRating', 'GrSlider', 'GrTransfer'])
 
 const controls: { name: string, render: () => unknown }[] = [
   { name: 'GrInput', render: () => h(GrInput, { modelValue: '' }) },
@@ -108,6 +111,9 @@ describe('контракт GrFormField', () => {
 
           const target = root.querySelector(`[id="${forId}"]`)
           expect(target, `<label for="${forId}"> указывает в пустоту`).not.toBeNull()
+          // `for` именует только labelable-элемент: `div[role="slider"]` с тем же id
+          // остаётся без имени, хотя ссылка формально цела.
+          expect(LABELABLE.has(target!.tagName), `<label for="${forId}"> указывает на <${target!.tagName.toLowerCase()}>: подпись по for его не именует`).toBe(true)
         }
 
         wrapper.unmount()

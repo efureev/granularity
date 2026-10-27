@@ -93,6 +93,8 @@ const listEl = ref<HTMLElement | null>(null)
 const rowEls = new Map<string, HTMLElement>()
 
 const count = computed(() => props.modelValue.length)
+// Пустой набор — группа, а не список: у `role="list"` дети — только пункты,
+// а имя на `div` без роли запрещено.
 const isEmpty = computed(() => count.value === 0)
 const isVertical = computed(() => props.orientation === 'vertical')
 
@@ -321,7 +323,7 @@ if (__GR_DEV__) {
   <GrCard :variant="variant">
     <div
       ref="listEl"
-      role="list"
+      :role="isEmpty ? 'group' : 'list'"
       data-gr-sortable
       :aria-label="resolvedLabel"
       :aria-disabled="disabled ? 'true' : undefined"

@@ -44,7 +44,8 @@
 
 `size`, `variant`, `activationMode`, `orientation`, `closable`, `emptyText` и
 `tabs` уходят в `GrTabs`; слоты `#tab` и `#empty` — туда же, а `#default` — в
-панели. Событие `close` всплывает наружу.
+панели. Событие `close` всплывает наружу. `aria-label` и `aria-labelledby`
+именуют ряд вкладок (`role="tablist"`), остальные атрибуты остаются на обёртке.
 
 Проброшенный проп, который не задали, приезжает в `GrTabs` **отсутствующим**, а
 не со значением обёртки. Для `size` и `variant` это принципиально: их дефолт

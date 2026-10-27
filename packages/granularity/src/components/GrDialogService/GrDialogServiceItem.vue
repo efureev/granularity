@@ -43,12 +43,20 @@ const state = inject(GRANULARITY_DIALOG_SERVICE_STATE) as DialogServiceState
 // дерева компонентов. Vue в этом случае берёт `provides` только из `appContext`,
 // куда попадает лишь `app.provide()` — значения от `<GrConfigProvider>` до сюда
 // не доходят. Поэтому вызов сервиса захватывает их в `setup` и кладёт в заявку,
-// а окно раздаёт вниз конфиг **своей** заявки.
+// а окно раздаёт вниз конфиг **своей** заявки — целиком: без темы и режима окно,
+// вызванное из острова, открылось бы в теме страницы.
 const EMPTY_DEFAULTS: GrComponentDefaults = Object.freeze({})
 
 provide<GrConfigContext>(GR_CONFIG_KEY, {
   size: computed(() => props.request.config?.size.value),
   componentDefaults: computed(() => props.request.config?.componentDefaults.value ?? EMPTY_DEFAULTS),
+  themeDefaults: computed(() => props.request.config?.themeDefaults?.value),
+  // Без слоёв весь `componentDefaults` — слой над темой: вложенный провайдер
+  // берёт `overrideDefaults`, как только тот объявлен, и пустой потерял бы пропсы.
+  overrideDefaults: computed(() => props.request.config?.overrideDefaults?.value ?? props.request.config?.componentDefaults.value ?? EMPTY_DEFAULTS),
+  theme: computed(() => props.request.config?.theme?.value),
+  mode: computed(() => props.request.config?.mode?.value),
+  portalTarget: computed(() => props.request.config?.portalTarget?.value),
 })
 
 // i18n: тот же приём. Адаптер хоста (из `appContext`) — запасной вариант для

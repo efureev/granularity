@@ -194,6 +194,21 @@ describe('GrDialogService: изоляция между приложениями'
   })
 })
 
+describe('GrDialogService: остров темы и режима', () => {
+  it('окно берёт тему и режим острова, из которого вызвано', async () => {
+    // Окно уезжает в `body`, вне DOM острова: пару `data-theme` ему ставит
+    // `GrModal` по конфигу, а конфиг доезжает только через мост сервиса.
+    const { wrapper, service } = mountCaller({ mode: 'dark' })
+    const island = wrapper.get('[data-theme]').attributes('data-theme')
+
+    void service.value!.confirm('Delete?')
+    await flush()
+
+    expect(island).toBeTruthy()
+    expect(confirmButton()?.closest('[data-theme]')?.getAttribute('data-theme')).toBe(island)
+  })
+})
+
 describe('GrDialogService: готовый синглтон', () => {
   it('подхватывает контекст, захваченный вызовом из setup', async () => {
     const adapter = { t: (key: string) => (key === 'gr.common.confirm' ? 'ИЗ-ПРОВАЙДЕРА' : key) }

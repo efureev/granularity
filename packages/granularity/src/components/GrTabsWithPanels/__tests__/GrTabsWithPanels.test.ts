@@ -11,8 +11,9 @@ const TABS = [
   { value: 'billing', label: 'Оплата' },
 ]
 
-function mountComposite(props: Record<string, unknown> = {}, slots: Record<string, unknown> = {}) {
+function mountComposite(props: Record<string, unknown> = {}, slots: Record<string, unknown> = {}, attrs: Record<string, unknown> = {}) {
   return mount(GrTabsWithPanels, {
+    attrs,
     // В документе, иначе dev-проверка `GrTabPanel` не найдёт вкладку по id и
     // предупредит на ровном месте: связку она ищет через `document`.
     attachTo: document.body,
@@ -169,5 +170,26 @@ describe('GrTabsWithPanels — поверхность не расходится 
 
     for (const event of tabsEmits)
       expect(wrapperEmits, `событие "${event}" не проброшено`).toContain(event)
+  })
+
+  it('имя ряда уходит на `role="tablist"`, остальные атрибуты — на обёртку', () => {
+    // На `div` без роли `aria-label` запрещён и ничего не именует.
+    const wrapper = mountComposite({}, {}, { 'aria-label': 'Настройки', 'class': 'mt-4', 'data-test': 'composite' })
+    const root = wrapper.get('[data-gr-tabs-with-panels]')
+    const tablist = wrapper.get('[role="tablist"]')
+
+    expect(tablist.attributes('aria-label')).toBe('Настройки')
+    expect(root.attributes('aria-label')).toBeUndefined()
+    expect(root.classes()).toContain('mt-4')
+    expect(root.attributes('data-test')).toBe('composite')
+    wrapper.unmount()
+  })
+
+  it('`aria-labelledby` тоже именует ряд вкладок', () => {
+    const wrapper = mountComposite({}, {}, { 'aria-labelledby': 'settings-title' })
+
+    expect(wrapper.get('[role="tablist"]').attributes('aria-labelledby')).toBe('settings-title')
+    expect(wrapper.get('[data-gr-tabs-with-panels]').attributes('aria-labelledby')).toBeUndefined()
+    wrapper.unmount()
   })
 })

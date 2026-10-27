@@ -12,6 +12,7 @@
  */
 import { computed, useId } from 'vue'
 
+import { useNameAttrs } from '../../composables/internal/useControlAria'
 import GrTabPanels from '../GrTabPanels/GrTabPanels.vue'
 import GrTabs from '../GrTabs/GrTabs.vue'
 import type { GrTab, GrTabsProps } from '../GrTabs/GrTabs.vue'
@@ -44,6 +45,11 @@ const props = withDefaults(defineProps<GrTabsWithPanelsProps>(), {
 
 const emit = defineEmits<GrTabsWithPanelsEmits>()
 
+defineOptions({ inheritAttrs: false })
+
+// Имя — ряду вкладок, раскладка и данные — корню.
+const { nameAttrs, restAttrs } = useNameAttrs()
+
 defineSlots<{
   /** Панели (`GrTabPanel`). */
   default?: () => any
@@ -69,8 +75,10 @@ const isVertical = computed(() => props.orientation === 'vertical')
     data-gr-tabs-with-panels
     :data-orientation="isVertical ? 'vertical' : 'horizontal'"
     :class="isVertical ? 'flex items-start gap-4' : 'flex flex-col gap-3'"
+    v-bind="restAttrs()"
   >
     <GrTabs
+      v-bind="nameAttrs()"
       :model-value="modelValue"
       :tabs="tabs"
       :id-base="resolvedIdBase"

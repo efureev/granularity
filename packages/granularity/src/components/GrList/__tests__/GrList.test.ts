@@ -97,7 +97,23 @@ describe('GrList — пустое состояние', () => {
     const wrapper = mount(GrList, { slots: { default: '<!-- v-if -->' } })
 
     expect(wrapper.get('[data-gr-list-empty]').text()).toBe('Nothing here yet')
-    expect(wrapper.get('[data-gr-list]').attributes('role')).toBe('list')
+  })
+
+  it('пустой контейнер — не список: внутри `role="list"` текст пустоты не пункт', () => {
+    // axe `aria-required-children`: у списка дети — только пункты.
+    const wrapper = mount(GrList, { props: { items: [], maxHeight: '10rem' } })
+    const list = wrapper.get('[data-gr-list]')
+
+    expect(list.attributes('role')).toBeUndefined()
+    // Прокручивать нечего — и шаг табуляции не нужен.
+    expect(list.attributes('tabindex')).toBeUndefined()
+  })
+
+  it('в загрузке список остаётся списком: `aria-busy` объявляет, что пункты едут', () => {
+    const list = mount(GrList, { props: { items: [], loading: true } }).get('[data-gr-list]')
+
+    expect(list.attributes('role')).toBe('list')
+    expect(list.attributes('aria-busy')).toBe('true')
   })
 
   it('со списком пунктов пустое состояние не показывается', () => {

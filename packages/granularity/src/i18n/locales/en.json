@@ -392,7 +392,8 @@
     "empty": "Nothing here yet"
   },
   "timeline": {
-    "empty": "Nothing here yet"
+    "empty": "Nothing here yet",
+    "label": "Timeline"
   },
   "tabs": {
     "empty": "Nothing here yet",

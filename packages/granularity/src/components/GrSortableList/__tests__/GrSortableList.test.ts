@@ -80,6 +80,18 @@ describe('разметка и ARIA', () => {
 
     wrapper.unmount()
   })
+
+  it('пустой набор — группа с именем, а не список с текстом вместо пунктов', () => {
+    // axe `aria-required-children`: у `role="list"` дети — только пункты, а
+    // имя на `div` без роли запрещено — поэтому группа.
+    const wrapper = mountList({ modelValue: [], ariaLabel: 'Этапы' })
+    const root = wrapper.get('[data-gr-sortable]')
+
+    expect(root.attributes('role')).toBe('group')
+    expect(root.attributes('aria-label')).toBe('Этапы')
+
+    wrapper.unmount()
+  })
 })
 
 describe('перенос указателем', () => {

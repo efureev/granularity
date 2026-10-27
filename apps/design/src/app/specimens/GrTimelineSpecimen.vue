@@ -99,7 +99,7 @@ const audit: AuditEvent[] = [
     </Specimen>
 
     <Specimen title="Горизонтальная лента" note="события — колонками; лента прокручивается вбок и достижима с клавиатуры" wide>
-      <GrTimeline orientation="horizontal">
+      <GrTimeline orientation="horizontal" aria-label="Путь заказа">
         <GrTimelineItem time="20 окт" datetime="2026-10-20" tone="success" title="Принят" description="Склад на Лесной" />
         <GrTimelineItem time="21 окт" datetime="2026-10-21" tone="success" title="Собран" description="3 позиции, 1 коробка" />
         <GrTimelineItem time="21 окт" datetime="2026-10-21" tone="primary" title="В пути" description="Курьер Сергей" />

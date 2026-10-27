@@ -90,3 +90,26 @@ export function useControlAria(): ControlAria {
     errorMessage: () => joinIds(read('aria-errormessage')),
   }
 }
+
+const NAME_KEYS = new Set<string>(['aria-label', 'aria-labelledby'].flatMap(name => [name, camel(name)]))
+
+export interface NameAttrs {
+  /** `aria-label` / `aria-labelledby` потребителя — для элемента с ролью. */
+  nameAttrs: () => Record<string, unknown>
+  /** Всё остальное — для корня. */
+  restAttrs: () => Record<string, unknown>
+}
+
+/**
+ * Имя потребителя — элементу с ролью внутри обёртки: на `div` без роли
+ * `aria-label` запрещён и ничего не именует. Функции, а не `computed`: `$attrs`
+ * не реактивен. Компонент объявляет `inheritAttrs: false`.
+ */
+export function useNameAttrs(): NameAttrs {
+  const attrs = useAttrs()
+
+  return {
+    nameAttrs: () => Object.fromEntries(Object.entries(attrs).filter(([key]) => NAME_KEYS.has(key))),
+    restAttrs: () => Object.fromEntries(Object.entries(attrs).filter(([key]) => !NAME_KEYS.has(key))),
+  }
+}

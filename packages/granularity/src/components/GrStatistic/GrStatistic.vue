@@ -464,22 +464,26 @@ defineSlots<{
           </slot>
         </dt>
 
-        <!-- Плейсхолдер загрузки повторяет высоту строки значения, чтобы блок не прыгал. -->
+        <!--
+          Плейсхолдер загрузки повторяет высоту строки значения, чтобы блок не прыгал.
+          Живая область — внутри `<dd>`: роль на нём сняла бы смысл значения, и `<dl>`
+          перестал бы быть списком определений.
+        -->
         <component
           :is="hasTitle ? 'dd' : 'div'"
           v-if="loading"
           data-gr-statistic-placeholder
           data-testid="gr-statistic-placeholder"
           class="m-0 mt-1"
-          role="status"
-          aria-busy="true"
         >
-          <GrSkeleton
-            width="6rem"
-            :height="statisticPlaceholderHeightBySize[resolvedSize]"
-            rounded="var(--gr-radius-md)"
-          />
-          <span class="sr-only">{{ t('gr.loading.defaultText', 'Loading...') }}</span>
+          <div role="status" aria-busy="true">
+            <GrSkeleton
+              width="6rem"
+              :height="statisticPlaceholderHeightBySize[resolvedSize]"
+              rounded="var(--gr-radius-md)"
+            />
+            <span class="sr-only">{{ t('gr.loading.defaultText', 'Loading...') }}</span>
+          </div>
         </component>
 
         <component

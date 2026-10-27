@@ -79,6 +79,7 @@ export const navButtonSizes: Record<GrPaginationSize, GrComponentSize> = {
 /**
  * Кластер навигации: первая, назад, страницы, вперёд, последняя — одной
  * строкой. Не шире ряда: если и он один не помещается, прокручивается вбок
- * без видимой полосы — на такой ширине стоит включить `compact`.
+ * без видимой полосы — на такой ширине стоит включить `compact`. Кольцо — для
+ * недоступной ленты: тогда шаг табуляции у неё самой.
  */
-export const navClusterClass = 'flex min-w-0 max-w-full flex-nowrap items-center overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'
+export const navClusterClass = 'flex min-w-0 max-w-full flex-nowrap items-center overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden rounded-[var(--gr-radius-control)] focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--gr-ring)]'

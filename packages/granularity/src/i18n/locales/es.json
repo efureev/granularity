@@ -394,7 +394,8 @@
     "empty": "Todavía no hay nada"
   },
   "timeline": {
-    "empty": "Todavía no hay nada"
+    "empty": "Todavía no hay nada",
+    "label": "Cronología"
   },
   "tabs": {
     "empty": "Todavía no hay nada",

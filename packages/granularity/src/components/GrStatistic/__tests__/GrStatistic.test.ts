@@ -36,8 +36,7 @@ describe('GrStatistic', () => {
     const wrapper = mount(GrStatistic, { props: { value: 42, loading: true } })
 
     expect(wrapper.find('[data-testid="gr-statistic-value"]').exists()).toBe(false)
-    const placeholder = wrapper.get('[data-testid="gr-statistic-placeholder"]')
-    expect(placeholder.attributes('aria-busy')).toBe('true')
+    expect(wrapper.get('[data-testid="gr-statistic-placeholder"] [role="status"]').attributes('aria-busy')).toBe('true')
   })
 
   it('слот по умолчанию заменяет форматированное значение', () => {
@@ -221,11 +220,11 @@ describe('GrStatistic — доступность динамики и загру�
 
   it('живая область загрузки не молчит', () => {
     const wrapper = mount(GrStatistic, { props: { value: 10, loading: true } })
-    const placeholder = wrapper.get('[data-testid="gr-statistic-placeholder"]')
+    const status = wrapper.get('[data-testid="gr-statistic-placeholder"] [role="status"]')
 
-    expect(placeholder.attributes('role')).toBe('status')
-    expect(placeholder.text()).toBe('Loading...')
-    expect(placeholder.find('.sr-only').exists()).toBe(true)
+    expect(status.text()).toBe('Loading...')
+    expect(status.attributes('aria-busy')).toBe('true')
+    expect(status.find('.sr-only').exists()).toBe(true)
   })
 })
 
@@ -304,6 +303,16 @@ describe('GrStatistic — пара «термин — значение»', () =>
 
     expect(wrapper.get('[data-testid="gr-statistic-placeholder"]').element.tagName).toBe('DD')
     expect(wrapper.find('[data-testid="gr-statistic-value"]').exists()).toBe(false)
+  })
+
+  it('живая область загрузки — внутри dd, а не на нём', () => {
+    // Роль на `<dd>` снимает с него смысл значения, и `<dl>` перестаёт быть
+    // списком определений (axe `definition-list`).
+    const wrapper = mount(GrStatistic, { props: { title: 'Заказы', value: 1284, loading: true } })
+    const dd = wrapper.get('[data-testid="gr-statistic-placeholder"]')
+
+    expect(dd.attributes('role')).toBeUndefined()
+    expect(dd.find('[role="status"]').exists()).toBe(true)
   })
 })
 

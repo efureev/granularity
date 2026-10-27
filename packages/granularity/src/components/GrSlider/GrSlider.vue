@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watchEffect } from 'vue'
+import { computed, ref, useId, watchEffect } from 'vue'
 
 import { useGrComponentSize } from '../shared/configContext'
 
@@ -474,6 +474,27 @@ function showTooltipFor(index: number): boolean {
   return activeThumb.value === index || hoveredThumb.value === index
 }
 
+/*
+ * `div[role="slider"]` не labelable: `<label for>` поля до бегунка не доходит,
+ * и подпись приезжает ссылкой. У диапазона к ней добавляется слово границы —
+ * то же, что `thumbAriaLabel` дописывает к своей подписи. Свой `ariaLabel`
+ * сильнее подписи поля, как у `GrSegmented`.
+ */
+const fieldLabelId = computed(() => (props.ariaLabel ? undefined : field?.labelId.value))
+const boundIdBase = useId()
+
+function boundId(index: number): string {
+  return `${boundIdBase}-${index === 0 ? 'min' : 'max'}`
+}
+
+function thumbLabelledBy(index: number): string | undefined {
+  const ids = aria.labelledBy(fieldLabelId.value)
+  if (!ids || !props.range)
+    return ids
+
+  return `${ids} ${boundId(index)}`
+}
+
 function thumbAriaLabel(index: number): string | undefined {
   if (!props.ariaLabel)
     return undefined
@@ -514,6 +535,10 @@ function thumbValueText(value: number): string | undefined {
         :value="String(value)"
         :disabled="isDisabled"
       >
+    </template>
+    <template v-if="range && thumbLabelledBy(0)">
+      <span :id="boundId(0)" hidden>{{ t('gr.slider.min', 'min') }}</span>
+      <span :id="boundId(1)" hidden>{{ t('gr.slider.max', 'max') }}</span>
     </template>
     <div
       ref="trackEl"
@@ -578,7 +603,7 @@ function thumbValueText(value: number): string | undefined {
         :aria-disabled="isDisabled ? 'true' : undefined"
         :aria-invalid="isInvalid ? 'true' : undefined"
         :aria-describedby="index === 0 ? aria.describedBy(describedBy) : undefined"
-        :aria-labelledby="index === 0 ? aria.labelledBy() : undefined"
+        :aria-labelledby="thumbLabelledBy(index)"
         :aria-errormessage="index === 0 ? aria.errorMessage() : undefined"
         :aria-required="isRequired && index === 0 ? 'true' : undefined"
         :aria-readonly="isReadonly ? 'true' : undefined"

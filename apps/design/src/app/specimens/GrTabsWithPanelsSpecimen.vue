@@ -159,7 +159,7 @@ const report = ref('sales')
     </Specimen>
 
     <Specimen title="Вертикаль" note="orientation=&quot;vertical&quot; ставит ряд сбоку от панелей, а не колонкой над ними.">
-      <GrTabsWithPanels v-model="settingsTab" :tabs="SETTINGS_TABS" orientation="vertical">
+      <GrTabsWithPanels v-model="settingsTab" :tabs="SETTINGS_TABS" orientation="vertical" aria-label="Разделы настроек">
         <GrTabPanel value="profile">
           <p class="text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)] text-[var(--gr-fg)]">
             Имя, фото и часовой пояс — их видят коллеги в проектах.

@@ -202,6 +202,16 @@ describe('GrPagination — конфигурация', () => {
     await wrapper.findAll('[data-gr-pagination-page]')[0].trigger('click')
     expect(wrapper.emitted('update:page')).toBeFalsy()
   })
+
+  it('недоступная лента сама в табуляции: прокрутить её больше нечем', () => {
+    // axe `scrollable-region-focusable`: узкая лента прокручивается вбок, а все
+    // кнопки внутри недоступны — без своего шага табуляции её не сдвинуть.
+    const nav = (disabled: boolean) => mountPagination({ props: { disabled } }).get('[data-gr-pagination-nav]')
+
+    expect(nav(true).attributes('tabindex')).toBe('0')
+    expect(nav(true).classes()).toContain('focus-visible:ring-[var(--gr-ring)]')
+    expect(nav(false).attributes('tabindex')).toBeUndefined()
+  })
 })
 
 describe('GrPagination — семантика и объявления', () => {

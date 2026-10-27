@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, type Component } from 'vue'
+import { computed, ref, useId, type Component } from 'vue'
 
 import { useGrComponentProp, useGrComponentSize } from '../shared/configContext'
 
@@ -232,6 +232,22 @@ const valueText = computed(() => {
 
 const resolvedAriaLabel = computed(() => props.ariaLabel ?? t('gr.rating.label', 'Rating'))
 
+/*
+ * Шкала — `div` с ролью, `<label for>` поля её не именует: подпись приезжает
+ * ссылкой, а свой `ariaLabel` сильнее неё. В показе (`role="img"`) ссылка
+ * заменила бы `aria-label` вместе с оценкой, поэтому оценка идёт в ту же ссылку.
+ */
+const fieldLabelId = computed(() => (props.ariaLabel ? undefined : field?.labelId.value))
+const valueTextId = useId()
+
+function scaleLabelledBy(): string | undefined {
+  const ids = aria.labelledBy(fieldLabelId.value)
+  if (!ids || asSlider.value)
+    return ids
+
+  return `${ids} ${valueTextId}`
+}
+
 const text = computed(() => {
   if (props.formatText)
     return props.formatText(displayValue.value)
@@ -333,6 +349,7 @@ function onKeydown(event: KeyboardEvent): void {
       :name="name"
       :value="String(modelValue)"
     >
+    <span v-if="!asSlider && scaleLabelledBy()" :id="valueTextId" hidden>{{ valueText }}</span>
     <div
       :id="resolvedId"
       data-gr-rating-scale
@@ -349,7 +366,7 @@ function onKeydown(event: KeyboardEvent): void {
       :aria-disabled="asSlider && disabled ? 'true' : undefined"
       :aria-invalid="asSlider && isInvalid ? 'true' : undefined"
       :aria-describedby="aria.describedBy(asSlider ? describedBy : undefined)"
-      :aria-labelledby="aria.labelledBy()"
+      :aria-labelledby="scaleLabelledBy()"
       :aria-errormessage="asSlider ? aria.errorMessage() : undefined"
       :aria-required="asSlider && isRequired ? 'true' : undefined"
       :aria-readonly="asSlider && isReadonly ? 'true' : undefined"

@@ -48,24 +48,22 @@ function commit(target: { value: number, sent: number }, value: GrSliderModelVal
 <template>
   <!-- Карточка каталога и «Темы рядом»: одно состояние, ничего не открыто. -->
   <div v-if="preview" class="flex w-full flex-col gap-3">
-    <!-- Имя ползунку — своим aria-label: подпись GrFormField к role="slider" не привязывается. -->
     <GrFormField>
       <template #label>
         Цена
         <span aria-hidden="true" class="ms-2 text-[var(--gr-muted-fg)]">{{ cardPriceText }}</span>
       </template>
-      <GrSlider v-model="cardPrice" aria-label="Цена" range :min="0" :max="10000" :step="500" :format-tooltip="rub" show-tooltip />
+      <GrSlider v-model="cardPrice" range :min="0" :max="10000" :step="500" :format-tooltip="rub" show-tooltip />
     </GrFormField>
   </div>
   <div v-else class="grid gap-x-8 gap-y-10 lg:grid-cols-2">
     <Specimen title="Значение" note="Пройденное — заливкой, значение — рядом с подписью и над ручкой.">
-      <!-- Имя ползунку — своим aria-label: подпись GrFormField к role="slider" не привязывается. -->
-      <GrFormField>
+        <GrFormField>
         <template #label>
           Громкость уведомлений
           <span aria-hidden="true" class="ms-2 text-[var(--gr-muted-fg)]">{{ percent(volume) }}</span>
         </template>
-        <GrSlider v-model="volume" aria-label="Громкость уведомлений" :format-tooltip="percent" show-tooltip />
+        <GrSlider v-model="volume" :format-tooltip="percent" show-tooltip />
       </GrFormField>
     </Specimen>
 
@@ -75,13 +73,13 @@ function commit(target: { value: number, sent: number }, value: GrSliderModelVal
           Цена
           <span aria-hidden="true" class="ms-2 text-[var(--gr-muted-fg)]">{{ priceText }}</span>
         </template>
-        <GrSlider v-model="price" aria-label="Цена" range :min="0" :max="10000" :step="500" :format-tooltip="rub" show-tooltip />
+        <GrSlider v-model="price" range :min="0" :max="10000" :step="500" :format-tooltip="rub" show-tooltip />
       </GrFormField>
     </Specimen>
 
     <Specimen title="Метки" note="Деления подписаны под шкалой; формат уходит и в подсказку, и диктору.">
       <GrFormField label="Размер шрифта">
-        <GrSlider v-model="fontSize" aria-label="Размер шрифта" :min="12" :max="24" :marks="FONT_MARKS" :format-tooltip="(value: number) => `${value} px`" />
+        <GrSlider v-model="fontSize" :min="12" :max="24" :marks="FONT_MARKS" :format-tooltip="(value: number) => `${value} px`" />
       </GrFormField>
       <p class="leading-[var(--gr-leading-tight)] text-[var(--gr-fg)]" :style="{ fontSize: `${fontSize}px` }">
         Тёплая бумага и графит.
@@ -90,17 +88,17 @@ function commit(target: { value: number, sent: number }, value: GrSliderModelVal
 
     <Specimen title="Состояния" note="Недоступный гаснет, как все поля; только чтение показывает значение; ошибка красит заливку и ручку.">
       <GrFormField label="Яркость экрана" hint="Управляется системой" disabled>
-        <GrSlider :model-value="40" aria-label="Яркость экрана" />
+        <GrSlider :model-value="40" />
       </GrFormField>
       <GrFormField label="Громкость звонка" hint="Задаёт администратор">
-        <GrSlider :model-value="70" aria-label="Громкость звонка" :format-tooltip="percent" readonly />
+        <GrSlider :model-value="70" :format-tooltip="percent" readonly />
       </GrFormField>
       <GrFormField :error="discountError">
         <template #label>
           Скидка
           <span aria-hidden="true" class="ms-2 text-[var(--gr-muted-fg)]">{{ percent(discount) }}</span>
         </template>
-        <GrSlider v-model="discount" aria-label="Скидка" :step="5" :format-tooltip="percent" show-tooltip />
+        <GrSlider v-model="discount" :step="5" :format-tooltip="percent" show-tooltip />
       </GrFormField>
     </Specimen>
 

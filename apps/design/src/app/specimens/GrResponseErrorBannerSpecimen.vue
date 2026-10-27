@@ -1,16 +1,12 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import type { ResponseErrorInfo, ResponseErrorTexts } from '@feugene/granularity'
+import type { ResponseErrorInfo } from '@feugene/granularity'
 
 import Specimen from './Specimen.vue'
 
 defineProps<{ preview?: boolean }>()
 
-// В словаре пакета нет `retryLabel`: без него кнопка повтора — английская «Retry».
-const BANNER_TEXTS: Partial<ResponseErrorTexts> = {
-  retryLabel: 'Повторить',
-}
 const FIELD_LABELS = { inn: 'ИНН', due_date: 'Срок оплаты' }
 
 function validationError(): ResponseErrorInfo {
@@ -78,7 +74,6 @@ function failReport(): void {
   <div v-if="preview" class="flex w-full flex-col gap-3">
     <GrResponseErrorBanner
       :error="previewError"
-      :texts="BANNER_TEXTS"
       :show-details="false"
       @dismiss="previewError = null"
     />
@@ -92,7 +87,6 @@ function failReport(): void {
     <Specimen title="Ошибки полей · 422" note="Ошибки по полям — списком с подписями полей; validation — тон warning.">
       <GrResponseErrorBanner
         :error="invoiceError"
-        :texts="BANNER_TEXTS"
         :field-labels="FIELD_LABELS"
         @dismiss="invoiceError = null"
       />
@@ -106,7 +100,6 @@ function failReport(): void {
     <Specimen title="Сбой сервера · 503" note="canRetry даёт повтор: кнопка берёт тон баннера, статус HTTP — для поддержки.">
       <GrResponseErrorBanner
         :error="reportError"
-        :texts="BANNER_TEXTS"
         can-retry
         @retry="retryReport"
         @dismiss="reportError = null"
@@ -125,7 +118,6 @@ function failReport(): void {
     <Specimen title="Нет связи" note="Без статуса бейджа нет; заголовок и текст — из словаря по виду ошибки, а не из ответа транспорта.">
       <GrResponseErrorBanner
         :error="syncError"
-        :texts="BANNER_TEXTS"
         can-retry
         @retry="syncError = null"
         @dismiss="syncError = null"
