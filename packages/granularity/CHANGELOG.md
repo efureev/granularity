@@ -7,6 +7,8 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v3.2.2] 2026-10-27
+
 ### Fixed
 
 - **`GrButton` легче в разметке на пятую часть строки классов.** Зеркало нажатого вида

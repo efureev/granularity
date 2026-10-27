@@ -7,6 +7,8 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v2.3.1] 2026-10-27
+
 ### Fixed
 
 - **«Глина» 2.0.1: заливка `slate` под указателем и в нажатии работает и без `color-mix`.**
