@@ -23,6 +23,8 @@ export type GrButtonClassOptions = {
   suffix?: boolean
   /** Префикс в ячейке у начального края: отступа с той стороны нет, его место — у ячейки. */
   prefixCell?: boolean
+  /** Нажатый переключатель — компонент ставит ему `data-gr-pressed`. */
+  pressed?: boolean
 }
 
 export type GrButtonToneTokens = {
@@ -337,20 +339,25 @@ function transparentFill(tokens: GrButtonToneTokens): { hover: string, active: s
   }
 }
 
+export function variantClass(variant: GrButtonVariant, tone: GrButtonTone): string {
+  return variantClassOf(variant, tone)
+}
+
 /**
  * Нажатая кнопка-переключатель (`aria-pressed="true"`, атрибут `data-gr-pressed`
  * ставит компонент) держит вид своего нажатого состояния: иначе включённое и
  * выключенное различались бы только для AT. Классы — зеркало `active:` того же
- * веса, с `hover:` — чтобы наведение их не перебивало.
+ * веса, с `hover:` — чтобы наведение их не перебивало. Получает их только нажатая
+ * кнопка: зеркало — пятая часть строки классов, и каждая обычная кнопка несла бы
+ * его в разметке впустую.
  */
-function withPressed(classes: string): string {
-  const active = classes.split(' ').filter(token => token.startsWith('active:')).map(token => token.slice('active:'.length))
-
-  return [classes, ...active.flatMap(rest => [`data-[gr-pressed]:${rest}`, `data-[gr-pressed]:hover:${rest}`])].join(' ')
-}
-
-export function variantClass(variant: GrButtonVariant, tone: GrButtonTone): string {
-  return withPressed(variantClassOf(variant, tone))
+export function pressedClass(variant: GrButtonVariant, tone: GrButtonTone): string {
+  return variantClassOf(variant, tone)
+    .split(' ')
+    .filter(token => token.startsWith('active:'))
+    .map(token => token.slice('active:'.length))
+    .flatMap(rest => [`data-[gr-pressed]:${rest}`, `data-[gr-pressed]:hover:${rest}`])
+    .join(' ')
 }
 
 function variantClassOf(variant: GrButtonVariant, tone: GrButtonTone): string {
@@ -445,6 +452,7 @@ export function grButtonClass(options: GrButtonClassOptions): string {
     // `loading` отключённым не выглядит: о нём говорит спиннер. Но нажатие он
     // не принимает — и не изображает.
     options.disabled ? disabledClassByVariant[options.variant] : variantClass(options.variant, options.tone),
+    options.pressed && !options.disabled ? pressedClass(options.variant, options.tone) : '',
     options.disabled || options.loading ? '' : pressClass,
   ].filter(Boolean).join(' ')
 }

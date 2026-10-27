@@ -166,6 +166,9 @@ const isDisabled = computed(() => props.disabled || (
 // Неинтерактивно при `disabled` ИЛИ во время `loading`.
 const blocked = computed(() => isDisabled.value || props.loading)
 
+// Нажатый переключатель вне лотка: в лотке выбранное несёт вес звена, а не нажатие.
+const isPressed = computed(() => isToggledOn.value && !inTray.value && !isDisabled.value)
+
 // Ключевое: `loading` НЕ ставит нативный `disabled` (элемент бы выпал из фокуса и
 // скринридер потерял бы контекст) — вместо этого `aria-disabled` + перехват клика.
 // Нативный `disabled` (только у `<button>`) оставляем лишь для явного `disabled`.
@@ -316,6 +319,7 @@ function rootClass(): string[] {
       prefix: hasSlotContent('prefix'),
       prefixCell: prefixInCell(),
       suffix,
+      pressed: isPressed.value,
     }),
     // Ждущая сервер кнопка не запрещена, а занята — курсор говорит именно это.
     looksDisabled.value ? 'cursor-not-allowed' : props.loading ? 'cursor-progress' : '',
@@ -339,7 +343,7 @@ defineSlots<{
     data-gr-button
     :data-gr-variant="resolvedVariant"
     :data-gr-tone="resolvedTone"
-    :data-gr-pressed="isToggledOn && !inTray && !isDisabled ? '' : undefined"
+    :data-gr-pressed="isPressed ? '' : undefined"
     :data-gr-busy-overlay="spinnerOverContent() ? '' : undefined"
     :data-gr-busy-shimmer="shimmerLabel() ? '' : undefined"
     :data-gr-busy-track="trackLoading() ? '' : undefined"

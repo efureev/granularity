@@ -14,6 +14,7 @@ import {
   stepRadius,
   squareSizes,
   surfaceShadowClass,
+  pressedClass,
   tones,
   variantClass,
   type GrButtonTone,
@@ -22,7 +23,7 @@ import {
 
 const variantTokens = (Object.keys(tones) as GrButtonTone[]).flatMap(tone =>
   (['primary', 'secondary', 'outline', 'ghost', 'ghost-border'] as GrButtonVariant[])
-    .flatMap(variant => splitClassTokens(variantClass(variant, tone))),
+    .flatMap(variant => [...splitClassTokens(variantClass(variant, tone)), ...splitClassTokens(pressedClass(variant, tone))]),
 )
 
 export const grButtonClassTokens = {

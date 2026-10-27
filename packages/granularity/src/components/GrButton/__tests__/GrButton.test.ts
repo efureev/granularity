@@ -546,6 +546,17 @@ describe('GrButton — нажатый переключатель', () => {
     expect(off.get('[data-gr-button]').attributes('data-gr-pressed')).toBeUndefined()
   })
 
+  it('зеркало нажатого вида есть только у нажатой кнопки — разметка остальных его не несёт', () => {
+    const pressedTokens = (wrapper: ReturnType<typeof mount>) => wrapper.get('[data-gr-button]').classes().filter(name => name.startsWith('data-[gr-pressed]'))
+    const plain = mount(GrButton, { props: { variant: 'outline', tone: 'neutral' }, slots: { default: 'B' } })
+    const on = mount(GrButton, { props: { variant: 'outline', tone: 'neutral' }, attrs: { 'aria-pressed': 'true' }, slots: { default: 'B' } })
+    const disabled = mount(GrButton, { props: { variant: 'outline', disabled: true }, attrs: { 'aria-pressed': 'true' }, slots: { default: 'B' } })
+
+    expect(pressedTokens(plain)).toEqual([])
+    expect(pressedTokens(disabled)).toEqual([])
+    expect(pressedTokens(on).length).toBeGreaterThan(0)
+  })
+
   it('в лотке и у недоступной кнопки атрибута нажатия нет', () => {
     const tray = mount({
       render: () => h(GrButtonGroup, { appearance: 'tray', ariaLabel: 'Вид' }, () => h(GrButton, { 'aria-pressed': 'true' }, () => 'B')),
