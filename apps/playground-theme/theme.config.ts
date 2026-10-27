@@ -176,6 +176,17 @@ export const contrast = createMode({
     '--gr-control-brd': '#000000',
     '--gr-ring': '#0b3fd4',
     '--gr-overlay-bg': 'rgb(0 0 0 / 0.7)',
+    '--gr-brd-strong': '#000000',
+    // Отклик поля: рамка уже чёрная, темнее под указателем ей некуда — фокус
+    // несёт цвет кольца, а только чтение отличает подложка.
+    '--gr-input-hover': '#000000',
+    '--gr-input-focus-brd': '#0b3fd4',
+    '--gr-input-readonly-bg': '#f0f0f0',
+    '--gr-input-readonly-brd': '#000000',
+    '--gr-control-brd-hover': '#000000',
+    '--gr-selected': 'var(--gr-primary)',
+    '--gr-selected-fg': 'var(--gr-primary-fg)',
+    '--gr-selected-hover': 'var(--gr-primary-hover)',
 
     // Состояния. Недоступный контрол гасится поверхностью и границей, а не
     // прозрачностью: `opacity` разбавляет выверенный контраст.

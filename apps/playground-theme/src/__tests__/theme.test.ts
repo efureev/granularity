@@ -4,6 +4,7 @@ import { emitCss, prepareApp, resolveThemeManifest } from '@feugene/granum/node'
 import { beforeAll, describe, expect, it } from 'vitest'
 
 import { grRoleTokens, type GrThemeData, resolveModes } from '@feugene/granularity-tokens'
+import clayData from '@feugene/granularity-tokens/themes/clay/theme.json'
 import slateData from '@feugene/granularity-tokens/themes/slate/theme.json'
 
 import granumConfig from '../../granum.config'
@@ -284,8 +285,8 @@ describe('сборка granum', () => {
     const { providers, themes: entries } = granumConfig
     const manifest = resolveThemeManifest({ providers, themes: entries!, root })
     const clay = manifest.themes.find(theme => theme.id === 'clay')
-    expect(clay?.extensions?.granularity).toEqual({
-      componentDefaults: { GrButton: { loadingIndicator: 'shimmer' }, GrButtonGroup: { appearance: 'tray' } },
-    })
+    // Ровно пропсы темы каталога: манифест их не теряет и своих не добавляет.
+    expect(clay?.extensions?.granularity).toEqual((clayData as GrThemeData).extensions?.granularity)
+    expect(clay?.extensions?.granularity).toMatchObject({ componentDefaults: { GrButton: { loadingIndicator: 'shimmer' } } })
   })
 })
