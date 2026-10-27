@@ -7,6 +7,8 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v3.2.1] 2026-10-27
+
 ### Fixed
 
 - **`GrSlider` и `GrRating` в `GrFormField` берут имя из подписи поля.** `<label for>` указывал
