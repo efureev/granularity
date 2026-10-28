@@ -242,6 +242,31 @@ describe('GrRichText — доступность и форма', () => {
     wrapper.unmount()
   })
 
+  it('недоступность и «только чтение» объявлены на области ввода', async () => {
+    const disabled = mountEditor({ modelValue: '<p>текст</p>', disabled: true })
+    const readonly = mountEditor({ modelValue: '<p>текст</p>', readonly: true })
+    await ready(disabled)
+    await ready(readonly)
+
+    expect(area(disabled).getAttribute('aria-disabled')).toBe('true')
+    expect(area(readonly).getAttribute('aria-readonly')).toBe('true')
+    expect(area(readonly).getAttribute('aria-disabled')).toBeNull()
+    disabled.unmount()
+    readonly.unmount()
+  })
+
+  it('состояние после монтирования доходит до области ввода', async () => {
+    const wrapper = mountEditor({ modelValue: '<p>текст</p>' })
+    await ready(wrapper)
+    expect(area(wrapper).getAttribute('aria-invalid')).toBeNull()
+
+    await wrapper.setProps({ invalid: true, disabled: true })
+
+    expect(area(wrapper).getAttribute('aria-invalid')).toBe('true')
+    expect(area(wrapper).getAttribute('aria-disabled')).toBe('true')
+    wrapper.unmount()
+  })
+
   /** Негативный класс: запрещённое состояние обязано не давать править. */
   it('`readonly` показывает значение, но не даёт править', async () => {
     const wrapper = mountEditor({ modelValue: '<p>текст</p>', readonly: true })

@@ -216,9 +216,19 @@ function editorAttributes(): Record<string, string> {
     attributes['aria-required'] = 'true'
   if (field.labelId.value && !props.ariaLabel)
     attributes['aria-labelledby'] = field.labelId.value
+  if (field.disabled.value)
+    attributes['aria-disabled'] = 'true'
+  else if (field.readonly.value)
+    attributes['aria-readonly'] = 'true'
 
   return attributes
 }
+
+// Атрибуты области ProseMirror ставит при создании редактора: смену состояния поля
+// после монтирования — ошибку, недоступность, подпись — ему передают явно.
+watch(editorAttributes, (attributes) => {
+  editor.value?.setOptions({ editorProps: { attributes } })
+})
 
 /**
  * Редактор поднимается **после монтирования**, а не в `setup`.
