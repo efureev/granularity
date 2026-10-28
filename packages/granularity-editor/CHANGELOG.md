@@ -7,6 +7,8 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v3.0.1] 2026-10-28
+
 ### Fixed
 
 - **Недоступный и «только для чтения» `GrRichText` объявлены на области ввода** — `aria-disabled` и
