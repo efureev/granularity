@@ -4,7 +4,7 @@
 свои режимы поверх темы пакета, тема каталога и своя тема приложения — в одной сборке granum.
 
 ```bash
-yarn build:tokens && yarn build:granularity   # стенды работают с собранным dist
+yarn build:tokens && yarn build:granularity && yarn build:chrono && yarn build:charts   # стенды работают с собранным dist
 yarn workspace @feugene/granularity-playground-theme dev
 yarn workspace @feugene/granularity-playground-theme test:run
 ```
@@ -14,12 +14,12 @@ yarn workspace @feugene/granularity-playground-theme test:run
 | Файл | Что в нём смотреть |
 | --- | --- |
 | `theme.config.ts` | режимы данными: `ocean` поверх тёмного (`extendMode`), высококонтрастный `contrast` с нуля (`createMode`) |
-| `granum.config.ts` | темы сборки — `themes`: основная `slate` с режимами `ocean` и `contrast` в `modes.define` (`ocean.definition` и `ocean.fallbacks`), дополнительные — тема каталога `clay` и своя тема (`loadTheme`), каждая своим листом |
+| `granum.config.ts` | провайдеры — ядро и спутники `chrono` и `charts`: свой режим доходит до спутников без строки о них в рецепте; темы сборки — `themes`: основная `slate` с режимами `ocean` и `contrast` в `modes.define` (`ocean.definition` и `ocean.fallbacks`), дополнительные — тема каталога `clay` и своя тема (`loadTheme`), каждая своим листом |
 | `src/themes/brand/` | своя тема приложения: `theme.json` с `"extends": "slate"`, `root.json` и `modes/*.json` — только отличия |
 | `src/main.ts` | `granularityThemePlugin` с манифестом сборки `virtual:granum/themes`: у островов дополнительных тем — пропсы по умолчанию их темы |
 | `src/granularity.ts` | общий лист `virtual:granum.css` и листы дополнительных тем `virtual:granum/themes.css` |
 | `vite.config.ts` | ранний скрипт режима в `<head>` — опция `themeScript` плагина granum |
-| `src/App.vue` | переключатель режимов из манифеста и острова дополнительных тем `<GrConfigProvider theme="…" mode="…">`: у «Глины» загрузка — свет по подписи, группа — лоток |
+| `src/App.vue` | переключатель режимов из манифеста, календарь, поле даты и график в текущем режиме, острова дополнительных тем `<GrConfigProvider theme="…" mode="…">`: у «Глины» загрузка — свет по подписи, группа — лоток |
 | `src/__tests__/theme.test.ts` | автопроверка: полнота ролей, контраст по WCAG, что granum положил режимы и темы под их пары и в свои листы |
 | `src/__tests__/themeRecipes.test.ts` | рецепты раздела «Свои режимы в конфиге» `modes.md` и «Своя тема приложения» `themes.md` на настоящем granum |
 

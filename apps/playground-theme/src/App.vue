@@ -2,6 +2,8 @@
 import { computed, onMounted, ref, watch } from 'vue'
 
 import { useTheme } from '@feugene/granularity'
+import type { GrChartSeries } from '@feugene/granularity-charts'
+import type { PlainDate } from '@feugene/granularity-chrono'
 import { grRoleTokens } from '@feugene/granularity-tokens'
 import themeManifest from 'virtual:granum/themes'
 
@@ -23,6 +25,19 @@ const ranges = [
 ]
 
 const tones = ['success', 'warning', 'danger', 'info', 'slate', 'azure'] as const
+
+// Пикер принимает `Date`, сетка календаря — дату без времени и зоны.
+const TODAY = new Date(2026, 9, 28)
+const delivery = ref<Date | null>(new Date(2026, 9, 30))
+const PLAIN_TODAY: PlainDate = { y: 2026, m: 9, d: 28 }
+const pickup = ref<PlainDate | null>({ y: 2026, m: 10, d: 2 })
+
+const QUARTER = ['Июль', 'Август', 'Сентябрь', 'Октябрь']
+const orders: GrChartSeries[] = [
+  { id: 'moscow', label: 'Москва', x: QUARTER, y: [420, 460, 445, 510] },
+  { id: 'kazan', label: 'Казань', x: QUARTER, y: [180, 210, 240, 236] },
+  { id: 'perm', label: 'Пермь', x: QUARTER, y: [120, 115, 150, 172] },
+]
 
 const projectName = ref('Ocean')
 const compact = ref(true)
@@ -176,6 +191,34 @@ function onModeChange(next: string | number): void {
         <GrAlert tone="danger" title="Ошибка">
           Тот же паттерн в тревожном тоне.
         </GrAlert>
+      </section>
+
+      <!-- Спутники читают те же роли: свой режим доходит до них без строки о спутниках в рецепте -->
+      <section class="grid gap-4 lg:grid-cols-2">
+        <GrCard class="p-4">
+          <div class="flex flex-col gap-4">
+            <h2 class="text-base font-semibold">
+              Даты · granularity-chrono
+            </h2>
+            <GrFormField label="Дата доставки">
+              <GrDatePicker v-model="delivery" :today="TODAY" locale="ru-RU" />
+            </GrFormField>
+            <GrCalendar v-model="pickup" :today="PLAIN_TODAY" locale="ru-RU" size="sm" aria-label="Дата самовывоза" />
+          </div>
+        </GrCard>
+
+        <GrCard class="p-4">
+          <div class="flex flex-col gap-4">
+            <h2 class="text-base font-semibold">
+              График · granularity-charts
+            </h2>
+            <p class="text-sm text-[var(--gr-muted-fg)]">
+              Ряды красятся палитрой <code>--gr-chart-*</code> режима, толщины и подсказку
+              <code>ocean</code> берёт у тёмного режима по цепочке.
+            </p>
+            <GrChartLine :series="orders" :height="220" show-points="always" aria-label="Заказы по городам за квартал" />
+          </div>
+        </GrCard>
       </section>
 
       <!-- Дополнительные темы: каждая своим листом, корень они не занимают -->

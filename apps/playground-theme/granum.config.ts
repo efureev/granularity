@@ -21,7 +21,7 @@ import { contrast, ocean } from './theme.config'
  */
 export default defineGranumConfig({
   engine: windEngine(),
-  providers: ['@feugene/granularity'],
+  providers: ['@feugene/granularity', '@feugene/granularity-chrono', '@feugene/granularity-charts'],
   components: 'all',
   themes: [
     {

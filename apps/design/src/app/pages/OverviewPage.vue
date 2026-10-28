@@ -2,13 +2,13 @@
 import { RouterLink } from 'vue-router'
 
 import { grFoundationTokens, grRoleTokens, grThemeCatalog } from '@feugene/granularity-tokens'
-import { grComponentTokens } from '@feugene/granularity/tokens'
 
 import { catalog, catalogGroups } from '../catalog'
 import { foundations } from '../foundations'
 import DocSection from '../parts/DocSection.vue'
 import PageHeader from '../parts/PageHeader.vue'
 import { plural } from '../plural'
+import { componentTokens } from '../tokenRegistry'
 
 const principles = [
   {
@@ -33,7 +33,7 @@ const stats = [
   { value: grRoleTokens.length, label: 'ролей темы' },
   { value: grFoundationTokens.length, label: 'примитивов' },
   { value: grThemeCatalog.length, label: plural(grThemeCatalog.length, ['тема', 'темы', 'тем']).replace(/^\d+ /, '') },
-  { value: grComponentTokens.length, label: 'токенов компонентов' },
+  { value: componentTokens.length, label: 'токенов компонентов' },
 ]
 </script>
 
@@ -42,7 +42,7 @@ const stats = [
     <PageHeader
       eyebrow="@feugene/granularity"
       title="Дизайн-система"
-      lead="Правила, по которым собраны компоненты пакета: роли цвета, шкалы, движение и доступность. У компонента — песочница, его вид в каждой теме каталога и значения токенов темы."
+      lead="Правила, по которым собраны компоненты ядра и спутников: роли цвета, шкалы, движение и доступность. У компонента — песочница, его вид в каждой теме каталога и значения токенов темы."
     >
       <dl class="mt-2 grid max-w-[720px] grid-cols-2 gap-4 sm:grid-cols-4">
         <div v-for="stat in stats" :key="stat.label" class="flex flex-col gap-0.5">
@@ -73,7 +73,7 @@ const stats = [
       </ul>
     </DocSection>
 
-    <DocSection title="Компоненты" :lead="`${plural(catalog.length, ['компонент', 'компонента', 'компонентов'])} в двенадцати группах. Страница компонента — все состояния и поведение на настоящих компонентах пакета, он же в каждой теме каталога и значения его токенов.`">
+    <DocSection title="Компоненты" :lead="`${plural(catalog.length, ['компонент', 'компонента', 'компонентов'])} ядра и спутников в ${plural(catalogGroups.length, ['группе', 'группах', 'группах'])}. Страница компонента — все состояния и поведение на настоящих компонентах, он же в каждой теме каталога и значения его токенов.`">
       <ul class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <li v-for="group in catalogGroups" :key="group.id">
           <RouterLink :to="{ name: 'components', hash: `#group-${group.id}` }" class="overview-card">

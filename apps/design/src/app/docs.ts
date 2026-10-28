@@ -3,15 +3,19 @@ import { marked, type Tokens } from 'marked'
 /**
  * Тексты берутся из документации пакета сборкой, а не копируются: документ в
  * репозитории и страница приложения не могут разойтись. Компонент в темах
- * каталога — `docs/design/*.md`, поведение компонента — `docs/components/*.md`;
- * ключ — имя компонента пакета (`GrButton`).
+ * каталога — `docs/design/*.md`, поведение компонента — `docs/components/*.md`
+ * ядра и спутников; ключ — имя компонента (`GrButton`, `GrCalendar`): имена уникальны
+ * во всей экосистеме.
  */
 function byComponent(sources: Record<string, string>): Record<string, string> {
   return Object.fromEntries(Object.entries(sources).map(([path, source]) => [path.slice(path.lastIndexOf('/') + 1, -'.md'.length), source]))
 }
 
 const designDocs = byComponent(import.meta.glob<string>('../../../../packages/granularity/docs/design/Gr*.md', { query: '?raw', import: 'default', eager: true }))
-const componentDocs = byComponent(import.meta.glob<string>('../../../../packages/granularity/docs/components/Gr*.md', { query: '?raw', import: 'default', eager: true }))
+const componentDocs = byComponent({
+  ...import.meta.glob<string>('../../../../packages/granularity/docs/components/Gr*.md', { query: '?raw', import: 'default', eager: true }),
+  ...import.meta.glob<string>('../../../../packages/granularity-*/docs/components/Gr*.md', { query: '?raw', import: 'default', eager: true }),
+})
 
 /** «Четыре темы рядом» — число растёт вместе с каталогом. */
 const COMPARISON_HEADING = /темы рядом$/i

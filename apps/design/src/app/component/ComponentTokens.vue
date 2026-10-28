@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 
-import { grComponentTokens } from '@feugene/granularity/tokens'
 import themeManifest from 'virtual:granum/themes'
 
 import { themeTokenRows } from '../componentTokens'
+import { componentTokens } from '../tokenRegistry'
 import TokenTable from '../parts/TokenTable.vue'
 import { plural } from '../plural'
 import type { TokenTableSection } from '../themeTokens'
@@ -15,7 +15,7 @@ import { useCatalogComponent } from './views'
 const component = useCatalogComponent()
 const theme = useViewedTheme()
 
-const tokens = computed(() => grComponentTokens.filter(token => component.value.exports.includes(token.owner)))
+const tokens = computed(() => componentTokens.filter(token => component.value.tokenOwners.includes(token.owner)))
 const modes = computed(() => modeColumns(themeManifest, theme.value.id))
 const rows = computed(() => themeTokenRows(tokens.value, theme.value.data))
 const others = computed(() => tokens.value.length - rows.value.length)

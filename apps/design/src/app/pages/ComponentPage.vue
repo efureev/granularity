@@ -94,7 +94,7 @@ const activeTab = computed({
           <component :is="views.tokens" />
         </GrTabPanel>
         <GrTabPanel value="hooks" keep-alive lazy>
-          <HooksPanel :owners="component.exports" />
+          <HooksPanel :owners="component.tokenOwners" />
         </GrTabPanel>
       </GrTabPanels>
     </div>

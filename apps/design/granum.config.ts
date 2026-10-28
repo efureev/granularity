@@ -19,7 +19,16 @@ const THEME = 'slate'
  */
 export default defineGranumConfig({
   engine: windEngine(),
-  providers: ['@feugene/granularity'],
+  providers: [
+    '@feugene/granularity',
+    '@feugene/granularity-chrono',
+    '@feugene/granularity-charts',
+    '@feugene/granularity-code',
+    '@feugene/granularity-dashboard',
+    '@feugene/granularity-editor',
+    '@feugene/granularity-forms-schema',
+    '@feugene/granularity-media',
+  ],
   components: 'all',
   themes: buildThemes(THEME),
   appSources: { dirs: ['src/app'] },

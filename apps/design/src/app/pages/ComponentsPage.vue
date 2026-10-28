@@ -30,7 +30,7 @@ const found = computed(() => groups.value.reduce((total, group) => total + group
     <PageHeader
       eyebrow="Каталог"
       title="Компоненты"
-      :lead="`${plural(catalog.length, ['компонент', 'компонента', 'компонентов'])} ядра в теме «${theme.data.title}». Карточка — один образец, страница компонента — все состояния, поведение, темы рядом и токены.`"
+      :lead="`${plural(catalog.length, ['компонент', 'компонента', 'компонентов'])} ядра и спутников в теме «${theme.data.title}». Карточка — один образец, страница компонента — все состояния, поведение, темы рядом и токены.`"
     />
 
     <div class="flex flex-col gap-4">

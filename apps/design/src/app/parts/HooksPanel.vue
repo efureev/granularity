@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 
-import { grComponentTokens } from '@feugene/granularity/tokens'
+import { componentTokens } from '../tokenRegistry'
 import IconSearch from '~icons/lucide/search'
 
 import { plural } from '../plural'
@@ -24,7 +24,7 @@ const props = defineProps<{
 
 const ALL = '*'
 
-const hooks = computed(() => grComponentTokens.filter(token => token.kind === 'hook' && props.owners.includes(token.owner)))
+const hooks = computed(() => componentTokens.filter(token => token.kind === 'hook' && props.owners.includes(token.owner)))
 const owners = computed(() => props.owners.filter(owner => hooks.value.some(hook => hook.owner === owner)))
 
 const search = ref('')

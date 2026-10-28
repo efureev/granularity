@@ -1,6 +1,13 @@
 import { existsSync, readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { grThemeCatalog } from '@feugene/granularity-tokens'
+import chartsManifest from '@feugene/granularity-charts/granum.manifest.json'
+import chronoManifest from '@feugene/granularity-chrono/granum.manifest.json'
+import codeManifest from '@feugene/granularity-code/granum.manifest.json'
+import dashboardManifest from '@feugene/granularity-dashboard/granum.manifest.json'
+import editorManifest from '@feugene/granularity-editor/granum.manifest.json'
+import formsSchemaManifest from '@feugene/granularity-forms-schema/granum.manifest.json'
+import mediaManifest from '@feugene/granularity-media/granum.manifest.json'
 import manifest from '@feugene/granularity/granum.manifest.json'
 import { describe, expect, it } from 'vitest'
 
@@ -9,7 +16,9 @@ import { COMPONENT_TAGS } from '../app/catalogData'
 import { comparisonRow, comparisonTable, componentDoc, designDoc, themeDocSection } from '../app/docs'
 
 const SPECIMENS = fileURLToPath(new URL('../app/specimens/', import.meta.url))
-const packageComponents = Object.keys(manifest.components).sort()
+/** Компоненты экосистемы: ядро и компонентные спутники — каталог показывает все. */
+const manifests = [manifest, chronoManifest, chartsManifest, codeManifest, dashboardManifest, editorManifest, formsSchemaManifest, mediaManifest]
+const packageComponents = manifests.flatMap(item => Object.keys(item.components)).sort()
 
 describe('каталог компонентов', () => {
   it('каждый компонент пакета — ровно в одной группе', () => {

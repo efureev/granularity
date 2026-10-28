@@ -1,4 +1,4 @@
-import { type CatalogGroup, catalogGroups, catalogPages, componentSlug } from './catalogData'
+import { type CatalogGroup, catalogGroups, catalogPages, componentSlug, SHARED_TOKEN_OWNERS } from './catalogData'
 import { componentDoc, plainText } from './docs'
 
 export { type CatalogGroup, catalogGroups, componentSlug, OWN_PAGES } from './catalogData'
@@ -14,6 +14,10 @@ export interface CatalogComponent {
   /** Компоненты пакета, которые описывает страница: их токены и хуки — на вкладках. Первый — главный. */
   exports: string[]
   group: string
+  /** Пакет компонента: ядро или спутник. */
+  package: string
+  /** Владельцы токенов на вкладках страницы: компоненты страницы и общая рама, которую они рисуют. */
+  tokenOwners: string[]
   importPath: string
   summary: string
 }
@@ -29,7 +33,9 @@ export const catalog: CatalogComponent[] = catalogPages().map(page => ({
   name: page.name.replace(/^Gr/, ''),
   exports: page.exports,
   group: page.group,
-  importPath: `@feugene/granularity/components/${page.name}`,
+  package: page.package,
+  tokenOwners: [...page.exports, ...(SHARED_TOKEN_OWNERS[page.group] ?? [])],
+  importPath: `${page.package}/components/${page.name}`,
   summary: summaryOf(page.name),
 }))
 

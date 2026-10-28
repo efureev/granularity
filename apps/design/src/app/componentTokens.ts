@@ -1,9 +1,6 @@
 import type { GrThemeData } from '@feugene/granularity-tokens'
 import type { GrComponentToken } from '@feugene/granularity/tokens'
 
-/** Пакет, под чьим именем тема кладёт значения компонентов ядра (`components/<пакет>/<GrX>/`). */
-export const CORE_PACKAGE = '@feugene/granularity'
-
 type ComponentValues = NonNullable<GrThemeData['components']>[string][string]
 
 /** Как показать значение рядом с текстом: образец цвета, тени, угла или шрифта. */
@@ -40,8 +37,13 @@ export function tokenPreview(name: string): TokenPreview | undefined {
   return undefined
 }
 
+/**
+ * Значения компонента в теме: тема кладёт их разделом своего пакета
+ * (`components/<пакет>/<GrX>/`), а имена компонентов уникальны во всей экосистеме —
+ * владелец находит свой раздел сам, будь он ядра или спутника.
+ */
 export function componentThemeValues(data: GrThemeData, owner: string): ComponentValues | undefined {
-  return data.components?.[CORE_PACKAGE]?.[owner]
+  return Object.values(data.components ?? {}).find(values => values[owner] !== undefined)?.[owner]
 }
 
 /** Пропы, которые тема включает компоненту (`componentDefaults` в `theme.json`). */

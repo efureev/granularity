@@ -2,7 +2,6 @@
 import { computed, ref } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
 
-import { grComponentTokens } from '@feugene/granularity/tokens'
 import themeManifest from 'virtual:granum/themes'
 import IconArrowRight from '~icons/lucide/arrow-right'
 
@@ -17,6 +16,7 @@ import ThemeHero from '../theme/ThemeHero.vue'
 import ThemeTokensPanel from '../theme/ThemeTokensPanel.vue'
 import { findDesignTheme, islandTheme, modeColumns } from '../themes'
 import { useThemeView } from '../viewedTheme'
+import { componentTokens } from '../tokenRegistry'
 import NotFoundPage from './NotFoundPage.vue'
 
 const route = useRoute()
@@ -27,7 +27,7 @@ const theme = computed(() => findDesignTheme(themeManifest, slug.value))
 const islands = computed(() => (theme.value ? islandTheme(theme.value) : undefined))
 const { view, error: dataError } = useThemeView(() => slug.value)
 const modes = computed(() => modeColumns(themeManifest, slug.value))
-const hookOwners = [...new Set(grComponentTokens.filter(token => token.kind === 'hook').map(token => token.owner))]
+const hookOwners = [...new Set(componentTokens.filter(token => token.kind === 'hook').map(token => token.owner))]
 
 const tabs = [
   { value: 'overview', label: 'Обзор' },
