@@ -7,6 +7,8 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v3.4.1] 2026-10-28
+
 ### Changed
 
 - **Листы `GrSwitch`, `GrPagination` и `GrButton` вместе легче на 3,1 КБ минифицированного CSS.**
