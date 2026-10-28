@@ -547,6 +547,55 @@ export const grComponentTokens: GrComponentToken[] = [
   },
   {
     "owner": "GrButton",
+    "name": "--gr-button-step-height",
+    "kind": "css",
+    "default": "`xs` 1.75rem, `sm` 2rem, `md` 2.5rem, `lg` 2.75rem",
+    "description": "Высота текущей ступени: её читают высота кнопки и запасной размер квадрата. Ставит правило ступени в листе компонента."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-step-gap",
+    "kind": "css",
+    "default": "`xs` .25rem, `sm` .375rem, `md` .5rem, `lg` .5rem",
+    "description": "Зазор между глифом и подписью на текущей ступени. Ставит правило ступени в листе компонента."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-step-px",
+    "kind": "css",
+    "default": "`xs` .625rem, `sm` .75rem, `md` 1rem, `lg` 1.25rem",
+    "description": "Боковой отступ текущей ступени. Ставит правило ступени в листе компонента."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-step-addon-px",
+    "kind": "css",
+    "default": "`xs` .5rem, `sm` .625rem, `md` .875rem, `lg` 1.125rem",
+    "description": "Отступ со стороны аддона: на 2px меньше бокового, чтобы глиф стоял оптически по центру. Ставит правило ступени в листе компонента."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-step-text",
+    "kind": "css",
+    "default": "`xs` `--gr-text-xs`, `sm` `--gr-text-sm`, `md` `--gr-text-sm`, `lg` `--gr-text-base`",
+    "description": "Кегль текущей ступени. Ставит правило ступени в листе компонента."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-step-leading",
+    "kind": "css",
+    "default": "`xs` `--gr-leading-xs`, `sm` `--gr-leading-sm`, `md` `--gr-leading-sm`, `lg` `--gr-leading-base`",
+    "description": "Интерлиньяж текущей ступени. Ставит правило ступени в листе компонента."
+  },
+  {
+    "owner": "GrButton",
+    "name": "--gr-button-step-glyph",
+    "kind": "css",
+    "default": "`xs` .875rem, `sm` 1rem, `md` 1rem, `lg` 1.25rem",
+    "description": "Размер своих глифов кнопки — спиннера и стрелки внешней ссылки. Ставит правило ступени в листе компонента."
+  },
+  {
+    "owner": "GrButton",
     "name": "--gr-button-corner-radius",
     "kind": "css",
     "default": "var(--gr-button-radius, var(--gr-button-step-radius)); в склеенной группе впереди `--gr-button-group-radius`",
@@ -584,9 +633,8 @@ export const grComponentTokens: GrComponentToken[] = [
     "owner": "GrButton",
     "name": "--gr-button-square-size",
     "kind": "hook",
-    "default": "высота кнопки текущей ступени",
-    "description": "Сторона квадратной кнопки (`square`): иконка без подписи обязана остаться квадратом на любой ступени.",
-    "literal": "Сторона берётся по ступени `size` из карты компонента (`sizes.md`)."
+    "default": "`--gr-button-step-height` — высота кнопки текущей ступени",
+    "description": "Сторона квадратной кнопки (`square`): иконка без подписи обязана остаться квадратом на любой ступени."
   },
   {
     "owner": "GrButton",
@@ -3011,6 +3059,62 @@ export const grComponentTokens: GrComponentToken[] = [
     "description": "Вес номеров страниц."
   },
   {
+    "owner": "GrPagination",
+    "name": "--gr-pagination-step-gap",
+    "kind": "css",
+    "default": "`xs` .125rem, `sm` .25rem, `md` .25rem, `lg` .25rem",
+    "description": "Зазор внутри групп кнопок и номеров. Ставит правило ступени в листе компонента."
+  },
+  {
+    "owner": "GrPagination",
+    "name": "--gr-pagination-step-text",
+    "kind": "css",
+    "default": "`xs` `--gr-text-xs`, `sm` `--gr-text-xs`, `md` `--gr-text-sm`, `lg` `--gr-text-base`",
+    "description": "Кегль номеров, счётчика и поля перехода. Ставит правило ступени в листе компонента."
+  },
+  {
+    "owner": "GrPagination",
+    "name": "--gr-pagination-step-leading",
+    "kind": "css",
+    "default": "`xs` `--gr-leading-xs`, `sm` `--gr-leading-xs`, `md` `--gr-leading-sm`, `lg` `--gr-leading-base`",
+    "description": "Интерлиньяж номеров, счётчика и поля перехода. Ставит правило ступени в листе компонента."
+  },
+  {
+    "owner": "GrPagination",
+    "name": "--gr-pagination-step-height",
+    "kind": "css",
+    "default": "`xs` 1.75rem, `sm` 2rem, `md` 2.5rem, `lg` 2.75rem",
+    "description": "Высота номера и поля перехода — та же, что у кнопок «назад/вперёд». Ставит правило ступени в листе компонента."
+  },
+  {
+    "owner": "GrPagination",
+    "name": "--gr-pagination-step-px",
+    "kind": "css",
+    "default": "`xs` .375rem, `sm` .5rem, `md` .5rem, `lg` .75rem",
+    "description": "Боковой отступ номера. Ставит правило ступени в листе компонента."
+  },
+  {
+    "owner": "GrPagination",
+    "name": "--gr-pagination-step-ellipsis-px",
+    "kind": "css",
+    "default": "`xs` .25rem, `sm` .25rem, `md` .25rem, `lg` .5rem",
+    "description": "Боковой отступ многоточия. Ставит правило ступени в листе компонента."
+  },
+  {
+    "owner": "GrPagination",
+    "name": "--gr-pagination-step-jumper",
+    "kind": "css",
+    "default": "`xs` 3rem, `sm` 3.5rem, `md` 3.5rem, `lg` 4rem",
+    "description": "Ширина поля перехода к странице. Ставит правило ступени в листе компонента."
+  },
+  {
+    "owner": "GrPagination",
+    "name": "--gr-pagination-step-page-size",
+    "kind": "css",
+    "default": "`xs` 84px, `sm` 92px, `md` 100px, `lg` 112px",
+    "description": "Минимальная ширина выбора размера страницы. Ставит правило ступени в листе компонента."
+  },
+  {
     "owner": "GrPopover",
     "name": "--gr-popover-max-width",
     "kind": "hook",
@@ -3736,9 +3840,8 @@ export const grComponentTokens: GrComponentToken[] = [
     "owner": "GrSwitch",
     "name": "--gr-switch-state-text-size",
     "kind": "hook",
-    "default": "9px на md, 11px на lg",
-    "description": "Кегль подписи состояния. Собственный, а не ступень шкалы: минимальный --gr-text-xs (12px) в дорожку не помещается. Один токен на обе ступени.",
-    "literal": "Кегль подписи состояния по ступени `size` из карты компонента."
+    "default": "`--gr-switch-step-state-size`: 9px на md, 11px на lg",
+    "description": "Кегль подписи состояния. Собственный, а не ступень шкалы: минимальный --gr-text-xs (12px) в дорожку не помещается. Один токен на обе ступени."
   },
   {
     "owner": "GrSwitch",
@@ -3837,6 +3940,62 @@ export const grComponentTokens: GrComponentToken[] = [
     "kind": "theme",
     "default": "3.5rem",
     "description": "Ширина дорожки с подписью состояния на ступени `lg`; в `autoWidth` — нижняя граница. Места под подпись — не меньше, чем в базовой теме: держит гейт."
+  },
+  {
+    "owner": "GrSwitch",
+    "name": "--gr-switch-step-width",
+    "kind": "css",
+    "default": "`--gr-switch-track-width-<ступень>` текущей ступени",
+    "description": "Ширина дорожки на текущей ступени. Ставит правило ступени в листе компонента."
+  },
+  {
+    "owner": "GrSwitch",
+    "name": "--gr-switch-step-height",
+    "kind": "css",
+    "default": "`--gr-switch-track-height-<ступень>` текущей ступени",
+    "description": "Высота дорожки: из неё выведены бегунок, иконка в нём и место подписи состояния. Ставит правило ступени в листе компонента."
+  },
+  {
+    "owner": "GrSwitch",
+    "name": "--gr-switch-step-icon",
+    "kind": "css",
+    "default": "`xs` .5rem, `sm` .625rem, `md` .75rem, `lg` 1rem",
+    "description": "Размер спиннера и иконки в бегунке. Ставит правило ступени в листе компонента."
+  },
+  {
+    "owner": "GrSwitch",
+    "name": "--gr-switch-step-text",
+    "kind": "css",
+    "default": "`xs` `--gr-text-xs`, `sm` `--gr-text-sm`, `md` `--gr-text-sm`, `lg` `--gr-text-base`",
+    "description": "Кегль подписи. Ставит правило ступени в листе компонента."
+  },
+  {
+    "owner": "GrSwitch",
+    "name": "--gr-switch-step-leading",
+    "kind": "css",
+    "default": "`xs` `--gr-leading-xs`, `sm` `--gr-leading-sm`, `md` `--gr-leading-sm`, `lg` `--gr-leading-base`",
+    "description": "Интерлиньяж подписи. Ставит правило ступени в листе компонента."
+  },
+  {
+    "owner": "GrSwitch",
+    "name": "--gr-switch-step-text-width",
+    "kind": "css",
+    "default": "`--gr-switch-text-track-width-<ступень>`; только `md` и `lg`",
+    "description": "Ширина дорожки с подписью состояния. Ставит правило ступени в листе компонента."
+  },
+  {
+    "owner": "GrSwitch",
+    "name": "--gr-switch-step-state-size",
+    "kind": "css",
+    "default": "`md` 9px, `lg` 11px",
+    "description": "Кегль подписи состояния, пока ручка `--gr-switch-state-text-size` не задана. Ставит правило ступени в листе компонента."
+  },
+  {
+    "owner": "GrSwitch",
+    "name": "--gr-switch-step-air",
+    "kind": "css",
+    "default": "`md` 8px, `lg` 10px",
+    "description": "Воздух вокруг подписи состояния в `autoWidth`. Ставит правило ступени в листе компонента."
   },
   {
     "owner": "GrTable",

@@ -513,161 +513,102 @@ function toggle(): void {
   visibility: hidden;
 }
 
-[data-gr-switch][data-gr-size='xs'] > [data-gr-switch-track] {
-  width: var(--gr-switch-track-width-xs);
-  height: var(--gr-switch-track-height-xs);
+[data-gr-switch][data-gr-size='xs'] {
+  --gr-switch-step-width: var(--gr-switch-track-width-xs);
+  --gr-switch-step-height: var(--gr-switch-track-height-xs);
+  --gr-switch-step-icon: 0.5rem;
+  --gr-switch-step-text: var(--gr-text-xs);
+  --gr-switch-step-leading: var(--gr-leading-xs);
 }
 
-[data-gr-switch][data-gr-size='xs'] [data-gr-switch-thumb] {
-  width: calc(var(--gr-switch-track-height-xs) - 4px);
-  height: calc(var(--gr-switch-track-height-xs) - 4px);
+[data-gr-switch][data-gr-size='sm'] {
+  --gr-switch-step-width: var(--gr-switch-track-width-sm);
+  --gr-switch-step-height: var(--gr-switch-track-height-sm);
+  --gr-switch-step-icon: 0.625rem;
+  --gr-switch-step-text: var(--gr-text-sm);
+  --gr-switch-step-leading: var(--gr-leading-sm);
 }
 
-[data-gr-switch][data-gr-size='xs'] :is([data-gr-switch-spinner], [data-gr-switch-thumb-icon]) {
-  width: 0.5rem;
-  max-width: calc(var(--gr-switch-track-height-xs) - 8px);
-  height: 0.5rem;
-  max-height: calc(var(--gr-switch-track-height-xs) - 8px);
+[data-gr-switch][data-gr-size='md'] {
+  --gr-switch-step-width: var(--gr-switch-track-width-md);
+  --gr-switch-step-height: var(--gr-switch-track-height-md);
+  --gr-switch-step-icon: 0.75rem;
+  --gr-switch-step-text: var(--gr-text-sm);
+  --gr-switch-step-leading: var(--gr-leading-sm);
+  --gr-switch-step-text-width: var(--gr-switch-text-track-width-md);
+  --gr-switch-step-state-size: 9px;
+  --gr-switch-step-air: 8px;
 }
 
-[data-gr-switch][data-gr-size='xs'] > [data-gr-switch-label] {
-  font-size: var(--gr-text-xs);
-  line-height: var(--gr-leading-xs);
+[data-gr-switch][data-gr-size='lg'] {
+  --gr-switch-step-width: var(--gr-switch-track-width-lg);
+  --gr-switch-step-height: var(--gr-switch-track-height-lg);
+  --gr-switch-step-icon: 1rem;
+  --gr-switch-step-text: var(--gr-text-base);
+  --gr-switch-step-leading: var(--gr-leading-base);
+  --gr-switch-step-text-width: var(--gr-switch-text-track-width-lg);
+  --gr-switch-step-state-size: 11px;
+  --gr-switch-step-air: 10px;
 }
 
-[data-gr-switch][data-gr-size='sm'] > [data-gr-switch-track] {
-  width: var(--gr-switch-track-width-sm);
-  height: var(--gr-switch-track-height-sm);
+[data-gr-switch][data-gr-size] > [data-gr-switch-track] {
+  width: var(--gr-switch-step-width);
+  height: var(--gr-switch-step-height);
 }
 
-[data-gr-switch][data-gr-size='sm'] [data-gr-switch-thumb] {
-  width: calc(var(--gr-switch-track-height-sm) - 4px);
-  height: calc(var(--gr-switch-track-height-sm) - 4px);
+[data-gr-switch][data-gr-size] [data-gr-switch-thumb] {
+  width: calc(var(--gr-switch-step-height) - 4px);
+  height: calc(var(--gr-switch-step-height) - 4px);
 }
 
-[data-gr-switch][data-gr-size='sm'] :is([data-gr-switch-spinner], [data-gr-switch-thumb-icon]) {
-  width: 0.625rem;
-  max-width: calc(var(--gr-switch-track-height-sm) - 8px);
-  height: 0.625rem;
-  max-height: calc(var(--gr-switch-track-height-sm) - 8px);
+[data-gr-switch][data-gr-size] :is([data-gr-switch-spinner], [data-gr-switch-thumb-icon]) {
+  width: var(--gr-switch-step-icon);
+  max-width: calc(var(--gr-switch-step-height) - 8px);
+  height: var(--gr-switch-step-icon);
+  max-height: calc(var(--gr-switch-step-height) - 8px);
 }
 
-[data-gr-switch][data-gr-size='sm'] > [data-gr-switch-label] {
-  font-size: var(--gr-text-sm);
-  line-height: var(--gr-leading-sm);
-}
-
-[data-gr-switch][data-gr-size='md'] > [data-gr-switch-track] {
-  width: var(--gr-switch-track-width-md);
-  height: var(--gr-switch-track-height-md);
-}
-
-[data-gr-switch][data-gr-size='md'] [data-gr-switch-thumb] {
-  width: calc(var(--gr-switch-track-height-md) - 4px);
-  height: calc(var(--gr-switch-track-height-md) - 4px);
-}
-
-[data-gr-switch][data-gr-size='md'] :is([data-gr-switch-spinner], [data-gr-switch-thumb-icon]) {
-  width: 0.75rem;
-  max-width: calc(var(--gr-switch-track-height-md) - 8px);
-  height: 0.75rem;
-  max-height: calc(var(--gr-switch-track-height-md) - 8px);
-}
-
-[data-gr-switch][data-gr-size='md'] > [data-gr-switch-label] {
-  font-size: var(--gr-text-sm);
-  line-height: var(--gr-leading-sm);
-}
-
-[data-gr-switch][data-gr-size='lg'] > [data-gr-switch-track] {
-  width: var(--gr-switch-track-width-lg);
-  height: var(--gr-switch-track-height-lg);
-}
-
-[data-gr-switch][data-gr-size='lg'] [data-gr-switch-thumb] {
-  width: calc(var(--gr-switch-track-height-lg) - 4px);
-  height: calc(var(--gr-switch-track-height-lg) - 4px);
-}
-
-[data-gr-switch][data-gr-size='lg'] :is([data-gr-switch-spinner], [data-gr-switch-thumb-icon]) {
-  width: 1rem;
-  max-width: calc(var(--gr-switch-track-height-lg) - 8px);
-  height: 1rem;
-  max-height: calc(var(--gr-switch-track-height-lg) - 8px);
-}
-
-[data-gr-switch][data-gr-size='lg'] > [data-gr-switch-label] {
-  font-size: var(--gr-text-base);
-  line-height: var(--gr-leading-base);
+[data-gr-switch][data-gr-size] > [data-gr-switch-label] {
+  font-size: var(--gr-switch-step-text);
+  line-height: var(--gr-switch-step-leading);
 }
 
 /*
  * Кегль подписи — свой, а не ступень шкалы пакета: минимальный `--gr-text-xs` — 12px,
  * и трёхбуквенное слово на нём не встаёт в 21px. Отступ со стороны бегунка —
  * `бегунок + зазор`, остаток и есть место подписи. В `autoWidth` к нему добавляется
- * воздух с обеих сторон: ширину задаёт сам текст, и без воздуха он прилипает к бегунку
- * и к закруглению. Расчёт места — `docs/components/GrSwitch.md`.
+ * воздух с обеих сторон (`--gr-switch-step-air`): ширину задаёт сам текст, и без
+ * воздуха он прилипает к бегунку и к закруглению. Расчёт места —
+ * `docs/components/GrSwitch.md`.
  */
-
-[data-gr-switch][data-gr-size='md'][data-gr-text='fixed'] > [data-gr-switch-track] {
-  width: var(--gr-switch-text-track-width-md);
+[data-gr-switch][data-gr-size][data-gr-text='fixed'] > [data-gr-switch-track] {
+  width: var(--gr-switch-step-text-width);
 }
 
-[data-gr-switch][data-gr-size='md'][data-gr-text='auto'] > [data-gr-switch-track] {
+[data-gr-switch][data-gr-size][data-gr-text='auto'] > [data-gr-switch-track] {
   width: auto;
-  min-width: var(--gr-switch-text-track-width-md);
+  min-width: var(--gr-switch-step-text-width);
 }
 
-[data-gr-switch][data-gr-size='md'] [data-gr-switch-state-text] {
-  font-size: var(--gr-switch-state-text-size, 9px);
+[data-gr-switch][data-gr-size] [data-gr-switch-state-text] {
+  font-size: var(--gr-switch-state-text-size, var(--gr-switch-step-state-size));
 }
 
-[data-gr-switch][data-gr-size='md'][data-gr-text='fixed']:not([aria-checked='true']) [data-gr-switch-state-text] {
-  padding-left: calc(var(--gr-switch-track-height-md) - 3px);
+[data-gr-switch][data-gr-size][data-gr-text='fixed']:not([aria-checked='true']) [data-gr-switch-state-text] {
+  padding-left: calc(var(--gr-switch-step-height) - 3px);
 }
 
-[data-gr-switch][data-gr-size='md'][data-gr-text='fixed'][aria-checked='true'] [data-gr-switch-state-text] {
-  padding-right: calc(var(--gr-switch-track-height-md) - 3px);
+[data-gr-switch][data-gr-size][data-gr-text='fixed'][aria-checked='true'] [data-gr-switch-state-text] {
+  padding-right: calc(var(--gr-switch-step-height) - 3px);
 }
 
-[data-gr-switch][data-gr-size='md'][data-gr-text='auto']:not([aria-checked='true']) [data-gr-switch-state-text] {
-  padding-right: 8px;
-  padding-left: calc(var(--gr-switch-track-height-md) + 5px);
+[data-gr-switch][data-gr-size][data-gr-text='auto']:not([aria-checked='true']) [data-gr-switch-state-text] {
+  padding-right: var(--gr-switch-step-air);
+  padding-left: calc(var(--gr-switch-step-height) - 3px + var(--gr-switch-step-air));
 }
 
-[data-gr-switch][data-gr-size='md'][data-gr-text='auto'][aria-checked='true'] [data-gr-switch-state-text] {
-  padding-right: calc(var(--gr-switch-track-height-md) + 5px);
-  padding-left: 8px;
-}
-
-[data-gr-switch][data-gr-size='lg'][data-gr-text='fixed'] > [data-gr-switch-track] {
-  width: var(--gr-switch-text-track-width-lg);
-}
-
-[data-gr-switch][data-gr-size='lg'][data-gr-text='auto'] > [data-gr-switch-track] {
-  width: auto;
-  min-width: var(--gr-switch-text-track-width-lg);
-}
-
-[data-gr-switch][data-gr-size='lg'] [data-gr-switch-state-text] {
-  font-size: var(--gr-switch-state-text-size, 11px);
-}
-
-[data-gr-switch][data-gr-size='lg'][data-gr-text='fixed']:not([aria-checked='true']) [data-gr-switch-state-text] {
-  padding-left: calc(var(--gr-switch-track-height-lg) - 3px);
-}
-
-[data-gr-switch][data-gr-size='lg'][data-gr-text='fixed'][aria-checked='true'] [data-gr-switch-state-text] {
-  padding-right: calc(var(--gr-switch-track-height-lg) - 3px);
-}
-
-[data-gr-switch][data-gr-size='lg'][data-gr-text='auto']:not([aria-checked='true']) [data-gr-switch-state-text] {
-  padding-right: 10px;
-  padding-left: calc(var(--gr-switch-track-height-lg) + 7px);
-}
-
-[data-gr-switch][data-gr-size='lg'][data-gr-text='auto'][aria-checked='true'] [data-gr-switch-state-text] {
-  padding-right: calc(var(--gr-switch-track-height-lg) + 7px);
-  padding-left: 10px;
+[data-gr-switch][data-gr-size][data-gr-text='auto'][aria-checked='true'] [data-gr-switch-state-text] {
+  padding-right: calc(var(--gr-switch-step-height) - 3px + var(--gr-switch-step-air));
+  padding-left: var(--gr-switch-step-air);
 }
 </style>

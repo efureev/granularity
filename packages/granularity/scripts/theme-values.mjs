@@ -108,9 +108,10 @@ function declaredTokens(css) {
 
 /**
  * Переменные-псевдонимы, которые компонент ставит себе сам по своим атрибутам: у кнопки
- * `--gr-button-tone-bg: var(--gr-button-primary-bg)` по `data-gr-tone`. Пробник контекста их не
- * видит — атрибутов элемента у него нет, и чтение через псевдоним дало бы пустоту. Псевдоним —
- * переменная не из слоёв темы, каждое объявление которой — ровно одна ссылка `var(--gr-…)`.
+ * `--gr-button-tone-bg: var(--gr-button-primary-bg)` по `data-gr-tone`, `--gr-button-step-height:
+ * 2.5rem` по `data-gr-size`. Пробник контекста их не видит — атрибутов элемента у него нет, и
+ * чтение через псевдоним дало бы пустоту. Псевдоним — переменная не из слоёв темы, каждое
+ * объявление которой — ровно одна ссылка `var(--gr-…)` либо литерал без `var()`.
  */
 function elementAliases(css, themeTokens) {
   const theme = new Set(themeTokens)
@@ -120,16 +121,20 @@ function elementAliases(css, themeTokens) {
       values.set(token, (values.get(token) ?? new Set()).add(value.trim()))
   }
 
-  return new Map([...values].filter(([, set]) => [...set].every(value => /^var\(--gr-[\w-]+\)$/.test(value))))
+  const plain = value => /^var\(--gr-[\w-]+\)$/.test(value) || !value.includes('var(')
+  return new Map([...values].filter(([, set]) => [...set].every(plain)))
 }
 
-/** Чтение через псевдоним — во все его значения: кнопка сверяется по каждому тону, как сверялся бы класс на тон. */
+/**
+ * Чтение через псевдоним — во все его значения: кнопка сверяется по каждому тону, как сверялся бы
+ * класс на тон. Чтение, которое раскрылось в литерал, не сверяется: тема на него не влияет.
+ */
 function expandAliases(expressions, aliases) {
   const out = new Set()
   const visit = (expression) => {
     const alias = [...expression.matchAll(/var\((--gr-[\w-]+)\)/g)].find(match => aliases.has(match[1]))
     if (!alias)
-      return out.add(expression)
+      return expression.startsWith('var(--gr-') ? out.add(expression) : out
     for (const value of aliases.get(alias[1]))
       visit(expression.replace(alias[0], value))
   }

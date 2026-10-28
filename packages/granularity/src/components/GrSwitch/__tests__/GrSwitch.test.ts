@@ -505,7 +505,7 @@ describe('GrSwitch — растущая дорожка', () => {
     const stateText = wrapper.get('[data-testid="gr-switch-state-text"]')
     expect(lookOf(stateText).position).toBeUndefined()
     // Со свободной стороны появляется отступ: центровать текст больше нечем.
-    expect(lookOf(stateText)).toMatchObject({ 'padding-left': '8px', 'padding-right': 'calc(var(--gr-switch-track-height-md) + 5px)' })
+    expect(lookOf(stateText)).toMatchObject({ 'padding-left': '8px', 'padding-right': 'calc(var(--gr-switch-track-height-md) - 3px + 8px)' })
   })
 
   it('невидимый дубль держит ширину при переключении', async () => {

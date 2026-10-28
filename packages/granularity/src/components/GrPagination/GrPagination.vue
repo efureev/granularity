@@ -491,130 +491,78 @@ if (__GR_DEV__) {
 }
 
 [data-gr-pagination][data-gr-size='xs'] {
+  --gr-pagination-step-gap: 0.125rem;
+  --gr-pagination-step-text: var(--gr-text-xs);
+  --gr-pagination-step-leading: var(--gr-leading-xs);
+  --gr-pagination-step-height: 1.75rem;
+  --gr-pagination-step-px: 0.375rem;
+  --gr-pagination-step-ellipsis-px: 0.25rem;
+  --gr-pagination-step-jumper: 3rem;
+  --gr-pagination-step-page-size: 84px;
   gap: 0.5rem;
-}
-
-[data-gr-pagination][data-gr-size='xs'] :is([data-gr-pagination-nav], [data-gr-pagination-pages]) {
-  gap: 0.125rem;
-}
-
-[data-gr-pagination][data-gr-size='xs'] :is([data-gr-pagination-total], [data-gr-pagination-compact], [data-gr-pagination-jump], [data-gr-pagination-page], [data-gr-pagination-ellipsis], [data-gr-pagination-jumper]) {
-  font-size: var(--gr-text-xs);
-  line-height: var(--gr-leading-xs);
-}
-
-[data-gr-pagination][data-gr-size='xs'] :is([data-gr-pagination-page], [data-gr-pagination-ellipsis]) {
-  height: 1.75rem;
-  min-width: 1.75rem;
-  padding-inline: 0.375rem;
-}
-
-[data-gr-pagination][data-gr-size='xs'] [data-gr-pagination-ellipsis] {
-  padding-inline: 0.25rem;
-}
-
-[data-gr-pagination][data-gr-size='xs'] [data-gr-pagination-jumper] {
-  width: 3rem;
-  height: 1.75rem;
-}
-
-[data-gr-pagination][data-gr-size='xs'] [data-gr-pagination-page-size] {
-  min-width: 84px;
 }
 
 [data-gr-pagination][data-gr-size='sm'] {
+  --gr-pagination-step-gap: 0.25rem;
+  --gr-pagination-step-text: var(--gr-text-xs);
+  --gr-pagination-step-leading: var(--gr-leading-xs);
+  --gr-pagination-step-height: 2rem;
+  --gr-pagination-step-px: 0.5rem;
+  --gr-pagination-step-ellipsis-px: 0.25rem;
+  --gr-pagination-step-jumper: 3.5rem;
+  --gr-pagination-step-page-size: 92px;
   gap: 0.5rem;
 }
 
-[data-gr-pagination][data-gr-size='sm'] :is([data-gr-pagination-nav], [data-gr-pagination-pages]) {
-  gap: 0.25rem;
-}
-
-[data-gr-pagination][data-gr-size='sm'] :is([data-gr-pagination-total], [data-gr-pagination-compact], [data-gr-pagination-jump], [data-gr-pagination-page], [data-gr-pagination-ellipsis], [data-gr-pagination-jumper]) {
-  font-size: var(--gr-text-xs);
-  line-height: var(--gr-leading-xs);
-}
-
-[data-gr-pagination][data-gr-size='sm'] :is([data-gr-pagination-page], [data-gr-pagination-ellipsis]) {
-  height: 2rem;
-  min-width: 2rem;
-  padding-inline: 0.5rem;
-}
-
-[data-gr-pagination][data-gr-size='sm'] [data-gr-pagination-ellipsis] {
-  padding-inline: 0.25rem;
-}
-
-[data-gr-pagination][data-gr-size='sm'] [data-gr-pagination-jumper] {
-  width: 3.5rem;
-  height: 2rem;
-}
-
-[data-gr-pagination][data-gr-size='sm'] [data-gr-pagination-page-size] {
-  min-width: 92px;
-}
-
 [data-gr-pagination][data-gr-size='md'] {
+  --gr-pagination-step-gap: 0.25rem;
+  --gr-pagination-step-text: var(--gr-text-sm);
+  --gr-pagination-step-leading: var(--gr-leading-sm);
+  --gr-pagination-step-height: 2.5rem;
+  --gr-pagination-step-px: 0.5rem;
+  --gr-pagination-step-ellipsis-px: 0.25rem;
+  --gr-pagination-step-jumper: 3.5rem;
+  --gr-pagination-step-page-size: 100px;
   gap: 0.75rem;
-}
-
-[data-gr-pagination][data-gr-size='md'] :is([data-gr-pagination-nav], [data-gr-pagination-pages]) {
-  gap: 0.25rem;
-}
-
-[data-gr-pagination][data-gr-size='md'] :is([data-gr-pagination-total], [data-gr-pagination-compact], [data-gr-pagination-jump], [data-gr-pagination-page], [data-gr-pagination-ellipsis], [data-gr-pagination-jumper]) {
-  font-size: var(--gr-text-sm);
-  line-height: var(--gr-leading-sm);
-}
-
-[data-gr-pagination][data-gr-size='md'] :is([data-gr-pagination-page], [data-gr-pagination-ellipsis]) {
-  height: 2.5rem;
-  min-width: 2.5rem;
-  padding-inline: 0.5rem;
-}
-
-[data-gr-pagination][data-gr-size='md'] [data-gr-pagination-ellipsis] {
-  padding-inline: 0.25rem;
-}
-
-[data-gr-pagination][data-gr-size='md'] [data-gr-pagination-jumper] {
-  width: 3.5rem;
-  height: 2.5rem;
-}
-
-[data-gr-pagination][data-gr-size='md'] [data-gr-pagination-page-size] {
-  min-width: 100px;
 }
 
 [data-gr-pagination][data-gr-size='lg'] {
+  --gr-pagination-step-gap: 0.25rem;
+  --gr-pagination-step-text: var(--gr-text-base);
+  --gr-pagination-step-leading: var(--gr-leading-base);
+  --gr-pagination-step-height: 2.75rem;
+  --gr-pagination-step-px: 0.75rem;
+  --gr-pagination-step-ellipsis-px: 0.5rem;
+  --gr-pagination-step-jumper: 4rem;
+  --gr-pagination-step-page-size: 112px;
   gap: 0.75rem;
 }
 
-[data-gr-pagination][data-gr-size='lg'] :is([data-gr-pagination-nav], [data-gr-pagination-pages]) {
-  gap: 0.25rem;
+[data-gr-pagination][data-gr-size] :is([data-gr-pagination-nav], [data-gr-pagination-pages]) {
+  gap: var(--gr-pagination-step-gap);
 }
 
-[data-gr-pagination][data-gr-size='lg'] :is([data-gr-pagination-total], [data-gr-pagination-compact], [data-gr-pagination-jump], [data-gr-pagination-page], [data-gr-pagination-ellipsis], [data-gr-pagination-jumper]) {
-  font-size: var(--gr-text-base);
-  line-height: var(--gr-leading-base);
+[data-gr-pagination][data-gr-size] :is([data-gr-pagination-total], [data-gr-pagination-compact], [data-gr-pagination-jump], [data-gr-pagination-page], [data-gr-pagination-ellipsis], [data-gr-pagination-jumper]) {
+  font-size: var(--gr-pagination-step-text);
+  line-height: var(--gr-pagination-step-leading);
 }
 
-[data-gr-pagination][data-gr-size='lg'] :is([data-gr-pagination-page], [data-gr-pagination-ellipsis]) {
-  height: 2.75rem;
-  min-width: 2.75rem;
-  padding-inline: 0.75rem;
+[data-gr-pagination][data-gr-size] :is([data-gr-pagination-page], [data-gr-pagination-ellipsis]) {
+  height: var(--gr-pagination-step-height);
+  min-width: var(--gr-pagination-step-height);
+  padding-inline: var(--gr-pagination-step-px);
 }
 
-[data-gr-pagination][data-gr-size='lg'] [data-gr-pagination-ellipsis] {
-  padding-inline: 0.5rem;
+[data-gr-pagination][data-gr-size] [data-gr-pagination-ellipsis] {
+  padding-inline: var(--gr-pagination-step-ellipsis-px);
 }
 
-[data-gr-pagination][data-gr-size='lg'] [data-gr-pagination-jumper] {
-  width: 4rem;
-  height: 2.75rem;
+[data-gr-pagination][data-gr-size] [data-gr-pagination-jumper] {
+  width: var(--gr-pagination-step-jumper);
+  height: var(--gr-pagination-step-height);
 }
 
-[data-gr-pagination][data-gr-size='lg'] [data-gr-pagination-page-size] {
-  min-width: 112px;
+[data-gr-pagination][data-gr-size] [data-gr-pagination-page-size] {
+  min-width: var(--gr-pagination-step-page-size);
 }
 </style>

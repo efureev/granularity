@@ -451,126 +451,73 @@ defineSlots<{
  */
 [data-gr-button][data-gr-size='xs'] {
   --gr-button-step-radius: var(--gr-button-radius-xs);
-}
-
-[data-gr-button][data-gr-size='xs']:not([data-gr-square]) {
-  height: 1.75rem;
-  gap: .25rem;
-  padding-inline: .625rem;
-  font-size: var(--gr-text-xs);
-  line-height: var(--gr-leading-xs);
-}
-
-[data-gr-button][data-gr-size='xs'][data-gr-pre] {
-  padding-inline-start: .5rem;
-}
-
-[data-gr-button][data-gr-size='xs'][data-gr-post] {
-  padding-inline-end: .5rem;
-}
-
-[data-gr-button][data-gr-size='xs'][data-gr-square] {
-  width: var(--gr-button-square-size, 1.75rem);
-  min-width: var(--gr-button-square-size, 1.75rem);
-  height: var(--gr-button-square-size, 1.75rem);
-}
-
-[data-gr-button][data-gr-size='xs'] [data-gr-button-glyph] {
-  width: .875rem;
-  height: .875rem;
+  --gr-button-step-height: 1.75rem;
+  --gr-button-step-gap: .25rem;
+  --gr-button-step-px: .625rem;
+  --gr-button-step-addon-px: .5rem;
+  --gr-button-step-text: var(--gr-text-xs);
+  --gr-button-step-leading: var(--gr-leading-xs);
+  --gr-button-step-glyph: .875rem;
 }
 
 [data-gr-button][data-gr-size='sm'] {
   --gr-button-step-radius: var(--gr-button-radius-sm);
-}
-
-[data-gr-button][data-gr-size='sm']:not([data-gr-square]) {
-  height: 2rem;
-  gap: .375rem;
-  padding-inline: .75rem;
-  font-size: var(--gr-text-sm);
-  line-height: var(--gr-leading-sm);
-}
-
-[data-gr-button][data-gr-size='sm'][data-gr-pre] {
-  padding-inline-start: .625rem;
-}
-
-[data-gr-button][data-gr-size='sm'][data-gr-post] {
-  padding-inline-end: .625rem;
-}
-
-[data-gr-button][data-gr-size='sm'][data-gr-square] {
-  width: var(--gr-button-square-size, 2rem);
-  min-width: var(--gr-button-square-size, 2rem);
-  height: var(--gr-button-square-size, 2rem);
-}
-
-[data-gr-button][data-gr-size='sm'] [data-gr-button-glyph] {
-  width: 1rem;
-  height: 1rem;
+  --gr-button-step-height: 2rem;
+  --gr-button-step-gap: .375rem;
+  --gr-button-step-px: .75rem;
+  --gr-button-step-addon-px: .625rem;
+  --gr-button-step-text: var(--gr-text-sm);
+  --gr-button-step-leading: var(--gr-leading-sm);
+  --gr-button-step-glyph: 1rem;
 }
 
 [data-gr-button][data-gr-size='md'] {
   --gr-button-step-radius: var(--gr-button-radius-md);
-}
-
-[data-gr-button][data-gr-size='md']:not([data-gr-square]) {
-  height: 2.5rem;
-  gap: .5rem;
-  padding-inline: 1rem;
-  font-size: var(--gr-text-sm);
-  line-height: var(--gr-leading-sm);
-}
-
-[data-gr-button][data-gr-size='md'][data-gr-pre] {
-  padding-inline-start: .875rem;
-}
-
-[data-gr-button][data-gr-size='md'][data-gr-post] {
-  padding-inline-end: .875rem;
-}
-
-[data-gr-button][data-gr-size='md'][data-gr-square] {
-  width: var(--gr-button-square-size, 2.5rem);
-  min-width: var(--gr-button-square-size, 2.5rem);
-  height: var(--gr-button-square-size, 2.5rem);
-}
-
-[data-gr-button][data-gr-size='md'] [data-gr-button-glyph] {
-  width: 1rem;
-  height: 1rem;
+  --gr-button-step-height: 2.5rem;
+  --gr-button-step-gap: .5rem;
+  --gr-button-step-px: 1rem;
+  --gr-button-step-addon-px: .875rem;
+  --gr-button-step-text: var(--gr-text-sm);
+  --gr-button-step-leading: var(--gr-leading-sm);
+  --gr-button-step-glyph: 1rem;
 }
 
 [data-gr-button][data-gr-size='lg'] {
   --gr-button-step-radius: var(--gr-button-radius-lg);
+  --gr-button-step-height: 2.75rem;
+  --gr-button-step-gap: .5rem;
+  --gr-button-step-px: 1.25rem;
+  --gr-button-step-addon-px: 1.125rem;
+  --gr-button-step-text: var(--gr-text-base);
+  --gr-button-step-leading: var(--gr-leading-base);
+  --gr-button-step-glyph: 1.25rem;
 }
 
-[data-gr-button][data-gr-size='lg']:not([data-gr-square]) {
-  height: 2.75rem;
-  gap: .5rem;
-  padding-inline: 1.25rem;
-  font-size: var(--gr-text-base);
-  line-height: var(--gr-leading-base);
+[data-gr-button][data-gr-size]:not([data-gr-square]) {
+  height: var(--gr-button-step-height);
+  gap: var(--gr-button-step-gap);
+  padding-inline: var(--gr-button-step-px);
+  font-size: var(--gr-button-step-text);
+  line-height: var(--gr-button-step-leading);
 }
 
-[data-gr-button][data-gr-size='lg'][data-gr-pre] {
-  padding-inline-start: 1.125rem;
+[data-gr-button][data-gr-size][data-gr-pre] {
+  padding-inline-start: var(--gr-button-step-addon-px);
 }
 
-[data-gr-button][data-gr-size='lg'][data-gr-post] {
-  padding-inline-end: 1.125rem;
+[data-gr-button][data-gr-size][data-gr-post] {
+  padding-inline-end: var(--gr-button-step-addon-px);
 }
 
-[data-gr-button][data-gr-size='lg'][data-gr-square] {
-  width: var(--gr-button-square-size, 2.75rem);
-  min-width: var(--gr-button-square-size, 2.75rem);
-  height: var(--gr-button-square-size, 2.75rem);
+[data-gr-button][data-gr-size][data-gr-square] {
+  width: var(--gr-button-square-size, var(--gr-button-step-height));
+  min-width: var(--gr-button-square-size, var(--gr-button-step-height));
+  height: var(--gr-button-square-size, var(--gr-button-step-height));
 }
 
-[data-gr-button][data-gr-size='lg'] [data-gr-button-glyph] {
-  width: 1.25rem;
-  height: 1.25rem;
+[data-gr-button][data-gr-size] [data-gr-button-glyph] {
+  width: var(--gr-button-step-glyph);
+  height: var(--gr-button-step-glyph);
 }
 
 /* Префикс в ячейке: отступа с начала нет, его место — у ячейки. После ступеней — иначе их отступ перебил бы. */
