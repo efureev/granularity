@@ -440,8 +440,8 @@ describe('GrTreeSelect — ARIA и состояния', () => {
     const wrapper = await mountHarness({ disabled: true })
 
     const trigger = wrapper.find('[data-testid="gr-tree-select-trigger"]')
-    expect(fieldLook(trigger.element)['background-color']).toBe('var(--gr-muted)')
-    expect(trigger.classes()).toContain('text-[var(--gr-muted-fg)]')
+    expect(fieldLook(trigger.element)['background-color']).toBe('var(--gr-disabled-bg)')
+    expect(trigger.classes()).toContain('text-[var(--gr-disabled-fg)]')
     expect(fieldLook(trigger.element).opacity).toBeUndefined()
 
     wrapper.unmount()

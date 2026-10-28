@@ -74,17 +74,18 @@ describe('отклик рамки поля на указатель', () => {
 })
 
 describe('отклик триггера GrColorPicker', () => {
-  // Триггер — поле, но откликается на указатель своей ручкой темы, а на фокус —
-  // только кольцом; у ошибки рамка — сообщение, как у остальных полей.
+  // Триггер откликается, как поле; цвет под указателем — ручка темы, у тем
+  // каталога равная `--gr-input-hover`. У ошибки рамка — сообщение.
   const { look: triggerLook } = componentSheet('GrInput/GrInput.vue', 'GrColorPicker/GrColorPicker.vue')
   const trigger = (props: Record<string, unknown> = {}) => mount(GrColorPicker, { props: { modelValue: '#3b82f6', ariaLabel: 'Цвет', ...props } })
 
-  it('под указателем — ручка `--gr-color-picker-trigger-hover-brd`, в фокусе рамка покоя', () => {
+  it('под указателем — ручка `--gr-color-picker-trigger-hover-brd`, в фокусе — рамка фокуса поля', () => {
     const wrapper = trigger()
     const shell = wrapper.get('[data-gr-color-picker-trigger]').element
 
     expect(triggerLook(shell, { hover: true })['border-color']).toBe('var(--gr-color-picker-trigger-hover-brd)')
-    expect(triggerLook(shell, { focus: true })['border-color']).toBe('var(--gr-input)')
+    expect(triggerLook(shell, { focus: true })['border-color']).toBe('var(--gr-input-focus-brd)')
+    expect(triggerLook(shell, { hover: true, focus: true })['border-color']).toBe('var(--gr-input-focus-brd)')
     wrapper.unmount()
   })
 

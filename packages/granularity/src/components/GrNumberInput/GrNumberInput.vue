@@ -773,7 +773,7 @@ if (__GR_DEV__) {
       :aria-readonly="isReadonly ? 'true' : undefined"
       :aria-label="ariaLabel"
       :readonly="isReadonly"
-      class="w-full bg-transparent text-[var(--gr-fg)] placeholder:text-[var(--gr-muted-fg)] focus:placeholder:text-transparent focus:outline-none disabled:cursor-not-allowed"
+      class="w-full bg-transparent text-[var(--gr-fg)] placeholder:text-[var(--gr-muted-fg)] focus:placeholder:text-transparent focus:outline-none disabled:cursor-not-allowed disabled:text-[var(--gr-disabled-fg)]"
       :class="inputClassName"
       :style="inputStyle"
       @input="onInput"
@@ -922,14 +922,3 @@ if (__GR_DEV__) {
     </div>
   </div>
 </template>
-
-<style>
-/*
- * Рамку рисует лист поля (`GrInput`). Недоступное числовое поле гасится ролями
- * недоступного контрола, а не приглушённой поверхностью, как остальные поля.
- */
-[data-gr-number-input][data-gr-field][data-gr-off] {
-  background-color: var(--gr-disabled-bg);
-  color: var(--gr-disabled-fg);
-}
-</style>

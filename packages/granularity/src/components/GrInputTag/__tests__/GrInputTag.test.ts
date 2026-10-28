@@ -226,7 +226,7 @@ describe('GrInputTag — состояние из GrFormField', () => {
     const wrapper = mount(GrInputTag, { props: { modelValue: ['a'], disabled: true } })
     const root = wrapper.get('[data-gr-input-tag]')
 
-    expect(fieldLook(root.element)['background-color']).toBe('var(--gr-muted)')
+    expect(fieldLook(root.element)['background-color']).toBe('var(--gr-disabled-bg)')
     expect(fieldLook(root.element).opacity).toBeUndefined()
   })
 })

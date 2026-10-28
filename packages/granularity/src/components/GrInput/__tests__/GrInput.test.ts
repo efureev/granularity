@@ -247,7 +247,7 @@ describe('GrInput — disabled', () => {
     const wrapper = mount(GrInput, { props: { modelValue: 'x', disabled: true } })
     const shell = look(wrapper.get('[data-gr-input] > div').element)
 
-    expect(shell['background-color']).toBe('var(--gr-muted)')
+    expect(shell['background-color']).toBe('var(--gr-disabled-bg)')
     expect(shell.cursor).toBe('not-allowed')
     expect(shell.opacity).toBeUndefined()
   })
@@ -256,7 +256,7 @@ describe('GrInput — disabled', () => {
   // заблокированное поле выглядело обычным (поймано визуальным гейтом GrSelect).
   it('приглушает и текст значения, а не только фон', () => {
     const wrapper = mount(GrInput, { props: { modelValue: 'x', disabled: true } })
-    expect(wrapper.get('input').classes()).toContain('disabled:text-[var(--gr-muted-fg)]')
+    expect(wrapper.get('input').classes()).toContain('disabled:text-[var(--gr-disabled-fg)]')
   })
 
   it('включённое поле остаётся на фоне поверхности', () => {

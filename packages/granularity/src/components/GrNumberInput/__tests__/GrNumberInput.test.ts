@@ -15,8 +15,8 @@ async function type(input: ReturnType<ReturnType<typeof mount>['get']>, text: st
   await input.trigger('input')
 }
 
-/** Рамку рисует лист поля (`GrInput`), недоступную подложку — лист `GrNumberInput`. */
-const { look } = componentSheet('GrInput/GrInput.vue', 'GrNumberInput/GrNumberInput.vue')
+/** Рамку рисует лист поля (`GrInput`). */
+const { look } = componentSheet('GrInput/GrInput.vue')
 describe('GrNumberInput', () => {
   it('санитизирует ввод: оставляет только цифры и один дробный разделитель', async () => {
     const wrapper = mount(GrNumberInput, {

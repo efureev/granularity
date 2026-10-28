@@ -775,16 +775,11 @@ async function pickFromScreen(): Promise<void> {
 }
 
 /*
- * Триггер — поле (лист `GrInput`), но откликается на указатель своей ручкой темы
- * `--gr-color-picker-trigger-hover-brd`, а на фокус рамкой не откликается: его
- * фокус — кольцо. У ошибки рамка — сообщение, отклика нет. `[data-gr-size]` во
- * втором правиле поднимает специфичность выше отклика поля на указатель.
+ * Триггер — поле (лист `GrInput`) и откликается, как поле; цвет рамки под
+ * указателем — ручка темы `--gr-color-picker-trigger-hover-brd` (у тем каталога —
+ * `--gr-input-hover`, как у полей).
  */
-[data-gr-color-picker-trigger][data-gr-field]:not([data-gr-off], [data-gr-readonly], [data-gr-invalid]):focus-within {
-  border-color: var(--gr-input);
-}
-
-[data-gr-color-picker-trigger][data-gr-field][data-gr-size]:not([data-gr-off], [data-gr-readonly], [data-gr-invalid]):hover {
+[data-gr-color-picker-trigger][data-gr-field]:not([data-gr-off], [data-gr-readonly], [data-gr-invalid], [data-gr-state]):hover:not(:focus-within) {
   border-color: var(--gr-color-picker-trigger-hover-brd);
 }
 </style>

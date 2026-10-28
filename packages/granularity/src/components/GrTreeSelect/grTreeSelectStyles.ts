@@ -50,7 +50,7 @@ export function grTreeSelectClass(options: { size: GrInputSize, shape: GrControl
     sizeClassBySize[options.size],
     paddingXClass[options.shape][options.size],
     'pr-9',
-    options.disabled ? 'text-[var(--gr-muted-fg)]' : 'text-[var(--gr-fg)]',
+    options.disabled ? 'text-[var(--gr-disabled-fg)]' : 'text-[var(--gr-fg)]',
   ].join(' ')
 }
 

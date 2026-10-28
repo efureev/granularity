@@ -73,8 +73,8 @@ describe('лист рамки поля', () => {
   it('недоступность и «только чтение» гасят лишь рамку покоя', () => {
     expect(look(frame({ disabled: true }))).toMatchObject({
       'border-color': 'var(--gr-disabled-brd)',
-      'background-color': 'var(--gr-muted)',
-      'color': 'var(--gr-muted-fg)',
+      'background-color': 'var(--gr-disabled-bg)',
+      'color': 'var(--gr-disabled-fg)',
       'cursor': 'not-allowed',
     })
     expect(look(frame({ readonly: true }))).toMatchObject({

@@ -219,7 +219,7 @@ export function grSelectClass(options: {
     (options.grows ? selectGrowSizeClassBySize : selectSizeClassBySize)[options.size],
     selectPaddingXClass[options.shape][options.size],
     // Цвет текста — утилитой и у недоступного: `docs/field.md`.
-    'disabled:text-[var(--gr-muted-fg)]',
+    'disabled:text-[var(--gr-disabled-fg)]',
   ].filter(Boolean).join(' ')
 }
 

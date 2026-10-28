@@ -59,7 +59,7 @@ export function autocompleteShellClass(options: { size: GrAutocompleteSize, disa
   return [
     autocompleteShellBase,
     autocompleteSizeClassBySize[options.size],
-    options.disabled ? 'text-[var(--gr-muted-fg)]' : 'text-[var(--gr-fg)]',
+    options.disabled ? 'text-[var(--gr-disabled-fg)]' : 'text-[var(--gr-fg)]',
   ].join(' ')
 }
 

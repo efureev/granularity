@@ -7,6 +7,11 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+
+- **Недоступный `GrCodeEditor` — текст `--gr-disabled-fg`, подложка `--gr-disabled-bg`** — как у
+  полей ядра 3.6.
+
 ## [v3.0.0] 2026-10-28
 
 ### Changed

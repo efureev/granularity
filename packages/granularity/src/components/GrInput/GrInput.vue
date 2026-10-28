@@ -450,7 +450,7 @@ function togglePassword(): void {
           :aria-readonly="isReadonly ? 'true' : undefined"
           :aria-label="ariaLabel"
           :aria-busy="props.loading ? 'true' : undefined"
-          class="w-full bg-transparent text-[var(--gr-fg)] placeholder:text-[var(--gr-muted-fg)] focus:outline-none disabled:cursor-not-allowed disabled:text-[var(--gr-muted-fg)]"
+          class="w-full bg-transparent text-[var(--gr-fg)] placeholder:text-[var(--gr-muted-fg)] focus:outline-none disabled:cursor-not-allowed disabled:text-[var(--gr-disabled-fg)]"
           :class="[className, type === 'search' ? '' : 'focus:placeholder:text-transparent']"
           :style="inputStyle"
           @input="onInput"
@@ -669,12 +669,12 @@ function togglePassword(): void {
 }
 
 /*
- * Недоступное поле гасится подложкой, а не `opacity`: прозрачность разбавляет
- * выверенные на AA роли текста.
+ * Недоступное поле гасится ролями недоступного контрола, а не `opacity`:
+ * прозрачность разбавляла бы и рамку, и подпись поля вокруг.
  */
 [data-gr-field][data-gr-off] {
-  background-color: var(--gr-muted);
-  color: var(--gr-muted-fg);
+  background-color: var(--gr-disabled-bg);
+  color: var(--gr-disabled-fg);
   cursor: not-allowed;
 }
 

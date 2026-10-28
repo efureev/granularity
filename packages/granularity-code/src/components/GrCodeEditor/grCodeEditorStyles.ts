@@ -23,7 +23,7 @@ export const editorHookClass = 'gr-code-editor'
 export const editorRootClass = 'min-w-0'
 
 export function editorTextColorClass(disabled: boolean): string {
-  return disabled ? 'text-[var(--gr-muted-fg)]' : 'text-[var(--gr-code-block-fg,var(--gr-fg))]'
+  return disabled ? 'text-[var(--gr-disabled-fg)]' : 'text-[var(--gr-code-block-fg,var(--gr-fg))]'
 }
 
 export const editorFontClass = codeSurfaceFontClass

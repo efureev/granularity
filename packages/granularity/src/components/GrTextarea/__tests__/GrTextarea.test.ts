@@ -118,7 +118,7 @@ describe('GrTextarea — паритет с GrInput', () => {
   it('disabled гасится токенами, а не прозрачностью', () => {
     const field = mount(GrTextarea, { props: { modelValue: '', disabled: true } }).get('textarea')
 
-    expect(look(field.element)).toMatchObject({ 'background-color': 'var(--gr-muted)', 'color': 'var(--gr-muted-fg)' })
+    expect(look(field.element)).toMatchObject({ 'background-color': 'var(--gr-disabled-bg)', 'color': 'var(--gr-disabled-fg)' })
     expect(look(field.element).opacity).toBeUndefined()
   })
 

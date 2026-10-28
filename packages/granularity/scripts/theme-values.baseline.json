@@ -226,6 +226,24 @@
             "value": "#ffffff",
             "color": "rgb(255, 255, 255)"
           },
+          "--gr-badge-tone-bg": {
+            "value": ""
+          },
+          "--gr-badge-tone-brd": {
+            "value": ""
+          },
+          "--gr-badge-tone-fg": {
+            "value": ""
+          },
+          "--gr-badge-tone-soft-bg": {
+            "value": ""
+          },
+          "--gr-badge-tone-soft-brd": {
+            "value": ""
+          },
+          "--gr-badge-tone-soft-fg": {
+            "value": ""
+          },
           "--gr-badge-warning-bg": {
             "value": "#c2410c",
             "color": "rgb(194, 65, 12)"
@@ -761,7 +779,28 @@
           "--gr-button-solid-image": {
             "value": "none"
           },
+          "--gr-button-step-addon-px": {
+            "value": ""
+          },
+          "--gr-button-step-gap": {
+            "value": ""
+          },
+          "--gr-button-step-glyph": {
+            "value": ""
+          },
+          "--gr-button-step-height": {
+            "value": ""
+          },
+          "--gr-button-step-leading": {
+            "value": ""
+          },
+          "--gr-button-step-px": {
+            "value": ""
+          },
           "--gr-button-step-radius": {
+            "value": ""
+          },
+          "--gr-button-step-text": {
             "value": ""
           },
           "--gr-button-success-bg": {
@@ -1087,8 +1126,8 @@
             "color": "rgba(0, 0, 0, 0.45)"
           },
           "--gr-color-picker-trigger-hover-brd": {
-            "value": "#4f46e5",
-            "color": "rgb(79, 70, 229)"
+            "value": "#e2e8f0",
+            "color": "rgb(226, 232, 240)"
           },
           "--gr-command-active-bg": {
             "value": "color-mix(in srgb, #f1f5f9 45%, transparent)",
@@ -1591,6 +1630,9 @@
             "value": "#e2e8f0",
             "color": "rgb(226, 232, 240)"
           },
+          "--gr-input-ring-color": {
+            "value": ""
+          },
           "--gr-invalid-brd": {
             "value": "#dc2626",
             "color": "rgb(220, 38, 38)"
@@ -1692,6 +1734,30 @@
           },
           "--gr-pagination-page-weight": {
             "value": "600"
+          },
+          "--gr-pagination-step-ellipsis-px": {
+            "value": ""
+          },
+          "--gr-pagination-step-gap": {
+            "value": ""
+          },
+          "--gr-pagination-step-height": {
+            "value": ""
+          },
+          "--gr-pagination-step-jumper": {
+            "value": ""
+          },
+          "--gr-pagination-step-leading": {
+            "value": ""
+          },
+          "--gr-pagination-step-page-size": {
+            "value": ""
+          },
+          "--gr-pagination-step-px": {
+            "value": ""
+          },
+          "--gr-pagination-step-text": {
+            "value": ""
           },
           "--gr-popover": {
             "value": "#ffffff",
@@ -1891,11 +1957,62 @@
             "value": "color-mix(in srgb, #e2e8f0 92%, #0f172a)",
             "color": "color(srgb 0.820078 0.844235 0.879059)"
           },
+          "--gr-segmented-font-size": {
+            "value": ""
+          },
+          "--gr-segmented-font-weight": {
+            "value": ""
+          },
+          "--gr-segmented-indicator-bg": {
+            "value": ""
+          },
+          "--gr-segmented-indicator-brd": {
+            "value": ""
+          },
           "--gr-segmented-indicator-highlight-shadow": {
             "value": "0 0 0 0 transparent"
           },
+          "--gr-segmented-indicator-shadow": {
+            "value": ""
+          },
+          "--gr-segmented-item-color": {
+            "value": ""
+          },
+          "--gr-segmented-item-hover-color": {
+            "value": ""
+          },
+          "--gr-segmented-item-px": {
+            "value": ""
+          },
+          "--gr-segmented-item-py": {
+            "value": ""
+          },
+          "--gr-segmented-item-selected-color": {
+            "value": ""
+          },
           "--gr-segmented-label-weight": {
             "value": "600"
+          },
+          "--gr-segmented-line-height": {
+            "value": ""
+          },
+          "--gr-segmented-min-height": {
+            "value": ""
+          },
+          "--gr-segmented-padding": {
+            "value": ""
+          },
+          "--gr-segmented-radius": {
+            "value": ""
+          },
+          "--gr-segmented-track-bg": {
+            "value": ""
+          },
+          "--gr-segmented-track-brd": {
+            "value": ""
+          },
+          "--gr-segmented-track-shadow": {
+            "value": ""
           },
           "--gr-select-option-active-bg": {
             "value": "color-mix(in srgb, #f1f5f9 30%, transparent)",
@@ -2203,6 +2320,30 @@
             "value": "#f1f5f9",
             "color": "rgb(241, 245, 249)"
           },
+          "--gr-switch-step-air": {
+            "value": ""
+          },
+          "--gr-switch-step-height": {
+            "value": ""
+          },
+          "--gr-switch-step-icon": {
+            "value": ""
+          },
+          "--gr-switch-step-leading": {
+            "value": ""
+          },
+          "--gr-switch-step-state-size": {
+            "value": ""
+          },
+          "--gr-switch-step-text": {
+            "value": ""
+          },
+          "--gr-switch-step-text-width": {
+            "value": ""
+          },
+          "--gr-switch-step-width": {
+            "value": ""
+          },
           "--gr-switch-text-track-width-lg": {
             "value": "3.5rem"
           },
@@ -2215,6 +2356,12 @@
           },
           "--gr-switch-thumb-shadow": {
             "value": "0 1px 2px rgba(15, 23, 42, 0.08)"
+          },
+          "--gr-switch-track-bg": {
+            "value": ""
+          },
+          "--gr-switch-track-brd": {
+            "value": ""
           },
           "--gr-switch-track-height-lg": {
             "value": "1.75rem"
@@ -2812,6 +2959,12 @@
           ],
           "--gr-badge-success-fg": [
             "rgb(255, 255, 255)"
+          ],
+          "--gr-badge-tone-brd": [
+            ""
+          ],
+          "--gr-badge-tone-soft-brd": [
+            ""
           ],
           "--gr-badge-warning-bg": [
             "rgb(194, 65, 12)"
@@ -3505,7 +3658,7 @@
             ""
           ],
           "--gr-color-picker-trigger-hover-brd": [
-            "rgb(79, 70, 229)"
+            "rgb(226, 232, 240)"
           ],
           "--gr-command-active-bg": [
             "color(srgb 0.945098 0.960784 0.976471 / 0.45)"
@@ -4311,15 +4464,6 @@
           "--gr-secondary-hover": [
             "color(srgb 0.820078 0.844235 0.879059)"
           ],
-          "--gr-segmented-font-size": [
-            ""
-          ],
-          "--gr-segmented-font-weight": [
-            ""
-          ],
-          "--gr-segmented-indicator-bg": [
-            ""
-          ],
           "--gr-segmented-indicator-brd": [
             ""
           ],
@@ -4332,43 +4476,13 @@
           "--gr-segmented-invalid-brd": [
             "rgb(220, 38, 38)"
           ],
-          "--gr-segmented-item-color": [
-            ""
-          ],
-          "--gr-segmented-item-hover-color": [
-            ""
-          ],
-          "--gr-segmented-item-px": [
-            ""
-          ],
-          "--gr-segmented-item-py": [
-            ""
-          ],
-          "--gr-segmented-item-selected-color": [
-            ""
-          ],
           "--gr-segmented-label-weight": [
             "600"
-          ],
-          "--gr-segmented-line-height": [
-            ""
-          ],
-          "--gr-segmented-min-height": [
-            ""
-          ],
-          "--gr-segmented-padding": [
-            ""
           ],
           "--gr-segmented-radius": [
             ""
           ],
-          "--gr-segmented-track-bg": [
-            ""
-          ],
           "--gr-segmented-track-brd": [
-            ""
-          ],
-          "--gr-segmented-track-shadow": [
             ""
           ],
           "--gr-select-option-active-bg": [
@@ -4573,9 +4687,6 @@
           "--gr-steps-done-fg": [
             "rgb(255, 255, 255)"
           ],
-          "--gr-steps-marker-size": [
-            ""
-          ],
           "--gr-success": [
             "rgb(16, 185, 129)"
           ],
@@ -4629,12 +4740,6 @@
           ],
           "--gr-switch-thumb-shadow": [
             "0 1px 2px rgba(15, 23, 42, 0.08)"
-          ],
-          "--gr-switch-track-bg": [
-            ""
-          ],
-          "--gr-switch-track-brd": [
-            ""
           ],
           "--gr-switch-track-height-lg": [
             "1.75rem"
@@ -4849,82 +4954,19 @@
           "--gr-transfer-selected-bg": [
             "color(srgb 0.309804 0.27451 0.898039 / 0.12)"
           ],
-          "--gr-tree-branch-elbow-width": [
-            ""
-          ],
           "--gr-tree-branch-line-color": [
             ""
           ],
           "--gr-tree-branch-line-default-color": [
             "rgb(226, 232, 240)"
           ],
-          "--gr-tree-branch-line-offset": [
-            ""
-          ],
-          "--gr-tree-branch-line-width": [
-            ""
-          ],
           "--gr-tree-branch-weight": [
             "600"
-          ],
-          "--gr-tree-checkbox-bg": [
-            ""
-          ],
-          "--gr-tree-checkbox-brd-width": [
-            ""
-          ],
-          "--gr-tree-checkbox-mr": [
-            ""
-          ],
-          "--gr-tree-checkbox-radius": [
-            ""
-          ],
-          "--gr-tree-checkbox-size": [
-            ""
-          ],
-          "--gr-tree-children-pl": [
-            ""
-          ],
-          "--gr-tree-content-gap": [
-            ""
-          ],
-          "--gr-tree-drag-handle-color": [
-            ""
-          ],
-          "--gr-tree-drag-handle-disabled-opacity": [
-            ""
           ],
           "--gr-tree-drag-handle-hover-bg": [
             ""
           ],
-          "--gr-tree-drag-handle-hover-opacity": [
-            ""
-          ],
-          "--gr-tree-drag-handle-mr": [
-            ""
-          ],
-          "--gr-tree-drag-handle-opacity": [
-            ""
-          ],
-          "--gr-tree-drag-handle-radius": [
-            ""
-          ],
-          "--gr-tree-drag-handle-size": [
-            ""
-          ],
-          "--gr-tree-font-size": [
-            ""
-          ],
-          "--gr-tree-gap": [
-            ""
-          ],
-          "--gr-tree-icon-size": [
-            ""
-          ],
           "--gr-tree-indent-step": [
-            ""
-          ],
-          "--gr-tree-row-current-bar-width": [
             ""
           ],
           "--gr-tree-row-current-bg": [
@@ -4939,31 +4981,7 @@
           "--gr-tree-row-indent": [
             "0px"
           ],
-          "--gr-tree-row-min-height": [
-            ""
-          ],
-          "--gr-tree-row-px": [
-            ""
-          ],
-          "--gr-tree-row-py": [
-            ""
-          ],
-          "--gr-tree-row-radius": [
-            ""
-          ],
-          "--gr-tree-toggle-color": [
-            ""
-          ],
           "--gr-tree-toggle-hover-bg": [
-            ""
-          ],
-          "--gr-tree-toggle-mr": [
-            ""
-          ],
-          "--gr-tree-toggle-radius": [
-            ""
-          ],
-          "--gr-tree-toggle-size": [
             ""
           ],
           "--gr-value-prefix-color": [
@@ -5262,6 +5280,24 @@
             "value": "#0f172a",
             "color": "rgb(15, 23, 42)"
           },
+          "--gr-badge-tone-bg": {
+            "value": ""
+          },
+          "--gr-badge-tone-brd": {
+            "value": ""
+          },
+          "--gr-badge-tone-fg": {
+            "value": ""
+          },
+          "--gr-badge-tone-soft-bg": {
+            "value": ""
+          },
+          "--gr-badge-tone-soft-brd": {
+            "value": ""
+          },
+          "--gr-badge-tone-soft-fg": {
+            "value": ""
+          },
           "--gr-badge-warning-bg": {
             "value": "#fb923c",
             "color": "rgb(251, 146, 60)"
@@ -5797,7 +5833,28 @@
           "--gr-button-solid-image": {
             "value": "none"
           },
+          "--gr-button-step-addon-px": {
+            "value": ""
+          },
+          "--gr-button-step-gap": {
+            "value": ""
+          },
+          "--gr-button-step-glyph": {
+            "value": ""
+          },
+          "--gr-button-step-height": {
+            "value": ""
+          },
+          "--gr-button-step-leading": {
+            "value": ""
+          },
+          "--gr-button-step-px": {
+            "value": ""
+          },
           "--gr-button-step-radius": {
+            "value": ""
+          },
+          "--gr-button-step-text": {
             "value": ""
           },
           "--gr-button-success-bg": {
@@ -6123,8 +6180,8 @@
             "color": "rgba(0, 0, 0, 0.45)"
           },
           "--gr-color-picker-trigger-hover-brd": {
-            "value": "#9d8bfa",
-            "color": "rgb(157, 139, 250)"
+            "value": "#334155",
+            "color": "rgb(51, 65, 85)"
           },
           "--gr-command-active-bg": {
             "value": "color-mix(in srgb, #334155 45%, transparent)",
@@ -6627,6 +6684,9 @@
             "value": "#334155",
             "color": "rgb(51, 65, 85)"
           },
+          "--gr-input-ring-color": {
+            "value": ""
+          },
           "--gr-invalid-brd": {
             "value": "#f87171",
             "color": "rgb(248, 113, 113)"
@@ -6728,6 +6788,30 @@
           },
           "--gr-pagination-page-weight": {
             "value": "600"
+          },
+          "--gr-pagination-step-ellipsis-px": {
+            "value": ""
+          },
+          "--gr-pagination-step-gap": {
+            "value": ""
+          },
+          "--gr-pagination-step-height": {
+            "value": ""
+          },
+          "--gr-pagination-step-jumper": {
+            "value": ""
+          },
+          "--gr-pagination-step-leading": {
+            "value": ""
+          },
+          "--gr-pagination-step-page-size": {
+            "value": ""
+          },
+          "--gr-pagination-step-px": {
+            "value": ""
+          },
+          "--gr-pagination-step-text": {
+            "value": ""
           },
           "--gr-popover": {
             "value": "#1e293b",
@@ -6927,11 +7011,62 @@
             "value": "color-mix(in srgb, #334155 92%, #f8fafc)",
             "color": "color(srgb 0.261804 0.312941 0.385725)"
           },
+          "--gr-segmented-font-size": {
+            "value": ""
+          },
+          "--gr-segmented-font-weight": {
+            "value": ""
+          },
+          "--gr-segmented-indicator-bg": {
+            "value": ""
+          },
+          "--gr-segmented-indicator-brd": {
+            "value": ""
+          },
           "--gr-segmented-indicator-highlight-shadow": {
             "value": "0 0 0 1px rgba(248, 250, 252, 0.08)"
           },
+          "--gr-segmented-indicator-shadow": {
+            "value": ""
+          },
+          "--gr-segmented-item-color": {
+            "value": ""
+          },
+          "--gr-segmented-item-hover-color": {
+            "value": ""
+          },
+          "--gr-segmented-item-px": {
+            "value": ""
+          },
+          "--gr-segmented-item-py": {
+            "value": ""
+          },
+          "--gr-segmented-item-selected-color": {
+            "value": ""
+          },
           "--gr-segmented-label-weight": {
             "value": "600"
+          },
+          "--gr-segmented-line-height": {
+            "value": ""
+          },
+          "--gr-segmented-min-height": {
+            "value": ""
+          },
+          "--gr-segmented-padding": {
+            "value": ""
+          },
+          "--gr-segmented-radius": {
+            "value": ""
+          },
+          "--gr-segmented-track-bg": {
+            "value": ""
+          },
+          "--gr-segmented-track-brd": {
+            "value": ""
+          },
+          "--gr-segmented-track-shadow": {
+            "value": ""
           },
           "--gr-select-option-active-bg": {
             "value": "color-mix(in srgb, #334155 30%, transparent)",
@@ -7239,6 +7374,30 @@
             "value": "#334155",
             "color": "rgb(51, 65, 85)"
           },
+          "--gr-switch-step-air": {
+            "value": ""
+          },
+          "--gr-switch-step-height": {
+            "value": ""
+          },
+          "--gr-switch-step-icon": {
+            "value": ""
+          },
+          "--gr-switch-step-leading": {
+            "value": ""
+          },
+          "--gr-switch-step-state-size": {
+            "value": ""
+          },
+          "--gr-switch-step-text": {
+            "value": ""
+          },
+          "--gr-switch-step-text-width": {
+            "value": ""
+          },
+          "--gr-switch-step-width": {
+            "value": ""
+          },
           "--gr-switch-text-track-width-lg": {
             "value": "3.5rem"
           },
@@ -7251,6 +7410,12 @@
           },
           "--gr-switch-thumb-shadow": {
             "value": "0 1px 2px rgba(0, 0, 0, 0.45)"
+          },
+          "--gr-switch-track-bg": {
+            "value": ""
+          },
+          "--gr-switch-track-brd": {
+            "value": ""
           },
           "--gr-switch-track-height-lg": {
             "value": "1.75rem"
@@ -7848,6 +8013,12 @@
           ],
           "--gr-badge-success-fg": [
             "rgb(15, 23, 42)"
+          ],
+          "--gr-badge-tone-brd": [
+            ""
+          ],
+          "--gr-badge-tone-soft-brd": [
+            ""
           ],
           "--gr-badge-warning-bg": [
             "rgb(251, 146, 60)"
@@ -8541,7 +8712,7 @@
             ""
           ],
           "--gr-color-picker-trigger-hover-brd": [
-            "rgb(157, 139, 250)"
+            "rgb(51, 65, 85)"
           ],
           "--gr-command-active-bg": [
             "color(srgb 0.2 0.254902 0.333333 / 0.45)"
@@ -9347,15 +9518,6 @@
           "--gr-secondary-hover": [
             "color(srgb 0.261804 0.312941 0.385725)"
           ],
-          "--gr-segmented-font-size": [
-            ""
-          ],
-          "--gr-segmented-font-weight": [
-            ""
-          ],
-          "--gr-segmented-indicator-bg": [
-            ""
-          ],
           "--gr-segmented-indicator-brd": [
             ""
           ],
@@ -9368,43 +9530,13 @@
           "--gr-segmented-invalid-brd": [
             "rgb(248, 113, 113)"
           ],
-          "--gr-segmented-item-color": [
-            ""
-          ],
-          "--gr-segmented-item-hover-color": [
-            ""
-          ],
-          "--gr-segmented-item-px": [
-            ""
-          ],
-          "--gr-segmented-item-py": [
-            ""
-          ],
-          "--gr-segmented-item-selected-color": [
-            ""
-          ],
           "--gr-segmented-label-weight": [
             "600"
-          ],
-          "--gr-segmented-line-height": [
-            ""
-          ],
-          "--gr-segmented-min-height": [
-            ""
-          ],
-          "--gr-segmented-padding": [
-            ""
           ],
           "--gr-segmented-radius": [
             ""
           ],
-          "--gr-segmented-track-bg": [
-            ""
-          ],
           "--gr-segmented-track-brd": [
-            ""
-          ],
-          "--gr-segmented-track-shadow": [
             ""
           ],
           "--gr-select-option-active-bg": [
@@ -9609,9 +9741,6 @@
           "--gr-steps-done-fg": [
             "rgb(255, 255, 255)"
           ],
-          "--gr-steps-marker-size": [
-            ""
-          ],
           "--gr-success": [
             "rgb(52, 211, 153)"
           ],
@@ -9665,12 +9794,6 @@
           ],
           "--gr-switch-thumb-shadow": [
             "0 1px 2px rgba(0, 0, 0, 0.45)"
-          ],
-          "--gr-switch-track-bg": [
-            ""
-          ],
-          "--gr-switch-track-brd": [
-            ""
           ],
           "--gr-switch-track-height-lg": [
             "1.75rem"
@@ -9885,82 +10008,19 @@
           "--gr-transfer-selected-bg": [
             "color(srgb 0.615686 0.545098 0.980392 / 0.12)"
           ],
-          "--gr-tree-branch-elbow-width": [
-            ""
-          ],
           "--gr-tree-branch-line-color": [
             ""
           ],
           "--gr-tree-branch-line-default-color": [
             "rgb(51, 65, 85)"
           ],
-          "--gr-tree-branch-line-offset": [
-            ""
-          ],
-          "--gr-tree-branch-line-width": [
-            ""
-          ],
           "--gr-tree-branch-weight": [
             "600"
-          ],
-          "--gr-tree-checkbox-bg": [
-            ""
-          ],
-          "--gr-tree-checkbox-brd-width": [
-            ""
-          ],
-          "--gr-tree-checkbox-mr": [
-            ""
-          ],
-          "--gr-tree-checkbox-radius": [
-            ""
-          ],
-          "--gr-tree-checkbox-size": [
-            ""
-          ],
-          "--gr-tree-children-pl": [
-            ""
-          ],
-          "--gr-tree-content-gap": [
-            ""
-          ],
-          "--gr-tree-drag-handle-color": [
-            ""
-          ],
-          "--gr-tree-drag-handle-disabled-opacity": [
-            ""
           ],
           "--gr-tree-drag-handle-hover-bg": [
             ""
           ],
-          "--gr-tree-drag-handle-hover-opacity": [
-            ""
-          ],
-          "--gr-tree-drag-handle-mr": [
-            ""
-          ],
-          "--gr-tree-drag-handle-opacity": [
-            ""
-          ],
-          "--gr-tree-drag-handle-radius": [
-            ""
-          ],
-          "--gr-tree-drag-handle-size": [
-            ""
-          ],
-          "--gr-tree-font-size": [
-            ""
-          ],
-          "--gr-tree-gap": [
-            ""
-          ],
-          "--gr-tree-icon-size": [
-            ""
-          ],
           "--gr-tree-indent-step": [
-            ""
-          ],
-          "--gr-tree-row-current-bar-width": [
             ""
           ],
           "--gr-tree-row-current-bg": [
@@ -9975,31 +10035,7 @@
           "--gr-tree-row-indent": [
             "0px"
           ],
-          "--gr-tree-row-min-height": [
-            ""
-          ],
-          "--gr-tree-row-px": [
-            ""
-          ],
-          "--gr-tree-row-py": [
-            ""
-          ],
-          "--gr-tree-row-radius": [
-            ""
-          ],
-          "--gr-tree-toggle-color": [
-            ""
-          ],
           "--gr-tree-toggle-hover-bg": [
-            ""
-          ],
-          "--gr-tree-toggle-mr": [
-            ""
-          ],
-          "--gr-tree-toggle-radius": [
-            ""
-          ],
-          "--gr-tree-toggle-size": [
             ""
           ],
           "--gr-value-prefix-color": [
@@ -10298,6 +10334,24 @@
             "value": "#0f172a",
             "color": "rgb(15, 23, 42)"
           },
+          "--gr-badge-tone-bg": {
+            "value": ""
+          },
+          "--gr-badge-tone-brd": {
+            "value": ""
+          },
+          "--gr-badge-tone-fg": {
+            "value": ""
+          },
+          "--gr-badge-tone-soft-bg": {
+            "value": ""
+          },
+          "--gr-badge-tone-soft-brd": {
+            "value": ""
+          },
+          "--gr-badge-tone-soft-fg": {
+            "value": ""
+          },
           "--gr-badge-warning-bg": {
             "value": "#fb923c",
             "color": "rgb(251, 146, 60)"
@@ -10833,7 +10887,28 @@
           "--gr-button-solid-image": {
             "value": "none"
           },
+          "--gr-button-step-addon-px": {
+            "value": ""
+          },
+          "--gr-button-step-gap": {
+            "value": ""
+          },
+          "--gr-button-step-glyph": {
+            "value": ""
+          },
+          "--gr-button-step-height": {
+            "value": ""
+          },
+          "--gr-button-step-leading": {
+            "value": ""
+          },
+          "--gr-button-step-px": {
+            "value": ""
+          },
           "--gr-button-step-radius": {
+            "value": ""
+          },
+          "--gr-button-step-text": {
             "value": ""
           },
           "--gr-button-success-bg": {
@@ -11159,8 +11234,8 @@
             "color": "rgba(0, 0, 0, 0.45)"
           },
           "--gr-color-picker-trigger-hover-brd": {
-            "value": "#9d8bfa",
-            "color": "rgb(157, 139, 250)"
+            "value": "#334155",
+            "color": "rgb(51, 65, 85)"
           },
           "--gr-command-active-bg": {
             "value": "color-mix(in srgb, #334155 45%, transparent)",
@@ -11663,6 +11738,9 @@
             "value": "#334155",
             "color": "rgb(51, 65, 85)"
           },
+          "--gr-input-ring-color": {
+            "value": ""
+          },
           "--gr-invalid-brd": {
             "value": "#f87171",
             "color": "rgb(248, 113, 113)"
@@ -11764,6 +11842,30 @@
           },
           "--gr-pagination-page-weight": {
             "value": "600"
+          },
+          "--gr-pagination-step-ellipsis-px": {
+            "value": ""
+          },
+          "--gr-pagination-step-gap": {
+            "value": ""
+          },
+          "--gr-pagination-step-height": {
+            "value": ""
+          },
+          "--gr-pagination-step-jumper": {
+            "value": ""
+          },
+          "--gr-pagination-step-leading": {
+            "value": ""
+          },
+          "--gr-pagination-step-page-size": {
+            "value": ""
+          },
+          "--gr-pagination-step-px": {
+            "value": ""
+          },
+          "--gr-pagination-step-text": {
+            "value": ""
           },
           "--gr-popover": {
             "value": "#1e293b",
@@ -11963,11 +12065,62 @@
             "value": "color-mix(in srgb, #334155 92%, #f8fafc)",
             "color": "color(srgb 0.261804 0.312941 0.385725)"
           },
+          "--gr-segmented-font-size": {
+            "value": ""
+          },
+          "--gr-segmented-font-weight": {
+            "value": ""
+          },
+          "--gr-segmented-indicator-bg": {
+            "value": ""
+          },
+          "--gr-segmented-indicator-brd": {
+            "value": ""
+          },
           "--gr-segmented-indicator-highlight-shadow": {
             "value": "0 0 0 1px rgba(248, 250, 252, 0.08)"
           },
+          "--gr-segmented-indicator-shadow": {
+            "value": ""
+          },
+          "--gr-segmented-item-color": {
+            "value": ""
+          },
+          "--gr-segmented-item-hover-color": {
+            "value": ""
+          },
+          "--gr-segmented-item-px": {
+            "value": ""
+          },
+          "--gr-segmented-item-py": {
+            "value": ""
+          },
+          "--gr-segmented-item-selected-color": {
+            "value": ""
+          },
           "--gr-segmented-label-weight": {
             "value": "600"
+          },
+          "--gr-segmented-line-height": {
+            "value": ""
+          },
+          "--gr-segmented-min-height": {
+            "value": ""
+          },
+          "--gr-segmented-padding": {
+            "value": ""
+          },
+          "--gr-segmented-radius": {
+            "value": ""
+          },
+          "--gr-segmented-track-bg": {
+            "value": ""
+          },
+          "--gr-segmented-track-brd": {
+            "value": ""
+          },
+          "--gr-segmented-track-shadow": {
+            "value": ""
           },
           "--gr-select-option-active-bg": {
             "value": "color-mix(in srgb, #334155 30%, transparent)",
@@ -12275,6 +12428,30 @@
             "value": "#334155",
             "color": "rgb(51, 65, 85)"
           },
+          "--gr-switch-step-air": {
+            "value": ""
+          },
+          "--gr-switch-step-height": {
+            "value": ""
+          },
+          "--gr-switch-step-icon": {
+            "value": ""
+          },
+          "--gr-switch-step-leading": {
+            "value": ""
+          },
+          "--gr-switch-step-state-size": {
+            "value": ""
+          },
+          "--gr-switch-step-text": {
+            "value": ""
+          },
+          "--gr-switch-step-text-width": {
+            "value": ""
+          },
+          "--gr-switch-step-width": {
+            "value": ""
+          },
           "--gr-switch-text-track-width-lg": {
             "value": "3.5rem"
           },
@@ -12287,6 +12464,12 @@
           },
           "--gr-switch-thumb-shadow": {
             "value": "0 1px 2px rgba(0, 0, 0, 0.45)"
+          },
+          "--gr-switch-track-bg": {
+            "value": ""
+          },
+          "--gr-switch-track-brd": {
+            "value": ""
           },
           "--gr-switch-track-height-lg": {
             "value": "1.75rem"
@@ -12884,6 +13067,12 @@
           ],
           "--gr-badge-success-fg": [
             "rgb(15, 23, 42)"
+          ],
+          "--gr-badge-tone-brd": [
+            ""
+          ],
+          "--gr-badge-tone-soft-brd": [
+            ""
           ],
           "--gr-badge-warning-bg": [
             "rgb(251, 146, 60)"
@@ -13577,7 +13766,7 @@
             ""
           ],
           "--gr-color-picker-trigger-hover-brd": [
-            "rgb(157, 139, 250)"
+            "rgb(51, 65, 85)"
           ],
           "--gr-command-active-bg": [
             "color(srgb 0.2 0.254902 0.333333 / 0.45)"
@@ -14383,15 +14572,6 @@
           "--gr-secondary-hover": [
             "color(srgb 0.261804 0.312941 0.385725)"
           ],
-          "--gr-segmented-font-size": [
-            ""
-          ],
-          "--gr-segmented-font-weight": [
-            ""
-          ],
-          "--gr-segmented-indicator-bg": [
-            ""
-          ],
           "--gr-segmented-indicator-brd": [
             ""
           ],
@@ -14404,43 +14584,13 @@
           "--gr-segmented-invalid-brd": [
             "rgb(248, 113, 113)"
           ],
-          "--gr-segmented-item-color": [
-            ""
-          ],
-          "--gr-segmented-item-hover-color": [
-            ""
-          ],
-          "--gr-segmented-item-px": [
-            ""
-          ],
-          "--gr-segmented-item-py": [
-            ""
-          ],
-          "--gr-segmented-item-selected-color": [
-            ""
-          ],
           "--gr-segmented-label-weight": [
             "600"
-          ],
-          "--gr-segmented-line-height": [
-            ""
-          ],
-          "--gr-segmented-min-height": [
-            ""
-          ],
-          "--gr-segmented-padding": [
-            ""
           ],
           "--gr-segmented-radius": [
             ""
           ],
-          "--gr-segmented-track-bg": [
-            ""
-          ],
           "--gr-segmented-track-brd": [
-            ""
-          ],
-          "--gr-segmented-track-shadow": [
             ""
           ],
           "--gr-select-option-active-bg": [
@@ -14645,9 +14795,6 @@
           "--gr-steps-done-fg": [
             "rgb(255, 255, 255)"
           ],
-          "--gr-steps-marker-size": [
-            ""
-          ],
           "--gr-success": [
             "rgb(52, 211, 153)"
           ],
@@ -14701,12 +14848,6 @@
           ],
           "--gr-switch-thumb-shadow": [
             "0 1px 2px rgba(0, 0, 0, 0.45)"
-          ],
-          "--gr-switch-track-bg": [
-            ""
-          ],
-          "--gr-switch-track-brd": [
-            ""
           ],
           "--gr-switch-track-height-lg": [
             "1.75rem"
@@ -14921,82 +15062,19 @@
           "--gr-transfer-selected-bg": [
             "color(srgb 0.615686 0.545098 0.980392 / 0.12)"
           ],
-          "--gr-tree-branch-elbow-width": [
-            ""
-          ],
           "--gr-tree-branch-line-color": [
             ""
           ],
           "--gr-tree-branch-line-default-color": [
             "rgb(51, 65, 85)"
           ],
-          "--gr-tree-branch-line-offset": [
-            ""
-          ],
-          "--gr-tree-branch-line-width": [
-            ""
-          ],
           "--gr-tree-branch-weight": [
             "600"
-          ],
-          "--gr-tree-checkbox-bg": [
-            ""
-          ],
-          "--gr-tree-checkbox-brd-width": [
-            ""
-          ],
-          "--gr-tree-checkbox-mr": [
-            ""
-          ],
-          "--gr-tree-checkbox-radius": [
-            ""
-          ],
-          "--gr-tree-checkbox-size": [
-            ""
-          ],
-          "--gr-tree-children-pl": [
-            ""
-          ],
-          "--gr-tree-content-gap": [
-            ""
-          ],
-          "--gr-tree-drag-handle-color": [
-            ""
-          ],
-          "--gr-tree-drag-handle-disabled-opacity": [
-            ""
           ],
           "--gr-tree-drag-handle-hover-bg": [
             ""
           ],
-          "--gr-tree-drag-handle-hover-opacity": [
-            ""
-          ],
-          "--gr-tree-drag-handle-mr": [
-            ""
-          ],
-          "--gr-tree-drag-handle-opacity": [
-            ""
-          ],
-          "--gr-tree-drag-handle-radius": [
-            ""
-          ],
-          "--gr-tree-drag-handle-size": [
-            ""
-          ],
-          "--gr-tree-font-size": [
-            ""
-          ],
-          "--gr-tree-gap": [
-            ""
-          ],
-          "--gr-tree-icon-size": [
-            ""
-          ],
           "--gr-tree-indent-step": [
-            ""
-          ],
-          "--gr-tree-row-current-bar-width": [
             ""
           ],
           "--gr-tree-row-current-bg": [
@@ -15011,31 +15089,7 @@
           "--gr-tree-row-indent": [
             "0px"
           ],
-          "--gr-tree-row-min-height": [
-            ""
-          ],
-          "--gr-tree-row-px": [
-            ""
-          ],
-          "--gr-tree-row-py": [
-            ""
-          ],
-          "--gr-tree-row-radius": [
-            ""
-          ],
-          "--gr-tree-toggle-color": [
-            ""
-          ],
           "--gr-tree-toggle-hover-bg": [
-            ""
-          ],
-          "--gr-tree-toggle-mr": [
-            ""
-          ],
-          "--gr-tree-toggle-radius": [
-            ""
-          ],
-          "--gr-tree-toggle-size": [
             ""
           ],
           "--gr-value-prefix-color": [
@@ -15333,6 +15387,24 @@
           "--gr-badge-success-fg": {
             "value": "#ffffff",
             "color": "rgb(255, 255, 255)"
+          },
+          "--gr-badge-tone-bg": {
+            "value": ""
+          },
+          "--gr-badge-tone-brd": {
+            "value": ""
+          },
+          "--gr-badge-tone-fg": {
+            "value": ""
+          },
+          "--gr-badge-tone-soft-bg": {
+            "value": ""
+          },
+          "--gr-badge-tone-soft-brd": {
+            "value": ""
+          },
+          "--gr-badge-tone-soft-fg": {
+            "value": ""
           },
           "--gr-badge-warning-bg": {
             "value": "#c2410c",
@@ -15869,7 +15941,28 @@
           "--gr-button-solid-image": {
             "value": "none"
           },
+          "--gr-button-step-addon-px": {
+            "value": ""
+          },
+          "--gr-button-step-gap": {
+            "value": ""
+          },
+          "--gr-button-step-glyph": {
+            "value": ""
+          },
+          "--gr-button-step-height": {
+            "value": ""
+          },
+          "--gr-button-step-leading": {
+            "value": ""
+          },
+          "--gr-button-step-px": {
+            "value": ""
+          },
           "--gr-button-step-radius": {
+            "value": ""
+          },
+          "--gr-button-step-text": {
             "value": ""
           },
           "--gr-button-success-bg": {
@@ -16195,8 +16288,8 @@
             "color": "rgba(0, 0, 0, 0.45)"
           },
           "--gr-color-picker-trigger-hover-brd": {
-            "value": "#4f46e5",
-            "color": "rgb(79, 70, 229)"
+            "value": "#e2e8f0",
+            "color": "rgb(226, 232, 240)"
           },
           "--gr-command-active-bg": {
             "value": "color-mix(in srgb, #f1f5f9 45%, transparent)",
@@ -16699,6 +16792,9 @@
             "value": "#e2e8f0",
             "color": "rgb(226, 232, 240)"
           },
+          "--gr-input-ring-color": {
+            "value": ""
+          },
           "--gr-invalid-brd": {
             "value": "#dc2626",
             "color": "rgb(220, 38, 38)"
@@ -16800,6 +16896,30 @@
           },
           "--gr-pagination-page-weight": {
             "value": "600"
+          },
+          "--gr-pagination-step-ellipsis-px": {
+            "value": ""
+          },
+          "--gr-pagination-step-gap": {
+            "value": ""
+          },
+          "--gr-pagination-step-height": {
+            "value": ""
+          },
+          "--gr-pagination-step-jumper": {
+            "value": ""
+          },
+          "--gr-pagination-step-leading": {
+            "value": ""
+          },
+          "--gr-pagination-step-page-size": {
+            "value": ""
+          },
+          "--gr-pagination-step-px": {
+            "value": ""
+          },
+          "--gr-pagination-step-text": {
+            "value": ""
           },
           "--gr-popover": {
             "value": "#ffffff",
@@ -16999,11 +17119,62 @@
             "value": "color-mix(in srgb, #e2e8f0 92%, #0f172a)",
             "color": "color(srgb 0.820078 0.844235 0.879059)"
           },
+          "--gr-segmented-font-size": {
+            "value": ""
+          },
+          "--gr-segmented-font-weight": {
+            "value": ""
+          },
+          "--gr-segmented-indicator-bg": {
+            "value": ""
+          },
+          "--gr-segmented-indicator-brd": {
+            "value": ""
+          },
           "--gr-segmented-indicator-highlight-shadow": {
             "value": "0 0 0 0 transparent"
           },
+          "--gr-segmented-indicator-shadow": {
+            "value": ""
+          },
+          "--gr-segmented-item-color": {
+            "value": ""
+          },
+          "--gr-segmented-item-hover-color": {
+            "value": ""
+          },
+          "--gr-segmented-item-px": {
+            "value": ""
+          },
+          "--gr-segmented-item-py": {
+            "value": ""
+          },
+          "--gr-segmented-item-selected-color": {
+            "value": ""
+          },
           "--gr-segmented-label-weight": {
             "value": "600"
+          },
+          "--gr-segmented-line-height": {
+            "value": ""
+          },
+          "--gr-segmented-min-height": {
+            "value": ""
+          },
+          "--gr-segmented-padding": {
+            "value": ""
+          },
+          "--gr-segmented-radius": {
+            "value": ""
+          },
+          "--gr-segmented-track-bg": {
+            "value": ""
+          },
+          "--gr-segmented-track-brd": {
+            "value": ""
+          },
+          "--gr-segmented-track-shadow": {
+            "value": ""
           },
           "--gr-select-option-active-bg": {
             "value": "color-mix(in srgb, #f1f5f9 30%, transparent)",
@@ -17311,6 +17482,30 @@
             "value": "#f1f5f9",
             "color": "rgb(241, 245, 249)"
           },
+          "--gr-switch-step-air": {
+            "value": ""
+          },
+          "--gr-switch-step-height": {
+            "value": ""
+          },
+          "--gr-switch-step-icon": {
+            "value": ""
+          },
+          "--gr-switch-step-leading": {
+            "value": ""
+          },
+          "--gr-switch-step-state-size": {
+            "value": ""
+          },
+          "--gr-switch-step-text": {
+            "value": ""
+          },
+          "--gr-switch-step-text-width": {
+            "value": ""
+          },
+          "--gr-switch-step-width": {
+            "value": ""
+          },
           "--gr-switch-text-track-width-lg": {
             "value": "3.5rem"
           },
@@ -17323,6 +17518,12 @@
           },
           "--gr-switch-thumb-shadow": {
             "value": "0 1px 2px rgba(15, 23, 42, 0.08)"
+          },
+          "--gr-switch-track-bg": {
+            "value": ""
+          },
+          "--gr-switch-track-brd": {
+            "value": ""
           },
           "--gr-switch-track-height-lg": {
             "value": "1.75rem"
@@ -17920,6 +18121,12 @@
           ],
           "--gr-badge-success-fg": [
             "rgb(255, 255, 255)"
+          ],
+          "--gr-badge-tone-brd": [
+            ""
+          ],
+          "--gr-badge-tone-soft-brd": [
+            ""
           ],
           "--gr-badge-warning-bg": [
             "rgb(194, 65, 12)"
@@ -18613,7 +18820,7 @@
             ""
           ],
           "--gr-color-picker-trigger-hover-brd": [
-            "rgb(79, 70, 229)"
+            "rgb(226, 232, 240)"
           ],
           "--gr-command-active-bg": [
             "color(srgb 0.945098 0.960784 0.976471 / 0.45)"
@@ -19419,15 +19626,6 @@
           "--gr-secondary-hover": [
             "color(srgb 0.820078 0.844235 0.879059)"
           ],
-          "--gr-segmented-font-size": [
-            ""
-          ],
-          "--gr-segmented-font-weight": [
-            ""
-          ],
-          "--gr-segmented-indicator-bg": [
-            ""
-          ],
           "--gr-segmented-indicator-brd": [
             ""
           ],
@@ -19440,43 +19638,13 @@
           "--gr-segmented-invalid-brd": [
             "rgb(220, 38, 38)"
           ],
-          "--gr-segmented-item-color": [
-            ""
-          ],
-          "--gr-segmented-item-hover-color": [
-            ""
-          ],
-          "--gr-segmented-item-px": [
-            ""
-          ],
-          "--gr-segmented-item-py": [
-            ""
-          ],
-          "--gr-segmented-item-selected-color": [
-            ""
-          ],
           "--gr-segmented-label-weight": [
             "600"
-          ],
-          "--gr-segmented-line-height": [
-            ""
-          ],
-          "--gr-segmented-min-height": [
-            ""
-          ],
-          "--gr-segmented-padding": [
-            ""
           ],
           "--gr-segmented-radius": [
             ""
           ],
-          "--gr-segmented-track-bg": [
-            ""
-          ],
           "--gr-segmented-track-brd": [
-            ""
-          ],
-          "--gr-segmented-track-shadow": [
             ""
           ],
           "--gr-select-option-active-bg": [
@@ -19681,9 +19849,6 @@
           "--gr-steps-done-fg": [
             "rgb(255, 255, 255)"
           ],
-          "--gr-steps-marker-size": [
-            ""
-          ],
           "--gr-success": [
             "rgb(16, 185, 129)"
           ],
@@ -19737,12 +19902,6 @@
           ],
           "--gr-switch-thumb-shadow": [
             "0 1px 2px rgba(15, 23, 42, 0.08)"
-          ],
-          "--gr-switch-track-bg": [
-            ""
-          ],
-          "--gr-switch-track-brd": [
-            ""
           ],
           "--gr-switch-track-height-lg": [
             "1.75rem"
@@ -19957,82 +20116,19 @@
           "--gr-transfer-selected-bg": [
             "color(srgb 0.309804 0.27451 0.898039 / 0.12)"
           ],
-          "--gr-tree-branch-elbow-width": [
-            ""
-          ],
           "--gr-tree-branch-line-color": [
             ""
           ],
           "--gr-tree-branch-line-default-color": [
             "rgb(226, 232, 240)"
           ],
-          "--gr-tree-branch-line-offset": [
-            ""
-          ],
-          "--gr-tree-branch-line-width": [
-            ""
-          ],
           "--gr-tree-branch-weight": [
             "600"
-          ],
-          "--gr-tree-checkbox-bg": [
-            ""
-          ],
-          "--gr-tree-checkbox-brd-width": [
-            ""
-          ],
-          "--gr-tree-checkbox-mr": [
-            ""
-          ],
-          "--gr-tree-checkbox-radius": [
-            ""
-          ],
-          "--gr-tree-checkbox-size": [
-            ""
-          ],
-          "--gr-tree-children-pl": [
-            ""
-          ],
-          "--gr-tree-content-gap": [
-            ""
-          ],
-          "--gr-tree-drag-handle-color": [
-            ""
-          ],
-          "--gr-tree-drag-handle-disabled-opacity": [
-            ""
           ],
           "--gr-tree-drag-handle-hover-bg": [
             ""
           ],
-          "--gr-tree-drag-handle-hover-opacity": [
-            ""
-          ],
-          "--gr-tree-drag-handle-mr": [
-            ""
-          ],
-          "--gr-tree-drag-handle-opacity": [
-            ""
-          ],
-          "--gr-tree-drag-handle-radius": [
-            ""
-          ],
-          "--gr-tree-drag-handle-size": [
-            ""
-          ],
-          "--gr-tree-font-size": [
-            ""
-          ],
-          "--gr-tree-gap": [
-            ""
-          ],
-          "--gr-tree-icon-size": [
-            ""
-          ],
           "--gr-tree-indent-step": [
-            ""
-          ],
-          "--gr-tree-row-current-bar-width": [
             ""
           ],
           "--gr-tree-row-current-bg": [
@@ -20047,31 +20143,7 @@
           "--gr-tree-row-indent": [
             "0px"
           ],
-          "--gr-tree-row-min-height": [
-            ""
-          ],
-          "--gr-tree-row-px": [
-            ""
-          ],
-          "--gr-tree-row-py": [
-            ""
-          ],
-          "--gr-tree-row-radius": [
-            ""
-          ],
-          "--gr-tree-toggle-color": [
-            ""
-          ],
           "--gr-tree-toggle-hover-bg": [
-            ""
-          ],
-          "--gr-tree-toggle-mr": [
-            ""
-          ],
-          "--gr-tree-toggle-radius": [
-            ""
-          ],
-          "--gr-tree-toggle-size": [
             ""
           ],
           "--gr-value-prefix-color": [
@@ -20372,6 +20444,24 @@
             "value": "#ffffff",
             "color": "rgb(255, 255, 255)"
           },
+          "--gr-badge-tone-bg": {
+            "value": ""
+          },
+          "--gr-badge-tone-brd": {
+            "value": ""
+          },
+          "--gr-badge-tone-fg": {
+            "value": ""
+          },
+          "--gr-badge-tone-soft-bg": {
+            "value": ""
+          },
+          "--gr-badge-tone-soft-brd": {
+            "value": ""
+          },
+          "--gr-badge-tone-soft-fg": {
+            "value": ""
+          },
           "--gr-badge-warning-bg": {
             "value": "#6f5a14",
             "color": "rgb(111, 90, 20)"
@@ -20909,7 +20999,28 @@
           "--gr-button-solid-image": {
             "value": "none"
           },
+          "--gr-button-step-addon-px": {
+            "value": ""
+          },
+          "--gr-button-step-gap": {
+            "value": ""
+          },
+          "--gr-button-step-glyph": {
+            "value": ""
+          },
+          "--gr-button-step-height": {
+            "value": ""
+          },
+          "--gr-button-step-leading": {
+            "value": ""
+          },
+          "--gr-button-step-px": {
+            "value": ""
+          },
           "--gr-button-step-radius": {
+            "value": ""
+          },
+          "--gr-button-step-text": {
             "value": ""
           },
           "--gr-button-success-bg": {
@@ -21739,6 +21850,9 @@
             "value": "#d9d8d5",
             "color": "rgb(217, 216, 213)"
           },
+          "--gr-input-ring-color": {
+            "value": ""
+          },
           "--gr-invalid-brd": {
             "value": "#b8433a",
             "color": "rgb(184, 67, 58)"
@@ -21840,6 +21954,30 @@
           },
           "--gr-pagination-page-weight": {
             "value": "500"
+          },
+          "--gr-pagination-step-ellipsis-px": {
+            "value": ""
+          },
+          "--gr-pagination-step-gap": {
+            "value": ""
+          },
+          "--gr-pagination-step-height": {
+            "value": ""
+          },
+          "--gr-pagination-step-jumper": {
+            "value": ""
+          },
+          "--gr-pagination-step-leading": {
+            "value": ""
+          },
+          "--gr-pagination-step-page-size": {
+            "value": ""
+          },
+          "--gr-pagination-step-px": {
+            "value": ""
+          },
+          "--gr-pagination-step-text": {
+            "value": ""
           },
           "--gr-popover": {
             "value": "#ffffff",
@@ -22039,11 +22177,62 @@
             "value": "color-mix(in srgb, #e8e6dc 92%, #141413)",
             "color": "color(srgb 0.843294 0.836078 0.799686)"
           },
+          "--gr-segmented-font-size": {
+            "value": ""
+          },
+          "--gr-segmented-font-weight": {
+            "value": ""
+          },
+          "--gr-segmented-indicator-bg": {
+            "value": ""
+          },
+          "--gr-segmented-indicator-brd": {
+            "value": ""
+          },
           "--gr-segmented-indicator-highlight-shadow": {
             "value": "0 0 0 1px color-mix(in srgb, #141413 15%, transparent)"
           },
+          "--gr-segmented-indicator-shadow": {
+            "value": ""
+          },
+          "--gr-segmented-item-color": {
+            "value": ""
+          },
+          "--gr-segmented-item-hover-color": {
+            "value": ""
+          },
+          "--gr-segmented-item-px": {
+            "value": ""
+          },
+          "--gr-segmented-item-py": {
+            "value": ""
+          },
+          "--gr-segmented-item-selected-color": {
+            "value": ""
+          },
           "--gr-segmented-label-weight": {
             "value": "500"
+          },
+          "--gr-segmented-line-height": {
+            "value": ""
+          },
+          "--gr-segmented-min-height": {
+            "value": ""
+          },
+          "--gr-segmented-padding": {
+            "value": ""
+          },
+          "--gr-segmented-radius": {
+            "value": ""
+          },
+          "--gr-segmented-track-bg": {
+            "value": ""
+          },
+          "--gr-segmented-track-brd": {
+            "value": ""
+          },
+          "--gr-segmented-track-shadow": {
+            "value": ""
           },
           "--gr-select-option-active-bg": {
             "value": "rgba(115, 114, 108, 0.1)",
@@ -22351,6 +22540,30 @@
             "value": "#82817e",
             "color": "rgb(130, 129, 126)"
           },
+          "--gr-switch-step-air": {
+            "value": ""
+          },
+          "--gr-switch-step-height": {
+            "value": ""
+          },
+          "--gr-switch-step-icon": {
+            "value": ""
+          },
+          "--gr-switch-step-leading": {
+            "value": ""
+          },
+          "--gr-switch-step-state-size": {
+            "value": ""
+          },
+          "--gr-switch-step-text": {
+            "value": ""
+          },
+          "--gr-switch-step-text-width": {
+            "value": ""
+          },
+          "--gr-switch-step-width": {
+            "value": ""
+          },
           "--gr-switch-text-track-width-lg": {
             "value": "52px"
           },
@@ -22363,6 +22576,12 @@
           },
           "--gr-switch-thumb-shadow": {
             "value": "none"
+          },
+          "--gr-switch-track-bg": {
+            "value": ""
+          },
+          "--gr-switch-track-brd": {
+            "value": ""
           },
           "--gr-switch-track-height-lg": {
             "value": "20px"
@@ -22963,6 +23182,12 @@
           ],
           "--gr-badge-success-fg": [
             "rgb(255, 255, 255)"
+          ],
+          "--gr-badge-tone-brd": [
+            ""
+          ],
+          "--gr-badge-tone-soft-brd": [
+            ""
           ],
           "--gr-badge-warning-bg": [
             "rgb(111, 90, 20)"
@@ -24447,15 +24672,6 @@
           "--gr-secondary-fg": [
             "rgb(61, 61, 58)"
           ],
-          "--gr-segmented-font-size": [
-            ""
-          ],
-          "--gr-segmented-font-weight": [
-            ""
-          ],
-          "--gr-segmented-indicator-bg": [
-            ""
-          ],
           "--gr-segmented-indicator-brd": [
             ""
           ],
@@ -24468,43 +24684,13 @@
           "--gr-segmented-invalid-brd": [
             "rgb(184, 67, 58)"
           ],
-          "--gr-segmented-item-color": [
-            ""
-          ],
-          "--gr-segmented-item-hover-color": [
-            ""
-          ],
-          "--gr-segmented-item-px": [
-            ""
-          ],
-          "--gr-segmented-item-py": [
-            ""
-          ],
-          "--gr-segmented-item-selected-color": [
-            ""
-          ],
           "--gr-segmented-label-weight": [
             "500"
-          ],
-          "--gr-segmented-line-height": [
-            ""
-          ],
-          "--gr-segmented-min-height": [
-            ""
-          ],
-          "--gr-segmented-padding": [
-            ""
           ],
           "--gr-segmented-radius": [
             ""
           ],
-          "--gr-segmented-track-bg": [
-            ""
-          ],
           "--gr-segmented-track-brd": [
-            ""
-          ],
-          "--gr-segmented-track-shadow": [
             ""
           ],
           "--gr-select-option-active-bg": [
@@ -24700,9 +24886,6 @@
           "--gr-steps-done-fg": [
             "rgb(250, 249, 245)"
           ],
-          "--gr-steps-marker-size": [
-            ""
-          ],
           "--gr-success": [
             "rgb(120, 140, 93)"
           ],
@@ -24759,12 +24942,6 @@
           ],
           "--gr-switch-thumb-shadow": [
             "none"
-          ],
-          "--gr-switch-track-bg": [
-            ""
-          ],
-          "--gr-switch-track-brd": [
-            ""
           ],
           "--gr-switch-track-height-lg": [
             "20px"
@@ -24982,82 +25159,19 @@
           "--gr-transfer-selected-bg": [
             "color(srgb 0.0784314 0.0784314 0.0745098 / 0.06)"
           ],
-          "--gr-tree-branch-elbow-width": [
-            ""
-          ],
           "--gr-tree-branch-line-color": [
             ""
           ],
           "--gr-tree-branch-line-default-color": [
             "rgb(217, 216, 213)"
           ],
-          "--gr-tree-branch-line-offset": [
-            ""
-          ],
-          "--gr-tree-branch-line-width": [
-            ""
-          ],
           "--gr-tree-branch-weight": [
             "400"
-          ],
-          "--gr-tree-checkbox-bg": [
-            ""
-          ],
-          "--gr-tree-checkbox-brd-width": [
-            ""
-          ],
-          "--gr-tree-checkbox-mr": [
-            ""
-          ],
-          "--gr-tree-checkbox-radius": [
-            ""
-          ],
-          "--gr-tree-checkbox-size": [
-            ""
-          ],
-          "--gr-tree-children-pl": [
-            ""
-          ],
-          "--gr-tree-content-gap": [
-            ""
-          ],
-          "--gr-tree-drag-handle-color": [
-            ""
-          ],
-          "--gr-tree-drag-handle-disabled-opacity": [
-            ""
           ],
           "--gr-tree-drag-handle-hover-bg": [
             ""
           ],
-          "--gr-tree-drag-handle-hover-opacity": [
-            ""
-          ],
-          "--gr-tree-drag-handle-mr": [
-            ""
-          ],
-          "--gr-tree-drag-handle-opacity": [
-            ""
-          ],
-          "--gr-tree-drag-handle-radius": [
-            ""
-          ],
-          "--gr-tree-drag-handle-size": [
-            ""
-          ],
-          "--gr-tree-font-size": [
-            ""
-          ],
-          "--gr-tree-gap": [
-            ""
-          ],
-          "--gr-tree-icon-size": [
-            ""
-          ],
           "--gr-tree-indent-step": [
-            ""
-          ],
-          "--gr-tree-row-current-bar-width": [
             ""
           ],
           "--gr-tree-row-current-bg": [
@@ -25072,31 +25186,7 @@
           "--gr-tree-row-indent": [
             "0px"
           ],
-          "--gr-tree-row-min-height": [
-            ""
-          ],
-          "--gr-tree-row-px": [
-            ""
-          ],
-          "--gr-tree-row-py": [
-            ""
-          ],
-          "--gr-tree-row-radius": [
-            ""
-          ],
-          "--gr-tree-toggle-color": [
-            ""
-          ],
           "--gr-tree-toggle-hover-bg": [
-            ""
-          ],
-          "--gr-tree-toggle-mr": [
-            ""
-          ],
-          "--gr-tree-toggle-radius": [
-            ""
-          ],
-          "--gr-tree-toggle-size": [
             ""
           ],
           "--gr-value-prefix-color": [
@@ -25398,6 +25488,24 @@
             "value": "#141413",
             "color": "rgb(20, 20, 19)"
           },
+          "--gr-badge-tone-bg": {
+            "value": ""
+          },
+          "--gr-badge-tone-brd": {
+            "value": ""
+          },
+          "--gr-badge-tone-fg": {
+            "value": ""
+          },
+          "--gr-badge-tone-soft-bg": {
+            "value": ""
+          },
+          "--gr-badge-tone-soft-brd": {
+            "value": ""
+          },
+          "--gr-badge-tone-soft-fg": {
+            "value": ""
+          },
           "--gr-badge-warning-bg": {
             "value": "#c9a82d",
             "color": "rgb(201, 168, 45)"
@@ -25935,7 +26043,28 @@
           "--gr-button-solid-image": {
             "value": "none"
           },
+          "--gr-button-step-addon-px": {
+            "value": ""
+          },
+          "--gr-button-step-gap": {
+            "value": ""
+          },
+          "--gr-button-step-glyph": {
+            "value": ""
+          },
+          "--gr-button-step-height": {
+            "value": ""
+          },
+          "--gr-button-step-leading": {
+            "value": ""
+          },
+          "--gr-button-step-px": {
+            "value": ""
+          },
           "--gr-button-step-radius": {
+            "value": ""
+          },
+          "--gr-button-step-text": {
             "value": ""
           },
           "--gr-button-success-bg": {
@@ -26765,6 +26894,9 @@
             "value": "#42423f",
             "color": "rgb(66, 66, 63)"
           },
+          "--gr-input-ring-color": {
+            "value": ""
+          },
           "--gr-invalid-brd": {
             "value": "#e3585a",
             "color": "rgb(227, 88, 90)"
@@ -26866,6 +26998,30 @@
           },
           "--gr-pagination-page-weight": {
             "value": "500"
+          },
+          "--gr-pagination-step-ellipsis-px": {
+            "value": ""
+          },
+          "--gr-pagination-step-gap": {
+            "value": ""
+          },
+          "--gr-pagination-step-height": {
+            "value": ""
+          },
+          "--gr-pagination-step-jumper": {
+            "value": ""
+          },
+          "--gr-pagination-step-leading": {
+            "value": ""
+          },
+          "--gr-pagination-step-page-size": {
+            "value": ""
+          },
+          "--gr-pagination-step-px": {
+            "value": ""
+          },
+          "--gr-pagination-step-text": {
+            "value": ""
           },
           "--gr-popover": {
             "value": "#30302e",
@@ -27065,11 +27221,62 @@
             "value": "color-mix(in srgb, #3a3a37 92%, #faf9f5)",
             "color": "color(srgb 0.287686 0.287373 0.275294)"
           },
+          "--gr-segmented-font-size": {
+            "value": ""
+          },
+          "--gr-segmented-font-weight": {
+            "value": ""
+          },
+          "--gr-segmented-indicator-bg": {
+            "value": ""
+          },
+          "--gr-segmented-indicator-brd": {
+            "value": ""
+          },
           "--gr-segmented-indicator-highlight-shadow": {
             "value": "0 0 0 1px color-mix(in srgb, #faf9f5 14%, transparent)"
           },
+          "--gr-segmented-indicator-shadow": {
+            "value": ""
+          },
+          "--gr-segmented-item-color": {
+            "value": ""
+          },
+          "--gr-segmented-item-hover-color": {
+            "value": ""
+          },
+          "--gr-segmented-item-px": {
+            "value": ""
+          },
+          "--gr-segmented-item-py": {
+            "value": ""
+          },
+          "--gr-segmented-item-selected-color": {
+            "value": ""
+          },
           "--gr-segmented-label-weight": {
             "value": "500"
+          },
+          "--gr-segmented-line-height": {
+            "value": ""
+          },
+          "--gr-segmented-min-height": {
+            "value": ""
+          },
+          "--gr-segmented-padding": {
+            "value": ""
+          },
+          "--gr-segmented-radius": {
+            "value": ""
+          },
+          "--gr-segmented-track-bg": {
+            "value": ""
+          },
+          "--gr-segmented-track-brd": {
+            "value": ""
+          },
+          "--gr-segmented-track-shadow": {
+            "value": ""
           },
           "--gr-select-option-active-bg": {
             "value": "rgba(240, 238, 230, 0.08)",
@@ -27377,6 +27584,30 @@
             "value": "#878681",
             "color": "rgb(135, 134, 129)"
           },
+          "--gr-switch-step-air": {
+            "value": ""
+          },
+          "--gr-switch-step-height": {
+            "value": ""
+          },
+          "--gr-switch-step-icon": {
+            "value": ""
+          },
+          "--gr-switch-step-leading": {
+            "value": ""
+          },
+          "--gr-switch-step-state-size": {
+            "value": ""
+          },
+          "--gr-switch-step-text": {
+            "value": ""
+          },
+          "--gr-switch-step-text-width": {
+            "value": ""
+          },
+          "--gr-switch-step-width": {
+            "value": ""
+          },
           "--gr-switch-text-track-width-lg": {
             "value": "52px"
           },
@@ -27389,6 +27620,12 @@
           },
           "--gr-switch-thumb-shadow": {
             "value": "none"
+          },
+          "--gr-switch-track-bg": {
+            "value": ""
+          },
+          "--gr-switch-track-brd": {
+            "value": ""
           },
           "--gr-switch-track-height-lg": {
             "value": "20px"
@@ -27989,6 +28226,12 @@
           ],
           "--gr-badge-success-fg": [
             "rgb(20, 20, 19)"
+          ],
+          "--gr-badge-tone-brd": [
+            ""
+          ],
+          "--gr-badge-tone-soft-brd": [
+            ""
           ],
           "--gr-badge-warning-bg": [
             "rgb(201, 168, 45)"
@@ -29473,15 +29716,6 @@
           "--gr-secondary-fg": [
             "rgb(209, 207, 197)"
           ],
-          "--gr-segmented-font-size": [
-            ""
-          ],
-          "--gr-segmented-font-weight": [
-            ""
-          ],
-          "--gr-segmented-indicator-bg": [
-            ""
-          ],
           "--gr-segmented-indicator-brd": [
             ""
           ],
@@ -29494,43 +29728,13 @@
           "--gr-segmented-invalid-brd": [
             "rgb(227, 88, 90)"
           ],
-          "--gr-segmented-item-color": [
-            ""
-          ],
-          "--gr-segmented-item-hover-color": [
-            ""
-          ],
-          "--gr-segmented-item-px": [
-            ""
-          ],
-          "--gr-segmented-item-py": [
-            ""
-          ],
-          "--gr-segmented-item-selected-color": [
-            ""
-          ],
           "--gr-segmented-label-weight": [
             "500"
-          ],
-          "--gr-segmented-line-height": [
-            ""
-          ],
-          "--gr-segmented-min-height": [
-            ""
-          ],
-          "--gr-segmented-padding": [
-            ""
           ],
           "--gr-segmented-radius": [
             ""
           ],
-          "--gr-segmented-track-bg": [
-            ""
-          ],
           "--gr-segmented-track-brd": [
-            ""
-          ],
-          "--gr-segmented-track-shadow": [
             ""
           ],
           "--gr-select-option-active-bg": [
@@ -29726,9 +29930,6 @@
           "--gr-steps-done-fg": [
             "rgb(38, 38, 36)"
           ],
-          "--gr-steps-marker-size": [
-            ""
-          ],
           "--gr-success": [
             "rgb(138, 158, 109)"
           ],
@@ -29785,12 +29986,6 @@
           ],
           "--gr-switch-thumb-shadow": [
             "none"
-          ],
-          "--gr-switch-track-bg": [
-            ""
-          ],
-          "--gr-switch-track-brd": [
-            ""
           ],
           "--gr-switch-track-height-lg": [
             "20px"
@@ -30008,82 +30203,19 @@
           "--gr-transfer-selected-bg": [
             "color(srgb 0.980392 0.976471 0.960784 / 0.06)"
           ],
-          "--gr-tree-branch-elbow-width": [
-            ""
-          ],
           "--gr-tree-branch-line-color": [
             ""
           ],
           "--gr-tree-branch-line-default-color": [
             "rgb(66, 66, 63)"
           ],
-          "--gr-tree-branch-line-offset": [
-            ""
-          ],
-          "--gr-tree-branch-line-width": [
-            ""
-          ],
           "--gr-tree-branch-weight": [
             "400"
-          ],
-          "--gr-tree-checkbox-bg": [
-            ""
-          ],
-          "--gr-tree-checkbox-brd-width": [
-            ""
-          ],
-          "--gr-tree-checkbox-mr": [
-            ""
-          ],
-          "--gr-tree-checkbox-radius": [
-            ""
-          ],
-          "--gr-tree-checkbox-size": [
-            ""
-          ],
-          "--gr-tree-children-pl": [
-            ""
-          ],
-          "--gr-tree-content-gap": [
-            ""
-          ],
-          "--gr-tree-drag-handle-color": [
-            ""
-          ],
-          "--gr-tree-drag-handle-disabled-opacity": [
-            ""
           ],
           "--gr-tree-drag-handle-hover-bg": [
             ""
           ],
-          "--gr-tree-drag-handle-hover-opacity": [
-            ""
-          ],
-          "--gr-tree-drag-handle-mr": [
-            ""
-          ],
-          "--gr-tree-drag-handle-opacity": [
-            ""
-          ],
-          "--gr-tree-drag-handle-radius": [
-            ""
-          ],
-          "--gr-tree-drag-handle-size": [
-            ""
-          ],
-          "--gr-tree-font-size": [
-            ""
-          ],
-          "--gr-tree-gap": [
-            ""
-          ],
-          "--gr-tree-icon-size": [
-            ""
-          ],
           "--gr-tree-indent-step": [
-            ""
-          ],
-          "--gr-tree-row-current-bar-width": [
             ""
           ],
           "--gr-tree-row-current-bg": [
@@ -30098,31 +30230,7 @@
           "--gr-tree-row-indent": [
             "0px"
           ],
-          "--gr-tree-row-min-height": [
-            ""
-          ],
-          "--gr-tree-row-px": [
-            ""
-          ],
-          "--gr-tree-row-py": [
-            ""
-          ],
-          "--gr-tree-row-radius": [
-            ""
-          ],
-          "--gr-tree-toggle-color": [
-            ""
-          ],
           "--gr-tree-toggle-hover-bg": [
-            ""
-          ],
-          "--gr-tree-toggle-mr": [
-            ""
-          ],
-          "--gr-tree-toggle-radius": [
-            ""
-          ],
-          "--gr-tree-toggle-size": [
             ""
           ],
           "--gr-value-prefix-color": [
@@ -30424,6 +30532,24 @@
             "value": "#141413",
             "color": "rgb(20, 20, 19)"
           },
+          "--gr-badge-tone-bg": {
+            "value": ""
+          },
+          "--gr-badge-tone-brd": {
+            "value": ""
+          },
+          "--gr-badge-tone-fg": {
+            "value": ""
+          },
+          "--gr-badge-tone-soft-bg": {
+            "value": ""
+          },
+          "--gr-badge-tone-soft-brd": {
+            "value": ""
+          },
+          "--gr-badge-tone-soft-fg": {
+            "value": ""
+          },
           "--gr-badge-warning-bg": {
             "value": "#c9a82d",
             "color": "rgb(201, 168, 45)"
@@ -30961,7 +31087,28 @@
           "--gr-button-solid-image": {
             "value": "none"
           },
+          "--gr-button-step-addon-px": {
+            "value": ""
+          },
+          "--gr-button-step-gap": {
+            "value": ""
+          },
+          "--gr-button-step-glyph": {
+            "value": ""
+          },
+          "--gr-button-step-height": {
+            "value": ""
+          },
+          "--gr-button-step-leading": {
+            "value": ""
+          },
+          "--gr-button-step-px": {
+            "value": ""
+          },
           "--gr-button-step-radius": {
+            "value": ""
+          },
+          "--gr-button-step-text": {
             "value": ""
           },
           "--gr-button-success-bg": {
@@ -31791,6 +31938,9 @@
             "value": "#42423f",
             "color": "rgb(66, 66, 63)"
           },
+          "--gr-input-ring-color": {
+            "value": ""
+          },
           "--gr-invalid-brd": {
             "value": "#e3585a",
             "color": "rgb(227, 88, 90)"
@@ -31892,6 +32042,30 @@
           },
           "--gr-pagination-page-weight": {
             "value": "500"
+          },
+          "--gr-pagination-step-ellipsis-px": {
+            "value": ""
+          },
+          "--gr-pagination-step-gap": {
+            "value": ""
+          },
+          "--gr-pagination-step-height": {
+            "value": ""
+          },
+          "--gr-pagination-step-jumper": {
+            "value": ""
+          },
+          "--gr-pagination-step-leading": {
+            "value": ""
+          },
+          "--gr-pagination-step-page-size": {
+            "value": ""
+          },
+          "--gr-pagination-step-px": {
+            "value": ""
+          },
+          "--gr-pagination-step-text": {
+            "value": ""
           },
           "--gr-popover": {
             "value": "#30302e",
@@ -32091,11 +32265,62 @@
             "value": "color-mix(in srgb, #3a3a37 92%, #faf9f5)",
             "color": "color(srgb 0.287686 0.287373 0.275294)"
           },
+          "--gr-segmented-font-size": {
+            "value": ""
+          },
+          "--gr-segmented-font-weight": {
+            "value": ""
+          },
+          "--gr-segmented-indicator-bg": {
+            "value": ""
+          },
+          "--gr-segmented-indicator-brd": {
+            "value": ""
+          },
           "--gr-segmented-indicator-highlight-shadow": {
             "value": "0 0 0 1px color-mix(in srgb, #faf9f5 14%, transparent)"
           },
+          "--gr-segmented-indicator-shadow": {
+            "value": ""
+          },
+          "--gr-segmented-item-color": {
+            "value": ""
+          },
+          "--gr-segmented-item-hover-color": {
+            "value": ""
+          },
+          "--gr-segmented-item-px": {
+            "value": ""
+          },
+          "--gr-segmented-item-py": {
+            "value": ""
+          },
+          "--gr-segmented-item-selected-color": {
+            "value": ""
+          },
           "--gr-segmented-label-weight": {
             "value": "500"
+          },
+          "--gr-segmented-line-height": {
+            "value": ""
+          },
+          "--gr-segmented-min-height": {
+            "value": ""
+          },
+          "--gr-segmented-padding": {
+            "value": ""
+          },
+          "--gr-segmented-radius": {
+            "value": ""
+          },
+          "--gr-segmented-track-bg": {
+            "value": ""
+          },
+          "--gr-segmented-track-brd": {
+            "value": ""
+          },
+          "--gr-segmented-track-shadow": {
+            "value": ""
           },
           "--gr-select-option-active-bg": {
             "value": "rgba(240, 238, 230, 0.08)",
@@ -32403,6 +32628,30 @@
             "value": "#878681",
             "color": "rgb(135, 134, 129)"
           },
+          "--gr-switch-step-air": {
+            "value": ""
+          },
+          "--gr-switch-step-height": {
+            "value": ""
+          },
+          "--gr-switch-step-icon": {
+            "value": ""
+          },
+          "--gr-switch-step-leading": {
+            "value": ""
+          },
+          "--gr-switch-step-state-size": {
+            "value": ""
+          },
+          "--gr-switch-step-text": {
+            "value": ""
+          },
+          "--gr-switch-step-text-width": {
+            "value": ""
+          },
+          "--gr-switch-step-width": {
+            "value": ""
+          },
           "--gr-switch-text-track-width-lg": {
             "value": "52px"
           },
@@ -32415,6 +32664,12 @@
           },
           "--gr-switch-thumb-shadow": {
             "value": "none"
+          },
+          "--gr-switch-track-bg": {
+            "value": ""
+          },
+          "--gr-switch-track-brd": {
+            "value": ""
           },
           "--gr-switch-track-height-lg": {
             "value": "20px"
@@ -33015,6 +33270,12 @@
           ],
           "--gr-badge-success-fg": [
             "rgb(20, 20, 19)"
+          ],
+          "--gr-badge-tone-brd": [
+            ""
+          ],
+          "--gr-badge-tone-soft-brd": [
+            ""
           ],
           "--gr-badge-warning-bg": [
             "rgb(201, 168, 45)"
@@ -34499,15 +34760,6 @@
           "--gr-secondary-fg": [
             "rgb(209, 207, 197)"
           ],
-          "--gr-segmented-font-size": [
-            ""
-          ],
-          "--gr-segmented-font-weight": [
-            ""
-          ],
-          "--gr-segmented-indicator-bg": [
-            ""
-          ],
           "--gr-segmented-indicator-brd": [
             ""
           ],
@@ -34520,43 +34772,13 @@
           "--gr-segmented-invalid-brd": [
             "rgb(227, 88, 90)"
           ],
-          "--gr-segmented-item-color": [
-            ""
-          ],
-          "--gr-segmented-item-hover-color": [
-            ""
-          ],
-          "--gr-segmented-item-px": [
-            ""
-          ],
-          "--gr-segmented-item-py": [
-            ""
-          ],
-          "--gr-segmented-item-selected-color": [
-            ""
-          ],
           "--gr-segmented-label-weight": [
             "500"
-          ],
-          "--gr-segmented-line-height": [
-            ""
-          ],
-          "--gr-segmented-min-height": [
-            ""
-          ],
-          "--gr-segmented-padding": [
-            ""
           ],
           "--gr-segmented-radius": [
             ""
           ],
-          "--gr-segmented-track-bg": [
-            ""
-          ],
           "--gr-segmented-track-brd": [
-            ""
-          ],
-          "--gr-segmented-track-shadow": [
             ""
           ],
           "--gr-select-option-active-bg": [
@@ -34752,9 +34974,6 @@
           "--gr-steps-done-fg": [
             "rgb(38, 38, 36)"
           ],
-          "--gr-steps-marker-size": [
-            ""
-          ],
           "--gr-success": [
             "rgb(138, 158, 109)"
           ],
@@ -34811,12 +35030,6 @@
           ],
           "--gr-switch-thumb-shadow": [
             "none"
-          ],
-          "--gr-switch-track-bg": [
-            ""
-          ],
-          "--gr-switch-track-brd": [
-            ""
           ],
           "--gr-switch-track-height-lg": [
             "20px"
@@ -35034,82 +35247,19 @@
           "--gr-transfer-selected-bg": [
             "color(srgb 0.980392 0.976471 0.960784 / 0.06)"
           ],
-          "--gr-tree-branch-elbow-width": [
-            ""
-          ],
           "--gr-tree-branch-line-color": [
             ""
           ],
           "--gr-tree-branch-line-default-color": [
             "rgb(66, 66, 63)"
           ],
-          "--gr-tree-branch-line-offset": [
-            ""
-          ],
-          "--gr-tree-branch-line-width": [
-            ""
-          ],
           "--gr-tree-branch-weight": [
             "400"
-          ],
-          "--gr-tree-checkbox-bg": [
-            ""
-          ],
-          "--gr-tree-checkbox-brd-width": [
-            ""
-          ],
-          "--gr-tree-checkbox-mr": [
-            ""
-          ],
-          "--gr-tree-checkbox-radius": [
-            ""
-          ],
-          "--gr-tree-checkbox-size": [
-            ""
-          ],
-          "--gr-tree-children-pl": [
-            ""
-          ],
-          "--gr-tree-content-gap": [
-            ""
-          ],
-          "--gr-tree-drag-handle-color": [
-            ""
-          ],
-          "--gr-tree-drag-handle-disabled-opacity": [
-            ""
           ],
           "--gr-tree-drag-handle-hover-bg": [
             ""
           ],
-          "--gr-tree-drag-handle-hover-opacity": [
-            ""
-          ],
-          "--gr-tree-drag-handle-mr": [
-            ""
-          ],
-          "--gr-tree-drag-handle-opacity": [
-            ""
-          ],
-          "--gr-tree-drag-handle-radius": [
-            ""
-          ],
-          "--gr-tree-drag-handle-size": [
-            ""
-          ],
-          "--gr-tree-font-size": [
-            ""
-          ],
-          "--gr-tree-gap": [
-            ""
-          ],
-          "--gr-tree-icon-size": [
-            ""
-          ],
           "--gr-tree-indent-step": [
-            ""
-          ],
-          "--gr-tree-row-current-bar-width": [
             ""
           ],
           "--gr-tree-row-current-bg": [
@@ -35124,31 +35274,7 @@
           "--gr-tree-row-indent": [
             "0px"
           ],
-          "--gr-tree-row-min-height": [
-            ""
-          ],
-          "--gr-tree-row-px": [
-            ""
-          ],
-          "--gr-tree-row-py": [
-            ""
-          ],
-          "--gr-tree-row-radius": [
-            ""
-          ],
-          "--gr-tree-toggle-color": [
-            ""
-          ],
           "--gr-tree-toggle-hover-bg": [
-            ""
-          ],
-          "--gr-tree-toggle-mr": [
-            ""
-          ],
-          "--gr-tree-toggle-radius": [
-            ""
-          ],
-          "--gr-tree-toggle-size": [
             ""
           ],
           "--gr-value-prefix-color": [
@@ -35449,6 +35575,24 @@
           "--gr-badge-success-fg": {
             "value": "#ffffff",
             "color": "rgb(255, 255, 255)"
+          },
+          "--gr-badge-tone-bg": {
+            "value": ""
+          },
+          "--gr-badge-tone-brd": {
+            "value": ""
+          },
+          "--gr-badge-tone-fg": {
+            "value": ""
+          },
+          "--gr-badge-tone-soft-bg": {
+            "value": ""
+          },
+          "--gr-badge-tone-soft-brd": {
+            "value": ""
+          },
+          "--gr-badge-tone-soft-fg": {
+            "value": ""
           },
           "--gr-badge-warning-bg": {
             "value": "#6f5a14",
@@ -35987,7 +36131,28 @@
           "--gr-button-solid-image": {
             "value": "none"
           },
+          "--gr-button-step-addon-px": {
+            "value": ""
+          },
+          "--gr-button-step-gap": {
+            "value": ""
+          },
+          "--gr-button-step-glyph": {
+            "value": ""
+          },
+          "--gr-button-step-height": {
+            "value": ""
+          },
+          "--gr-button-step-leading": {
+            "value": ""
+          },
+          "--gr-button-step-px": {
+            "value": ""
+          },
           "--gr-button-step-radius": {
+            "value": ""
+          },
+          "--gr-button-step-text": {
             "value": ""
           },
           "--gr-button-success-bg": {
@@ -36817,6 +36982,9 @@
             "value": "#d9d8d5",
             "color": "rgb(217, 216, 213)"
           },
+          "--gr-input-ring-color": {
+            "value": ""
+          },
           "--gr-invalid-brd": {
             "value": "#b8433a",
             "color": "rgb(184, 67, 58)"
@@ -36918,6 +37086,30 @@
           },
           "--gr-pagination-page-weight": {
             "value": "500"
+          },
+          "--gr-pagination-step-ellipsis-px": {
+            "value": ""
+          },
+          "--gr-pagination-step-gap": {
+            "value": ""
+          },
+          "--gr-pagination-step-height": {
+            "value": ""
+          },
+          "--gr-pagination-step-jumper": {
+            "value": ""
+          },
+          "--gr-pagination-step-leading": {
+            "value": ""
+          },
+          "--gr-pagination-step-page-size": {
+            "value": ""
+          },
+          "--gr-pagination-step-px": {
+            "value": ""
+          },
+          "--gr-pagination-step-text": {
+            "value": ""
           },
           "--gr-popover": {
             "value": "#ffffff",
@@ -37117,11 +37309,62 @@
             "value": "color-mix(in srgb, #e8e6dc 92%, #141413)",
             "color": "color(srgb 0.843294 0.836078 0.799686)"
           },
+          "--gr-segmented-font-size": {
+            "value": ""
+          },
+          "--gr-segmented-font-weight": {
+            "value": ""
+          },
+          "--gr-segmented-indicator-bg": {
+            "value": ""
+          },
+          "--gr-segmented-indicator-brd": {
+            "value": ""
+          },
           "--gr-segmented-indicator-highlight-shadow": {
             "value": "0 0 0 1px color-mix(in srgb, #141413 15%, transparent)"
           },
+          "--gr-segmented-indicator-shadow": {
+            "value": ""
+          },
+          "--gr-segmented-item-color": {
+            "value": ""
+          },
+          "--gr-segmented-item-hover-color": {
+            "value": ""
+          },
+          "--gr-segmented-item-px": {
+            "value": ""
+          },
+          "--gr-segmented-item-py": {
+            "value": ""
+          },
+          "--gr-segmented-item-selected-color": {
+            "value": ""
+          },
           "--gr-segmented-label-weight": {
             "value": "500"
+          },
+          "--gr-segmented-line-height": {
+            "value": ""
+          },
+          "--gr-segmented-min-height": {
+            "value": ""
+          },
+          "--gr-segmented-padding": {
+            "value": ""
+          },
+          "--gr-segmented-radius": {
+            "value": ""
+          },
+          "--gr-segmented-track-bg": {
+            "value": ""
+          },
+          "--gr-segmented-track-brd": {
+            "value": ""
+          },
+          "--gr-segmented-track-shadow": {
+            "value": ""
           },
           "--gr-select-option-active-bg": {
             "value": "rgba(115, 114, 108, 0.1)",
@@ -37429,6 +37672,30 @@
             "value": "#82817e",
             "color": "rgb(130, 129, 126)"
           },
+          "--gr-switch-step-air": {
+            "value": ""
+          },
+          "--gr-switch-step-height": {
+            "value": ""
+          },
+          "--gr-switch-step-icon": {
+            "value": ""
+          },
+          "--gr-switch-step-leading": {
+            "value": ""
+          },
+          "--gr-switch-step-state-size": {
+            "value": ""
+          },
+          "--gr-switch-step-text": {
+            "value": ""
+          },
+          "--gr-switch-step-text-width": {
+            "value": ""
+          },
+          "--gr-switch-step-width": {
+            "value": ""
+          },
           "--gr-switch-text-track-width-lg": {
             "value": "52px"
           },
@@ -37441,6 +37708,12 @@
           },
           "--gr-switch-thumb-shadow": {
             "value": "none"
+          },
+          "--gr-switch-track-bg": {
+            "value": ""
+          },
+          "--gr-switch-track-brd": {
+            "value": ""
           },
           "--gr-switch-track-height-lg": {
             "value": "20px"
@@ -38041,6 +38314,12 @@
           ],
           "--gr-badge-success-fg": [
             "rgb(255, 255, 255)"
+          ],
+          "--gr-badge-tone-brd": [
+            ""
+          ],
+          "--gr-badge-tone-soft-brd": [
+            ""
           ],
           "--gr-badge-warning-bg": [
             "rgb(111, 90, 20)"
@@ -39525,15 +39804,6 @@
           "--gr-secondary-fg": [
             "rgb(61, 61, 58)"
           ],
-          "--gr-segmented-font-size": [
-            ""
-          ],
-          "--gr-segmented-font-weight": [
-            ""
-          ],
-          "--gr-segmented-indicator-bg": [
-            ""
-          ],
           "--gr-segmented-indicator-brd": [
             ""
           ],
@@ -39546,43 +39816,13 @@
           "--gr-segmented-invalid-brd": [
             "rgb(184, 67, 58)"
           ],
-          "--gr-segmented-item-color": [
-            ""
-          ],
-          "--gr-segmented-item-hover-color": [
-            ""
-          ],
-          "--gr-segmented-item-px": [
-            ""
-          ],
-          "--gr-segmented-item-py": [
-            ""
-          ],
-          "--gr-segmented-item-selected-color": [
-            ""
-          ],
           "--gr-segmented-label-weight": [
             "500"
-          ],
-          "--gr-segmented-line-height": [
-            ""
-          ],
-          "--gr-segmented-min-height": [
-            ""
-          ],
-          "--gr-segmented-padding": [
-            ""
           ],
           "--gr-segmented-radius": [
             ""
           ],
-          "--gr-segmented-track-bg": [
-            ""
-          ],
           "--gr-segmented-track-brd": [
-            ""
-          ],
-          "--gr-segmented-track-shadow": [
             ""
           ],
           "--gr-select-option-active-bg": [
@@ -39778,9 +40018,6 @@
           "--gr-steps-done-fg": [
             "rgb(250, 249, 245)"
           ],
-          "--gr-steps-marker-size": [
-            ""
-          ],
           "--gr-success": [
             "rgb(120, 140, 93)"
           ],
@@ -39837,12 +40074,6 @@
           ],
           "--gr-switch-thumb-shadow": [
             "none"
-          ],
-          "--gr-switch-track-bg": [
-            ""
-          ],
-          "--gr-switch-track-brd": [
-            ""
           ],
           "--gr-switch-track-height-lg": [
             "20px"
@@ -40060,82 +40291,19 @@
           "--gr-transfer-selected-bg": [
             "color(srgb 0.0784314 0.0784314 0.0745098 / 0.06)"
           ],
-          "--gr-tree-branch-elbow-width": [
-            ""
-          ],
           "--gr-tree-branch-line-color": [
             ""
           ],
           "--gr-tree-branch-line-default-color": [
             "rgb(217, 216, 213)"
           ],
-          "--gr-tree-branch-line-offset": [
-            ""
-          ],
-          "--gr-tree-branch-line-width": [
-            ""
-          ],
           "--gr-tree-branch-weight": [
             "400"
-          ],
-          "--gr-tree-checkbox-bg": [
-            ""
-          ],
-          "--gr-tree-checkbox-brd-width": [
-            ""
-          ],
-          "--gr-tree-checkbox-mr": [
-            ""
-          ],
-          "--gr-tree-checkbox-radius": [
-            ""
-          ],
-          "--gr-tree-checkbox-size": [
-            ""
-          ],
-          "--gr-tree-children-pl": [
-            ""
-          ],
-          "--gr-tree-content-gap": [
-            ""
-          ],
-          "--gr-tree-drag-handle-color": [
-            ""
-          ],
-          "--gr-tree-drag-handle-disabled-opacity": [
-            ""
           ],
           "--gr-tree-drag-handle-hover-bg": [
             ""
           ],
-          "--gr-tree-drag-handle-hover-opacity": [
-            ""
-          ],
-          "--gr-tree-drag-handle-mr": [
-            ""
-          ],
-          "--gr-tree-drag-handle-opacity": [
-            ""
-          ],
-          "--gr-tree-drag-handle-radius": [
-            ""
-          ],
-          "--gr-tree-drag-handle-size": [
-            ""
-          ],
-          "--gr-tree-font-size": [
-            ""
-          ],
-          "--gr-tree-gap": [
-            ""
-          ],
-          "--gr-tree-icon-size": [
-            ""
-          ],
           "--gr-tree-indent-step": [
-            ""
-          ],
-          "--gr-tree-row-current-bar-width": [
             ""
           ],
           "--gr-tree-row-current-bg": [
@@ -40150,31 +40318,7 @@
           "--gr-tree-row-indent": [
             "0px"
           ],
-          "--gr-tree-row-min-height": [
-            ""
-          ],
-          "--gr-tree-row-px": [
-            ""
-          ],
-          "--gr-tree-row-py": [
-            ""
-          ],
-          "--gr-tree-row-radius": [
-            ""
-          ],
-          "--gr-tree-toggle-color": [
-            ""
-          ],
           "--gr-tree-toggle-hover-bg": [
-            ""
-          ],
-          "--gr-tree-toggle-mr": [
-            ""
-          ],
-          "--gr-tree-toggle-radius": [
-            ""
-          ],
-          "--gr-tree-toggle-size": [
             ""
           ],
           "--gr-value-prefix-color": [
@@ -40478,6 +40622,24 @@
             "value": "#ffffff",
             "color": "rgb(255, 255, 255)"
           },
+          "--gr-badge-tone-bg": {
+            "value": ""
+          },
+          "--gr-badge-tone-brd": {
+            "value": ""
+          },
+          "--gr-badge-tone-fg": {
+            "value": ""
+          },
+          "--gr-badge-tone-soft-bg": {
+            "value": ""
+          },
+          "--gr-badge-tone-soft-brd": {
+            "value": ""
+          },
+          "--gr-badge-tone-soft-fg": {
+            "value": ""
+          },
           "--gr-badge-warning-bg": {
             "value": "#c2410c",
             "color": "rgb(194, 65, 12)"
@@ -41015,7 +41177,28 @@
           "--gr-button-solid-image": {
             "value": "none"
           },
+          "--gr-button-step-addon-px": {
+            "value": ""
+          },
+          "--gr-button-step-gap": {
+            "value": ""
+          },
+          "--gr-button-step-glyph": {
+            "value": ""
+          },
+          "--gr-button-step-height": {
+            "value": ""
+          },
+          "--gr-button-step-leading": {
+            "value": ""
+          },
+          "--gr-button-step-px": {
+            "value": ""
+          },
           "--gr-button-step-radius": {
+            "value": ""
+          },
+          "--gr-button-step-text": {
             "value": ""
           },
           "--gr-button-success-bg": {
@@ -41341,8 +41524,8 @@
             "color": "rgba(0, 0, 0, 0.45)"
           },
           "--gr-color-picker-trigger-hover-brd": {
-            "value": "#4f46e5",
-            "color": "rgb(79, 70, 229)"
+            "value": "#e2e8f0",
+            "color": "rgb(226, 232, 240)"
           },
           "--gr-command-active-bg": {
             "value": "color-mix(in srgb, #f1f5f9 45%, transparent)",
@@ -41845,6 +42028,9 @@
             "value": "#e2e8f0",
             "color": "rgb(226, 232, 240)"
           },
+          "--gr-input-ring-color": {
+            "value": ""
+          },
           "--gr-invalid-brd": {
             "value": "#dc2626",
             "color": "rgb(220, 38, 38)"
@@ -41946,6 +42132,30 @@
           },
           "--gr-pagination-page-weight": {
             "value": "600"
+          },
+          "--gr-pagination-step-ellipsis-px": {
+            "value": ""
+          },
+          "--gr-pagination-step-gap": {
+            "value": ""
+          },
+          "--gr-pagination-step-height": {
+            "value": ""
+          },
+          "--gr-pagination-step-jumper": {
+            "value": ""
+          },
+          "--gr-pagination-step-leading": {
+            "value": ""
+          },
+          "--gr-pagination-step-page-size": {
+            "value": ""
+          },
+          "--gr-pagination-step-px": {
+            "value": ""
+          },
+          "--gr-pagination-step-text": {
+            "value": ""
           },
           "--gr-popover": {
             "value": "#ffffff",
@@ -42145,11 +42355,62 @@
             "value": "color-mix(in srgb, #e2e8f0 92%, #0f172a)",
             "color": "color(srgb 0.820078 0.844235 0.879059)"
           },
+          "--gr-segmented-font-size": {
+            "value": ""
+          },
+          "--gr-segmented-font-weight": {
+            "value": ""
+          },
+          "--gr-segmented-indicator-bg": {
+            "value": ""
+          },
+          "--gr-segmented-indicator-brd": {
+            "value": ""
+          },
           "--gr-segmented-indicator-highlight-shadow": {
             "value": "0 0 0 0 transparent"
           },
+          "--gr-segmented-indicator-shadow": {
+            "value": ""
+          },
+          "--gr-segmented-item-color": {
+            "value": ""
+          },
+          "--gr-segmented-item-hover-color": {
+            "value": ""
+          },
+          "--gr-segmented-item-px": {
+            "value": ""
+          },
+          "--gr-segmented-item-py": {
+            "value": ""
+          },
+          "--gr-segmented-item-selected-color": {
+            "value": ""
+          },
           "--gr-segmented-label-weight": {
             "value": "600"
+          },
+          "--gr-segmented-line-height": {
+            "value": ""
+          },
+          "--gr-segmented-min-height": {
+            "value": ""
+          },
+          "--gr-segmented-padding": {
+            "value": ""
+          },
+          "--gr-segmented-radius": {
+            "value": ""
+          },
+          "--gr-segmented-track-bg": {
+            "value": ""
+          },
+          "--gr-segmented-track-brd": {
+            "value": ""
+          },
+          "--gr-segmented-track-shadow": {
+            "value": ""
           },
           "--gr-select-option-active-bg": {
             "value": "color-mix(in srgb, #f1f5f9 30%, transparent)",
@@ -42457,6 +42718,30 @@
             "value": "#f1f5f9",
             "color": "rgb(241, 245, 249)"
           },
+          "--gr-switch-step-air": {
+            "value": ""
+          },
+          "--gr-switch-step-height": {
+            "value": ""
+          },
+          "--gr-switch-step-icon": {
+            "value": ""
+          },
+          "--gr-switch-step-leading": {
+            "value": ""
+          },
+          "--gr-switch-step-state-size": {
+            "value": ""
+          },
+          "--gr-switch-step-text": {
+            "value": ""
+          },
+          "--gr-switch-step-text-width": {
+            "value": ""
+          },
+          "--gr-switch-step-width": {
+            "value": ""
+          },
           "--gr-switch-text-track-width-lg": {
             "value": "3.5rem"
           },
@@ -42469,6 +42754,12 @@
           },
           "--gr-switch-thumb-shadow": {
             "value": "0 1px 2px rgba(15, 23, 42, 0.08)"
+          },
+          "--gr-switch-track-bg": {
+            "value": ""
+          },
+          "--gr-switch-track-brd": {
+            "value": ""
           },
           "--gr-switch-track-height-lg": {
             "value": "1.75rem"
@@ -43066,6 +43357,12 @@
           ],
           "--gr-badge-success-fg": [
             "rgb(255, 255, 255)"
+          ],
+          "--gr-badge-tone-brd": [
+            ""
+          ],
+          "--gr-badge-tone-soft-brd": [
+            ""
           ],
           "--gr-badge-warning-bg": [
             "rgb(194, 65, 12)"
@@ -43766,7 +44063,7 @@
             ""
           ],
           "--gr-color-picker-trigger-hover-brd": [
-            "rgb(79, 70, 229)"
+            "rgb(226, 232, 240)"
           ],
           "--gr-command-active-bg": [
             "color(srgb 0.945098 0.960784 0.976471 / 0.45)"
@@ -44575,15 +44872,6 @@
           "--gr-secondary-hover": [
             "color(srgb 0.820078 0.844235 0.879059)"
           ],
-          "--gr-segmented-font-size": [
-            ""
-          ],
-          "--gr-segmented-font-weight": [
-            ""
-          ],
-          "--gr-segmented-indicator-bg": [
-            ""
-          ],
           "--gr-segmented-indicator-brd": [
             ""
           ],
@@ -44596,43 +44884,13 @@
           "--gr-segmented-invalid-brd": [
             "rgb(220, 38, 38)"
           ],
-          "--gr-segmented-item-color": [
-            ""
-          ],
-          "--gr-segmented-item-hover-color": [
-            ""
-          ],
-          "--gr-segmented-item-px": [
-            ""
-          ],
-          "--gr-segmented-item-py": [
-            ""
-          ],
-          "--gr-segmented-item-selected-color": [
-            ""
-          ],
           "--gr-segmented-label-weight": [
             "600"
-          ],
-          "--gr-segmented-line-height": [
-            ""
-          ],
-          "--gr-segmented-min-height": [
-            ""
-          ],
-          "--gr-segmented-padding": [
-            ""
           ],
           "--gr-segmented-radius": [
             ""
           ],
-          "--gr-segmented-track-bg": [
-            ""
-          ],
           "--gr-segmented-track-brd": [
-            ""
-          ],
-          "--gr-segmented-track-shadow": [
             ""
           ],
           "--gr-select-option-active-bg": [
@@ -44840,9 +45098,6 @@
           "--gr-steps-done-fg": [
             "rgb(255, 255, 255)"
           ],
-          "--gr-steps-marker-size": [
-            ""
-          ],
           "--gr-success": [
             "rgb(16, 185, 129)"
           ],
@@ -44896,12 +45151,6 @@
           ],
           "--gr-switch-thumb-shadow": [
             "0 1px 2px rgba(15, 23, 42, 0.08)"
-          ],
-          "--gr-switch-track-bg": [
-            ""
-          ],
-          "--gr-switch-track-brd": [
-            ""
           ],
           "--gr-switch-track-height-lg": [
             "1.75rem"
@@ -45116,82 +45365,19 @@
           "--gr-transfer-selected-bg": [
             "color(srgb 0.309804 0.27451 0.898039 / 0.12)"
           ],
-          "--gr-tree-branch-elbow-width": [
-            ""
-          ],
           "--gr-tree-branch-line-color": [
             ""
           ],
           "--gr-tree-branch-line-default-color": [
             "rgb(226, 232, 240)"
           ],
-          "--gr-tree-branch-line-offset": [
-            ""
-          ],
-          "--gr-tree-branch-line-width": [
-            ""
-          ],
           "--gr-tree-branch-weight": [
             "600"
-          ],
-          "--gr-tree-checkbox-bg": [
-            ""
-          ],
-          "--gr-tree-checkbox-brd-width": [
-            ""
-          ],
-          "--gr-tree-checkbox-mr": [
-            ""
-          ],
-          "--gr-tree-checkbox-radius": [
-            ""
-          ],
-          "--gr-tree-checkbox-size": [
-            ""
-          ],
-          "--gr-tree-children-pl": [
-            ""
-          ],
-          "--gr-tree-content-gap": [
-            ""
-          ],
-          "--gr-tree-drag-handle-color": [
-            ""
-          ],
-          "--gr-tree-drag-handle-disabled-opacity": [
-            ""
           ],
           "--gr-tree-drag-handle-hover-bg": [
             ""
           ],
-          "--gr-tree-drag-handle-hover-opacity": [
-            ""
-          ],
-          "--gr-tree-drag-handle-mr": [
-            ""
-          ],
-          "--gr-tree-drag-handle-opacity": [
-            ""
-          ],
-          "--gr-tree-drag-handle-radius": [
-            ""
-          ],
-          "--gr-tree-drag-handle-size": [
-            ""
-          ],
-          "--gr-tree-font-size": [
-            ""
-          ],
-          "--gr-tree-gap": [
-            ""
-          ],
-          "--gr-tree-icon-size": [
-            ""
-          ],
           "--gr-tree-indent-step": [
-            ""
-          ],
-          "--gr-tree-row-current-bar-width": [
             ""
           ],
           "--gr-tree-row-current-bg": [
@@ -45206,31 +45392,7 @@
           "--gr-tree-row-indent": [
             "0px"
           ],
-          "--gr-tree-row-min-height": [
-            ""
-          ],
-          "--gr-tree-row-px": [
-            ""
-          ],
-          "--gr-tree-row-py": [
-            ""
-          ],
-          "--gr-tree-row-radius": [
-            ""
-          ],
-          "--gr-tree-toggle-color": [
-            ""
-          ],
           "--gr-tree-toggle-hover-bg": [
-            ""
-          ],
-          "--gr-tree-toggle-mr": [
-            ""
-          ],
-          "--gr-tree-toggle-radius": [
-            ""
-          ],
-          "--gr-tree-toggle-size": [
             ""
           ],
           "--gr-value-prefix-color": [
@@ -45529,6 +45691,24 @@
             "value": "#0f172a",
             "color": "rgb(15, 23, 42)"
           },
+          "--gr-badge-tone-bg": {
+            "value": ""
+          },
+          "--gr-badge-tone-brd": {
+            "value": ""
+          },
+          "--gr-badge-tone-fg": {
+            "value": ""
+          },
+          "--gr-badge-tone-soft-bg": {
+            "value": ""
+          },
+          "--gr-badge-tone-soft-brd": {
+            "value": ""
+          },
+          "--gr-badge-tone-soft-fg": {
+            "value": ""
+          },
           "--gr-badge-warning-bg": {
             "value": "#fb923c",
             "color": "rgb(251, 146, 60)"
@@ -46066,7 +46246,28 @@
           "--gr-button-solid-image": {
             "value": "none"
           },
+          "--gr-button-step-addon-px": {
+            "value": ""
+          },
+          "--gr-button-step-gap": {
+            "value": ""
+          },
+          "--gr-button-step-glyph": {
+            "value": ""
+          },
+          "--gr-button-step-height": {
+            "value": ""
+          },
+          "--gr-button-step-leading": {
+            "value": ""
+          },
+          "--gr-button-step-px": {
+            "value": ""
+          },
           "--gr-button-step-radius": {
+            "value": ""
+          },
+          "--gr-button-step-text": {
             "value": ""
           },
           "--gr-button-success-bg": {
@@ -46392,8 +46593,8 @@
             "color": "rgba(0, 0, 0, 0.45)"
           },
           "--gr-color-picker-trigger-hover-brd": {
-            "value": "#9d8bfa",
-            "color": "rgb(157, 139, 250)"
+            "value": "#334155",
+            "color": "rgb(51, 65, 85)"
           },
           "--gr-command-active-bg": {
             "value": "color-mix(in srgb, #334155 45%, transparent)",
@@ -46896,6 +47097,9 @@
             "value": "#334155",
             "color": "rgb(51, 65, 85)"
           },
+          "--gr-input-ring-color": {
+            "value": ""
+          },
           "--gr-invalid-brd": {
             "value": "#f87171",
             "color": "rgb(248, 113, 113)"
@@ -46997,6 +47201,30 @@
           },
           "--gr-pagination-page-weight": {
             "value": "600"
+          },
+          "--gr-pagination-step-ellipsis-px": {
+            "value": ""
+          },
+          "--gr-pagination-step-gap": {
+            "value": ""
+          },
+          "--gr-pagination-step-height": {
+            "value": ""
+          },
+          "--gr-pagination-step-jumper": {
+            "value": ""
+          },
+          "--gr-pagination-step-leading": {
+            "value": ""
+          },
+          "--gr-pagination-step-page-size": {
+            "value": ""
+          },
+          "--gr-pagination-step-px": {
+            "value": ""
+          },
+          "--gr-pagination-step-text": {
+            "value": ""
           },
           "--gr-popover": {
             "value": "#1e293b",
@@ -47196,11 +47424,62 @@
             "value": "color-mix(in srgb, #334155 92%, #f8fafc)",
             "color": "color(srgb 0.261804 0.312941 0.385725)"
           },
+          "--gr-segmented-font-size": {
+            "value": ""
+          },
+          "--gr-segmented-font-weight": {
+            "value": ""
+          },
+          "--gr-segmented-indicator-bg": {
+            "value": ""
+          },
+          "--gr-segmented-indicator-brd": {
+            "value": ""
+          },
           "--gr-segmented-indicator-highlight-shadow": {
             "value": "0 0 0 1px rgba(248, 250, 252, 0.08)"
           },
+          "--gr-segmented-indicator-shadow": {
+            "value": ""
+          },
+          "--gr-segmented-item-color": {
+            "value": ""
+          },
+          "--gr-segmented-item-hover-color": {
+            "value": ""
+          },
+          "--gr-segmented-item-px": {
+            "value": ""
+          },
+          "--gr-segmented-item-py": {
+            "value": ""
+          },
+          "--gr-segmented-item-selected-color": {
+            "value": ""
+          },
           "--gr-segmented-label-weight": {
             "value": "600"
+          },
+          "--gr-segmented-line-height": {
+            "value": ""
+          },
+          "--gr-segmented-min-height": {
+            "value": ""
+          },
+          "--gr-segmented-padding": {
+            "value": ""
+          },
+          "--gr-segmented-radius": {
+            "value": ""
+          },
+          "--gr-segmented-track-bg": {
+            "value": ""
+          },
+          "--gr-segmented-track-brd": {
+            "value": ""
+          },
+          "--gr-segmented-track-shadow": {
+            "value": ""
           },
           "--gr-select-option-active-bg": {
             "value": "color-mix(in srgb, #334155 30%, transparent)",
@@ -47508,6 +47787,30 @@
             "value": "#334155",
             "color": "rgb(51, 65, 85)"
           },
+          "--gr-switch-step-air": {
+            "value": ""
+          },
+          "--gr-switch-step-height": {
+            "value": ""
+          },
+          "--gr-switch-step-icon": {
+            "value": ""
+          },
+          "--gr-switch-step-leading": {
+            "value": ""
+          },
+          "--gr-switch-step-state-size": {
+            "value": ""
+          },
+          "--gr-switch-step-text": {
+            "value": ""
+          },
+          "--gr-switch-step-text-width": {
+            "value": ""
+          },
+          "--gr-switch-step-width": {
+            "value": ""
+          },
           "--gr-switch-text-track-width-lg": {
             "value": "3.5rem"
           },
@@ -47520,6 +47823,12 @@
           },
           "--gr-switch-thumb-shadow": {
             "value": "0 1px 2px rgba(0, 0, 0, 0.45)"
+          },
+          "--gr-switch-track-bg": {
+            "value": ""
+          },
+          "--gr-switch-track-brd": {
+            "value": ""
           },
           "--gr-switch-track-height-lg": {
             "value": "1.75rem"
@@ -48117,6 +48426,12 @@
           ],
           "--gr-badge-success-fg": [
             "rgb(15, 23, 42)"
+          ],
+          "--gr-badge-tone-brd": [
+            ""
+          ],
+          "--gr-badge-tone-soft-brd": [
+            ""
           ],
           "--gr-badge-warning-bg": [
             "rgb(251, 146, 60)"
@@ -48817,7 +49132,7 @@
             ""
           ],
           "--gr-color-picker-trigger-hover-brd": [
-            "rgb(157, 139, 250)"
+            "rgb(51, 65, 85)"
           ],
           "--gr-command-active-bg": [
             "color(srgb 0.2 0.254902 0.333333 / 0.45)"
@@ -49626,15 +49941,6 @@
           "--gr-secondary-hover": [
             "color(srgb 0.261804 0.312941 0.385725)"
           ],
-          "--gr-segmented-font-size": [
-            ""
-          ],
-          "--gr-segmented-font-weight": [
-            ""
-          ],
-          "--gr-segmented-indicator-bg": [
-            ""
-          ],
           "--gr-segmented-indicator-brd": [
             ""
           ],
@@ -49647,43 +49953,13 @@
           "--gr-segmented-invalid-brd": [
             "rgb(248, 113, 113)"
           ],
-          "--gr-segmented-item-color": [
-            ""
-          ],
-          "--gr-segmented-item-hover-color": [
-            ""
-          ],
-          "--gr-segmented-item-px": [
-            ""
-          ],
-          "--gr-segmented-item-py": [
-            ""
-          ],
-          "--gr-segmented-item-selected-color": [
-            ""
-          ],
           "--gr-segmented-label-weight": [
             "600"
-          ],
-          "--gr-segmented-line-height": [
-            ""
-          ],
-          "--gr-segmented-min-height": [
-            ""
-          ],
-          "--gr-segmented-padding": [
-            ""
           ],
           "--gr-segmented-radius": [
             ""
           ],
-          "--gr-segmented-track-bg": [
-            ""
-          ],
           "--gr-segmented-track-brd": [
-            ""
-          ],
-          "--gr-segmented-track-shadow": [
             ""
           ],
           "--gr-select-option-active-bg": [
@@ -49891,9 +50167,6 @@
           "--gr-steps-done-fg": [
             "rgb(255, 255, 255)"
           ],
-          "--gr-steps-marker-size": [
-            ""
-          ],
           "--gr-success": [
             "rgb(52, 211, 153)"
           ],
@@ -49947,12 +50220,6 @@
           ],
           "--gr-switch-thumb-shadow": [
             "0 1px 2px rgba(0, 0, 0, 0.45)"
-          ],
-          "--gr-switch-track-bg": [
-            ""
-          ],
-          "--gr-switch-track-brd": [
-            ""
           ],
           "--gr-switch-track-height-lg": [
             "1.75rem"
@@ -50167,82 +50434,19 @@
           "--gr-transfer-selected-bg": [
             "color(srgb 0.615686 0.545098 0.980392 / 0.12)"
           ],
-          "--gr-tree-branch-elbow-width": [
-            ""
-          ],
           "--gr-tree-branch-line-color": [
             ""
           ],
           "--gr-tree-branch-line-default-color": [
             "rgb(51, 65, 85)"
           ],
-          "--gr-tree-branch-line-offset": [
-            ""
-          ],
-          "--gr-tree-branch-line-width": [
-            ""
-          ],
           "--gr-tree-branch-weight": [
             "600"
-          ],
-          "--gr-tree-checkbox-bg": [
-            ""
-          ],
-          "--gr-tree-checkbox-brd-width": [
-            ""
-          ],
-          "--gr-tree-checkbox-mr": [
-            ""
-          ],
-          "--gr-tree-checkbox-radius": [
-            ""
-          ],
-          "--gr-tree-checkbox-size": [
-            ""
-          ],
-          "--gr-tree-children-pl": [
-            ""
-          ],
-          "--gr-tree-content-gap": [
-            ""
-          ],
-          "--gr-tree-drag-handle-color": [
-            ""
-          ],
-          "--gr-tree-drag-handle-disabled-opacity": [
-            ""
           ],
           "--gr-tree-drag-handle-hover-bg": [
             ""
           ],
-          "--gr-tree-drag-handle-hover-opacity": [
-            ""
-          ],
-          "--gr-tree-drag-handle-mr": [
-            ""
-          ],
-          "--gr-tree-drag-handle-opacity": [
-            ""
-          ],
-          "--gr-tree-drag-handle-radius": [
-            ""
-          ],
-          "--gr-tree-drag-handle-size": [
-            ""
-          ],
-          "--gr-tree-font-size": [
-            ""
-          ],
-          "--gr-tree-gap": [
-            ""
-          ],
-          "--gr-tree-icon-size": [
-            ""
-          ],
           "--gr-tree-indent-step": [
-            ""
-          ],
-          "--gr-tree-row-current-bar-width": [
             ""
           ],
           "--gr-tree-row-current-bg": [
@@ -50257,31 +50461,7 @@
           "--gr-tree-row-indent": [
             "0px"
           ],
-          "--gr-tree-row-min-height": [
-            ""
-          ],
-          "--gr-tree-row-px": [
-            ""
-          ],
-          "--gr-tree-row-py": [
-            ""
-          ],
-          "--gr-tree-row-radius": [
-            ""
-          ],
-          "--gr-tree-toggle-color": [
-            ""
-          ],
           "--gr-tree-toggle-hover-bg": [
-            ""
-          ],
-          "--gr-tree-toggle-mr": [
-            ""
-          ],
-          "--gr-tree-toggle-radius": [
-            ""
-          ],
-          "--gr-tree-toggle-size": [
             ""
           ],
           "--gr-value-prefix-color": [
@@ -50580,6 +50760,24 @@
             "value": "#0f172a",
             "color": "rgb(15, 23, 42)"
           },
+          "--gr-badge-tone-bg": {
+            "value": ""
+          },
+          "--gr-badge-tone-brd": {
+            "value": ""
+          },
+          "--gr-badge-tone-fg": {
+            "value": ""
+          },
+          "--gr-badge-tone-soft-bg": {
+            "value": ""
+          },
+          "--gr-badge-tone-soft-brd": {
+            "value": ""
+          },
+          "--gr-badge-tone-soft-fg": {
+            "value": ""
+          },
           "--gr-badge-warning-bg": {
             "value": "#fb923c",
             "color": "rgb(251, 146, 60)"
@@ -51117,7 +51315,28 @@
           "--gr-button-solid-image": {
             "value": "none"
           },
+          "--gr-button-step-addon-px": {
+            "value": ""
+          },
+          "--gr-button-step-gap": {
+            "value": ""
+          },
+          "--gr-button-step-glyph": {
+            "value": ""
+          },
+          "--gr-button-step-height": {
+            "value": ""
+          },
+          "--gr-button-step-leading": {
+            "value": ""
+          },
+          "--gr-button-step-px": {
+            "value": ""
+          },
           "--gr-button-step-radius": {
+            "value": ""
+          },
+          "--gr-button-step-text": {
             "value": ""
           },
           "--gr-button-success-bg": {
@@ -51443,8 +51662,8 @@
             "color": "rgba(0, 0, 0, 0.45)"
           },
           "--gr-color-picker-trigger-hover-brd": {
-            "value": "#9d8bfa",
-            "color": "rgb(157, 139, 250)"
+            "value": "#334155",
+            "color": "rgb(51, 65, 85)"
           },
           "--gr-command-active-bg": {
             "value": "color-mix(in srgb, #334155 45%, transparent)",
@@ -51947,6 +52166,9 @@
             "value": "#334155",
             "color": "rgb(51, 65, 85)"
           },
+          "--gr-input-ring-color": {
+            "value": ""
+          },
           "--gr-invalid-brd": {
             "value": "#f87171",
             "color": "rgb(248, 113, 113)"
@@ -52048,6 +52270,30 @@
           },
           "--gr-pagination-page-weight": {
             "value": "600"
+          },
+          "--gr-pagination-step-ellipsis-px": {
+            "value": ""
+          },
+          "--gr-pagination-step-gap": {
+            "value": ""
+          },
+          "--gr-pagination-step-height": {
+            "value": ""
+          },
+          "--gr-pagination-step-jumper": {
+            "value": ""
+          },
+          "--gr-pagination-step-leading": {
+            "value": ""
+          },
+          "--gr-pagination-step-page-size": {
+            "value": ""
+          },
+          "--gr-pagination-step-px": {
+            "value": ""
+          },
+          "--gr-pagination-step-text": {
+            "value": ""
           },
           "--gr-popover": {
             "value": "#1e293b",
@@ -52247,11 +52493,62 @@
             "value": "color-mix(in srgb, #334155 92%, #f8fafc)",
             "color": "color(srgb 0.261804 0.312941 0.385725)"
           },
+          "--gr-segmented-font-size": {
+            "value": ""
+          },
+          "--gr-segmented-font-weight": {
+            "value": ""
+          },
+          "--gr-segmented-indicator-bg": {
+            "value": ""
+          },
+          "--gr-segmented-indicator-brd": {
+            "value": ""
+          },
           "--gr-segmented-indicator-highlight-shadow": {
             "value": "0 0 0 1px rgba(248, 250, 252, 0.08)"
           },
+          "--gr-segmented-indicator-shadow": {
+            "value": ""
+          },
+          "--gr-segmented-item-color": {
+            "value": ""
+          },
+          "--gr-segmented-item-hover-color": {
+            "value": ""
+          },
+          "--gr-segmented-item-px": {
+            "value": ""
+          },
+          "--gr-segmented-item-py": {
+            "value": ""
+          },
+          "--gr-segmented-item-selected-color": {
+            "value": ""
+          },
           "--gr-segmented-label-weight": {
             "value": "600"
+          },
+          "--gr-segmented-line-height": {
+            "value": ""
+          },
+          "--gr-segmented-min-height": {
+            "value": ""
+          },
+          "--gr-segmented-padding": {
+            "value": ""
+          },
+          "--gr-segmented-radius": {
+            "value": ""
+          },
+          "--gr-segmented-track-bg": {
+            "value": ""
+          },
+          "--gr-segmented-track-brd": {
+            "value": ""
+          },
+          "--gr-segmented-track-shadow": {
+            "value": ""
           },
           "--gr-select-option-active-bg": {
             "value": "color-mix(in srgb, #334155 30%, transparent)",
@@ -52559,6 +52856,30 @@
             "value": "#334155",
             "color": "rgb(51, 65, 85)"
           },
+          "--gr-switch-step-air": {
+            "value": ""
+          },
+          "--gr-switch-step-height": {
+            "value": ""
+          },
+          "--gr-switch-step-icon": {
+            "value": ""
+          },
+          "--gr-switch-step-leading": {
+            "value": ""
+          },
+          "--gr-switch-step-state-size": {
+            "value": ""
+          },
+          "--gr-switch-step-text": {
+            "value": ""
+          },
+          "--gr-switch-step-text-width": {
+            "value": ""
+          },
+          "--gr-switch-step-width": {
+            "value": ""
+          },
           "--gr-switch-text-track-width-lg": {
             "value": "3.5rem"
           },
@@ -52571,6 +52892,12 @@
           },
           "--gr-switch-thumb-shadow": {
             "value": "0 1px 2px rgba(0, 0, 0, 0.45)"
+          },
+          "--gr-switch-track-bg": {
+            "value": ""
+          },
+          "--gr-switch-track-brd": {
+            "value": ""
           },
           "--gr-switch-track-height-lg": {
             "value": "1.75rem"
@@ -53168,6 +53495,12 @@
           ],
           "--gr-badge-success-fg": [
             "rgb(15, 23, 42)"
+          ],
+          "--gr-badge-tone-brd": [
+            ""
+          ],
+          "--gr-badge-tone-soft-brd": [
+            ""
           ],
           "--gr-badge-warning-bg": [
             "rgb(251, 146, 60)"
@@ -53868,7 +54201,7 @@
             ""
           ],
           "--gr-color-picker-trigger-hover-brd": [
-            "rgb(157, 139, 250)"
+            "rgb(51, 65, 85)"
           ],
           "--gr-command-active-bg": [
             "color(srgb 0.2 0.254902 0.333333 / 0.45)"
@@ -54677,15 +55010,6 @@
           "--gr-secondary-hover": [
             "color(srgb 0.261804 0.312941 0.385725)"
           ],
-          "--gr-segmented-font-size": [
-            ""
-          ],
-          "--gr-segmented-font-weight": [
-            ""
-          ],
-          "--gr-segmented-indicator-bg": [
-            ""
-          ],
           "--gr-segmented-indicator-brd": [
             ""
           ],
@@ -54698,43 +55022,13 @@
           "--gr-segmented-invalid-brd": [
             "rgb(248, 113, 113)"
           ],
-          "--gr-segmented-item-color": [
-            ""
-          ],
-          "--gr-segmented-item-hover-color": [
-            ""
-          ],
-          "--gr-segmented-item-px": [
-            ""
-          ],
-          "--gr-segmented-item-py": [
-            ""
-          ],
-          "--gr-segmented-item-selected-color": [
-            ""
-          ],
           "--gr-segmented-label-weight": [
             "600"
-          ],
-          "--gr-segmented-line-height": [
-            ""
-          ],
-          "--gr-segmented-min-height": [
-            ""
-          ],
-          "--gr-segmented-padding": [
-            ""
           ],
           "--gr-segmented-radius": [
             ""
           ],
-          "--gr-segmented-track-bg": [
-            ""
-          ],
           "--gr-segmented-track-brd": [
-            ""
-          ],
-          "--gr-segmented-track-shadow": [
             ""
           ],
           "--gr-select-option-active-bg": [
@@ -54942,9 +55236,6 @@
           "--gr-steps-done-fg": [
             "rgb(255, 255, 255)"
           ],
-          "--gr-steps-marker-size": [
-            ""
-          ],
           "--gr-success": [
             "rgb(52, 211, 153)"
           ],
@@ -54998,12 +55289,6 @@
           ],
           "--gr-switch-thumb-shadow": [
             "0 1px 2px rgba(0, 0, 0, 0.45)"
-          ],
-          "--gr-switch-track-bg": [
-            ""
-          ],
-          "--gr-switch-track-brd": [
-            ""
           ],
           "--gr-switch-track-height-lg": [
             "1.75rem"
@@ -55218,82 +55503,19 @@
           "--gr-transfer-selected-bg": [
             "color(srgb 0.615686 0.545098 0.980392 / 0.12)"
           ],
-          "--gr-tree-branch-elbow-width": [
-            ""
-          ],
           "--gr-tree-branch-line-color": [
             ""
           ],
           "--gr-tree-branch-line-default-color": [
             "rgb(51, 65, 85)"
           ],
-          "--gr-tree-branch-line-offset": [
-            ""
-          ],
-          "--gr-tree-branch-line-width": [
-            ""
-          ],
           "--gr-tree-branch-weight": [
             "600"
-          ],
-          "--gr-tree-checkbox-bg": [
-            ""
-          ],
-          "--gr-tree-checkbox-brd-width": [
-            ""
-          ],
-          "--gr-tree-checkbox-mr": [
-            ""
-          ],
-          "--gr-tree-checkbox-radius": [
-            ""
-          ],
-          "--gr-tree-checkbox-size": [
-            ""
-          ],
-          "--gr-tree-children-pl": [
-            ""
-          ],
-          "--gr-tree-content-gap": [
-            ""
-          ],
-          "--gr-tree-drag-handle-color": [
-            ""
-          ],
-          "--gr-tree-drag-handle-disabled-opacity": [
-            ""
           ],
           "--gr-tree-drag-handle-hover-bg": [
             ""
           ],
-          "--gr-tree-drag-handle-hover-opacity": [
-            ""
-          ],
-          "--gr-tree-drag-handle-mr": [
-            ""
-          ],
-          "--gr-tree-drag-handle-opacity": [
-            ""
-          ],
-          "--gr-tree-drag-handle-radius": [
-            ""
-          ],
-          "--gr-tree-drag-handle-size": [
-            ""
-          ],
-          "--gr-tree-font-size": [
-            ""
-          ],
-          "--gr-tree-gap": [
-            ""
-          ],
-          "--gr-tree-icon-size": [
-            ""
-          ],
           "--gr-tree-indent-step": [
-            ""
-          ],
-          "--gr-tree-row-current-bar-width": [
             ""
           ],
           "--gr-tree-row-current-bg": [
@@ -55308,31 +55530,7 @@
           "--gr-tree-row-indent": [
             "0px"
           ],
-          "--gr-tree-row-min-height": [
-            ""
-          ],
-          "--gr-tree-row-px": [
-            ""
-          ],
-          "--gr-tree-row-py": [
-            ""
-          ],
-          "--gr-tree-row-radius": [
-            ""
-          ],
-          "--gr-tree-toggle-color": [
-            ""
-          ],
           "--gr-tree-toggle-hover-bg": [
-            ""
-          ],
-          "--gr-tree-toggle-mr": [
-            ""
-          ],
-          "--gr-tree-toggle-radius": [
-            ""
-          ],
-          "--gr-tree-toggle-size": [
             ""
           ],
           "--gr-value-prefix-color": [
@@ -55630,6 +55828,24 @@
           "--gr-badge-success-fg": {
             "value": "#ffffff",
             "color": "rgb(255, 255, 255)"
+          },
+          "--gr-badge-tone-bg": {
+            "value": ""
+          },
+          "--gr-badge-tone-brd": {
+            "value": ""
+          },
+          "--gr-badge-tone-fg": {
+            "value": ""
+          },
+          "--gr-badge-tone-soft-bg": {
+            "value": ""
+          },
+          "--gr-badge-tone-soft-brd": {
+            "value": ""
+          },
+          "--gr-badge-tone-soft-fg": {
+            "value": ""
           },
           "--gr-badge-warning-bg": {
             "value": "#c2410c",
@@ -56168,7 +56384,28 @@
           "--gr-button-solid-image": {
             "value": "none"
           },
+          "--gr-button-step-addon-px": {
+            "value": ""
+          },
+          "--gr-button-step-gap": {
+            "value": ""
+          },
+          "--gr-button-step-glyph": {
+            "value": ""
+          },
+          "--gr-button-step-height": {
+            "value": ""
+          },
+          "--gr-button-step-leading": {
+            "value": ""
+          },
+          "--gr-button-step-px": {
+            "value": ""
+          },
           "--gr-button-step-radius": {
+            "value": ""
+          },
+          "--gr-button-step-text": {
             "value": ""
           },
           "--gr-button-success-bg": {
@@ -56494,8 +56731,8 @@
             "color": "rgba(0, 0, 0, 0.45)"
           },
           "--gr-color-picker-trigger-hover-brd": {
-            "value": "#4f46e5",
-            "color": "rgb(79, 70, 229)"
+            "value": "#e2e8f0",
+            "color": "rgb(226, 232, 240)"
           },
           "--gr-command-active-bg": {
             "value": "color-mix(in srgb, #f1f5f9 45%, transparent)",
@@ -56998,6 +57235,9 @@
             "value": "#e2e8f0",
             "color": "rgb(226, 232, 240)"
           },
+          "--gr-input-ring-color": {
+            "value": ""
+          },
           "--gr-invalid-brd": {
             "value": "#dc2626",
             "color": "rgb(220, 38, 38)"
@@ -57099,6 +57339,30 @@
           },
           "--gr-pagination-page-weight": {
             "value": "600"
+          },
+          "--gr-pagination-step-ellipsis-px": {
+            "value": ""
+          },
+          "--gr-pagination-step-gap": {
+            "value": ""
+          },
+          "--gr-pagination-step-height": {
+            "value": ""
+          },
+          "--gr-pagination-step-jumper": {
+            "value": ""
+          },
+          "--gr-pagination-step-leading": {
+            "value": ""
+          },
+          "--gr-pagination-step-page-size": {
+            "value": ""
+          },
+          "--gr-pagination-step-px": {
+            "value": ""
+          },
+          "--gr-pagination-step-text": {
+            "value": ""
           },
           "--gr-popover": {
             "value": "#ffffff",
@@ -57298,11 +57562,62 @@
             "value": "color-mix(in srgb, #e2e8f0 92%, #0f172a)",
             "color": "color(srgb 0.820078 0.844235 0.879059)"
           },
+          "--gr-segmented-font-size": {
+            "value": ""
+          },
+          "--gr-segmented-font-weight": {
+            "value": ""
+          },
+          "--gr-segmented-indicator-bg": {
+            "value": ""
+          },
+          "--gr-segmented-indicator-brd": {
+            "value": ""
+          },
           "--gr-segmented-indicator-highlight-shadow": {
             "value": "0 0 0 0 transparent"
           },
+          "--gr-segmented-indicator-shadow": {
+            "value": ""
+          },
+          "--gr-segmented-item-color": {
+            "value": ""
+          },
+          "--gr-segmented-item-hover-color": {
+            "value": ""
+          },
+          "--gr-segmented-item-px": {
+            "value": ""
+          },
+          "--gr-segmented-item-py": {
+            "value": ""
+          },
+          "--gr-segmented-item-selected-color": {
+            "value": ""
+          },
           "--gr-segmented-label-weight": {
             "value": "600"
+          },
+          "--gr-segmented-line-height": {
+            "value": ""
+          },
+          "--gr-segmented-min-height": {
+            "value": ""
+          },
+          "--gr-segmented-padding": {
+            "value": ""
+          },
+          "--gr-segmented-radius": {
+            "value": ""
+          },
+          "--gr-segmented-track-bg": {
+            "value": ""
+          },
+          "--gr-segmented-track-brd": {
+            "value": ""
+          },
+          "--gr-segmented-track-shadow": {
+            "value": ""
           },
           "--gr-select-option-active-bg": {
             "value": "color-mix(in srgb, #f1f5f9 30%, transparent)",
@@ -57610,6 +57925,30 @@
             "value": "#f1f5f9",
             "color": "rgb(241, 245, 249)"
           },
+          "--gr-switch-step-air": {
+            "value": ""
+          },
+          "--gr-switch-step-height": {
+            "value": ""
+          },
+          "--gr-switch-step-icon": {
+            "value": ""
+          },
+          "--gr-switch-step-leading": {
+            "value": ""
+          },
+          "--gr-switch-step-state-size": {
+            "value": ""
+          },
+          "--gr-switch-step-text": {
+            "value": ""
+          },
+          "--gr-switch-step-text-width": {
+            "value": ""
+          },
+          "--gr-switch-step-width": {
+            "value": ""
+          },
           "--gr-switch-text-track-width-lg": {
             "value": "3.5rem"
           },
@@ -57622,6 +57961,12 @@
           },
           "--gr-switch-thumb-shadow": {
             "value": "0 1px 2px rgba(15, 23, 42, 0.08)"
+          },
+          "--gr-switch-track-bg": {
+            "value": ""
+          },
+          "--gr-switch-track-brd": {
+            "value": ""
           },
           "--gr-switch-track-height-lg": {
             "value": "1.75rem"
@@ -58219,6 +58564,12 @@
           ],
           "--gr-badge-success-fg": [
             "rgb(255, 255, 255)"
+          ],
+          "--gr-badge-tone-brd": [
+            ""
+          ],
+          "--gr-badge-tone-soft-brd": [
+            ""
           ],
           "--gr-badge-warning-bg": [
             "rgb(194, 65, 12)"
@@ -58919,7 +59270,7 @@
             ""
           ],
           "--gr-color-picker-trigger-hover-brd": [
-            "rgb(79, 70, 229)"
+            "rgb(226, 232, 240)"
           ],
           "--gr-command-active-bg": [
             "color(srgb 0.945098 0.960784 0.976471 / 0.45)"
@@ -59728,15 +60079,6 @@
           "--gr-secondary-hover": [
             "color(srgb 0.820078 0.844235 0.879059)"
           ],
-          "--gr-segmented-font-size": [
-            ""
-          ],
-          "--gr-segmented-font-weight": [
-            ""
-          ],
-          "--gr-segmented-indicator-bg": [
-            ""
-          ],
           "--gr-segmented-indicator-brd": [
             ""
           ],
@@ -59749,43 +60091,13 @@
           "--gr-segmented-invalid-brd": [
             "rgb(220, 38, 38)"
           ],
-          "--gr-segmented-item-color": [
-            ""
-          ],
-          "--gr-segmented-item-hover-color": [
-            ""
-          ],
-          "--gr-segmented-item-px": [
-            ""
-          ],
-          "--gr-segmented-item-py": [
-            ""
-          ],
-          "--gr-segmented-item-selected-color": [
-            ""
-          ],
           "--gr-segmented-label-weight": [
             "600"
-          ],
-          "--gr-segmented-line-height": [
-            ""
-          ],
-          "--gr-segmented-min-height": [
-            ""
-          ],
-          "--gr-segmented-padding": [
-            ""
           ],
           "--gr-segmented-radius": [
             ""
           ],
-          "--gr-segmented-track-bg": [
-            ""
-          ],
           "--gr-segmented-track-brd": [
-            ""
-          ],
-          "--gr-segmented-track-shadow": [
             ""
           ],
           "--gr-select-option-active-bg": [
@@ -59993,9 +60305,6 @@
           "--gr-steps-done-fg": [
             "rgb(255, 255, 255)"
           ],
-          "--gr-steps-marker-size": [
-            ""
-          ],
           "--gr-success": [
             "rgb(16, 185, 129)"
           ],
@@ -60049,12 +60358,6 @@
           ],
           "--gr-switch-thumb-shadow": [
             "0 1px 2px rgba(15, 23, 42, 0.08)"
-          ],
-          "--gr-switch-track-bg": [
-            ""
-          ],
-          "--gr-switch-track-brd": [
-            ""
           ],
           "--gr-switch-track-height-lg": [
             "1.75rem"
@@ -60269,82 +60572,19 @@
           "--gr-transfer-selected-bg": [
             "color(srgb 0.309804 0.27451 0.898039 / 0.12)"
           ],
-          "--gr-tree-branch-elbow-width": [
-            ""
-          ],
           "--gr-tree-branch-line-color": [
             ""
           ],
           "--gr-tree-branch-line-default-color": [
             "rgb(226, 232, 240)"
           ],
-          "--gr-tree-branch-line-offset": [
-            ""
-          ],
-          "--gr-tree-branch-line-width": [
-            ""
-          ],
           "--gr-tree-branch-weight": [
             "600"
-          ],
-          "--gr-tree-checkbox-bg": [
-            ""
-          ],
-          "--gr-tree-checkbox-brd-width": [
-            ""
-          ],
-          "--gr-tree-checkbox-mr": [
-            ""
-          ],
-          "--gr-tree-checkbox-radius": [
-            ""
-          ],
-          "--gr-tree-checkbox-size": [
-            ""
-          ],
-          "--gr-tree-children-pl": [
-            ""
-          ],
-          "--gr-tree-content-gap": [
-            ""
-          ],
-          "--gr-tree-drag-handle-color": [
-            ""
-          ],
-          "--gr-tree-drag-handle-disabled-opacity": [
-            ""
           ],
           "--gr-tree-drag-handle-hover-bg": [
             ""
           ],
-          "--gr-tree-drag-handle-hover-opacity": [
-            ""
-          ],
-          "--gr-tree-drag-handle-mr": [
-            ""
-          ],
-          "--gr-tree-drag-handle-opacity": [
-            ""
-          ],
-          "--gr-tree-drag-handle-radius": [
-            ""
-          ],
-          "--gr-tree-drag-handle-size": [
-            ""
-          ],
-          "--gr-tree-font-size": [
-            ""
-          ],
-          "--gr-tree-gap": [
-            ""
-          ],
-          "--gr-tree-icon-size": [
-            ""
-          ],
           "--gr-tree-indent-step": [
-            ""
-          ],
-          "--gr-tree-row-current-bar-width": [
             ""
           ],
           "--gr-tree-row-current-bg": [
@@ -60359,31 +60599,7 @@
           "--gr-tree-row-indent": [
             "0px"
           ],
-          "--gr-tree-row-min-height": [
-            ""
-          ],
-          "--gr-tree-row-px": [
-            ""
-          ],
-          "--gr-tree-row-py": [
-            ""
-          ],
-          "--gr-tree-row-radius": [
-            ""
-          ],
-          "--gr-tree-toggle-color": [
-            ""
-          ],
           "--gr-tree-toggle-hover-bg": [
-            ""
-          ],
-          "--gr-tree-toggle-mr": [
-            ""
-          ],
-          "--gr-tree-toggle-radius": [
-            ""
-          ],
-          "--gr-tree-toggle-size": [
             ""
           ],
           "--gr-value-prefix-color": [
@@ -60684,6 +60900,24 @@
             "value": "#ffffff",
             "color": "rgb(255, 255, 255)"
           },
+          "--gr-badge-tone-bg": {
+            "value": ""
+          },
+          "--gr-badge-tone-brd": {
+            "value": ""
+          },
+          "--gr-badge-tone-fg": {
+            "value": ""
+          },
+          "--gr-badge-tone-soft-bg": {
+            "value": ""
+          },
+          "--gr-badge-tone-soft-brd": {
+            "value": ""
+          },
+          "--gr-badge-tone-soft-fg": {
+            "value": ""
+          },
           "--gr-badge-warning-bg": {
             "value": "#c2410c",
             "color": "rgb(194, 65, 12)"
@@ -61221,7 +61455,28 @@
           "--gr-button-solid-image": {
             "value": "linear-gradient(to bottom, color-mix(in srgb, #ffffff 6%, transparent), transparent 60%)"
           },
+          "--gr-button-step-addon-px": {
+            "value": ""
+          },
+          "--gr-button-step-gap": {
+            "value": ""
+          },
+          "--gr-button-step-glyph": {
+            "value": ""
+          },
+          "--gr-button-step-height": {
+            "value": ""
+          },
+          "--gr-button-step-leading": {
+            "value": ""
+          },
+          "--gr-button-step-px": {
+            "value": ""
+          },
           "--gr-button-step-radius": {
+            "value": ""
+          },
+          "--gr-button-step-text": {
             "value": ""
           },
           "--gr-button-success-bg": {
@@ -61547,8 +61802,8 @@
             "color": "rgba(0, 0, 0, 0.45)"
           },
           "--gr-color-picker-trigger-hover-brd": {
-            "value": "#4f46e5",
-            "color": "rgb(79, 70, 229)"
+            "value": "#e2e8f0",
+            "color": "rgb(226, 232, 240)"
           },
           "--gr-command-active-bg": {
             "value": "color-mix(in srgb, #f1f5f9 45%, transparent)",
@@ -62051,6 +62306,9 @@
             "value": "#e2e8f0",
             "color": "rgb(226, 232, 240)"
           },
+          "--gr-input-ring-color": {
+            "value": ""
+          },
           "--gr-invalid-brd": {
             "value": "#dc2626",
             "color": "rgb(220, 38, 38)"
@@ -62152,6 +62410,30 @@
           },
           "--gr-pagination-page-weight": {
             "value": "600"
+          },
+          "--gr-pagination-step-ellipsis-px": {
+            "value": ""
+          },
+          "--gr-pagination-step-gap": {
+            "value": ""
+          },
+          "--gr-pagination-step-height": {
+            "value": ""
+          },
+          "--gr-pagination-step-jumper": {
+            "value": ""
+          },
+          "--gr-pagination-step-leading": {
+            "value": ""
+          },
+          "--gr-pagination-step-page-size": {
+            "value": ""
+          },
+          "--gr-pagination-step-px": {
+            "value": ""
+          },
+          "--gr-pagination-step-text": {
+            "value": ""
           },
           "--gr-popover": {
             "value": "#ffffff",
@@ -62351,11 +62633,62 @@
             "value": "color-mix(in srgb, #e2e8f0 92%, #0f172a)",
             "color": "color(srgb 0.820078 0.844235 0.879059)"
           },
+          "--gr-segmented-font-size": {
+            "value": ""
+          },
+          "--gr-segmented-font-weight": {
+            "value": ""
+          },
+          "--gr-segmented-indicator-bg": {
+            "value": ""
+          },
+          "--gr-segmented-indicator-brd": {
+            "value": ""
+          },
           "--gr-segmented-indicator-highlight-shadow": {
             "value": "0 0 0 0 transparent"
           },
+          "--gr-segmented-indicator-shadow": {
+            "value": ""
+          },
+          "--gr-segmented-item-color": {
+            "value": ""
+          },
+          "--gr-segmented-item-hover-color": {
+            "value": ""
+          },
+          "--gr-segmented-item-px": {
+            "value": ""
+          },
+          "--gr-segmented-item-py": {
+            "value": ""
+          },
+          "--gr-segmented-item-selected-color": {
+            "value": ""
+          },
           "--gr-segmented-label-weight": {
             "value": "600"
+          },
+          "--gr-segmented-line-height": {
+            "value": ""
+          },
+          "--gr-segmented-min-height": {
+            "value": ""
+          },
+          "--gr-segmented-padding": {
+            "value": ""
+          },
+          "--gr-segmented-radius": {
+            "value": ""
+          },
+          "--gr-segmented-track-bg": {
+            "value": ""
+          },
+          "--gr-segmented-track-brd": {
+            "value": ""
+          },
+          "--gr-segmented-track-shadow": {
+            "value": ""
           },
           "--gr-select-option-active-bg": {
             "value": "color-mix(in srgb, #f1f5f9 30%, transparent)",
@@ -62663,6 +62996,30 @@
             "value": "#f1f5f9",
             "color": "rgb(241, 245, 249)"
           },
+          "--gr-switch-step-air": {
+            "value": ""
+          },
+          "--gr-switch-step-height": {
+            "value": ""
+          },
+          "--gr-switch-step-icon": {
+            "value": ""
+          },
+          "--gr-switch-step-leading": {
+            "value": ""
+          },
+          "--gr-switch-step-state-size": {
+            "value": ""
+          },
+          "--gr-switch-step-text": {
+            "value": ""
+          },
+          "--gr-switch-step-text-width": {
+            "value": ""
+          },
+          "--gr-switch-step-width": {
+            "value": ""
+          },
           "--gr-switch-text-track-width-lg": {
             "value": "3.5rem"
           },
@@ -62675,6 +63032,12 @@
           },
           "--gr-switch-thumb-shadow": {
             "value": "0 1px 2px rgba(15, 23, 42, 0.08)"
+          },
+          "--gr-switch-track-bg": {
+            "value": ""
+          },
+          "--gr-switch-track-brd": {
+            "value": ""
           },
           "--gr-switch-track-height-lg": {
             "value": "1.75rem"
@@ -63272,6 +63635,12 @@
           ],
           "--gr-badge-success-fg": [
             "rgb(255, 255, 255)"
+          ],
+          "--gr-badge-tone-brd": [
+            ""
+          ],
+          "--gr-badge-tone-soft-brd": [
+            ""
           ],
           "--gr-badge-warning-bg": [
             "rgb(194, 65, 12)"
@@ -63969,7 +64338,7 @@
             ""
           ],
           "--gr-color-picker-trigger-hover-brd": [
-            "rgb(79, 70, 229)"
+            "rgb(226, 232, 240)"
           ],
           "--gr-command-active-bg": [
             "color(srgb 0.945098 0.960784 0.976471 / 0.45)"
@@ -64772,15 +65141,6 @@
           "--gr-secondary-fg": [
             "rgb(30, 41, 59)"
           ],
-          "--gr-segmented-font-size": [
-            ""
-          ],
-          "--gr-segmented-font-weight": [
-            ""
-          ],
-          "--gr-segmented-indicator-bg": [
-            ""
-          ],
           "--gr-segmented-indicator-brd": [
             ""
           ],
@@ -64793,43 +65153,13 @@
           "--gr-segmented-invalid-brd": [
             "rgb(220, 38, 38)"
           ],
-          "--gr-segmented-item-color": [
-            ""
-          ],
-          "--gr-segmented-item-hover-color": [
-            ""
-          ],
-          "--gr-segmented-item-px": [
-            ""
-          ],
-          "--gr-segmented-item-py": [
-            ""
-          ],
-          "--gr-segmented-item-selected-color": [
-            ""
-          ],
           "--gr-segmented-label-weight": [
             "600"
-          ],
-          "--gr-segmented-line-height": [
-            ""
-          ],
-          "--gr-segmented-min-height": [
-            ""
-          ],
-          "--gr-segmented-padding": [
-            ""
           ],
           "--gr-segmented-radius": [
             ""
           ],
-          "--gr-segmented-track-bg": [
-            ""
-          ],
           "--gr-segmented-track-brd": [
-            ""
-          ],
-          "--gr-segmented-track-shadow": [
             ""
           ],
           "--gr-select-option-active-bg": [
@@ -65034,9 +65364,6 @@
           "--gr-steps-done-fg": [
             "rgb(255, 255, 255)"
           ],
-          "--gr-steps-marker-size": [
-            ""
-          ],
           "--gr-success": [
             "rgb(16, 185, 129)"
           ],
@@ -65090,12 +65417,6 @@
           ],
           "--gr-switch-thumb-shadow": [
             "0 1px 2px rgba(15, 23, 42, 0.08)"
-          ],
-          "--gr-switch-track-bg": [
-            ""
-          ],
-          "--gr-switch-track-brd": [
-            ""
           ],
           "--gr-switch-track-height-lg": [
             "1.75rem"
@@ -65310,82 +65631,19 @@
           "--gr-transfer-selected-bg": [
             "color(srgb 0.309804 0.27451 0.898039 / 0.12)"
           ],
-          "--gr-tree-branch-elbow-width": [
-            ""
-          ],
           "--gr-tree-branch-line-color": [
             ""
           ],
           "--gr-tree-branch-line-default-color": [
             "rgb(226, 232, 240)"
           ],
-          "--gr-tree-branch-line-offset": [
-            ""
-          ],
-          "--gr-tree-branch-line-width": [
-            ""
-          ],
           "--gr-tree-branch-weight": [
             "600"
-          ],
-          "--gr-tree-checkbox-bg": [
-            ""
-          ],
-          "--gr-tree-checkbox-brd-width": [
-            ""
-          ],
-          "--gr-tree-checkbox-mr": [
-            ""
-          ],
-          "--gr-tree-checkbox-radius": [
-            ""
-          ],
-          "--gr-tree-checkbox-size": [
-            ""
-          ],
-          "--gr-tree-children-pl": [
-            ""
-          ],
-          "--gr-tree-content-gap": [
-            ""
-          ],
-          "--gr-tree-drag-handle-color": [
-            ""
-          ],
-          "--gr-tree-drag-handle-disabled-opacity": [
-            ""
           ],
           "--gr-tree-drag-handle-hover-bg": [
             ""
           ],
-          "--gr-tree-drag-handle-hover-opacity": [
-            ""
-          ],
-          "--gr-tree-drag-handle-mr": [
-            ""
-          ],
-          "--gr-tree-drag-handle-opacity": [
-            ""
-          ],
-          "--gr-tree-drag-handle-radius": [
-            ""
-          ],
-          "--gr-tree-drag-handle-size": [
-            ""
-          ],
-          "--gr-tree-font-size": [
-            ""
-          ],
-          "--gr-tree-gap": [
-            ""
-          ],
-          "--gr-tree-icon-size": [
-            ""
-          ],
           "--gr-tree-indent-step": [
-            ""
-          ],
-          "--gr-tree-row-current-bar-width": [
             ""
           ],
           "--gr-tree-row-current-bg": [
@@ -65400,31 +65658,7 @@
           "--gr-tree-row-indent": [
             "0px"
           ],
-          "--gr-tree-row-min-height": [
-            ""
-          ],
-          "--gr-tree-row-px": [
-            ""
-          ],
-          "--gr-tree-row-py": [
-            ""
-          ],
-          "--gr-tree-row-radius": [
-            ""
-          ],
-          "--gr-tree-toggle-color": [
-            ""
-          ],
           "--gr-tree-toggle-hover-bg": [
-            ""
-          ],
-          "--gr-tree-toggle-mr": [
-            ""
-          ],
-          "--gr-tree-toggle-radius": [
-            ""
-          ],
-          "--gr-tree-toggle-size": [
             ""
           ],
           "--gr-value-prefix-color": [
@@ -65723,6 +65957,24 @@
             "value": "#0f172a",
             "color": "rgb(15, 23, 42)"
           },
+          "--gr-badge-tone-bg": {
+            "value": ""
+          },
+          "--gr-badge-tone-brd": {
+            "value": ""
+          },
+          "--gr-badge-tone-fg": {
+            "value": ""
+          },
+          "--gr-badge-tone-soft-bg": {
+            "value": ""
+          },
+          "--gr-badge-tone-soft-brd": {
+            "value": ""
+          },
+          "--gr-badge-tone-soft-fg": {
+            "value": ""
+          },
           "--gr-badge-warning-bg": {
             "value": "#fb923c",
             "color": "rgb(251, 146, 60)"
@@ -66260,7 +66512,28 @@
           "--gr-button-solid-image": {
             "value": "linear-gradient(to bottom, color-mix(in srgb, #ffffff 6%, transparent), transparent 60%)"
           },
+          "--gr-button-step-addon-px": {
+            "value": ""
+          },
+          "--gr-button-step-gap": {
+            "value": ""
+          },
+          "--gr-button-step-glyph": {
+            "value": ""
+          },
+          "--gr-button-step-height": {
+            "value": ""
+          },
+          "--gr-button-step-leading": {
+            "value": ""
+          },
+          "--gr-button-step-px": {
+            "value": ""
+          },
           "--gr-button-step-radius": {
+            "value": ""
+          },
+          "--gr-button-step-text": {
             "value": ""
           },
           "--gr-button-success-bg": {
@@ -66586,8 +66859,8 @@
             "color": "rgba(0, 0, 0, 0.45)"
           },
           "--gr-color-picker-trigger-hover-brd": {
-            "value": "#9d8bfa",
-            "color": "rgb(157, 139, 250)"
+            "value": "#334155",
+            "color": "rgb(51, 65, 85)"
           },
           "--gr-command-active-bg": {
             "value": "color-mix(in srgb, #334155 45%, transparent)",
@@ -67090,6 +67363,9 @@
             "value": "#334155",
             "color": "rgb(51, 65, 85)"
           },
+          "--gr-input-ring-color": {
+            "value": ""
+          },
           "--gr-invalid-brd": {
             "value": "#f87171",
             "color": "rgb(248, 113, 113)"
@@ -67191,6 +67467,30 @@
           },
           "--gr-pagination-page-weight": {
             "value": "600"
+          },
+          "--gr-pagination-step-ellipsis-px": {
+            "value": ""
+          },
+          "--gr-pagination-step-gap": {
+            "value": ""
+          },
+          "--gr-pagination-step-height": {
+            "value": ""
+          },
+          "--gr-pagination-step-jumper": {
+            "value": ""
+          },
+          "--gr-pagination-step-leading": {
+            "value": ""
+          },
+          "--gr-pagination-step-page-size": {
+            "value": ""
+          },
+          "--gr-pagination-step-px": {
+            "value": ""
+          },
+          "--gr-pagination-step-text": {
+            "value": ""
           },
           "--gr-popover": {
             "value": "#1e293b",
@@ -67390,11 +67690,62 @@
             "value": "color-mix(in srgb, #334155 92%, #f8fafc)",
             "color": "color(srgb 0.261804 0.312941 0.385725)"
           },
+          "--gr-segmented-font-size": {
+            "value": ""
+          },
+          "--gr-segmented-font-weight": {
+            "value": ""
+          },
+          "--gr-segmented-indicator-bg": {
+            "value": ""
+          },
+          "--gr-segmented-indicator-brd": {
+            "value": ""
+          },
           "--gr-segmented-indicator-highlight-shadow": {
             "value": "0 0 0 1px rgba(248, 250, 252, 0.08)"
           },
+          "--gr-segmented-indicator-shadow": {
+            "value": ""
+          },
+          "--gr-segmented-item-color": {
+            "value": ""
+          },
+          "--gr-segmented-item-hover-color": {
+            "value": ""
+          },
+          "--gr-segmented-item-px": {
+            "value": ""
+          },
+          "--gr-segmented-item-py": {
+            "value": ""
+          },
+          "--gr-segmented-item-selected-color": {
+            "value": ""
+          },
           "--gr-segmented-label-weight": {
             "value": "600"
+          },
+          "--gr-segmented-line-height": {
+            "value": ""
+          },
+          "--gr-segmented-min-height": {
+            "value": ""
+          },
+          "--gr-segmented-padding": {
+            "value": ""
+          },
+          "--gr-segmented-radius": {
+            "value": ""
+          },
+          "--gr-segmented-track-bg": {
+            "value": ""
+          },
+          "--gr-segmented-track-brd": {
+            "value": ""
+          },
+          "--gr-segmented-track-shadow": {
+            "value": ""
           },
           "--gr-select-option-active-bg": {
             "value": "color-mix(in srgb, #334155 30%, transparent)",
@@ -67702,6 +68053,30 @@
             "value": "#334155",
             "color": "rgb(51, 65, 85)"
           },
+          "--gr-switch-step-air": {
+            "value": ""
+          },
+          "--gr-switch-step-height": {
+            "value": ""
+          },
+          "--gr-switch-step-icon": {
+            "value": ""
+          },
+          "--gr-switch-step-leading": {
+            "value": ""
+          },
+          "--gr-switch-step-state-size": {
+            "value": ""
+          },
+          "--gr-switch-step-text": {
+            "value": ""
+          },
+          "--gr-switch-step-text-width": {
+            "value": ""
+          },
+          "--gr-switch-step-width": {
+            "value": ""
+          },
           "--gr-switch-text-track-width-lg": {
             "value": "3.5rem"
           },
@@ -67714,6 +68089,12 @@
           },
           "--gr-switch-thumb-shadow": {
             "value": "0 1px 2px rgba(0, 0, 0, 0.45)"
+          },
+          "--gr-switch-track-bg": {
+            "value": ""
+          },
+          "--gr-switch-track-brd": {
+            "value": ""
           },
           "--gr-switch-track-height-lg": {
             "value": "1.75rem"
@@ -68311,6 +68692,12 @@
           ],
           "--gr-badge-success-fg": [
             "rgb(15, 23, 42)"
+          ],
+          "--gr-badge-tone-brd": [
+            ""
+          ],
+          "--gr-badge-tone-soft-brd": [
+            ""
           ],
           "--gr-badge-warning-bg": [
             "rgb(251, 146, 60)"
@@ -69008,7 +69395,7 @@
             ""
           ],
           "--gr-color-picker-trigger-hover-brd": [
-            "rgb(157, 139, 250)"
+            "rgb(51, 65, 85)"
           ],
           "--gr-command-active-bg": [
             "color(srgb 0.2 0.254902 0.333333 / 0.45)"
@@ -69811,15 +70198,6 @@
           "--gr-secondary-fg": [
             "rgb(241, 245, 249)"
           ],
-          "--gr-segmented-font-size": [
-            ""
-          ],
-          "--gr-segmented-font-weight": [
-            ""
-          ],
-          "--gr-segmented-indicator-bg": [
-            ""
-          ],
           "--gr-segmented-indicator-brd": [
             ""
           ],
@@ -69832,43 +70210,13 @@
           "--gr-segmented-invalid-brd": [
             "rgb(248, 113, 113)"
           ],
-          "--gr-segmented-item-color": [
-            ""
-          ],
-          "--gr-segmented-item-hover-color": [
-            ""
-          ],
-          "--gr-segmented-item-px": [
-            ""
-          ],
-          "--gr-segmented-item-py": [
-            ""
-          ],
-          "--gr-segmented-item-selected-color": [
-            ""
-          ],
           "--gr-segmented-label-weight": [
             "600"
-          ],
-          "--gr-segmented-line-height": [
-            ""
-          ],
-          "--gr-segmented-min-height": [
-            ""
-          ],
-          "--gr-segmented-padding": [
-            ""
           ],
           "--gr-segmented-radius": [
             ""
           ],
-          "--gr-segmented-track-bg": [
-            ""
-          ],
           "--gr-segmented-track-brd": [
-            ""
-          ],
-          "--gr-segmented-track-shadow": [
             ""
           ],
           "--gr-select-option-active-bg": [
@@ -70073,9 +70421,6 @@
           "--gr-steps-done-fg": [
             "rgb(255, 255, 255)"
           ],
-          "--gr-steps-marker-size": [
-            ""
-          ],
           "--gr-success": [
             "rgb(52, 211, 153)"
           ],
@@ -70129,12 +70474,6 @@
           ],
           "--gr-switch-thumb-shadow": [
             "0 1px 2px rgba(0, 0, 0, 0.45)"
-          ],
-          "--gr-switch-track-bg": [
-            ""
-          ],
-          "--gr-switch-track-brd": [
-            ""
           ],
           "--gr-switch-track-height-lg": [
             "1.75rem"
@@ -70349,82 +70688,19 @@
           "--gr-transfer-selected-bg": [
             "color(srgb 0.615686 0.545098 0.980392 / 0.12)"
           ],
-          "--gr-tree-branch-elbow-width": [
-            ""
-          ],
           "--gr-tree-branch-line-color": [
             ""
           ],
           "--gr-tree-branch-line-default-color": [
             "rgb(51, 65, 85)"
           ],
-          "--gr-tree-branch-line-offset": [
-            ""
-          ],
-          "--gr-tree-branch-line-width": [
-            ""
-          ],
           "--gr-tree-branch-weight": [
             "600"
-          ],
-          "--gr-tree-checkbox-bg": [
-            ""
-          ],
-          "--gr-tree-checkbox-brd-width": [
-            ""
-          ],
-          "--gr-tree-checkbox-mr": [
-            ""
-          ],
-          "--gr-tree-checkbox-radius": [
-            ""
-          ],
-          "--gr-tree-checkbox-size": [
-            ""
-          ],
-          "--gr-tree-children-pl": [
-            ""
-          ],
-          "--gr-tree-content-gap": [
-            ""
-          ],
-          "--gr-tree-drag-handle-color": [
-            ""
-          ],
-          "--gr-tree-drag-handle-disabled-opacity": [
-            ""
           ],
           "--gr-tree-drag-handle-hover-bg": [
             ""
           ],
-          "--gr-tree-drag-handle-hover-opacity": [
-            ""
-          ],
-          "--gr-tree-drag-handle-mr": [
-            ""
-          ],
-          "--gr-tree-drag-handle-opacity": [
-            ""
-          ],
-          "--gr-tree-drag-handle-radius": [
-            ""
-          ],
-          "--gr-tree-drag-handle-size": [
-            ""
-          ],
-          "--gr-tree-font-size": [
-            ""
-          ],
-          "--gr-tree-gap": [
-            ""
-          ],
-          "--gr-tree-icon-size": [
-            ""
-          ],
           "--gr-tree-indent-step": [
-            ""
-          ],
-          "--gr-tree-row-current-bar-width": [
             ""
           ],
           "--gr-tree-row-current-bg": [
@@ -70439,31 +70715,7 @@
           "--gr-tree-row-indent": [
             "0px"
           ],
-          "--gr-tree-row-min-height": [
-            ""
-          ],
-          "--gr-tree-row-px": [
-            ""
-          ],
-          "--gr-tree-row-py": [
-            ""
-          ],
-          "--gr-tree-row-radius": [
-            ""
-          ],
-          "--gr-tree-toggle-color": [
-            ""
-          ],
           "--gr-tree-toggle-hover-bg": [
-            ""
-          ],
-          "--gr-tree-toggle-mr": [
-            ""
-          ],
-          "--gr-tree-toggle-radius": [
-            ""
-          ],
-          "--gr-tree-toggle-size": [
             ""
           ],
           "--gr-value-prefix-color": [
@@ -70762,6 +71014,24 @@
             "value": "#0f172a",
             "color": "rgb(15, 23, 42)"
           },
+          "--gr-badge-tone-bg": {
+            "value": ""
+          },
+          "--gr-badge-tone-brd": {
+            "value": ""
+          },
+          "--gr-badge-tone-fg": {
+            "value": ""
+          },
+          "--gr-badge-tone-soft-bg": {
+            "value": ""
+          },
+          "--gr-badge-tone-soft-brd": {
+            "value": ""
+          },
+          "--gr-badge-tone-soft-fg": {
+            "value": ""
+          },
           "--gr-badge-warning-bg": {
             "value": "#fb923c",
             "color": "rgb(251, 146, 60)"
@@ -71299,7 +71569,28 @@
           "--gr-button-solid-image": {
             "value": "linear-gradient(to bottom, color-mix(in srgb, #ffffff 6%, transparent), transparent 60%)"
           },
+          "--gr-button-step-addon-px": {
+            "value": ""
+          },
+          "--gr-button-step-gap": {
+            "value": ""
+          },
+          "--gr-button-step-glyph": {
+            "value": ""
+          },
+          "--gr-button-step-height": {
+            "value": ""
+          },
+          "--gr-button-step-leading": {
+            "value": ""
+          },
+          "--gr-button-step-px": {
+            "value": ""
+          },
           "--gr-button-step-radius": {
+            "value": ""
+          },
+          "--gr-button-step-text": {
             "value": ""
           },
           "--gr-button-success-bg": {
@@ -71625,8 +71916,8 @@
             "color": "rgba(0, 0, 0, 0.45)"
           },
           "--gr-color-picker-trigger-hover-brd": {
-            "value": "#9d8bfa",
-            "color": "rgb(157, 139, 250)"
+            "value": "#334155",
+            "color": "rgb(51, 65, 85)"
           },
           "--gr-command-active-bg": {
             "value": "color-mix(in srgb, #334155 45%, transparent)",
@@ -72129,6 +72420,9 @@
             "value": "#334155",
             "color": "rgb(51, 65, 85)"
           },
+          "--gr-input-ring-color": {
+            "value": ""
+          },
           "--gr-invalid-brd": {
             "value": "#f87171",
             "color": "rgb(248, 113, 113)"
@@ -72230,6 +72524,30 @@
           },
           "--gr-pagination-page-weight": {
             "value": "600"
+          },
+          "--gr-pagination-step-ellipsis-px": {
+            "value": ""
+          },
+          "--gr-pagination-step-gap": {
+            "value": ""
+          },
+          "--gr-pagination-step-height": {
+            "value": ""
+          },
+          "--gr-pagination-step-jumper": {
+            "value": ""
+          },
+          "--gr-pagination-step-leading": {
+            "value": ""
+          },
+          "--gr-pagination-step-page-size": {
+            "value": ""
+          },
+          "--gr-pagination-step-px": {
+            "value": ""
+          },
+          "--gr-pagination-step-text": {
+            "value": ""
           },
           "--gr-popover": {
             "value": "#1e293b",
@@ -72429,11 +72747,62 @@
             "value": "color-mix(in srgb, #334155 92%, #f8fafc)",
             "color": "color(srgb 0.261804 0.312941 0.385725)"
           },
+          "--gr-segmented-font-size": {
+            "value": ""
+          },
+          "--gr-segmented-font-weight": {
+            "value": ""
+          },
+          "--gr-segmented-indicator-bg": {
+            "value": ""
+          },
+          "--gr-segmented-indicator-brd": {
+            "value": ""
+          },
           "--gr-segmented-indicator-highlight-shadow": {
             "value": "0 0 0 1px rgba(248, 250, 252, 0.08)"
           },
+          "--gr-segmented-indicator-shadow": {
+            "value": ""
+          },
+          "--gr-segmented-item-color": {
+            "value": ""
+          },
+          "--gr-segmented-item-hover-color": {
+            "value": ""
+          },
+          "--gr-segmented-item-px": {
+            "value": ""
+          },
+          "--gr-segmented-item-py": {
+            "value": ""
+          },
+          "--gr-segmented-item-selected-color": {
+            "value": ""
+          },
           "--gr-segmented-label-weight": {
             "value": "600"
+          },
+          "--gr-segmented-line-height": {
+            "value": ""
+          },
+          "--gr-segmented-min-height": {
+            "value": ""
+          },
+          "--gr-segmented-padding": {
+            "value": ""
+          },
+          "--gr-segmented-radius": {
+            "value": ""
+          },
+          "--gr-segmented-track-bg": {
+            "value": ""
+          },
+          "--gr-segmented-track-brd": {
+            "value": ""
+          },
+          "--gr-segmented-track-shadow": {
+            "value": ""
           },
           "--gr-select-option-active-bg": {
             "value": "color-mix(in srgb, #334155 30%, transparent)",
@@ -72741,6 +73110,30 @@
             "value": "#334155",
             "color": "rgb(51, 65, 85)"
           },
+          "--gr-switch-step-air": {
+            "value": ""
+          },
+          "--gr-switch-step-height": {
+            "value": ""
+          },
+          "--gr-switch-step-icon": {
+            "value": ""
+          },
+          "--gr-switch-step-leading": {
+            "value": ""
+          },
+          "--gr-switch-step-state-size": {
+            "value": ""
+          },
+          "--gr-switch-step-text": {
+            "value": ""
+          },
+          "--gr-switch-step-text-width": {
+            "value": ""
+          },
+          "--gr-switch-step-width": {
+            "value": ""
+          },
           "--gr-switch-text-track-width-lg": {
             "value": "3.5rem"
           },
@@ -72753,6 +73146,12 @@
           },
           "--gr-switch-thumb-shadow": {
             "value": "0 1px 2px rgba(0, 0, 0, 0.45)"
+          },
+          "--gr-switch-track-bg": {
+            "value": ""
+          },
+          "--gr-switch-track-brd": {
+            "value": ""
           },
           "--gr-switch-track-height-lg": {
             "value": "1.75rem"
@@ -73350,6 +73749,12 @@
           ],
           "--gr-badge-success-fg": [
             "rgb(15, 23, 42)"
+          ],
+          "--gr-badge-tone-brd": [
+            ""
+          ],
+          "--gr-badge-tone-soft-brd": [
+            ""
           ],
           "--gr-badge-warning-bg": [
             "rgb(251, 146, 60)"
@@ -74047,7 +74452,7 @@
             ""
           ],
           "--gr-color-picker-trigger-hover-brd": [
-            "rgb(157, 139, 250)"
+            "rgb(51, 65, 85)"
           ],
           "--gr-command-active-bg": [
             "color(srgb 0.2 0.254902 0.333333 / 0.45)"
@@ -74850,15 +75255,6 @@
           "--gr-secondary-fg": [
             "rgb(241, 245, 249)"
           ],
-          "--gr-segmented-font-size": [
-            ""
-          ],
-          "--gr-segmented-font-weight": [
-            ""
-          ],
-          "--gr-segmented-indicator-bg": [
-            ""
-          ],
           "--gr-segmented-indicator-brd": [
             ""
           ],
@@ -74871,43 +75267,13 @@
           "--gr-segmented-invalid-brd": [
             "rgb(248, 113, 113)"
           ],
-          "--gr-segmented-item-color": [
-            ""
-          ],
-          "--gr-segmented-item-hover-color": [
-            ""
-          ],
-          "--gr-segmented-item-px": [
-            ""
-          ],
-          "--gr-segmented-item-py": [
-            ""
-          ],
-          "--gr-segmented-item-selected-color": [
-            ""
-          ],
           "--gr-segmented-label-weight": [
             "600"
-          ],
-          "--gr-segmented-line-height": [
-            ""
-          ],
-          "--gr-segmented-min-height": [
-            ""
-          ],
-          "--gr-segmented-padding": [
-            ""
           ],
           "--gr-segmented-radius": [
             ""
           ],
-          "--gr-segmented-track-bg": [
-            ""
-          ],
           "--gr-segmented-track-brd": [
-            ""
-          ],
-          "--gr-segmented-track-shadow": [
             ""
           ],
           "--gr-select-option-active-bg": [
@@ -75112,9 +75478,6 @@
           "--gr-steps-done-fg": [
             "rgb(255, 255, 255)"
           ],
-          "--gr-steps-marker-size": [
-            ""
-          ],
           "--gr-success": [
             "rgb(52, 211, 153)"
           ],
@@ -75168,12 +75531,6 @@
           ],
           "--gr-switch-thumb-shadow": [
             "0 1px 2px rgba(0, 0, 0, 0.45)"
-          ],
-          "--gr-switch-track-bg": [
-            ""
-          ],
-          "--gr-switch-track-brd": [
-            ""
           ],
           "--gr-switch-track-height-lg": [
             "1.75rem"
@@ -75388,82 +75745,19 @@
           "--gr-transfer-selected-bg": [
             "color(srgb 0.615686 0.545098 0.980392 / 0.12)"
           ],
-          "--gr-tree-branch-elbow-width": [
-            ""
-          ],
           "--gr-tree-branch-line-color": [
             ""
           ],
           "--gr-tree-branch-line-default-color": [
             "rgb(51, 65, 85)"
           ],
-          "--gr-tree-branch-line-offset": [
-            ""
-          ],
-          "--gr-tree-branch-line-width": [
-            ""
-          ],
           "--gr-tree-branch-weight": [
             "600"
-          ],
-          "--gr-tree-checkbox-bg": [
-            ""
-          ],
-          "--gr-tree-checkbox-brd-width": [
-            ""
-          ],
-          "--gr-tree-checkbox-mr": [
-            ""
-          ],
-          "--gr-tree-checkbox-radius": [
-            ""
-          ],
-          "--gr-tree-checkbox-size": [
-            ""
-          ],
-          "--gr-tree-children-pl": [
-            ""
-          ],
-          "--gr-tree-content-gap": [
-            ""
-          ],
-          "--gr-tree-drag-handle-color": [
-            ""
-          ],
-          "--gr-tree-drag-handle-disabled-opacity": [
-            ""
           ],
           "--gr-tree-drag-handle-hover-bg": [
             ""
           ],
-          "--gr-tree-drag-handle-hover-opacity": [
-            ""
-          ],
-          "--gr-tree-drag-handle-mr": [
-            ""
-          ],
-          "--gr-tree-drag-handle-opacity": [
-            ""
-          ],
-          "--gr-tree-drag-handle-radius": [
-            ""
-          ],
-          "--gr-tree-drag-handle-size": [
-            ""
-          ],
-          "--gr-tree-font-size": [
-            ""
-          ],
-          "--gr-tree-gap": [
-            ""
-          ],
-          "--gr-tree-icon-size": [
-            ""
-          ],
           "--gr-tree-indent-step": [
-            ""
-          ],
-          "--gr-tree-row-current-bar-width": [
             ""
           ],
           "--gr-tree-row-current-bg": [
@@ -75478,31 +75772,7 @@
           "--gr-tree-row-indent": [
             "0px"
           ],
-          "--gr-tree-row-min-height": [
-            ""
-          ],
-          "--gr-tree-row-px": [
-            ""
-          ],
-          "--gr-tree-row-py": [
-            ""
-          ],
-          "--gr-tree-row-radius": [
-            ""
-          ],
-          "--gr-tree-toggle-color": [
-            ""
-          ],
           "--gr-tree-toggle-hover-bg": [
-            ""
-          ],
-          "--gr-tree-toggle-mr": [
-            ""
-          ],
-          "--gr-tree-toggle-radius": [
-            ""
-          ],
-          "--gr-tree-toggle-size": [
             ""
           ],
           "--gr-value-prefix-color": [
@@ -75800,6 +76070,24 @@
           "--gr-badge-success-fg": {
             "value": "#ffffff",
             "color": "rgb(255, 255, 255)"
+          },
+          "--gr-badge-tone-bg": {
+            "value": ""
+          },
+          "--gr-badge-tone-brd": {
+            "value": ""
+          },
+          "--gr-badge-tone-fg": {
+            "value": ""
+          },
+          "--gr-badge-tone-soft-bg": {
+            "value": ""
+          },
+          "--gr-badge-tone-soft-brd": {
+            "value": ""
+          },
+          "--gr-badge-tone-soft-fg": {
+            "value": ""
           },
           "--gr-badge-warning-bg": {
             "value": "#c2410c",
@@ -76338,7 +76626,28 @@
           "--gr-button-solid-image": {
             "value": "linear-gradient(to bottom, color-mix(in srgb, #ffffff 6%, transparent), transparent 60%)"
           },
+          "--gr-button-step-addon-px": {
+            "value": ""
+          },
+          "--gr-button-step-gap": {
+            "value": ""
+          },
+          "--gr-button-step-glyph": {
+            "value": ""
+          },
+          "--gr-button-step-height": {
+            "value": ""
+          },
+          "--gr-button-step-leading": {
+            "value": ""
+          },
+          "--gr-button-step-px": {
+            "value": ""
+          },
           "--gr-button-step-radius": {
+            "value": ""
+          },
+          "--gr-button-step-text": {
             "value": ""
           },
           "--gr-button-success-bg": {
@@ -76664,8 +76973,8 @@
             "color": "rgba(0, 0, 0, 0.45)"
           },
           "--gr-color-picker-trigger-hover-brd": {
-            "value": "#4f46e5",
-            "color": "rgb(79, 70, 229)"
+            "value": "#e2e8f0",
+            "color": "rgb(226, 232, 240)"
           },
           "--gr-command-active-bg": {
             "value": "color-mix(in srgb, #f1f5f9 45%, transparent)",
@@ -77168,6 +77477,9 @@
             "value": "#e2e8f0",
             "color": "rgb(226, 232, 240)"
           },
+          "--gr-input-ring-color": {
+            "value": ""
+          },
           "--gr-invalid-brd": {
             "value": "#dc2626",
             "color": "rgb(220, 38, 38)"
@@ -77269,6 +77581,30 @@
           },
           "--gr-pagination-page-weight": {
             "value": "600"
+          },
+          "--gr-pagination-step-ellipsis-px": {
+            "value": ""
+          },
+          "--gr-pagination-step-gap": {
+            "value": ""
+          },
+          "--gr-pagination-step-height": {
+            "value": ""
+          },
+          "--gr-pagination-step-jumper": {
+            "value": ""
+          },
+          "--gr-pagination-step-leading": {
+            "value": ""
+          },
+          "--gr-pagination-step-page-size": {
+            "value": ""
+          },
+          "--gr-pagination-step-px": {
+            "value": ""
+          },
+          "--gr-pagination-step-text": {
+            "value": ""
           },
           "--gr-popover": {
             "value": "#ffffff",
@@ -77468,11 +77804,62 @@
             "value": "color-mix(in srgb, #e2e8f0 92%, #0f172a)",
             "color": "color(srgb 0.820078 0.844235 0.879059)"
           },
+          "--gr-segmented-font-size": {
+            "value": ""
+          },
+          "--gr-segmented-font-weight": {
+            "value": ""
+          },
+          "--gr-segmented-indicator-bg": {
+            "value": ""
+          },
+          "--gr-segmented-indicator-brd": {
+            "value": ""
+          },
           "--gr-segmented-indicator-highlight-shadow": {
             "value": "0 0 0 0 transparent"
           },
+          "--gr-segmented-indicator-shadow": {
+            "value": ""
+          },
+          "--gr-segmented-item-color": {
+            "value": ""
+          },
+          "--gr-segmented-item-hover-color": {
+            "value": ""
+          },
+          "--gr-segmented-item-px": {
+            "value": ""
+          },
+          "--gr-segmented-item-py": {
+            "value": ""
+          },
+          "--gr-segmented-item-selected-color": {
+            "value": ""
+          },
           "--gr-segmented-label-weight": {
             "value": "600"
+          },
+          "--gr-segmented-line-height": {
+            "value": ""
+          },
+          "--gr-segmented-min-height": {
+            "value": ""
+          },
+          "--gr-segmented-padding": {
+            "value": ""
+          },
+          "--gr-segmented-radius": {
+            "value": ""
+          },
+          "--gr-segmented-track-bg": {
+            "value": ""
+          },
+          "--gr-segmented-track-brd": {
+            "value": ""
+          },
+          "--gr-segmented-track-shadow": {
+            "value": ""
           },
           "--gr-select-option-active-bg": {
             "value": "color-mix(in srgb, #f1f5f9 30%, transparent)",
@@ -77780,6 +78167,30 @@
             "value": "#f1f5f9",
             "color": "rgb(241, 245, 249)"
           },
+          "--gr-switch-step-air": {
+            "value": ""
+          },
+          "--gr-switch-step-height": {
+            "value": ""
+          },
+          "--gr-switch-step-icon": {
+            "value": ""
+          },
+          "--gr-switch-step-leading": {
+            "value": ""
+          },
+          "--gr-switch-step-state-size": {
+            "value": ""
+          },
+          "--gr-switch-step-text": {
+            "value": ""
+          },
+          "--gr-switch-step-text-width": {
+            "value": ""
+          },
+          "--gr-switch-step-width": {
+            "value": ""
+          },
           "--gr-switch-text-track-width-lg": {
             "value": "3.5rem"
           },
@@ -77792,6 +78203,12 @@
           },
           "--gr-switch-thumb-shadow": {
             "value": "0 1px 2px rgba(15, 23, 42, 0.08)"
+          },
+          "--gr-switch-track-bg": {
+            "value": ""
+          },
+          "--gr-switch-track-brd": {
+            "value": ""
           },
           "--gr-switch-track-height-lg": {
             "value": "1.75rem"
@@ -78389,6 +78806,12 @@
           ],
           "--gr-badge-success-fg": [
             "rgb(255, 255, 255)"
+          ],
+          "--gr-badge-tone-brd": [
+            ""
+          ],
+          "--gr-badge-tone-soft-brd": [
+            ""
           ],
           "--gr-badge-warning-bg": [
             "rgb(194, 65, 12)"
@@ -79086,7 +79509,7 @@
             ""
           ],
           "--gr-color-picker-trigger-hover-brd": [
-            "rgb(79, 70, 229)"
+            "rgb(226, 232, 240)"
           ],
           "--gr-command-active-bg": [
             "color(srgb 0.945098 0.960784 0.976471 / 0.45)"
@@ -79889,15 +80312,6 @@
           "--gr-secondary-fg": [
             "rgb(30, 41, 59)"
           ],
-          "--gr-segmented-font-size": [
-            ""
-          ],
-          "--gr-segmented-font-weight": [
-            ""
-          ],
-          "--gr-segmented-indicator-bg": [
-            ""
-          ],
           "--gr-segmented-indicator-brd": [
             ""
           ],
@@ -79910,43 +80324,13 @@
           "--gr-segmented-invalid-brd": [
             "rgb(220, 38, 38)"
           ],
-          "--gr-segmented-item-color": [
-            ""
-          ],
-          "--gr-segmented-item-hover-color": [
-            ""
-          ],
-          "--gr-segmented-item-px": [
-            ""
-          ],
-          "--gr-segmented-item-py": [
-            ""
-          ],
-          "--gr-segmented-item-selected-color": [
-            ""
-          ],
           "--gr-segmented-label-weight": [
             "600"
-          ],
-          "--gr-segmented-line-height": [
-            ""
-          ],
-          "--gr-segmented-min-height": [
-            ""
-          ],
-          "--gr-segmented-padding": [
-            ""
           ],
           "--gr-segmented-radius": [
             ""
           ],
-          "--gr-segmented-track-bg": [
-            ""
-          ],
           "--gr-segmented-track-brd": [
-            ""
-          ],
-          "--gr-segmented-track-shadow": [
             ""
           ],
           "--gr-select-option-active-bg": [
@@ -80151,9 +80535,6 @@
           "--gr-steps-done-fg": [
             "rgb(255, 255, 255)"
           ],
-          "--gr-steps-marker-size": [
-            ""
-          ],
           "--gr-success": [
             "rgb(16, 185, 129)"
           ],
@@ -80207,12 +80588,6 @@
           ],
           "--gr-switch-thumb-shadow": [
             "0 1px 2px rgba(15, 23, 42, 0.08)"
-          ],
-          "--gr-switch-track-bg": [
-            ""
-          ],
-          "--gr-switch-track-brd": [
-            ""
           ],
           "--gr-switch-track-height-lg": [
             "1.75rem"
@@ -80427,82 +80802,19 @@
           "--gr-transfer-selected-bg": [
             "color(srgb 0.309804 0.27451 0.898039 / 0.12)"
           ],
-          "--gr-tree-branch-elbow-width": [
-            ""
-          ],
           "--gr-tree-branch-line-color": [
             ""
           ],
           "--gr-tree-branch-line-default-color": [
             "rgb(226, 232, 240)"
           ],
-          "--gr-tree-branch-line-offset": [
-            ""
-          ],
-          "--gr-tree-branch-line-width": [
-            ""
-          ],
           "--gr-tree-branch-weight": [
             "600"
-          ],
-          "--gr-tree-checkbox-bg": [
-            ""
-          ],
-          "--gr-tree-checkbox-brd-width": [
-            ""
-          ],
-          "--gr-tree-checkbox-mr": [
-            ""
-          ],
-          "--gr-tree-checkbox-radius": [
-            ""
-          ],
-          "--gr-tree-checkbox-size": [
-            ""
-          ],
-          "--gr-tree-children-pl": [
-            ""
-          ],
-          "--gr-tree-content-gap": [
-            ""
-          ],
-          "--gr-tree-drag-handle-color": [
-            ""
-          ],
-          "--gr-tree-drag-handle-disabled-opacity": [
-            ""
           ],
           "--gr-tree-drag-handle-hover-bg": [
             ""
           ],
-          "--gr-tree-drag-handle-hover-opacity": [
-            ""
-          ],
-          "--gr-tree-drag-handle-mr": [
-            ""
-          ],
-          "--gr-tree-drag-handle-opacity": [
-            ""
-          ],
-          "--gr-tree-drag-handle-radius": [
-            ""
-          ],
-          "--gr-tree-drag-handle-size": [
-            ""
-          ],
-          "--gr-tree-font-size": [
-            ""
-          ],
-          "--gr-tree-gap": [
-            ""
-          ],
-          "--gr-tree-icon-size": [
-            ""
-          ],
           "--gr-tree-indent-step": [
-            ""
-          ],
-          "--gr-tree-row-current-bar-width": [
             ""
           ],
           "--gr-tree-row-current-bg": [
@@ -80517,31 +80829,7 @@
           "--gr-tree-row-indent": [
             "0px"
           ],
-          "--gr-tree-row-min-height": [
-            ""
-          ],
-          "--gr-tree-row-px": [
-            ""
-          ],
-          "--gr-tree-row-py": [
-            ""
-          ],
-          "--gr-tree-row-radius": [
-            ""
-          ],
-          "--gr-tree-toggle-color": [
-            ""
-          ],
           "--gr-tree-toggle-hover-bg": [
-            ""
-          ],
-          "--gr-tree-toggle-mr": [
-            ""
-          ],
-          "--gr-tree-toggle-radius": [
-            ""
-          ],
-          "--gr-tree-toggle-size": [
             ""
           ],
           "--gr-value-prefix-color": [

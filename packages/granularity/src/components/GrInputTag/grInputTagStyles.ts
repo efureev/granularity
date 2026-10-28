@@ -30,7 +30,7 @@ export function grInputTagWrapperClass(options: { size: GrInputTagSize, disabled
   return [
     wrapperBaseClass,
     wrapperSizeClassBySize[options.size],
-    options.disabled ? 'text-[var(--gr-muted-fg)]' : 'text-[var(--gr-fg)] cursor-text',
+    options.disabled ? 'text-[var(--gr-disabled-fg)]' : 'text-[var(--gr-fg)] cursor-text',
   ].join(' ')
 }
 

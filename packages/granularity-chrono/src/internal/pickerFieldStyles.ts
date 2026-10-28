@@ -26,7 +26,7 @@ export const fieldBaseClass = 'w-full truncate pr-9 placeholder:text-[var(--gr-m
 
 /** Цвет текста — утилитой и у недоступного: `packages/granularity/docs/field.md`. */
 export const fieldEnabledClass = 'cursor-pointer text-[var(--gr-fg)]'
-export const fieldDisabledClass = 'text-[var(--gr-muted-fg)]'
+export const fieldDisabledClass = 'text-[var(--gr-disabled-fg)]'
 
 export interface PickerFieldOptions {
   size: GrPickerSize

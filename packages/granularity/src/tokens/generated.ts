@@ -2168,8 +2168,8 @@ export const grComponentTokens: GrComponentToken[] = [
     "owner": "GrColorPicker",
     "name": "--gr-color-picker-trigger-hover-brd",
     "kind": "theme",
-    "default": "var(--gr-primary)",
-    "description": "Рамка триггера под указателем. Тема, где триггер — такое же поле, как остальные, ставит `--gr-input-hover`."
+    "default": "var(--gr-input-hover)",
+    "description": "Рамка триггера под указателем. Темы каталога ставят `--gr-input-hover`: триггер откликается, как поле; своя тема вправе дать ему свой цвет."
   },
   {
     "owner": "GrCommandPalette",
