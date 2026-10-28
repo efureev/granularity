@@ -411,6 +411,21 @@ describe('GrDateRangePicker — inline', () => {
     expect(lastModel(wrapper)).toEqual([at(10), at(14)])
     wrapper.unmount()
   })
+
+  it('курсор колонки времени объявлен и без открытия панели', async () => {
+    // В `inline` панель не «открывают»: колонки, ждущие открытия, остались бы без
+    // `aria-activedescendant`, и стрелки молчали бы для скринридера.
+    const wrapper = mountPicker({ inline: true, enableTime: true, use12Hours: false, modelValue: [at(10), at(14)] })
+    for (let i = 0; i < 4; i += 1) await nextTick()
+
+    const hours = new DOMWrapper(document.querySelector('[data-gr-date-range-picker-time] [data-unit="hour"]'))
+    await hours.trigger('keydown', { key: 'ArrowDown' })
+    await nextTick()
+
+    const id = hours.attributes('aria-activedescendant')
+    expect(id && document.querySelector(`[id="${id}"]`)?.textContent?.trim()).toBe('01')
+    wrapper.unmount()
+  })
 })
 
 describe('GrDateRangePicker — проброс слота шапки недели', () => {

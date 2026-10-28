@@ -11,16 +11,16 @@
 | --- | --- | --- |
 | `--gr-calendar-bg` | `var(--gr-card)` | Фон панели календаря |
 | `--gr-calendar-padding` | `0.75rem` | Внутренний отступ панели |
-| `--gr-calendar-selected-bg` | `var(--gr-primary)` | Заливка выбранного дня |
-| `--gr-calendar-selected-fg` | `var(--gr-primary-fg)` | Текст выбранного дня |
+| `--gr-calendar-selected-bg` | `var(--gr-selected)` | Заливка выбранного дня — роль выбора, как у отметок ядра |
+| `--gr-calendar-selected-fg` | `var(--gr-selected-fg)` | Текст выбранного дня |
 | `--gr-calendar-hover-bg` | `var(--gr-muted)` | Подсветка дня под курсором |
 | `--gr-calendar-today-ring` | `var(--gr-primary)` | Обводка сегодняшнего дня |
 | `--gr-calendar-outside-fg` | `var(--gr-muted-fg)` | Дни добора соседних месяцев |
 | `--gr-calendar-range-bg` | `var(--gr-muted)` | Полоса выбранного периода |
 | `--gr-calendar-cell-size` | `1.75rem`…`2.5rem` по `size` | Сторона ячейки дня; для узкой карточки — `min(2.25rem, 12cqi)` |
 | `--gr-time-picker-column-height` | `12rem` | Сколько значений видно в колонке разом |
-| `--gr-time-picker-selected-bg` | `var(--gr-primary)` | Заливка выбранного значения |
-| `--gr-time-picker-selected-fg` | `var(--gr-primary-fg)` | Текст выбранного значения |
+| `--gr-time-picker-selected-bg` | `var(--gr-selected)` | Заливка выбранного значения |
+| `--gr-time-picker-selected-fg` | `var(--gr-selected-fg)` | Текст выбранного значения |
 | `--gr-time-picker-hover-bg` | `var(--gr-muted)` | Подсветка значения под курсором |
 | `--gr-time-picker-active-ring` | `var(--gr-ring)` | Кольцо клавиатурного курсора |
 

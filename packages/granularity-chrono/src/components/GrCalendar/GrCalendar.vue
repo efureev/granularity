@@ -36,7 +36,8 @@ import {
   calendarGridClass,
   calendarPeriodClass,
   calendarPeriodGridClass,
-  calendarQuarterGridClass,
+  calendarPeriodRowClass,
+  calendarQuarterRowClass,
   calendarRangeCellClass,
   calendarHeaderClass,
   calendarNavButtonClass,
@@ -291,6 +292,16 @@ const periodCells = computed<PeriodCell[]>(() => (
       })
 ))
 
+/** Кварталы стоят по два в ряд, месяцы и годы — по три: стрелки вниз и вверх ходят по этой ширине. */
+const periodColumns = computed(() => (props.mode === 'quarter' ? 2 : 3))
+
+const periodRows = computed<PeriodCell[][]>(() => {
+  const rows: PeriodCell[][] = []
+  for (let start = 0; start < periodCells.value.length; start += periodColumns.value)
+    rows.push(periodCells.value.slice(start, start + periodColumns.value))
+  return rows
+})
+
 const periodLabels = computed(() => (props.mode === 'month' ? monthNames(resolvedLocale.value, 'short') : []))
 
 /**
@@ -445,9 +456,9 @@ const roving = useRovingFocus<string>({
   items: () => cellKeys.value,
   elementFor: key => dayEls.value.get(key),
   orientation: () => 'grid',
-  // Семь дней в неделе против трёх периодов в ряду: примитив у сеток один,
+  // Семь дней в неделе против двух-трёх периодов в ряду: примитив у сеток один,
   // разная у них только ширина.
-  columns: () => (isDayMode.value ? 7 : 3),
+  columns: () => (isDayMode.value ? 7 : periodColumns.value),
   // Края сетки — не кольцо: за ними следующий и предыдущий месяцы.
   wrap: () => false,
   onOverflow: (edge) => {
@@ -709,41 +720,48 @@ defineExpose({
       </div>
     </slot>
 
-    <!-- Сетка периодов: те же роли `grid`/`row`/`gridcell`, только рядов три
-         по три ячейки, а не недели по семь дней. -->
+    <!-- Сетка периодов: те же роли `grid`/`row`/`gridcell`, только ряды по две-три
+         ячейки, а не недели по семь дней. -->
     <div
       v-if="!isDayMode"
       :id="gridId"
       data-gr-calendar-periods
       role="grid"
-      :class="mode === 'quarter' ? calendarQuarterGridClass : calendarPeriodGridClass"
+      :class="calendarPeriodGridClass"
       :aria-label="ariaLabel"
       :aria-labelledby="ariaLabel ? undefined : titleId"
       :aria-readonly="readonly ? 'true' : undefined"
       :aria-disabled="disabled ? 'true' : undefined"
       @keydown="onGridKeydown"
     >
-      <span
-        v-for="cell in periodCells"
-        :ref="element => setDayEl(cell.key, element)"
-        :key="cell.key"
-        role="gridcell"
-        data-gr-calendar-period
-        :data-key="cell.key"
-        :tabindex="roving.tabindexFor(cell.key)"
-        :aria-selected="cell.key === selectedPeriodKey ? 'true' : 'false'"
-        :aria-disabled="cell.disabled ? 'true' : undefined"
-        :aria-current="cell.current ? 'date' : undefined"
-        :class="calendarPeriodClass({
-          size: resolvedSize,
-          selected: cell.key === selectedPeriodKey,
-          current: cell.current,
-          disabled: cell.disabled,
-        })"
-        @click="onPeriodClick(cell)"
+      <div
+        v-for="(row, rowIndex) in periodRows"
+        :key="rowIndex"
+        role="row"
+        :class="mode === 'quarter' ? calendarQuarterRowClass : calendarPeriodRowClass"
       >
-        {{ periodLabel(cell) }}
-      </span>
+        <span
+          v-for="cell in row"
+          :ref="element => setDayEl(cell.key, element)"
+          :key="cell.key"
+          role="gridcell"
+          data-gr-calendar-period
+          :data-key="cell.key"
+          :tabindex="roving.tabindexFor(cell.key)"
+          :aria-selected="cell.key === selectedPeriodKey ? 'true' : 'false'"
+          :aria-disabled="cell.disabled ? 'true' : undefined"
+          :aria-current="cell.current ? 'date' : undefined"
+          :class="calendarPeriodClass({
+            size: resolvedSize,
+            selected: cell.key === selectedPeriodKey,
+            current: cell.current,
+            disabled: cell.disabled,
+          })"
+          @click="onPeriodClick(cell)"
+        >
+          {{ periodLabel(cell) }}
+        </span>
+      </div>
     </div>
 
     <table

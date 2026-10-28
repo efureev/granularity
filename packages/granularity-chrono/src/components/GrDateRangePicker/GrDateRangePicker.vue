@@ -294,6 +294,7 @@ const {
   selected,
   formValues,
   panelOpen,
+  panelVisible,
   hasBeenOpen,
   fieldEl,
   showClear,
@@ -846,7 +847,7 @@ const calendarVars = { '--gr-calendar-bg': 'transparent', '--gr-calendar-padding
                 :locale="resolvedLocale"
                 :size="resolvedSize"
                 :locked="isLocked"
-                :open="panelOpen"
+                :open="panelVisible"
                 @update:model-value="time => setBoundTime(edge, time)"
               />
             </div>

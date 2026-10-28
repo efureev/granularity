@@ -467,6 +467,26 @@ describe('GrCalendar — режимы месяца и года', () => {
     wrapper.unmount()
   })
 
+  /**
+   * Паттерн grid требует уровня рядов: ячейка без `row` над собой — сирота, и
+   * скринридер не объявляет ни строку, ни колонку (axe: `aria-required-children`
+   * у сетки и `aria-required-parent` у ячеек).
+   */
+  it.each([
+    ['month', 3],
+    ['quarter', 2],
+    ['year', 3],
+  ] as const)('сетка `%s` разбита на ряды по %i ячейки', (mode, perRow) => {
+    const wrapper = mountMonths({ mode })
+    const grid = wrapper.get('[data-gr-calendar-periods]').element
+    const rows = [...grid.children]
+
+    expect(rows.every(row => row.getAttribute('role') === 'row')).toBe(true)
+    expect(rows.map(row => row.querySelectorAll('[role="gridcell"]').length).every(count => count === perRow)).toBe(true)
+    expect(periods(wrapper).every(cell => cell.element.parentElement?.getAttribute('role') === 'row')).toBe(true)
+    wrapper.unmount()
+  })
+
   it('заголовок показывает год, а листание ходит годами', async () => {
     const wrapper = mountMonths()
     expect(wrapper.get('[data-gr-calendar-title]').text()).toBe('2026')
@@ -610,6 +630,22 @@ describe('GrCalendar — режим квартала', () => {
     expect(cells).toHaveLength(4)
     expect(cells.map(cell => cell.text())).toEqual(['Q1', 'Q2', 'Q3', 'Q4'])
     expect(wrapper.find('[data-gr-calendar-grid]').exists(), 'дневная сетка в этом режиме не рендерится').toBe(false)
+    wrapper.unmount()
+  })
+
+  it('стрелки ходят по двум колонкам: вниз из Q1 — Q3, а не следующий год', async () => {
+    const wrapper = mountQuarters({ modelValue: iso('2026-02-10') })
+    const grid = wrapper.get('[data-gr-calendar-periods]')
+    const focused = () => wrapper.findAll('[data-gr-calendar-period]').filter(cell => cell.attributes('tabindex') === '0')[0]!.attributes('data-key')
+
+    await grid.trigger('keydown', { key: 'ArrowDown' })
+    await nextTick()
+    expect(focused()).toBe('2026-Q3')
+
+    await grid.trigger('keydown', { key: 'ArrowRight' })
+    await nextTick()
+    expect(focused()).toBe('2026-Q4')
+    expect(wrapper.emitted('periodChange'), 'год не листается внутри сетки').toBeUndefined()
     wrapper.unmount()
   })
 

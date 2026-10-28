@@ -51,7 +51,7 @@ export function timeOptionClass(options: TimeOptionClassOptions): string {
   if (options.disabled)
     parts.push('cursor-not-allowed text-[var(--gr-disabled-fg)]')
   else if (options.selected)
-    parts.push('bg-[var(--gr-time-picker-selected-bg,var(--gr-primary))] text-[var(--gr-time-picker-selected-fg,var(--gr-primary-fg))]')
+    parts.push('bg-[var(--gr-time-picker-selected-bg,var(--gr-selected))] text-[var(--gr-time-picker-selected-fg,var(--gr-selected-fg))]')
   else
     parts.push('text-[var(--gr-fg)] hover:bg-[var(--gr-time-picker-hover-bg,var(--gr-muted))]')
 

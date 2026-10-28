@@ -109,7 +109,7 @@ export function calendarDayClass(options: CalendarDayClassOptions): string {
   if (options.disabled)
     parts.push('cursor-not-allowed text-[var(--gr-disabled-fg)]')
   else if (options.selected)
-    parts.push('bg-[var(--gr-calendar-selected-bg,var(--gr-primary))] text-[var(--gr-calendar-selected-fg,var(--gr-primary-fg))]')
+    parts.push('bg-[var(--gr-calendar-selected-bg,var(--gr-selected))] text-[var(--gr-calendar-selected-fg,var(--gr-selected-fg))]')
   else if (options.inMonth)
     parts.push('cursor-pointer text-[var(--gr-fg)] hover:bg-[var(--gr-calendar-hover-bg,var(--gr-muted))]')
   else
@@ -123,11 +123,14 @@ export function calendarDayClass(options: CalendarDayClassOptions): string {
   return parts.join(' ')
 }
 
-/** Сетка месяцев и лет: три колонки вместо семи, ячейка шире и ниже. */
-export const calendarPeriodGridClass = 'grid grid-cols-3 gap-1'
+/** Сетка месяцев, кварталов и лет — стопка рядов: ряд обязан быть элементом с ролью `row`. */
+export const calendarPeriodGridClass = 'flex flex-col gap-1'
 
-/** Четыре квартала — две колонки: три оставили бы одинокую ячейку во второй строке. */
-export const calendarQuarterGridClass = 'grid grid-cols-2 gap-1'
+/** Ряд месяцев и лет: три колонки вместо семи, ячейка шире и ниже. */
+export const calendarPeriodRowClass = 'grid grid-cols-3 gap-1'
+
+/** Ряд кварталов — две колонки: три оставили бы одинокую ячейку во втором ряду. */
+export const calendarQuarterRowClass = 'grid grid-cols-2 gap-1'
 
 export const calendarPeriodSizes: Record<GrCalendarSize, string> = {
   xs: 'h-7 text-[length:var(--gr-control-text-xs)] leading-[var(--gr-control-leading-xs)]',
@@ -156,7 +159,7 @@ export function calendarPeriodClass(options: CalendarPeriodClassOptions): string
   if (options.disabled)
     parts.push('cursor-not-allowed text-[var(--gr-disabled-fg)]')
   else if (options.selected)
-    parts.push('bg-[var(--gr-calendar-selected-bg,var(--gr-primary))] text-[var(--gr-calendar-selected-fg,var(--gr-primary-fg))]')
+    parts.push('bg-[var(--gr-calendar-selected-bg,var(--gr-selected))] text-[var(--gr-calendar-selected-fg,var(--gr-selected-fg))]')
   else
     parts.push('cursor-pointer text-[var(--gr-fg)] hover:bg-[var(--gr-calendar-hover-bg,var(--gr-muted))]')
 
