@@ -9,15 +9,7 @@ import { iconClass, iconTag } from '../shared/icon'
 import { resolveScrollOverflow, type GrScrollOverflow } from '../shared/scrollOverflow'
 import { useGrComponentProp, useGrComponentSize } from '../shared/configContext'
 import {
-  grTabsBadgeClass,
-  grTabsCloseClass,
-  grTabsEmptyClass,
-  grTabsListClass,
-  grTabsTabClass,
-  tabCloseIconSizes,
-  grTabsContentClass,
-  tabLabelVerticalClass,
-  tabIconClass,
+  grTabsLookAttrs,
   type GrTabsOrientation,
   type GrTabsSize,
   type GrTabsVariant,
@@ -122,26 +114,7 @@ const { t } = useGranularityTranslations()
 const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrTabs' })
 const resolvedVariant = useGrComponentProp('GrTabs', 'variant', () => props.variant, 'pills')
 
-const tablistClass = computed(() => grTabsListClass({
-  variant: resolvedVariant.value,
-  size: resolvedSize.value,
-  orientation: props.orientation,
-}))
-
-function tabClass(tab: GrTab): string {
-  return grTabsTabClass({
-    variant: resolvedVariant.value,
-    size: resolvedSize.value,
-    active: tab.value === props.modelValue,
-    disabled: Boolean(tab.disabled),
-    orientation: props.orientation,
-  })
-}
-
-const badgeClass = computed(() => grTabsBadgeClass(resolvedSize.value))
-const closeClass = computed(() => grTabsCloseClass(resolvedSize.value))
-const closeIconClass = computed(() => tabCloseIconSizes[resolvedSize.value])
-const emptyClass = computed(() => grTabsEmptyClass(resolvedSize.value))
+const lookAttrs = computed(() => grTabsLookAttrs({ variant: resolvedVariant.value, size: resolvedSize.value }))
 
 /**
  * Пустой ряд — не пустой `tablist`: роль обязана владеть потомками `tab`,
@@ -432,7 +405,7 @@ if (__GR_DEV__) {
 </script>
 
 <template>
-  <div v-if="isEmpty" data-gr-tabs-empty :class="emptyClass">
+  <div v-if="isEmpty" data-gr-tabs-empty :data-gr-size="resolvedSize">
     <slot name="empty">
       {{ resolvedEmptyText }}
     </slot>
@@ -445,7 +418,7 @@ if (__GR_DEV__) {
     data-gr-tabs
     :aria-orientation="orientation"
     :data-overflow="orientation === 'vertical' ? undefined : scrollOverflow"
-    :class="tablistClass"
+    v-bind="lookAttrs"
     @keydown="onKeydown"
     @scroll.passive="scheduleMeasure"
   >
@@ -462,10 +435,9 @@ if (__GR_DEV__) {
       :aria-disabled="tab.disabled ? 'true' : undefined"
       :aria-keyshortcuts="isClosable(tab) ? 'Delete' : undefined"
       :tabindex="roving.tabindexFor(index)"
-      :class="tabClass(tab)"
       @click="onClick($event, tab, index)"
     >
-      <span :class="grTabsContentClass(orientation)">
+      <span>
         <slot
           name="tab"
           :tab="tab"
@@ -475,11 +447,12 @@ if (__GR_DEV__) {
           <component
             :is="iconTag(tab.icon)"
             v-if="tab.icon"
-            :class="[tabIconClass, iconClass(tab.icon)]"
+            data-gr-tab-icon
+            :class="iconClass(tab.icon)"
             aria-hidden="true"
           />
-          <span :class="orientation === 'vertical' ? tabLabelVerticalClass : undefined">{{ tab.label }}</span>
-          <span v-if="tab.badge" :class="badgeClass">
+          <span :data-gr-tab-label="orientation === 'vertical' ? '' : undefined">{{ tab.label }}</span>
+          <span v-if="tab.badge" data-gr-tab-badge>
             {{ tab.badge }}
           </span>
         </slot>
@@ -488,11 +461,10 @@ if (__GR_DEV__) {
         <span
           v-if="isClosable(tab)"
           data-gr-tab-close
-          :class="closeClass"
           :title="closeTitle"
           aria-hidden="true"
         >
-          <IconX :class="closeIconClass" />
+          <IconX />
         </span>
       </span>
     </button>
@@ -500,6 +472,315 @@ if (__GR_DEV__) {
 </template>
 
 <style>
+/*
+ * Вид вкладок — лист по атрибутам (`docs/markup-weight.md`): вариант и ступень
+ * ставит ряд, ориентацию, выбор и недоступность лист читает по `aria-orientation`,
+ * `aria-selected` и `aria-disabled`.
+ */
+[data-gr-tabs] {
+  display: inline-flex;
+  max-width: 100%;
+}
+
+[data-gr-tabs][data-gr-variant='pills'] {
+  border-width: 1px;
+  border-radius: var(--gr-radius-lg);
+  border-color: var(--gr-tabs-pills-list-brd);
+  background-color: var(--gr-tabs-pills-list-bg);
+}
+
+[data-gr-tabs][data-gr-variant='line'] {
+  border-bottom-width: 1px;
+  border-color: var(--gr-brd);
+}
+
+/*
+ * Вертикальный `line` подчёркивает вкладку сбоку, а не снизу: линия должна идти
+ * вдоль списка, иначе она отделяет вкладки друг от друга вместо ряда целиком.
+ */
+[data-gr-tabs][data-gr-variant='line'][aria-orientation='vertical'] {
+  border-right-width: 1px;
+  border-bottom-width: 0;
+}
+
+/* Вертикальный ряд — колонка; прокрутки ему не нужно: он растёт вниз. */
+[data-gr-tabs][aria-orientation='vertical'] {
+  flex-direction: column;
+}
+
+/*
+ * Переполнение прокручивается, а не переносится строкой: перенос ломает ряд и
+ * уводит вкладки под панель. Полоса прокрутки скрыта — ряд ведёт клавиатура и
+ * автоскролл к активной вкладке.
+ */
+[data-gr-tabs]:not([aria-orientation='vertical']) {
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+[data-gr-tabs]:not([aria-orientation='vertical'])::-webkit-scrollbar {
+  display: none;
+}
+
+[data-gr-tab] {
+  flex-shrink: 0;
+  color: var(--gr-muted-fg);
+  font-weight: var(--gr-tabs-font-weight);
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+  transition-duration: var(--gr-duration-fast);
+  transition-timing-function: var(--gr-ease-out);
+}
+
+[data-gr-tab]:focus {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+}
+
+[data-gr-tab]:focus-visible {
+  box-shadow: 0 0 0 2px var(--gr-ring);
+}
+
+[data-gr-tabs][aria-orientation='vertical'] > [data-gr-tab] {
+  text-align: start;
+}
+
+[data-gr-tabs][data-gr-variant='pills'] > [data-gr-tab] {
+  border-radius: var(--gr-tabs-pills-radius);
+}
+
+[data-gr-tabs][data-gr-variant='pills'] > [data-gr-tab][aria-selected='true']:not([aria-disabled='true']) {
+  border-width: 1px;
+  border-color: var(--gr-tabs-pills-active-brd);
+  background-color: var(--gr-tabs-pills-active-bg);
+  color: var(--gr-tabs-pills-active-fg);
+}
+
+[data-gr-tabs][data-gr-variant='pills'] > [data-gr-tab]:not([aria-selected='true'], [aria-disabled='true']):hover {
+  background-color: var(--gr-tabs-pills-hover-bg);
+  color: var(--gr-fg);
+}
+
+/*
+ * Подчёркивание `line` — нижняя рамка вкладки поверх линии ряда (`margin-bottom: -1px`).
+ * Цвет у неё только по состоянию: прозрачная у покоя, тон у выбранной.
+ */
+[data-gr-tabs][data-gr-variant='line'] > [data-gr-tab] {
+  margin-bottom: -1px;
+  border-bottom-width: 2px;
+  border-radius: var(--gr-radius-md) var(--gr-radius-md) var(--gr-radius-none) var(--gr-radius-none);
+  border-color: transparent;
+}
+
+[data-gr-tabs][data-gr-variant='line'] > [data-gr-tab][aria-selected='true']:not([aria-disabled='true']) {
+  border-color: var(--gr-selected);
+  color: var(--gr-fg);
+}
+
+[data-gr-tabs][data-gr-variant='line'] > [data-gr-tab]:not([aria-selected='true'], [aria-disabled='true']):hover {
+  border-color: var(--gr-brd-strong);
+  color: var(--gr-fg);
+}
+
+[data-gr-tab][aria-disabled='true'] {
+  color: var(--gr-disabled-fg);
+  cursor: not-allowed;
+}
+
+[data-gr-tab] > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/*
+ * Вертикаль — колонка разделов настроек, а не ряд кнопок. По центру значки подписей
+ * разной длины вставали рваной линией, и колонка читалась меню; в колонке
+ * содержимое вкладки — у начала, подпись занимает остаток, бейдж и крестик — у конца.
+ */
+[data-gr-tabs][aria-orientation='vertical'] > [data-gr-tab] > span {
+  display: flex;
+  width: 100%;
+}
+
+[data-gr-tab-label] {
+  overflow: hidden;
+  min-width: 0;
+  flex: 1 1 0%;
+  text-align: start;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+[data-gr-tab-icon] {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+}
+
+/* Счётчик у вкладки — на ступень мельче подписи. */
+[data-gr-tab-badge] {
+  border-radius: var(--gr-radius-full);
+  background-color: var(--gr-secondary);
+  color: var(--gr-secondary-fg);
+}
+
+/*
+ * Крестик закрытия — `<span>`, а не кнопка: `role="tab"` объявляет потомков
+ * презентационными, и вложенный интерактив теряется у скринридера. Своего кольца
+ * фокуса у него нет по той же причине: закрытие с клавиатуры — `Delete`/`Backspace`.
+ */
+[data-gr-tab-close] {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--gr-radius-sm);
+  color: var(--gr-muted-fg);
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+  transition-duration: var(--gr-duration-fast);
+  transition-timing-function: var(--gr-ease-out);
+}
+
+[data-gr-tab-close]:hover {
+  background-color: var(--gr-muted);
+  color: var(--gr-fg);
+}
+
+/* Пустой ряд держит высоту вкладки: иначе соседние блоки прыгают при закрытии последней. */
+[data-gr-tabs-empty] {
+  display: inline-flex;
+  align-items: center;
+  color: var(--gr-muted-fg);
+}
+
+:is([data-gr-tabs][data-gr-size='xs'] > [data-gr-tab], [data-gr-tabs-empty][data-gr-size='xs']) {
+  height: 1.75rem;
+  padding-inline: 0.5rem;
+  font-size: var(--gr-text-xs);
+  line-height: var(--gr-leading-xs);
+}
+
+[data-gr-tabs][data-gr-variant='pills'][data-gr-size='xs'] {
+  gap: 0.125rem;
+  padding: 0.125rem;
+}
+
+[data-gr-tabs][data-gr-variant='line'][data-gr-size='xs'] {
+  gap: 0.25rem;
+}
+
+[data-gr-tabs][data-gr-size='xs'] [data-gr-tab-badge] {
+  padding: 0.125rem 0.25rem;
+  font-size: var(--gr-text-2xs);
+  line-height: var(--gr-leading-2xs);
+}
+
+[data-gr-tabs][data-gr-size='xs'] [data-gr-tab-close] {
+  width: 1rem;
+  height: 1rem;
+}
+
+[data-gr-tabs][data-gr-size='xs'] [data-gr-tab-close] > svg {
+  width: 0.75rem;
+  height: 0.75rem;
+}
+
+:is([data-gr-tabs][data-gr-size='sm'] > [data-gr-tab], [data-gr-tabs-empty][data-gr-size='sm']) {
+  height: 2rem;
+  padding-inline: 0.625rem;
+  font-size: var(--gr-text-xs);
+  line-height: var(--gr-leading-xs);
+}
+
+[data-gr-tabs][data-gr-variant='pills'][data-gr-size='sm'] {
+  gap: 0.25rem;
+  padding: 0.25rem;
+}
+
+[data-gr-tabs][data-gr-variant='line'][data-gr-size='sm'] {
+  gap: 0.5rem;
+}
+
+[data-gr-tabs][data-gr-size='sm'] [data-gr-tab-badge] {
+  padding: 0.125rem 0.375rem;
+  font-size: var(--gr-text-2xs);
+  line-height: var(--gr-leading-2xs);
+}
+
+[data-gr-tabs][data-gr-size='sm'] [data-gr-tab-close] {
+  width: 1rem;
+  height: 1rem;
+}
+
+[data-gr-tabs][data-gr-size='sm'] [data-gr-tab-close] > svg {
+  width: 0.75rem;
+  height: 0.75rem;
+}
+
+:is([data-gr-tabs][data-gr-size='md'] > [data-gr-tab], [data-gr-tabs-empty][data-gr-size='md']) {
+  height: 2.5rem;
+  padding-inline: 0.75rem;
+  font-size: var(--gr-text-sm);
+  line-height: var(--gr-leading-sm);
+}
+
+[data-gr-tabs][data-gr-variant='pills'][data-gr-size='md'] {
+  gap: 0.25rem;
+  padding: 0.25rem;
+}
+
+[data-gr-tabs][data-gr-variant='line'][data-gr-size='md'] {
+  gap: 0.5rem;
+}
+
+[data-gr-tabs][data-gr-size='md'] [data-gr-tab-badge] {
+  padding: 0.125rem 0.375rem;
+  font-size: var(--gr-text-2xs);
+  line-height: var(--gr-leading-2xs);
+}
+
+[data-gr-tabs][data-gr-size='md'] [data-gr-tab-close] {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+[data-gr-tabs][data-gr-size='md'] [data-gr-tab-close] > svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+:is([data-gr-tabs][data-gr-size='lg'] > [data-gr-tab], [data-gr-tabs-empty][data-gr-size='lg']) {
+  height: 2.75rem;
+  padding-inline: 1rem;
+  font-size: var(--gr-text-base);
+  line-height: var(--gr-leading-base);
+}
+
+[data-gr-tabs][data-gr-variant='pills'][data-gr-size='lg'] {
+  gap: 0.25rem;
+  padding: 0.375rem;
+}
+
+[data-gr-tabs][data-gr-variant='line'][data-gr-size='lg'] {
+  gap: 0.75rem;
+}
+
+[data-gr-tabs][data-gr-size='lg'] [data-gr-tab-badge] {
+  padding: 0.125rem 0.5rem;
+  font-size: var(--gr-text-xs);
+  line-height: var(--gr-leading-xs);
+}
+
+[data-gr-tabs][data-gr-size='lg'] [data-gr-tab-close] {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+[data-gr-tabs][data-gr-size='lg'] [data-gr-tab-close] > svg {
+  width: 1rem;
+  height: 1rem;
+}
+
 /*
  * Затухание у края, за которым ряд продолжается.
  *

@@ -4,6 +4,9 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import GrAutocomplete from '../GrAutocomplete.vue'
 import { composingKeydown } from '../../../testing/keyboard'
+import { componentSheet } from '../../../__tests__/componentSheet'
+
+const { look: chipLook } = componentSheet('GrBadge/GrBadge.vue', 'GrChip/GrChip.vue')
 
 const OPTIONS = [
   { value: 'vue', label: 'Vue' },
@@ -115,15 +118,14 @@ describe('GrAutocomplete', () => {
 
     // Soft-бейдж несёт сплошную подложку И рамку — именно рамка делает чип
     // различимым на фоне поля (`--gr-muted` против `--gr-bg` — 7 единиц из 255).
-    expect(chip.classes()).toContain('bg-[var(--gr-muted)]')
-    expect(chip.classes()).toContain('border-[color-mix(in_srgb,var(--gr-brd)_var(--gr-badge-light-brd),var(--gr-muted))]')
+    expect(chipLook(chip.element)['background-color']).toBe('var(--gr-muted)')
+    expect(chipLook(chip.element)['border-color']).toBe('color-mix(in srgb, var(--gr-brd) var(--gr-badge-light-brd), var(--gr-muted))')
 
     const toned = mount(GrAutocomplete, {
       props: { modelValue: ['vue'], multiple: true, options: OPTIONS, ariaLabel: 'Stack', tagTone: 'success' },
     })
 
-    expect(toned.get('[data-gr-autocomplete-chip]').classes())
-      .toContain('bg-[var(--gr-success-light)]')
+    expect(chipLook(toned.get('[data-gr-autocomplete-chip]').element)['background-color']).toBe('var(--gr-success-light)')
   })
 
   it('allowCustomValue: Enter коммитит произвольное значение', async () => {

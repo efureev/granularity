@@ -9,16 +9,8 @@ import { useGrFormControl } from '../../composables/useGrFormControl'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 
 import {
-  grSwitchLabelClass,
-  grSwitchRootClass,
-  grSwitchSpinnerClass,
-  grSwitchStateTextClass,
-  grSwitchThumbClass,
-  grSwitchThumbIconClass,
-  grSwitchTrackClass,
+  grSwitchLookAttrs,
   isGrSwitchStateTextSize,
-  stateTextGhostClass,
-  stateTextStackClass,
   type GrSwitchLabelPosition,
   type GrSwitchSize,
   type GrSwitchStateTextSize,
@@ -210,66 +202,30 @@ const stateTextSize = computed<GrSwitchStateTextSize | undefined>(() => {
   return isGrSwitchStateTextSize(resolvedSize.value) ? resolvedSize.value : undefined
 })
 
-const rootClass = computed(() => grSwitchRootClass(props.labelPosition))
+const lookAttrs = computed(() => grSwitchLookAttrs({
+  size: resolvedSize.value,
+  labelPosition: props.labelPosition,
+  stateText: stateTextSize.value ? { autoWidth: resolvedAutoWidth.value } : undefined,
+}))
 
-const trackClass = computed(() => grSwitchTrackClass(
-  resolvedSize.value,
-  stateTextSize.value ? { size: stateTextSize.value, autoWidth: resolvedAutoWidth.value } : undefined,
-))
-
+/**
+ * Цвета дорожки по состоянию задаёт лист; инлайн — только произвольный цвет
+ * потребителя. Недоступность перебивает его: иначе выключенный переключатель
+ * остался бы таким же ярким, как рабочий. При ошибке рамка остаётся ролью ошибки.
+ */
 const trackStyle = computed(() => {
-  const isChecked = props.modelValue
-  const defaultBackgroundColor = isChecked ? 'var(--gr-selected)' : 'var(--gr-switch-off-bg)'
-  const customBackgroundColor = getCustomColor(
-    isChecked ? props.activeBackgroundColor : props.inactiveBackgroundColor,
-  )
-  // Недоступность гасится токеном и перебивает кастомный цвет: иначе выключенный
-  // переключатель остался бы таким же ярким, как рабочий.
-  const backgroundColor = isDisabled.value
-    ? 'var(--gr-disabled-bg)'
-    : customBackgroundColor ?? defaultBackgroundColor
+  const custom = getCustomColor(props.modelValue ? props.activeBackgroundColor : props.inactiveBackgroundColor)
+  if (!custom || isDisabled.value)
+    return undefined
 
-  return {
-    '--gr-switch-track-bg': backgroundColor,
-    // Вердикт валидации — рамкой дорожки ролью ошибки, как у полей ввода:
-    // раньше `invalid` ставил только `aria-invalid`.
-    '--gr-switch-track-brd': isDisabled.value
-      ? 'var(--gr-disabled-brd)'
-      : isInvalid.value
-        ? 'var(--gr-invalid-brd)'
-        : customBackgroundColor
-          ? backgroundColor
-          : isChecked
-            ? 'var(--gr-selected)'
-          // Выключенная дорожка светлая, как поверхность вокруг: видна она
-          // только рамкой, и рамке нужна роль с 3:1 к фону.
-            : 'var(--gr-control-brd)',
-    'backgroundColor': 'var(--gr-switch-track-bg)',
-  }
+  return { '--gr-switch-track-bg': custom, '--gr-switch-track-brd': isInvalid.value ? undefined : custom }
 })
-
-const thumbClass = computed(() => grSwitchThumbClass({ size: resolvedSize.value, checked: props.modelValue }))
-
-const spinnerClass = computed(() => grSwitchSpinnerClass(resolvedSize.value))
 
 // Спиннер и иконка занимают центр бегунка: пока идёт запрос, важнее «состояние
 // меняется», чем «каким оно стало».
 const thumbIconSlot = computed(() => (props.modelValue ? slots['checked-icon'] : slots['unchecked-icon']))
 
-const thumbIconClass = computed(() => grSwitchThumbIconClass(resolvedSize.value))
-
-const labelClass = computed(() => grSwitchLabelClass(resolvedSize.value, isDisabled.value))
-
 const resolvedLoadingText = computed(() => props.loadingText ?? t('gr.switch.loading', 'Saving…'))
-
-const stateTextClass = computed(() => (stateTextSize.value
-  ? grSwitchStateTextClass({
-      size: stateTextSize.value,
-      checked: props.modelValue,
-      disabled: isDisabled.value,
-      autoWidth: resolvedAutoWidth.value,
-    })
-  : ''))
 
 const checkedStateText = computed(() => props.checkedText ?? t('gr.switch.on', 'ON'))
 const uncheckedStateText = computed(() => props.uncheckedText ?? t('gr.switch.off', 'OFF'))
@@ -334,7 +290,7 @@ function toggle(): void {
   <button
       :id="fieldId"
       ref="rootEl"
-      v-bind="aria.rootAttrs()"
+      v-bind="{ ...aria.rootAttrs(), ...lookAttrs }"
       type="button"
       role="switch"
       data-gr-switch
@@ -348,7 +304,6 @@ function toggle(): void {
       :aria-readonly="isReadonly ? 'true' : undefined"
       :aria-busy="loading ? 'true' : undefined"
       :disabled="isDisabled"
-      :class="rootClass"
       @click="toggle"
       @focus="emit('focus', $event)"
       @blur="emit('blur', $event)"
@@ -356,35 +311,30 @@ function toggle(): void {
     <span
         data-testid="gr-switch-track"
         data-gr-switch-track
-        :class="trackClass"
         :style="trackStyle"
     >
       <span
           v-if="stateTextSize"
           data-testid="gr-switch-state-text"
           data-gr-switch-state-text
-          :class="stateTextClass"
           aria-hidden="true"
       >
-        <span :class="stateTextStackClass">{{ resolvedStateText }}</span>
+        <span>{{ resolvedStateText }}</span>
         <span
             v-if="resolvedAutoWidth"
             data-gr-switch-state-text-ghost
-            :class="stateTextGhostClass"
         >{{ ghostStateText }}</span>
       </span>
       <span
           data-testid="gr-switch-thumb"
           data-gr-switch-thumb
-          :class="thumbClass"
           aria-hidden="true"
       >
-        <IconLoader v-if="loading" data-gr-switch-spinner :class="spinnerClass" />
+        <IconLoader v-if="loading" data-gr-switch-spinner class="animate-spin" />
         <span
             v-else-if="thumbIconSlot"
             data-testid="gr-switch-thumb-icon"
             data-gr-switch-thumb-icon
-            :class="thumbIconClass"
         >
           <slot v-if="modelValue" name="checked-icon" />
           <slot v-else name="unchecked-icon" />
@@ -394,10 +344,330 @@ function toggle(): void {
     <span
         v-if="$slots.default"
         data-gr-switch-label
-        :class="labelClass"
     >
       <slot />
     </span>
     <span v-if="loading" data-gr-switch-loading-text class="sr-only">{{ resolvedLoadingText }}</span>
   </button>
 </template>
+
+<style>
+/*
+ * Вид переключателя — лист по атрибутам (`docs/markup-weight.md`): ступень, сторона
+ * подписи и режим подписи состояния ставит корень, включённость, ошибку и
+ * недоступность лист читает по `aria-checked`, `aria-invalid` и `:disabled`.
+ */
+[data-gr-switch] {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  user-select: none;
+}
+
+[data-gr-switch]:disabled {
+  cursor: not-allowed;
+}
+
+/* `start` разворачивает ряд, а не меняет порядок узлов: DOM-порядок читает диктор. */
+[data-gr-switch][data-gr-label='start'] {
+  flex-direction: row-reverse;
+}
+
+/*
+ * Цвета дорожки — переменными на ней самой: произвольный цвет потребителя
+ * (`activeBackgroundColor`) ставится инлайном поверх них. Выключенная дорожка
+ * светлая, как поверхность вокруг: видна она только рамкой, и рамке нужна роль с
+ * 3:1 к фону. Ошибка — рамкой ролью ошибки, как у полей ввода.
+ *
+ * Геометрия — из темы: у каждой ступени высота и ширина дорожки. Всё остальное
+ * выводится из высоты формулой, поэтому зазоры сходятся в любой теме сами: бегунок —
+ * высота минус рамка и зазор с обеих сторон, отступ подписи — бегунок плюс зазор.
+ */
+[data-gr-switch-track] {
+  --gr-switch-track-bg: var(--gr-switch-off-bg);
+  --gr-switch-track-brd: var(--gr-control-brd);
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  border-width: 1px;
+  border-radius: var(--gr-radius-full);
+  border-color: var(--gr-switch-track-brd);
+  background-color: var(--gr-switch-track-bg);
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+  transition-duration: var(--gr-duration-fast);
+  transition-timing-function: var(--gr-ease-out);
+}
+
+[data-gr-switch][aria-checked='true'] > [data-gr-switch-track] {
+  --gr-switch-track-bg: var(--gr-selected);
+  --gr-switch-track-brd: var(--gr-selected);
+}
+
+[data-gr-switch][aria-invalid='true'] > [data-gr-switch-track] {
+  --gr-switch-track-brd: var(--gr-invalid-brd);
+}
+
+/* Недоступность гасится токеном, а не `opacity`: прозрачность роняет контраст подписи. */
+[data-gr-switch]:disabled > [data-gr-switch-track] {
+  --gr-switch-track-bg: var(--gr-disabled-bg);
+  --gr-switch-track-brd: var(--gr-disabled-brd);
+}
+
+/*
+ * Положение бегунка — без единого числа, зависящего от ширины дорожки: крайнее
+ * положение — пара `left: calc(100% − зазор)` и `translateX(-100%)`. Процент в
+ * `left` считается от дорожки, процент в `transform` — от самого бегунка, и левый
+ * край встаёт на `ширина − бегунок − зазор`, какой бы ширина ни была. Обе величины
+ * анимируются, композиция даёт линейный ход — `autoWidth` не нужны замеры.
+ */
+[data-gr-switch-thumb] {
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--gr-radius-full);
+  background-color: var(--gr-switch-thumb-bg);
+  box-shadow: var(--gr-switch-thumb-shadow);
+  transform: translateX(0);
+  transition-property: left, transform;
+  transition-duration: var(--gr-duration-fast);
+  transition-timing-function: var(--gr-ease-out);
+}
+
+[data-gr-switch][aria-checked='true'] [data-gr-switch-thumb] {
+  left: calc(100% - 1px);
+  transform: translateX(-100%);
+}
+
+/*
+ * Содержимое бегунка — спиннер загрузки или иконка действия — мельче его на ступень,
+ * иначе знак упирается в края круга; потолок — бегунок минус 4px. Цвет — хук с
+ * фолбэком, а не инлайн: инлайн победил бы CSS потребителя. По состоянию он не
+ * ветвится и в недоступном виде не тускнеет: гасится дорожка, бегунок остаётся тем же.
+ */
+:is([data-gr-switch-spinner], [data-gr-switch-thumb-icon]) {
+  color: var(--gr-switch-thumb-fg, var(--gr-muted-fg));
+}
+
+[data-gr-switch-thumb-icon] {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+}
+
+[data-gr-switch-label] {
+  color: var(--gr-muted-fg);
+}
+
+[data-gr-switch]:disabled > [data-gr-switch-label] {
+  color: var(--gr-disabled-fg);
+}
+
+/*
+ * Подпись состояния — грид, а не флекс: в `autoWidth` в ту же клетку кладётся
+ * невидимый дубль противоположного текста, и ширина ячейки становится максимумом из
+ * двух — иначе дорожка дёргалась бы на каждом щелчке. При фиксированной ширине ячейка
+ * накрывает дорожку и на её размер не влияет, в `autoWidth` встаёт в поток и задаёт его.
+ *
+ * Цвет — роль `-fg` той заливки, на которой подпись лежит; хук фолбэком, а не
+ * инлайном: заливку задают произвольным цветом, и безопасный цвет текста на ней
+ * называет тот же, кто задал фон.
+ */
+[data-gr-switch-state-text] {
+  display: grid;
+  align-items: center;
+  justify-items: center;
+  overflow: hidden;
+  color: var(--gr-switch-state-text-fg, var(--gr-muted-fg));
+  font-weight: 600;
+  line-height: 1;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+[data-gr-switch][aria-checked='true'] [data-gr-switch-state-text] {
+  color: var(--gr-switch-state-text-fg, var(--gr-selected-fg));
+}
+
+[data-gr-switch]:disabled [data-gr-switch-state-text] {
+  color: var(--gr-switch-state-text-fg, var(--gr-disabled-fg));
+}
+
+[data-gr-switch][data-gr-text='fixed'] [data-gr-switch-state-text] {
+  position: absolute;
+  inset: 0;
+}
+
+[data-gr-switch-state-text] > span {
+  grid-column-start: 1;
+  grid-row-start: 1;
+}
+
+/* Дубль занимает место, но не рисуется: `visibility`, а не `display`. */
+[data-gr-switch-state-text-ghost] {
+  visibility: hidden;
+}
+
+[data-gr-switch][data-gr-size='xs'] > [data-gr-switch-track] {
+  width: var(--gr-switch-track-width-xs);
+  height: var(--gr-switch-track-height-xs);
+}
+
+[data-gr-switch][data-gr-size='xs'] [data-gr-switch-thumb] {
+  width: calc(var(--gr-switch-track-height-xs) - 4px);
+  height: calc(var(--gr-switch-track-height-xs) - 4px);
+}
+
+[data-gr-switch][data-gr-size='xs'] :is([data-gr-switch-spinner], [data-gr-switch-thumb-icon]) {
+  width: 0.5rem;
+  max-width: calc(var(--gr-switch-track-height-xs) - 8px);
+  height: 0.5rem;
+  max-height: calc(var(--gr-switch-track-height-xs) - 8px);
+}
+
+[data-gr-switch][data-gr-size='xs'] > [data-gr-switch-label] {
+  font-size: var(--gr-text-xs);
+  line-height: var(--gr-leading-xs);
+}
+
+[data-gr-switch][data-gr-size='sm'] > [data-gr-switch-track] {
+  width: var(--gr-switch-track-width-sm);
+  height: var(--gr-switch-track-height-sm);
+}
+
+[data-gr-switch][data-gr-size='sm'] [data-gr-switch-thumb] {
+  width: calc(var(--gr-switch-track-height-sm) - 4px);
+  height: calc(var(--gr-switch-track-height-sm) - 4px);
+}
+
+[data-gr-switch][data-gr-size='sm'] :is([data-gr-switch-spinner], [data-gr-switch-thumb-icon]) {
+  width: 0.625rem;
+  max-width: calc(var(--gr-switch-track-height-sm) - 8px);
+  height: 0.625rem;
+  max-height: calc(var(--gr-switch-track-height-sm) - 8px);
+}
+
+[data-gr-switch][data-gr-size='sm'] > [data-gr-switch-label] {
+  font-size: var(--gr-text-sm);
+  line-height: var(--gr-leading-sm);
+}
+
+[data-gr-switch][data-gr-size='md'] > [data-gr-switch-track] {
+  width: var(--gr-switch-track-width-md);
+  height: var(--gr-switch-track-height-md);
+}
+
+[data-gr-switch][data-gr-size='md'] [data-gr-switch-thumb] {
+  width: calc(var(--gr-switch-track-height-md) - 4px);
+  height: calc(var(--gr-switch-track-height-md) - 4px);
+}
+
+[data-gr-switch][data-gr-size='md'] :is([data-gr-switch-spinner], [data-gr-switch-thumb-icon]) {
+  width: 0.75rem;
+  max-width: calc(var(--gr-switch-track-height-md) - 8px);
+  height: 0.75rem;
+  max-height: calc(var(--gr-switch-track-height-md) - 8px);
+}
+
+[data-gr-switch][data-gr-size='md'] > [data-gr-switch-label] {
+  font-size: var(--gr-text-sm);
+  line-height: var(--gr-leading-sm);
+}
+
+[data-gr-switch][data-gr-size='lg'] > [data-gr-switch-track] {
+  width: var(--gr-switch-track-width-lg);
+  height: var(--gr-switch-track-height-lg);
+}
+
+[data-gr-switch][data-gr-size='lg'] [data-gr-switch-thumb] {
+  width: calc(var(--gr-switch-track-height-lg) - 4px);
+  height: calc(var(--gr-switch-track-height-lg) - 4px);
+}
+
+[data-gr-switch][data-gr-size='lg'] :is([data-gr-switch-spinner], [data-gr-switch-thumb-icon]) {
+  width: 1rem;
+  max-width: calc(var(--gr-switch-track-height-lg) - 8px);
+  height: 1rem;
+  max-height: calc(var(--gr-switch-track-height-lg) - 8px);
+}
+
+[data-gr-switch][data-gr-size='lg'] > [data-gr-switch-label] {
+  font-size: var(--gr-text-base);
+  line-height: var(--gr-leading-base);
+}
+
+/*
+ * Кегль подписи — свой, а не ступень шкалы пакета: минимальный `--gr-text-xs` — 12px,
+ * и трёхбуквенное слово на нём не встаёт в 21px. Отступ со стороны бегунка —
+ * `бегунок + зазор`, остаток и есть место подписи. В `autoWidth` к нему добавляется
+ * воздух с обеих сторон: ширину задаёт сам текст, и без воздуха он прилипает к бегунку
+ * и к закруглению. Расчёт места — `docs/components/GrSwitch.md`.
+ */
+
+[data-gr-switch][data-gr-size='md'][data-gr-text='fixed'] > [data-gr-switch-track] {
+  width: var(--gr-switch-text-track-width-md);
+}
+
+[data-gr-switch][data-gr-size='md'][data-gr-text='auto'] > [data-gr-switch-track] {
+  width: auto;
+  min-width: var(--gr-switch-text-track-width-md);
+}
+
+[data-gr-switch][data-gr-size='md'] [data-gr-switch-state-text] {
+  font-size: var(--gr-switch-state-text-size, 9px);
+}
+
+[data-gr-switch][data-gr-size='md'][data-gr-text='fixed']:not([aria-checked='true']) [data-gr-switch-state-text] {
+  padding-left: calc(var(--gr-switch-track-height-md) - 3px);
+}
+
+[data-gr-switch][data-gr-size='md'][data-gr-text='fixed'][aria-checked='true'] [data-gr-switch-state-text] {
+  padding-right: calc(var(--gr-switch-track-height-md) - 3px);
+}
+
+[data-gr-switch][data-gr-size='md'][data-gr-text='auto']:not([aria-checked='true']) [data-gr-switch-state-text] {
+  padding-right: 8px;
+  padding-left: calc(var(--gr-switch-track-height-md) + 5px);
+}
+
+[data-gr-switch][data-gr-size='md'][data-gr-text='auto'][aria-checked='true'] [data-gr-switch-state-text] {
+  padding-right: calc(var(--gr-switch-track-height-md) + 5px);
+  padding-left: 8px;
+}
+
+[data-gr-switch][data-gr-size='lg'][data-gr-text='fixed'] > [data-gr-switch-track] {
+  width: var(--gr-switch-text-track-width-lg);
+}
+
+[data-gr-switch][data-gr-size='lg'][data-gr-text='auto'] > [data-gr-switch-track] {
+  width: auto;
+  min-width: var(--gr-switch-text-track-width-lg);
+}
+
+[data-gr-switch][data-gr-size='lg'] [data-gr-switch-state-text] {
+  font-size: var(--gr-switch-state-text-size, 11px);
+}
+
+[data-gr-switch][data-gr-size='lg'][data-gr-text='fixed']:not([aria-checked='true']) [data-gr-switch-state-text] {
+  padding-left: calc(var(--gr-switch-track-height-lg) - 3px);
+}
+
+[data-gr-switch][data-gr-size='lg'][data-gr-text='fixed'][aria-checked='true'] [data-gr-switch-state-text] {
+  padding-right: calc(var(--gr-switch-track-height-lg) - 3px);
+}
+
+[data-gr-switch][data-gr-size='lg'][data-gr-text='auto']:not([aria-checked='true']) [data-gr-switch-state-text] {
+  padding-right: 10px;
+  padding-left: calc(var(--gr-switch-track-height-lg) + 7px);
+}
+
+[data-gr-switch][data-gr-size='lg'][data-gr-text='auto'][aria-checked='true'] [data-gr-switch-state-text] {
+  padding-right: calc(var(--gr-switch-track-height-lg) + 7px);
+  padding-left: 10px;
+}
+</style>

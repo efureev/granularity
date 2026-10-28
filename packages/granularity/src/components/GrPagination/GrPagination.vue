@@ -5,18 +5,7 @@ import { useGranularityTranslations } from '../../internal/granularityI18n'
 import GrButton from '../GrButton/GrButton.vue'
 import GrSelect from '../GrSelect/GrSelect.vue'
 import { useGrComponentSize } from '../shared/configContext'
-import {
-  type GrPaginationSize,
-  ellipsisSizes,
-  jumperSizes,
-  labelSizes,
-  navButtonSizes,
-  navClusterClass,
-  pageListGaps,
-  pageBoxSizes,
-  pageSizeSelectWidths,
-  rowGaps,
-} from './grPaginationStyles'
+import { type GrPaginationSize, navButtonSizes } from './grPaginationStyles'
 
 /**
  * Пропы пагинации.
@@ -114,13 +103,6 @@ defineSlots<{
 
 const resolvedSize = useGrComponentSize(() => props.size, { component: 'GrPagination' })
 
-const rowClass = computed(() => rowGaps[resolvedSize.value])
-const pageListClass = computed(() => pageListGaps[resolvedSize.value])
-const pageClass = computed(() => pageBoxSizes[resolvedSize.value])
-const jumperClass = computed(() => jumperSizes[resolvedSize.value])
-const ellipsisClass = computed(() => ellipsisSizes[resolvedSize.value])
-const labelClass = computed(() => labelSizes[resolvedSize.value])
-const selectWrapClass = computed(() => pageSizeSelectWidths[resolvedSize.value])
 const navButtonSize = computed(() => navButtonSizes[resolvedSize.value])
 
 const emit = defineEmits<GrPaginationEmits>()
@@ -282,24 +264,21 @@ if (__GR_DEV__) {
 
 <template>
   <div
-    class="flex flex-wrap items-center justify-end"
-    :class="rowClass"
     data-gr-pagination
+    :data-gr-size="resolvedSize"
     role="navigation"
     :aria-label="resolvedAriaLabel"
   >
     <div
       v-if="showTotal"
       data-gr-pagination-total
-      class="text-[var(--gr-muted-fg)] tabular-nums"
-      :class="labelClass"
     >
       <slot name="total" :from="rangeFrom" :to="rangeTo" :total="resolvedTotal">
         {{ totalText }}
       </slot>
     </div>
 
-    <div v-if="showPageSize" :class="selectWrapClass">
+    <div v-if="showPageSize" data-gr-pagination-page-size>
       <GrSelect
         v-model="pageSizeModel"
         :options="pageSizeOptions"
@@ -317,7 +296,7 @@ if (__GR_DEV__) {
       кнопки внутри доступны, ленту двигает фокус по ним; недоступную —
       только её собственный шаг табуляции.
     -->
-    <div data-gr-pagination-nav :class="[navClusterClass, pageListClass]" :tabindex="disabled ? 0 : undefined">
+    <div data-gr-pagination-nav :tabindex="disabled ? 0 : undefined">
     <GrButton variant="ghost" :size="navButtonSize" :disabled="disabled || currentPage <= 1" :aria-label="t('gr.pagination.first', 'First page')" data-gr-pagination-first @click="first">
       «
     </GrButton>
@@ -330,21 +309,17 @@ if (__GR_DEV__) {
     <div
       v-if="compact"
       data-gr-pagination-compact
-      class="px-2 text-[var(--gr-fg)] tabular-nums"
-      :class="labelClass"
       role="status"
     >
       {{ currentPage }} / {{ pageCount }}
     </div>
 
     <template v-else>
-      <ul class="flex items-center [list-style:none]" :class="pageListClass" data-gr-pagination-pages role="list">
+      <ul data-gr-pagination-pages role="list">
         <li v-for="(item, index) in items" :key="index" :aria-hidden="typeof item === 'string' ? 'true' : undefined">
           <span
             v-if="item === 'ellipsis-start' || item === 'ellipsis-end'"
             data-gr-pagination-ellipsis
-            class="grid place-items-center text-[var(--gr-muted-fg)]"
-            :class="ellipsisClass"
           >…</span>
           <button
             v-else
@@ -353,15 +328,6 @@ if (__GR_DEV__) {
             :disabled="disabled"
             :aria-current="item === currentPage ? 'page' : undefined"
             :aria-label="t('gr.pagination.page', 'Page {n}', { n: item })"
-            class="rounded-[var(--gr-radius-control)] [font-weight:var(--gr-pagination-page-weight)] transition-colors duration-[var(--gr-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] disabled:cursor-not-allowed"
-            :class="[
-              pageClass,
-              item === currentPage
-                ? 'bg-[var(--gr-selected)] text-[var(--gr-selected-fg)]'
-                // Подсветка — та же, что у соседних «назад/вперёд» (ghost-кнопки):
-                // ряд обязан читаться одним контролом.
-                : 'text-[var(--gr-pagination-page-fg)] hover:bg-[var(--gr-pagination-page-hover-bg)] hover:text-[var(--gr-pagination-page-hover-fg)]',
-            ]"
             @click="goTo(item)"
           >
             {{ item }}
@@ -385,7 +351,7 @@ if (__GR_DEV__) {
     </div>
 
     <!-- «Перейти к странице»: Enter или blur применяют введённый номер. -->
-    <div v-if="showJumper" class="flex items-center gap-2 text-[var(--gr-muted-fg)]" :class="labelClass">
+    <div v-if="showJumper" data-gr-pagination-jump>
       <span>{{ resolvedJumperLabel }}</span>
       <input
         v-model="jumperValue"
@@ -396,11 +362,259 @@ if (__GR_DEV__) {
         data-gr-pagination-jumper
         :disabled="disabled"
         :aria-label="resolvedJumperLabel"
-        class="rounded-[var(--gr-radius-control)] border border-[var(--gr-brd)] bg-[var(--gr-bg)] px-2 text-center text-[var(--gr-fg)] tabular-nums transition-colors duration-[var(--gr-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] disabled:cursor-not-allowed"
-        :class="jumperClass"
         @keydown.enter="submitJumper"
         @blur="submitJumper"
       >
     </div>
   </div>
 </template>
+
+<style>
+/*
+ * Вид пагинации — лист по атрибуту ступени (`docs/markup-weight.md`): номеров в
+ * ряду до десятка. Текущую страницу и недоступность лист читает по `aria-current`
+ * и `:disabled`.
+ *
+ * Коробка номера и многоточия — шкала `GrButton` (28/32/40/44), а не своя: номера
+ * стоят с навигационными кнопками в одном ряду. У многоточия поля уже: ему не
+ * нужен клик-таргет.
+ */
+[data-gr-pagination] {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+[data-gr-pagination-total] {
+  color: var(--gr-muted-fg);
+  font-variant-numeric: tabular-nums;
+}
+
+/*
+ * Кластер навигации — одной строкой: «назад» не уезжает от своих страниц. Не шире
+ * ряда: если и он один не помещается, прокручивается вбок без видимой полосы — на
+ * такой ширине стоит включить `compact`. Кольцо — для недоступной ленты: тогда шаг
+ * табуляции у неё самой.
+ */
+[data-gr-pagination-nav] {
+  display: flex;
+  overflow-x: auto;
+  min-width: 0;
+  max-width: 100%;
+  flex-wrap: nowrap;
+  align-items: center;
+  border-radius: var(--gr-radius-control);
+  scrollbar-width: none;
+}
+
+[data-gr-pagination-nav]::-webkit-scrollbar {
+  display: none;
+}
+
+[data-gr-pagination-nav]:focus,
+[data-gr-pagination-page]:focus,
+[data-gr-pagination-jumper]:focus {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+}
+
+[data-gr-pagination-nav]:focus-visible {
+  box-shadow: inset 0 0 0 2px var(--gr-ring);
+}
+
+[data-gr-pagination-compact] {
+  padding-inline: 0.5rem;
+  color: var(--gr-fg);
+  font-variant-numeric: tabular-nums;
+}
+
+[data-gr-pagination-pages] {
+  display: flex;
+  align-items: center;
+  list-style: none;
+}
+
+[data-gr-pagination-ellipsis] {
+  display: grid;
+  place-items: center;
+  color: var(--gr-muted-fg);
+}
+
+/* Подсветка — та же, что у соседних «назад/вперёд» (ghost-кнопки): ряд обязан читаться одним контролом. */
+[data-gr-pagination-page] {
+  border-radius: var(--gr-radius-control);
+  color: var(--gr-pagination-page-fg);
+  font-weight: var(--gr-pagination-page-weight);
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+  transition-duration: var(--gr-duration-fast);
+  transition-timing-function: var(--gr-ease-out);
+}
+
+[data-gr-pagination-page]:not([aria-current='page']):hover {
+  background-color: var(--gr-pagination-page-hover-bg);
+  color: var(--gr-pagination-page-hover-fg);
+}
+
+[data-gr-pagination-page][aria-current='page'] {
+  background-color: var(--gr-selected);
+  color: var(--gr-selected-fg);
+}
+
+:is([data-gr-pagination-page], [data-gr-pagination-jumper]):focus-visible {
+  box-shadow: 0 0 0 2px var(--gr-ring);
+}
+
+:is([data-gr-pagination-page], [data-gr-pagination-jumper]):disabled {
+  cursor: not-allowed;
+}
+
+[data-gr-pagination-jump] {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--gr-muted-fg);
+}
+
+[data-gr-pagination-jumper] {
+  padding-inline: 0.5rem;
+  border-width: 1px;
+  border-radius: var(--gr-radius-control);
+  border-color: var(--gr-brd);
+  background-color: var(--gr-bg);
+  color: var(--gr-fg);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+  transition-duration: var(--gr-duration-fast);
+  transition-timing-function: var(--gr-ease-out);
+}
+
+[data-gr-pagination][data-gr-size='xs'] {
+  gap: 0.5rem;
+}
+
+[data-gr-pagination][data-gr-size='xs'] :is([data-gr-pagination-nav], [data-gr-pagination-pages]) {
+  gap: 0.125rem;
+}
+
+[data-gr-pagination][data-gr-size='xs'] :is([data-gr-pagination-total], [data-gr-pagination-compact], [data-gr-pagination-jump], [data-gr-pagination-page], [data-gr-pagination-ellipsis], [data-gr-pagination-jumper]) {
+  font-size: var(--gr-text-xs);
+  line-height: var(--gr-leading-xs);
+}
+
+[data-gr-pagination][data-gr-size='xs'] :is([data-gr-pagination-page], [data-gr-pagination-ellipsis]) {
+  height: 1.75rem;
+  min-width: 1.75rem;
+  padding-inline: 0.375rem;
+}
+
+[data-gr-pagination][data-gr-size='xs'] [data-gr-pagination-ellipsis] {
+  padding-inline: 0.25rem;
+}
+
+[data-gr-pagination][data-gr-size='xs'] [data-gr-pagination-jumper] {
+  width: 3rem;
+  height: 1.75rem;
+}
+
+[data-gr-pagination][data-gr-size='xs'] [data-gr-pagination-page-size] {
+  min-width: 84px;
+}
+
+[data-gr-pagination][data-gr-size='sm'] {
+  gap: 0.5rem;
+}
+
+[data-gr-pagination][data-gr-size='sm'] :is([data-gr-pagination-nav], [data-gr-pagination-pages]) {
+  gap: 0.25rem;
+}
+
+[data-gr-pagination][data-gr-size='sm'] :is([data-gr-pagination-total], [data-gr-pagination-compact], [data-gr-pagination-jump], [data-gr-pagination-page], [data-gr-pagination-ellipsis], [data-gr-pagination-jumper]) {
+  font-size: var(--gr-text-xs);
+  line-height: var(--gr-leading-xs);
+}
+
+[data-gr-pagination][data-gr-size='sm'] :is([data-gr-pagination-page], [data-gr-pagination-ellipsis]) {
+  height: 2rem;
+  min-width: 2rem;
+  padding-inline: 0.5rem;
+}
+
+[data-gr-pagination][data-gr-size='sm'] [data-gr-pagination-ellipsis] {
+  padding-inline: 0.25rem;
+}
+
+[data-gr-pagination][data-gr-size='sm'] [data-gr-pagination-jumper] {
+  width: 3.5rem;
+  height: 2rem;
+}
+
+[data-gr-pagination][data-gr-size='sm'] [data-gr-pagination-page-size] {
+  min-width: 92px;
+}
+
+[data-gr-pagination][data-gr-size='md'] {
+  gap: 0.75rem;
+}
+
+[data-gr-pagination][data-gr-size='md'] :is([data-gr-pagination-nav], [data-gr-pagination-pages]) {
+  gap: 0.25rem;
+}
+
+[data-gr-pagination][data-gr-size='md'] :is([data-gr-pagination-total], [data-gr-pagination-compact], [data-gr-pagination-jump], [data-gr-pagination-page], [data-gr-pagination-ellipsis], [data-gr-pagination-jumper]) {
+  font-size: var(--gr-text-sm);
+  line-height: var(--gr-leading-sm);
+}
+
+[data-gr-pagination][data-gr-size='md'] :is([data-gr-pagination-page], [data-gr-pagination-ellipsis]) {
+  height: 2.5rem;
+  min-width: 2.5rem;
+  padding-inline: 0.5rem;
+}
+
+[data-gr-pagination][data-gr-size='md'] [data-gr-pagination-ellipsis] {
+  padding-inline: 0.25rem;
+}
+
+[data-gr-pagination][data-gr-size='md'] [data-gr-pagination-jumper] {
+  width: 3.5rem;
+  height: 2.5rem;
+}
+
+[data-gr-pagination][data-gr-size='md'] [data-gr-pagination-page-size] {
+  min-width: 100px;
+}
+
+[data-gr-pagination][data-gr-size='lg'] {
+  gap: 0.75rem;
+}
+
+[data-gr-pagination][data-gr-size='lg'] :is([data-gr-pagination-nav], [data-gr-pagination-pages]) {
+  gap: 0.25rem;
+}
+
+[data-gr-pagination][data-gr-size='lg'] :is([data-gr-pagination-total], [data-gr-pagination-compact], [data-gr-pagination-jump], [data-gr-pagination-page], [data-gr-pagination-ellipsis], [data-gr-pagination-jumper]) {
+  font-size: var(--gr-text-base);
+  line-height: var(--gr-leading-base);
+}
+
+[data-gr-pagination][data-gr-size='lg'] :is([data-gr-pagination-page], [data-gr-pagination-ellipsis]) {
+  height: 2.75rem;
+  min-width: 2.75rem;
+  padding-inline: 0.75rem;
+}
+
+[data-gr-pagination][data-gr-size='lg'] [data-gr-pagination-ellipsis] {
+  padding-inline: 0.5rem;
+}
+
+[data-gr-pagination][data-gr-size='lg'] [data-gr-pagination-jumper] {
+  width: 4rem;
+  height: 2.75rem;
+}
+
+[data-gr-pagination][data-gr-size='lg'] [data-gr-pagination-page-size] {
+  min-width: 112px;
+}
+</style>

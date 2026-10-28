@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest'
 
 import { GR_TONES } from '../../shared/tones'
+import { componentSheet, lookElement } from '../../../__tests__/componentSheet'
 import {
   derivedThemeVars,
-  getColorClassExpression,
   getColorDistance,
   getContrastRatio,
   readComponentThemeVars,
@@ -11,7 +11,7 @@ import {
   themeVarsByName,
   THEME_MODES,
 } from '../../../__tests__/cssContrast'
-import { badgeDotToneClass, darkToneClassByTone, lightToneClassByTone } from '../grBadgeStyles'
+import { grBadgeLookAttrs } from '../grBadgeStyles'
 
 /**
  * Контрастная гарантия для `GrBadge` — по образцу теста `GrButton`.
@@ -43,22 +43,26 @@ const MODES: BadgeMode[] = [
   { name: 'solid', dark: true },
 ]
 
-/**
- * Цвета берём из карты тонов, а не из собранного `grBadgeClass`: там есть
- * `text-[length:var(--gr-control-text-sm)]` из size-мапы, и обобщённый парсер `text-[` схватил бы размер
- * вместо цвета.
- */
+const { look } = componentSheet('GrBadge/GrBadge.vue')
+
+/** Вид метки из её листа: тот же каскад, что видит браузер. */
+function badgeLook(tone: (typeof GR_TONES)[number], dark: boolean) {
+  return look(lookElement('span', { 'data-gr-badge': '', ...grBadgeLookAttrs({ tone, size: 'sm', radius: 'round', dark }) }))
+}
+
 function badgeColors(tone: (typeof GR_TONES)[number], dark: boolean) {
-  const className = (dark ? darkToneClassByTone : lightToneClassByTone)[tone]
+  const style = badgeLook(tone, dark)
 
-  const text = getColorClassExpression(className, 'text-[')
-  const background = getColorClassExpression(className, 'bg-[')
+  return { text: style.color, background: style['background-color'], border: style['border-color'] }
+}
 
-  if (!text || !background) {
-    throw new Error(`GrBadge: не удалось извлечь цвета для ${dark ? 'solid' : 'soft'}/${tone}: ${className}`)
-  }
+/** Маркер на мягкой метке `badgeTone`; свой тон у него есть, только если отличается. */
+function dotColor(badgeTone: (typeof GR_TONES)[number], dotTone: (typeof GR_TONES)[number]) {
+  const badge = lookElement('span', { 'data-gr-badge': '', ...grBadgeLookAttrs({ tone: badgeTone, size: 'sm', radius: 'round' }) })
+  const dot = lookElement('span', { 'data-gr-badge-dot': '', 'data-gr-tone': dotTone === badgeTone ? undefined : dotTone })
+  badge.append(dot)
 
-  return { text, background }
+  return look(dot)['background-color']
 }
 
 describe('GrBadge · контраст', () => {
@@ -106,12 +110,9 @@ describe('GrBadge · контраст', () => {
 
       for (const tone of GR_TONES) {
         // soft: границу держит рамка — сама подложка от фона почти не отличается.
-        const softBorder = getColorClassExpression(lightToneClassByTone[tone], 'border-[')
+        const softBorder = badgeColors(tone, false).border
         // filled: границу держит заливка.
-        const solidFill = getColorClassExpression(darkToneClassByTone[tone], 'bg-[')
-
-        if (!softBorder || !solidFill)
-          throw new Error(`GrBadge: не удалось извлечь границы для ${tone}`)
+        const solidFill = badgeColors(tone, true).background
 
         for (const [mode, expression] of [['soft', softBorder], ['solid', solidFill]] as const) {
           const distance = getColorDistance(
@@ -128,13 +129,15 @@ describe('GrBadge · контраст', () => {
     expect(failures).toEqual([])
   })
 
-  it('ни одна карта тонов не содержит цвета вне токенов', () => {
+  it('ни один тон не красит литералом вне токенов', () => {
     // `text-white` в solid-карте был именно такой утечкой: литерал не знает
     // полярности заливки и не переживает смену темы.
-    for (const [name, map] of [['soft', lightToneClassByTone], ['solid', darkToneClassByTone]] as const) {
-      for (const [tone, className] of Object.entries(map)) {
-        expect(className, `${name}/${tone}`).not.toMatch(/\b(?:text|bg|border)-(?:white|black)\b/)
-        expect(className, `${name}/${tone}`).not.toMatch(/#[0-9a-f]{3,8}\b/i)
+    for (const dark of [false, true]) {
+      for (const tone of GR_TONES) {
+        for (const value of Object.values(badgeColors(tone, dark))) {
+          expect(value, `${dark ? 'solid' : 'soft'}/${tone}`).not.toMatch(/\b(?:white|black)\b/)
+          expect(value, `${dark ? 'solid' : 'soft'}/${tone}`).not.toMatch(/#[0-9a-f]{3,8}\b/i)
+        }
       }
     }
   })
@@ -157,14 +160,10 @@ describe('GrBadge · контраст точки-маркера', () => {
       const vars = { ...themeVarsByName[theme], ...readComponentThemeVars('GrBadge', theme) }
 
       for (const badgeTone of GR_TONES) {
-        const background = getColorClassExpression(lightToneClassByTone[badgeTone], 'bg-[')
-        if (!background)
-          throw new Error(`GrBadge: не удалось извлечь подложку для ${badgeTone}`)
+        const background = badgeColors(badgeTone, false).background
 
         for (const dotTone of GR_TONES) {
-          const dot = getColorClassExpression(badgeDotToneClass[dotTone], 'bg-[')
-          if (!dot)
-            throw new Error(`GrBadge: не удалось извлечь цвет маркера ${dotTone}`)
+          const dot = dotColor(badgeTone, dotTone)
 
           const ratio = getContrastRatio(
             resolveColorExpression(dot, vars, derivedThemeVars),

@@ -7,6 +7,36 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+
+- **Вид повторяющихся компонентов — лист по атрибутам, а не утилиты**, как у `GrButton` в 3.3.0
+  (`docs/markup-weight.md`). Переведены `GrBadge`, `GrChip`, `GrCheckbox`, `GrSwitch`, `GrRadio`,
+  `GrTabs`, `GrPagination` и `GrSegmented`.
+  - Экземпляр несёт только состояние: `data-gr-size`, `data-gr-tone`, `data-gr-variant` и флаги.
+    Всё, что в разметке уже есть, — `aria-checked`, `aria-selected`, `aria-current`, `aria-disabled`,
+    `aria-invalid`, `:disabled` — лист читает напрямую.
+  - Ушли строки классов, инлайн-переменные `GrSwitch` и `GrSegmented`, скрытый инлайн-стиль
+    нативного поля `GrCheckbox` и атрибуты `scoped`-стиля `GrBadge`.
+  - Палитру тонов и радиусы `GrChip` берёт у листа `GrBadge`: в одном ряду они обязаны совпадать.
+  - Вычисленные стили каждого компонента совпадают с прежними до свойства, кроме кривой переходов
+    и двух исправлений `GrSegmented` ниже: сверены все состояния в четырёх темах и обоих режимах.
+  - Классы-маркеры `gr-badge`, `gr-badge__label`, `gr-badge__text` и `gr-checkbox-icon` убраны:
+    селектор метки — `[data-gr-badge]`. Вариант `GrSegmented` теперь в `data-gr-variant`, а не
+    в `data-variant`.
+  - Переходы цвета у `GrCheckbox`, `GrSwitch`, `GrRadio`, `GrTabs`, `GrPagination` и
+    `GrSegmented` идут по кривой темы `--gr-ease-out`, а не по кривой движка: так движение
+    задаёт дизайн-система (`motion.md`).
+  - Если тесты или стили приложения искали у этих компонентов классы, им теперь нужны атрибуты.
+
+### Fixed
+
+- **Подпись `GrSegmented` берёт вес из темы.** Утилита `font-[var(--gr-segmented-font-weight)]`
+  движок собирал в `font-family`, и `--gr-segmented-label-weight` не действовал: подписи стояли
+  обычным начертанием, а не semibold «Сланца» и medium «Глины».
+- **Недоступный сегмент `GrSegmented` гаснет.** Цвет `--gr-disabled-fg` проигрывал базовому цвету
+  сегмента: утилиты одной специфичности, и решал порядок в собранном CSS. Недоступный сегмент
+  выглядел рабочим и отличался только курсором.
+
 ## [v3.3.0] 2026-10-27
 
 ### Changed

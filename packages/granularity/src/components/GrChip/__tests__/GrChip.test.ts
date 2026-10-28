@@ -4,6 +4,9 @@ import { describe, expect, it } from 'vitest'
 
 import GrConfigProvider from '../../GrConfigProvider/GrConfigProvider.vue'
 import GrChip from '../GrChip.vue'
+import { componentSheet } from '../../../__tests__/componentSheet'
+
+const { look: chipLook } = componentSheet('GrBadge/GrBadge.vue', 'GrChip/GrChip.vue')
 
 /**
  * Главное, что проверяет этот файл, — **разметка меняется вместе с природой
@@ -138,14 +141,14 @@ describe('GrChip', () => {
     })
 
     const fromConfig = mount(Harness)
-    expect(fromConfig.get('[data-gr-chip]').attributes('class')).toContain('var(--gr-success-light)')
+    expect(chipLook(fromConfig.get('[data-gr-chip]').element)['background-color']).toBe('var(--gr-success-light)')
 
     const fromProp = mount(Harness, { props: { chipProps: { tone: 'danger' } } })
-    expect(fromProp.get('[data-gr-chip]').attributes('class')).toContain('var(--gr-danger-light)')
+    expect(chipLook(fromProp.get('[data-gr-chip]').element)['background-color']).toBe('var(--gr-danger-light)')
 
     // Без провайдера остаётся собственный дефолт компонента.
     const bare = mount(GrChip, { props: { label: 'A' } })
-    expect(bare.attributes('class')).toContain('var(--gr-muted)')
+    expect(chipLook(bare.element)['background-color']).toBe('var(--gr-muted)')
   })
 
   /**
@@ -160,14 +163,14 @@ describe('GrChip', () => {
       props: { label: 'A', tone: 'primary', selectable: true, selected: false },
     })
 
-    expect(wrapper.attributes('class')).toContain('var(--gr-accent)')
-    expect(wrapper.attributes('class')).not.toContain('--gr-badge-primary-bg')
+    expect(chipLook(wrapper.element)['background-color']).toBe('var(--gr-accent)')
+    expect(chipLook(wrapper.element)['font-weight']).toBeUndefined()
 
     await wrapper.setProps({ selected: true })
 
-    expect(wrapper.attributes('class')).toContain('--gr-badge-primary-bg')
+    expect(chipLook(wrapper.element)['background-color']).toBe('var(--gr-badge-primary-bg)')
     // Второй, нецветовой канал: одной заливки для WCAG 1.4.1 мало.
-    expect(wrapper.attributes('class')).toContain('font-600')
+    expect(chipLook(wrapper.element)['font-weight']).toBe('600')
   })
 
   it('иконка рендерится в своём узле перед подписью', () => {

@@ -26,7 +26,7 @@
 
 **Своего CSS-файла у компонента подключать не нужно.** У большинства компонентов
 собственного CSS нет вовсе, а у тех, у кого есть (`GrIcon`, `GrToaster`,
-`GrSplitter` и ещё восемнадцать), его `styles.css` granum берёт из манифеста
+`GrSplitter` и ещё двадцать шесть), его `styles.css` granum берёт из манифеста
 пакета в слой `granum.components`; JS-чанк компонента CSS не импортирует, поэтому
 двойной доставки нет. Subpath вида
 `@feugene/granularity/components/<Name>/styles.css` пакет не публикует —

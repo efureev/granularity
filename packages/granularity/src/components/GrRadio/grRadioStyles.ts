@@ -7,92 +7,25 @@ import {
 
 export type GrRadioVariant = 'radiobox' | 'button'
 
-export const grRadioEnabledClass = 'cursor-pointer'
+const flag = (on: boolean | undefined): '' | undefined => (on ? '' : undefined)
 
 /**
- * Отключённая кнопка-радио гасится, но НЕ теряет состояние: в отключённой
- * группе всё равно должно быть видно, что выбрано. Поэтому не отдаём вид
- * `GrButton`-у (его disabled состояние-слепой), а держим свою пару.
+ * Вид радио — атрибуты корня, а не классы (`docs/markup-weight.md`): ступень и
+ * «только для чтения». Выбор, недоступность и ошибку лист `GrRadio.vue` читает по
+ * `aria-checked`, `aria-disabled` и `aria-invalid` — они в разметке есть и так.
+ * Только для чтения у недоступного не ставится: недоступность сильнее.
  */
-export const grRadioButtonDisabledClass = 'cursor-not-allowed bg-transparent text-[var(--gr-muted-fg)] border border-[var(--gr-brd)]'
-export const grRadioButtonDisabledCheckedClass = 'cursor-not-allowed bg-[var(--gr-muted)] text-[var(--gr-fg)] border border-[var(--gr-muted-fg)]'
-
-/**
- * Отключённый переключатель гасится токенами, а не `opacity`: прозрачность
- * разбавляет выверенные на AA цвета текста.
- */
-export const grRadioRootDisabledClass = 'cursor-not-allowed text-[var(--gr-muted-fg)]'
-export const grRadioRootEnabledClass = 'group/radio cursor-pointer'
-/** Только для чтения: значение видно и читается, но курсор не обещает клика. */
-export const grRadioRootReadonlyClass = 'cursor-default'
-
-export const grRadioControlCheckedClass = 'border-[var(--gr-selected)] bg-[var(--gr-radio-checked-bg)]'
-/** Рамка невыбранного радио — `--gr-control-brd` с 3:1 к фону: другого признака у него нет. */
-/** Отклик на указатель над всей подписью; только у рабочего радио, см. `grRadioRootEnabledClass`. */
-export const grRadioControlCheckedHoverClass = 'group-hover/radio:border-[var(--gr-selected-hover)] group-hover/radio:bg-[var(--gr-radio-checked-hover-bg)]'
-export const grRadioControlUncheckedHoverClass = 'group-hover/radio:border-[var(--gr-control-brd-hover)]'
-export const grRadioControlUncheckedClass = 'border-[var(--gr-control-brd)] bg-[var(--gr-bg)]'
-export const grRadioControlDisabledClass = 'border-[var(--gr-brd)] bg-[var(--gr-muted)]'
-export const grRadioControlInvalidClass = 'border-[var(--gr-danger)] bg-[var(--gr-bg)]'
-
-export const grRadioDotCheckedClass = 'bg-[var(--gr-radio-dot)] opacity-100 scale-100'
-export const grRadioDotUncheckedClass = 'bg-transparent opacity-0 scale-75'
-export const grRadioDotDisabledClass = 'bg-[var(--gr-muted-fg)] opacity-100 scale-100'
-// Базовые классы «точки» внутри radiobox — нестандартный transition.
-export const grRadioDotBaseClass = 'rounded-[var(--gr-radius-full)] transition-[transform,opacity,background-color] duration-[var(--gr-duration-fast)]'
-
-/**
- * Ступени `radiobox`: коробка, точка и кегли подписи с описанием.
- *
- * До этого коробка была зашита `h-4 w-4` в шаблоне, а кегли — фиксированным
- * `--gr-text-sm`: вариант `radiobox` не масштабировался вовсе, хотя `size` у
- * компонента был и работал для варианта `button`. Ступени согласованы с высотой
- * кнопки (`grButtonStyles.sizes`: 28/32/40/44) — радио стоит в тех же формах.
- */
-export const grRadioControlSizes: Record<GrButtonSize, string> = {
-  xs: 'h-3.5 w-3.5',
-  sm: 'h-4 w-4',
-  md: 'h-5 w-5',
-  lg: 'h-6 w-6',
+export function grRadioLookAttrs(options: { size: GrButtonSize, disabled: boolean, readonly: boolean }): Record<string, string | undefined> {
+  return {
+    'data-gr-size': options.size,
+    'data-gr-readonly': flag(options.readonly && !options.disabled),
+  }
 }
-
-export const grRadioDotSizes: Record<GrButtonSize, string> = {
-  xs: 'h-[5px] w-[5px]',
-  sm: 'h-[6px] w-[6px]',
-  md: 'h-2 w-2',
-  lg: 'h-2.5 w-2.5',
-}
-
-const grRadioLabelTexts: Record<GrButtonSize, string> = {
-  xs: 'text-[length:var(--gr-text-xs)] leading-[var(--gr-leading-xs)]',
-  sm: 'text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)]',
-  md: 'text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)]',
-  lg: 'text-[length:var(--gr-text-base)] leading-[var(--gr-leading-base)]',
-}
-
-export const grRadioDescriptionSizes: Record<GrButtonSize, string> = {
-  xs: 'text-[length:var(--gr-text-2xs)] leading-[var(--gr-leading-2xs)] text-[var(--gr-muted-fg)]',
-  sm: 'text-[length:var(--gr-text-xs)] leading-[var(--gr-leading-xs)] text-[var(--gr-muted-fg)]',
-  md: 'text-[length:var(--gr-text-xs)] leading-[var(--gr-leading-xs)] text-[var(--gr-muted-fg)]',
-  lg: 'text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)] text-[var(--gr-muted-fg)]',
-}
-
-/** Выбранный вариант выделяется текстом, а не только точкой. */
-export const grRadioLabelCheckedColorClass = 'text-[var(--gr-fg)] font-500'
-export const grRadioLabelColorClass = 'text-[var(--gr-muted-fg)]'
-
-export function grRadioLabelClassFor(size: GrButtonSize, checked: boolean): string {
-  return [
-    grRadioLabelTexts[size],
-    checked ? grRadioLabelCheckedColorClass : grRadioLabelColorClass,
-  ].join(' ')
-}
-
-export const grRadioLabelSizes = grRadioLabelTexts
 
 export interface GrRadioButtonLookOptions {
   checked: boolean
   disabled: boolean
+  readonly: boolean
   size: GrButtonSize
   buttonVariant: GrButtonVariant
   buttonTone: GrButtonTone
@@ -103,52 +36,15 @@ export interface GrRadioButtonLookOptions {
 /**
  * Вид `button` — вид кнопки по атрибутам её листа. Недоступный переключатель
  * тона не получает: вес кнопки не включается, остаются основа и ступень, а цвета
- * ставят классы радио.
+ * недоступного ставит лист радио — выбор в недоступной группе обязан оставаться виден.
  */
 export function grRadioButtonLook(options: GrRadioButtonLookOptions): Record<string, string | undefined> {
-  return grButtonLookAttrs({
-    variant: options.checked ? options.selectedButtonVariant : options.buttonVariant,
-    tone: options.disabled ? undefined : options.checked ? options.selectedButtonTone : options.buttonTone,
-    size: options.size,
-  })
-}
-
-/** Классы радио поверх вида кнопки: курсор и цвета недоступного. */
-export function grRadioButtonClass(options: { checked: boolean, disabled: boolean, readonly: boolean }): string {
-  if (options.disabled)
-    return options.checked ? grRadioButtonDisabledCheckedClass : grRadioButtonDisabledClass
-
-  return options.readonly ? grRadioRootReadonlyClass : grRadioEnabledClass
-}
-
-export function grRadioRootClass(options: { disabled: boolean, readonly: boolean }): string {
-  if (options.disabled)
-    return grRadioRootDisabledClass
-  return options.readonly ? grRadioRootReadonlyClass : grRadioRootEnabledClass
-}
-
-export function grRadioControlClass(options: {
-  checked: boolean
-  disabled: boolean
-  invalid: boolean
-  size: GrButtonSize
-}): string {
-  const state = options.disabled
-    ? grRadioControlDisabledClass
-    : options.invalid && !options.checked
-      ? grRadioControlInvalidClass
-      : options.checked ? grRadioControlCheckedClass : grRadioControlUncheckedClass
-
-  const hover = options.disabled || options.invalid
-    ? ''
-    : options.checked ? grRadioControlCheckedHoverClass : grRadioControlUncheckedHoverClass
-
-  return [grRadioControlSizes[options.size], state, hover].filter(Boolean).join(' ')
-}
-
-export function grRadioDotClass(options: { checked: boolean, disabled: boolean }): string {
-  if (!options.checked)
-    return grRadioDotUncheckedClass
-
-  return options.disabled ? grRadioDotDisabledClass : grRadioDotCheckedClass
+  return {
+    ...grButtonLookAttrs({
+      variant: options.checked ? options.selectedButtonVariant : options.buttonVariant,
+      tone: options.disabled ? undefined : options.checked ? options.selectedButtonTone : options.buttonTone,
+      size: options.size,
+    }),
+    'data-gr-readonly': flag(options.readonly && !options.disabled),
+  }
 }

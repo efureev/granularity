@@ -6,6 +6,11 @@ import { granularityGlobal } from '../../../testing'
 
 import GrFormField from '../../GrFormField/GrFormField.vue'
 import GrSegmented from '../GrSegmented.vue'
+import { componentSheet } from '../../../__tests__/componentSheet'
+
+const { cascade, look } = componentSheet('GrSegmented/GrSegmented.vue')
+/** Объявления листа на корне — формулы как написаны, без подстановки. */
+const declared = (wrapper: { get: (selector: string) => { element: Element } }) => cascade(wrapper.get('[data-gr-segmented]').element)
 
 const options = [
   { value: 'list', label: 'List' },
@@ -98,7 +103,7 @@ describe('GrSegmented', () => {
 
     const group = wrapper.get('[role="radiogroup"]')
     expect(group.attributes('aria-label')).toBe('View mode')
-    expect(group.attributes('data-variant')).toBe('pills')
+    expect(group.attributes('data-gr-variant')).toBe('pills')
 
     const radios = wrapper.findAll('[role="radio"]')
     expect(radios).toHaveLength(3)
@@ -217,9 +222,8 @@ describe('GrSegmented', () => {
     await nextTick()
 
     const group = wrapper.get('[data-gr-segmented]')
-    expect(group.attributes('data-variant')).toBe('button')
-    expect(group.attributes('class')).toContain('w-full')
-    expect(group.attributes('style')).toContain('grid-template-columns: minmax(0,1fr) minmax(0,1fr) minmax(0,1fr)')
+    expect(group.attributes('data-gr-variant')).toBe('button')
+    expect(cascade(group.element)).toMatchObject({ 'width': '100%', 'grid-auto-columns': 'minmax(0, 1fr)' })
   })
 
   it('itemWidth="content" делит ширину по содержимому, а не поровну', async () => {
@@ -236,13 +240,10 @@ describe('GrSegmented', () => {
     })
     await nextTick()
 
-    const style = wrapper.get('[data-gr-segmented]').attributes('style')!
-    expect(style).not.toContain('1fr')
     // Минимум трека — ноль: у однострочной подписи `min-content` равен
     // `max-content`, и трек с таким минимумом не сжимался — ряд вылезал за
     // контейнер. Само сжатие меряет `apps/showcase/e2e/interaction.spec.ts`.
-    expect(style).toContain('grid-template-columns: minmax(0,auto) minmax(0,auto) minmax(0,auto)')
-    expect(style).not.toContain('min-content')
+    expect(declared(wrapper)['grid-auto-columns']).toBe('minmax(0, auto)')
 
     wrapper.unmount()
   })
@@ -258,8 +259,7 @@ describe('GrSegmented', () => {
     })
     await nextTick()
 
-    expect(withMode.get('[data-gr-segmented]').attributes('style'))
-      .toBe(plain.get('[data-gr-segmented]').attributes('style'))
+    expect(declared(withMode)).toEqual(declared(plain))
 
     plain.unmount()
     withMode.unmount()
@@ -281,8 +281,7 @@ describe('GrSegmented', () => {
     })
     await nextTick()
 
-    expect(withMode.get('[data-gr-segmented]').attributes('style'))
-      .toBe(plain.get('[data-gr-segmented]').attributes('style'))
+    expect(declared(withMode)).toEqual(declared(plain))
 
     plain.unmount()
     withMode.unmount()
@@ -295,7 +294,7 @@ describe('GrSegmented', () => {
     })
     await nextTick()
 
-    expect(wrapper.get('[data-gr-segmented]').attributes('style')).toContain('minmax(0,auto)')
+    expect(declared(wrapper)['grid-auto-columns']).toBe('minmax(0, auto)')
 
     wrapper.unmount()
   })
@@ -308,9 +307,7 @@ describe('GrSegmented', () => {
       },
     })
 
-    const style = wrapper.get('[data-gr-segmented]').attributes('style')
-
-    expect(style).toContain('--gr-segmented-indicator-shadow: var(--gr-shadow-1), var(--gr-segmented-indicator-highlight-shadow)')
+    expect(declared(wrapper)['--gr-segmented-indicator-shadow']).toBe('var(--gr-shadow-1), var(--gr-segmented-indicator-highlight-shadow)')
   })
 
   it('использует одинаковый inset трека и компактные size-токены для sm и xs', () => {
@@ -330,31 +327,15 @@ describe('GrSegmented', () => {
       },
     })
 
-    const smStyle = smWrapper.get('[data-gr-segmented]').attributes('style')
-    const xsStyle = xsWrapper.get('[data-gr-segmented]').attributes('style')
-    const mdStyle = mount(GrSegmented, {
-      props: {
-        modelValue: 'board',
-        size: 'md',
-        options: [...options],
-      },
-    }).get('[data-gr-segmented]').attributes('style')
-    const lgStyle = mount(GrSegmented, {
-      props: {
-        modelValue: 'board',
-        size: 'lg',
-        options: [...options],
-      },
-    }).get('[data-gr-segmented]').attributes('style')
+    const smStyle = declared(smWrapper)
+    const xsStyle = declared(xsWrapper)
+    const mdStyle = declared(mount(GrSegmented, { props: { modelValue: 'board', size: 'md', options: [...options] } }))
+    const lgStyle = declared(mount(GrSegmented, { props: { modelValue: 'board', size: 'lg', options: [...options] } }))
 
-    expect(smStyle).toContain('--gr-segmented-padding: 4px')
-    expect(smStyle).toContain('--gr-segmented-font-size: 0.75rem')
-    expect(smStyle).toContain('--gr-segmented-min-height: 22px')
-    expect(xsStyle).toContain('--gr-segmented-padding: 4px')
-    expect(xsStyle).toContain('--gr-segmented-item-px: 10px')
-    expect(xsStyle).toContain('--gr-segmented-min-height: 18px')
-    expect(mdStyle).toContain('--gr-segmented-padding: 4px')
-    expect(lgStyle).toContain('--gr-segmented-padding: 4px')
+    expect(smStyle).toMatchObject({ '--gr-segmented-padding': '4px', '--gr-segmented-font-size': '0.75rem', '--gr-segmented-min-height': '22px' })
+    expect(xsStyle).toMatchObject({ '--gr-segmented-padding': '4px', '--gr-segmented-item-px': '10px', '--gr-segmented-min-height': '18px' })
+    expect(mdStyle['--gr-segmented-padding']).toBe('4px')
+    expect(lgStyle['--gr-segmented-padding']).toBe('4px')
   })
 
   it('обновляет индикатор при controlled update без сброса в ноль', async () => {
@@ -447,8 +428,8 @@ describe('GrSegmented — readonly и недоступность', () => {
     })
 
     expect(wrapper.html()).not.toMatch(/opacity-\d/)
-    expect(wrapper.get('[role="radiogroup"]').classes()).toContain('text-[var(--gr-disabled-fg)]')
-    expect(wrapper.findAll('[data-gr-segmented-item]')[1].classes()).toContain('text-[var(--gr-disabled-fg)]')
+    expect(look(wrapper.get('[role="radiogroup"]').element).color).toBe('var(--gr-disabled-fg)')
+    expect(look(wrapper.findAll('[data-gr-segmented-item]')[1].element).color).toBe('var(--gr-disabled-fg)')
   })
 })
 
@@ -515,9 +496,8 @@ describe('GrSegmented — ориентация', () => {
     const root = wrapper.get('[data-gr-segmented]')
 
     expect(root.attributes('aria-orientation')).toBe('horizontal')
-    expect(root.classes()).toContain('grid-flow-col')
-    expect(root.attributes('style')).toContain('grid-template-columns: minmax(0,max-content) minmax(0,max-content) minmax(0,max-content)')
-    expect(root.attributes('style')).not.toContain('grid-template-rows')
+    expect(cascade(root.element)).toMatchObject({ 'grid-auto-flow': 'column', 'grid-auto-columns': 'minmax(0, max-content)' })
+    expect(cascade(root.element)['grid-auto-rows']).toBeUndefined()
   })
 
   it('vertical разворачивает ряд в колонку и объявляет ориентацию', () => {
@@ -527,12 +507,12 @@ describe('GrSegmented — ориентация', () => {
     const root = wrapper.get('[data-gr-segmented]')
 
     expect(root.attributes('aria-orientation')).toBe('vertical')
-    expect(root.classes()).toContain('grid-flow-row')
-    expect(root.classes()).not.toContain('grid-flow-col')
-
     // Колонка одна: сегменты одинаковой ширины по построению, а не по `block`.
-    expect(root.attributes('style')).toContain('grid-template-columns: minmax(0,1fr)')
-    expect(root.attributes('style')).toContain('grid-template-rows: minmax(0,max-content) minmax(0,max-content) minmax(0,max-content)')
+    expect(cascade(root.element)).toMatchObject({
+      'grid-auto-flow': 'row',
+      'grid-template-columns': 'minmax(0, 1fr)',
+      'grid-auto-rows': 'minmax(0, max-content)',
+    })
   })
 
   it('block в вертикали занимает ширину контейнера, но колонку не множит', () => {
@@ -541,14 +521,13 @@ describe('GrSegmented — ориентация', () => {
     })
     const root = wrapper.get('[data-gr-segmented]')
 
-    expect(root.classes()).toContain('w-full')
-    expect(root.attributes('style')).toContain('grid-template-columns: minmax(0,1fr)')
+    expect(cascade(root.element)).toMatchObject({ 'width': '100%', 'grid-template-columns': 'minmax(0, 1fr)' })
   })
 
   it('без пропа дорожка остаётся пилюлей — это дефолт сегментов, а не пакета', () => {
     const wrapper = mount(GrSegmented, { props: { modelValue: 'list', options: [...options] } })
 
-    expect(wrapper.get('[data-gr-segmented]').attributes('style')).toContain('--gr-segmented-radius: 9999px')
+    expect(declared(wrapper)['--gr-segmented-radius']).toBe('9999px')
   })
 
   it('shape="box" даёт то же скругление, что у полей ввода', () => {
@@ -556,9 +535,7 @@ describe('GrSegmented — ориентация', () => {
       props: { modelValue: 'list', options: [...options], shape: 'box' },
     })
 
-    const style = wrapper.get('[data-gr-segmented]').attributes('style')
-    expect(style).toContain('--gr-segmented-radius: var(--gr-radius-control)')
-    expect(style).not.toContain('9999px')
+    expect(declared(wrapper)['--gr-segmented-radius']).toBe('var(--gr-radius-control)')
   })
 
   it('в вертикали пилюля считается формулой, а `box` — нет', () => {
@@ -568,14 +545,12 @@ describe('GrSegmented — ориентация', () => {
     const pill = mount(GrSegmented, {
       props: { modelValue: 'list', options: [...options], orientation: 'vertical' },
     })
-    expect(pill.get('[data-gr-segmented]').attributes('style'))
-      .toContain('--gr-segmented-radius: calc(var(--gr-segmented-min-height) / 2 + var(--gr-segmented-padding))')
+    expect(declared(pill)['--gr-segmented-radius']).toBe('calc(var(--gr-segmented-min-height) / 2 + var(--gr-segmented-padding))')
 
     const box = mount(GrSegmented, {
       props: { modelValue: 'list', options: [...options], orientation: 'vertical', shape: 'box' },
     })
-    expect(box.get('[data-gr-segmented]').attributes('style'))
-      .toContain('--gr-segmented-radius: var(--gr-radius-control)')
+    expect(declared(box)['--gr-segmented-radius']).toBe('var(--gr-radius-control)')
   })
 
   it('форма приходит и из componentDefaults, а локальный проп её перебивает', () => {
@@ -583,15 +558,13 @@ describe('GrSegmented — ориентация', () => {
       props: { modelValue: 'list', options: [...options] },
       global: granularityGlobal({ componentDefaults: { GrSegmented: { shape: 'box' } } }),
     })
-    expect(withDefault.get('[data-gr-segmented]').attributes('style'))
-      .toContain('--gr-segmented-radius: var(--gr-radius-control)')
+    expect(declared(withDefault)['--gr-segmented-radius']).toBe('var(--gr-radius-control)')
 
     const overridden = mount(GrSegmented, {
       props: { modelValue: 'list', options: [...options], shape: 'pill' },
       global: granularityGlobal({ componentDefaults: { GrSegmented: { shape: 'box' } } }),
     })
-    expect(overridden.get('[data-gr-segmented]').attributes('style'))
-      .toContain('--gr-segmented-radius: 9999px')
+    expect(declared(overridden)['--gr-segmented-radius']).toBe('9999px')
   })
 
   it('сегмент внутри считает радиус от дорожки в обеих формах', () => {
@@ -601,17 +574,19 @@ describe('GrSegmented — ориентация', () => {
       const wrapper = mount(GrSegmented, {
         props: { modelValue: 'list', options: [...options], shape },
       })
-      expect(wrapper.findAll('[role="radio"]')[0].classes().join(' '))
-        .toContain('rounded-[calc(var(--gr-segmented-radius)-var(--gr-segmented-padding))]')
+      expect(cascade(wrapper.findAll('[role="radio"]')[0].element)['border-radius'])
+        .toBe('calc(var(--gr-segmented-radius) - var(--gr-segmented-padding))')
     }
   })
 
   it('пустой список опций не оставляет треков ни в одной ориентации', () => {
+    // Треки неявные — по одному на сегмент: без сегментов их нет, явного шаблона под ряд тоже.
     const horizontal = mount(GrSegmented, { props: { modelValue: '', options: [] } })
-    expect(horizontal.get('[data-gr-segmented]').attributes('style')).toContain('grid-template-columns: none')
+    expect(horizontal.findAll('[data-gr-segmented-item]')).toHaveLength(0)
+    expect(declared(horizontal)['grid-template-columns']).toBeUndefined()
 
     const vertical = mount(GrSegmented, { props: { modelValue: '', options: [], orientation: 'vertical' } })
-    expect(vertical.get('[data-gr-segmented]').attributes('style')).toContain('grid-template-rows: none')
+    expect(declared(vertical)['grid-template-rows']).toBeUndefined()
   })
 
   it('в вертикали работают обе оси стрелок — так требует APG для radiogroup', async () => {
@@ -658,16 +633,14 @@ describe('GrSegmented — ориентация', () => {
 describe('GrSegmented — радиус дорожки', () => {
   it('горизонталь остаётся пилюлей, вертикаль считает радиус от высоты сегмента', () => {
     const horizontal = mount(GrSegmented, { props: { modelValue: 'list', options: [...options] } })
-    expect(horizontal.get('[data-gr-segmented]').attributes('style')).toContain('--gr-segmented-radius: 9999px')
+    expect(declared(horizontal)['--gr-segmented-radius']).toBe('9999px')
 
     // `9999px` выверен под короткий ряд: на высокой колонке он превращает
     // дорожку в эллипс.
     const vertical = mount(GrSegmented, {
       props: { modelValue: 'list', options: [...options], orientation: 'vertical' },
     })
-    const style = vertical.get('[data-gr-segmented]').attributes('style')
-    expect(style).toContain('--gr-segmented-radius: calc(var(--gr-segmented-min-height) / 2 + var(--gr-segmented-padding))')
-    expect(style).not.toContain('--gr-segmented-radius: 9999px')
+    expect(declared(vertical)['--gr-segmented-radius']).toBe('calc(var(--gr-segmented-min-height) / 2 + var(--gr-segmented-padding))')
   })
 })
 
@@ -776,16 +749,15 @@ describe('GrSegmented — обрезанная подпись', () => {
  * `apps/showcase/e2e/interaction.spec.ts` в обеих темах; здесь — роли.
  */
 describe('GrSegmented — состояние ошибки', () => {
-  const INVALID_TRACK = '--gr-segmented-track-brd: var(--gr-segmented-invalid-brd, var(--gr-invalid-brd))'
-  const INVALID_RING = '--gr-ring: var(--gr-invalid-ring)'
+  const INVALID_TRACK = 'var(--gr-segmented-invalid-brd, var(--gr-invalid-brd))'
+  const INVALID_RING = 'var(--gr-invalid-ring)'
 
   it('`invalid` красит рамку дорожки и кольцо фокуса ролями ошибки', () => {
     const wrapper = mount(GrSegmented, { props: { modelValue: '', invalid: true, options: [...options] } })
     const root = wrapper.get('[data-gr-segmented]')
 
     expect(root.attributes('aria-invalid')).toBe('true')
-    expect(root.attributes('style')).toContain(INVALID_TRACK)
-    expect(root.attributes('style')).toContain(INVALID_RING)
+    expect(cascade(root.element)).toMatchObject({ '--gr-segmented-track-brd': INVALID_TRACK, '--gr-ring': INVALID_RING })
   })
 
   it('ошибка `GrFormField` доходит до дорожки так же', () => {
@@ -794,15 +766,13 @@ describe('GrSegmented — состояние ошибки', () => {
       slots: { default: () => h(GrSegmented, { modelValue: '', options: [...options] }) },
     })
 
-    expect(wrapper.get('[data-gr-segmented]').attributes('style')).toContain(INVALID_TRACK)
+    expect(declared(wrapper)['--gr-segmented-track-brd']).toBe(INVALID_TRACK)
   })
 
   it('без ошибки рамка обычная', () => {
     const wrapper = mount(GrSegmented, { props: { modelValue: '', options: [...options] } })
-    const style = wrapper.get('[data-gr-segmented]').attributes('style')!
-
-    expect(style).toContain('--gr-segmented-track-brd: var(--gr-brd)')
-    expect(style).not.toContain('--gr-ring')
+    expect(declared(wrapper)['--gr-segmented-track-brd']).toBe('var(--gr-brd)')
+    expect(declared(wrapper)['--gr-ring']).toBeUndefined()
   })
 })
 
@@ -811,13 +781,9 @@ describe('GrSegmented — выравнивание содержимого сег
     const row = mount(GrSegmented, { props: { modelValue: 'list', options: [...options] } })
     const column = mount(GrSegmented, { props: { modelValue: 'list', orientation: 'vertical', options: [...options] } })
 
-    for (const radio of row.findAll('[role="radio"]')) {
-      expect(radio.classes()).toContain('justify-center')
-      expect(radio.classes()).not.toContain('justify-start')
-    }
-    for (const radio of column.findAll('[role="radio"]')) {
-      expect(radio.classes()).toContain('justify-start')
-      expect(radio.classes()).not.toContain('justify-center')
-    }
+    for (const radio of row.findAll('[role="radio"]'))
+      expect(cascade(radio.element)['justify-content']).toBe('center')
+    for (const radio of column.findAll('[role="radio"]'))
+      expect(cascade(radio.element)['justify-content']).toBe('flex-start')
   })
 })

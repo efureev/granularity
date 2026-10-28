@@ -22,6 +22,9 @@ import { GRANULARITY_I18N_KEY } from '../../../i18n/adapter'
 import { useGranularityTranslations } from '../../../internal/granularityI18n'
 import { resetUnsupportedSizeWarnings, themeComponentDefaults, useGrComponentProp, useGrComponentSize, useGrConfig } from '../../shared/configContext'
 import { resetGrZIndexOwner } from '../zIndexScale'
+import { componentSheet } from '../../../__tests__/componentSheet'
+
+const { look: badgeLook } = componentSheet('GrBadge/GrBadge.vue')
 
 // Тестовый потребитель конфига: рендерит разрешённый размер и дефолтные пропсы.
 const Consumer = defineComponent({
@@ -216,7 +219,7 @@ describe('componentDefaults: дефолтные пропсы по компоне
       { GrBadge: { tone: 'success', radius: 'square' } },
       () => h(GrBadge, null, { default: () => 'New' }),
     )
-    expect(badge.get('.gr-badge').classes().join(' ')).toContain('var(--gr-success-light)')
+    expect(badgeLook(badge.get('[data-gr-badge]').element)['background-color']).toBe('var(--gr-success-light)')
 
     const input = mountWithDefaults(
       { GrInput: { clearable: true } },

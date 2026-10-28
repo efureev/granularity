@@ -432,6 +432,48 @@ export const grComponentTokens: GrComponentToken[] = [
     "description": "Сила рамки мягкой метки и чипа: 100% — рамка тона, 0% — рамки не видно."
   },
   {
+    "owner": "GrBadge",
+    "name": "--gr-badge-tone-soft-bg",
+    "kind": "css",
+    "default": "`--gr-<тон>-light`; у `primary` — `--gr-accent`, у `neutral` — `--gr-muted`",
+    "description": "Подложка мягкого вида. Ставит правило тона в листе `GrBadge` по `data-gr-tone` — на корне бейджа, маркера и `GrChip`; вид читает одну переменную вместо копии на каждый тон."
+  },
+  {
+    "owner": "GrBadge",
+    "name": "--gr-badge-tone-soft-fg",
+    "kind": "css",
+    "default": "`--gr-<тон>-text`; у `primary` — `--gr-accent-fg`, у `neutral` — `--gr-fg`",
+    "description": "Текст мягкого вида. Ставит правило тона в листе `GrBadge` по `data-gr-tone` — на корне бейджа, маркера и `GrChip`; вид читает одну переменную вместо копии на каждый тон."
+  },
+  {
+    "owner": "GrBadge",
+    "name": "--gr-badge-tone-soft-brd",
+    "kind": "css",
+    "default": "`color-mix(in srgb, var(--gr-<тон>) 30%, var(--gr-<тон>-light))`; у `neutral` — `--gr-brd`",
+    "description": "Цвет рамки мягкого вида до смешения с подложкой по `--gr-badge-light-brd`. Ставит правило тона в листе `GrBadge` по `data-gr-tone` — на корне бейджа, маркера и `GrChip`; вид читает одну переменную вместо копии на каждый тон."
+  },
+  {
+    "owner": "GrBadge",
+    "name": "--gr-badge-tone-bg",
+    "kind": "css",
+    "default": "`--gr-badge-<тон>-bg`",
+    "description": "Заливка (`dark`, выбранный чип) и маркер на мягкой подложке. Ставит правило тона в листе `GrBadge` по `data-gr-tone` — на корне бейджа, маркера и `GrChip`; вид читает одну переменную вместо копии на каждый тон."
+  },
+  {
+    "owner": "GrBadge",
+    "name": "--gr-badge-tone-fg",
+    "kind": "css",
+    "default": "`--gr-badge-<тон>-fg`",
+    "description": "Текст на заливке. Ставит правило тона в листе `GrBadge` по `data-gr-tone` — на корне бейджа, маркера и `GrChip`; вид читает одну переменную вместо копии на каждый тон."
+  },
+  {
+    "owner": "GrBadge",
+    "name": "--gr-badge-tone-brd",
+    "kind": "css",
+    "default": "`--gr-badge-<тон>-bg`; у `neutral` — `color-mix(in srgb, var(--gr-fg) 35%, var(--gr-brd))`",
+    "description": "Рамка на заливке. Ставит правило тона в листе `GrBadge` по `data-gr-tone` — на корне бейджа, маркера и `GrChip`; вид читает одну переменную вместо копии на каждый тон."
+  },
+  {
     "owner": "GrBadgeWrap",
     "name": "--gr-badge-wrap-offset-x",
     "kind": "hook",
@@ -3237,16 +3279,16 @@ export const grComponentTokens: GrComponentToken[] = [
   {
     "owner": "GrSegmented",
     "name": "--gr-segmented-track-bg",
-    "kind": "inline",
+    "kind": "css",
     "default": "var(--gr-muted); в варианте `button` — var(--gr-card)",
-    "description": "Фон дорожки переключателя."
+    "description": "Фон дорожки переключателя. Ставит лист компонента по атрибутам корня."
   },
   {
     "owner": "GrSegmented",
     "name": "--gr-segmented-track-brd",
-    "kind": "inline",
+    "kind": "css",
     "default": "var(--gr-brd)",
-    "description": "Цвет рамки дорожки."
+    "description": "Цвет рамки дорожки. Ставит лист компонента по атрибутам корня."
   },
   {
     "owner": "GrSegmented",
@@ -3258,30 +3300,30 @@ export const grComponentTokens: GrComponentToken[] = [
   {
     "owner": "GrSegmented",
     "name": "--gr-segmented-track-shadow",
-    "kind": "inline",
+    "kind": "css",
     "default": "none; в варианте `button` — var(--gr-shadow-1)",
-    "description": "Тень дорожки."
+    "description": "Тень дорожки. Ставит лист компонента по атрибутам корня."
   },
   {
     "owner": "GrSegmented",
     "name": "--gr-segmented-indicator-bg",
-    "kind": "inline",
+    "kind": "css",
     "default": "var(--gr-card); в варианте `button` — var(--gr-selected)",
-    "description": "Заливка бегунка под выбранным пунктом."
+    "description": "Заливка бегунка под выбранным пунктом. Ставит лист компонента по атрибутам корня."
   },
   {
     "owner": "GrSegmented",
     "name": "--gr-segmented-indicator-brd",
-    "kind": "inline",
+    "kind": "css",
     "default": "подмес `--gr-fg` к фону дорожки",
-    "description": "Цвет рамки бегунка."
+    "description": "Цвет рамки бегунка. Ставит лист компонента по атрибутам корня."
   },
   {
     "owner": "GrSegmented",
     "name": "--gr-segmented-indicator-shadow",
-    "kind": "inline",
+    "kind": "css",
     "default": "var(--gr-shadow-1); в варианте `button` — var(--gr-shadow-2)",
-    "description": "Тень бегунка — она отделяет его от дорожки."
+    "description": "Тень бегунка — она отделяет его от дорожки. Ставит лист компонента по атрибутам корня."
   },
   {
     "owner": "GrSegmented",
@@ -3293,79 +3335,79 @@ export const grComponentTokens: GrComponentToken[] = [
   {
     "owner": "GrSegmented",
     "name": "--gr-segmented-item-color",
-    "kind": "inline",
+    "kind": "css",
     "default": "var(--gr-muted-fg)",
-    "description": "Цвет невыбранного пункта."
+    "description": "Цвет невыбранного пункта. Ставит лист компонента по атрибутам корня."
   },
   {
     "owner": "GrSegmented",
     "name": "--gr-segmented-item-hover-color",
-    "kind": "inline",
+    "kind": "css",
     "default": "var(--gr-fg)",
-    "description": "Цвет пункта под курсором."
+    "description": "Цвет пункта под курсором. Ставит лист компонента по атрибутам корня."
   },
   {
     "owner": "GrSegmented",
     "name": "--gr-segmented-item-selected-color",
-    "kind": "inline",
+    "kind": "css",
     "default": "var(--gr-fg); в варианте `button` — var(--gr-selected-fg)",
-    "description": "Цвет выбранного пункта."
+    "description": "Цвет выбранного пункта. Ставит лист компонента по атрибутам корня."
   },
   {
     "owner": "GrSegmented",
     "name": "--gr-segmented-item-px",
-    "kind": "inline",
+    "kind": "css",
     "default": "10px / 12px / 14px / 16px по ступеням `xs…lg`",
-    "description": "Горизонтальные поля пункта."
+    "description": "Горизонтальные поля пункта. Ставит лист компонента по атрибутам корня."
   },
   {
     "owner": "GrSegmented",
     "name": "--gr-segmented-item-py",
-    "kind": "inline",
-    "default": "2px / 4px / 6px / 8px по ступеням `xs…lg`",
-    "description": "Вертикальные поля пункта."
+    "kind": "css",
+    "default": "1px / 3px / 5px / 7px по ступеням `xs…lg`",
+    "description": "Вертикальные поля пункта. Ставит лист компонента по атрибутам корня."
   },
   {
     "owner": "GrSegmented",
     "name": "--gr-segmented-min-height",
-    "kind": "inline",
-    "default": "20px / 24px / 32px / 36px по ступеням `xs…lg`",
-    "description": "Минимальная высота дорожки: переключатель обязан вставать в строку с контролами той же ступени."
+    "kind": "css",
+    "default": "18px / 22px / 30px / 34px по ступеням `xs…lg`",
+    "description": "Минимальная высота дорожки: переключатель обязан вставать в строку с контролами той же ступени. Ставит лист компонента по атрибутам корня."
   },
   {
     "owner": "GrSegmented",
     "name": "--gr-segmented-padding",
-    "kind": "inline",
+    "kind": "css",
     "default": "4px",
-    "description": "Внутренний отступ дорожки вокруг бегунка."
+    "description": "Внутренний отступ дорожки вокруг бегунка. Ставит лист компонента по атрибутам корня."
   },
   {
     "owner": "GrSegmented",
     "name": "--gr-segmented-radius",
-    "kind": "inline",
+    "kind": "css",
     "default": "9999px",
-    "description": "Скругление дорожки и бегунка."
+    "description": "Скругление дорожки и бегунка. Ставит лист компонента по атрибутам корня."
   },
   {
     "owner": "GrSegmented",
     "name": "--gr-segmented-font-size",
-    "kind": "inline",
+    "kind": "css",
     "default": "0.75rem / 0.875rem / 0.9375rem по ступеням",
-    "description": "Кегль подписи пункта."
+    "description": "Кегль подписи пункта. Ставит лист компонента по атрибутам корня."
   },
   {
     "owner": "GrSegmented",
     "name": "--gr-segmented-font-weight",
-    "kind": "inline",
+    "kind": "css",
     "default": "var(--gr-segmented-label-weight)",
-    "description": "Начертание подписи пункта."
+    "description": "Начертание подписи пункта. Ставит лист компонента по атрибутам корня."
   },
   {
     "owner": "GrSegmented",
     "name": "--gr-segmented-line-height",
-    "kind": "inline",
+    "kind": "css",
     "default": "1rem / 1.25rem по ступеням",
-    "description": "Межстрочный интервал подписи пункта."
+    "description": "Межстрочный интервал подписи пункта. Ставит лист компонента по атрибутам корня."
   },
   {
     "owner": "GrSegmented",
@@ -3672,16 +3714,16 @@ export const grComponentTokens: GrComponentToken[] = [
   {
     "owner": "GrSwitch",
     "name": "--gr-switch-track-bg",
-    "kind": "inline",
-    "default": "var(--gr-selected) во включённом состоянии, var(--gr-switch-off-bg) в выключенном, var(--gr-disabled-bg) в недоступном",
-    "description": "Заливка дорожки переключателя."
+    "kind": "css",
+    "default": "var(--gr-switch-off-bg) в выключенном состоянии, var(--gr-selected) во включённом, var(--gr-disabled-bg) в недоступном",
+    "description": "Заливка дорожки переключателя. Ставит лист компонента по состоянию; произвольный цвет `activeBackgroundColor` / `inactiveBackgroundColor` ложится инлайном поверх, кроме недоступного."
   },
   {
     "owner": "GrSwitch",
     "name": "--gr-switch-track-brd",
-    "kind": "inline",
-    "default": "var(--gr-selected) / var(--gr-control-brd) / var(--gr-disabled-brd)",
-    "description": "Цвет рамки дорожки переключателя."
+    "kind": "css",
+    "default": "var(--gr-control-brd) / var(--gr-selected) / var(--gr-invalid-brd) / var(--gr-disabled-brd)",
+    "description": "Цвет рамки дорожки переключателя. Ставит лист компонента по состоянию; при произвольном цвете заливки рамка берёт его же, кроме ошибки и недоступного."
   },
   {
     "owner": "GrSwitch",

@@ -1,14 +1,13 @@
 import { describe, expect, it } from 'vitest'
 
+import { componentSheet, lookElement } from '../../../__tests__/componentSheet'
 import {
   derivedThemeVars,
-  getColorClassExpression,
   getContrastRatio,
   resolveColorExpression,
   themeVarsByName,
   THEME_MODES,
 } from '../../../__tests__/cssContrast'
-import { thumbBase, thumbContentColorClass } from '../grSwitchStyles'
 
 /**
  * Содержимое бегунка — спиннер загрузки и иконка действия — лежит на его
@@ -25,11 +24,12 @@ const THEMES = THEME_MODES
 
 describe('GrSwitch · контраст содержимого бегунка', () => {
   it('спиннер и знак различимы на заливке бегунка в обеих темах', () => {
-    const content = getColorClassExpression(thumbContentColorClass, 'text-[')
-    const thumb = getColorClassExpression(thumbBase, 'bg-[')
-
-    if (!content || !thumb)
-      throw new Error('GrSwitch: не удалось извлечь цвета бегунка')
+    const { look } = componentSheet('GrSwitch/GrSwitch.vue')
+    const thumbElement = lookElement('span', { 'data-gr-switch-thumb': '' })
+    const icon = lookElement('span', { 'data-gr-switch-thumb-icon': '' })
+    thumbElement.append(icon)
+    const content = look(icon).color
+    const thumb = look(thumbElement)['background-color']
 
     const failures: string[] = []
 

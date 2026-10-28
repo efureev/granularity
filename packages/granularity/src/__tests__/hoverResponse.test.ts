@@ -11,6 +11,10 @@ import GrRadio from '../components/GrRadio/GrRadio.vue'
 import GrSelect from '../components/GrSelect/GrSelect.vue'
 import GrTextarea from '../components/GrTextarea/GrTextarea.vue'
 import GrTreeSelect from '../components/GrTreeSelect/GrTreeSelect.vue'
+import { componentSheet } from './componentSheet'
+
+const { look: checkboxLook } = componentSheet('GrCheckbox/GrCheckbox.vue')
+const { look: radioLook } = componentSheet('GrButton/GrButton.vue', 'GrRadio/GrRadio.vue')
 
 /**
  * Отклик на указатель — у рабочего контрола и только у него.
@@ -72,9 +76,11 @@ describe('отклик отметки и радио на указатель', ()
     const unchecked = mount(GrCheckbox, { props: { modelValue: false, label: 'Согласие' } })
     const checked = mount(GrCheckbox, { props: { modelValue: true, label: 'Согласие' } })
 
-    expect(unchecked.classes()).toContain('group/checkbox')
-    expect(unchecked.get('[role="checkbox"]').classes()).toContain('group-hover/checkbox:border-[var(--gr-control-brd-hover)]')
-    expect(checked.get('[role="checkbox"]').classes()).toContain('group-hover/checkbox:bg-[var(--gr-selected-hover)]')
+    // Указатель над подписью — `:hover` у корня, и коробка откликается на него.
+    const box = (wrapper: typeof unchecked) => wrapper.get('[role="checkbox"]').element
+    expect(checkboxLook(box(unchecked), {})['border-color']).toBe('var(--gr-control-brd)')
+    expect(checkboxLook(box(unchecked), { hover: true })['border-color']).toBe('var(--gr-control-brd-hover)')
+    expect(checkboxLook(box(checked), { hover: true })['background-color']).toBe('var(--gr-selected-hover)')
     unchecked.unmount()
     checked.unmount()
   })
@@ -86,7 +92,9 @@ describe('отклик отметки и радио на указатель', ()
   ])('GrCheckbox: %s не откликается', (_name, extra) => {
     const wrapper = mount(GrCheckbox, { props: { modelValue: true, label: 'Согласие', ...extra } })
 
-    expect(wrapper.get('[role="checkbox"]').classes().some(name => name.startsWith('group-hover/'))).toBe(false)
+    const box = wrapper.get('[role="checkbox"]').element
+    expect(checkboxLook(box, { hover: true })['border-color']).toBe(checkboxLook(box)['border-color'])
+    expect(checkboxLook(box, { hover: true })['background-color']).toBe(checkboxLook(box)['background-color'])
     wrapper.unmount()
   })
 
@@ -94,9 +102,10 @@ describe('отклик отметки и радио на указатель', ()
     const enabled = mount(GrRadio, { props: { modelValue: 'a', value: 'a', label: 'Первый' } })
     const disabled = mount(GrRadio, { props: { modelValue: 'a', value: 'a', label: 'Первый', disabled: true } })
 
-    expect(enabled.find('.group\\/radio').exists()).toBe(true)
-    expect(enabled.get('[data-gr-radio-control]').classes()).toContain('group-hover/radio:bg-[var(--gr-radio-checked-hover-bg)]')
-    expect(disabled.get('[data-gr-radio-control]').classes().some(name => name.startsWith('group-hover/'))).toBe(false)
+    // Указатель над подписью — `:hover` у корня, и кружок откликается на него.
+    expect(radioLook(enabled.get('[data-gr-radio-control]').element, { hover: true })['background-color']).toBe('var(--gr-radio-checked-hover-bg)')
+    const box = disabled.get('[data-gr-radio-control]').element
+    expect(radioLook(box, { hover: true })).toEqual(radioLook(box))
     enabled.unmount()
     disabled.unmount()
   })

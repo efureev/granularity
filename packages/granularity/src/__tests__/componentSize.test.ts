@@ -56,8 +56,8 @@ import GrOtpInput from '../components/GrOtpInput/GrOtpInput.vue'
 import GrSwitch from '../components/GrSwitch/GrSwitch.vue'
 import GrTable from '../components/GrTable/GrTable.vue'
 import GrTabs from '../components/GrTabs/GrTabs.vue'
-import { look, lookElement } from '../components/GrButton/__tests__/buttonSheet'
-import { tabSizes } from '../components/GrTabs/grTabsStyles'
+import { look, lookElement as buttonElement } from '../components/GrButton/__tests__/buttonSheet'
+import { componentSheet, lookElement } from './componentSheet'
 import GrTextarea from '../components/GrTextarea/GrTextarea.vue'
 import GrTooltip from '../components/GrTooltip/GrTooltip.vue'
 import GrTransfer from '../components/GrTransfer/GrTransfer.vue'
@@ -301,10 +301,7 @@ function panelMarkup(html: string): string {
   return panel ? panel[0] : html
 }
 
-/** Высота из набора утилит — `h-10` → `10`. */
-function heightUnit(classes: string): string {
-  return classes.match(/\bh-(\d+(?:\.\d+)?)\b/)?.[1] ?? ''
-}
+const { look: tabsLook } = componentSheet('GrTabs/GrTabs.vue')
 
 describe('контракт размера', () => {
   /**
@@ -318,8 +315,8 @@ describe('контракт размера', () => {
     const mismatched = (['xs', 'sm', 'md', 'lg'] as const)
       .map(size => ({
         size,
-        tab: Number(heightUnit(tabSizes[size])) / 4,
-        button: Number.parseFloat(look(lookElement({ variant: 'primary', tone: 'primary', size })).height ?? ''),
+        tab: Number.parseFloat(tabsLook(lookElement('div', { 'data-gr-tabs': '', 'data-gr-size': size }).appendChild(lookElement('button', { 'data-gr-tab': '' }))).height ?? ''),
+        button: Number.parseFloat(look(buttonElement({ variant: 'primary', tone: 'primary', size })).height ?? ''),
       }))
       .filter(item => item.tab !== item.button)
 

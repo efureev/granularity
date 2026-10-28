@@ -15,6 +15,9 @@ vi.mock('~icons/lucide/check', () => {
 
 import GrCheckbox from '../../GrCheckbox/GrCheckbox.vue'
 import GrCheckboxGroup from '../GrCheckboxGroup.vue'
+import { componentSheet } from '../../../__tests__/componentSheet'
+
+const { look: checkboxLook } = componentSheet('GrCheckbox/GrCheckbox.vue')
 
 const OPTIONS = [
   { value: 'sms', label: 'SMS' },
@@ -113,7 +116,7 @@ describe('GrCheckboxGroup', () => {
 
     const control = wrapper.get('[role="checkbox"]')
     expect(control.attributes('aria-invalid')).toBeUndefined()
-    expect(control.classes()).toContain('border-[var(--gr-danger)]')
+    expect(checkboxLook(control.element)['border-color']).toBe('var(--gr-danger)')
   })
 
   // `role="group"` из ARIA-атрибутов виджета не поддерживает ни `aria-required`,
@@ -154,9 +157,9 @@ describe('GrCheckboxGroup', () => {
       },
     })
 
-    const controls = wrapper.findAll('[role="checkbox"]')
-    expect(controls[0].classes()).toContain('h-5')
-    expect(controls[1].classes()).toContain('h-3')
+    const roots = wrapper.findAll('[data-gr-checkbox]')
+    expect(roots[0].attributes('data-gr-size')).toBe('lg')
+    expect(roots[1].attributes('data-gr-size')).toBe('xs')
   })
 
   it('без пропа size берёт размер из GrConfigProvider', () => {
@@ -172,7 +175,7 @@ describe('GrCheckboxGroup', () => {
       },
     })
 
-    expect(wrapper.get('[role="checkbox"]').classes()).toContain('h-3.5')
+    expect(wrapper.get('[data-gr-checkbox]').attributes('data-gr-size')).toBe('sm')
   })
 
   it('слот-режим: чекбоксы без своего v-model работают от модели группы', async () => {

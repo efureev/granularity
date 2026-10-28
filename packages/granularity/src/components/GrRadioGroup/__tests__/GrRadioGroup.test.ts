@@ -14,6 +14,9 @@ vi.mock('~icons/lucide/loader-circle', () => {
 import GrFormField from '../../GrFormField/GrFormField.vue'
 import GrRadio from '../../GrRadio/GrRadio.vue'
 import GrRadioGroup from '../GrRadioGroup.vue'
+import { componentSheet } from '../../../__tests__/componentSheet'
+
+const { look: radioLook } = componentSheet('GrButton/GrButton.vue', 'GrRadio/GrRadio.vue')
 
 describe('GrRadioGroup', () => {
   it('рендерит options и эмитит update:modelValue для radiobox-варианта', async () => {
@@ -105,7 +108,7 @@ describe('GrRadioGroup — состояния', () => {
     expect(wrapper.emitted('update:modelValue')).toBeUndefined()
 
     expect(wrapper.get('[data-gr-radio-group]').attributes('aria-readonly')).toBe('true')
-    expect(radios[0].classes()).toContain('cursor-default')
+    expect(radioLook(radios[0].element).cursor).toBe('default')
   })
 
   it('внутри GrFormField берёт имя, описание и состояние ошибки', () => {

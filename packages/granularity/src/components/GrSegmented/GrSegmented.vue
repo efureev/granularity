@@ -13,14 +13,7 @@ import type { ComponentPublicInstance } from 'vue'
 import IconLoader from '~icons/lucide/loader-circle'
 
 import {
-  grSegmentedIndicatorClass,
-  grSegmentedItemClass,
-  grSegmentedItemIconClass,
-  grSegmentedItemLabelClass,
-  grSegmentedItemSpinnerClass,
-  grSegmentedRootClass,
-  grSegmentedRootStyle,
-  grSegmentedTrack,
+  grSegmentedLookAttrs,
   type GrSegmentedItemWidth,
   type GrSegmentedOption,
   type GrSegmentedOrientation,
@@ -184,43 +177,14 @@ const selectedIndex = computed(() => props.options.findIndex(option => option.va
 const selectedOption = computed(() => props.options[selectedIndex.value] ?? null)
 const indicatorDuration = computed(() => Math.max(0, Math.round(props.indicatorDuration)))
 const isVertical = computed(() => props.orientation === 'vertical')
-const rootClassName = computed(() => grSegmentedRootClass({
+const lookAttrs = computed(() => grSegmentedLookAttrs({
   variant: resolvedVariant.value,
-  orientation: props.orientation,
+  size: resolvedSize.value,
+  shape: resolvedShape.value,
   block: props.block,
-  disabled: isDisabled.value,
+  vertical: isVertical.value,
+  itemWidth: resolvedItemWidth.value,
 }))
-
-/**
- * Раскладка задаётся треками, а не классами: число сегментов известно только в
- * рантайме. По вертикали колонка одна — сегменты одинаковой ширины по
- * построению, и `block` решает лишь, занимать ли ширину контейнера.
- */
-const rootStyle = computed<Record<string, string>>(() => {
-  const empty = props.options.length === 0
-  const track = () => grSegmentedTrack({
-    block: props.block,
-    vertical: isVertical.value,
-    itemWidth: resolvedItemWidth.value,
-  })
-
-  return {
-    ...grSegmentedRootStyle({
-      variant: resolvedVariant.value,
-      size: resolvedSize.value,
-      orientation: props.orientation,
-      shape: resolvedShape.value,
-      invalid: isInvalid.value,
-    }),
-    gridTemplateColumns: isVertical.value
-      ? 'minmax(0,1fr)'
-      : empty ? 'none' : props.options.map(track).join(' '),
-    ...(isVertical.value
-      ? { gridTemplateRows: empty ? 'none' : props.options.map(track).join(' ') }
-      : {}),
-  }
-})
-const indicatorClassName = computed(() => grSegmentedIndicatorClass(resolvedVariant.value))
 const resolvedName = computed(() => props.name ?? fallbackName)
 const hasIndicator = computed(() => selectedIndex.value !== -1 && indicatorGeometry.value !== null)
 
@@ -512,7 +476,6 @@ if (__GR_DEV__) {
     :id="fieldId"
     ref="rootRef"
     data-gr-segmented
-    :data-variant="resolvedVariant"
     role="radiogroup"
     :aria-orientation="orientation"
     :aria-label="ariaLabel"
@@ -523,9 +486,7 @@ if (__GR_DEV__) {
     :aria-required="isRequired ? 'true' : undefined"
     :aria-readonly="isReadonly ? 'true' : undefined"
     :aria-disabled="isDisabled ? 'true' : undefined"
-    :class="rootClassName"
-    :style="rootStyle"
-    v-bind="aria.rootAttrs()"
+    v-bind="{ ...lookAttrs, ...aria.rootAttrs() }"
     @focusin="onFocusIn"
     @focusout="onFocusOut"
   >
@@ -545,7 +506,6 @@ if (__GR_DEV__) {
       v-if="hasIndicator"
       data-gr-segmented-indicator
       aria-hidden="true"
-      :class="indicatorClassName"
       :style="indicatorStyle"
     />
 
@@ -563,13 +523,7 @@ if (__GR_DEV__) {
       :aria-busy="isOptionBusy(option) ? 'true' : undefined"
       :disabled="resolveOptionDisabled(option)"
       :tabindex="roving.tabindexFor(option.value)"
-      :class="grSegmentedItemClass({
-        variant: resolvedVariant,
-        selected: isOptionSelected(option),
-        disabled: resolveOptionDisabled(option),
-        iconOnly: isIconOnlyOption(option),
-        orientation,
-      })"
+      :data-gr-icon-only="isIconOnlyOption(option) ? '' : undefined"
       @click="onItemClick(option)"
       @keydown="onKeydown($event, index)"
     >
@@ -584,19 +538,19 @@ if (__GR_DEV__) {
           v-if="isOptionBusy(option)"
           data-gr-segmented-spinner
           aria-hidden="true"
-          :class="grSegmentedItemSpinnerClass"
+          class="animate-spin"
         />
         <component
           :is="option.icon"
           v-else-if="option.icon"
+          data-gr-segmented-icon
           aria-hidden="true"
-          :class="grSegmentedItemIconClass"
         />
         <!-- Подпись сегмента обрезается по ширине трека, и «Включе…» без
              подсказки прочитать нечем: полный текст отдаётся по наведению. -->
         <span
           v-if="option.label"
-          :class="grSegmentedItemLabelClass"
+          data-gr-segmented-label
           @pointerenter="titleWhenTruncated"
         >
           {{ option.label }}
@@ -605,3 +559,229 @@ if (__GR_DEV__) {
     </button>
   </div>
 </template>
+
+<style>
+/*
+ * Вид сегментов — лист по атрибутам (`docs/markup-weight.md`): вариант, ступень,
+ * форму, растяжение и деление ширины ставит корень, ориентацию, ошибку и
+ * недоступность лист читает по `aria-*` корня, выбор — по `aria-checked` сегмента.
+ * Инлайн остаётся только у индикатора: его геометрию меряет скрипт.
+ */
+[data-gr-segmented] {
+  --gr-segmented-font-weight: var(--gr-segmented-label-weight);
+  position: relative;
+  display: inline-grid;
+  min-width: 0;
+  align-items: stretch;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, max-content);
+  padding: var(--gr-segmented-padding);
+  border-width: 1px;
+  border-radius: var(--gr-segmented-radius);
+  border-color: var(--gr-segmented-track-brd);
+  background-color: var(--gr-segmented-track-bg);
+  color: var(--gr-segmented-item-color);
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+  transition-duration: var(--gr-duration-fast);
+  transition-timing-function: var(--gr-ease-out);
+}
+
+/*
+ * Треки — неявные: число сегментов известно только в рантайме, а неявный трек
+ * считается так же, как явный. `content` — это `minmax(0, auto)`: грид растит треки
+ * равными долями до их `max-content`, и разница между сегментами равна разнице их
+ * содержимого. Минимум — ноль, а не `min-content`: у однострочной подписи они равны,
+ * и трек с минимумом `min-content` не сжимался бы — ряд вылезал бы за контейнер.
+ * По вертикали колонка одна, и `block` решает лишь, занимать ли ширину контейнера.
+ */
+[data-gr-segmented][data-gr-block] {
+  width: 100%;
+  grid-auto-columns: minmax(0, 1fr);
+}
+
+[data-gr-segmented][data-gr-block][data-gr-item-width='content'] {
+  grid-auto-columns: minmax(0, auto);
+}
+
+[data-gr-segmented][aria-orientation='vertical'] {
+  grid-template-columns: minmax(0, 1fr);
+  grid-auto-flow: row;
+  grid-auto-rows: minmax(0, max-content);
+}
+
+[data-gr-segmented][data-gr-variant='pills'] {
+  --gr-segmented-track-bg: var(--gr-muted);
+  --gr-segmented-track-brd: var(--gr-brd);
+  --gr-segmented-track-shadow: none;
+  --gr-segmented-indicator-bg: var(--gr-card);
+  --gr-segmented-indicator-brd: color-mix(in srgb, var(--gr-card) 84%, var(--gr-brd) 16%);
+  --gr-segmented-indicator-shadow: var(--gr-shadow-1), var(--gr-segmented-indicator-highlight-shadow);
+  --gr-segmented-item-color: var(--gr-muted-fg);
+  --gr-segmented-item-selected-color: var(--gr-fg);
+  --gr-segmented-item-hover-color: var(--gr-fg);
+}
+
+[data-gr-segmented][data-gr-variant='button'] {
+  --gr-segmented-track-bg: var(--gr-card);
+  --gr-segmented-track-brd: var(--gr-brd);
+  --gr-segmented-track-shadow: var(--gr-shadow-1);
+  --gr-segmented-indicator-bg: var(--gr-selected);
+  --gr-segmented-indicator-brd: color-mix(in srgb, var(--gr-selected) 88%, var(--gr-brd) 12%);
+  --gr-segmented-indicator-shadow: var(--gr-shadow-2);
+  --gr-segmented-item-color: var(--gr-muted-fg);
+  --gr-segmented-item-selected-color: var(--gr-selected-fg);
+  --gr-segmented-item-hover-color: var(--gr-fg);
+
+  box-shadow: var(--gr-segmented-track-shadow);
+}
+
+[data-gr-segmented][data-gr-size='xs'] {
+  --gr-segmented-padding: 4px;
+  --gr-segmented-item-px: 10px;
+  --gr-segmented-item-py: 1px;
+  --gr-segmented-font-size: 0.75rem;
+  --gr-segmented-line-height: 1rem;
+  --gr-segmented-min-height: 18px;
+}
+
+[data-gr-segmented][data-gr-size='sm'] {
+  --gr-segmented-padding: 4px;
+  --gr-segmented-item-px: 12px;
+  --gr-segmented-item-py: 3px;
+  --gr-segmented-font-size: 0.75rem;
+  --gr-segmented-line-height: 1rem;
+  --gr-segmented-min-height: 22px;
+}
+
+[data-gr-segmented][data-gr-size='md'] {
+  --gr-segmented-padding: 4px;
+  --gr-segmented-item-px: 14px;
+  --gr-segmented-item-py: 5px;
+  --gr-segmented-font-size: 0.875rem;
+  --gr-segmented-line-height: 1.25rem;
+  --gr-segmented-min-height: 30px;
+}
+
+[data-gr-segmented][data-gr-size='lg'] {
+  --gr-segmented-padding: 4px;
+  --gr-segmented-item-px: 16px;
+  --gr-segmented-item-py: 7px;
+  --gr-segmented-font-size: 0.9375rem;
+  --gr-segmented-line-height: 1.25rem;
+  --gr-segmented-min-height: 34px;
+}
+
+/*
+ * Радиус по форме и ориентации. В вертикали пилюля — это пилюля одной строки, а не
+ * всей колонки: `9999px` на высокой колонке превращает дорожку в эллипс. Формула
+ * повторяет высоту сегмента, поэтому скругление у колонки такое же, как у ряда.
+ */
+[data-gr-segmented][data-gr-shape='pill'] {
+  --gr-segmented-radius: 9999px;
+}
+
+[data-gr-segmented][data-gr-shape='pill'][aria-orientation='vertical'] {
+  --gr-segmented-radius: calc(var(--gr-segmented-min-height) / 2 + var(--gr-segmented-padding));
+}
+
+[data-gr-segmented][data-gr-shape='box'] {
+  --gr-segmented-radius: var(--gr-radius-control);
+}
+
+/*
+ * Вердикт валидации — рамкой дорожки и кольцом фокуса, как у полей ввода и
+ * `GrRadioGroup`. Роли — `--gr-invalid-*`: тема вправе развести подсветку и ошибку.
+ */
+[data-gr-segmented][aria-invalid='true'] {
+  --gr-segmented-track-brd: var(--gr-segmented-invalid-brd, var(--gr-invalid-brd));
+  --gr-ring: var(--gr-invalid-ring);
+}
+
+[data-gr-segmented][aria-disabled='true'] {
+  color: var(--gr-disabled-fg);
+}
+
+[data-gr-segmented-indicator] {
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-width: 1px;
+  border-radius: calc(var(--gr-segmented-radius) - var(--gr-segmented-padding));
+  border-color: var(--gr-segmented-indicator-brd);
+  background-color: var(--gr-segmented-indicator-bg);
+  box-shadow: var(--gr-segmented-indicator-shadow);
+  pointer-events: none;
+  transition-property: transform, width, height, opacity;
+  transition-timing-function: var(--gr-ease-out);
+}
+
+/*
+ * Выравнивание в ряду — по центру: сегмент читается кнопкой. В колонке — к началу:
+ * вертикаль — это боковые фильтры, и по центру значки подписей разной длины вставали
+ * рваной линией, как в меню, а не в списке.
+ */
+[data-gr-segmented-item] {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  min-width: 0;
+  min-height: var(--gr-segmented-min-height);
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: var(--gr-segmented-item-py) var(--gr-segmented-item-px);
+  border-radius: calc(var(--gr-segmented-radius) - var(--gr-segmented-padding));
+  color: var(--gr-segmented-item-color);
+  font-size: var(--gr-segmented-font-size);
+  font-weight: var(--gr-segmented-font-weight);
+  line-height: var(--gr-segmented-line-height);
+  cursor: pointer;
+  user-select: none;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+  transition-duration: var(--gr-duration-fast);
+  transition-timing-function: var(--gr-ease-out);
+}
+
+[data-gr-segmented][aria-orientation='vertical'] > [data-gr-segmented-item] {
+  justify-content: flex-start;
+}
+
+[data-gr-segmented-item][aria-checked='true'] {
+  color: var(--gr-segmented-item-selected-color);
+}
+
+[data-gr-segmented-item]:not(:disabled):hover {
+  color: var(--gr-segmented-item-hover-color);
+}
+
+/* Недоступный сегмент гасится токеном, а не `opacity`: прозрачность роняет контраст подписи. */
+[data-gr-segmented-item]:disabled {
+  color: var(--gr-disabled-fg);
+  cursor: not-allowed;
+}
+
+[data-gr-segmented-item]:focus {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+}
+
+[data-gr-segmented-item]:focus-visible {
+  box-shadow: 0 0 0 2px var(--gr-ring), 0 0 0 4px var(--gr-bg);
+}
+
+[data-gr-segmented-item][data-gr-icon-only] {
+  gap: 0;
+}
+
+:is([data-gr-segmented-icon], [data-gr-segmented-spinner]) {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+}
+
+[data-gr-segmented-label] {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+</style>

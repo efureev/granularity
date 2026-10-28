@@ -5,6 +5,9 @@ import { describe, expect, it } from 'vitest'
 import GrRadioGroup from '../../GrRadioGroup/GrRadioGroup.vue'
 import GrRadio from '../GrRadio.vue'
 import { grRadioSafelist } from '../safelist'
+import { componentSheet } from '../../../__tests__/componentSheet'
+
+const { look: radioLook } = componentSheet('GrButton/GrButton.vue', 'GrRadio/GrRadio.vue')
 
 describe('GrRadio (radiobox)', () => {
   it('не держит в safelist классы точки: они литералы, granum извлекает их из чанка сам', () => {
@@ -30,7 +33,7 @@ describe('GrRadio (radiobox)', () => {
     expect(root.attributes('aria-checked')).toBe('true')
 
     const dot = wrapper.get('[data-gr-radio-dot]')
-    expect(dot.attributes('class')).toContain('bg-[var(--gr-radio-dot)]')
+    expect(radioLook(dot.element)).toMatchObject({ 'background-color': 'var(--gr-radio-dot)', 'opacity': '1' })
   })
 
   it('скрывает dot когда не выбрано', () => {
@@ -48,7 +51,7 @@ describe('GrRadio (radiobox)', () => {
     expect(root.attributes('aria-checked')).toBe('false')
 
     const dot = wrapper.get('[data-gr-radio-dot]')
-    expect(dot.attributes('class')).toContain('opacity-0')
+    expect(radioLook(dot.element).opacity).toBe('0')
   })
 
   // Внутрь `role="radio"` нельзя вкладывать интерактивные элементы: роль объявляет
@@ -196,8 +199,8 @@ describe('GrRadio — подпись, описание и состояния', (
     const wrapper = mountGroup()
     const labels = wrapper.findAll('[data-gr-radio-label]')
 
-    expect(labels[0].classes()).toContain('text-[var(--gr-fg)]')
-    expect(labels[1].classes()).toContain('text-[var(--gr-muted-fg)]')
+    expect(radioLook(labels[0].element).color).toBe('var(--gr-fg)')
+    expect(radioLook(labels[1].element).color).toBe('var(--gr-muted-fg)')
     wrapper.unmount()
   })
 
@@ -221,7 +224,7 @@ describe('GrRadio — подпись, описание и состояния', (
   it('invalid приходит и от пропа, и от группы', () => {
     const own = mount(GrRadio, { props: { value: 'a', invalid: true }, slots: { default: 'A' } })
     expect(own.get('[role="radio"]').attributes('aria-invalid')).toBe('true')
-    expect(own.get('[data-gr-radio-control]').classes()).toContain('border-[var(--gr-danger)]')
+    expect(radioLook(own.get('[data-gr-radio-control]').element)['border-color']).toBe('var(--gr-danger)')
 
     const group = mountGroup({ invalid: true })
     expect(group.findAll('[data-gr-radio]')[1].attributes('aria-invalid')).toBe('true')
@@ -240,17 +243,17 @@ describe('GrRadio — подпись, описание и состояния', (
       slots: { default: 'B' },
     })
 
-    expect(checked.get('[data-gr-radio]').classes()).toContain('bg-[var(--gr-muted)]')
-    expect(unchecked.get('[data-gr-radio]').classes()).toContain('bg-transparent')
-    expect(checked.get('[data-gr-radio]').classes().some(cls => cls.startsWith('opacity-'))).toBe(false)
+    expect(radioLook(checked.get('[data-gr-radio]').element)['background-color']).toBe('var(--gr-muted)')
+    expect(radioLook(unchecked.get('[data-gr-radio]').element)['background-color']).toBe('transparent')
+    expect(radioLook(checked.get('[data-gr-radio]').element).opacity).toBeUndefined()
   })
 
   it('disabled гасится токенами, а не прозрачностью', () => {
     const wrapper = mount(GrRadio, { props: { value: 'a', disabled: true }, slots: { default: 'A' } })
     const root = wrapper.get('[role="radio"]')
 
-    expect(root.classes()).toContain('text-[var(--gr-muted-fg)]')
-    expect(root.classes().some(cls => cls.startsWith('opacity-'))).toBe(false)
+    expect(radioLook(root.element).color).toBe('var(--gr-muted-fg)')
+    expect(radioLook(root.element).opacity).toBeUndefined()
   })
 })
 

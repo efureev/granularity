@@ -736,7 +736,7 @@ describe('GrButton — скругление по ступеням', () => {
     const style = look(buttonOf(mount(GrButton, { slots: { default: 'Save' } })))
     const property = { ss: 'border-start-start-radius', se: 'border-start-end-radius', ee: 'border-end-end-radius', es: 'border-end-start-radius' }
     for (const [corner, name] of Object.entries(property))
-      expect(style[name]).toBe(`var(--gr-button-radius-${corner}, var(--gr-button-corner-radius))`)
+      expect(style[name]).toBe(`var(--gr-button-radius-${corner}, var(--gr-button-radius, var(--gr-button-radius-md)))`)
   })
 })
 

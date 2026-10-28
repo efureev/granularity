@@ -4,7 +4,7 @@ import { selectSizeClassBySize } from '../components/GrSelect/grSelectStyles'
 import { triggerSizeClassBySize } from '../components/GrColorPicker/grColorPickerStyles'
 import { shellHeightClass as inputHeights } from '../components/GrInput/grInputStyles'
 import { shellHeightClass as numberInputHeights } from '../components/GrNumberInput/grNumberInputStyles'
-import { rootSizeStyles as segmentedSizes } from '../components/GrSegmented/grSegmentedStyles'
+import { componentSheet, lookElement } from './componentSheet'
 import { sizeClassBySize as treeSelectSizes } from '../components/GrTreeSelect/grTreeSelectStyles'
 import { GR_COMPONENT_SIZES, GR_CONTROL_HEIGHTS_PX } from '../components/shared/sizes'
 
@@ -40,6 +40,10 @@ const utilityControls: Record<string, Record<string, string>> = {
   GrColorPicker: triggerSizeClassBySize,
 }
 
+const { cascade } = componentSheet('GrSegmented/GrSegmented.vue')
+/** Переменные дорожки `GrSegmented` ступени `size` — из её листа. */
+const segmentedTrack = (size: typeof GR_COMPONENT_SIZES[number]) => cascade(lookElement('div', { 'data-gr-segmented': '', 'data-gr-size': size }))
+
 describe('линейка высот контролов', () => {
   for (const [name, map] of Object.entries(utilityControls)) {
     it(`${name} держит высоту шкалы на каждой ступени`, () => {
@@ -52,7 +56,7 @@ describe('линейка высот контролов', () => {
 
   it('внешняя высота дорожки GrSegmented равна высоте поля', () => {
     for (const size of GR_COMPONENT_SIZES) {
-      const style = segmentedSizes[size]
+      const style = segmentedTrack(size)
       // Рамка входит в ступень, а не прибавляется к ней: у `GrSelect` рамка и
       // высота лежат на одном элементе, и дорожка обязана считать так же. Без
       // этого слагаемого дорожка выходила на 2 px выше — замерено линейкой на
@@ -69,7 +73,7 @@ describe('линейка высот контролов', () => {
     // Иначе `min-height` перестаёт задавать высоту, дорожка вырастает по
     // контенту, и линейка расходится обратно — незаметно для предыдущей проверки.
     for (const size of GR_COMPONENT_SIZES) {
-      const style = segmentedSizes[size]
+      const style = segmentedTrack(size)
       const lineHeight = px(style['--gr-segmented-line-height']) * 16
       const content = lineHeight + 2 * px(style['--gr-segmented-item-py'])
 

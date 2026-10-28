@@ -36,11 +36,7 @@ import { useGrFormControl } from '../../composables/useGrFormControl'
 
 import { GR_CHECKBOX_GROUP_CONTEXT } from './grCheckboxGroupContext'
 import {
-  grCheckboxCheckIconClass,
-  grCheckboxControlClass,
-  grCheckboxIndeterminateIconClass,
-  grCheckboxLabelClass,
-  grCheckboxRootClass,
+  grCheckboxLookAttrs,
   type GrCheckboxLabelPosition,
   type GrCheckboxSize,
 } from './grCheckboxStyles'
@@ -101,14 +97,6 @@ export interface GrCheckboxEmits {
   /** Фокус ушёл с контрола. */
   (e: 'blur', event: FocusEvent): void
 }
-
-const hiddenInputStyle = {
-  position: 'absolute',
-  opacity: '0',
-  width: '0',
-  height: '0',
-  pointerEvents: 'none',
-} as const
 
 // Связи потребителя (`aria-describedby` и соседи) уходят с обёртки на `role="checkbox"`.
 defineOptions({ inheritAttrs: false })
@@ -201,28 +189,12 @@ const resolvedSize = useGrComponentSize(
   { component: 'GrCheckbox' },
 )
 
-const rootClassName = computed(() => grCheckboxRootClass({
+const lookAttrs = computed(() => grCheckboxLookAttrs({
   size: resolvedSize.value,
-  disabled: resolvedDisabled.value,
-  labelPosition: props.labelPosition,
-}))
-
-const controlClassName = computed(() => grCheckboxControlClass({
-  size: resolvedSize.value,
-  active: checked.value || props.indeterminate,
   disabled: resolvedDisabled.value,
   invalid: showsInvalid.value,
-  readonly: isReadonly.value,
+  labelPosition: props.labelPosition,
 }))
-
-const indeterminateIconClassName = computed(() => grCheckboxIndeterminateIconClass(resolvedSize.value))
-
-const checkIconClassName = computed(() => grCheckboxCheckIconClass({
-  size: resolvedSize.value,
-  checked: checked.value,
-}))
-
-const labelClassName = computed(() => grCheckboxLabelClass(resolvedSize.value))
 
 // Держим `.checked` на нативном input синхронно с состоянием — `:checked`-биндинг
 // на скрытом элементе иногда отстаёт при программных обновлениях.
@@ -315,9 +287,8 @@ function onClick(e: MouseEvent): void {
 
 <template>
   <div
-    v-bind="aria.rootAttrs()"
+    v-bind="{ ...aria.rootAttrs(), ...lookAttrs }"
     data-gr-checkbox
-    :class="rootClassName"
     @click="onClick"
   >
     <input
@@ -331,7 +302,6 @@ function onClick(e: MouseEvent): void {
       :form="form"
       tabindex="-1"
       aria-hidden="true"
-      :style="hiddenInputStyle"
       @change="onNativeChange"
       @focus="onNativeFocus"
     >
@@ -350,26 +320,213 @@ function onClick(e: MouseEvent): void {
       :aria-label="ariaLabel"
       :aria-labelledby="aria.labelledBy(labelledBy)"
       :tabindex="resolvedDisabled ? -1 : (tabindex ?? 0)"
-      :class="controlClassName"
       @keydown.space.prevent="toggle"
       @focus="emit('focus', $event)"
       @blur="emit('blur', $event)"
     >
-      <IconMinus
-        v-if="indeterminate"
-        :class="indeterminateIconClassName"
-      />
-      <IconCheck
-        v-else
-        :class="checkIconClassName"
-      />
+      <IconMinus v-if="indeterminate" />
+      <IconCheck v-else />
     </span>
     <span
       v-if="hasLabel"
       :id="labelId"
-      :class="labelClassName"
     >
       <slot />
     </span>
   </div>
 </template>
+
+<style>
+/*
+ * Вид чекбокса — лист по атрибутам (`docs/markup-weight.md`): чекбоксов в таблице с
+ * выбором строк десятки. Ступень, недоступность, ошибку и сторону подписи ставит
+ * корень, отметку лист читает по `aria-checked` и `aria-readonly` индикатора.
+ */
+[data-gr-checkbox] {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+}
+
+[data-gr-checkbox][data-gr-off] {
+  cursor: not-allowed;
+}
+
+/*
+ * Подпись слева от контрола — порядком флекса, а не физическими отступами (RTL).
+ * `justify-content` обязателен: в `row-reverse` главная ось идёт справа налево, и
+ * растянутая строка (внутри `grid` или во всю ширину) прижалась бы к правому краю.
+ */
+[data-gr-checkbox][data-gr-label='start'] {
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+}
+
+/* Нативный input — только для формы и `<label for>`: виджет — индикатор с ролью. */
+[data-gr-checkbox] > input {
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/*
+ * Рамка — единственное, по чему виден невыбранный контрол: роль с 3:1 к фону
+ * (`--gr-control-brd`), а не разделитель `--gr-brd`. Только для чтения — тоже она:
+ * значение там передаёт состояние, а WCAG 1.4.11 освобождает лишь недоступный контрол.
+ */
+[data-gr-checkbox-indicator] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-width: 1px;
+  border-radius: var(--gr-radius-sm);
+  border-color: var(--gr-control-brd);
+  background-color: var(--gr-bg);
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+  transition-duration: var(--gr-duration-fast);
+  transition-timing-function: var(--gr-ease-out);
+}
+
+[data-gr-checkbox-indicator]:not([aria-checked='false']) {
+  border-color: var(--gr-selected);
+  background-color: var(--gr-selected);
+}
+
+[data-gr-checkbox][data-gr-invalid] > [data-gr-checkbox-indicator] {
+  border-color: var(--gr-danger);
+}
+
+[data-gr-checkbox][data-gr-invalid] > [data-gr-checkbox-indicator]:not([aria-checked='false']) {
+  background-color: var(--gr-danger);
+}
+
+/* Недоступный — фоном, а не `opacity`: прозрачность роняет контраст галочки на заливке. */
+[data-gr-checkbox][data-gr-off] > [data-gr-checkbox-indicator] {
+  border-color: var(--gr-brd);
+  background-color: var(--gr-muted);
+}
+
+[data-gr-checkbox][data-gr-off] > [data-gr-checkbox-indicator]:not([aria-checked='false']) {
+  border-color: var(--gr-muted-fg);
+  background-color: var(--gr-muted-fg);
+}
+
+/* Отклик на указатель над всей подписью, а не только над коробкой. */
+[data-gr-checkbox]:not([data-gr-off], [data-gr-invalid]):hover > [data-gr-checkbox-indicator]:not([aria-readonly='true']) {
+  border-color: var(--gr-control-brd-hover);
+}
+
+[data-gr-checkbox]:not([data-gr-off], [data-gr-invalid]):hover > [data-gr-checkbox-indicator]:not([aria-readonly='true'], [aria-checked='false']) {
+  border-color: var(--gr-selected-hover);
+  background-color: var(--gr-selected-hover);
+}
+
+[data-gr-checkbox-indicator]:focus-visible {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 2px var(--gr-ring), 0 0 0 4px var(--gr-bg);
+}
+
+[data-gr-checkbox-indicator][aria-checked='mixed'] > svg {
+  color: var(--gr-selected-fg);
+}
+
+/* Галочка проявляется движением, поэтому у неё есть скрытое состояние, а у тире — нет. */
+[data-gr-checkbox-indicator]:not([aria-checked='mixed']) > svg {
+  color: transparent;
+  opacity: 0;
+  transform: scale(0.75);
+  transition-property: transform;
+  transition-duration: var(--gr-duration-fast);
+  transition-timing-function: var(--gr-ease-out);
+}
+
+[data-gr-checkbox-indicator][aria-checked='true'] > svg {
+  color: var(--gr-selected-fg);
+  opacity: 1;
+  transform: scale(1);
+}
+
+[data-gr-checkbox-indicator] + span {
+  color: var(--gr-muted-fg);
+}
+
+[data-gr-checkbox][data-gr-size='xs'] {
+  gap: 0.375rem;
+}
+
+[data-gr-checkbox][data-gr-size='xs'] > [data-gr-checkbox-indicator] {
+  width: 0.75rem;
+  height: 0.75rem;
+}
+
+[data-gr-checkbox][data-gr-size='xs'] > [data-gr-checkbox-indicator] > svg {
+  width: 0.625rem;
+  height: 0.625rem;
+}
+
+[data-gr-checkbox][data-gr-size='xs'] > [data-gr-checkbox-indicator] + span {
+  font-size: var(--gr-text-xs);
+  line-height: var(--gr-leading-xs);
+}
+
+[data-gr-checkbox][data-gr-size='sm'] {
+  gap: 0.375rem;
+}
+
+[data-gr-checkbox][data-gr-size='sm'] > [data-gr-checkbox-indicator] {
+  width: 0.875rem;
+  height: 0.875rem;
+}
+
+[data-gr-checkbox][data-gr-size='sm'] > [data-gr-checkbox-indicator] > svg {
+  width: 0.75rem;
+  height: 0.75rem;
+}
+
+[data-gr-checkbox][data-gr-size='sm'] > [data-gr-checkbox-indicator] + span {
+  font-size: var(--gr-text-sm);
+  line-height: var(--gr-leading-sm);
+}
+
+[data-gr-checkbox][data-gr-size='md'] {
+  gap: 0.5rem;
+}
+
+[data-gr-checkbox][data-gr-size='md'] > [data-gr-checkbox-indicator] {
+  width: 1rem;
+  height: 1rem;
+}
+
+[data-gr-checkbox][data-gr-size='md'] > [data-gr-checkbox-indicator] > svg {
+  width: 0.875rem;
+  height: 0.875rem;
+}
+
+[data-gr-checkbox][data-gr-size='md'] > [data-gr-checkbox-indicator] + span {
+  font-size: var(--gr-text-sm);
+  line-height: var(--gr-leading-sm);
+}
+
+[data-gr-checkbox][data-gr-size='lg'] {
+  gap: 0.5rem;
+}
+
+[data-gr-checkbox][data-gr-size='lg'] > [data-gr-checkbox-indicator] {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+[data-gr-checkbox][data-gr-size='lg'] > [data-gr-checkbox-indicator] > svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+[data-gr-checkbox][data-gr-size='lg'] > [data-gr-checkbox-indicator] + span {
+  font-size: var(--gr-text-base);
+  line-height: var(--gr-leading-base);
+}
+</style>

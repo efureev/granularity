@@ -7,132 +7,27 @@ export type GrCheckboxSize = GrButtonSize
 export const GR_CHECKBOX_LABEL_POSITIONS = ['start', 'end'] as const
 export type GrCheckboxLabelPosition = typeof GR_CHECKBOX_LABEL_POSITIONS[number]
 
-// Группа именная: строка таблицы или узел дерева со своим `group` не должны
-// подсвечивать вложенную отметку, когда указатель на соседней ячейке.
-export const rootBase = 'group/checkbox inline-flex items-center select-none'
+const flag = (on: boolean | undefined): '' | undefined => (on ? '' : undefined)
 
-export const rootGaps: Record<GrCheckboxSize, string> = {
-  xs: 'gap-1.5',
-  sm: 'gap-1.5',
-  md: 'gap-2',
-  lg: 'gap-2',
-}
-
-export const rootDisabledClass = 'cursor-not-allowed'
-export const rootEnabledClass = 'cursor-pointer'
-
-// Подпись слева от контрола — порядком флекса, а не физическими отступами.
-// `justify-end` обязателен: в `row-reverse` главная ось идёт справа налево, и
-// без него растянутая строка (внутри `grid`/`w-full`) прижалась бы к правому краю.
-export const rootLabelStartClass = 'flex-row-reverse justify-end'
-
-export const controlBase = 'rounded-[var(--gr-radius-sm)] border flex items-center justify-center transition-colors duration-[var(--gr-duration-fast)] focus-visible:outline-none focus-visible:shadow-[0_0_0_2px_var(--gr-ring),0_0_0_4px_var(--gr-bg)]'
-
-export const controlSizes: Record<GrCheckboxSize, string> = {
-  xs: 'h-3 w-3',
-  sm: 'h-3.5 w-3.5',
-  md: 'h-4 w-4',
-  lg: 'h-5 w-5',
-}
-
-export const controlCheckedClass = 'border-[var(--gr-selected)] bg-[var(--gr-selected)]'
-// Рамка — единственное, по чему виден невыбранный контрол: роль с 3:1 к фону
-// (`--gr-control-brd`), а не разделитель `--gr-brd`. Только для чтения — тоже она:
-// значение там передаёт состояние, а 1.4.11 освобождает лишь недоступный контрол.
-export const controlUncheckedClass = 'border-[var(--gr-control-brd)] bg-[var(--gr-bg)]'
-/** Отклик на указатель над всей подписью, а не только над коробкой. */
-export const controlCheckedHoverClass = 'group-hover/checkbox:border-[var(--gr-selected-hover)] group-hover/checkbox:bg-[var(--gr-selected-hover)]'
-export const controlUncheckedHoverClass = 'group-hover/checkbox:border-[var(--gr-control-brd-hover)]'
-export const controlInvalidCheckedClass = 'border-[var(--gr-danger)] bg-[var(--gr-danger)]'
-export const controlInvalidUncheckedClass = 'border-[var(--gr-danger)] bg-[var(--gr-bg)]'
-
-// Disabled показываем фоном, а не `opacity`: прозрачность разбавляет выверенные
-// на AA токены и роняет контраст галочки на заливке.
-export const controlDisabledCheckedClass = 'border-[var(--gr-muted-fg)] bg-[var(--gr-muted-fg)]'
-export const controlDisabledUncheckedClass = 'border-[var(--gr-brd)] bg-[var(--gr-muted)]'
-
-// Цвет задаётся состоянием, а не базой: `text-transparent` и `text-[var(--gr-selected-fg)]`
-// генерируют одно и то же свойство, и победит не тот, кто правее в атрибуте, а тот,
-// кто ниже в сгенерированном CSS. Держим их взаимоисключающими.
-export const iconBase = 'gr-checkbox-icon'
-export const iconColorClass = 'text-[var(--gr-selected-fg)]'
-
-export const iconSizes: Record<GrCheckboxSize, string> = {
-  xs: 'h-2.5 w-2.5',
-  sm: 'h-3 w-3',
-  md: 'h-3.5 w-3.5',
-  lg: 'h-4 w-4',
-}
-
-// Галочка «проявляется» анимацией, поэтому у неё есть состояние, а у тире — нет.
-export const iconCheckTransitionClass = 'transition-transform transition-opacity duration-[var(--gr-duration-fast)]'
-export const iconCheckVisibleClass = 'opacity-100 scale-100 text-[var(--gr-selected-fg)]'
-export const iconCheckHiddenClass = 'opacity-0 scale-75 text-transparent'
-
-export const labelBase = 'text-[var(--gr-muted-fg)]'
-
-export const labelSizes: Record<GrCheckboxSize, string> = {
-  xs: 'text-[length:var(--gr-text-xs)] leading-[var(--gr-leading-xs)]',
-  sm: 'text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)]',
-  md: 'text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)]',
-  lg: 'text-[length:var(--gr-text-base)] leading-[var(--gr-leading-base)]',
-}
-
-export function grCheckboxRootClass(options: {
+/**
+ * Вид чекбокса — атрибуты корня, а не классы (`docs/markup-weight.md`): ступень,
+ * недоступность, ошибка и сторона подписи. Отметку лист читает по `aria-checked`
+ * и `aria-readonly` индикатора — они в разметке есть и так.
+ *
+ * Порядок состояний — приоритет: недоступный контрол не показывает ни ошибку, ни
+ * акцент, иначе «выключено» читается как «требует внимания». Поэтому ошибка у
+ * недоступного не ставится вовсе.
+ */
+export function grCheckboxLookAttrs(options: {
   size: GrCheckboxSize
   disabled: boolean
+  invalid: boolean
   labelPosition: GrCheckboxLabelPosition
-}): string {
-  return [
-    rootBase,
-    rootGaps[options.size],
-    options.disabled ? rootDisabledClass : rootEnabledClass,
-    options.labelPosition === 'start' ? rootLabelStartClass : '',
-  ].filter(Boolean).join(' ')
-}
-
-// Порядок состояний — приоритет: недоступный контрол не показывает ни ошибку,
-// ни акцент, иначе «выключено» читается как «требует внимания».
-export function grCheckboxControlClass(options: {
-  size: GrCheckboxSize
-  active: boolean
-  disabled?: boolean
-  invalid?: boolean
-  readonly?: boolean
-}): string {
-  return [
-    controlBase,
-    controlSizes[options.size],
-    grCheckboxControlStateClass(options),
-    options.disabled || options.invalid || options.readonly
-      ? ''
-      : options.active ? controlCheckedHoverClass : controlUncheckedHoverClass,
-  ].filter(Boolean).join(' ')
-}
-
-function grCheckboxControlStateClass(options: { active: boolean, disabled?: boolean, invalid?: boolean }): string {
-  if (options.disabled)
-    return options.active ? controlDisabledCheckedClass : controlDisabledUncheckedClass
-
-  if (options.invalid)
-    return options.active ? controlInvalidCheckedClass : controlInvalidUncheckedClass
-
-  return options.active ? controlCheckedClass : controlUncheckedClass
-}
-
-export function grCheckboxIndeterminateIconClass(size: GrCheckboxSize): string {
-  return [iconBase, iconSizes[size], iconColorClass].join(' ')
-}
-
-export function grCheckboxCheckIconClass(options: { size: GrCheckboxSize, checked: boolean }): string {
-  return [
-    iconBase,
-    iconSizes[options.size],
-    iconCheckTransitionClass,
-    options.checked ? iconCheckVisibleClass : iconCheckHiddenClass,
-  ].join(' ')
-}
-
-export function grCheckboxLabelClass(size: GrCheckboxSize): string {
-  return [labelBase, labelSizes[size]].join(' ')
+}): Record<string, string | undefined> {
+  return {
+    'data-gr-size': options.size,
+    'data-gr-off': flag(options.disabled),
+    'data-gr-invalid': flag(options.invalid && !options.disabled),
+    'data-gr-label': options.labelPosition === 'start' ? 'start' : undefined,
+  }
 }

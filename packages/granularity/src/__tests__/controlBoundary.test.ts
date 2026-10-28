@@ -2,11 +2,14 @@ import { mount } from '@vue/test-utils'
 import { describe, expect, it } from 'vitest'
 
 import GrCheckbox from '../components/GrCheckbox/GrCheckbox.vue'
+import GrRadio from '../components/GrRadio/GrRadio.vue'
 import GrSwitch from '../components/GrSwitch/GrSwitch.vue'
 
-import { controlUncheckedClass } from '../components/GrCheckbox/grCheckboxStyles'
-import { grRadioControlUncheckedClass } from '../components/GrRadio/grRadioStyles'
-import { getColorClassExpression } from './cssContrast'
+import { componentSheet } from './componentSheet'
+
+const { look: checkboxLook } = componentSheet('GrCheckbox/GrCheckbox.vue')
+const { look: switchLook } = componentSheet('GrSwitch/GrSwitch.vue')
+const { look: radioLook } = componentSheet('GrButton/GrButton.vue', 'GrRadio/GrRadio.vue')
 
 /**
  * Граница переключаемого контрола — единственное, по чему его видно.
@@ -18,19 +21,26 @@ import { getColorClassExpression } from './cssContrast'
  * пакета токенов. Здесь — что контролы ядра рисуют рамку именно ею.
  */
 describe('граница переключаемого контрола', () => {
-  it.each([
-    ['GrCheckbox', controlUncheckedClass],
-    ['GrRadio', grRadioControlUncheckedClass],
-  ])('%s: невыбранная рамка — `--gr-control-brd`', (_name, className) => {
-    expect(getColorClassExpression(className, 'border-[')).toBe('var(--gr-control-brd)')
+  it('GrCheckbox: невыбранная рамка — `--gr-control-brd`', () => {
+    const wrapper = mount(GrCheckbox, { props: { modelValue: false, label: 'Согласие' } })
+
+    expect(checkboxLook(wrapper.get('[role="checkbox"]').element)['border-color']).toBe('var(--gr-control-brd)')
+    wrapper.unmount()
+  })
+
+  it('GrRadio: невыбранная рамка — `--gr-control-brd`', () => {
+    const wrapper = mount(GrRadio, { props: { modelValue: 'b', value: 'a', label: 'Первый' } })
+
+    expect(radioLook(wrapper.get('[data-gr-radio-control]').element)['border-color']).toBe('var(--gr-control-brd)')
+    wrapper.unmount()
   })
 
   it('GrSwitch: рамка выключенной дорожки — `--gr-control-brd`, у недоступной — своя', () => {
     const off = mount(GrSwitch, { props: { modelValue: false, ariaLabel: 'Уведомления' } })
     const disabled = mount(GrSwitch, { props: { modelValue: false, disabled: true, ariaLabel: 'Уведомления' } })
 
-    expect(off.get('[data-gr-switch-track]').attributes('style')).toContain('--gr-switch-track-brd: var(--gr-control-brd)')
-    expect(disabled.get('[data-gr-switch-track]').attributes('style')).toContain('--gr-switch-track-brd: var(--gr-disabled-brd)')
+    expect(switchLook(off.get('[data-gr-switch-track]').element)['border-color']).toBe('var(--gr-control-brd)')
+    expect(switchLook(disabled.get('[data-gr-switch-track]').element)['border-color']).toBe('var(--gr-disabled-brd)')
     off.unmount()
     disabled.unmount()
   })
@@ -39,8 +49,8 @@ describe('граница переключаемого контрола', () => {
     const readonly = mount(GrCheckbox, { props: { modelValue: false, readonly: true, label: 'Согласие' } })
     const disabled = mount(GrCheckbox, { props: { modelValue: false, disabled: true, label: 'Согласие' } })
 
-    expect(readonly.get('[role="checkbox"]').classes()).toContain('border-[var(--gr-control-brd)]')
-    expect(disabled.get('[role="checkbox"]').classes()).not.toContain('border-[var(--gr-control-brd)]')
+    expect(checkboxLook(readonly.get('[role="checkbox"]').element)['border-color']).toBe('var(--gr-control-brd)')
+    expect(checkboxLook(disabled.get('[role="checkbox"]').element)['border-color']).not.toBe('var(--gr-control-brd)')
     readonly.unmount()
     disabled.unmount()
   })

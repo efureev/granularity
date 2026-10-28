@@ -2,97 +2,63 @@ import { mount } from '@vue/test-utils'
 import { describe, expect, it, vi } from 'vitest'
 import { h } from 'vue'
 
+import { componentSheet } from '../../../__tests__/componentSheet'
 import GrBadge from '../GrBadge.vue'
-import {
-  badgeDotCurrentColorClass,
-  badgeDotSizeClassBySize,
-  badgeDotToneClass,
-} from '../grBadgeStyles'
+
+const { look } = componentSheet('GrBadge/GrBadge.vue')
+const label = (wrapper: { element: Element }) => wrapper.element.firstElementChild!
+const text = (wrapper: { element: Element }) => label(wrapper).lastElementChild!
 
 describe('GrBadge', () => {
   it('рендерит light-tone по указанному tone', () => {
-    const wrapper = mount(GrBadge, {
-      props: {
-        tone: 'success',
-      },
-      slots: {
-        default: 'Success',
-      },
-    })
+    const wrapper = mount(GrBadge, { props: { tone: 'success' }, slots: { default: 'Success' } })
+    const style = look(wrapper.element)
 
     expect(wrapper.text()).toContain('Success')
-    expect(wrapper.attributes('class')).toContain('bg-[var(--gr-success-light)]')
+    expect(style['background-color']).toBe('var(--gr-success-light)')
     // Именно `-text`, а не `--gr-success`: насыщенный тон на своей же светлой
     // подложке даёт 2.24:1.
-    expect(wrapper.attributes('class')).toContain('text-[var(--gr-success-text)]')
+    expect(style.color).toBe('var(--gr-success-text)')
+    // Вид — атрибуты и лист компонента: разметка метки не несёт строки утилит.
+    expect(wrapper.attributes('class')).toBeUndefined()
   })
 
   it('поддерживает size: sm / md / lg', () => {
-    const sm = mount(GrBadge, { props: { size: 'sm' }, slots: { default: 'SM' } })
-    expect(sm.attributes('class')).toContain('text-[length:var(--gr-control-text-xs)]')
-    expect(sm.attributes('class')).toContain('px-2')
+    const styleOf = (size: 'sm' | 'md' | 'lg') => look(mount(GrBadge, { props: { size }, slots: { default: size } }).element)
 
-    const md = mount(GrBadge, { props: { size: 'md' }, slots: { default: 'MD' } })
-    expect(md.attributes('class')).toContain('text-[length:var(--gr-control-text-sm)]')
-    expect(md.attributes('class')).toContain('px-3')
-
-    const lg = mount(GrBadge, { props: { size: 'lg' }, slots: { default: 'LG' } })
-    expect(lg.attributes('class')).toContain('text-[length:var(--gr-control-text-md)]')
-    expect(lg.attributes('class')).toContain('px-3')
-    expect(lg.attributes('class')).toContain('py-1')
+    expect(styleOf('sm')).toMatchObject({ 'font-size': 'var(--gr-control-text-xs)', 'padding': '0.125rem 0.625rem' })
+    expect(styleOf('md')).toMatchObject({ 'font-size': 'var(--gr-control-text-sm)', 'padding': '0.25rem 0.75rem' })
+    expect(styleOf('lg')).toMatchObject({ 'font-size': 'var(--gr-control-text-md)', 'padding': '0.375rem 0.875rem' })
   })
 
   it('поддерживает радиусы square / semi / round', () => {
-    const square = mount(GrBadge, { props: { radius: 'square' }, slots: { default: 'Square' } })
-    expect(square.attributes('class')).toContain('rounded-[var(--gr-radius-none)]')
+    const radiusOf = (props: Record<string, unknown>) => look(mount(GrBadge, { props, slots: { default: 'R' } }).element)['border-radius']
 
-    const semi = mount(GrBadge, {
-      props: { radius: 'semi', size: 'lg' },
-      slots: { default: 'Semi' },
-    })
-    expect(semi.attributes('class')).toContain('rounded-[var(--gr-badge-semi-radius-lg)]')
-
-    const round = mount(GrBadge, { props: { radius: 'round' }, slots: { default: 'Round' } })
-    expect(round.attributes('class')).toContain('rounded-[var(--gr-radius-full)]')
+    expect(radiusOf({ radius: 'square' })).toBe('var(--gr-radius-none)')
+    expect(radiusOf({ radius: 'semi', size: 'lg' })).toBe('var(--gr-badge-semi-radius-lg)')
+    expect(radiusOf({ radius: 'round' })).toBe('var(--gr-radius-full)')
   })
 
   it('рендерит dark filled tone при dark=true', () => {
-    const wrapper = mount(GrBadge, {
-      props: {
-        tone: 'success',
-        dark: true,
-        size: 'lg',
-        radius: 'semi',
-      },
-      slots: {
-        default: 'Success',
-      },
-    })
+    const style = look(mount(GrBadge, { props: { tone: 'success', dark: true, size: 'lg', radius: 'semi' }, slots: { default: 'Success' } }).element)
 
     // Заливка filled идёт через покомпонентный слой: вес у тем разный (в светлой
     // это `-solid` под светлый текст, в тёмной — роль тона под тёмный).
-    expect(wrapper.attributes('class')).toContain('bg-[var(--gr-badge-success-bg)]')
+    expect(style['background-color']).toBe('var(--gr-badge-success-bg)')
     // Полярность текста задаёт тема, а не захардкоженный `text-white`: тот давал
     // 2.54:1 в light и 1.92:1 в dark.
-    expect(wrapper.attributes('class')).toContain('text-[var(--gr-badge-success-fg)]')
-    expect(wrapper.attributes('class')).toContain('rounded-[var(--gr-badge-semi-radius-lg)]')
+    expect(style.color).toBe('var(--gr-badge-success-fg)')
+    expect(style['border-radius']).toBe('var(--gr-badge-semi-radius-lg)')
   })
 
   it('поддерживает новые tones slate и azure', () => {
-    const slate = mount(GrBadge, {
-      props: { tone: 'slate' },
-      slots: { default: 'Slate' },
-    })
+    const slate = look(mount(GrBadge, { props: { tone: 'slate' }, slots: { default: 'Slate' } }).element)
+    const azure = look(mount(GrBadge, { props: { tone: 'azure', dark: true }, slots: { default: 'Azure' } }).element)
 
-    const azure = mount(GrBadge, {
-      props: { tone: 'azure', dark: true },
-      slots: { default: 'Azure' },
-    })
-
-    expect(slate.attributes('class')).toContain('bg-[var(--gr-slate-light)]')
-    expect(slate.attributes('class')).toContain('text-[var(--gr-slate-text)]')
-    expect(azure.attributes('class')).toContain('bg-[var(--gr-badge-azure-bg)]')
-    expect(azure.attributes('class')).toContain('text-[var(--gr-badge-azure-fg)]')
+    expect(slate['background-color']).toBe('var(--gr-slate-light)')
+    expect(slate.color).toBe('var(--gr-slate-text)')
+    expect(azure['background-color']).toBe('var(--gr-badge-azure-bg)')
+    expect(azure.color).toBe('var(--gr-badge-azure-fg)')
   })
 
   /**
@@ -107,21 +73,22 @@ describe('GrBadge', () => {
     const wrapper = mount(GrBadge, { props: { tone: 'danger' }, slots: { default: '3' } })
 
     for (const el of [wrapper.element, ...wrapper.element.querySelectorAll('*')]) {
-      expect(el.getAttribute('role'), el.className).toBeNull()
+      expect(el.getAttribute('role'), el.outerHTML).toBeNull()
       expect(
         [...el.attributes].map(a => a.name).filter(name => name.startsWith('aria-')),
-        el.className,
+        el.outerHTML,
       ).toEqual([])
     }
   })
 
   it('текст лежит в собственном узле и достаётся скринридеру', () => {
-    // `text-box-trim` живёт на `.gr-badge__text`, а не на корне: если содержимое
+    // `text-box-trim` живёт на узле текста, а не на корне: если содержимое
     // переедет, обрезка перестанет попадать в текст и вернётся косой базлайн.
     const wrapper = mount(GrBadge, { slots: { default: 'Черновик' } })
 
-    expect(wrapper.get('.gr-badge__text').text()).toBe('Черновик')
-    expect(wrapper.get('.gr-badge__text').attributes('aria-hidden')).toBeUndefined()
+    expect(text(wrapper).textContent).toBe('Черновик')
+    expect(look(text(wrapper))['text-box-trim']).toBe('trim-both')
+    expect(text(wrapper).getAttribute('aria-hidden')).toBeNull()
   })
 })
 
@@ -141,7 +108,7 @@ describe('GrBadge — снятое имя пропа', () => {
       expect(warn.mock.calls[0][0]).toContain('`variant` переименован в `tone`')
       // Предупреждение ничего не чинит за потребителя: алиас после 1.0 остался
       // бы навсегда.
-      expect(wrapper.classes().join(' ')).not.toContain('danger')
+      expect(wrapper.attributes('data-gr-tone')).toBe('neutral')
       wrapper.unmount()
     }
     finally {
@@ -169,23 +136,21 @@ describe('GrBadge — снятое имя пропа', () => {
       expect(icon.exists()).toBe(true)
       expect(icon.find('[data-testid="spinner"]').exists()).toBe(true)
       // Порядок узлов, а не только факт наличия: иконка стоит перед подписью.
-      expect(wrapper.find('.gr-badge__label').element.firstElementChild)
-        .toBe(icon.element)
+      expect(label(wrapper).firstElementChild).toBe(icon.element)
     })
 
     it.each([
-      ['xs', 'h-3'],
-      ['sm', 'h-3.5'],
-      ['md', 'h-4'],
-      ['lg', 'h-4'],
+      ['xs', '0.75rem'],
+      ['sm', '0.875rem'],
+      ['md', '1rem'],
+      ['lg', '1rem'],
     ] as const)('size `%s` → размер иконки `%s`', (size, expected) => {
       const wrapper = mount(GrBadge, {
         props: { size },
         slots: { icon: '<svg />', default: 'Метка' },
       })
 
-      expect(wrapper.find('[data-gr-badge-icon]').classes()).toContain(expected)
-      expect(wrapper.find('[data-gr-badge-icon]').classes()).toContain('shrink-0')
+      expect(look(wrapper.get('[data-gr-badge-icon]').element)).toMatchObject({ 'width': expected, 'height': expected, 'flex-shrink': '0' })
     })
   })
 
@@ -217,7 +182,7 @@ describe('GrBadge · точка-маркер', () => {
       slots: { default: 'Оплачено' },
     })
 
-    expect(wrapper.get('[data-gr-badge-dot]').classes()).toContain(badgeDotToneClass.success)
+    expect(look(wrapper.get('[data-gr-badge-dot]').element)['background-color']).toBe('var(--gr-badge-success-bg)')
   })
 
   it('названный тон красит маркер отдельно от плашки', () => {
@@ -225,11 +190,10 @@ describe('GrBadge · точка-маркер', () => {
       props: { tone: 'neutral', dot: 'warning' },
       slots: { default: 'Ждёт оплаты' },
     })
-    const dot = wrapper.get('[data-gr-badge-dot]')
 
     // Ради этой пары паттерн и существует: тихая плашка, цветной маркер.
-    expect(dot.classes()).toContain(badgeDotToneClass.warning)
-    expect(dot.classes()).not.toContain(badgeDotToneClass.neutral)
+    expect(look(wrapper.get('[data-gr-badge-dot]').element)['background-color']).toBe('var(--gr-badge-warning-bg)')
+    expect(look(wrapper.element)['background-color']).toBe('var(--gr-muted)')
   })
 
   it('на заливке маркер всегда цвета текста, и названный тон предупреждает', () => {
@@ -240,11 +204,9 @@ describe('GrBadge · точка-маркер', () => {
         props: { tone: 'neutral', dark: true, dot: 'success' },
         slots: { default: 'Активен' },
       })
-      const dot = wrapper.get('[data-gr-badge-dot]')
 
       // Подложка filled-бейджа берётся из того же слоя — тон слился бы с ней.
-      expect(dot.classes()).toContain(badgeDotCurrentColorClass)
-      expect(dot.classes()).not.toContain(badgeDotToneClass.success)
+      expect(look(wrapper.get('[data-gr-badge-dot]').element)['background-color']).toBe('currentColor')
       expect(warn).toHaveBeenCalledTimes(1)
       expect(warn.mock.calls[0][0]).toContain('success')
     }
@@ -280,17 +242,16 @@ describe('GrBadge · точка-маркер', () => {
 
     expect(dot.attributes('aria-hidden')).toBe('true')
     // `text-box-trim` живёт на подписи; попади маркер внутрь — потянул бы высоту.
-    expect(dot.element.parentElement?.classList.contains('gr-badge__label')).toBe(true)
-    expect(wrapper.get('.gr-badge__text').find('[data-gr-badge-dot]').exists()).toBe(false)
+    expect(dot.element.parentElement).toBe(label(wrapper))
+    expect(text(wrapper).querySelector('[data-gr-badge-dot]')).toBeNull()
   })
 
   it('размер маркера идёт за ступенью бейджа', () => {
+    const expected = { xs: '0.375rem', sm: '0.375rem', md: '0.5rem', lg: '0.5rem' } as const
     for (const size of (['xs', 'sm', 'md', 'lg'] as const)) {
       const wrapper = mount(GrBadge, { props: { size, dot: true }, slots: { default: 'X' } })
-      const classes = wrapper.get('[data-gr-badge-dot]').classes()
 
-      for (const token of badgeDotSizeClassBySize[size].split(' '))
-        expect(classes, size).toContain(token)
+      expect(look(wrapper.get('[data-gr-badge-dot]').element), size).toMatchObject({ width: expected[size], height: expected[size] })
     }
   })
 })

@@ -3,6 +3,9 @@ import { nextTick } from 'vue'
 import { afterEach, describe, expect, it } from 'vitest'
 
 import GrSelect from '../GrSelect.vue'
+import { componentSheet } from '../../../__tests__/componentSheet'
+
+const { look: chipLook } = componentSheet('GrBadge/GrBadge.vue', 'GrChip/GrChip.vue')
 
 function getTeleportedElement<T extends Element = HTMLElement>(selector: string): T {
   const element = document.body.querySelector(selector)
@@ -927,11 +930,11 @@ describe('GrSelect — теги', () => {
 
     // Своя плашка красилась `--gr-muted` без рамки: на светлой теме это 1.05:1
     // к фону поля, то есть тег было не видно.
-    expect(tag.classes()).toContain('bg-[var(--gr-muted)]')
-    expect(tag.classes()).toContain('border-[color-mix(in_srgb,var(--gr-brd)_var(--gr-badge-light-brd),var(--gr-muted))]')
+    expect(chipLook(tag.element)['background-color']).toBe('var(--gr-muted)')
+    expect(chipLook(tag.element)['border-color']).toBe('color-mix(in srgb, var(--gr-brd) var(--gr-badge-light-brd), var(--gr-muted))')
 
     const toned = mount(GrSelect, { props: { ...tagProps, tagTone: 'info' } })
-    expect(toned.get('[data-gr-select-tag]').classes()).toContain('bg-[var(--gr-info-light)]')
+    expect(chipLook(toned.get('[data-gr-select-tag]').element)['background-color']).toBe('var(--gr-info-light)')
   })
 
   /**
@@ -955,11 +958,11 @@ describe('GrSelect — теги', () => {
 
     const tags = wrapper.findAll('[data-gr-select-tag]')
 
-    expect(tags[0].classes()).toContain('bg-[var(--gr-success-light)]')
+    expect(chipLook(tags[0].element)['background-color']).toBe('var(--gr-success-light)')
     // Без своего тона опция берёт общий `tagTone`.
-    expect(tags[1].classes()).toContain('bg-[var(--gr-info-light)]')
+    expect(chipLook(tags[1].element)['background-color']).toBe('var(--gr-info-light)')
     // `dark` у опции тоже перекрывает общий: заливка плотная.
-    expect(tags[2].classes()).toContain('bg-[var(--gr-badge-danger-bg)]')
+    expect(chipLook(tags[2].element)['background-color']).toBe('var(--gr-badge-danger-bg)')
   })
 
   it('крестик снимает значение', async () => {

@@ -5,6 +5,9 @@ import { describe, expect, it } from 'vitest'
 import GrConfigProvider from '../../GrConfigProvider/GrConfigProvider.vue'
 import GrTabs from '../GrTabs.vue'
 import type { GrTab } from '../GrTabs.vue'
+import { componentSheet } from '../../../__tests__/componentSheet'
+
+const { look: tabsLook } = componentSheet('GrTabs/GrTabs.vue')
 
 const tabs = [
   { value: 'overview', label: 'Overview' },
@@ -212,17 +215,17 @@ describe('GrTabs — вид и содержимое вкладки', () => {
 
   it('pills — обойма с рамкой, line — ряд с подчёркиванием активной', () => {
     const pills = mount(GrTabs, { props: baseProps })
-    expect(pills.get('[role="tablist"]').classes()).toContain('bg-[var(--gr-tabs-pills-list-bg)]')
-    expect(pills.get('[data-gr-tab]').classes()).toContain('bg-[var(--gr-tabs-pills-active-bg)]')
+    expect(tabsLook(pills.get('[role="tablist"]').element)['background-color']).toBe('var(--gr-tabs-pills-list-bg)')
+    expect(tabsLook(pills.get('[data-gr-tab]').element)['background-color']).toBe('var(--gr-tabs-pills-active-bg)')
 
     const line = mount(GrTabs, { props: { ...baseProps, variant: 'line' } })
-    const list = line.get('[role="tablist"]')
-    expect(list.classes()).toContain('border-b')
-    expect(list.classes()).not.toContain('bg-[var(--gr-tabs-pills-list-bg)]')
+    const list = tabsLook(line.get('[role="tablist"]').element)
+    expect(list['border-bottom-width']).toBe('1px')
+    expect(list['background-color']).toBeUndefined()
 
-    const active = line.get('[data-gr-tab]')
-    expect(active.classes()).toContain('border-[var(--gr-selected)]')
-    expect(active.classes()).not.toContain('bg-[var(--gr-tabs-pills-active-bg)]')
+    const active = tabsLook(line.get('[data-gr-tab]').element)
+    expect(active['border-color']).toBe('var(--gr-selected)')
+    expect(active['background-color']).toBeUndefined()
   })
 
   it('вариант читается из GrConfigProvider, локальный проп сильнее', () => {
@@ -237,9 +240,8 @@ describe('GrTabs — вид и содержимое вкладки', () => {
       `,
     })
 
-    expect(mount(Harness).get('[role="tablist"]').classes()).toContain('border-b')
-    expect(mount(Harness, { props: { variant: 'pills' } }).get('[role="tablist"]').classes())
-      .toContain('bg-[var(--gr-tabs-pills-list-bg)]')
+    expect(mount(Harness).get('[role="tablist"]').attributes('data-gr-variant')).toBe('line')
+    expect(mount(Harness, { props: { variant: 'pills' } }).get('[role="tablist"]').attributes('data-gr-variant')).toBe('pills')
   })
 
   it('иконка вкладки рендерится декоративной', () => {
@@ -272,12 +274,12 @@ describe('GrTabs — вид и содержимое вкладки', () => {
 
   it('горизонтальный ряд прокручивается, вертикальный — колонка', () => {
     const horizontal = mount(GrTabs, { props: baseProps })
-    expect(horizontal.get('[role="tablist"]').classes()).toContain('overflow-x-auto')
+    expect(tabsLook(horizontal.get('[role="tablist"]').element)['overflow-x']).toBe('auto')
 
     const vertical = mount(GrTabs, { props: { ...baseProps, orientation: 'vertical' } })
-    const list = vertical.get('[role="tablist"]')
-    expect(list.classes()).toContain('flex-col')
-    expect(list.classes()).not.toContain('overflow-x-auto')
+    const list = tabsLook(vertical.get('[role="tablist"]').element)
+    expect(list['flex-direction']).toBe('column')
+    expect(list['overflow-x']).toBeUndefined()
   })
 
   /**
@@ -310,11 +312,11 @@ describe('GrTabs — вид и содержимое вкладки', () => {
 
   it('кегли идут от токенов --gr-text-*', () => {
     const xs = mount(GrTabs, { props: { ...baseProps, size: 'xs' } })
-    expect(xs.get('[data-gr-tab]').classes()).toContain('text-[length:var(--gr-text-xs)]')
+    expect(tabsLook(xs.get('[data-gr-tab]').element)['font-size']).toBe('var(--gr-text-xs)')
     expect(xs.html()).not.toMatch(/text-\[\d+px\]/)
 
     const lg = mount(GrTabs, { props: { ...baseProps, size: 'lg' } })
-    expect(lg.get('[data-gr-tab]').classes()).toContain('text-[length:var(--gr-text-base)]')
+    expect(tabsLook(lg.get('[data-gr-tab]').element)['font-size']).toBe('var(--gr-text-base)')
     expect(lg.html()).not.toMatch(/text-\[\d+px\]/)
   })
 })
@@ -341,7 +343,7 @@ describe('GrTabs — пустой ряд', () => {
     const wrapper = mount(GrTabs, { props: { ...emptyProps, size: 'lg' } })
 
     // Иначе соседние блоки прыгают, когда закрыли последнюю вкладку.
-    expect(wrapper.get('[data-gr-tabs-empty]').classes()).toContain('h-11')
+    expect(tabsLook(wrapper.get('[data-gr-tabs-empty]').element).height).toBe('2.75rem')
   })
 })
 
@@ -653,10 +655,10 @@ describe('GrTabs — вертикальная колонка выровнена 
     const wrapper = mount(GrTabs, { props: { modelValue: 'profile', tabs: sections, orientation: 'vertical' } })
     const tab = wrapper.findAll('[role="tab"]')[1]
 
-    expect(tab.classes()).toContain('text-start')
+    expect(tabsLook(tab.element)['text-align']).toBe('start')
     const content = tab.element.firstElementChild!
-    expect(content.classList.contains('w-full')).toBe(true)
-    expect(content.firstElementChild!.classList.contains('flex-1')).toBe(true)
+    expect(tabsLook(content).width).toBe('100%')
+    expect(tabsLook(content.firstElementChild!).flex).toBe('1 1 0%')
     expect(content.lastElementChild!.textContent?.trim()).toBe('1')
   })
 
@@ -664,7 +666,7 @@ describe('GrTabs — вертикальная колонка выровнена 
     const wrapper = mount(GrTabs, { props: { modelValue: 'profile', tabs: sections } })
     const tab = wrapper.findAll('[role="tab"]')[1]
 
-    expect(tab.classes()).not.toContain('text-start')
-    expect(tab.element.firstElementChild!.classList.contains('inline-flex')).toBe(true)
+    expect(tabsLook(tab.element)['text-align']).toBeUndefined()
+    expect(tabsLook(tab.element.firstElementChild!).display).toBe('inline-flex')
   })
 })

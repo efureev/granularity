@@ -5,6 +5,9 @@ import { afterEach, describe, expect, it } from 'vitest'
 import { resetGranularityDom } from '../../../testing'
 import GrChip from '../../GrChip/GrChip.vue'
 import GrChipGroup from '../GrChipGroup.vue'
+import { componentSheet } from '../../../__tests__/componentSheet'
+
+const { look: chipLook } = componentSheet('GrBadge/GrBadge.vue', 'GrChip/GrChip.vue')
 
 /**
  * Группа — составной виджет, и проверяется здесь именно это: одна остановка
@@ -187,16 +190,15 @@ describe('GrChipGroup', () => {
     const wrapper = mountGroup({ modelValue: ['beta'], tone: 'primary' })
     const [unselected, selected] = chips(wrapper)
 
-    expect(selected.attributes('class')).toContain('--gr-badge-primary-bg')
-    expect(unselected.attributes('class')).toContain('var(--gr-accent)')
-    expect(unselected.attributes('class')).not.toContain('--gr-badge-primary-bg')
+    expect(chipLook(selected.element)['background-color']).toBe('var(--gr-badge-primary-bg)')
+    expect(chipLook(unselected.element)['background-color']).toBe('var(--gr-accent)')
   })
 
   it('размер группы доезжает до чипов, а проп чипа сильнее', () => {
     const fromGroup = mountGroup({ modelValue: [], size: 'lg' })
-    expect(chips(fromGroup)[0].attributes('class')).toContain('--gr-control-text-lg')
+    expect(chips(fromGroup)[0].attributes('data-gr-size')).toBe('lg')
 
     const fromChip = mountGroup({ modelValue: [], size: 'lg' }, { size: 'xs' })
-    expect(chips(fromChip)[0].attributes('class')).toContain('--gr-control-text-xs')
+    expect(chips(fromChip)[0].attributes('data-gr-size')).toBe('xs')
   })
 })

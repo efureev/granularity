@@ -6,15 +6,8 @@ import { useGrComponentSize } from '../shared/configContext'
 import type { GrButtonSize, GrButtonTone, GrButtonVariant } from '../GrButton'
 
 import {
-  grRadioButtonClass,
   grRadioButtonLook,
-  grRadioControlClass,
-  grRadioDescriptionSizes,
-  grRadioDotBaseClass,
-  grRadioDotClass,
-  grRadioDotSizes,
-  grRadioLabelClassFor,
-  grRadioRootClass,
+  grRadioLookAttrs,
   type GrRadioVariant,
 } from './grRadioStyles'
 import { GR_RADIO_GROUP_CONTEXT, type GrRadioValue } from './grRadioGroupContext'
@@ -150,15 +143,10 @@ const submitsValue = computed(
 const descriptionId = useId()
 const hasDescription = computed(() => Boolean(slots.description))
 
-const buttonClassName = computed(() => grRadioButtonClass({
-  checked: checked.value,
-  disabled: resolvedDisabled.value,
-  readonly: resolvedReadonly.value,
-}))
-
 const buttonLook = computed(() => grRadioButtonLook({
   checked: checked.value,
   disabled: resolvedDisabled.value,
+  readonly: resolvedReadonly.value,
   size: resolvedSize.value,
   buttonVariant: props.buttonVariant,
   buttonTone: props.buttonTone,
@@ -166,23 +154,11 @@ const buttonLook = computed(() => grRadioButtonLook({
   selectedButtonTone: props.selectedButtonTone,
 }))
 
-const rootClassName = computed(() => grRadioRootClass({
+const lookAttrs = computed(() => grRadioLookAttrs({
+  size: resolvedSize.value,
   disabled: resolvedDisabled.value,
   readonly: resolvedReadonly.value,
 }))
-const controlClassName = computed(() => grRadioControlClass({
-  size: resolvedSize.value,
-  checked: checked.value,
-  disabled: resolvedDisabled.value,
-  invalid: resolvedInvalid.value,
-}))
-const dotClassName = computed(() => grRadioDotClass({
-  checked: checked.value,
-  disabled: resolvedDisabled.value,
-}))
-const labelClassName = computed(() => grRadioLabelClassFor(resolvedSize.value, checked.value))
-const dotSizeClassName = computed(() => grRadioDotSizes[resolvedSize.value])
-const descriptionClassName = computed(() => grRadioDescriptionSizes[resolvedSize.value])
 
 function setValue(next: GrRadioValue): void {
   if (resolvedDisabled.value)
@@ -254,7 +230,6 @@ defineSlots<{
     :aria-errormessage="aria.errorMessage()"
     :data-value="domValue"
     :tabindex="rovingTabindex"
-    :class="buttonClassName"
     v-bind="{ ...buttonLook, ...aria.rootAttrs() }"
     @click="onButtonClick"
     @keydown.space.prevent="onButtonClick"
@@ -288,9 +263,7 @@ defineSlots<{
     :aria-errormessage="aria.errorMessage()"
     :data-value="domValue"
     :tabindex="rovingTabindex"
-    class="inline-flex items-start gap-2 select-none focus-visible:outline-none focus-visible:rounded-[var(--gr-radius-md)] focus-visible:shadow-[0_0_0_2px_var(--gr-ring),0_0_0_4px_var(--gr-bg)]"
-    :class="rootClassName"
-    v-bind="aria.rootAttrs()"
+    v-bind="{ ...lookAttrs, ...aria.rootAttrs() }"
     @click="onButtonClick"
     @keydown.space.prevent="onButtonClick"
     @keydown.enter.prevent="onButtonClick"
@@ -304,20 +277,12 @@ defineSlots<{
       :form="form"
     >
 
-    <span
-      data-gr-radio-control
-      aria-hidden="true"
-      class="mt-0.5 shrink-0 rounded-[var(--gr-radius-full)] border flex items-center justify-center transition-colors duration-[var(--gr-duration-fast)]"
-      :class="controlClassName"
-    >
-      <span
-        data-gr-radio-dot
-        :class="[grRadioDotBaseClass, dotSizeClassName, dotClassName]"
-      />
+    <span data-gr-radio-control aria-hidden="true">
+      <span data-gr-radio-dot />
     </span>
 
-    <span class="grid gap-0.5">
-      <span data-gr-radio-label :class="labelClassName">
+    <span>
+      <span data-gr-radio-label>
         <slot />
       </span>
 
@@ -325,10 +290,226 @@ defineSlots<{
         v-if="hasDescription"
         :id="descriptionId"
         data-gr-radio-description
-        :class="descriptionClassName"
       >
         <slot name="description" />
       </span>
     </span>
   </div>
 </template>
+
+<style>
+/*
+ * Вид радио — лист по атрибутам (`docs/markup-weight.md`): ступень и «только для
+ * чтения» ставит корень, выбор, недоступность и ошибку лист читает по `aria-checked`,
+ * `aria-disabled` и `aria-invalid`. Вид `button` рисует лист `GrButton`; здесь — только
+ * курсор и цвета недоступного.
+ */
+[data-gr-radio]:not([data-gr-button]) {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+/* Корень вида `button` — `div` с ролью, курсора кнопки у него нет. */
+[data-gr-radio][data-gr-button] {
+  cursor: pointer;
+}
+
+/* Только для чтения: значение видно и читается, но курсор не обещает клика. */
+[data-gr-radio][data-gr-readonly] {
+  cursor: default;
+}
+
+/* Недоступный гасится токенами, а не `opacity`: прозрачность разбавляет выверенные на AA цвета. */
+[data-gr-radio]:not([data-gr-button])[aria-disabled='true'] {
+  color: var(--gr-muted-fg);
+  cursor: not-allowed;
+}
+
+[data-gr-radio]:not([data-gr-button]):focus-visible {
+  border-radius: var(--gr-radius-md);
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 2px var(--gr-ring), 0 0 0 4px var(--gr-bg);
+}
+
+/* Рамка невыбранного радио — `--gr-control-brd` с 3:1 к фону: другого признака у него нет. */
+[data-gr-radio-control] {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  margin-top: 0.125rem;
+  border-width: 1px;
+  border-radius: var(--gr-radius-full);
+  border-color: var(--gr-control-brd);
+  background-color: var(--gr-bg);
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+  transition-duration: var(--gr-duration-fast);
+  transition-timing-function: var(--gr-ease-out);
+}
+
+[data-gr-radio][aria-invalid='true'] > [data-gr-radio-control] {
+  border-color: var(--gr-danger);
+}
+
+[data-gr-radio][aria-checked='true'] > [data-gr-radio-control] {
+  border-color: var(--gr-selected);
+  background-color: var(--gr-radio-checked-bg);
+}
+
+[data-gr-radio][aria-disabled='true'] > [data-gr-radio-control] {
+  border-color: var(--gr-brd);
+  background-color: var(--gr-muted);
+}
+
+/* Отклик на указатель над всей подписью — только у рабочего радио. */
+[data-gr-radio]:not([aria-disabled='true'], [aria-invalid='true'], [data-gr-readonly]):hover > [data-gr-radio-control] {
+  border-color: var(--gr-control-brd-hover);
+}
+
+[data-gr-radio][aria-checked='true']:not([aria-disabled='true'], [aria-invalid='true'], [data-gr-readonly]):hover > [data-gr-radio-control] {
+  border-color: var(--gr-selected-hover);
+  background-color: var(--gr-radio-checked-hover-bg);
+}
+
+[data-gr-radio-dot] {
+  border-radius: var(--gr-radius-full);
+  background-color: transparent;
+  opacity: 0;
+  transform: scale(0.75);
+  transition-property: transform, opacity, background-color;
+  transition-duration: var(--gr-duration-fast);
+  transition-timing-function: var(--gr-ease-out);
+}
+
+[data-gr-radio][aria-checked='true'] [data-gr-radio-dot] {
+  background-color: var(--gr-radio-dot);
+  opacity: 1;
+  transform: scale(1);
+}
+
+[data-gr-radio][aria-checked='true'][aria-disabled='true'] [data-gr-radio-dot] {
+  background-color: var(--gr-muted-fg);
+}
+
+[data-gr-radio-control] + span {
+  display: grid;
+  gap: 0.125rem;
+}
+
+[data-gr-radio-label] {
+  color: var(--gr-muted-fg);
+}
+
+/* Выбранный вариант выделяется текстом, а не только точкой. */
+[data-gr-radio][aria-checked='true'] [data-gr-radio-label] {
+  color: var(--gr-fg);
+  font-weight: 500;
+}
+
+[data-gr-radio-description] {
+  color: var(--gr-muted-fg);
+}
+
+[data-gr-radio][data-gr-size='xs'] > [data-gr-radio-control] {
+  width: 0.875rem;
+  height: 0.875rem;
+}
+
+[data-gr-radio][data-gr-size='xs'] [data-gr-radio-dot] {
+  width: 5px;
+  height: 5px;
+}
+
+[data-gr-radio][data-gr-size='xs'] [data-gr-radio-label] {
+  font-size: var(--gr-text-xs);
+  line-height: var(--gr-leading-xs);
+}
+
+[data-gr-radio][data-gr-size='xs'] [data-gr-radio-description] {
+  font-size: var(--gr-text-2xs);
+  line-height: var(--gr-leading-2xs);
+}
+
+[data-gr-radio][data-gr-size='sm'] > [data-gr-radio-control] {
+  width: 1rem;
+  height: 1rem;
+}
+
+[data-gr-radio][data-gr-size='sm'] [data-gr-radio-dot] {
+  width: 6px;
+  height: 6px;
+}
+
+[data-gr-radio][data-gr-size='sm'] [data-gr-radio-label] {
+  font-size: var(--gr-text-sm);
+  line-height: var(--gr-leading-sm);
+}
+
+[data-gr-radio][data-gr-size='sm'] [data-gr-radio-description] {
+  font-size: var(--gr-text-xs);
+  line-height: var(--gr-leading-xs);
+}
+
+[data-gr-radio][data-gr-size='md'] > [data-gr-radio-control] {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+[data-gr-radio][data-gr-size='md'] [data-gr-radio-dot] {
+  width: 0.5rem;
+  height: 0.5rem;
+}
+
+[data-gr-radio][data-gr-size='md'] [data-gr-radio-label] {
+  font-size: var(--gr-text-sm);
+  line-height: var(--gr-leading-sm);
+}
+
+[data-gr-radio][data-gr-size='md'] [data-gr-radio-description] {
+  font-size: var(--gr-text-xs);
+  line-height: var(--gr-leading-xs);
+}
+
+[data-gr-radio][data-gr-size='lg'] > [data-gr-radio-control] {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+[data-gr-radio][data-gr-size='lg'] [data-gr-radio-dot] {
+  width: 0.625rem;
+  height: 0.625rem;
+}
+
+[data-gr-radio][data-gr-size='lg'] [data-gr-radio-label] {
+  font-size: var(--gr-text-base);
+  line-height: var(--gr-leading-base);
+}
+
+[data-gr-radio][data-gr-size='lg'] [data-gr-radio-description] {
+  font-size: var(--gr-text-sm);
+  line-height: var(--gr-leading-sm);
+}
+
+/*
+ * Недоступная кнопка-радио гасится, но не теряет состояние: в недоступной группе
+ * выбор обязан оставаться виден, поэтому вид не отдан недоступной `GrButton` —
+ * у радио своя пара.
+ */
+[data-gr-radio][data-gr-button][aria-disabled='true'] {
+  border-width: 1px;
+  border-color: var(--gr-brd);
+  background-color: transparent;
+  color: var(--gr-muted-fg);
+  cursor: not-allowed;
+}
+
+[data-gr-radio][data-gr-button][aria-disabled='true'][aria-checked='true'] {
+  border-color: var(--gr-muted-fg);
+  background-color: var(--gr-muted);
+  color: var(--gr-fg);
+}
+</style>

@@ -13,14 +13,7 @@ import { warnRenamedProp } from '../shared/renamedProp'
 import { hasMeaningfulSlotContent } from '../shared/slotNodes'
 import { GR_CHIP_GROUP_CONTEXT } from '../shared/chipGroupContext'
 import type { GrChipRadius, GrChipSize, GrChipTone } from './grChipStyles'
-import {
-  chipCloseButtonClass,
-  chipCloseClass,
-  chipIconClass,
-  chipIconSizeClassBySize,
-  chipLabelClass,
-  grChipClass,
-} from './grChipStyles'
+import { grChipLookAttrs } from './grChipStyles'
 
 /**
  * Интерактивный тег: снимаемый, выбираемый, с иконкой.
@@ -178,7 +171,7 @@ const resolvedDark = useGrComponentProp(
   false,
 )
 
-const rootClass = computed(() => grChipClass({
+const lookAttrs = computed(() => grChipLookAttrs({
   tone: resolvedTone.value,
   dark: resolvedDark.value,
   size: resolvedSize.value,
@@ -190,17 +183,14 @@ const rootClass = computed(() => grChipClass({
 
 /**
  * Группа с ошибкой — рамка невыбранных чипов ролью ошибки, как у полей ввода.
- * Раньше `invalid` группы доходил только до `aria-invalid`. Стилем, а не
- * классом: тон чипа сам задаёт цвет рамки, и два `border-[…]` решал бы порядок
- * утилит в листе.
+ * Инлайном, а не правилом листа: рамка ошибки обязана перебить и цвет тона, и
+ * отклик нейтрального чипа на указатель, а правила тона лежат в листе `GrBadge`.
  */
 const invalidStyle = computed(() => (
   inGroup.value && group!.invalid?.value && !isSelected.value && !isDisabled.value
     ? { borderColor: 'var(--gr-invalid-brd)' }
     : undefined
 ))
-
-const iconSizeClass = computed(() => chipIconSizeClassBySize[resolvedSize.value])
 
 const removeTitle = computed(() => {
   if (props.removeLabel)
@@ -321,7 +311,7 @@ defineExpose({
     ref="rootEl"
     data-gr-chip
     :type="isInteractive ? 'button' : undefined"
-    :class="rootClass"
+    v-bind="lookAttrs"
     :style="invalidStyle"
     :role="chipRole"
     :data-value="value"
@@ -336,11 +326,11 @@ defineExpose({
     @click="isInteractive ? onRootClick($event) : undefined"
     @keydown="isInteractive ? onRootKeydown($event) : undefined"
   >
-    <span v-if="$slots.icon" data-gr-chip-icon :class="[chipIconClass, iconSizeClass]">
+    <span v-if="$slots.icon" data-gr-chip-icon>
       <slot name="icon" />
     </span>
 
-    <span v-if="hasLabel" data-gr-chip-label :class="chipLabelClass">
+    <span v-if="hasLabel" data-gr-chip-label>
       <slot>{{ label }}</slot>
     </span>
 
@@ -352,11 +342,10 @@ defineExpose({
     <span
       v-if="isClosable && isInteractive"
       data-gr-chip-close
-      :class="[chipCloseClass, iconSizeClass]"
       :title="removeTitle"
       aria-hidden="true"
     >
-      <IconClose class="h-full w-full" />
+      <IconClose />
     </span>
 
     <button
@@ -364,13 +353,180 @@ defineExpose({
       ref="removeEl"
       data-gr-chip-close
       type="button"
-      :class="[chipCloseButtonClass, iconSizeClass]"
       :aria-label="removeTitle"
       :tabindex="removeTabindex"
       @mousedown.prevent.stop
       @click.stop="requestRemove()"
     >
-      <IconClose class="h-full w-full" />
+      <IconClose />
     </button>
   </component>
 </template>
+
+<style>
+/*
+ * Вид чипа — лист по атрибутам (`docs/markup-weight.md`). Цвета тона и радиусы
+ * задаёт лист `GrBadge` по тем же атрибутам: чип стоит с бейджем в одном ряду и не
+ * расходится с ним по цвету. Здесь — то, что у чипа своё.
+ *
+ * Размеры у чипа свои: по нему кликают, и цель нажатия обязана совпадать с
+ * соседним контролом, а не с подписью. Отсюда контрольная шкала кегля и явная
+ * высота — у метки её нет вовсе.
+ */
+[data-gr-chip] {
+  display: inline-flex;
+  max-width: 100%;
+  align-items: center;
+  border-width: 1px;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+/*
+ * Недоступный гасится токенами, а не `opacity`: прозрачность разбавляет выверенные
+ * на AA токены текста и роняет контраст. Цвета тона под ним не остаются.
+ */
+[data-gr-chip][data-gr-off] {
+  border-color: var(--gr-chip-disabled-brd, var(--gr-brd));
+  background-color: var(--gr-chip-disabled-bg, var(--gr-muted));
+  color: var(--gr-chip-disabled-fg, var(--gr-disabled-fg));
+  cursor: not-allowed;
+}
+
+[data-gr-chip][data-gr-interactive] {
+  cursor: pointer;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+  transition-duration: var(--gr-duration-fast);
+  transition-timing-function: var(--gr-ease-out);
+}
+
+/* Нажимаемый нейтральный чип — не нейтральная метка: тема может поставить его на бумагу с рамкой поля. */
+[data-gr-chip][data-gr-tone='neutral'][data-gr-interactive]:not([data-gr-dark]) {
+  border-color: var(--gr-chip-neutral-brd);
+  background-color: var(--gr-chip-neutral-bg);
+  color: var(--gr-chip-neutral-fg);
+}
+
+[data-gr-chip][data-gr-tone='neutral'][data-gr-interactive]:not([data-gr-dark]):hover {
+  border-color: var(--gr-chip-neutral-hover-brd);
+  background-color: var(--gr-chip-neutral-hover-bg);
+}
+
+[data-gr-chip][data-gr-interactive]:focus,
+[data-gr-chip-close]:is(button):focus {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+}
+
+[data-gr-chip][data-gr-interactive]:focus-visible {
+  box-shadow: 0 0 0 1px var(--gr-bg), 0 0 0 3px var(--gr-ring);
+}
+
+/*
+ * Одной заливки выбранному мало: начертание — второй, нецветовой канал (WCAG 1.4.1).
+ * Он же вытягивает набор, которому потребитель поставил `dark` целиком: заливка у
+ * выбранного и невыбранного там совпадает.
+ */
+[data-gr-chip][data-gr-selected] {
+  font-weight: 600;
+}
+
+[data-gr-chip][data-gr-size='xs'] {
+  height: 1.5rem;
+  gap: 0.25rem;
+  padding-inline: 0.5rem;
+  font-size: var(--gr-control-text-xs);
+  line-height: var(--gr-control-leading-xs);
+}
+
+[data-gr-chip][data-gr-size='xs'] :is([data-gr-chip-icon], [data-gr-chip-close]) {
+  width: 0.75rem;
+  height: 0.75rem;
+}
+
+[data-gr-chip][data-gr-size='sm'] {
+  height: 1.75rem;
+  gap: 0.25rem;
+  padding-inline: 0.625rem;
+  font-size: var(--gr-control-text-sm);
+  line-height: var(--gr-control-leading-sm);
+}
+
+[data-gr-chip][data-gr-size='sm'] :is([data-gr-chip-icon], [data-gr-chip-close]) {
+  width: 0.875rem;
+  height: 0.875rem;
+}
+
+[data-gr-chip][data-gr-size='md'] {
+  height: 2rem;
+  gap: 0.375rem;
+  padding-inline: 0.75rem;
+  font-size: var(--gr-control-text-md);
+  line-height: var(--gr-control-leading-md);
+}
+
+[data-gr-chip][data-gr-size='md'] :is([data-gr-chip-icon], [data-gr-chip-close]) {
+  width: 1rem;
+  height: 1rem;
+}
+
+[data-gr-chip][data-gr-size='lg'] {
+  height: 2.25rem;
+  gap: 0.375rem;
+  padding-inline: 0.875rem;
+  font-size: var(--gr-control-text-lg);
+  line-height: var(--gr-control-leading-lg);
+}
+
+[data-gr-chip][data-gr-size='lg'] :is([data-gr-chip-icon], [data-gr-chip-close]) {
+  width: 1rem;
+  height: 1rem;
+}
+
+/* Крестик и иконка не растут вместе с кеглем один в один — плитка бы разъехалась. */
+[data-gr-chip-icon] {
+  flex-shrink: 0;
+}
+
+/* Подпись жмётся, а не ломает ряд: чип с длинным тегом не должен рвать раскладку. */
+[data-gr-chip-label] {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Крестик наследует цвет тона: своей роли у него нет, он часть плитки. */
+[data-gr-chip-close] {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--gr-radius-full);
+  color: currentColor;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+  transition-duration: var(--gr-duration-fast);
+  transition-timing-function: var(--gr-ease-out);
+}
+
+[data-gr-chip-close]:hover {
+  background-color: color-mix(in srgb, currentColor 18%, transparent);
+}
+
+[data-gr-chip-close] > svg {
+  width: 100%;
+  height: 100%;
+}
+
+/*
+ * Крестик-кнопка стоит в таб-порядке и обязана показывать фокус сама: она есть
+ * только там, где чип не виджет, то есть кольца на корне нет.
+ */
+[data-gr-chip-close]:is(button) {
+  cursor: pointer;
+}
+
+[data-gr-chip-close]:is(button):focus-visible {
+  box-shadow: 0 0 0 2px var(--gr-ring);
+}
+</style>

@@ -14,6 +14,9 @@ vi.mock('~icons/lucide/check', () => {
 })
 
 import GrCheckbox from '../GrCheckbox.vue'
+import { componentSheet } from '../../../__tests__/componentSheet'
+
+const { look: checkboxLook } = componentSheet('GrCheckbox/GrCheckbox.vue')
 
 describe('GrCheckbox', () => {
   it('рисует индикатор и синхронизирует checked у нативного input[type=checkbox]', () => {
@@ -32,8 +35,7 @@ describe('GrCheckbox', () => {
     const native = wrapper.get('input[type="checkbox"]').element as HTMLInputElement
     expect(native.checked).toBe(true)
 
-    const icon = wrapper.get('[data-icon="check"]')
-    expect(icon.attributes('class')).toContain('gr-checkbox-icon')
+    expect(checkboxLook(wrapper.get('[data-icon="check"]').element)).toMatchObject({ opacity: '1', color: 'var(--gr-selected-fg)' })
   })
 
   it('эмитит update:modelValue при изменении', async () => {
@@ -163,7 +165,7 @@ describe('GrCheckbox', () => {
 
     const control = wrapper.get('[role="checkbox"]')
     expect(control.attributes('aria-invalid')).toBe('true')
-    expect(control.classes()).toContain('border-[var(--gr-danger)]')
+    expect(checkboxLook(control.element)['border-color']).toBe('var(--gr-danger)')
   })
 
   // Disabled гасится фоном, а не `opacity`: прозрачность разбавляет выверенные на AA
@@ -175,19 +177,19 @@ describe('GrCheckbox', () => {
     })
 
     const root = unchecked.get('[data-gr-checkbox]')
-    expect(root.classes()).toContain('cursor-not-allowed')
-    expect(root.classes().some(cls => cls.startsWith('opacity-'))).toBe(false)
+    expect(checkboxLook(root.element).cursor).toBe('not-allowed')
+    expect(checkboxLook(root.element).opacity).toBeUndefined()
 
     const control = unchecked.get('[role="checkbox"]')
-    expect(control.classes()).toContain('bg-[var(--gr-muted)]')
-    expect(control.classes().some(cls => cls.startsWith('opacity-'))).toBe(false)
+    expect(checkboxLook(control.element)['background-color']).toBe('var(--gr-muted)')
+    expect(checkboxLook(control.element).opacity).toBeUndefined()
     expect(control.attributes('tabindex')).toBe('-1')
 
     const checked = mount(GrCheckbox, {
       props: { modelValue: true, disabled: true },
       slots: { default: 'Terms' },
     })
-    expect(checked.get('[role="checkbox"]').classes()).toContain('bg-[var(--gr-muted-fg)]')
+    expect(checkboxLook(checked.get('[role="checkbox"]').element)['background-color']).toBe('var(--gr-muted-fg)')
   })
 
   it('readonly: состояние видно, но не меняется — ни кликом, ни от внешнего label', async () => {
@@ -219,7 +221,7 @@ describe('GrCheckbox', () => {
       slots: { default: 'Terms' },
     })
 
-    expect(wrapper.get('[data-gr-checkbox]').classes()).toContain('flex-row-reverse')
+    expect(checkboxLook(wrapper.get('[data-gr-checkbox]').element)['flex-direction']).toBe('row-reverse')
   })
 
   it('клик по подписи переключает значение', async () => {
@@ -247,10 +249,10 @@ describe('GrCheckbox', () => {
 
   it('масштабирует контрол, иконку и подпись пропом size', () => {
     const sizes = {
-      xs: { control: 'h-3', icon: 'h-2.5', label: 'text-[length:var(--gr-text-xs)]' },
-      sm: { control: 'h-3.5', icon: 'h-3', label: 'text-[length:var(--gr-text-sm)]' },
-      md: { control: 'h-4', icon: 'h-3.5', label: 'text-[length:var(--gr-text-sm)]' },
-      lg: { control: 'h-5', icon: 'h-4', label: 'text-[length:var(--gr-text-base)]' },
+      xs: { control: '0.75rem', icon: '0.625rem', label: 'var(--gr-text-xs)' },
+      sm: { control: '0.875rem', icon: '0.75rem', label: 'var(--gr-text-sm)' },
+      md: { control: '1rem', icon: '0.875rem', label: 'var(--gr-text-sm)' },
+      lg: { control: '1.25rem', icon: '1rem', label: 'var(--gr-text-base)' },
     } as const
 
     for (const [size, expected] of Object.entries(sizes)) {
@@ -259,9 +261,9 @@ describe('GrCheckbox', () => {
         slots: { default: 'Label' },
       })
 
-      expect(wrapper.get('[role="checkbox"]').classes()).toContain(expected.control)
-      expect(wrapper.get('[data-icon="check"]').classes()).toContain(expected.icon)
-      expect(wrapper.get('[data-gr-checkbox] > span:last-child').classes()).toContain(expected.label)
+      expect(checkboxLook(wrapper.get('[role="checkbox"]').element).height).toBe(expected.control)
+      expect(checkboxLook(wrapper.get('[data-icon="check"]').element).height).toBe(expected.icon)
+      expect(checkboxLook(wrapper.get('[data-gr-checkbox] > span:last-child').element)['font-size']).toBe(expected.label)
     }
   })
 
@@ -278,14 +280,14 @@ describe('GrCheckbox', () => {
       slots: { default: 'Label' },
       global: { provide },
     })
-    expect(fromConfig.get('[role="checkbox"]').classes()).toContain('h-5')
+    expect(fromConfig.get('[data-gr-checkbox]').attributes('data-gr-size')).toBe('lg')
 
     const localWins = mount(GrCheckbox, {
       props: { modelValue: true, size: 'xs' },
       slots: { default: 'Label' },
       global: { provide },
     })
-    expect(localWins.get('[role="checkbox"]').classes()).toContain('h-3')
+    expect(localWins.get('[data-gr-checkbox]').attributes('data-gr-size')).toBe('xs')
   })
 
   it('точечный componentDefaults.GrCheckbox.size сильнее глобального size провайдера', () => {
@@ -302,6 +304,6 @@ describe('GrCheckbox', () => {
       },
     })
 
-    expect(wrapper.get('[role="checkbox"]').classes()).toContain('h-3.5')
+    expect(wrapper.get('[data-gr-checkbox]').attributes('data-gr-size')).toBe('sm')
   })
 })

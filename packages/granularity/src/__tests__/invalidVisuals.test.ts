@@ -11,6 +11,7 @@ import GrSlider from '../components/GrSlider/GrSlider.vue'
 import GrSwitch from '../components/GrSwitch/GrSwitch.vue'
 import GrTransfer from '../components/GrTransfer/GrTransfer.vue'
 import { granularityGlobal, resetGranularityDom } from '../testing'
+import { componentSheet } from './componentSheet'
 
 afterEach(resetGranularityDom)
 
@@ -63,7 +64,7 @@ describe('invalid виден глазом', () => {
   it('GrSwitch: рамка дорожки', () => {
     const wrapper = mount(GrSwitch, { props: { modelValue: false, invalid: true, ariaLabel: 'Условия' }, global: granularityGlobal() })
 
-    expect(wrapper.get('[data-gr-switch-track]').attributes('style')).toContain(`--gr-switch-track-brd: ${INVALID}`)
+    expect(componentSheet('GrSwitch/GrSwitch.vue').look(wrapper.get('[data-gr-switch-track]').element)['border-color']).toBe(INVALID)
   })
 
   it('GrFileUpload: рамка зоны, а сброс поверх сильнее ошибки', () => {

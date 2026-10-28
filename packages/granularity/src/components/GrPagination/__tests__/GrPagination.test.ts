@@ -2,7 +2,17 @@ import { mount } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import GrPagination, { type GrPaginationProps } from '../GrPagination.vue'
-import { navButtonSizes, pageBoxSizes } from '../grPaginationStyles'
+import { componentSheet, lookElement } from '../../../__tests__/componentSheet'
+import { look as buttonLook, lookElement as buttonElement } from '../../GrButton/__tests__/buttonSheet'
+import { navButtonSizes } from '../grPaginationStyles'
+
+const { look } = componentSheet('GrPagination/GrPagination.vue')
+
+/** Коробка номера ступени `size` — из листа пагинации. */
+function pageBox(size: 'xs' | 'sm' | 'md' | 'lg'): Record<string, string> {
+  const root = lookElement('div', { 'data-gr-pagination': '', 'data-gr-size': size })
+  return look(root.appendChild(lookElement('button', { 'data-gr-pagination-page': '' })))
+}
 import type { GranularityI18nAdapter } from '../../../i18n/adapter'
 import { granularityGlobal } from '../../../testing'
 
@@ -66,7 +76,7 @@ describe('GrPagination', () => {
     expect(numericButtons.map(button => button.text())).toEqual(['1', '5', '6', '7', '12'])
     // активная страница подсвечена
     const active = numericButtons.find(button => button.text() === '6')!
-    expect(active.classes()).toContain('bg-[var(--gr-selected)]')
+    expect(look(active.element)['background-color']).toBe('var(--gr-selected)')
     // есть многоточия (с обеих сторон)
     expect(wrapper.findAll('[data-gr-pagination-ellipsis]').length).toBe(2)
   })
@@ -209,7 +219,7 @@ describe('GrPagination — конфигурация', () => {
     const nav = (disabled: boolean) => mountPagination({ props: { disabled } }).get('[data-gr-pagination-nav]')
 
     expect(nav(true).attributes('tabindex')).toBe('0')
-    expect(nav(true).classes()).toContain('focus-visible:ring-[var(--gr-ring)]')
+    expect(look(nav(true).element, { focus: true })['box-shadow']).toBe('inset 0 0 0 2px var(--gr-ring)')
     expect(nav(false).attributes('tabindex')).toBeUndefined()
   })
 })
@@ -391,12 +401,13 @@ describe('GrPagination — рост коробки совпадает с GrButto
    * приходилось выдавать размер на ступень ниже собственного имени.
    */
   it('sm и md — разные коробки, и кнопке достаётся её же размер', () => {
-    expect(pageBoxSizes.sm).toContain('h-8')
-    expect(pageBoxSizes.md).toContain('h-10')
-    expect(pageBoxSizes.sm).not.toBe(pageBoxSizes.md)
+    expect(pageBox('sm').height).toBe('2rem')
+    expect(pageBox('md').height).toBe('2.5rem')
 
-    for (const size of ['xs', 'sm', 'md', 'lg'] as const)
+    for (const size of ['xs', 'sm', 'md', 'lg'] as const) {
       expect(navButtonSizes[size]).toBe(size)
+      expect(pageBox(size).height, size).toBe(buttonLook(buttonElement({ variant: 'ghost', tone: 'primary', size })).height)
+    }
   })
 })
 
@@ -411,7 +422,7 @@ describe('GrPagination — навигация одним кластером', ()
 
     for (const part of ['first', 'prev', 'pages', 'next', 'last'])
       expect(nav.find(`[data-gr-pagination-${part}]`).exists(), part).toBe(true)
-    expect(nav.classes()).toEqual(expect.arrayContaining(['flex-nowrap', 'min-w-0', 'max-w-full']))
+    expect(look(nav.element)).toMatchObject({ 'flex-wrap': 'nowrap', 'min-width': '0', 'max-width': '100%' })
 
     // Переносится ряд только между группами: кнопки навигации — не его прямые дети.
     const groups = [...wrapper.element.children].map(child => [...child.attributes].map(attr => attr.name).find(name => name.startsWith('data-gr-pagination')) ?? child.tagName)
