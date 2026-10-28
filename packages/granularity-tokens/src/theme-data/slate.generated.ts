@@ -8,7 +8,7 @@ const data: GrThemeData = {
   "title": "Сланец",
   "description": "Холодные нейтрали шкалы slate, индиго-акцент и контраст, выверенный по AA в обоих режимах.",
   "docs": "https://granularity.tech/themes/slate",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "targets": {
     "@feugene/granularity": "^3.1.0",
     "@feugene/granularity-charts": "^3.0.0",
@@ -703,7 +703,7 @@ const data: GrThemeData = {
         "root": {
           "gr-color-picker-area-thumb-border": "#fff",
           "gr-color-picker-area-thumb-ring": "rgba(0, 0, 0, 0.45)",
-          "gr-color-picker-trigger-hover-brd": "var(--gr-primary)"
+          "gr-color-picker-trigger-hover-brd": "var(--gr-input-hover)"
         }
       },
       "GrCommandPalette": {

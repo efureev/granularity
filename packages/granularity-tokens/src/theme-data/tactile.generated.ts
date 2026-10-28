@@ -8,7 +8,7 @@ const data: GrThemeData = {
   "title": "Тактильная",
   "description": "Кнопка как предмет: свет сверху, тень цвета тона снизу, подъём под указателем и пружина в отклике.",
   "docs": "https://granularity.tech/themes/tactile",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "targets": {
     "@feugene/granularity": "^3.1.0",
     "@feugene/granularity-charts": "^3.0.0",
@@ -703,7 +703,7 @@ const data: GrThemeData = {
         "root": {
           "gr-color-picker-area-thumb-border": "#fff",
           "gr-color-picker-area-thumb-ring": "rgba(0, 0, 0, 0.45)",
-          "gr-color-picker-trigger-hover-brd": "var(--gr-primary)"
+          "gr-color-picker-trigger-hover-brd": "var(--gr-input-hover)"
         }
       },
       "GrCommandPalette": {

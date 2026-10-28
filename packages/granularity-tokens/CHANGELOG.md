@@ -7,6 +7,12 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+
+- **Триггер `GrColorPicker` под указателем — как поле во всех темах каталога.**
+  `--gr-color-picker-trigger-hover-brd` у «Сланца» 1.4.0 и «Чертежа» 1.3.0 — `--gr-input-hover`
+  вместо `--gr-primary`, как уже было у «Глины»; «Тактильная» 1.3.0 наследует это у «Сланца».
+
 ## [v2.3.1] 2026-10-27
 
 ### Fixed
