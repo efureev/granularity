@@ -16,7 +16,6 @@ import type { GrTimePickerSize } from './grTimePickerStyles'
 import {
   timeColumnClass,
   timeColumnLabelClass,
-  timeOptionClass,
   timePanelClass,
 } from './grTimePickerStyles'
 
@@ -299,7 +298,7 @@ defineExpose({ focus })
 </script>
 
 <template>
-  <div data-gr-time-columns :class="timePanelClass">
+  <div data-gr-time-columns :data-gr-size="size" :class="timePanelClass">
     <div v-for="column in columns" :key="column.unit" data-gr-time-picker-column>
       <div :class="timeColumnLabelClass" aria-hidden="true">
         {{ columnLabel(column.unit) }}
@@ -326,12 +325,7 @@ defineExpose({ focus })
           :data-key="option.key"
           :aria-selected="index === column.selectedIndex ? 'true' : 'false'"
           :aria-disabled="option.disabled ? 'true' : undefined"
-          :class="timeOptionClass({
-            size,
-            selected: index === column.selectedIndex,
-            active: navigation[column.unit].activeIndex.value === index,
-            disabled: option.disabled,
-          })"
+          :data-gr-active="navigation[column.unit].activeIndex.value === index ? '' : undefined"
           @click="onOptionClick(column.unit, option, index)"
         >
           {{ option.label }}

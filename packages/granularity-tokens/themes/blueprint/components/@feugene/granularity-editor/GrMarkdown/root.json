@@ -1,0 +1,9 @@
+{
+  "gr-markdown-display-weight": "var(--gr-font-semibold)",
+  "gr-markdown-h1-size": "1.75em",
+  "gr-markdown-h2-size": "1.4em",
+  "gr-markdown-quote-bar": "var(--gr-brd)",
+  "gr-markdown-quote-fg": "var(--gr-muted-fg)",
+  "gr-markdown-quote-font": "var(--gr-font-ui)",
+  "gr-markdown-quote-size": "1em"
+}

@@ -544,6 +544,14 @@
 | `--gr-form-field-label-weight` | тема компонента | var(--gr-font-regular) | Вес подписи поля. |
 | `--gr-form-field-required-fg` | тема компонента | var(--gr-invalid-text) | Цвет звёздочки обязательного поля. Тема, где звёздочка — пометка, а не тревога, ставит приглушённый цвет. |
 
+### GrFormSection
+
+| Токен | Откуда | По умолчанию | Назначение |
+| --- | --- | --- | --- |
+| `--gr-form-section-title-size` | тема компонента | var(--gr-text-sm) | Кегль заголовка раздела. Шрифт у него — `--gr-font-display` темы. |
+| `--gr-form-section-title-leading` | тема компонента | var(--gr-leading-sm) | Интерлиньяж заголовка раздела. |
+| `--gr-form-section-title-weight` | тема компонента | var(--gr-font-bold) | Начертание заголовка раздела. |
+
 ### GrIcon
 
 | Токен | Откуда | По умолчанию | Назначение |

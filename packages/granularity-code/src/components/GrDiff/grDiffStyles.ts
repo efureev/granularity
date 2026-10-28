@@ -25,7 +25,7 @@ export const diffRowClass = 'gr-diff__row'
 export const diffGutterCellClass = 'gr-diff__gutter'
 
 export const diffRootClass
-  = 'min-w-0 rounded-[var(--gr-radius-md)] bg-[var(--gr-code-block-bg,var(--gr-muted))] text-[var(--gr-code-block-fg,var(--gr-fg))]'
+  = 'min-w-0 rounded-[var(--gr-code-block-radius)] bg-[var(--gr-code-block-bg,var(--gr-muted))] text-[var(--gr-code-block-fg,var(--gr-fg))]'
 
 export const diffScrollClass = codeSurfaceScrollClass
 export const diffFontClass = codeSurfaceFontClass
@@ -45,8 +45,8 @@ export const diffSummaryClass = 'flex items-center gap-2 border-b border-[var(--
  */
 export const diffRowTone: Record<GrDiffOp, string> = {
   equal: '',
-  add: 'bg-[var(--gr-diff-added,var(--gr-success-light))]',
-  remove: 'bg-[var(--gr-diff-removed,var(--gr-danger-light))]',
+  add: 'bg-[var(--gr-diff-added)]',
+  remove: 'bg-[var(--gr-diff-removed)]',
 }
 
 /**
@@ -60,15 +60,22 @@ export const diffRowTone: Record<GrDiffOp, string> = {
  * там, где его труднее всего заметить.
  */
 export const diffWordTone: Record<'add' | 'remove', string> = {
-  add: 'bg-[var(--gr-diff-word-added,var(--gr-success))] text-[var(--gr-diff-word-added-fg,var(--gr-success-fg))]',
-  remove: 'bg-[var(--gr-diff-word-removed,var(--gr-danger))] text-[var(--gr-diff-word-removed-fg,var(--gr-danger-fg))]',
+  add: 'bg-[var(--gr-diff-word-added)] text-[var(--gr-diff-word-added-fg)]',
+  remove: 'bg-[var(--gr-diff-word-removed)] text-[var(--gr-diff-word-removed-fg)]',
 }
 
 /** Жёлоб: номера строк и знак правки. Не выделяется мышью — это не содержимое. */
 export const diffGutterClass
-  = 'select-none pr-2 text-right text-[var(--gr-diff-gutter,var(--gr-muted-fg))]'
+  = 'select-none pr-2 text-right text-[var(--gr-diff-gutter,var(--gr-code-block-line-number))]'
 
 export const diffSignClass = 'select-none px-1 text-center'
+
+/** Знак «+»/«−» — второй признак к заливке строки: тема вправе покрасить его ролью тона. */
+export const diffSignTone: Record<GrDiffOp, string> = {
+  equal: '',
+  add: 'text-[var(--gr-diff-sign-added)]',
+  remove: 'text-[var(--gr-diff-sign-removed)]',
+}
 
 /**
  * Полоса пропуска: разделитель между показанными участками.
@@ -77,7 +84,7 @@ export const diffSignClass = 'select-none px-1 text-center'
  * не достать, и внутри тёмного диффа она осталась бы светлым разрывом.
  */
 export const diffGapRowClass
-  = 'flex items-center gap-2 border-y border-[var(--gr-brd)] bg-[var(--gr-diff-gap-bg,var(--gr-bg))] px-3 py-1 text-[var(--gr-diff-gutter,var(--gr-muted-fg))]'
+  = 'flex items-center gap-2 border-y border-[var(--gr-brd)] bg-[var(--gr-diff-gap-bg)] px-3 py-1 text-[var(--gr-diff-gutter,var(--gr-code-block-line-number))]'
 
 /** Пропуск, который открывается целиком одним нажатием: кнопка во всю полосу. */
 export const diffGapClass

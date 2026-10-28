@@ -17,6 +17,7 @@ import type {
   GrDashboardItemOverflow,
   GrDashboardItemPadding,
   GrDashboardItemSize,
+  GrDashboardItemVariant,
 } from './grDashboardItemStyles'
 import {
   actionsClass,
@@ -25,6 +26,7 @@ import {
   cardBodyClass,
   cardClass,
   draggingClass,
+  editRimClass,
   headerClass,
   headerSizes,
   overflowClass,
@@ -56,6 +58,11 @@ export interface GrDashboardItemProps {
   padding?: GrDashboardItemPadding
   /** `hidden` снимает и полосу прокрутки, и остановку `Tab` у тела. */
   overflow?: GrDashboardItemOverflow
+  /**
+   * Вид карточки — вариант `GrCard`. По умолчанию `elevated`; тема выбирает свой
+   * через `componentDefaults` («Глина» кладёт виджеты на сетку рамкой, без тени).
+   */
+  variant?: GrDashboardItemVariant
   /**
    * Высоту виджета определяет его содержимое, а не запись раскладки.
    *
@@ -96,6 +103,7 @@ const props = withDefaults(defineProps<GrDashboardItemProps>(), {
   size: undefined,
   padding: undefined,
   overflow: undefined,
+  variant: undefined,
   autoHeight: undefined,
   draggable: undefined,
   resizable: undefined,
@@ -128,6 +136,7 @@ defineSlots<{
 const dashboard = useGrDashboardContext()
 const size = useGrComponentSize(() => props.size, { component: 'GrDashboardItem' })
 const overflow = useGrComponentProp('GrDashboardItem', 'overflow', () => props.overflow, 'auto')
+const variant = useGrComponentProp('GrDashboardItem', 'variant', () => props.variant, 'elevated')
 const autoHeight = useGrComponentProp('GrDashboardItem', 'autoHeight', () => props.autoHeight, false)
 
 /**
@@ -442,7 +451,7 @@ const named = computed(() => Boolean(props.ariaLabel) || Boolean(props.title))
     @focusin="focusWithin = true"
     @focusout="focusWithin = false"
   >
-    <GrCard :class="cardClass" :body-class="cardBodyClass" variant="elevated">
+    <GrCard :class="cardClass" :body-class="cardBodyClass" :variant="variant">
       <template v-if="showHeader" #header>
         <div :class="[headerClass, headerSizes[size]]">
           <DragHandle
@@ -489,6 +498,8 @@ const named = computed(() => Boolean(props.ariaLabel) || Boolean(props.title))
         </div>
       </template>
     </GrCard>
+
+    <span v-if="editing" data-gr-dashboard-item-edit-rim :class="editRimClass" aria-hidden="true" />
 
     <div v-if="showOverlayHeader" data-gr-dashboard-overlay-header :class="overlayClasses">
       <DragHandle

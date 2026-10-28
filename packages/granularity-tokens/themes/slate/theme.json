@@ -3,11 +3,16 @@
   "title": "Сланец",
   "description": "Холодные нейтрали шкалы slate, индиго-акцент и контраст, выверенный по AA в обоих режимах.",
   "docs": "https://granularity.tech/themes/slate",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "targets": {
-    "@feugene/granularity": "^3.1.0",
-    "@feugene/granularity-charts": "^3.0.0",
-    "@feugene/granularity-media": "^3.0.0"
+    "@feugene/granularity": "^3.7.0",
+    "@feugene/granularity-charts": "^4.0.0",
+    "@feugene/granularity-chrono": "^4.0.0",
+    "@feugene/granularity-code": "^4.0.0",
+    "@feugene/granularity-dashboard": "^3.0.0",
+    "@feugene/granularity-editor": "^4.0.0",
+    "@feugene/granularity-forms-schema": "^3.0.0",
+    "@feugene/granularity-media": "^4.0.0"
   },
   "defaultMode": "light",
   "modes": {

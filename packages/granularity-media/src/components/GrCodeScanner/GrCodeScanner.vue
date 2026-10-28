@@ -254,7 +254,7 @@ defineExpose({
         autoplay
       />
 
-      <div v-if="isLive && !undetectable" :class="reticleClass" />
+      <div v-if="isLive && !undetectable" data-gr-code-scanner-reticle :class="reticleClass" />
 
       <div v-if="!isLive || undetectable" :class="stateLayerClass">
         <p :class="[stateTextClass, sizeTextClass[resolvedSize]]">
@@ -282,3 +282,17 @@ defineExpose({
     </div>
   </div>
 </template>
+
+<style>
+/*
+ * Прицел — рамка, видимая только в четырёх углах: маска из четырёх квадратов со
+ * стороной `--gr-code-scanner-reticle-corner`. При `50%` квадраты покрывают рамку
+ * целиком, и она сплошная.
+ */
+[data-gr-code-scanner-reticle] {
+  mask-image: linear-gradient(#000 0 0), linear-gradient(#000 0 0), linear-gradient(#000 0 0), linear-gradient(#000 0 0);
+  mask-position: left top, right top, left bottom, right bottom;
+  mask-repeat: no-repeat;
+  mask-size: var(--gr-code-scanner-reticle-corner) var(--gr-code-scanner-reticle-corner);
+}
+</style>

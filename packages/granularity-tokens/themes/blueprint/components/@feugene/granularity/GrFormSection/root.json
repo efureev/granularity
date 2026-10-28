@@ -1,0 +1,5 @@
+{
+  "gr-form-section-title-leading": "var(--gr-leading-sm)",
+  "gr-form-section-title-size": "var(--gr-text-sm)",
+  "gr-form-section-title-weight": "var(--gr-font-bold)"
+}

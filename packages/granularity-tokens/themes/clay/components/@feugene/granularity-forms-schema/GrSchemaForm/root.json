@@ -1,0 +1,9 @@
+{
+  "gr-schema-form-row-brd": "transparent",
+  "gr-schema-form-row-divider": "var(--gr-brd)",
+  "gr-schema-form-row-padding": "0.75rem 0px",
+  "gr-schema-form-row-radius": "0px",
+  "gr-schema-form-section-divider": "var(--gr-brd)",
+  "gr-schema-form-section-divider-space": "1.75rem",
+  "gr-schema-form-section-gap": "1.75rem"
+}

@@ -8,11 +8,16 @@ const data: GrThemeData = {
   "title": "Тактильная",
   "description": "Кнопка как предмет: свет сверху, тень цвета тона снизу, подъём под указателем и пружина в отклике.",
   "docs": "https://granularity.tech/themes/tactile",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "targets": {
-    "@feugene/granularity": "^3.1.0",
-    "@feugene/granularity-charts": "^3.0.0",
-    "@feugene/granularity-media": "^3.0.0"
+    "@feugene/granularity": "^3.7.0",
+    "@feugene/granularity-charts": "^4.0.0",
+    "@feugene/granularity-chrono": "^4.0.0",
+    "@feugene/granularity-code": "^4.0.0",
+    "@feugene/granularity-dashboard": "^3.0.0",
+    "@feugene/granularity-editor": "^4.0.0",
+    "@feugene/granularity-forms-schema": "^3.0.0",
+    "@feugene/granularity-media": "^4.0.0"
   },
   "root": {
     "gr-slate-0": "#ffffff",
@@ -816,6 +821,13 @@ const data: GrThemeData = {
           "gr-form-field-required-fg": "var(--gr-invalid-text)"
         }
       },
+      "GrFormSection": {
+        "root": {
+          "gr-form-section-title-leading": "var(--gr-leading-sm)",
+          "gr-form-section-title-size": "var(--gr-text-sm)",
+          "gr-form-section-title-weight": "var(--gr-font-bold)"
+        }
+      },
       "GrImageViewer": {
         "root": {
           "gr-image-viewer-scrim": "rgb(0 0 0 / 0.6)",
@@ -1046,11 +1058,26 @@ const data: GrThemeData = {
           "gr-chart-bar-gap": "1px"
         }
       },
+      "GrChartBullet": {
+        "root": {
+          "gr-chart-bullet-target": "var(--gr-fg)",
+          "gr-chart-bullet-value": "var(--gr-chart-1)"
+        }
+      },
       "GrChartFrame": {
         "root": {
+          "gr-chart-frame-brush-fill": "var(--gr-primary)",
           "gr-chart-frame-brush-fill-opacity": "0.12",
+          "gr-chart-frame-brush-stroke": "var(--gr-primary)",
+          "gr-chart-frame-crosshair": "var(--gr-brd)",
           "gr-chart-frame-grid-width": "1px",
-          "gr-chart-frame-reference-band-opacity": "0.12"
+          "gr-chart-frame-reference": "var(--gr-muted-fg)",
+          "gr-chart-frame-reference-band-opacity": "0.12",
+          "gr-chart-frame-tooltip-bg": "var(--gr-card)",
+          "gr-chart-frame-tooltip-brd": "var(--gr-brd)",
+          "gr-chart-frame-tooltip-fg": "var(--gr-fg)",
+          "gr-chart-frame-tooltip-shadow": "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)",
+          "gr-chart-frame-tooltip-swatch-ring": "transparent"
         }
       },
       "GrChartFunnel": {
@@ -1079,20 +1106,157 @@ const data: GrThemeData = {
       "GrChartWaterfall": {
         "root": {
           "gr-chart-waterfall-connector-width": "1px",
+          "gr-chart-waterfall-total": "var(--gr-chart-1)",
           "gr-chart-waterfall-zero-step": "2px"
         }
       },
       "GrSparkline": {
         "root": {
+          "gr-sparkline-color": "var(--gr-chart-1)",
           "gr-sparkline-fill-opacity": "0.15",
           "gr-sparkline-width": "1.5px"
         }
       }
     },
+    "@feugene/granularity-chrono": {
+      "GrCalendar": {
+        "root": {
+          "gr-calendar-hover-bg": "var(--gr-muted)",
+          "gr-calendar-preview-end-bg": "var(--gr-selected)",
+          "gr-calendar-preview-end-fg": "var(--gr-selected-fg)",
+          "gr-calendar-preview-end-ring": "transparent",
+          "gr-calendar-range-bg": "var(--gr-muted)",
+          "gr-calendar-range-preview-bg": "var(--gr-muted)",
+          "gr-calendar-title-weight": "600",
+          "gr-calendar-today-fg": "var(--gr-fg)",
+          "gr-calendar-today-ring": "var(--gr-primary)",
+          "gr-calendar-today-weight": "normal"
+        }
+      },
+      "GrTimePicker": {
+        "root": {
+          "gr-time-picker-hover-bg": "var(--gr-muted)"
+        }
+      }
+    },
+    "@feugene/granularity-code": {
+      "GrCodeBlock": {
+        "root": {
+          "gr-code-block-comment": "var(--gr-muted-fg)",
+          "gr-code-block-function": "var(--gr-primary-text)",
+          "gr-code-block-key": "var(--gr-primary-text)",
+          "gr-code-block-keyword": "var(--gr-danger-text)",
+          "gr-code-block-line-number": "var(--gr-muted-fg)",
+          "gr-code-block-literal": "var(--gr-warning-text)",
+          "gr-code-block-number": "var(--gr-azure-text)",
+          "gr-code-block-punctuation": "var(--gr-fg)",
+          "gr-code-block-radius": "var(--gr-radius-md)",
+          "gr-code-block-string": "var(--gr-success-text)",
+          "gr-code-block-type": "var(--gr-primary-text)",
+          "gr-code-block-variable": "var(--gr-fg)"
+        }
+      },
+      "GrCodeEditor": {
+        "root": {
+          "gr-code-editor-active-line": "transparent",
+          "gr-code-editor-selection": "var(--gr-info-light)"
+        }
+      },
+      "GrDiff": {
+        "root": {
+          "gr-diff-added": "var(--gr-success-light)",
+          "gr-diff-gap-bg": "var(--gr-bg)",
+          "gr-diff-removed": "var(--gr-danger-light)",
+          "gr-diff-sign-added": "currentColor",
+          "gr-diff-sign-removed": "currentColor",
+          "gr-diff-word-added": "var(--gr-success)",
+          "gr-diff-word-added-fg": "var(--gr-success-fg)",
+          "gr-diff-word-removed": "var(--gr-danger)",
+          "gr-diff-word-removed-fg": "var(--gr-danger-fg)"
+        }
+      }
+    },
+    "@feugene/granularity-dashboard": {
+      "GrDashboardFrame": {
+        "root": {
+          "gr-dashboard-frame-ghost-brd": "var(--gr-primary)",
+          "gr-dashboard-frame-handle-active-color": "var(--gr-primary-text)",
+          "gr-dashboard-frame-handle-hover-bg": "transparent",
+          "gr-dashboard-frame-placeholder-bg": "var(--gr-muted)",
+          "gr-dashboard-frame-placeholder-brd": "var(--gr-primary)",
+          "gr-dashboard-frame-resize-color": "var(--gr-muted-fg)",
+          "gr-dashboard-frame-resize-color-hover": "var(--gr-primary)"
+        }
+      },
+      "GrDashboardItem": {
+        "root": {
+          "gr-dashboard-item-edit-brd": "transparent"
+        }
+      },
+      "GrDashboardPalette": {
+        "root": {
+          "gr-dashboard-palette-item-bg-hover": "var(--gr-muted)"
+        }
+      }
+    },
+    "@feugene/granularity-editor": {
+      "GrMarkdown": {
+        "root": {
+          "gr-markdown-display-weight": "var(--gr-font-semibold)",
+          "gr-markdown-h1-size": "1.75em",
+          "gr-markdown-h2-size": "1.4em",
+          "gr-markdown-quote-bar": "var(--gr-brd)",
+          "gr-markdown-quote-fg": "var(--gr-muted-fg)",
+          "gr-markdown-quote-font": "var(--gr-font-ui)",
+          "gr-markdown-quote-size": "1em"
+        }
+      },
+      "GrRichText": {
+        "root": {
+          "gr-rich-text-display-weight": "var(--gr-font-semibold)",
+          "gr-rich-text-h2-size": "1.25em",
+          "gr-rich-text-quote-bar": "var(--gr-brd)",
+          "gr-rich-text-quote-fg": "var(--gr-muted-fg)",
+          "gr-rich-text-quote-font": "var(--gr-font-ui)",
+          "gr-rich-text-quote-size": "1em",
+          "gr-rich-text-toolbar-bg": "var(--gr-muted)"
+        }
+      }
+    },
+    "@feugene/granularity-forms-schema": {
+      "GrSchemaForm": {
+        "root": {
+          "gr-schema-form-row-brd": "var(--gr-brd)",
+          "gr-schema-form-row-divider": "transparent",
+          "gr-schema-form-row-padding": "1rem",
+          "gr-schema-form-row-radius": "var(--gr-radius-lg)",
+          "gr-schema-form-section-divider": "transparent",
+          "gr-schema-form-section-divider-space": "0px",
+          "gr-schema-form-section-gap": "1.5rem"
+        }
+      }
+    },
     "@feugene/granularity-media": {
+      "GrCodeScanner": {
+        "root": {
+          "gr-code-scanner-reticle": "var(--gr-primary)",
+          "gr-code-scanner-reticle-corner": "50%",
+          "gr-code-scanner-reticle-radius": "var(--gr-radius-md)",
+          "gr-code-scanner-reticle-width": "2px"
+        }
+      },
       "GrImageCrop": {
         "root": {
+          "gr-image-crop-guide": "var(--gr-brd)",
+          "gr-image-crop-inset": "0px",
           "gr-image-crop-mask": "rgb(0 0 0 / 0.55)"
+        }
+      },
+      "GrVideoPlayer": {
+        "root": {
+          "gr-video-player-panel-bg": "linear-gradient(to top, rgb(0 0 0 / 0.72), transparent)",
+          "gr-video-player-progress": "var(--gr-primary)",
+          "gr-video-player-ring": "#ffffff"
         }
       }
     }

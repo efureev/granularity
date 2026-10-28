@@ -33,6 +33,6 @@ export const sparklineRootClass
 export const sparklineCanvasClass
   = 'block h-full w-full overflow-visible p-[var(--gr-sparkline-inset,3px)]'
 
-export const sparklineStroke = 'var(--gr-sparkline-color,var(--gr-chart-1))'
+export const sparklineStroke = 'var(--gr-sparkline-color)'
 export const sparklineStrokeWidth = 'var(--gr-sparkline-width)'
 export const sparklineFillOpacity = 'var(--gr-sparkline-fill-opacity)'

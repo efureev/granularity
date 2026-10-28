@@ -1,0 +1,5 @@
+{
+  "gr-form-section-title-leading": "var(--gr-leading-xl)",
+  "gr-form-section-title-size": "var(--gr-text-xl)",
+  "gr-form-section-title-weight": "var(--gr-font-medium)"
+}

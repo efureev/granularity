@@ -12,8 +12,9 @@ export const formSectionRootClass = 'grid gap-4'
 export const formSectionHeaderClass = 'flex flex-wrap items-start justify-between gap-3'
 
 // `m-0` — у нативного заголовка есть браузерные отступы, и без сброса секция
-// разъезжается по вертикали.
-export const formSectionTitleClass = 'm-0 text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)] font-700'
+// разъезжается по вертикали. Шрифт — заголовков темы, как у карточки и окна; кегль,
+// интерлиньяж и начертание решает тема.
+export const formSectionTitleClass = 'm-0 font-[var(--gr-font-display)] text-[length:var(--gr-form-section-title-size)] leading-[var(--gr-form-section-title-leading)] [font-weight:var(--gr-form-section-title-weight)]'
 
 export const formSectionDescriptionClass = 'mt-1 text-[length:var(--gr-text-sm)] leading-[var(--gr-leading-sm)] text-[var(--gr-muted-fg)]'
 

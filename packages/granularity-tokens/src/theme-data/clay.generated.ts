@@ -8,11 +8,16 @@ const data: GrThemeData = {
   "title": "Глина",
   "description": "Тёплая бумага, графитовые чернила и одна глиняная точка на экран.",
   "docs": "https://granularity.tech/themes/clay",
-  "version": "2.0.1",
+  "version": "2.1.0",
   "targets": {
-    "@feugene/granularity": "^3.1.0",
-    "@feugene/granularity-charts": "^3.0.0",
-    "@feugene/granularity-media": "^3.0.0"
+    "@feugene/granularity": "^3.7.0",
+    "@feugene/granularity-charts": "^4.0.0",
+    "@feugene/granularity-chrono": "^4.0.0",
+    "@feugene/granularity-code": "^4.0.0",
+    "@feugene/granularity-dashboard": "^3.0.0",
+    "@feugene/granularity-editor": "^4.0.0",
+    "@feugene/granularity-forms-schema": "^3.0.0",
+    "@feugene/granularity-media": "^4.0.0"
   },
   "root": {
     "gr-slate-0": "#ffffff",
@@ -868,6 +873,13 @@ const data: GrThemeData = {
           "gr-form-field-required-fg": "var(--gr-muted-fg)"
         }
       },
+      "GrFormSection": {
+        "root": {
+          "gr-form-section-title-leading": "var(--gr-leading-xl)",
+          "gr-form-section-title-size": "var(--gr-text-xl)",
+          "gr-form-section-title-weight": "var(--gr-font-medium)"
+        }
+      },
       "GrImageViewer": {
         "root": {
           "gr-image-viewer-chrome-bg": "rgb(0 0 0 / 0.35)",
@@ -1120,7 +1132,7 @@ const data: GrThemeData = {
       "GrChartArea": {
         "root": {
           "gr-chart-area-fill-fade": "0.02",
-          "gr-chart-area-fill-opacity": "0.28",
+          "gr-chart-area-fill-opacity": "0.14",
           "gr-chart-area-line-width": "2px",
           "gr-chart-area-stack-opacity": "0.85"
         }
@@ -1131,16 +1143,31 @@ const data: GrThemeData = {
           "gr-chart-bar-gap": "1px"
         }
       },
+      "GrChartBullet": {
+        "root": {
+          "gr-chart-bullet-target": "var(--gr-chart-1)",
+          "gr-chart-bullet-value": "var(--gr-fg)"
+        }
+      },
       "GrChartFrame": {
         "root": {
-          "gr-chart-frame-brush-fill-opacity": "0.12",
+          "gr-chart-frame-brush-fill": "var(--gr-fg)",
+          "gr-chart-frame-brush-fill-opacity": "0.06",
+          "gr-chart-frame-brush-stroke": "var(--gr-brd-strong)",
+          "gr-chart-frame-crosshair": "var(--gr-brd-strong)",
           "gr-chart-frame-grid-width": "1px",
-          "gr-chart-frame-reference-band-opacity": "0.12"
+          "gr-chart-frame-reference": "var(--gr-brd-strong)",
+          "gr-chart-frame-reference-band-opacity": "0.12",
+          "gr-chart-frame-tooltip-bg": "var(--gr-fg)",
+          "gr-chart-frame-tooltip-brd": "var(--gr-fg)",
+          "gr-chart-frame-tooltip-fg": "var(--gr-bg)",
+          "gr-chart-frame-tooltip-shadow": "none",
+          "gr-chart-frame-tooltip-swatch-ring": "var(--gr-bg)"
         }
       },
       "GrChartFunnel": {
         "root": {
-          "gr-chart-funnel-dim": "0.45"
+          "gr-chart-funnel-dim": "0.35"
         }
       },
       "GrChartLine": {
@@ -1151,7 +1178,7 @@ const data: GrThemeData = {
       },
       "GrChartPie": {
         "root": {
-          "gr-chart-pie-dim": "0.45",
+          "gr-chart-pie-dim": "0.35",
           "gr-chart-pie-gap": "2px"
         }
       },
@@ -1164,20 +1191,198 @@ const data: GrThemeData = {
       "GrChartWaterfall": {
         "root": {
           "gr-chart-waterfall-connector-width": "1px",
+          "gr-chart-waterfall-total": "var(--gr-fg)",
           "gr-chart-waterfall-zero-step": "2px"
         }
       },
       "GrSparkline": {
         "root": {
+          "gr-sparkline-color": "var(--gr-fg)",
           "gr-sparkline-fill-opacity": "0.15",
           "gr-sparkline-width": "1.5px"
         }
       }
     },
+    "@feugene/granularity-chrono": {
+      "GrCalendar": {
+        "root": {
+          "gr-calendar-preview-end-bg": "transparent",
+          "gr-calendar-preview-end-fg": "var(--gr-fg)",
+          "gr-calendar-preview-end-ring": "var(--gr-brd-strong)",
+          "gr-calendar-range-bg": "color-mix(in srgb, var(--gr-fg) 6%, transparent)",
+          "gr-calendar-title-weight": "500",
+          "gr-calendar-today-fg": "var(--gr-primary-text)",
+          "gr-calendar-today-ring": "transparent",
+          "gr-calendar-today-weight": "600"
+        },
+        "modes": {
+          "dark": {
+            "gr-calendar-hover-bg": "rgba(240, 238, 230, 0.08)",
+            "gr-calendar-range-preview-bg": "rgba(240, 238, 230, 0.08)"
+          },
+          "light": {
+            "gr-calendar-hover-bg": "rgba(115, 114, 108, 0.1)",
+            "gr-calendar-range-preview-bg": "rgba(115, 114, 108, 0.1)"
+          }
+        }
+      },
+      "GrTimePicker": {
+        "modes": {
+          "dark": {
+            "gr-time-picker-hover-bg": "rgba(240, 238, 230, 0.08)"
+          },
+          "light": {
+            "gr-time-picker-hover-bg": "rgba(115, 114, 108, 0.1)"
+          }
+        }
+      }
+    },
+    "@feugene/granularity-code": {
+      "GrCodeBlock": {
+        "root": {
+          "gr-code-block-comment": "var(--gr-muted-fg)",
+          "gr-code-block-key": "var(--gr-azure-text)",
+          "gr-code-block-keyword": "var(--gr-primary-text)",
+          "gr-code-block-number": "var(--gr-info-text)",
+          "gr-code-block-radius": "var(--gr-radius-lg)",
+          "gr-code-block-string": "var(--gr-success-text)",
+          "gr-code-block-type": "var(--gr-warning-text)",
+          "gr-code-block-variable": "var(--gr-fg)"
+        },
+        "modes": {
+          "dark": {
+            "gr-code-block-function": "#e3a0c8",
+            "gr-code-block-line-number": "var(--gr-slate-text)",
+            "gr-code-block-literal": "#bfb0e6",
+            "gr-code-block-punctuation": "#d6d4ca"
+          },
+          "light": {
+            "gr-code-block-function": "#8c3566",
+            "gr-code-block-line-number": "var(--gr-muted-fg)",
+            "gr-code-block-literal": "#5b4a96",
+            "gr-code-block-punctuation": "var(--gr-secondary-fg)"
+          }
+        }
+      },
+      "GrCodeEditor": {
+        "modes": {
+          "dark": {
+            "gr-code-editor-active-line": "rgba(240, 238, 230, 0.08)",
+            "gr-code-editor-selection": "var(--gr-bg)"
+          },
+          "light": {
+            "gr-code-editor-active-line": "rgba(115, 114, 108, 0.1)",
+            "gr-code-editor-selection": "#dad8d0"
+          }
+        }
+      },
+      "GrDiff": {
+        "root": {
+          "gr-diff-added": "color-mix(in srgb, var(--gr-success) 13%, var(--gr-muted))",
+          "gr-diff-gap-bg": "var(--gr-muted)",
+          "gr-diff-removed": "color-mix(in srgb, var(--gr-danger) 13%, var(--gr-muted))",
+          "gr-diff-sign-added": "var(--gr-success-text)",
+          "gr-diff-sign-removed": "var(--gr-danger-text)",
+          "gr-diff-word-added": "color-mix(in srgb, var(--gr-success) 25%, var(--gr-muted))",
+          "gr-diff-word-added-fg": "currentColor",
+          "gr-diff-word-removed": "color-mix(in srgb, var(--gr-danger) 25%, var(--gr-muted))",
+          "gr-diff-word-removed-fg": "currentColor"
+        }
+      }
+    },
+    "@feugene/granularity-dashboard": {
+      "GrDashboardFrame": {
+        "root": {
+          "gr-dashboard-frame-ghost-brd": "var(--gr-brd-strong)",
+          "gr-dashboard-frame-handle-active-color": "var(--gr-fg)",
+          "gr-dashboard-frame-placeholder-bg": "color-mix(in srgb, var(--gr-fg) 6%, transparent)",
+          "gr-dashboard-frame-placeholder-brd": "var(--gr-brd-strong)",
+          "gr-dashboard-frame-resize-color": "var(--gr-brd-strong)",
+          "gr-dashboard-frame-resize-color-hover": "var(--gr-secondary-fg)"
+        },
+        "modes": {
+          "dark": {
+            "gr-dashboard-frame-handle-hover-bg": "rgba(240, 238, 230, 0.08)"
+          },
+          "light": {
+            "gr-dashboard-frame-handle-hover-bg": "rgba(115, 114, 108, 0.1)"
+          }
+        }
+      },
+      "GrDashboardItem": {
+        "root": {
+          "gr-dashboard-item-edit-brd": "var(--gr-brd-strong)"
+        }
+      },
+      "GrDashboardPalette": {
+        "modes": {
+          "dark": {
+            "gr-dashboard-palette-item-bg-hover": "rgba(240, 238, 230, 0.08)"
+          },
+          "light": {
+            "gr-dashboard-palette-item-bg-hover": "rgba(115, 114, 108, 0.1)"
+          }
+        }
+      }
+    },
+    "@feugene/granularity-editor": {
+      "GrMarkdown": {
+        "root": {
+          "gr-markdown-display-weight": "var(--gr-font-medium)",
+          "gr-markdown-h1-size": "2em",
+          "gr-markdown-h2-size": "1.5em",
+          "gr-markdown-quote-bar": "var(--gr-brd-strong)",
+          "gr-markdown-quote-fg": "var(--gr-secondary-fg)",
+          "gr-markdown-quote-font": "var(--gr-font-display)",
+          "gr-markdown-quote-size": "1.125em"
+        }
+      },
+      "GrRichText": {
+        "root": {
+          "gr-rich-text-display-weight": "var(--gr-font-medium)",
+          "gr-rich-text-h2-size": "1.4em",
+          "gr-rich-text-quote-bar": "var(--gr-brd-strong)",
+          "gr-rich-text-quote-fg": "var(--gr-secondary-fg)",
+          "gr-rich-text-quote-font": "var(--gr-font-display)",
+          "gr-rich-text-quote-size": "1.15em",
+          "gr-rich-text-toolbar-bg": "var(--gr-bg)"
+        }
+      }
+    },
+    "@feugene/granularity-forms-schema": {
+      "GrSchemaForm": {
+        "root": {
+          "gr-schema-form-row-brd": "transparent",
+          "gr-schema-form-row-divider": "var(--gr-brd)",
+          "gr-schema-form-row-padding": "0.75rem 0px",
+          "gr-schema-form-row-radius": "0px",
+          "gr-schema-form-section-divider": "var(--gr-brd)",
+          "gr-schema-form-section-divider-space": "1.75rem",
+          "gr-schema-form-section-gap": "1.75rem"
+        }
+      }
+    },
     "@feugene/granularity-media": {
+      "GrCodeScanner": {
+        "root": {
+          "gr-code-scanner-reticle": "#faf9f5",
+          "gr-code-scanner-reticle-corner": "24px",
+          "gr-code-scanner-reticle-radius": "var(--gr-radius-lg)",
+          "gr-code-scanner-reticle-width": "3px"
+        }
+      },
       "GrImageCrop": {
         "root": {
-          "gr-image-crop-mask": "rgb(0 0 0 / 0.55)"
+          "gr-image-crop-guide": "#faf9f5",
+          "gr-image-crop-inset": "1.5rem",
+          "gr-image-crop-mask": "rgb(20 20 19 / 0.6)"
+        }
+      },
+      "GrVideoPlayer": {
+        "root": {
+          "gr-video-player-panel-bg": "rgb(20 20 19 / 0.72)",
+          "gr-video-player-progress": "#faf9f5",
+          "gr-video-player-ring": "#6aa3e8"
         }
       }
     }
@@ -1203,6 +1408,12 @@ const data: GrThemeData = {
         },
         "GrConfirmDialog": {
           "cancelVariant": "ghost"
+        },
+        "GrDashboardItem": {
+          "variant": "outlined"
+        },
+        "GrDashboardPalette": {
+          "appearance": "list"
         },
         "GrDescriptionList": {
           "labelWidth": "160px"

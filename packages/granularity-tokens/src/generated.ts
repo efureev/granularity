@@ -1234,11 +1234,16 @@ export const grThemeCatalog: GrThemeCatalogEntry[] = [
     "title": "Чертёж",
     "description": "Плоская точность: заливка, линия и шрифт. Без теней и бликов; главный сигнал — линия хода по нижней кромке.",
     "docs": "https://granularity.tech/themes/blueprint",
-    "version": "1.3.0",
+    "version": "1.4.0",
     "targets": {
-      "@feugene/granularity": "^3.1.0",
-      "@feugene/granularity-charts": "^3.0.0",
-      "@feugene/granularity-media": "^3.0.0"
+      "@feugene/granularity": "^3.7.0",
+      "@feugene/granularity-charts": "^4.0.0",
+      "@feugene/granularity-chrono": "^4.0.0",
+      "@feugene/granularity-code": "^4.0.0",
+      "@feugene/granularity-dashboard": "^3.0.0",
+      "@feugene/granularity-editor": "^4.0.0",
+      "@feugene/granularity-forms-schema": "^3.0.0",
+      "@feugene/granularity-media": "^4.0.0"
     },
     "defaultMode": "light",
     "modes": [
@@ -1259,11 +1264,16 @@ export const grThemeCatalog: GrThemeCatalogEntry[] = [
     "title": "Глина",
     "description": "Тёплая бумага, графитовые чернила и одна глиняная точка на экран.",
     "docs": "https://granularity.tech/themes/clay",
-    "version": "2.0.1",
+    "version": "2.1.0",
     "targets": {
-      "@feugene/granularity": "^3.1.0",
-      "@feugene/granularity-charts": "^3.0.0",
-      "@feugene/granularity-media": "^3.0.0"
+      "@feugene/granularity": "^3.7.0",
+      "@feugene/granularity-charts": "^4.0.0",
+      "@feugene/granularity-chrono": "^4.0.0",
+      "@feugene/granularity-code": "^4.0.0",
+      "@feugene/granularity-dashboard": "^3.0.0",
+      "@feugene/granularity-editor": "^4.0.0",
+      "@feugene/granularity-forms-schema": "^3.0.0",
+      "@feugene/granularity-media": "^4.0.0"
     },
     "defaultMode": "light",
     "modes": [
@@ -1284,11 +1294,16 @@ export const grThemeCatalog: GrThemeCatalogEntry[] = [
     "title": "Сланец",
     "description": "Холодные нейтрали шкалы slate, индиго-акцент и контраст, выверенный по AA в обоих режимах.",
     "docs": "https://granularity.tech/themes/slate",
-    "version": "1.4.0",
+    "version": "1.5.0",
     "targets": {
-      "@feugene/granularity": "^3.1.0",
-      "@feugene/granularity-charts": "^3.0.0",
-      "@feugene/granularity-media": "^3.0.0"
+      "@feugene/granularity": "^3.7.0",
+      "@feugene/granularity-charts": "^4.0.0",
+      "@feugene/granularity-chrono": "^4.0.0",
+      "@feugene/granularity-code": "^4.0.0",
+      "@feugene/granularity-dashboard": "^3.0.0",
+      "@feugene/granularity-editor": "^4.0.0",
+      "@feugene/granularity-forms-schema": "^3.0.0",
+      "@feugene/granularity-media": "^4.0.0"
     },
     "defaultMode": "light",
     "modes": [
@@ -1309,11 +1324,16 @@ export const grThemeCatalog: GrThemeCatalogEntry[] = [
     "title": "Тактильная",
     "description": "Кнопка как предмет: свет сверху, тень цвета тона снизу, подъём под указателем и пружина в отклике.",
     "docs": "https://granularity.tech/themes/tactile",
-    "version": "1.3.0",
+    "version": "1.4.0",
     "targets": {
-      "@feugene/granularity": "^3.1.0",
-      "@feugene/granularity-charts": "^3.0.0",
-      "@feugene/granularity-media": "^3.0.0"
+      "@feugene/granularity": "^3.7.0",
+      "@feugene/granularity-charts": "^4.0.0",
+      "@feugene/granularity-chrono": "^4.0.0",
+      "@feugene/granularity-code": "^4.0.0",
+      "@feugene/granularity-dashboard": "^3.0.0",
+      "@feugene/granularity-editor": "^4.0.0",
+      "@feugene/granularity-forms-schema": "^3.0.0",
+      "@feugene/granularity-media": "^4.0.0"
     },
     "extends": "slate",
     "defaultMode": "light",

@@ -7,6 +7,19 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+
+- **Промежуток между разделами и строка повторителя — решение темы.** Своего вида у формы два места,
+  и оба теперь токены вида `theme`: `--gr-schema-form-section-gap`, `-section-divider`,
+  `-section-divider-space` (воздух и волосяная линия между разделами) и `--gr-schema-form-row-brd`,
+  `-row-radius`, `-row-padding`, `-row-divider` (строка повторителя — плиткой в рамке или рядом списка
+  под линией). Линии нарисованы фоном и места не занимают. Темы каталога несут значения с
+  `@feugene/granularity-tokens` 2.5.0 — «Сланец», «Тактильная» и «Чертёж» с прежним видом, «Глина» —
+  линиями вместо коробок. Своей теме-копии нужны значения (`granum doctor`, `theme-incomplete`).
+- **Peer `@feugene/granularity-tokens` — `>=2.5.0 <3.0.0`**: темы со значениями формы.
+- **Peer `@feugene/granularity-chrono` — `>=2.0.0 <5.0.0`**: схема работает и с chrono 4 — он
+  перенёс вид календаря в лист и отдал подсветку теме, API пикеров прежний.
+
 ## [v2.0.3] 2026-10-28
 
 ### Changed

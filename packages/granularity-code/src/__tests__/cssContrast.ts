@@ -180,16 +180,42 @@ function themeData(theme: string): GrThemeData {
   return JSON.parse(readFileSync(requireFromPackage.resolve(`@feugene/granularity-tokens/themes/${theme}/theme.json`), 'utf8')) as GrThemeData
 }
 
+/** Режим и его предки по `extends` — от корня цепочки к самому режиму. */
+function modeChain(data: GrThemeData, mode: string): string[] {
+  const chain: string[] = []
+  for (let name: string | undefined = mode; name; name = data.modes[name]?.extends)
+    chain.unshift(name)
+  return chain
+}
+
 /**
- * Примитивы и роли каждой темы каталога в каждом её режиме — из данных пакета
- * токенов, которые отгружаются. Ключ — пара `<тема>-<режим>`: набор держит
- * каталог, а не тест.
+ * Значения токенов вида `theme` компонентов этого пакета в теме: палитра подсветки,
+ * подложки диффа и редактора живут у темы, а не в коде компонента.
+ */
+function packageVars(data: GrThemeData, mode: string): TokenMap {
+  const vars: TokenMap = {}
+  for (const component of Object.values(data.components?.['@feugene/granularity-code'] ?? {})) {
+    Object.assign(vars, withDashes(component.root))
+    for (const name of modeChain(data, mode))
+      Object.assign(vars, withDashes(component.modes?.[name]))
+  }
+  return vars
+}
+
+/**
+ * Примитивы, роли и значения компонентов пакета каждой темы каталога в каждом её
+ * режиме — из данных пакета токенов, которые отгружаются. Ключ — пара
+ * `<тема>-<режим>`: набор держит каталог, а не тест.
  */
 export const themeVarsByName: Readonly<Record<string, TokenMap>> = Object.fromEntries(grThemeCatalog.flatMap((entry) => {
   const data = themeData(entry.id)
   const modes = resolveModes(data)
 
-  return entry.modes.map(mode => [`${entry.id}-${mode.name}`, { ...withDashes(data.root), ...withDashes(modes.get(mode.name)) }])
+  return entry.modes.map(mode => [`${entry.id}-${mode.name}`, {
+    ...withDashes(data.root),
+    ...withDashes(modes.get(mode.name)),
+    ...packageVars(data, mode.name),
+  }])
 }))
 
 /** Производные формулы (`--gr-primary-hover` и т.п.) — из реестра пакета токенов. */

@@ -5,18 +5,34 @@
 
 ## Палитра поверхности
 
-| Токен | По умолчанию | Что красит |
-| --- | --- | --- |
-| `--gr-code-block-bg` | `var(--gr-muted)` | фон всех трёх поверхностей |
-| `--gr-code-block-fg` | `var(--gr-fg)` | текст по умолчанию |
-| `--gr-code-block-key` | `var(--gr-primary-text)` | имя поля, функции, типа |
-| `--gr-code-block-string` | `var(--gr-success-text)` | строка |
-| `--gr-code-block-number` | `var(--gr-azure-text)` | число |
-| `--gr-code-block-literal` | `var(--gr-warning-text)` | `true`, `false`, `null` |
-| `--gr-code-block-keyword` | `var(--gr-danger-text)` | ключевое слово |
-| `--gr-code-block-comment` | `var(--gr-muted-fg)` | комментарий |
-| `--gr-code-block-punctuation` | `var(--gr-fg)` | скобки, запятые, операторы |
-| `--gr-code-block-line-number` | `var(--gr-muted-fg)` | номера строк |
+Цвет каждой роли подсветки — токен вида `theme`: палитру решает тема, а не пакет, значения лежат в
+разделе `components/@feugene/granularity-code/` темы пакета токенов и переключаются вместе с режимом.
+Хуками остаются только подложка, цвет текста и ширина жёлоба — их приложение меняет у одного блока.
+
+| Токен | Вид | «Сланец» | «Глина» | Что красит |
+| --- | --- | --- | --- | --- |
+| `--gr-code-block-bg` | hook | `var(--gr-muted)` | — | фон всех трёх поверхностей |
+| `--gr-code-block-fg` | hook | `var(--gr-fg)` | — | текст по умолчанию |
+| `--gr-code-block-radius` | theme | `var(--gr-radius-md)` | `var(--gr-radius-lg)` | скругление листа — блока и диффа |
+| `--gr-code-block-key` | theme | `var(--gr-primary-text)` | `var(--gr-azure-text)` | имя поля |
+| `--gr-code-block-type` | theme | `var(--gr-primary-text)` | `var(--gr-warning-text)` | имя типа |
+| `--gr-code-block-function` | theme | `var(--gr-primary-text)` | своя «слива» | имя функции |
+| `--gr-code-block-string` | theme | `var(--gr-success-text)` | `var(--gr-success-text)` | строка |
+| `--gr-code-block-number` | theme | `var(--gr-azure-text)` | `var(--gr-info-text)` | число |
+| `--gr-code-block-literal` | theme | `var(--gr-warning-text)` | свой «вереск» | `true`, `false`, `null` |
+| `--gr-code-block-keyword` | theme | `var(--gr-danger-text)` | `var(--gr-primary-text)` | ключевое слово |
+| `--gr-code-block-comment` | theme | `var(--gr-muted-fg)` | `var(--gr-muted-fg)` | комментарий |
+| `--gr-code-block-punctuation` | theme | `var(--gr-fg)` | `var(--gr-secondary-fg)`, в тёмном — свой | скобки, запятые, операторы |
+| `--gr-code-block-variable` | theme | `var(--gr-fg)` | `var(--gr-fg)` | имя переменной |
+| `--gr-code-block-line-number` | theme | `var(--gr-muted-fg)` | в тёмном — `var(--gr-slate-text)` | номера строк |
+
+Двух цветов «Глине» не хватает среди ролей темы — литерала и функции, — и они заданы значениями темы по
+режимам, а не формулой: формула завела бы цвет, которого тема не знает и переопределить не может.
+
+У палитры два требования, и держит их `grCodeBlockContrast.test.ts` для каждой темы каталога в каждом
+режиме: каждая роль читается на фоне блока (AA 4.5:1 — кегль кода мелкий), и роли различимы между собой
+(ΔE ≥ 12 — они стоят в одной строке). Совпадать разрешено только объявленным парам: имена объявленного
+(ключ, тип, функция) «Сланец» красит одним цветом, пунктуацию и переменную — цветом текста.
 
 **Имя говорит «block», а пользуются все трое** — и это осознанно. Правило
 репозитория требует, чтобы имя своего токена начиналось с имени компонента,
@@ -26,15 +42,21 @@
 
 ## Своё у диффа и редактора
 
-`--gr-diff-added`, `--gr-diff-removed`, `--gr-diff-word-added`,
-`--gr-diff-word-removed`, `--gr-diff-word-added-fg`, `--gr-diff-word-removed-fg`,
-`--gr-diff-gutter`, `--gr-diff-gap-bg`, `--gr-code-editor-selection`,
-`--gr-code-editor-cursor`, `--gr-code-editor-active-line`,
-`--gr-code-editor-placeholder`, `--gr-code-editor-issue-error`,
-`--gr-code-editor-issue-warning`, `--gr-code-editor-issue-info`.
+| Токен | Вид | «Сланец» | «Глина» |
+| --- | --- | --- | --- |
+| `--gr-diff-added` / `-removed` | theme | `var(--gr-success-light)` / `var(--gr-danger-light)` | тон 13 % на листе кода |
+| `--gr-diff-word-added` / `-removed` | theme | `var(--gr-success)` / `var(--gr-danger)` | тон 25 % на листе кода |
+| `--gr-diff-word-added-fg` / `-removed-fg` | theme | `var(--gr-success-fg)` / `var(--gr-danger-fg)` | `currentColor` — цвет текста строки |
+| `--gr-diff-sign-added` / `-removed` | theme | `currentColor` | `var(--gr-success-text)` / `var(--gr-danger-text)` |
+| `--gr-diff-gap-bg` | theme | `var(--gr-bg)` | `var(--gr-muted)` — лист кода |
+| `--gr-diff-gutter` | hook | `var(--gr-code-block-line-number)` | — |
+| `--gr-code-editor-selection` | theme | `var(--gr-info-light)` | сплошной тон: светлее листа в светлом, тон страницы в тёмном |
+| `--gr-code-editor-active-line` | theme | `transparent` | полупрозрачный графит, как наведение пунктов ядра |
+| `--gr-code-editor-cursor`, `-placeholder`, `-issue-*` | hook | роли текста | — |
 
-Все — `kind: hook`: значение не присваивается, а подставляется фолбэком
-`var(--gr-x, дефолт)`. Присвой их пакет — фолбэк перестал бы срабатывать.
+Номер строки диффа по умолчанию берёт номер строки палитры: тема, которая светлит его ради заливок
+строк, светлит и дифф — в тёмной «Глине» номер на заливке добавленной строки иначе давал бы 4,25:1.
+Контраст слова на его подсветке, знака и номера на заливке строки держит `grDiffContrast.test.ts`.
 
 Цвет текста на пословной подсветке и подложка полосы пропуска — тоже токены, а
 не роли темы, и это не мелочь: перекрасить подложку, не имея возможности
@@ -45,9 +67,9 @@
 
 Своя палитра — **умолчание**, а не диктат.
 
-Дифф и блок красятся ролями из токенов: чтобы поставить любую тему, её цвета
-раскладывают по одиннадцати переменным (плюс перечисленные выше у диффа) на
-любой обёртке. Одна и та же раскладка ложится сразу на все поверхности, и
+Дифф и блок красятся токенами: чтобы поставить любую палитру, её цвета
+раскладывают по одиннадцати переменным ролей (плюс перечисленные выше у диффа) на
+любой обёртке — приложение сильнее темы. Одна и та же раскладка ложится сразу на все поверхности, и
 `prefers-color-scheme` продолжает работать, потому что переменные обычные.
 
 Редактор умеет и второй путь: тема CodeMirror — обычное расширение, и `extensions`

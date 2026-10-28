@@ -1,0 +1,11 @@
+{
+  "gr-diff-added": "var(--gr-success-light)",
+  "gr-diff-gap-bg": "var(--gr-bg)",
+  "gr-diff-removed": "var(--gr-danger-light)",
+  "gr-diff-sign-added": "currentColor",
+  "gr-diff-sign-removed": "currentColor",
+  "gr-diff-word-added": "var(--gr-success)",
+  "gr-diff-word-added-fg": "var(--gr-success-fg)",
+  "gr-diff-word-removed": "var(--gr-danger)",
+  "gr-diff-word-removed-fg": "var(--gr-danger-fg)"
+}

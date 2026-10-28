@@ -40,6 +40,7 @@ import {
   diffRowTone,
   diffScrollClass,
   diffSignClass,
+  diffSignTone,
   diffSizeClass,
   diffSplitCellClass,
   diffSummaryClass,
@@ -551,7 +552,7 @@ defineExpose({
         >
           <span v-if="resolvedLineNumbers" :class="[diffGutterCellClass, diffGutterClass]">{{ entry.line.beforeNumber ?? '' }}</span>
           <span v-if="resolvedLineNumbers" :class="[diffGutterCellClass, diffGutterClass]">{{ entry.line.afterNumber ?? '' }}</span>
-          <span :class="diffSignClass" aria-hidden="true">{{ signOf(entry.line.op) }}</span>
+          <span :class="[diffSignClass, diffSignTone[entry.line.op]]" aria-hidden="true">{{ signOf(entry.line.op) }}</span>
           <span v-if="entry.line.op !== 'equal'" class="sr-only">{{ opLabel(entry.line.op) }}</span>
           <span class="flex-1">
             <template v-if="wordPairs.get(entry.line)">
@@ -581,7 +582,7 @@ defineExpose({
         >
           <div class="flex" :class="[diffSplitCellClass, entry.left ? diffRowTone[entry.left.op] : '']">
             <span v-if="resolvedLineNumbers" :class="[diffGutterCellClass, diffGutterClass]">{{ entry.left?.beforeNumber ?? '' }}</span>
-            <span :class="diffSignClass" aria-hidden="true">{{ entry.left ? signOf(entry.left.op) : ' ' }}</span>
+            <span :class="[diffSignClass, entry.left ? diffSignTone[entry.left.op] : '']" aria-hidden="true">{{ entry.left ? signOf(entry.left.op) : ' ' }}</span>
             <span v-if="entry.left && entry.left.op !== 'equal'" class="sr-only">{{ opLabel(entry.left.op) }}</span>
             <span class="flex-1">
               <template v-if="entry.left && wordPairs.get(entry.left)">
@@ -602,7 +603,7 @@ defineExpose({
           </div>
           <div class="flex" :class="[diffSplitCellClass, entry.right ? diffRowTone[entry.right.op] : '']">
             <span v-if="resolvedLineNumbers" :class="[diffGutterCellClass, diffGutterClass]">{{ entry.right?.afterNumber ?? '' }}</span>
-            <span :class="diffSignClass" aria-hidden="true">{{ entry.right ? signOf(entry.right.op) : ' ' }}</span>
+            <span :class="[diffSignClass, entry.right ? diffSignTone[entry.right.op] : '']" aria-hidden="true">{{ entry.right ? signOf(entry.right.op) : ' ' }}</span>
             <span v-if="entry.right && entry.right.op !== 'equal'" class="sr-only">{{ opLabel(entry.right.op) }}</span>
             <span class="flex-1">
               <template v-if="entry.right && wordPairs.get(entry.right)">

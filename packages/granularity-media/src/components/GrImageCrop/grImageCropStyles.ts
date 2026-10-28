@@ -20,9 +20,15 @@ export const imageClass = 'pointer-events-none absolute left-1/2 top-1/2 max-w-n
  * поверх почти чёрного фона не читается вовсе, и пользователь не видит, что
  * попадёт в кадр. Линия работает в обеих темах.
  */
-export const circleMaskClass = 'pointer-events-none absolute inset-0 m-auto aspect-square rounded-[var(--gr-radius-full)] border border-[var(--gr-image-crop-guide,var(--gr-brd))] shadow-[0_0_0_9999px_var(--gr-image-crop-mask)]'
+export const circleMaskClass = 'pointer-events-none absolute inset-[var(--gr-image-crop-inset)] m-auto aspect-square rounded-[var(--gr-radius-full)] border border-[var(--gr-image-crop-guide)] shadow-[0_0_0_9999px_var(--gr-image-crop-mask)]'
 
-export const rectGuideClass = 'pointer-events-none absolute inset-0 border border-[var(--gr-image-crop-guide,var(--gr-brd))]'
+/**
+ * Рамка прямоугольного кадра — та же тень наружу. Рамка отодвинута от края окна
+ * на `--gr-image-crop-inset` и держит соотношение кадра (`aspect-ratio` ставит
+ * компонент): за ней видна картинка под затемнением — что останется за кадром.
+ * При нулевом отступе рамка совпадает с окном, а тень уходит за его край.
+ */
+export const rectGuideClass = 'pointer-events-none absolute inset-[var(--gr-image-crop-inset)] m-auto border border-[var(--gr-image-crop-guide)] shadow-[0_0_0_9999px_var(--gr-image-crop-mask)]'
 
 /**
  * Плавность включается только вне жеста: под пальцем картинка обязана идти

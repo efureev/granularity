@@ -1,7 +1,5 @@
+import { componentSheet, lookElement } from '@feugene/granularity-test-kit/vue'
 import { describe, expect, it } from 'vitest'
-
-import { calendarDayClass, calendarPeriodClass } from '../components/GrCalendar/grCalendarStyles'
-import { timeOptionClass } from '../components/GrTimePicker/grTimePickerStyles'
 
 /**
  * Выбор в пакете — роль выбора ядра, а не основной тон: выбранный день, период и
@@ -11,16 +9,19 @@ import { timeOptionClass } from '../components/GrTimePicker/grTimePickerStyles'
  * компонент берёт именно её. На `--gr-primary` выбор в «Глине» вышел бы глиняным,
  * а у ядра он графитовый.
  */
-const SELECTED = ['var(--gr-selected)', 'var(--gr-selected-fg)']
+const calendar = componentSheet('GrCalendar/GrCalendar.vue')
+const time = componentSheet('GrTimePicker/GrTimePicker.vue')
 
 describe('выбор красится ролью выбора', () => {
   it.each([
-    ['день', calendarDayClass({ size: 'md', inMonth: true, today: false, selected: true, disabled: false })],
-    ['период', calendarPeriodClass({ size: 'md', selected: true, current: false, disabled: false })],
-    ['значение колонки времени', timeOptionClass({ size: 'md', selected: true, active: false, disabled: false })],
-  ])('%s', (_name, classes) => {
-    for (const role of SELECTED)
-      expect(classes).toContain(role)
-    expect(classes).not.toContain('--gr-primary')
+    ['день', calendar, lookElement('span', { 'data-gr-calendar-day': '', 'data-gr-selected': '' })],
+    ['период', calendar, lookElement('span', { 'data-gr-calendar-period': '', 'aria-selected': 'true' })],
+    ['значение колонки времени', time, lookElement('div', { 'data-gr-time-picker-option': '', 'aria-selected': 'true' })],
+  ])('%s', (_name, sheet, element) => {
+    const look = sheet.look(element)
+
+    expect(look['background-color']).toContain('var(--gr-selected)')
+    expect(look.color).toContain('var(--gr-selected-fg)')
+    expect(JSON.stringify(look)).not.toContain('--gr-primary')
   })
 })

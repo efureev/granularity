@@ -47,7 +47,7 @@ export const bubbleButtonSize = {
  */
 export const rootClass = 'relative overflow-hidden'
 
-export const toolbarClass = 'flex flex-wrap items-center gap-1 border-b border-[var(--gr-brd)] bg-[var(--gr-muted)] px-2 py-1.5'
+export const toolbarClass = 'flex flex-wrap items-center gap-1 border-b border-[var(--gr-brd)] px-2 py-1.5'
 
 export const toolbarSeparatorClass = 'mx-1 h-4 w-px bg-[var(--gr-brd)]'
 
@@ -95,8 +95,8 @@ export const contentClass = 'px-3 py-2 outline-none'
  * Отбиваются рамкой изнутри, как тулбар, — и по той же причине: у края поля
  * линия сходится со скруглением рамки, поэтому она принадлежит границе между
  * зонами, а не самой зоне. Фона у них нет: тулбар — панель управления и потому
- * подложен `--gr-muted`, а шапка с подвалом несут содержимое потребителя, и
- * вторая подложка спорила бы с ним.
+ * подложен (`--gr-rich-text-toolbar-bg`, лист `styles.css`), а шапка с подвалом
+ * несут содержимое потребителя, и вторая подложка спорила бы с ним.
  */
 export const fieldHeaderClass = 'border-b border-[var(--gr-brd)] px-3 py-2'
 export const fieldFooterClass = 'border-t border-[var(--gr-brd)] px-3 py-2'

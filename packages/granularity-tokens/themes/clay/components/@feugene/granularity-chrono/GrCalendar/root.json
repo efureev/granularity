@@ -1,0 +1,10 @@
+{
+  "gr-calendar-preview-end-bg": "transparent",
+  "gr-calendar-preview-end-fg": "var(--gr-fg)",
+  "gr-calendar-preview-end-ring": "var(--gr-brd-strong)",
+  "gr-calendar-range-bg": "color-mix(in srgb, var(--gr-fg) 6%, transparent)",
+  "gr-calendar-title-weight": "500",
+  "gr-calendar-today-fg": "var(--gr-primary-text)",
+  "gr-calendar-today-ring": "transparent",
+  "gr-calendar-today-weight": "600"
+}

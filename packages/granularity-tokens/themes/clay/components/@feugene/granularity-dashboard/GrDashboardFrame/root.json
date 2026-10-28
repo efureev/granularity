@@ -1,0 +1,8 @@
+{
+  "gr-dashboard-frame-ghost-brd": "var(--gr-brd-strong)",
+  "gr-dashboard-frame-handle-active-color": "var(--gr-fg)",
+  "gr-dashboard-frame-placeholder-bg": "color-mix(in srgb, var(--gr-fg) 6%, transparent)",
+  "gr-dashboard-frame-placeholder-brd": "var(--gr-brd-strong)",
+  "gr-dashboard-frame-resize-color": "var(--gr-brd-strong)",
+  "gr-dashboard-frame-resize-color-hover": "var(--gr-secondary-fg)"
+}

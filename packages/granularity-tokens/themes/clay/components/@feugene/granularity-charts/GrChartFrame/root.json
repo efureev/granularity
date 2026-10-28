@@ -1,5 +1,14 @@
 {
-  "gr-chart-frame-brush-fill-opacity": "0.12",
+  "gr-chart-frame-brush-fill": "var(--gr-fg)",
+  "gr-chart-frame-brush-fill-opacity": "0.06",
+  "gr-chart-frame-brush-stroke": "var(--gr-brd-strong)",
+  "gr-chart-frame-crosshair": "var(--gr-brd-strong)",
   "gr-chart-frame-grid-width": "1px",
-  "gr-chart-frame-reference-band-opacity": "0.12"
+  "gr-chart-frame-reference": "var(--gr-brd-strong)",
+  "gr-chart-frame-reference-band-opacity": "0.12",
+  "gr-chart-frame-tooltip-bg": "var(--gr-fg)",
+  "gr-chart-frame-tooltip-brd": "var(--gr-fg)",
+  "gr-chart-frame-tooltip-fg": "var(--gr-bg)",
+  "gr-chart-frame-tooltip-shadow": "none",
+  "gr-chart-frame-tooltip-swatch-ring": "var(--gr-bg)"
 }

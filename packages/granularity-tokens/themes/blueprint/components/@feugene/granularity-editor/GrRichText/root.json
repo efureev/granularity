@@ -1,0 +1,9 @@
+{
+  "gr-rich-text-display-weight": "var(--gr-font-semibold)",
+  "gr-rich-text-h2-size": "1.25em",
+  "gr-rich-text-quote-bar": "var(--gr-brd)",
+  "gr-rich-text-quote-fg": "var(--gr-muted-fg)",
+  "gr-rich-text-quote-font": "var(--gr-font-ui)",
+  "gr-rich-text-quote-size": "1em",
+  "gr-rich-text-toolbar-bg": "var(--gr-muted)"
+}

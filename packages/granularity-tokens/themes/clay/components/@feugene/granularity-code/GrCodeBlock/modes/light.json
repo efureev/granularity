@@ -1,0 +1,6 @@
+{
+  "gr-code-block-function": "#8c3566",
+  "gr-code-block-line-number": "var(--gr-muted-fg)",
+  "gr-code-block-literal": "#5b4a96",
+  "gr-code-block-punctuation": "var(--gr-secondary-fg)"
+}

@@ -10,13 +10,14 @@ import { usePortalTarget } from '@feugene/granularity/composables/usePortalTarge
 import { useDashboardTransfer } from '../../composables/useDashboardTransfer'
 import TransferGhost from '../GrDashboardFrame/shared/TransferGhost.vue'
 
-import type { GrDashboardPaletteItem, GrDashboardPaletteSize } from './grDashboardPaletteStyles'
+import type { GrDashboardPaletteAppearance, GrDashboardPaletteItem, GrDashboardPaletteSize } from './grDashboardPaletteStyles'
 import {
   actionClass,
   descriptionClass,
   emptyClass,
   headingClass,
   listClass,
+  listItemClass,
   measureClass,
   paletteSizes,
   rowClass,
@@ -47,6 +48,11 @@ export interface GrDashboardPaletteProps {
   draggable?: boolean
   /** Каталог недоступен: кнопки «Добавить» выключены, плитки не перетаскиваются. */
   disabled?: boolean
+  /**
+   * Вид каталога: плитки в рамках или строки под волосяными линиями. По умолчанию
+   * `tiles`; тема выбирает свой через `componentDefaults`.
+   */
+  appearance?: GrDashboardPaletteAppearance
   /** Имя списка плиток. Не задано — из локали («Widget catalog»). */
   ariaLabel?: string
 }
@@ -61,6 +67,7 @@ const props = withDefaults(defineProps<GrDashboardPaletteProps>(), {
   size: undefined,
   draggable: undefined,
   disabled: false,
+  appearance: undefined,
 })
 
 const emit = defineEmits<GrDashboardPaletteEmits>()
@@ -91,6 +98,7 @@ const { t } = useGranularityTranslations()
 const { announce } = useAnnouncer()
 const size = useGrComponentSize(() => props.size, { component: 'GrDashboardPalette' })
 const draggable = useGrComponentProp('GrDashboardPalette', 'draggable', () => props.draggable, true)
+const appearance = useGrComponentProp('GrDashboardPalette', 'appearance', () => props.appearance, 'tiles')
 
 const transfer = useDashboardTransfer()
 const portal = usePortalTarget()
@@ -160,8 +168,8 @@ function measure(item: GrDashboardPaletteItem): string | undefined {
 
 <template>
   <div v-bind="$attrs" data-gr-dashboard-palette :class="paletteSizes[size]">
-    <ul v-if="items.length > 0" :class="listClass" :aria-label="label">
-      <li v-for="item in items" :key="item.id" data-gr-dashboard-palette-item>
+    <ul v-if="items.length > 0" :class="listClass[appearance]" :aria-label="label">
+      <li v-for="item in items" :key="item.id" data-gr-dashboard-palette-item :class="listItemClass[appearance]">
         <slot
           name="item"
           :item="item"
@@ -171,7 +179,7 @@ function measure(item: GrDashboardPaletteItem): string | undefined {
         >
           <span
             :class="[
-              rowClass,
+              rowClass[appearance],
               item.disabled ? rowDisabledClass : '',
               canDrag(item) ? rowDraggableClass : '',
               carried?.id === item.id ? rowTransferringClass : '',

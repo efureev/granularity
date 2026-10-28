@@ -108,7 +108,7 @@ describe('GrCodeBlock — палитра подсветки', () => {
     })
 
     it('номер строки читается на фоне блока', () => {
-      const ratio = getContrastRatio(resolve('var(--gr-muted-fg)', theme), background)
+      const ratio = getContrastRatio(resolve('var(--gr-code-block-line-number)', theme), background)
 
       expect(ratio, `номер строки: ${ratio.toFixed(2)}:1`).toBeGreaterThanOrEqual(AA_NORMAL_TEXT)
     })

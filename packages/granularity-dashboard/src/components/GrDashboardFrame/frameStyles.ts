@@ -19,9 +19,9 @@ export const placeholderClass = [
   'pointer-events-none',
   'm-[var(--gr-dashboard-frame-placeholder-inset,4px)]',
   'rounded-[var(--gr-dashboard-frame-placeholder-radius,var(--gr-radius-lg))]',
-  'bg-[var(--gr-dashboard-frame-placeholder-bg,var(--gr-muted))]',
+  'bg-[var(--gr-dashboard-frame-placeholder-bg)]',
   'border-2 border-dashed',
-  'border-[var(--gr-dashboard-frame-placeholder-brd,var(--gr-primary))]',
+  'border-[var(--gr-dashboard-frame-placeholder-brd)]',
   'transition-opacity duration-[var(--gr-duration-fast)] ease-[var(--gr-ease-out)]',
 ].join(' ')
 
@@ -36,13 +36,13 @@ const handleBaseClass = [
   'touch-none',
   'select-none',
   'transition-colors duration-[var(--gr-duration-fast)] ease-[var(--gr-ease-out)]',
-  'hover:text-[var(--gr-fg)]',
+  'hover:text-[var(--gr-fg)] hover:bg-[var(--gr-dashboard-frame-handle-hover-bg)]',
   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]',
 ].join(' ')
 
 export const dragHandleClass = `${handleBaseClass} cursor-grab`
 
-export const dragHandleGrabbedClass = 'cursor-grabbing text-[var(--gr-primary-text)]'
+export const dragHandleGrabbedClass = 'cursor-grabbing text-[var(--gr-dashboard-frame-handle-active-color)]'
 
 /** Кнопка настроек виджета. Та же цель, что у ручки переноса, — но нажимается, а не тащится. */
 export const settingsButtonClass = `${handleBaseClass} cursor-pointer`
@@ -58,11 +58,11 @@ export const resizeHandleClass = [
   'w-[var(--gr-dashboard-frame-resize-size,14px)] h-[var(--gr-dashboard-frame-resize-size,14px)]',
   'bg-transparent p-0',
   'border-0 border-b-2 border-r-2 border-solid',
-  'border-[var(--gr-dashboard-frame-handle-color,var(--gr-muted-fg))]',
+  'border-[var(--gr-dashboard-frame-handle-color,var(--gr-dashboard-frame-resize-color))]',
   'rounded-br-[var(--gr-dashboard-frame-resize-radius,var(--gr-radius-lg))]',
   'cursor-nwse-resize touch-none',
   'transition-colors duration-[var(--gr-duration-fast)] ease-[var(--gr-ease-out)]',
-  'hover:border-[var(--gr-primary)]',
+  'hover:border-[var(--gr-dashboard-frame-resize-color-hover)]',
   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]',
 ].join(' ')
 
@@ -81,7 +81,7 @@ export const ghostClass = [
   'px-3 py-2',
   'rounded-[var(--gr-dashboard-frame-ghost-radius,var(--gr-radius-lg))]',
   'bg-[var(--gr-dashboard-frame-ghost-bg,var(--gr-card))]',
-  'border border-solid border-[var(--gr-dashboard-frame-ghost-brd,var(--gr-primary))]',
+  'border border-solid border-[var(--gr-dashboard-frame-ghost-brd)]',
   'shadow-[var(--gr-dashboard-frame-ghost-shadow,var(--gr-shadow-3))]',
   'text-[var(--gr-fg)]',
   'text-[length:var(--gr-control-text-sm)] leading-[var(--gr-control-leading-sm)]',

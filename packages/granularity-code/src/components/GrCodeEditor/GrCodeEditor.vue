@@ -559,14 +559,14 @@ defineExpose({
  * объявляется здесь, обычным CSS, и берётся из тех же токенов, что у блока, —
  * иначе редактор с подключённой грамматикой оставался бы одноцветным.
  */
-:where(.gr-code-editor) .gr-code-key { color: var(--gr-code-block-key, var(--gr-primary-text)); }
-:where(.gr-code-editor) .gr-code-string { color: var(--gr-code-block-string, var(--gr-success-text)); }
-:where(.gr-code-editor) .gr-code-number { color: var(--gr-code-block-number, var(--gr-azure-text)); }
-:where(.gr-code-editor) .gr-code-literal { color: var(--gr-code-block-literal, var(--gr-warning-text)); }
-:where(.gr-code-editor) .gr-code-punctuation { color: var(--gr-code-block-punctuation, var(--gr-fg)); }
-:where(.gr-code-editor) .gr-code-keyword { color: var(--gr-code-block-keyword, var(--gr-danger-text)); }
-:where(.gr-code-editor) .gr-code-comment { color: var(--gr-code-block-comment, var(--gr-muted-fg)); }
-:where(.gr-code-editor) .gr-code-type { color: var(--gr-code-block-type, var(--gr-primary-text)); }
-:where(.gr-code-editor) .gr-code-function { color: var(--gr-code-block-function, var(--gr-primary-text)); }
-:where(.gr-code-editor) .gr-code-variable { color: var(--gr-code-block-variable, var(--gr-fg)); }
+:where(.gr-code-editor) .gr-code-key { color: var(--gr-code-block-key); }
+:where(.gr-code-editor) .gr-code-string { color: var(--gr-code-block-string); }
+:where(.gr-code-editor) .gr-code-number { color: var(--gr-code-block-number); }
+:where(.gr-code-editor) .gr-code-literal { color: var(--gr-code-block-literal); }
+:where(.gr-code-editor) .gr-code-punctuation { color: var(--gr-code-block-punctuation); }
+:where(.gr-code-editor) .gr-code-keyword { color: var(--gr-code-block-keyword); }
+:where(.gr-code-editor) .gr-code-comment { color: var(--gr-code-block-comment); }
+:where(.gr-code-editor) .gr-code-type { color: var(--gr-code-block-type); }
+:where(.gr-code-editor) .gr-code-function { color: var(--gr-code-block-function); }
+:where(.gr-code-editor) .gr-code-variable { color: var(--gr-code-block-variable); }
 </style>

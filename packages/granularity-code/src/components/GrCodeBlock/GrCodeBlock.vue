@@ -316,7 +316,7 @@ const copyLabel = computed(() => (
   margin-right: 1em;
   text-align: right;
   text-indent: 0;
-  color: var(--gr-code-block-line-number, var(--gr-muted-fg));
+  color: var(--gr-code-block-line-number);
   user-select: none;
 }
 </style>

@@ -19,13 +19,13 @@ export const bulletTrackFill = 'var(--gr-chart-bullet-track,var(--gr-muted))'
  */
 export const bulletValueWidth = 'var(--gr-chart-bullet-value-width,8px)'
 
-export const bulletTargetStroke = 'var(--gr-chart-bullet-target,var(--gr-fg))'
+export const bulletTargetStroke = 'var(--gr-chart-bullet-target)'
 
 /** Маркер переполнения: значение вышло за шкалу, и это надо показать, а не срезать. */
 export const bulletOverflowFill = 'var(--gr-chart-bullet-overflow,var(--gr-danger))'
 
-/** Полоса значения — цветом первой серии: это данные, а не семантика. */
-export const bulletValueFill = 'var(--gr-chart-1)'
+/** Полоса значения — цвет темы: «Сланец» берёт первую серию, «Глина» — графит, отдавая глину цели. */
+export const bulletValueFill = 'var(--gr-chart-bullet-value)'
 
 /**
  * Полосы диапазонов по умолчанию — оттенками приглушённой роли, а не палитрой

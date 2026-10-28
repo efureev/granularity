@@ -55,7 +55,7 @@ describe('GrChartWaterfall', () => {
   it('цвет идёт по знаку шага, а не по индексу серии', () => {
     const fills = bars(factory()).map(node => node.attributes('fill'))
 
-    expect(fills[0]).toContain('--gr-chart-1')
+    expect(fills[0]).toContain('--gr-chart-waterfall-total')
     expect(fills[1]).toContain('--gr-success')
     expect(fills[2]).toContain('--gr-danger')
   })

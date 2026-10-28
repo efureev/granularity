@@ -1,3 +1,5 @@
 {
+  "gr-image-crop-guide": "var(--gr-brd)",
+  "gr-image-crop-inset": "0px",
   "gr-image-crop-mask": "rgb(0 0 0 / 0.55)"
 }

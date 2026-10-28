@@ -32,20 +32,16 @@ import {
 } from '../../chrono/plainDate'
 import type { GrCalendarSize } from './grCalendarStyles'
 import {
-  calendarDayClass,
+  calendarDayAttrs,
   calendarGridClass,
-  calendarPeriodClass,
-  calendarPeriodGridClass,
-  calendarPeriodRowClass,
-  calendarQuarterRowClass,
-  calendarRangeCellClass,
   calendarHeaderClass,
   calendarNavButtonClass,
   calendarNavSizes,
+  calendarPeriodGridClass,
+  calendarPeriodRowClass,
+  calendarQuarterRowClass,
+  calendarRangeCellAttrs,
   calendarRootClass,
-  calendarTitleClass,
-  calendarWeekdayClass,
-  calendarWeekNumberClass,
 } from './grCalendarStyles'
 
 /**
@@ -407,10 +403,25 @@ function rangeStateOf(cell: CalendarCell): { inRange: boolean, start: boolean, e
   }
 }
 
+/** Полоса — предпросмотр, а не выбор: начало есть, конца ещё нет. */
+const isPreview = computed(() => Boolean(props.rangeStart && !props.rangeEnd && props.rangePreview))
+
+/**
+ * Второй край предпросмотра — день под курсором. Он ещё не выбран и выглядит
+ * иначе, чем начало: заливка обещала бы выбор, которого не было.
+ */
+function isPreviewEnd(cell: CalendarCell): boolean {
+  const { rangeStart, rangeEnd, rangePreview } = props
+  if (!rangeStart || rangeEnd || !rangePreview)
+    return false
+
+  return isSamePlainDate(cell.date, rangePreview) && !isSamePlainDate(cell.date, rangeStart)
+}
+
 /** Край диапазона выглядит выбранным: заливка та же, что у одиночного выбора. */
 function isEdge(cell: CalendarCell): boolean {
   const state = rangeStateOf(cell)
-  return state.start || state.end
+  return (state.start || state.end) && !isPreviewEnd(cell)
 }
 
 const dayEls = ref(new Map<string, HTMLElement>())
@@ -686,6 +697,7 @@ defineExpose({
 <template>
   <div
     data-gr-calendar
+    :data-gr-size="resolvedSize"
     :class="calendarRootClass"
     :aria-disabled="disabled ? 'true' : undefined"
     :data-allow-mismatch="viewFromClock ? 'children' : undefined"
@@ -703,7 +715,7 @@ defineExpose({
           <span aria-hidden="true">‹</span>
         </button>
 
-        <span :id="titleId" :class="calendarTitleClass" data-gr-calendar-title aria-live="off">
+        <span :id="titleId" data-gr-calendar-title aria-live="off">
           {{ periodTitle }}
         </span>
 
@@ -751,12 +763,6 @@ defineExpose({
           :aria-selected="cell.key === selectedPeriodKey ? 'true' : 'false'"
           :aria-disabled="cell.disabled ? 'true' : undefined"
           :aria-current="cell.current ? 'date' : undefined"
-          :class="calendarPeriodClass({
-            size: resolvedSize,
-            selected: cell.key === selectedPeriodKey,
-            current: cell.current,
-            disabled: cell.disabled,
-          })"
           @click="onPeriodClick(cell)"
         >
           {{ periodLabel(cell) }}
@@ -779,14 +785,13 @@ defineExpose({
     >
       <thead>
         <tr>
-          <th v-if="resolvedShowWeekNumbers" scope="col" :class="calendarWeekNumberClass">
+          <th v-if="resolvedShowWeekNumbers" scope="col" data-gr-calendar-week-head>
             <span class="sr-only">{{ t('grChrono.calendar.weekNumber', 'Week') }}</span>
           </th>
           <th
             v-for="column in weekdayColumns"
             :key="column.isoWeekday"
             scope="col"
-            :class="calendarWeekdayClass"
             data-gr-calendar-weekday
           >
             <slot name="weekday" v-bind="column">
@@ -802,7 +807,6 @@ defineExpose({
           <th
             v-if="resolvedShowWeekNumbers"
             scope="row"
-            :class="calendarWeekNumberClass"
             data-gr-calendar-week-number
           >
             {{ week.weekNumber }}
@@ -813,7 +817,7 @@ defineExpose({
             :key="cell.key"
             role="gridcell"
             data-gr-calendar-cell
-            :class="calendarRangeCellClass(rangeStateOf(cell))"
+            v-bind="calendarRangeCellAttrs({ ...rangeStateOf(cell), preview: isPreview })"
             :aria-selected="isSelected(cell) || rangeStateOf(cell).inRange ? 'true' : 'false'"
           >
             <span
@@ -823,12 +827,10 @@ defineExpose({
               :tabindex="roving.tabindexFor(cell.key)"
               :aria-disabled="cell.disabled ? 'true' : undefined"
               :aria-current="cell.today ? 'date' : undefined"
-              :class="calendarDayClass({
-                size: resolvedSize,
-                inMonth: cell.inMonth,
-                today: cell.today,
+              v-bind="calendarDayAttrs({
                 selected: isSelected(cell) || isEdge(cell),
-                disabled: cell.disabled,
+                outside: !cell.inMonth,
+                previewEnd: isPreviewEnd(cell),
               })"
               @click="onDayClick(cell)"
               @mouseenter="emit('dayHover', cell.date)"
@@ -845,3 +847,176 @@ defineExpose({
     <slot name="footer" :select="selectDate" :can-select="canSelectDate" />
   </div>
 </template>
+
+<style>
+/*
+ * Вид календаря — лист по атрибутам (`docs/markup-weight.md` ядра): дней в сетке
+ * сорок два, периодов — до двенадцати. Ступень ставит корень (`data-gr-size`),
+ * состояние лист читает по ARIA: «сегодня» — `aria-current`, запрет — `aria-disabled`,
+ * выбранный период — `aria-selected`, недоступный календарь — `aria-disabled` корня,
+ * «только чтение» — `aria-readonly` сетки. Свои флаги — где ARIA молчит: выбранный
+ * день и край предпросмотра (`aria-selected` у ячейки стоит на всей полосе), день
+ * соседнего месяца, полоса периода у ячейки таблицы.
+ */
+[data-gr-calendar][data-gr-size='xs'] {
+  --gr-calendar-step-cell: var(--gr-calendar-cell-size, 1.75rem);
+  --gr-calendar-step-period: 1.75rem;
+  --gr-calendar-step-text: var(--gr-control-text-xs);
+  --gr-calendar-step-leading: var(--gr-control-leading-xs);
+  --gr-calendar-step-radius: var(--gr-radius-control-xs);
+}
+
+[data-gr-calendar][data-gr-size='sm'] {
+  --gr-calendar-step-cell: var(--gr-calendar-cell-size, 2rem);
+  --gr-calendar-step-period: 2rem;
+  --gr-calendar-step-text: var(--gr-control-text-sm);
+  --gr-calendar-step-leading: var(--gr-control-leading-sm);
+  --gr-calendar-step-radius: var(--gr-radius-control-sm);
+}
+
+[data-gr-calendar][data-gr-size='md'] {
+  --gr-calendar-step-cell: var(--gr-calendar-cell-size, 2.25rem);
+  --gr-calendar-step-period: 2.25rem;
+  --gr-calendar-step-text: var(--gr-control-text-md);
+  --gr-calendar-step-leading: var(--gr-control-leading-md);
+  --gr-calendar-step-radius: var(--gr-radius-control-md);
+}
+
+[data-gr-calendar][data-gr-size='lg'] {
+  --gr-calendar-step-cell: var(--gr-calendar-cell-size, 2.5rem);
+  --gr-calendar-step-period: 2.5rem;
+  --gr-calendar-step-text: var(--gr-control-text-lg);
+  --gr-calendar-step-leading: var(--gr-control-leading-lg);
+  --gr-calendar-step-radius: var(--gr-radius-control-lg);
+}
+
+[data-gr-calendar-title] {
+  font-size: var(--gr-control-text-md);
+  font-weight: var(--gr-calendar-title-weight);
+  line-height: var(--gr-leading-sm);
+}
+
+[data-gr-calendar-weekday] {
+  color: var(--gr-muted-fg);
+  font-size: var(--gr-control-text-xs);
+  font-weight: 500;
+  line-height: var(--gr-leading-xs);
+  text-align: center;
+}
+
+:is([data-gr-calendar-week-head], [data-gr-calendar-week-number]) {
+  padding-right: 0.25rem;
+  color: var(--gr-muted-fg);
+  font-size: var(--gr-control-text-xs);
+  line-height: var(--gr-leading-xs);
+  text-align: right;
+  vertical-align: middle;
+}
+
+/* Полоса и её скругление — у ячейки таблицы: цепочка скруглённых дней полосой не выглядит. */
+[data-gr-calendar-cell][data-gr-band='range'] {
+  background-color: var(--gr-calendar-range-bg);
+}
+
+[data-gr-calendar-cell][data-gr-band='preview'] {
+  background-color: var(--gr-calendar-range-preview-bg);
+}
+
+[data-gr-calendar-cell][data-gr-start] {
+  border-top-left-radius: var(--gr-calendar-step-radius);
+  border-bottom-left-radius: var(--gr-calendar-step-radius);
+}
+
+[data-gr-calendar-cell][data-gr-end] {
+  border-top-right-radius: var(--gr-calendar-step-radius);
+  border-bottom-right-radius: var(--gr-calendar-step-radius);
+}
+
+:is([data-gr-calendar-day], [data-gr-calendar-period]) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--gr-calendar-step-radius);
+  color: var(--gr-fg);
+  font-size: var(--gr-calendar-step-text);
+  line-height: var(--gr-calendar-step-leading);
+  cursor: pointer;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+  transition-duration: var(--gr-duration-fast);
+  transition-timing-function: var(--gr-ease-out);
+}
+
+[data-gr-calendar-day] {
+  width: var(--gr-calendar-step-cell);
+  height: var(--gr-calendar-step-cell);
+}
+
+[data-gr-calendar-period] {
+  width: 100%;
+  height: var(--gr-calendar-step-period);
+  padding-inline: 0.5rem;
+}
+
+[data-gr-calendar-day][data-gr-outside] {
+  color: var(--gr-calendar-outside-fg, var(--gr-muted-fg));
+}
+
+/* Отклик — только там, где клик что-то сделает: не на выбранном, запрещённом и в запертом календаре. */
+[data-gr-calendar]:not([aria-disabled='true']) :is([data-gr-calendar-grid], [data-gr-calendar-periods]):not([aria-readonly='true']) :is([data-gr-calendar-day]:not([data-gr-selected], [data-gr-preview]), [data-gr-calendar-period][aria-selected='false']):not([aria-disabled='true']):hover {
+  background-color: var(--gr-calendar-hover-bg);
+}
+
+/* Начертание «сегодня» держится и на выбранном дне: выбор меняет цвет, а не то, что день сегодняшний. */
+:is([data-gr-calendar-day], [data-gr-calendar-period])[aria-current]:not([data-gr-outside]) {
+  font-weight: var(--gr-calendar-today-weight);
+}
+
+:is([data-gr-calendar-day], [data-gr-calendar-period])[aria-current]:not([data-gr-outside], [data-gr-selected], [data-gr-preview], [aria-selected='true'], [aria-disabled='true']) {
+  color: var(--gr-calendar-today-fg);
+}
+
+:is([data-gr-calendar-day], [data-gr-calendar-period])[aria-current]:not([data-gr-selected], [data-gr-preview], [aria-selected='true']) {
+  box-shadow: inset 0 0 0 1px var(--gr-calendar-today-ring);
+}
+
+:is([data-gr-calendar-day][data-gr-selected], [data-gr-calendar-period][aria-selected='true']) {
+  background-color: var(--gr-calendar-selected-bg, var(--gr-selected));
+  color: var(--gr-calendar-selected-fg, var(--gr-selected-fg));
+}
+
+[data-gr-calendar-day][data-gr-preview] {
+  background-color: var(--gr-calendar-preview-end-bg);
+  color: var(--gr-calendar-preview-end-fg);
+  box-shadow: inset 0 0 0 1px var(--gr-calendar-preview-end-ring);
+}
+
+/* Запрещённая дата не выглядит выбранной, даже если модель на неё указывает. */
+:is([data-gr-calendar-day], [data-gr-calendar-period])[aria-disabled='true'] {
+  background-color: transparent;
+  color: var(--gr-disabled-fg);
+  cursor: not-allowed;
+}
+
+:is([data-gr-calendar-grid], [data-gr-calendar-periods])[aria-readonly='true'] :is([data-gr-calendar-day], [data-gr-calendar-period]) {
+  cursor: default;
+}
+
+/* Недоступный календарь гаснет ролями недоступного контрола, а выбор остаётся виден — как у полей ядра. */
+[data-gr-calendar][aria-disabled='true'] :is([data-gr-calendar-title], [data-gr-calendar-weekday], [data-gr-calendar-week-head], [data-gr-calendar-week-number], [data-gr-calendar-day], [data-gr-calendar-period]) {
+  color: var(--gr-disabled-fg);
+}
+
+[data-gr-calendar][aria-disabled='true'] :is([data-gr-calendar-day], [data-gr-calendar-period]) {
+  cursor: not-allowed;
+}
+
+[data-gr-calendar][aria-disabled='true'] :is([data-gr-calendar-day][data-gr-selected], [data-gr-calendar-period][aria-selected='true']) {
+  background-color: var(--gr-disabled-bg);
+}
+
+:is([data-gr-calendar-day], [data-gr-calendar-period])[data-key]:focus-visible {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 2px var(--gr-ring);
+}
+</style>

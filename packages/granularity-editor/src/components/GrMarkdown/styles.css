@@ -68,8 +68,18 @@
   margin-top: calc(var(--gr-markdown-heading-flow, 1.8em) - var(--gr-markdown-flow, 1em));
 }
 
-[data-gr-markdown] h1.gr-md-heading { font-size: 1.75em; }
-[data-gr-markdown] h2.gr-md-heading { font-size: 1.4em; }
+/**
+ * Крупные заголовки — шрифтом заголовков темы (`--gr-font-display`), как
+ * заголовки карточек и окон ядра: документ звучит тем же голосом, что интерфейс
+ * вокруг. Мелкие уровни длинный текст сканирует глазами — им шрифт текста.
+ */
+[data-gr-markdown] :is(h1, h2).gr-md-heading {
+  font-family: var(--gr-font-display);
+  font-weight: var(--gr-markdown-display-weight);
+}
+
+[data-gr-markdown] h1.gr-md-heading { font-size: var(--gr-markdown-h1-size); }
+[data-gr-markdown] h2.gr-md-heading { font-size: var(--gr-markdown-h2-size); }
 [data-gr-markdown] h3.gr-md-heading { font-size: 1.2em; }
 [data-gr-markdown] h4.gr-md-heading { font-size: 1.05em; }
 [data-gr-markdown] :is(h5, h6).gr-md-heading { font-size: 1em; }
@@ -318,8 +328,10 @@ ol.gr-md-list {
 .gr-md-quote {
   margin: 0;
   padding-inline-start: 1em;
-  border-inline-start: 3px solid var(--gr-markdown-quote-bar, var(--gr-brd));
-  color: var(--gr-muted-fg);
+  border-inline-start: 3px solid var(--gr-markdown-quote-bar);
+  color: var(--gr-markdown-quote-fg);
+  font-family: var(--gr-markdown-quote-font);
+  font-size: var(--gr-markdown-quote-size);
 }
 
 .gr-md-quote > * + * {

@@ -17,6 +17,7 @@ interface StandOptions {
   mode?: 'view' | 'edit'
   props?: Record<string, unknown>
   slots?: Record<string, () => unknown>
+  componentDefaults?: Record<string, Record<string, unknown>>
 }
 
 function stand(options: StandOptions = {}) {
@@ -41,7 +42,7 @@ function stand(options: StandOptions = {}) {
   })
 
   const restore = stubElementRects({ width: 1200 })
-  const wrapper = mount(Stand, { attachTo: document.body, global: granularityGlobal() })
+  const wrapper = mount(Stand, { attachTo: document.body, global: granularityGlobal({ componentDefaults: options.componentDefaults }) })
   restore()
 
   return { root: wrapper.element as HTMLElement, layout }
@@ -363,5 +364,35 @@ describe('grDashboardItem: кнопка настроек', () => {
     expect(button).not.toBeNull()
     expect(button?.hasAttribute('disabled')).toBe(false)
     expect(button?.getAttribute('tabindex')).toBeNull()
+  })
+})
+
+describe('grDashboardItem: вид карточки — у темы', () => {
+  const card = (root: HTMLElement) => query(root, '[data-gr-card]')!
+
+  it('по умолчанию карточка поднята — рамка и тень', () => {
+    expect(card(stand({ mode: 'view' }).root).className).toContain('shadow-[var(--gr-shadow-1)]')
+  })
+
+  it('вариант приходит из componentDefaults темы: «Глина» кладёт виджет на сетку рамкой', () => {
+    const root = stand({ mode: 'view', componentDefaults: { GrDashboardItem: { variant: 'outlined' } } }).root
+
+    expect(card(root).className).not.toContain('shadow-')
+    expect(card(root).className).toContain('border-[var(--gr-brd)]')
+  })
+
+  it('проп на месте сильнее темы', () => {
+    const root = stand({ mode: 'view', props: { variant: 'elevated' }, componentDefaults: { GrDashboardItem: { variant: 'outlined' } } }).root
+
+    expect(card(root).className).toContain('shadow-[var(--gr-shadow-1)]')
+  })
+
+  it('рамка правки — слоем поверх карточки, только в режиме правки', () => {
+    expect(query(stand({ mode: 'view' }).root, '[data-gr-dashboard-item-edit-rim]')).toBeNull()
+
+    const rim = query(stand({ mode: 'edit' }).root, '[data-gr-dashboard-item-edit-rim]')!
+    expect(rim.className).toContain('border-[var(--gr-dashboard-item-edit-brd)]')
+    expect(rim.className).toContain('pointer-events-none')
+    expect(rim.getAttribute('aria-hidden')).toBe('true')
   })
 })

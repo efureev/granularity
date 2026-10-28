@@ -1,0 +1,6 @@
+{
+  "gr-code-block-function": "#e3a0c8",
+  "gr-code-block-line-number": "var(--gr-slate-text)",
+  "gr-code-block-literal": "#bfb0e6",
+  "gr-code-block-punctuation": "#d6d4ca"
+}

@@ -308,15 +308,15 @@ const grTheme = EditorView.theme({
   '.cm-content': { caretColor: 'var(--gr-code-editor-cursor, var(--gr-fg))' },
   '.cm-cursor, .cm-dropCursor': { borderLeftColor: 'var(--gr-code-editor-cursor, var(--gr-fg))' },
   '&.cm-focused .cm-selectionBackground, .cm-selectionBackground, .cm-content ::selection': {
-    backgroundColor: 'var(--gr-code-editor-selection, var(--gr-info-light))',
+    backgroundColor: 'var(--gr-code-editor-selection)',
   },
-  '.cm-activeLine': { backgroundColor: 'var(--gr-code-editor-active-line, transparent)' },
+  '.cm-activeLine': { backgroundColor: 'var(--gr-code-editor-active-line)' },
   // Свой цвет обязателен: дефолтный `#888` CodeMirror даёт 3.2:1 на светлой
   // подложке и 2.9:1 на тёмной — ниже AA в обеих темах.
   '.cm-placeholder': { color: 'var(--gr-code-editor-placeholder, var(--gr-muted-fg))' },
   '.cm-gutters': {
     backgroundColor: 'transparent',
-    color: 'var(--gr-code-block-line-number, var(--gr-muted-fg))',
+    color: 'var(--gr-code-block-line-number)',
     border: 'none',
   },
   // Волна — вторым признаком к цвету: подчёркивание видно и тому, кто тон не

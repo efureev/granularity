@@ -1,0 +1,10 @@
+{
+  "gr-code-block-comment": "var(--gr-muted-fg)",
+  "gr-code-block-key": "var(--gr-azure-text)",
+  "gr-code-block-keyword": "var(--gr-primary-text)",
+  "gr-code-block-number": "var(--gr-info-text)",
+  "gr-code-block-radius": "var(--gr-radius-lg)",
+  "gr-code-block-string": "var(--gr-success-text)",
+  "gr-code-block-type": "var(--gr-warning-text)",
+  "gr-code-block-variable": "var(--gr-fg)"
+}

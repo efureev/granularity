@@ -7,6 +7,26 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+
+- **Цвет места, призрака и ручек — решение темы.** `--gr-dashboard-frame-placeholder-bg`,
+  `-placeholder-brd`, `-ghost-brd` и `--gr-dashboard-palette-item-bg-hover` были хуками с запасным
+  значением в коде, теперь это токены вида `theme`. Темы каталога несут их с
+  `@feugene/granularity-tokens` 2.5.0 — «Сланец», «Тактильная» и «Чертёж» с прежним видом, «Глина» —
+  раскладка графитом: место — чернила 6 % в пунктире плотной рамки, призрак — в той же рамке. Своей
+  теме-копии нужны значения (`granum doctor`, `theme-incomplete`).
+- **Peer `@feugene/granularity-tokens` — `>=2.5.0 <3.0.0`**: темы со значениями дашборда.
+
+### Added
+
+- **`GrDashboardItem` — проп `variant`**: вариант `GrCard` (`elevated` по умолчанию, `outlined`,
+  `ghost`), настраивается `componentDefaults` — «Глина» кладёт виджеты рамкой без тени.
+- **`GrDashboardPalette` — проп `appearance`**: `tiles` (по умолчанию) или `list` — строки под
+  волосяными линиями; «Глина» держит каталог списком.
+- **Токены темы**: `--gr-dashboard-item-edit-brd` (рамка виджета в правке — слоем поверх карточки),
+  `--gr-dashboard-frame-handle-hover-bg`, `-handle-active-color`, `-resize-color`,
+  `-resize-color-hover`. Хук `--gr-dashboard-frame-handle-color` по-прежнему красит все ручки разом.
+
 ## [v2.0.2] 2026-10-21
 
 ### Changed

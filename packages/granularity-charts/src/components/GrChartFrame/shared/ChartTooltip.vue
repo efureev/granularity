@@ -7,6 +7,7 @@ import {
   frameTooltipRowClass,
   frameTooltipTitleClass,
   frameTooltipValueClass,
+  tooltipSwatchRing,
 } from '../chartFrameStyles'
 
 /**
@@ -28,7 +29,7 @@ defineProps<{
     <span :class="frameTooltipTitleClass">{{ title }}</span>
     <span v-for="series in active.series" :key="series.id" :class="frameTooltipRowClass">
       <svg :class="frameLegendSwatchClass" viewBox="0 0 12 12" aria-hidden="true" focusable="false">
-        <path :d="symbolPath(series.style.shape, 6, 6, 10)" :fill="series.style.color" />
+        <path :d="symbolPath(series.style.shape, 6, 6, 10)" :fill="series.style.color" :stroke="tooltipSwatchRing" stroke-width="1" />
       </svg>
       <span>{{ series.label }}</span>
       <span :class="frameTooltipValueClass">{{ formatValue(series.value, series.axis) }}</span>

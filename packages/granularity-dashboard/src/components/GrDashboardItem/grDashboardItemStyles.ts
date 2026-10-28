@@ -1,4 +1,5 @@
 // Только тип: `import type` стирается на сборке и ребра графа компонентов не создаёт.
+import type { GrCardVariant } from '@feugene/granularity/components/GrCard'
 import type { GrComponentSize } from '@feugene/granularity/components/GrConfigProvider'
 
 export type GrDashboardItemSize = GrComponentSize
@@ -47,6 +48,16 @@ export const rootClass = [
   'overflow-hidden',
   'rounded-[var(--gr-dashboard-item-radius,var(--gr-radius-lg))]',
 ].join(' ')
+
+/** Вид карточки виджета — вариант `GrCard`: поднятая или лежащая на сетке в рамке. */
+export type GrDashboardItemVariant = GrCardVariant
+
+/**
+ * Рамка режима правки — отдельным слоем поверх карточки, а не цветом её рамки:
+ * рамку `GrCard` рисует утилита, и лист виджета её бы не перекрыл. Тема, которой
+ * правка не меняет рамку, ставит токен в `transparent`.
+ */
+export const editRimClass = 'pointer-events-none absolute inset-0 rounded-[inherit] border border-solid border-[var(--gr-dashboard-item-edit-brd)]'
 
 /** Виджет, который сейчас несут: он один поднят над сеткой. */
 export const draggingClass = [

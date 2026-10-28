@@ -1,4 +1,5 @@
 {
   "gr-chart-waterfall-connector-width": "1px",
+  "gr-chart-waterfall-total": "var(--gr-chart-1)",
   "gr-chart-waterfall-zero-step": "2px"
 }

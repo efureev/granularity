@@ -1,0 +1,6 @@
+{
+  "gr-code-scanner-reticle": "#faf9f5",
+  "gr-code-scanner-reticle-corner": "24px",
+  "gr-code-scanner-reticle-radius": "var(--gr-radius-lg)",
+  "gr-code-scanner-reticle-width": "3px"
+}

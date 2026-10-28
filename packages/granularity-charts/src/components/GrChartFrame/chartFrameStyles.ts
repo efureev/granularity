@@ -73,12 +73,19 @@ export const frameGhostClass = 'absolute inset-0 h-full w-full'
 
 export const frameTooltipClass
   = 'pointer-events-none z-[var(--gr-z-tooltip)] flex flex-col gap-1 rounded-[var(--gr-radius-md)] '
-    + 'border border-[var(--gr-chart-frame-tooltip-brd,var(--gr-brd))] '
-    + 'bg-[var(--gr-chart-frame-tooltip-bg,var(--gr-card))] px-3 py-2 shadow-lg '
-    + 'text-[var(--gr-chart-frame-tooltip-fg,var(--gr-fg))] '
+    + 'border border-[var(--gr-chart-frame-tooltip-brd)] '
+    + 'bg-[var(--gr-chart-frame-tooltip-bg)] px-3 py-2 shadow-[var(--gr-chart-frame-tooltip-shadow)] '
+    + 'text-[var(--gr-chart-frame-tooltip-fg)] '
     + 'text-[length:var(--gr-control-text-sm)] leading-[var(--gr-leading-normal)]'
 
 export const frameTooltipTitleClass = 'font-600'
+
+/**
+ * Кольцо метки серии в подсказке. Цвета серий подобраны к странице, а пузырь
+ * подсказки тема вправе сделать тёмным или светлым наоборот — кольцо цвета его
+ * текста держит метку видимой на любом фоне, и для своих цветов серий тоже.
+ */
+export const tooltipSwatchRing = 'var(--gr-chart-frame-tooltip-swatch-ring)'
 
 export const frameTooltipRowClass = 'flex items-center gap-2'
 
@@ -108,9 +115,9 @@ export const gridStroke = 'var(--gr-chart-frame-grid,var(--gr-brd))'
 export const gridStrokeWidth = 'var(--gr-chart-frame-grid-width)'
 export const axisStroke = 'var(--gr-chart-frame-axis,var(--gr-brd))'
 export const labelFill = 'var(--gr-chart-frame-label,var(--gr-muted-fg))'
-export const crosshairStroke = 'var(--gr-chart-frame-crosshair,var(--gr-brd))'
-export const brushFill = 'var(--gr-chart-frame-brush-fill,var(--gr-primary))'
-export const brushStroke = 'var(--gr-chart-frame-brush-stroke,var(--gr-primary))'
+export const crosshairStroke = 'var(--gr-chart-frame-crosshair)'
+export const brushFill = 'var(--gr-chart-frame-brush-fill)'
+export const brushStroke = 'var(--gr-chart-frame-brush-stroke)'
 export const brushFillOpacity = 'var(--gr-chart-frame-brush-fill-opacity)'
 
 /**
@@ -120,7 +127,7 @@ export const brushFillOpacity = 'var(--gr-chart-frame-brush-fill-opacity)'
  * легенде. Свой цвет опоры (`color`) отменяет этот дефолт — но решает так автор
  * графика, а не палитра.
  */
-export const referenceStroke = 'var(--gr-chart-frame-reference,var(--gr-muted-fg))'
+export const referenceStroke = 'var(--gr-chart-frame-reference)'
 export const referenceLabelFill = 'var(--gr-chart-frame-reference-label,var(--gr-muted-fg))'
 
 /** Полоса заливается едва заметно: коридор допустимого не должен спорить с данными. */

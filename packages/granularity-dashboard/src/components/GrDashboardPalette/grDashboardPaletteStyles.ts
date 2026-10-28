@@ -17,25 +17,45 @@ export interface GrDashboardPaletteItem {
   disabled?: boolean
 }
 
-export const listClass = 'flex flex-col gap-2 m-0 p-0 list-none'
+/**
+ * Вид каталога: `tiles` — плитки в рамках, `list` — строки под волосяными
+ * линиями. Выбирает тема через `componentDefaults`: «Глина» держит каталог списком,
+ * чтобы панель не дробилась на ячейки.
+ */
+export type GrDashboardPaletteAppearance = 'tiles' | 'list'
+
+export const listClass: Record<GrDashboardPaletteAppearance, string> = {
+  tiles: 'flex flex-col gap-2 m-0 p-0 list-none',
+  list: 'flex flex-col m-0 p-0 list-none',
+}
+
+/** Строка списка отбивается волосяной линией сверху; у первой линии нет. */
+export const listItemClass: Record<GrDashboardPaletteAppearance, string> = {
+  tiles: '',
+  list: 'border-0 border-t border-solid border-[var(--gr-dashboard-palette-item-brd,var(--gr-brd))] first:border-t-0',
+}
 
 /**
- * Строка каталога — плитка, а не строка текста.
+ * Строка каталога — плитка или строка списка, но не строка текста.
  *
  * Человек выбирает, что поставить на дашборд, и решение это не текстовое:
- * рамка отделяет варианты друг от друга, а подсветка при наведении показывает,
- * с чем он сейчас имеет дело. Кликабельной плитку не делаем — интерактив в ней
- * ровно один, кнопка: вложенный в неё второй потерял бы виджет для скринридера.
+ * рамка или линия отделяет варианты друг от друга, а подсветка при наведении
+ * показывает, с чем он сейчас имеет дело. Кликабельной строку не делаем —
+ * интерактив в ней ровно один, кнопка: вложенный в неё второй потерял бы виджет
+ * для скринридера.
  */
-export const rowClass = [
+const rowBaseClass = [
   'flex items-start gap-3 min-w-0',
   'p-3',
-  'rounded-[var(--gr-radius-md)]',
   'bg-[var(--gr-dashboard-palette-item-bg,transparent)]',
-  'border border-solid border-[var(--gr-dashboard-palette-item-brd,var(--gr-brd))]',
   'transition-colors duration-[var(--gr-duration-fast)] ease-[var(--gr-ease-out)]',
-  'hover:bg-[var(--gr-dashboard-palette-item-bg-hover,var(--gr-muted))]',
+  'hover:bg-[var(--gr-dashboard-palette-item-bg-hover)]',
 ].join(' ')
+
+export const rowClass: Record<GrDashboardPaletteAppearance, string> = {
+  tiles: `${rowBaseClass} rounded-[var(--gr-radius-md)] border border-solid border-[var(--gr-dashboard-palette-item-brd,var(--gr-brd))]`,
+  list: rowBaseClass,
+}
 
 /**
  * Уже добавленный виджет гасится фоном, а не прозрачностью: `opacity`

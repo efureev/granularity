@@ -27,7 +27,7 @@ function isWeekend(date: PlainDate): boolean {
 const PERIOD_MODES = ['week', 'month', 'quarter', 'year'] as const
 type PeriodMode = typeof PERIOD_MODES[number]
 
-// Выбранный период не совпадает с текущим: видны оба признака — заливка выбора и обводка «сейчас».
+// Выбранный период не совпадает с текущим: видны оба признака — заливка выбора и отметка «сейчас».
 const periods = reactive<Record<PeriodMode, PlainDate | null>>({
   week: { y: 2026, m: 9, d: 19 },
   month: { y: 2026, m: 10, d: 1 },
@@ -124,7 +124,7 @@ const QUICK_DAYS = [
       </div>
     </Specimen>
 
-    <Specimen title="Сегодня, выбор, соседние дни" note="Сегодня — обводка, выбор — заливка: состояние несёт форма, а не один цвет. Дни соседних месяцев приглушены, номера недель — по ISO.">
+    <Specimen title="Сегодня, выбор, соседние дни" note="Выбор — заливка, «сегодня» — обводка или начертание, как решит тема: состояние несёт форма, а не один цвет. Дни соседних месяцев приглушены, номера недель — по ISO.">
       <div>
         <GrCalendar v-model="reportDate" :today="TODAY" show-week-numbers aria-label="Дата отчёта" />
       </div>

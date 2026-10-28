@@ -1,4 +1,5 @@
 {
+  "gr-sparkline-color": "var(--gr-chart-1)",
   "gr-sparkline-fill-opacity": "0.15",
   "gr-sparkline-width": "1.5px"
 }

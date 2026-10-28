@@ -2,6 +2,7 @@ import type {
   GrDashboardItemOverflow,
   GrDashboardItemPadding,
   GrDashboardItemSize,
+  GrDashboardItemVariant,
 } from './grDashboardItemStyles'
 
 /**
@@ -15,6 +16,8 @@ export interface GrDashboardItemConfigurableProps {
   /** Не задан — отступы берутся от `size`. */
   padding: GrDashboardItemPadding
   overflow: GrDashboardItemOverflow
+  /** Вид карточки — вариант `GrCard`. */
+  variant: GrDashboardItemVariant
   /** Высоту виджета определяет содержимое, а не запись раскладки. */
   autoHeight: boolean
 }

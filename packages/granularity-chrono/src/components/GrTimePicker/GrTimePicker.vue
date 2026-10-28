@@ -461,3 +461,76 @@ const fieldAttrs = computed(() => pickerFieldAttrs(fieldOptions.value))
     </PickerSurface>
   </div>
 </template>
+
+<style>
+/*
+ * Вид значения в колонке — лист по атрибутам (`docs/markup-weight.md` ядра): в
+ * колонке минут шестьдесят значений. Колонки рисует `TimeColumns`, общий для
+ * `GrTimePicker`, `GrDateTimePicker` и `GrDateRangePicker`; лист лежит здесь, и
+ * пикеры даты со временем получают его зависимостью от `GrTimePicker`. Ступень
+ * ставит корень колонок (`data-gr-size`), выбор и запрет лист читает по
+ * `aria-selected` и `aria-disabled`, клавиатурный курсор — флаг `data-gr-active`:
+ * `aria-activedescendant` стоит на колонке, а не на значении.
+ */
+[data-gr-time-columns][data-gr-size='xs'] {
+  --gr-time-picker-step-option: 1.5rem;
+  --gr-time-picker-step-text: var(--gr-control-text-xs);
+  --gr-time-picker-step-leading: var(--gr-control-leading-xs);
+}
+
+[data-gr-time-columns][data-gr-size='sm'] {
+  --gr-time-picker-step-option: 1.75rem;
+  --gr-time-picker-step-text: var(--gr-control-text-sm);
+  --gr-time-picker-step-leading: var(--gr-control-leading-sm);
+}
+
+[data-gr-time-columns][data-gr-size='md'] {
+  --gr-time-picker-step-option: 2rem;
+  --gr-time-picker-step-text: var(--gr-control-text-md);
+  --gr-time-picker-step-leading: var(--gr-control-leading-md);
+}
+
+[data-gr-time-columns][data-gr-size='lg'] {
+  --gr-time-picker-step-option: 2.25rem;
+  --gr-time-picker-step-text: var(--gr-control-text-lg);
+  --gr-time-picker-step-leading: var(--gr-control-leading-lg);
+}
+
+[data-gr-time-picker-option] {
+  display: flex;
+  width: 100%;
+  height: var(--gr-time-picker-step-option);
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--gr-radius-control);
+  color: var(--gr-fg);
+  font-size: var(--gr-time-picker-step-text);
+  font-variant-numeric: tabular-nums;
+  line-height: var(--gr-time-picker-step-leading);
+  cursor: pointer;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+  transition-duration: var(--gr-duration-fast);
+  transition-timing-function: var(--gr-ease-out);
+}
+
+[data-gr-time-picker-option][aria-selected='false']:not([aria-disabled='true']):hover {
+  background-color: var(--gr-time-picker-hover-bg);
+}
+
+[data-gr-time-picker-option][aria-selected='true'] {
+  background-color: var(--gr-time-picker-selected-bg, var(--gr-selected));
+  color: var(--gr-time-picker-selected-fg, var(--gr-selected-fg));
+}
+
+/* Запрещённое значение не выглядит выбранным, даже если модель на него указывает. */
+[data-gr-time-picker-option][aria-disabled='true'] {
+  background-color: transparent;
+  color: var(--gr-disabled-fg);
+  cursor: not-allowed;
+}
+
+/* Курсор — кольцо, выбор — заливка: совпав, они не сливаются в один признак. */
+[data-gr-time-picker-option][data-gr-active]:not([aria-disabled='true']) {
+  box-shadow: inset 0 0 0 1px var(--gr-time-picker-active-ring, var(--gr-ring));
+}
+</style>

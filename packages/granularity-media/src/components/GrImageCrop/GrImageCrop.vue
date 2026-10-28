@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vue'
 
 import GrSlider from '@feugene/granularity/components/GrSlider'
 import { useDragGesture } from '@feugene/granularity/composables/useDragGesture'
@@ -116,6 +116,8 @@ const viewportEl = ref<HTMLElement | null>(null)
 const image = shallowRef<HTMLImageElement | null>(null)
 const naturalSize = ref({ width: 0, height: 0 })
 const viewportSize = ref({ width: 0, height: 0 })
+const guideEl = ref<HTMLElement | null>(null)
+const guideSize = ref({ width: 0, height: 0 })
 const offset = ref<GrCropOffset>({ x: 0, y: 0 })
 const objectUrl = ref<string | null>(null)
 
@@ -137,7 +139,12 @@ const viewport = computed(() => (
  * иначе доля пикселя, на которую содержимое окна расходится с `aspectRatio`,
  * доезжала бы до файла лишней строкой.
  */
-const frame = computed(() => frameFor(viewport.value, ratio.value))
+/**
+ * Рамку тема вправе отодвинуть от края окна (`--gr-image-crop-inset`): тогда кадр —
+ * бокс рамки, измеренный вместе с бордером, а не окно. Без отступа они совпадают.
+ */
+const frameBase = computed(() => (guideSize.value.width > 0 ? guideSize.value : viewport.value))
+const frame = computed(() => frameFor(frameBase.value, ratio.value))
 const hasImage = computed(() => image.value !== null && naturalSize.value.width > 0)
 /**
  * Своё увеличение — как `useControlledOpen` у оверлеев ядра: проп перекрывает
@@ -170,6 +177,22 @@ function announceChange(): void {
   if (hasImage.value)
     emit('change', currentRect())
 }
+
+// Рамка появляется вместе с картинкой, и её бокс меряется после отрисовки. Рамка с
+// отступом меняет кадр, а первое объявление ушло ещё от окна — кадр пересчитывается.
+watch(hasImage, async (has) => {
+  if (!has) {
+    guideSize.value = { width: 0, height: 0 }
+    return
+  }
+  await nextTick()
+  const before = frame.value
+  measureGuide()
+  if (frame.value.width === before.width && frame.value.height === before.height)
+    return
+  offset.value = clampOffset(offset.value, naturalSize.value, frame.value, currentZoom.value)
+  announceChange()
+})
 
 function moveBy(dx: number, dy: number): void {
   if (props.disabled || !hasImage.value)
@@ -323,6 +346,13 @@ function measureViewport(): void {
     return
 
   viewportSize.value = { width: element.clientWidth, height: element.clientHeight }
+  measureGuide()
+}
+
+/** Дробный бокс рамки: окно меряется наблюдателем с той же точностью. */
+function measureGuide(): void {
+  const rect = guideEl.value?.getBoundingClientRect()
+  guideSize.value = { width: rect?.width ?? 0, height: rect?.height ?? 0 }
 }
 
 onMounted(() => {
@@ -333,6 +363,7 @@ onMounted(() => {
         width: entry?.contentRect.width ?? 0,
         height: entry?.contentRect.height ?? 0,
       }
+      measureGuide()
       offset.value = clampOffset(offset.value, naturalSize.value, frame.value, currentZoom.value)
       // Размер окна изменился — изменилась и вырезаемая область: у адаптивной
       // раскладки это происходит и без участия пользователя, а первое
@@ -450,8 +481,8 @@ defineExpose({
           :class="[imageClass, drag.isDragging.value ? '' : imageTransitionClass]"
           :style="imageStyle"
         >
-        <div v-if="shape === 'circle'" :class="circleMaskClass" />
-        <div v-else :class="rectGuideClass" />
+        <div v-if="shape === 'circle'" ref="guideEl" :class="circleMaskClass" />
+        <div v-else ref="guideEl" :class="rectGuideClass" :style="{ aspectRatio: String(ratio) }" />
       </template>
 
       <slot v-else name="empty">

@@ -149,7 +149,13 @@ const schema = computed(() => createSchema(props.schema))
 
 const actions = computed<GrRichTextAction[]>(() => schema.value.actions)
 
-const showToolbar = computed(() => props.toolbar === true || props.toolbar === 'both')
+/**
+ * Панель — для правки. В «только чтении» поле читается как документ, и ряд
+ * недоступных кнопок обещал бы правку, которой не будет. Недоступное поле панель
+ * держит: правка вернётся, и раскладка не прыгает.
+ */
+const showToolbar = computed(() => (props.toolbar === true || props.toolbar === 'both')
+  && !(field.readonly.value && !field.disabled.value))
 const showBubble = computed(() => props.toolbar === 'bubble' || props.toolbar === 'both')
 
 // ————— Значение.

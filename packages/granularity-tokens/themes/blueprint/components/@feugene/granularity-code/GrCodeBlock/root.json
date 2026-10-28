@@ -1,0 +1,14 @@
+{
+  "gr-code-block-comment": "var(--gr-muted-fg)",
+  "gr-code-block-function": "var(--gr-primary-text)",
+  "gr-code-block-key": "var(--gr-primary-text)",
+  "gr-code-block-keyword": "var(--gr-danger-text)",
+  "gr-code-block-line-number": "var(--gr-muted-fg)",
+  "gr-code-block-literal": "var(--gr-warning-text)",
+  "gr-code-block-number": "var(--gr-azure-text)",
+  "gr-code-block-punctuation": "var(--gr-fg)",
+  "gr-code-block-radius": "var(--gr-radius-md)",
+  "gr-code-block-string": "var(--gr-success-text)",
+  "gr-code-block-type": "var(--gr-primary-text)",
+  "gr-code-block-variable": "var(--gr-fg)"
+}

@@ -18,8 +18,8 @@ export type { GrChartSize as GrChartWaterfallSize } from '../GrChartFrame/chartF
 export const waterfallRiseFill = 'var(--gr-success)'
 export const waterfallFallFill = 'var(--gr-danger)'
 
-/** Итог и объявленное накопление — нейтральным цветом первой серии: это не движение. */
-export const waterfallTotalFill = 'var(--gr-chart-1)'
+/** Итог и объявленное накопление — цвет темы, не тон движения: «Сланец» — первая серия, «Глина» — графит. */
+export const waterfallTotalFill = 'var(--gr-chart-waterfall-total)'
 
 /** Нулевой шаг — ни прибавление, ни убавление; приглушённая роль вместо обеих. */
 export const waterfallZeroFill = 'var(--gr-muted-fg)'

@@ -2798,6 +2798,27 @@ export const grComponentTokens: GrComponentToken[] = [
     "description": "Цвет звёздочки обязательного поля. Тема, где звёздочка — пометка, а не тревога, ставит приглушённый цвет."
   },
   {
+    "owner": "GrFormSection",
+    "name": "--gr-form-section-title-size",
+    "kind": "theme",
+    "default": "var(--gr-text-sm)",
+    "description": "Кегль заголовка раздела. Шрифт у него — `--gr-font-display` темы."
+  },
+  {
+    "owner": "GrFormSection",
+    "name": "--gr-form-section-title-leading",
+    "kind": "theme",
+    "default": "var(--gr-leading-sm)",
+    "description": "Интерлиньяж заголовка раздела."
+  },
+  {
+    "owner": "GrFormSection",
+    "name": "--gr-form-section-title-weight",
+    "kind": "theme",
+    "default": "var(--gr-font-bold)",
+    "description": "Начертание заголовка раздела."
+  },
+  {
     "owner": "GrIcon",
     "name": "--gr-icon-size",
     "kind": "css",

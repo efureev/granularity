@@ -104,3 +104,29 @@ describe('grDashboardPalette', () => {
     expect(wrapper.emitted('add')).toHaveLength(1)
   })
 })
+
+describe('GrDashboardPalette — вид каталога у темы', () => {
+  const items: GrDashboardPaletteItem[] = [
+    { id: 'a', title: 'Выручка' },
+    { id: 'b', title: 'Заказы' },
+  ]
+  const ROW = '[data-gr-dashboard-palette-item]'
+
+  it('по умолчанию — плитки в рамках', () => {
+    const wrapper = mount(GrDashboardPalette, { props: { items }, global: granularityGlobal() })
+
+    expect(wrapper.findAll(ROW)[0]!.find('span').classes().join(' ')).toContain('border-[var(--gr-dashboard-palette-item-brd,var(--gr-brd))]')
+    expect(wrapper.findAll(ROW)[1]!.classes()).toEqual([])
+  })
+
+  it('тема переключает каталог в список: строки под волосяными линиями, без рамки плитки', () => {
+    const wrapper = mount(GrDashboardPalette, {
+      props: { items },
+      global: granularityGlobal({ componentDefaults: { GrDashboardPalette: { appearance: 'list' } } }),
+    })
+
+    expect(wrapper.findAll(ROW)[1]!.classes()).toContain('border-t')
+    expect(wrapper.findAll(ROW)[0]!.classes()).toContain('first:border-t-0')
+    expect(wrapper.findAll(ROW)[0]!.find('span').classes().join(' ')).not.toContain('rounded-')
+  })
+})

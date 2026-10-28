@@ -1,0 +1,5 @@
+{
+  "gr-video-player-panel-bg": "linear-gradient(to top, rgb(0 0 0 / 0.72), transparent)",
+  "gr-video-player-progress": "var(--gr-primary)",
+  "gr-video-player-ring": "#ffffff"
+}

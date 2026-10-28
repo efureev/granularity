@@ -31,7 +31,7 @@ export const codeBlockNumberedClass = 'gr-code-block--numbered'
  * того чтобы включить свою прокрутку, и вылезает за родителя вместе с кнопкой
  * копирования. Лог с длинной строкой — обычный вход, а не край.
  */
-export const codeBlockRootClass = 'relative min-w-0 rounded-[var(--gr-radius-md)] bg-[var(--gr-code-block-bg,var(--gr-muted))] text-[var(--gr-code-block-fg,var(--gr-fg))]'
+export const codeBlockRootClass = 'relative min-w-0 rounded-[var(--gr-code-block-radius)] bg-[var(--gr-code-block-bg,var(--gr-muted))] text-[var(--gr-code-block-fg,var(--gr-fg))]'
 
 /**
  * Полоса под кнопку: 28 px самой кнопки плюс отбивка `right-1`.
@@ -63,47 +63,38 @@ export const codeBlockPaddings = codeSurfacePaddings
 export const codeBlockTextSizes = codeSurfaceTextSizes
 
 /**
- * Роли подсветки — одиннадцать, общие на весь пакет. Дефолты — ссылки на
- * `-text`-роли темы: они переключаются вместе с ней, поэтому подсветка работает
- * в обеих без своего theme-слоя.
- *
- * Число взято от `azure`, а не от `info`: `info` — синий в двух шагах от индиго
- * `primary`, и пара «ключ ↔ число» давала ΔE 9.4 в светлой теме и 7.8 в тёмной.
- * В `{"count": 42}` эти два цвета стоят через двоеточие и читались бы как один.
- * С `azure` расстояние 53.8 и 16.6.
+ * Роли подсветки — одиннадцать, общие на весь пакет. Цвет каждой — токен вида
+ * `theme`: палитру решает тема, а не пакет, и в теме она переключается вместе с
+ * режимом.
  *
  * Пять ролей сверх шести ядерных встроенный токенизатор не производит — их
  * даёт подключённая подсветка (Shiki, CodeMirror). Цвета им нужны всё равно:
  * без них TypeScript в блоке был бы одноцветной простынёй.
  *
- * **Цветов семь, а ролей одиннадцать — и это дизайн, а не нехватка.** Тема даёт
- * восемь хорошо различимых `-text`-ролей (`info` стоит в двух шагах от
- * `primary`, `invalid` — тот же цвет, что `danger`, `slate` в 11.6 от
- * `muted-fg`). Изобретать девятый оттенок формулой значило бы завести цвет,
- * которого тема не знает и переопределить не может.
+ * Роли сведены в смысловые группы, и тема вправе дать группе один цвет:
  *
- * Поэтому роли сведены в смысловые группы:
- *
- * - **имена объявленного** — ключ, функция, тип: один цвет. `obj.field`,
- *   `obj.method()` и `Foo` в разметке различаются позицией, а не оттенком;
+ * - **имена объявленного** — ключ, функция, тип. `obj.field`, `obj.method()` и
+ *   `Foo` в разметке различаются позицией, а не оттенком: «Сланец» красит их
+ *   одним `--gr-primary-text`, «Глина» разводит ключ, тип и функцию;
  * - **значения** — строка, число, литерал: каждому свой;
  * - **ключевое слово** — акцент;
  * - **комментарий** — приглушённо;
  * - **пунктуация и переменная** — обычный текст.
  *
  * Совпадения объявлены списком в `grCodeBlockContrast.test.ts`: роль, случайно
- * совпавшая с чужой, краснеет, пока совпадение не объяснят.
+ * совпавшая с чужой, краснеет, пока совпадение не объяснят. Контраст и
+ * различимость палитры каждой темы держит тот же тест.
  */
 export const codeTokenClass: Record<GrCodeRole, string> = {
-  key: 'text-[var(--gr-code-block-key,var(--gr-primary-text))]',
-  string: 'text-[var(--gr-code-block-string,var(--gr-success-text))]',
-  number: 'text-[var(--gr-code-block-number,var(--gr-azure-text))]',
-  literal: 'text-[var(--gr-code-block-literal,var(--gr-warning-text))]',
-  punctuation: 'text-[var(--gr-code-block-punctuation,var(--gr-fg))]',
-  keyword: 'text-[var(--gr-code-block-keyword,var(--gr-danger-text))]',
-  comment: 'text-[var(--gr-code-block-comment,var(--gr-muted-fg))]',
-  type: 'text-[var(--gr-code-block-type,var(--gr-primary-text))]',
-  function: 'text-[var(--gr-code-block-function,var(--gr-primary-text))]',
-  variable: 'text-[var(--gr-code-block-variable,var(--gr-fg))]',
+  key: 'text-[var(--gr-code-block-key)]',
+  string: 'text-[var(--gr-code-block-string)]',
+  number: 'text-[var(--gr-code-block-number)]',
+  literal: 'text-[var(--gr-code-block-literal)]',
+  punctuation: 'text-[var(--gr-code-block-punctuation)]',
+  keyword: 'text-[var(--gr-code-block-keyword)]',
+  comment: 'text-[var(--gr-code-block-comment)]',
+  type: 'text-[var(--gr-code-block-type)]',
+  function: 'text-[var(--gr-code-block-function)]',
+  variable: 'text-[var(--gr-code-block-variable)]',
   plain: '',
 }

@@ -1,0 +1,9 @@
+{
+  "gr-dashboard-frame-ghost-brd": "var(--gr-primary)",
+  "gr-dashboard-frame-handle-active-color": "var(--gr-primary-text)",
+  "gr-dashboard-frame-handle-hover-bg": "transparent",
+  "gr-dashboard-frame-placeholder-bg": "var(--gr-muted)",
+  "gr-dashboard-frame-placeholder-brd": "var(--gr-primary)",
+  "gr-dashboard-frame-resize-color": "var(--gr-muted-fg)",
+  "gr-dashboard-frame-resize-color-hover": "var(--gr-primary)"
+}

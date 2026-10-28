@@ -184,6 +184,8 @@ granum доставляет его в слой `granum.components` (`ADDING_COMP
 `GrRadio`, `GrTabs`, `GrPagination`, `GrSegmented`. Рамка поля — общий лист `GrInput` для
 `GrInput`, `GrTextarea`, `GrNumberInput`, `GrSelect`, `GrAutocomplete`, `GrInputTag`,
 `GrTreeSelect`, триггера `GrColorPicker` и полей спутников ([`field.md`](./field.md)).
+В спутниках — день и период `GrCalendar` и значение в колонке `GrTimePicker`
+(`granularity-chrono`): разметка месяца стала легче на 70 %.
 
 ## Как проверить, что вид не изменился
 
@@ -195,7 +197,7 @@ granum доставляет его в слой `granum.components` (`ADDING_COMP
    `outline-none` перебивал отступ контура из темы. Перенос — повод найти и такие
    дефекты: у `GrSegmented` утилита `font-[var()]` писала вес в семейство шрифта, а цвет
    недоступного сегмента проигрывал базовому по порядку утилит в собранном CSS.
-2. **Тесты читают лист.** `src/__tests__/componentSheet.ts` разбирает `<style>` компонента и
+2. **Тесты читают лист.** `componentSheet` из `@feugene/granularity-test-kit/vue` разбирает `<style>` компонента и
    считает каскад для элемента так же, как браузер: правило применяется, если селектор совпал
    (`element.matches`), а из совпавших выигрывает правило с большей специфичностью, при
    равной — позднее. Тест проверяет, что элемент получает, а не какие классы на нём висят:

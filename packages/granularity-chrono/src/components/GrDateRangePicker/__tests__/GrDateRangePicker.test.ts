@@ -45,7 +45,12 @@ function cell(key: string) {
 }
 
 function inRange(key: string): boolean {
-  return cell(key).attributes('class')?.includes('--gr-calendar-range-bg') ?? false
+  return cell(key).attributes('data-gr-band') !== undefined
+}
+
+/** День залит выбором: одиночный выбор или край закрытого периода. */
+function isFilled(key: string): boolean {
+  return day(key).attributes('data-gr-selected') !== undefined
 }
 
 async function openPicker(wrapper: Picker) {
@@ -129,8 +134,10 @@ describe('GrDateRangePicker — подсветка', () => {
     expect(inRange('2026-08-14')).toBe(true)
     expect(inRange('2026-08-15')).toBe(false)
 
-    expect(day('2026-08-10').attributes('class')).toContain('--gr-calendar-selected-bg')
-    expect(day('2026-08-12').attributes('class')).not.toContain('--gr-calendar-selected-bg')
+    expect(cell('2026-08-12').attributes('data-gr-band')).toBe('range')
+    expect(isFilled('2026-08-10')).toBe(true)
+    expect(isFilled('2026-08-14')).toBe(true)
+    expect(isFilled('2026-08-12')).toBe(false)
     wrapper.unmount()
   })
 
@@ -143,6 +150,11 @@ describe('GrDateRangePicker — подсветка', () => {
 
     expect(inRange('2026-08-12')).toBe(true)
     expect(inRange('2026-08-14')).toBe(false)
+    expect(cell('2026-08-12').attributes('data-gr-band')).toBe('preview')
+    // День под курсором ещё не выбран: у него свой вид, а не заливка выбора.
+    expect(isFilled('2026-08-10')).toBe(true)
+    expect(isFilled('2026-08-13')).toBe(false)
+    expect(day('2026-08-13').attributes('data-gr-preview')).toBe('')
     wrapper.unmount()
   })
 
@@ -202,20 +214,20 @@ describe('GrDateRangePicker — перф-инвариант', () => {
 
   it('наведение без открытого периода не перерисовывает сетку', async () => {
     // Подсвечивать нечего — значит и трогать состояние незачем: иначе каждое
-    // движение мыши по уже выбранному периоду стоило бы 42 пересчёта классов.
-    const rangeClass = vi.spyOn(calendarStyles, 'calendarRangeCellClass')
+    // движение мыши по уже выбранному периоду стоило бы 42 пересчёта атрибутов.
+    const rangeAttrs = vi.spyOn(calendarStyles, 'calendarRangeCellAttrs')
 
     const wrapper = mountPicker({ modelValue: [at(10), at(14)] })
     await openPicker(wrapper)
 
-    const before = rangeClass.mock.calls.length
+    const before = rangeAttrs.mock.calls.length
     expect(before, 'шпион не видит вызовов — проверять нечего').toBeGreaterThan(0)
 
     await day('2026-08-20').trigger('mouseenter')
     await day('2026-08-21').trigger('mouseenter')
 
-    expect(rangeClass.mock.calls.length - before).toBe(0)
-    rangeClass.mockRestore()
+    expect(rangeAttrs.mock.calls.length - before).toBe(0)
+    rangeAttrs.mockRestore()
     wrapper.unmount()
   })
 })
@@ -931,7 +943,7 @@ describe('GrDateRangePicker — панель идёт за набором', () =
     await type(wrapper, '08/16/2026')
     await nextTick()
 
-    expect(day('2026-08-16').attributes('class')).toContain('--gr-calendar-selected-bg')
+    expect(isFilled('2026-08-16')).toBe(true)
     expect(wrapper.emitted('update:modelValue')).toBeUndefined()
     wrapper.unmount()
   })
@@ -968,7 +980,7 @@ describe('GrDateRangePicker — панель идёт за набором', () =
     await type(wrapper, '08/16/2026 — 08')
     await nextTick()
 
-    expect(day('2026-08-16').attributes('class')).toContain('--gr-calendar-selected-bg')
+    expect(isFilled('2026-08-16')).toBe(true)
     wrapper.unmount()
   })
 })

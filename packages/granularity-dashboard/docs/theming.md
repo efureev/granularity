@@ -1,7 +1,9 @@
 # Темизация
 
-Пакет не заводит ни одного собственного цвета: всё, что видно, — роли ядра. Своих переменных ровно
-столько, сколько мест, которые приложение вправе перенастроить.
+Пакет не заводит ни одного собственного цвета: всё, что видно, — роли ядра. Решения дизайна — цвет
+места, призрака и ручек, рамка правки, подсветка каталога — токены вида `theme`: значение даёт тема
+(`components/@feugene/granularity-dashboard/` в пакете токенов), компонент читает его без запасного.
+Остальные переменные — ручки приложения (`hook`) и механика (`inline`).
 
 ## Токены пакета
 
@@ -14,26 +16,38 @@
 | `--gr-dashboard-item-radius` | `hook` | `var(--gr-radius-lg)` | скругление виджета — радиус `GrCard` |
 | `--gr-dashboard-item-dragging-shadow` | `hook` | `var(--gr-shadow-3)` | тень поднятого виджета |
 | `--gr-dashboard-item-overlay-bg` | `hook` | `var(--gr-card)` | фон панели редактирования у виджета без шапки |
-| `--gr-dashboard-frame-placeholder-bg` | `hook` | `var(--gr-muted)` | заливка подложки-места |
-| `--gr-dashboard-frame-placeholder-brd` | `hook` | `var(--gr-primary)` | пунктирная рамка подложки |
+| `--gr-dashboard-item-edit-brd` | `theme` | `transparent` | рамка виджета в правке — слоем поверх рамки карточки |
+| `--gr-dashboard-frame-placeholder-bg` | `theme` | `var(--gr-muted)` | заливка подложки-места |
+| `--gr-dashboard-frame-placeholder-brd` | `theme` | `var(--gr-primary)` | пунктирная рамка подложки |
 | `--gr-dashboard-frame-placeholder-radius` | `hook` | `var(--gr-radius-lg)` | скругление подложки |
 | `--gr-dashboard-frame-placeholder-inset` | `hook` | `4px` | отступ подложки внутрь своей ячейки |
-| `--gr-dashboard-frame-handle-color` | `hook` | `var(--gr-muted-fg)` | цвет ручек в покое |
+| `--gr-dashboard-frame-handle-color` | `hook` | `var(--gr-muted-fg)` | цвет ручек в покое; сильнее `-resize-color` |
+| `--gr-dashboard-frame-handle-hover-bg` | `theme` | `transparent` | подложка ручки под указателем |
+| `--gr-dashboard-frame-handle-active-color` | `theme` | `var(--gr-primary-text)` | ручка, пока виджет несут |
+| `--gr-dashboard-frame-resize-color` | `theme` | `var(--gr-muted-fg)` | уголок растягивания в покое |
+| `--gr-dashboard-frame-resize-color-hover` | `theme` | `var(--gr-primary)` | уголок под указателем |
 | `--gr-dashboard-frame-handle-size` | `hook` | `1.5rem` | сторона ручки переноса |
 | `--gr-dashboard-frame-resize-size` | `hook` | `14px` | сторона уголка растягивания |
 | `--gr-dashboard-frame-resize-radius` | `hook` | `var(--gr-radius-lg)` | скругление уголка растягивания |
 | `--gr-dashboard-frame-ghost-bg` | `hook` | `var(--gr-card)` | фон призрака под курсором |
-| `--gr-dashboard-frame-ghost-brd` | `hook` | `var(--gr-primary)` | рамка призрака |
+| `--gr-dashboard-frame-ghost-brd` | `theme` | `var(--gr-primary)` | рамка призрака |
 | `--gr-dashboard-frame-ghost-radius` | `hook` | `var(--gr-radius-lg)` | скругление призрака |
 | `--gr-dashboard-frame-ghost-shadow` | `hook` | `var(--gr-shadow-3)` | тень призрака |
 | `--gr-dashboard-frame-ghost-z` | `hook` | `var(--gr-z-toast)` | слой призрака |
 | `--gr-dashboard-palette-item-bg` | `hook` | `transparent` | фон плитки каталога в покое |
-| `--gr-dashboard-palette-item-bg-hover` | `hook` | `var(--gr-muted)` | фон плитки под курсором |
+| `--gr-dashboard-palette-item-bg-hover` | `theme` | `var(--gr-muted)` | фон плитки или строки под курсором |
 | `--gr-dashboard-palette-item-brd` | `hook` | `var(--gr-brd)` | рамка плитки каталога |
 
-`hook` означает «нигде не присвоено, работает дефолт из `var(--gr-x, …)`»: присвой пакет значение
-сам — переопределение темой перестало бы падать на дефолт. `inline` — компонент присваивает сам,
-обычно из пропа.
+Дефолт `theme` — значение «Сланца»; «Тактильная» и «Чертёж» держат его же. `hook` означает «нигде не
+присвоено, работает дефолт из `var(--gr-x, …)`»: присвой пакет значение сам — переопределение
+приложением перестало бы падать на дефолт. `inline` — компонент присваивает сам, обычно из пропа.
+
+**«Глина»** раскладку красит графитом, а глину оставляет данным — первой серии графиков: место —
+чернила 6 % в пунктире плотной рамки, призрак — белый лист в той же рамке, ручка под указателем —
+полупрозрачный графит. Два решения, которые токеном не выразить, тема несёт пропами по умолчанию
+(`componentDefaults`): виджет лежит на сетке рамкой без тени (`GrDashboardItem.variant = 'outlined'`),
+в правке рамка плотнее (`--gr-dashboard-item-edit-brd`); каталог — строками под волосяными линиями
+(`GrDashboardPalette.appearance = 'list'`).
 
 ## Что стоит и чего не стоит перекрашивать
 

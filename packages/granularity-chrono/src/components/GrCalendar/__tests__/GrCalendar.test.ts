@@ -3,6 +3,7 @@ import { defineComponent, nextTick } from 'vue'
 import { afterEach, describe, expect, it } from 'vitest'
 
 import { announced, resetGranularityDom } from '@feugene/granularity/testing'
+import { componentSheet } from '@feugene/granularity-test-kit/vue'
 
 import type { PlainDate } from '../../../chrono/plainDate'
 import GrConfigProvider from '@feugene/granularity/components/GrConfigProvider'
@@ -843,6 +844,8 @@ describe('GrCalendar — режим недели', () => {
  * `--gr-calendar-cell-size` с прежним умолчанием по размеру.
  */
 describe('GrCalendar — размер ячейки дня через хук', () => {
+  const sheet = componentSheet('GrCalendar/GrCalendar.vue')
+
   it.each([
     ['xs', '1.75rem'],
     ['sm', '2rem'],
@@ -850,9 +853,9 @@ describe('GrCalendar — размер ячейки дня через хук', ()
     ['lg', '2.5rem'],
   ] as const)('%s: сторона из `--gr-calendar-cell-size`, умолчание %s', (size, fallback) => {
     const wrapper = mount(GrCalendar, { props: { modelValue: null, size } })
-    const day = wrapper.get('[data-gr-calendar-day]').classes()
+    const look = sheet.look(wrapper.get('[data-gr-calendar-day]').element)
 
-    expect(day).toContain(`w-[var(--gr-calendar-cell-size,${fallback})]`)
-    expect(day).toContain(`h-[var(--gr-calendar-cell-size,${fallback})]`)
+    expect(look.width).toBe(`var(--gr-calendar-cell-size, ${fallback})`)
+    expect(look.height).toBe(`var(--gr-calendar-cell-size, ${fallback})`)
   })
 })

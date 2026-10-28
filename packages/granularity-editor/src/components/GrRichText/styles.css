@@ -34,8 +34,11 @@
   line-height: var(--gr-leading-tight);
 }
 
+/* Верхний уровень — шрифтом заголовков темы, как у документа `GrMarkdown`. */
 [data-gr-rich-text-content] .ProseMirror h2 {
-  font-size: 1.25em;
+  font-family: var(--gr-font-display);
+  font-size: var(--gr-rich-text-h2-size);
+  font-weight: var(--gr-rich-text-display-weight);
 }
 
 [data-gr-rich-text-content] .ProseMirror h3 {
@@ -57,12 +60,15 @@
 
 [data-gr-rich-text-content] .ProseMirror blockquote {
   padding-left: 0.75em;
-  border-left: 2px solid var(--gr-brd);
-  color: var(--gr-muted-fg);
+  border-left: 2px solid var(--gr-rich-text-quote-bar);
+  color: var(--gr-rich-text-quote-fg);
+  font-family: var(--gr-rich-text-quote-font);
+  font-size: var(--gr-rich-text-quote-size);
 }
 
+/* Цвет текстовой роли, а не заливки: ссылка — текст на фоне поля и обязана держать AA. */
 [data-gr-rich-text-content] .ProseMirror a {
-  color: var(--gr-primary);
+  color: var(--gr-primary-text);
   text-decoration: underline;
 }
 
@@ -97,4 +103,16 @@
   height: 0;
   color: var(--gr-muted-fg);
   pointer-events: none;
+}
+
+/*
+ * Панель — на своей подложке; у недоступного поля подложку несёт рамка поля
+ * (`--gr-disabled-bg`), и панель её не перекрывает.
+ */
+[data-gr-rich-text-toolbar] {
+  background-color: var(--gr-rich-text-toolbar-bg);
+}
+
+[data-gr-rich-text][data-gr-off] > [data-gr-rich-text-toolbar] {
+  background-color: transparent;
 }

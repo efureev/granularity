@@ -338,3 +338,39 @@ describe('GrImageCrop', () => {
     expect(warn.mock.calls[0]?.[0]).toContain('Access-Control-Allow-Origin')
   })
 })
+
+describe('GrImageCrop — рамка с отступом от края окна', () => {
+  /**
+   * Тема вправе отодвинуть рамку от края (`--gr-image-crop-inset`): тогда кадр —
+   * бокс рамки, а не окно. jsdom раскладки не считает — бокс рамки подставлен.
+   */
+  function stubGuide(width: number, height: number) {
+    return vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function (this: HTMLElement) {
+      return this.className.includes('--gr-image-crop-inset') ? new DOMRect(0, 0, width, height) : new DOMRect()
+    })
+  }
+
+  it('рамка и тень — от отступа темы, соотношение рамки — кадра', async () => {
+    const wrapper = await mountLoaded({ aspectRatio: 4 / 3 })
+    const guide = wrapper.find('[role="application"] > div').element as HTMLElement
+
+    expect(guide.className).toContain('inset-[var(--gr-image-crop-inset)]')
+    expect(guide.className).toContain('shadow-[0_0_0_9999px_var(--gr-image-crop-mask)]')
+    expect(guide.style.aspectRatio).toBe(`${4 / 3} / 1`)
+  })
+
+  it('кадр считается от рамки, а не от окна: рамка вдвое меньше — картинка вдвое мельче', async () => {
+    const scaleOf = (wrapper: CropWrapper) => Number(/scale\(([\d.]+)\)/.exec(wrapper.find('img').attributes('style') ?? '')![1])
+    const whole = await mountLoaded()
+
+    const spy = stubGuide(VIEWPORT_WIDTH / 2, VIEWPORT_WIDTH / 2)
+    const inset = await mountLoaded()
+    await nextTick()
+    await nextTick()
+    spy.mockRestore()
+
+    expect(scaleOf(inset)).toBeCloseTo(scaleOf(whole) / 2, 5)
+    // Первое объявление шло от окна — рамка с отступом пересчитала кадр и объявила его снова.
+    expect(inset.emitted('change')!.length).toBe(whole.emitted('change')!.length + 1)
+  })
+})

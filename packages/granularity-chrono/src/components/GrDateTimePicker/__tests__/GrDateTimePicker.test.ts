@@ -147,7 +147,7 @@ describe('GrDateTimePicker — autoApply=false', () => {
     expect(wrapper.emitted('update:modelValue')).toBeFalsy()
     // Поле показывает старое значение, панель — новое.
     expect((field(wrapper).element as HTMLInputElement).value).toBe('Aug 12, 2026, 09:00')
-    expect(query('[data-gr-calendar-day][data-key="2026-08-20"]').attributes('class')).toContain('--gr-calendar-selected-bg')
+    expect(query('[data-gr-calendar-day][data-key="2026-08-20"]').attributes('data-gr-selected')).toBe('')
     wrapper.unmount()
   })
 
@@ -183,8 +183,7 @@ describe('GrDateTimePicker — autoApply=false', () => {
 
     await openPicker(wrapper)
 
-    expect(query('[data-gr-calendar-day][data-key="2026-08-12"]').attributes('class'))
-      .toContain('--gr-calendar-selected-bg')
+    expect(query('[data-gr-calendar-day][data-key="2026-08-12"]').attributes('data-gr-selected')).toBe('')
     wrapper.unmount()
   })
 
@@ -198,11 +197,8 @@ describe('GrDateTimePicker — autoApply=false', () => {
     await query('[data-gr-date-time-picker-cancel]').trigger('click')
     await nextTick()
 
-    expect(query('[data-gr-calendar-day][data-key="2026-08-12"]').attributes('class'))
-      .toContain('--gr-calendar-selected-bg')
-    expect(query('[data-gr-calendar-day][data-key="2026-08-20"]').attributes('class'))
-      .not
-      .toContain('--gr-calendar-selected-bg')
+    expect(query('[data-gr-calendar-day][data-key="2026-08-12"]').attributes('data-gr-selected')).toBe('')
+    expect(query('[data-gr-calendar-day][data-key="2026-08-20"]').attributes('data-gr-selected')).toBeUndefined()
     wrapper.unmount()
   })
 
@@ -488,7 +484,7 @@ describe('GrDateTimePicker — панель идёт за набором', () =>
     await nextTick()
 
     expect(query('[data-gr-calendar-title]').text()).toContain('September')
-    expect(day('2026-09-23').attributes('class')).toContain('--gr-calendar-selected-bg')
+    expect(day('2026-09-23').attributes('data-gr-selected')).toBe('')
     expect(wrapper.emitted('update:modelValue')).toBeUndefined()
     wrapper.unmount()
   })

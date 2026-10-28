@@ -7,6 +7,7 @@ export type {
   GrDashboardItemOverflow,
   GrDashboardItemPadding,
   GrDashboardItemSize,
+  GrDashboardItemVariant,
 } from './grDashboardItemStyles'
 export { grDashboardItemSafelist } from './safelist'
 export type { GrDashboardItemEmits, GrDashboardItemProps } from './GrDashboardItem.vue'

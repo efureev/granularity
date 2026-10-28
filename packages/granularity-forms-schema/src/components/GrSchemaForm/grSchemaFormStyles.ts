@@ -65,11 +65,20 @@ export function spanToClass(span: GrUiSpan | undefined): string {
  * или переставили, иначе появляется рывком, и глаз теряет, какая именно
  * изменилась.
  */
-export const schemaRowClass = 'relative grid gap-x-[var(--gr-schema-form-gap-x,1rem)] gap-y-[var(--gr-schema-form-gap-y,0.25rem)] items-start rounded-[var(--gr-radius-lg)] border border-[var(--gr-brd)] p-4 transition-colors duration-[var(--gr-duration-fast)] ease-[var(--gr-ease-out)]'
+export const schemaRowClass = 'relative grid gap-x-[var(--gr-schema-form-gap-x,1rem)] gap-y-[var(--gr-schema-form-gap-y,0.25rem)] items-start rounded-[var(--gr-schema-form-row-radius)] border border-solid border-[var(--gr-schema-form-row-brd)] p-[var(--gr-schema-form-row-padding)] transition-colors duration-[var(--gr-duration-fast)] ease-[var(--gr-ease-out)]'
 export const schemaRowActionsClass = 'flex items-center gap-1 justify-end'
 export const schemaArrayEmptyClass = 'rounded-[var(--gr-radius-lg)] border border-dashed border-[var(--gr-brd)] p-6 text-center text-[length:var(--gr-control-text-sm)] leading-[var(--gr-leading-sm)] text-[var(--gr-muted-fg)]'
-export const schemaArrayListClass = 'grid gap-[var(--gr-schema-form-row-gap,0.75rem)]'
-export const schemaSectionsClass = 'grid gap-6'
+/**
+ * Строки повторителя — плитками в рамке или рядами списка под линией: решает тема.
+ * Линия между строками — фоном, а не бордером: она не занимает места, и у темы без
+ * линии раскладка та же.
+ */
+export const schemaArrayListClass = 'grid gap-[var(--gr-schema-form-row-gap,0.75rem)] [&>*+*]:[background:linear-gradient(var(--gr-schema-form-row-divider),var(--gr-schema-form-row-divider))_top/100%_1px_no-repeat]'
+/**
+ * Разделы формы: воздух между ними и, если тема хочет, волосяная линия — фоном, со
+ * своим отступом сверху. Коробкой раздел не обводится: форма — одна поверхность.
+ */
+export const schemaSectionsClass = 'grid gap-[var(--gr-schema-form-section-gap)] [&>*+*]:[background:linear-gradient(var(--gr-schema-form-section-divider),var(--gr-schema-form-section-divider))_top/100%_1px_no-repeat] [&>*+*]:pt-[var(--gr-schema-form-section-divider-space)]'
 export const schemaFormErrorsClass = 'mb-4'
 export const schemaRowLabelClass = 'text-[length:var(--gr-control-text-sm)] leading-[var(--gr-control-leading-sm)] font-600 text-[var(--gr-muted-fg)]'
 

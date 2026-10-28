@@ -7,6 +7,14 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- **Заголовок `GrFormSection` — по теме.** Шрифт — шрифт заголовков темы (`--gr-font-display`), как
+  у `GrCard` и окон; кегль, интерлиньяж и начертание — токены вида `theme`
+  `--gr-form-section-title-size`, `-title-leading`, `-title-weight`. «Сланец», «Тактильная» и
+  «Чертёж» — прежний полужирный текст ступени `sm`, «Глина» — антиква 20px: значения в темах
+  `@feugene/granularity-tokens` 2.5.0, зависимость поднята до `^2.5.0`.
+
 ## [v3.6.0] 2026-10-28
 
 ### Changed

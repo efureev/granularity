@@ -1,0 +1,11 @@
+{
+  "gr-diff-added": "color-mix(in srgb, var(--gr-success) 13%, var(--gr-muted))",
+  "gr-diff-gap-bg": "var(--gr-muted)",
+  "gr-diff-removed": "color-mix(in srgb, var(--gr-danger) 13%, var(--gr-muted))",
+  "gr-diff-sign-added": "var(--gr-success-text)",
+  "gr-diff-sign-removed": "var(--gr-danger-text)",
+  "gr-diff-word-added": "color-mix(in srgb, var(--gr-success) 25%, var(--gr-muted))",
+  "gr-diff-word-added-fg": "currentColor",
+  "gr-diff-word-removed": "color-mix(in srgb, var(--gr-danger) 25%, var(--gr-muted))",
+  "gr-diff-word-removed-fg": "currentColor"
+}

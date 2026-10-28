@@ -443,7 +443,7 @@ describe('гидрация companion-пакета dashboard', () => {
 
   it('серверный HTML содержит разложенные виджеты, а не пустые обёртки', () => {
     expect(snapshots.dashboard.html).toMatch(/data-gr-dashboard[ >]/)
-    expect(snapshots.dashboard.html.match(/data-gr-dashboard-item/g) ?? []).toHaveLength(3)
+    expect(snapshots.dashboard.html.match(/data-gr-dashboard-item[ =>]/g) ?? []).toHaveLength(3)
   })
 
   it('раскладка уходит с сервера от объявленного брейкпоинта, а не от нулевой ширины', () => {

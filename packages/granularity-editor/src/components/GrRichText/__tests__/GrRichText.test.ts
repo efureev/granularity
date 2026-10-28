@@ -268,16 +268,22 @@ describe('GrRichText — доступность и форма', () => {
   })
 
   /** Негативный класс: запрещённое состояние обязано не давать править. */
-  it('`readonly` показывает значение, но не даёт править', async () => {
+  it('`readonly` показывает значение, но не даёт править — и панели нет', async () => {
     const wrapper = mountEditor({ modelValue: '<p>текст</p>', readonly: true })
     await ready(wrapper)
 
     expect(area(wrapper).getAttribute('contenteditable')).toBe('false')
     expect(area(wrapper).innerHTML).toContain('текст')
+    // Ряд недоступных кнопок обещал бы правку, которой не будет: поле читается как документ.
+    expect(wrapper.find('[data-gr-rich-text-toolbar]').exists()).toBe(false)
+    wrapper.unmount()
+  })
 
-    await action(wrapper, 'bold').trigger('click')
-    await nextTick()
-    expect(wrapper.emitted('update:modelValue')).toBeUndefined()
+  it('недоступное и одновременно «только чтение» поле панель держит — недоступным', async () => {
+    const wrapper = mountEditor({ modelValue: '<p>текст</p>', readonly: true, disabled: true })
+    await ready(wrapper)
+
+    expect(action(wrapper, 'bold').attributes('disabled')).toBeDefined()
     wrapper.unmount()
   })
 

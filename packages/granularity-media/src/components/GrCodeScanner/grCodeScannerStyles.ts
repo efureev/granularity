@@ -8,9 +8,11 @@ export const videoClass = 'h-full w-full object-contain'
 
 /**
  * Прицел: показывает, куда наводить. Рамка, а не затемнение вокруг, — код
- * распознаётся по всему кадру, и затемнение обещало бы обратное.
+ * распознаётся по всему кадру, и затемнение обещало бы обратное. Сплошная рамка
+ * или уголки — решает тема длиной уголка (`--gr-code-scanner-reticle-corner`,
+ * маска в листе `GrCodeScanner.vue`): `50%` — сплошная.
  */
-export const reticleClass = 'pointer-events-none absolute inset-[15%] rounded-[var(--gr-radius-md)] border-2 border-[var(--gr-code-scanner-reticle,var(--gr-primary))]'
+export const reticleClass = 'pointer-events-none absolute inset-[15%] rounded-[var(--gr-code-scanner-reticle-radius)] border-solid [border-width:var(--gr-code-scanner-reticle-width)] border-[var(--gr-code-scanner-reticle)]'
 
 export const stateLayerClass = 'absolute inset-0 grid place-content-center gap-3 p-4 text-center transition-opacity duration-[var(--gr-duration-base)] ease-[var(--gr-ease-out)]'
 

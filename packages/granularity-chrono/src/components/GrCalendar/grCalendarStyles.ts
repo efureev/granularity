@@ -4,7 +4,8 @@ import type { GrComponentSize } from '@feugene/granularity/components/GrConfigPr
 export type GrCalendarSize = GrComponentSize
 
 /**
- * Классы сетки.
+ * Классы раскладки. Вид ячеек, заголовка и шапки недели — лист `GrCalendar.vue`
+ * по атрибутам (`docs/markup-weight.md` ядра): ячеек в месяце сорок две.
  *
  * Пиксельных литералов здесь нет: кегли, радиусы и длительности — только
  * токенами. Утилиты uno-шкалы (`text-sm`, `rounded-md`) запрещены наравне с
@@ -17,39 +18,14 @@ export const calendarRootClass
 
 export const calendarHeaderClass = 'flex items-center justify-between gap-2'
 
-export const calendarTitleClass
-  = 'font-600 text-[length:var(--gr-control-text-md)] leading-[var(--gr-leading-sm)]'
-
 export const calendarNavButtonClass
   = 'inline-flex items-center justify-center rounded-[var(--gr-radius-control)] '
     + 'text-[var(--gr-muted-fg)] transition-colors duration-[var(--gr-duration-fast)] ease-[var(--gr-ease-out)] '
-    + 'hover:bg-[var(--gr-muted)] hover:text-[var(--gr-fg)] '
+    + 'hover:bg-[var(--gr-calendar-hover-bg)] hover:text-[var(--gr-fg)] '
     + 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)] '
     + 'disabled:cursor-not-allowed disabled:bg-[var(--gr-disabled-bg)] disabled:text-[var(--gr-disabled-fg)]'
 
 export const calendarGridClass = 'border-collapse tabular-nums'
-
-export const calendarWeekdayClass
-  = 'text-center font-500 text-[length:var(--gr-control-text-xs)] leading-[var(--gr-leading-xs)] '
-    + 'text-[var(--gr-muted-fg)]'
-
-export const calendarWeekNumberClass
-  = 'pr-1 text-right align-middle text-[length:var(--gr-control-text-xs)] leading-[var(--gr-leading-xs)] '
-    + 'text-[var(--gr-muted-fg)]'
-
-/**
- * Размер ячейки — не меньше 24 CSS-px по WCAG 2.2 «Target Size (Minimum)».
- *
- * Сторона ячейки — хук `--gr-calendar-cell-size` с умолчанием по размеру: месяц
- * на `md` занимает 290px, и в карточку телефона он без хука не помещался. С ним
- * потребитель ставит, например, `min(2.25rem, 12cqi)`.
- */
-export const calendarCellSizes: Record<GrCalendarSize, string> = {
-  xs: 'h-[var(--gr-calendar-cell-size,1.75rem)] w-[var(--gr-calendar-cell-size,1.75rem)] text-[length:var(--gr-control-text-xs)] leading-[var(--gr-control-leading-xs)]',
-  sm: 'h-[var(--gr-calendar-cell-size,2rem)] w-[var(--gr-calendar-cell-size,2rem)] text-[length:var(--gr-control-text-sm)] leading-[var(--gr-control-leading-sm)]',
-  md: 'h-[var(--gr-calendar-cell-size,2.25rem)] w-[var(--gr-calendar-cell-size,2.25rem)] text-[length:var(--gr-control-text-md)] leading-[var(--gr-control-leading-md)]',
-  lg: 'h-[var(--gr-calendar-cell-size,2.5rem)] w-[var(--gr-calendar-cell-size,2.5rem)] text-[length:var(--gr-control-text-lg)] leading-[var(--gr-control-leading-lg)]',
-}
 
 export const calendarNavSizes: Record<GrCalendarSize, string> = {
   xs: 'h-6 w-6',
@@ -62,65 +38,47 @@ export const calendarNavSizes: Record<GrCalendarSize, string> = {
  * Полоса диапазона рисуется на ячейке таблицы, а не на самом дне: у дня свой
  * радиус, и цепочка скруглённых квадратов полосой не выглядит. Ячейка отдаёт
  * сплошную заливку, а скругление остаётся только на краях.
+ *
+ * Предпросмотр — полоса от начала до дня под курсором, пока конец не выбран: у
+ * него своя заливка, чтобы «ещё не выбрано» не читалось как выбор.
  */
 export interface CalendarRangeCellOptions {
   inRange: boolean
   start: boolean
   end: boolean
+  preview: boolean
 }
 
-export function calendarRangeCellClass(options: CalendarRangeCellOptions): string {
-  if (!options.inRange && !options.start && !options.end)
-    return ''
+export function calendarRangeCellAttrs(options: CalendarRangeCellOptions): Record<string, string | undefined> {
+  if (!options.inRange)
+    return {}
 
-  const parts = ['bg-[var(--gr-calendar-range-bg,var(--gr-muted))]']
-
-  if (options.start)
-    parts.push('rounded-l-[var(--gr-radius-control)]')
-  if (options.end)
-    parts.push('rounded-r-[var(--gr-radius-control)]')
-
-  return parts.join(' ')
+  return {
+    'data-gr-band': options.preview ? 'preview' : 'range',
+    'data-gr-start': options.start ? '' : undefined,
+    'data-gr-end': options.end ? '' : undefined,
+  }
 }
 
-export interface CalendarDayClassOptions {
-  size: GrCalendarSize
-  inMonth: boolean
-  today: boolean
+export interface CalendarDayAttrsOptions {
   selected: boolean
-  disabled: boolean
+  /** День соседнего месяца в добивке сетки. */
+  outside: boolean
+  /** Второй край предпросмотра: день под курсором, ещё не выбранный. */
+  previewEnd: boolean
 }
 
 /**
- * Классы дня.
- *
- * Состояния читаются не только цветом: «сегодня» несёт обводку, выбранный —
- * заливку с проверенным контрастом. Требование WCAG 1.4.1, и в тёмной теме
- * его надо смотреть отдельно.
+ * Атрибуты вида дня: остальное состояние лист читает по ARIA (`aria-current`,
+ * `aria-disabled`). Выбор — свой флаг: `aria-selected` у ячейки таблицы стоит и на
+ * днях внутри полосы, а залит только выбранный день и края.
  */
-export function calendarDayClass(options: CalendarDayClassOptions): string {
-  const parts = [
-    'inline-flex items-center justify-center rounded-[var(--gr-radius-control)]',
-    'transition-colors duration-[var(--gr-duration-fast)] ease-[var(--gr-ease-out)]',
-    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]',
-    calendarCellSizes[options.size],
-  ]
-
-  if (options.disabled)
-    parts.push('cursor-not-allowed text-[var(--gr-disabled-fg)]')
-  else if (options.selected)
-    parts.push('bg-[var(--gr-calendar-selected-bg,var(--gr-selected))] text-[var(--gr-calendar-selected-fg,var(--gr-selected-fg))]')
-  else if (options.inMonth)
-    parts.push('cursor-pointer text-[var(--gr-fg)] hover:bg-[var(--gr-calendar-hover-bg,var(--gr-muted))]')
-  else
-    parts.push('cursor-pointer text-[var(--gr-calendar-outside-fg,var(--gr-muted-fg))] hover:bg-[var(--gr-calendar-hover-bg,var(--gr-muted))]')
-
-  // Обводка «сегодня» рисуется поверх любого состояния, кроме выбранного:
-  // у выбранного дня заливка сама достаточно заметна.
-  if (options.today && !options.selected)
-    parts.push('ring-1 ring-[var(--gr-calendar-today-ring,var(--gr-primary))] ring-inset')
-
-  return parts.join(' ')
+export function calendarDayAttrs(options: CalendarDayAttrsOptions): Record<string, string | undefined> {
+  return {
+    'data-gr-selected': options.selected ? '' : undefined,
+    'data-gr-outside': options.outside ? '' : undefined,
+    'data-gr-preview': options.previewEnd ? '' : undefined,
+  }
 }
 
 /** Сетка месяцев, кварталов и лет — стопка рядов: ряд обязан быть элементом с ролью `row`. */
@@ -131,40 +89,3 @@ export const calendarPeriodRowClass = 'grid grid-cols-3 gap-1'
 
 /** Ряд кварталов — две колонки: три оставили бы одинокую ячейку во втором ряду. */
 export const calendarQuarterRowClass = 'grid grid-cols-2 gap-1'
-
-export const calendarPeriodSizes: Record<GrCalendarSize, string> = {
-  xs: 'h-7 text-[length:var(--gr-control-text-xs)] leading-[var(--gr-control-leading-xs)]',
-  sm: 'h-8 text-[length:var(--gr-control-text-sm)] leading-[var(--gr-control-leading-sm)]',
-  md: 'h-9 text-[length:var(--gr-control-text-md)] leading-[var(--gr-control-leading-md)]',
-  lg: 'h-10 text-[length:var(--gr-control-text-lg)] leading-[var(--gr-control-leading-lg)]',
-}
-
-export interface CalendarPeriodClassOptions {
-  size: GrCalendarSize
-  selected: boolean
-  /** Период, в который попадает «сегодня». */
-  current: boolean
-  disabled: boolean
-}
-
-/** Состояния те же, что у дня, и читаются так же: заливка — выбор, обводка — «сейчас». */
-export function calendarPeriodClass(options: CalendarPeriodClassOptions): string {
-  const parts = [
-    'inline-flex w-full items-center justify-center rounded-[var(--gr-radius-control)] px-2',
-    'transition-colors duration-[var(--gr-duration-fast)] ease-[var(--gr-ease-out)]',
-    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]',
-    calendarPeriodSizes[options.size],
-  ]
-
-  if (options.disabled)
-    parts.push('cursor-not-allowed text-[var(--gr-disabled-fg)]')
-  else if (options.selected)
-    parts.push('bg-[var(--gr-calendar-selected-bg,var(--gr-selected))] text-[var(--gr-calendar-selected-fg,var(--gr-selected-fg))]')
-  else
-    parts.push('cursor-pointer text-[var(--gr-fg)] hover:bg-[var(--gr-calendar-hover-bg,var(--gr-muted))]')
-
-  if (options.current && !options.selected)
-    parts.push('ring-1 ring-[var(--gr-calendar-today-ring,var(--gr-primary))] ring-inset')
-
-  return parts.join(' ')
-}

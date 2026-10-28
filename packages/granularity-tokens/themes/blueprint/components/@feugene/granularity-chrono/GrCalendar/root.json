@@ -1,0 +1,12 @@
+{
+  "gr-calendar-hover-bg": "var(--gr-muted)",
+  "gr-calendar-preview-end-bg": "var(--gr-selected)",
+  "gr-calendar-preview-end-fg": "var(--gr-selected-fg)",
+  "gr-calendar-preview-end-ring": "transparent",
+  "gr-calendar-range-bg": "var(--gr-muted)",
+  "gr-calendar-range-preview-bg": "var(--gr-muted)",
+  "gr-calendar-title-weight": "600",
+  "gr-calendar-today-fg": "var(--gr-fg)",
+  "gr-calendar-today-ring": "var(--gr-primary)",
+  "gr-calendar-today-weight": "normal"
+}
