@@ -7,14 +7,18 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v3.0.0] 2026-10-28
+
 ### Changed
 
 - **Поле пикеров — рамка поля ядра** (`grFieldLookAttrs`, `packages/granularity/docs/field.md`)
-  вместо своей копии классов. `GrDatePicker`, `GrDateRangePicker`, `GrDateTimePicker` и `GrTimePicker` получают рамку
-  `--gr-input` вместо `--gr-brd`, скругление по ступени, отклик на указатель и фокус, вид «только
-  чтение» и кольцо толщины темы — как `GrInput` в каждой теме. Недоступное поле гасится, как у
+  вместо своей копии классов. `GrDatePicker`, `GrDateRangePicker`, `GrDateTimePicker` и
+  `GrTimePicker` получают рамку `--gr-input` вместо `--gr-brd`, скругление по ступени, отклик на
+  указатель и фокус, вид «только чтение» и кольцо толщины темы — как `GrInput` в каждой теме. Недоступное поле гасится, как у
   `GrInput`: подложка `--gr-muted`, текст `--gr-muted-fg`. Ребро на `GrInput` объявлено в
   `dependencies` каждого пикера.
+- **Peer `@feugene/granularity` — `>=3.5.0 <4.0.0`**: `grFieldLookAttrs`, которой ставится рамка
+  поля, появилась в ядре 3.5.0.
 
 ## [v2.0.2] 2026-10-21
 

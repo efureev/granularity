@@ -7,12 +7,16 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v3.0.0] 2026-10-28
+
 ### Changed
 
 - **Рамка `GrRichText` — рамка поля ядра** (`grFieldLookAttrs`, вид `area`,
   `packages/granularity/docs/field.md`): рамка `--gr-input` вместо `--gr-brd`, скругление по ступени вместо `--gr-radius-lg`, отклик на
   указатель, в фокусе — `--gr-input-focus-brd` и кольцо толщины темы вместо рамки `--gr-primary`,
   вид «только чтение» — как у `GrTextarea`. Ребро на `GrInput` объявлено в `dependencies`.
+- **Peer `@feugene/granularity` — `>=3.5.0 <4.0.0`**: `grFieldLookAttrs`, которой ставится рамка
+  поля, появилась в ядре 3.5.0.
 
 ## [v2.0.3] 2026-10-22
 

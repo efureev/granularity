@@ -7,6 +7,8 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v3.0.0] 2026-10-28
+
 ### Changed
 
 - **Рамка `GrCodeEditor` — рамка поля ядра** (`grFieldLookAttrs`, вид `area`,
@@ -14,6 +16,8 @@ to [Semantic Versioning](https://semver.org/).
   указатель и фокус, кольцо толщины темы. Подложка остаётся кодовой (`--gr-code-block-bg`), как у
   блока и диффа, и в «только чтение» тоже: редактор кода читается кодом, а не полем ввода. Ребро
   на `GrInput` объявлено в `dependencies`.
+- **Peer `@feugene/granularity` — `>=3.5.0 <4.0.0`**: `grFieldLookAttrs`, которой ставится рамка
+  поля, появилась в ядре 3.5.0.
 
 ## [v2.0.2] 2026-10-21
 

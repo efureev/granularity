@@ -7,6 +7,8 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v3.5.0] 2026-10-28
+
 ### Added
 
 - **`grFieldLookAttrs` — рамка поля для своих компонентов** (`@feugene/granularity/components/GrInput`,

@@ -7,6 +7,13 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v2.0.3] 2026-10-28
+
+### Changed
+
+- **Peer `@feugene/granularity-chrono` — `>=2.0.0 <4.0.0`**: схема работает и с chrono 3 — его
+  пикеры сменили только вид поля, API у них прежний.
+
 ## [v2.0.2] 2026-10-21
 
 ### Changed

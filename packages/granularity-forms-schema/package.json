@@ -1,7 +1,7 @@
 {
   "name": "@feugene/granularity-forms-schema",
   "description": "Schema-driven forms for the @feugene/granularity design system — zod and JSON Schema into real form fields, zero dependencies.",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "license": "LicenseRef-Granularity-EUC-1.1",
   "author": {
     "name": "Evgeniy Fureev",
@@ -137,7 +137,7 @@
   "peerDependencies": {
     "@feugene/fint-i18n": ">=0.9.0 <1.0.0",
     "@feugene/granularity": ">=2.0.0 <4.0.0",
-    "@feugene/granularity-chrono": ">=2.0.0 <3.0.0",
+    "@feugene/granularity-chrono": ">=2.0.0 <4.0.0",
     "@feugene/granum": ">=3.0.0 <4.0.0",
     "@feugene/unplugin-granularity": ">=1.0.0 <2.0.0",
     "unplugin-vue-components": ">=0.26.0",
@@ -165,7 +165,7 @@
     "@antfu/eslint-config": "^9.3.0",
     "@feugene/fint-i18n": "^0.9.0",
     "@feugene/granularity": "^3.0.0",
-    "@feugene/granularity-chrono": "^2.0.0",
+    "@feugene/granularity-chrono": "^3.0.0",
     "@feugene/granularity-test-kit": "^2.0.0",
     "@feugene/granularity-tokens": "^2.0.0",
     "@feugene/granum": "^3.13.0",

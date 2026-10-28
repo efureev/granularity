@@ -6,10 +6,10 @@
   "dependencies": {
     "@feugene/granularity": "^3.0.0",
     "@feugene/granularity-charts": "^3.0.0",
-    "@feugene/granularity-chrono": "^2.0.0",
-    "@feugene/granularity-code": "^2.0.0",
+    "@feugene/granularity-chrono": "^3.0.0",
+    "@feugene/granularity-code": "^3.0.0",
     "@feugene/granularity-dashboard": "^2.0.0",
-    "@feugene/granularity-editor": "^2.0.0",
+    "@feugene/granularity-editor": "^3.0.0",
     "@feugene/granularity-forms-schema": "^2.0.0",
     "@feugene/granularity-media": "^3.0.0",
     "@unocss/reset": "^66.8.1",
