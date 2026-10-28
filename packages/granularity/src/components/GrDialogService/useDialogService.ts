@@ -4,6 +4,7 @@ import type { App, AppContext, InjectionKey } from 'vue'
 import { ensurePortalRoot } from '../../composables/internal/portalRoot'
 import GrDialogServiceHost from './GrDialogServiceHost.vue'
 import { useGrConfig } from '../shared/configContext'
+import { registerDomReset } from '../../internal/domResets'
 import { resolveGranularityI18n } from '../../internal/granularityI18n'
 import {
   createDialogServiceState,
@@ -185,6 +186,16 @@ function teardownDialogServiceState(state: DialogServiceState): void {
 export function teardownDialogService(): void {
   teardownDialogServiceState(resolveDialogServiceState())
 }
+
+// Уборка между тестами снимает все состояния сразу: вне `setup` выбрать «то
+// самое» нельзя, а неотвеченный диалог прошлого теста стоял бы головой очереди
+// и не пускал следующий.
+registerDomReset(() => {
+  if (moduleState)
+    teardownDialogServiceState(moduleState)
+  for (const state of registeredStates)
+    teardownDialogServiceState(state)
+})
 
 function enqueue(
   state: DialogServiceState,

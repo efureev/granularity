@@ -88,6 +88,13 @@ export interface ModalOverlay {
   isMounted: Ref<boolean>
   /** Показан ли слой: этим переключаются `<Transition>` внутри. */
   isVisible: Ref<boolean>
+  /**
+   * Слой доигрывает уход: поддерево ещё в DOM, но уже не показано. Корень
+   * полноэкранного слоя на это время — `inert`: клик достаётся элементу под
+   * ним, а не исчезающему слою. Решает компонент, а не примитив: у сайдбара
+   * тот же корень живёт и в потоке страницы, где гаснуть ему нельзя.
+   */
+  isLeaving: ComputedRef<boolean>
   /** Верхний ли это слой сейчас. */
   isTopmost: Ref<boolean>
   /** Значение атрибута `inert` для корня: слой перестал быть верхним. */
@@ -146,6 +153,7 @@ export function useModalOverlay(
   const themeAttrs = useGrThemeAttrs()
 
   const { mounted: isMounted, visible: isVisible, onPanelAfterLeave } = useOverlayPresence(open)
+  const isLeaving = computed(() => isMounted.value && !isVisible.value)
 
   const layer = useOverlayLayer(open, onDismiss, {
     modal: isModal,
@@ -191,6 +199,7 @@ export function useModalOverlay(
     rootEl,
     isMounted,
     isVisible,
+    isLeaving,
     isTopmost,
     inertAttr,
     rootsAbove: layer.rootsAbove,

@@ -159,6 +159,7 @@ const {
   rootEl,
   isMounted,
   isVisible,
+  isLeaving,
   inertAttr,
   layerZIndex,
   portalTarget,
@@ -280,7 +281,7 @@ defineSlots<{
       :aria-label="layerActive ? ariaLabel : undefined"
       :class="layerActive ? layerRootClass : layerPassThroughClass"
       :style="layerActive ? { zIndex: layerZIndex } : undefined"
-      :inert="inertAttr"
+      :inert="inertAttr || (layerActive && isLeaving) || undefined"
     >
       <Transition
         enter-active-class="transition-opacity duration-[var(--gr-duration-base)] ease-[var(--gr-ease-out)]"

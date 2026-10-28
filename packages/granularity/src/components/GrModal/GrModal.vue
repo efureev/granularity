@@ -42,7 +42,6 @@ import {
   panelSectionClass,
   panelTransition,
   root as rootBaseClass,
-  rootClosingClass,
 } from './grModalStyles'
 
 export type { GrModalScrollBehavior }
@@ -278,6 +277,7 @@ const {
   rootEl,
   isMounted,
   isVisible,
+  isLeaving,
   inertAttr,
   layerZIndex,
   portalTarget,
@@ -293,13 +293,6 @@ const {
   // потребитель не указал цель явно.
   initialFocus: () => props.initialFocus ?? panelRef.value,
 })
-
-// Поддерево слоя живёт до конца leave-анимации панели, а корень растянут на
-// вьюпорт — значит всё это время он и перехватывает клики.
-const rootClass = computed(() => [
-  rootBaseClass,
-  isMounted.value && !isVisible.value ? rootClosingClass : '',
-].filter(Boolean))
 
 function onPanelAfterLeave(): void {
   releasePresence()
@@ -336,9 +329,9 @@ defineExpose({
       v-bind="themeAttrs"
       role="dialog"
       aria-modal="true"
-      :class="rootClass"
+      :class="rootBaseClass"
       :style="{ zIndex: layerZIndex }"
-      :inert="inertAttr"
+      :inert="inertAttr || isLeaving || undefined"
       :aria-labelledby="labelledBy"
       :aria-describedby="describedBy"
       :aria-label="ariaLabelAttr"

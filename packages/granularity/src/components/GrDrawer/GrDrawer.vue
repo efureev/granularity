@@ -229,6 +229,7 @@ const {
   rootEl,
   isMounted,
   isVisible,
+  isLeaving,
   inertAttr,
   layerZIndex,
   portalTarget,
@@ -268,7 +269,7 @@ defineExpose({
       :aria-modal="modal ? 'true' : undefined"
       :class="rootClasses"
       :style="{ zIndex: layerZIndex }"
-      :inert="inertAttr"
+      :inert="inertAttr || isLeaving || undefined"
       :aria-labelledby="labelledBy"
       :aria-label="ariaLabel"
     >

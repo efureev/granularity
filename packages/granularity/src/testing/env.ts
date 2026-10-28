@@ -1,21 +1,28 @@
 import { resetAnnouncer } from '../composables/useAnnouncer'
 import { resetPortalRoot } from '../composables/internal/portalRoot'
 import { useToast } from '../composables/useToast'
+import { runDomResets } from '../internal/domResets'
 
 /**
  * Уборка между тестами.
  *
- * `document.body.innerHTML = ''` сам по себе оставляет пакет в разобранном
- * состоянии: корень портала и хост живого региона закэшированы модулями, и
- * после очистки `body` они указывают на узлы **вне документа**. Следующий
- * монтаж телепортирует туда оверлеи, тест ищет их в документе и не находит —
- * без единой ошибки в консоли. Очередь тостов переживает размонтирование по
- * замыслу, поэтому её тоже гасим.
+ * `document.body.innerHTML = ''` убирает узлы, но не модульное состояние
+ * пакета, и оно переживает тест: очередь тостов (переживает и размонтирование —
+ * по замыслу), таймеры живого региона и очередь сервиса диалогов вместе с
+ * захваченным контекстом приложения. Неотвеченный диалог прошлого теста стоит
+ * головой очереди, и новый не появляется вовсе — без единой ошибки в консоли.
+ * Сервис диалогов записывает свою уборку сам (`internal/domResets`): подпуть
+ * `testing` его граф не тянет.
+ *
+ * Приложения Vue помощник не размонтирует — это работа раннера
+ * (`enableAutoUnmount` у `@vue/test-utils`): открытый слой несмонтированного
+ * теста остался бы в стеке Esc и `inert` и держал бы блокировку прокрутки.
  */
 export function resetGranularityDom(): void {
   useToast().clear()
   resetAnnouncer()
   resetPortalRoot()
+  runDomResets()
 
   if (typeof document !== 'undefined')
     document.body.innerHTML = ''

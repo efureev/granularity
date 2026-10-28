@@ -11,19 +11,25 @@
  */
 
 /**
- * Смещения те же, что в `styles/tokens.css`: шаг 50 оставляет приложению место
- * вклиниться между слоями, а тосты стоят выше модалок.
+ * Смещения те же, что у шкалы в темах каталога, от слоя выпадашек: шаг 50
+ * оставляет приложению место вклиниться между слоями. Сдвигается шкала
+ * целиком — оставленный на месте слой оказался бы под модалкой или над
+ * тостами чужого приложения.
  */
 export const GR_Z_INDEX_OFFSETS: Record<string, number> = {
+  '--gr-z-bottom-nav': -150,
   // Шапка ниже якорных панелей: она перекрывает контент, но не выпадашки.
   '--gr-z-navbar': -100,
   '--gr-z-dropdown': 0,
   '--gr-z-tooltip': 50,
   '--gr-z-modal': 100,
+  // Полноэкранная загрузка накрывает и модалку, но не тосты.
+  '--gr-z-loading': 150,
   '--gr-z-toast': 200,
 }
 
 let owner: symbol | null = null
+let ownerBase: number | null = null
 
 /**
  * Ставит шкалу от базы и возвращает функцию отката к прежним значениям.
@@ -32,17 +38,18 @@ let owner: symbol | null = null
 export function applyGrZIndexBase(token: symbol, base: number | undefined): (() => void) | null {
   if (typeof document === 'undefined' || base == null) {
     if (owner === token)
-      owner = null
+      owner = ownerBase = null
     return null
   }
 
-  if (owner && owner !== token && __GR_DEV__) {
+  if (owner && owner !== token && ownerBase !== base && __GR_DEV__) {
     console.warn(
-      '[GrConfigProvider] zIndexBase задан больше чем одним провайдером. '
+      `[GrConfigProvider] zIndexBase задан провайдерами с разной базой (${ownerBase} и ${base}). `
       + 'Шкала слоёв одна на документ (панели телепортируются в body), поэтому применится последняя.',
     )
   }
   owner = token
+  ownerBase = base
 
   const root = document.documentElement
   const previous = Object.keys(GR_Z_INDEX_OFFSETS)
@@ -58,11 +65,12 @@ export function applyGrZIndexBase(token: symbol, base: number | undefined): (() 
       else root.style.removeProperty(name)
     }
     if (owner === token)
-      owner = null
+      owner = ownerBase = null
   }
 }
 
 /** Тестовая очистка владельца шкалы между кейсами. */
 export function resetGrZIndexOwner(): void {
   owner = null
+  ownerBase = null
 }

@@ -875,7 +875,7 @@ describe('mode и theme: острова режима и темы', () => {
 })
 
 describe('zIndexBase: шкала слоёв', () => {
-  const NAMES = ['--gr-z-dropdown', '--gr-z-tooltip', '--gr-z-modal', '--gr-z-toast']
+  const NAMES = ['--gr-z-bottom-nav', '--gr-z-navbar', '--gr-z-dropdown', '--gr-z-tooltip', '--gr-z-modal', '--gr-z-loading', '--gr-z-toast']
 
   afterEach(() => {
     for (const name of NAMES) document.documentElement.style.removeProperty(name)
@@ -894,13 +894,13 @@ describe('zIndexBase: шкала слоёв', () => {
       setup: () => () => h(GrConfigProvider, { zIndexBase: 5000 }, { default: () => h('span', 'x') }),
     }))
 
-    // Смещения те же, что в токенах: 0 / 50 / 100 / 200.
-    expect(read()).toEqual(['5000', '5050', '5100', '5200'])
+    // Смещения те же, что в темах: −150 / −100 / 0 / 50 / 100 / 150 / 200.
+    expect(read()).toEqual(['4850', '4900', '5000', '5050', '5100', '5150', '5200'])
 
     wrapper.unmount()
 
     // Своё значение приложения возвращается, чужих остатков не остаётся.
-    expect(read()).toEqual(['', '', '999', ''])
+    expect(read()).toEqual(['', '', '', '', '999', '', ''])
   })
 
   it('на `:root`, а не на обёртку: панели телепортируются в body', () => {
@@ -913,7 +913,7 @@ describe('zIndexBase: шкала слоёв', () => {
     wrapper.unmount()
   })
 
-  it('второй провайдер с базой предупреждает: шкала одна на документ', () => {
+  it('второй провайдер с другой базой предупреждает: шкала одна на документ', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
 
     const wrapper = mount(defineComponent({
@@ -923,7 +923,22 @@ describe('zIndexBase: шкала слоёв', () => {
     }))
 
     expect(warn).toHaveBeenCalledWith(expect.stringContaining('zIndexBase'))
-    expect(read()[0]).toBe('7000')
+    expect(read()[2]).toBe('7000')
+
+    wrapper.unmount()
+  })
+
+  it('второй провайдер с той же базой молчит: шкала от этого не меняется', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+
+    const wrapper = mount(defineComponent({
+      setup: () => () => h(GrConfigProvider, { zIndexBase: 3000 }, {
+        default: () => h(GrConfigProvider, { zIndexBase: 3000 }, { default: () => h('span', 'x') }),
+      }),
+    }))
+
+    expect(warn).not.toHaveBeenCalled()
+    expect(read()[2]).toBe('3000')
 
     wrapper.unmount()
   })
@@ -933,7 +948,7 @@ describe('zIndexBase: шкала слоёв', () => {
       setup: () => () => h(GrConfigProvider, null, { default: () => h('span', 'x') }),
     }))
 
-    expect(read()).toEqual(['', '', '', ''])
+    expect(read().every(value => value === '')).toBe(true)
 
     wrapper.unmount()
   })

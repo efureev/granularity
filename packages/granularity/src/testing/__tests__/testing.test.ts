@@ -2,9 +2,10 @@ import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 
 import { mount } from '@vue/test-utils'
-import { defineComponent, h } from 'vue'
+import { defineComponent, h, nextTick } from 'vue'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
+import { useDialogService } from '../../components/GrDialogService'
 import { useAnnouncer } from '../../composables/useAnnouncer'
 import { ensurePortalRoot, getPortalRoot } from '../../composables/internal/portalRoot'
 import { useGrComponentProp, useGrComponentSize } from '../../components/shared/configContext'
@@ -145,6 +146,45 @@ describe('уборка окружения', () => {
     resetGranularityDom()
 
     expect(document.querySelector('[data-gr-announcer-region="polite"]')).toBeNull()
+  })
+
+  async function flushDialogs(): Promise<void> {
+    for (let i = 0; i < 3; i++) {
+      await nextTick()
+      await new Promise(resolve => setTimeout(resolve))
+    }
+  }
+
+  it('снимает очередь сервиса диалогов: неотвеченный диалог прошлого теста не держит новый', async () => {
+    void useDialogService().confirm('Первый?')
+    await flushDialogs()
+
+    resetGranularityDom()
+
+    void useDialogService().confirm('Второй?')
+    await flushDialogs()
+
+    expect(document.body.textContent).toContain('Второй?')
+  })
+
+  it('сбрасывает контекст, который сервис захватил в `setup` прошлого теста', async () => {
+    const wrapper = mount(defineComponent({
+      setup() {
+        void useDialogService().confirm('Первый?')
+        return () => h('div')
+      },
+    }), { global: granularityGlobal({ i18n: { 'gr.dialog.confirm.title': 'Заголовок-1' } }) })
+    await flushDialogs()
+    expect(document.body.textContent).toContain('Заголовок-1')
+
+    wrapper.unmount()
+    resetGranularityDom()
+
+    void useDialogService().confirm('Второй?')
+    await flushDialogs()
+
+    expect(document.body.textContent).toContain('Второй?')
+    expect(document.body.textContent).not.toContain('Заголовок-1')
   })
 })
 

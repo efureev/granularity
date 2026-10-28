@@ -61,9 +61,12 @@ change and belongs in a major release, not a patch. See [`docs/styling.md`](./do
 yarn add @feugene/granularity vue @floating-ui/dom
 ```
 
-`@floating-ui/dom` is a required peer dependency, not a bundled one: positioning (`GrDropdown`,
-`GrSelect`, `GrAutocomplete`, `GrTreeSelect`, `GrTooltip`) is built on it, and keeping it external
-means an application that already uses floating-ui ends up with a single copy.
+`@floating-ui/dom` is a required peer dependency, not a bundled one: every floating panel — selects,
+menus, tooltips, popovers — is positioned with it, and so is everything that renders one (the data
+table, pagination, the sidebar, the colour picker); an import from the package root always pulls it
+in. Without it the application's build fails to resolve the import from
+`dist/composables/useFloating.js`. Keeping it external means an application that already uses
+floating-ui ends up with a single copy.
 
 The overlay components (`GrModal`, `GrDrawer`, `GrDialog`, `GrImageViewer`) need nothing else —
 their focus trap, layer stack and scroll lock are the package's own primitives. `@headlessui/vue`

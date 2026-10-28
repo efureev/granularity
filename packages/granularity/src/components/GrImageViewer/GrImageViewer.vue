@@ -498,6 +498,7 @@ const {
   rootEl,
   isMounted,
   isVisible,
+  isLeaving,
   inertAttr,
   layerZIndex,
   portalTarget,
@@ -630,7 +631,7 @@ defineSlots<{
       ref="rootEl"
       v-bind="themeAttrs"
       data-gr-overlay-root
-      :inert="inertAttr"
+      :inert="inertAttr || isLeaving || undefined"
       class="fixed inset-0"
       :style="viewerStyle"
       role="dialog"
