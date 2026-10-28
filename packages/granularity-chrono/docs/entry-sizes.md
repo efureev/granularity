@@ -1,6 +1,6 @@
 # Вес гранулярных импортов
 
-> Сгенерировано `yarn sizes:docs` по собранному `dist` пакета `@feugene/granularity-chrono` 3.0.0.
+> Сгенерировано `yarn sizes:docs` по собранному `dist` пакета `@feugene/granularity-chrono` 3.0.1.
 > Править руками бесполезно — правка потеряется на следующей сборке.
 
 Сколько приезжает потребителю, взявшему один подпуть: gzip самого entry и всего, что он тянет
@@ -13,7 +13,7 @@
 | Компонент | gzip | файлов | от бареля |
 | --- | ---: | ---: | ---: |
 | `GrDateRangePicker` | 21.5 kB | 8 | 51 % |
-| `GrDateTimePicker` | 20.3 kB | 7 | 48 % |
+| `GrDateTimePicker` | 20.4 kB | 7 | 48 % |
 | `GrDatePicker` | 16.7 kB | 7 | 40 % |
 | `GrTimePicker` | 14.0 kB | 7 | 33 % |
 | `GrCalendar` | 8.0 kB | 4 | 19 % |

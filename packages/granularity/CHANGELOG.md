@@ -7,6 +7,8 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v3.6.0] 2026-10-28
+
 ### Changed
 
 - **Недоступное поле гасится ролями недоступного контрола** — подложка `--gr-disabled-bg`, текст

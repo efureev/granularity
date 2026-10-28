@@ -15,10 +15,10 @@ The published packages:
 
 <!-- Generated from the workspace by `yarn docs:ecosystem`; `yarn docs:ecosystem:check` gates it. -->
 <!-- ecosystem:generated:start -->
-- [`@feugene/granularity`](./packages/granularity/README.md) `3.5.0` — Granularity design system package with Vue 3 components, consumed via the `@feugene/granum` build pipeline.
+- [`@feugene/granularity`](./packages/granularity/README.md) `3.6.0` — Granularity design system package with Vue 3 components, consumed via the `@feugene/granum` build pipeline.
 - [`@feugene/granularity-charts`](./packages/granularity-charts/README.md) `3.0.0` — Charts for the @feugene/granularity design system — own SVG, zero dependencies, drawn with theme tokens.
-- [`@feugene/granularity-chrono`](./packages/granularity-chrono/README.md) `3.0.0` — Calendar, date and time components for the @feugene/granularity design system — no third-party date widget, no date library.
-- [`@feugene/granularity-code`](./packages/granularity-code/README.md) `3.0.0` — Code surfaces for @feugene/granularity: view, edit and diff — the viewer and the diff carry no dependencies at all.
+- [`@feugene/granularity-chrono`](./packages/granularity-chrono/README.md) `3.0.1` — Calendar, date and time components for the @feugene/granularity design system — no third-party date widget, no date library.
+- [`@feugene/granularity-code`](./packages/granularity-code/README.md) `3.0.1` — Code surfaces for @feugene/granularity: view, edit and diff — the viewer and the diff carry no dependencies at all.
 - [`@feugene/granularity-dashboard`](./packages/granularity-dashboard/README.md) `2.0.2` — Widget grid for the @feugene/granularity design system — drag, resize, breakpoints and layout persistence, zero dependencies.
 - [`@feugene/granularity-datasource`](./packages/granularity-datasource/README.md) `0.1.2` — List state for @feugene/granularity: sorting, filters, paging, URL sync and race-free fetching behind one composable.
 - [`@feugene/granularity-devtools`](./packages/granularity-devtools/README.md) `2.1.1` — Vue DevTools panel for @feugene/granularity — where a prop value came from, the overlay layer stack and design-system warnings.
@@ -26,7 +26,7 @@ The published packages:
 - [`@feugene/granularity-forms-schema`](./packages/granularity-forms-schema/README.md) `2.0.3` — Schema-driven forms for the @feugene/granularity design system — zod and JSON Schema into real form fields, zero dependencies.
 - [`@feugene/granularity-media`](./packages/granularity-media/README.md) `3.0.0` — Media components for @feugene/granularity: image cropping, camera capture, code scanning and video playback.
 - [`@feugene/granularity-test-kit`](./packages/granularity-test-kit/README.md) `2.3.0` — Test gates for @feugene/granularity design-system packages — token, registry and defaults contracts as reusable factories.
-- [`@feugene/granularity-tokens`](./packages/granularity-tokens/README.md) `2.3.1` — Design tokens and themes of @feugene/granularity: the token registry, theme data by mode and the theme builder.
+- [`@feugene/granularity-tokens`](./packages/granularity-tokens/README.md) `2.4.0` — Design tokens and themes of @feugene/granularity: the token registry, theme data by mode and the theme builder.
 - [`@feugene/unplugin-granularity`](./packages/unplugin-granularity/README.md) `1.2.1` — unplugin-vue-components resolver for @feugene/granularity — granular auto-import for components and directives.
 <!-- ecosystem:generated:end -->
 

@@ -7,6 +7,8 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v2.4.0] 2026-10-28
+
 ### Changed
 
 - **Триггер `GrColorPicker` под указателем — как поле во всех темах каталога.**

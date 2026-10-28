@@ -1,6 +1,6 @@
 # Вес гранулярных импортов
 
-> Сгенерировано `yarn sizes:docs` по собранному `dist` пакета `@feugene/granularity` 3.5.0.
+> Сгенерировано `yarn sizes:docs` по собранному `dist` пакета `@feugene/granularity` 3.6.0.
 > Править руками бесполезно — правка потеряется на следующей сборке.
 
 Сколько приезжает потребителю, взявшему один подпуть: gzip самого entry и всего, что он тянет
@@ -18,7 +18,7 @@
 | `GrTreeSelect` | 92.5 kB | 53 | 14 % |
 | `GrPagination` | 91.6 kB | 56 | 14 % |
 | `GrSelect` | 80.5 kB | 48 | 12 % |
-| `GrColorPicker` | 79.8 kB | 38 | 12 % |
+| `GrColorPicker` | 79.9 kB | 38 | 12 % |
 | `GrTransfer` | 75.0 kB | 47 | 12 % |
 | `GrJsonViewer` | 73.4 kB | 46 | 11 % |
 | `GrAutocomplete` | 66.3 kB | 41 | 10 % |
@@ -27,7 +27,7 @@
 | `GrDropdownMenu` | 60.5 kB | 28 | 9 % |
 | `GrSidebar` | 60.1 kB | 36 | 9 % |
 | `GrCommandPalette` | 56.9 kB | 27 | 9 % |
-| `GrFormFile` | 56.7 kB | 37 | 9 % |
+| `GrFormFile` | 56.8 kB | 37 | 9 % |
 | `GrInputTag` | 49.9 kB | 32 | 8 % |
 | `GrImageViewer` | 46.7 kB | 25 | 7 % |
 | `GrDialog` | 46.3 kB | 29 | 7 % |
@@ -60,7 +60,7 @@
 | `GrSegmented` | 18.6 kB | 13 | 3 % |
 | `GrTable` | 18.2 kB | 12 | 3 % |
 | `GrTabs` | 18.0 kB | 12 | 3 % |
-| `GrFilePreview` | 17.9 kB | 10 | 3 % |
+| `GrFilePreview` | 18.0 kB | 10 | 3 % |
 | `GrTimeline` | 17.9 kB | 11 | 3 % |
 | `GrDelta` | 17.5 kB | 11 | 3 % |
 | `GrCheckboxGroup` | 17.4 kB | 13 | 3 % |
@@ -97,4 +97,4 @@
 | `GrValue` | 2.1 kB | 3 | < 1 % |
 | `GrSkeleton` | 1.7 kB | 3 | < 1 % |
 
-Весь пакет из корня — 645.9 kB.
+Весь пакет из корня — 646.0 kB.
