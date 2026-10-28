@@ -4,7 +4,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import GrAutocomplete from '../GrAutocomplete.vue'
 import { composingKeydown } from '../../../testing/keyboard'
-import { componentSheet } from '../../../__tests__/componentSheet'
+import { componentSheet } from '@feugene/granularity-test-kit/vue'
 
 const { look: chipLook } = componentSheet('GrBadge/GrBadge.vue', 'GrChip/GrChip.vue')
 

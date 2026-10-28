@@ -2,7 +2,7 @@ import { mount } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import GrPagination, { type GrPaginationProps } from '../GrPagination.vue'
-import { componentSheet, lookElement } from '../../../__tests__/componentSheet'
+import { componentSheet, lookElement } from '@feugene/granularity-test-kit/vue'
 import { look as buttonLook, lookElement as buttonElement } from '../../GrButton/__tests__/buttonSheet'
 import { navButtonSizes } from '../grPaginationStyles'
 

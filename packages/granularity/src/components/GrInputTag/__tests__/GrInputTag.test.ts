@@ -20,7 +20,7 @@ vi.mock('~icons/lucide/loader-2', () => {
   }
 })
 
-import { componentSheet } from '../../../__tests__/componentSheet'
+import { componentSheet } from '@feugene/granularity-test-kit/vue'
 import GrConfigProvider from '../../GrConfigProvider/GrConfigProvider.vue'
 import GrFormField from '../../GrFormField/GrFormField.vue'
 import { resetAnnouncer } from '../../../composables/useAnnouncer'

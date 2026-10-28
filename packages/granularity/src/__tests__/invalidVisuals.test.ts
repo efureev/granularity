@@ -11,7 +11,7 @@ import GrSlider from '../components/GrSlider/GrSlider.vue'
 import GrSwitch from '../components/GrSwitch/GrSwitch.vue'
 import GrTransfer from '../components/GrTransfer/GrTransfer.vue'
 import { granularityGlobal, resetGranularityDom } from '../testing'
-import { componentSheet } from './componentSheet'
+import { componentSheet } from '@feugene/granularity-test-kit/vue'
 
 afterEach(resetGranularityDom)
 

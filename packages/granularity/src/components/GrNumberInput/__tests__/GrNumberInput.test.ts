@@ -2,7 +2,7 @@ import { mount } from '@vue/test-utils'
 import { defineComponent, nextTick, ref } from 'vue'
 import { describe, expect, it, vi } from 'vitest'
 
-import { componentSheet } from '../../../__tests__/componentSheet'
+import { componentSheet } from '@feugene/granularity-test-kit/vue'
 import GrNumberInput from '../GrNumberInput.vue'
 import { granularityGlobal, mockRect, pointer, press } from '../../../testing'
 

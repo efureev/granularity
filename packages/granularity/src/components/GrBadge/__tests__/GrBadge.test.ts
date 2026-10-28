@@ -2,7 +2,7 @@ import { mount } from '@vue/test-utils'
 import { describe, expect, it, vi } from 'vitest'
 import { h } from 'vue'
 
-import { componentSheet } from '../../../__tests__/componentSheet'
+import { componentSheet } from '@feugene/granularity-test-kit/vue'
 import GrBadge from '../GrBadge.vue'
 
 const { look } = componentSheet('GrBadge/GrBadge.vue')

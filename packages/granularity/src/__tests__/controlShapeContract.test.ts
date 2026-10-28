@@ -7,7 +7,7 @@ import GrInput from '../components/GrInput/GrInput.vue'
 import GrNumberInput from '../components/GrNumberInput/GrNumberInput.vue'
 import GrSelect from '../components/GrSelect/GrSelect.vue'
 import GrTreeSelect from '../components/GrTreeSelect/GrTreeSelect.vue'
-import { componentSheet } from './componentSheet'
+import { componentSheet } from '@feugene/granularity-test-kit/vue'
 import { granularityGlobal } from '../testing'
 
 /**

@@ -22,7 +22,7 @@ import { GRANULARITY_I18N_KEY } from '../../../i18n/adapter'
 import { useGranularityTranslations } from '../../../internal/granularityI18n'
 import { resetUnsupportedSizeWarnings, themeComponentDefaults, useGrComponentProp, useGrComponentSize, useGrConfig } from '../../shared/configContext'
 import { resetGrZIndexOwner } from '../zIndexScale'
-import { componentSheet } from '../../../__tests__/componentSheet'
+import { componentSheet } from '@feugene/granularity-test-kit/vue'
 
 const { look: badgeLook } = componentSheet('GrBadge/GrBadge.vue')
 const { look: fieldLook } = componentSheet('GrInput/GrInput.vue')

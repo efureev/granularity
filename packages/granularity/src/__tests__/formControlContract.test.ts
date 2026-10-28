@@ -3,7 +3,7 @@ import { defineComponent, h, nextTick } from 'vue'
 import { describe, expect, it } from 'vitest'
 
 import GrFormField from '../components/GrFormField/GrFormField.vue'
-import { componentSheet } from './componentSheet'
+import { componentSheet } from '@feugene/granularity-test-kit/vue'
 import { controls, declaredEmits, declaredProps, describedText, hasAttr } from './formControls'
 
 /**

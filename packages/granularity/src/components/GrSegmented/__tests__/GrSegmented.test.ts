@@ -6,7 +6,7 @@ import { granularityGlobal } from '../../../testing'
 
 import GrFormField from '../../GrFormField/GrFormField.vue'
 import GrSegmented from '../GrSegmented.vue'
-import { componentSheet } from '../../../__tests__/componentSheet'
+import { componentSheet } from '@feugene/granularity-test-kit/vue'
 
 const { cascade, look } = componentSheet('GrSegmented/GrSegmented.vue')
 /** Объявления листа на корне — формулы как написаны, без подстановки. */

@@ -5,7 +5,7 @@ import { afterEach, describe, expect, it } from 'vitest'
 import { resetGranularityDom } from '../../../testing'
 import GrChip from '../../GrChip/GrChip.vue'
 import GrChipGroup from '../GrChipGroup.vue'
-import { componentSheet } from '../../../__tests__/componentSheet'
+import { componentSheet } from '@feugene/granularity-test-kit/vue'
 
 const { look: chipLook } = componentSheet('GrBadge/GrBadge.vue', 'GrChip/GrChip.vue')
 

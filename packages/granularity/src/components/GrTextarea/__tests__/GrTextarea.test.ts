@@ -2,7 +2,7 @@ import { mount } from '@vue/test-utils'
 import { defineComponent, nextTick } from 'vue'
 import { describe, expect, it } from 'vitest'
 
-import { componentSheet } from '../../../__tests__/componentSheet'
+import { componentSheet } from '@feugene/granularity-test-kit/vue'
 import GrTextarea from '../GrTextarea.vue'
 
 /** Рамку рисует лист поля (`GrInput`), цвет текста — лист `GrTextarea`. */

@@ -1,7 +1,7 @@
-import { componentSheet, lookElement as element } from '../../../__tests__/componentSheet'
+import { componentSheet, lookElement as element } from '@feugene/granularity-test-kit/vue'
 import { grButtonLookAttrs, type GrButtonLookOptions } from '../grButtonStyles'
 
-export type { SheetState as ButtonState } from '../../../__tests__/componentSheet'
+export type { SheetState as ButtonState } from '@feugene/granularity-test-kit/vue'
 
 export const { cascade, look } = componentSheet('GrButton/GrButton.vue')
 

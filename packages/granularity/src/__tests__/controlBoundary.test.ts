@@ -5,7 +5,7 @@ import GrCheckbox from '../components/GrCheckbox/GrCheckbox.vue'
 import GrRadio from '../components/GrRadio/GrRadio.vue'
 import GrSwitch from '../components/GrSwitch/GrSwitch.vue'
 
-import { componentSheet } from './componentSheet'
+import { componentSheet } from '@feugene/granularity-test-kit/vue'
 
 const { look: checkboxLook } = componentSheet('GrCheckbox/GrCheckbox.vue')
 const { look: switchLook } = componentSheet('GrSwitch/GrSwitch.vue')

@@ -178,6 +178,8 @@ import { nextFrame, queryOne, stubElementRects } from '@feugene/granularity-test
 | `stubElementRects(rect)` | a rectangle for **every** element, prototype-wide, with a restore. A component that measures its root in `onMounted` reads the size before the test can reach the node |
 | `nextFrame()` | one `requestAnimationFrame`. `nextTick` is the Vue queue, not the browser frame |
 | `fintI18nGlobal(i18n)` | `{ provide }` with the instance under `Symbol.for('FintI18n')`, shaped to compose with other `provide` blocks |
+| `componentSheet(...files)` | the cascade of a component's `<style>` without a browser: `cascade(element, state?)` — the winning declarations as written, `look(element, state?)` — with the variables the sheet sets on the element or its ancestors substituted. Paths are relative to `src/components` of the package under test: a `.vue` file gives its `<style>` block, a `.css` file is read whole. `:hover`, `:active` and focus are marker attributes of the same specificity — jsdom has no such states |
+| `lookElement(tag, attrs)` | an element with the look attributes, without mounting the component |
 
 ### `@feugene/granularity-test-kit/a11y` — axe in jsdom
 

@@ -6,7 +6,7 @@ import GrConfigProvider from '../../GrConfigProvider/GrConfigProvider.vue'
 import GrSwitch from '../GrSwitch.vue'
 import { GR_COMPONENT_SIZES } from '../../shared/sizes'
 import { GR_SWITCH_STATE_TEXT_SIZES, type GrSwitchSize, SWITCH_THUMB_GAP } from '../grSwitchStyles'
-import { componentSheet, lookElement } from '../../../__tests__/componentSheet'
+import { componentSheet, lookElement } from '@feugene/granularity-test-kit/vue'
 import { readComponentThemeVars } from '../../../__tests__/cssContrast'
 import { THEME_MODES } from '../../../__tests__/themeCss'
 

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { GR_TONES } from '../../shared/tones'
-import { componentSheet, lookElement } from '../../../__tests__/componentSheet'
+import { componentSheet, lookElement } from '@feugene/granularity-test-kit/vue'
 import {
   derivedThemeVars,
   getColorDistance,

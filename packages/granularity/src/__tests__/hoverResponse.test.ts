@@ -12,7 +12,7 @@ import GrRadio from '../components/GrRadio/GrRadio.vue'
 import GrSelect from '../components/GrSelect/GrSelect.vue'
 import GrTextarea from '../components/GrTextarea/GrTextarea.vue'
 import GrTreeSelect from '../components/GrTreeSelect/GrTreeSelect.vue'
-import { componentSheet } from './componentSheet'
+import { componentSheet } from '@feugene/granularity-test-kit/vue'
 
 const { look: fieldLook } = componentSheet('GrInput/GrInput.vue')
 const { look: checkboxLook } = componentSheet('GrCheckbox/GrCheckbox.vue')

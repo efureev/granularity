@@ -15,7 +15,7 @@ vi.mock('~icons/lucide/check', () => {
 
 import GrCheckbox from '../../GrCheckbox/GrCheckbox.vue'
 import GrCheckboxGroup from '../GrCheckboxGroup.vue'
-import { componentSheet } from '../../../__tests__/componentSheet'
+import { componentSheet } from '@feugene/granularity-test-kit/vue'
 
 const { look: checkboxLook } = componentSheet('GrCheckbox/GrCheckbox.vue')
 

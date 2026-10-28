@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest'
 import GrConfigProvider from '../../GrConfigProvider/GrConfigProvider.vue'
 import GrTabs from '../GrTabs.vue'
 import type { GrTab } from '../GrTabs.vue'
-import { componentSheet } from '../../../__tests__/componentSheet'
+import { componentSheet } from '@feugene/granularity-test-kit/vue'
 
 const { look: tabsLook } = componentSheet('GrTabs/GrTabs.vue')
 

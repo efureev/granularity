@@ -2,7 +2,7 @@ import { DOMWrapper, mount } from '@vue/test-utils'
 import { defineComponent, nextTick, ref } from 'vue'
 import { afterEach, describe, expect, it } from 'vitest'
 
-import { componentSheet } from '../../../__tests__/componentSheet'
+import { componentSheet } from '@feugene/granularity-test-kit/vue'
 import GrTreeSelect from '../GrTreeSelect.vue'
 import type { GrTreeSelectProps } from '../grTreeSelectTypes'
 import type { GranularityI18nAdapter } from '../../../i18n/adapter'

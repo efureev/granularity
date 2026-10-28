@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest'
 import GrRadioGroup from '../../GrRadioGroup/GrRadioGroup.vue'
 import GrRadio from '../GrRadio.vue'
 import { grRadioSafelist } from '../safelist'
-import { componentSheet } from '../../../__tests__/componentSheet'
+import { componentSheet } from '@feugene/granularity-test-kit/vue'
 
 const { look: radioLook } = componentSheet('GrButton/GrButton.vue', 'GrRadio/GrRadio.vue')
 

@@ -3,7 +3,7 @@ import { resolve } from 'node:path'
 
 /**
  * Каскад листа компонента без браузера: вид компонента — правила по атрибутам в
- * его `<style>` (`docs/markup-weight.md`), и тесты читают их, а не строку классов.
+ * его `<style>` (`docs/markup-weight.md` ядра), и тесты читают их, а не строку классов.
  *
  * Правило применяется, если селектор совпал с элементом (`element.matches`);
  * у свойства выигрывает правило с большей специфичностью, при равной — позднее.
@@ -85,7 +85,7 @@ export function specificity(selector: string): Specificity {
   const total: Specificity = [0, 0, 0]
   let i = 0
   while (i < selector.length) {
-    const char = selector[i]
+    const char = selector[i] ?? ''
     if (char === '[') {
       total[1]++
       i = selector.indexOf(']', i) + 1
@@ -98,6 +98,7 @@ export function specificity(selector: string): Specificity {
     }
     else if (char === ':') {
       const match = /^:([\w-]+)(\()?/.exec(selector.slice(i))!
+      const name = match[1] ?? ''
       i += match[0].length
       if (!match[2]) {
         total[1]++
@@ -112,13 +113,13 @@ export function specificity(selector: string): Specificity {
           depth--
         i++
       }
-      if (['not', 'is', 'has'].includes(match[1])) {
+      if (['not', 'is', 'has'].includes(name)) {
         const best = splitTopLevel(selector.slice(start, i - 1)).map(specificity).sort(compare).at(-1)!
         total[0] += best[0]
         total[1] += best[1]
         total[2] += best[2]
       }
-      else if (match[1] !== 'where') {
+      else if (name !== 'where') {
         total[1]++
       }
     }
@@ -167,15 +168,20 @@ export interface ComponentSheet {
 }
 
 /**
- * Лист компонента: пути от `src/components`, например `GrButton/GrButton.vue`.
+ * Лист компонента: пути от `src/components`, например `GrButton/GrButton.vue` —
+ * блок `<style>` SFC — или `GrRichText/styles.css` — лист файлом.
  * Несколько файлов — когда вид собирают листы нескольких компонентов: палитру
  * `GrChip` красит лист `GrBadge`.
  */
 export function componentSheet(...files: string[]): ComponentSheet {
   // Пути — от cwd пакета: в vitest `import.meta.url` не всегда file-scheme.
   const sheet = files
-    // Блок `<style>` — с начала строки: слово `<style>` встречается и в комментариях скрипта.
-    .map(file => /^<style>([\s\S]*?)^<\/style>/m.exec(readFileSync(resolve(process.cwd(), 'src/components', file), 'utf8'))![1])
+    .map((file) => {
+      const text = readFileSync(resolve(process.cwd(), 'src/components', file), 'utf8')
+      // Лист файлом (`styles.css` рядом с компонентом) — целиком; у SFC — блок `<style>`
+      // с начала строки: слово `<style>` встречается и в комментариях скрипта.
+      return file.endsWith('.css') ? text : /^<style>([\s\S]*?)^<\/style>/m.exec(text)![1]
+    })
     .join('\n')
     .replace(/\/\*[\s\S]*?\*\//g, '')
   const rules: Record<Motion, Rule[]> = {
@@ -235,7 +241,7 @@ export function componentSheet(...files: string[]): ComponentSheet {
     const vars = variables(element, style)
     const expand = (value: string, depth = 0): string => (depth > 8
       ? value
-      : value.replace(/var\((--[\w-]+)\)/g, (whole, variable: string) => (variable in vars ? expand(vars[variable], depth + 1) : whole)))
+      : value.replace(/var\((--[\w-]+)\)/g, (whole, variable: string) => (vars[variable] === undefined ? whole : expand(vars[variable], depth + 1))))
     return Object.fromEntries(Object.entries(style).map(([name, value]) => [name, expand(value)]))
   }
 

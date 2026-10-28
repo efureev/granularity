@@ -2,7 +2,7 @@ import { mount } from '@vue/test-utils'
 import { defineComponent, nextTick } from 'vue'
 import { afterEach, describe, expect, it } from 'vitest'
 
-import { componentSheet } from '../../../__tests__/componentSheet'
+import { componentSheet } from '@feugene/granularity-test-kit/vue'
 import GrAutocomplete from '../GrAutocomplete.vue'
 import GrFormField from '../../GrFormField/GrFormField.vue'
 

@@ -14,7 +14,7 @@ vi.mock('~icons/lucide/loader-circle', () => {
 import GrFormField from '../../GrFormField/GrFormField.vue'
 import GrRadio from '../../GrRadio/GrRadio.vue'
 import GrRadioGroup from '../GrRadioGroup.vue'
-import { componentSheet } from '../../../__tests__/componentSheet'
+import { componentSheet } from '@feugene/granularity-test-kit/vue'
 
 const { look: radioLook } = componentSheet('GrButton/GrButton.vue', 'GrRadio/GrRadio.vue')
 

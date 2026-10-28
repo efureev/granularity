@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { componentSheet, lookElement } from '../../../__tests__/componentSheet'
+import { componentSheet, lookElement } from '@feugene/granularity-test-kit/vue'
 import {
   derivedThemeVars,
   getContrastRatio,

@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **`componentSheet` и `lookElement` в `./vue`** — каскад листа компонента без браузера: тесты читают
+  вид компонента из его `<style>`, а не строку классов. Жили в тестах ядра; спутнику, который переносит
+  вид в лист, они нужны так же. Лист файлом (`GrRichText/styles.css`) читается целиком.
+
 ## [v2.3.0] 2026-10-22
 
 ### Added

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { grFieldLookAttrs } from '../components/GrInput/grFieldLook'
 import type { GrFieldKind } from '../components/GrInput/grFieldLook'
-import { componentSheet, lookElement } from './componentSheet'
+import { componentSheet, lookElement } from '@feugene/granularity-test-kit/vue'
 import { GR_COMPONENT_SIZES, GR_CONTROL_HEIGHTS_PX } from '../components/shared/sizes'
 
 /**

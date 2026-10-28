@@ -1,7 +1,8 @@
 // @vitest-environment jsdom
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterAll, afterEach, describe, expect, it } from 'vitest'
 
-import { fintI18nGlobal, nextFrame, queryOne, queryWrapper, stubElementRects } from '../vue'
+import { componentSheet, fintI18nGlobal, lookElement, nextFrame, queryOne, queryWrapper, stubElementRects } from '../vue'
+import { createFixturePackage } from './fixture'
 
 afterEach(() => {
   document.body.innerHTML = ''
@@ -103,5 +104,58 @@ describe('fintI18nGlobal', () => {
 
     expect(merged[other]).toBe(1)
     expect(merged[Symbol.for('FintI18n')]).toBe('i18n')
+  })
+})
+
+describe('componentSheet', () => {
+  const sheet = `<script setup lang="ts"></script>
+
+<template><span /></template>
+
+<style>
+/* <style> в комментарии листа не обрывает разбор */
+[data-x] { color: red; }
+[data-x][data-y] { color: blue; }
+[data-x]:hover { background-color: var(--x-bg); }
+[data-p] { --x-bg: var(--gr-muted); }
+@media (prefers-reduced-motion: no-preference) {
+  [data-x] { transition-duration: 150ms; }
+}
+</style>
+`
+  const fixture = createFixturePackage({ 'src/components/GrThing/GrThing.vue': sheet })
+  const { cascade, look } = componentSheet(`${fixture.dir}/src/components/GrThing/GrThing.vue`)
+
+  afterAll(fixture.cleanup)
+
+  it('выигрывает более специфичное правило', () => {
+    expect(cascade(lookElement('span', { 'data-x': '' })).color).toBe('red')
+    expect(cascade(lookElement('span', { 'data-x': '', 'data-y': '' })).color).toBe('blue')
+  })
+
+  it('состояние ставится меткой, переменная предка подставляется', () => {
+    const parent = lookElement('div', { 'data-p': '' })
+    const element = lookElement('span', { 'data-x': '' })
+    parent.append(element)
+    document.body.append(parent)
+
+    expect(cascade(element)['background-color']).toBeUndefined()
+    expect(cascade(element, { hover: true })['background-color']).toBe('var(--x-bg)')
+    expect(look(element, { hover: true })['background-color']).toBe('var(--gr-muted)')
+  })
+
+  it('лист файлом читается целиком', () => {
+    const css = createFixturePackage({ 'src/components/GrThing/styles.css': '[data-x] { color: green; }' })
+    const element = lookElement('span', { 'data-x': '' })
+
+    expect(componentSheet(`${css.dir}/src/components/GrThing/styles.css`).cascade(element).color).toBe('green')
+    css.cleanup()
+  })
+
+  it('читает медиазапрос движения', () => {
+    const element = lookElement('span', { 'data-x': '' })
+
+    expect(cascade(element)['transition-duration']).toBe('150ms')
+    expect(cascade(element, { reducedMotion: true })['transition-duration']).toBeUndefined()
   })
 })
