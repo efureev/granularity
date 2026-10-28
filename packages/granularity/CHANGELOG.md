@@ -7,6 +7,8 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v3.4.0] 2026-10-28
+
 ### Changed
 
 - **Вид повторяющихся компонентов — лист по атрибутам, а не утилиты**, как у `GrButton` в 3.3.0
