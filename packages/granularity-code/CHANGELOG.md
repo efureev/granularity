@@ -7,6 +7,14 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+
+- **Рамка `GrCodeEditor` — рамка поля ядра** (`grFieldLookAttrs`, вид `area`,
+  `packages/granularity/docs/field.md`): рамка `--gr-input` вместо `--gr-brd`, скругление по ступени вместо `--gr-radius-md`, отклик на
+  указатель и фокус, кольцо толщины темы. Подложка остаётся кодовой (`--gr-code-block-bg`), как у
+  блока и диффа, и в «только чтение» тоже: редактор кода читается кодом, а не полем ввода. Ребро
+  на `GrInput` объявлено в `dependencies`.
+
 ## [v2.0.2] 2026-10-21
 
 ### Changed

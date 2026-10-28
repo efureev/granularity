@@ -8,13 +8,14 @@ import { grDatePickerSafelist } from './safelist'
  * Без второго потребитель, выбравший только `GrDatePicker`, получил бы панель
  * без фона, рамки и тени: granum подмешивает safelist и CSS лишь тем
  * компонентам, что попали в селекцию, а `GrPopover` попадает в неё только через
- * этот граф.
+ * этот граф. Поле — рамка поля ядра (`pickerFieldAttrs`): её лист живёт в
+ * `GrInput` и приезжает по его ребру.
  */
 export const grDatePickerConfig = defineGranumComponent(import.meta.url, {
   name: 'GrDatePicker',
   safelist: grDatePickerSafelist,
   dependencies: [
     'GrCalendar',
-    { provider: '@feugene/granularity', components: ['GrPopover', 'GrButton'] },
+    { provider: '@feugene/granularity', components: ['GrPopover', 'GrButton', 'GrInput'] },
   ],
 })

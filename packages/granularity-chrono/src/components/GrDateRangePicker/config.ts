@@ -6,7 +6,8 @@ import { grDateRangePickerSafelist } from './safelist'
  * Панель собрана из чужой разметки: сетка — `GrCalendar`, колонки времени —
  * внутренний компонент `GrTimePicker`, поповер и кнопки — ядро. Все рёбра
  * объявлены, иначе потребитель, выбравший один `GrDateRangePicker`, получил бы
- * панель без стилей.
+ * панель без стилей. Поле — рамка поля ядра (`pickerFieldAttrs`): её лист живёт
+ * в `GrInput` и приезжает по его ребру.
  *
  * Ребро к `GrTimePicker` безусловно, хотя колонки включает необязательный
  * `enable-time`: селекция статична, и по ней не видно, каким пропом компонент
@@ -18,6 +19,6 @@ export const grDateRangePickerConfig = defineGranumComponent(import.meta.url, {
   dependencies: [
     'GrCalendar',
     'GrTimePicker',
-    { provider: '@feugene/granularity', components: ['GrPopover', 'GrButton'] },
+    { provider: '@feugene/granularity', components: ['GrPopover', 'GrButton', 'GrInput'] },
   ],
 })

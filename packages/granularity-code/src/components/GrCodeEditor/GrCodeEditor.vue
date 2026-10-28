@@ -5,22 +5,20 @@ import { useGranularityTranslations } from '@feugene/granularity/composables/use
 import { useGrComponentProp, useGrComponentSize } from '@feugene/granularity/composables/useGrComponentConfig'
 import { useGrFormControl } from '@feugene/granularity/composables/useGrFormControl'
 import type { GrComponentSize } from '@feugene/granularity/components/GrConfigProvider'
+import { grFieldLookAttrs } from '@feugene/granularity/components/GrInput'
 
 import { clampIssues, minimalChange, type GrCodeIssue } from './editorState'
 import { builtInLineTokenizer, builtInLines } from '../../highlight/builtIn'
 import { codeTokenClass } from '../shared/grCodeBlockStyles'
 import {
-  editorDisabledClass,
-  editorFocusClass,
   editorFontClass,
   editorHintClass,
   editorHookClass,
-  editorInvalidClass,
   editorIssuesClass,
   editorIssueTone,
   editorPaddings,
-  editorReadonlyClass,
   editorRootClass,
+  editorTextColorClass,
   editorTextSizes,
 } from './grCodeEditorStyles'
 
@@ -457,13 +455,18 @@ const scrollStyle = computed(() => {
 const rootClass = computed(() => [
   editorHookClass,
   editorRootClass,
-  editorFocusClass,
   editorFontClass,
   editorTextSizes[resolvedSize.value],
-  control.invalid.value ? editorInvalidClass : '',
-  control.disabled.value ? editorDisabledClass : '',
-  control.readonly.value && !control.disabled.value ? editorReadonlyClass : '',
+  editorTextColorClass(control.disabled.value),
 ])
+
+const rootAttrs = computed(() => grFieldLookAttrs({
+  kind: 'area',
+  size: resolvedSize.value,
+  invalid: control.invalid.value,
+  disabled: control.disabled.value,
+  readonly: control.readonly.value,
+}))
 
 async function focus(): Promise<void> {
   const current = view.value
@@ -499,7 +502,7 @@ defineExpose({
 </script>
 
 <template>
-  <div :class="rootClass">
+  <div :class="rootClass" v-bind="rootAttrs">
     <div
       v-show="isMounted && view"
       :id="inputId"
@@ -534,6 +537,15 @@ defineExpose({
 </template>
 
 <style>
+/*
+ * Рамка — поле ядра (лист `GrInput`), подложка — кодовая, как у блока и диффа, и
+ * у «только чтения» тоже: редактор кода читается кодом, а не полем ввода.
+ * Недоступный гасится подложкой поля.
+ */
+.gr-code-editor[data-gr-field]:not([data-gr-off]) {
+  background-color: var(--gr-code-block-bg, var(--gr-muted));
+}
+
 :where(.gr-code-editor__line) {
   display: block;
 }

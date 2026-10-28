@@ -28,6 +28,7 @@ import {
   clearButtonClass,
   iconClass,
   indicatorClass,
+  pickerFieldAttrs,
   pickerFieldClass,
   spinnerClass,
   trailingZoneClass,
@@ -698,11 +699,14 @@ defineExpose({
   close: shell.closePanel,
 })
 
-const fieldClass = computed(() => pickerFieldClass({
+const fieldOptions = computed(() => ({
   size: resolvedSize.value,
   disabled: isDisabled.value,
   invalid: isInvalid.value,
+  readonly: isReadonly.value,
 }))
+const fieldClass = computed(() => pickerFieldClass(fieldOptions.value))
+const fieldAttrs = computed(() => pickerFieldAttrs(fieldOptions.value))
 
 /**
  * Панель отдаёт свои фон и отступ, а календарь внутри неё — нет: две подложки
@@ -734,7 +738,7 @@ const calendarVars = { '--gr-calendar-bg': 'transparent', '--gr-calendar-padding
           <input
             :id="inputId"
             ref="fieldEl"
-            v-bind="triggerProps"
+            v-bind="{ ...triggerProps, ...fieldAttrs }"
             data-gr-date-range-picker-field
             type="text"
             role="combobox"

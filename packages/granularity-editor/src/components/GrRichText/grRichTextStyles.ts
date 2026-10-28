@@ -40,13 +40,12 @@ export const bubbleButtonSize = {
   lg: 'xs',
 } as const satisfies Record<GrRichTextSize, 'xs'>
 
-export const rootClass = 'relative overflow-hidden rounded-[var(--gr-radius-lg)] border border-[var(--gr-brd)] bg-[var(--gr-bg)] transition-colors duration-[var(--gr-duration-fast)] ease-[var(--gr-ease-out)]'
-
-export const rootFocusClass = 'focus-within:border-[var(--gr-primary)] focus-within:ring-2 focus-within:ring-[var(--gr-ring)]'
-
-export const rootInvalidClass = 'border-[var(--gr-invalid-brd)] focus-within:border-[var(--gr-invalid-brd)] focus-within:ring-[var(--gr-invalid-ring)]'
-
-export const rootDisabledClass = 'bg-[var(--gr-muted)] cursor-not-allowed'
+/**
+ * Корень — рамка поля ядра (`grFieldLookAttrs`, вид `area`): рамку, скругление
+ * ступени, подложку, отклик и кольцо по `focus-within` рисует лист `GrInput`, как
+ * у `GrTextarea`. `overflow-hidden` обрезает панель по дуге рамки.
+ */
+export const rootClass = 'relative overflow-hidden'
 
 export const toolbarClass = 'flex flex-wrap items-center gap-1 border-b border-[var(--gr-brd)] bg-[var(--gr-muted)] px-2 py-1.5'
 

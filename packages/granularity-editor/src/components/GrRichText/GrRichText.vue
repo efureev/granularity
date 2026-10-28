@@ -13,6 +13,7 @@ import './tokens.css'
 import './styles.css'
 
 import GrButton from '@feugene/granularity/components/GrButton'
+import { grFieldLookAttrs } from '@feugene/granularity/components/GrInput'
 import GrPopover from '@feugene/granularity/components/GrPopover'
 import { useGrComponentSize } from '@feugene/granularity/composables/useGrComponentConfig'
 import { useGrFormControl } from '@feugene/granularity/composables/useGrFormControl'
@@ -33,9 +34,6 @@ import {
   fieldHeaderClass,
   iconClass,
   rootClass,
-  rootDisabledClass,
-  rootFocusClass,
-  rootInvalidClass,
   sizeClasses,
   toolbarButtonSize,
   toolbarClass,
@@ -627,16 +625,19 @@ defineExpose({
   blur: () => editor.value?.commands.blur(),
 })
 
-const rootClasses = computed(() => [
-  rootClass,
-  sizeClasses[resolvedSize.value],
-  field.disabled.value ? rootDisabledClass : rootFocusClass,
-  field.invalid.value ? rootInvalidClass : '',
-])
+const rootClasses = computed(() => [rootClass, sizeClasses[resolvedSize.value]])
+
+const rootAttrs = computed(() => grFieldLookAttrs({
+  kind: 'area',
+  size: resolvedSize.value,
+  invalid: field.invalid.value,
+  disabled: field.disabled.value,
+  readonly: field.readonly.value,
+}))
 </script>
 
 <template>
-  <div ref="rootEl" data-gr-rich-text :class="rootClasses">
+  <div ref="rootEl" data-gr-rich-text :class="rootClasses" v-bind="rootAttrs">
     <!-- Форме уходит разметка строкой: скрытое поле не умеет объектов. -->
     <input v-if="name" type="hidden" :name="name" :value="formValue">
 

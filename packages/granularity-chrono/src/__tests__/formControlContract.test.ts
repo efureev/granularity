@@ -191,8 +191,9 @@ describe('контракт форм-контрола', () => {
 
 /**
  * Ошибка валидации и декоративный тон — разные каналы. В пакете декоративного
- * тона у полей пока нет, поэтому проверяется одна половина: `invalid` красится
- * ролью `--gr-invalid-*`, а не `--gr-danger` напрямую.
+ * тона у полей пока нет, поэтому проверяется одна половина: `invalid` ставит
+ * рамке поля ядра `data-gr-invalid`, и лист поля красит её ролью `--gr-invalid-*`,
+ * а не `--gr-danger`.
  */
 describe('invalid красится своей ролью', () => {
   for (const control of controls) {
@@ -202,8 +203,11 @@ describe('invalid красится своей ролью', () => {
       })
       await nextTick()
 
-      expect(wrapper.html()).toContain('--gr-invalid-brd')
-      expect(wrapper.html(), 'вердикт валидации не должен красить тоном danger').not.toContain('--gr-danger')
+      // Рамку красит лист поля ядра: ошибка — `data-gr-invalid`, и подсветки
+      // `data-gr-state` при ней нет. Цвета по ролям держит тест листа в ядре.
+      const field = wrapper.get('[data-gr-field]')
+      expect(field.attributes('data-gr-invalid')).toBe('')
+      expect(field.attributes('data-gr-state')).toBeUndefined()
       wrapper.unmount()
     })
   }
