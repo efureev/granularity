@@ -2,6 +2,7 @@ import { mount } from '@vue/test-utils'
 import { defineComponent, nextTick } from 'vue'
 import { afterEach, describe, expect, it } from 'vitest'
 
+import { componentSheet } from '../../../__tests__/componentSheet'
 import GrAutocomplete from '../GrAutocomplete.vue'
 import GrFormField from '../../GrFormField/GrFormField.vue'
 
@@ -25,6 +26,8 @@ function options(): HTMLButtonElement[] {
   return [...document.querySelectorAll<HTMLButtonElement>('[data-gr-autocomplete-option]')]
 }
 
+/** Рамку поля рисует лист `GrInput` по атрибутам оболочки. */
+const { look: fieldLook } = componentSheet('GrInput/GrInput.vue')
 describe('GrAutocomplete — доступность панели', () => {
   it('опции не табируемы: Tab из поля выходит из виджета, а не в панель', async () => {
     const wrapper = mount(GrAutocomplete, {
@@ -150,7 +153,7 @@ describe('GrAutocomplete — disabled и readonly', () => {
     const wrapper = mount(Harness, { attachTo: document.body })
     await nextTick()
 
-    expect(wrapper.get('[data-gr-autocomplete-shell]').classes()).toContain('cursor-not-allowed')
+    expect(fieldLook(wrapper.get('[data-gr-autocomplete-shell]').element).cursor).toBe('not-allowed')
     expect(wrapper.find('[data-gr-chip-close]').exists()).toBe(false)
 
     wrapper.unmount()

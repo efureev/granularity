@@ -4,6 +4,6 @@ import { grNumberInputSafelist } from './safelist'
 
 export const grNumberInputConfig = defineGranumComponent(import.meta.url, {
   name: 'GrNumberInput',
-  dependencies: ['GrIcon'],
+  dependencies: ['GrIcon', 'GrInput'],
   safelist: grNumberInputSafelist,
 })

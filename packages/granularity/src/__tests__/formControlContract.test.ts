@@ -3,6 +3,7 @@ import { defineComponent, h, nextTick } from 'vue'
 import { describe, expect, it } from 'vitest'
 
 import GrFormField from '../components/GrFormField/GrFormField.vue'
+import { componentSheet } from './componentSheet'
 import { controls, declaredEmits, declaredProps, describedText, hasAttr } from './formControls'
 
 /**
@@ -162,6 +163,10 @@ describe('контракт форм-контрола', () => {
  * визуально сообщал о непройденной валидации.
  */
 describe('invalid не равен тону danger', () => {
+  // Рамку полей рисует лист `GrInput` по атрибутам их рамки.
+  const { look } = componentSheet('GrInput/GrInput.vue')
+  const fieldBorder = (wrapper: ReturnType<typeof mount>) => look(wrapper.get('[data-gr-field]').element)['border-color']
+
   const stateful = new Set(['GrInput', 'GrTextarea', 'GrNumberInput', 'GrSelect', 'GrTreeSelect', 'GrInputTag'])
   const colored = controls.filter(({ meta }) => stateful.has(meta.name) || meta.name === 'GrAutocomplete')
 
@@ -170,7 +175,7 @@ describe('invalid не равен тону danger', () => {
       const wrapper = mount(component as never, { props: { ...meta.props, invalid: true } as never })
       await nextTick()
 
-      expect(wrapper.html()).toContain('--gr-invalid-brd')
+      expect(fieldBorder(wrapper)).toBe('var(--gr-invalid-brd)')
     })
 
     if (!stateful.has(meta.name))
@@ -180,9 +185,8 @@ describe('invalid не равен тону danger', () => {
       const wrapper = mount(component as never, { props: { ...meta.props, state: 'danger' } as never })
       await nextTick()
 
-      const html = wrapper.html()
-      expect(html).toContain('--gr-danger')
-      expect(html, 'декоративный тон не должен выглядеть вердиктом валидации').not.toContain('--gr-invalid-brd')
+      // Декоративный тон не должен выглядеть вердиктом валидации.
+      expect(fieldBorder(wrapper)).toBe('var(--gr-danger)')
     })
   }
 })

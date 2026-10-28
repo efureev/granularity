@@ -420,10 +420,10 @@ describe('GrSelect — поле с чипами растёт с рядами', (
     const wrapper = mount(GrSelect, {
       props: { modelValue: [], options: tagOptions, optionsView: 'panel', multiple: true, tags: true },
     })
-    const trigger = wrapper.get('[data-gr-select-trigger]').classes()
+    const trigger = wrapper.get('[data-gr-select-trigger]')
 
-    expect(trigger).toContain('h-10')
-    expect(trigger).not.toContain('absolute')
+    expect(trigger.attributes('data-gr-field')).toBe('line')
+    expect(trigger.classes()).not.toContain('absolute')
     expect(wrapper.find('[data-gr-select-tags]').exists()).toBe(false)
     wrapper.unmount()
   })

@@ -51,6 +51,7 @@ import {
   type GrColorPickerSize,
   type GrColorPickerView,
 } from './grColorPickerStyles'
+import { grFieldLookAttrs } from '../GrInput/grFieldLook'
 import { useControlAria } from '../../composables/internal/useControlAria'
 
 export type { GrColorPickerSize, GrColorPickerView } from './grColorPickerStyles'
@@ -302,8 +303,15 @@ const triggerClass = computed(() => grColorPickerTriggerClass({
   size: resolvedSize.value,
   shape: resolvedShape.value,
   disabled: isDisabled.value,
+}))
+
+const triggerFieldAttrs = computed(() => grFieldLookAttrs({
+  size: resolvedSize.value,
+  shape: resolvedShape.value,
   invalid: isInvalid.value,
+  disabled: isDisabled.value,
   readonly: isReadonly.value,
+  trigger: true,
 }))
 
 const panelClass = computed(() => grColorPickerPanelClass(resolvedSize.value))
@@ -485,7 +493,7 @@ async function pickFromScreen(): Promise<void> {
         <button
           :id="fieldId"
           ref="triggerEl"
-          v-bind="triggerProps"
+          v-bind="{ ...triggerProps, ...triggerFieldAttrs }"
           data-gr-color-picker-trigger
           type="button"
           :class="triggerClass"
@@ -764,5 +772,19 @@ async function pickFromScreen(): Promise<void> {
       rgb(0 0 0) 100%
     ),
     var(--gr-color-picker-area-saturation);
+}
+
+/*
+ * Триггер — поле (лист `GrInput`), но откликается на указатель своей ручкой темы
+ * `--gr-color-picker-trigger-hover-brd`, а на фокус рамкой не откликается: его
+ * фокус — кольцо. У ошибки рамка — сообщение, отклика нет. `[data-gr-size]` во
+ * втором правиле поднимает специфичность выше отклика поля на указатель.
+ */
+[data-gr-color-picker-trigger][data-gr-field]:not([data-gr-off], [data-gr-readonly], [data-gr-invalid]):focus-within {
+  border-color: var(--gr-input);
+}
+
+[data-gr-color-picker-trigger][data-gr-field][data-gr-size]:not([data-gr-off], [data-gr-readonly], [data-gr-invalid]):hover {
+  border-color: var(--gr-color-picker-trigger-hover-brd);
 }
 </style>

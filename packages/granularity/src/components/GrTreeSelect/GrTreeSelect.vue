@@ -33,6 +33,7 @@ import type { GrInputSize } from '../GrInput/GrInput.vue'
 import { panelPopTransition } from '../shared/overlayTransition'
 import type { GrTreeSelectModelValue, GrTreeSelectProps } from './grTreeSelectTypes'
 import { grTreeSelectClass, grTreeSelectPanelClass, grTreeSelectStateClass, paddingX, trailingZoneWidth } from './grTreeSelectStyles'
+import { grFieldLookAttrs } from '../GrInput/grFieldLook'
 
 import IconCheck from '~icons/lucide/check'
 import IconChevronDown from '~icons/lucide/chevron-down'
@@ -382,16 +383,21 @@ const panelTextClass = computed(() => ({
 })[resolvedSize.value])
 const resolvedShape = useGrComponentProp('GrTreeSelect', 'shape', () => props.shape, 'box')
 
-const className = computed(() => {
-  return grTreeSelectClass({
-    size: resolvedSize.value,
-    shape: resolvedShape.value,
-    state: props.state,
-    invalid: isInvalid.value,
-    disabled: isDisabled.value,
-    readonly: isReadonly.value,
-  })
-})
+const className = computed(() => grTreeSelectClass({
+  size: resolvedSize.value,
+  shape: resolvedShape.value,
+  disabled: isDisabled.value,
+}))
+
+const triggerFieldAttrs = computed(() => grFieldLookAttrs({
+  size: resolvedSize.value,
+  shape: resolvedShape.value,
+  state: props.state,
+  invalid: isInvalid.value,
+  disabled: isDisabled.value,
+  readonly: isReadonly.value,
+  trigger: true,
+}))
 
 const panelClasses = computed(() => {
   return grTreeSelectPanelClass
@@ -720,7 +726,8 @@ const themeAttrs = useGrThemeAttrs()
         :aria-errormessage="aria.errorMessage()"
         :aria-labelledby="aria.labelledBy()"
         :aria-label="ariaLabel"
-        class="w-full border placeholder:text-[var(--gr-muted-fg)] transition-colors duration-[var(--gr-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[calc(var(--gr-input-focus-ring-width))] focus-visible:ring-[var(--gr-ring)]"
+        v-bind="triggerFieldAttrs"
+        class="w-full placeholder:text-[var(--gr-muted-fg)] focus:outline-none"
         :class="[className, $slots.value || hasTags ? 'text-transparent placeholder:text-transparent' : '']"
         :style="triggerStyle"
         @pointerdown="onTriggerPointerDown"

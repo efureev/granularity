@@ -49,12 +49,12 @@ size="xs">` физически не мог примениться к полов�
 нет вовсе.
 
 ```ts
-// grInputStyles.ts
+// grInputStyles.ts — кегль поля; высоту ступени и рамку рисует лист поля (field.md)
 export const sizes = {
-  xs: 'h-7 px-2.5 text-[length:var(--gr-control-text-xs)]',
-  sm: 'h-8 px-3 text-[length:var(--gr-control-text-sm)]',
-  md: 'h-10 px-3 text-[length:var(--gr-control-text-md)]',
-  lg: 'h-11 px-4 text-[length:var(--gr-control-text-lg)]',
+  xs: 'h-full text-[length:var(--gr-control-text-xs)] leading-[var(--gr-control-leading-xs)]',
+  sm: 'h-full text-[length:var(--gr-control-text-sm)] leading-[var(--gr-control-leading-sm)]',
+  md: 'h-full text-[length:var(--gr-control-text-md)] leading-[var(--gr-control-leading-md)]',
+  lg: 'h-full text-[length:var(--gr-control-text-lg)] leading-[var(--gr-control-leading-lg)]',
 } as const
 ```
 
@@ -149,8 +149,8 @@ export const sizes = {
 
 ### Ступень — это высота, и она одна на всех
 
-`GR_CONTROL_HEIGHTS_PX` в `shared/sizes.ts`: **28 / 32 / 40 / 44 px** для `xs…lg`. У поля она выражена утилитой
-(`h-7`…`h-11`), у `GrSegmented` складывается из высоты сегмента и поля дорожки с двух сторон — и пока эти числа жили
+`GR_CONTROL_HEIGHTS_PX` в `shared/sizes.ts`: **28 / 32 / 40 / 44 px** для `xs…lg`. У поля её задаёт лист рамки
+поля (`data-gr-field`, `data-gr-size`, [`field.md`](./field.md)), у `GrSegmented` складывается из высоты сегмента и поля дорожки с двух сторон — и пока эти числа жили
 порознь, дорожка была выше поля той же ступени на 4, 4, 8 и 10 px соответственно. В одной строке рядом с селектом это
 читается как сбитая вёрстка, а сверить было нечем: величины выражены по-разному.
 
@@ -225,7 +225,7 @@ export const sizes = {
 **Форма тянет за собой горизонтальный отступ, и это не украшение.** Пилюля на
 40 px даёт дугу 20 px; при отступе 12 px (`px-3` у `GrInput` в `md`) текст
 заезжает в скругление. Поэтому у пилюли отступ не меньше половины высоты, и
-таблица одна на все поля: высоты у них общие (`h-7/h-8/h-10/h-11`). Класс и его
+таблица одна на все поля: высоты у них общие, их задаёт лист рамки поля. Класс и его
 числовой двойник (аддоны задают отступ инлайн-стилем) сторожит
 `src/components/shared/__tests__/controlShape.test.ts`.
 

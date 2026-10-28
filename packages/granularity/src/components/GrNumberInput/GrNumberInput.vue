@@ -10,15 +10,13 @@ import {
   stepperCompactClass,
   stepperWideClass,
   grNumberInputInputClass,
-  grNumberInputShellClass,
   type GrNumberInputControlsDirection,
   type GrNumberInputSize,
   type GrNumberInputState,
   type GrNumberInputTextAlign,
   paddingX,
-  shellShapeClass,
-  shellHeightClass,
 } from './grNumberInputStyles'
+import { grFieldLookAttrs } from '../GrInput/grFieldLook'
 import { addStep, bigStep } from './numberInputMath'
 import { useGrFormFieldContext } from '../shared/formFieldContext'
 import { useGrFormControl } from '../../composables/useGrFormControl'
@@ -333,14 +331,14 @@ const clearButtonStyle = computed(() => {
 const horizontalLeftControlsStyle = computed(() => addonStyle('left', prefixLen.value))
 const horizontalRightControlsStyle = computed(() => addonStyle('right', suffixLen.value))
 
-const shellClassName = computed(() => {
-  return grNumberInputShellClass({
-    disabled: isDisabled.value,
-    state: props.state,
-    invalid: isInvalid.value,
-    readonly: isReadonly.value,
-  })
-})
+const shellAttrs = computed(() => grFieldLookAttrs({
+  size: resolvedSize.value,
+  shape: resolvedShape.value,
+  state: props.state,
+  invalid: isInvalid.value,
+  disabled: isDisabled.value,
+  readonly: isReadonly.value,
+}))
 
 const inputClassName = computed(() => {
   return grNumberInputInputClass({
@@ -735,9 +733,9 @@ if (__GR_DEV__) {
 <template>
   <div
     data-gr-number-input
-    v-bind="aria.layoutAttrs()"
-    class="relative overflow-hidden border transition-colors duration-[var(--gr-duration-fast)] focus-within:ring-2 focus-within:ring-[calc(var(--gr-input-focus-ring-width))] focus-within:ring-[var(--gr-ring)]"
-    :class="[aria.ownsWidth() ? '' : 'w-full', shellShapeClass[resolvedShape][resolvedSize], shellHeightClass[resolvedSize], shellClassName]"
+    v-bind="{ ...aria.layoutAttrs(), ...shellAttrs }"
+    class="relative overflow-hidden"
+    :class="aria.ownsWidth() ? '' : 'w-full'"
   >
     <div
       v-if="$slots.prefix"
@@ -924,3 +922,14 @@ if (__GR_DEV__) {
     </div>
   </div>
 </template>
+
+<style>
+/*
+ * Рамку рисует лист поля (`GrInput`). Недоступное числовое поле гасится ролями
+ * недоступного контрола, а не приглушённой поверхностью, как остальные поля.
+ */
+[data-gr-number-input][data-gr-field][data-gr-off] {
+  background-color: var(--gr-disabled-bg);
+  color: var(--gr-disabled-fg);
+}
+</style>

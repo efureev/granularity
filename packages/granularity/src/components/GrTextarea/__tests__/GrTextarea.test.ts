@@ -2,8 +2,11 @@ import { mount } from '@vue/test-utils'
 import { defineComponent, nextTick } from 'vue'
 import { describe, expect, it } from 'vitest'
 
+import { componentSheet } from '../../../__tests__/componentSheet'
 import GrTextarea from '../GrTextarea.vue'
 
+/** Рамку рисует лист поля (`GrInput`), цвет текста — лист `GrTextarea`. */
+const { look } = componentSheet('GrInput/GrInput.vue', 'GrTextarea/GrTextarea.vue')
 describe('GrTextarea', () => {
   it('эмитит update:modelValue при вводе', async () => {
     const wrapper = mount(GrTextarea, {
@@ -29,8 +32,8 @@ describe('GrTextarea', () => {
     const textarea = wrapper.get('textarea')
 
     expect(textarea.attributes('aria-invalid')).toBe('true')
-    expect(textarea.attributes('class')).toContain('border-[var(--gr-invalid-brd)]')
-    expect(textarea.attributes('class')).toContain('focus-visible:ring-[var(--gr-invalid-ring)]')
+    expect(look(textarea.element)['border-color']).toBe('var(--gr-invalid-brd)')
+    expect(look(textarea.element, { focus: true })['box-shadow']).toContain('var(--gr-invalid-ring)')
   })
 
   it('уважает rows и state для валидного значения', () => {
@@ -45,8 +48,8 @@ describe('GrTextarea', () => {
     const textarea = wrapper.get('textarea')
 
     expect(textarea.attributes('rows')).toBe('6')
-    expect(textarea.attributes('class')).toContain('border-[var(--gr-warning)]')
-    expect(textarea.attributes('class')).toContain('focus-visible:ring-[var(--gr-warning)]')
+    expect(look(textarea.element)['border-color']).toBe('var(--gr-warning)')
+    expect(look(textarea.element, { focus: true })['box-shadow']).toContain('var(--gr-warning)')
   })
 })
 
@@ -115,8 +118,8 @@ describe('GrTextarea — паритет с GrInput', () => {
   it('disabled гасится токенами, а не прозрачностью', () => {
     const field = mount(GrTextarea, { props: { modelValue: '', disabled: true } }).get('textarea')
 
-    expect(field.classes()).toContain('bg-[var(--gr-muted)]')
-    expect(field.classes().some(cls => cls.startsWith('opacity-'))).toBe(false)
+    expect(look(field.element)).toMatchObject({ 'background-color': 'var(--gr-muted)', 'color': 'var(--gr-muted-fg)' })
+    expect(look(field.element).opacity).toBeUndefined()
   })
 
   it('readonly и size доходят до поля', () => {

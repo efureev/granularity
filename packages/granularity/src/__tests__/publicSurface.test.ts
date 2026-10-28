@@ -43,6 +43,7 @@ const ALLOWED_VALUES: Record<string, string> = {
   'GrFileUpload/GrUploadHttpError': 'то же',
   'GrFileUpload/FileValidationError': 'прилетает эмитом `error`; тот же класс, что в ./fileValidation',
   'GrForm/createGrFormMessageResolver': 'документирован в form-controls.md',
+  'GrInput/grFieldLookAttrs': 'документирован в field.md: рамку поля ставят компоненты ядра, спутников и приложения',
   'GrForm/getByPath': 'адресация модели: тот, кто строит правила снаружи, обязан читать модель так же, как форма',
   'GrForm/isEmpty': 'признак пустоты: своя копия разошлась бы с формой молча — правило `min` перестало бы срабатывать',
   'GrForm/runFieldRules': 'движок правил тестируется и переиспользуется отдельно',

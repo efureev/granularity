@@ -2,9 +2,13 @@ import { mount } from '@vue/test-utils'
 import { nextTick } from 'vue'
 import { describe, expect, it, vi } from 'vitest'
 
+import { componentSheet } from '../../../__tests__/componentSheet'
 import { granularityGlobal, mockRect } from '../../../testing'
 
 import GrInput from '../GrInput.vue'
+
+/** Рамку поля рисует лист `GrInput` по атрибутам оболочки. */
+const { look } = componentSheet('GrInput/GrInput.vue')
 
 describe('GrInput', () => {
   it('поддерживает size=xs', () => {
@@ -17,7 +21,7 @@ describe('GrInput', () => {
 
     // Высота ступени живёт на оболочке: рамка обязана входить в ступень, а не
     // прибавляться к ней сверху.
-    expect(wrapper.get('[data-gr-input] > div').classes()).toContain('h-7')
+    expect(look(wrapper.get('[data-gr-input] > div').element).height).toBe('1.75rem')
 
     const input = wrapper.get('input')
     expect(input.attributes('class')).toContain('px-2.5')
@@ -34,7 +38,7 @@ describe('GrInput', () => {
 
     // Высота ступени живёт на оболочке: рамка обязана входить в ступень, а не
     // прибавляться к ней сверху.
-    expect(wrapper.get('[data-gr-input] > div').classes()).toContain('h-11')
+    expect(look(wrapper.get('[data-gr-input] > div').element).height).toBe('2.75rem')
 
     const input = wrapper.get('input')
     expect(input.attributes('class')).toContain('px-4')
@@ -50,7 +54,7 @@ describe('GrInput', () => {
 
     // Высота ступени живёт на оболочке: рамка обязана входить в ступень, а не
     // прибавляться к ней сверху.
-    expect(wrapper.get('[data-gr-input] > div').classes()).toContain('h-10')
+    expect(look(wrapper.get('[data-gr-input] > div').element).height).toBe('2.5rem')
 
     const input = wrapper.get('input')
     expect(input.attributes('class')).toContain('px-3')
@@ -241,11 +245,11 @@ describe('GrInput — disabled', () => {
   // `opacity-50` разбавляла выверенные на AA токены текста: гасим фоном.
   it('гасится токенами фона, а не прозрачностью', () => {
     const wrapper = mount(GrInput, { props: { modelValue: 'x', disabled: true } })
-    const shell = wrapper.get('[data-gr-input] > div')
+    const shell = look(wrapper.get('[data-gr-input] > div').element)
 
-    expect(shell.classes()).toContain('bg-[var(--gr-muted)]')
-    expect(shell.classes()).toContain('cursor-not-allowed')
-    expect(shell.classes().some(cls => cls.startsWith('opacity-'))).toBe(false)
+    expect(shell['background-color']).toBe('var(--gr-muted)')
+    expect(shell.cursor).toBe('not-allowed')
+    expect(shell.opacity).toBeUndefined()
   })
 
   // Контраст сохраняем, но disabled обязан читаться как disabled: без этого
@@ -257,10 +261,7 @@ describe('GrInput — disabled', () => {
 
   it('включённое поле остаётся на фоне поверхности', () => {
     const wrapper = mount(GrInput, { props: { modelValue: 'x' } })
-    const shell = wrapper.get('[data-gr-input] > div')
-
-    expect(shell.classes()).toContain('bg-[var(--gr-bg)]')
-    expect(shell.classes()).not.toContain('bg-[var(--gr-muted)]')
+    expect(look(wrapper.get('[data-gr-input] > div').element)['background-color']).toBe('var(--gr-bg)')
   })
 })
 
@@ -531,7 +532,7 @@ describe('GrInput — форма рамки', () => {
   it('по умолчанию коробка: скругление шкалы контролов', () => {
     const wrapper = mount(GrInput, { props: { modelValue: '' } })
 
-    expect(shell(wrapper).classes()).toContain('rounded-[var(--gr-radius-control-md)]')
+    expect(look(shell(wrapper).element)['border-radius']).toBe('var(--gr-radius-control-md)')
     expect(wrapper.get('input').classes()).toContain('px-3')
   })
 
@@ -540,7 +541,7 @@ describe('GrInput — форма рамки', () => {
     // тянуть отступ за собой, иначе пилюля выглядит сломанной.
     const wrapper = mount(GrInput, { props: { modelValue: '', shape: 'pill' } })
 
-    expect(shell(wrapper).classes()).toContain('rounded-[var(--gr-radius-full)]')
+    expect(look(shell(wrapper).element)['border-radius']).toBe('var(--gr-radius-full)')
     expect(wrapper.get('input').classes()).toContain('px-5')
     expect(wrapper.get('input').classes()).not.toContain('px-3')
   })
@@ -550,13 +551,13 @@ describe('GrInput — форма рамки', () => {
       props: { modelValue: '' },
       global: granularityGlobal({ componentDefaults: { GrInput: { shape: 'pill' } } }),
     })
-    expect(shell(fromConfig).classes()).toContain('rounded-[var(--gr-radius-full)]')
+    expect(look(shell(fromConfig).element)['border-radius']).toBe('var(--gr-radius-full)')
 
     const overridden = mount(GrInput, {
       props: { modelValue: '', shape: 'box' },
       global: granularityGlobal({ componentDefaults: { GrInput: { shape: 'pill' } } }),
     })
-    expect(shell(overridden).classes()).toContain('rounded-[var(--gr-radius-control-md)]')
+    expect(look(shell(overridden).element)['border-radius']).toBe('var(--gr-radius-control-md)')
   })
 
   it('аддон-отсек в пилюле отодвигает поле на увеличенный отступ', () => {

@@ -49,6 +49,7 @@ import {
   type GrSelectVariant,
   type GrSelectView,
 } from './grSelectStyles'
+import { grFieldLookAttrs } from '../GrInput/grFieldLook'
 
 import IconCheck from '~icons/lucide/check'
 import IconChevronDown from '~icons/lucide/chevron-down'
@@ -931,6 +932,22 @@ const tagsRowClass = computed(() => [
   panelClearVisible.value ? 'pr-16' : 'pr-10',
 ])
 
+// Рамка поля — у нативного `<select>` и у триггера панели; у вида `link` рамки нет.
+// С чипами на месте триггер лежит под их рядом во всю высоту корня (`absolute
+// inset-0`), а высоту задаёт ряд: своей высоты ступени у рамки тогда нет — `area`.
+const fieldAttrs = computed(() => props.view === 'link'
+  ? {}
+  : grFieldLookAttrs({
+      kind: tagsLayout.value ? 'area' : 'line',
+      size: resolvedSize.value,
+      shape: resolvedShape.value,
+      state: props.state,
+      invalid: isInvalid.value,
+      disabled: isDisabled.value,
+      readonly: isReadonly.value,
+      trigger: true,
+    }))
+
 const triggerClassName = computed(() => {
   return grSelectTriggerClass({
     view: props.view,
@@ -1021,6 +1038,7 @@ const themeAttrs = useGrThemeAttrs()
       :aria-required="isRequired ? 'true' : undefined"
       :aria-readonly="isReadonly ? 'true' : undefined"
       :data-gr-select-empty="nativeShowsEmpty ? '' : undefined"
+      v-bind="isLinkNative ? {} : fieldAttrs"
       :class="isLinkNative ? grSelectLinkNativeOverlayClass : [baseClassName, nativeClassName]"
       :style="isLinkNative ? undefined : nativeEmptyStyle"
       @change="onChange"
@@ -1117,6 +1135,7 @@ const themeAttrs = useGrThemeAttrs()
       :aria-activedescendant="triggerActiveDescendant"
       :aria-expanded="open ? 'true' : 'false'"
       :aria-busy="loading ? 'true' : undefined"
+      v-bind="fieldAttrs"
       :class="[baseClassName, triggerClassName]"
       @click="toggleDropdown"
       @keydown="onComboKeydown"

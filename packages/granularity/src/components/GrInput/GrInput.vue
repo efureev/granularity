@@ -17,7 +17,8 @@ import { useGrFormControl } from '../../composables/useGrFormControl'
 import { useGranularityTranslations } from '../../internal/granularityI18n'
 import type { InputHTMLAttributes } from 'vue'
 
-import { addonInlinePrefixClass, addonInlineSuffixClass, addonSegmentPrefixClass, addonSegmentSuffixClass, grInputFieldClass, grInputShellClass, paddingX } from './grInputStyles'
+import { grFieldLookAttrs } from './grFieldLook'
+import { addonInlinePrefixClass, addonInlineSuffixClass, addonSegmentPrefixClass, addonSegmentSuffixClass, grInputFieldClass, paddingX } from './grInputStyles'
 
 import IconLoader from '~icons/lucide/loader-2'
 import IconX from '~icons/lucide/x'
@@ -332,8 +333,8 @@ const {
   trailingReserve: () => trailingReserve.value,
 })
 
-// Border/ring/disabled — на оболочке (`focus-within`), размеры/выравнивание — на инпуте.
-const shellClass = computed(() => grInputShellClass({
+// Рамка, кольцо и недоступность — на оболочке (`focus-within`), размеры и выравнивание — на инпуте.
+const shellAttrs = computed(() => grFieldLookAttrs({
   size: resolvedSize.value,
   state: props.state,
   invalid: isInvalid.value,
@@ -411,8 +412,10 @@ function togglePassword(): void {
 <template>
   <div data-gr-input :class="aria.ownsWidth() ? '' : 'w-full'" v-bind="aria.layoutAttrs()">
     <!-- `class` и `style` потребителя — на корне: он держит рамку и ширину.
-         На нативное поле уходит остальное — там `aria-*` и `data-*` что-то значат. -->
-    <div :class="shellClass">
+         На нативное поле уходит остальное — там `aria-*` и `data-*` что-то значат.
+         `overflow-hidden` обрезает отсек аддона по внешней дуге рамки: «скруглять
+         только внешние углы» получается само. -->
+    <div class="relative w-full overflow-hidden" v-bind="shellAttrs">
       <div
           v-if="$slots.prefix"
           :id="prefixId"
@@ -539,14 +542,149 @@ function togglePassword(): void {
   </div>
 </template>
 
-<style scoped>
+<style>
+/*
+ * Рамка поля — общая для всех полей экосистемы: её ставят атрибутами
+ * `grFieldLookAttrs` и `GrInput`, и `GrSelect`, и пикеры спутников
+ * (`docs/field.md`). Атрибуты взаимоисключающие там, где спорили бы: при ошибке
+ * подсветки `data-gr-state` нет, у недоступного нет «только для чтения».
+ */
+[data-gr-field] {
+  --gr-input-ring-color: var(--gr-ring);
+  border-width: 1px;
+  border-color: var(--gr-input);
+  background-color: var(--gr-bg);
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+  transition-duration: var(--gr-duration-fast);
+  transition-timing-function: var(--gr-ease-out);
+}
+
+[data-gr-field][data-gr-size='xs'] {
+  border-radius: var(--gr-radius-control-xs);
+}
+
+[data-gr-field][data-gr-size='sm'] {
+  border-radius: var(--gr-radius-control-sm);
+}
+
+[data-gr-field][data-gr-size='md'] {
+  border-radius: var(--gr-radius-control-md);
+}
+
+[data-gr-field][data-gr-size='lg'] {
+  border-radius: var(--gr-radius-control-lg);
+}
+
+[data-gr-field][data-gr-shape='pill'] {
+  border-radius: var(--gr-radius-full);
+}
+
+/* Ступень — внешняя высота: рамка входит в неё, а не прибавляется сверху. */
+[data-gr-field='line'][data-gr-size='xs'] {
+  height: 1.75rem;
+}
+
+[data-gr-field='line'][data-gr-size='sm'] {
+  height: 2rem;
+}
+
+[data-gr-field='line'][data-gr-size='md'] {
+  height: 2.5rem;
+}
+
+[data-gr-field='line'][data-gr-size='lg'] {
+  height: 2.75rem;
+}
+
+[data-gr-field='wrap'][data-gr-size='xs'] {
+  min-height: 1.75rem;
+}
+
+[data-gr-field='wrap'][data-gr-size='sm'] {
+  min-height: 2rem;
+}
+
+[data-gr-field='wrap'][data-gr-size='md'] {
+  min-height: 2.5rem;
+}
+
+[data-gr-field='wrap'][data-gr-size='lg'] {
+  min-height: 2.75rem;
+}
+
+/*
+ * Подсветка `state` — решение разработчика, ошибка — вердикт валидации, тема
+ * вправе развести их по цвету. Недоступность и «только чтение» гасят лишь рамку
+ * покоя: подсветка и ошибка остаются видны.
+ */
+[data-gr-field][data-gr-state='success'] {
+  --gr-input-ring-color: var(--gr-success);
+  border-color: var(--gr-success);
+}
+
+[data-gr-field][data-gr-state='warning'] {
+  --gr-input-ring-color: var(--gr-warning);
+  border-color: var(--gr-warning);
+}
+
+[data-gr-field][data-gr-state='danger'] {
+  --gr-input-ring-color: var(--gr-danger);
+  border-color: var(--gr-danger);
+}
+
+[data-gr-field][data-gr-invalid] {
+  --gr-input-ring-color: var(--gr-invalid-ring);
+  border-color: var(--gr-invalid-brd);
+}
+
+[data-gr-field][data-gr-readonly]:not([data-gr-state], [data-gr-invalid]) {
+  border-color: var(--gr-input-readonly-brd);
+}
+
+[data-gr-field][data-gr-off]:not([data-gr-state], [data-gr-invalid]) {
+  border-color: var(--gr-disabled-brd);
+}
+
+/*
+ * Отклик на указатель и фокус — только у рабочего поля без подсветки: у
+ * недоступного и у поля только для чтения рамке нечего обещать, а у ошибки и
+ * подсветки она — сообщение. Под указателем сфокусированное поле держит рамку
+ * фокуса.
+ */
+[data-gr-field]:not([data-gr-off], [data-gr-readonly], [data-gr-invalid], [data-gr-state]):hover:not(:focus-within) {
+  border-color: var(--gr-input-hover);
+}
+
+[data-gr-field]:not([data-gr-off], [data-gr-readonly], [data-gr-invalid], [data-gr-state]):focus-within {
+  border-color: var(--gr-input-focus-brd);
+}
+
+[data-gr-field]:not([data-gr-trigger]):focus-within,
+[data-gr-field][data-gr-trigger]:focus-visible {
+  box-shadow: 0 0 0 var(--gr-input-focus-ring-width) var(--gr-input-ring-color);
+}
+
+[data-gr-field][data-gr-readonly] {
+  background-color: var(--gr-input-readonly-bg);
+}
+
+/*
+ * Недоступное поле гасится подложкой, а не `opacity`: прозрачность разбавляет
+ * выверенные на AA роли текста.
+ */
+[data-gr-field][data-gr-off] {
+  background-color: var(--gr-muted);
+  color: var(--gr-muted-fg);
+  cursor: not-allowed;
+}
+
 /*
  * Свой крестик (`clearable`) — единственная кнопка очистки: Chromium и Safari
  * рисуют у `type="search"` ещё и нативный, и у поля их становилось два. Без
  * `clearable` нативный тоже не нужен — он есть не во всех браузерах.
  */
-input[type='search']::-webkit-search-cancel-button,
-input[type='search']::-webkit-search-decoration {
+[data-gr-input] input[type='search']::-webkit-search-cancel-button,
+[data-gr-input] input[type='search']::-webkit-search-decoration {
   -webkit-appearance: none;
   appearance: none;
 }

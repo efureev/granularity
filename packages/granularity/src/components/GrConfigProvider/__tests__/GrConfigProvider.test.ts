@@ -25,6 +25,7 @@ import { resetGrZIndexOwner } from '../zIndexScale'
 import { componentSheet } from '../../../__tests__/componentSheet'
 
 const { look: badgeLook } = componentSheet('GrBadge/GrBadge.vue')
+const { look: fieldLook } = componentSheet('GrInput/GrInput.vue')
 
 // Тестовый потребитель конфига: рендерит разрешённый размер и дефолтные пропсы.
 const Consumer = defineComponent({
@@ -211,7 +212,7 @@ describe('componentDefaults: дефолтные пропсы по компоне
 
     // Кнопке достался точечный xs, инпуту — глобальный lg.
     expect(wrapper.get('[data-gr-button]').attributes('data-gr-size')).toBe('xs')
-    expect(wrapper.get('[data-gr-input] > div').classes().join(' ')).toContain('h-11')
+    expect(fieldLook(wrapper.get('[data-gr-input] > div').element).height).toBe('2.75rem')
   })
 
   it('работает для GrBadge и GrInput', () => {

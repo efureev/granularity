@@ -1,43 +1,31 @@
 import { describe, expect, it } from 'vitest'
 
-import { selectSizeClassBySize } from '../components/GrSelect/grSelectStyles'
-import { triggerSizeClassBySize } from '../components/GrColorPicker/grColorPickerStyles'
-import { shellHeightClass as inputHeights } from '../components/GrInput/grInputStyles'
-import { shellHeightClass as numberInputHeights } from '../components/GrNumberInput/grNumberInputStyles'
+import { grFieldLookAttrs } from '../components/GrInput/grFieldLook'
+import type { GrFieldKind } from '../components/GrInput/grFieldLook'
 import { componentSheet, lookElement } from './componentSheet'
-import { sizeClassBySize as treeSelectSizes } from '../components/GrTreeSelect/grTreeSelectStyles'
 import { GR_COMPONENT_SIZES, GR_CONTROL_HEIGHTS_PX } from '../components/shared/sizes'
 
 /**
  * Одна линейка высот на все контролы формы.
  *
- * Высота у них выражена по-разному: у поля это утилита `h-10`, у `GrSegmented`
- * она складывается из высоты сегмента и поля дорожки с двух сторон. Пока числа
- * жили порознь, дорожка была выше поля той же ступени на 4–10 px, причём
- * по-разному на каждой ступени, — и увидеть это можно было только поставив их
- * рядом в одну строку.
+ * Высота у них выражена по-разному: рамку поля рисует лист `GrInput` по атрибутам
+ * (`data-gr-field`, `data-gr-size`), и его ставят все поля ядра и спутников, а у
+ * `GrSegmented` она складывается из высоты сегмента и поля дорожки с двух сторон.
+ * Пока числа жили порознь, дорожка была выше поля той же ступени на 4–10 px,
+ * причём по-разному на каждой ступени, — и увидеть это можно было только
+ * поставив их рядом в одну строку.
  */
-function heightFromUtility(classes: string): number {
-  const match = /\bh-(\d+)\b/.exec(classes)
-  if (!match)
-    throw new Error(`в «${classes}» нет утилиты высоты`)
-
-  // Шаг шкалы uno — 4px: `h-10` это 40px.
-  return Number(match[1]) * 4
-}
-
 const TRACK_BORDER_PX = 2
 
 function px(value: string): number {
   return Number.parseFloat(value)
 }
 
-const utilityControls: Record<string, Record<string, string>> = {
-  GrInput: inputHeights,
-  GrSelect: selectSizeClassBySize,
-  GrNumberInput: numberInputHeights,
-  GrTreeSelect: treeSelectSizes,
-  GrColorPicker: triggerSizeClassBySize,
+const field = componentSheet('GrInput/GrInput.vue')
+/** Высота рамки поля ступени `size` — точная у `line`, минимальная у `wrap`; в px. */
+function fieldHeight(size: typeof GR_COMPONENT_SIZES[number], kind: GrFieldKind): number {
+  const style = field.cascade(lookElement('div', grFieldLookAttrs({ size, kind })))
+  return px(style[kind === 'line' ? 'height' : 'min-height']) * 16
 }
 
 const { cascade } = componentSheet('GrSegmented/GrSegmented.vue')
@@ -45,14 +33,20 @@ const { cascade } = componentSheet('GrSegmented/GrSegmented.vue')
 const segmentedTrack = (size: typeof GR_COMPONENT_SIZES[number]) => cascade(lookElement('div', { 'data-gr-segmented': '', 'data-gr-size': size }))
 
 describe('линейка высот контролов', () => {
-  for (const [name, map] of Object.entries(utilityControls)) {
-    it(`${name} держит высоту шкалы на каждой ступени`, () => {
-      for (const size of GR_COMPONENT_SIZES) {
-        expect(heightFromUtility(map[size]), `${name} / ${size}`)
-          .toBe(GR_CONTROL_HEIGHTS_PX[size])
-      }
+  for (const kind of ['line', 'wrap'] as const) {
+    it(`рамка поля \`${kind}\` держит высоту шкалы на каждой ступени`, () => {
+      for (const size of GR_COMPONENT_SIZES)
+        expect(fieldHeight(size, kind), `${kind} / ${size}`).toBe(GR_CONTROL_HEIGHTS_PX[size])
     })
   }
+
+  it('у многострочной рамки высоты ступени нет', () => {
+    for (const size of GR_COMPONENT_SIZES) {
+      const style = field.cascade(lookElement('div', grFieldLookAttrs({ size, kind: 'area' })))
+      expect(style.height, size).toBeUndefined()
+      expect(style['min-height'], size).toBeUndefined()
+    }
+  })
 
   it('внешняя высота дорожки GrSegmented равна высоте поля', () => {
     for (const size of GR_COMPONENT_SIZES) {

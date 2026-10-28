@@ -2861,6 +2861,13 @@ export const grComponentTokens: GrComponentToken[] = [
     "description": "Focus-ring внутри просмотрщика: общий `--gr-ring` на тёмном хроме не читается."
   },
   {
+    "owner": "GrInput",
+    "name": "--gr-input-ring-color",
+    "kind": "css",
+    "default": "var(--gr-ring); у подсветки — роль тона, у ошибки — `--gr-invalid-ring`",
+    "description": "Цвет кольца фокуса рамки поля (`data-gr-field`). Ставит лист `GrInput` по подсветке и ошибке, кольцо читает его одно на все состояния."
+  },
+  {
     "owner": "GrJsonViewer",
     "name": "--gr-json-viewer-bg",
     "kind": "hook",

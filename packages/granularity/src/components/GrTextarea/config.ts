@@ -4,5 +4,6 @@ import { grTextareaSafelist } from './safelist'
 
 export const grTextareaConfig = defineGranumComponent(import.meta.url, {
   name: 'GrTextarea',
+  dependencies: ['GrInput'],
   safelist: grTextareaSafelist,
 })

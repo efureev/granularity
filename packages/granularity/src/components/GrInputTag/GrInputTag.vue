@@ -36,6 +36,7 @@ import {
   type GrInputTagSize,
   type GrInputTagState,
 } from './grInputTagStyles'
+import { grFieldLookAttrs } from '../GrInput/grFieldLook'
 import { useControlAria } from '../../composables/internal/useControlAria'
 
 export type { GrInputTagSize, GrInputTagState } from './grInputTagStyles'
@@ -891,15 +892,19 @@ function onPaste(e: ClipboardEvent): void {
   })
 }
 
-const wrapperClassName = computed(() => {
-  return grInputTagWrapperClass({
+const wrapperClassName = computed(() => grInputTagWrapperClass({ size: resolvedSize.value, disabled: isDisabled.value }))
+
+const wrapperAttrs = computed(() => ({
+  ...aria.rootAttrs(),
+  ...grFieldLookAttrs({
+    kind: 'wrap',
     size: resolvedSize.value,
     state: props.state,
     invalid: isInvalid.value,
     disabled: isDisabled.value,
     readonly: isReadonly.value,
-  })
-})
+  }),
+}))
 
 const inputClassName = computed(() => grInputTagInputClass(resolvedSize.value))
 
@@ -936,7 +941,7 @@ if (__GR_DEV__) {
     data-gr-input-tag
     data-testid="gr-input-tag"
     :class="[wrapperClassName, aria.ownsWidth() ? '' : 'w-full']"
-    v-bind="aria.rootAttrs()"
+    v-bind="wrapperAttrs"
     @click="focus"
     @focusin="onFocusIn"
     @focusout="onFocusOut"

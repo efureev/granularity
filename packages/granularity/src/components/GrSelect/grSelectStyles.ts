@@ -1,5 +1,5 @@
 import type { GrControlShape } from '../shared/controlShape'
-import { controlPillPaddingXClass, controlShapeRadiusClass, fieldBorderClass, fieldBorderResponseClass, fieldBorderStateClass, fieldReadonlySurfaceClass } from '../shared/controlShape'
+import { controlPillPaddingXClass } from '../shared/controlShape'
 
 import type { GrComponentSize, GrControlState } from '../shared/sizes'
 import { overlayListPanelClass } from '../shared/overlayListPanel'
@@ -52,33 +52,16 @@ export type GrSelectOptionOrGroup<TValue extends GrSelectValue = string>
     | GrSelectOptionGroup<TValue>
 export type GrSelectModelValue<TValue extends GrSelectValue = string> = TValue | TValue[]
 
-/** Скругление приходит формой, поэтому здесь его нет. */
-export const defaultBaseClass = 'w-full border text-[var(--gr-fg)] transition-colors duration-[var(--gr-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[calc(var(--gr-input-focus-ring-width))] focus-visible:ring-[var(--gr-ring)]'
+/** Рамку, её высоту, скругление и кольцо рисует лист поля (`GrInput`) по атрибутам триггера. */
+export const defaultBaseClass = 'w-full text-[var(--gr-fg)] focus:outline-none'
 
-/**
- * Цвет рамки по состоянию — та же карта, что у `GrInput` и `GrTextarea`: поля
- * одной формы обязаны показывать ошибку одинаково.
- */
-export const borderClassByState: Record<GrSelectState, string> = {
-  default: fieldBorderClass,
-  success: 'border-[var(--gr-success)] focus-visible:ring-[var(--gr-success)]',
-  warning: 'border-[var(--gr-warning)] focus-visible:ring-[var(--gr-warning)]',
-  danger: 'border-[var(--gr-danger)] focus-visible:ring-[var(--gr-danger)]',
-}
-
-/**
- * Ошибка валидации красится своей ролью, а не декоративным тоном `danger`:
- * `state="danger"` — это подсветка по решению разработчика, `invalid` — вердикт
- * валидации, и тема вправе развести их по цвету.
- */
-export const invalidBorderClass = 'border-[var(--gr-invalid-brd)] focus-visible:ring-[var(--gr-invalid-ring)]'
 export const linkBaseClass = 'cursor-pointer inline-block w-auto align-baseline appearance-none bg-transparent border border-transparent px-0 py-0 rounded-[var(--gr-radius-control)] transition-colors duration-[var(--gr-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]'
 
 export const selectSizeClassBySize: Record<GrSelectSize, string> = {
-  xs: 'h-7 text-[length:var(--gr-control-text-xs)] leading-[var(--gr-control-leading-xs)]',
-  sm: 'h-8 text-[length:var(--gr-control-text-sm)] leading-[var(--gr-control-leading-sm)]',
-  md: 'h-10 text-[length:var(--gr-control-text-md)] leading-[var(--gr-control-leading-md)]',
-  lg: 'h-11 text-[length:var(--gr-control-text-lg)] leading-[var(--gr-control-leading-lg)]',
+  xs: 'text-[length:var(--gr-control-text-xs)] leading-[var(--gr-control-leading-xs)]',
+  sm: 'text-[length:var(--gr-control-text-sm)] leading-[var(--gr-control-leading-sm)]',
+  md: 'text-[length:var(--gr-control-text-md)] leading-[var(--gr-control-leading-md)]',
+  lg: 'text-[length:var(--gr-control-text-lg)] leading-[var(--gr-control-leading-lg)]',
 }
 
 /**
@@ -235,16 +218,8 @@ export function grSelectClass(options: {
   return [
     (options.grows ? selectGrowSizeClassBySize : selectSizeClassBySize)[options.size],
     selectPaddingXClass[options.shape][options.size],
-    controlShapeRadiusClass[options.shape][options.size],
-    // `invalid` сильнее `state`: ошибка перекрывает любую другую подсветку.
-    fieldBorderStateClass(options, invalidBorderClass, borderClassByState),
-    fieldBorderResponseClass(options),
-    // Заливка — здесь, а не в базовом классе: у поля только для чтения она своя,
-    // а два `bg-*` одной специфичности разрулил бы порядок правил.
-    options.readonly ? fieldReadonlySurfaceClass : 'bg-[var(--gr-bg)]',
-    // Заблокированный контрол гасится фоном и цветом текста, а не `opacity`:
-    // прозрачность разбавляет выверенные на AA токены и роняет контраст.
-    'disabled:cursor-not-allowed disabled:bg-[var(--gr-muted)] disabled:text-[var(--gr-muted-fg)]',
+    // Цвет текста — утилитой и у недоступного: `docs/field.md`.
+    'disabled:text-[var(--gr-muted-fg)]',
   ].filter(Boolean).join(' ')
 }
 

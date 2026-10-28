@@ -6,6 +6,9 @@ import GrSelect from '../GrSelect.vue'
 import { componentSheet } from '../../../__tests__/componentSheet'
 
 const { look: chipLook } = componentSheet('GrBadge/GrBadge.vue', 'GrChip/GrChip.vue')
+/** Рамку поля рисует лист `GrInput` по атрибутам `<select>` и триггера. */
+const { look: fieldLook } = componentSheet('GrInput/GrInput.vue')
+const border = (element: { element: Element }, property = 'border-color') => fieldLook(element.element)[property]
 
 function getTeleportedElement<T extends Element = HTMLElement>(selector: string): T {
   const element = document.body.querySelector(selector)
@@ -34,7 +37,7 @@ describe('GrSelect', () => {
     })
 
     const select = wrapper.get('select')
-    expect(select.attributes('class')).toContain('h-7')
+    expect(border(select, 'height')).toBe('1.75rem')
     expect(select.attributes('class')).toContain('px-2.5')
     expect(select.attributes('class')).toContain('text-[length:var(--gr-control-text-xs)]')
   })
@@ -112,7 +115,7 @@ describe('GrSelect', () => {
     })
 
     const defaultSelect = defaultWrapper.get('select')
-    expect(defaultSelect.attributes('class')).toContain('border-[var(--gr-input)]')
+    expect(border(defaultSelect)).toBe('var(--gr-input)')
   })
 
   it('в native-режиме добавляет option для modelValue, которого нет в options, когда allowCustomValue=true', () => {
@@ -1049,26 +1052,25 @@ describe('GrSelect — визуальное состояние', () => {
 
   it('invalid красит рамку, а не только объявляет ошибку', () => {
     const plain = mount(GrSelect, { props: { modelValue: 'a', options } })
-    expect(plain.get('select').classes()).toContain('border-[var(--gr-input)]')
+    expect(border(plain.get('select'))).toBe('var(--gr-input)')
 
     const invalid = mount(GrSelect, { props: { modelValue: 'a', options, invalid: true } })
     const select = invalid.get('select')
 
     expect(select.attributes('aria-invalid')).toBe('true')
     // Раньше ошибка была слышна диктору, но не видна глазами.
-    expect(select.classes()).toContain('border-[var(--gr-invalid-brd)]')
+    expect(border(select)).toBe('var(--gr-invalid-brd)')
   })
 
   it('state задаёт оттенок рамки, invalid его перебивает', () => {
     const success = mount(GrSelect, { props: { modelValue: 'a', options, state: 'success' } })
-    expect(success.get('select').classes()).toContain('border-[var(--gr-success)]')
+    expect(border(success.get('select'))).toBe('var(--gr-success)')
 
     const warning = mount(GrSelect, { props: { modelValue: 'a', options, state: 'warning' } })
-    expect(warning.get('select').classes()).toContain('border-[var(--gr-warning)]')
+    expect(border(warning.get('select'))).toBe('var(--gr-warning)')
 
     const both = mount(GrSelect, { props: { modelValue: 'a', options, state: 'success', invalid: true } })
-    expect(both.get('select').classes()).toContain('border-[var(--gr-invalid-brd)]')
-    expect(both.get('select').classes()).not.toContain('border-[var(--gr-success)]')
+    expect(border(both.get('select'))).toBe('var(--gr-invalid-brd)')
   })
 
   it('в панельном режиме состояние достаётся триггеру', async () => {
@@ -1077,7 +1079,7 @@ describe('GrSelect — визуальное состояние', () => {
       attachTo: document.body,
     })
 
-    expect(wrapper.get('[data-gr-select-trigger]').classes()).toContain('border-[var(--gr-invalid-brd)]')
+    expect(border(wrapper.get('[data-gr-select-trigger]'))).toBe('var(--gr-invalid-brd)')
     wrapper.unmount()
   })
 
@@ -1086,7 +1088,7 @@ describe('GrSelect — визуальное состояние', () => {
       props: { modelValue: 'a', options, view: 'link', state: 'danger', invalid: true },
     })
 
-    expect(wrapper.get('select').classes().some(cls => cls.startsWith('border-[var(--gr-danger)'))).toBe(false)
+    expect(wrapper.get('select').attributes('data-gr-field')).toBeUndefined()
   })
 })
 

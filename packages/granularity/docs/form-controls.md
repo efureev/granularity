@@ -26,7 +26,8 @@
 
 `invalid` — свой или пришедший из ошибки `GrFormField` — это и `aria-invalid`, и
 вид: каждый контрол красит то, что его обрамляет, ролями ошибки
-`--gr-invalid-brd` и `--gr-invalid-ring`. Поля ввода и списки — рамку;
+`--gr-invalid-brd` и `--gr-invalid-ring`. Поля ввода и списки — рамку (её рисует общий лист поля,
+[`field.md`](./field.md));
 `GrSlider` — заливку и рамку бегунка; `GrSwitch` — рамку дорожки; `GrSegmented`
 — рамку дорожки; `GrFileUpload` — рамку зоны; `GrTransfer` — рамку списка
 выбранного; `GrChipGroup` — рамку невыбранных чипов; `GrRating` — пустые

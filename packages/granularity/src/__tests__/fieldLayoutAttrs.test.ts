@@ -89,7 +89,7 @@ describe('class и style потребителя — на корне контро
     }
   })
 
-  it('GrTextarea без счётчика: класс потребителя на обёртке не стирает классы поля', () => {
+  it('GrTextarea без счётчика: класс потребителя на обёртке не стирает вид поля', () => {
     const wrapper = mount(GrTextarea, { props: { modelValue: '' }, attrs: { class: 'mt-2', style: 'width: 200px' } })
     const root = wrapper.element as HTMLElement
     const field = root.querySelector('textarea')!
@@ -98,7 +98,8 @@ describe('class и style потребителя — на корне контро
     expect(root.classList.contains('mt-2')).toBe(true)
     expect(root.style.width).toBe('200px')
     expect(root.classList.contains('w-full')).toBe(false)
-    expect(field.classList.contains('border')).toBe(true)
+    expect(field.getAttribute('data-gr-field')).toBe('area')
+    expect(field.classList.contains('focus:outline-none')).toBe(true)
     expect(field.classList.contains('mt-2')).toBe(false)
   })
 })

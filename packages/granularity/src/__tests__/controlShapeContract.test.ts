@@ -7,7 +7,7 @@ import GrInput from '../components/GrInput/GrInput.vue'
 import GrNumberInput from '../components/GrNumberInput/GrNumberInput.vue'
 import GrSelect from '../components/GrSelect/GrSelect.vue'
 import GrTreeSelect from '../components/GrTreeSelect/GrTreeSelect.vue'
-import { controlShapeRadiusClass } from '../components/shared/controlShape'
+import { componentSheet } from './componentSheet'
 import { granularityGlobal } from '../testing'
 
 /**
@@ -20,40 +20,38 @@ import { granularityGlobal } from '../testing'
  * `GrAutocomplete`, `GrInputTag`) сюда не входят намеренно — см. их доки.
  */
 /**
- * `shaped` — элемент, несущий форму. Нужен там, где тот же радиус встречается в
- * разметке ещё раз и проверка по всему поддереву зеленела бы впустую: у
- * `GrColorPicker` `--gr-radius-full` носит ползунок области цвета.
+ * Форму несёт рамка поля — элемент с атрибутами `grFieldLookAttrs`, — и рисует её
+ * лист `GrInput`: скругление проверяется каскадом листа на этой рамке.
  */
-const controls: { name: string, shaped?: string, render: (shape?: 'box' | 'pill') => unknown }[] = [
+const { look } = componentSheet('GrInput/GrInput.vue')
+const BOX_MD = 'var(--gr-radius-control-md)'
+const PILL = 'var(--gr-radius-full)'
+
+const controls: { name: string, render: (shape?: 'box' | 'pill') => unknown }[] = [
   { name: 'GrInput', render: shape => h(GrInput, { modelValue: '', shape }) },
   { name: 'GrSelect', render: shape => h(GrSelect, { modelValue: '', options: [], shape }) },
   { name: 'GrNumberInput', render: shape => h(GrNumberInput, { modelValue: null, shape }) },
   { name: 'GrTreeSelect', render: shape => h(GrTreeSelect, { modelValue: '', data: [], shape }) },
-  {
-    name: 'GrColorPicker',
-    shaped: '[data-gr-color-picker-trigger]',
-    render: shape => h(GrColorPicker, { modelValue: '#3b82f6', shape }),
-  },
+  { name: 'GrColorPicker', render: shape => h(GrColorPicker, { modelValue: '#3b82f6', shape }) },
 ]
 
 describe('контракт формы рамки', () => {
   for (const control of controls) {
     describe(control.name, () => {
-      const markup = (wrapper: ReturnType<typeof mount>): string =>
-        control.shaped ? wrapper.get(control.shaped).classes().join(' ') : wrapper.html()
+      const radius = (wrapper: ReturnType<typeof mount>): string => look(wrapper.get('[data-gr-field]').element)['border-radius']
 
       it('по умолчанию — коробка со скруглением шкалы контролов', () => {
         const wrapper = mount({ render: () => control.render() })
 
-        expect(markup(wrapper)).toContain(controlShapeRadiusClass.box.md)
+        expect(radius(wrapper)).toBe(BOX_MD)
       })
 
       it('shape="pill" меняет скругление коробки', () => {
         const box = mount({ render: () => control.render('box') })
         const pill = mount({ render: () => control.render('pill') })
 
-        expect(markup(pill)).toContain(controlShapeRadiusClass.pill.md)
-        expect(markup(pill), 'коробка и пилюля отрисовались одинаково').not.toBe(markup(box))
+        expect(radius(box)).toBe(BOX_MD)
+        expect(radius(pill)).toBe(PILL)
       })
 
       it('форма приходит из componentDefaults', () => {
@@ -62,7 +60,7 @@ describe('контракт формы рамки', () => {
           { global: granularityGlobal({ componentDefaults: { [control.name]: { shape: 'pill' } } }) },
         )
 
-        expect(markup(wrapper)).toContain(controlShapeRadiusClass.pill.md)
+        expect(radius(wrapper)).toBe(PILL)
       })
     })
   }

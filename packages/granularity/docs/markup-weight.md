@@ -64,7 +64,8 @@ CSS уменьшился тоже: утилита с произвольным з
 - Атрибуты собирает одна функция рядом с компонентом (`grButtonLookAttrs` в
   `grButtonStyles.ts`). Ею же пользуется компонент, который рисуется тем же видом:
   `GrRadio` в виде кнопки берёт атрибуты кнопки и получает её лист, `GrChip` берёт у
-  `GrBadge` атрибуты палитры. Импорт функции — то ребро зависимости, по которому лист
+  `GrBadge` атрибуты палитры, все поля — рамку поля у `GrInput` (`grFieldLookAttrs`,
+  [`field.md`](./field.md)). Импорт функции — то ребро зависимости, по которому лист
   соседа приезжает в приложение (`config.dependencies`). Правила, которые читают
   переменные соседа, живут в листе соседа: `granum doctor` считает объявленным только
   своё, и чип, читающий `--gr-badge-tone-*` из своего листа, получил бы
@@ -180,7 +181,9 @@ granum доставляет его в слой `granum.components` (`ADDING_COMP
 ## Кто уже на листе
 
 `GrButton` (и `GrRadio` в виде кнопки), `GrBadge`, `GrChip`, `GrCheckbox`, `GrSwitch`,
-`GrRadio`, `GrTabs`, `GrPagination`, `GrSegmented`.
+`GrRadio`, `GrTabs`, `GrPagination`, `GrSegmented`. Рамка поля — общий лист `GrInput` для
+`GrInput`, `GrTextarea`, `GrNumberInput`, `GrSelect`, `GrAutocomplete`, `GrInputTag`,
+`GrTreeSelect`, триггера `GrColorPicker` и полей спутников ([`field.md`](./field.md)).
 
 ## Как проверить, что вид не изменился
 

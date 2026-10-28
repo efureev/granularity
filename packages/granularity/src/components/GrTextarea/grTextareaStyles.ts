@@ -1,22 +1,7 @@
 import type { GrComponentSize, GrControlState } from '../shared/sizes'
-import { fieldBorderClass, fieldBorderResponseClass, fieldBorderStateClass } from '../shared/controlShape'
 
 export type GrTextareaState = GrControlState
 export type GrTextareaSize = GrComponentSize
-
-export const borderClassByState: Record<GrTextareaState, string> = {
-  default: fieldBorderClass,
-  success: 'border-[var(--gr-success)] focus-visible:ring-[var(--gr-success)]',
-  warning: 'border-[var(--gr-warning)] focus-visible:ring-[var(--gr-warning)]',
-  danger: 'border-[var(--gr-danger)] focus-visible:ring-[var(--gr-danger)]',
-}
-
-/**
- * Ошибка валидации красится своей ролью, а не декоративным тоном `danger`:
- * `state="danger"` — это подсветка по решению разработчика, `invalid` — вердикт
- * валидации, и тема вправе развести их по цвету.
- */
-export const invalidBorderClass = 'border-[var(--gr-invalid-brd)] focus-visible:ring-[var(--gr-invalid-ring)]'
 
 /**
  * Кегль совпадает с `GrInput` на каждой ступени: поле ввода и текстовая область
@@ -39,15 +24,6 @@ export const resizeClass: Record<GrTextareaResize, string> = {
   both: 'resize',
 }
 
-export const enabledSurfaceClass = 'bg-[var(--gr-bg)]'
-
-/**
- * Заблокированное поле гасится фоном, а не `opacity`: прозрачность разбавляет
- * выверенные на AA токены текста. Классы взаимоисключающие — два `bg-*` одной
- * специфичности разрулил бы порядок в сгенерированном CSS.
- */
-export const disabledSurfaceClass = 'bg-[var(--gr-muted)] text-[var(--gr-muted-fg)] cursor-not-allowed'
-
 /**
  * Ряд счётчиков под полем: слева строки, справа символы. Обе подписи — один
  * визуальный уровень, поэтому кегль и цвет у них общие (`countClass`).
@@ -58,10 +34,3 @@ export const countRowClass = 'mt-1 flex items-baseline justify-between gap-3'
 export const lineCountClass = 'text-[length:var(--gr-control-text-xs)] leading-[var(--gr-leading-xs)] text-[var(--gr-muted-fg)] tabular-nums'
 
 export const countClass = 'mt-1 text-right text-[length:var(--gr-control-text-xs)] leading-[var(--gr-leading-xs)] text-[var(--gr-muted-fg)] tabular-nums'
-
-export function grTextareaClass(options: { state: GrTextareaState, invalid: boolean, disabled: boolean, readonly?: boolean }): string {
-  return [
-    fieldBorderStateClass(options, invalidBorderClass, borderClassByState),
-    fieldBorderResponseClass(options),
-  ].filter(Boolean).join(' ')
-}

@@ -12,7 +12,7 @@ const componentsDir = resolve(pkgDir, 'src/components')
 export type DependencyKind
   /** Модуль импортирует компонент соседа — статически или через `import()`. */
   = | 'component'
-    /** Модуль подмешивает себе safelist или строки классов соседа. */
+    /** Модуль подмешивает себе safelist, строки классов или атрибуты вида соседа (его лист). */
     | 'styles'
 
 export interface DependencyUsage {
@@ -127,7 +127,7 @@ export function parseDependencyUsages(
   }
 
   for (const [, typeOnly, clause, dependency, subpath] of code.matchAll(NAMED_IMPORT)) {
-    if (typeOnly || !/safelist|Styles/i.test(subpath))
+    if (typeOnly || !/safelist|Styles|Look/i.test(subpath))
       continue
     const hasValue = clause.split(',').some(name => name.trim() && !name.trim().startsWith('type '))
     if (hasValue)

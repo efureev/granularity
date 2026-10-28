@@ -13,6 +13,6 @@ export const grAutocompleteConfig = defineGranumComponent(import.meta.url, {
    * внутри модалки, встаёт над ней.
    */
   dynamicTokens: ['gr-z-dropdown', 'gr-z-modal'],
-  dependencies: ['GrChip'],
+  dependencies: ['GrChip', 'GrInput'],
   safelist: grAutocompleteSafelist,
 })

@@ -2,6 +2,7 @@ import { mount } from '@vue/test-utils'
 import { defineComponent, nextTick, ref } from 'vue'
 import { describe, expect, it, vi } from 'vitest'
 
+import { componentSheet } from '../../../__tests__/componentSheet'
 import GrNumberInput from '../GrNumberInput.vue'
 import { granularityGlobal, mockRect, pointer, press } from '../../../testing'
 
@@ -14,6 +15,8 @@ async function type(input: ReturnType<ReturnType<typeof mount>['get']>, text: st
   await input.trigger('input')
 }
 
+/** Рамку рисует лист поля (`GrInput`), недоступную подложку — лист `GrNumberInput`. */
+const { look } = componentSheet('GrInput/GrInput.vue', 'GrNumberInput/GrNumberInput.vue')
 describe('GrNumberInput', () => {
   it('санитизирует ввод: оставляет только цифры и один дробный разделитель', async () => {
     const wrapper = mount(GrNumberInput, {
@@ -50,7 +53,7 @@ describe('GrNumberInput', () => {
     })
 
     const input = wrapper.get('input')
-    expect(wrapper.get('[data-gr-number-input]').classes()).toContain('h-10')
+    expect(look(wrapper.get('[data-gr-number-input]').element).height).toBe('2.5rem')
     expect(input.attributes('class')).toContain('px-3')
     expect(input.attributes('class')).toContain('text-center')
   })
@@ -91,7 +94,7 @@ describe('GrNumberInput', () => {
     })
 
     expect(wrapper.attributes('class')).toContain('overflow-hidden')
-    expect(wrapper.attributes('class')).toContain('rounded-[var(--gr-radius-control-md)]')
+    expect(look(wrapper.element)['border-radius']).toBe('var(--gr-radius-control-md)')
   })
 
   it('учитывает suffix + controls: добавляет padding-right под оба аддона', () => {
@@ -541,7 +544,7 @@ describe('GrNumberInput — озвучивание, очистка и событ
     const wrapper = mount(GrNumberInput, { props: { modelValue: 1, disabled: true, controls: true } })
 
     expect(wrapper.html()).not.toMatch(/opacity-\d/)
-    expect(wrapper.get('[data-gr-number-input]').classes()).toContain('text-[var(--gr-disabled-fg)]')
+    expect(look(wrapper.get('[data-gr-number-input]').element)).toMatchObject({ 'color': 'var(--gr-disabled-fg)', 'background-color': 'var(--gr-disabled-bg)' })
   })
 })
 

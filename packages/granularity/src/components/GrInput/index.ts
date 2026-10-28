@@ -7,6 +7,8 @@ export { grInputConfig } from './config'
 // Реэкспорт затягивает `defaults.ts` (и его аугментацию реестра) к потребителю.
 export type { GrInputConfigurableProps } from './defaults'
 
+export { grFieldLookAttrs } from './grFieldLook'
+export type { GrFieldKind, GrFieldLookOptions } from './grFieldLook'
 export type { GrInputSize, GrInputTextAlign } from './GrInput.vue'
 export { grInputSafelist } from './safelist'
 export type { GrInputProps } from './GrInput.vue'

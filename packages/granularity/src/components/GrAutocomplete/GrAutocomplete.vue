@@ -38,6 +38,7 @@ import {
   type GrAutocompleteValue,
   type GrAutocompleteSize,
 } from './grAutocompleteStyles'
+import { grFieldLookAttrs } from '../GrInput/grFieldLook'
 
 import IconCheck from '~icons/lucide/check'
 import IconChevronDown from '~icons/lucide/chevron-down'
@@ -751,7 +752,8 @@ const themeAttrs = useGrThemeAttrs()
   >
     <div
       data-gr-autocomplete-shell
-      :class="autocompleteShellClass({ size: resolvedSize, disabled: isDisabled, invalid: isInvalid, readonly: isReadonly })"
+      :class="autocompleteShellClass({ size: resolvedSize, disabled: isDisabled })"
+      v-bind="grFieldLookAttrs({ kind: 'wrap', size: resolvedSize, invalid: isInvalid, disabled: isDisabled, readonly: isReadonly })"
       @mousedown.self.prevent="focusInput"
     >
       <span

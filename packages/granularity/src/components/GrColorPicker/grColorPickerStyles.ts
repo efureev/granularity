@@ -1,5 +1,5 @@
 import type { GrControlShape } from '../shared/controlShape'
-import { controlPillPaddingXClass, controlShapeRadiusClass, fieldBorderClass, fieldBorderStateClass } from '../shared/controlShape'
+import { controlPillPaddingXClass } from '../shared/controlShape'
 
 import type { GrComponentSize } from '../shared/sizes'
 
@@ -10,10 +10,10 @@ export type GrColorPickerSize = GrComponentSize
  * с `GrInput`, и своя лестница высот выдала бы его из ряда.
  */
 export const triggerSizeClassBySize: Record<GrColorPickerSize, string> = {
-  xs: 'h-7 gap-1.5 text-[length:var(--gr-control-text-xs)] leading-[var(--gr-control-leading-xs)]',
-  sm: 'h-8 gap-2 text-[length:var(--gr-control-text-sm)] leading-[var(--gr-control-leading-sm)]',
-  md: 'h-10 gap-2 text-[length:var(--gr-control-text-md)] leading-[var(--gr-control-leading-md)]',
-  lg: 'h-11 gap-2.5 text-[length:var(--gr-control-text-lg)] leading-[var(--gr-control-leading-lg)]',
+  xs: 'gap-1.5 text-[length:var(--gr-control-text-xs)] leading-[var(--gr-control-leading-xs)]',
+  sm: 'gap-2 text-[length:var(--gr-control-text-sm)] leading-[var(--gr-control-leading-sm)]',
+  md: 'gap-2 text-[length:var(--gr-control-text-md)] leading-[var(--gr-control-leading-md)]',
+  lg: 'gap-2.5 text-[length:var(--gr-control-text-lg)] leading-[var(--gr-control-leading-lg)]',
 }
 
 /**
@@ -47,18 +47,10 @@ export const panelSizeClassBySize: Record<GrColorPickerSize, string> = {
 }
 
 /**
- * Скругление приходит формой, поэтому здесь его нет. Цвет рамки и заливки —
- * только у состояний: два `border-*` одной специфичности в одном атрибуте
- * разрулил бы порядок правил в CSS, а не разметка.
+ * Рамку рисует лист поля (`GrInput`) по атрибутам триггера, свой отклик на
+ * указатель — лист компонента. Цвет текста — утилитой: `docs/field.md`.
  */
-export const triggerBaseClass = 'inline-flex w-full min-w-0 items-center border text-[var(--gr-fg)] transition-colors duration-[var(--gr-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[calc(var(--gr-input-focus-ring-width))] focus-visible:ring-[var(--gr-ring)]'
-
-/** Недоступное поле гасится токенами, а не `opacity`: прозрачность роняет контраст подписи. */
-export const triggerDisabledClass = 'cursor-not-allowed bg-[var(--gr-muted)] text-[var(--gr-disabled-fg)]'
-/** Только для чтения: панель открывается посмотреть, но рамка не зовёт править. */
-export const triggerReadonlyClass = 'cursor-pointer bg-[var(--gr-input-readonly-bg)]'
-export const triggerEnabledClass = 'cursor-pointer bg-[var(--gr-bg)] hover:border-[var(--gr-color-picker-trigger-hover-brd)]'
-export const triggerInvalidClass = 'border-[var(--gr-invalid-brd)] focus-visible:ring-[var(--gr-invalid-ring)]'
+export const triggerBaseClass = 'inline-flex w-full min-w-0 items-center focus:outline-none'
 
 export const triggerValueClass = 'min-w-0 flex-1 truncate text-left tabular-nums'
 
@@ -142,21 +134,13 @@ export const presetsGridClass = 'flex flex-wrap gap-1.5'
 export const presetBaseClass = 'relative h-5 w-5 shrink-0 overflow-hidden rounded-[var(--gr-radius-sm)] border border-[color-mix(in_srgb,var(--gr-fg)_18%,transparent)] transition-shadow duration-[var(--gr-duration-fast)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--gr-ring)]'
 export const presetSelectedClass = 'ring-2 ring-[var(--gr-selected)] ring-offset-1 ring-offset-[var(--gr-popover)]'
 
-export function grColorPickerTriggerClass(options: {
-  size: GrColorPickerSize
-  disabled: boolean
-  invalid: boolean
-  readonly?: boolean
-  shape: GrControlShape
-}): string {
+export function grColorPickerTriggerClass(options: { size: GrColorPickerSize, shape: GrControlShape, disabled: boolean }): string {
   return [
     triggerBaseClass,
     triggerSizeClassBySize[options.size],
     triggerPaddingXClass[options.shape][options.size],
-    controlShapeRadiusClass[options.shape][options.size],
-    options.disabled ? triggerDisabledClass : options.readonly ? triggerReadonlyClass : triggerEnabledClass,
-    fieldBorderStateClass(options, triggerInvalidClass, { default: fieldBorderClass }),
-  ].filter(Boolean).join(' ')
+    options.disabled ? 'text-[var(--gr-disabled-fg)]' : 'cursor-pointer text-[var(--gr-fg)]',
+  ].join(' ')
 }
 
 export function grColorPickerPanelClass(size: GrColorPickerSize): string {

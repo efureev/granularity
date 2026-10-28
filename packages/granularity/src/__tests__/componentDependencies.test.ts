@@ -68,6 +68,7 @@ describe('граф зависимостей компонентов', () => {
       ['ленивый импорт SFC', 'const C = () => import(\'../GrButton/GrButton.vue\')', 'component'],
       ['чужой safelist', 'import { grButtonSafelist } from \'../GrButton/safelist\'', 'styles'],
       ['чужая мапа классов', 'import { buttonSizeMap } from \'../GrButton/grButtonStyles\'', 'styles'],
+      ['атрибуты вида соседа', 'import { grButtonLookAttrs } from \'../GrButton/grButtonLook\'', 'styles'],
     ])('%s — ребро (%#)', (_, code, kind) => {
       expect(parseDependencyUsages(code)).toEqual([{ dependency: 'GrButton', kind }])
     })

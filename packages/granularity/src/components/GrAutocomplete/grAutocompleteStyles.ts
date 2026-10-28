@@ -1,5 +1,4 @@
 import type { GrComponentSize } from '../shared/sizes'
-import { controlShapeRadiusClass, fieldBorderClass, fieldBorderResponseClass, fieldBorderStateClass, fieldReadonlySurfaceClass } from '../shared/controlShape'
 import { overlayListPanelClass } from '../shared/overlayListPanel'
 import { overlayPanelSurfaceClass } from '../shared/overlayPanelSurface'
 
@@ -42,53 +41,26 @@ export function isAutocompleteOptionGroup<TValue extends GrAutocompleteValue>(
 export type GrAutocompleteModelValue<TValue extends GrAutocompleteValue = string> = TValue | TValue[]
 
 /**
- * Оболочка (визуально повторяет `GrInput`): бордер + focus-ring по `focus-within`,
- * т.к. фокус живёт на вложенном `<input role="combobox">`. Flex-контейнер с
- * `flex-wrap` — чтобы chips в multiple-режиме переносились и коробка росла в высоту.
+ * Оболочка — flex-контейнер с `flex-wrap`, чтобы чипы в `multiple` переносились и
+ * коробка росла в высоту. Рамку рисует лист поля (`GrInput`), кольцо — по
+ * `focus-within`: фокус живёт на вложенном `<input role="combobox">`. Цвет текста
+ * — утилитой: `docs/field.md`.
  */
-export const autocompleteShellBase = 'relative flex w-full flex-wrap items-center gap-1 border text-[var(--gr-fg)] transition-colors duration-[var(--gr-duration-fast)] focus-within:ring-2 focus-within:ring-[calc(var(--gr-input-focus-ring-width))] focus-within:ring-[var(--gr-ring)]'
+export const autocompleteShellBase = 'relative flex w-full flex-wrap items-center gap-1'
 
-export const autocompleteShellEnabledClass = 'bg-[var(--gr-bg)]'
-
-/**
- * Заблокированная оболочка гасится фоном, а не `opacity` (как `GrInput`):
- * прозрачность разбавляет выверенные на AA токены текста и роняет контраст.
- * Фон взаимоисключающий с `autocompleteShellEnabledClass` — два `bg-*` одной
- * специфичности разрулил бы порядок в сгенерированном CSS, а не порядок в
- * списке классов.
- */
-export const autocompleteShellDisabledClass = 'bg-[var(--gr-muted)] text-[var(--gr-muted-fg)] cursor-not-allowed'
-
-/**
- * Ошибка валидации красится своей ролью, а не декоративным тоном `danger`:
- * тема вправе развести вердикт валидации и подсветку по решению разработчика.
- */
-export const invalidShellClass = 'border-[var(--gr-invalid-brd)] focus-within:ring-[var(--gr-invalid-ring)]'
-
-// Размеры совпадают с `GrInput`/`GrSelect` (h → min-h, чтобы multiple мог расти).
 export const autocompleteSizeClassBySize: Record<GrAutocompleteSize, string> = {
-  xs: 'min-h-7 px-2.5 py-1 text-[length:var(--gr-control-text-xs)] leading-[var(--gr-control-leading-xs)]',
-  sm: 'min-h-8 px-3 py-1 text-[length:var(--gr-control-text-sm)] leading-[var(--gr-control-leading-sm)]',
-  md: 'min-h-10 px-3 py-1.5 text-[length:var(--gr-control-text-md)] leading-[var(--gr-control-leading-md)]',
-  lg: 'min-h-11 px-4 py-2 text-[length:var(--gr-control-text-lg)] leading-[var(--gr-control-leading-lg)]',
+  xs: 'px-2.5 py-1 text-[length:var(--gr-control-text-xs)] leading-[var(--gr-control-leading-xs)]',
+  sm: 'px-3 py-1 text-[length:var(--gr-control-text-sm)] leading-[var(--gr-control-leading-sm)]',
+  md: 'px-3 py-1.5 text-[length:var(--gr-control-text-md)] leading-[var(--gr-control-leading-md)]',
+  lg: 'px-4 py-2 text-[length:var(--gr-control-text-lg)] leading-[var(--gr-control-leading-lg)]',
 }
 
-export function autocompleteShellClass(options: {
-  size: GrAutocompleteSize
-  disabled: boolean
-  invalid: boolean
-  readonly?: boolean
-}): string {
+export function autocompleteShellClass(options: { size: GrAutocompleteSize, disabled: boolean }): string {
   return [
     autocompleteShellBase,
     autocompleteSizeClassBySize[options.size],
-    controlShapeRadiusClass.box[options.size],
-    fieldBorderStateClass(options, invalidShellClass, { default: fieldBorderClass }),
-    fieldBorderResponseClass(options),
-    options.disabled ? autocompleteShellDisabledClass : options.readonly ? fieldReadonlySurfaceClass : autocompleteShellEnabledClass,
-  ]
-    .filter(Boolean)
-    .join(' ')
+    options.disabled ? 'text-[var(--gr-muted-fg)]' : 'text-[var(--gr-fg)]',
+  ].join(' ')
 }
 
 /** Общая подсветка наведения и активной опции. */

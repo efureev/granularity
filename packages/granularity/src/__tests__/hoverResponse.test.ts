@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest'
 
 import GrAutocomplete from '../components/GrAutocomplete/GrAutocomplete.vue'
 import GrCheckbox from '../components/GrCheckbox/GrCheckbox.vue'
+import GrColorPicker from '../components/GrColorPicker/GrColorPicker.vue'
 import GrInput from '../components/GrInput/GrInput.vue'
 import GrInputTag from '../components/GrInputTag/GrInputTag.vue'
 import GrNumberInput from '../components/GrNumberInput/GrNumberInput.vue'
@@ -13,6 +14,7 @@ import GrTextarea from '../components/GrTextarea/GrTextarea.vue'
 import GrTreeSelect from '../components/GrTreeSelect/GrTreeSelect.vue'
 import { componentSheet } from './componentSheet'
 
+const { look: fieldLook } = componentSheet('GrInput/GrInput.vue')
 const { look: checkboxLook } = componentSheet('GrCheckbox/GrCheckbox.vue')
 const { look: radioLook } = componentSheet('GrButton/GrButton.vue', 'GrRadio/GrRadio.vue')
 
@@ -21,12 +23,12 @@ const { look: radioLook } = componentSheet('GrButton/GrButton.vue', 'GrRadio/GrR
  *
  * Рамка поля под указателем — роль `--gr-input-hover`, в фокусе — `--gr-input-focus-brd`; коробка отметки и кружок
  * радио — `--gr-control-brd-hover` и `--gr-selected-hover`. Тема без отклика
- * ставит в них значения покоя, поэтому классы есть всегда, а видны — там, где
+ * ставит в них значения покоя, поэтому правила есть всегда, а видны — там, где
  * тема их развела. У недоступного контрола откликаться нечему, а у ошибки и
  * подсветки `state` рамка — сообщение: наведение стирало бы его.
  */
-const FIELD_HOVER = 'hover:not-focus-within:border-[var(--gr-input-hover)]'
-const FIELD_FOCUS = 'focus-within:border-[var(--gr-input-focus-brd)]'
+/** Рамку всех полей рисует лист `GrInput` по атрибутам их оболочки (`grFieldLookAttrs`). */
+const border = (element: Element, state = {}) => fieldLook(element, state)['border-color']
 
 const fields = [
   ['GrInput', GrInput, { modelValue: '', ariaLabel: 'Поле' }, '[data-gr-input] > div'],
@@ -39,23 +41,23 @@ const fields = [
 ] as const
 
 describe('отклик рамки поля на указатель', () => {
-  it.each(fields)('%s: у рабочего поля рамка покоя — `--gr-input`, под указателем — `--gr-input-hover`', (_name, component, props, selector) => {
+  it.each(fields)('%s: у рабочего поля рамка покоя — `--gr-input`, под указателем — `--gr-input-hover`, в фокусе — `--gr-input-focus-brd`', (_name, component, props, selector) => {
     const wrapper = mount(component as never, { props } as never)
-    const classes = wrapper.get(selector).classes()
+    const shell = wrapper.get(selector).element
 
-    expect(classes).toContain('border-[var(--gr-input)]')
-    expect(classes).toContain(FIELD_HOVER)
-    expect(classes).toContain(FIELD_FOCUS)
+    expect(shell.hasAttribute('data-gr-field')).toBe(true)
+    expect(border(shell)).toBe('var(--gr-input)')
+    expect(border(shell, { hover: true })).toBe('var(--gr-input-hover)')
+    expect(border(shell, { focus: true })).toBe('var(--gr-input-focus-brd)')
     wrapper.unmount()
   })
 
   it.each(fields)('%s: только для чтения — своя рамка и без отклика', (_name, component, props, selector) => {
     const readonly = mount(component as never, { props: { ...props, readonly: true } } as never)
-    const classes = readonly.get(selector).classes()
+    const shell = readonly.get(selector).element
 
-    expect(classes).toContain('border-[var(--gr-input-readonly-brd)]')
-    expect(classes).not.toContain('border-[var(--gr-input)]')
-    expect(classes).not.toContain(FIELD_HOVER)
+    expect(border(shell)).toBe('var(--gr-input-readonly-brd)')
+    expect(border(shell, { hover: true })).toBe('var(--gr-input-readonly-brd)')
     readonly.unmount()
   })
 
@@ -63,11 +65,34 @@ describe('отклик рамки поля на указатель', () => {
     const disabled = mount(component as never, { props: { ...props, disabled: true } } as never)
     const invalid = mount(component as never, { props: { ...props, invalid: true } } as never)
 
-    expect(disabled.get(selector).classes()).not.toContain(FIELD_HOVER)
-    expect(invalid.get(selector).classes()).not.toContain(FIELD_HOVER)
-    expect(invalid.get(selector).classes()).not.toContain(FIELD_FOCUS)
+    expect(border(disabled.get(selector).element, { hover: true })).toBe(border(disabled.get(selector).element))
+    expect(border(invalid.get(selector).element, { hover: true })).toBe('var(--gr-invalid-brd)')
+    expect(border(invalid.get(selector).element, { focus: true })).toBe('var(--gr-invalid-brd)')
     disabled.unmount()
     invalid.unmount()
+  })
+})
+
+describe('отклик триггера GrColorPicker', () => {
+  // Триггер — поле, но откликается на указатель своей ручкой темы, а на фокус —
+  // только кольцом; у ошибки рамка — сообщение, как у остальных полей.
+  const { look: triggerLook } = componentSheet('GrInput/GrInput.vue', 'GrColorPicker/GrColorPicker.vue')
+  const trigger = (props: Record<string, unknown> = {}) => mount(GrColorPicker, { props: { modelValue: '#3b82f6', ariaLabel: 'Цвет', ...props } })
+
+  it('под указателем — ручка `--gr-color-picker-trigger-hover-brd`, в фокусе рамка покоя', () => {
+    const wrapper = trigger()
+    const shell = wrapper.get('[data-gr-color-picker-trigger]').element
+
+    expect(triggerLook(shell, { hover: true })['border-color']).toBe('var(--gr-color-picker-trigger-hover-brd)')
+    expect(triggerLook(shell, { focus: true })['border-color']).toBe('var(--gr-input)')
+    wrapper.unmount()
+  })
+
+  it('с ошибкой под указателем держит рамку ошибки', () => {
+    const wrapper = trigger({ invalid: true })
+
+    expect(triggerLook(wrapper.get('[data-gr-color-picker-trigger]').element, { hover: true })['border-color']).toBe('var(--gr-invalid-brd)')
+    wrapper.unmount()
   })
 })
 
@@ -117,11 +142,11 @@ describe('толщина кольца фокуса поля', () => {
   it.each(fields)('%s: оболочка берёт толщину кольца из темы', (_name, component, props, selector) => {
     const wrapper = mount(component as never, { props } as never)
 
-    expect(wrapper.get(selector).classes().some(name => name.endsWith(`:${WIDTH}`))).toBe(true)
+    expect(fieldLook(wrapper.get(selector).element, { focus: true })['box-shadow']).toContain('var(--gr-input-focus-ring-width)')
     wrapper.unmount()
   })
 
-  // Толщину задают два правила: `ring-2` рисует кольцо и ставит 2px, правило
+  // Ячейки `GrOtpInput` рисуют кольцо утилитами: `ring-2` ставит 2px, правило
   // темы перекрывает только толщину. Перекрытие держится на порядке правил в
   // CSS — если движок его сменит, кольцо молча вернётся к 2px.
   it.each(['focus-within', 'focus-visible'])('%s: правило толщины идёт после ring-2', async (variant) => {

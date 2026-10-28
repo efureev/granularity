@@ -20,6 +20,7 @@ vi.mock('~icons/lucide/loader-2', () => {
   }
 })
 
+import { componentSheet } from '../../../__tests__/componentSheet'
 import GrConfigProvider from '../../GrConfigProvider/GrConfigProvider.vue'
 import GrFormField from '../../GrFormField/GrFormField.vue'
 import { resetAnnouncer } from '../../../composables/useAnnouncer'
@@ -31,6 +32,8 @@ afterEach(() => {
   resetAnnouncer()
 })
 
+/** Рамку поля рисует лист `GrInput` по атрибутам обёртки. */
+const { look: fieldLook } = componentSheet('GrInput/GrInput.vue')
 describe('GrInputTag', () => {
   it('добавляет тег по Enter', async () => {
     const wrapper = mount(GrInputTag, {
@@ -200,7 +203,7 @@ describe('GrInputTag — состояние из GrFormField', () => {
 
     const wrapper = mount(Harness)
 
-    expect(wrapper.get('[data-gr-input-tag]').classes()).toContain('border-[var(--gr-invalid-brd)]')
+    expect(fieldLook(wrapper.get('[data-gr-input-tag]').element)['border-color']).toBe('var(--gr-invalid-brd)')
   })
 
   it('readonly поля доходит до инпута', () => {
@@ -223,8 +226,8 @@ describe('GrInputTag — состояние из GrFormField', () => {
     const wrapper = mount(GrInputTag, { props: { modelValue: ['a'], disabled: true } })
     const root = wrapper.get('[data-gr-input-tag]')
 
-    expect(root.classes()).toContain('bg-[var(--gr-muted)]')
-    expect(root.classes().some(cls => cls.startsWith('opacity-'))).toBe(false)
+    expect(fieldLook(root.element)['background-color']).toBe('var(--gr-muted)')
+    expect(fieldLook(root.element).opacity).toBeUndefined()
   })
 })
 
@@ -426,7 +429,7 @@ describe('GrInputTag — clearable и размер', () => {
       `,
     })
 
-    expect(mount(Harness).get('[data-gr-input-tag]').classes()).toContain('min-h-7')
+    expect(fieldLook(mount(Harness).get('[data-gr-input-tag]').element)['min-height']).toBe('1.75rem')
   })
 })
 

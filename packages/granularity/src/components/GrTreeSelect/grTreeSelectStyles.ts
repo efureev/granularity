@@ -1,5 +1,5 @@
 import type { GrControlShape } from '../shared/controlShape'
-import { controlPillPaddingX, controlPillPaddingXClass, controlShapeRadiusClass, fieldBorderClass, fieldBorderResponseClass, fieldBorderStateClass, fieldReadonlySurfaceClass } from '../shared/controlShape'
+import { controlPillPaddingX, controlPillPaddingXClass } from '../shared/controlShape'
 
 import type { GrControlState } from '../shared/sizes'
 import { overlayListPanelClass } from '../shared/overlayListPanel'
@@ -10,10 +10,10 @@ import type { GrInputSize } from '../GrInput'
 export type GrTreeSelectState = GrControlState
 
 export const sizeClassBySize: Record<GrInputSize, string> = {
-  xs: 'h-7 text-[length:var(--gr-control-text-xs)] leading-[var(--gr-control-leading-xs)]',
-  sm: 'h-8 text-[length:var(--gr-control-text-sm)] leading-[var(--gr-control-leading-sm)]',
-  md: 'h-10 text-[length:var(--gr-control-text-md)] leading-[var(--gr-control-leading-md)]',
-  lg: 'h-11 text-[length:var(--gr-control-text-lg)] leading-[var(--gr-control-leading-lg)]',
+  xs: 'text-[length:var(--gr-control-text-xs)] leading-[var(--gr-control-leading-xs)]',
+  sm: 'text-[length:var(--gr-control-text-sm)] leading-[var(--gr-control-leading-sm)]',
+  md: 'text-[length:var(--gr-control-text-md)] leading-[var(--gr-control-leading-md)]',
+  lg: 'text-[length:var(--gr-control-text-lg)] leading-[var(--gr-control-leading-lg)]',
 }
 
 /** Отступ зависит и от размера, и от формы — см. `shared/controlShape.ts`. */
@@ -44,44 +44,14 @@ export const paddingX: Record<GrControlShape, Record<GrInputSize, string>> = {
 /** Ширина зоны шеврона/крестика справа (`pr-9` в классе триггера). */
 export const trailingZoneWidth = '2.25rem'
 
-export const borderClassByState: Record<GrTreeSelectState, string> = {
-  default: fieldBorderClass,
-  success: 'border-[var(--gr-success)] focus-visible:ring-[var(--gr-success)]',
-  warning: 'border-[var(--gr-warning)] focus-visible:ring-[var(--gr-warning)]',
-  danger: 'border-[var(--gr-danger)] focus-visible:ring-[var(--gr-danger)]',
-}
-
-/**
- * Ошибка валидации красится своей ролью, а не декоративным тоном `danger`:
- * `state="danger"` — это подсветка по решению разработчика, `invalid` — вердикт
- * валидации, и тема вправе развести их по цвету.
- */
-export const invalidBorderClass = 'border-[var(--gr-invalid-brd)] focus-visible:ring-[var(--gr-invalid-ring)]'
-
-/**
- * Disabled красится фоном и цветом текста, а не прозрачностью: `opacity`
- * разбавляет выверенные на AA токены и роняет контраст подписи.
- */
-export const shellEnabledClass = 'bg-[var(--gr-bg)] text-[var(--gr-fg)]'
-export const shellDisabledClass = 'bg-[var(--gr-muted)] text-[var(--gr-muted-fg)] cursor-not-allowed'
-
-export function grTreeSelectClass(options: {
-  size: GrInputSize
-  state: GrTreeSelectState
-  invalid: boolean
-  disabled?: boolean
-  readonly?: boolean
-  shape: GrControlShape
-}): string {
+/** Рамку рисует лист поля (`GrInput`) по атрибутам триггера; цвет текста — утилитой: `docs/field.md`. */
+export function grTreeSelectClass(options: { size: GrInputSize, shape: GrControlShape, disabled?: boolean }): string {
   return [
     sizeClassBySize[options.size],
     paddingXClass[options.shape][options.size],
-    controlShapeRadiusClass[options.shape][options.size],
     'pr-9',
-    options.disabled ? shellDisabledClass : options.readonly ? `${fieldReadonlySurfaceClass} text-[var(--gr-fg)]` : shellEnabledClass,
-    fieldBorderStateClass(options, invalidBorderClass, borderClassByState),
-    fieldBorderResponseClass(options),
-  ].filter(Boolean).join(' ')
+    options.disabled ? 'text-[var(--gr-muted-fg)]' : 'text-[var(--gr-fg)]',
+  ].join(' ')
 }
 
 export const grTreeSelectPanelClass = `${overlayPanelSurfaceClass} ${overlayListPanelClass} overflow-hidden`

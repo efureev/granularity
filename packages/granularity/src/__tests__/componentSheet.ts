@@ -7,8 +7,8 @@ import { resolve } from 'node:path'
  *
  * Правило применяется, если селектор совпал с элементом (`element.matches`);
  * у свойства выигрывает правило с большей специфичностью, при равной — позднее.
- * `:hover`, `:active` и `:focus-visible` jsdom не умеет, поэтому состояние
- * ставится атрибутом-меткой той же специфичности. Из медиазапросов читается
+ * `:hover`, `:active`, `:focus-visible` и `:focus-within` jsdom не умеет, поэтому
+ * состояние ставится атрибутом-меткой той же специфичности. Из медиазапросов читается
  * только `prefers-reduced-motion`: по умолчанию — `no-preference`, со
  * `state.reducedMotion` — `reduce`.
  */
@@ -138,17 +138,21 @@ export interface SheetState {
   hover?: boolean
   active?: boolean
   focus?: boolean
+  /** Фокус у потомка: `:focus-within` элемента без его собственного `:focus-visible`. */
+  focusWithin?: boolean
   /** Пользователь с `prefers-reduced-motion: reduce`. */
   reducedMotion?: boolean
 }
 
 const MARKERS = { hover: 'data-test-hover', active: 'data-test-active', focus: 'data-test-focus' } as const
+const FOCUS_WITHIN = 'data-test-focus-within'
 
 function marked(selector: string): string {
   return selector
     .replaceAll(':hover', `[${MARKERS.hover}]`)
     .replaceAll(':active', `[${MARKERS.active}]`)
     .replaceAll(':focus-visible', `[${MARKERS.focus}]`)
+    .replaceAll(':focus-within', `[${FOCUS_WITHIN}]`)
 }
 
 export interface ComponentSheet {
@@ -170,7 +174,8 @@ export interface ComponentSheet {
 export function componentSheet(...files: string[]): ComponentSheet {
   // Пути — от cwd пакета: в vitest `import.meta.url` не всегда file-scheme.
   const sheet = files
-    .map(file => /<style>([\s\S]*)<\/style>/.exec(readFileSync(resolve(process.cwd(), 'src/components', file), 'utf8'))![1])
+    // Блок `<style>` — с начала строки: слово `<style>` встречается и в комментариях скрипта.
+    .map(file => /^<style>([\s\S]*?)^<\/style>/m.exec(readFileSync(resolve(process.cwd(), 'src/components', file), 'utf8'))![1])
     .join('\n')
     .replace(/\/\*[\s\S]*?\*\//g, '')
   const rules: Record<Motion, Rule[]> = {
@@ -180,14 +185,21 @@ export function componentSheet(...files: string[]): ComponentSheet {
 
   function cascade(element: Element, state: SheetState = {}): Record<string, string> {
     // `:hover` и `:active` достаются и предкам элемента — так подпись откликается за коробку.
+    // Фокус — самому элементу (`:focus-visible`), а `:focus-within` — ему и предкам.
     const markedNodes = [] as [Element, string][]
+    const mark = (node: Element, marker: string) => {
+      node.setAttribute(marker, '')
+      markedNodes.push([node, marker])
+    }
     for (const key of Object.keys(MARKERS) as (keyof typeof MARKERS)[]) {
       if (!state[key])
         continue
-      for (let node: Element | null = element; node; node = key === 'focus' ? null : node.parentElement) {
-        node.setAttribute(MARKERS[key], '')
-        markedNodes.push([node, MARKERS[key]])
-      }
+      for (let node: Element | null = element; node; node = key === 'focus' ? null : node.parentElement)
+        mark(node, MARKERS[key])
+    }
+    if (state.focus || state.focusWithin) {
+      for (let node: Element | null = element; node; node = node.parentElement)
+        mark(node, FOCUS_WITHIN)
     }
     const winners = new Map<string, { value: string, rank: Specificity, order: number }>()
     for (const rule of rules[state.reducedMotion ? 'reduce' : 'no-preference']) {

@@ -2,6 +2,7 @@ import { DOMWrapper, mount } from '@vue/test-utils'
 import { defineComponent, nextTick, ref } from 'vue'
 import { afterEach, describe, expect, it } from 'vitest'
 
+import { componentSheet } from '../../../__tests__/componentSheet'
 import GrTreeSelect from '../GrTreeSelect.vue'
 import type { GrTreeSelectProps } from '../grTreeSelectTypes'
 import type { GranularityI18nAdapter } from '../../../i18n/adapter'
@@ -104,6 +105,8 @@ function bodyFindAllRows(): DOMWrapper<Element>[] {
   return [...document.body.querySelectorAll('.gr-tree__row')].map(el => new DOMWrapper(el))
 }
 
+/** Рамку триггера рисует лист поля (`GrInput`). */
+const { look: fieldLook } = componentSheet('GrInput/GrInput.vue')
 describe('GrTreeSelect (unit)', () => {
   afterEach(() => {
     document.body.innerHTML = ''
@@ -437,9 +440,9 @@ describe('GrTreeSelect — ARIA и состояния', () => {
     const wrapper = await mountHarness({ disabled: true })
 
     const trigger = wrapper.find('[data-testid="gr-tree-select-trigger"]')
-    expect(trigger.classes()).toContain('bg-[var(--gr-muted)]')
+    expect(fieldLook(trigger.element)['background-color']).toBe('var(--gr-muted)')
     expect(trigger.classes()).toContain('text-[var(--gr-muted-fg)]')
-    expect(trigger.classes().join(' ')).not.toContain('opacity-50')
+    expect(fieldLook(trigger.element).opacity).toBeUndefined()
 
     wrapper.unmount()
   })
