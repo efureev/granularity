@@ -128,7 +128,7 @@ utility classes, so components render with their own CSS but without layout.
 | --- | ---: | ---: |
 | the whole package from the root | 646.0 kB | 100 % |
 | the lightest component — `GrSkeleton` | 1.7 kB | < 1 % |
-| the median component — `GrTextarea` | 19.4 kB | 3 % |
+| the median component — `GrTextarea` | 19.5 kB | 3 % |
 | the 5 heaviest together | 251.5 kB | 39 % |
 
 These numbers **do not add up**: shared code is counted again in every row but paid for once, which is why
@@ -147,17 +147,17 @@ on this one — the core stays lean, and you install only what you reach for.
 <!-- ecosystem:generated:start -->
 | Package | Version | What it adds |
 | --- | --- | --- |
-| [`@feugene/granularity-charts`](../granularity-charts) | 3.0.0 | Charts — own SVG, zero dependencies, drawn with theme tokens. |
-| [`@feugene/granularity-chrono`](../granularity-chrono) | 3.1.0 | Calendar, date and time components — no third-party date widget, no date library. |
-| [`@feugene/granularity-code`](../granularity-code) | 3.0.1 | Code surfaces: view, edit and diff — the viewer and the diff carry no dependencies at all. |
-| [`@feugene/granularity-dashboard`](../granularity-dashboard) | 2.0.2 | Widget grid — drag, resize, breakpoints and layout persistence, zero dependencies. |
+| [`@feugene/granularity-charts`](../granularity-charts) | 4.0.0 | Charts — own SVG, zero dependencies, drawn with theme tokens. |
+| [`@feugene/granularity-chrono`](../granularity-chrono) | 4.0.0 | Calendar, date and time components — no third-party date widget, no date library. |
+| [`@feugene/granularity-code`](../granularity-code) | 4.0.0 | Code surfaces: view, edit and diff — the viewer and the diff carry no dependencies at all. |
+| [`@feugene/granularity-dashboard`](../granularity-dashboard) | 3.0.0 | Widget grid — drag, resize, breakpoints and layout persistence, zero dependencies. |
 | [`@feugene/granularity-datasource`](../granularity-datasource) | 0.1.2 | List state: sorting, filters, paging, URL sync and race-free fetching behind one composable. |
 | [`@feugene/granularity-devtools`](../granularity-devtools) | 2.1.1 | Vue DevTools panel — where a prop value came from, the overlay layer stack and design-system warnings. |
-| [`@feugene/granularity-editor`](../granularity-editor) | 3.0.1 | Rich-text editing: a TipTap-backed GrRichText field with a design-system toolbar. |
-| [`@feugene/granularity-forms-schema`](../granularity-forms-schema) | 2.0.3 | Schema-driven forms — zod and JSON Schema into real form fields, zero dependencies. |
-| [`@feugene/granularity-media`](../granularity-media) | 3.0.0 | Media components: image cropping, camera capture, code scanning and video playback. |
-| [`@feugene/granularity-test-kit`](../granularity-test-kit) | 2.3.0 | Test gates for @feugene/granularity design-system packages — token, registry and defaults contracts as reusable factories. |
-| [`@feugene/granularity-tokens`](../granularity-tokens) | 2.4.0 | Design tokens and themes of @feugene/granularity: the token registry, theme data by mode and the theme builder. |
+| [`@feugene/granularity-editor`](../granularity-editor) | 4.0.0 | Rich-text editing: a TipTap-backed GrRichText field with a design-system toolbar. |
+| [`@feugene/granularity-forms-schema`](../granularity-forms-schema) | 3.0.0 | Schema-driven forms — zod and JSON Schema into real form fields, zero dependencies. |
+| [`@feugene/granularity-media`](../granularity-media) | 4.0.0 | Media components: image cropping, camera capture, code scanning and video playback. |
+| [`@feugene/granularity-test-kit`](../granularity-test-kit) | 2.4.0 | Test gates for @feugene/granularity design-system packages — token, registry and defaults contracts as reusable factories. |
+| [`@feugene/granularity-tokens`](../granularity-tokens) | 2.5.0 | Design tokens and themes of @feugene/granularity: the token registry, theme data by mode and the theme builder. |
 | [`@feugene/unplugin-granularity`](../unplugin-granularity) | 1.2.1 | unplugin-vue-components resolver — granular auto-import for components and directives. |
 <!-- ecosystem:generated:end -->
 

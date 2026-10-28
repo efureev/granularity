@@ -7,6 +7,8 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v4.0.0] 2026-10-28
+
 ### Changed
 
 - **Голос текста — решение темы.** Крупные заголовки `GrMarkdown` (`h1`, `h2`) и верхний уровень

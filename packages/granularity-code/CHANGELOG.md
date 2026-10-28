@@ -7,6 +7,8 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v4.0.0] 2026-10-28
+
 ### Changed
 
 - **Палитра подсветки — решение темы.** Цвета одиннадцати ролей (`--gr-code-block-key`, `-string`,

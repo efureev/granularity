@@ -7,6 +7,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [v3.0.0] 2026-10-28
+
 ### Changed
 
 - **Цвет места, призрака и ручек — решение темы.** `--gr-dashboard-frame-placeholder-bg`,

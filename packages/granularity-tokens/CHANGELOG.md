@@ -7,6 +7,8 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v2.5.0] 2026-10-28
+
 ### Added
 
 - **Темы каталога несут значения `@feugene/granularity-chrono` 4**: подсветку, полосу периода,

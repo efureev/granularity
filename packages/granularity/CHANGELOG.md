@@ -7,6 +7,8 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v3.7.0] 2026-10-28
+
 ### Added
 
 - **Заголовок `GrFormSection` — по теме.** Шрифт — шрифт заголовков темы (`--gr-font-display`), как

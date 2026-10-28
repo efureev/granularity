@@ -7,6 +7,8 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [v4.0.0] 2026-10-28
+
 ### Changed
 
 - **Подсказка, курсор, кисть, опора и нейтральные цвета графиков — решение темы.** `--gr-chart-frame-tooltip-bg`,

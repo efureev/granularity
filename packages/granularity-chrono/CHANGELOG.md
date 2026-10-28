@@ -7,6 +7,8 @@ to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [v4.0.0] 2026-10-28
+
 ### Changed
 
 - **Подсветка, полоса периода и «сегодня» — решение темы.** `--gr-calendar-hover-bg`,

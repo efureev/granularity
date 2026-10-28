@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v4.0.0] 2026-10-28
+
 ### Changed
 
 - **Дорожка плеера, прицел сканера и направляющая кадра — решение темы.** `--gr-video-player-progress`,
